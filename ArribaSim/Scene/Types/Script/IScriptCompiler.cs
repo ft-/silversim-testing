@@ -27,8 +27,8 @@ using ArribaSim.Types.Asset;
 
 namespace ArribaSim.Scene.Types.Script
 {
-    public interface IScriptEngine
+    public interface IScriptCompiler
     {
-        IScriptAssembly CompileScript(AssetData asset);
+        IScriptAssembly Compile(AssetData asset);
     }
 }

@@ -77,7 +77,7 @@ namespace ArribaSim.Scene.Types.Object
             {
                 lock(this)
                 {
-                    m_ScriptInstance.RemoveScript();
+                    m_ScriptInstance.Dispose();
                     m_ScriptInstance = value;
                     if(m_ScriptInstance != null)
                     {
@@ -92,7 +92,7 @@ namespace ArribaSim.Scene.Types.Object
         {
             lock(this)
             {
-                m_ScriptInstance.RemoveScript();
+                m_ScriptInstance.Dispose();
             }
         }
     }

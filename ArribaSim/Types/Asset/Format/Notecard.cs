@@ -153,7 +153,7 @@ namespace ArribaSim.Types.Asset.Format
                 }
                 else if(data[0] == "sale_price")
                 {
-                    item.SaleInfo.Price = uint.Parse(data[1]);
+                    item.SaleInfo.Price = int.Parse(data[1]);
                 }
                 else if(data[0] == "perm_mask")
                 {

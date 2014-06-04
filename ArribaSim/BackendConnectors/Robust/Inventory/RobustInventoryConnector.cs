@@ -143,7 +143,7 @@ namespace ArribaSim.BackendConnectors.Robust.Inventory
             item.Name = map["Name"].AsString.ToString();
             item.Permissions.NextOwner = map["NextPermissions"].AsUInt;
             item.Owner.ID = map["Owner"].AsUUID;
-            item.SaleInfo.Price = map["SalePrice"].AsUInt;
+            item.SaleInfo.Price = map["SalePrice"].AsInt;
             item.SaleInfo.Type = (InventoryItem.SaleInfoData.SaleType) map["SaleType"].AsUInt;
             return item;
         }

@@ -27,17 +27,19 @@ using ArribaSim.Types;
 using System;
 using System.Collections.Generic;
 using ThreadedClasses;
+using ArribaSim.Scene.Types.Script.Events;
 
 namespace ArribaSim.Scene.Types.Object
 {
     public class ObjectPart : IObject, IDisposable
     {
         #region Events
-        public event Action<ObjectPart> OnUpdate;
+        public delegate void OnUpdateDelegate(ObjectPart part, int changed);
+        public event OnUpdateDelegate OnUpdate;
         #endregion
 
         #region Fields
-        public UUID m_ID = UUID.Zero;
+        private UUID m_ID = UUID.Zero;
         private string m_Name = string.Empty;
         private string m_Description = string.Empty;
         private Vector3 m_GlobalPosition = Vector3.Zero;
@@ -46,6 +48,10 @@ namespace ArribaSim.Scene.Types.Object
         private PrimitivePhysicsShapeType m_PhysicsShapeType = PrimitivePhysicsShapeType.Prim;
         private PrimitiveMaterial m_Material = PrimitiveMaterial.Wood;
         private Vector3 m_Size = new Vector3(0.5, 0.5, 0.5);
+        private string m_SitText = string.Empty;
+        private string m_TouchText = string.Empty;
+        private Vector3 m_SitTargetOffset = Vector3.Zero;
+        private Quaternion m_SitTargetOrientation = Quaternion.Identity;
 
         public class TextParam
         {
@@ -168,6 +174,57 @@ namespace ArribaSim.Scene.Types.Object
         public ObjectGroup Group { get; private set; }
         public ObjectPartInventory Inventory { get; private set; }
 
+        public Vector3 SitTargetOffset
+        {
+            get
+            {
+                lock (this) return m_SitTargetOffset;
+            }
+            set
+            {
+                lock (this) m_SitTargetOffset = value;
+                OnUpdate.Invoke(this, 0);
+            }
+        }
+
+        public Quaternion SitTargetOrientation
+        {
+            get
+            {
+                lock (this) return m_SitTargetOrientation;
+            }
+            set
+            {
+                lock (this) m_SitTargetOrientation = value;
+                OnUpdate.Invoke(this, 0);
+            }
+        }
+
+        public string SitText
+        {
+            get
+            {
+                lock(this) return m_SitText;
+            }
+            set
+            {
+                lock(this) m_SitText = value;
+                OnUpdate(this, 0);
+            }
+        }
+
+        public string TouchText
+        {
+            get
+            {
+                lock (this) return m_TouchText;
+            }
+            set
+            {
+                lock (this) m_TouchText = value;
+                OnUpdate(this, 0);
+            }
+        }
 
         public PrimitivePhysicsShapeType PhysicsShapeType
         {
@@ -178,7 +235,7 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 m_PhysicsShapeType = value;
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, (int)ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -191,7 +248,7 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 m_Material = value;
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, 0);
             }
         }
 
@@ -210,7 +267,7 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_Size = value;
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, (int)ChangedEvent.ChangedFlags.Scale);
             }
         }
 
@@ -229,7 +286,7 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_Slice = value;
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, (int)ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -252,7 +309,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_Text.Text = value.Text;
                     m_Text.TextColor = new ColorAlpha(value.TextColor);
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, 0);
             }
         }
 
@@ -285,7 +342,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_Flexible.Tension = value.Tension;
                     m_Flexible.Wind = value.Wind;
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, (int)ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -314,7 +371,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_PointLight.LightColor = new Color(value.LightColor);
                     m_PointLight.Radius = value.Radius;
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, 0);
             }
         }
 
@@ -339,7 +396,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_Omega.Gain = value.Gain;
                     m_Omega.Spinrate = value.Spinrate;
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, 0);
             }
         }
 
@@ -394,13 +451,23 @@ namespace ArribaSim.Scene.Types.Object
                     m_Shape.IsSculptMirrored = value.IsSculptMirrored;
                     m_Shape.HoleSize = value.HoleSize;
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, (int)ChangedEvent.ChangedFlags.Shape);
             }
         }
 
         public UUID ID
         {
-            get { return m_ID; }
+            get 
+            {
+                return m_ID; 
+            }
+            set
+            {
+                lock(this)
+                {
+                    m_ID = value;
+                }
+            }
         }
 
         public string Name
@@ -412,7 +479,7 @@ namespace ArribaSim.Scene.Types.Object
             set 
             { 
                 m_Name = value;
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, 0);
             }
         }
 
@@ -425,7 +492,7 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 m_Description = value;
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, 0);
             }
         }
         #endregion
@@ -474,7 +541,7 @@ namespace ArribaSim.Scene.Types.Object
                         m_GlobalPosition = value;
                     }
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, 0);
             }
         }
 
@@ -493,7 +560,7 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_GlobalPosition = value;
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, 0);
             }
         }
 
@@ -540,7 +607,7 @@ namespace ArribaSim.Scene.Types.Object
                         m_GlobalPosition = value;
                     }
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, 0);
             }
         }
         #endregion
@@ -589,7 +656,7 @@ namespace ArribaSim.Scene.Types.Object
                         m_GlobalRotation = value;
                     }
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, 0);
             }
         }
 
@@ -608,7 +675,7 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_GlobalRotation = value;
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, 0);
             }
         }
 
@@ -655,7 +722,7 @@ namespace ArribaSim.Scene.Types.Object
                         m_GlobalRotation = value;
                     }
                 }
-                OnUpdate.Invoke(this);
+                OnUpdate.Invoke(this, 0);
             }
         }
         #endregion

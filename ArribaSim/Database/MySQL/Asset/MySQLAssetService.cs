@@ -114,7 +114,7 @@ namespace ArribaSim.Database.MySQL.Asset
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assets WHERE id=?id", conn))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assets WHERE id LIKE ?id", conn))
                     {
                         cmd.Parameters.AddWithValue("?id", key);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())

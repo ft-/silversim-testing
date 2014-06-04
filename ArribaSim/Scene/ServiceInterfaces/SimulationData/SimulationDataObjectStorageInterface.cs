@@ -25,6 +25,7 @@
 
 using ArribaSim.Scene.Types.Object;
 using ArribaSim.Types;
+using System.Collections.Generic;
 
 namespace ArribaSim.Scene.ServiceInterfaces.SimulationData
 {
@@ -36,8 +37,20 @@ namespace ArribaSim.Scene.ServiceInterfaces.SimulationData
         }
         #endregion
 
-        public delegate void LoadObjectCallback(ObjectGroup objgroup);
+        public abstract ObjectGroup this[UUID key]
+        {
+            get;
+        }
 
-        public abstract void LoadObjects(UUID regionID, LoadObjectCallback callback);
+        public abstract List<UUID> ObjectsInRegion(UUID key);
+
+        public abstract void StoreObject(ObjectGroup objgroup);
+        public abstract void StoreObjectInventory(ObjectGroup objgroup);
+
+        public abstract void DeleteObject(UUID obj);
+        public abstract void DeleteObjectGroup(UUID obj);
+
+        public abstract void UpdateObjectPart(ObjectPart objpart);
+        public abstract void UpdateObjectPartInventory(ObjectPart objpart);
     }
 }

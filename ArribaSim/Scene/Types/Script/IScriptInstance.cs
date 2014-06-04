@@ -24,15 +24,16 @@
  */
 
 using ArribaSim.Scene.Types.Script.Events;
+using System;
 
 namespace ArribaSim.Scene.Types.Script
 {
-    public interface IScriptInstance
+    public interface IScriptInstance : IDisposable
     {
+        /* Dispose must deregister all possible handles */
         void PostEvent(IScriptEvent e);
         void StartScript();
         void StopScript();
-        void RemoveScript();
         bool IsRunning { get; }
     }
 }

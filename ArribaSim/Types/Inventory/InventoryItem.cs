@@ -68,7 +68,7 @@ namespace ArribaSim.Types.Inventory
                 Copy = 2,
                 Content = 3
             }
-            public uint Price;
+            public int Price;
             public SaleType Type;
             public uint PermMask;
 

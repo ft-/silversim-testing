@@ -51,6 +51,7 @@ namespace ArribaSim.Scene.Types.Object
         private UUID m_GroupID = UUID.Zero;
         private UUI m_Owner = UUI.Unknown;
         private UUI m_Creator = UUI.Unknown;
+        private UUI m_LastOwner = UUI.Unknown;
 
         #region Constructor
         public ObjectGroup()
@@ -115,6 +116,23 @@ namespace ArribaSim.Scene.Types.Object
                     m_GroupID = new UUID(value);
                 }
                 OnUpdate(this);
+            }
+        }
+        public UUI LastOwner
+        {
+            get
+            {
+                lock(this)
+                {
+                    return new UUI(m_LastOwner);
+                }
+            }
+            set
+            {
+                lock(this)
+                {
+                    m_LastOwner = value;
+                }
             }
         }
 

@@ -25,6 +25,7 @@
 
 using ArribaSim.Scene.Types.Parcel;
 using ArribaSim.Types;
+using System.Collections.Generic;
 
 namespace ArribaSim.Scene.ServiceInterfaces.SimulationData
 {
@@ -36,10 +37,12 @@ namespace ArribaSim.Scene.ServiceInterfaces.SimulationData
         }
         #endregion
 
-        public delegate void LoadParcelCallback(ParcelInfo parcel);
+        public abstract ParcelInfo this[UUID parcelID]
+        {
+            get;
+        }
+        public abstract List<UUID> ParcelsInRegion(UUID key);
 
-        public abstract void LoadParcels(UUID regionID, LoadParcelCallback callback);
-
-        public abstract void StoreParcel(ParcelInfo parcel);
+        public abstract void Store(ParcelInfo parcel);
     }
 }
