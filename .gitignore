@@ -1,0 +1,23 @@
+.project
+.settings
+*.csproj
+*.csproj.user
+*.build
+*.mdb
+*.mdp
+*.mds
+*.bat
+*.pdb
+*.pidb
+*.dll.build
+*.dll
+*.sln
+*.cache
+*.FileListAbsolute.txt
+*.suo
+
+obj
+
+# we make bin no-add primarily
+# however, if needed we can force an addition by using git add -f
+bin
