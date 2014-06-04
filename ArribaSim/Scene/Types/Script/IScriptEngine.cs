@@ -23,16 +23,12 @@
  * License text is derived from GNU classpath text
  */
 
-using ArribaSim.Scene.Types.Script.Events;
+using ArribaSim.Types.Asset;
 
 namespace ArribaSim.Scene.Types.Script
 {
-    public interface IScriptInstance
+    public interface IScriptEngine
     {
-        void PostEvent(IScriptEvent e);
-        void StartScript();
-        void StopScript();
-        void RemoveScript();
-        bool IsRunning { get; }
+        IScriptAssembly CompileScript(AssetData asset);
     }
 }

@@ -29,10 +29,11 @@ using System.Linq;
 using System.Text;
 using ArribaSim.Types.Inventory;
 using ArribaSim.Types;
+using ArribaSim.Scene.Types.Script;
 
 namespace ArribaSim.Scene.Types.Object
 {
-    public class ObjectPartInventoryItem : InventoryItem
+    public class ObjectPartInventoryItem : InventoryItem, IDisposable
     {
         #region Constructors
         public ObjectPartInventoryItem()
@@ -60,5 +61,39 @@ namespace ArribaSim.Scene.Types.Object
             SaleInfo = item.SaleInfo;
         }
         #endregion
+
+        #region Fields
+        private IScriptInstance m_ScriptInstance;
+        #endregion
+
+        #region Properties
+        public IScriptInstance ScriptInstance
+        {
+            get
+            {
+                return m_ScriptInstance;
+            }
+            set
+            {
+                lock(this)
+                {
+                    m_ScriptInstance.RemoveScript();
+                    m_ScriptInstance = value;
+                    if(m_ScriptInstance != null)
+                    {
+                        m_ScriptInstance.StartScript();
+                    }
+                }
+            }
+        }
+        #endregion
+
+        public void Dispose()
+        {
+            lock(this)
+            {
+                m_ScriptInstance.RemoveScript();
+            }
+        }
     }
 }
