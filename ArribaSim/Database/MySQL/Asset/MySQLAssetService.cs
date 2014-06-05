@@ -23,18 +23,22 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Main.Common;
 using ArribaSim.ServiceInterfaces.Asset;
 using ArribaSim.ServiceInterfaces.Database;
 using ArribaSim.Types;
 using ArribaSim.Types.Asset;
 using log4net;
+using Mono.Addins;
 using MySql.Data.MySqlClient;
+using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
 
 namespace ArribaSim.Database.MySQL.Asset
 {
+    #region Service Implementation
     public class MySQLAssetService : AssetServiceInterface, IDBServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -43,7 +47,7 @@ namespace ArribaSim.Database.MySQL.Asset
         private MySQLAssetMetadataService m_MetadataService;
 
         #region Constructor
-        MySQLAssetService(string connectionString)
+        public MySQLAssetService(string connectionString)
         {
             m_ConnectionString = connectionString;
             m_MetadataService = new MySQLAssetMetadataService(connectionString);
@@ -258,4 +262,27 @@ namespace ArribaSim.Database.MySQL.Asset
         private static readonly int MAX_ASSET_NAME = 64;
         private static readonly int MAX_ASSET_DESC = 256;
     }
+    #endregion
+
+    #region Factory
+    [Extension(Path="/Database/MySQL", NodeName = "AssetService")]
+    public class MySQLAssetServiceFactory : PluginFactory
+    {
+        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public MySQLAssetServiceFactory()
+        {
+
+        }
+
+        public override void Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            if(!ownSection.Contains("ConnectionString"))
+            {
+                m_Log.FatalFormat("Missing 'ConnectionString' in section {0}", ownSection.Name);
+                throw new ConfigurationLoader.ConfigurationError();
+            }
+            loader.PluginInstances.Add(new MySQLAssetService(ownSection.GetString("ConnectionString")));
+        }
+    }
+    #endregion
 }

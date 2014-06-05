@@ -15,6 +15,7 @@
 *.cache
 *.FileListAbsolute.txt
 *.suo
+data
 
 obj
 
