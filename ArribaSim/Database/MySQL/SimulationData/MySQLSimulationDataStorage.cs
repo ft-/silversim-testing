@@ -27,7 +27,6 @@ using ArribaSim.Main.Common;
 using ArribaSim.Scene.ServiceInterfaces.SimulationData;
 using ArribaSim.ServiceInterfaces.Database;
 using log4net;
-using Mono.Addins;
 using MySql.Data.MySqlClient;
 using Nini.Config;
 using System.Reflection;
@@ -35,18 +34,25 @@ using System.Reflection;
 namespace ArribaSim.Database.MySQL.SimulationData
 {
     #region Service Implementation
-    public class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface
+    public class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin
     {
         private string m_ConnectionString;
         private MySQLSimulationDataObjectStorage m_ObjectStorage;
         private MySQLSimulationDataParcelStorage m_ParcelStorage;
 
+        #region Constructor
         public MySQLSimulationDataStorage(string connectionString)
         {
             m_ConnectionString = connectionString;
             m_ObjectStorage = new MySQLSimulationDataObjectStorage(connectionString);
             m_ParcelStorage = new MySQLSimulationDataParcelStorage(connectionString);
         }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+
+        }
+        #endregion
 
         public void VerifyConnection()
         {
@@ -80,8 +86,7 @@ namespace ArribaSim.Database.MySQL.SimulationData
     #endregion
 
     #region Factory
-    [Extension(Path = "/Database/MySQL", NodeName = "SimulationData")]
-    public class MySQLSimulationDataServiceFactory : PluginFactory
+    public class MySQLSimulationDataServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public MySQLSimulationDataServiceFactory()
@@ -89,14 +94,14 @@ namespace ArribaSim.Database.MySQL.SimulationData
 
         }
 
-        public override void Initialize(ConfigurationLoader loader, IConfig ownSection)
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             if (!ownSection.Contains("ConnectionString"))
             {
                 m_Log.FatalFormat("Missing 'ConnectionString' in section {0}", ownSection.Name);
                 throw new ConfigurationLoader.ConfigurationError();
             }
-            loader.PluginInstances.Add(new MySQLSimulationDataStorage(ownSection.GetString("ConnectionString")));
+            return new MySQLSimulationDataStorage(ownSection.GetString("ConnectionString"));
         }
     }
     #endregion

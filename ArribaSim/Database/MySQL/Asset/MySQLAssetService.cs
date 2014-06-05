@@ -29,7 +29,6 @@ using ArribaSim.ServiceInterfaces.Database;
 using ArribaSim.Types;
 using ArribaSim.Types.Asset;
 using log4net;
-using Mono.Addins;
 using MySql.Data.MySqlClient;
 using Nini.Config;
 using System;
@@ -39,7 +38,7 @@ using System.Reflection;
 namespace ArribaSim.Database.MySQL.Asset
 {
     #region Service Implementation
-    public class MySQLAssetService : AssetServiceInterface, IDBServiceInterface
+    public class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin
     {
         private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -51,6 +50,11 @@ namespace ArribaSim.Database.MySQL.Asset
         {
             m_ConnectionString = connectionString;
             m_MetadataService = new MySQLAssetMetadataService(connectionString);
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+
         }
         #endregion
 
@@ -265,8 +269,7 @@ namespace ArribaSim.Database.MySQL.Asset
     #endregion
 
     #region Factory
-    [Extension(Path="/Database/MySQL", NodeName = "AssetService")]
-    public class MySQLAssetServiceFactory : PluginFactory
+    public class MySQLAssetServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public MySQLAssetServiceFactory()
@@ -274,14 +277,14 @@ namespace ArribaSim.Database.MySQL.Asset
 
         }
 
-        public override void Initialize(ConfigurationLoader loader, IConfig ownSection)
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             if(!ownSection.Contains("ConnectionString"))
             {
                 m_Log.FatalFormat("Missing 'ConnectionString' in section {0}", ownSection.Name);
                 throw new ConfigurationLoader.ConfigurationError();
             }
-            loader.PluginInstances.Add(new MySQLAssetService(ownSection.GetString("ConnectionString")));
+            return new MySQLAssetService(ownSection.GetString("ConnectionString"));
         }
     }
     #endregion

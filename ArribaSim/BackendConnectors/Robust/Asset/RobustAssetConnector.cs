@@ -23,19 +23,24 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Main.Common;
 using ArribaSim.ServiceInterfaces.Asset;
 using ArribaSim.Types;
 using ArribaSim.Types.Asset;
 using HttpClasses;
+using log4net;
+using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
 using System.Text;
 using System.Xml;
 
 namespace ArribaSim.BackendConnectors.Robust.Asset
 {
-    public class RobustAssetConnector : AssetServiceInterface
+    #region Service Implementation
+    public class RobustAssetConnector : AssetServiceInterface, IPlugin
     {
         public class RobustAssetProtocolError : Exception
         {
@@ -71,6 +76,11 @@ namespace ArribaSim.BackendConnectors.Robust.Asset
             m_AssetURI = uri;
             m_MetadataService = new RobustAssetMetadataConnector(uri);
             m_MetadataService.TimeoutMs = m_TimeoutMs;
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+
         }
         #endregion
 
@@ -249,6 +259,11 @@ namespace ArribaSim.BackendConnectors.Robust.Asset
         #region Store asset method
         public override void Store(AssetData asset)
         {
+            if(asset.Temporary)
+            {
+                /* Do not store temporary assets on grid */
+                return;
+            }
             string assetbase_header = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<AssetBase>";
             string flags = "";
 
@@ -518,6 +533,27 @@ namespace ArribaSim.BackendConnectors.Robust.Asset
 
         private static readonly int MAX_BASE64_READ_LENGTH = 10240;
         #endregion
-
     }
+    #endregion
+
+    #region Factory
+    public class RobustAssetConnectorFactory : IPluginFactory
+    {
+        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public RobustAssetConnectorFactory()
+        {
+
+        }
+
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            if (!ownSection.Contains("URI"))
+            {
+                m_Log.FatalFormat("Missing 'URI' in section {0}", ownSection.Name);
+                throw new ConfigurationLoader.ConfigurationError();
+            }
+            return new RobustAssetConnector(ownSection.GetString("URI"));
+        }
+    }
+    #endregion
 }

@@ -8,15 +8,12 @@ using System.Xml;
 using log4net;
 using log4net.Config;
 using Nini.Config;
-using Mono.Addins;
 using ThreadedClasses;
 
 namespace ArribaSim.Main.Common
 {
     public class ConfigurationLoader
     {
-        public const string REGISTRY_LOCATION_PATH = "../data";
-
         public class ConfigurationError : Exception
         {
             public ConfigurationError()
@@ -28,8 +25,18 @@ namespace ArribaSim.Main.Common
         private ILog m_Log;
         private IConfigSource m_Config = new IniConfigSource();
         private Queue<CFG_ISource> m_Sources = new Queue<CFG_ISource>();
-        public RwLockedList<object> PluginInstances = new RwLockedList<object>();
-        
+        private RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
+
+        public T GetService<T>(string serviceName)
+        {
+            IPlugin module = PluginInstances[serviceName];
+            if(!typeof(T).IsAssignableFrom(module.GetType()))
+            {
+                throw new InvalidOperationException("Unexpected module configured for service " + serviceName);
+            }
+            return (T)module;
+        }
+
         #region Configuration Loader Helpers
         private interface CFG_ISource
         {
@@ -167,6 +174,7 @@ namespace ArribaSim.Main.Common
         {
             string m_Name;
             string m_Info;
+            string m_Assembly = string.Empty;
 
             public CFG_IniResourceSource(string name)
             {
@@ -178,6 +186,13 @@ namespace ArribaSim.Main.Common
             {
                 m_Name = name;
                 m_Info = info;
+            }
+
+            public CFG_IniResourceSource(string name, string info, string assembly)
+            {
+                m_Name = name;
+                m_Info = info;
+                m_Assembly = assembly;
             }
 
             public string DirName
@@ -192,7 +207,7 @@ namespace ArribaSim.Main.Common
             {
                 get
                 {
-                    return "Could not load ini file {0}";
+                    return m_Info;
                 }
             }
 
@@ -200,7 +215,7 @@ namespace ArribaSim.Main.Common
             {
                 get
                 {
-                    return m_Info;
+                    return m_Name;
                 }
             }
 
@@ -208,11 +223,29 @@ namespace ArribaSim.Main.Common
             {
                 get
                 {
-                    string[] names = GetType().Assembly.GetManifestResourceNames();
-                    string assemblyName = GetType().Assembly.GetName().Name;
-                    Stream resource = GetType().Assembly.GetManifestResourceStream(assemblyName + ".Resources." + m_Name);
+                    Assembly assembly;
+                    if(m_Assembly != string.Empty)
+                    {
+                        try
+                        {
+                            assembly = Assembly.LoadFrom("plugins/" + m_Assembly + ".dll");
+                        }
+                        catch
+                        {
+                            throw new FileNotFoundException();
+                        }
+                    }
+                    else
+                    {
+                        assembly = GetType().Assembly;
+                    }
+
+                    string assemblyName = assembly.GetName().Name;
+                    Stream resource = assembly.GetManifestResourceStream(assemblyName + ".Resources." + m_Name);
                     if(null == resource)
                     {
+                        System.Console.Write(assemblyName + ".Resources." + m_Name);
+                        System.Console.WriteLine();
                         throw new FileNotFoundException();
                     }
                     return new IniConfigSource(resource);
@@ -222,6 +255,7 @@ namespace ArribaSim.Main.Common
 
         #endregion
 
+        #region Config Source Management
         private void AddSource(CFG_ISource cfgsource, string file)
         {
             Uri configUri;
@@ -265,24 +299,85 @@ namespace ArribaSim.Main.Common
             }
         }
 
+        private void AddResourceConfig(string resourcereference, string info)
+        {
+            string[] nameparts = resourcereference.Split(new char[] { ':' }, 2, StringSplitOptions.None);
+            if (nameparts.Length == 1)
+            {
+                m_Sources.Enqueue(new CFG_IniResourceSource(nameparts[0], info));
+            }
+            else
+            {
+                m_Sources.Enqueue(new CFG_IniResourceSource(nameparts[1], info, nameparts[0]));
+            }
+        }
+        #endregion
+
+        #region Module Loading
+ 
         private void LoadModules()
         {
             foreach (IConfig config in m_Config.Configs)
             {
                 foreach (string key in config.GetKeys())
                 {
-                    if (key.StartsWith("Module"))
+                    if (key.Equals("Module"))
                     {
-                        PluginFactory module = AddinManager.GetExtensionNode<PluginFactory>(config.GetString(key));
-                        module.Initialize(this, config);
+                        string modulename = config.GetString(key);
+                        string[] modulenameparts = modulename.Split(new char[] {':'}, 2, StringSplitOptions.None);
+                        if(modulenameparts.Length < 2)
+                        {
+                            m_Log.FatalFormat("Invalid Module in section {0}: {1}", config.Name, modulename);
+                            throw new ConfigurationError();
+                        }
+                        string assemblyname = "plugins/" + modulenameparts[0] + ".dll";
+                        Assembly assembly;
+                        try
+                        {
+                            assembly = Assembly.LoadFrom(assemblyname);
+                        }
+                        catch
+                        {
+                            m_Log.FatalFormat("Failed to load module {0}", assemblyname);
+                            throw new ConfigurationError();
+                        }
+
+                        /* try to load class from assembly */
+                        string typename = modulenameparts[0] + "." + modulenameparts[1];
+                        Type t;
+                        try
+                        {
+                            t = assembly.GetType(modulenameparts[0] + "." + modulenameparts[1]);
+                        }
+                        catch
+                        {
+                            m_Log.FatalFormat("Failed to load factory {1} in module {0}", assemblyname, typename);
+                            throw new ConfigurationError();
+                        }
+
+                        /* check type inheritance first */
+                        if (!t.GetInterfaces().Contains(typeof(IPluginFactory)))
+                        {
+                            m_Log.FatalFormat("Failed to load factory {1} in module {0}", assemblyname, typename);
+                            throw new ConfigurationError();
+                        }
+
+                        IPluginFactory module = (IPluginFactory)assembly.CreateInstance(typename);
+                        PluginInstances.Add(config.Name, module.Initialize(this, config));
                     }
                 }
             }
         }
+        #endregion
 
+        #region Process [ParameterMap] section
         private void ProcessParameterMap()
         {
             IConfig parameterMap = m_Config.Configs["ParameterMap"];
+            if(null == parameterMap)
+            {
+                return;
+            }
 
             foreach (string key in parameterMap.GetKeys())
             {
@@ -319,7 +414,27 @@ namespace ArribaSim.Main.Common
                 toconfig.Set(toparts[1], fromconfig.Get(fromparts[1]));
             }
         }
+        #endregion
 
+        #region Process ImportResource* entries
+        private void ProcessImportResources()
+        {
+            foreach (IConfig config in m_Config.Configs)
+            {
+                foreach (string key in config.GetKeys())
+                {
+                    if (key.StartsWith("ImportResource"))
+                    {
+                        AddResourceConfig(config.GetString(key),
+                            String.Format("Import of resource {0} failed", config.GetString(key)));
+                        config.Remove(key);
+                    }
+                }
+            }
+        }
+        #endregion
+
+        #region Process [ResourceMap] section
         private void ProcessResourceMap()
         {
             IConfig resourceMap = m_Config.Configs["ResourceMap"];
@@ -338,13 +453,19 @@ namespace ArribaSim.Main.Common
                 }
                 if(config.Contains(parts[1]))
                 {
-                    string resourcename = resourceMap.Get(key) + "." + config.Get(parts[1]) + ".ini";
-                    m_Sources.Enqueue(new CFG_IniResourceSource(resourcename, 
-                        String.Format("Parameter {1} in section {0} is invalid", parts[1], parts[0])));
+                    if (config.Get(parts[1]) != string.Empty)
+                    {
+                        string configname = resourceMap.GetString(key) + "." + config.Get(parts[1]) + ".ini";
+                        AddResourceConfig(configname,
+                            String.Format("Parameter {1} = {2} in section {0} is invalid", parts[0], parts[1], config.Get(parts[1])));
+                        config.Remove(parts[1]);
+                    }
                 }
             }
         }
+        #endregion
 
+        #region Constructor and Main
         public ConfigurationLoader(string[] args, string defaultConfigName, string defaultsIniName)
         {
             ArgvConfigSource configSource = new ArgvConfigSource(args);
@@ -369,20 +490,18 @@ namespace ArribaSim.Main.Common
                     throw new ConfigurationError();
                 }
                 AddIncludes(source);
+                ProcessImportResources();
                 ProcessParameterMap();
                 ProcessResourceMap();
             }
+            ProcessParameterMap();
 
-            string registryLocation = REGISTRY_LOCATION_PATH;
             string logConfigFile = string.Empty;
             IConfig startupConfig = m_Config.Configs["Startup"];
             if(startupConfig != null)
             {
-                registryLocation = startupConfig.GetString("RegistryLocation", REGISTRY_LOCATION_PATH);
                 logConfigFile = startupConfig.GetString("LogConfig", string.Empty);
             }
-
-            AddinManager.Initialize(".", "plugins", registryLocation);
 
             /* Initialize Log system */
             if (logConfigFile != String.Empty)
@@ -399,12 +518,15 @@ namespace ArribaSim.Main.Common
                 m_Log.Info("[MAIN]: configured log4net using defaults");
             }
 
-            m_Log.Info("Updating addin registry");
-            AddinManager.Registry.Update();
-
             m_Log.Info("Loading specified modules");
             LoadModules();
 
+            m_Log.Info("Starting modules");
+            foreach(IPlugin instance in PluginInstances.Values)
+            {
+                instance.Startup(this);
+            }
         }
+        #endregion
     }
 }

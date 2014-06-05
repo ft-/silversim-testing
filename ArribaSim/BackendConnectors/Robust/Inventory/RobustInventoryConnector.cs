@@ -24,16 +24,21 @@
  */
 
 using ArribaSim.BackendConnectors.Robust.Common;
+using ArribaSim.Main.Common;
 using ArribaSim.ServiceInterfaces.Inventory;
 using ArribaSim.Types;
 using ArribaSim.Types.Asset;
 using ArribaSim.Types.Inventory;
 using HttpClasses;
+using log4net;
+using Nini.Config;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace ArribaSim.BackendConnectors.Robust.Inventory
 {
-    public class RobustInventoryConnector : InventoryServiceInterface
+    #region Service Implementation
+    public class RobustInventoryConnector : InventoryServiceInterface, IPlugin
     {
         private string m_InventoryURI;
         private RobustInventoryFolderConnector m_FolderService;
@@ -53,6 +58,11 @@ namespace ArribaSim.BackendConnectors.Robust.Inventory
             m_ItemService.TimeoutMs = m_TimeoutMs;
             m_FolderService = new RobustInventoryFolderConnector(uri);
             m_FolderService.TimeoutMs = m_TimeoutMs;
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+
         }
         #endregion
 
@@ -149,4 +159,28 @@ namespace ArribaSim.BackendConnectors.Robust.Inventory
         }
         #endregion
     }
+    #endregion
+
+
+    #region Factory
+    public class RobustInventoryConnectorFactory : IPluginFactory
+    {
+        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public RobustInventoryConnectorFactory()
+        {
+
+        }
+
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            if (!ownSection.Contains("URI"))
+            {
+                m_Log.FatalFormat("Missing 'URI' in section {0}", ownSection.Name);
+                throw new ConfigurationLoader.ConfigurationError();
+            }
+            return new RobustInventoryConnector(ownSection.GetString("URI"));
+        }
+    }
+    #endregion
+
 }
