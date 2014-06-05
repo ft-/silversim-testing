@@ -23,13 +23,10 @@
  * License text is derived from GNU classpath text
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ArribaSim.Types.Inventory;
-using ArribaSim.Types;
 using ArribaSim.Scene.Types.Script;
+using ArribaSim.Types;
+using ArribaSim.Types.Inventory;
+using System;
 
 namespace ArribaSim.Scene.Types.Object
 {
@@ -63,7 +60,7 @@ namespace ArribaSim.Scene.Types.Object
         #endregion
 
         #region Fields
-        private IScriptInstance m_ScriptInstance;
+        private IScriptInstance m_ScriptInstance = null;
         #endregion
 
         #region Properties

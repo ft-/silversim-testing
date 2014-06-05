@@ -23,11 +23,11 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Scene.Types.Script.Events;
 using ArribaSim.Types;
 using System;
 using System.Collections.Generic;
 using ThreadedClasses;
-using ArribaSim.Scene.Types.Script.Events;
 
 namespace ArribaSim.Scene.Types.Object
 {
