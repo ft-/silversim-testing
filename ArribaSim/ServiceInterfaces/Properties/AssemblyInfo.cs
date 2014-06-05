@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ArribaSim Development")]
 [assembly: AssemblyProduct("ArribaSim.ServiceInterfaces")]
-[assembly: AssemblyCopyright("BSD License")]
+[assembly: AssemblyCopyright("GPLv2 License + Link Exception")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

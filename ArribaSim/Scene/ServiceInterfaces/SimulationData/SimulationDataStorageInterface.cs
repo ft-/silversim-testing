@@ -23,6 +23,11 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Scene.Types.Object;
+using ArribaSim.Scene.Types.Scene;
+using ArribaSim.Types;
+using System.Collections.Generic;
+
 namespace ArribaSim.Scene.ServiceInterfaces.SimulationData
 {
     public abstract class SimulationDataStorageInterface
@@ -41,6 +46,48 @@ namespace ArribaSim.Scene.ServiceInterfaces.SimulationData
         public abstract SimulationDataParcelStorageInterface Parcels
         {
             get;
+        }
+
+        public void StoreScene(SceneInterface scene)
+        {
+            #region Store Objects
+            List<UUID> objectsToDelete = Objects.ObjectsInRegion(scene.ID);
+            List<UUID> primsToDelete = Objects.PrimitivesInRegion(scene.ID);
+            foreach(ObjectGroup objgroup in scene.Objects)
+            {
+                if(objgroup.IsTemporary)
+                {
+                    /* Do not store temporary objects */
+                    continue;
+                }
+
+                objectsToDelete.Remove(objgroup.ID);
+                foreach (ObjectPart objpart in objgroup.Values)
+                {
+                    primsToDelete.Remove(objpart.ID);
+                    if(!objgroup.IsChanged && objpart.IsChanged)
+                    {
+                        Objects.UpdateObjectPart(objpart);
+                    }
+                    else
+                    {
+                        Objects.UpdateObjectPartInventory(objpart);
+                    }
+                }
+
+                Objects.UpdateObjectGroup(objgroup);
+            }
+
+            foreach(UUID id in primsToDelete)
+            {
+                Objects.DeleteObjectPart(id);
+            }
+
+            foreach(UUID id in objectsToDelete)
+            {
+                Objects.DeleteObjectGroup(id);
+            }
+            #endregion
         }
     }
 }

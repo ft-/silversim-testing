@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using ArribaSim.Types;
 
 namespace ArribaSim.Scene.Types.Parcel
@@ -147,5 +148,10 @@ namespace ArribaSim.Scene.Types.Parcel
         public URI MusicURI = null;
         public UUI Owner = new UUI();
         public UUID SnapshotID = UUID.Zero;
+
+        public ParcelInfo()
+        {
+
+        }
     }
 }

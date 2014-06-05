@@ -52,6 +52,8 @@ namespace ArribaSim.Scene.Types.Object
         private string m_TouchText = string.Empty;
         private Vector3 m_SitTargetOffset = Vector3.Zero;
         private Quaternion m_SitTargetOrientation = Quaternion.Identity;
+        private readonly AnArray m_ParticleSystem = new AnArray();
+        private bool m_IsAllowedDrop = false;
 
         public class TextParam
         {
@@ -159,6 +161,7 @@ namespace ArribaSim.Scene.Types.Object
         public ObjectPart()
         {
             Group = null;
+            IsChanged = false;
             Inventory = new ObjectPartInventory();
         }
         #endregion
@@ -174,6 +177,22 @@ namespace ArribaSim.Scene.Types.Object
         public ObjectGroup Group { get; private set; }
         public ObjectPartInventory Inventory { get; private set; }
 
+        public bool IsChanged { get; private set; }
+
+        public bool IsAllowedDrop
+        {
+            get
+            {
+                return m_IsAllowedDrop;
+            }
+            set
+            {
+                m_IsAllowedDrop = value;
+                IsChanged = true;
+                OnUpdate(this, (int)ChangedEvent.ChangedFlags.AllowedDrop);
+            }
+        }
+
         public Vector3 SitTargetOffset
         {
             get
@@ -183,7 +202,8 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 lock (this) m_SitTargetOffset = value;
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -196,7 +216,8 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 lock (this) m_SitTargetOrientation = value;
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -209,6 +230,7 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 lock(this) m_SitText = value;
+                IsChanged = true;
                 OnUpdate(this, 0);
             }
         }
@@ -222,6 +244,7 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 lock (this) m_TouchText = value;
+                IsChanged = true;
                 OnUpdate(this, 0);
             }
         }
@@ -235,7 +258,8 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 m_PhysicsShapeType = value;
-                OnUpdate.Invoke(this, (int)ChangedEvent.ChangedFlags.Shape);
+                IsChanged = true;
+                OnUpdate(this, (int)ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -248,7 +272,8 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 m_Material = value;
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -267,7 +292,8 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_Size = value;
                 }
-                OnUpdate.Invoke(this, (int)ChangedEvent.ChangedFlags.Scale);
+                IsChanged = true;
+                OnUpdate(this, (int)ChangedEvent.ChangedFlags.Scale);
             }
         }
 
@@ -286,7 +312,8 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_Slice = value;
                 }
-                OnUpdate.Invoke(this, (int)ChangedEvent.ChangedFlags.Shape);
+                IsChanged = true;
+                OnUpdate(this, (int)ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -309,7 +336,26 @@ namespace ArribaSim.Scene.Types.Object
                     m_Text.Text = value.Text;
                     m_Text.TextColor = new ColorAlpha(value.TextColor);
                 }
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
+            }
+        }
+
+        public AnArray ParticleSystem
+        {
+            get
+            {
+                return m_ParticleSystem;
+            }
+            set
+            {
+                lock(m_ParticleSystem)
+                {
+                    m_ParticleSystem.Clear();
+                    m_ParticleSystem.AddRange(value);
+                    IsChanged = true;
+                    OnUpdate(this, 0);
+                }
             }
         }
 
@@ -342,7 +388,8 @@ namespace ArribaSim.Scene.Types.Object
                     m_Flexible.Tension = value.Tension;
                     m_Flexible.Wind = value.Wind;
                 }
-                OnUpdate.Invoke(this, (int)ChangedEvent.ChangedFlags.Shape);
+                IsChanged = true;
+                OnUpdate(this, (int)ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -371,7 +418,8 @@ namespace ArribaSim.Scene.Types.Object
                     m_PointLight.LightColor = new Color(value.LightColor);
                     m_PointLight.Radius = value.Radius;
                 }
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -396,7 +444,8 @@ namespace ArribaSim.Scene.Types.Object
                     m_Omega.Gain = value.Gain;
                     m_Omega.Spinrate = value.Spinrate;
                 }
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -451,7 +500,8 @@ namespace ArribaSim.Scene.Types.Object
                     m_Shape.IsSculptMirrored = value.IsSculptMirrored;
                     m_Shape.HoleSize = value.HoleSize;
                 }
-                OnUpdate.Invoke(this, (int)ChangedEvent.ChangedFlags.Shape);
+                IsChanged = true;
+                OnUpdate(this, (int)ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -479,7 +529,8 @@ namespace ArribaSim.Scene.Types.Object
             set 
             { 
                 m_Name = value;
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -492,7 +543,8 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 m_Description = value;
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
         #endregion
@@ -541,7 +593,8 @@ namespace ArribaSim.Scene.Types.Object
                         m_GlobalPosition = value;
                     }
                 }
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -560,7 +613,8 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_GlobalPosition = value;
                 }
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -607,7 +661,8 @@ namespace ArribaSim.Scene.Types.Object
                         m_GlobalPosition = value;
                     }
                 }
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
         #endregion
@@ -656,7 +711,8 @@ namespace ArribaSim.Scene.Types.Object
                         m_GlobalRotation = value;
                     }
                 }
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -675,7 +731,8 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_GlobalRotation = value;
                 }
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -722,7 +779,8 @@ namespace ArribaSim.Scene.Types.Object
                         m_GlobalRotation = value;
                     }
                 }
-                OnUpdate.Invoke(this, 0);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
         #endregion

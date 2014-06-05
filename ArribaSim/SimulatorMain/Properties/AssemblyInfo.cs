@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("ArribaSim.Scene.ServiceInterfaces")]
+[assembly: AssemblyTitle("ArribaSim.Simulator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ArribaSim Development")]
-[assembly: AssemblyProduct("ArribaSim.Scene.ServiceInterfaces")]
+[assembly: AssemblyProduct("ArribaSim.Simulator")]
 [assembly: AssemblyCopyright("GPLv2 License + Link Exception")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

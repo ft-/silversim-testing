@@ -29,13 +29,15 @@ using System.Linq;
 using System.Text;
 using ThreadedClasses;
 using ArribaSim.Types;
+using ArribaSim.Scene.Types.Script.Events;
 
 namespace ArribaSim.Scene.Types.Object
 {
     public class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject
     {
         #region Events
-        public event Action<ObjectGroup> OnUpdate;
+        public delegate void OnUpdateDelegate(ObjectGroup objgroup, int flags);
+        public event OnUpdateDelegate OnUpdate;
         #endregion
 
         public const int LINK_SET = -1;
@@ -45,22 +47,44 @@ namespace ArribaSim.Scene.Types.Object
         public const int LINK_ROOT = 1;
 
         private bool m_IsTempOnRez = false;
+        private bool m_IsTemporary = false;
         private bool m_IsPhysics = false;
         private bool m_IsPhantom = false;
+        private bool m_IsVolumeDetect = false;
         private Vector3 m_Velocity = Vector3.Zero;
         private UUID m_GroupID = UUID.Zero;
         private UUI m_Owner = UUI.Unknown;
         private UUI m_Creator = UUI.Unknown;
         private UUI m_LastOwner = UUI.Unknown;
+        private Date m_CreationDate = new Date();
 
         #region Constructor
         public ObjectGroup()
         {
-
+            IsChanged = false;
         }
         #endregion
 
         #region Properties
+        public bool IsChanged { get; private set; }
+
+        public bool IsTemporary
+        {
+            get
+            {
+                return m_IsTemporary;
+            }
+            set
+            {
+                lock(this) 
+                {
+                    m_IsTemporary = value;
+                }
+                IsChanged = true;
+                OnUpdate(this, 0);
+            }
+        }
+
         public bool IsTempOnRez
         {
             get
@@ -70,7 +94,32 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 m_IsTempOnRez = value;
-                OnUpdate(this);
+                lock(this) 
+                {
+                    m_IsTemporary = m_IsTemporary && m_IsTempOnRez;
+                }
+                IsChanged = true;
+                OnUpdate(this, 0);
+            }
+        }
+
+        public Date CreationDate
+        {
+            get
+            {
+                lock(this)
+                {
+                    return new Date(m_CreationDate);
+                }
+            }
+            set
+            {
+                lock(this)
+                {
+                    m_CreationDate = new Date(value);
+                }
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -83,7 +132,8 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 m_IsPhantom = value;
-                OnUpdate(this);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -96,7 +146,22 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 m_IsPhysics = value;
-                OnUpdate(this);
+                IsChanged = true;
+                OnUpdate(this, 0);
+            }
+        }
+
+        public bool IsVolumeDetect
+        {
+            get
+            {
+                return m_IsVolumeDetect;
+            }
+            set
+            {
+                m_IsVolumeDetect = value;
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -115,7 +180,8 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_GroupID = new UUID(value);
                 }
-                OnUpdate(this);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
         public UUI LastOwner
@@ -133,6 +199,8 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_LastOwner = value;
                 }
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -151,7 +219,8 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_Owner = value;
                 }
-                OnUpdate(this);
+                IsChanged = true;
+                OnUpdate(this, (int)ChangedEvent.ChangedFlags.Owner);
             }
         }
 
@@ -170,7 +239,8 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_Creator = value;
                 }
-                OnUpdate(this);
+                IsChanged = true;
+                OnUpdate(this, 0);
             }
         }
 
@@ -197,7 +267,8 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_Velocity = value;
                 }
-                OnUpdate.Invoke(this);
+                IsChanged = true;
+                OnUpdate.Invoke(this, 0);
             }
         }
 

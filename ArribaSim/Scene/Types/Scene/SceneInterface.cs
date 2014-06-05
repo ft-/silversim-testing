@@ -26,29 +26,36 @@
 using ArribaSim.Scene.Types.Object;
 using ArribaSim.Types;
 using System;
+using System.Collections.Generic;
 
-namespace ArribaSim.Scene.Management
+namespace ArribaSim.Scene.Types.Scene
 {
-    public interface ISceneObjects
+    public interface ISceneObjects : IEnumerable<IObject>
     {
         IObject this[UUID id] { get; }
         void ForEachInDistance(Vector3 pos, double maxdistance, Action<IObject> d);
     }
 
-    public interface ISceneObjectGroups
+    public interface ISceneObjectGroups : IEnumerable<ObjectGroup>
     {
         ObjectGroup this[UUID id] { get; }
     }
 
-    public interface ISceneObjectParts
+    public interface ISceneObjectParts : IEnumerable<ObjectPart>
     {
         ObjectPart this[UUID id] { get; }
     }
 
-    public interface IScene
+    public abstract class SceneInterface
     {
-        ISceneObjects Objects { get; }
-        ISceneObjectGroups ObjectGroups { get; }
-        ISceneObjectParts Primitives { get; }
+        public UUID ID { get; protected set;  }
+        public abstract ISceneObjects Objects { get; }
+        public abstract ISceneObjectGroups ObjectGroups { get; }
+        public abstract ISceneObjectParts Primitives { get; }
+
+        public SceneInterface()
+        {
+
+        }
     }
 }

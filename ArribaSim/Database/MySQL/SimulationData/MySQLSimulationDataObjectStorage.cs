@@ -1,13 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿/*
+ * ArribaSim is distributed under the terms of the
+ * GNU General Public License v2 
+ * with the following clarification and special exception.
+ * 
+ * Linking this code statically or dynamically with other modules is
+ * making a combined work based on this code. Thus, the terms and
+ * conditions of the GNU General Public License cover the whole
+ * combination.
+ * 
+ * As a special exception, the copyright holders of this code give you
+ * permission to link this code with independent modules to produce an
+ * executable, regardless of the license terms of these independent
+ * modules, and to copy and distribute the resulting executable under
+ * terms of your choice, provided that you also meet, for each linked
+ * independent module, the terms and conditions of the license of that
+ * module. An independent module is a module which is not derived from
+ * or based on this code. If you modify this code, you may extend
+ * this exception to your version of the code, but you are not
+ * obligated to do so. If you do not wish to do so, delete this
+ * exception statement from your version.
+ * 
+ * License text is derived from GNU classpath text
+ */
+
 using ArribaSim.Scene.ServiceInterfaces.SimulationData;
+using ArribaSim.Scene.Types.Object;
 using ArribaSim.Types;
+using System;
 using ArribaSim.Types.Asset;
 using ArribaSim.Types.Inventory;
-using ArribaSim.Scene.Types.Object;
 using MySql.Data.MySqlClient;
+using System.Collections.Generic;
 
 namespace ArribaSim.Database.MySQL.SimulationData
 {
@@ -26,8 +49,31 @@ namespace ArribaSim.Database.MySQL.SimulationData
             using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using(MySqlCommand cmd = new MySqlCommand("SELECT ID FROM prims WHERE RootPartID = ID ORDER BY LinkNumber", connection))
+                using(MySqlCommand cmd = new MySqlCommand("SELECT ID FROM objects WHERE RegionID LIKE ?id ORDER BY LinkNumber", connection))
                 {
+                    cmd.Parameters.AddWithValue("?id", key);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        while (dbReader.Read())
+                        {
+                            objects.Add(new UUID(dbReader["ID"].ToString()));
+                        }
+                    }
+                }
+            }
+            return objects;
+        }
+
+        public override List<UUID> PrimitivesInRegion(UUID key)
+        {
+            List<UUID> objects = new List<UUID>();
+
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM prims WHERE RegionID LIKE ?id ORDER BY LinkNumber", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", key);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
@@ -57,7 +103,7 @@ namespace ArribaSim.Database.MySQL.SimulationData
                             item = new ObjectPartInventoryItem();
                             item.AssetID = (string)dbReader["AssetID"];
                             item.AssetType = (AssetType)(int)dbReader["AssetType"];
-                            item.CreationDate = Date.UnixTimeToDateTime((ulong)dbReader["CreationDate"]);
+                            item.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
                             item.Creator = new UUI((string)dbReader["Creator"]);
                             item.Description = (string)dbReader["Description"];
                             item.Flags = (uint)dbReader["Flags"];
@@ -92,44 +138,61 @@ namespace ArribaSim.Database.MySQL.SimulationData
                 using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RootPartID LIKE ?id ORDER BY LinkNumber", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RootPartID LIKE ?id ORDER BY LinkNumber", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?id", key);
+                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        {
+                            if (!dbReader.Read())
+                            {
+                                throw new InvalidOperationException();
+                            }
+
+                            objgroup = new ObjectGroup();
+
+                            objgroup.IsVolumeDetect = MySQLUtilities.GetBoolean(dbReader, "IsVolumeDetect");
+                            objgroup.IsPhantom = MySQLUtilities.GetBoolean(dbReader, "IsPhantom");
+                            objgroup.IsPhysics = MySQLUtilities.GetBoolean(dbReader, "IsPhysics");
+                            objgroup.IsTempOnRez = MySQLUtilities.GetBoolean(dbReader, "IsTempOnRez");
+                            objgroup.Owner = new UUI((string)dbReader["Owner"]);
+                            objgroup.LastOwner = new UUI((string)dbReader["LastOwner"]);
+                            objgroup.Creator = new UUI((string)dbReader["Creator"]);
+                            objgroup.GroupID = (string)dbReader["GroupID"];
+                        }
+                    }
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RootPartID LIKE ?id ORDER BY LinkNumber", connection))
                     {
                         cmd.Parameters.AddWithValue("?id", key);
                         using(MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
-                            objgroup = new ObjectGroup();
-
                             while(dbReader.Read())
                             {
                                 ObjectPart objpart = new ObjectPart();
                                 objpart.ID = (string)dbReader["ID"];
-                                objpart.Position = (string)dbReader["Position"];
-                                objpart.Rotation = new AString((string)dbReader["Rotation"]).AsQuaternion;
+                                objpart.Position = MySQLUtilities.GetVector(dbReader, "Position");
+                                objpart.Rotation = MySQLUtilities.GetQuaternion(dbReader, "Rotation");
                                 objpart.SitText = (string)dbReader["SitText"];
                                 objpart.TouchText = (string)dbReader["TouchText"];
                                 objpart.Name = (string)dbReader["Name"];
                                 objpart.Description = (string)dbReader["Description"];
-                                objpart.SitTargetOffset = (string)dbReader["SitTargetOffset"];
-                                objpart.SitTargetOrientation = new AString((string)dbReader["SitTargetOrientation"]).AsQuaternion;
+                                objpart.SitTargetOffset = MySQLUtilities.GetVector(dbReader, "SitTargetOffset");
+                                objpart.SitTargetOrientation = MySQLUtilities.GetQuaternion(dbReader, "SitTargetOrientation");
 
                                 objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)(int)dbReader["ShapeType"];
                                 objpart.Material = (PrimitiveMaterial)(int)dbReader["Material"];
-                                objpart.Size = (string)dbReader["Size"];
-                                objpart.Slice = (string)dbReader["Slice"];
+                                objpart.Size = MySQLUtilities.GetVector(dbReader, "Size");
+                                objpart.Slice = MySQLUtilities.GetVector(dbReader, "Slice");
                                 
 
                                 ObjectPart.OmegaParam op = new ObjectPart.OmegaParam();
-                                op.Axis = (string)dbReader["OmegaAxis"];
-                                op.Spinrate = (float)dbReader["OmegaSpinRate"];
-                                op.Gain = (float)dbReader["OmegaGain"];
+                                op.Axis = MySQLUtilities.GetVector(dbReader, "OmegaAxis");
+                                op.Spinrate = (double)dbReader["OmegaSpinRate"];
+                                op.Gain = (double)dbReader["OmegaGain"];
                                 objpart.Omega = op;
 
                                 ObjectPart.PointLightParam lp = new ObjectPart.PointLightParam();
-                                lp.IsLight = ((int) dbReader["LightEnabled"]) != 0;
-                                lp.LightColor = new Color(
-                                    (double)dbReader["LightColorRed"],
-                                    (double)dbReader["LightColorGreen"],
-                                    (double)dbReader["LightColorBlue"]);
+                                lp.IsLight = MySQLUtilities.GetBoolean(dbReader, "LightEnabled");
+                                lp.LightColor = MySQLUtilities.GetColor(dbReader, "LightColor");
                                 lp.Intensity = (double)dbReader["LightIntensity"];
                                 lp.Radius = (double)dbReader["LightRadius"];
                                 lp.Falloff = (double)dbReader["LightFalloff"];
@@ -137,42 +200,40 @@ namespace ArribaSim.Database.MySQL.SimulationData
 
                                 ObjectPart.TextParam tp = new ObjectPart.TextParam();
                                 tp.Text = (string)dbReader["Text"];
-                                tp.TextColor = new ColorAlpha(
-                                    (double)dbReader["TextColorRed"], 
-                                    (double)dbReader["TextColorGreen"],
-                                    (double)dbReader["TextColorBlue"],
-                                    (double)dbReader["TextColorAlpha"]);
+                                tp.TextColor = MySQLUtilities.GetColorAlpha(dbReader, "TextColor");
                                 objpart.Text = tp;
 
                                 ObjectPart.FlexibleParam fp = new ObjectPart.FlexibleParam();
-                                fp.IsFlexible = (int)dbReader["IsFlexible"] != 0;
+                                fp.IsFlexible = MySQLUtilities.GetBoolean(dbReader, "IsFlexible");
                                 fp.Friction = (double)dbReader["FlexibleFriction"];
                                 fp.Gravity = (double)dbReader["FlexibleGravity"];
                                 fp.Softness = (int)dbReader["FlexibleSoftness"];
                                 fp.Wind = (double)dbReader["FlexibleWind"];
-                                fp.Force = (string)dbReader["FlexibleForce"];
+                                fp.Force = MySQLUtilities.GetVector(dbReader, "FlexibleForce");
                                 objpart.Flexible = fp;
 
                                 ObjectPart.PrimitiveShape ps = new ObjectPart.PrimitiveShape();
-                                ps.AdvancedCut = (string)dbReader["ShapeAdvancedCut"];
-                                ps.Cut = (string)dbReader["ShapeCut"];
-                                ps.Dimple = (string)dbReader["ShapeDimple"];
+                                ps.AdvancedCut = MySQLUtilities.GetVector(dbReader, "ShapeAdvancedCut");
+                                ps.Cut = MySQLUtilities.GetVector(dbReader, "ShapeCut");
+                                ps.Dimple = MySQLUtilities.GetVector(dbReader, "ShapeDimple");
                                 ps.HoleShape = (PrimitiveHoleShape)(int)dbReader["ShapeHoleShape"];
-                                ps.HoleSize = (string)dbReader["ShapeHoleSize"];
+                                ps.HoleSize = MySQLUtilities.GetVector(dbReader, "ShapeHoleSize");
                                 ps.Hollow = (double)dbReader["ShapeHollow"];
-                                ps.IsSculptInverted = (int)dbReader["IsShapeSculptInverted"] != 0;
-                                ps.IsSculptMirrored = (int)dbReader["IsShapeSculptMirrored"] != 0;
+                                ps.IsSculptInverted = MySQLUtilities.GetBoolean(dbReader, "IsShapeSculptInverted");
+                                ps.IsSculptMirrored = MySQLUtilities.GetBoolean(dbReader, "IsShapeSculptMirrored");
                                 ps.RadiusOffset = (double)dbReader["ShapeRadiusOffset"];
                                 ps.Revolutions = (double)dbReader["ShapeRevolutions"];
                                 ps.SculptMap = (string)dbReader["ShapeSculptMap"];
                                 ps.SculptType = (PrimitiveSculptType)(int)dbReader["ShapeSculptType"];
                                 ps.Skew = (double)dbReader["ShapeSkew"];
-                                ps.Taper = (string)dbReader["ShapeTaper"];
-                                ps.TopShear = (string)dbReader["ShapeTopShear"];
-                                ps.TopSize = (string)dbReader["ShapeTopSize"];
-                                ps.Twist = (string)dbReader["ShapeTwist"];
+                                ps.Taper = MySQLUtilities.GetVector(dbReader, "ShapeTaper");
+                                ps.TopShear = MySQLUtilities.GetVector(dbReader, "ShapeTopShear");
+                                ps.TopSize = MySQLUtilities.GetVector(dbReader, "ShapeTopSize");
+                                ps.Twist = MySQLUtilities.GetVector(dbReader, "ShapeTwist");
                                 ps.Type = (PrimitiveShapeType)(int)dbReader["ShapeType"];
                                 objpart.Shape = ps;
+
+                                objpart.ParticleSystem = MySQLUtilities.GetArray(dbReader, "ParticleSystem");
 
                                 LoadInventory(objpart);
                                 objgroup.Add((int)dbReader["LinkNumber"], objpart.ID, objpart);
@@ -184,30 +245,9 @@ namespace ArribaSim.Database.MySQL.SimulationData
             }
         }
 
-
-        public override void StoreObject(ObjectGroup objgroup)
+        public override void UpdateObjectGroup(ObjectGroup objgroup)
         {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-            }
-        }
 
-        public override void StoreObjectInventory(ObjectGroup objgroup)
-        {
-            using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                /*
-                foreach(ObjectPart part in objgroup)
-                {
-                    foreach(ObjectPartInventoryItem item in part.Inventory)
-                    {
-//                        MySQLUtilities.ReplaceInsertInto(connection, "primitems", );
-                    }
-                }
-                 * */
-            }
         }
 
         public override void UpdateObjectPart(ObjectPart objpart)
@@ -215,6 +255,7 @@ namespace ArribaSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
+                UpdateObjectPart(connection, objpart);
             }
         }
 
@@ -223,15 +264,24 @@ namespace ArribaSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
+                foreach (ObjectPartInventoryItem item in objpart.Inventory.Values)
+                {
+                    UpdateObjectPartInventoryItem(connection, item);
+                }
             }
         }
 
-        public override void DeleteObject(UUID obj)
+        public override void DeleteObjectPart(UUID obj)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE ID LIKE ?id", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", obj);
+                    cmd.ExecuteNonQuery();
+                }
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE ID LIKE ?id", connection))
                 {
                     cmd.Parameters.AddWithValue("?id", obj);
                     cmd.ExecuteNonQuery();
@@ -244,12 +294,113 @@ namespace ArribaSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE RootPartID LIKE ?id"))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE RootPartID LIKE ?id"))
+                {
+                    cmd.Parameters.AddWithValue("?id", obj);
+                    cmd.ExecuteNonQuery();
+                }
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM objects WHERE RootPartID LIKE ?id"))
                 {
                     cmd.Parameters.AddWithValue("?id", obj);
                     cmd.ExecuteNonQuery();
                 }
             }
         }
+
+        #region Storage Functions
+        private void UpdateObjectPartInventoryItem(MySqlConnection connection, ObjectPartInventoryItem item)
+        {
+            Dictionary<string, object> p = new Dictionary<string, object>();
+            p["AssetID"] = item.AssetID;
+            p["AssetType"] = (int)item.AssetType;
+            p["CreationDate"] = item.CreationDate;
+            p["Creator"] = item.Creator;
+            p["Description"] = item.Description;
+            p["Flags"] = item.Flags;
+            p["GroupID"] = item.GroupID;
+            p["GroupOwned"] = item.GroupOwned;
+            p["ID"] = item.ID;
+            p["InventoryType"] = (int)item.InventoryType;
+            p["LastOwner"] = item.LastOwner;
+            p["ParentFolderID"] = item.ParentFolderID;
+            p["BasePermissions"] = item.Permissions.Base;
+            p["CurrentPermissions"] = item.Permissions.Current;
+            p["EveryOnePermissions"] = item.Permissions.EveryOne;
+            p["GroupPermissions"] = item.Permissions.Group;
+            p["NextOwnerPermissions"] = item.Permissions.NextOwner;
+            p["SaleType"] = item.SaleInfo.Type;
+            p["SalePrice"] = item.SaleInfo.Price;
+            p["SalePermMask"] = item.SaleInfo.PermMask;
+
+            MySQLUtilities.ReplaceInsertInto(connection, "primitems", p);
+        }
+
+        private void UpdateObjectPart(MySqlConnection connection, ObjectPart objpart)
+        {
+            Dictionary<string, object> p = new Dictionary<string, object>();
+            p["ID"] = objpart.ID;
+            p["Position"] = objpart.Position;
+            p["Rotation"] = objpart.Rotation;
+            p["SitText"] = objpart.SitText;
+            p["TouchText"] = objpart.TouchText;
+            p["Name"] = objpart.Name;
+            p["Description"] = objpart.Description;
+            p["SitTargetOffset"] = objpart.SitTargetOffset;
+            p["SitTargetOrientation"] = objpart.SitTargetOrientation;
+            p["ShapeType"] = (int)objpart.PhysicsShapeType;
+            p["Material"] = (int)objpart.Material;
+            p["Size"] = objpart.Size;
+            p["Slice"] = objpart.Slice;
+
+            ObjectPart.OmegaParam op = objpart.Omega;
+            p["OmegaAxis"] = op.Axis;
+            p["OmegaSpinRate"] = op.Spinrate;
+            p["OmegaGain"] = op.Gain;
+
+            ObjectPart.PointLightParam lp = objpart.PointLight;
+            p["LightEnabled"] = lp.IsLight;
+            p["LightColor"] = lp.LightColor;
+            p["LightIntensity"] = lp.Intensity;
+            p["LightRadius"] = lp.Radius;
+            p["LightFalloff"] = lp.Falloff;
+
+            ObjectPart.TextParam tp = objpart.Text;
+            p["Text"] = tp.Text;
+            p["TextColor"] = tp.TextColor;
+
+            ObjectPart.FlexibleParam fp = objpart.Flexible;
+            p["IsFlexible"] = fp.IsFlexible;
+            p["FlexibleFriction"] = fp.Friction;
+            p["FlexibleGravity"] = fp.Gravity;
+            p["FlexibleSoftness"] = fp.Softness;
+            p["FlexibleWind"] = fp.Wind;
+            p["FlexibleForce"] = fp.Force;
+
+            ObjectPart.PrimitiveShape ps = objpart.Shape;
+            p["ShapeAdvancedCut"] = ps.AdvancedCut;
+            p["ShapeCut"] = ps.Cut;
+            p["ShapeDimple"] = ps.Dimple;
+            p["ShapeHoleShape"] = (int)ps.HoleShape;
+            p["ShapeHoleSize"] = ps.HoleSize;
+            p["ShapeHollow"] = ps.Hollow;
+            p["IsShapeSculptInverted"] = ps.IsSculptInverted;
+            p["IsShapeSculptMirrored"] = ps.IsSculptMirrored;
+            p["ShapeRadiusOffset"] = ps.RadiusOffset;
+            p["ShapeRevolutions"] = ps.Revolutions;
+            p["ShapeSculptMap"] = ps.SculptMap;
+            p["ShapeSculptType"] = (int)ps.SculptType;
+            p["ShapeSkew"] = ps.Skew;
+            p["ShapeTaper"] = ps.Taper;
+            p["ShapeTopShear"] = ps.TopShear;
+            p["ShapeTopSize"] = ps.TopSize;
+            p["ShapeTwist"] = ps.Twist;
+            p["ShapeType"] = (int)ps.Type;
+
+            p["ParticleSystem"] = objpart.ParticleSystem;
+
+            MySQLUtilities.ReplaceInsertInto(connection, "prims", p);
+        }
+
+        #endregion
     }
 }

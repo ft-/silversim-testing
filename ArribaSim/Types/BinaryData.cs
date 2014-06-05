@@ -110,7 +110,6 @@ namespace ArribaSim.Types
         {
             return m_Data.GetEnumerator();
         }
-
         #endregion Enumerator
 
         #region Helpers
