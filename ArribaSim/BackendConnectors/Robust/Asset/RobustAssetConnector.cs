@@ -259,9 +259,9 @@ namespace ArribaSim.BackendConnectors.Robust.Asset
         #region Store asset method
         public override void Store(AssetData asset)
         {
-            if(asset.Temporary)
+            if(asset.Temporary || asset.Local)
             {
-                /* Do not store temporary assets on grid */
+                /* Do not store temporary or local assets on grid */
                 return;
             }
             string assetbase_header = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<AssetBase>";

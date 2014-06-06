@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using ArribaSim.Main.Common;
 
 namespace ArribaSim.Main.Simulator
@@ -14,6 +15,7 @@ namespace ArribaSim.Main.Simulator
 
         public static void Main(string[] args)
         {
+            Thread.CurrentThread.Name = "ArribaSim:Main";
             try
             {
                 m_ConfigLoader = new ConfigurationLoader(args, DEFAULT_CONFIG_FILENAME, "Simulator.defaults.ini");
