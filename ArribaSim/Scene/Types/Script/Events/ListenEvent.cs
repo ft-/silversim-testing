@@ -36,12 +36,14 @@ namespace ArribaSim.Scene.Types.Script.Events
             Say = 1,
             Shout = 2,
             Region = 3,
-            SayTo = 4
+            SayTo = 4,
+            OwnerSay = 5
         }
 
         #region Extension Fields for Chat Router
         public ChatType Type;
         public Vector3 GlobalPosition;
+        public UUID TargetID;
         #endregion
 
         public int Channel;

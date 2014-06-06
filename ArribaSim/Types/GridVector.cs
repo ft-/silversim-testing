@@ -27,18 +27,12 @@ using System;
 
 namespace ArribaSim.Types
 {
-    public class GridVector
+    public struct GridVector
     {
         public uint X;
         public uint Y;
 
         #region Constructors
-        public GridVector()
-        {
-            X = 0;
-            Y = 0;
-        }
-
         public GridVector(GridVector v)
         {
             X = v.X;
@@ -104,6 +98,11 @@ namespace ArribaSim.Types
             {
                 return new GridVector();
             }
+        }
+
+        public new string ToString()
+        {
+            return String.Format("{0},{1}", X, Y);
         }
         #endregion
     }

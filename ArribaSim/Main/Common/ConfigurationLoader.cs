@@ -319,6 +319,10 @@ namespace ArribaSim.Main.Common
         {
             foreach (IConfig config in m_Config.Configs)
             {
+                if (config.Contains("IsTemplate"))
+                {
+                    continue;
+                }
                 foreach (string key in config.GetKeys())
                 {
                     if (key.Equals("Module"))
@@ -465,6 +469,39 @@ namespace ArribaSim.Main.Common
         }
         #endregion
 
+        #region Process UseTemplates lines
+        private void ProcessUseTemplates()
+        {
+            foreach (IConfig config in m_Config.Configs)
+            {
+                string[] sections = config.GetString("Use", string.Empty).Split(new char[] { ',', ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach(string section in sections)
+                {
+                    if(section == config.Name)
+                    {
+                        System.Console.Write("Self referencing Use");
+                        System.Console.WriteLine();
+                        throw new ConfigurationError();
+                    }
+                    IConfig configSection = m_Config.Configs[section];
+                    if(!configSection.Contains("IsTemplate"))
+                    {
+                        System.Console.Write("Use does not reference a valid template");
+                        System.Console.WriteLine();
+                        throw new ConfigurationError();
+                    }
+                    foreach (string fromkey in configSection.GetKeys())
+                    {
+                        if (!config.Contains(fromkey) && fromkey != "IsTemplate")
+                        {
+                            config.Set(fromkey, configSection.Get(fromkey));
+                        }
+                    }
+                }
+            }
+        }
+        #endregion
+
         #region Constructor and Main
         public ConfigurationLoader(string[] args, string defaultConfigName, string defaultsIniName)
         {
@@ -495,6 +532,7 @@ namespace ArribaSim.Main.Common
                 ProcessResourceMap();
             }
             ProcessParameterMap();
+            ProcessUseTemplates();
 
             string logConfigFile = string.Empty;
             IConfig startupConfig = m_Config.Configs["Startup"];

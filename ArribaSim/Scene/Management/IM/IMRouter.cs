@@ -23,25 +23,34 @@
  * License text is derived from GNU classpath text
  */
 
-namespace ArribaSim.Types.IM
-{
-    public struct GridInstantMessage
-    {
-        public ulong ID;
-        public UUI FromAgent;
-        public UUI ToAgent;
-        public GridInstantMessageDialog Dialog;
-        public bool FromGroup;
-        public string Message;
-        public UUID IMSessionID;
-        public bool Offline;
-        public Vector3 Position;
-        public byte[] BinaryBucket;
-        public int ParentEstateID;
-        public UUID RegionID;
-        public Date Timestamp;
+using ArribaSim.Types.IM;
+using ThreadedClasses;
 
-        public delegate void OnResultDelegate(GridInstantMessage im, bool success);
-        public OnResultDelegate OnResult;
+namespace ArribaSim.Scene.Management.IM
+{
+    public static class IMRouter
+    {
+        #region Fields
+        public static RwLockedList<OnSendDelegate> GridIM = new RwLockedList<OnSendDelegate>();
+        public static RwLockedList<OnSendDelegate> SceneIM = new RwLockedList<OnSendDelegate>();
+        #endregion
+
+        public delegate bool OnSendDelegate(GridInstantMessage im);
+
+        #region Methods
+        public static void Send(GridInstantMessage im)
+        {
+            bool success = false;
+            foreach(OnSendDelegate del in SceneIM)
+            {
+                success = success || del(im);
+            }
+            foreach(OnSendDelegate del in GridIM)
+            {
+                success = success || del(im);
+            }
+            im.OnResult(im, success);
+        }
+        #endregion
     }
 }

@@ -23,25 +23,15 @@
  * License text is derived from GNU classpath text
  */
 
-namespace ArribaSim.Types.IM
+namespace ArribaSim.Scene.ServiceInterfaces.Chat
 {
-    public struct GridInstantMessage
+    public abstract class ChatServiceFactoryInterface
     {
-        public ulong ID;
-        public UUI FromAgent;
-        public UUI ToAgent;
-        public GridInstantMessageDialog Dialog;
-        public bool FromGroup;
-        public string Message;
-        public UUID IMSessionID;
-        public bool Offline;
-        public Vector3 Position;
-        public byte[] BinaryBucket;
-        public int ParentEstateID;
-        public UUID RegionID;
-        public Date Timestamp;
+        public ChatServiceFactoryInterface()
+        {
 
-        public delegate void OnResultDelegate(GridInstantMessage im, bool success);
-        public OnResultDelegate OnResult;
+        }
+
+        public abstract ChatServiceInterface Instantiate();
     }
 }

@@ -23,50 +23,46 @@
  * License text is derived from GNU classpath text
  */
 
-using ArribaSim.Scene.Types.Object;
+using ArribaSim.Main.Common;
+using ArribaSim.Scene.ServiceInterfaces.Chat;
+using ArribaSim.Scene.ServiceInterfaces.Scene;
+using ArribaSim.Scene.Types.Scene;
 using ArribaSim.Types;
-using System;
-using System.Collections.Generic;
+using Nini.Config;
 
-namespace ArribaSim.Scene.Types.Scene
+namespace ArribaSim.Scene.Implementation.Basic
 {
-    public interface ISceneObjects : IEnumerable<IObject>
+    class SceneFactory : SceneFactoryInterface, IPlugin
     {
-        IObject this[UUID id] { get; }
-        void ForEachInDistance(Vector3 pos, double maxdistance, Action<IObject> d);
+        public ChatServiceFactoryInterface m_ChatFactory;
+        public string m_ChatFactoryName;
+
+        public SceneFactory(string chatFactoryName)
+        {
+            m_ChatFactoryName = chatFactoryName;
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+            m_ChatFactory = loader.GetService<ChatServiceFactoryInterface>(m_ChatFactoryName);
+        }
+
+        public override SceneInterface Instantiate(UUID id, GridVector position, uint sizeX, uint sizeY)
+        {
+            return new BasicScene(m_ChatFactory.Instantiate(), id, position, sizeX, sizeY);
+        }
     }
 
-    public interface ISceneObjectGroups : IEnumerable<ObjectGroup>
+    public class Factory : IPluginFactory
     {
-        ObjectGroup this[UUID id] { get; }
-    }
-
-    public interface ISceneObjectParts : IEnumerable<ObjectPart>
-    {
-        ObjectPart this[UUID id] { get; }
-    }
-
-    public abstract class SceneInterface
-    {
-        public UUID ID { get; protected set;  }
-        public uint SizeX { get; protected set; }
-        public uint SizeY { get; protected set; }
-        public string Name { get; protected set; }
-        public GridVector GridPosition { get; protected set; }
-        public abstract ISceneObjects Objects { get; }
-        public abstract ISceneObjectGroups ObjectGroups { get; }
-        public abstract ISceneObjectParts Primitives { get; }
-
-        public event Action<SceneInterface> OnRemove;
-
-        public SceneInterface()
+        public Factory()
         {
 
         }
 
-        public void InvokeOnRemove()
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig)
         {
-            OnRemove(this);
+            return new SceneFactory(ownConfig.GetString("ChatModuleSection", "Chat"));
         }
     }
 }

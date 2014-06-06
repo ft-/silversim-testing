@@ -23,25 +23,18 @@
  * License text is derived from GNU classpath text
  */
 
-namespace ArribaSim.Types.IM
-{
-    public struct GridInstantMessage
-    {
-        public ulong ID;
-        public UUI FromAgent;
-        public UUI ToAgent;
-        public GridInstantMessageDialog Dialog;
-        public bool FromGroup;
-        public string Message;
-        public UUID IMSessionID;
-        public bool Offline;
-        public Vector3 Position;
-        public byte[] BinaryBucket;
-        public int ParentEstateID;
-        public UUID RegionID;
-        public Date Timestamp;
+using ArribaSim.Scene.Types.Scene;
+using ArribaSim.Types;
 
-        public delegate void OnResultDelegate(GridInstantMessage im, bool success);
-        public OnResultDelegate OnResult;
+namespace ArribaSim.Scene.ServiceInterfaces.Scene
+{
+    public abstract class SceneFactoryInterface
+    {
+        public SceneFactoryInterface()
+        {
+
+        }
+
+        public abstract SceneInterface Instantiate(UUID id, GridVector position, uint sizeX, uint sizeY);
     }
 }

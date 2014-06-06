@@ -23,25 +23,39 @@
  * License text is derived from GNU classpath text
  */
 
-namespace ArribaSim.Types.IM
-{
-    public struct GridInstantMessage
-    {
-        public ulong ID;
-        public UUI FromAgent;
-        public UUI ToAgent;
-        public GridInstantMessageDialog Dialog;
-        public bool FromGroup;
-        public string Message;
-        public UUID IMSessionID;
-        public bool Offline;
-        public Vector3 Position;
-        public byte[] BinaryBucket;
-        public int ParentEstateID;
-        public UUID RegionID;
-        public Date Timestamp;
+using ArribaSim.Scene.ServiceInterfaces.Chat;
+using ArribaSim.Scene.Types.Script.Events;
+using ArribaSim.Types;
+using System;
 
-        public delegate void OnResultDelegate(GridInstantMessage im, bool success);
-        public OnResultDelegate OnResult;
+namespace ArribaSim.Scene.Chat
+{
+    class RegionListenerInfo : ListenerInfo
+    {
+        public new bool IsIgnorePosition
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        private static Vector3 GetPositionFunc()
+        {
+            return Vector3.Zero;
+        }
+
+        public RegionListenerInfo(
+            ChatHandler handler,
+            int channel, 
+            string name,
+            UUID id, 
+            string message,
+            ChatServiceInterface.GetUUIDDelegate getuuid, 
+            Action<ListenEvent> send)
+            : base(handler, channel, name, id, message, getuuid, GetPositionFunc, send)
+        {
+
+        }
     }
 }
