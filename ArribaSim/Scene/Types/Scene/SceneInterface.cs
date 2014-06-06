@@ -24,6 +24,7 @@
  */
 
 using ArribaSim.Scene.Types.Object;
+using ArribaSim.Scene.Types.Parcel;
 using ArribaSim.Types;
 using System;
 using System.Collections.Generic;
@@ -33,7 +34,7 @@ namespace ArribaSim.Scene.Types.Scene
     public interface ISceneObjects : IEnumerable<IObject>
     {
         IObject this[UUID id] { get; }
-        void ForEachInDistance(Vector3 pos, double maxdistance, Action<IObject> d);
+        void ForEach(Vector3 pos, double maxdistance, Action<IObject> d);
     }
 
     public interface ISceneObjectGroups : IEnumerable<ObjectGroup>
@@ -46,6 +47,17 @@ namespace ArribaSim.Scene.Types.Scene
         ObjectPart this[UUID id] { get; }
     }
 
+    public interface ISceneAgents : IEnumerable<IAgent>
+    {
+        IAgent this[UUID id] { get; }
+    }
+
+    public interface ISceneParcels : IEnumerable<ParcelInfo>
+    {
+        ParcelInfo this[UUID id] { get; }
+        ParcelInfo this[Vector3 position] { get; }
+    }
+
     public abstract class SceneInterface
     {
         public UUID ID { get; protected set;  }
@@ -56,7 +68,8 @@ namespace ArribaSim.Scene.Types.Scene
         public abstract ISceneObjects Objects { get; }
         public abstract ISceneObjectGroups ObjectGroups { get; }
         public abstract ISceneObjectParts Primitives { get; }
-
+        public abstract ISceneAgents Agents { get; }
+        public abstract ISceneParcels Parcels { get; }
         public event Action<SceneInterface> OnRemove;
 
         public SceneInterface()
@@ -68,5 +81,8 @@ namespace ArribaSim.Scene.Types.Scene
         {
             OnRemove(this);
         }
+
+        public abstract void Add(IObject obj);
+        public abstract bool Remove(IObject obj);
     }
 }

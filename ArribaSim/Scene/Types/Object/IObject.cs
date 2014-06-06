@@ -23,6 +23,7 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Scene.Types.Scene;
 using ArribaSim.Types;
 using System;
 using System.Collections.Generic;
@@ -141,6 +142,8 @@ namespace ArribaSim.Scene.Types.Object
 
     public interface IObject
     {
+        event Action<IObject> OnPositionChange;
+
         #region Properties
         UUID ID
         {
@@ -176,6 +179,8 @@ namespace ArribaSim.Scene.Types.Object
             get;
             set;
         }
+
+        bool IsInScene(SceneInterface scene);
         #endregion
 
         #region Methods

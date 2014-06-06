@@ -23,6 +23,7 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Scene.Types.Scene;
 using ArribaSim.Scene.Types.Script.Events;
 using ArribaSim.Types;
 using System;
@@ -36,6 +37,7 @@ namespace ArribaSim.Scene.Types.Object
         #region Events
         public delegate void OnUpdateDelegate(ObjectPart part, int changed);
         public event OnUpdateDelegate OnUpdate;
+        public event Action<IObject> OnPositionChange;
         #endregion
 
         #region Fields
@@ -549,6 +551,11 @@ namespace ArribaSim.Scene.Types.Object
         }
         #endregion
 
+        public bool IsInScene(SceneInterface scene)
+        {
+            return true;
+        }
+
         #region Position Properties
         public Vector3 Position
         {
@@ -595,6 +602,7 @@ namespace ArribaSim.Scene.Types.Object
                 }
                 IsChanged = true;
                 OnUpdate(this, 0);
+                OnPositionChange(this);
             }
         }
 
@@ -615,6 +623,7 @@ namespace ArribaSim.Scene.Types.Object
                 }
                 IsChanged = true;
                 OnUpdate(this, 0);
+                OnPositionChange(this);
             }
         }
 
@@ -663,6 +672,7 @@ namespace ArribaSim.Scene.Types.Object
                 }
                 IsChanged = true;
                 OnUpdate(this, 0);
+                OnPositionChange(this);
             }
         }
         #endregion

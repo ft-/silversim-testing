@@ -23,6 +23,7 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Scene.Types.Scene;
 using ArribaSim.Scene.Types.Script.Events;
 using ArribaSim.Types;
 using System;
@@ -36,6 +37,7 @@ namespace ArribaSim.Scene.Types.Object
         #region Events
         public delegate void OnUpdateDelegate(ObjectGroup objgroup, int flags);
         public event OnUpdateDelegate OnUpdate;
+        public event Action<IObject> OnPositionChange;
         #endregion
 
         public const int LINK_SET = -1;
@@ -305,6 +307,20 @@ namespace ArribaSim.Scene.Types.Object
             set { RootPart.LocalPosition = value; }
         }
         #endregion
+
+        public bool IsInScene(SceneInterface scene)
+        {
+            return true;
+        }
+
+        public void InvokeOnPositionUpdate(IObject obj)
+        {
+            if(obj != RootPart)
+            {
+                return;
+            }
+            OnPositionChange(this);
+        }
 
         #region Primitive Params Methods
         public void GetPrimitiveParams(int linkTarget, AnArray.Enumerator enumerator, ref AnArray paramList)

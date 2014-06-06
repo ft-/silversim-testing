@@ -25,19 +25,149 @@
 
 using ArribaSim.Scene.Management.IM;
 using ArribaSim.Scene.ServiceInterfaces.Chat;
+using ArribaSim.Scene.Types.Object;
+using ArribaSim.Scene.Types.Parcel;
 using ArribaSim.Scene.Types.Scene;
 using ArribaSim.Types;
 using ArribaSim.Types.IM;
 using System;
-
+using System.Collections;
+using System.Collections.Generic;
+using ThreadedClasses;
+ 
 namespace ArribaSim.Scene.Implementation.Basic
 {
-    class BasicScene : SceneInterface, ISceneObjects, ISceneObjectGroups, ISceneObjectParts
+    class BasicScene : SceneInterface
     {
-        private ChatServiceInterface m_ChatService;
+        #region Fields
+        protected internal RwLockedDictionary<UUID, ObjectPart> m_Primitives = new RwLockedDictionary<UUID,ObjectPart>();
+        protected internal RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
+        protected internal RwLockedDictionary<UUID, ParcelInfo> m_Parcels = new RwLockedDictionary<UUID, ParcelInfo>();
+        #endregion
 
+        #region Interface wrappers
+        class BasicSceneObjects : ISceneObjects
+        {
+            private BasicScene m_Scene;
+
+            public BasicSceneObjects(BasicScene scene)
+            {
+                m_Scene = scene;
+            }
+
+            public IObject this[UUID id] 
+            {
+                get
+                {
+                    return m_Scene.m_Objects[id];
+                }
+            }
+
+            public void ForEach(Vector3 pos, double maxdistance, Action<IObject> d)
+            {
+                double maxDistanceSquared = maxdistance * maxdistance;
+                m_Scene.m_Objects.ForEach(delegate(IObject obj)
+                {
+                    if((obj.GlobalPosition - pos).LengthSquared <= maxDistanceSquared && obj.IsInScene(m_Scene))
+                    {
+                        d(obj);
+                    }
+                });
+            }
+
+            public IEnumerator<IObject> GetEnumerator()
+            {
+                return m_Scene.m_Objects.Values.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+        }
+
+        class BasicSceneObjectParts : ISceneObjectParts
+        {
+            private BasicScene m_Scene;
+
+            public BasicSceneObjectParts(BasicScene scene)
+            {
+                m_Scene = scene;
+            }
+
+            public ObjectPart this[UUID id] 
+            {
+                get
+                {
+                    return m_Scene.m_Primitives[id];
+                }
+            }
+
+            public IEnumerator<ObjectPart> GetEnumerator()
+            {
+                return m_Scene.m_Primitives.Values.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+        }
+
+        class BasicSceneParcels : ISceneParcels
+        {
+            private BasicScene m_Scene;
+
+            public BasicSceneParcels(BasicScene scene)
+            {
+                m_Scene = scene;
+            }
+
+            public ParcelInfo this[UUID id]
+            {
+                get
+                {
+                    return m_Scene.m_Parcels[id];
+                }
+            }
+
+            public ParcelInfo this[Vector3 pos]
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+            }
+
+            public IEnumerator<ParcelInfo> GetEnumerator()
+            {
+                return m_Scene.m_Parcels.Values.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+        }
+        #endregion
+
+        #region Services
+        private ChatServiceInterface m_ChatService;
+        private BasicSceneObjects m_SceneObjects;
+        private BasicSceneParcels m_SceneParcels;
+        private BasicSceneObjectParts m_SceneObjectParts;
+        private DefaultSceneObjectGroupInterface m_SceneObjectGroups;
+        private DefaultSceneAgentInterface m_SceneAgents;
+        #endregion
+
+        #region Constructor
         public BasicScene(ChatServiceInterface chatService, UUID id, GridVector position, uint sizeX, uint sizeY)
         {
+            m_SceneObjects = new BasicSceneObjects(this);
+            m_SceneObjectParts = new BasicSceneObjectParts(this);
+            m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
+            m_SceneAgents = new DefaultSceneAgentInterface(this);
+            m_SceneParcels = new BasicSceneParcels(this);
             ID = id;
             GridPosition = position;
             SizeX = sizeX;
@@ -46,30 +176,51 @@ namespace ArribaSim.Scene.Implementation.Basic
             IMRouter.SceneIM.Add(IMSend);
             OnRemove += RemoveScene;
         }
+        #endregion
 
+        #region Internal Delegates
         private bool IMSend(GridInstantMessage im)
         {
-            return false;
+            IAgent agent;
+            try
+            {
+                agent = Agents[im.ToAgent.ID];
+            }
+            catch
+            {
+                return false;
+            }
+
+            return agent.IMSend(im);
         }
 
         private void RemoveScene(SceneInterface s)
         {
             IMRouter.SceneIM.Remove(IMSend);
         }
+        #endregion
 
+        #region Properties
         public override ISceneObjects Objects
         {
             get
             {
-                return this;
+                return m_SceneObjects;
             }
         }
         
+        public override ISceneAgents Agents
+        {
+            get
+            {
+                return m_SceneAgents;
+            }
+        }
         public override ISceneObjectGroups ObjectGroups 
         { 
             get
             {
-                return this;
+                return m_SceneObjectGroups;
             }
         }
 
@@ -77,8 +228,73 @@ namespace ArribaSim.Scene.Implementation.Basic
         { 
             get
             {
-                return this;
+                return m_SceneObjectParts;
             }
         }
+
+        public override ISceneParcels Parcels
+        {
+            get
+            {
+                return m_SceneParcels;
+            }    
+        }
+        #endregion
+
+        #region add and remove
+        public override void Add(IObject obj)
+        {
+            if(obj is ObjectGroup)
+            {
+                ObjectGroup objgroup = (ObjectGroup)obj;
+                List<UUID> removeAgain = new List<UUID>();
+
+                try
+                {
+                    foreach (ObjectPart objpart in objgroup.Values)
+                    {
+                        m_Primitives.Add(objpart.ID, objpart);
+                        removeAgain.Add(objpart.ID);
+                    }
+                    m_Objects.Add(objgroup.ID, objgroup);
+                }
+                catch
+                {
+                    foreach (UUID objpart in removeAgain)
+                    {
+                        m_Primitives.Remove(objpart);
+                    }
+                }
+            }
+            else
+            {
+                m_Objects.Add(obj.ID, obj);
+            }
+        }
+
+        public override bool Remove(IObject obj)
+        {
+            if(!m_Objects.ContainsValue(obj))
+            {
+                return false;
+            }
+            if (obj is ObjectGroup)
+            {
+                ObjectGroup objgroup = (ObjectGroup)obj;
+
+                foreach (ObjectPart objpart in objgroup.Values)
+                {
+                    m_Primitives.Remove(objpart.ID);
+                }
+                m_Objects.Remove(objgroup.ID);
+            }
+            else
+            {
+                m_Objects.Remove(obj.ID);
+            }
+
+            return true;
+        }
+        #endregion
     }
 }
