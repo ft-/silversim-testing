@@ -23,42 +23,41 @@
  * License text is derived from GNU classpath text
  */
 
-using ArribaSim.Main.Common;
+using ArribaSim.Types;
 using System;
-using System.Threading;
+using System.Collections.Generic;
 
-namespace ArribaSim.Main.Simulator
+namespace ArribaSim.ServiceInterfaces.Avatar
 {
-    public static class Application
+    public class AvatarUpdateFailedException : Exception
     {
-        private const string DEFAULT_CONFIG_FILENAME = "../data/ArribaSim.ini";
-
-        public static ConfigurationLoader m_ConfigLoader;
-
-        public static void Main(string[] args)
-        {
-            Thread.CurrentThread.Name = "ArribaSim:Main";
-            try
-            {
-                m_ConfigLoader = new ConfigurationLoader(args, DEFAULT_CONFIG_FILENAME, "Simulator.defaults.ini");
-            }
-            catch(ConfigurationLoader.ConfigurationError e)
-            {
-#if DEBUG
-                System.Console.Write(e.StackTrace.ToString());
-                System.Console.WriteLine();
-#endif
-                Environment.Exit(1);
-            }
-            catch(Exception e)
-            {
-#if DEBUG
-                System.Console.Write(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message));
-                System.Console.Write(e.StackTrace.ToString());
-                System.Console.WriteLine();
-#endif
-                Environment.Exit(1);
-            }
+        public AvatarUpdateFailedException()
+        { 
         }
+    }
+
+    public abstract class AvatarServiceInterface
+    {
+        #region Constructor
+        public AvatarServiceInterface()
+        {
+
+        }
+        #endregion
+
+        public abstract Dictionary<string, string> this[UUID avatarID]
+        {
+            get;
+            set; /* setting null means remove of avatar settings */
+        }
+
+        public abstract string this[UUID avatarID, string itemKey]
+        {
+            get;
+            set;
+        }
+
+        public abstract void Remove(UUID avatarID, IList<string> nameList);
+        public abstract void Remove(UUID avatarID, string name);
     }
 }

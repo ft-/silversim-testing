@@ -69,6 +69,7 @@ namespace ArribaSim.ServiceInterfaces.Grid
         public abstract List<RegionInfo> GetDefaultHypergridRegions(UUID ScopeID);
         public abstract List<RegionInfo> GetRegionsByRange(UUID ScopeID, GridVector min, GridVector max);
         public abstract List<RegionInfo> GetNeighbours(UUID ScopeID, UUID RegionID);
+        public abstract List<RegionInfo> GetAllRegions(UUID ScopeID);
 
         public abstract List<RegionInfo> SearchRegionsByName(UUID ScopeID, string searchString);
         #endregion

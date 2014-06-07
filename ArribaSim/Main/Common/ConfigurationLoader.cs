@@ -396,6 +396,12 @@ namespace ArribaSim.Main.Common
                             throw new ConfigurationError();
                         }
 
+                        if(t == null)
+                        {
+                            m_Log.FatalFormat("Failed to load factory {1} in module {0}", assemblyname, typename);
+                            throw new ConfigurationError();
+                        }
+
                         /* check type inheritance first */
                         if (!t.GetInterfaces().Contains(typeof(IPluginFactory)))
                         {

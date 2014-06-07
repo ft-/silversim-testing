@@ -23,15 +23,15 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Main.Common;
 using ArribaSim.StructuredData.LLSD;
 using ArribaSim.Types;
+using log4net;
 using MySql.Data.MySqlClient;
-using ArribaSim.Main.Common;
+using Nini.Config;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using Nini.Config;
-using log4net;
-using System;
 
 namespace ArribaSim.Database.MySQL
 {
