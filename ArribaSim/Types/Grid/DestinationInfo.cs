@@ -23,41 +23,45 @@
  * License text is derived from GNU classpath text
  */
 
+using System.Net;
+
 namespace ArribaSim.Types.Grid
 {
-    public class RegionInfo
+    public class DestinationInfo : RegionInfo
     {
         #region Constructor
-        public RegionInfo()
+        public DestinationInfo()
         {
 
         }
+        public DestinationInfo(RegionInfo ri)
+        {
+            ID = ri.ID;
+            Location = ri.Location;
+            Size = ri.Size;
+            Name = ri.Name;
+            ServerIP = ri.ServerIP;
+            ServerHttpPort = ri.ServerHttpPort;
+            ServerURI = ri.ServerURI;
+            ServerPort = ri.ServerPort;
+            RegionMapTexture = ri.RegionMapTexture;
+            ParcelMapTexture = ri.ParcelMapTexture;
+            Access = ri.Access;
+            RegionSecret = ri.RegionSecret;
+            Owner = new UUI(ri.Owner);
+            Flags = ri.Flags;
+            ScopeID = ri.ScopeID;
+        }
         #endregion
 
-        #region Region Information
-        public UUID ID = UUID.Zero;
-        public GridVector Location = GridVector.Zero;
-        public GridVector Size = GridVector.Zero;
-        public string Name = string.Empty;
-        public string ServerIP = string.Empty;
-        public uint ServerHttpPort = 0;
-        public string ServerURI = string.Empty;
-        public uint ServerPort = 0;
-        public UUID RegionMapTexture = UUID.Zero;
-        public UUID ParcelMapTexture = UUID.Zero;
-        public uint Access = 0;
-        public string RegionSecret = string.Empty;
-        public UUI Owner = UUI.Unknown;
-        public uint Flags = 0;
-        #endregion
-
-        #region Authentication Info
-        public UUID AuthenticatingPrincipalID = UUID.Zero;
-        public string AuthenticatingToken = string.Empty;
-        #endregion
-
-        #region Informational Fields
-        public UUID ScopeID = UUID.Zero;
+        #region Fields
+        public string GatekeeperURI = string.Empty;
+        public EndPoint SimIP;
+        public Vector3 Position = Vector3.Zero;
+        public Vector3 LookAt = Vector3.Zero;
+        public uint TeleportFlags = 0;
+        public string StartLocation = string.Empty;
+        public bool LocalToGrid = false;
         #endregion
     }
 }

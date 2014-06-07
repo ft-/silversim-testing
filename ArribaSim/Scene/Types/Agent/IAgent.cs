@@ -33,6 +33,7 @@ using ArribaSim.ServiceInterfaces.Friends;
 using ArribaSim.ServiceInterfaces.UserAgents;
 using ArribaSim.ServiceInterfaces.Presence;
 using ArribaSim.ServiceInterfaces.GridUser;
+using ArribaSim.ServiceInterfaces.DestinationLookup;
 
 namespace ArribaSim.Scene.Types.Agent
 {

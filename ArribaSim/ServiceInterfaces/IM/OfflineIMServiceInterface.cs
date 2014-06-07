@@ -25,10 +25,39 @@
 
 using ArribaSim.Types;
 using ArribaSim.Types.IM;
+using System;
 using System.Collections.Generic;
 
 namespace ArribaSim.ServiceInterfaces.IM
 {
+    public class IMOfflineStoreFailedException : Exception
+    {
+        public IMOfflineStoreFailedException()
+        {
+
+        }
+
+        public IMOfflineStoreFailedException(string message)
+            : base(message)
+        {
+
+        }
+    }
+
+    public class IMOfflineRetrieveFailedException : Exception
+    {
+        public IMOfflineRetrieveFailedException()
+        {
+
+        }
+
+        public IMOfflineRetrieveFailedException(string message)
+            : base(message)
+        {
+
+        }
+    }
+
     public abstract class OfflineIMServiceInterface
     {
         #region Constructor

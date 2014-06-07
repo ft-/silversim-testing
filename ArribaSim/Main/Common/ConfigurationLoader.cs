@@ -23,6 +23,7 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Scene.ServiceInterfaces.RegionLoader;
 using ArribaSim.ServiceInterfaces.Database;
 using log4net;
 using log4net.Config;
@@ -622,6 +623,12 @@ namespace ArribaSim.Main.Common
             foreach(IPlugin instance in PluginInstances.Values)
             {
                 instance.Startup(this);
+            }
+
+            m_Log.Info("[MAIN]: Loading regions");
+            foreach(IRegionLoaderInterface regionLoader in GetServices<IRegionLoaderInterface>().Values)
+            {
+                regionLoader.LoadRegions();
             }
         }
         #endregion

@@ -31,6 +31,7 @@ namespace ArribaSim.Scene.Management.IM
     public static class IMRouter
     {
         #region Fields
+        public static RwLockedList<OnSendDelegate> OfflineIM = new RwLockedList<OnSendDelegate>();
         public static RwLockedList<OnSendDelegate> GridIM = new RwLockedList<OnSendDelegate>();
         public static RwLockedList<OnSendDelegate> SceneIM = new RwLockedList<OnSendDelegate>();
         #endregion
@@ -48,6 +49,17 @@ namespace ArribaSim.Scene.Management.IM
             foreach(OnSendDelegate del in GridIM)
             {
                 success = success || del(im);
+            }
+            if(!success)
+            {
+                foreach(OnSendDelegate del in OfflineIM)
+                {
+                    success = del(im);
+                    if(success)
+                    {
+                        break;
+                    }
+                }
             }
             im.OnResult(im, success);
         }

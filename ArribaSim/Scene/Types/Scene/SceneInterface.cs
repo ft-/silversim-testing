@@ -30,6 +30,10 @@ using ArribaSim.Scene.Types.Terrain;
 using ArribaSim.Types;
 using System;
 using System.Collections.Generic;
+using ArribaSim.ServiceInterfaces.Presence;
+using ArribaSim.ServiceInterfaces.Asset;
+using ArribaSim.ServiceInterfaces.Avatar;
+using ArribaSim.ServiceInterfaces.Groups;
 
 namespace ArribaSim.Scene.Types.Scene
 {
@@ -74,6 +78,10 @@ namespace ArribaSim.Scene.Types.Scene
         public abstract ISceneAgents Agents { get; }
         public abstract ISceneParcels Parcels { get; }
         public event Action<SceneInterface> OnRemove;
+        public AssetServiceInterface AssetService { get; protected set; }
+        public GroupsServiceInterface GroupsService { get; protected set; }
+        public AvatarServiceInterface AvatarService { get; protected set; }
+        public PresenceServiceInterface PresenceService { get; protected set; }
 
         public SceneInterface()
         {

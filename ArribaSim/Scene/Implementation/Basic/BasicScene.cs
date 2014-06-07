@@ -36,7 +36,11 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using ThreadedClasses;
- 
+using ArribaSim.ServiceInterfaces.Presence;
+using ArribaSim.ServiceInterfaces.Groups;
+using ArribaSim.ServiceInterfaces.Asset;
+using ArribaSim.ServiceInterfaces.Avatar;
+
 namespace ArribaSim.Scene.Implementation.Basic
 {
     class BasicScene : SceneInterface
@@ -163,8 +167,21 @@ namespace ArribaSim.Scene.Implementation.Basic
         #endregion
 
         #region Constructor
-        public BasicScene(ChatServiceInterface chatService, UUID id, GridVector position, uint sizeX, uint sizeY)
+        public BasicScene(
+            ChatServiceInterface chatService, 
+            UUID id,
+            GridVector position, 
+            uint sizeX, 
+            uint sizeY,
+            PresenceServiceInterface presenceService,
+            AvatarServiceInterface avatarService,
+            GroupsServiceInterface groupsService,
+            AssetServiceInterface assetService)
         {
+            PresenceService = presenceService;
+            AvatarService = avatarService;
+            GroupsService = groupsService;
+            AssetService = assetService;
             Terrain = new TerrainMap(sizeX, sizeY);
             m_SceneObjects = new BasicSceneObjects(this);
             m_SceneObjectParts = new BasicSceneObjectParts(this);

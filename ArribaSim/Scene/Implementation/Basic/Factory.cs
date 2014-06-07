@@ -27,6 +27,10 @@ using ArribaSim.Main.Common;
 using ArribaSim.Scene.ServiceInterfaces.Chat;
 using ArribaSim.Scene.ServiceInterfaces.Scene;
 using ArribaSim.Scene.Types.Scene;
+using ArribaSim.ServiceInterfaces.Presence;
+using ArribaSim.ServiceInterfaces.Groups;
+using ArribaSim.ServiceInterfaces.Asset;
+using ArribaSim.ServiceInterfaces.Avatar;
 using ArribaSim.Types;
 using Nini.Config;
 
@@ -36,20 +40,37 @@ namespace ArribaSim.Scene.Implementation.Basic
     {
         public ChatServiceFactoryInterface m_ChatFactory;
         public string m_ChatFactoryName;
+        public string m_PresenceServiceName;
+        public string m_AvatarServiceName;
+        public string m_GroupsServiceName;
+        public string m_AssetServiceName;
 
-        public SceneFactory(string chatFactoryName)
+        public PresenceServiceInterface m_PresenceService;
+        public AvatarServiceInterface m_AvatarService;
+        public GroupsServiceInterface m_GroupsService = null;
+        public AssetServiceInterface m_AssetService;
+
+        public SceneFactory(IConfig ownConfig)
         {
-            m_ChatFactoryName = chatFactoryName;
+            m_ChatFactoryName = ownConfig.GetString("ChatService", "Chat");
+            m_PresenceServiceName = ownConfig.GetString("PresenceService", "PresenceService");
+            m_AvatarServiceName = ownConfig.GetString("AvatarService", "AvatarService");
+            m_GroupsServiceName = ownConfig.GetString("GroupsService", "GroupsService");
+            m_AssetServiceName = ownConfig.GetString("AssetService", "AssetService");
         }
 
         public void Startup(ConfigurationLoader loader)
         {
             m_ChatFactory = loader.GetService<ChatServiceFactoryInterface>(m_ChatFactoryName);
+            m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
+            m_AvatarService = loader.GetService<AvatarServiceInterface>(m_AvatarServiceName);
+            //m_GroupsService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
+            m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
         }
 
         public override SceneInterface Instantiate(UUID id, GridVector position, uint sizeX, uint sizeY)
         {
-            return new BasicScene(m_ChatFactory.Instantiate(), id, position, sizeX, sizeY);
+            return new BasicScene(m_ChatFactory.Instantiate(), id, position, sizeX, sizeY, m_PresenceService, m_AvatarService, m_GroupsService, m_AssetService);
         }
     }
 
@@ -62,7 +83,7 @@ namespace ArribaSim.Scene.Implementation.Basic
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig)
         {
-            return new SceneFactory(ownConfig.GetString("ChatModuleSection", "Chat"));
+            return new SceneFactory(ownConfig);
         }
     }
 }
