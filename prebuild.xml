@@ -288,8 +288,10 @@
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
       <Reference name="ArribaSim.Types"/>
+      <Reference name="ArribaSim.Scene.Types"/>
       <Reference name="ArribaSim.ServiceInterfaces"/>
       <Reference name="ArribaSim.Main.Common"/>
+      <Reference name="ArribaSim.Scene.Management"/>
       <Reference name="HttpClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>

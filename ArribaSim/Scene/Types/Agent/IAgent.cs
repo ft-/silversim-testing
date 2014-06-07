@@ -25,6 +25,14 @@
 
 using ArribaSim.Scene.Types.Object;
 using ArribaSim.Types.IM;
+using ArribaSim.ServiceInterfaces.Asset;
+using ArribaSim.ServiceInterfaces.Inventory;
+using ArribaSim.ServiceInterfaces.Groups;
+using ArribaSim.ServiceInterfaces.Profile;
+using ArribaSim.ServiceInterfaces.Friends;
+using ArribaSim.ServiceInterfaces.UserAgents;
+using ArribaSim.ServiceInterfaces.Presence;
+using ArribaSim.ServiceInterfaces.GridUser;
 
 namespace ArribaSim.Scene.Types.Agent
 {
@@ -34,5 +42,45 @@ namespace ArribaSim.Scene.Types.Agent
         string FirstName { get; set; }
         string LastName { get; set; }
         bool IMSend(GridInstantMessage im);
+
+        AssetServiceInterface AssetService
+        {
+            get;
+        }
+
+        InventoryServiceInterface InventoryService
+        {
+            get;
+        }
+
+        GroupsServiceInterface GroupsService
+        {
+            get;
+        }
+
+        ProfileServiceInterface ProfileService
+        {
+            get;
+        }
+
+        FriendsServiceInterface FriendsService
+        {
+            get;
+        }
+
+        UserAgentServiceInterface UserAgentService
+        {
+            get;
+        }
+
+        PresenceServiceInterface PresenceService
+        {
+            get;
+        }
+
+        GridUserServiceInterface GridUserService
+        {
+            get;
+        }
     }
 }

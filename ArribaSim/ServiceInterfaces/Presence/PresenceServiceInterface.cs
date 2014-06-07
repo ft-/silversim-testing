@@ -23,10 +23,59 @@
  * License text is derived from GNU classpath text
  */
 
-namespace ArribaSim.Scene.Management.Scene
+using ArribaSim.Types;
+using ArribaSim.Types.Presence;
+using System;
+
+namespace ArribaSim.ServiceInterfaces.Presence
 {
-    public static class SceneManager
+    public class PresenceUpdateFailedException : Exception
     {
-        public static SceneList Scenes = new SceneList();
+        public PresenceUpdateFailedException()
+        {
+
+        }
+    }
+
+    public class PresenceNotFoundException : Exception
+    {
+        public PresenceNotFoundException()
+        {
+
+        }
+    }
+
+    public class PresenceLogoutRegionFailedException : Exception
+    {
+        public PresenceLogoutRegionFailedException()
+        {
+        }
+    }
+
+    public abstract class PresenceServiceInterface
+    {
+        public enum SetType
+        {
+            Login,
+            Report
+        }
+
+        public PresenceServiceInterface()
+        {
+
+        }
+
+        public abstract PresenceInfo this[UUID sessionID]
+        {
+            get;
+            set; /* setting null means logout, != null not allowed */
+        }
+
+        public abstract PresenceInfo this[UUID sessionID, SetType reportType]
+        {
+            set; /* setting null means logout, != null login message */
+        }
+
+        public abstract void logoutRegion(UUID regionID);
     }
 }
