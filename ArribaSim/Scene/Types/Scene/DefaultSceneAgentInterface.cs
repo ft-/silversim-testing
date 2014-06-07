@@ -23,6 +23,7 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Scene.Types.Agent;
 using ArribaSim.Scene.Types.Object;
 using ArribaSim.Types;
 using System.Collections;

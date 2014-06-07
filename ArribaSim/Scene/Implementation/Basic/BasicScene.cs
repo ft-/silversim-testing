@@ -25,9 +25,11 @@
 
 using ArribaSim.Scene.Management.IM;
 using ArribaSim.Scene.ServiceInterfaces.Chat;
+using ArribaSim.Scene.Types.Agent;
 using ArribaSim.Scene.Types.Object;
 using ArribaSim.Scene.Types.Parcel;
 using ArribaSim.Scene.Types.Scene;
+using ArribaSim.Scene.Types.Terrain;
 using ArribaSim.Types;
 using ArribaSim.Types.IM;
 using System;
@@ -163,6 +165,7 @@ namespace ArribaSim.Scene.Implementation.Basic
         #region Constructor
         public BasicScene(ChatServiceInterface chatService, UUID id, GridVector position, uint sizeX, uint sizeY)
         {
+            Terrain = new TerrainMap(sizeX, sizeY);
             m_SceneObjects = new BasicSceneObjects(this);
             m_SceneObjectParts = new BasicSceneObjectParts(this);
             m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
@@ -241,7 +244,7 @@ namespace ArribaSim.Scene.Implementation.Basic
         }
         #endregion
 
-        #region add and remove
+        #region Add and Remove
         public override void Add(IObject obj)
         {
             if(obj is ObjectGroup)

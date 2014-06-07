@@ -23,8 +23,10 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Scene.Types.Agent;
 using ArribaSim.Scene.Types.Object;
 using ArribaSim.Scene.Types.Parcel;
+using ArribaSim.Scene.Types.Terrain;
 using ArribaSim.Types;
 using System;
 using System.Collections.Generic;
@@ -64,6 +66,7 @@ namespace ArribaSim.Scene.Types.Scene
         public uint SizeX { get; protected set; }
         public uint SizeY { get; protected set; }
         public string Name { get; protected set; }
+        public TerrainMap Terrain { get; protected set; }
         public GridVector GridPosition { get; protected set; }
         public abstract ISceneObjects Objects { get; }
         public abstract ISceneObjectGroups ObjectGroups { get; }

@@ -23,6 +23,7 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Scene.Types.Agent;
 using ArribaSim.Scene.Types.Scene;
 using ArribaSim.Scene.Types.Script.Events;
 using ArribaSim.Types;
@@ -57,10 +58,13 @@ namespace ArribaSim.Scene.Types.Object
         private UUI m_Creator = UUI.Unknown;
         private UUI m_LastOwner = UUI.Unknown;
         private Date m_CreationDate = new Date();
+        protected internal RwLockedBiDiMappingDictionary<IAgent, ObjectPart> m_SittingAgents = new RwLockedBiDiMappingDictionary<IAgent, ObjectPart>();
+        public AgentSittingInterface AgentSitting { get; private set; }
 
         #region Constructor
         public ObjectGroup()
         {
+            AgentSitting = new AgentSittingInterface(this);
             IsChanged = false;
         }
         #endregion
@@ -306,6 +310,20 @@ namespace ArribaSim.Scene.Types.Object
             get { return RootPart.LocalPosition; }
             set { RootPart.LocalPosition = value; }
         }
+
+        public IObject GetObjectLink(int linkTarget)
+        {
+            int PrimCount = Count;
+            if(PrimCount < linkTarget)
+            {
+                linkTarget -= (PrimCount + 1);
+                return m_SittingAgents.Keys1[linkTarget];
+            }
+            else
+            {
+                return this[linkTarget];
+            }
+        }
         #endregion
 
         public bool IsInScene(SceneInterface scene)
@@ -383,7 +401,7 @@ namespace ArribaSim.Scene.Types.Object
                                 }
                                 try
                                 {
-                                    ObjectPart obj = this[linkTarget];
+                                    IObject obj = GetObjectLink(linkTarget);
                                     obj.GetPrimitiveParams(enumerator, ref paramList);
                                 }
                                 catch(KeyNotFoundException)
@@ -457,6 +475,11 @@ namespace ArribaSim.Scene.Types.Object
                                     enumerator.GoToMarkPosition();
                                     obj.SetPrimitiveParams(enumerator);
                                 }
+                                m_SittingAgents.ForEach(delegate(IAgent agent)
+                                {
+                                    enumerator.GoToMarkPosition();
+                                    agent.SetPrimitiveParams(enumerator);
+                                });
                                 break;
 
                             case LINK_ALL_CHILDREN:
@@ -468,6 +491,11 @@ namespace ArribaSim.Scene.Types.Object
                                         enumerator.GoToMarkPosition();
                                         kvp.Value.SetPrimitiveParams(enumerator);
                                     }
+                                });
+                                m_SittingAgents.ForEach(delegate(IAgent agent)
+                                {
+                                    enumerator.GoToMarkPosition();
+                                    agent.SetPrimitiveParams(enumerator);
                                 });
                                 break;
 
@@ -481,6 +509,11 @@ namespace ArribaSim.Scene.Types.Object
                                         kvp.Value.SetPrimitiveParams(enumerator);
                                     }
                                 });
+                                m_SittingAgents.ForEach(delegate(IAgent agent)
+                                {
+                                    enumerator.GoToMarkPosition();
+                                    agent.SetPrimitiveParams(enumerator);
+                                });
                                 break;
 
                             default:
@@ -490,7 +523,7 @@ namespace ArribaSim.Scene.Types.Object
                                 }
                                 try
                                 {
-                                    ObjectPart obj = this[linkTarget];
+                                    IObject obj = GetObjectLink(linkTarget);
                                     obj.SetPrimitiveParams(enumerator);
                                 }
                                 catch(KeyNotFoundException)
@@ -622,6 +655,26 @@ namespace ArribaSim.Scene.Types.Object
 
                     default:
                         throw new ArgumentException("Unknown Object Details Type");
+                }
+            }
+        }
+        #endregion
+
+        #region Agent Sitting
+        public class AgentSittingInterface
+        {
+            ObjectGroup m_Group;
+
+            public AgentSittingInterface(ObjectGroup group)
+            {
+                m_Group = group;
+            }
+
+            public IAgent this[ObjectPart p]
+            {
+                get
+                {
+                    return m_Group.m_SittingAgents[p];
                 }
             }
         }

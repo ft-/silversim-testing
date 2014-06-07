@@ -20,13 +20,21 @@ namespace ArribaSim.Main.Simulator
             {
                 m_ConfigLoader = new ConfigurationLoader(args, DEFAULT_CONFIG_FILENAME, "Simulator.defaults.ini");
             }
-            catch(ConfigurationLoader.ConfigurationError)
+            catch(ConfigurationLoader.ConfigurationError e)
             {
+#if DEBUG
+                System.Console.Write(e.StackTrace.ToString());
+                System.Console.WriteLine();
+#endif
                 return;
             }
             catch(Exception e)
             {
+#if DEBUG
                 System.Console.Write(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message));
+                System.Console.Write(e.StackTrace.ToString());
+                System.Console.WriteLine();
+#endif
                 return;
             }
         }

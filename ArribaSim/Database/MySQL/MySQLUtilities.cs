@@ -26,13 +26,49 @@
 using ArribaSim.StructuredData.LLSD;
 using ArribaSim.Types;
 using MySql.Data.MySqlClient;
+using ArribaSim.Main.Common;
 using System.Collections.Generic;
 using System.IO;
+using Nini.Config;
+using log4net;
+using System;
 
 namespace ArribaSim.Database.MySQL
 {
     public static class MySQLUtilities
     {
+        #region Connection String Creator
+        public static string BuildConnectionString(IConfig config, ILog log)
+        {
+            if (!(config.Contains("Server") && config.Contains("Username") && config.Contains("Password") && config.Contains("Database")))
+            {
+                if (!config.Contains("Server"))
+                {
+                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Server' missing in [{0}]", config.Name);
+                }
+                if (!config.Contains("Username"))
+                {
+                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Username' missing in [{0}]", config.Name);
+                }
+                if (!config.Contains("Password"))
+                {
+                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Password' missing in [{0}]", config.Name);
+                }
+                if (!config.Contains("Database"))
+                {
+                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Database' missing in [{0}]", config.Name);
+                }
+                throw new ConfigurationLoader.ConfigurationError();
+            }
+            return String.Format("Server={0};Uid={1};Pwd={2};Database={3};", 
+                config.GetString("Server"),
+                config.GetString("Username"),
+                config.GetString("Password"),
+                config.GetString("Database"));
+        }
+        #endregion
+
+        #region REPLACE INSERT INTO helper
         public static void ReplaceInsertInto(MySqlConnection connection, string tablename, Dictionary<string, object> vals)
         {
             string q1 = "REPLACE INSERT INTO ?tablename (";
@@ -148,7 +184,9 @@ namespace ArribaSim.Database.MySQL
                 command.ExecuteNonQuery();
             }
         }
+        #endregion
 
+        #region Data parsers
         public static Date GetDate(MySqlDataReader dbReader, string prefix)
         {
             return Date.UnixTimeToDateTime((ulong)dbReader[prefix]);
@@ -206,5 +244,46 @@ namespace ArribaSim.Database.MySQL
                 return (AnArray)val;
             }
         }
+        #endregion
+
+        #region Migrations helper
+        private static uint GetTableRevision(MySqlConnection connection, string name)
+        {
+            using(MySqlCommand cmd = new MySqlCommand("SHOW TABLE STATUS WHERE name=?name", connection))
+            {
+                cmd.Parameters.AddWithValue("?name", name);
+                using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                {
+                    if (dbReader.Read())
+                    {
+                        return uint.Parse((string)dbReader["Comment"]);
+                    }
+                }
+            }
+            return 0;
+        }
+
+        public static void ProcessMigrations(string connectionString, string tablename, string[] migrations, ILog log)
+        {
+
+            using(MySqlConnection connection = new MySqlConnection(connectionString))
+            {
+                connection.Open();
+                uint revision = GetTableRevision(connection, tablename);
+                string sqlcmd;
+                while(revision < migrations.Length)
+                {
+                    sqlcmd = migrations[revision];
+                    sqlcmd = sqlcmd.Replace("%tablename%", tablename);
+                    sqlcmd += String.Format(" COMMENT='{0}'", ++revision);
+                    log.InfoFormat("[MYSQL MIGRATION]: Updating {0} to revision {1}", tablename, revision);
+                    using(MySqlCommand cmd = new MySqlCommand(sqlcmd, connection))
+                    {
+                        cmd.ExecuteNonQuery();
+                    }
+                }
+            }
+        }
+        #endregion
     }
 }

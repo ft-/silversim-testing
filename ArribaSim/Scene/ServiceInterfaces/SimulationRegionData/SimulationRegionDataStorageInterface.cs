@@ -23,15 +23,32 @@
  * License text is derived from GNU classpath text
  */
 
-using ArribaSim.Types.IM;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ArribaSim.Types.Grid;
+using ArribaSim.Types;
 
-namespace ArribaSim.Scene.Types.Object
+namespace ArribaSim.Scene.ServiceInterfaces.SimulationData
 {
-    public interface IAgent : IObject
+    public abstract class SimulationRegionDataStorageInterface
     {
-        string DisplayName { get; set; }
-        string FirstName { get; set; }
-        string LastName { get; set; }
-        bool IMSend(GridInstantMessage im);
+        public SimulationRegionDataStorageInterface()
+        {
+
+        }
+
+        public abstract RegionInfo this[UUID regionID]
+        {
+            get;
+        }
+
+        public abstract List<UUID> Regions
+        {
+            get;
+        }
+
+        public abstract void Store(RegionInfo region);
     }
 }
