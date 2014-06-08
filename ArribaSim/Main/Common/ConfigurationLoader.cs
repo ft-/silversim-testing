@@ -23,6 +23,7 @@
  * License text is derived from GNU classpath text
  */
 
+using ArribaSim.Main.Common.HttpServer;
 using ArribaSim.Scene.ServiceInterfaces.RegionLoader;
 using ArribaSim.ServiceInterfaces.Database;
 using log4net;
@@ -33,6 +34,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Xml;
 using ThreadedClasses;
 
@@ -52,6 +54,7 @@ namespace ArribaSim.Main.Common
         private IConfigSource m_Config = new IniConfigSource();
         private Queue<CFG_ISource> m_Sources = new Queue<CFG_ISource>();
         private RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
+        private ManualResetEvent m_ShutdownEvent;
 
         public T GetService<T>(string serviceName)
         {
@@ -548,8 +551,9 @@ namespace ArribaSim.Main.Common
         #endregion
 
         #region Constructor and Main
-        public ConfigurationLoader(string[] args, string defaultConfigName, string defaultsIniName)
+        public ConfigurationLoader(string[] args, string defaultConfigName, string defaultsIniName, ManualResetEvent shutdownEvent)
         {
+            m_ShutdownEvent = shutdownEvent;
             ArgvConfigSource configSource = new ArgvConfigSource(args);
             configSource.AddSwitch("Startup", "config");
             IConfig startup = configSource.Configs["Startup"];
@@ -609,7 +613,15 @@ namespace ArribaSim.Main.Common
             foreach (KeyValuePair<string, IDBServiceInterface> p in dbInterfaces)
             {
                 m_Log.InfoFormat("[MAIN]: -> {0}", p.Key);
-                p.Value.VerifyConnection();
+                try
+                {
+                    p.Value.VerifyConnection();
+                }
+                catch(Exception e)
+                {
+                    m_Log.FatalFormat("[MAIN]: Database connection verification for {0} failed", p.Key);
+                    throw e;
+                }
             }
 
             m_Log.Info("[MAIN]: Process Migrations of all database modules");
@@ -618,6 +630,17 @@ namespace ArribaSim.Main.Common
                 m_Log.InfoFormat("[MAIN]: -> {0}", p.Key);
                 p.Value.ProcessMigrations();
             }
+
+            m_Log.Info("[MAIN]: Initializing HTTP Server");
+            IConfig httpConfig = m_Config.Configs["Network"];
+            if(null == httpConfig)
+            {
+                m_Log.Fatal("Missing configuration section [Network]");
+                throw new ConfigurationError();
+            }
+
+            PluginInstances.Add("HttpServer", new BaseHttpServer(httpConfig));
+            PluginInstances.Add("XmlRpcServer", new HttpXmlRpcHandler());
 
             m_Log.Info("[MAIN]: Starting modules");
             foreach(IPlugin instance in PluginInstances.Values)
@@ -629,6 +652,29 @@ namespace ArribaSim.Main.Common
             foreach(IRegionLoaderInterface regionLoader in GetServices<IRegionLoaderInterface>().Values)
             {
                 regionLoader.LoadRegions();
+            }
+        }
+        #endregion
+
+        #region Shutdown Control
+        public void TriggerShutdown()
+        {
+            m_ShutdownEvent.Set();
+        }
+
+        public void Shutdown()
+        {
+            CommandManager.ClearCommands();
+            SortedList<ShutdownOrder, IPluginShutdown> shutdownList = new SortedList<ShutdownOrder, IPluginShutdown>();
+
+            foreach(IPluginShutdown s in GetServices<IPluginShutdown>().Values)
+            {
+                shutdownList.Add(s.ShutdownOrder, s);
+            }
+
+            foreach(IPluginShutdown s in shutdownList.Values)
+            {
+                s.Shutdown();
             }
         }
         #endregion

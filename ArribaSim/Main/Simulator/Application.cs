@@ -34,13 +34,14 @@ namespace ArribaSim.Main.Simulator
         private const string DEFAULT_CONFIG_FILENAME = "../data/ArribaSim.ini";
 
         public static ConfigurationLoader m_ConfigLoader;
+        public static ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
 
         public static void Main(string[] args)
         {
             Thread.CurrentThread.Name = "ArribaSim:Main";
             try
             {
-                m_ConfigLoader = new ConfigurationLoader(args, DEFAULT_CONFIG_FILENAME, "Simulator.defaults.ini");
+                m_ConfigLoader = new ConfigurationLoader(args, DEFAULT_CONFIG_FILENAME, "Simulator.defaults.ini", m_ShutdownEvent);
             }
             catch(ConfigurationLoader.ConfigurationError e)
             {
@@ -59,6 +60,10 @@ namespace ArribaSim.Main.Simulator
 #endif
                 Environment.Exit(1);
             }
+
+            m_ShutdownEvent.WaitOne();
+
+            m_ConfigLoader.Shutdown();
         }
     }
 }
