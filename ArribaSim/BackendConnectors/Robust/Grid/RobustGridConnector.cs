@@ -227,7 +227,14 @@ namespace ArribaSim.BackendConnectors.Robust.Grid
 
         public override List<RegionInfo> GetAllRegions(UUID ScopeID)
         {
-            throw new NotSupportedException();
+            Dictionary<string, string> post = new Dictionary<string, string>();
+            post["SCOPEID"] = ScopeID;
+            post["XMIN"] = "0";
+            post["YMIN"] = "0";
+            post["XMAX"] = "65535";
+            post["YMAX"] = "65535";
+            post["METHOD"] = "get_region_range";
+            return DeserializeList(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
         }
 
         public override List<RegionInfo> SearchRegionsByName(UUID ScopeID, string searchString)
