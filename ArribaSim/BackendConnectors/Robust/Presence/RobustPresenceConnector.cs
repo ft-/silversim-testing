@@ -23,20 +23,16 @@
  * License text is derived from GNU classpath text
  */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using ArribaSim.BackendConnectors.Robust.Common;
+using ArribaSim.Main.Common;
 using ArribaSim.ServiceInterfaces.Presence;
 using ArribaSim.Types;
 using ArribaSim.Types.Presence;
-using ArribaSim.Main.Common;
-using ArribaSim.Scene.Management.Scene;
-using ArribaSim.Scene.Types.Scene;
 using HttpClasses;
-using ArribaSim.BackendConnectors.Robust.Common;
 using log4net;
 using Nini.Config;
+using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace ArribaSim.BackendConnectors.Robust.Presence

@@ -24,17 +24,21 @@
  */
 
 using ArribaSim.BackendConnectors.Robust.Common;
+using ArribaSim.Main.Common;
 using ArribaSim.ServiceInterfaces.Grid;
 using ArribaSim.Types;
 using ArribaSim.Types.Grid;
 using HttpClasses;
+using log4net;
+using Nini.Config;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace ArribaSim.BackendConnectors.Robust.Grid
 {
     #region Service Implementation
-    public class RobustGridConnector : GridServiceInterface
+    public class RobustGridConnector : GridServiceInterface, IPlugin
     {
         string m_GridURI;
         public int TimeoutMs { get; set; }
@@ -49,6 +53,11 @@ namespace ArribaSim.BackendConnectors.Robust.Grid
             }
             uri += "grid";
             m_GridURI = uri;
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+
         }
         #endregion
 
@@ -253,4 +262,26 @@ namespace ArribaSim.BackendConnectors.Robust.Grid
         #endregion
     }
     #endregion
+
+    #region Factory
+    public class RobustGridConnectorFactory : IPluginFactory
+    {
+        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        public RobustGridConnectorFactory()
+        {
+
+        }
+
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            if (!ownSection.Contains("URI"))
+            {
+                m_Log.FatalFormat("Missing 'URI' in section {0}", ownSection.Name);
+                throw new ConfigurationLoader.ConfigurationError();
+            }
+            return new RobustGridConnector(ownSection.GetString("URI"));
+        }
+    }
+    #endregion
+
 }

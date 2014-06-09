@@ -24,16 +24,16 @@
  */
 
 using ArribaSim.Scene.Types.Object;
-using ArribaSim.Types.IM;
 using ArribaSim.ServiceInterfaces.Asset;
-using ArribaSim.ServiceInterfaces.Inventory;
-using ArribaSim.ServiceInterfaces.Groups;
-using ArribaSim.ServiceInterfaces.Profile;
 using ArribaSim.ServiceInterfaces.Friends;
-using ArribaSim.ServiceInterfaces.UserAgents;
-using ArribaSim.ServiceInterfaces.Presence;
+using ArribaSim.ServiceInterfaces.Grid;
 using ArribaSim.ServiceInterfaces.GridUser;
-using ArribaSim.ServiceInterfaces.DestinationLookup;
+using ArribaSim.ServiceInterfaces.Groups;
+using ArribaSim.ServiceInterfaces.Inventory;
+using ArribaSim.ServiceInterfaces.Presence;
+using ArribaSim.ServiceInterfaces.Profile;
+using ArribaSim.ServiceInterfaces.UserAgents;
+using ArribaSim.Types.IM;
 
 namespace ArribaSim.Scene.Types.Agent
 {
@@ -80,6 +80,11 @@ namespace ArribaSim.Scene.Types.Agent
         }
 
         GridUserServiceInterface GridUserService
+        {
+            get;
+        }
+
+        GridServiceInterface GridService
         {
             get;
         }

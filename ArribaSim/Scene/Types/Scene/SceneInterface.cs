@@ -27,13 +27,15 @@ using ArribaSim.Scene.Types.Agent;
 using ArribaSim.Scene.Types.Object;
 using ArribaSim.Scene.Types.Parcel;
 using ArribaSim.Scene.Types.Terrain;
+using ArribaSim.ServiceInterfaces.Asset;
+using ArribaSim.ServiceInterfaces.Avatar;
+using ArribaSim.ServiceInterfaces.Grid;
+using ArribaSim.ServiceInterfaces.GridUser;
+using ArribaSim.ServiceInterfaces.Groups;
+using ArribaSim.ServiceInterfaces.Presence;
 using ArribaSim.Types;
 using System;
 using System.Collections.Generic;
-using ArribaSim.ServiceInterfaces.Presence;
-using ArribaSim.ServiceInterfaces.Asset;
-using ArribaSim.ServiceInterfaces.Avatar;
-using ArribaSim.ServiceInterfaces.Groups;
 
 namespace ArribaSim.Scene.Types.Scene
 {
@@ -82,6 +84,8 @@ namespace ArribaSim.Scene.Types.Scene
         public GroupsServiceInterface GroupsService { get; protected set; }
         public AvatarServiceInterface AvatarService { get; protected set; }
         public PresenceServiceInterface PresenceService { get; protected set; }
+        public GridUserServiceInterface GridUserService { get; protected set; }
+        public GridServiceInterface GridService { get; protected set; }
 
         public SceneInterface()
         {
