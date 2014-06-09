@@ -72,7 +72,7 @@ namespace ArribaSim.Scene.Implementation.Basic
             m_ChatFactory = loader.GetService<ChatServiceFactoryInterface>(m_ChatFactoryName);
             m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
             m_AvatarService = loader.GetService<AvatarServiceInterface>(m_AvatarServiceName);
-            //m_GroupsService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
+            m_GroupsService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
             m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
             m_GridUserService = loader.GetService<GridUserServiceInterface>(m_GridUserServiceName);
