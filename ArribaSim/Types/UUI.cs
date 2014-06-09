@@ -47,6 +47,56 @@ namespace ArribaSim.Types
             }
         }
 
+        public string FullName
+        {
+            get
+            {
+                if (HomeURI == null)
+                {
+                    return string.Format("{0} {1}", FirstName.Replace(" ", "."), LastName.Replace(" ", "."));
+                }
+                else
+                {
+                    return string.Format("{0}.{1} @{2}", FirstName.Replace(" ", "."), LastName.Replace(" ", "."), HomeURI.ToString());
+                }
+            }
+            set
+            {
+                string[] names = value.Split(new char[] { ' ' }, 2, StringSplitOptions.None);
+                if(names.Length < 2)
+                {
+                    FirstName = names[0];
+                    LastName = "";
+                    HomeURI = null;
+                }
+                else
+                {
+                    if (names[1].StartsWith("@"))
+                    {
+                        /* HG UUI */
+                        HomeURI = new Uri("http://" + names[1]);
+                        names = names[0].Split(new char[] { '.' }, 2, StringSplitOptions.None);
+                        if(names.Length < 2)
+                        {
+                            FirstName = names[0];
+                            LastName = "";
+                        }
+                        else
+                        {
+                            FirstName = names[0];
+                            LastName = names[1];
+                        }
+                    }
+                    else
+                    {
+                        FirstName = names[0];
+                        LastName = names[1];
+                        HomeURI = null;
+                    }
+                }
+            }
+        }
+
         public UUI()
         {
         }

@@ -45,7 +45,8 @@ namespace ArribaSim.BackendConnectors.Robust.IM
         string m_OfflineIMURI;
         public RobustOfflineIMConnector(string uri)
         {
-            if(!uri.EndsWith("/"))
+            TimeoutMs = 20000;
+            if (!uri.EndsWith("/"))
             {
                 uri += "/";
             }
@@ -71,15 +72,8 @@ namespace ArribaSim.BackendConnectors.Robust.IM
             post["BinaryBucket"] = BitConverter.ToString(im.BinaryBucket).Replace("-", string.Empty);
             post["Dialog"] = ((int)im.Dialog).ToString();
             post["FromAgentID"] = im.FromAgent.ID;
-            if (im.FromAgent.HomeURI == null)
-            {
-                post["FromAgentName"] = im.FromAgent.FirstName + " " + im.FromAgent.LastName;
-            }
-            else
-            {
-                post["FromAgentName"] = im.FromAgent.FirstName + "." + im.FromAgent.LastName + " @" + im.FromAgent.HomeURI;
-            }
-            bool isFromGroup = !im.FromGroup.Equals(UUID.Zero);
+            post["FromAgentName"] = im.FromAgent.FullName;
+            bool isFromGroup = !im.IsFromGroup.Equals(UUID.Zero);
             post["FromGroup"] = isFromGroup.ToString();
             post["Message"] = im.Message;
             post["EstateID"] = im.ParentEstateID.ToString();
@@ -125,11 +119,11 @@ namespace ArribaSim.BackendConnectors.Robust.IM
                 im.BinaryBucket = StringToByteArray(m["BinaryBucket"].ToString());
                 im.Dialog = (GridInstantMessageDialog) m["Dialog"].AsInt;
                 im.FromAgent.ID = m["FromAgentID"].ToString();
-                //im.FromAgent.CreatorData = m["FromAgentName"].ToString();
-                im.FromGroup = m["FromGroup"].AsBoolean;
+                im.FromAgent.FullName = m["FromAgentName"].ToString();
+                im.IsFromGroup = m["FromGroup"].AsBoolean;
                 im.IMSessionID = m["SessionID"].ToString();
                 im.Message = m["Message"].ToString();
-                im.Offline = m["Offline"].AsBoolean;
+                im.IsOffline = m["Offline"].AsBoolean;
                 im.ParentEstateID = m["EstateID"].AsInt;
                 im.Position = m["Position"].AsVector3;
                 im.RegionID = m["RegionID"].AsString.ToString();

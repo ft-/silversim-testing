@@ -31,10 +31,10 @@ namespace ArribaSim.Types.IM
         public UUI FromAgent;
         public UUI ToAgent;
         public GridInstantMessageDialog Dialog;
-        public bool FromGroup;
+        public bool IsFromGroup;
         public string Message;
         public UUID IMSessionID;
-        public bool Offline;
+        public bool IsOffline;
         public Vector3 Position;
         public byte[] BinaryBucket;
         public int ParentEstateID;
@@ -43,5 +43,9 @@ namespace ArribaSim.Types.IM
 
         public delegate void OnResultDelegate(GridInstantMessage im, bool success);
         public OnResultDelegate OnResult;
+        public bool NoOfflineIMStore;
+
+        /* can be used for storing the result */
+        public bool ResultInfo;
     }
 }

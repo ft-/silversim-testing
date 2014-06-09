@@ -54,6 +54,7 @@ namespace ArribaSim.BackendConnectors.Robust.Avatar
         #region Constructor
         public RobustAvatarConnector(string uri)
         {
+            TimeoutMs = 20000;
             if(!uri.EndsWith("/"))
             {
                 uri += "/";

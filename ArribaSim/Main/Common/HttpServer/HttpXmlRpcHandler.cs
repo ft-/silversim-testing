@@ -43,7 +43,6 @@ namespace ArribaSim.Main.Common.HttpServer
 
         public RwLockedDictionary<string, XmlRpcDelegate> XmlRpcMethods = new RwLockedDictionary<string,XmlRpcDelegate>();
         XmlRpcDeserializer m_XmlRpcDeserializer = new XmlRpcDeserializer();
-        XmlRpcSerializer m_XmlRpcSerializer = new XmlRpcSerializer();
 
         void RequestHandler(HttpListenerContext context)
         {
@@ -91,9 +90,8 @@ namespace ArribaSim.Main.Common.HttpServer
                     FaultResponse(context.Response, -32700, "Internal service error");
                     return;
                 }
-                
-                string restext = m_XmlRpcSerializer.Serialize(res);
-                byte[] buffer = Encoding.UTF8.GetBytes(restext);
+
+                byte[] buffer = Encoding.UTF8.GetBytes(res.ToString());
 
                 HttpListenerResponse response = context.Response;
                 response.ContentType = "text/xml";
@@ -117,7 +115,7 @@ namespace ArribaSim.Main.Common.HttpServer
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_Log.Info("Initializing XMLRPC Handler");
+            m_Log.Info("[XMLRPC SERVER]: Initializing XMLRPC Handler");
             BaseHttpServer server = loader.GetService<BaseHttpServer>("HttpServer");
             server.RootUriContentTypeHandlers["text/xml"] = RequestHandler;
             server.RootUriContentTypeHandlers["application/xml"] = RequestHandler;
@@ -125,7 +123,7 @@ namespace ArribaSim.Main.Common.HttpServer
 
         public void Shutdown()
         {
-            m_Log.Info("Deinitializing XMLRPC Handler");
+            m_Log.Info("[XMLRPC SERVER]: Deinitializing XMLRPC Handler");
             XmlRpcMethods.Clear();
         }
 

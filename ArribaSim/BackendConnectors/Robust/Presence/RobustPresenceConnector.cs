@@ -51,7 +51,8 @@ namespace ArribaSim.BackendConnectors.Robust.Presence
         #region Constructor
         public RobustPresenceConnector(string uri, string homeuri)
         {
-            if(!uri.EndsWith("/"))
+            TimeoutMs = 20000;
+            if (!uri.EndsWith("/"))
             {
                 uri += "/";
             }

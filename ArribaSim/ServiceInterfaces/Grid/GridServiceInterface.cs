@@ -25,10 +25,27 @@
 
 using ArribaSim.Types;
 using ArribaSim.Types.Grid;
+using System;
 using System.Collections.Generic;
 
 namespace ArribaSim.ServiceInterfaces.Grid
 {
+    public class GridRegionUpdateFailedException : Exception
+    {
+        public GridRegionUpdateFailedException()
+        {
+
+        }
+    }
+
+    public class GridServiceInaccessibleException : Exception
+    {
+        public GridServiceInaccessibleException()
+        {
+
+        }
+    }
+
     public abstract class GridServiceInterface
     {
         #region Constructor
@@ -43,15 +60,23 @@ namespace ArribaSim.ServiceInterfaces.Grid
         {
             get;
         }
+
         public abstract RegionInfo this[UUID ScopeID, GridVector position]
         {
             get;
         }
+
         public abstract RegionInfo this[UUID ScopeID, uint gridX, uint gridY]
         {
             get;
         }
+
         public abstract RegionInfo this[UUID ScopeID, string regionName]
+        {
+            get;
+        }
+
+        public abstract RegionInfo this[UUID regionID]
         {
             get;
         }

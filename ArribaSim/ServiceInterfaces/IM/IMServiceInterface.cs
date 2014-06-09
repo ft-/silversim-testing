@@ -24,9 +24,18 @@
  */
 
 using ArribaSim.Types.IM;
+using System;
 
 namespace ArribaSim.ServiceInterfaces.IM
 {
+    public class IMSendFailedException : Exception
+    {
+        public IMSendFailedException()
+        {
+
+        }
+    }
+
     public abstract class IMServiceInterface
     {
         #region Constructor

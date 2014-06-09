@@ -56,14 +56,14 @@ namespace ArribaSim.Main.Common.HttpServer
             }
             m_Listener = new HttpListener();
             m_Port = (uint)httpConfig.GetInt("HttpListenerPort", 9000);
-            m_Log.InfoFormat("Adding HTTP Server at port {0}", m_Port);
+            m_Log.InfoFormat("[HTTP SERVER]: Adding HTTP Server at port {0}", m_Port);
             m_Listener.Prefixes.Add(String.Format("http://+:{0}/", m_Port));
         }
 
         public void Startup(ConfigurationLoader loader)
         {
             //  netsh http add urlacl url=http://+:8008/ user=Everyone listen=yes
-            m_Log.InfoFormat("Starting HTTP Server");
+            m_Log.InfoFormat("[HTTP SERVER]: Starting HTTP Server");
             m_Listener.Start();
             m_Listener.BeginGetContext(GetContextCallback, null);
         }
@@ -78,7 +78,7 @@ namespace ArribaSim.Main.Common.HttpServer
 
         public void Shutdown()
         {
-            m_Log.InfoFormat("Stopping HTTP Server");
+            m_Log.InfoFormat("[HTTP SERVER]: Stopping HTTP Server");
             m_Listener.Stop();
             StartsWithUriHandlers.Clear();
             UriHandlers.Clear();

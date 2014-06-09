@@ -37,6 +37,7 @@ using System.Reflection;
 
 namespace ArribaSim.BackendConnectors.Robust.GridUser
 {
+    #region Service Implementation
     class RobustGridUserConnector : GridUserServiceInterface, IPlugin
     {
         public int TimeoutMs { get; set; }
@@ -45,7 +46,8 @@ namespace ArribaSim.BackendConnectors.Robust.GridUser
         #region Constructor
         public RobustGridUserConnector(string uri)
         {
-            if(!uri.EndsWith("/"))
+            TimeoutMs = 20000;
+            if (!uri.EndsWith("/"))
             {
                 uri += "/";
             }
@@ -108,6 +110,7 @@ namespace ArribaSim.BackendConnectors.Robust.GridUser
                 return GetUserInfo(userID.ToString());
             }
         }
+
         private void checkResult(Map map)
         {
             if (!map.ContainsKey("result"))
@@ -161,6 +164,7 @@ namespace ArribaSim.BackendConnectors.Robust.GridUser
             checkResult(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridUserURI, null, post, false, TimeoutMs)));
         }
     }
+    #endregion
 
     #region Factory
     public class RobustGridUserConnectorFactory : IPluginFactory
