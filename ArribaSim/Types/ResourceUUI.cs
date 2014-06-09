@@ -23,17 +23,26 @@
  * License text is derived from GNU classpath text
  */
 
-namespace ArribaSim.Types.Presence
-{
-    public class PresenceInfo
-    {
-        public UUI UserID = UUI.Unknown;
-        public UUID RegionID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
+using System;
 
-        public PresenceInfo()
+namespace ArribaSim.Types
+{
+    public class ResourceUUI
+    {
+        public UUID ID = UUID.Zero;
+        public Uri LocationURI = null;
+
+        public ResourceUUI()
         {
 
+        }
+
+        public static ResourceUUI Unknown
+        {
+            get
+            {
+                return new ResourceUUI();
+            }
         }
     }
 }

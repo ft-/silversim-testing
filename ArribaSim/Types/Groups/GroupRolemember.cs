@@ -23,15 +23,15 @@
  * License text is derived from GNU classpath text
  */
 
-namespace ArribaSim.Types.Presence
+namespace ArribaSim.Types.Groups
 {
-    public class PresenceInfo
+    public class GroupRolemember
     {
-        public UUI UserID = UUI.Unknown;
-        public UUID RegionID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
+        public UUID GroupID = UUID.Zero;
+        public UUID RoleID = UUID.Zero;
+        public UUI Principal = UUI.Unknown;
 
-        public PresenceInfo()
+        public GroupRolemember()
         {
 
         }

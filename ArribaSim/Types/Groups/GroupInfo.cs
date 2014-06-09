@@ -23,15 +23,35 @@
  * License text is derived from GNU classpath text
  */
 
-namespace ArribaSim.Types.Presence
-{
-    public class PresenceInfo
-    {
-        public UUI UserID = UUI.Unknown;
-        public UUID RegionID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ArribaSim.Types;
 
-        public PresenceInfo()
+namespace ArribaSim.Types.Groups
+{
+    public class GroupInfo
+    {
+        public UUID ID = UUID.Zero;
+        public string Name = "";
+        public string Charter = "";
+        public string Location = "";
+        public UUID InsigniaID = UUID.Zero;
+        public UUI FounderID = UUI.Unknown;
+        public int MembershipFee = 0;
+        public bool IsOpenEnrollment = false;
+        public bool IsShownInList = false;
+        public bool IsAllowPublish = false;
+        public bool IsMaturePublish = false;
+        public UUID OwnerRoleID = UUID.Zero;
+
+        #region Informational fields
+        public int MemberCount = 0;
+        public int RoleCount = 0;
+        #endregion
+
+        public GroupInfo()
         {
 
         }

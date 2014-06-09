@@ -23,15 +23,23 @@
  * License text is derived from GNU classpath text
  */
 
-namespace ArribaSim.Types.Presence
+namespace ArribaSim.Types.Groups
 {
-    public class PresenceInfo
+    public class GroupNotice
     {
-        public UUI UserID = UUI.Unknown;
-        public UUID RegionID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
+        public UUID GroupID = UUID.Zero;
+        public UUID ID = UUID.Zero;
+        public Date Timestamp = new Date();
+        public string FromName = string.Empty;
+        public string Subject = string.Empty;
+        public string Message = string.Empty;
+        public bool HasAttachment = false;
+        public int AttachmentType = 0;
+        public string AttachmentName = "";
+        public UUID AttachmentItemID = UUID.Zero;
+        public UUI AttachmentOwner = UUI.Unknown;
 
-        public PresenceInfo()
+        public GroupNotice()
         {
 
         }
