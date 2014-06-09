@@ -30,16 +30,18 @@ using ArribaSim.Scene.Types.Object;
 using ArribaSim.Scene.Types.Parcel;
 using ArribaSim.Scene.Types.Scene;
 using ArribaSim.Scene.Types.Terrain;
+using ArribaSim.ServiceInterfaces.Asset;
+using ArribaSim.ServiceInterfaces.Avatar;
+using ArribaSim.ServiceInterfaces.Grid;
+using ArribaSim.ServiceInterfaces.GridUser;
+using ArribaSim.ServiceInterfaces.Groups;
+using ArribaSim.ServiceInterfaces.Presence;
 using ArribaSim.Types;
 using ArribaSim.Types.IM;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using ThreadedClasses;
-using ArribaSim.ServiceInterfaces.Presence;
-using ArribaSim.ServiceInterfaces.Groups;
-using ArribaSim.ServiceInterfaces.Asset;
-using ArribaSim.ServiceInterfaces.Avatar;
 
 namespace ArribaSim.Scene.Implementation.Basic
 {
@@ -176,12 +178,16 @@ namespace ArribaSim.Scene.Implementation.Basic
             PresenceServiceInterface presenceService,
             AvatarServiceInterface avatarService,
             GroupsServiceInterface groupsService,
-            AssetServiceInterface assetService)
+            AssetServiceInterface assetService,
+            GridServiceInterface gridService,
+            GridUserServiceInterface gridUserService)
         {
             PresenceService = presenceService;
             AvatarService = avatarService;
             GroupsService = groupsService;
             AssetService = assetService;
+            GridService = gridService;
+            GridUserService = gridUserService;
             Terrain = new TerrainMap(sizeX, sizeY);
             m_SceneObjects = new BasicSceneObjects(this);
             m_SceneObjectParts = new BasicSceneObjectParts(this);

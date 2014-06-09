@@ -27,10 +27,12 @@ using ArribaSim.Main.Common;
 using ArribaSim.Scene.ServiceInterfaces.Chat;
 using ArribaSim.Scene.ServiceInterfaces.Scene;
 using ArribaSim.Scene.Types.Scene;
-using ArribaSim.ServiceInterfaces.Presence;
-using ArribaSim.ServiceInterfaces.Groups;
 using ArribaSim.ServiceInterfaces.Asset;
 using ArribaSim.ServiceInterfaces.Avatar;
+using ArribaSim.ServiceInterfaces.Grid;
+using ArribaSim.ServiceInterfaces.GridUser;
+using ArribaSim.ServiceInterfaces.Groups;
+using ArribaSim.ServiceInterfaces.Presence;
 using ArribaSim.Types;
 using Nini.Config;
 
@@ -44,11 +46,15 @@ namespace ArribaSim.Scene.Implementation.Basic
         public string m_AvatarServiceName;
         public string m_GroupsServiceName;
         public string m_AssetServiceName;
+        public string m_GridServiceName;
+        public string m_GridUserServiceName;
 
         public PresenceServiceInterface m_PresenceService;
         public AvatarServiceInterface m_AvatarService;
         public GroupsServiceInterface m_GroupsService = null;
         public AssetServiceInterface m_AssetService;
+        public GridServiceInterface m_GridService;
+        public GridUserServiceInterface m_GridUserService;
 
         public SceneFactory(IConfig ownConfig)
         {
@@ -57,6 +63,8 @@ namespace ArribaSim.Scene.Implementation.Basic
             m_AvatarServiceName = ownConfig.GetString("AvatarService", "AvatarService");
             m_GroupsServiceName = ownConfig.GetString("GroupsService", "GroupsService");
             m_AssetServiceName = ownConfig.GetString("AssetService", "AssetService");
+            m_GridServiceName = ownConfig.GetString("GridService", "GridService");
+            m_GridUserServiceName = ownConfig.GetString("GridUserService", "GridUserService");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -66,11 +74,13 @@ namespace ArribaSim.Scene.Implementation.Basic
             m_AvatarService = loader.GetService<AvatarServiceInterface>(m_AvatarServiceName);
             //m_GroupsService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
             m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
+            m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
+            m_GridUserService = loader.GetService<GridUserServiceInterface>(m_GridUserServiceName);
         }
 
         public override SceneInterface Instantiate(UUID id, GridVector position, uint sizeX, uint sizeY)
         {
-            return new BasicScene(m_ChatFactory.Instantiate(), id, position, sizeX, sizeY, m_PresenceService, m_AvatarService, m_GroupsService, m_AssetService);
+            return new BasicScene(m_ChatFactory.Instantiate(), id, position, sizeX, sizeY, m_PresenceService, m_AvatarService, m_GroupsService, m_AssetService, m_GridService, m_GridUserService);
         }
     }
 

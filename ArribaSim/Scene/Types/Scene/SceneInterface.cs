@@ -89,7 +89,6 @@ namespace ArribaSim.Scene.Types.Scene
 
         public SceneInterface()
         {
-
         }
 
         public void InvokeOnRemove()
