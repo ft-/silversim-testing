@@ -29,8 +29,8 @@ using ArribaSim.Types;
 using ArribaSim.Types.Grid;
 using log4net;
 using Nini.Config;
-using System.Reflection;
 using System.Collections.Generic;
+using System.Reflection;
 using ThreadedClasses;
 
 namespace ArribaSim.Database.Null.Grid
@@ -351,34 +351,6 @@ namespace ArribaSim.Database.Null.Grid
             return result;
         }
         #endregion
-
-        private static readonly string[] Migrations = new string[]{
-            "CREATE TABLE %tablename% (" +
-                "uuid CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "regionName VARCHAR(128)," +
-                "regionSecret VARCHAR(128)," +
-                "serverIP VARCHAR(64)," +
-                "serverPort INT(10) UNSIGNED," +
-                "serverURI VARCHAR(255)," +
-                "locX INT(10) UNSIGNED," +
-                "locY INT(10) UNSIGNED," +
-                "regionMapTexture CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "serverHttpPort INT(10) UNSIGNED," +
-                "owner VARCHAR(255) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "access INT(10) UNSIGNED DEFAULT '1'," +
-                "ScopeID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "sizeX INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
-                "sizeY INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
-                "flags INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
-                "last_seen BIGINT(20) UNSIGNED NOT NULL DEFAULT '0'," +
-                "AuthenticatingToken VARCHAR(255) NOT NULL DEFAULT ''," +
-                "AuthenticatingPrincipalID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "parcelMapTexture CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "PRIMARY KEY(uuid)," +
-                "KEY regionName (regionName)," +
-                "KEY ScopeID (ScopeID)," +
-                "KEY flags (flags))"
-        };
     }
     #endregion
 
