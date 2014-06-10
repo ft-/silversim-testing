@@ -36,6 +36,11 @@ namespace ArribaSim.ServiceInterfaces.Grid
         {
 
         }
+        public GridRegionUpdateFailedException(string message)
+            : base(message)
+        {
+
+        }
     }
 
     public class GridServiceInaccessibleException : Exception
@@ -61,9 +66,12 @@ namespace ArribaSim.ServiceInterfaces.Grid
             get;
         }
 
-        public abstract RegionInfo this[UUID ScopeID, GridVector position]
+        public RegionInfo this[UUID ScopeID, GridVector position]
         {
-            get;
+            get
+            {
+                return this[ScopeID, position.X, position.Y];
+            }
         }
 
         public abstract RegionInfo this[UUID ScopeID, uint gridX, uint gridY]
@@ -86,6 +94,7 @@ namespace ArribaSim.ServiceInterfaces.Grid
         #region Region Registration
         public abstract void RegisterRegion(RegionInfo regionInfo);
         public abstract void UnregisterRegion(UUID ScopeID, UUID RegionID);
+        public abstract void DeleteRegion(UUID scopeID, UUID regionID);
         #endregion
 
         #region List accessors
@@ -95,6 +104,7 @@ namespace ArribaSim.ServiceInterfaces.Grid
         public abstract List<RegionInfo> GetRegionsByRange(UUID ScopeID, GridVector min, GridVector max);
         public abstract List<RegionInfo> GetNeighbours(UUID ScopeID, UUID RegionID);
         public abstract List<RegionInfo> GetAllRegions(UUID ScopeID);
+        public abstract List<RegionInfo> GetOnlineRegions(UUID ScopeID);
 
         public abstract List<RegionInfo> SearchRegionsByName(UUID ScopeID, string searchString);
         #endregion

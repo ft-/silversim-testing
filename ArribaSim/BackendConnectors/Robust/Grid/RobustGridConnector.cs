@@ -74,14 +74,6 @@ namespace ArribaSim.BackendConnectors.Robust.Grid
             }
         }
 
-        public override RegionInfo this[UUID ScopeID, GridVector position]
-        {
-            get
-            {
-                return this[ScopeID, position.X, position.Y];
-            }
-        }
-
         public override RegionInfo this[UUID ScopeID, uint gridX, uint gridY]
         {
             get
@@ -149,6 +141,11 @@ namespace ArribaSim.BackendConnectors.Robust.Grid
             post["REGIONID"] = RegionID;
             post["METHOD"] = "deregister";
             checkResult(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
+        }
+
+        public override void DeleteRegion(UUID scopeID, UUID regionID)
+        {
+            throw new NotSupportedException();
         }
         #endregion
 
@@ -235,6 +232,20 @@ namespace ArribaSim.BackendConnectors.Robust.Grid
             post["YMAX"] = "65535";
             post["METHOD"] = "get_region_range";
             return DeserializeList(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
+        }
+
+        public override List<RegionInfo> GetOnlineRegions(UUID ScopeID)
+        {
+            List<RegionInfo> allRegions = GetAllRegions(ScopeID);
+            List<RegionInfo> onlineRegions = new List<RegionInfo>();
+            foreach(RegionInfo ri in allRegions)
+            {
+                if((ri.Flags & (uint)RegionFlags.RegionOnline) != 0)
+                {
+                    onlineRegions.Add(ri);
+                }
+            }
+            return onlineRegions;
         }
 
         public override List<RegionInfo> SearchRegionsByName(UUID ScopeID, string searchString)
