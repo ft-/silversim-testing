@@ -33,6 +33,7 @@ using log4net;
 using Nini.Config;
 using System.Collections.Generic;
 using System.Reflection;
+using System;
 
 namespace ArribaSim.BackendConnectors.Robust.GridUser
 {
@@ -72,9 +73,12 @@ namespace ArribaSim.BackendConnectors.Robust.GridUser
             info.LastPosition = new Vector3(map["LastPosition"].ToString());
             info.LastLookAt = new Vector3(map["LastLookAt"].ToString());
             info.Online = map["Online"].AsBoolean;
-            /* TODO: */
-            //info.LastLogin = //$xmlout.="<Login>".strftime("%F %T", intval($this->Login))."</Login>";
-            //info.LastLogout = //$xmlout.="<Logout>".strftime("%F %T", intval($this->Logout))."</Logout>";
+            DateTime login;
+            DateTime logout;
+            DateTime.TryParse(map["Login"].ToString(), out login);
+            DateTime.TryParse(map["Logout"].ToString(), out logout);
+            info.LastLogin = new Date(login);
+            info.LastLogout = new Date(logout);
             return info;
         }
 
@@ -125,7 +129,8 @@ namespace ArribaSim.BackendConnectors.Robust.GridUser
         public override void LoggedIn(UUI userID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["UserID"] = userID;
+            post["UserID"] = userID.ID;
+            post["UserData"] = userID.CreatorData;
             post["METHOD"] = "loggedin";
             checkResult(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridUserURI, null, post, false, TimeoutMs)));
         }
@@ -133,7 +138,8 @@ namespace ArribaSim.BackendConnectors.Robust.GridUser
         public override void LoggedOut(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["UserID"] = userID;
+            post["UserID"] = userID.ID;
+            post["UserData"] = userID.CreatorData;
             post["RegionID"] = lastRegionID.ToString();
             post["Position"] = lastPosition.ToString();
             post["LookAt"] = lastLookAt.ToString();
@@ -144,7 +150,8 @@ namespace ArribaSim.BackendConnectors.Robust.GridUser
         public override void SetHome(UUI userID, UUID homeRegionID, Vector3 homePosition, Vector3 homeLookAt)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["UserID"] = userID;
+            post["UserID"] = userID.ID;
+            post["UserData"] = userID.CreatorData;
             post["RegionID"] = homeRegionID.ToString();
             post["Position"] = homePosition.ToString();
             post["LookAt"] = homeLookAt.ToString();
@@ -155,7 +162,8 @@ namespace ArribaSim.BackendConnectors.Robust.GridUser
         public override void SetPosition(UUI userID, UUI lastRegionID, Vector3 lastPosition, Vector3 lastLookAt)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["UserID"] = userID;
+            post["UserID"] = userID.ID;
+            post["UserData"] = userID.CreatorData;
             post["RegionID"] = lastRegionID.ToString();
             post["Position"] = lastPosition.ToString();
             post["LookAt"] = lastLookAt.ToString();
