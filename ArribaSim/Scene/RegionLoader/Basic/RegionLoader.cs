@@ -1,11 +1,12 @@
+﻿/*
 
 ArribaSim is distributed under the terms of the
-GNU General Public License v2 
+GNU Affero General Public License v3
 with the following clarification and special exception.
 
 Linking this code statically or dynamically with other modules is
 making a combined work based on this code. Thus, the terms and
-conditions of the GNU General Public License cover the whole
+conditions of the GNU Affero General Public License cover the whole
 combination.
 
 As a special exception, the copyright holders of this code give you
@@ -20,5 +21,34 @@ this exception to your version of the code, but you are not
 obligated to do so. If you do not wish to do so, delete this
 exception statement from your version.
 
-License text is derived from GNU classpath text
+*/
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ArribaSim.Main.Common;
+using ArribaSim.Scene.ServiceInterfaces.RegionLoader;
+
+namespace ArribaSim.Scene.RegionLoader.Basic
+{
+    class RegionLoaderService : IPlugin, IRegionLoaderInterface
+    {
+        #region Constructor
+        public RegionLoaderService(string regionStorage, string regionIni)
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+
+        }
+        #endregion
+
+        public void LoadRegions()
+        {
+
+        }
+    }
+}
