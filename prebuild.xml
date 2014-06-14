@@ -146,6 +146,56 @@
       </Files>
     </Project>
 
+    <Project frameworkVersion="v4_0" name="ArribaSim.Linden.Caps" path="ArribaSim/Linden/Caps" type="Library">
+      <Configuration name="Release">
+        <Options>
+          <OutputPath>../../../bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug">
+        <Options>
+          <OutputPath>../../../bin/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../../bin/</ReferencePath>
+      <Reference name="System"/>
+      <Reference name="System.Core"/>
+      <Reference name="ArribaSim.Types"/>
+      <Reference name="ArribaSim.ServiceInterfaces"/>
+      <Reference name="ArribaSim.Scene.Types"/>
+      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
+      <Reference name="ThreadedClasses" path="../../../bin/"/>
+      <Files>
+        <Match pattern="*.cs" recurse="true"/>
+      </Files>
+    </Project>
+
+    <Project frameworkVersion="v4_0" name="ArribaSim.Linden.UDP" path="ArribaSim/Linden/UDP" type="Library">
+      <Configuration name="Release">
+        <Options>
+          <OutputPath>../../../bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug">
+        <Options>
+          <OutputPath>../../../bin/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../../bin/</ReferencePath>
+      <Reference name="System"/>
+      <Reference name="System.Core"/>
+      <Reference name="ArribaSim.Types"/>
+      <Reference name="ArribaSim.ServiceInterfaces"/>
+      <Reference name="ArribaSim.Scene.Types"/>
+      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
+      <Reference name="ThreadedClasses" path="../../../bin/"/>
+      <Files>
+        <Match pattern="*.cs" recurse="true"/>
+      </Files>
+    </Project>
+
     <Project frameworkVersion="v4_0" name="ArribaSim.ServiceInterfaces" path="ArribaSim/ServiceInterfaces" type="Library">
       <Configuration name="Release">
         <Options>

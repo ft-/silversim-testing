@@ -10,7 +10,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("ArribaSim Development")]
 [assembly: AssemblyProduct("ArribaSim.Stacked.Asset")]
-[assembly: AssemblyCopyright("GPLv2 License + Link Exception")]
+[assembly: AssemblyCopyright("Affero GPLv3 License + Link Exception")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
