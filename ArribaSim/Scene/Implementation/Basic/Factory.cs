@@ -32,9 +32,11 @@ using ArribaSim.ServiceInterfaces.Avatar;
 using ArribaSim.ServiceInterfaces.Grid;
 using ArribaSim.ServiceInterfaces.GridUser;
 using ArribaSim.ServiceInterfaces.Groups;
+using ArribaSim.ServiceInterfaces.IM;
 using ArribaSim.ServiceInterfaces.Presence;
 using ArribaSim.Types;
 using Nini.Config;
+using System.Net;
 
 namespace ArribaSim.Scene.Implementation.Basic
 {
@@ -48,6 +50,7 @@ namespace ArribaSim.Scene.Implementation.Basic
         public string m_AssetServiceName;
         public string m_GridServiceName;
         public string m_GridUserServiceName;
+        public string m_IMServiceName;
 
         public PresenceServiceInterface m_PresenceService;
         public AvatarServiceInterface m_AvatarService;
@@ -55,6 +58,7 @@ namespace ArribaSim.Scene.Implementation.Basic
         public AssetServiceInterface m_AssetService;
         public GridServiceInterface m_GridService;
         public GridUserServiceInterface m_GridUserService;
+        public IMServiceInterface m_IMService;
 
         public SceneFactory(IConfig ownConfig)
         {
@@ -65,6 +69,7 @@ namespace ArribaSim.Scene.Implementation.Basic
             m_AssetServiceName = ownConfig.GetString("AssetService", "AssetService");
             m_GridServiceName = ownConfig.GetString("GridService", "GridService");
             m_GridUserServiceName = ownConfig.GetString("GridUserService", "GridUserService");
+            m_IMServiceName = ownConfig.GetString("IMService", "IMService");
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -76,11 +81,12 @@ namespace ArribaSim.Scene.Implementation.Basic
             m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
             m_GridUserService = loader.GetService<GridUserServiceInterface>(m_GridUserServiceName);
+            m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
         }
 
-        public override SceneInterface Instantiate(UUID id, GridVector position, uint sizeX, uint sizeY)
+        public override SceneInterface Instantiate(UUID id, GridVector position, uint sizeX, uint sizeY, IPAddress address, int port)
         {
-            return new BasicScene(m_ChatFactory.Instantiate(), id, position, sizeX, sizeY, m_PresenceService, m_AvatarService, m_GroupsService, m_AssetService, m_GridService, m_GridUserService);
+            return new BasicScene(m_ChatFactory.Instantiate(), m_IMService, id, position, sizeX, sizeY, m_PresenceService, m_AvatarService, m_GroupsService, m_AssetService, m_GridService, m_GridUserService, address, port);
         }
     }
 

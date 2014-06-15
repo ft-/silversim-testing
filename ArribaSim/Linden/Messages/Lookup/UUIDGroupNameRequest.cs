@@ -23,26 +23,37 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using ArribaSim.Types;
+using System.Collections.Generic;
 
-namespace ArribaSim.Linden.Messages.Circuit
+namespace ArribaSim.Linden.Messages.Lookup
 {
-    public class AddCircuitCode : Message
+    public class UUIDGroupNameRequest : Message
     {
-        public UInt32 CircuitCode;
-        public UUID SessionID;
-        public UUID AgentID;
+        public List<UUID> GroupIDs = new List<UUID>();
+
+        public UUIDGroupNameRequest()
+        {
+
+        }
 
         public virtual new MessageType Number
         {
             get
             {
-                return MessageType.AddCircuitCode;
+                return MessageType.UUIDGroupNameRequest;
             }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            UUIDGroupNameRequest m = new UUIDGroupNameRequest();
+            uint c = p.ReadUInt8();
+            for (uint i = 0; i < c; ++i)
+            {
+                m.GroupIDs.Add(p.ReadUUID());
+            }
+            return m;
         }
     }
 }

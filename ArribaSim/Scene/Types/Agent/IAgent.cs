@@ -44,6 +44,12 @@ namespace ArribaSim.Scene.Types.Agent
         string LastName { get; set; }
         bool IMSend(GridInstantMessage im);
 
+        int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
+        {
+            get;
+            set;
+        }
+
         AssetServiceInterface AssetService
         {
             get;

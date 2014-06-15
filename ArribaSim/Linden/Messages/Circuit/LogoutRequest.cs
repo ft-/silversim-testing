@@ -23,26 +23,34 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using ArribaSim.Types;
 
 namespace ArribaSim.Linden.Messages.Circuit
 {
-    public class AddCircuitCode : Message
+    public class LogoutRequest : Message
     {
-        public UInt32 CircuitCode;
-        public UUID SessionID;
-        public UUID AgentID;
+        public UUID SessionID = UUID.Zero;
+        public UUID AgentID = UUID.Zero;
+
+        public LogoutRequest()
+        {
+
+        }
 
         public virtual new MessageType Number
         {
             get
             {
-                return MessageType.AddCircuitCode;
+                return MessageType.LogoutRequest;
             }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            LogoutRequest m = new LogoutRequest();
+            m.SessionID = p.ReadUUID();
+            m.AgentID = p.ReadUUID();
+            return m;
         }
     }
 }

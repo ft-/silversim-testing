@@ -23,26 +23,48 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using ArribaSim.Types;
+using System;
 
-namespace ArribaSim.Linden.Messages.Circuit
+namespace ArribaSim.Linden.Messages.Parcel
 {
-    public class AddCircuitCode : Message
+    public class ParcelPropertiesRequest : Message
     {
-        public UInt32 CircuitCode;
-        public UUID SessionID;
-        public UUID AgentID;
+        public UUID AgentID = UUID.Zero;
+        public UUID SessionID = UUID.Zero;
+
+        public Int32 SequenceID = 0;
+        public double West = 0;
+        public double South = 0;
+        public double East = 0;
+        public double North = 0;
+        public bool SnapSelection = false;
+
+        public ParcelPropertiesRequest()
+        {
+
+        }
 
         public virtual new MessageType Number
         {
             get
             {
-                return MessageType.AddCircuitCode;
+                return MessageType.ParcelPropertiesRequest;
             }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ParcelPropertiesRequest m = new ParcelPropertiesRequest();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.SequenceID = p.ReadInt32();
+            m.West = p.ReadFloat();
+            m.South = p.ReadFloat();
+            m.East = p.ReadFloat();
+            m.North = p.ReadFloat();
+            m.SnapSelection = p.ReadBoolean();
+            return m;
         }
     }
 }

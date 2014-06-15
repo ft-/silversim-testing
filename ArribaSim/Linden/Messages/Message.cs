@@ -24,38 +24,40 @@ exception statement from your version.
 */
 
 using System;
+using ArribaSim.Types;
 
 namespace ArribaSim.Linden.Messages
 {
     public class Message
     {
         #region Message Type
-        public enum MessageType
+        public enum MessagePriority
         {
             High,
             Medium,
             Low
         }
 
-        protected static readonly UInt32 LOW = 0xFFFF0000;
-        protected static readonly UInt32 MEDIUM = 0xFF00;
-        protected static readonly UInt32 HIGH = 0;
+        public UInt32 ReceivedOnCircuitCode;
+        public delegate void Send(UInt32 circuitCode, Message m);
+        public UUID CircuitSessionID = UUID.Zero;
+        public UUID CircuitAgentID = UUID.Zero;
 
-        public MessageType Type
+        public MessagePriority Type
         {
             get
             {
-                if(Number <= 0xFE)
+                if((UInt32)Number <= 0xFE)
                 {
-                    return MessageType.High;
+                    return MessagePriority.High;
                 }
-                else if (Number <= 0xFFFE)
+                else if ((UInt32)Number <= 0xFFFE)
                 {
-                    return MessageType.Medium;
+                    return MessagePriority.Medium;
                 }
                 else
                 {
-                    return MessageType.Low;
+                    return MessagePriority.Low;
                 }
             }
         }
@@ -70,7 +72,7 @@ namespace ArribaSim.Linden.Messages
             }
         }
 
-        public virtual UInt32 Number
+        public virtual MessageType Number
         {
             get
             {

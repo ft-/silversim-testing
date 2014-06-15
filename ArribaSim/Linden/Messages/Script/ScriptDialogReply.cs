@@ -23,26 +23,45 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using ArribaSim.Types;
+using System;
 
-namespace ArribaSim.Linden.Messages.Circuit
+namespace ArribaSim.Linden.Messages.Script
 {
-    public class AddCircuitCode : Message
+    public class ScriptDialogReply : Message
     {
-        public UInt32 CircuitCode;
-        public UUID SessionID;
-        public UUID AgentID;
+        public UUID AgentID = UUID.Zero;
+        public UUID SessionID = UUID.Zero;
+
+        public UUID ObjectID = UUID.Zero;
+
+        public Int32 ChatChannel = 0;
+        public Int32 ButtonIndex = 0;
+        public string ButtonLabel = "";
+
+        public ScriptDialogReply()
+        {
+
+        }
 
         public virtual new MessageType Number
         {
             get
             {
-                return MessageType.AddCircuitCode;
+                return MessageType.ScriptDialogReply;
             }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ScriptDialogReply m = new ScriptDialogReply();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.ObjectID = p.ReadUUID();
+            m.ChatChannel = p.ReadInt32();
+            m.ButtonIndex = p.ReadInt32();
+            m.ButtonLabel = p.ReadStringLen8();
+            return m;
         }
     }
 }

@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using ArribaSim.Types;
 using ArribaSim.Scene.ServiceInterfaces.Chat;
 using ArribaSim.Scene.Types.Script.Events;
 using ThreadedClasses;
@@ -54,30 +55,51 @@ namespace ArribaSim.Scene.Chat
                         break;
 
                     case ListenEvent.ChatType.Say:
-                        if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared <= sayDistanceSquared ||
-                            listener.IsIgnorePosition)
+
+                        if (ev.TargetID.Equals(UUID.Zero))
+                        {
+                            if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared <= sayDistanceSquared ||
+                                listener.IsIgnorePosition)
+                            {
+                                listener.Send(ev);
+                            }
+                        }
+                        else if (listener.GetUUID().Equals(ev.TargetID))
                         {
                             listener.Send(ev);
                         }
                         break;
 
                     case ListenEvent.ChatType.Shout:
-                        if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared <= shoutDistanceSquared ||
-                            listener.IsIgnorePosition)
+                        if (ev.TargetID.Equals(UUID.Zero))
+                        {
+                            if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared <= shoutDistanceSquared ||
+                                listener.IsIgnorePosition)
+                            {
+                                listener.Send(ev);
+                            }
+                        }
+                        else if (listener.GetUUID().Equals(ev.TargetID))
                         {
                             listener.Send(ev);
                         }
                         break;
 
                     case ListenEvent.ChatType.Whisper:
-                        if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared <= whisperDistanceSquared ||
-                            listener.IsIgnorePosition)
+                        if (ev.TargetID.Equals(UUID.Zero))
+                        {
+                            if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared <= whisperDistanceSquared ||
+                                listener.IsIgnorePosition)
+                            {
+                                listener.Send(ev);
+                            }
+                        }
+                        else if (listener.GetUUID().Equals(ev.TargetID))
                         {
                             listener.Send(ev);
                         }
                         break;
 
-                    case ListenEvent.ChatType.SayTo:
                     case ListenEvent.ChatType.OwnerSay:
                         if(listener.GetUUID().Equals(ev.TargetID))
                         {

@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using ArribaSim.Linden.UDP;
 using ArribaSim.Scene.Management.IM;
 using ArribaSim.Scene.ServiceInterfaces.Chat;
 using ArribaSim.Scene.Types.Agent;
@@ -35,12 +36,14 @@ using ArribaSim.ServiceInterfaces.Avatar;
 using ArribaSim.ServiceInterfaces.Grid;
 using ArribaSim.ServiceInterfaces.GridUser;
 using ArribaSim.ServiceInterfaces.Groups;
+using ArribaSim.ServiceInterfaces.IM;
 using ArribaSim.ServiceInterfaces.Presence;
 using ArribaSim.Types;
 using ArribaSim.Types.IM;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Net;
 using ThreadedClasses;
 
 namespace ArribaSim.Scene.Implementation.Basic
@@ -51,6 +54,7 @@ namespace ArribaSim.Scene.Implementation.Basic
         protected internal RwLockedDictionary<UUID, ObjectPart> m_Primitives = new RwLockedDictionary<UUID,ObjectPart>();
         protected internal RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
         protected internal RwLockedDictionary<UUID, ParcelInfo> m_Parcels = new RwLockedDictionary<UUID, ParcelInfo>();
+        private LindenUDPServer m_UDPServer;
         #endregion
 
         #region Interface wrappers
@@ -171,6 +175,7 @@ namespace ArribaSim.Scene.Implementation.Basic
         #region Constructor
         public BasicScene(
             ChatServiceInterface chatService, 
+            IMServiceInterface imService,
             UUID id,
             GridVector position, 
             uint sizeX, 
@@ -180,8 +185,11 @@ namespace ArribaSim.Scene.Implementation.Basic
             GroupsServiceInterface groupsService,
             AssetServiceInterface assetService,
             GridServiceInterface gridService,
-            GridUserServiceInterface gridUserService)
+            GridUserServiceInterface gridUserService,
+            IPAddress address, 
+            int port)
         {
+            m_UDPServer = new LindenUDPServer(address, port, imService, chatService);
             PresenceService = presenceService;
             AvatarService = avatarService;
             GroupsService = groupsService;
@@ -201,6 +209,7 @@ namespace ArribaSim.Scene.Implementation.Basic
             m_ChatService = chatService;
             IMRouter.SceneIM.Add(IMSend);
             OnRemove += RemoveScene;
+            m_UDPServer.Start();
         }
         #endregion
 
@@ -223,6 +232,7 @@ namespace ArribaSim.Scene.Implementation.Basic
         private void RemoveScene(SceneInterface s)
         {
             IMRouter.SceneIM.Remove(IMSend);
+            m_UDPServer.Stop();
         }
         #endregion
 

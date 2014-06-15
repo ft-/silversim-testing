@@ -23,26 +23,30 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using ArribaSim.Types;
+using System;
 
-namespace ArribaSim.Linden.Messages.Circuit
+namespace ArribaSim.Linden.Messages.Estate
 {
-    public class AddCircuitCode : Message
+    public class EstateCovenantReply : Message
     {
-        public UInt32 CircuitCode;
-        public UUID SessionID;
-        public UUID AgentID;
+        public UUID CovenantID = UUID.Zero;
+        public UInt32 CovenantTimestamp = 0;
+        public string EstateName = string.Empty;
+        public UUID EstateOwnerID = UUID.Zero;
+
+        public EstateCovenantReply()
+        {
+
+        }
 
         public virtual new MessageType Number
         {
             get
             {
-                return MessageType.AddCircuitCode;
+                return MessageType.EstateCovenantReply;
             }
         }
+
     }
 }

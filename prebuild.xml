@@ -165,6 +165,7 @@
       <Reference name="ArribaSim.ServiceInterfaces"/>
       <Reference name="ArribaSim.Scene.Types"/>
       <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
+      <Reference name="ArribaSim.Linden.Messages"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
@@ -190,6 +191,7 @@
       <Reference name="ArribaSim.ServiceInterfaces"/>
       <Reference name="ArribaSim.Scene.Types"/>
       <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
+      <Reference name="ArribaSim.Linden.Messages"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
@@ -560,6 +562,7 @@
       <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
       <Reference name="ArribaSim.Scene.Management"/>
       <Reference name="ArribaSim.Main.Common"/>
+      <Reference name="ArribaSim.Linden.UDP"/>
       <Reference name="HttpClasses" path="../../../../bin/"/>
       <Reference name="Nini" path="../../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../../bin/"/>
