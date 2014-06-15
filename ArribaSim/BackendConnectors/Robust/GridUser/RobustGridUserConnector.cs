@@ -110,7 +110,7 @@ namespace ArribaSim.BackendConnectors.Robust.GridUser
         {
             get
             {
-                return GetUserInfo(userID.ToString());
+                return GetUserInfo(userID.ID);
             }
         }
 
