@@ -66,6 +66,10 @@ namespace ArribaSim.BackendConnectors.Robust.GridUser
         {
             GridUserInfo info = new GridUserInfo();
             info.UserID = new UUI(map["UserID"].ToString());
+            if(map.ContainsKey("UserData"))
+            {
+                info.UserID.CreatorData = map["UserData"].ToString();
+            }
             info.HomeRegionID = map["HomeRegionID"].ToString();
             info.HomePosition = new Vector3(map["HomePosition"].ToString());
             info.HomeLookAt = new Vector3(map["HomeLookAt"].ToString());

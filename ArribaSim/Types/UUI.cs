@@ -45,6 +45,25 @@ namespace ArribaSim.Types
             {
                 return string.Format("{0};{1} {2}", HomeURI.ToString(), FirstName, LastName);
             }
+            set
+            {
+                string[] parts = value.Split(new char[] { ';' }, 2, StringSplitOptions.None);
+                if(parts.Length < 2)
+                {
+                    throw new ArgumentException();
+                }
+                HomeURI = new Uri(parts[0]);
+                string[] names = parts[1].Split(new char[] { ' ' }, 2, StringSplitOptions.None);
+                FirstName = names[0];
+                if (names.Length > 1)
+                {
+                    LastName = names[1];
+                }
+                else
+                {
+                    LastName = string.Empty;
+                }
+            }
         }
 
         public string FullName
