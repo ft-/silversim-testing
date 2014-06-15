@@ -134,6 +134,7 @@ namespace ArribaSim.Linden.UDP
             }
         }
 
+        #region UDP Receive Handler
         void BeginUdpReceive()
         {
             UDPReceivePacket pck;
@@ -258,6 +259,7 @@ namespace ArribaSim.Linden.UDP
             /* return the buffer to the pool */
             m_InboundBufferQueue.Enqueue(pck);
         }
+        #endregion
 
         protected internal void SendPacketTo(UDPPacket p, EndPoint ep)
         {

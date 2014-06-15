@@ -30,9 +30,9 @@ using ArribaSim.Scene.Types.Script.Events;
 using ArribaSim.Types;
 using ArribaSim.Types.IM;
 using System;
-using System.Threading;
 using System.Collections.Generic;
 using System.Net;
+using System.Threading;
 using ThreadedClasses;
 
 namespace ArribaSim.Linden.UDP
