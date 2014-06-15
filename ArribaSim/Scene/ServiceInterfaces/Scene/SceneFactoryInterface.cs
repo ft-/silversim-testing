@@ -24,8 +24,7 @@ exception statement from your version.
 */
 
 using ArribaSim.Scene.Types.Scene;
-using ArribaSim.Types;
-using System.Net;
+using ArribaSim.Types.Grid;
 
 namespace ArribaSim.Scene.ServiceInterfaces.Scene
 {
@@ -36,6 +35,6 @@ namespace ArribaSim.Scene.ServiceInterfaces.Scene
 
         }
 
-        public abstract SceneInterface Instantiate(UUID id, GridVector position, uint sizeX, uint sizeY, IPAddress address, int port);
+        public abstract SceneInterface Instantiate(RegionInfo ri);
     }
 }

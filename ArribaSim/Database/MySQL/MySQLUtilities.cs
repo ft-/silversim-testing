@@ -71,7 +71,7 @@ namespace ArribaSim.Database.MySQL
         #region REPLACE INSERT INTO helper
         public static void ReplaceInsertInto(MySqlConnection connection, string tablename, Dictionary<string, object> vals)
         {
-            string q1 = "REPLACE INSERT INTO ?tablename (";
+            string q1 = "REPLACE INTO " + tablename + " (";
             string q2 = ") VALUES (";
             bool first = true;
             foreach(KeyValuePair<string, object> kvp in vals)
@@ -85,41 +85,48 @@ namespace ArribaSim.Database.MySQL
 
                 if (kvp.Value is Vector3)
                 {
-                    q1 += kvp.Key.ToString() + "X";
-                    q2 += "?" + kvp.Key.ToString() + "X";
-                    q1 += kvp.Key.ToString() + "Y";
-                    q2 += "?" + kvp.Key.ToString() + "Y";
+                    q1 += kvp.Key.ToString() + "X,";
+                    q2 += "?" + kvp.Key.ToString() + "X,";
+                    q1 += kvp.Key.ToString() + "Y,";
+                    q2 += "?" + kvp.Key.ToString() + "Y,";
                     q1 += kvp.Key.ToString() + "Z";
                     q2 += "?" + kvp.Key.ToString() + "Z";
                 }
-                else if (kvp.Value is Quaternion)
+                else if(kvp.Value is GridVector)
                 {
-                    q1 += kvp.Key.ToString() + "X";
-                    q2 += "?" + kvp.Key.ToString() + "X";
+                    q1 += kvp.Key.ToString() + "X,";
+                    q2 += "?" + kvp.Key.ToString() + "X,";
                     q1 += kvp.Key.ToString() + "Y";
                     q2 += "?" + kvp.Key.ToString() + "Y";
-                    q1 += kvp.Key.ToString() + "Z";
-                    q2 += "?" + kvp.Key.ToString() + "Z";
+                }
+                else if (kvp.Value is Quaternion)
+                {
+                    q1 += kvp.Key.ToString() + "X,";
+                    q2 += "?" + kvp.Key.ToString() + "X,";
+                    q1 += kvp.Key.ToString() + "Y,";
+                    q2 += "?" + kvp.Key.ToString() + "Y,";
+                    q1 += kvp.Key.ToString() + "Z,";
+                    q2 += "?" + kvp.Key.ToString() + "Z,";
                     q1 += kvp.Key.ToString() + "W";
                     q2 += "?" + kvp.Key.ToString() + "W";
                 }
                 else if(kvp.Value is Color)
                 {
-                    q1 += kvp.Key.ToString() + "Red";
-                    q2 += "?" + kvp.Key.ToString() + "Red";
-                    q1 += kvp.Key.ToString() + "Green";
-                    q2 += "?" + kvp.Key.ToString() + "Green";
+                    q1 += kvp.Key.ToString() + "Red,";
+                    q2 += "?" + kvp.Key.ToString() + "Red,";
+                    q1 += kvp.Key.ToString() + "Green,";
+                    q2 += "?" + kvp.Key.ToString() + "Green,";
                     q1 += kvp.Key.ToString() + "Blue";
                     q2 += "?" + kvp.Key.ToString() + "Blue";
                 }
                 else if (kvp.Value is ColorAlpha)
                 {
-                    q1 += kvp.Key.ToString() + "Red";
-                    q2 += "?" + kvp.Key.ToString() + "Red";
-                    q1 += kvp.Key.ToString() + "Green";
-                    q2 += "?" + kvp.Key.ToString() + "Green";
-                    q1 += kvp.Key.ToString() + "Blue";
-                    q2 += "?" + kvp.Key.ToString() + "Blue";
+                    q1 += kvp.Key.ToString() + "Red,";
+                    q2 += "?" + kvp.Key.ToString() + "Red,";
+                    q1 += kvp.Key.ToString() + "Green,";
+                    q2 += "?" + kvp.Key.ToString() + "Green,";
+                    q1 += kvp.Key.ToString() + "Blue,";
+                    q2 += "?" + kvp.Key.ToString() + "Blue,";
                     q1 += kvp.Key.ToString() + "Alpha";
                     q2 += "?" + kvp.Key.ToString() + "Alpha";
                 }
@@ -139,6 +146,11 @@ namespace ArribaSim.Database.MySQL
                         command.Parameters.AddWithValue("?" + kvp.Key + "X", ((Vector3)kvp.Value).X);
                         command.Parameters.AddWithValue("?" + kvp.Key + "Y", ((Vector3)kvp.Value).Y);
                         command.Parameters.AddWithValue("?" + kvp.Key + "Z", ((Vector3)kvp.Value).Z);
+                    }
+                    else if(kvp.Value is GridVector)
+                    {
+                        command.Parameters.AddWithValue("?" + kvp.Key + "X", ((GridVector)kvp.Value).X);
+                        command.Parameters.AddWithValue("?" + kvp.Key + "Y", ((GridVector)kvp.Value).Y);
                     }
                     else if (kvp.Value is Quaternion)
                     {
@@ -178,7 +190,7 @@ namespace ArribaSim.Database.MySQL
                     }
                     else
                     {
-                        command.Parameters.AddWithValue("?" + kvp.Key, kvp.Value);
+                        command.Parameters.AddWithValue("?" + kvp.Key, kvp.Value.ToString());
                     }
                 }
                 command.ExecuteNonQuery();

@@ -248,6 +248,11 @@ namespace ArribaSim.BackendConnectors.Robust.Grid
             return onlineRegions;
         }
 
+        public override List<RegionInfo> GetOnlineRegions()
+        {
+            throw new NotSupportedException();
+        }
+
         public override List<RegionInfo> SearchRegionsByName(UUID ScopeID, string searchString)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();

@@ -34,6 +34,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Threading;
 using ThreadedClasses;
 
 namespace ArribaSim.Linden.UDP
@@ -52,7 +53,7 @@ namespace ArribaSim.Linden.UDP
     #endregion
 
     #region LLUDP Server
-    public class LindenUDPServer
+    public class LindenUDPServer : IDisposable
     {
         private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         IPAddress m_BindAddress;
@@ -63,6 +64,8 @@ namespace ArribaSim.Linden.UDP
         bool m_InboundRunning = false;
         IMServiceInterface m_IMService;
         ChatServiceInterface m_ChatService;
+        BlockingQueue<IScriptEvent> m_ChatQueue = new BlockingQueue<IScriptEvent>();
+        Thread m_ChatThread;
 
         public LindenUDPServer(IPAddress bindAddress, int port, IMServiceInterface imService, ChatServiceInterface chatService)
         {
@@ -87,9 +90,11 @@ namespace ArribaSim.Linden.UDP
             }
             catch (SocketException)
             {
-                /* however, mono does not have an idea about this is all about, so we catch that here */
+                /* however, mono does not have an idea about what this is all about, so we catch that here */
             }
 
+            m_ChatThread = new Thread(ChatSendHandler);
+            m_ChatThread.Start();
             m_UdpSocket.Bind(ep);
             m_Log.InfoFormat("[LLUDP SERVER]: Initialized UDP Server at {0}:{1}", bindAddress.ToString(), port);
         }
@@ -102,6 +107,36 @@ namespace ArribaSim.Linden.UDP
                 circuit.SendMessage(m);
             }
         }
+
+        public void Dispose()
+        {
+            Stop();
+            m_ChatQueue.Enqueue(new ShutdownEvent());
+        }
+
+        public void Shutdown()
+        {
+            Stop();
+            m_ChatQueue.Enqueue(new ShutdownEvent());
+        }
+
+        #region Chat Thread
+        public void ChatSendHandler()
+        {
+            while(true)
+            {
+                IScriptEvent ev = m_ChatQueue.Dequeue();
+                if(ev is ShutdownEvent)
+                {
+                    break;
+                }
+                else if(ev is ListenEvent)
+                {
+                    m_ChatService.Send((ListenEvent)ev);
+                }
+            }
+        }
+        #endregion
 
         public void Start()
         {

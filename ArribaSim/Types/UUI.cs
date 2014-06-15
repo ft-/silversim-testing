@@ -138,7 +138,8 @@ namespace ArribaSim.Types
             string[] parts = uuiString.Split(Semicolon, 3);
             if (parts.Length < 2)
             {
-                throw new ArgumentException("Invald UUI");
+                ID = new UUID(parts[0]);
+                return;
             }
             ID = new UUID(parts[0]);
             if (parts.Length > 2)
@@ -151,6 +152,18 @@ namespace ArribaSim.Types
                 FirstName = names[0];
             }
             HomeURI = new Uri(parts[1]);
+        }
+
+        public override string ToString()
+        {
+            if(HomeURI != null)
+            {
+                return String.Format("{0};{1};{2} {3}", ID.ToString(), HomeURI, FirstName.Replace(' ', '.'), LastName.Replace(' ', '.'));
+            }
+            else
+            {
+                return ID.ToString();
+            }
         }
 
         private static readonly char[] Semicolon = new char[1] { (char)';' };

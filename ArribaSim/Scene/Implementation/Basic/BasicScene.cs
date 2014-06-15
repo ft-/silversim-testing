@@ -44,7 +44,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Sockets;
 using ThreadedClasses;
+using ArribaSim.Types.Grid;
 
 namespace ArribaSim.Scene.Implementation.Basic
 {
@@ -176,39 +178,35 @@ namespace ArribaSim.Scene.Implementation.Basic
         public BasicScene(
             ChatServiceInterface chatService, 
             IMServiceInterface imService,
-            UUID id,
-            GridVector position, 
-            uint sizeX, 
-            uint sizeY,
             PresenceServiceInterface presenceService,
             AvatarServiceInterface avatarService,
             GroupsServiceInterface groupsService,
             AssetServiceInterface assetService,
             GridServiceInterface gridService,
             GridUserServiceInterface gridUserService,
-            IPAddress address, 
-            int port)
+            RegionInfo ri)
         {
-            m_UDPServer = new LindenUDPServer(address, port, imService, chatService);
+            m_UDPServer = new LindenUDPServer(new IPAddress(0), (int)ri.ServerPort, imService, chatService);
             PresenceService = presenceService;
             AvatarService = avatarService;
             GroupsService = groupsService;
             AssetService = assetService;
             GridService = gridService;
             GridUserService = gridUserService;
-            Terrain = new TerrainMap(sizeX, sizeY);
+            Terrain = new TerrainMap(ri.Size.X, ri.Size.Y);
             m_SceneObjects = new BasicSceneObjects(this);
             m_SceneObjectParts = new BasicSceneObjectParts(this);
             m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
             m_SceneAgents = new DefaultSceneAgentInterface(this);
             m_SceneParcels = new BasicSceneParcels(this);
-            ID = id;
-            GridPosition = position;
-            SizeX = sizeX;
-            SizeY = sizeY;
+            ID = ri.ID;
+            GridPosition = ri.Location;
+            SizeX = ri.Size.X;
+            SizeY = ri.Size.Y;
             m_ChatService = chatService;
             IMRouter.SceneIM.Add(IMSend);
             OnRemove += RemoveScene;
+            ExternalHostName = ri.ServerIP;
             m_UDPServer.Start();
         }
         #endregion
@@ -232,7 +230,7 @@ namespace ArribaSim.Scene.Implementation.Basic
         private void RemoveScene(SceneInterface s)
         {
             IMRouter.SceneIM.Remove(IMSend);
-            m_UDPServer.Stop();
+            m_UDPServer.Shutdown();
         }
         #endregion
 

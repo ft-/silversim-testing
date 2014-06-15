@@ -105,6 +105,7 @@ namespace ArribaSim.ServiceInterfaces.Grid
         public abstract List<RegionInfo> GetNeighbours(UUID ScopeID, UUID RegionID);
         public abstract List<RegionInfo> GetAllRegions(UUID ScopeID);
         public abstract List<RegionInfo> GetOnlineRegions(UUID ScopeID);
+        public abstract List<RegionInfo> GetOnlineRegions();
 
         public abstract List<RegionInfo> SearchRegionsByName(UUID ScopeID, string searchString);
         #endregion

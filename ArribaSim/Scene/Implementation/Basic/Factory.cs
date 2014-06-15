@@ -37,6 +37,7 @@ using ArribaSim.ServiceInterfaces.Presence;
 using ArribaSim.Types;
 using Nini.Config;
 using System.Net;
+using ArribaSim.Types.Grid;
 
 namespace ArribaSim.Scene.Implementation.Basic
 {
@@ -84,9 +85,17 @@ namespace ArribaSim.Scene.Implementation.Basic
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
         }
 
-        public override SceneInterface Instantiate(UUID id, GridVector position, uint sizeX, uint sizeY, IPAddress address, int port)
+        public override SceneInterface Instantiate(RegionInfo ri)
         {
-            return new BasicScene(m_ChatFactory.Instantiate(), m_IMService, id, position, sizeX, sizeY, m_PresenceService, m_AvatarService, m_GroupsService, m_AssetService, m_GridService, m_GridUserService, address, port);
+            return new BasicScene(m_ChatFactory.Instantiate(), 
+                m_IMService, 
+                m_PresenceService,
+                m_AvatarService, 
+                m_GroupsService, 
+                m_AssetService, 
+                m_GridService,
+                m_GridUserService, 
+                ri);
         }
     }
 

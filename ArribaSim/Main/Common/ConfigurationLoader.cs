@@ -56,6 +56,15 @@ namespace ArribaSim.Main.Common
         private RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
         private ManualResetEvent m_ShutdownEvent;
 
+        public IConfigSource Config
+        {
+            get
+            {
+                return m_Config;
+            }
+        }
+
+
         public T GetService<T>(string serviceName)
         {
             IPlugin module = PluginInstances[serviceName];

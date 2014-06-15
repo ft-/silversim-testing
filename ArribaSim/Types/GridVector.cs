@@ -45,6 +45,28 @@ namespace ArribaSim.Types
             Y = y;
         }
 
+        public GridVector(string v)
+        {
+            string[] x = v.Split(new char[] { ',' });
+            if(x.Length != 2)
+            {
+                throw new ArgumentException();
+            }
+            X = uint.Parse(x[0]);
+            Y = uint.Parse(x[1]);
+        }
+
+        public GridVector(string v, uint multiplier)
+        {
+            string[] x = v.Split(new char[] { ',' });
+            if (x.Length != 2)
+            {
+                throw new ArgumentException();
+            }
+            X = uint.Parse(x[0]) * multiplier;
+            Y = uint.Parse(x[1]) * multiplier;
+        }
+
         public GridVector(ulong regionHandle)
         {
             X = (uint)(regionHandle & 0xFFFFFFFF);

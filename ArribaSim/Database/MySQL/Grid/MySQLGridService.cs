@@ -178,25 +178,25 @@ namespace ArribaSim.Database.MySQL.Grid
         private RegionInfo ToRegionInfo(MySqlDataReader dbReader)
         {
             RegionInfo ri = new RegionInfo();
-            ri.ID = (string)dbReader["uuid"];
-            ri.Name = (string)dbReader["regionName"];
-            ri.RegionSecret = (string)dbReader["regionSecret"];
+            ri.ID = dbReader["uuid"].ToString();
+            ri.Name = dbReader["regionName"].ToString();
+            ri.RegionSecret = dbReader["regionSecret"].ToString();
             ri.ServerIP = (string)dbReader["serverIP"];
             ri.ServerPort = (uint)dbReader["serverPort"];
             ri.ServerURI = (string)dbReader["serverURI"];
             ri.Location.X = (uint)dbReader["locX"];
             ri.Location.Y = (uint)dbReader["locY"];
-            ri.RegionMapTexture = (string)dbReader["regionMapTexture"];
+            ri.RegionMapTexture = dbReader["regionMapTexture"].ToString();
             ri.ServerHttpPort = (uint)dbReader["serverHttpPort"];
-            ri.Owner = new UUI((string)dbReader["owner"]);
+            ri.Owner = new UUI(dbReader["owner"].ToString());
             ri.Access = (uint)dbReader["access"];
-            ri.ScopeID = (string)dbReader["ScopeID"];
+            ri.ScopeID = dbReader["ScopeID"].ToString();
             ri.Size.X = (uint)dbReader["sizeX"];
             ri.Size.Y = (uint)dbReader["sizeY"];
             ri.Flags = (uint)dbReader["flags"];
-            ri.AuthenticatingToken = (string)dbReader["AuthenticatingToken"];
-            ri.AuthenticatingPrincipalID = (string)dbReader["AuthenticatingPrincipalID"];
-            ri.ParcelMapTexture = (string)dbReader["parcelMapTexture"];
+            ri.AuthenticatingToken = dbReader["AuthenticatingToken"].ToString();
+            ri.AuthenticatingPrincipalID = dbReader["AuthenticatingPrincipalID"].ToString();
+            ri.ParcelMapTexture = dbReader["parcelMapTexture"].ToString();
 
             return ri;
         }
@@ -219,7 +219,7 @@ namespace ArribaSim.Database.MySQL.Grid
                         {
                             if (dbReader.Read())
                             {
-                                if ((string)dbReader["uuid"] != regionInfo.ID.ToString())
+                                if (dbReader["uuid"].ToString() != regionInfo.ID.ToString())
                                 {
                                     throw new GridRegionUpdateFailedException("Duplicate region name");
                                 }
@@ -254,10 +254,10 @@ namespace ArribaSim.Database.MySQL.Grid
                 }
 
                 Dictionary<string, object> regionData = new Dictionary<string, object>();
-                regionData["locX"] = regionInfo.Location.X;
-                regionData["locY"] = regionInfo.Location.Y;
-                regionData["sizeX"] = regionInfo.Size.X;
-                regionData["sizeY"] = regionInfo.Size.Y;
+                regionData["uuid"] = regionInfo.ID;
+                regionData["regionName"] = regionInfo.Name;
+                regionData["loc"] = regionInfo.Location;
+                regionData["size"] = regionInfo.Size;
                 regionData["regionName"] = regionInfo.Name;
                 regionData["serverIP"] = regionInfo.ServerIP;
                 regionData["serverHttpPort"] = regionInfo.ServerHttpPort;
@@ -332,10 +332,11 @@ namespace ArribaSim.Database.MySQL.Grid
             using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0", connection))
+                using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?flags", (uint)RegionFlags.DefaultRegion);
-                    using(MySqlDataReader dbReader = cmd.ExecuteReader())
+                    cmd.Parameters.AddWithValue("?flag", (uint)RegionFlags.DefaultRegion);
+                    cmd.Parameters.AddWithValue("?scopeid", ScopeID);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while(dbReader.Read())
                         {
@@ -355,9 +356,33 @@ namespace ArribaSim.Database.MySQL.Grid
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?flag", (uint)RegionFlags.RegionOnline);
+                    cmd.Parameters.AddWithValue("?scopeid", ScopeID);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        while (dbReader.Read())
+                        {
+                            result.Add(ToRegionInfo(dbReader));
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        public override List<RegionInfo> GetOnlineRegions()
+        {
+            List<RegionInfo> result = new List<RegionInfo>();
+
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0", connection))
                 {
-                    cmd.Parameters.AddWithValue("?flags", (uint)RegionFlags.RegionOnline);
+                    cmd.Parameters.AddWithValue("?flag", (uint)RegionFlags.RegionOnline);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
@@ -378,9 +403,10 @@ namespace ArribaSim.Database.MySQL.Grid
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
                 {
                     cmd.Parameters.AddWithValue("?flags", (uint)RegionFlags.FallbackRegion);
+                    cmd.Parameters.AddWithValue("?scopeid", ScopeID);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
@@ -401,9 +427,10 @@ namespace ArribaSim.Database.MySQL.Grid
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
                 {
                     cmd.Parameters.AddWithValue("?flags", (uint)RegionFlags.DefaultHGRegion);
+                    cmd.Parameters.AddWithValue("?scopeid", ScopeID);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())

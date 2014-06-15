@@ -28,27 +28,90 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ArribaSim.Main.Common;
+using ArribaSim.ServiceInterfaces.Grid;
+using ArribaSim.Types.Grid;
+using ArribaSim.Types;
 using ArribaSim.Scene.ServiceInterfaces.RegionLoader;
+using ArribaSim.Scene.ServiceInterfaces.Scene;
+using Nini.Config;
+using System.Web;
+using System.Xml;
+using System.Net;
+using log4net;
+using System.Reflection;
 
 namespace ArribaSim.Scene.RegionLoader.Basic
 {
     class RegionLoaderService : IPlugin, IRegionLoaderInterface
     {
-        #region Constructor
-        public RegionLoaderService(string regionStorage, string regionIni)
-        {
+        private string m_RegionStorage;
+        private string m_RegionCfg;
+        private string m_ExternalHostName = string.Empty;
+        private GridServiceInterface m_RegionService;
+        private SceneFactoryInterface m_SceneFactory;
+        private uint m_HttpPort = 0;
+        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
+        #region Constructor
+        public RegionLoaderService(string regionStorage, string regionCfg)
+        {
+            m_RegionStorage = regionStorage;
+            m_RegionCfg = regionCfg;
         }
 
         public void Startup(ConfigurationLoader loader)
         {
-
+            m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
+            m_RegionService = loader.GetService<GridServiceInterface>(m_RegionStorage);
+            if(loader.Config.Configs["Network"] != null)
+            {
+                m_ExternalHostName = loader.Config.Configs["Network"].GetString("ExternalHostName", "127.0.0.1");
+                m_HttpPort = (uint)loader.Config.Configs["Network"].GetInt("HttpListenerPort", 9000);
+            }
         }
         #endregion
 
         public void LoadRegions()
         {
+            if (!string.IsNullOrEmpty(m_RegionCfg))
+            {
+                IConfigSource cfg;
+                if (Uri.IsWellFormedUriString(m_RegionCfg, UriKind.Absolute))
+                {
+                    XmlReader r = XmlReader.Create(m_RegionCfg);
+                    cfg = new XmlConfigSource(r);
+                }
+                else
+                {
+                    cfg = new IniConfigSource(m_RegionCfg);
+                }
 
+                foreach (IConfig regionEntry in cfg.Configs)
+                {
+                    RegionInfo r = new RegionInfo();
+                    r.Name = regionEntry.Name;
+                    r.ID = regionEntry.GetString("RegionUUID");
+                    r.Location = new GridVector(regionEntry.GetString("Location"), 256);
+                    r.ServerPort = (uint)regionEntry.GetInt("InternalPort");
+                    r.ServerURI = string.Format("http://{0}:{1}/", m_ExternalHostName, m_HttpPort);
+                    r.Size.X = ((uint)regionEntry.GetInt("SizeX", 256) + 255) & (~(uint)255);
+                    r.Size.Y = ((uint)regionEntry.GetInt("SizeY", 256) + 255) & (~(uint)255);
+                    r.Flags = (uint)RegionFlags.RegionOnline;
+                    r.Owner.ID = regionEntry.GetString("OwnerID");
+                    r.ScopeID = regionEntry.GetString("ScopeID", "00000000-0000-0000-0000-000000000000");
+                    r.ServerHttpPort = m_HttpPort;
+                    r.RegionMapTexture = regionEntry.GetString("MaptileStaticUUID", "00000000-0000-0000-0000-000000000000");
+                    r.Access = (uint)regionEntry.GetInt("Access", 1);
+                    r.ServerIP = regionEntry.GetString("ExternalHostName", m_ExternalHostName);
+                    m_RegionService.RegisterRegion(r);
+                }
+            }
+
+            foreach(RegionInfo ri in m_RegionService.GetOnlineRegions())
+            {
+                m_Log.InfoFormat("[REGION LOADER]: Starting Region {0}", ri.Name);
+                m_SceneFactory.Instantiate(ri);
+            }
         }
     }
 }

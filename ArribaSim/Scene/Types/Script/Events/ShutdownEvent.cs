@@ -23,28 +23,13 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ArribaSim.Main.Common;
-using ArribaSim.Types;
-using Nini.Config;
-
-namespace ArribaSim.Scene.RegionLoader.Basic
+namespace ArribaSim.Scene.Types.Script.Events
 {
-    public class Factory : IPluginFactory
+    public class ShutdownEvent : IScriptEvent
     {
-        public Factory()
+        public ShutdownEvent()
         {
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig)
-        {
-            string regionCfgName = ownConfig.GetString("region_config_source", "");
-
-            return new RegionLoaderService(ownConfig.GetString("RegionStorage"), regionCfgName);
         }
     }
 }

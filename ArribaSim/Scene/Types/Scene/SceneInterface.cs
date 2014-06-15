@@ -35,6 +35,8 @@ using ArribaSim.ServiceInterfaces.Groups;
 using ArribaSim.ServiceInterfaces.Presence;
 using ArribaSim.Types;
 using System;
+using System.Net;
+using System.Net.Sockets;
 using System.Collections.Generic;
 
 namespace ArribaSim.Scene.Types.Scene
@@ -72,6 +74,8 @@ namespace ArribaSim.Scene.Types.Scene
         public uint SizeX { get; protected set; }
         public uint SizeY { get; protected set; }
         public string Name { get; protected set; }
+        public IPAddress LastIPAddress { get; protected set; }
+        public string ExternalHostName { get; protected set; }
         public TerrainMap Terrain { get; protected set; }
         public GridVector GridPosition { get; protected set; }
         public abstract ISceneObjects Objects { get; }
@@ -80,6 +84,8 @@ namespace ArribaSim.Scene.Types.Scene
         public abstract ISceneAgents Agents { get; }
         public abstract ISceneParcels Parcels { get; }
         public event Action<SceneInterface> OnRemove;
+        public delegate void IPChangedDelegate(SceneInterface scene, IPAddress address);
+        public event IPChangedDelegate OnIPChanged;
         public AssetServiceInterface AssetService { get; protected set; }
         public GroupsServiceInterface GroupsService { get; protected set; }
         public AvatarServiceInterface AvatarService { get; protected set; }
@@ -89,6 +95,7 @@ namespace ArribaSim.Scene.Types.Scene
 
         public SceneInterface()
         {
+            LastIPAddress = new IPAddress(0);
         }
 
         public void InvokeOnRemove()
@@ -98,5 +105,30 @@ namespace ArribaSim.Scene.Types.Scene
 
         public abstract void Add(IObject obj);
         public abstract bool Remove(IObject obj);
+
+        public void TriggerIPChanged(IPAddress ip)
+        {
+            LastIPAddress = ip;
+            OnIPChanged(this, ip);
+        }
+
+        #region Dynamic IP Support
+        public void CheckExternalNameLookup()
+        {
+            IPAddress[] addresses = Dns.GetHostAddresses(ExternalHostName);
+            for (int i = 0; i < addresses.Length; ++i)
+            {
+                if (addresses[i].AddressFamily == AddressFamily.InterNetwork)
+                {
+                    /* we take the first IPv4 address */
+                    if (!LastIPAddress.Equals(addresses[i]))
+                    {
+                        TriggerIPChanged(LastIPAddress);
+                    }
+                    return;
+                }
+            }
+        }
+        #endregion
     }
 }
