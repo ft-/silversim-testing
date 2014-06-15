@@ -38,6 +38,7 @@ using ThreadedClasses;
 
 namespace ArribaSim.Linden.UDP
 {
+    #region Rx Buffer
     public class UDPReceivePacket : UDPPacket
     {
         public EndPoint RemoteEndPoint = new IPEndPoint(0, 0);
@@ -48,7 +49,9 @@ namespace ArribaSim.Linden.UDP
 
         }
     }
+    #endregion
 
+    #region LLUDP Server
     public class LindenUDPServer
     {
         private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
@@ -620,4 +623,5 @@ namespace ArribaSim.Linden.UDP
             }
         }
     }
+    #endregion
 }

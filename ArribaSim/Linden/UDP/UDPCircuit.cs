@@ -130,7 +130,27 @@ namespace ArribaSim.Linden.UDP
                     break;
 
                 case MessageType.ScriptDialogReply:
-                    /* TODO: specific decoder for ListenEvent */
+                    /* script dialog uses a different internal format, so we decode it specifically */
+                    if(!pck.ReadUUID().Equals(AgentID))
+                    {
+
+                    }
+                    else if (!pck.ReadUUID().Equals(SessionID))
+                    {
+
+                    }
+                    else
+                    {
+                        /* TODO: specific decoder for ListenEvent */
+                        ListenEvent ev = new ListenEvent();
+                        ev.TargetID = pck.ReadUUID();
+                        ev.Channel = pck.ReadInt32();
+                        ev.ButtonIndex = pck.ReadInt32();
+                        ev.Message = pck.ReadStringLen8();
+                        ev.ID = AgentID;
+                        ev.Type = ListenEvent.ChatType.Say;
+                        m_Server.RouteChat(ev);
+                    }
                     break;
 
                 case MessageType.ChatFromViewer:

@@ -53,5 +53,6 @@ namespace ArribaSim.Scene.Types.Script.Events
         public string Name;
         public UUID ID;
         public string Message;
+        public int ButtonIndex;
     }
 }
