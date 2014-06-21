@@ -27,7 +27,7 @@ using System;
 
 namespace ArribaSim.Types
 {
-    public class UUI
+    public sealed class UUI
     {
         public UUID ID = UUID.Zero;
         public string FirstName = string.Empty;

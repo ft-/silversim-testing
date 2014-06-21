@@ -29,12 +29,16 @@ using ArribaSim.Scene.Types.Script.Events;
 using ArribaSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using ThreadedClasses;
+using log4net;
 
 namespace ArribaSim.Scene.Types.Object
 {
-    public class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject
+    public class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject, IDisposable
     {
+        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         #region Events
         public delegate void OnUpdateDelegate(ObjectGroup objgroup, int flags);
         public event OnUpdateDelegate OnUpdate;
@@ -60,6 +64,8 @@ namespace ArribaSim.Scene.Types.Object
         private Date m_CreationDate = new Date();
         protected internal RwLockedBiDiMappingDictionary<IAgent, ObjectPart> m_SittingAgents = new RwLockedBiDiMappingDictionary<IAgent, ObjectPart>();
         public AgentSittingInterface AgentSitting { get; private set; }
+        public SceneInterface Scene { get; set; }
+        private Vector3 m_Acceleration = new Vector3();
 
         #region Constructor
         public ObjectGroup()
@@ -67,10 +73,48 @@ namespace ArribaSim.Scene.Types.Object
             AgentSitting = new AgentSittingInterface(this);
             IsChanged = false;
         }
+
+        public void Dispose()
+        {
+            Scene = null;
+        }
         #endregion
+
+        private void TriggerOnUpdate(int flags)
+        {
+            var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
+            if (ev != null)
+            {
+                foreach (OnUpdateDelegate del in ev.GetInvocationList())
+                {
+                    try
+                    {
+                        del(this, flags);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.DebugFormat("[OBJECT GROUP]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                    }
+                }
+            }
+        }
 
         #region Properties
         public bool IsChanged { get; private set; }
+
+        public Vector3 Acceleration
+        {
+            get
+            {
+                return m_Acceleration;
+            }
+            set
+            {
+                m_Acceleration = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
 
         public bool IsTemporary
         {
@@ -85,7 +129,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_IsTemporary = value;
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -103,7 +147,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_IsTemporary = m_IsTemporary && m_IsTempOnRez;
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -123,7 +167,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_CreationDate = new Date(value);
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -137,7 +181,7 @@ namespace ArribaSim.Scene.Types.Object
             {
                 m_IsPhantom = value;
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -151,7 +195,7 @@ namespace ArribaSim.Scene.Types.Object
             {
                 m_IsPhysics = value;
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -165,7 +209,7 @@ namespace ArribaSim.Scene.Types.Object
             {
                 m_IsVolumeDetect = value;
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -185,7 +229,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_GroupID = new UUID(value);
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
         public UUI LastOwner
@@ -204,7 +248,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_LastOwner = value;
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -224,7 +268,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_Owner = value;
                 }
                 IsChanged = true;
-                OnUpdate(this, (int)ChangedEvent.ChangedFlags.Owner);
+                TriggerOnUpdate( (int)ChangedEvent.ChangedFlags.Owner);
             }
         }
 
@@ -244,7 +288,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_Creator = value;
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -272,8 +316,26 @@ namespace ArribaSim.Scene.Types.Object
                     m_Velocity = value;
                 }
                 IsChanged = true;
-                OnUpdate.Invoke(this, 0);
+                TriggerOnUpdate(0);
             }
+        }
+
+        public Quaternion Rotation
+        {
+            get { return RootPart.Rotation; }
+            set { RootPart.Rotation = value; }
+        }
+
+        public Quaternion GlobalRotation
+        {
+            get { return RootPart.GlobalRotation; }
+            set { RootPart.GlobalRotation = value; }
+        }
+
+        public Quaternion LocalRotation
+        {
+            get { return RootPart.LocalRotation; }
+            set { RootPart.LocalRotation = value; }
         }
 
         public UUID ID
@@ -337,11 +399,18 @@ namespace ArribaSim.Scene.Types.Object
             {
                 return;
             }
-            OnPositionChange(this);
+            var e = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
+            if (e != null)
+            {
+                foreach (Action<IObject> del in e.GetInvocationList())
+                {
+                    del(this);
+                }
+            }
         }
 
         #region Primitive Params Methods
-        public void GetPrimitiveParams(int linkTarget, AnArray.Enumerator enumerator, ref AnArray paramList)
+        public void GetPrimitiveParams(int linkThis, int linkTarget, AnArray.Enumerator enumerator, ref AnArray paramList)
         {
             if(0 == linkTarget)
             {
@@ -351,8 +420,6 @@ namespace ArribaSim.Scene.Types.Object
             {
                 throw new ArgumentException(String.Format("Invalid link target parameter for SetPrimitiveParams: {0}", linkTarget));
             }
-
-            int linkThis = linkTarget;
 
             while (enumerator.MoveNext())
             {
@@ -417,10 +484,10 @@ namespace ArribaSim.Scene.Types.Object
 
         public void GetPrimitiveParams(AnArray.Enumerator enumerator, ref AnArray paramList)
         {
-            GetPrimitiveParams(LINK_ROOT, enumerator, ref paramList);
+            GetPrimitiveParams(LINK_ROOT, LINK_ROOT, enumerator, ref paramList);
         }
 
-        public void SetPrimitiveParams(int linkTarget, AnArray.MarkEnumerator enumerator)
+        public void SetPrimitiveParams(int linkThis, int linkTarget, AnArray.MarkEnumerator enumerator)
         {
             if (0 == linkTarget)
             {
@@ -430,8 +497,6 @@ namespace ArribaSim.Scene.Types.Object
             {
                 throw new ArgumentException(String.Format("Invalid link target parameter for SetPrimitiveParams: {0}", linkTarget));
             }
-
-            int linkThis = linkTarget;
 
             while (enumerator.MoveNext())
             {
@@ -539,7 +604,7 @@ namespace ArribaSim.Scene.Types.Object
 
         public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator)
         {
-            SetPrimitiveParams(LINK_ROOT, enumerator);
+            SetPrimitiveParams(LINK_ROOT, LINK_ROOT, enumerator);
         }
         #endregion
 

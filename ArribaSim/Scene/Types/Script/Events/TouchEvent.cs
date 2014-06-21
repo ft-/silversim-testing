@@ -23,6 +23,8 @@ exception statement from your version.
 
 */
 
+using System.Collections.Generic;
+
 namespace ArribaSim.Scene.Types.Script.Events
 {
     public struct TouchEvent : IScriptEvent
@@ -34,6 +36,6 @@ namespace ArribaSim.Scene.Types.Script.Events
             End
         }
         public TouchType Type;
-        public DetectInfo Detected;
+        public List<DetectInfo> Detected;
     }
 }

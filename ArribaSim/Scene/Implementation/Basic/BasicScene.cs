@@ -172,6 +172,19 @@ namespace ArribaSim.Scene.Implementation.Basic
         private BasicSceneObjectParts m_SceneObjectParts;
         private DefaultSceneObjectGroupInterface m_SceneObjectGroups;
         private DefaultSceneAgentInterface m_SceneAgents;
+
+        public override T GetService<T>()
+        {
+            if(typeof(T).IsAssignableFrom(typeof(ChatServiceInterface)))
+            {
+                return (T) (object)m_ChatService;
+            }
+            else
+            {
+                return base.GetService<T>();
+            }
+        }
+
         #endregion
 
         #region Constructor
@@ -200,6 +213,7 @@ namespace ArribaSim.Scene.Implementation.Basic
             m_SceneAgents = new DefaultSceneAgentInterface(this);
             m_SceneParcels = new BasicSceneParcels(this);
             ID = ri.ID;
+            Name = ri.Name;
             GridPosition = ri.Location;
             SizeX = ri.Size.X;
             SizeY = ri.Size.Y;

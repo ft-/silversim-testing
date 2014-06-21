@@ -24,16 +24,17 @@ exception statement from your version.
 */
 
 using ArribaSim.Types;
+using System;
 
 namespace ArribaSim.Scene.Types.Script.Events
 {
     public struct RemoteDataEvent : IScriptEvent
     {
-        public int Type;
+        public Int32 Type;
         public UUID Channel;
         public UUID MessageID;
         public string Sender;
-        public int IData;
+        public Int32 IData;
         public string SData;
     }
 }

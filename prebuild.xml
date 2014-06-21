@@ -32,6 +32,10 @@
       </Options>
     </Configuration>
     
+    <!-- ******************************************************************* -->
+    <!-- Core Logic Code -->
+    <!-- ******************************************************************* -->
+    
     <Project frameworkVersion="v4_0" name="ArribaSim.Main.Simulator" path="ArribaSim/Main/Simulator" type="Exe">
       <Configuration name="Release">
         <Options>
@@ -193,6 +197,7 @@
       <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
       <Reference name="ArribaSim.Linden.Messages"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
+      <Reference name="log4net" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
       </Files>
@@ -293,7 +298,35 @@
       </Files>
     </Project>
 
-    <!-- Plugins -->
+    <Project frameworkVersion="v4_0" name="ArribaSim.Scripting.Common" path="ArribaSim/Scripting/Common" type="Library">
+      <Configuration name="Release">
+        <Options>
+          <OutputPath>../../../bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug">
+        <Options>
+          <OutputPath>../../../bin/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../../bin/</ReferencePath>
+      <Reference name="log4net"/>
+      <Reference name="System"/>
+      <Reference name="System.Core"/>
+      <Reference name="ArribaSim.Types"/>
+      <Reference name="ArribaSim.Scene.Types"/>
+      <Reference name="ThreadedClasses" path="../../../bin/"/>
+      <Reference name="Nini" path="../../../bin/"/>
+      <Files>
+        <Match pattern="*.cs" recurse="true"/>
+      </Files>
+    </Project>
+
+    <!-- ******************************************************************* -->
+    <!-- Database Plugins -->
+    <!-- ******************************************************************* -->
+    
     <Project frameworkVersion="v4_0" name="ArribaSim.Database.MySQL" path="ArribaSim/Database/MySQL" type="Library">
       <Configuration name="Release">
         <Options>
@@ -354,6 +387,10 @@
       </Files>
     </Project>
 
+    <!-- ******************************************************************* -->
+    <!-- Connector Plugins -->
+    <!-- ******************************************************************* -->
+    
     <Project frameworkVersion="v4_0" name="ArribaSim.BackendConnectors.Robust" path="ArribaSim/BackendConnectors/Robust" type="Library">
       <Configuration name="Release">
         <Options>
@@ -477,6 +514,10 @@
       </Files>
     </Project>
     
+    <!-- ******************************************************************* -->
+    <!-- Simulator Plugins -->
+    <!-- ******************************************************************* -->
+    
     <Project frameworkVersion="v4_0" name="ArribaSim.Scene.Chat" path="ArribaSim/Scene/Chat" type="Library">
       <Configuration name="Release">
         <Options>
@@ -529,6 +570,7 @@
       <Reference name="ArribaSim.ServiceInterfaces"/>
       <Reference name="ArribaSim.Scene.Types"/>
       <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
+      <Reference name="ArribaSim.Scene.Management"/>
       <Reference name="ArribaSim.Main.Common"/>
       <Reference name="HttpClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
@@ -600,6 +642,42 @@
         <Match pattern="*.cs" recurse="true"/>
       </Files>
     </Project>
+    
+    <!-- ******************************************************************* -->
+    <!-- Scripting Plugins -->
+    <!-- ******************************************************************* -->
+    
+    <Project frameworkVersion="v4_0" name="ArribaSim.Scripting.LSL" path="ArribaSim/Scripting/LSL" type="Library">
+      <Configuration name="Release">
+        <Options>
+          <OutputPath>../../../bin/plugins/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug">
+        <Options>
+          <OutputPath>../../../bin/plugins/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../../bin/"/>
+      <Reference name="System"/>
+      <Reference name="System.Core"/>
+      <Reference name="System.Xml"/>
+      <Reference name="ArribaSim.Types"/>
+      <Reference name="ArribaSim.ServiceInterfaces"/>
+      <Reference name="ArribaSim.Scene.Types"/>
+      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
+      <Reference name="ArribaSim.Scripting.Common"/>
+      <Reference name="ArribaSim.Main.Common"/>
+      <Reference name="HttpClasses" path="../../../bin/"/>
+      <Reference name="Nini" path="../../../bin/"/>
+      <Reference name="ThreadedClasses" path="../../../bin/"/>
+      <Files>
+        <Match pattern="*.cs" recurse="true"/>
+      </Files>
+    </Project>
+    
     
   </Solution>
 

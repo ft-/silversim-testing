@@ -30,6 +30,19 @@ using System.Collections.Generic;
 
 namespace ArribaSim.Scene.Types.Object
 {
+    public enum ClickActionType : int
+    {
+        None = 0,
+        Touch = 0,
+        Sit = 1,
+        Buy = 2,
+        Pay = 3,
+        Open = 4,
+        Play = 5,
+        OpenMedia = 6,
+        Zoom = 7
+    }
+
     public enum PrimitiveParamsType : int
     {
         Name = 27,
@@ -156,6 +169,12 @@ namespace ArribaSim.Scene.Types.Object
             set;
         }
 
+        UUI Owner
+        {
+            get;
+            set;
+        }
+
         string Description
         {
             get;
@@ -168,6 +187,12 @@ namespace ArribaSim.Scene.Types.Object
             set;
         }
 
+        Vector3 Velocity
+        {
+            get;
+            set;
+        }
+
         Vector3 GlobalPosition
         {
             get;
@@ -175,6 +200,30 @@ namespace ArribaSim.Scene.Types.Object
         }
 
         Vector3 LocalPosition
+        {
+            get;
+            set;
+        }
+
+        Vector3 Acceleration
+        {
+            get;
+            set;
+        }
+
+        Quaternion GlobalRotation
+        {
+            get;
+            set;
+        }
+
+        Quaternion LocalRotation
+        {
+            get;
+            set;
+        }
+
+        Quaternion Rotation
         {
             get;
             set;

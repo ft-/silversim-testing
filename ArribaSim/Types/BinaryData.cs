@@ -28,7 +28,7 @@ using System.Collections;
 
 namespace ArribaSim.Types
 {
-    public class BinaryData : IValue, IEnumerable, IEquatable<BinaryData>
+    public sealed class BinaryData : IValue, IEnumerable, IEquatable<BinaryData>
     {
         private byte[] m_Data;
 

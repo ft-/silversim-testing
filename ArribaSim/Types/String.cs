@@ -28,7 +28,7 @@ using System.Globalization;
 
 namespace ArribaSim.Types
 {
-    public class AString : IComparable<AString>, IEquatable<AString>, IComparable<string>, IEquatable<string>, IValue
+    public sealed class AString : IComparable<AString>, IEquatable<AString>, IComparable<string>, IEquatable<string>, IValue
     {
         private string m_Value;
 
@@ -85,7 +85,30 @@ namespace ArribaSim.Types
             return (string)m_Value.Clone();
         }
 
+        public AString Substring(Int32 startIndex)
+        {
+            return new AString(m_Value.Substring(startIndex));
+        }
+
+        public AString Substring(Int32 startIndex, Int32 length)
+        {
+            return new AString(m_Value.Substring(startIndex, length));
+        }
+
+        public Integer Length
+        {
+            get
+            {
+                return new Integer(m_Value.Length);
+            }
+        }
+
         #region Operators
+        public static AString operator+(AString a, AString b)
+        {
+            return new AString(a.m_Value + b.m_Value);
+        }
+
         public static implicit operator bool(AString v)
         {
             bool result;
@@ -121,6 +144,26 @@ namespace ArribaSim.Types
             return new Vector3(v.m_Value);
         }
         #endregion Operators
+
+        public static AString Format(string format, object arg0)
+        {
+            return new AString(string.Format(format, arg0));
+        }
+
+        public static AString Format(string format, params object[] args)
+        {
+            return new AString(string.Format(format, args));
+        }
+
+        public static AString Format(string format, object arg0, object arg1)
+        {
+            return new AString(string.Format(format, arg0, arg1));
+        }
+
+        public static AString Format(string format, object arg0, object arg1, object arg2)
+        {
+            return new AString(string.Format(format, arg0, arg1, arg2));
+        }
 
         #region Helpers
         public ABoolean AsBoolean { get { return new ABoolean(m_Value != ""); } }

@@ -29,11 +29,15 @@ using ArribaSim.Types;
 using System;
 using System.Collections.Generic;
 using ThreadedClasses;
+using log4net;
+using System.Reflection;
 
 namespace ArribaSim.Scene.Types.Object
 {
     public class ObjectPart : IObject, IDisposable
     {
+        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         #region Events
         public delegate void OnUpdateDelegate(ObjectPart part, int changed);
         public event OnUpdateDelegate OnUpdate;
@@ -56,6 +60,10 @@ namespace ArribaSim.Scene.Types.Object
         private Quaternion m_SitTargetOrientation = Quaternion.Identity;
         private readonly AnArray m_ParticleSystem = new AnArray();
         private bool m_IsAllowedDrop = false;
+        private ClickActionType m_ClickAction = ClickActionType.None;
+        private bool m_IsPassCollisions = false;
+        private bool m_IsPassTouches = false;
+        private bool m_IsSoundQueueing = false;
 
         public class TextParam
         {
@@ -155,6 +163,21 @@ namespace ArribaSim.Scene.Types.Object
             #endregion
         }
         private readonly PrimitiveShape m_Shape = new PrimitiveShape();
+        public class CollisionSoundParam
+        {
+            #region Constructor
+            public CollisionSoundParam()
+            {
+
+            }
+            #endregion
+
+            #region Fields
+            public UUID ImpactSound = UUID.Zero;
+            public double ImpactVolume = 0f;
+            #endregion
+        }
+        private readonly CollisionSoundParam m_CollisionSound = new CollisionSoundParam();
 
         public readonly RwLockedSortedDictionary<int, PrimitiveFace> Faces = new RwLockedSortedDictionary<int, PrimitiveFace>();
         #endregion
@@ -175,11 +198,175 @@ namespace ArribaSim.Scene.Types.Object
         }
         #endregion
 
+        private void TriggerOnUpdate(int flags)
+        {
+            var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
+            if (ev != null)
+            {
+                foreach (OnUpdateDelegate del in ev.GetInvocationList())
+                {
+                    try
+                    {
+                        del(this, flags);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.DebugFormat("[OBJECT PART]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                    }
+                }
+            }
+        }
+
+        private void TriggerOnPositionChange()
+        {
+            var ev = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
+            if (ev != null)
+            {
+                foreach(Action<IObject> del in ev.GetInvocationList())
+                {
+                    try
+                    {
+                        del(this);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.DebugFormat("[OBJECT PART]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                    }
+                }
+            }
+        }
+
         #region Properties
         public ObjectGroup Group { get; private set; }
         public ObjectPartInventory Inventory { get; private set; }
 
         public bool IsChanged { get; private set; }
+
+        public ClickActionType ClickAction
+        {
+            get
+            {
+                return m_ClickAction;
+            }
+            set
+            {
+                m_ClickAction = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public bool IsPassCollisions
+        {
+            get
+            {
+                return m_IsPassCollisions;
+            }
+            set
+            {
+                m_IsPassCollisions = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public bool IsPassTouches
+        {
+            get
+            {
+                return m_IsPassTouches;
+            }
+            set
+            {
+                m_IsPassTouches = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public Vector3 Velocity
+        {
+            get
+            {
+                if(Group != null)
+                {
+                    return Group.Velocity;
+                }
+                else
+                {
+                    return Vector3.Zero;
+                }
+            }
+            set
+            {
+                if(Group != null)
+                {
+                    Group.Velocity = value;
+                }
+            }
+        }
+
+        public Vector3 Acceleration
+        {
+            get
+            {
+                if(Group != null)
+                {
+                    return Group.Acceleration;
+                }
+                else
+                {
+                    return Vector3.Zero;
+                }
+            }
+            set
+            {
+                if(Group != null)
+                {
+                    Group.Acceleration = value;
+                }
+            }
+        }
+
+        public bool IsSoundQueueing
+        {
+            get
+            {
+                return m_IsSoundQueueing;
+            }
+            set
+            {
+                m_IsSoundQueueing = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public int LinkNumber
+        {
+            get
+            {
+                ObjectGroup grp = Group;
+                if(grp != null)
+                {
+                    try
+                    {
+                        grp.ForEach(delegate(KeyValuePair<int, ObjectPart> kvp)
+                        {
+                            if (kvp.Value == this)
+                            {
+                                throw new ReturnValueException<int>(kvp.Key);
+                            }
+                        });
+                    }
+                    catch(ReturnValueException<int> e)
+                    {
+                        return e.Value;
+                    }
+                }
+                return -1;
+            }
+        }
 
         public bool IsAllowedDrop
         {
@@ -191,7 +378,7 @@ namespace ArribaSim.Scene.Types.Object
             {
                 m_IsAllowedDrop = value;
                 IsChanged = true;
-                OnUpdate(this, (int)ChangedEvent.ChangedFlags.AllowedDrop);
+                TriggerOnUpdate((int)ChangedEvent.ChangedFlags.AllowedDrop);
             }
         }
 
@@ -205,7 +392,7 @@ namespace ArribaSim.Scene.Types.Object
             {
                 lock (this) m_SitTargetOffset = value;
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate( 0);
             }
         }
 
@@ -219,7 +406,7 @@ namespace ArribaSim.Scene.Types.Object
             {
                 lock (this) m_SitTargetOrientation = value;
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -233,7 +420,26 @@ namespace ArribaSim.Scene.Types.Object
             {
                 lock(this) m_SitText = value;
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public UUI Owner
+        {
+            get
+            {
+                if (Group != null)
+                {
+                    return Group.Owner;
+                }
+                return UUI.Unknown;
+            }
+            set
+            {
+                if(Group != null)
+                {
+                    Group.Owner = value;
+                }
             }
         }
 
@@ -247,7 +453,7 @@ namespace ArribaSim.Scene.Types.Object
             {
                 lock (this) m_TouchText = value;
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -261,7 +467,7 @@ namespace ArribaSim.Scene.Types.Object
             {
                 m_PhysicsShapeType = value;
                 IsChanged = true;
-                OnUpdate(this, (int)ChangedEvent.ChangedFlags.Shape);
+                TriggerOnUpdate((int)ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -275,7 +481,31 @@ namespace ArribaSim.Scene.Types.Object
             {
                 m_Material = value;
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public CollisionSoundParam CollisionSound
+        {
+            get
+            {
+                CollisionSoundParam res = new CollisionSoundParam();
+                lock(m_CollisionSound)
+                {
+                    res.ImpactSound = m_CollisionSound.ImpactSound;
+                    res.ImpactVolume = m_CollisionSound.ImpactVolume;
+                }
+                return res;
+            }
+            set
+            {
+                lock(m_CollisionSound)
+                {
+                    m_CollisionSound.ImpactSound = value.ImpactSound;
+                    m_CollisionSound.ImpactVolume = value.ImpactVolume;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
             }
         }
 
@@ -295,7 +525,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_Size = value;
                 }
                 IsChanged = true;
-                OnUpdate(this, (int)ChangedEvent.ChangedFlags.Scale);
+                TriggerOnUpdate((int)ChangedEvent.ChangedFlags.Scale);
             }
         }
 
@@ -315,7 +545,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_Slice = value;
                 }
                 IsChanged = true;
-                OnUpdate(this, (int)ChangedEvent.ChangedFlags.Shape);
+                TriggerOnUpdate((int)ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -339,7 +569,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_Text.TextColor = new ColorAlpha(value.TextColor);
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -356,7 +586,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_ParticleSystem.Clear();
                     m_ParticleSystem.AddRange(value);
                     IsChanged = true;
-                    OnUpdate(this, 0);
+                    TriggerOnUpdate(0);
                 }
             }
         }
@@ -391,7 +621,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_Flexible.Wind = value.Wind;
                 }
                 IsChanged = true;
-                OnUpdate(this, (int)ChangedEvent.ChangedFlags.Shape);
+                TriggerOnUpdate((int)ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -421,7 +651,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_PointLight.Radius = value.Radius;
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -447,7 +677,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_Omega.Spinrate = value.Spinrate;
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -503,7 +733,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_Shape.HoleSize = value.HoleSize;
                 }
                 IsChanged = true;
-                OnUpdate(this, (int)ChangedEvent.ChangedFlags.Shape);
+                TriggerOnUpdate((int)ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -532,7 +762,7 @@ namespace ArribaSim.Scene.Types.Object
             { 
                 m_Name = value;
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
 
@@ -546,7 +776,7 @@ namespace ArribaSim.Scene.Types.Object
             {
                 m_Description = value;
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
             }
         }
         #endregion
@@ -601,8 +831,8 @@ namespace ArribaSim.Scene.Types.Object
                     }
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
-                OnPositionChange(this);
+                TriggerOnUpdate(0);
+                TriggerOnPositionChange();
             }
         }
 
@@ -622,8 +852,8 @@ namespace ArribaSim.Scene.Types.Object
                     m_GlobalPosition = value;
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
-                OnPositionChange(this);
+                TriggerOnUpdate(0);
+                TriggerOnPositionChange();
             }
         }
 
@@ -671,8 +901,8 @@ namespace ArribaSim.Scene.Types.Object
                     }
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
-                OnPositionChange(this);
+                TriggerOnUpdate(0);
+                TriggerOnPositionChange();
             }
         }
         #endregion
@@ -722,7 +952,8 @@ namespace ArribaSim.Scene.Types.Object
                     }
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
+                TriggerOnPositionChange();
             }
         }
 
@@ -742,7 +973,8 @@ namespace ArribaSim.Scene.Types.Object
                     m_GlobalRotation = value;
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
+                TriggerOnPositionChange();
             }
         }
 
@@ -790,7 +1022,8 @@ namespace ArribaSim.Scene.Types.Object
                     }
                 }
                 IsChanged = true;
-                OnUpdate(this, 0);
+                TriggerOnUpdate(0);
+                TriggerOnPositionChange();
             }
         }
         #endregion

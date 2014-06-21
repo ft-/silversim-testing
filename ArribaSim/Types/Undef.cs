@@ -27,7 +27,7 @@ using System;
 
 namespace ArribaSim.Types
 {
-    public class Undef : IComparable<Undef>, IEquatable<Undef>, IValue
+    public sealed class Undef : IComparable<Undef>, IEquatable<Undef>, IValue
     {
         public Undef()
         {

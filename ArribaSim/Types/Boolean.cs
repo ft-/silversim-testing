@@ -29,7 +29,7 @@ using System.Collections.Generic;
 namespace ArribaSim.Types
 {
     [Serializable]
-    public class ABoolean : IComparable<ABoolean>, IEquatable<ABoolean>, IValue
+    public sealed class ABoolean : IComparable<ABoolean>, IEquatable<ABoolean>, IValue
     {
         private bool m_Value;
 

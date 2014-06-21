@@ -31,6 +31,7 @@ using ArribaSim.Main.Common;
 using ArribaSim.ServiceInterfaces.Grid;
 using ArribaSim.Types.Grid;
 using ArribaSim.Types;
+using ArribaSim.Scene.Management.Scene;
 using ArribaSim.Scene.ServiceInterfaces.RegionLoader;
 using ArribaSim.Scene.ServiceInterfaces.Scene;
 using Nini.Config;
@@ -110,7 +111,7 @@ namespace ArribaSim.Scene.RegionLoader.Basic
             foreach(RegionInfo ri in m_RegionService.GetOnlineRegions())
             {
                 m_Log.InfoFormat("[REGION LOADER]: Starting Region {0}", ri.Name);
-                m_SceneFactory.Instantiate(ri);
+                SceneManager.Scenes.Add(m_SceneFactory.Instantiate(ri));
             }
         }
     }

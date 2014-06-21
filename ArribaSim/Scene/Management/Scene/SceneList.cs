@@ -72,7 +72,24 @@ namespace ArribaSim.Scene.Management.Scene
                 throw;
             }
             m_Log.InfoFormat("[SCENE MANAGER]: Adding region {0} at {1}", scene.Name, scene.GridPosition);
-            OnRegionAdd(scene);
+            if (OnRegionAdd != null)
+            {
+                var ev = OnRegionAdd; /* events are not exactly thread-safe, so copy the reference first */
+                if (null != ev)
+                {
+                    foreach (Action<SceneInterface> del in ev.GetInvocationList())
+                    {
+                        try
+                        {
+                            del(scene);
+                        }
+                        catch (Exception e)
+                        {
+                            m_Log.DebugFormat("[SCENE MANAGER]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                        }
+                    }
+                }
+            }
         }
 
         public new void Remove(UUID key)
@@ -93,7 +110,24 @@ namespace ArribaSim.Scene.Management.Scene
         public void Remove(SceneInterface scene)
         {
             m_Log.InfoFormat("[SCENE MANAGER]: Removing region {0} at {1}", scene.Name, scene.GridPosition);
-            OnRegionRemove(scene);
+            if (OnRegionRemove != null)
+            {
+                var ev = OnRegionRemove; /* events are not exactly thread-safe, so copy the reference first */
+                if (null != ev)
+                {
+                    foreach (Action<SceneInterface> del in ev.GetInvocationList())
+                    {
+                        try
+                        {
+                            del(scene);
+                        }
+                        catch (Exception e)
+                        {
+                            m_Log.DebugFormat("[SCENE MANAGER]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                        }
+                    }
+                }
+            }
             scene.InvokeOnRemove();
             m_RegionNames.Remove(scene.ID);
             base.Remove(scene.ID);

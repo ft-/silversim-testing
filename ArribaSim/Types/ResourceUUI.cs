@@ -27,7 +27,7 @@ using System;
 
 namespace ArribaSim.Types
 {
-    public class ResourceUUI
+    public sealed class ResourceUUI
     {
         public UUID ID = UUID.Zero;
         public Uri LocationURI = null;

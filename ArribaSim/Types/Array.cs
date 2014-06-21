@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace ArribaSim.Types
 {
-    public class AnArray : List<IValue>, IValue
+    public sealed class AnArray : List<IValue>, IValue
     {
         #region Constructors
         public AnArray()

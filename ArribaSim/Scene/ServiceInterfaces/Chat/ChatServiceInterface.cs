@@ -69,6 +69,8 @@ namespace ArribaSim.Scene.ServiceInterfaces.Chat
             }
 
             public abstract void Send(ListenEvent ev);
+
+            public abstract bool IsActive { get; set; }
         }
 
         #region Constructor

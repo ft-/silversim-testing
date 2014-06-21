@@ -34,10 +34,12 @@ using ArribaSim.ServiceInterfaces.GridUser;
 using ArribaSim.ServiceInterfaces.Groups;
 using ArribaSim.ServiceInterfaces.Presence;
 using ArribaSim.Types;
+using log4net;
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Collections.Generic;
+using System.Reflection;
 
 namespace ArribaSim.Scene.Types.Scene
 {
@@ -70,7 +72,9 @@ namespace ArribaSim.Scene.Types.Scene
 
     public abstract class SceneInterface
     {
-        public UUID ID { get; protected set;  }
+        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
+        public UUID ID { get; protected set; }
         public uint SizeX { get; protected set; }
         public uint SizeY { get; protected set; }
         public string Name { get; protected set; }
@@ -92,6 +96,37 @@ namespace ArribaSim.Scene.Types.Scene
         public PresenceServiceInterface PresenceService { get; protected set; }
         public GridUserServiceInterface GridUserService { get; protected set; }
         public GridServiceInterface GridService { get; protected set; }
+        public virtual T GetService<T>()
+        {
+            if(typeof(T).IsAssignableFrom(typeof(AssetServiceInterface)))
+            {
+                return (T)(object)AssetService;
+            }
+            else if(typeof(T).IsAssignableFrom(typeof(GroupsServiceInterface)))
+            {
+                return (T)(object)GroupsService;
+            }
+            else if(typeof(T).IsAssignableFrom(typeof(AvatarServiceInterface)))
+            {
+                return (T)(object)AvatarService;
+            }
+            else if (typeof(T).IsAssignableFrom(typeof(PresenceServiceInterface)))
+            {
+                return (T)(object)PresenceService;
+            }
+            else if (typeof(T).IsAssignableFrom(typeof(GridUserServiceInterface)))
+            {
+                return (T)(object)GridUserService;
+            }
+            else if (typeof(T).IsAssignableFrom(typeof(GridServiceInterface)))
+            {
+                return (T)(object)GridService;
+            }
+            else
+            {
+                throw new ArgumentException();
+            }
+        }
 
         public SceneInterface()
         {
@@ -100,7 +135,20 @@ namespace ArribaSim.Scene.Types.Scene
 
         public void InvokeOnRemove()
         {
-            OnRemove(this);
+            if (null != OnRemove)
+            {
+                foreach (Action<SceneInterface> del in OnRemove.GetInvocationList())
+                {
+                    try
+                    {
+                        del(this);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.DebugFormat("[SCENE]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                    }
+                }
+            }
         }
 
         public abstract void Add(IObject obj);
@@ -109,7 +157,20 @@ namespace ArribaSim.Scene.Types.Scene
         public void TriggerIPChanged(IPAddress ip)
         {
             LastIPAddress = ip;
-            OnIPChanged(this, ip);
+            if (OnIPChanged != null)
+            {
+                foreach (IPChangedDelegate del in OnIPChanged.GetInvocationList())
+                {
+                    try
+                    {
+                        del(this, ip);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.DebugFormat("[SCENE]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                    }
+                }
+            }
         }
 
         #region Dynamic IP Support

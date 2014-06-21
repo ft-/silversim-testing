@@ -238,10 +238,6 @@ namespace ArribaSim.StructuredData.JSON
             {
                 io.Write("\"" + SerializeString(val.ToString()) + "\"");
             }
-            else if(val is UUI)
-            {
-                io.Write("\"" + SerializeString(val.ToString()) + "\"");
-            }
             else if(val is Date)
             {
                 DateTime dt = (Date)val;

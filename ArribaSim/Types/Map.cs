@@ -28,7 +28,7 @@ using System.Collections.Generic;
 
 namespace ArribaSim.Types
 {
-    public class Map : Dictionary<string, IValue>, IValue
+    public sealed class Map : Dictionary<string, IValue>, IValue
     {
         #region Properties
         public ValueType Type

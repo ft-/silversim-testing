@@ -1,0 +1,310 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ArribaSim.Scene.Types.Script;
+using ArribaSim.Scene.Types.Script.Events;
+using ArribaSim.Scene.Types.Object;
+using ArribaSim.Scene.Types;
+using ArribaSim.Scene.ServiceInterfaces.Chat;
+using ArribaSim.Types;
+using ThreadedClasses;
+
+namespace ArribaSim.Scripting.LSL.Variants.LSL
+{
+    public partial class LSLScript : IScriptInstance
+    {
+        public class ResetScriptException : Exception
+        {
+            public ResetScriptException()
+            {
+
+            }
+        }
+
+        public class ChangeStateException : Exception
+        {
+            public string NewState { get; private set; }
+            public ChangeStateException(string newstate)
+            {
+                NewState = newstate;
+            }
+        }
+
+        public static int MaxListenerHandles = 64;
+
+        private ObjectPart m_Part;
+        private NonblockingQueue<IScriptEvent> m_Events = new NonblockingQueue<IScriptEvent>();
+        private List<DetectInfo> m_Detected = new List<DetectInfo>();
+        private Dictionary<string, LSLState> m_States = new Dictionary<string, LSLState>();
+        private LSLState m_CurrentState = null;
+        public Integer StartParameter = new Integer();
+        private RwLockedDictionary<int, ChatServiceInterface.Listener> m_Listeners = new RwLockedDictionary<int, ChatServiceInterface.Listener>();
+
+        public LSLScript(ObjectPart part)
+        {
+            m_Part = part;
+        }
+
+        public void Dispose()
+        {
+            m_Part = null;
+        }
+
+        public ObjectPart Part
+        {
+            get
+            {
+                return m_Part;
+            }
+        }
+
+        public void PostEvent(IScriptEvent e)
+        {
+            if (IsRunning)
+            {
+                m_Events.Enqueue(e);
+            }
+        }
+
+        public void Reset()
+        {
+            if (IsRunning)
+            {
+                m_Events.Enqueue(new ResetScriptEvent());
+                /* TODO: add to script thread pool */
+            }
+        }
+
+        public bool IsRunning { get; set; }
+
+        public void Remove()
+        {
+            ResetListeners();
+        }
+
+        public void ProcessEvent()
+        {
+            IScriptEvent ev;
+            try
+            {
+                ev = m_Events.Dequeue();
+                if(m_CurrentState == null)
+                {
+                    m_CurrentState = m_States["default"];
+                    m_CurrentState.state_entry();
+                }
+            }
+            catch
+            {
+                return;
+            }
+
+            try
+            {
+                if (ev is AtRotTargetEvent)
+                {
+                    AtRotTargetEvent e = (AtRotTargetEvent)ev;
+                    m_CurrentState.at_rot_target(new Integer(e.Handle), e.TargetRotation, e.OurRotation);
+                }
+                else if (ev is AttachEvent)
+                {
+                    AttachEvent e = (AttachEvent)ev;
+                    m_CurrentState.attach(e.ObjectID);
+                }
+                else if (ev is AtTargetEvent)
+                {
+                    AtTargetEvent e = (AtTargetEvent)ev;
+                    m_CurrentState.at_target(new Integer(e.Handle), e.TargetPosition, e.OurPosition);
+                }
+                else if (ev is ChangedEvent)
+                {
+                    ChangedEvent e = (ChangedEvent)ev;
+                    m_CurrentState.changed(new Integer(e.Flags));
+                }
+                else if (ev is CollisionEvent)
+                {
+                    m_Detected = ((CollisionEvent)ev).Detected;
+                    switch(((CollisionEvent)ev).Type)
+                    {
+                        case CollisionEvent.CollisionType.Start:
+                            m_CurrentState.collision_start(new Integer(m_Detected.Count));
+                            break;
+
+                        case CollisionEvent.CollisionType.End:
+                            m_CurrentState.collision_end(new Integer(m_Detected.Count));
+                            break;
+
+                        case CollisionEvent.CollisionType.Continuous:
+                            m_CurrentState.collision(new Integer(m_Detected.Count));
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                else if (ev is DataserverEvent)
+                {
+                    DataserverEvent e = (DataserverEvent)ev;
+                    m_CurrentState.dataserver(e.QueryID, new AString(e.Data));
+                }
+                else if (ev is EmailEvent)
+                {
+                    EmailEvent e = (EmailEvent)ev;
+                    m_CurrentState.email(new AString(e.Time), new AString(e.Address), new AString(e.Subject), new AString(e.Message), new Integer(e.NumberLeft));
+                }
+                else if (ev is HttpRequestEvent)
+                {
+                    HttpRequestEvent e = (HttpRequestEvent)ev;
+                    m_CurrentState.http_request(e.RequestID, new AString(e.Method), new AString(e.Body));
+                }
+                else if (ev is HttpResponseEvent)
+                {
+                    HttpResponseEvent e = (HttpResponseEvent)ev;
+                    m_CurrentState.http_response(e.RequestID, new Integer(e.Status), e.Metadata, new AString(e.Body));
+                }
+                else if (ev is LandCollisionEvent)
+                {
+                    LandCollisionEvent e = (LandCollisionEvent)ev;
+                    switch(e.Type)
+                    {
+                        case LandCollisionEvent.CollisionType.Start:
+                            m_CurrentState.land_collision_start(e.Position);
+                            break;
+
+                        case LandCollisionEvent.CollisionType.End:
+                            m_CurrentState.land_collision_end(e.Position);
+                            break;
+
+                        case LandCollisionEvent.CollisionType.Continuous:
+                            m_CurrentState.land_collision(e.Position);
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                else if (ev is LinkMessageEvent)
+                {
+                    LinkMessageEvent e = (LinkMessageEvent)ev;
+                    m_CurrentState.link_message(new Integer(e.SenderNumber), new Integer(e.Number), new AString(e.Data), e.Id);
+                }
+                else if (ev is ListenEvent)
+                {
+                    ListenEvent e = (ListenEvent)ev;
+                    m_CurrentState.listen(new Integer(e.Channel), new AString(e.Name), e.ID, new AString(e.Message));
+                }
+                else if (ev is MoneyEvent)
+                {
+                    MoneyEvent e = (MoneyEvent)ev;
+                    m_CurrentState.money(e.ID, new Integer(e.Amount));
+                }
+                else if (ev is MovingEndEvent)
+                {
+                    m_CurrentState.moving_end();
+                }
+                else if (ev is MovingStartEvent)
+                {
+                    m_CurrentState.moving_start();
+                }
+                else if (ev is NoSensorEvent)
+                {
+                    m_CurrentState.no_sensor();
+                }
+                else if (ev is NotAtRotTargetEvent)
+                {
+                    m_CurrentState.not_at_rot_target();
+                }
+                else if (ev is NotAtTargetEvent)
+                {
+                    m_CurrentState.not_at_target();
+                }
+                else if (ev is ObjectRezEvent)
+                {
+                    ObjectRezEvent e = (ObjectRezEvent)ev;
+                    m_CurrentState.object_rez(e.ObjectID);
+                }
+                else if (ev is OnRezEvent)
+                {
+                    OnRezEvent e = (OnRezEvent)ev;
+                    StartParameter = new Integer(e.StartParam);
+                    m_CurrentState.on_rez(new Integer(e.StartParam));
+                }
+                else if (ev is PathUpdateEvent)
+                {
+                    PathUpdateEvent e = (PathUpdateEvent)ev;
+                    m_CurrentState.path_update(new Integer(e.Type), e.Reserved);
+                }
+                else if (ev is RemoteDataEvent)
+                {
+                    RemoteDataEvent e =(RemoteDataEvent)ev;
+                    m_CurrentState.remote_data(new Integer(e.Type), e.Channel, e.MessageID, new AString(e.Sender), new Integer(e.IData), new AString(e.SData));
+                }
+                else if (ev is ResetScriptEvent)
+                {
+                    throw new ResetScriptException();
+                }
+                else if (ev is RuntimePermissionsEvent)
+                {
+                    RuntimePermissionsEvent e = (RuntimePermissionsEvent)ev;
+                    m_CurrentState.run_time_permissions(new Integer(e.Permissions));
+                }
+                else if (ev is SensorEvent)
+                {
+                    SensorEvent e = (SensorEvent)ev;
+                    m_Detected = e.Data;
+                    m_CurrentState.sensor(new Integer(m_Detected.Count));
+                }
+                else if (ev is TouchEvent)
+                {
+                    TouchEvent e = (TouchEvent)ev;
+                    m_Detected = e.Detected;
+                    switch(e.Type)
+                    {
+                        case TouchEvent.TouchType.Start:
+                            m_CurrentState.touch_start(new Integer(m_Detected.Count));
+                            break;
+
+                        case TouchEvent.TouchType.End:
+                            m_CurrentState.touch_end(new Integer(m_Detected.Count));
+                            break;
+
+                        case TouchEvent.TouchType.Continuous:
+                            m_CurrentState.touch(new Integer(m_Detected.Count));
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+            }
+            catch(ResetScriptException)
+            {
+                ResetListeners();
+                m_Events.Clear();
+                m_CurrentState = m_States["default"];
+                m_CurrentState.state_entry();
+            }
+            catch(ChangeStateException e)
+            {
+                ResetListeners();
+                m_Events.Clear();
+                m_CurrentState.state_exit();
+                m_CurrentState = m_States[e.NewState];
+                m_CurrentState.state_entry();
+            }
+            catch(Exception e)
+            {
+                llShout(DEBUG_CHANNEL, new AString(e.Message));
+            }
+        }
+
+        public bool HasEventsPending
+        { 
+            get
+            {
+                return m_Events.Count != 0;
+            }
+        }
+    }
+}

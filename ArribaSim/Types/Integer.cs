@@ -28,7 +28,7 @@ using System;
 namespace ArribaSim.Types
 {
     [Serializable]
-    public class Integer : IComparable<Integer>, IEquatable<Integer>, IValue
+    public sealed class Integer : IComparable<Integer>, IEquatable<Integer>, IValue
     {
         private Int32 m_Value;
 
@@ -75,7 +75,46 @@ namespace ArribaSim.Types
             return m_Value.Equals(v.m_Value);
         }
 
+        public override bool Equals(object v)
+        {
+            if(typeof(IValue).IsAssignableFrom(v.GetType()))
+            {
+                return m_Value.Equals(((IValue)v).AsInteger);
+            }
+            return false;
+        }
+
         #region Operators
+        public static Integer operator-(Integer v)
+        {
+            return new Integer(-v.m_Value);
+        }
+
+        public static Integer operator+(Integer a, Integer b)
+        {
+            return new Integer(a.m_Value + b.m_Value);
+        }
+
+        public static Integer operator-(Integer a, Integer b)
+        {
+            return new Integer(a.m_Value - b.m_Value);
+        }
+
+        public static Integer operator *(Integer a, Integer b)
+        {
+            return new Integer(a.m_Value * b.m_Value);
+        }
+
+        public static Integer operator /(Integer a, Integer b)
+        {
+            return new Integer(a.m_Value / b.m_Value);
+        }
+
+        public static Integer operator %(Integer a, Integer b)
+        {
+            return new Integer(a.m_Value % b.m_Value);
+        }
+
         public static implicit operator ABoolean(Integer v)
         {
             return new ABoolean(v.m_Value != 0);
@@ -88,6 +127,40 @@ namespace ArribaSim.Types
         public static implicit operator Int32(Integer v)
         {
             return v.m_Value;
+        }
+        public static bool operator==(Integer a, Integer b)
+        {
+            return a.m_Value == b.m_Value;
+        }
+
+        public static bool operator!=(Integer a, Integer b)
+        {
+            return a.m_Value != b.m_Value;
+        }
+
+        public static bool operator<(Integer a, Integer b)
+        {
+            return a.m_Value < b.m_Value;
+        }
+
+        public static bool operator>(Integer a, Integer b)
+        {
+            return a.m_Value > b.m_Value;
+        }
+
+        public static bool operator<=(Integer a, Integer b)
+        {
+            return a.m_Value <= b.m_Value;
+        }
+
+        public static bool operator >=(Integer a, Integer b)
+        {
+            return a.m_Value >= b.m_Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_Value;
         }
         #endregion Operators
 

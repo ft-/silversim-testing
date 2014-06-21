@@ -78,7 +78,7 @@ namespace ArribaSim.Scene.Types.Object
                     m_ScriptInstance = value;
                     if(m_ScriptInstance != null)
                     {
-                        m_ScriptInstance.StartScript();
+                        m_ScriptInstance.IsRunning = true;
                     }
                 }
             }

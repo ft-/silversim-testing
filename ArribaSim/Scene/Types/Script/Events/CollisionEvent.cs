@@ -23,6 +23,8 @@ exception statement from your version.
 
 */
 
+using System.Collections.Generic;
+
 namespace ArribaSim.Scene.Types.Script.Events
 {
     public struct CollisionEvent : IScriptEvent
@@ -34,6 +36,6 @@ namespace ArribaSim.Scene.Types.Script.Events
             End
         }
         public CollisionType Type;
-        public DetectInfo Detected;
+        public List<DetectInfo> Detected;
     }
 }

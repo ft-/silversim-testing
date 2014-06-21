@@ -29,7 +29,7 @@ using System.Globalization;
 namespace ArribaSim.Types
 {
     [Serializable]
-    public class Real : IComparable<Real>, IEquatable<Real>, IValue
+    public sealed class Real : IComparable<Real>, IEquatable<Real>, IValue
     {
         private double m_Value;
 
@@ -76,6 +76,15 @@ namespace ArribaSim.Types
             return m_Value.Equals(v.m_Value);
         }
 
+        public override bool Equals(object v)
+        {
+            if (typeof(IValue).IsAssignableFrom(v.GetType()))
+            {
+                return Equals(((IValue)v).AsReal);
+            }
+            return false;
+        }
+
         public override string ToString()
         {
             return string.Format(EnUsCulture, "{0}", m_Value);
@@ -115,6 +124,36 @@ namespace ArribaSim.Types
 
 
         #region Operators
+        public static Real operator -(Real v)
+        {
+            return new Real(-v.m_Value);
+        }
+
+        public static Real operator +(Real a, Real b)
+        {
+            return new Real(a.m_Value + b.m_Value);
+        }
+
+        public static Real operator -(Real a, Real b)
+        {
+            return new Real(a.m_Value - b.m_Value);
+        }
+
+        public static Real operator *(Real a, Real b)
+        {
+            return new Real(a.m_Value * b.m_Value);
+        }
+
+        public static Real operator /(Real a, Real b)
+        {
+            return new Real(a.m_Value / b.m_Value);
+        }
+
+        public static Real operator %(Real a, Real b)
+        {
+            return new Real(a.m_Value % b.m_Value);
+        }
+
         public static explicit operator Integer(Real v)
         {
             return new Integer((Int32)v.m_Value);
@@ -129,9 +168,44 @@ namespace ArribaSim.Types
         {
             return v.m_Value.ToString();
         }
+
         public static implicit operator double(Real v)
         {
             return v.m_Value;
+        }
+        public static bool operator ==(Real a, Real b)
+        {
+            return a.m_Value == b.m_Value;
+        }
+
+        public static bool operator !=(Real a, Real b)
+        {
+            return a.m_Value != b.m_Value;
+        }
+
+        public static bool operator <(Real a, Real b)
+        {
+            return a.m_Value < b.m_Value;
+        }
+
+        public static bool operator >(Real a, Real b)
+        {
+            return a.m_Value > b.m_Value;
+        }
+
+        public static bool operator <=(Real a, Real b)
+        {
+            return a.m_Value <= b.m_Value;
+        }
+
+        public static bool operator >=(Real a, Real b)
+        {
+            return a.m_Value >= b.m_Value;
+        }
+
+        public override int GetHashCode()
+        {
+            return (int)m_Value;
         }
         #endregion Operators
 

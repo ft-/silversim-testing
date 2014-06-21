@@ -29,7 +29,7 @@ using System.Globalization;
 namespace ArribaSim.Types
 {
     [Serializable]
-    public class Date : IComparable<Date>, IEquatable<Date>, IValue
+    public sealed class Date : IComparable<Date>, IEquatable<Date>, IValue
     {
         private DateTime m_Value;
 

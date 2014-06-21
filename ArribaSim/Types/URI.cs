@@ -27,7 +27,7 @@ using System;
 
 namespace ArribaSim.Types
 {
-    public class URI : IEquatable<URI>, IEquatable<string>, IValue
+    public sealed class URI : IEquatable<URI>, IEquatable<string>, IValue
     {
         private Uri m_Value;
 

@@ -138,7 +138,10 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 m_TexGen = value;
-                OnUpdate.Invoke(this);
+                foreach(Action<PrimitiveFace> del in OnUpdate.GetInvocationList())
+                {
+                    del(this);
+                }
             }
         }
 
@@ -165,7 +168,10 @@ namespace ArribaSim.Scene.Types.Object
                     m_Texture.Offsets = value.Offsets;
                     m_Texture.Rotation = value.Rotation;
                 }
-                OnUpdate.Invoke(this);
+                foreach (Action<PrimitiveFace> del in OnUpdate.GetInvocationList())
+                {
+                    del(this);
+                }
             }
         }
 
@@ -188,7 +194,10 @@ namespace ArribaSim.Scene.Types.Object
                     m_BumpShiny.Bump = value.Bump;
                     m_BumpShiny.Shiny = value.Shiny;
                 }
-                OnUpdate.Invoke(this);
+                foreach (Action<PrimitiveFace> del in OnUpdate.GetInvocationList())
+                {
+                    del(this);
+                }
             }
         }
 
@@ -210,7 +219,10 @@ namespace ArribaSim.Scene.Types.Object
                     m_Color.B = value.B;
                     m_Color.A = value.A;
                 }
-                OnUpdate.Invoke(this);
+                foreach (Action<PrimitiveFace> del in OnUpdate.GetInvocationList())
+                {
+                    del(this);
+                }
             }
         }
 
@@ -223,7 +235,10 @@ namespace ArribaSim.Scene.Types.Object
             set
             {
                 m_IsFullBright = value;
-                OnUpdate.Invoke(this);
+                foreach (Action<PrimitiveFace> del in OnUpdate.GetInvocationList())
+                {
+                    del(this);
+                }
             }
         }
 
@@ -242,7 +257,10 @@ namespace ArribaSim.Scene.Types.Object
                 {
                     m_Glow = value;
                 }
-                OnUpdate.Invoke(this);
+                foreach (Action<PrimitiveFace> del in OnUpdate.GetInvocationList())
+                {
+                    del(this);
+                }
             }
         }
         #endregion

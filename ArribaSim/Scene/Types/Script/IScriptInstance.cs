@@ -24,16 +24,23 @@ exception statement from your version.
 */
 
 using ArribaSim.Scene.Types.Script.Events;
+using ArribaSim.Scene.Types.Object;
 using System;
+using System.Threading;
 
 namespace ArribaSim.Scene.Types.Script
 {
     public interface IScriptInstance : IDisposable
     {
-        /* Dispose must deregister all possible handles */
         void PostEvent(IScriptEvent e);
-        void StartScript();
-        void StopScript();
-        bool IsRunning { get; }
+        bool IsRunning { get; set; }
+        /* Remove and Dispose must deregister all possible handles */
+        void Remove();
+        void Reset();
+
+        void ProcessEvent();
+        bool HasEventsPending { get; }
+
+        ObjectPart Part { get; }
     }
 }

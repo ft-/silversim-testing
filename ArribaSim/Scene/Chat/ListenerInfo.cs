@@ -39,6 +39,7 @@ namespace ArribaSim.Scene.Chat
         private ChatServiceInterface.GetUUIDDelegate m_GetUUID;
         private ChatServiceInterface.GetPositionDelegate m_GetPos;
         private Action<ListenEvent> m_Send;
+        public override bool IsActive { get; set; }
 
         private ChatHandler m_Handler;
 
@@ -52,6 +53,7 @@ namespace ArribaSim.Scene.Chat
             ChatServiceInterface.GetPositionDelegate getpos, 
             Action<ListenEvent> send)
         {
+            IsActive = true;
             m_Handler = handler;
             m_Channel = channel;
             m_Name = name;
@@ -119,7 +121,10 @@ namespace ArribaSim.Scene.Chat
                 }
             }
 
-            m_Send(ev);
+            if (IsActive)
+            {
+                m_Send(ev);
+            }
         }
     }
 }
