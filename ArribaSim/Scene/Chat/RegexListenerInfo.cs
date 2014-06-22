@@ -35,8 +35,11 @@ namespace ArribaSim.Scene.Chat
     {
         private int m_Channel;
         private Regex m_Name = null;
+        private string m_NamePlain = string.Empty;
         private UUID m_ID;
         private Regex m_Message = null;
+        private string m_MessagePlain = string.Empty;
+        private Int32 m_RegexBitfield = 0;
         private ChatServiceInterface.GetUUIDDelegate m_GetUUID;
         private ChatServiceInterface.GetPositionDelegate m_GetPos;
         private Action<ListenEvent> m_Send;
@@ -50,21 +53,37 @@ namespace ArribaSim.Scene.Chat
             string name,
             UUID id, 
             string message,
+            Int32 regexBitfield,
             ChatServiceInterface.GetUUIDDelegate getuuid, 
             ChatServiceInterface.GetPositionDelegate getpos, 
             Action<ListenEvent> send)
         {
+            m_RegexBitfield = regexBitfield;
             IsActive = true;
             m_Handler = handler;
             m_Channel = channel;
             if(!String.IsNullOrEmpty(name))
             {
-                m_Name = new Regex(name);
+                if((m_RegexBitfield & 1) != 0)
+                {
+                    m_Name = new Regex(name);
+                }
+                else
+                {
+                    m_NamePlain = name;
+                }
             }
             m_ID = id;
             if(!String.IsNullOrEmpty(name))
             {
-                m_Message = new Regex(message);
+                if ((m_RegexBitfield & 2) != 0)
+                {
+                    m_Message = new Regex(message);
+                }
+                else
+                {
+                    m_MessagePlain = message;
+                }
             }
             m_GetUUID = getuuid;
             m_GetPos = getpos;
@@ -104,9 +123,19 @@ namespace ArribaSim.Scene.Chat
         {
             if(m_Name != null)
             {
-                if(!m_Name.IsMatch(ev.Name))
+                if ((m_RegexBitfield & 1) != 0)
                 {
-                    return;
+                    if (!m_Name.IsMatch(ev.Name))
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    if(m_NamePlain != ev.Name)
+                    {
+                        return;
+                    }
                 }
             }
             if(m_ID != null)
@@ -122,9 +151,19 @@ namespace ArribaSim.Scene.Chat
             }
             if(m_Message != null)
             {
-                if (!m_Message.IsMatch(ev.Message))
+                if ((m_RegexBitfield & 2) != 0)
                 {
-                    return;
+                    if (!m_Message.IsMatch(ev.Message))
+                    {
+                        return;
+                    }
+                }
+                else
+                {
+                    if(m_MessagePlain != ev.Message)
+                    {
+                        return;
+                    }
                 }
             }
 

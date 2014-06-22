@@ -23,63 +23,39 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ArribaSim.Scene.Types.Script;
-using ArribaSim.Scene.Types.Object;
-using ArribaSim.Scene.Types;
 using ArribaSim.Types;
 
 namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        #region Sit Targets
-        void llSitTarget(Vector3 offset, Quaternion rot)
+        public void llResetTime()
         {
-            Part.SitTargetOffset = offset;
-            Part.SitTargetOrientation = rot;
-        }
-
-        void llLinkSitTarget(Integer link, Vector3 offset, Quaternion rot)
-        {
-            ObjectPart part;
-            if (link == LINK_THIS)
+            lock(this)
             {
-                part = Part;
+                m_ExecutionTime = 0;
             }
-            else if (!Part.Group.TryGetValue(link, out part))
+        }
+
+        public Real llGetTime()
+        {
+            double v;
+            lock(this)
             {
-                return;
+                v = m_ExecutionTime;
             }
-
-            part.SitTargetOffset = offset;
-            part.SitTargetOrientation = rot;
+            return new Real(v);
         }
-        #endregion
-
-        #region Sit control
-        public UUID llAvatarOnSitTarget()
+        
+        public Real llGetAndResetTime()
         {
-            return llAvatarOnLinkSitTarget(LINK_THIS);
+            double old;
+            lock(this)
+            {
+                old = m_ExecutionTime;
+                m_ExecutionTime = 0;
+            }
+            return new Real(old);
         }
-
-        public UUID llAvatarOnLinkSitTarget(Integer link)
-        {
-            return UUID.Zero;
-        }
-
-        public void llForceMouselook(Integer mouselook)
-        {
-
-        }
-
-        public void llUnSit(UUID id)
-        {
-
-        }
-        #endregion
     }
 }

@@ -27,59 +27,45 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ArribaSim.Scene.Types.Script;
-using ArribaSim.Scene.Types.Object;
-using ArribaSim.Scene.Types;
 using ArribaSim.Types;
 
 namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        #region Sit Targets
-        void llSitTarget(Vector3 offset, Quaternion rot)
+        public AnArray llGetParcelDetails(Vector3 pos, AnArray param)
         {
-            Part.SitTargetOffset = offset;
-            Part.SitTargetOrientation = rot;
+            return new AnArray();
         }
 
-        void llLinkSitTarget(Integer link, Vector3 offset, Quaternion rot)
+        public Integer llGetParcelFlags(Vector3 pos)
         {
-            ObjectPart part;
-            if (link == LINK_THIS)
-            {
-                part = Part;
-            }
-            else if (!Part.Group.TryGetValue(link, out part))
-            {
-                return;
-            }
-
-            part.SitTargetOffset = offset;
-            part.SitTargetOrientation = rot;
-        }
-        #endregion
-
-        #region Sit control
-        public UUID llAvatarOnSitTarget()
-        {
-            return llAvatarOnLinkSitTarget(LINK_THIS);
+            return new Integer();
         }
 
-        public UUID llAvatarOnLinkSitTarget(Integer link)
+        public Integer llGetParcelMaxPrims(Vector3 pos, Integer sim_wide)
         {
-            return UUID.Zero;
+            return new Integer();
         }
 
-        public void llForceMouselook(Integer mouselook)
+        public AString llGetParcelMusicURL()
+        {
+            return new AString();
+        }
+
+        public void llSetParcelMusicURL(AString url)
         {
 
         }
 
-        public void llUnSit(UUID id)
+        public Integer llReturnObjectsByID(AnArray objects)
         {
-
+            return new Integer();
         }
-        #endregion
+
+        public Integer llReturnObjectsByOwner(UUID owner, Integer scope)
+        {
+            return new Integer();
+        }
     }
 }

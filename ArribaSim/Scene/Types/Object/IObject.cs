@@ -193,6 +193,12 @@ namespace ArribaSim.Scene.Types.Object
             set;
         }
 
+        Vector3 AngularVelocity
+        {
+            get;
+            set;
+        }
+
         Vector3 GlobalPosition
         {
             get;

@@ -66,6 +66,7 @@ namespace ArribaSim.Scene.Types.Object
         public AgentSittingInterface AgentSitting { get; private set; }
         public SceneInterface Scene { get; set; }
         private Vector3 m_Acceleration = new Vector3();
+        private Vector3 m_AngularVelocity = new Vector3();
 
         #region Constructor
         public ObjectGroup()
@@ -314,6 +315,26 @@ namespace ArribaSim.Scene.Types.Object
                 lock (this)
                 {
                     m_Velocity = value;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public Vector3 AngularVelocity
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_AngularVelocity;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_AngularVelocity = value;
                 }
                 IsChanged = true;
                 TriggerOnUpdate(0);

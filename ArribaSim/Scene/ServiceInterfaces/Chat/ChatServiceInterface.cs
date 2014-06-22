@@ -87,7 +87,10 @@ namespace ArribaSim.Scene.ServiceInterfaces.Chat
 
         public abstract Listener AddListen(int channel, string name, UUID id, string message, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> action);
 
-        public abstract Listener AddListenRegex(int channel, string name, UUID id, string message, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> action);
+        public const Int32 ListenRegexName = 1;
+        public const Int32 ListenRegexMessage = 2;
+
+        public abstract Listener AddListenRegex(int channel, string name, UUID id, string message, Int32 regexBitfield, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> action);
 
         public abstract Listener AddRegionListener(int channel, string name, UUID id, string message, GetUUIDDelegate getuuid, Action<ListenEvent> send);
     }

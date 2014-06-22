@@ -306,6 +306,28 @@ namespace ArribaSim.Scene.Types.Object
             }
         }
 
+        public Vector3 AngularVelocity
+        {
+            get
+            {
+                if (Group != null)
+                {
+                    return Group.AngularVelocity;
+                }
+                else
+                {
+                    return Vector3.Zero;
+                }
+            }
+            set
+            {
+                if (Group != null)
+                {
+                    Group.AngularVelocity = value;
+                }
+            }
+        }
+
         public Vector3 Acceleration
         {
             get

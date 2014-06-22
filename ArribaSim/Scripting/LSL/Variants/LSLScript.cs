@@ -35,11 +35,26 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 
         private ObjectPart m_Part;
         private NonblockingQueue<IScriptEvent> m_Events = new NonblockingQueue<IScriptEvent>();
-        private List<DetectInfo> m_Detected = new List<DetectInfo>();
+        protected List<DetectInfo> m_Detected = new List<DetectInfo>();
         private Dictionary<string, LSLState> m_States = new Dictionary<string, LSLState>();
         private LSLState m_CurrentState = null;
         public Integer StartParameter = new Integer();
-        private RwLockedDictionary<int, ChatServiceInterface.Listener> m_Listeners = new RwLockedDictionary<int, ChatServiceInterface.Listener>();
+        protected RwLockedDictionary<int, ChatServiceInterface.Listener> m_Listeners = new RwLockedDictionary<int, ChatServiceInterface.Listener>();
+        private double m_ExecutionTime = 0;
+
+        public double ExecutionTime
+        {
+            get
+            {
+                return m_ExecutionTime;
+            }
+        }
+
+        public void AddState(string name, LSLState state)
+        {
+            m_States.Add(name, state);
+            state.Script = this;
+        }
 
         public LSLScript(ObjectPart part)
         {
@@ -48,6 +63,11 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 
         public void Dispose()
         {
+            IsRunning = false;
+            m_Events.Clear();
+            ResetListeners();
+
+            m_States.Clear();
             m_Part = null;
         }
 
@@ -80,7 +100,11 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 
         public void Remove()
         {
+            IsRunning = false;
+            m_Events.Clear();
             ResetListeners();
+            m_States.Clear();
+            m_Part = null;
         }
 
         public void ProcessEvent()
@@ -100,6 +124,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 return;
             }
 
+            int startticks = Environment.TickCount;
             try
             {
                 if (ev is AtRotTargetEvent)
@@ -282,7 +307,12 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             {
                 ResetListeners();
                 m_Events.Clear();
+                lock(this)
+                {
+                    m_ExecutionTime = 0f;
+                }
                 m_CurrentState = m_States["default"];
+                startticks = Environment.TickCount;
                 m_CurrentState.state_entry();
             }
             catch(ChangeStateException e)
@@ -296,6 +326,12 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             catch(Exception e)
             {
                 llShout(DEBUG_CHANNEL, new AString(e.Message));
+            }
+            int exectime = Environment.TickCount - startticks;
+            float execfloat = exectime / 1000f;
+            lock(this)
+            {
+                m_ExecutionTime += execfloat;
             }
         }
 

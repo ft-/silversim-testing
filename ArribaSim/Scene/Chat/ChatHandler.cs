@@ -83,9 +83,9 @@ namespace ArribaSim.Scene.Chat
             return li;
         }
 
-        public override Listener AddListenRegex(int channel, string name, UUID id, string message, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> send)
+        public override Listener AddListenRegex(int channel, string name, UUID id, string message, Int32 regexBitfield, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> send)
         {
-            Listener li = new RegexListenerInfo(this, channel, name, id, message, getuuid, getpos, send);
+            Listener li = new RegexListenerInfo(this, channel, name, id, message, regexBitfield, getuuid, getpos, send);
 
             ChannelInfo ci = m_Channels.GetOrAddIfNotExists(channel, delegate()
             {
