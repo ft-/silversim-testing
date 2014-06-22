@@ -26,6 +26,7 @@ exception statement from your version.
 using ArribaSim.Scene.Types.Script;
 using ArribaSim.Types;
 using ArribaSim.Types.Inventory;
+using ArribaSim.Types.Asset;
 using System;
 
 namespace ArribaSim.Scene.Types.Object
@@ -36,6 +37,42 @@ namespace ArribaSim.Scene.Types.Object
         public ObjectPartInventoryItem()
         {
 
+        }
+
+        public ObjectPartInventoryItem(AssetData asset)
+        {
+            AssetID = asset.ID;
+            AssetType = asset.Type;
+            Creator = asset.Creator;
+            Name = asset.Name;
+            Description = asset.Description;
+            Flags = 0;
+            ID = UUID.Random;
+            switch(AssetType)
+            {
+                case AssetType.Animation: InventoryType = InventoryType.Animation; break;
+                case AssetType.Bodypart: InventoryType = InventoryType.Bodypart; break;
+                case AssetType.CallingCard: InventoryType = InventoryType.CallingCard; break;
+                case AssetType.Clothing: InventoryType = InventoryType.Clothing; break;
+                case AssetType.Gesture: InventoryType = InventoryType.Gesture; break;
+                case AssetType.ImageJPEG: InventoryType = InventoryType.Snapshot; break;
+                case AssetType.ImageTGA: InventoryType = InventoryType.Snapshot; break;
+                case AssetType.Landmark: InventoryType = InventoryType.Landmark; break;
+                case AssetType.LSLBytecode: InventoryType = InventoryType.LSLBytecode; break;
+                case AssetType.LSLText: InventoryType = InventoryType.LSLText; break;
+                case AssetType.Notecard: InventoryType = InventoryType.Notecard; break;
+                case AssetType.Sound: InventoryType = InventoryType.Sound; break;
+                case AssetType.SoundWAV: InventoryType = InventoryType.SoundWAV; break;
+                case AssetType.Texture: InventoryType = InventoryType.Texture; break;
+                case AssetType.TextureTGA: InventoryType = InventoryType.TextureTGA; break;
+                default: InventoryType = InventoryType.Unknown; break;
+            }
+            Owner = asset.Creator;
+            Permissions.Base = 0x7FFFFFFF;
+            Permissions.Current = 0x7FFFFFFF;
+            Permissions.EveryOne = 0;
+            Permissions.Group = 0;
+            Permissions.NextOwner = 0x7FFFFFFF;
         }
 
         public ObjectPartInventoryItem(InventoryItem item)

@@ -27,6 +27,7 @@ using ArribaSim.Scene.Types.Object;
 using ArribaSim.Scene.Types.Scene;
 using ArribaSim.Types;
 using ArribaSim.Types.Asset.Format;
+using ArribaSim.Types.Asset;
 using ArribaSim.Types.Inventory;
 using System;
 using System.Reflection;
@@ -54,6 +55,37 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
         public void osMakeNotecard(string notecardName, string contents)
         {
             CheckThreatLevel(MethodBase.GetCurrentMethod().Name, ThreatLevelType.High);
+            Notecard nc = new Notecard();
+            nc.Text = contents;
+            AssetData asset = nc;
+            asset.ID = UUID.Random;
+            asset.Name = notecardName;
+            asset.Creator = Part.Group.Owner;
+            asset.Description = "osMakeNotecard";
+            Part.Group.Scene.AssetService.Store(asset);
+            ObjectPartInventoryItem item = new ObjectPartInventoryItem(asset);
+            item.ParentFolderID = Part.ID;
+
+            for(uint i = 0; i < 1000; ++i)
+            {
+                if (i == 0)
+                {
+                    item.Name = notecardName;
+                }
+                else
+                {
+                    item.Name = string.Format("{0} {1}", notecardName, i);
+                }
+                try
+                {
+                    Part.Inventory.Add(item.ID, item.Name, item);
+                }
+                catch
+                {
+                    return;
+                }
+            }
+            throw new Exception(string.Format("Could not store notecard with name {0}", notecardName));
         }
 
         public string osGetNotecard(string name)

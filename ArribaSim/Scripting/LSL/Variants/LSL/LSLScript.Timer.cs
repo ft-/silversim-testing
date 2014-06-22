@@ -27,30 +27,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ArribaSim.Types;
+using System.Timers;
+using ArribaSim.Scene.Types.Script.Events;
 
 namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public string llGetRegionName()
+        private Timer m_Timer = new Timer();
+
+        private void OnTimerEvent(object sender, ElapsedEventArgs e)
         {
-            return Part.Group.Scene.Name;
+            PostEvent(new TimerEvent());
         }
 
-        public string llGetSimulatorHostname()
+        public void llSetTimerEvent(double sec)
         {
-            return string.Empty;
-        }
-
-        public Vector3 llGetRegionCorner()
-        {
-            return Vector3.Zero;
-        }
-
-        public UUID llRequestSimulatorData(string region, int data)
-        {
-            return UUID.Zero;
+            m_Timer.Enabled = false;
+            m_Timer.Interval = sec;
+            m_Timer.Enabled = sec > 0.01;
         }
     }
 }

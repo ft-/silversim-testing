@@ -123,6 +123,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             m_Part.Group.OnUpdate -= OnGroupUpdate;
             m_Part.Group.OnPositionChange -= OnGroupPositionUpdate;
 
+            m_Timer.Enabled = false;
             IsRunning = false;
             m_Events.Clear();
             ResetListeners();
@@ -164,7 +165,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             m_Part.OnPositionChange -= OnPrimPositionUpdate;
             m_Part.Group.OnUpdate -= OnGroupUpdate;
             m_Part.Group.OnPositionChange -= OnGroupPositionUpdate;
-
+            m_Timer.Enabled = false;
             IsRunning = false;
             m_Events.Clear();
             ResetListeners();
@@ -371,6 +372,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             catch(ResetScriptException)
             {
                 ResetListeners();
+                m_Timer.Enabled = false;
                 m_Events.Clear();
                 lock(this)
                 {
@@ -383,6 +385,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             catch(ChangeStateException e)
             {
                 ResetListeners();
+                m_Timer.Enabled = false;
                 m_Events.Clear();
                 m_CurrentState.state_exit();
                 m_CurrentState = m_States[e.NewState];

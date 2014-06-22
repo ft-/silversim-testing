@@ -23,34 +23,13 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ArribaSim.Types;
-
-namespace ArribaSim.Scripting.LSL.Variants.LSL
+namespace ArribaSim.Scene.Types.Script.Events
 {
-    public partial class LSLScript
+    public class TimerEvent : IScriptEvent
     {
-        public string llGetRegionName()
+        public TimerEvent()
         {
-            return Part.Group.Scene.Name;
-        }
 
-        public string llGetSimulatorHostname()
-        {
-            return string.Empty;
-        }
-
-        public Vector3 llGetRegionCorner()
-        {
-            return Vector3.Zero;
-        }
-
-        public UUID llRequestSimulatorData(string region, int data)
-        {
-            return UUID.Zero;
         }
     }
 }

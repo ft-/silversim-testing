@@ -126,5 +126,10 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
         {
             Part.IsSoundQueueing = queue != 0;
         }
+
+        public void llSetSoundRadius(double radius)
+        {
+
+        }
     }
 }
