@@ -41,6 +41,11 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return Part.ID;
         }
 
+        public void llAllowInventoryDrop(int add)
+        {
+            Part.IsAllowedDrop = add != 0;
+        }
+
         public AnArray llGetLinkPrimitiveParams(int link, AnArray param)
         {
             AnArray parout = new AnArray();

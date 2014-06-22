@@ -24,6 +24,10 @@ exception statement from your version.
 */
 
 using ArribaSim.Scene.Types.Object;
+using ArribaSim.Scene.Types.Script;
+using ArribaSim.Scene.Types.Script.Events;
+using ArribaSim.Types.Inventory;
+using System;
 using ThreadedClasses;
 
 namespace ArribaSim.Scripting.LSL.Variants.LSL
@@ -47,6 +51,89 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 return e.Value.Name;
             }
             return string.Empty;
+        }
+
+        public void llResetScript()
+        {
+            throw new ResetScriptException();
+        }
+
+        public void llResetOtherScript(string name)
+        {
+            ObjectPartInventoryItem item;
+            IScriptInstance si;
+            if (Part.Inventory.TryGetValue(name, out item))
+            {
+                si = item.ScriptInstance;
+                if (item.InventoryType != InventoryType.LSLText && item.InventoryType != InventoryType.LSLBytecode)
+                {
+                    throw new Exception(string.Format("Inventory item {0} is not a script", name));
+                }
+                else if (null == si)
+                {
+                    throw new Exception(string.Format("Inventory item {0} is not a compiled script", name));
+                }
+                else
+                {
+                    si.PostEvent(new ResetScriptEvent());
+                }
+            }
+            else
+            {
+                throw new Exception(string.Format("Inventory item {0} does not exist", name));
+            }
+        }
+
+        public int llGetScriptState(string script)
+        {
+            ObjectPartInventoryItem item;
+            IScriptInstance si;
+            if (Part.Inventory.TryGetValue(script, out item))
+            {
+                si = item.ScriptInstance;
+                if (item.InventoryType != InventoryType.LSLText && item.InventoryType != InventoryType.LSLBytecode)
+                {
+                    throw new Exception(string.Format("Inventory item {0} is not a script", script));
+                }
+                else if (null == si)
+                {
+                    throw new Exception(string.Format("Inventory item {0} is not a compiled script", script));
+                }
+                else
+                {
+                    return si.IsRunning ? TRUE : FALSE;
+                }
+            }
+            else
+            {
+                throw new Exception(string.Format("Inventory item {0} does not exist", script));
+            }
+        }
+
+        public void llSetScriptState(string script, int running)
+        {
+            ObjectPartInventoryItem item;
+            IScriptInstance si;
+            if (Part.Inventory.TryGetValue(script, out item))
+            {
+                si = item.ScriptInstance;
+                if (item.InventoryType != InventoryType.LSLText && item.InventoryType != InventoryType.LSLBytecode)
+                {
+                    throw new Exception(string.Format("Inventory item {0} is not a script", script));
+                }
+                else if (null == si)
+                {
+                    throw new Exception(string.Format("Inventory item {0} is not a compiled script", script));
+                }
+                else
+                {
+                    si.IsRunning = running != 0;
+                }
+            }
+            else
+            {
+                throw new Exception(string.Format("Inventory item {0} does not exist", script));
+            }
         }
     }
 }

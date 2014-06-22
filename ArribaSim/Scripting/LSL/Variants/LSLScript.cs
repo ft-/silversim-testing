@@ -80,10 +80,49 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
         public LSLScript(ObjectPart part)
         {
             m_Part = part;
+            m_Part.OnUpdate += OnPrimUpdate;
+            m_Part.OnPositionChange += OnPrimPositionUpdate;
+            m_Part.Group.OnUpdate += OnGroupUpdate;
+            m_Part.Group.OnPositionChange += OnGroupPositionUpdate;
+        }
+
+        private void OnPrimPositionUpdate(IObject part)
+        {
+
+        }
+
+        private void OnGroupPositionUpdate(IObject group)
+        {
+
+        }
+
+        private void OnPrimUpdate(ObjectPart part, int flags)
+        {
+            if(flags != 0)
+            {
+                ChangedEvent e = new ChangedEvent();
+                e.Flags = flags;
+                PostEvent(e);
+            }
+        }
+
+        private void OnGroupUpdate(ObjectGroup group, int flags)
+        {
+            if (flags != 0)
+            {
+                ChangedEvent e = new ChangedEvent();
+                e.Flags = flags;
+                PostEvent(e);
+            }
         }
 
         public void Dispose()
         {
+            m_Part.OnUpdate -= OnPrimUpdate;
+            m_Part.OnPositionChange -= OnPrimPositionUpdate;
+            m_Part.Group.OnUpdate -= OnGroupUpdate;
+            m_Part.Group.OnPositionChange -= OnGroupPositionUpdate;
+
             IsRunning = false;
             m_Events.Clear();
             ResetListeners();
@@ -121,6 +160,11 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 
         public void Remove()
         {
+            m_Part.OnUpdate -= OnPrimUpdate;
+            m_Part.OnPositionChange -= OnPrimPositionUpdate;
+            m_Part.Group.OnUpdate -= OnGroupUpdate;
+            m_Part.Group.OnPositionChange -= OnGroupPositionUpdate;
+
             IsRunning = false;
             m_Events.Clear();
             ResetListeners();

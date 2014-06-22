@@ -165,5 +165,48 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 
             return src[index].AsVector3;
         }
+
+        public string llDumpList2String(AnArray src, string separator)
+        {
+            string s = string.Empty;
+
+            foreach(IValue val in src)
+            {
+                if(!string.IsNullOrEmpty(s))
+                {
+                    s += separator;
+                }
+                s += val.ToString();
+            }
+            return s;
+        }
+
+        public const int TYPE_INTEGER = 1;
+        public const int TYPE_FLOAT = 2;
+        public const int TYPE_STRING = 3;
+        public const int TYPE_KEY = 4;
+        public const int TYPE_VECTOR = 5;
+        public const int TYPE_ROTATION = 6;
+        public const int TYPE_INVALID = 0;
+
+        public int llGetListEntryType(AnArray src, int index)
+        {
+            if (index < 0)
+            {
+                index = src.Count - index;
+            }
+
+            if (index < 0 || index >= src.Count)
+            {
+                return TYPE_INVALID;
+            }
+
+            return (int)src[index].LSL_Type;
+        }
+
+        public int llGetListLength(AnArray src)
+        {
+            return src.Count;
+        }
     }
 }
