@@ -29,14 +29,14 @@ using System.Linq;
 using System.Text;
 using ArribaSim.Scene.Types.Object;
 
-namespace ArribaSim.Scripting.LSL.Variants.OSSL
+namespace ArribaSim.Scripting.LSL.Variants.ASSL
 {
-    public partial class OSSLScript : LSL.LSLScript
+    public partial class ASSLScript : OSSL.OSSLScript
     {
-        public OSSLScript(ObjectPart part)
+        public ASSLScript(ObjectPart part)
             : base(part)
         {
-
+            
         }
     }
 }

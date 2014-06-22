@@ -29,8 +29,6 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public class LSLState
     {
-        protected internal LSLScript Script;
-
         public LSLState()
         {
         }

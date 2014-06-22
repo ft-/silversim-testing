@@ -27,14 +27,13 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using ArribaSim.Scene.Types.Object;
+using ArribaSim.Types;
 
-namespace ArribaSim.Scripting.LSL.Variants.OSSL
+namespace ArribaSim.Scripting.LSL.Variants.ASSL
 {
-    public partial class OSSLScript : LSL.LSLScript
+    public partial class ASSLScript
     {
-        public OSSLScript(ObjectPart part)
-            : base(part)
+        public void asLogListen(Integer onChannel, Integer enable)
         {
 
         }
