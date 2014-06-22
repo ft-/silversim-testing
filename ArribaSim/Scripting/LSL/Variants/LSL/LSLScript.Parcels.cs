@@ -38,34 +38,49 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return new AnArray();
         }
 
-        public Integer llGetParcelFlags(Vector3 pos)
+        public int llGetParcelFlags(Vector3 pos)
         {
-            return new Integer();
+            return 0;
         }
 
-        public Integer llGetParcelMaxPrims(Vector3 pos, Integer sim_wide)
+        public int llGetParcelMaxPrims(Vector3 pos, int sim_wide)
         {
-            return new Integer();
+            return 0;
         }
 
-        public AString llGetParcelMusicURL()
+        public string llGetParcelMusicURL()
         {
-            return new AString();
+            return string.Empty;
         }
 
-        public void llSetParcelMusicURL(AString url)
+        public void llSetParcelMusicURL(string url)
         {
 
         }
 
-        public Integer llReturnObjectsByID(AnArray objects)
+        public int llReturnObjectsByID(AnArray objects)
         {
-            return new Integer();
+            return 0;
         }
 
-        public Integer llReturnObjectsByOwner(UUID owner, Integer scope)
+        public int llReturnObjectsByOwner(UUID owner, int scope)
         {
-            return new Integer();
+            return 0;
+        }
+
+        public UUID llGetLandOwnerAt(Vector3 pos)
+        {
+            return UUID.Zero;
+        }
+
+        public int llGetParcelPrimCount(Vector3 pos, int category, int sim_wide)
+        {
+            return 0;
+        }
+
+        public AnArray llGetParcelPrimOwners(Vector3 pos)
+        {
+            return new AnArray();
         }
     }
 }

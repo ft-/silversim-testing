@@ -39,6 +39,19 @@ namespace ArribaSim.Scene.Types.Scene
             m_Scene = scene;
         }
 
+        public int Count
+        {
+            get
+            {
+                int n = 0;
+                foreach(ObjectGroup g in this)
+                {
+                    ++n;
+                }
+                return n;
+            }
+        }
+
         public ObjectGroup this[UUID id]
         {
             get

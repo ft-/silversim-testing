@@ -29,7 +29,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public Vector3 llDetectedGrab(Integer number)
+        public Vector3 llDetectedGrab(int number)
         {
             if(m_Detected.Count > number && number >= 0)
             {
@@ -38,12 +38,12 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return Vector3.Zero;
         }
 
-        public Integer llDetectedGroup(Integer number)
+        public int llDetectedGroup(int number)
         {
-            return new Integer(0);
+            return 0;
         }
 
-        public UUID llDetectedKey(Integer number)
+        public UUID llDetectedKey(int number)
         {
             if(m_Detected.Count > number && number >= 0)
             {
@@ -52,25 +52,25 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return UUID.Zero;
         }
 
-        public Integer llDetectedLinkNumber(Integer number)
+        public int llDetectedLinkNumber(int number)
         {
             if(m_Detected.Count > number && number >= 0)
             {
-                return new Integer(m_Detected[number].LinkNumber);
+                return m_Detected[number].LinkNumber;
             }
-            return new Integer(-1);
+            return -1;
         }
 
-        public AString llDetectedName(Integer number)
+        public string llDetectedName(int number)
         {
             if(m_Detected.Count > number && number >= 0)
             {
-                return new AString(m_Detected[number].Object.Name);
+                return m_Detected[number].Object.Name;
             }
-            return new AString();
+            return string.Empty;
         }
 
-        public UUID llDetectedOwner(Integer number)
+        public UUID llDetectedOwner(int number)
         {
             if (m_Detected.Count > number && number >= 0)
             {
@@ -79,7 +79,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return UUID.Zero;
         }
 
-        public Vector3 llDetectedPos(Integer number)
+        public Vector3 llDetectedPos(int number)
         {
             if(m_Detected.Count > number && number >= 0)
             {
@@ -88,7 +88,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return Vector3.Zero;
         }
 
-        public Quaternion llDetectedRot(Integer number)
+        public Quaternion llDetectedRot(int number)
         {
             if (m_Detected.Count > number && number >= 0)
             {
@@ -97,7 +97,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return Quaternion.Identity;
         }
 
-        public Vector3 llDetectedTouchBinormal(Integer number)
+        public Vector3 llDetectedTouchBinormal(int number)
         {
             if (m_Detected.Count > number && number >= 0)
             {
@@ -105,17 +105,17 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             }
             return Vector3.Zero;
         }
-        
-        public Integer llDetectedTouchFace(Integer number)
+
+        public int llDetectedTouchFace(int number)
         {
             if (m_Detected.Count > number && number >= 0)
             {
-                return new Integer(m_Detected[number].TouchFace);
+                return m_Detected[number].TouchFace;
             }
-            return new Integer(-1);
+            return -1;
         }
 
-        public Vector3 llDetectedTouchNormal(Integer number)
+        public Vector3 llDetectedTouchNormal(int number)
         {
             if (m_Detected.Count > number && number >= 0)
             {
@@ -124,7 +124,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return Vector3.Zero;
         }
 
-        public Vector3 llDetectedTouchPos(Integer number)
+        public Vector3 llDetectedTouchPos(int number)
         {
             if (m_Detected.Count > number && number >= 0)
             {
@@ -133,7 +133,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return Vector3.Zero;
         }
 
-        public Vector3 llDetectedTouchST(Integer number)
+        public Vector3 llDetectedTouchST(int number)
         {
             if (m_Detected.Count > number && number >= 0)
             {
@@ -142,7 +142,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return Vector3.Zero;
         }
 
-        public Vector3 llDetectedTouchUV(Integer number)
+        public Vector3 llDetectedTouchUV(int number)
         {
             if (m_Detected.Count > number && number >= 0)
             {
@@ -151,12 +151,12 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return Vector3.Zero;
         }
 
-        public Integer llDetectedType(Integer number)
+        public int llDetectedType(int number)
         {
-            return new Integer(0);
+            return 0;
         }
 
-        public Vector3 llDetectedVel(Integer number)
+        public Vector3 llDetectedVel(int number)
         {
             if (m_Detected.Count > number && number >= 0)
             {

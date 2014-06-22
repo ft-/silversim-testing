@@ -28,6 +28,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ArribaSim.Scene.Types.Object;
+using ThreadedClasses;
+using ArribaSim.Types;
 
 namespace ArribaSim.Scripting.LSL.Variants.OSSL
 {
@@ -37,6 +39,73 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
             : base(part)
         {
 
+        }
+
+        public class Permissions
+        {
+            public RwLockedList<UUI> Creators = new RwLockedList<UUI>();
+            public RwLockedList<UUI> Owners = new RwLockedList<UUI>();
+            public bool IsAllowedForParcelOwner;
+            public bool IsAllowedForParcelMember;
+            public bool IsAllowedForEstateOwner;
+            public bool IsAllowedForEstateManager;
+
+            public Permissions()
+            {
+
+            }
+        }
+
+        public enum ThreatLevelType : uint
+        {
+            None = 0,
+            Nuisance = 1,
+            VeryLow = 2,
+            Low = 3,
+            Moderate = 4,
+            High = 5,
+            VeryHigh = 6,
+            Severe = 7
+        }
+
+        public ThreatLevelType ThreatLevel { get; protected set; }
+
+        public static readonly RwLockedDictionary<string, Permissions> OSSLPermissions = new RwLockedDictionary<string, Permissions>();
+
+        public void CheckThreatLevel(string name, ThreatLevelType level)
+        {
+            if((int)level >= (int)ThreatLevel)
+            {
+                return;
+            }
+
+            Permissions perms;
+            if(OSSLPermissions.TryGetValue(name, out perms))
+            {
+                if(perms.Creators.Contains(Part.Group.Creator))
+                {
+                    return;
+                }
+                if(perms.Owners.Contains(Part.Group.Owner))
+                {
+                    return;
+                }
+                /* TODO: implement parcel rights */
+
+                if(perms.IsAllowedForEstateOwner)
+                {
+                    if(Part.Group.Scene.Owner == Part.Group.Owner)
+                    {
+                        return;
+                    }
+                }
+
+                if(perms.IsAllowedForEstateManager)
+                {
+                    /* TODO: implement estate managers */
+                }
+            }
+            throw new Exception(string.Format("OSSL Function {0} not allowed", name));
         }
     }
 }

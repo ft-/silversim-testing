@@ -23,19 +23,24 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using ArribaSim.Scene.Types.Object;
+using ArribaSim.Scene.Types.Script.Events;
 using ArribaSim.Types;
+using System.Reflection;
 
-namespace ArribaSim.Scripting.LSL.Variants.LSL
+namespace ArribaSim.Scripting.LSL.Variants.OSSL
 {
-    public partial class LSLScript
+    public partial class OSSLScript
     {
-        public UUID llHTTPRequest(string url, AnArray parameters, string body)
+        public void osMessageObject(UUID objectUUID, string message)
         {
-            return UUID.Zero;
+            CheckThreatLevel(MethodBase.GetCurrentMethod().Name, ThreatLevelType.Low);
+
+            IObject obj = Part.Group.Scene.Objects[objectUUID];
+            DataserverEvent ev = new DataserverEvent();
+            ev.Data = message;
+            ev.QueryID = Part.Group.ID;
+            obj.PostEvent(ev);
         }
     }
 }

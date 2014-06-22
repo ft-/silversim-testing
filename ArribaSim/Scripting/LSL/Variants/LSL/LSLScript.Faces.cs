@@ -37,32 +37,47 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
     public partial class LSLScript
     {
         #region Faces
-        public void llSetAlpha(double alpha, Integer faces)
+        public int llGetNumberOfSides()
+        {
+            return 0;
+        }
+
+        public double llGetAlpha(int face)
+        {
+            return 0f;
+        }
+
+        public void llSetAlpha(double alpha, int faces)
         {
 
         }
 
-        public void llSetLinkAlpha(Integer linktarget, double alpha, Integer faces)
+        public void llSetLinkAlpha(int linktarget, double alpha, int faces)
         {
 
         }
 
-        public void llSetTexture(AString texture, Integer face)
+        public void llSetTexture(string texture, int face)
         {
 
         }
 
-        public void llSetLinkTexture(Integer link, AString texture, Integer face)
+        public void llSetLinkTexture(int link, string texture, int face)
         {
 
         }
 
-        public void llSetColor(Vector3 color, Integer face)
+        public Vector3 llGetColor(int face)
+        {
+            return Vector3.Zero;
+        }
+
+        public void llSetColor(Vector3 color, int face)
         {
 
         }
 
-        public void llSetLinkColor(Integer link, Vector3 color, Integer face)
+        public void llSetLinkColor(int link, Vector3 color, int face)
         {
 
         }

@@ -33,7 +33,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public Integer llAbs(Integer v)
+        public int llAbs(int v)
         {
             if(v < 0)
             {

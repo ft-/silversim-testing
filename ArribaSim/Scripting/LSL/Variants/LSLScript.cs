@@ -192,22 +192,22 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 else if (ev is DataserverEvent)
                 {
                     DataserverEvent e = (DataserverEvent)ev;
-                    m_CurrentState.dataserver(e.QueryID, new AString(e.Data));
+                    m_CurrentState.dataserver(e.QueryID, e.Data);
                 }
                 else if (ev is EmailEvent)
                 {
                     EmailEvent e = (EmailEvent)ev;
-                    m_CurrentState.email(new AString(e.Time), new AString(e.Address), new AString(e.Subject), new AString(e.Message), new Integer(e.NumberLeft));
+                    m_CurrentState.email(e.Time, e.Address, e.Subject, e.Message, e.NumberLeft);
                 }
                 else if (ev is HttpRequestEvent)
                 {
                     HttpRequestEvent e = (HttpRequestEvent)ev;
-                    m_CurrentState.http_request(e.RequestID, new AString(e.Method), new AString(e.Body));
+                    m_CurrentState.http_request(e.RequestID, e.Method, e.Body);
                 }
                 else if (ev is HttpResponseEvent)
                 {
                     HttpResponseEvent e = (HttpResponseEvent)ev;
-                    m_CurrentState.http_response(e.RequestID, new Integer(e.Status), e.Metadata, new AString(e.Body));
+                    m_CurrentState.http_response(e.RequestID, e.Status, e.Metadata, e.Body);
                 }
                 else if (ev is LandCollisionEvent)
                 {
@@ -233,17 +233,17 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 else if (ev is LinkMessageEvent)
                 {
                     LinkMessageEvent e = (LinkMessageEvent)ev;
-                    m_CurrentState.link_message(new Integer(e.SenderNumber), new Integer(e.Number), new AString(e.Data), e.Id);
+                    m_CurrentState.link_message(e.SenderNumber, e.Number, e.Data, e.Id);
                 }
                 else if (ev is ListenEvent)
                 {
                     ListenEvent e = (ListenEvent)ev;
-                    m_CurrentState.listen(new Integer(e.Channel), new AString(e.Name), e.ID, new AString(e.Message));
+                    m_CurrentState.listen(e.Channel, e.Name, e.ID, e.Message);
                 }
                 else if (ev is MoneyEvent)
                 {
                     MoneyEvent e = (MoneyEvent)ev;
-                    m_CurrentState.money(e.ID, new Integer(e.Amount));
+                    m_CurrentState.money(e.ID, e.Amount);
                 }
                 else if (ev is MovingEndEvent)
                 {
@@ -284,7 +284,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 else if (ev is RemoteDataEvent)
                 {
                     RemoteDataEvent e =(RemoteDataEvent)ev;
-                    m_CurrentState.remote_data(new Integer(e.Type), e.Channel, e.MessageID, new AString(e.Sender), new Integer(e.IData), new AString(e.SData));
+                    m_CurrentState.remote_data(e.Type, e.Channel, e.MessageID, e.Sender, e.IData, e.SData);
                 }
                 else if (ev is ResetScriptEvent)
                 {
@@ -308,15 +308,15 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                     switch(e.Type)
                     {
                         case TouchEvent.TouchType.Start:
-                            m_CurrentState.touch_start(new Integer(m_Detected.Count));
+                            m_CurrentState.touch_start(m_Detected.Count);
                             break;
 
                         case TouchEvent.TouchType.End:
-                            m_CurrentState.touch_end(new Integer(m_Detected.Count));
+                            m_CurrentState.touch_end(m_Detected.Count);
                             break;
 
                         case TouchEvent.TouchType.Continuous:
-                            m_CurrentState.touch(new Integer(m_Detected.Count));
+                            m_CurrentState.touch(m_Detected.Count);
                             break;
 
                         default:
@@ -346,7 +346,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             }
             catch(Exception e)
             {
-                llShout(DEBUG_CHANNEL, new AString(e.Message));
+                llShout(DEBUG_CHANNEL, e.Message);
             }
             int exectime = Environment.TickCount - startticks;
             float execfloat = exectime / 1000f;

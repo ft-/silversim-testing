@@ -25,19 +25,38 @@ exception statement from your version.
 
 using ArribaSim.Scene.Types.Object;
 using ArribaSim.Scene.Types.Scene;
-using ArribaSim.Scene.Types.Script.Events;
 using ArribaSim.Types;
 using ArribaSim.Types.Asset.Format;
 using ArribaSim.Types.Inventory;
 using System;
+using System.Reflection;
 
-namespace ArribaSim.Scripting.LSL.Variants.LSL
+namespace ArribaSim.Scripting.LSL.Variants.OSSL
 {
-    public partial class LSLScript
+    public partial class OSSLScript
     {
-        public const string EOF = "\n\n\n";
+        public void osMakeNotecard(string notecardName, AnArray contents)
+        {
+            CheckThreatLevel(MethodBase.GetCurrentMethod().Name, ThreatLevelType.High);
+            string nc = string.Empty;
 
-        public UUID llGetNotecardLine(string name, int line)
+            foreach(IValue val in contents)
+            {
+                if(!string.IsNullOrEmpty(nc))
+                {
+                    nc += "\n";
+                }
+                nc += val.ToString();
+            }
+            osMakeNotecard(notecardName, nc);
+        }
+
+        public void osMakeNotecard(string notecardName, string contents)
+        {
+            CheckThreatLevel(MethodBase.GetCurrentMethod().Name, ThreatLevelType.High);
+        }
+
+        public string osGetNotecard(string name)
         {
             ObjectPartInventoryItem item;
             if (Part.Inventory.TryGetValue(name, out item))
@@ -48,23 +67,8 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 }
                 else
                 {
-                    UUID query = UUID.Random;
-
                     Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
-                    string[] lines = nc.Text.Split('\n');
-                    DataserverEvent e = new DataserverEvent();
-                    if (line >= lines.Length || line < 0)
-                    {
-                        e.Data = EOF;
-                        e.QueryID = query;
-                        Part.PostEvent(e);
-                        return query;
-                    }
-
-                    e.Data = lines[line];
-                    e.QueryID = query;
-                    Part.PostEvent(e);
-                    return query;
+                    return nc.Text;
                 }
             }
             else
@@ -73,7 +77,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             }
         }
 
-        public UUID llGetNumberOfNotecardLines(string name)
+        public string osGetNotecardLine(string name, int line)
         {
             ObjectPartInventoryItem item;
             if (Part.Inventory.TryGetValue(name, out item))
@@ -84,12 +88,34 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 }
                 else
                 {
-                    UUID query = UUID.Random;
                     Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
-                    DataserverEvent e = new DataserverEvent();
-                    e.Data = nc.Text.Split('\n').Length.ToString();
-                    e.QueryID = query;
-                    return query;
+                    string[] lines = nc.Text.Split('\n');
+                    if(line >= lines.Length || line < 0)
+                    {
+                        return EOF;
+                    }
+                    return lines[line];
+                }
+            }
+            else
+            {
+                throw new Exception(string.Format("Inventory item {0} does not exist", name));
+            }
+        }
+
+        public int osGetNumberOfNotecardLines(string name)
+        {
+            ObjectPartInventoryItem item;
+            if (Part.Inventory.TryGetValue(name, out item))
+            {
+                if (item.InventoryType != InventoryType.Notecard)
+                {
+                    throw new Exception(string.Format("Inventory item {0} is not a notecard", name));
+                }
+                else
+                {
+                    Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
+                    return nc.Text.Split('\n').Length;
                 }
             }
             else

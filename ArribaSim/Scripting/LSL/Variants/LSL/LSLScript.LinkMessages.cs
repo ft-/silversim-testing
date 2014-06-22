@@ -49,13 +49,13 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             }
         }
 
-        public void llMessageLinked(Integer link, Integer num, AString str, UUID id)
+        public void llMessageLinked(int link, int num, string str, UUID id)
         {
             LinkMessageEvent ev = new LinkMessageEvent();
             ev.SenderNumber = Part.LinkNumber;
             ev.TargetNumber = link;
             ev.Number = num;
-            ev.Data = str.ToString();
+            ev.Data = str;
             ev.Id = id;
 
             if(link == LINK_THIS)
@@ -95,7 +95,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             }
             else
             {
-                enqueue_to_scripts(Part.Group[link.AsInt], ev);
+                enqueue_to_scripts(Part.Group[link], ev);
             }
         }
     }

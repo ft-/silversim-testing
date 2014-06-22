@@ -34,15 +34,15 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public AnArray llDeleteSubList(AnArray src, Integer start, Integer end)
+        public AnArray llDeleteSubList(AnArray src, int start, int end)
         {
             if(start < 0)
             {
-                start = new Integer(src.Count) - start;
+                start = src.Count - start;
             }
             if(end < 0)
             {
-                end = new Integer(src.Count) - end;
+                end = src.Count - end;
             }
 
             if(start < 0 || start >= src.Count || end < 0 || end >= src.Count)
@@ -74,6 +74,96 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 }
             }
             return res;
+        }
+
+        public double llList2Float(AnArray src, int index)
+        {
+            if(index < 0)
+            {
+                index = src.Count - index;
+            }
+
+            if(index < 0 ||index >=src.Count)
+            {
+                return 0;
+            }
+
+            return src[index].AsReal;
+        }
+
+        public int llList2Integer(AnArray src, int index)
+        {
+            if (index < 0)
+            {
+                index = src.Count - index;
+            }
+
+            if (index < 0 || index >= src.Count)
+            {
+                return 0;
+            }
+
+            return src[index].AsInteger;
+        }
+
+        public UUID llList2Key(AnArray src, int index)
+        {
+            if (index < 0)
+            {
+                index = src.Count - index;
+            }
+
+            if (index < 0 || index >= src.Count)
+            {
+                return UUID.Zero;
+            }
+
+            return src[index].AsUUID;
+        }
+
+        public Quaternion llList2Rot(AnArray src, int index)
+        {
+            if (index < 0)
+            {
+                index = src.Count - index;
+            }
+
+            if (index < 0 || index >= src.Count)
+            {
+                return Quaternion.Identity;
+            }
+
+            return src[index].AsQuaternion;
+        }
+
+        public string llList2String(AnArray src, int index)
+        {
+            if (index < 0)
+            {
+                index = src.Count - index;
+            }
+
+            if (index < 0 || index >= src.Count)
+            {
+                return "";
+            }
+
+            return src[index].AsString.ToString();
+        }
+
+        public Vector3 llList2Vector(AnArray src, int index)
+        {
+            if (index < 0)
+            {
+                index = src.Count - index;
+            }
+
+            if (index < 0 || index >= src.Count)
+            {
+                return Vector3.Zero;
+            }
+
+            return src[index].AsVector3;
         }
     }
 }

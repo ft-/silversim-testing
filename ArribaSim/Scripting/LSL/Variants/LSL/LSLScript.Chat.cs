@@ -38,61 +38,61 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             ev.Name = Part.Group.Name;
             Part.Group.Scene.GetService<ChatServiceInterface>().Send(ev);
         }
-        public void llShout(Integer channel, AString message)
+        public void llShout(int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;
             ev.Type = ListenEvent.ChatType.Shout;
-            ev.Message = message.ToString();
+            ev.Message = message;
             sendChat(ev);
         }
 
-        public void llSay(Integer channel, AString message)
+        public void llSay(int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;
             ev.Type = ListenEvent.ChatType.Say;
-            ev.Message = message.ToString();
+            ev.Message = message;
             sendChat(ev);
         }
 
-        public void llWhisper(Integer channel, AString message)
+        public void llWhisper(int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;
             ev.Type = ListenEvent.ChatType.Whisper;
-            ev.Message = message.ToString();
+            ev.Message = message;
             sendChat(ev);
         }
 
-        public void llOwnerSay(AString message)
+        public void llOwnerSay(string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = PUBLIC_CHANNEL;
             ev.Type = ListenEvent.ChatType.OwnerSay;
-            ev.Message = message.ToString();
+            ev.Message = message;
             ev.TargetID = Part.Group.Owner.ID;
             sendChat(ev);
         }
 
-        public void llRegionSay(Integer channel, AString message)
+        public void llRegionSay(int channel, string message)
         {
             if (channel != PUBLIC_CHANNEL)
             {
                 ListenEvent ev = new ListenEvent();
                 ev.Type = ListenEvent.ChatType.Region;
                 ev.Channel = channel;
-                ev.Message = message.ToString();
+                ev.Message = message;
                 sendChat(ev);
             }
         }
 
-        public void llRegionSayTo(UUID target, Integer channel, AString message)
+        public void llRegionSayTo(UUID target, int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;
             ev.Type = ListenEvent.ChatType.Region;
-            ev.Message = message.ToString();
+            ev.Message = message;
             ev.TargetID = target;
             sendChat(ev);
         }
@@ -102,7 +102,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             PostEvent(ev);
         }
 
-        public Integer llListen(Integer channel, AString name, UUID id, AString msg)
+        public Integer llListen(int channel, string name, UUID id, string msg)
         {
             if(m_Listeners.Count >= MaxListenerHandles)
             {
@@ -117,10 +117,10 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 if(!m_Listeners.TryGetValue(newhandle, out l))
                 {
                     l = chatservice.AddListen(
-                        channel.AsInt, 
-                        name.ToString(), 
+                        channel, 
+                        name, 
                         id, 
-                        msg.ToString(), 
+                        msg, 
                         delegate() { return Part.ID; },
                         delegate() { return Part.GlobalPosition; }, 
                         onListen);
@@ -139,21 +139,21 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return new Integer(-1);
         }
 
-        public void llListenRemove(Integer handle)
+        public void llListenRemove(int handle)
         {
             ChatServiceInterface.Listener l;
-            if(m_Listeners.Remove(handle.AsInt, out l))
+            if(m_Listeners.Remove(handle, out l))
             {
                 l.Remove();
             }
         }
 
-        public void llListenControl(Integer handle, Integer active)
+        public void llListenControl(int handle, int active)
         {
             ChatServiceInterface.Listener l;
-            if(m_Listeners.TryGetValue(handle.AsInt, out l))
+            if(m_Listeners.TryGetValue(handle, out l))
             {
-                l.IsActive = active;
+                l.IsActive = active != 0;
             }
         }
 

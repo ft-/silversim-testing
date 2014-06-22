@@ -33,12 +33,12 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
         {
         }
 
-        public virtual void at_rot_target(Integer handle, Quaternion targetrot, Quaternion ourrot)
+        public virtual void at_rot_target(int handle, Quaternion targetrot, Quaternion ourrot)
         {
 
         }
 
-        public virtual void at_target(Integer tnum, Vector3 targetpos, Vector3 ourpos)
+        public virtual void at_target(int tnum, Vector3 targetpos, Vector3 ourpos)
         {
 
         }
@@ -48,47 +48,47 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 
         }
 
-        public virtual void changed(Integer change)
+        public virtual void changed(int change)
         {
 
         }
 
-        public virtual void collision(Integer num_detected)
+        public virtual void collision(int num_detected)
         {
 
         }
 
-        public virtual void collision_end(Integer num_detected)
+        public virtual void collision_end(int num_detected)
         {
 
         }
 
-        public virtual void collision_start(Integer num_detected)
+        public virtual void collision_start(int num_detected)
         {
 
         }
 
-        public virtual void control(UUID id, Integer level, Integer edge)
+        public virtual void control(UUID id, int level, int edge)
         {
 
         }
 
-        public virtual void dataserver(UUID queryid, AString data)
+        public virtual void dataserver(UUID queryid, string data)
         {
 
         }
 
-        public virtual void email(AString time, AString address, AString subject, AString message, Integer num_left)
+        public virtual void email(string time, string address, string subject, string message, int num_left)
         {
 
         }
 
-        public virtual void http_request(UUID request_id, AString method, AString body)
+        public virtual void http_request(UUID request_id, string method, string body)
         {
 
         }
 
-        public virtual void http_response(UUID request_id, Integer status, AnArray metadata, AString body)
+        public virtual void http_response(UUID request_id, int status, AnArray metadata, string body)
         {
 
         }
@@ -108,16 +108,16 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 
         }
 
-        public virtual void link_message(Integer sender_num, Integer num, AString str, UUID id)
+        public virtual void link_message(int sender_num, int num, string str, UUID id)
         {
         }
 
-        public virtual void listen(Integer channel, AString name, UUID id, AString message)
+        public virtual void listen(int channel, string name, UUID id, string message)
         {
 
         }
 
-        public virtual void money(UUID id, Integer amount)
+        public virtual void money(UUID id, int amount)
         {
 
         }
@@ -150,27 +150,27 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 
         }
 
-        public virtual void on_rez(Integer start_param)
+        public virtual void on_rez(int start_param)
         {
 
         }
 
-        public virtual void path_update(Integer type, AnArray reserved)
+        public virtual void path_update(int type, AnArray reserved)
         {
 
         }
 
-        public virtual void remote_data(Integer event_type, UUID channel, UUID message_id, AString sender, Integer idata, AString sdata)
+        public virtual void remote_data(int event_type, UUID channel, UUID message_id, string sender, int idata, string sdata)
         {
 
         }
 
-        public virtual void run_time_permissions(Integer perm)
+        public virtual void run_time_permissions(int perm)
         {
 
         }
 
-        public virtual void sensor(Integer num_detected)
+        public virtual void sensor(int num_detected)
         {
 
         }
@@ -190,22 +190,22 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 
         }
 
-        public virtual void touch(Integer num_detected)
+        public virtual void touch(int num_detected)
         {
 
         }
 
-        public virtual void touch_end(Integer num_detected)
+        public virtual void touch_end(int num_detected)
         {
 
         }
 
-        public virtual void touch_start(Integer num_detected)
+        public virtual void touch_start(int num_detected)
         {
 
         }
 
-        public virtual void transaction_result(UUID id, Integer success, AString data)
+        public virtual void transaction_result(UUID id, int success, string data)
         {
 
         }

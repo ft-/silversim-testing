@@ -33,7 +33,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public void llLinkParticleSystem(Integer link, AnArray rules)
+        public void llLinkParticleSystem(int link, AnArray rules)
         {
 
         }

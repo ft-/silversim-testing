@@ -23,19 +23,30 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ArribaSim.Types;
+using ArribaSim.Scene.Types.Object;
+using ThreadedClasses;
 
 namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public UUID llHTTPRequest(string url, AnArray parameters, string body)
+        public string llGetScriptName()
         {
-            return UUID.Zero;
+            try
+            {
+                Part.Inventory.ForEach(delegate(ObjectPartInventoryItem item)
+                {
+                    if (item.ScriptInstance == this)
+                    {
+                        throw new ReturnValueException<ObjectPartInventoryItem>(item);
+                    }
+                });
+            }
+            catch(ReturnValueException<ObjectPartInventoryItem> e)
+            {
+                return e.Value.Name;
+            }
+            return string.Empty;
         }
     }
 }

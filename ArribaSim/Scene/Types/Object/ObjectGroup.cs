@@ -172,6 +172,18 @@ namespace ArribaSim.Scene.Types.Object
             }
         }
 
+        public Vector3 Size
+        {
+            get
+            {
+                return RootPart.Size;
+            }
+            set
+            {
+                RootPart.Size = value;
+            }
+        }
+
         public bool IsPhantom
         {
             get
@@ -763,6 +775,16 @@ namespace ArribaSim.Scene.Types.Object
                     return m_Group.m_SittingAgents[p];
                 }
             }
+        }
+        #endregion
+
+        #region Script Events
+        public void PostEvent(IScriptEvent ev)
+        {
+            ForEach(delegate(ObjectPart item)
+            {
+                item.PostEvent(ev);
+            });
         }
         #endregion
     }

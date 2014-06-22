@@ -33,9 +33,9 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public Integer GetUnixTime()
+        public int GetUnixTime()
         {
-            return new Integer((int)Date.GetUnixTime());
+            return (int)Date.GetUnixTime();
         }
     }
 }

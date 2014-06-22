@@ -41,6 +41,19 @@ namespace ArribaSim.Scene.Types.Scene
             m_Scene = scene;
         }
 
+        public int Count
+        {
+            get
+            {
+                int c = 0;
+                foreach(IAgent n in this)
+                {
+                    ++c;
+                }
+                return c;
+            }
+        }
+
         public IAgent this[UUID id]
         {
             get

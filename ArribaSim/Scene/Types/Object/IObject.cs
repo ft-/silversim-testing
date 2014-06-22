@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using ArribaSim.Scene.Types.Scene;
+using ArribaSim.Scene.Types.Script.Events;
 using ArribaSim.Types;
 using System;
 using System.Collections.Generic;
@@ -235,6 +236,12 @@ namespace ArribaSim.Scene.Types.Object
             set;
         }
 
+        Vector3 Size
+        {
+            get;
+            set;
+        }
+
         bool IsInScene(SceneInterface scene);
         #endregion
 
@@ -242,9 +249,11 @@ namespace ArribaSim.Scene.Types.Object
         void GetPrimitiveParams(AnArray.Enumerator enumerator, ref AnArray paramList);
         void SetPrimitiveParams(AnArray.MarkEnumerator enumerator);
         void GetObjectDetails(AnArray.Enumerator enumerator, ref AnArray paramList);
+        void PostEvent(IScriptEvent ev);
         #endregion
     }
 
+    #region Params Helper
     public static class ParamsHelper
     {
         #region List Access Helpers
@@ -358,4 +367,5 @@ namespace ArribaSim.Scene.Types.Object
         }
         #endregion
     }
+    #endregion
 }

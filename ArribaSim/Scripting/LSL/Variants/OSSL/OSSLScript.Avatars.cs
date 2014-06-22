@@ -23,19 +23,39 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using ArribaSim.Scene.Types.Agent;
 using ArribaSim.Types;
 
-namespace ArribaSim.Scripting.LSL.Variants.LSL
+namespace ArribaSim.Scripting.LSL.Variants.OSSL
 {
-    public partial class LSLScript
+    public partial class OSSLScript
     {
-        public UUID llHTTPRequest(string url, AnArray parameters, string body)
+        public AnArray osGetAvatarList()
         {
-            return UUID.Zero;
+            AnArray res = new AnArray();
+
+            foreach(IAgent agent in Part.Group.Scene.Agents)
+            {
+                if(agent.ID == Part.Group.Scene.Owner.ID)
+                {
+                    continue;
+                }
+                res.Add(agent.ID);
+                res.Add(agent.GlobalPosition);
+                res.Add(agent.Name);
+            }
+            return res;
+        }
+
+        public AnArray osGetAgents()
+        {
+            AnArray res = new AnArray();
+
+            foreach (IAgent agent in Part.Group.Scene.Agents)
+            {
+                res.Add(agent.Name);
+            }
+            return res;
         }
     }
 }

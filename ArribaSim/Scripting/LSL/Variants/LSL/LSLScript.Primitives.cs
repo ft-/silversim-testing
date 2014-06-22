@@ -41,7 +41,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return Part.ID;
         }
 
-        public AnArray llGetLinkPrimitiveParams(Integer link, AnArray param)
+        public AnArray llGetLinkPrimitiveParams(int link, AnArray param)
         {
             AnArray parout = new AnArray();
             Part.Group.GetPrimitiveParams(Part.LinkNumber, link, param.GetEnumerator(), ref parout);
@@ -85,22 +85,22 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return Part.Size;
         }
 
-        public void llPassCollisions(Integer pass)
+        public void llPassCollisions(int pass)
         {
-            Part.IsPassCollisions = pass;
+            Part.IsPassCollisions = pass != 0;
         }
 
-        public void llPassTouches(Integer pass)
+        public void llPassTouches(int pass)
         {
             Part.IsPassTouches = pass != 0;
         }
 
-        public void llSetClickAction(Integer action)
+        public void llSetClickAction(int action)
         {
-            Part.ClickAction = (ClickActionType)action.AsInt;
+            Part.ClickAction = (ClickActionType)action;
         }
 
-        public void llSetPayPrice(Integer price, AnArray quick_pay_buttons)
+        public void llSetPayPrice(int price, AnArray quick_pay_buttons)
         {
 
         }
@@ -115,7 +115,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             Part.Group.SetPrimitiveParams(Part.LinkNumber, LINK_THIS, rules.GetMarkEnumerator());
         }
 
-        public void llSetLinkPrimitiveParams(Integer linkTarget, AnArray rules)
+        public void llSetLinkPrimitiveParams(int linkTarget, AnArray rules)
         {
             Part.Group.SetPrimitiveParams(Part.LinkNumber, linkTarget, rules.GetMarkEnumerator());
         }
@@ -125,30 +125,25 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             Part.Size = size;
         }
 
-        public void llSetSitText(AString text)
+        public void llSetSitText(string text)
         {
-            Part.Group.RootPart.SitText = text.ToString();
+            Part.Group.RootPart.SitText = text;
         }
 
-        public void llSetSoundQueueing(Integer queue)
-        {
-            Part.IsSoundQueueing = queue != 0;
-        }
-
-        public void llSetText(AString text, Color color, Real alpha)
+        public void llSetText(string text, Color color, double alpha)
         {
             ObjectPart.TextParam tp = new ObjectPart.TextParam();
-            tp.Text = text.ToString();
+            tp.Text = text;
             tp.TextColor = new ColorAlpha(color, alpha);
             Part.Text = tp;
         }
 
-        public void llSetTouchText(AString text)
+        public void llSetTouchText(string text)
         {
-            Part.Group.RootPart.TouchText = text.ToString();
+            Part.Group.RootPart.TouchText = text;
         }
 
-        public void llTargetOmega(Vector3 axis, Real spinrate, Real gain)
+        public void llTargetOmega(Vector3 axis, double spinrate, double gain)
         {
             ObjectPart.OmegaParam op = new ObjectPart.OmegaParam();
             op.Axis = axis;

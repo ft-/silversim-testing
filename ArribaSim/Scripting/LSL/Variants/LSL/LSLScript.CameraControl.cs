@@ -38,7 +38,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
         {
         }
 
-        public void llSetLinkCamera(Integer link, Vector3 eye, Vector3 at)
+        public void llSetLinkCamera(int link, Vector3 eye, Vector3 at)
         {
 
         }

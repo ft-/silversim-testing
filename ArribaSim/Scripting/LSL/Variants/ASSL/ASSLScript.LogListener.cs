@@ -33,7 +33,7 @@ namespace ArribaSim.Scripting.LSL.Variants.ASSL
 {
     public partial class ASSLScript
     {
-        public void asLogListen(Integer onChannel, Integer enable)
+        public void asLogListen(int onChannel, int enable)
         {
 
         }

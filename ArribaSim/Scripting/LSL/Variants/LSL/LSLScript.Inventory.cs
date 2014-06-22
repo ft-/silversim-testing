@@ -26,24 +26,25 @@ exception statement from your version.
 using ArribaSim.Scene.Types.Object;
 using ArribaSim.Types;
 using ArribaSim.Types.Inventory;
+using System;
 
 namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public void llGiveInventory(UUID destination, AString inventory)
+        public void llGiveInventory(UUID destination, string inventory)
         {
         }
 
-        public void llGiveInventoryList(UUID target, AString folder, AnArray inventory)
+        public void llGiveInventoryList(UUID target, string folder, AnArray inventory)
         {
 
         }
 
-        public void llRemoveInventory(AString item)
+        public void llRemoveInventory(string item)
         {
             ObjectPartInventoryItem resitem;
-            if (Part.Inventory.TryGetValue(item.ToString(), out resitem))
+            if (Part.Inventory.TryGetValue(item, out resitem))
             {
                 if (resitem.ScriptInstance != null)
                 {
@@ -53,11 +54,11 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             }
         }
 
-        public UUID llGetInventoryCreator(AString item)
+        public UUID llGetInventoryCreator(string item)
         {
             try
             {
-                return Part.Inventory[item.ToString()].Creator.ID;
+                return Part.Inventory[item].Creator.ID;
             }
             catch
             {
@@ -65,11 +66,11 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             }
         }
 
-        public UUID llGetInventoryKey(AString item)
+        public UUID llGetInventoryKey(string item)
         {
             try
             {
-                return Part.Inventory[item.ToString()].ID;
+                return Part.Inventory[item].ID;
             }
             catch
             {
@@ -77,83 +78,82 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             }
         }
 
-        public AString llGetInventoryName(Integer type, Integer number)
+        public string llGetInventoryName(int type, int number)
         {
-            return new AString();
+            return string.Empty;
         }
 
-        public Integer llGetInventoryNumber(Integer type)
+        public int llGetInventoryNumber(int type)
         {
-            if (type.AsInt == -1)
+            if (type == -1)
             {
-                return new Integer(Part.Inventory.Count);
+                return Part.Inventory.Count;
             }
-            return new Integer(Part.Inventory.CountType((Types.Inventory.InventoryType)type.AsInt));
+            return Part.Inventory.CountType((Types.Inventory.InventoryType)type);
         }
 
-        public Integer llGetInventoryPermMask(AString item, Integer category)
+        public int llGetInventoryPermMask(string item, int category)
         {
-            return new Integer(0);
+            return 0;
         }
 
-        public Integer llGetInventoryType(AString name)
+        public int llGetInventoryType(string name)
         {
             try
             {
-                return new Integer((int)Part.Inventory[name.ToString()].InventoryType);
+                return (int)Part.Inventory[name.ToString()].InventoryType;
             }
             catch
             {
-                return new Integer(-1);
+                return -1;
             }
         }
 
-        public Integer llGetScriptState(AString script)
+        public int llGetScriptState(string script)
         {
             ObjectPartInventoryItem item;
-            if(Part.Inventory.TryGetValue(script.ToString(), out item))
+            if(Part.Inventory.TryGetValue(script, out item))
             {
                 if(item.InventoryType != InventoryType.LSLText && item.InventoryType != InventoryType.LSLBytecode)
                 {
-                    llShout(DEBUG_CHANNEL, AString.Format("Inventory item {0} is not a script", script.ToString()));
+                    throw new Exception(string.Format("Inventory item {0} is not a script", script));
                 }
                 else if(null == item.ScriptInstance)
                 {
-                    llShout(DEBUG_CHANNEL, AString.Format("Inventory item {0} is not a compiled script", script.ToString()));
+                    throw new Exception(string.Format("Inventory item {0} is not a compiled script", script));
                 }
                 else
                 {
-                    return new ABoolean(item.ScriptInstance.IsRunning).AsInteger;
+                    return item.ScriptInstance.IsRunning ? TRUE : FALSE;
                 }
             }
             else
             {
-                llShout(DEBUG_CHANNEL, AString.Format("Inventory item {0} does not exist", script.ToString()));
+                throw new Exception(string.Format("Inventory item {0} does not exist", script));
             }
-            return new Integer(0);
         }
 
-        public void llSetScriptState(AString script, Integer running)
+        public void llSetScriptState(string script, int running)
         {
             ObjectPartInventoryItem item;
-            if (Part.Inventory.TryGetValue(script.ToString(), out item))
+            if (Part.Inventory.TryGetValue(script, out item))
             {
                 if (item.InventoryType != InventoryType.LSLText && item.InventoryType != InventoryType.LSLBytecode)
                 {
-                    llShout(DEBUG_CHANNEL, AString.Format("Inventory item {0} is not a script", script.ToString()));
+                    throw new Exception(string.Format("Inventory item {0} is not a script", script));
                 }
                 else if (null == item.ScriptInstance)
                 {
-                    llShout(DEBUG_CHANNEL, AString.Format("Inventory item {0} is not a compiled script", script.ToString()));
+                    throw new Exception(string.Format("Inventory item {0} is not a compiled script", script));
                 }
                 else
                 {
-                    item.ScriptInstance.IsRunning = running;
+                    item.ScriptInstance.IsRunning = running != 0;
                 }
             }
             else
             {
-                llShout(DEBUG_CHANNEL, AString.Format("Inventory item {0} does not exist", script.ToString()));
+                throw new Exception(string.Format("Inventory item {0} does not exist", script));
             }
         }
     }

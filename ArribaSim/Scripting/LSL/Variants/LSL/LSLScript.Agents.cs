@@ -28,24 +28,65 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ArribaSim.Types;
+using ArribaSim.Scene.Types.Scene;
+using ArribaSim.Scene.Types.Object;
+using ArribaSim.Scene.Types.Agent;
 
 namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public string llGetRegionName()
+        public int llGetRegionAgentCount()
         {
-            return Part.Group.Scene.Name;
+            return Part.Group.Scene.Agents.Count;
         }
 
-        public Vector3 llGetRegionCorner()
-        {
-            return Vector3.Zero;
-        }
+        public const int DATA_ONLINE = 1;
+        public const int DATA_NAME = 2;
+        public const int DATA_BORN = 3;
+        public const int DATA_RATING = 4;
+        public const int DATA_PAYINFO = 8;
+        
+        public const int PAYMENT_INFO_ON_FILE = 0x1;
+        public const int PAYMENT_INFO_USED = 0x2;
 
-        public UUID llRequestSimulatorData(string region, int data)
+        public UUID llRequestAgentData(UUID id, int data)
         {
             return UUID.Zero;
+        }
+
+        public UUID llRequestDisplayName(UUID id)
+        {
+            return UUID.Zero;
+        }
+
+        public UUID llRequestUsername(UUID id)
+        {
+            return UUID.Zero;
+        }
+
+        public string llGetDisplayName(UUID id)
+        {
+            return string.Empty;
+        }
+
+        public Vector3 llGetAgentSize(UUID id)
+        {
+            IAgent agent;
+            try
+            {
+                agent = Part.Group.Scene.Agents[id];
+            }
+            catch
+            {
+                return Vector3.Zero;
+            }
+
+            if(agent.IsInScene(Part.Group.Scene))
+            {
+                return agent.Size;
+            }
+            return Vector3.Zero;
         }
     }
 }

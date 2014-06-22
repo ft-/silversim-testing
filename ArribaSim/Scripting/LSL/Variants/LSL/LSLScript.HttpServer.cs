@@ -33,7 +33,17 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public UUID llHTTPRequest(string url, AnArray parameters, string body)
+        public UUID llRequestURL()
+        {
+            return UUID.Zero;
+        }
+
+        public void llReleaseURL(UUID id)
+        {
+
+        }
+
+        public UUID llRequestSecureURL()
         {
             return UUID.Zero;
         }

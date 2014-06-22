@@ -33,7 +33,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public AString llDeleteSubString(AString src, Integer start, Integer end)
+        public string llDeleteSubString(string src, int start, int end)
         {
             if (start < 0)
             {
@@ -49,7 +49,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 return src;
             }
 
-            AString res = new AString();
+            string res = string.Empty;
             if (start > end)
             {
                 res += src.Substring(0, end + 1);

@@ -43,7 +43,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             Part.SitTargetOrientation = rot;
         }
 
-        void llLinkSitTarget(Integer link, Vector3 offset, Quaternion rot)
+        void llLinkSitTarget(int link, Vector3 offset, Quaternion rot)
         {
             ObjectPart part;
             if (link == LINK_THIS)
@@ -66,12 +66,12 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return llAvatarOnLinkSitTarget(LINK_THIS);
         }
 
-        public UUID llAvatarOnLinkSitTarget(Integer link)
+        public UUID llAvatarOnLinkSitTarget(int link)
         {
             return UUID.Zero;
         }
 
-        public void llForceMouselook(Integer mouselook)
+        public void llForceMouselook(int mouselook)
         {
 
         }

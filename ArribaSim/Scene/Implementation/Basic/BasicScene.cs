@@ -117,6 +117,19 @@ namespace ArribaSim.Scene.Implementation.Basic
                 }
             }
 
+            public int Count
+            {
+                get
+                {
+                    int n = 0;
+                    foreach(ObjectPart i in this)
+                    {
+                        ++n;
+                    }
+                    return n;
+                }
+            }
+
             public IEnumerator<ObjectPart> GetEnumerator()
             {
                 return m_Scene.m_Primitives.Values.GetEnumerator();

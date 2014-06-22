@@ -33,14 +33,62 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public Integer llClearLinkMedia(Integer link, Integer face)
+        public int llClearLinkMedia(int link, int face)
         {
-            return new Integer(0);
+            return 0;
         }
 
-        public Integer llClearPrimMedia(Integer face)
+        public int llClearPrimMedia(int face)
         {
-            return new Integer(0);
+            return 0;
+        }
+
+        public const int PRIM_MEDIA_ALT_IMAGE_ENABLE = 0;
+        public const int PRIM_MEDIA_CONTROLS = 1;
+        public const int PRIM_MEDIA_CURRENT_URL = 2;
+        public const int PRIM_MEDIA_HOME_URL = 3;
+        public const int PRIM_MEDIA_AUTO_LOOP = 4;
+        public const int PRIM_MEDIA_AUTO_PLAY = 5;
+        public const int PRIM_MEDIA_AUTO_SCALE = 6;
+        public const int PRIM_MEDIA_AUTO_ZOOM = 7;
+        public const int PRIM_MEDIA_FIRST_CLICK_INTERACT = 8;
+        public const int PRIM_MEDIA_WIDTH_PIXELS = 9;
+        public const int PRIM_MEDIA_HEIGHT_PIXELS = 10;
+        public const int PRIM_MEDIA_WHITELIST_ENABLE = 11;
+        public const int PRIM_MEDIA_WHITELIST = 12;
+        public const int PRIM_MEDIA_PERMS_INTERACT = 13;
+        public const int PRIM_MEDIA_PERMS_CONTROL = 14;
+
+        public const int PRIM_MEDIA_PERM_NONE = 0x0;
+        public const int PRIM_MEDIA_PERM_OWNER = 0x1;
+        public const int PRIM_MEDIA_PERM_GROUP = 0x2;
+        public const int PRIM_MEDIA_PERM_ANYONE = 0x4;
+
+        public const int PRIM_MEDIA_CONTROLS_STANDARD = 0;
+        public const int PRIM_MEDIA_CONTROLS_MINI = 1;
+
+        public AnArray llGetPrimMediaParams(int face, AnArray param)
+        {
+            return new AnArray();
+        }
+
+        public const int STATUS_OK = 0;
+        public const int STATUS_MALFORMED_PARAMS = 1000;
+        public const int STATUS_TYPE_MISMATCH = 1001;
+        public const int STATUS_BOUNDS_ERROR = 1002;
+        public const int STATUS_NOT_FOUND = 1003;
+        public const int STATUS_NOT_SUPPORTED = 1004;
+        public const int STATUS_INTERNAL_ERROR = 1999;
+        public const int STATUS_WHITELIST_FAILED = 2001;
+
+        public int llSetLinkMedia(int link, int face, AnArray param)
+        {
+            return 0;
+        }
+
+        public int llSetPrimMediaParams(int face, AnArray param)
+        {
+            return llSetLinkMedia(LINK_THIS, face, param);
         }
     }
 }

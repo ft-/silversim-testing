@@ -31,7 +31,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public void llInstantMessage(UUID user, AString message)
+        public void llInstantMessage(UUID user, string message)
         {
             IMServiceInterface imservice = Part.Group.Scene.GetService<IMServiceInterface>();
             GridInstantMessage im = new GridInstantMessage();
@@ -40,7 +40,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             im.ToAgent.ID = user;
             im.Position = Part.Group.GlobalPosition;
             im.RegionID = Part.Group.Scene.ID;
-            im.Message = message.ToString();
+            im.Message = message;
             im.OnResult = delegate(GridInstantMessage imret, bool success) { };
             imservice.Send(im);
         }

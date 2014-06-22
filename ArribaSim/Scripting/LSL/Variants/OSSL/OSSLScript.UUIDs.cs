@@ -24,18 +24,15 @@ exception statement from your version.
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ArribaSim.Types;
 
-namespace ArribaSim.Scripting.LSL.Variants.LSL
+namespace ArribaSim.Scripting.LSL.Variants.OSSL
 {
-    public partial class LSLScript
+    public partial class OSSLScript
     {
-        public UUID llHTTPRequest(string url, AnArray parameters, string body)
+        public int osIsUUID(string input)
         {
-            return UUID.Zero;
+            Guid v;
+            return Guid.TryParse(input, out v) ? TRUE : FALSE;
         }
     }
 }

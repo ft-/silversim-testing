@@ -35,17 +35,17 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public void llCollisionSound(AString impact_sound, Real impact_volume)
+        public void llCollisionSound(string impact_sound, double impact_volume)
         {
             ObjectPartInventoryItem item;
             ObjectPart.CollisionSoundParam para = new ObjectPart.CollisionSoundParam();
             
-            if (impact_volume < 0) impact_volume = new Real(0);
-            if (impact_volume > 1) impact_volume = new Real(1);
+            if (impact_volume < 0f) impact_volume = 0f;
+            if (impact_volume > 1f) impact_volume = 1f;
 
             para.ImpactVolume = impact_volume;
 
-            if (Part.Inventory.TryGetValue(impact_sound.ToString(), out item))
+            if (Part.Inventory.TryGetValue(impact_sound, out item))
             {
                 if (item.AssetType == AssetType.Sound || item.AssetType == AssetType.SoundWAV)
                 {
@@ -54,40 +54,40 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 }
                 else
                 {
-                    llShout(DEBUG_CHANNEL, AString.Format("Inventory item {0} does not reference a sound", impact_sound));
+                    llShout(DEBUG_CHANNEL, string.Format("Inventory item {0} does not reference a sound", impact_sound));
                 }
             }
             else
             {
                 UUID id;
-                if (UUID.TryParse(impact_sound.ToString(), out id))
+                if (UUID.TryParse(impact_sound, out id))
                 {
                     para.ImpactSound = id;
                     Part.CollisionSound = para;
                 }
                 else
                 {
-                    llShout(DEBUG_CHANNEL, AString.Format("'{0}' does not reference an inventory item nor a key", impact_sound));
+                    llShout(DEBUG_CHANNEL, string.Format("'{0}' does not reference an inventory item nor a key", impact_sound));
                 }
             }
         }
 
-        public void llLoopSound(AString sound, Real volume)
+        public void llLoopSound(string sound, double volume)
         {
 
         }
 
-        public void llLoopSoundMaster(AString sound, Real volume)
+        public void llLoopSoundMaster(string sound, double volume)
         {
 
         }
 
-        public void llLoopSoundSlave(AString sound, Real volume)
+        public void llLoopSoundSlave(string sound, double volume)
         {
 
         }
 
-        public void llPreloadSound(AString sound)
+        public void llPreloadSound(string sound)
         {
 
         }
@@ -97,24 +97,34 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 
         }
 
-        public void llPlaySound(AString sound, Real volume)
+        public void llPlaySound(string sound, double volume)
         {
 
         }
 
-        public void llPlaySoundSlave(AString sound, Real volume)
+        public void llPlaySoundSlave(string sound, double volume)
         {
 
         }
 
-        public void llTriggerSound(AString sound, Real volume)
+        public void llTriggerSound(string sound, double volume)
         {
 
         }
 
-        public void llTriggerSoundLimited(AString sound, Real volume, Vector3 top_north_east, Vector3 bottom_south_west)
+        public void llTriggerSoundLimited(string sound, double volume, Vector3 top_north_east, Vector3 bottom_south_west)
         {
 
+        }
+
+        public void llAdjustSoundVolume(double volume)
+        {
+
+        }
+
+        public void llSetSoundQueueing(int queue)
+        {
+            Part.IsSoundQueueing = queue != 0;
         }
     }
 }

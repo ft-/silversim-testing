@@ -1517,5 +1517,18 @@ namespace ArribaSim.Scene.Types.Object
             Group.GetObjectDetails(enumerator, ref paramList);
         }
         #endregion
+
+        #region Script Events
+        public void PostEvent(IScriptEvent ev)
+        {
+            Inventory.ForEach(delegate(ObjectPartInventoryItem item)
+            {
+                if (item.ScriptInstance != null)
+                {
+                    item.ScriptInstance.PostEvent(ev);
+                }
+            });
+        }
+        #endregion
     }
 }

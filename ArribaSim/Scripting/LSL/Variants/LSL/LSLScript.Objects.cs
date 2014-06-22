@@ -44,9 +44,9 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return Part.Group.Creator.ID;
         }
 
-        public AString llGetObjectDesc()
+        public string llGetObjectDesc()
         {
-            return new AString(Part.Group.Name);
+            return Part.Group.Name;
         }
 
         public AnArray llGetObjectDetails(AnArray param)
@@ -61,19 +61,19 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return Part.Group.Description;
         }
 
-        public void llSetObjectDesc(AString desc)
+        public void llSetObjectDesc(string desc)
         {
-            Part.Group.Description = desc.ToString();
+            Part.Group.Description = desc;
         }
 
-        public void llSetObjectName(AString name)
+        public void llSetObjectName(string name)
         {
-            Part.Group.Name = name.ToString();
+            Part.Group.Name = name;
         }
 
-        public Integer llSetRegionPos(Vector3 pos)
+        public int llSetRegionPos(Vector3 pos)
         {
-            return new Integer(0);
+            return 0;
         }
 
         public Vector3 llGetVel()
@@ -100,12 +100,12 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return part.Owner.ID;
         }
 
-        public Integer llGetNumberOfPrims()
+        public int llGetNumberOfPrims()
         {
-            return new Integer(Part.Group.Count);
+            return Part.Group.Count;
         }
 
-        public UUID llGetLinkKey(Integer link)
+        public UUID llGetLinkKey(int link)
         {
             if(link == LINK_THIS)
             {
@@ -117,21 +117,21 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             }
         }
 
-        public AString llGetLinkName(Integer link)
+        public string llGetLinkName(int link)
         {
             if (link == LINK_THIS)
             {
-                return new AString(Part.Name);
+                return Part.Name;
             }
             else
             {
-                return new AString(Part.Group[link].Name);
+                return Part.Group[link].Name;
             }
         }
 
-        public Integer llGetLinkNumber()
+        public int llGetLinkNumber()
         {
-            return new Integer(Part.LinkNumber);
+            return Part.LinkNumber;
         }
     }
 }

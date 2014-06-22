@@ -33,9 +33,30 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public UUID llHTTPRequest(string url, AnArray parameters, string body)
+
+        public const int PARCEL_MEDIA_COMMAND_STOP = 0;
+        public const int PARCEL_MEDIA_COMMAND_PAUSE = 1;
+        public const int PARCEL_MEDIA_COMMAND_PLAY = 2;
+        public const int PARCEL_MEDIA_COMMAND_LOOP = 3;
+        public const int PARCEL_MEDIA_COMMAND_TEXTURE = 4;
+        public const int PARCEL_MEDIA_COMMAND_URL = 5;
+        public const int PARCEL_MEDIA_COMMAND_TIME = 6;
+        public const int PARCEL_MEDIA_COMMAND_AGENT = 7;
+        public const int PARCEL_MEDIA_COMMAND_UNLOAD = 8;
+        public const int PARCEL_MEDIA_COMMAND_AUTO_ALIGN = 9;
+        public const int PARCEL_MEDIA_COMMAND_TYPE = 10;
+        public const int PARCEL_MEDIA_COMMAND_SIZE = 11;
+        public const int PARCEL_MEDIA_COMMAND_DESC = 12;
+        public const int PARCEL_MEDIA_COMMAND_LOOP_SET = 13;
+
+        public void llParcelMediaCommandList(AnArray commandList)
         {
-            return UUID.Zero;
+
+        }
+
+        public AnArray llParcelMediaQuery(AnArray query)
+        {
+            return new AnArray();
         }
     }
 }

@@ -35,16 +35,19 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
     public partial class LSLScript
     {
         #region LSL Constants
-        public readonly Integer PUBLIC_CHANNEL = new Integer(0);
-        public readonly Integer DEBUG_CHANNEL = new Integer(0x7FFFFFFF);
+        public const int PUBLIC_CHANNEL = 0;
+        public const int DEBUG_CHANNEL = 0x7FFFFFFF;
 
-        public readonly Integer LINK_ROOT = new Integer(1);
-        public readonly Integer LINK_SET = new Integer(-1);
-        public readonly Integer LINK_ALL_OTHERS = new Integer(-2);
-        public readonly Integer LINK_ALL_CHILDREN = new Integer(-3);
-        public readonly Integer LINK_THIS = new Integer(-4);
+        public const int LINK_ROOT = 1;
+        public const int LINK_SET = -1;
+        public const int LINK_ALL_OTHERS = -2;
+        public const int LINK_ALL_CHILDREN = -3;
+        public const int LINK_THIS = -4;
 
-        public readonly Integer PRIM_OMEGA = new Integer(32);
+        public const int PRIM_OMEGA = 32;
+
+        public const int TRUE = 1;
+        public const int FALSE = 0;
         #endregion
     }
 }

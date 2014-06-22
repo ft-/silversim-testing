@@ -34,14 +34,14 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
     public partial class LSLScript
     {
         #region Texture Animation
-        void llSetLinkTextureAnim(Integer link, Integer mode, Integer face, Integer sizeX, Integer sizeY, Real start, Real length, Real rate)
+        void llSetLinkTextureAnim(int link, int mode, int face, int sizeX, int sizeY, double start, double length, double rate)
         {
 
         }
 
-        void llSetTextureAnim(Integer mode, Integer face, Integer sizeX, Integer sizeY, Real start, Real length, Real rate)
+        void llSetTextureAnim(int mode, int face, int sizeX, int sizeY, double start, double length, double rate)
         {
-            llSetLinkTextureAnim(new Integer(LINK_THIS), mode, face, sizeX, sizeY, start, length, rate);
+            llSetLinkTextureAnim(LINK_THIS, mode, face, sizeX, sizeY, start, length, rate);
         }
         #endregion
     }

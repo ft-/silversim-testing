@@ -33,11 +33,16 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
 {
     public partial class LSLScript
     {
-        public void llDialog(UUID avatar, AString message, AnArray buttons, Integer channel)
+        public void llDialog(UUID avatar, string message, AnArray buttons, int channel)
         {
         }
 
-        public void llTextBox(UUID avatar, AString message, Integer channel)
+        public void llTextBox(UUID avatar, string message, int channel)
+        {
+
+        }
+
+        public void llLoadURL(UUID avatar, string message, string url)
         {
 
         }

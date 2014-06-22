@@ -37,17 +37,17 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             }
         }
 
-        public Real llGetTime()
+        public double llGetTime()
         {
             double v;
             lock(this)
             {
                 v = m_ExecutionTime;
             }
-            return new Real(v);
+            return v;
         }
-        
-        public Real llGetAndResetTime()
+
+        public double llGetAndResetTime()
         {
             double old;
             lock(this)
@@ -55,7 +55,7 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 old = m_ExecutionTime;
                 m_ExecutionTime = 0;
             }
-            return new Real(old);
+            return old;
         }
     }
 }

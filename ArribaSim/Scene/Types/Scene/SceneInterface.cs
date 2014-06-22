@@ -52,16 +52,19 @@ namespace ArribaSim.Scene.Types.Scene
     public interface ISceneObjectGroups : IEnumerable<ObjectGroup>
     {
         ObjectGroup this[UUID id] { get; }
+        int Count { get; }
     }
 
     public interface ISceneObjectParts : IEnumerable<ObjectPart>
     {
         ObjectPart this[UUID id] { get; }
+        int Count { get; }
     }
 
     public interface ISceneAgents : IEnumerable<IAgent>
     {
         IAgent this[UUID id] { get; }
+        int Count { get; }
     }
 
     public interface ISceneParcels : IEnumerable<ParcelInfo>
@@ -96,6 +99,9 @@ namespace ArribaSim.Scene.Types.Scene
         public PresenceServiceInterface PresenceService { get; protected set; }
         public GridUserServiceInterface GridUserService { get; protected set; }
         public GridServiceInterface GridService { get; protected set; }
+        private NotecardCache m_NotecardCache;
+
+        public UUI Owner { get; protected set; }
         public virtual T GetService<T>()
         {
             if(typeof(T).IsAssignableFrom(typeof(AssetServiceInterface)))
@@ -122,6 +128,10 @@ namespace ArribaSim.Scene.Types.Scene
             {
                 return (T)(object)GridService;
             }
+            else if(typeof(T).IsAssignableFrom(typeof(NotecardCache)))
+            {
+                return (T)(object)m_NotecardCache;
+            }
             else
             {
                 throw new ArgumentException();
@@ -131,6 +141,7 @@ namespace ArribaSim.Scene.Types.Scene
         public SceneInterface()
         {
             LastIPAddress = new IPAddress(0);
+            m_NotecardCache = new NotecardCache(this);
         }
 
         public void InvokeOnRemove()
