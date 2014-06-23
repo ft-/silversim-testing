@@ -62,5 +62,25 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             }
             return res;
         }
+
+        public string llToLower(string s)
+        {
+            return s.ToLower();
+        }
+
+        public string llToUpper(string s)
+        {
+            return s.ToUpper();
+        }
+
+        public string llUnescapeURL(string url)
+        {
+            return Uri.UnescapeDataString(url);
+        }
+
+        public string llEscapeURL(string url)
+        {
+            return Uri.EscapeDataString(url);
+        }
     }
 }

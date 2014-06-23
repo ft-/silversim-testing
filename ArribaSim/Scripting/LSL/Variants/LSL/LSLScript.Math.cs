@@ -128,6 +128,20 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return new Vector3(roll, pitch, yaw);
         }
 
+        public double llRot2Angle(Quaternion r)
+        {
+            /* based on http://wiki.secondlife.com/wiki/LlRot2Angle */
+            double s2 = r.Z * r.Z; // square of the s-element
+            double v2 = r.X * r.X + r.Y * r.Y + r.Z * r.Z; // sum of the squares of the v-elements
+
+            if (s2 < v2) // compare the s-component to the v-component
+                return 2.0 * Math.Acos(Math.Sqrt(s2 / (s2 + v2))); // use arccos if the v-component is dominant
+            if (v2 != 0) // make sure the v-component is non-zero
+                return 2.0 * Math.Asin(Math.Sqrt(v2 / (s2 + v2))); // use arcsin if the s-component is dominant
+
+            return 0.0; // argument is scaled too small to be meaningful, or it is a zero rotation, so return zer
+        }
+
         public Vector3 llRot2Axis(Quaternion q)
         {
             return llVecNorm(new Vector3(q.X, q.Y, q.Z)) * Math.Sign(q.W);
@@ -157,6 +171,135 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 return 2.0 * Math.Asin(Math.Sqrt(v2 / (s2 + v2)));
             }
             return 0f;
+        }
+
+        public Quaternion llAxes2Rot(Vector3 fwd, Vector3 left, Vector3 up)
+        {
+            double s;
+            double t = fwd.X + left.Y + up.Z + 1.0;
+
+            if(t >= 1.0)
+            {
+                s = 0.5 / Math.Sqrt(t);
+                return new Quaternion((left.Z - up.Y) * s, (up.X - fwd.Z) * s, (fwd.Y - left.X) * s, 0.25 / s);
+            }
+            else
+            {
+                double m = (left.Y > up.Z) ? left.Y : up.Z;
+
+                if(m < fwd.X)
+                {
+                    s = Math.Sqrt(fwd.X - (left.Y + up.Z) + 1.0);
+                    return new Quaternion(
+                        s * 0.5,
+                        (fwd.Y + left.X) * (0.5 / s),
+                        (up.X + fwd.Z) * (0.5 / s),
+                        (left.Z - up.Y) * (0.5 / s));
+                }
+                else if(m == left.Y)
+                {
+                    s = Math.Sqrt(left.Y - (up.Z + fwd.X) + 1.0);
+                    return new Quaternion(
+                        (fwd.Y + left.X) * (0.5 / s),
+                        s * 0.5,
+                        (left.Z + up.Y) * (0.5 / s),
+                        (up.X - fwd.Z) * (0.5 / s));
+                }
+                else
+                {
+                    s = Math.Sqrt(up.Z - (fwd.X + left.Y) + 1.0);
+                    return new Quaternion(
+                        (up.X + fwd.Z) * (0.5 / s),
+                        (left.Z + up.Y) * (0.5 / s),
+                        s * 0.5,
+                        (fwd.Y - left.X) * (0.5 / s));
+                }
+            }
+        }
+
+        public Vector3 llRot2Fwd(Quaternion r)
+        {
+            double x, y, z, sq;
+            sq = r.LengthSquared;
+            if(Math.Abs(1.0 -sq)>0.000001)
+            {
+                sq = 1.0 / Math.Sqrt(sq);
+                r.X *= sq;
+                r.Y *= sq;
+                r.Z *= sq;
+                r.W *= sq;
+            }
+
+            x = r.X * r.X - r.Y * r.Y - r.Z * r.Z + r.W * r.W;
+            y = 2 * (r.X * r.Y + r.Z * r.W);
+            z = 2 * (r.X * r.Z - r.Y * r.W);
+            return new Vector3(x, y, z);
+        }
+
+        public Vector3 llRot2Left(Quaternion r)
+        {
+            double x, y, z, sq;
+
+            sq = r.LengthSquared;
+            if (Math.Abs(1.0 - sq) > 0.000001)
+            {
+                sq = 1.0 / Math.Sqrt(sq);
+                r.X *= sq;
+                r.Y *= sq;
+                r.Z *= sq;
+                r.W *= sq;
+            }
+
+            x = 2 * (r.X * r.Y - r.Z * r.W);
+            y = -r.X * r.X + r.Y * r.Y - r.Z * r.Z + r.W * r.W;
+            z = 2 * (r.X * r.W + r.Y * r.Z);
+            return new Vector3(x, y, z);
+        }
+
+        public Vector3 llRot2Up(Quaternion r)
+        {
+            double x, y, z, sq;
+
+            sq = r.LengthSquared;
+            if (Math.Abs(1.0 - sq) > 0.000001)
+            {
+                sq = 1.0 / Math.Sqrt(sq);
+                r.X *= sq;
+                r.Y *= sq;
+                r.Z *= sq;
+                r.W *= sq;
+            }
+
+            x = 2 * (r.X * r.Z + r.Y * r.W);
+            y = 2 * (-r.X * r.W + r.Y * r.Z);
+            z = -r.X * r.X - r.Y * r.Y + r.Z * r.Z + r.W * r.W;
+            return new Vector3(x, y, z);
+        }
+
+        public Quaternion llRotBetween(Vector3 a, Vector3 b)
+        {
+            return Quaternion.RotBetween(a, b);
+        }
+
+        public int llFloor(double f)
+        {
+            return (int)Math.Floor(f);
+        }
+
+        public int llCeil(double f)
+        {
+            return (int)Math.Ceiling(f);
+        }
+
+        public int llRound(double f)
+        {
+            return (int)Math.Round(f, MidpointRounding.AwayFromZero);
+        }
+
+        private static Random random = new Random();
+        public double llFrand(double mag)
+        {
+            return random.NextDouble() * mag;
         }
     }
 }

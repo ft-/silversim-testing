@@ -37,5 +37,10 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
         {
             return (int)Date.GetUnixTime();
         }
+
+        public string llGetTimestamp()
+        {
+            return DateTime.Now.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ");
+        }
     }
 }

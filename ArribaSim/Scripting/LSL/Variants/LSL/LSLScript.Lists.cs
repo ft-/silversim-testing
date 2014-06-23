@@ -181,6 +181,11 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
             return s;
         }
 
+        public string llList2CSV(AnArray src)
+        {
+            return llDumpList2String(src, ", ");
+        }
+
         public const int TYPE_INTEGER = 1;
         public const int TYPE_FLOAT = 2;
         public const int TYPE_STRING = 3;

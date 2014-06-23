@@ -431,6 +431,79 @@ namespace ArribaSim.Types
             return this;
         }
 
+        public static Quaternion RotBetween(Vector3 a, Vector3 b)
+        {
+            Quaternion rotBetween;
+            // Check for zero vectors. If either is zero, return zero rotation. Otherwise,
+            // continue calculation.
+            if (a == new Vector3(0.0f, 0.0f, 0.0f) || b == new Vector3(0.0f, 0.0f, 0.0f))
+            {
+                rotBetween = new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
+            }
+            else
+            {
+                a = Vector3.Normalize(a);
+                b = Vector3.Normalize(b);
+                double dotProduct = a.Dot(b);
+                // There are two degenerate cases possible. These are for vectors 180 or
+                // 0 degrees apart. These have to be detected and handled individually.
+                //
+                // Check for vectors 180 degrees apart.
+                // A dot product of -1 would mean the angle between vectors is 180 degrees.
+                if (dotProduct < -0.9999999f)
+                {
+                    // First assume X axis is orthogonal to the vectors.
+                    Vector3 orthoVector = new Vector3(1.0f, 0.0f, 0.0f);
+                    orthoVector = orthoVector - a * (a.X / a.Dot(a));
+                    // Check for near zero vector. A very small non-zero number here will create
+                    // a rotation in an undesired direction.
+                    if (orthoVector.Length > 0.0001)
+                    {
+                        rotBetween = new Quaternion(orthoVector.X, orthoVector.Y, orthoVector.Z, 0.0f);
+                    }
+                    // If the magnitude of the vector was near zero, then assume the X axis is not
+                    // orthogonal and use the Z axis instead.
+                    else
+                    {
+                        // Set 180 z rotation.
+                        rotBetween = new Quaternion(0.0f, 0.0f, 1.0f, 0.0f);
+                    }
+                }
+                // Check for parallel vectors.
+                // A dot product of 1 would mean the angle between vectors is 0 degrees.
+                else if (dotProduct > 0.9999999f)
+                {
+                    // Set zero rotation.
+                    rotBetween = new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
+                }
+                else
+                {
+                    // All special checks have been performed so get the axis of rotation.
+                    Vector3 crossProduct = a.Cross(b);
+                    // Quarternion s value is the length of the unit vector + dot product.
+                    double qs = 1.0 + dotProduct;
+                    rotBetween = new Quaternion(crossProduct.X, crossProduct.Y, crossProduct.Z, qs);
+                    // Normalize the rotation.
+                    double mag = rotBetween.Length;
+                    // We shouldn't have to worry about a divide by zero here. The qs value will be
+                    // non-zero because we already know if we're here, then the dotProduct is not -1 so
+                    // qs will not be zero. Also, we've already handled the input vectors being zero so the
+                    // crossProduct vector should also not be zero.
+                    rotBetween.X /= mag;
+                    rotBetween.Y /= mag;
+                    rotBetween.Z /= mag;
+                    rotBetween.W /= mag;
+                    // Check for undefined values and set zero rotation if any found. This code might not actually be required
+                    // any longer since zero vectors are checked for at the top.
+                    if (Double.IsNaN(rotBetween.X) || Double.IsNaN(rotBetween.Y) || Double.IsNaN(rotBetween.Z) || Double.IsNaN(rotBetween.W))
+                    {
+                        rotBetween = new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
+                    }
+                }
+            }
+            return rotBetween;
+
+        }
 
         public static Quaternion Parse(string val)
         {
