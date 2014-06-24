@@ -36,44 +36,116 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
     {
         public AnArray llDeleteSubList(AnArray src, int start, int end)
         {
-            if(start < 0)
+            if (start < 0)
             {
                 start = src.Count - start;
             }
-            if(end < 0)
+            if (end < 0)
             {
                 end = src.Count - end;
             }
 
-            if(start < 0 || start >= src.Count || end < 0 || end >= src.Count)
+            if (start < 0)
             {
-                return new AnArray(src);
+                start = 0;
+            }
+            else if (start > src.Count)
+            {
+                start = src.Count;
             }
 
-            AnArray res = new AnArray();
-            if(start > end)
+            if (end < 0)
             {
-                for(int i = 0; i <= end; ++i)
+                end = 0;
+            }
+            else if (end > src.Count)
+            {
+                end = src.Count;
+            }
+
+            if (start > end)
+            {
+                AnArray res = new AnArray();
+                for (int i = start; i <= end; ++i)
                 {
                     res.Add(src[i]);
                 }
-                for(int i = start; i < src.Count; ++i)
-                {
-                    res.Add(src[i]);
-                }
+
+                return res;
             }
             else
             {
-                for(int i = 0; i < start; ++i)
+                AnArray res = new AnArray();
+
+                for (int i = 0; i < start + 1; ++i)
                 {
                     res.Add(src[i]);
                 }
-                for(int i = end + 1; i < src.Count; ++i)
+
+                for (int i = end; i < src.Count; ++i)
                 {
                     res.Add(src[i]);
                 }
+
+                return res;
             }
-            return res;
+        }
+
+        public AnArray llList2List(AnArray src, int start, int end)
+        {
+            if (start < 0)
+            {
+                start = src.Count - start;
+            }
+            if (end < 0)
+            {
+                end = src.Count - end;
+            }
+
+            if (start < 0)
+            {
+                start = 0;
+            }
+            else if (start > src.Count)
+            {
+                start = src.Count;
+            }
+
+            if (end < 0)
+            {
+                end = 0;
+            }
+            else if (end > src.Count)
+            {
+                end = src.Count;
+            }
+
+            if (start <= end)
+            {
+                AnArray res = new AnArray();
+                for (int i = start; i <= end; ++i )
+                {
+                    res.Add(src[i]);
+                }
+
+                return res;
+            }
+            else
+            {
+                AnArray res = new AnArray();
+
+                for (int i = 0; i < end + 1; ++i)
+                {
+                    res.Add(src[i]);
+                }
+
+                for (int i = start; i < src.Count; ++i)
+                {
+                    res.Add(src[i]);
+                }
+
+                return res;
+            }
         }
 
         public double llList2Float(AnArray src, int index)
@@ -212,6 +284,178 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
         public int llGetListLength(AnArray src)
         {
             return src.Count;
+        }
+
+        private AnArray ParseString2List(string src, AnArray separators, AnArray spacers, bool keepNulls)
+        {
+            AnArray res = new AnArray();
+            string value = null;
+            
+            while(src.Length != 0)
+            {
+                IValue foundSpacer = null;
+                foreach(IValue spacer in spacers)
+                {
+                    if(spacer.LSL_Type != LSLValueType.String)
+                    {
+                        continue;
+                    }
+                    if(src.StartsWith(spacer.ToString()))
+                    {
+                        foundSpacer = spacer;
+                        break;
+                    }
+                }
+
+                if (foundSpacer != null)
+                {
+                    src = src.Substring(foundSpacer.ToString().Length);
+                    continue;
+                }
+
+                IValue foundSeparator = null;
+                foreach(IValue separator in separators)
+                {
+                    if(separator.LSL_Type != LSLValueType.String)
+                    {
+                        continue;
+                    }
+
+                    if(src.StartsWith(separator.ToString()))
+                    {
+                        foundSeparator = separator;
+                        break;
+                    }
+                }
+
+                if(foundSeparator != null)
+                {
+                    if(value == null && keepNulls)
+                    {
+                        res.Add(value);
+                    }
+                    else if(value != null)
+                    {
+                        res.Add(value);
+                    }
+                    value = null;
+                    src = src.Substring(foundSeparator.ToString().Length);
+                    if(src.Length == 0)
+                    {
+                        /* special case we consumed all entries but a separator at end */
+                        if(keepNulls)
+                        {
+                            res.Add(string.Empty);
+                        }
+                    }
+                }
+
+                int minIndex = src.Length;
+
+                foreach(IValue spacer in spacers)
+                {
+                    if (spacer.LSL_Type != LSLValueType.String)
+                    {
+                        continue;
+                    }
+                    int resIndex = src.IndexOf(spacer.ToString());
+                    if(resIndex < 0)
+                    {
+                        continue;
+                    }
+                    else if(resIndex < minIndex)
+                    {
+                        minIndex = resIndex;
+                    }
+                }
+                foreach(IValue separator in separators)
+                {
+                    if(spacers.LSL_Type != LSLValueType.String)
+                    {
+                        continue;
+                    }
+                    int resIndex = src.IndexOf(separator.ToString());
+                    if (resIndex < 0)
+                    {
+                        continue;
+                    }
+                    else if (resIndex < minIndex)
+                    {
+                        minIndex = resIndex;
+                    }
+                }
+
+                value = src.Substring(0, minIndex);
+                src = src.Substring(minIndex);
+            }
+
+            if (value != null)
+            {
+                res.Add(value);
+            }
+
+            return res;
+        }
+
+        public AnArray llParseString2List(string src, AnArray separators, AnArray spacers)
+        {
+            return ParseString2List(src, separators, spacers, false);
+        }
+
+        public AnArray llParseStringKeepNulls(string src, AnArray separators, AnArray spacers)
+        {
+            return ParseString2List(src, separators, spacers, true);
+        }
+
+        public AnArray llCSV2List(string src)
+        {
+            bool wsconsume = true;
+            bool inbracket = false;
+            string value = string.Empty;
+            AnArray ret = new AnArray();
+
+            foreach(char c in src)
+            {
+                switch(c)
+                {
+                    case ' ': case '\t':
+                        if(wsconsume)
+                        {
+                            break;
+                        }
+                        value += c;
+                        break;
+
+                    case '<':
+                        inbracket = true;
+                        value += c;
+                        break;
+
+                    case '>':
+                        inbracket = false;
+                        value += c;
+                        break;
+
+                    case ',':
+                        if(inbracket)
+                        {
+                            value += c;
+                            break;
+                        }
+
+                        ret.Add(value);
+                        wsconsume = true;
+                        break;
+
+                    default:
+                        wsconsume = false;
+                        value += c;
+                        break;
+                }
+            }
+
+            ret.Add(string.Empty);
+            return ret;
         }
     }
 }

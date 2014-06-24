@@ -44,23 +44,32 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
                 end = src.Length - end;
             }
 
-            if (start < 0 || start >= src.Length || end < 0 || end >= src.Length)
+            if (start < 0)
             {
-                return src;
+                start = 0;
+            }
+            else if (start > src.Length)
+            {
+                start = src.Length;
             }
 
-            string res = string.Empty;
+            if (end < 0)
+            {
+                end = 0;
+            }
+            else if (end > src.Length)
+            {
+                end = src.Length;
+            }
+
             if (start > end)
             {
-                res += src.Substring(0, end + 1);
-                res += src.Substring(start);
+                return src.Substring(start, end - start + 1);
             }
             else
             {
-                res += src.Substring(0, start + 1);
-                res += src.Substring(end);
+                return src.Substring(0, start + 1) + src.Substring(end);
             }
-            return res;
         }
 
         public string llToLower(string s)
@@ -81,6 +90,82 @@ namespace ArribaSim.Scripting.LSL.Variants.LSL
         public string llEscapeURL(string url)
         {
             return Uri.EscapeDataString(url);
+        }
+
+        public const int STRING_TRIM_HEAD = 0x1;
+        public const int STRING_TRIM_TAIL = 0x2;
+        public const int STRING_TRIM = 0x3;
+
+        private readonly char[] trimchars = new char[] { ' ', '\t', '\r', '\n' };
+
+        public string llStringTrim(string src, int type)
+        {
+            switch(type & STRING_TRIM)
+            {
+                case STRING_TRIM_HEAD:
+                    src = src.TrimStart(trimchars);
+                    break;
+                case STRING_TRIM_TAIL:
+                    src = src.TrimEnd(trimchars);
+                    break;
+
+                case STRING_TRIM:
+                    src = src.Trim(trimchars);
+                    break;
+            }
+
+            return src;
+        }
+
+        public int llStringLength(string src)
+        {
+            return src.Length;
+        }
+
+        public int llSubStringIndex(string source, string pattern)
+        {
+            return source.IndexOf(pattern);
+        }
+
+        public string llGetSubstring(string src, int start, int end)
+        {
+            if(start < 0)
+            {
+                start = src.Length - start;
+            }
+            if (end < 0)
+            {
+                end = src.Length - end;
+            }
+
+            if(start < 0)
+            {
+                start = 0;
+            }
+            else if(start > src.Length)
+            {
+                start = src.Length;
+            }
+
+            if (end < 0)
+            {
+                end = 0;
+            }
+            else if(end > src.Length)
+            {
+                end = src.Length;
+            }
+
+            if(start <= end)
+            {
+                return src.Substring(start, end - start + 1);
+            }
+            else
+            {
+                string a = src.Substring(start);
+                string b = src.Substring(0, end + 1);
+                return b + a;
+            }
         }
     }
 }

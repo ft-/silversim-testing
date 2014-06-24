@@ -25,6 +25,7 @@ exception statement from your version.
 
 using ArribaSim.Types;
 using ArribaSim.Types.Inventory;
+using System;
 using System.Collections.Generic;
 using ThreadedClasses;
 
@@ -32,6 +33,9 @@ namespace ArribaSim.Scene.Types.Object
 {
     public class ObjectPartInventory : RwLockedSortedDoubleDictionary<UUID, string, ObjectPartInventoryItem>
     {
+        public delegate void OnChangeDelegate();
+        public event OnChangeDelegate OnChange;
+
         public ObjectPartInventory()
         {
         }
@@ -98,6 +102,88 @@ namespace ArribaSim.Scene.Types.Object
             }
 
             return n;
+        }
+
+        #endregion
+
+        #region Overrides
+        public new void Add(UUID key1, string key2, ObjectPartInventoryItem item)
+        {
+            base.Add(key1, key2, item);
+            
+            var addDelegate = OnChange;
+            if(addDelegate != null)
+            {
+                foreach (OnChangeDelegate d in addDelegate.GetInvocationList())
+                {
+                    d();
+                }
+            }
+        }
+
+        public new void ChangeKey(string newKey, string oldKey)
+        {
+            base.ChangeKey(newKey, oldKey);
+
+            var updateDelegate = OnChange;
+            if(updateDelegate != null)
+            {
+                foreach (OnChangeDelegate d in updateDelegate.GetInvocationList())
+                {
+                    d();
+                }
+            }
+        }
+
+        public new bool Remove(UUID key1)
+        {
+            if (base.Remove(key1))
+            {
+                var updateDelegate = OnChange;
+                if (updateDelegate != null)
+                {
+                    foreach (OnChangeDelegate d in updateDelegate.GetInvocationList())
+                    {
+                        d();
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public new bool Remove(string key2)
+        {
+            if (base.Remove(key2))
+            {
+                var updateDelegate = OnChange;
+                if (updateDelegate != null)
+                {
+                    foreach (OnChangeDelegate d in updateDelegate.GetInvocationList())
+                    {
+                        d();
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public new bool Remove(UUID key1, string key2)
+        {
+            if (base.Remove(key1, key2))
+            {
+                var updateDelegate = OnChange;
+                if (updateDelegate != null)
+                {
+                    foreach (OnChangeDelegate d in updateDelegate.GetInvocationList())
+                    {
+                        d();
+                    }
+                }
+                return true;
+            }
+            return false;
         }
         #endregion
     }
