@@ -81,6 +81,18 @@ namespace ArribaSim.Linden.UDP
                 m_InboundBufferQueue.Enqueue(new UDPReceivePacket());
             }
 
+            try
+            {
+                if (m_UdpSocket.Ttl < 128)
+                {
+                    m_UdpSocket.Ttl = 128;
+                }
+            }
+            catch (SocketException)
+            {
+                m_Log.Debug("[LLUDP SERVER]: Failed to increase default TTL");
+            }
+
             /* since Win 2000, there is a WSAECONNRESET, we do not want that in our code */
             try
             {
