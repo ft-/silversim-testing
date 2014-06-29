@@ -48,6 +48,12 @@ namespace ArribaSim.Main.Common
             {
 
             }
+
+            public ConfigurationError(string msg)
+                : base(msg)
+            {
+
+            }
         }
 
         private ILog m_Log;
