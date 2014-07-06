@@ -111,6 +111,12 @@ namespace ArribaSim.Linden.Messages
             PacketTypes.Add(MessageType.RequestObjectPropertiesFamily, Object.RequestObjectPropertiesFamily.Decode);
             PacketTypes.Add(MessageType.RequestPayPrice, Object.RequestPayPrice.Decode);
 
+            /* Task Inventory */
+            PacketTypes.Add(MessageType.UpdateTaskInventory, TaskInventory.UpdateTaskInventory.Decode);
+            PacketTypes.Add(MessageType.RemoveTaskInventory, TaskInventory.RemoveTaskInventory.Decode);
+            PacketTypes.Add(MessageType.MoveTaskInventory, TaskInventory.MoveTaskInventory.Decode);
+            PacketTypes.Add(MessageType.RequestTaskInventory, TaskInventory.RequestTaskInventory.Decode);
+
             /* Region */
             PacketTypes.Add(MessageType.RequestRegionInfo, Region.RequestRegionInfo.Decode);
             PacketTypes.Add(MessageType.GodUpdateRegionInfo, Region.GodUpdateRegionInfo.Decode);

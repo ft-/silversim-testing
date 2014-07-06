@@ -24,16 +24,18 @@ exception statement from your version.
 */
 
 using ArribaSim.Types;
+using System;
 
-namespace ArribaSim.Linden.Messages.Inventory
+namespace ArribaSim.Linden.Messages.TaskInventory
 {
-    public class InventoryAssetResponse : Message
+    public class RemoveTaskInventory : Message
     {
-        public UUID QueryID;
-        public UUID AssetID;
-        public bool IsReadable;
+        public UUID AgentID;
+        public UUID SessionID;
+        public UInt32 LocalID;
+        public UUID ItemID;
 
-        public InventoryAssetResponse()
+        public RemoveTaskInventory()
         {
 
         }
@@ -42,16 +44,20 @@ namespace ArribaSim.Linden.Messages.Inventory
         {
             get
             {
-                return MessageType.InventoryAssetResponse;
+                return MessageType.RemoveTaskInventory;
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public static Message Decode(UDPPacket p)
         {
-            p.WriteMessageType(Number);
-            p.WriteUUID(QueryID);
-            p.WriteUUID(AssetID);
-            p.WriteBoolean(IsReadable);
+            RemoveTaskInventory m = new RemoveTaskInventory();
+
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.LocalID = p.ReadUInt32();
+            m.ItemID = p.ReadUUID();
+
+            return m;
         }
     }
 }

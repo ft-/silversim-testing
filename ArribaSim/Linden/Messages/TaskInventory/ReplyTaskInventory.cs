@@ -24,16 +24,21 @@ exception statement from your version.
 */
 
 using ArribaSim.Types;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace ArribaSim.Linden.Messages.Inventory
+namespace ArribaSim.Linden.Messages.TaskInventory
 {
-    public class InventoryAssetResponse : Message
+    public class ReplyTaskInventory : Message
     {
-        public UUID QueryID;
-        public UUID AssetID;
-        public bool IsReadable;
+        public UUID TaskID;
+        public Int16 Serial;
+        public string Filename;
 
-        public InventoryAssetResponse()
+
+        public ReplyTaskInventory()
         {
 
         }
@@ -42,16 +47,16 @@ namespace ArribaSim.Linden.Messages.Inventory
         {
             get
             {
-                return MessageType.InventoryAssetResponse;
+                return MessageType.ReplyTaskInventory;
             }
         }
 
         public new void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
-            p.WriteUUID(QueryID);
-            p.WriteUUID(AssetID);
-            p.WriteBoolean(IsReadable);
+            p.WriteUUID(TaskID);
+            p.WriteInt16(Serial);
+            p.WriteStringLen8(Filename);
         }
     }
 }
