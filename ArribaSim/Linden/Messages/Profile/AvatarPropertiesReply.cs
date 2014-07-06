@@ -24,17 +24,25 @@ exception statement from your version.
 */
 
 using ArribaSim.Types;
+using System;
 
-namespace ArribaSim.Linden.Messages.Agent
+namespace ArribaSim.Linden.Messages.Profile
 {
-    public class TrackAgent : Message
+    public class AvatarPropertiesReply : Message
     {
         public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
+        public UUID AvatarID = UUID.Zero;
+        public UUID ImageID = UUID.Zero;
+        public UUID FLImageID = UUID.Zero;
+        public UUID PartnerID = UUID.Zero;
+        public string AboutText;
+        public string FLAboutText;
+        public string BornOn;
+        public string ProfileURL;
+        public byte[] CharterMember = new byte[1];
+        public UInt32 Flags = 0;
 
-        public UUID PreyID = UUID.Zero;
-
-        public TrackAgent()
+        public AvatarPropertiesReply()
         {
 
         }
@@ -43,17 +51,24 @@ namespace ArribaSim.Linden.Messages.Agent
         {
             get
             {
-                return MessageType.TrackAgent;
+                return MessageType.AvatarPropertiesReply;
             }
         }
 
-        public static Message Decode(UDPPacket p)
+        public new void Serialize(UDPPacket p)
         {
-            TrackAgent m = new TrackAgent();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.PreyID = p.ReadUUID();
-            return m;
+            p.WriteMessageType(Number);
+            p.WriteUUID(AgentID);
+            p.WriteUUID(AvatarID);
+            p.WriteUUID(ImageID);
+            p.WriteUUID(FLImageID);
+            p.WriteStringLen16(AboutText);
+            p.WriteStringLen8(FLAboutText);
+            p.WriteStringLen8(BornOn);
+            p.WriteStringLen8(ProfileURL);
+            p.WriteUInt8((byte)CharterMember.Length);
+            p.WriteBytes(CharterMember);
+            p.WriteUInt32(Flags);
         }
     }
 }

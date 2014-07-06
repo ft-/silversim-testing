@@ -24,17 +24,26 @@ exception statement from your version.
 */
 
 using ArribaSim.Types;
+using System;
+using System.Collections.Generic;
 
-namespace ArribaSim.Linden.Messages.Agent
+namespace ArribaSim.Linden.Messages.Script
 {
-    public class TrackAgent : Message
+    public class ScriptDialog : Message
     {
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
+        public UUID ObjectID;
+        public string FirstName;
+        public string LastName;
+        public string ObjectName;
+        public string Message;
+        public Int32 ChatChannel;
+        public UUID ImageID;
 
-        public UUID PreyID = UUID.Zero;
+        public List<string> Buttons = new List<string>();
 
-        public TrackAgent()
+        public List<UUID> OwnerData = new List<UUID>();
+
+        public ScriptDialog()
         {
 
         }
@@ -43,17 +52,32 @@ namespace ArribaSim.Linden.Messages.Agent
         {
             get
             {
-                return MessageType.TrackAgent;
+                return MessageType.ScriptDialog;
             }
         }
 
-        public static Message Decode(UDPPacket p)
+        public new void Serialize(UDPPacket p)
         {
-            TrackAgent m = new TrackAgent();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.PreyID = p.ReadUUID();
-            return m;
+            p.WriteMessageType(Number);
+            p.WriteUUID(ObjectID);
+            p.WriteStringLen8(FirstName);
+            p.WriteStringLen8(LastName);
+            p.WriteStringLen8(ObjectName);
+            p.WriteStringLen16(Message);
+            p.WriteInt32(ChatChannel);
+            p.WriteUUID(ImageID);
+
+            p.WriteUInt8((byte)Buttons.Count);
+            foreach (string d in Buttons)
+            {
+                p.WriteStringLen8(d);
+            }
+
+            p.WriteUInt8((byte)OwnerData.Count);
+            foreach(UUID d in OwnerData)
+            {
+                p.WriteUUID(d);
+            }
         }
     }
 }

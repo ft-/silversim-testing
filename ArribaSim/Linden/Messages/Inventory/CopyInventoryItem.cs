@@ -24,17 +24,26 @@ exception statement from your version.
 */
 
 using ArribaSim.Types;
+using System;
+using System.Collections.Generic;
 
-namespace ArribaSim.Linden.Messages.Agent
+namespace ArribaSim.Linden.Messages.Inventory
 {
-    public class TrackAgent : Message
+    public class CopyInventoryItem : Message
     {
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
+        public UUID AgentID;
+        public UUID SessionID;
+        public struct InventoryDataEntry
+        {
+            public UInt32 CallbackID;
+            public UUID OldAgentID;
+            public UUID OldItemID;
+            public UUID NewFolderID;
+            public string NewName;
+        }
+        public List<InventoryDataEntry> InventoryData = new List<InventoryDataEntry>();
 
-        public UUID PreyID = UUID.Zero;
-
-        public TrackAgent()
+        public CopyInventoryItem()
         {
 
         }
@@ -43,16 +52,28 @@ namespace ArribaSim.Linden.Messages.Agent
         {
             get
             {
-                return MessageType.TrackAgent;
+                return MessageType.CopyInventoryItem;
             }
         }
 
         public static Message Decode(UDPPacket p)
         {
-            TrackAgent m = new TrackAgent();
+            CopyInventoryItem m = new CopyInventoryItem();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
-            m.PreyID = p.ReadUUID();
+
+            uint c = p.ReadUInt8();
+            for (uint i = 0; i < c; ++i)
+            {
+                InventoryDataEntry d = new InventoryDataEntry();
+                d.CallbackID = p.ReadUInt32();
+                d.OldAgentID = p.ReadUUID();
+                d.OldItemID = p.ReadUUID();
+                d.NewFolderID = p.ReadUUID();
+                d.NewName = p.ReadStringLen8();
+                m.InventoryData.Add(d);
+            }
+
             return m;
         }
     }

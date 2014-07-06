@@ -23,43 +23,47 @@ exception statement from your version.
 
 */
 
-namespace ArribaSim.Types.Inventory
+using ArribaSim.Types;
+using System;
+using System.Collections.Generic;
+
+namespace ArribaSim.Linden.Messages.Camera
 {
-    public enum InventoryType : sbyte
+    public class SetFollowCamProperties : Message
     {
-        Unknown = -1,
-        Texture = 0,
-        Sound = 1,
-        CallingCard = 2,
-        Landmark = 3,
-        //[Obsolete]
-        //Script = 4,
-        Clothing = 5,
-        Object = 6,
-        Notecard = 7,
-        Folder = 8,
-        RootFolder = 9,
-        LSLText = 10,
-        LSLBytecode = 11,
-        TextureTGA = 12,
-        Bodypart = 13,
-        TrashFolder = 14,
-        SnapshotFolder = 15,
-        Snapshot = 15,
-        LostAndFoundFolder = 16,
-        SoundWAV = 17,
-        Attachable = 18,
-        Wearable = 19,
-        Animation = 20,
-        Gesture = 21,
-        Simstate = 22,
-        FavoriteFolder = 23,
-        CurrentOutfitFolder = 46,
-        OutfitFolder = 47,
-        MyOutfitsFolder = 48,
-        Mesh = 49,
-        Inbox = 50,
-        Outbox = 51,
-        BasicRoot = 51
+        public UUID ObjectID = UUID.Zero;
+
+        public struct CameraProperty
+        {
+            public Int32 Type;
+            public double Value;
+        }
+
+        public List<CameraProperty> CameraProperties = new List<CameraProperty>();
+
+        public SetFollowCamProperties()
+        {
+
+        }
+
+        public virtual new MessageType Number
+        {
+            get
+            {
+                return MessageType.SetFollowCamProperties;
+            }
+        }
+
+        public new void Serialize(UDPPacket p)
+        {
+            p.WriteMessageType(Number);
+            p.WriteUUID(ObjectID);
+            p.WriteUInt8((byte)CameraProperties.Count);
+            foreach(CameraProperty d in CameraProperties)
+            {
+                p.WriteInt32(d.Type);
+                p.WriteFloat((float)d.Value);
+            }
+        }
     }
 }

@@ -24,17 +24,25 @@ exception statement from your version.
 */
 
 using ArribaSim.Types;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace ArribaSim.Linden.Messages.Agent
+namespace ArribaSim.Linden.Messages.Inventory
 {
-    public class TrackAgent : Message
+    public class MoveInventoryFolder : Message
     {
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
+        public UUID AgentID;
+        public UUID SessionID;
+        public struct InventoryDataEntry
+        {
+            public UUID FolderID;
+            public UUID ParentID;
+        }
+        public List<InventoryDataEntry> InventoryData = new List<InventoryDataEntry>();
 
-        public UUID PreyID = UUID.Zero;
-
-        public TrackAgent()
+        public MoveInventoryFolder()
         {
 
         }
@@ -43,16 +51,25 @@ namespace ArribaSim.Linden.Messages.Agent
         {
             get
             {
-                return MessageType.TrackAgent;
+                return MessageType.MoveInventoryFolder;
             }
         }
 
         public static Message Decode(UDPPacket p)
         {
-            TrackAgent m = new TrackAgent();
+            MoveInventoryFolder m = new MoveInventoryFolder();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
-            m.PreyID = p.ReadUUID();
+
+            uint c = p.ReadUInt8();
+            for (uint i = 0; i < c; ++i)
+            {
+                InventoryDataEntry d = new InventoryDataEntry();
+                d.FolderID = p.ReadUUID();
+                d.ParentID = p.ReadUUID();
+                m.InventoryData.Add(d);
+            }
+
             return m;
         }
     }

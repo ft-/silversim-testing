@@ -25,16 +25,19 @@ exception statement from your version.
 
 using ArribaSim.Types;
 
-namespace ArribaSim.Linden.Messages.Agent
+namespace ArribaSim.Linden.Messages.Avatar
 {
-    public class TrackAgent : Message
+    public class AvatarSitResponse : Message
     {
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
+        public UUID SitObject = UUID.Zero;
+        public bool IsAutoPilot = false;
+        public Vector3 SitPosition = Vector3.Zero;
+        public Quaternion SitRotation = Quaternion.Identity;
+        public Vector3 CameraEyeOffset = Vector3.Zero;
+        public Vector3 CameraAtOffset = Vector3.Zero;
+        public bool ForceMouselook = false;
 
-        public UUID PreyID = UUID.Zero;
-
-        public TrackAgent()
+        public AvatarSitResponse()
         {
 
         }
@@ -43,17 +46,20 @@ namespace ArribaSim.Linden.Messages.Agent
         {
             get
             {
-                return MessageType.TrackAgent;
+                return MessageType.AvatarSitResponse;
             }
         }
 
-        public static Message Decode(UDPPacket p)
+        public new void Serialize(UDPPacket p)
         {
-            TrackAgent m = new TrackAgent();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.PreyID = p.ReadUUID();
-            return m;
+            p.WriteMessageType(Number);
+            p.WriteUUID(SitObject);
+            p.WriteBoolean(IsAutoPilot);
+            p.WriteVector3f(SitPosition);
+            p.WriteLLQuaternion(SitRotation);
+            p.WriteVector3f(CameraEyeOffset);
+            p.WriteVector3f(CameraAtOffset);
+            p.WriteBoolean(ForceMouselook);
         }
     }
 }

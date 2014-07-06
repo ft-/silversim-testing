@@ -25,14 +25,31 @@ exception statement from your version.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ArribaSim.Types;
 
-namespace ArribaSim.Linden.Messages.Object
+namespace ArribaSim.Linden.Messages.Profile
 {
-    public class KillObject : Message
+    public class AvatarGroupsReply : Message
     {
-        public List<UInt32> LocalIDs = new List<UInt32>();
+        public UUID AgentID = UUID.Zero;
+        public UUID AvatarID = UUID.Zero;
 
-        public KillObject()
+        public struct GroupDataEntry
+        {
+            public UInt64 GroupPowers;
+            public bool AcceptNotices;
+            public string GroupTitle;
+            public UUID GroupID;
+            public string GroupName;
+            public UUID GroupInsigniaID;
+        }
+
+        public List<GroupDataEntry> GroupData = new List<GroupDataEntry>();
+        public bool ListInProfile = false;
+
+        public AvatarGroupsReply()
         {
 
         }
@@ -41,18 +58,26 @@ namespace ArribaSim.Linden.Messages.Object
         {
             get
             {
-                return MessageType.KillObject;
+                return MessageType.AvatarGroupsReply;
             }
         }
 
         public new void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
-            p.WriteUInt8((byte)LocalIDs.Count);
-            foreach (UInt32 i in LocalIDs)
+            p.WriteUUID(AgentID);
+            p.WriteUUID(AvatarID);
+            p.WriteUInt8((byte)GroupData.Count);
+            foreach(GroupDataEntry d in GroupData)
             {
-                p.WriteUInt32(i);
+                p.WriteUInt64(d.GroupPowers);
+                p.WriteBoolean(d.AcceptNotices);
+                p.WriteStringLen8(d.GroupTitle);
+                p.WriteUUID(d.GroupID);
+                p.WriteStringLen8(d.GroupName);
+                p.WriteUUID(d.GroupInsigniaID);
             }
+            p.WriteBoolean(ListInProfile);
         }
     }
 }

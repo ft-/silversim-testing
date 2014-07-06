@@ -23,18 +23,28 @@ exception statement from your version.
 
 */
 
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using ArribaSim.Types;
 
-namespace ArribaSim.Linden.Messages.Agent
+namespace ArribaSim.Linden.Messages.Avatar
 {
-    public class TrackAgent : Message
+    public class AvatarAppearance : Message
     {
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
+        public UUID Sender = UUID.Zero;
+        public bool IsTrial = false;
 
-        public UUID PreyID = UUID.Zero;
+        public struct ObjData
+        {
+            public byte[] TextureEntry;
+        }
+        public List<ObjData> ObjectData = new List<ObjData>();
 
-        public TrackAgent()
+        public byte[] VisualParams;
+
+        public AvatarAppearance()
         {
 
         }
@@ -43,17 +53,23 @@ namespace ArribaSim.Linden.Messages.Agent
         {
             get
             {
-                return MessageType.TrackAgent;
+                return MessageType.AvatarAppearance;
             }
         }
 
-        public static Message Decode(UDPPacket p)
+        public new void Serialize(UDPPacket p)
         {
-            TrackAgent m = new TrackAgent();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.PreyID = p.ReadUUID();
-            return m;
+            p.WriteMessageType(Number);
+            p.WriteUUID(Sender);
+            p.WriteBoolean(IsTrial);
+            p.WriteUInt8((byte)ObjectData.Count);
+            foreach (ObjData d in ObjectData)
+            {
+                p.WriteUInt16BE((UInt16)d.TextureEntry.Length);
+                p.WriteBytes(d.TextureEntry);
+            }
+            p.WriteUInt8((byte)VisualParams.Length);
+            p.WriteBytes(VisualParams);
         }
     }
 }

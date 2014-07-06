@@ -23,43 +23,45 @@ exception statement from your version.
 
 */
 
-namespace ArribaSim.Types.Inventory
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ArribaSim.Types;
+
+namespace ArribaSim.Linden.Messages.Profile
 {
-    public enum InventoryType : sbyte
+    public class AvatarNotesUpdate : Message
     {
-        Unknown = -1,
-        Texture = 0,
-        Sound = 1,
-        CallingCard = 2,
-        Landmark = 3,
-        //[Obsolete]
-        //Script = 4,
-        Clothing = 5,
-        Object = 6,
-        Notecard = 7,
-        Folder = 8,
-        RootFolder = 9,
-        LSLText = 10,
-        LSLBytecode = 11,
-        TextureTGA = 12,
-        Bodypart = 13,
-        TrashFolder = 14,
-        SnapshotFolder = 15,
-        Snapshot = 15,
-        LostAndFoundFolder = 16,
-        SoundWAV = 17,
-        Attachable = 18,
-        Wearable = 19,
-        Animation = 20,
-        Gesture = 21,
-        Simstate = 22,
-        FavoriteFolder = 23,
-        CurrentOutfitFolder = 46,
-        OutfitFolder = 47,
-        MyOutfitsFolder = 48,
-        Mesh = 49,
-        Inbox = 50,
-        Outbox = 51,
-        BasicRoot = 51
+        public UUID AgentID = UUID.Zero;
+        public UUID SessionID = UUID.Zero;
+
+        public UUID TargetID = UUID.Zero;
+        public string Notes;
+
+        public AvatarNotesUpdate()
+        {
+
+        }
+
+        public virtual new MessageType Number
+        {
+            get
+            {
+                return MessageType.AvatarNotesUpdate;
+            }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            AvatarNotesUpdate m = new AvatarNotesUpdate();
+
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.TargetID = p.ReadUUID();
+            m.Notes = p.ReadStringLen16();
+
+            return m;
+        }
     }
 }

@@ -23,18 +23,24 @@ exception statement from your version.
 
 */
 
-using ArribaSim.Types;
+using System;
+using System.Collections.Generic;
 
-namespace ArribaSim.Linden.Messages.Agent
+namespace ArribaSim.Linden.Messages.Object
 {
-    public class TrackAgent : Message
+    public class ObjectUpdateCompressed : Message
     {
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
+        public UInt64 RegionHandle;
+        public UInt16 TimeDilation;
+        public struct ObjData
+        {
+            public UInt32 UpdateFlags;
+            public byte[] Data;
+        }
 
-        public UUID PreyID = UUID.Zero;
+        public List<ObjData> ObjectData = new List<ObjData>();
 
-        public TrackAgent()
+        public ObjectUpdateCompressed()
         {
 
         }
@@ -43,17 +49,22 @@ namespace ArribaSim.Linden.Messages.Agent
         {
             get
             {
-                return MessageType.TrackAgent;
+                return MessageType.ObjectUpdateCompressed;
             }
         }
 
-        public static Message Decode(UDPPacket p)
+        public new void Serialize(UDPPacket p)
         {
-            TrackAgent m = new TrackAgent();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.PreyID = p.ReadUUID();
-            return m;
+            p.WriteMessageType(Number);
+            p.WriteUInt64(RegionHandle);
+            p.WriteUInt16(TimeDilation);
+            p.WriteUInt8((byte)ObjectData.Count);
+            foreach (ObjData d in ObjectData)
+            {
+                p.WriteUInt32(d.UpdateFlags);
+                p.WriteUInt16BE((UInt16)d.Data.Length);
+                p.WriteBytes(d.Data);
+            }
         }
     }
 }

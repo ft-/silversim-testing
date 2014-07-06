@@ -24,17 +24,21 @@ exception statement from your version.
 */
 
 using ArribaSim.Types;
+using System;
 
-namespace ArribaSim.Linden.Messages.Agent
+namespace ArribaSim.Linden.Messages.Profile
 {
-    public class TrackAgent : Message
+    public class AvatarInterestsUpdate : Message
     {
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
+        public UInt32 WantToMask;
+        public string WantToText;
+        public UInt32 SkillsMask;
+        public string SkillsText;
+        public string LanguagesText;
 
-        public UUID PreyID = UUID.Zero;
-
-        public TrackAgent()
+        public AvatarInterestsUpdate()
         {
 
         }
@@ -43,16 +47,22 @@ namespace ArribaSim.Linden.Messages.Agent
         {
             get
             {
-                return MessageType.TrackAgent;
+                return MessageType.AvatarInterestsUpdate;
             }
         }
 
         public static Message Decode(UDPPacket p)
         {
-            TrackAgent m = new TrackAgent();
+            AvatarInterestsUpdate m = new AvatarInterestsUpdate();
+
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
-            m.PreyID = p.ReadUUID();
+            m.WantToMask = p.ReadUInt32();
+            m.WantToText = p.ReadStringLen8();
+            m.SkillsMask = p.ReadUInt32();
+            m.SkillsText = p.ReadStringLen8();
+            m.LanguagesText = p.ReadStringLen8();
+
             return m;
         }
     }

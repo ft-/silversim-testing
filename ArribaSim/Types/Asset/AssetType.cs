@@ -25,7 +25,7 @@ exception statement from your version.
 
 namespace ArribaSim.Types.Asset
 {
-    public enum AssetType : int
+    public enum AssetType : sbyte
     {
         Material = -2,
         Unknown = -1,

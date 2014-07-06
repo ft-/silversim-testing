@@ -23,43 +23,40 @@ exception statement from your version.
 
 */
 
-namespace ArribaSim.Types.Inventory
+using ArribaSim.Types;
+using System;
+
+namespace ArribaSim.Linden.Messages.Script
 {
-    public enum InventoryType : sbyte
+    public class ScriptQuestion : Message
     {
-        Unknown = -1,
-        Texture = 0,
-        Sound = 1,
-        CallingCard = 2,
-        Landmark = 3,
-        //[Obsolete]
-        //Script = 4,
-        Clothing = 5,
-        Object = 6,
-        Notecard = 7,
-        Folder = 8,
-        RootFolder = 9,
-        LSLText = 10,
-        LSLBytecode = 11,
-        TextureTGA = 12,
-        Bodypart = 13,
-        TrashFolder = 14,
-        SnapshotFolder = 15,
-        Snapshot = 15,
-        LostAndFoundFolder = 16,
-        SoundWAV = 17,
-        Attachable = 18,
-        Wearable = 19,
-        Animation = 20,
-        Gesture = 21,
-        Simstate = 22,
-        FavoriteFolder = 23,
-        CurrentOutfitFolder = 46,
-        OutfitFolder = 47,
-        MyOutfitsFolder = 48,
-        Mesh = 49,
-        Inbox = 50,
-        Outbox = 51,
-        BasicRoot = 51
+        public UUID TaskID = UUID.Zero;
+        public UUID ItemID = UUID.Zero;
+        public string ObjectName;
+        public string ObjectOwner;
+        public UInt32 Questions;
+
+        public ScriptQuestion()
+        {
+
+        }
+
+        public virtual new MessageType Number
+        {
+            get
+            {
+                return MessageType.ScriptQuestion;
+            }
+        }
+
+        public new void Serialize(UDPPacket p)
+        {
+            p.WriteMessageType(Number);
+            p.WriteUUID(TaskID);
+            p.WriteUUID(ItemID);
+            p.WriteStringLen8(ObjectName);
+            p.WriteStringLen8(ObjectOwner);
+            p.WriteUInt32(Questions);
+        }
     }
 }

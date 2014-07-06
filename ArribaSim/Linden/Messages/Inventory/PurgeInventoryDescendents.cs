@@ -23,43 +23,42 @@ exception statement from your version.
 
 */
 
-namespace ArribaSim.Types.Inventory
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using ArribaSim.Types;
+
+namespace ArribaSim.Linden.Messages.Inventory
 {
-    public enum InventoryType : sbyte
+    public class PurgeInventoryDescendents : Message
     {
-        Unknown = -1,
-        Texture = 0,
-        Sound = 1,
-        CallingCard = 2,
-        Landmark = 3,
-        //[Obsolete]
-        //Script = 4,
-        Clothing = 5,
-        Object = 6,
-        Notecard = 7,
-        Folder = 8,
-        RootFolder = 9,
-        LSLText = 10,
-        LSLBytecode = 11,
-        TextureTGA = 12,
-        Bodypart = 13,
-        TrashFolder = 14,
-        SnapshotFolder = 15,
-        Snapshot = 15,
-        LostAndFoundFolder = 16,
-        SoundWAV = 17,
-        Attachable = 18,
-        Wearable = 19,
-        Animation = 20,
-        Gesture = 21,
-        Simstate = 22,
-        FavoriteFolder = 23,
-        CurrentOutfitFolder = 46,
-        OutfitFolder = 47,
-        MyOutfitsFolder = 48,
-        Mesh = 49,
-        Inbox = 50,
-        Outbox = 51,
-        BasicRoot = 51
+        public UUID AgentID;
+        public UUID SessionID;
+        public UUID FolderID;
+
+        public PurgeInventoryDescendents()
+        {
+
+        }
+
+        public virtual new MessageType Number
+        {
+            get
+            {
+                return MessageType.PurgeInventoryDescendents;
+            }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            PurgeInventoryDescendents m = new PurgeInventoryDescendents();
+
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.FolderID = p.ReadUUID();
+
+            return m;
+        }
     }
 }

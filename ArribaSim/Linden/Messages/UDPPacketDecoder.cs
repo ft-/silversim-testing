@@ -36,13 +36,23 @@ namespace ArribaSim.Linden.Messages
         {
             /* Agent */
             PacketTypes.Add(MessageType.TrackAgent, Agent.TrackAgent.Decode);
+            PacketTypes.Add(MessageType.CompleteAgentMovement, Agent.CompleteAgentMovement.Decode);
+
+            /* God */
+            PacketTypes.Add(MessageType.RequestGodlikePowers, God.RequestGodlikePowers.Decode);
 
             /* Circuit */
             PacketTypes.Add(MessageType.CompleteAgentMovement, Circuit.CompleteAgentMovement.Decode);
             PacketTypes.Add(MessageType.LogoutRequest, Circuit.LogoutRequest.Decode);
+            PacketTypes.Add(MessageType.ConfirmEnableSimulator, Circuit.ConfirmEnableSimulator.Decode);
 
             /* Script */
             PacketTypes.Add(MessageType.ScriptDialogReply, Script.ScriptDialogReply.Decode);
+            PacketTypes.Add(MessageType.ForceScriptControlRelease, Script.ForceScriptControlRelease.Decode);
+            PacketTypes.Add(MessageType.RevokePermissions, Script.RevokePermissions.Decode);
+            PacketTypes.Add(MessageType.GetScriptRunning, Script.GetScriptRunning.Decode);
+            PacketTypes.Add(MessageType.SetScriptRunning, Script.SetScriptRunning.Decode);
+            PacketTypes.Add(MessageType.ScriptReset, Script.ScriptReset.Decode);
             
             /* Parcel */
             PacketTypes.Add(MessageType.ParcelPropertiesRequest, Parcel.ParcelPropertiesRequest.Decode);
@@ -54,6 +64,21 @@ namespace ArribaSim.Linden.Messages
 
             /* Land */
             PacketTypes.Add(MessageType.ModifyLand, Land.ModifyLand.Decode);
+
+            /* Inventory */
+            PacketTypes.Add(MessageType.CopyInventoryFromNotecard, Inventory.CopyInventoryFromNotecard.Decode);
+            PacketTypes.Add(MessageType.UpdateInventoryItem, Inventory.UpdateInventoryItem.Decode);
+            PacketTypes.Add(MessageType.MoveInventoryItem, Inventory.MoveInventoryItem.Decode);
+            PacketTypes.Add(MessageType.CopyInventoryItem, Inventory.CopyInventoryItem.Decode);
+            PacketTypes.Add(MessageType.RemoveInventoryItem, Inventory.RemoveInventoryItem.Decode);
+            PacketTypes.Add(MessageType.ChangeInventoryItemFlags, Inventory.ChangeInventoryItemFlags.Decode);
+            PacketTypes.Add(MessageType.CreateInventoryFolder, Inventory.CreateInventoryFolder.Decode);
+            PacketTypes.Add(MessageType.UpdateInventoryFolder, Inventory.UpdateInventoryFolder.Decode);
+            PacketTypes.Add(MessageType.MoveInventoryFolder, Inventory.MoveInventoryFolder.Decode);
+            PacketTypes.Add(MessageType.RemoveInventoryFolder, Inventory.RemoveInventoryFolder.Decode);
+            PacketTypes.Add(MessageType.FetchInventoryDescendents, Inventory.FetchInventoryDescendents.Decode);
+            PacketTypes.Add(MessageType.FetchInventory, Inventory.FetchInventory.Decode);
+            PacketTypes.Add(MessageType.RemoveInventoryObjects, Inventory.RemoveInventoryObjects.Decode);
 
             /* Objects */
             PacketTypes.Add(MessageType.ObjectRotation, Object.ObjectRotation.Decode);
@@ -84,6 +109,7 @@ namespace ArribaSim.Linden.Messages
             PacketTypes.Add(MessageType.ObjectSpinStop, Object.ObjectSpinStop.Decode);
             PacketTypes.Add(MessageType.ObjectExportSelected, Object.ObjectExportSelected.Decode);
             PacketTypes.Add(MessageType.RequestObjectPropertiesFamily, Object.RequestObjectPropertiesFamily.Decode);
+            PacketTypes.Add(MessageType.RequestPayPrice, Object.RequestPayPrice.Decode);
 
             /* Region */
             PacketTypes.Add(MessageType.RequestRegionInfo, Region.RequestRegionInfo.Decode);
@@ -100,6 +126,16 @@ namespace ArribaSim.Linden.Messages
             /* UUID to Name Lookup */
             PacketTypes.Add(MessageType.UUIDNameRequest, Names.UUIDNameRequest.Decode);
             PacketTypes.Add(MessageType.UUIDGroupNameRequest, Names.UUIDGroupNameRequest.Decode);
+
+            /* User */
+            PacketTypes.Add(MessageType.GodKickUser, User.GodKickUser.Decode);
+            PacketTypes.Add(MessageType.EjectUser, User.EjectUser.Decode);
+
+            /* Profile */
+            PacketTypes.Add(MessageType.AvatarPropertiesRequest, Profile.AvatarPropertiesRequest.Decode);
+            PacketTypes.Add(MessageType.AvatarPropertiesUpdate, Profile.AvatarPropertiesUpdate.Decode);
+            PacketTypes.Add(MessageType.AvatarInterestsUpdate, Profile.AvatarInterestsUpdate.Decode);
+            PacketTypes.Add(MessageType.AvatarNotesUpdate, Profile.AvatarNotesUpdate.Decode);
         }
     }
 }

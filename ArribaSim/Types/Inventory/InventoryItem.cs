@@ -61,7 +61,7 @@ namespace ArribaSim.Types.Inventory
         #region SaleInfo
         public struct SaleInfoData
         {
-            public enum SaleType : uint
+            public enum SaleType : byte
             {
                 NoSale = 0,
                 Original = 1,
