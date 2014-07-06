@@ -23,67 +23,40 @@ exception statement from your version.
 
 */
 
-using System;
 using ArribaSim.Types;
+using System.Collections.Generic;
 
-namespace ArribaSim.Linden.Messages
+namespace ArribaSim.Linden.Messages.Names
 {
-    public class Message
+    public class UUIDNameRequest : Message
     {
-        #region Message Type
-        public enum MessagePriority
+
+        public List<UUID> UUIDNameBlock = new List<UUID>();
+
+        public UUIDNameRequest()
         {
-            High,
-            Medium,
-            Low
+
         }
 
-        public UInt32 ReceivedOnCircuitCode;
-        public delegate void Send(UInt32 circuitCode, Message m);
-        public UUID CircuitSessionID = UUID.Zero;
-        public UUID CircuitAgentID = UUID.Zero;
-
-        public MessagePriority Type
+        public virtual new MessageType Number
         {
             get
             {
-                if((UInt32)Number <= 0xFE)
-                {
-                    return MessagePriority.High;
-                }
-                else if ((UInt32)Number <= 0xFFFE)
-                {
-                    return MessagePriority.Medium;
-                }
-                else
-                {
-                    return MessagePriority.Low;
-                }
+                return MessageType.UUIDNameRequest;
             }
         }
-        #endregion
 
-        #region Overloaded methods
-        public virtual bool ZeroFlag
+        public static Message Decode(UDPPacket p)
         {
-            get
+            UUIDNameRequest m = new UUIDNameRequest();
+
+            uint c = p.ReadUInt8();
+            for (uint i = 0; i < c; ++i)
             {
-                return false;
+                m.UUIDNameBlock.Add(p.ReadUUID());
             }
-        }
 
-        public virtual MessageType Number
-        {
-            get
-            {
-                return 0;
-            }
+            return m;
         }
-
-        public virtual void Serialize(UDPPacket p)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
     }
 }

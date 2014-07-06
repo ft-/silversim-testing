@@ -24,66 +24,54 @@ exception statement from your version.
 */
 
 using System;
-using ArribaSim.Types;
+using System.Collections.Generic;
 
-namespace ArribaSim.Linden.Messages
+namespace ArribaSim.Linden.Messages.Simulator
 {
-    public class Message
+    public class SimStats : Message
     {
-        #region Message Type
-        public enum MessagePriority
+        public struct Data
         {
-            High,
-            Medium,
-            Low
+            public UInt32 StatID;
+            public double StatValue;
         }
 
-        public UInt32 ReceivedOnCircuitCode;
-        public delegate void Send(UInt32 circuitCode, Message m);
-        public UUID CircuitSessionID = UUID.Zero;
-        public UUID CircuitAgentID = UUID.Zero;
+        public UInt32 RegionX = 0;
+        public UInt32 RegionY = 0;
+        public UInt32 RegionFlags = 0;
+        public UInt32 ObjectCapacity = 0;
 
-        public MessagePriority Type
+        public List<Data> Stat = new List<Data>();
+        public Int32 PID = 0;
+
+        public SimStats()
         {
-            get
-            {
-                if((UInt32)Number <= 0xFE)
-                {
-                    return MessagePriority.High;
-                }
-                else if ((UInt32)Number <= 0xFFFE)
-                {
-                    return MessagePriority.Medium;
-                }
-                else
-                {
-                    return MessagePriority.Low;
-                }
-            }
-        }
-        #endregion
 
-        #region Overloaded methods
-        public virtual bool ZeroFlag
+        }
+
+        public virtual new MessageType Number
         {
             get
             {
-                return false;
+                return MessageType.SimStats;
             }
         }
 
-        public virtual MessageType Number
+        public new void Serialize(UDPPacket p)
         {
-            get
+            p.WriteMessageType(Number);
+            p.WriteUInt32(RegionX);
+            p.WriteUInt32(RegionY);
+            p.WriteUInt32(RegionFlags);
+            p.WriteUInt32(ObjectCapacity);
+
+            p.WriteUInt8((byte)Stat.Count);
+            foreach(Data d in Stat)
             {
-                return 0;
+                p.WriteUInt32(d.StatID);
+                p.WriteFloat((float)d.StatValue);
             }
+            p.WriteInt32(PID);
         }
-
-        public virtual void Serialize(UDPPacket p)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
     }
 }

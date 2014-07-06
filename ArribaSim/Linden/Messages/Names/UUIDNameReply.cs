@@ -23,67 +23,45 @@ exception statement from your version.
 
 */
 
-using System;
 using ArribaSim.Types;
+using System.Collections.Generic;
 
-namespace ArribaSim.Linden.Messages
+namespace ArribaSim.Linden.Messages.Names
 {
-    public class Message
+    public class UUIDNameReply : Message
     {
-        #region Message Type
-        public enum MessagePriority
+        public struct Data
         {
-            High,
-            Medium,
-            Low
+            public UUID ID;
+            public string FirstName;
+            public string LastName;
         }
 
-        public UInt32 ReceivedOnCircuitCode;
-        public delegate void Send(UInt32 circuitCode, Message m);
-        public UUID CircuitSessionID = UUID.Zero;
-        public UUID CircuitAgentID = UUID.Zero;
+        public List<Data> UUIDNameBlock = new List<Data>();
 
-        public MessagePriority Type
+        public UUIDNameReply()
         {
-            get
-            {
-                if((UInt32)Number <= 0xFE)
-                {
-                    return MessagePriority.High;
-                }
-                else if ((UInt32)Number <= 0xFFFE)
-                {
-                    return MessagePriority.Medium;
-                }
-                else
-                {
-                    return MessagePriority.Low;
-                }
-            }
-        }
-        #endregion
 
-        #region Overloaded methods
-        public virtual bool ZeroFlag
+        }
+
+        public virtual new MessageType Number
         {
             get
             {
-                return false;
+                return MessageType.UUIDNameReply;
             }
         }
 
-        public virtual MessageType Number
+        public new void Serialize(UDPPacket p)
         {
-            get
+            p.WriteMessageType(Number);
+            p.WriteUInt8((byte)UUIDNameBlock.Count);
+            foreach(Data d in UUIDNameBlock)
             {
-                return 0;
+                p.WriteUUID(d.ID);
+                p.WriteStringLen8(d.FirstName);
+                p.WriteStringLen8(d.LastName);
             }
         }
-
-        public virtual void Serialize(UDPPacket p)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
     }
 }

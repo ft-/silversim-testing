@@ -23,67 +23,44 @@ exception statement from your version.
 
 */
 
-using System;
 using ArribaSim.Types;
+using System;
+using System.Collections.Generic;
 
-namespace ArribaSim.Linden.Messages
+namespace ArribaSim.Linden.Messages.Object
 {
-    public class Message
+    public class ObjectDrop : Message
     {
-        #region Message Type
-        public enum MessagePriority
+        public UUID AgentID = UUID.Zero;
+        public UUID SessionID = UUID.Zero;
+
+        public List<UInt32> ObjectList = new List<UInt32>();
+
+        public ObjectDrop()
         {
-            High,
-            Medium,
-            Low
+
         }
 
-        public UInt32 ReceivedOnCircuitCode;
-        public delegate void Send(UInt32 circuitCode, Message m);
-        public UUID CircuitSessionID = UUID.Zero;
-        public UUID CircuitAgentID = UUID.Zero;
-
-        public MessagePriority Type
+        public virtual new MessageType Number
         {
             get
             {
-                if((UInt32)Number <= 0xFE)
-                {
-                    return MessagePriority.High;
-                }
-                else if ((UInt32)Number <= 0xFFFE)
-                {
-                    return MessagePriority.Medium;
-                }
-                else
-                {
-                    return MessagePriority.Low;
-                }
+                return MessageType.ObjectDrop;
             }
         }
-        #endregion
 
-        #region Overloaded methods
-        public virtual bool ZeroFlag
+        public static Message Decode(UDPPacket p)
         {
-            get
+            ObjectDrop m = new ObjectDrop();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+
+            uint c = p.ReadUInt8();
+            for (uint i = 0; i < c; ++i)
             {
-                return false;
+                m.ObjectList.Add(p.ReadUInt32());
             }
+            return m;
         }
-
-        public virtual MessageType Number
-        {
-            get
-            {
-                return 0;
-            }
-        }
-
-        public virtual void Serialize(UDPPacket p)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
     }
 }

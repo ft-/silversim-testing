@@ -23,67 +23,57 @@ exception statement from your version.
 
 */
 
-using System;
 using ArribaSim.Types;
+using System;
+using System.Collections.Generic;
 
-namespace ArribaSim.Linden.Messages
+namespace ArribaSim.Linden.Messages.Object
 {
-    public class Message
+    public class ObjectBuy : Message
     {
-        #region Message Type
-        public enum MessagePriority
+        public struct Data
         {
-            High,
-            Medium,
-            Low
+            public UInt32 ObjectLocalID;
+            public byte SaleType;
+            public Int32 SalePrice;
         }
 
-        public UInt32 ReceivedOnCircuitCode;
-        public delegate void Send(UInt32 circuitCode, Message m);
-        public UUID CircuitSessionID = UUID.Zero;
-        public UUID CircuitAgentID = UUID.Zero;
+        public UUID AgentID = UUID.Zero;
+        public UUID SessionID = UUID.Zero;
+        public UUID GroupID = UUID.Zero;
+        public UUID CategoryID = UUID.Zero;
 
-        public MessagePriority Type
+        public List<Data> ObjectData = new List<Data>(); 
+
+        public ObjectBuy()
         {
-            get
-            {
-                if((UInt32)Number <= 0xFE)
-                {
-                    return MessagePriority.High;
-                }
-                else if ((UInt32)Number <= 0xFFFE)
-                {
-                    return MessagePriority.Medium;
-                }
-                else
-                {
-                    return MessagePriority.Low;
-                }
-            }
-        }
-        #endregion
 
-        #region Overloaded methods
-        public virtual bool ZeroFlag
+        }
+
+        public virtual new MessageType Number
         {
             get
             {
-                return false;
+                return MessageType.ObjectBuy;
             }
         }
 
-        public virtual MessageType Number
+        public static Message Decode(UDPPacket p)
         {
-            get
+            ObjectBuy m = new ObjectBuy();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+
+            uint c = p.ReadUInt8();
+            for (uint i = 0; i < c; ++i)
             {
-                return 0;
+                Data d = new Data();
+                d.ObjectLocalID = p.ReadUInt32();
+                d.SaleType = p.ReadUInt8();
+                d.SalePrice = p.ReadInt32();
+                m.ObjectData.Add(d);
             }
+            return m;
         }
-
-        public virtual void Serialize(UDPPacket p)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
     }
 }

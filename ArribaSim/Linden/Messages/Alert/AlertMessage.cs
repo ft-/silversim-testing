@@ -23,67 +23,45 @@ exception statement from your version.
 
 */
 
-using System;
-using ArribaSim.Types;
+using System.Collections.Generic;
 
-namespace ArribaSim.Linden.Messages
+namespace ArribaSim.Linden.Messages.Alert
 {
-    public class Message
+    public class AlertMessage : Message
     {
-        #region Message Type
-        public enum MessagePriority
+        public struct Data
         {
-            High,
-            Medium,
-            Low
+            public string Message;
+            public byte[] ExtraParams;
         }
 
-        public UInt32 ReceivedOnCircuitCode;
-        public delegate void Send(UInt32 circuitCode, Message m);
-        public UUID CircuitSessionID = UUID.Zero;
-        public UUID CircuitAgentID = UUID.Zero;
+        public string Message = string.Empty;
+        public List<Data> AlertInfo = new List<Data>();
 
-        public MessagePriority Type
+        public AlertMessage()
         {
-            get
-            {
-                if((UInt32)Number <= 0xFE)
-                {
-                    return MessagePriority.High;
-                }
-                else if ((UInt32)Number <= 0xFFFE)
-                {
-                    return MessagePriority.Medium;
-                }
-                else
-                {
-                    return MessagePriority.Low;
-                }
-            }
-        }
-        #endregion
 
-        #region Overloaded methods
-        public virtual bool ZeroFlag
+        }
+
+        public virtual new MessageType Number
         {
             get
             {
-                return false;
+                return MessageType.AlertMessage;
             }
         }
 
-        public virtual MessageType Number
+        public new void Serialize(UDPPacket p)
         {
-            get
+            p.WriteMessageType(Number);
+            p.WriteStringLen8(Message);
+            p.WriteUInt8((byte)AlertInfo.Count);
+            foreach(Data d in AlertInfo)
             {
-                return 0;
+                p.WriteStringLen8(d.Message);
+                p.WriteUInt8((byte)d.ExtraParams.Length);
+                p.WriteBytes(d.ExtraParams);
             }
         }
-
-        public virtual void Serialize(UDPPacket p)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
     }
 }

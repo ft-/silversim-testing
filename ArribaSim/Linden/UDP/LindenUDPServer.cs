@@ -27,6 +27,7 @@ using ArribaSim.Linden.Messages;
 using ArribaSim.Scene.ServiceInterfaces.Chat;
 using ArribaSim.Scene.Types.Script.Events;
 using ArribaSim.ServiceInterfaces.IM;
+using ArribaSim.Types;
 using ArribaSim.Types.IM;
 using log4net;
 using System;
@@ -135,6 +136,7 @@ namespace ArribaSim.Linden.UDP
         #region Chat Thread
         public void ChatSendHandler()
         {
+            Thread.CurrentThread.Name = "Chat:Routing Thread";
             while(true)
             {
                 IScriptEvent ev = m_ChatQueue.Dequeue();
@@ -228,39 +230,47 @@ namespace ArribaSim.Linden.UDP
             /* we do not want to spend time on decoding packets that are unknown where they belong */
             if(!m_Circuits.TryGetValue(pck.RemoteEndPoint, out circuit))
             {
-                /* check whether we got an UseCircuitCode */
-                MessageType mType = pck.ReadMessageType();
-                if(MessageType.UseCircuitCode == mType)
+                try
                 {
-                    /* it is, so we have actually to look for the circuitcode and set up the remote endpoint here */
-                    if(m_Circuits.TryGetValue(pck.ReadUInt32(), out circuit))
+                    /* check whether we got an UseCircuitCode */
+                    MessageType mType = pck.ReadMessageType();
+                    if (MessageType.UseCircuitCode == mType)
                     {
-                        /* there it is check for SessionID and AgentID */
-                        if(!circuit.SessionID.Equals(pck.ReadUUID()))
+                        /* it is, so we have actually to look for the circuitcode and set up the remote endpoint here */
+                        if (m_Circuits.TryGetValue(pck.ReadUInt32(), out circuit))
                         {
-                            /* no match on SessionID */
-                        }
-                        else if(!circuit.AgentID.Equals(pck.ReadUUID()))
-                        {
-                            /* no match on AgentID */
-                        }
-                        else
-                        {
-                            /* it matches, so we have to change the actual key */
-                            IPEndPoint endpoint = new IPEndPoint(0, 0);
-                            m_Circuits.Remove(circuit.CircuitCode);
-                            m_Circuits.Add(endpoint.Create(pck.RemoteEndPoint.Serialize()), circuit.CircuitCode, circuit);
-                            circuit.RemoteEndPoint = endpoint;
-                            try
+                            /* there it is check for SessionID and AgentID */
+                            if (!circuit.SessionID.Equals(pck.ReadUUID()))
                             {
-                                circuit.Start();
+                                /* no match on SessionID */
                             }
-                            catch
+                            else if (!circuit.AgentID.Equals(pck.ReadUUID()))
                             {
-                                circuit.Stop();
+                                /* no match on AgentID */
+                            }
+                            else
+                            {
+                                /* it matches, so we have to change the actual key */
+                                IPEndPoint endpoint = new IPEndPoint(0, 0);
+                                EndPoint ep = endpoint.Create(pck.RemoteEndPoint.Serialize());
+                                m_Circuits.Remove(circuit.CircuitCode);
+                                m_Circuits.Add(ep, circuit.CircuitCode, circuit);
+                                circuit.RemoteEndPoint = ep;
+                                try
+                                {
+                                    circuit.Start();
+                                }
+                                catch
+                                {
+                                    circuit.Stop();
+                                }
                             }
                         }
                     }
+                }
+                catch
+                {
+
                 }
 
                 /* back to pool with that packet. Packet holds nothing of interest. */
@@ -481,7 +491,7 @@ namespace ArribaSim.Linden.UDP
                 case MessageType.ObjectDescription:
                 case MessageType.ObjectCategory:
                 case MessageType.ObjectSelect:
-                case MessageType.ObjectDeselet:
+                case MessageType.ObjectDeselect:
                 case MessageType.ObjectAttach:
                 case MessageType.ObjectDetach:
                 case MessageType.ObjectDrop:

@@ -23,67 +23,55 @@ exception statement from your version.
 
 */
 
-using System;
 using ArribaSim.Types;
+using System;
+using System.Collections.Generic;
 
-namespace ArribaSim.Linden.Messages
+namespace ArribaSim.Linden.Messages.Object
 {
-    public class Message
+    public class ObjectAttach : Message
     {
-        #region Message Type
-        public enum MessagePriority
+        public struct Data
         {
-            High,
-            Medium,
-            Low
+            public UInt32 ObjectLocalID;
+            public Quaternion Rotation;
         }
 
-        public UInt32 ReceivedOnCircuitCode;
-        public delegate void Send(UInt32 circuitCode, Message m);
-        public UUID CircuitSessionID = UUID.Zero;
-        public UUID CircuitAgentID = UUID.Zero;
+        public UUID AgentID = UUID.Zero;
+        public UUID SessionID = UUID.Zero;
+        public byte AttachmentPoint = 0;
 
-        public MessagePriority Type
+        public List<Data> ObjectData = new List<Data>();
+
+        public ObjectAttach()
         {
-            get
-            {
-                if((UInt32)Number <= 0xFE)
-                {
-                    return MessagePriority.High;
-                }
-                else if ((UInt32)Number <= 0xFFFE)
-                {
-                    return MessagePriority.Medium;
-                }
-                else
-                {
-                    return MessagePriority.Low;
-                }
-            }
-        }
-        #endregion
 
-        #region Overloaded methods
-        public virtual bool ZeroFlag
+        }
+
+        public virtual new MessageType Number
         {
             get
             {
-                return false;
+                return MessageType.ObjectAttach;
             }
         }
 
-        public virtual MessageType Number
+        public static Message Decode(UDPPacket p)
         {
-            get
+            ObjectAttach m = new ObjectAttach();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.AttachmentPoint = p.ReadUInt8();
+
+            uint c = p.ReadUInt8();
+            for (uint i = 0; i < c; ++i)
             {
-                return 0;
+                Data d = new Data();
+                d.ObjectLocalID = p.ReadUInt32();
+                d.Rotation = p.ReadLLQuaternion();
+                m.ObjectData.Add(d);
             }
+            return m;
         }
-
-        public virtual void Serialize(UDPPacket p)
-        {
-            throw new NotImplementedException();
-        }
-        #endregion
     }
 }

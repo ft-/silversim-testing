@@ -463,7 +463,7 @@ namespace ArribaSim.Linden.Messages
             return val;
         }
 
-        public void WriteUInt64(UInt32 val)
+        public void WriteUInt64(UInt64 val)
         {
             if(IsZeroEncoded)
             {
@@ -1015,6 +1015,62 @@ namespace ArribaSim.Linden.Messages
                 WriteUInt8((byte)(t >> 8));
                 WriteUInt8((byte)(t & 0xFF));
             }
+        }
+        #endregion
+
+        #region Vector
+        public Vector3 ReadVector3f()
+        {
+            float x, y, z;
+            x = ReadFloat();
+            y = ReadFloat();
+            z = ReadFloat();
+
+            return new Vector3(x, y, z);
+        }
+
+        public Vector3 ReadVector3d()
+        {
+            double x, y, z;
+            x = ReadDouble();
+            y = ReadDouble();
+            z = ReadDouble();
+
+            return new Vector3(x, y, z);
+        }
+
+        public void WriteVector3f(Vector3 v)
+        {
+            WriteFloat((float)v.X);
+            WriteFloat((float)v.Y);
+            WriteFloat((float)v.Z);
+        }
+
+        public void WriteVector3d(Vector3 v)
+        {
+            WriteDouble(v.X);
+            WriteDouble(v.Y);
+            WriteDouble(v.Z);
+        }
+        #endregion
+
+        #region Quaternion
+        public Quaternion ReadLLQuaternion()
+        {
+            float x, y, z;
+            x = ReadFloat();
+            y = ReadFloat();
+            z = ReadFloat();
+
+            return new Quaternion(x, y, z);
+        }
+
+        public void WriteLLQuaternion(Quaternion q)
+        {
+            Quaternion qo = q.Normalize();
+            WriteFloat((float)qo.X);
+            WriteFloat((float)qo.Y);
+            WriteFloat((float)qo.Z);
         }
         #endregion
     }

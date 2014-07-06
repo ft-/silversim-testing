@@ -29,9 +29,11 @@ using ArribaSim.Scene.Types.Scene;
 using ArribaSim.Scene.Types.Script.Events;
 using ArribaSim.Types;
 using ArribaSim.Types.IM;
+using log4net;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Reflection;
 using System.Threading;
 using ThreadedClasses;
 
@@ -39,6 +41,7 @@ namespace ArribaSim.Linden.UDP
 {
     public class UDPCircuit
     {
+        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
         public UInt32 CircuitCode { get; private set; }
         public UUID SessionID = UUID.Zero;
@@ -270,6 +273,7 @@ namespace ArribaSim.Linden.UDP
             int lastAckTick = Environment.TickCount;
             int lastPingTick = Environment.TickCount;
             byte pingID = 0;
+            Thread.CurrentThread.Name = string.Format("LLUDP:Transmitter for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
 
             while (true)
             {
@@ -341,7 +345,16 @@ namespace ArribaSim.Linden.UDP
 
         public void SendMessage(Message m)
         {
-
+            try
+            {
+                UDPPacket p = new UDPPacket();
+                m.Serialize(p);
+                SendPacket(p);
+            }
+            catch(Exception e)
+            {
+                m_Log.ErrorFormat("[UDP CIRCUIT] : {0} at {1}", e.ToString(), e.StackTrace.ToString());
+            }
         }
         #endregion
     }
