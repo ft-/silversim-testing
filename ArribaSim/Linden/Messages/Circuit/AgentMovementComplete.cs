@@ -26,7 +26,7 @@ exception statement from your version.
 using ArribaSim.Types;
 using System;
 
-namespace ArribaSim.Linden.Messages.Agent
+namespace ArribaSim.Linden.Messages.Circuit
 {
     public class AgentMovementComplete : Message
     {

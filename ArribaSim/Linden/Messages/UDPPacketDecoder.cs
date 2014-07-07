@@ -36,7 +36,12 @@ namespace ArribaSim.Linden.Messages
         {
             /* Agent */
             PacketTypes.Add(MessageType.TrackAgent, Agent.TrackAgent.Decode);
-            PacketTypes.Add(MessageType.CompleteAgentMovement, Agent.CompleteAgentMovement.Decode);
+
+            /* Appearance */
+            PacketTypes.Add(MessageType.AgentWearablesRequest, Appearance.AgentWearablesRequest.Decode);
+            PacketTypes.Add(MessageType.AgentIsNowWearing, Appearance.AgentIsNowWearing.Decode);
+            PacketTypes.Add(MessageType.AgentCachedTexture, Appearance.AgentCachedTexture.Decode);
+            PacketTypes.Add(MessageType.ViewerEffect, Appearance.ViewerEffect.Decode);
 
             /* God */
             PacketTypes.Add(MessageType.RequestGodlikePowers, God.RequestGodlikePowers.Decode);
@@ -64,6 +69,7 @@ namespace ArribaSim.Linden.Messages
 
             /* Land */
             PacketTypes.Add(MessageType.ModifyLand, Land.ModifyLand.Decode);
+            PacketTypes.Add(MessageType.LandStatRequest, Land.LandStatRequest.Decode);
 
             /* Inventory */
             PacketTypes.Add(MessageType.CopyInventoryFromNotecard, Inventory.CopyInventoryFromNotecard.Decode);
@@ -79,6 +85,7 @@ namespace ArribaSim.Linden.Messages
             PacketTypes.Add(MessageType.FetchInventoryDescendents, Inventory.FetchInventoryDescendents.Decode);
             PacketTypes.Add(MessageType.FetchInventory, Inventory.FetchInventory.Decode);
             PacketTypes.Add(MessageType.RemoveInventoryObjects, Inventory.RemoveInventoryObjects.Decode);
+            PacketTypes.Add(MessageType.LinkInventoryItem, Inventory.LinkInventoryItem.Decode);
 
             /* Objects */
             PacketTypes.Add(MessageType.ObjectRotation, Object.ObjectRotation.Decode);
@@ -110,6 +117,11 @@ namespace ArribaSim.Linden.Messages
             PacketTypes.Add(MessageType.ObjectExportSelected, Object.ObjectExportSelected.Decode);
             PacketTypes.Add(MessageType.RequestObjectPropertiesFamily, Object.RequestObjectPropertiesFamily.Decode);
             PacketTypes.Add(MessageType.RequestPayPrice, Object.RequestPayPrice.Decode);
+            PacketTypes.Add(MessageType.DeRezObject, Object.DeRezObject.Decode);
+            PacketTypes.Add(MessageType.RezObject, Object.RezObject.Decode);
+            PacketTypes.Add(MessageType.RezObjectFromNotecard, Object.RezObjectFromNotecard.Decode);
+            PacketTypes.Add(MessageType.ObjectIncludeInSearch, Object.ObjectIncludeInSearch.Decode);
+            PacketTypes.Add(MessageType.RezRestoreToWorld, Object.RezRestoreToWorld.Decode);
 
             /* Task Inventory */
             PacketTypes.Add(MessageType.UpdateTaskInventory, TaskInventory.UpdateTaskInventory.Decode);
@@ -142,6 +154,12 @@ namespace ArribaSim.Linden.Messages
             PacketTypes.Add(MessageType.AvatarPropertiesUpdate, Profile.AvatarPropertiesUpdate.Decode);
             PacketTypes.Add(MessageType.AvatarInterestsUpdate, Profile.AvatarInterestsUpdate.Decode);
             PacketTypes.Add(MessageType.AvatarNotesUpdate, Profile.AvatarNotesUpdate.Decode);
+
+            /* Map */
+            PacketTypes.Add(MessageType.MapLayerRequest, Map.MapLayerRequest.Decode);
+            PacketTypes.Add(MessageType.MapBlockRequest, Map.MapBlockRequest.Decode);
+            PacketTypes.Add(MessageType.MapNameRequest, Map.MapNameRequest.Decode);
+            PacketTypes.Add(MessageType.MapItemRequest, Map.MapItemRequest.Decode);
         }
     }
 }

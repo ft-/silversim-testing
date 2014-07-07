@@ -23,21 +23,22 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using ArribaSim.Types;
+using System;
 
-namespace ArribaSim.Linden.Messages.Agent
+namespace ArribaSim.Linden.Messages.Map
 {
-    public class CompleteAgentMovement : Message
+    public class MapItemRequest : Message
     {
         public UUID AgentID;
         public UUID SessionID;
-        public UInt32 CircuitCode;
+        public UInt32 Flags;
+        public UInt32 EstateID;
+        public bool IsGodlike;
+        public UInt32 ItemType;
+        public UInt64 RegionHandle;
 
-        public CompleteAgentMovement()
+        public MapItemRequest()
         {
 
         }
@@ -46,16 +47,20 @@ namespace ArribaSim.Linden.Messages.Agent
         {
             get
             {
-                return MessageType.CompleteAgentMovement;
+                return MessageType.MapItemRequest;
             }
         }
 
         public static Message Decode(UDPPacket p)
         {
-            CompleteAgentMovement m = new CompleteAgentMovement();
+            MapItemRequest m = new MapItemRequest();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
-            m.CircuitCode = p.ReadUInt32();
+            m.Flags = p.ReadUInt32();
+            m.EstateID = p.ReadUInt32();
+            m.IsGodlike = p.ReadBoolean();
+            m.ItemType = p.ReadUInt32();
+            m.RegionHandle = p.ReadUInt64();
 
             return m;
         }
