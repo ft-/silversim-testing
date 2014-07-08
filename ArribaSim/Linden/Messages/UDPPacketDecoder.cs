@@ -58,6 +58,7 @@ namespace ArribaSim.Linden.Messages
             PacketTypes.Add(MessageType.GetScriptRunning, Script.GetScriptRunning.Decode);
             PacketTypes.Add(MessageType.SetScriptRunning, Script.SetScriptRunning.Decode);
             PacketTypes.Add(MessageType.ScriptReset, Script.ScriptReset.Decode);
+            PacketTypes.Add(MessageType.RezScript, Script.RezScript.Decode);
             
             /* Parcel */
             PacketTypes.Add(MessageType.ParcelPropertiesRequest, Parcel.ParcelPropertiesRequest.Decode);
@@ -66,6 +67,20 @@ namespace ArribaSim.Linden.Messages
             PacketTypes.Add(MessageType.ParcelReturnObjects, Parcel.ParcelReturnObjects.Decode);
             PacketTypes.Add(MessageType.ParcelSetOtherCleanTime, Parcel.ParcelSetOtherCleanTime.Decode);
             PacketTypes.Add(MessageType.ParcelSelectObjects, Parcel.ParcelSelectObjects.Decode);
+            PacketTypes.Add(MessageType.ParcelBuyPass, Parcel.ParcelBuyPass.Decode);
+            PacketTypes.Add(MessageType.ParcelDeedToGroup, Parcel.ParcelDeedToGroup.Decode);
+            PacketTypes.Add(MessageType.ParcelReclaim, Parcel.ParcelReclaim.Decode);
+            PacketTypes.Add(MessageType.ParcelClaim, Parcel.ParcelClaim.Decode);
+            PacketTypes.Add(MessageType.ParcelJoin, Parcel.ParcelJoin.Decode);
+            PacketTypes.Add(MessageType.ParcelDivide, Parcel.ParcelDivide.Decode);
+            PacketTypes.Add(MessageType.ParcelRelease, Parcel.ParcelRelease.Decode);
+            PacketTypes.Add(MessageType.ParcelBuy, Parcel.ParcelBuy.Decode);
+            PacketTypes.Add(MessageType.ParcelGodForceOwner, Parcel.ParcelGodForceOwner.Decode);
+            PacketTypes.Add(MessageType.ParcelAccessListRequest, Parcel.ParcelAccessListRequest.Decode);
+            PacketTypes.Add(MessageType.ParcelAccessListUpdate, Parcel.ParcelAccessListUpdate.Decode);
+            PacketTypes.Add(MessageType.ParcelDwellRequest, Parcel.ParcelDwellRequest.Decode);
+            PacketTypes.Add(MessageType.ViewerStartAuction, Parcel.ViewerStartAuction.Decode);
+            PacketTypes.Add(MessageType.CancelAuction, Parcel.CancelAuction.Decode);
 
             /* Land */
             PacketTypes.Add(MessageType.ModifyLand, Land.ModifyLand.Decode);
@@ -154,12 +169,32 @@ namespace ArribaSim.Linden.Messages
             PacketTypes.Add(MessageType.AvatarPropertiesUpdate, Profile.AvatarPropertiesUpdate.Decode);
             PacketTypes.Add(MessageType.AvatarInterestsUpdate, Profile.AvatarInterestsUpdate.Decode);
             PacketTypes.Add(MessageType.AvatarNotesUpdate, Profile.AvatarNotesUpdate.Decode);
+            PacketTypes.Add(MessageType.PickInfoUpdate, Profile.PickInfoUpdate.Decode);
+            PacketTypes.Add(MessageType.PickDelete, Profile.PickDelete.Decode);
+            PacketTypes.Add(MessageType.PickGodDelete, Profile.PickGodDelete.Decode);
 
             /* Map */
             PacketTypes.Add(MessageType.MapLayerRequest, Map.MapLayerRequest.Decode);
             PacketTypes.Add(MessageType.MapBlockRequest, Map.MapBlockRequest.Decode);
             PacketTypes.Add(MessageType.MapNameRequest, Map.MapNameRequest.Decode);
             PacketTypes.Add(MessageType.MapItemRequest, Map.MapItemRequest.Decode);
+
+            /* Event */
+            PacketTypes.Add(MessageType.EventInfoRequest, Event.EventInfoRequest.Decode);
+            PacketTypes.Add(MessageType.EventNotificationAddRequest, Event.EventNotificationAddRequest.Decode);
+            PacketTypes.Add(MessageType.EventNotificationRemoveRequest, Event.EventNotificationRemoveRequest.Decode);
+            PacketTypes.Add(MessageType.EventGodDelete, Event.EventGodDelete.Decode);
+
+            /* Friend */
+            PacketTypes.Add(MessageType.AcceptFriendship, Friend.AcceptFriendship.Decode);
+            PacketTypes.Add(MessageType.DeclineFriendship, Friend.DeclineFriendship.Decode);
+            PacketTypes.Add(MessageType.TerminateFriendship, Friend.TerminateFriendship.Decode);
+
+            /* Calling Card */
+            PacketTypes.Add(MessageType.OfferCallingCard, CallingCard.OfferCallingCard.Decode);
+            PacketTypes.Add(MessageType.AcceptCallingCard, CallingCard.AcceptCallingCard.Decode);
+            PacketTypes.Add(MessageType.DeclineCallingCard, CallingCard.DeclineCallingCard.Decode);
+            
         }
     }
 }
