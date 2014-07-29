@@ -32,31 +32,52 @@ namespace ArribaSim.StructuredData.JSON
                     }
                     s += c;
                 }
+                else
+                {
+                    s += c;
+                }
             }
             return s;
         }
 
         private static IValue ParseValue(StreamReader io)
         {
-            switch((char)io.Read())
+            char c;
+            for (; ;)
+            {
+                c = (char)io.Peek();
+                if(char.IsWhiteSpace(c))
+                {
+                    io.Read();
+                }
+                else
+                {
+                    break;
+                }
+            }
+            switch(c)
             {
                 case '\"':
+                    io.Read();
                     return new AString(ReadString(io, '\"'));
 
                 case '\'':
+                    io.Read();
                     return new AString(ReadString(io, '\''));
 
                 case '[':
+                    io.Read();
                     return ParseArray(io);
 
                 case '{':
+                    io.Read();
                     return ParseMap(io);
 
                 default:
                     string input = "";
                     for (; ;)
                     {
-                        char c = (char) io.Peek();
+                        c = (char) io.Peek();
                         if(c == ']' || c == ',' | c == '}')
                         {
                             break;
@@ -72,6 +93,10 @@ namespace ArribaSim.StructuredData.JSON
                     else if(input == "false")
                     {
                         return new ABoolean(false);
+                    }
+                    else if(input == "null")
+                    {
+                        return new Undef();
                     }
                     else
                     {
@@ -171,7 +196,7 @@ namespace ArribaSim.StructuredData.JSON
             using(StreamReader sr = new StreamReader(io))
             {
                 char c = (char)sr.Peek();
-                if(c != '{' || c != '[')
+                if(c != '{' && c != '[')
                 {
                     throw new InvalidJSONSerialization();
                 }
@@ -269,6 +294,10 @@ namespace ArribaSim.StructuredData.JSON
             else if(val is AString)
             {
                 io.Write("\"" + SerializeString(val.ToString()) + "\"");
+            }
+            else if(val is AnArray)
+            {
+                SerializeArray(io, (AnArray)val);
             }
             else
             {

@@ -1,0 +1,23 @@
+<?xml version="1.0" ?>
+<Project frameworkVersion="v4_0" name="Tests.ArribaSim.JSON" path="ArribaSim-Tests/JSON" type="Exe">
+    <Configuration name="Release">
+        <Options>
+            <OutputPath>../../bin/</OutputPath>
+        </Options>
+    </Configuration>
+    <Configuration name="Debug">
+        <Options>
+          <OutputPath>../../bin/</OutputPath>
+        </Options>
+    </Configuration>
+
+    <ReferencePath>../../bin/</ReferencePath>
+    <Reference name="System"/>
+    <Reference name="ArribaSim.Types"/>
+    <Reference name="ArribaSim.Scripting.LSL"/>
+    <Reference name="ArribaSim.Scripting.Common"/>
+    <Reference name="ArribaSim.StructuredData"/>
+    <Files>
+        <Match pattern="*.cs" recurse="true"/>
+    </Files>
+</Project>
