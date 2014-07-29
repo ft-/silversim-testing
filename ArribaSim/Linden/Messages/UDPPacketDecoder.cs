@@ -184,6 +184,7 @@ namespace ArribaSim.Linden.Messages
             PacketTypes.Add(MessageType.EventNotificationAddRequest, Event.EventNotificationAddRequest.Decode);
             PacketTypes.Add(MessageType.EventNotificationRemoveRequest, Event.EventNotificationRemoveRequest.Decode);
             PacketTypes.Add(MessageType.EventGodDelete, Event.EventGodDelete.Decode);
+            PacketTypes.Add(MessageType.EventLocationRequest, Event.EventLocationRequest.Decode);
 
             /* Friend */
             PacketTypes.Add(MessageType.AcceptFriendship, Friend.AcceptFriendship.Decode);
@@ -195,6 +196,12 @@ namespace ArribaSim.Linden.Messages
             PacketTypes.Add(MessageType.AcceptCallingCard, CallingCard.AcceptCallingCard.Decode);
             PacketTypes.Add(MessageType.DeclineCallingCard, CallingCard.DeclineCallingCard.Decode);
             
+            /* Economy */
+            PacketTypes.Add(MessageType.EconomyDataRequest, Economy.EconomyDataRequest.Decode);
+
+            /* Search */
+            PacketTypes.Add(MessageType.AvatarPickerRequest, Search.AvatarPickerRequest.Decode);
+            PacketTypes.Add(MessageType.PlacesQuery, Search.PlacesQuery.Decode);
         }
     }
 }
