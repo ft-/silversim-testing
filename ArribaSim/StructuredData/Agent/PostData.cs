@@ -42,6 +42,7 @@ namespace ArribaSim.StructuredData.Agent
         public ClientInfo Client;
         public SessionInfo Session;
         public CircuitInfo Circuit;
+        public AppearanceInfo Appearance;
 
         public PostData()
         {
