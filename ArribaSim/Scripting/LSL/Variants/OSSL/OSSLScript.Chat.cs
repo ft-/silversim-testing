@@ -37,6 +37,7 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
         public const int OS_LISTEN_REGEX_NAME = 1;
         public const int OS_LISTEN_REGEX_MESSAGE = 2;
 
+        #region osListenRegex
         public int osListenRegex(int channel, string name, UUID id, string msg, int regexBitfield)
         {
             if (m_Listeners.Count >= MaxListenerHandles)
@@ -74,6 +75,6 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
             }
             return -1;
         }
-
+        #endregion
     }
 }

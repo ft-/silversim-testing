@@ -29,10 +29,12 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
 {
     public partial class OSSLScript
     {
+        #region osIsUUID
         public int osIsUUID(string input)
         {
             Guid v;
             return Guid.TryParse(input, out v) ? TRUE : FALSE;
         }
+        #endregion
     }
 }

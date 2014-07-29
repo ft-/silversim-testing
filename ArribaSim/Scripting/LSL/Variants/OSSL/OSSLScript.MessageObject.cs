@@ -32,6 +32,7 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
 {
     public partial class OSSLScript
     {
+        #region osMessageObject
         public void osMessageObject(UUID objectUUID, string message)
         {
             CheckThreatLevel(MethodBase.GetCurrentMethod().Name, ThreatLevelType.Low);
@@ -42,5 +43,6 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
             ev.QueryID = Part.Group.ID;
             obj.PostEvent(ev);
         }
+        #endregion
     }
 }

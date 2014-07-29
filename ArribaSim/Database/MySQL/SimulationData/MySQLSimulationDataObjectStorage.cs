@@ -115,14 +115,14 @@ namespace ArribaSim.Database.MySQL.SimulationData
                             item.Name = new UUI((string)dbReader["Name"]);
                             item.Owner = new UUI((string)dbReader["Owner"]);
                             item.ParentFolderID = (string)dbReader["ParentFolderID"];
-                            item.Permissions.Base = (uint)dbReader["BasePermissions"];
-                            item.Permissions.Current = (uint)dbReader["CurrentPermissions"];
-                            item.Permissions.EveryOne = (uint)dbReader["EveryOnePermissions"];
-                            item.Permissions.Group = (uint)dbReader["GroupPermissions"];
-                            item.Permissions.NextOwner = (uint)dbReader["NextOwnerPermissions"];
+                            item.Permissions.Base = (InventoryItem.PermissionsMask)(uint)dbReader["BasePermissions"];
+                            item.Permissions.Current = (InventoryItem.PermissionsMask)(uint)dbReader["CurrentPermissions"];
+                            item.Permissions.EveryOne = (InventoryItem.PermissionsMask)(uint)dbReader["EveryOnePermissions"];
+                            item.Permissions.Group = (InventoryItem.PermissionsMask)(uint)dbReader["GroupPermissions"];
+                            item.Permissions.NextOwner = (InventoryItem.PermissionsMask)(uint)dbReader["NextOwnerPermissions"];
                             item.SaleInfo.Type = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
                             item.SaleInfo.Price = (int)dbReader["SalePrice"];
-                            item.SaleInfo.PermMask = (uint)dbReader["SalePermMask"];
+                            item.SaleInfo.PermMask = (InventoryItem.PermissionsMask)(uint)dbReader["SalePermMask"];
                             objpart.Inventory.Add(item.ID, item.Name, item);
                         }
                     }

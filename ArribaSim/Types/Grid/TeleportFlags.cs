@@ -23,10 +23,15 @@ exception statement from your version.
 
 */
 
+using System;
+
 namespace ArribaSim.Types.Grid
 {
+    [Flags]
     public enum TeleportFlags : uint
     {
+        None = 0,
+
         SetHomeToTarget = 1 << 0,
         SetLastToTarget = 1 << 1,
         ViaLure = 1 << 2,

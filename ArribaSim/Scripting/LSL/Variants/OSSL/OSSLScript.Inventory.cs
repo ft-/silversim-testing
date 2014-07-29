@@ -27,6 +27,7 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
 {
     public partial class OSSLScript
     {
+        #region osGetInventoryDesc
         public string osGetInventoryDesc(string item)
         {
             try
@@ -38,5 +39,6 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
                 return string.Empty;
             }
         }
+        #endregion
     }
 }

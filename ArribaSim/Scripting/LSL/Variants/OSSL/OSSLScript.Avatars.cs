@@ -30,6 +30,7 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
 {
     public partial class OSSLScript
     {
+        #region osGetAvatarList
         public AnArray osGetAvatarList()
         {
             AnArray res = new AnArray();
@@ -46,7 +47,9 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
             }
             return res;
         }
+        #endregion
 
+        #region osGetAgents
         public AnArray osGetAgents()
         {
             AnArray res = new AnArray();
@@ -57,5 +60,6 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
             }
             return res;
         }
+        #endregion
     }
 }

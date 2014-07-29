@@ -36,9 +36,9 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
 {
     public partial class OSSLScript
     {
+        #region osMakeNotecard
         public void osMakeNotecard(string notecardName, AnArray contents)
         {
-            CheckThreatLevel(MethodBase.GetCurrentMethod().Name, ThreatLevelType.High);
             string nc = string.Empty;
 
             foreach(IValue val in contents)
@@ -54,7 +54,6 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
 
         public void osMakeNotecard(string notecardName, string contents)
         {
-            CheckThreatLevel(MethodBase.GetCurrentMethod().Name, ThreatLevelType.High);
             Notecard nc = new Notecard();
             nc.Text = contents;
             AssetData asset = nc;
@@ -87,7 +86,9 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
             }
             throw new Exception(string.Format("Could not store notecard with name {0}", notecardName));
         }
+        #endregion
 
+        #region osGetNotecard
         public string osGetNotecard(string name)
         {
             ObjectPartInventoryItem item;
@@ -108,7 +109,9 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
                 throw new Exception(string.Format("Inventory item {0} does not exist", name));
             }
         }
+        #endregion
 
+        #region osGetNotecardLine
         public string osGetNotecardLine(string name, int line)
         {
             ObjectPartInventoryItem item;
@@ -134,7 +137,9 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
                 throw new Exception(string.Format("Inventory item {0} does not exist", name));
             }
         }
+        #endregion
 
+        #region osGetNumberOfNotecardLines
         public int osGetNumberOfNotecardLines(string name)
         {
             ObjectPartInventoryItem item;
@@ -155,5 +160,6 @@ namespace ArribaSim.Scripting.LSL.Variants.OSSL
                 throw new Exception(string.Format("Inventory item {0} does not exist", name));
             }
         }
+        #endregion
     }
 }

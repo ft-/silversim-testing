@@ -68,11 +68,11 @@ namespace ArribaSim.Scene.Types.Object
                 default: InventoryType = InventoryType.Unknown; break;
             }
             Owner = asset.Creator;
-            Permissions.Base = 0x7FFFFFFF;
-            Permissions.Current = 0x7FFFFFFF;
-            Permissions.EveryOne = 0;
-            Permissions.Group = 0;
-            Permissions.NextOwner = 0x7FFFFFFF;
+            Permissions.Base = InventoryItem.PermissionsMask.Every;
+            Permissions.Current = InventoryItem.PermissionsMask.Every;
+            Permissions.EveryOne = InventoryItem.PermissionsMask.None;
+            Permissions.Group = InventoryItem.PermissionsMask.None;
+            Permissions.NextOwner = InventoryItem.PermissionsMask.Every;
         }
 
         public ObjectPartInventoryItem(InventoryItem item)

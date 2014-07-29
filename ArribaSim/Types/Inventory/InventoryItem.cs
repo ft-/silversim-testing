@@ -47,13 +47,27 @@ namespace ArribaSim.Types.Inventory
         #endregion
 
         #region Permissions
+        [Flags] 
+        public enum PermissionsMask : uint
+        {
+            None = 0,
+            Transfer = 1 << 13,
+            Modify = 1 << 14,
+            Copy = 1 << 15,
+            Export = 1 << 16,
+            Move = 1 << 19,
+            Damage = 1 << 20,
+            All = Transfer | Modify | Copy | Move,
+            Every = 0x7FFFFFFF
+        }
+
         public struct PermissionsData
         {
-            public uint Base;
-            public uint Current;
-            public uint EveryOne;
-            public uint Group;
-            public uint NextOwner;
+            public PermissionsMask Base;
+            public PermissionsMask Current;
+            public PermissionsMask EveryOne;
+            public PermissionsMask Group;
+            public PermissionsMask NextOwner;
         }
         public PermissionsData Permissions;
         #endregion
@@ -70,7 +84,7 @@ namespace ArribaSim.Types.Inventory
             }
             public int Price;
             public SaleType Type;
-            public uint PermMask;
+            public PermissionsMask PermMask;
 
             #region Properties
             public string TypeName

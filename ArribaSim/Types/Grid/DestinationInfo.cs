@@ -59,7 +59,7 @@ namespace ArribaSim.Types.Grid
         public EndPoint SimIP;
         public Vector3 Position = Vector3.Zero;
         public Vector3 LookAt = Vector3.Zero;
-        public uint TeleportFlags = 0;
+        public TeleportFlags TeleportFlags = TeleportFlags.None;
         public string StartLocation = string.Empty;
         public bool LocalToGrid = false;
         #endregion
