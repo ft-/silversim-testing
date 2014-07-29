@@ -193,7 +193,7 @@ namespace ArribaSim.Database.MySQL.Grid
             ri.ScopeID = dbReader["ScopeID"].ToString();
             ri.Size.X = (uint)dbReader["sizeX"];
             ri.Size.Y = (uint)dbReader["sizeY"];
-            ri.Flags = (uint)dbReader["flags"];
+            ri.Flags = (RegionFlags)(uint)dbReader["flags"];
             ri.AuthenticatingToken = dbReader["AuthenticatingToken"].ToString();
             ri.AuthenticatingPrincipalID = dbReader["AuthenticatingPrincipalID"].ToString();
             ri.ParcelMapTexture = dbReader["parcelMapTexture"].ToString();

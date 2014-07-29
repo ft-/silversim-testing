@@ -240,7 +240,7 @@ namespace ArribaSim.BackendConnectors.Robust.Grid
             List<RegionInfo> onlineRegions = new List<RegionInfo>();
             foreach(RegionInfo ri in allRegions)
             {
-                if((ri.Flags & (uint)RegionFlags.RegionOnline) != 0)
+                if((ri.Flags & RegionFlags.RegionOnline) != 0)
                 {
                     onlineRegions.Add(ri);
                 }

@@ -182,7 +182,7 @@ namespace ArribaSim.Database.Null.Grid
         {
             if(m_DeleteOnUnregister)
             {
-                m_RegionList.RemoveIf(RegionID, delegate(RegionInfo ri) { return (ri.Flags & (uint)RegionFlags.Persistent) == 0 && ri.ScopeID.Equals(ScopeID); });
+                m_RegionList.RemoveIf(RegionID, delegate(RegionInfo ri) { return (ri.Flags & RegionFlags.Persistent) == 0 && ri.ScopeID.Equals(ScopeID); });
             }
 
             m_RegionList.ForEach(delegate(RegionInfo ri)
@@ -190,7 +190,7 @@ namespace ArribaSim.Database.Null.Grid
                 if(ri.ScopeID.Equals(ScopeID) &&
                     ri.ID.Equals(RegionID))
                 {
-                    ri.Flags &= (~((uint)RegionFlags.RegionOnline));
+                    ri.Flags &= (~RegionFlags.RegionOnline);
                 }
             });
         }
@@ -208,7 +208,7 @@ namespace ArribaSim.Database.Null.Grid
             List<RegionInfo> result = new List<RegionInfo>();
             m_RegionList.ForEach(delegate(RegionInfo ri)
             {
-                if ((ri.Flags & (uint)RegionFlags.DefaultRegion) != 0 && ri.ScopeID.Equals(ScopeID))
+                if ((ri.Flags & RegionFlags.DefaultRegion) != 0 && ri.ScopeID.Equals(ScopeID))
                 {
                     result.Add(ri);
                 }
@@ -222,7 +222,7 @@ namespace ArribaSim.Database.Null.Grid
             List<RegionInfo> result = new List<RegionInfo>();
             m_RegionList.ForEach(delegate(RegionInfo ri)
             {
-                if ((ri.Flags & (uint)RegionFlags.RegionOnline) != 0 && ri.ScopeID.Equals(ScopeID))
+                if ((ri.Flags & RegionFlags.RegionOnline) != 0 && ri.ScopeID.Equals(ScopeID))
                 {
                     result.Add(ri);
                 }
@@ -236,7 +236,7 @@ namespace ArribaSim.Database.Null.Grid
             List<RegionInfo> result = new List<RegionInfo>();
             m_RegionList.ForEach(delegate(RegionInfo ri)
             {
-                if ((ri.Flags & (uint)RegionFlags.RegionOnline) != 0)
+                if ((ri.Flags & RegionFlags.RegionOnline) != 0)
                 {
                     result.Add(ri);
                 }
@@ -250,7 +250,7 @@ namespace ArribaSim.Database.Null.Grid
             List<RegionInfo> result = new List<RegionInfo>();
             m_RegionList.ForEach(delegate(RegionInfo ri)
             {
-                if ((ri.Flags & (uint)RegionFlags.FallbackRegion) != 0 && ri.ScopeID.Equals(ScopeID))
+                if ((ri.Flags & RegionFlags.FallbackRegion) != 0 && ri.ScopeID.Equals(ScopeID))
                 {
                     result.Add(ri);
                 }
@@ -264,7 +264,7 @@ namespace ArribaSim.Database.Null.Grid
             List<RegionInfo> result = new List<RegionInfo>();
             m_RegionList.ForEach(delegate(RegionInfo ri)
             {
-                if ((ri.Flags & (uint)RegionFlags.DefaultHGRegion) != 0 && ri.ScopeID.Equals(ScopeID))
+                if ((ri.Flags & RegionFlags.DefaultHGRegion) != 0 && ri.ScopeID.Equals(ScopeID))
                 {
                     result.Add(ri);
                 }

@@ -48,7 +48,7 @@ namespace ArribaSim.Types.Grid
         public uint Access = 0;
         public string RegionSecret = string.Empty;
         public UUI Owner = UUI.Unknown;
-        public uint Flags = 0;
+        public RegionFlags Flags = 0;
         #endregion
 
         #region Authentication Info

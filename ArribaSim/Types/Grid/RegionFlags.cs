@@ -23,8 +23,11 @@ exception statement from your version.
 
 */
 
+using System;
+
 namespace ArribaSim.Types.Grid
 {
+    [Flags]
     public enum RegionFlags : uint
     {
         DefaultRegion = 1,
