@@ -1,6 +1,6 @@
 <?xml version="1.0" ?>
 <Prebuild version="1.10" xmlns="http://dnpb.sourceforge.net/schemas/prebuild-1.10.xsd">
-  <Solution activeConfig="Release" name="ArribaSim" path="./" version="0.8.0-$Rev$">
+  <Solution activeConfig="Release" name="SilverSim" path="./" version="0.8.0-$Rev$">
     <Configuration name="Release">
       <Options>
         <CompilerDefines>TRACE</CompilerDefines>
@@ -36,7 +36,7 @@
     <!-- Core Logic Code -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="ArribaSim.Main.Simulator" path="ArribaSim/Main/Simulator" type="Exe">
+    <Project frameworkVersion="v4_0" name="SilverSim.Main.Simulator" path="SilverSim/Main/Simulator" type="Exe">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/</OutputPath>
@@ -50,13 +50,13 @@
 
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
-      <Reference name="ArribaSim.Main.Common"/>
+      <Reference name="SilverSim.Main.Common"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.Main.Common" path="ArribaSim/Main/Common" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Main.Common" path="SilverSim/Main/Common" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/</OutputPath>
@@ -74,9 +74,9 @@
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="log4net" path="../../../bin/"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.ServiceInterfaces"/>
       <Reference name="Nwc.XmlRpc"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
@@ -84,7 +84,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.Types" path="ArribaSim/Types" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Types" path="SilverSim/Types" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../bin/</OutputPath>
@@ -107,7 +107,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.StructuredData" path="ArribaSim/StructuredData" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.StructuredData" path="SilverSim/StructuredData" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../bin/</OutputPath>
@@ -123,14 +123,14 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
+      <Reference name="SilverSim.Types"/>
       <Reference name="ThreadedClasses"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.LL.Messages" path="ArribaSim/LL/Messages" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.LL.Messages" path="SilverSim/LL/Messages" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/</OutputPath>
@@ -145,13 +145,13 @@
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="ArribaSim.Types"/>
+      <Reference name="SilverSim.Types"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.LL.Caps" path="ArribaSim/LL/Caps" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.LL.Caps" path="SilverSim/LL/Caps" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/</OutputPath>
@@ -166,18 +166,18 @@
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
-      <Reference name="ArribaSim.LL.Messages"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.Scene.ServiceInterfaces"/>
+      <Reference name="SilverSim.LL.Messages"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.LL.UDP" path="ArribaSim/LL/UDP" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.LL.UDP" path="SilverSim/LL/UDP" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/</OutputPath>
@@ -192,11 +192,11 @@
       <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
-      <Reference name="ArribaSim.LL.Messages"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.Scene.ServiceInterfaces"/>
+      <Reference name="SilverSim.LL.Messages"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Reference name="log4net" path="../../../bin/"/>
       <Files>
@@ -204,7 +204,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.ServiceInterfaces" path="ArribaSim/ServiceInterfaces" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.ServiceInterfaces" path="SilverSim/ServiceInterfaces" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../bin/</OutputPath>
@@ -219,13 +219,13 @@
       <ReferencePath>../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="ArribaSim.Types"/>
+      <Reference name="SilverSim.Types"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.Scene.Types" path="ArribaSim/Scene/Types" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Types" path="SilverSim/Scene/Types" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/</OutputPath>
@@ -242,15 +242,15 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.Scene.ServiceInterfaces" path="ArribaSim/Scene/ServiceInterfaces" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.ServiceInterfaces" path="SilverSim/Scene/ServiceInterfaces" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/</OutputPath>
@@ -266,15 +266,15 @@
       <Reference name="log4net"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.Scene.Types"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.Scene.Types"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.Scene.Management" path="ArribaSim/Scene/Management" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Management" path="SilverSim/Scene/Management" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/</OutputPath>
@@ -290,8 +290,8 @@
       <Reference name="log4net"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.Scene.Types"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.Scene.Types"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Files>
@@ -299,7 +299,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.Scripting.Common" path="ArribaSim/Scripting/Common" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scripting.Common" path="SilverSim/Scripting/Common" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/</OutputPath>
@@ -315,8 +315,8 @@
       <Reference name="log4net"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.Scene.Types"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.Scene.Types"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Files>
@@ -328,7 +328,7 @@
     <!-- Grid Simulator Plugins -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="ArribaSim.Scene.Registration" path="ArribaSim/Scene/Registration" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Registration" path="SilverSim/Scene/Registration" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/plugins/</OutputPath>
@@ -345,12 +345,12 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Main.Common"/>
-      <Reference name="ArribaSim.Scene.Management"/>
-      <Reference name="ArribaSim.StructuredData"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Main.Common"/>
+      <Reference name="SilverSim.Scene.Management"/>
+      <Reference name="SilverSim.StructuredData"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Reference name="Nwc.XmlRpc" path="../../../bin/"/>
@@ -363,7 +363,7 @@
     <!-- Database Plugins -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="ArribaSim.Database.MySQL" path="ArribaSim/Database/MySQL" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Database.MySQL" path="SilverSim/Database/MySQL" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/plugins/</OutputPath>
@@ -379,12 +379,12 @@
       <Reference name="log4net"/>
       <Reference name="System"/>
       <Reference name="System.Data"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
-      <Reference name="ArribaSim.StructuredData"/>
-      <Reference name="ArribaSim.Main.Common"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.Scene.ServiceInterfaces"/>
+      <Reference name="SilverSim.StructuredData"/>
+      <Reference name="SilverSim.Main.Common"/>
       <Reference name="MySQL.Data" path="../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
@@ -393,7 +393,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.Database.Null" path="ArribaSim/Database/Null" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Database.Null" path="SilverSim/Database/Null" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/plugins/</OutputPath>
@@ -409,12 +409,12 @@
       <Reference name="log4net"/>
       <Reference name="System"/>
       <Reference name="System.Data"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
-      <Reference name="ArribaSim.StructuredData"/>
-      <Reference name="ArribaSim.Main.Common"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.Scene.ServiceInterfaces"/>
+      <Reference name="SilverSim.StructuredData"/>
+      <Reference name="SilverSim.Main.Common"/>
       <Reference name="MySQL.Data" path="../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
@@ -427,7 +427,7 @@
     <!-- Handler Plugins -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="ArribaSim.BackendHandlers.Robust.Simulation" path="ArribaSim/BackendHandlers/Robust/Simulation" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.BackendHandlers.Robust.Simulation" path="SilverSim/BackendHandlers/Robust/Simulation" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../../bin/plugins/</OutputPath>
@@ -444,12 +444,12 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Main.Common"/>
-      <Reference name="ArribaSim.Scene.Management"/>
-      <Reference name="ArribaSim.StructuredData"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Main.Common"/>
+      <Reference name="SilverSim.Scene.Management"/>
+      <Reference name="SilverSim.StructuredData"/>
       <Reference name="Nini" path="../../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../../bin/"/>
       <Reference name="Nwc.XmlRpc" path="../../../../bin/"/>
@@ -463,7 +463,7 @@
     <!-- Connector Plugins -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="ArribaSim.BackendConnectors.Robust" path="ArribaSim/BackendConnectors/Robust" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.BackendConnectors.Robust" path="SilverSim/BackendConnectors/Robust" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/plugins/</OutputPath>
@@ -480,11 +480,11 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Main.Common"/>
-      <Reference name="ArribaSim.Scene.Management"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Main.Common"/>
+      <Reference name="SilverSim.Scene.Management"/>
       <Reference name="HttpClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
@@ -495,7 +495,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.BackendConnectors.Flotsam" path="ArribaSim/BackendConnectors/Flotsam" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.BackendConnectors.Flotsam" path="SilverSim/BackendConnectors/Flotsam" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/plugins/</OutputPath>
@@ -512,11 +512,11 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Main.Common"/>
-      <Reference name="ArribaSim.Scene.Management"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Main.Common"/>
+      <Reference name="SilverSim.Scene.Management"/>
       <Reference name="HttpClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
@@ -526,7 +526,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.BackendConnectors.OpenSimProfile" path="ArribaSim/BackendConnectors/OpenSimProfile" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.BackendConnectors.OpenSimProfile" path="SilverSim/BackendConnectors/OpenSimProfile" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/plugins/</OutputPath>
@@ -543,11 +543,11 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Main.Common"/>
-      <Reference name="ArribaSim.Scene.Management"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Main.Common"/>
+      <Reference name="SilverSim.Scene.Management"/>
       <Reference name="HttpClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
@@ -557,7 +557,7 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="ArribaSim.Stacked.Asset" path="ArribaSim/Stacked/Asset" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Stacked.Asset" path="SilverSim/Stacked/Asset" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/plugins/</OutputPath>
@@ -574,9 +574,9 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Main.Common"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Main.Common"/>
       <Reference name="HttpClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
@@ -590,7 +590,7 @@
     <!-- Simulator Plugins -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="ArribaSim.Scene.Chat" path="ArribaSim/Scene/Chat" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Chat" path="SilverSim/Scene/Chat" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/plugins/</OutputPath>
@@ -607,11 +607,11 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Main.Common"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.Scene.ServiceInterfaces"/>
+      <Reference name="SilverSim.Main.Common"/>
       <Reference name="HttpClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
@@ -621,7 +621,7 @@
       </Files>
     </Project>
     
-    <Project frameworkVersion="v4_0" name="ArribaSim.Scene.RegionLoader" path="ArribaSim/Scene/RegionLoader" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.RegionLoader" path="SilverSim/Scene/RegionLoader" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/plugins/</OutputPath>
@@ -638,12 +638,12 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.Management"/>
-      <Reference name="ArribaSim.Main.Common"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.Scene.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.Management"/>
+      <Reference name="SilverSim.Main.Common"/>
       <Reference name="HttpClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
@@ -653,7 +653,7 @@
       </Files>
     </Project>
     
-    <Project frameworkVersion="v4_0" name="ArribaSim.Scene.Implementation.Basic" path="ArribaSim/Scene/Implementation/Basic" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Implementation.Basic" path="SilverSim/Scene/Implementation/Basic" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../../bin/plugins/</OutputPath>
@@ -670,13 +670,13 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.Management"/>
-      <Reference name="ArribaSim.Main.Common"/>
-      <Reference name="ArribaSim.LL.UDP"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.Scene.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.Management"/>
+      <Reference name="SilverSim.Main.Common"/>
+      <Reference name="SilverSim.LL.UDP"/>
       <Reference name="HttpClasses" path="../../../../bin/"/>
       <Reference name="Nini" path="../../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../../bin/"/>
@@ -685,7 +685,7 @@
       </Files>
     </Project>
     
-    <Project frameworkVersion="v4_0" name="ArribaSim.Main.IM" path="ArribaSim/Main/IM" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Main.IM" path="SilverSim/Main/IM" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/plugins/</OutputPath>
@@ -702,12 +702,12 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.Management"/>
-      <Reference name="ArribaSim.Main.Common"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.Scene.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.Management"/>
+      <Reference name="SilverSim.Main.Common"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
@@ -719,7 +719,7 @@
     <!-- Scripting Plugins -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="ArribaSim.Scripting.LSL" path="ArribaSim/Scripting/LSL" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scripting.LSL" path="SilverSim/Scripting/LSL" type="Library">
       <Configuration name="Release">
         <Options>
           <OutputPath>../../../bin/plugins/</OutputPath>
@@ -736,12 +736,12 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
-      <Reference name="ArribaSim.Types"/>
-      <Reference name="ArribaSim.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scene.Types"/>
-      <Reference name="ArribaSim.Scene.ServiceInterfaces"/>
-      <Reference name="ArribaSim.Scripting.Common"/>
-      <Reference name="ArribaSim.Main.Common"/>
+      <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.Scene.ServiceInterfaces"/>
+      <Reference name="SilverSim.Scripting.Common"/>
+      <Reference name="SilverSim.Main.Common"/>
       <Reference name="HttpClasses" path="../../../bin/"/>
       <Reference name="Nini" path="../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
@@ -750,7 +750,7 @@
       </Files>
     </Project>
     
-  <?include file="ArribaSim-Tests/*/prebuild*.xml" ?>
+  <?include file="SilverSim-Tests/*/prebuild*.xml" ?>
     
   </Solution>
 
