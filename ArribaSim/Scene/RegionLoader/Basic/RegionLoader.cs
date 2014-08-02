@@ -66,7 +66,7 @@ namespace ArribaSim.Scene.RegionLoader.Basic
             m_RegionService = loader.GetService<GridServiceInterface>(m_RegionStorage);
             if(loader.Config.Configs["Network"] != null)
             {
-                m_ExternalHostName = loader.Config.Configs["Network"].GetString("ExternalHostName", "127.0.0.1");
+                m_ExternalHostName = loader.Config.Configs["Network"].GetString("ExternalHostName", "SYSTEMIP");
                 m_HttpPort = (uint)loader.Config.Configs["Network"].GetInt("HttpListenerPort", 9000);
             }
         }

@@ -63,6 +63,8 @@ namespace ArribaSim.Main.Common.HttpServer
             ExternalHostName = httpConfig.GetString("ExternalHostName", "SYSTEMIP");
 
             m_Listener = new TcpListener(new IPAddress(0), (int)Port);
+            m_Listener.Server.Ttl = 128;
+
             m_Log.InfoFormat("[HTTP SERVER]: Adding HTTP Server at port {0}", Port);
         }
 
