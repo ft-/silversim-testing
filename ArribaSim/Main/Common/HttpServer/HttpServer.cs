@@ -48,6 +48,8 @@ namespace ArribaSim.Main.Common.HttpServer
         private TcpListener m_Listener;
         private uint m_Port;
 
+        private bool m_IsBehindProxy = false;
+
         public BaseHttpServer(IConfig httpConfig)
         {
             if (!HttpListener.IsSupported)
@@ -56,6 +58,8 @@ namespace ArribaSim.Main.Common.HttpServer
                 return;
             }
             m_Port = (uint)httpConfig.GetInt("HttpListenerPort", 9000);
+            m_IsBehindProxy = httpConfig.GetBoolean("HasProxy", false);
+
             m_Listener = new TcpListener(new IPAddress(0), (int)m_Port);
             m_Log.InfoFormat("[HTTP SERVER]: Adding HTTP Server at port {0}", m_Port);
         }
@@ -88,7 +92,6 @@ namespace ArribaSim.Main.Common.HttpServer
         {
             TcpClient client = m_Listener.EndAcceptTcpClient(ar);
             m_Listener.BeginAcceptTcpClient(AcceptConnectionCallback, null);
-
             try
             {
                 while (true)
@@ -96,7 +99,8 @@ namespace ArribaSim.Main.Common.HttpServer
                     HttpRequest req;
                     try
                     {
-                        req = new HttpRequest(client.GetStream());
+                        string remoteAddr = IPAddress.Parse(((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString()).ToString();
+                        req = new HttpRequest(client.GetStream(), remoteAddr, m_IsBehindProxy);
                     }
                     catch (HttpResponse.ConnectionCloseException)
                     {

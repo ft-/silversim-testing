@@ -54,6 +54,7 @@ namespace ArribaSim.Main.Common.HttpServer
         private HttpRequestBodyStream RawBody;
         public ConnectionModeEnum ConnectionMode { get; private set; }
         public HttpResponse Response { get; private set; }
+        public string CallerIP { get; private set; }
 
         public bool IsChunkedAccepted
         {
@@ -131,7 +132,7 @@ namespace ArribaSim.Main.Common.HttpServer
             return headerLine;
         }
 
-        public HttpRequest(Stream httpStream)
+        public HttpRequest(Stream httpStream, string callerIP, bool isBehindProxy)
         {
             m_HttpStream = httpStream;
             Body = null;
@@ -352,6 +353,15 @@ namespace ArribaSim.Main.Common.HttpServer
                         res.Close();
                     }
                 }
+            }
+
+            if (m_Headers.ContainsKey("X-Forwarded-For") && isBehindProxy)
+            {
+                CallerIP = m_Headers["X-Forwarded-For"];
+            }
+            else
+            {
+                CallerIP = callerIP;
             }
         }
 
