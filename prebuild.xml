@@ -53,6 +53,7 @@
       <Reference name="ArribaSim.Main.Common"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -80,6 +81,7 @@
       <Reference name="Nwc.XmlRpc"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
       </Files>
     </Project>
@@ -104,6 +106,7 @@
       <Reference name="Nini" path="../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path=".." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -127,6 +130,7 @@
       <Reference name="ThreadedClasses"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path=".." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -148,6 +152,7 @@
       <Reference name="ArribaSim.Types"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -174,6 +179,7 @@
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -201,6 +207,7 @@
       <Reference name="log4net" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -222,6 +229,7 @@
       <Reference name="ArribaSim.Types"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path=".." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -247,6 +255,7 @@
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -271,6 +280,7 @@
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -296,6 +306,7 @@
       <Reference name="Nini" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -321,6 +332,7 @@
       <Reference name="Nini" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -355,6 +367,7 @@
       <Reference name="Nini" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -385,6 +398,7 @@
       <Reference name="Nini" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -420,6 +434,7 @@
       <Reference name="Nwc.XmlRpc" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
       </Files>
     </Project>
@@ -452,6 +467,7 @@
       <Reference name="Nwc.XmlRpc" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -483,6 +499,7 @@
       <Reference name="Nwc.XmlRpc" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
 
@@ -498,7 +515,7 @@
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../../bin/</ReferencePath>
+      <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="log4net" path="../../../bin/"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
@@ -511,6 +528,7 @@
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
       </Files>
     </Project>
@@ -531,7 +549,7 @@
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../../bin/</ReferencePath>
+      <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="log4net" path="../../../bin/"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
@@ -546,6 +564,7 @@
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
       </Files>
     </Project>
@@ -562,7 +581,7 @@
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../../bin/</ReferencePath>
+      <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="log4net" path="../../../bin/"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
@@ -578,6 +597,7 @@
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
       </Files>
     </Project>
@@ -594,7 +614,7 @@
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../../../bin/</ReferencePath>
+      <ReferencePath>../../../../bin/</ReferencePath>
       <Reference name="log4net" path="../../../../bin/"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
@@ -611,6 +631,7 @@
       <Reference name="ThreadedClasses" path="../../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
     
@@ -626,7 +647,7 @@
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../../bin/</ReferencePath>
+      <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="log4net" path="../../../bin/"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
@@ -641,6 +662,7 @@
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
     
@@ -660,7 +682,7 @@
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../../bin/</ReferencePath>
+      <ReferencePath>../../../bin/</ReferencePath>
       <Reference name="log4net" path="../../../bin/"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
@@ -676,6 +698,7 @@
       <Reference name="ThreadedClasses" path="../../../bin/"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match path="../.." pattern="Properties/VersionInfo.cs" recurse="false"/>
       </Files>
     </Project>
     
