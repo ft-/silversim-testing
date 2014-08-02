@@ -49,7 +49,8 @@ namespace ArribaSim.Main.Common.HttpServer
         public uint MinorVersion;
         public bool IsCloseConnection { get; private set; }
         private bool m_IsHeaderSent = false;
-        private HttpResponseBodyStream ResponseBody = null;
+        private Stream ResponseBody = null;
+        private bool IsChunkedAccepted = false;
 
         public string ContentType
         {
@@ -72,6 +73,7 @@ namespace ArribaSim.Main.Common.HttpServer
             IsCloseConnection = HttpRequest.ConnectionModeEnum.Close == request.ConnectionMode;
             StatusCode = statusCode;
             StatusDescription = statusDescription;
+            IsChunkedAccepted = request.ContainsHeader("TE");
         }
 
         private void SendHeaders()
@@ -138,6 +140,28 @@ namespace ArribaSim.Main.Common.HttpServer
             }
 
             return m_Output;
+        }
+
+        public Stream GetChunkedOutputStream()
+        {
+            if (IsChunkedAccepted)
+            {
+                if (!m_IsHeaderSent)
+                {
+                    Headers["Transfer-Encoding"] = "chunked";
+                    SendHeaders();
+                }
+                else
+                {
+                    throw new InvalidOperationException();
+                }
+
+                return ResponseBody = new HttpResponseChunkedBodyStream(m_Output);
+            }
+            else
+            {
+                return GetOutputStream();
+            }
         }
     }
 }

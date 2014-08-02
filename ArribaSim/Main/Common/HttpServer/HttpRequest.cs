@@ -55,6 +55,14 @@ namespace ArribaSim.Main.Common.HttpServer
         public ConnectionModeEnum ConnectionMode { get; private set; }
         public HttpResponse Response { get; private set; }
 
+        public bool IsChunkedAccepted
+        {
+            get
+            {
+                return ContainsHeader("TE");
+            }
+        }
+
         public string this[string fieldName]
         {
             get
@@ -63,7 +71,7 @@ namespace ArribaSim.Main.Common.HttpServer
             }
         }
 
-        public bool Contains(string fieldName)
+        public bool ContainsHeader(string fieldName)
         {
             return m_Headers.ContainsKey(fieldName);
         }
@@ -258,11 +266,33 @@ namespace ArribaSim.Main.Common.HttpServer
                 }
             }
 
-            if(m_Headers.ContainsKey("Content-Length"))
+            if(ContainsHeader("Content-Length"))
             {
                 /* there is a body */
                 RawBody = new HttpRequestBodyStream(m_HttpStream, long.Parse(m_Headers["Content-Length"]));
                 Body = RawBody;
+
+                if(ContainsHeader("Transfer-Encoding"))
+                {
+                    string[] transferEncodings = this["Transfer-Encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                    foreach(string transferEncoding in transferEncodings)
+                    {
+                        if(transferEncoding == "gzip" || transferEncoding == "x-gzip")
+                        {
+                            Body = new GZipStream(Body, CompressionMode.Decompress);
+                        }
+                        else if(transferEncoding == "chunked")
+                        {
+                            Body = new HttpRequestChunkedBodyStream(Body);
+                        }
+                        else
+                        {
+                            ConnectionMode = ConnectionModeEnum.Close;
+                            HttpResponse res = BeginResponse(HttpStatusCode.NotImplemented, "Transfer-Encoding " + transferEncoding + " not implemented");
+                            res.Close();
+                        }
+                    }
+                }
 
                 string contentEncoding = "";
                 if(m_Headers.ContainsKey("Content-Encoding"))
@@ -291,8 +321,36 @@ namespace ArribaSim.Main.Common.HttpServer
                 else
                 {
                     ConnectionMode = ConnectionModeEnum.Close;
-                    HttpResponse res = BeginResponse(HttpStatusCode.NotAcceptable, "Content-Encoding not accepted");
+                    HttpResponse res = BeginResponse(HttpStatusCode.NotImplemented, "Content-Encoding not accepted");
                     res.Close();
+                }
+            }
+            else if(ContainsHeader("Transfer-Encoding"))
+            {
+                bool HaveChunkedInFront = false;
+                Body = m_HttpStream;
+                string[] transferEncodings = this["Transfer-Encoding"].Split(new char[] { '\t', ' ' }, StringSplitOptions.RemoveEmptyEntries);
+                foreach (string transferEncoding in transferEncodings)
+                {
+                    if (transferEncoding == "gzip" || transferEncoding == "x-gzip")
+                    {
+                        if (!HaveChunkedInFront)
+                        {
+                            ConnectionMode = ConnectionModeEnum.Close;
+                        }
+                        Body = new GZipStream(Body, CompressionMode.Decompress);
+                    }
+                    else if (transferEncoding == "chunked")
+                    {
+                        HaveChunkedInFront = true;
+                        Body = new HttpRequestChunkedBodyStream(Body);
+                    }
+                    else
+                    {
+                        ConnectionMode = ConnectionModeEnum.Close;
+                        HttpResponse res = BeginResponse(HttpStatusCode.NotImplemented, "Transfer-Encoding " + transferEncoding + " not implemented");
+                        res.Close();
+                    }
                 }
             }
         }
@@ -325,6 +383,23 @@ namespace ArribaSim.Main.Common.HttpServer
                 RawBody = null;
             }
             return Response = new HttpResponse(m_HttpStream, this, statuscode, statusDescription);
+        }
+
+        public HttpResponse BeginChunkedResponse()
+        {
+            if (Body != null)
+            {
+                Body.Close();
+                Body = null;
+            }
+            if (RawBody != null)
+            {
+                RawBody.Close();
+                RawBody = null;
+            }
+            Response = new HttpResponse(m_HttpStream, this, HttpStatusCode.OK, "OK");
+            Response.Headers["Transfer-Encoding"] = "chunked";
+            return Response;
         }
     }
 }

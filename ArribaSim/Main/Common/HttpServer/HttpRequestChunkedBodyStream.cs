@@ -28,16 +28,36 @@ using System.IO;
 
 namespace ArribaSim.Main.Common.HttpServer
 {
-    public class HttpRequestBodyStream : Stream
+    public class HttpRequestChunkedBodyStream : Stream
     {
         private Stream m_Input;
-        private long m_RemainingLength;
-        private long m_ContentLength;
-        public HttpRequestBodyStream(Stream input, long contentLength)
+        private int m_RemainingChunkLength = 0;
+        private bool m_EndOfChunked = false;
+
+        private string ReadHeaderLine()
         {
-            m_RemainingLength = contentLength;
+            int c;
+            string headerLine = string.Empty;
+            while ((c = m_Input.ReadByte()) != '\r')
+            {
+                if (c == -1)
+                {
+                    throw new EndOfStreamException();
+                }
+                headerLine += (char)c;
+            }
+
+            if (m_Input.ReadByte() != '\n')
+            {
+                throw new InvalidDataException();
+            }
+
+            return headerLine;
+        }
+
+        public HttpRequestChunkedBodyStream(Stream input)
+        {
             m_Input = input;
-            m_ContentLength = contentLength;
         }
 
         public override bool CanRead
@@ -76,7 +96,7 @@ namespace ArribaSim.Main.Common.HttpServer
         { 
             get
             {
-                return m_ContentLength;
+                throw new NotSupportedException();
             }
         }
 
@@ -84,7 +104,7 @@ namespace ArribaSim.Main.Common.HttpServer
         {
             get
             {
-                return m_ContentLength - m_RemainingLength;
+                throw new NotSupportedException();
             }
             set
             {
@@ -109,22 +129,31 @@ namespace ArribaSim.Main.Common.HttpServer
             throw new NotSupportedException();
         }
 
+        public void ReadToEnd()
+        {
+            byte[] b = new byte[10240];
+            while (!m_EndOfChunked)
+            {
+                if (m_RemainingChunkLength == 0)
+                {
+                    Read(b, 0, 1);
+                }
+                else if (m_RemainingChunkLength > 10240)
+                {
+                    Read(b, 0, 10240);
+                }
+                else
+                {
+                    Read(b, 0, m_RemainingChunkLength);
+                }
+            }
+        }
+
         public new void Close()
         {
             if(m_Input != null)
             {
-                byte[] b = new byte[10240];
-                while(m_RemainingLength > 0)
-                {
-                    if(m_RemainingLength > 10240)
-                    {
-                        Read(b, 0, 10240);
-                    }
-                    else
-                    {
-                        Read(b, 0, (int)m_RemainingLength);
-                    }
-                }
+                ReadToEnd();
                 m_Input = null;
             }
         }
@@ -133,18 +162,7 @@ namespace ArribaSim.Main.Common.HttpServer
         {
             if (m_Input != null)
             {
-                byte[] b = new byte[10240];
-                while (m_RemainingLength > 0)
-                {
-                    if (m_RemainingLength > 10240)
-                    {
-                        Read(b, 0, 10240);
-                    }
-                    else
-                    {
-                        Read(b, 0, (int)m_RemainingLength);
-                    }
-                }
+                ReadToEnd();
                 m_Input = null;
             }
             base.Dispose(disposing);
@@ -157,35 +175,61 @@ namespace ArribaSim.Main.Common.HttpServer
 
         public override void Flush()
         {
-            if (m_Input != null && m_RemainingLength > 0)
+            if (m_Input != null)
             {
-                byte[] b = new byte[10240];
-                while (m_RemainingLength > 0)
-                {
-                    if (m_RemainingLength > 10240)
-                    {
-                        Read(b, 0, 10240);
-                    }
-                    else
-                    {
-                        Read(b, 0, (int)m_RemainingLength);
-                    }
-                }
+                ReadToEnd();
+                m_Input = null;
             }
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if(count > m_RemainingLength)
+            int sumResult = 0;
+            while(!m_EndOfChunked)
             {
-                count = (int)m_RemainingLength;
+                if(m_RemainingChunkLength == 0)
+                {
+                    string chunkHeader = ReadHeaderLine();
+                    string[] chunkFields = chunkHeader.Split(';');
+                    m_RemainingChunkLength = int.Parse(chunkFields[0], System.Globalization.NumberStyles.HexNumber);
+                    if(0 == m_RemainingChunkLength)
+                    {
+                        m_EndOfChunked = true;
+                        while ((chunkHeader = ReadHeaderLine()) != string.Empty)
+                        {
+                        }
+                    }
+                    /* start to read a new chunk */
+                }
+                else if(m_RemainingChunkLength >= count)
+                {
+                    int result = m_Input.Read(buffer, offset, count);
+                    if(result > 0)
+                    {
+                        m_RemainingChunkLength -= result;
+                        return sumResult + result;
+                    }
+                    else
+                    {
+                        throw new InvalidDataException();
+                    }
+                }
+                else
+                {
+                    int result = m_Input.Read(buffer, offset, m_RemainingChunkLength);
+                    if (result > 0)
+                    {
+                        m_RemainingChunkLength -= result;
+                        sumResult += result;
+                        offset += result;
+                    }
+                    else
+                    {
+                        throw new InvalidDataException();
+                    }
+                }
             }
-            int result = m_Input.Read(buffer, offset, count);
-            if(result > 0)
-            {
-                m_RemainingLength -= result;
-            }
-            return result;
+            return sumResult;
         }
 
         public override long Seek(long offset, SeekOrigin origin)

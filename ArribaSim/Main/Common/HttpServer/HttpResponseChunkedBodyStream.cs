@@ -25,21 +25,20 @@ exception statement from your version.
 
 using System;
 using System.IO;
+using System.Text;
 
 namespace ArribaSim.Main.Common.HttpServer
 {
-    public class HttpResponseBodyStream : Stream
+    public class HttpResponseChunkedBodyStream : Stream
     {
         private Stream m_Output;
-        private long m_RemainingLength;
-        private long m_ContentLength;
-        private static readonly byte[] FillBytes = new byte[10240];
+        private long m_WrittenLength = 0;
+        private byte[] StreamBuffer = new byte[10240];
+        private int BufferFill = 0;
 
-        public HttpResponseBodyStream(Stream output, long contentLength)
+        public HttpResponseChunkedBodyStream(Stream output)
         {
-            m_RemainingLength = contentLength;
             m_Output = output;
-            m_ContentLength = contentLength;
         }
 
         public override bool CanRead
@@ -78,7 +77,7 @@ namespace ArribaSim.Main.Common.HttpServer
         { 
             get
             {
-                return m_ContentLength;
+                return m_WrittenLength;
             }
         }
 
@@ -86,7 +85,7 @@ namespace ArribaSim.Main.Common.HttpServer
         {
             get
             {
-                return m_ContentLength - m_RemainingLength;
+                return m_WrittenLength;
             }
             set
             {
@@ -111,21 +110,16 @@ namespace ArribaSim.Main.Common.HttpServer
             throw new NotSupportedException();
         }
 
+        private static readonly byte[] LastChunkData = new byte[] { (byte)'0', (byte)'\r', (byte)'\n', (byte)'\r', (byte)'\n' };
         public new void Close()
         {
-            if(m_Output != null)
+            if (m_Output != null)
             {
-                while(m_RemainingLength > 0)
+                if (BufferFill != 0)
                 {
-                    if(m_RemainingLength > FillBytes.Length)
-                    {
-                        Write(FillBytes, 0, FillBytes.Length);
-                    }
-                    else
-                    {
-                        Write(FillBytes, 0, (int)m_RemainingLength);
-                    }
+                    FlushBuffer();
                 }
+                m_Output.Write(LastChunkData, 0, LastChunkData.Length);
                 m_Output = null;
             }
         }
@@ -134,17 +128,11 @@ namespace ArribaSim.Main.Common.HttpServer
         {
             if (m_Output != null)
             {
-                while (m_RemainingLength > 0)
+                if (BufferFill != 0)
                 {
-                    if (m_RemainingLength > 10240)
-                    {
-                        Write(FillBytes, 0, 10240);
-                    }
-                    else
-                    {
-                        Write(FillBytes, 0, (int)m_RemainingLength);
-                    }
+                    FlushBuffer();
                 }
+                m_Output.Write(LastChunkData, 0, LastChunkData.Length);
                 m_Output = null;
             }
             base.Dispose(disposing);
@@ -152,30 +140,43 @@ namespace ArribaSim.Main.Common.HttpServer
 
         public override void Flush()
         {
-            if (m_Output != null && m_RemainingLength > 0)
+            if (m_Output != null)
             {
-                while (m_RemainingLength > 0)
+                if(BufferFill != 0)
                 {
-                    if (m_RemainingLength > FillBytes.Length)
-                    {
-                        Write(FillBytes, 0, FillBytes.Length);
-                    }
-                    else
-                    {
-                        Write(FillBytes, 0, (int)m_RemainingLength);
-                    }
+                    FlushBuffer();
                 }
+                m_Output.Write(LastChunkData, 0, LastChunkData.Length);
+                m_Output = null;
             }
+        }
+
+        private void FlushBuffer()
+        {
+            string chunkHeader = string.Format("{0:x}\r\n", BufferFill);
+            byte[] chunkHeaderData = Encoding.ASCII.GetBytes(chunkHeader);
+            m_Output.Write(chunkHeaderData, 0, chunkHeaderData.Length);
+            m_Output.Write(StreamBuffer, 0, BufferFill);
+            BufferFill = 0;
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            if(count > m_RemainingLength)
+            while(count > 0)
             {
-                count = (int)m_RemainingLength;
+                if(count + BufferFill >= StreamBuffer.Length)
+                {
+                    Buffer.BlockCopy(buffer, offset, StreamBuffer, BufferFill, StreamBuffer.Length - BufferFill);
+                    count -= (StreamBuffer.Length - BufferFill);
+                    offset += (StreamBuffer.Length - BufferFill);
+                    FlushBuffer();
+                }
+                else
+                {
+                    Buffer.BlockCopy(buffer, offset, StreamBuffer, BufferFill, count);
+                    count = 0;
+                }
             }
-            m_Output.Write(buffer, offset, count);
-            m_RemainingLength -= count;
         }
 
         public override int Read(byte[] buffer, int offset, int count)
