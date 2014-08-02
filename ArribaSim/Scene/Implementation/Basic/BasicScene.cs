@@ -23,7 +23,7 @@ exception statement from your version.
 
 */
 
-using ArribaSim.Linden.UDP;
+using ArribaSim.LL.UDP;
 using ArribaSim.Scene.Management.IM;
 using ArribaSim.Scene.ServiceInterfaces.Chat;
 using ArribaSim.Scene.Types.Agent;

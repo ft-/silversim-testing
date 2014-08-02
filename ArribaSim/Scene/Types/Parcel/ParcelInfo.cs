@@ -102,7 +102,7 @@ namespace ArribaSim.Scene.Types.Parcel
     public enum ParcelCategory : int
     {
         None = 0,
-        Linden,
+        LL,
         Adult,
         Arts,
         Business,
