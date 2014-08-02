@@ -159,7 +159,7 @@ namespace ArribaSim.Main.Common.HttpServer
                             {
                                 try
                                 {
-                                    del(req);
+                                    kvp.Value(req);
                                 }
                                 catch (HttpResponse.ConnectionCloseException)
                                 {

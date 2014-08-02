@@ -81,6 +81,14 @@ namespace ArribaSim.Main.Common
             return (T)module;
         }
 
+        public BaseHttpServer HttpServer
+        {
+            get
+            {
+                return GetService<BaseHttpServer>("HttpServer");
+            }
+        }
+
         #region Configuration Loader Helpers
         private interface CFG_ISource
         {
