@@ -234,6 +234,7 @@ namespace ArribaSim.Scene.Implementation.Basic
             IMRouter.SceneIM.Add(IMSend);
             OnRemove += RemoveScene;
             ExternalHostName = ri.ServerIP;
+            RegionPort = ri.ServerPort;
             m_UDPServer.Start();
         }
         #endregion

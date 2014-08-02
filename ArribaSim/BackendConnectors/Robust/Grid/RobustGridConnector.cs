@@ -130,6 +130,26 @@ namespace ArribaSim.BackendConnectors.Robust.Grid
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["METHOD"] = "register";
+            post["uuid"] = regionInfo.ID;
+            post["locX"] = regionInfo.Location.X.ToString();
+            post["locY"] = regionInfo.Location.Y.ToString();
+            post["sizeX"] = regionInfo.Size.X.ToString();
+            post["sizeY"] = regionInfo.Size.Y.ToString();
+            post["regionName"] = regionInfo.Name;
+            post["serverIP"] = regionInfo.ServerIP;
+            post["serverHttpPort"] = regionInfo.ServerHttpPort.ToString();
+            post["serverURI"] = regionInfo.ServerURI;
+            post["serverPort"] = regionInfo.ServerPort.ToString();
+            post["regionMapTexture"] = regionInfo.RegionMapTexture;
+            post["parcelMapTexture"] = regionInfo.ParcelMapTexture;
+            post["access"] = regionInfo.Access.ToString();
+            post["regionSecret"] = regionInfo.RegionSecret;
+            post["owner_uuid"] = regionInfo.Owner.ID;
+            post["Token"] = "";
+            post["SCOPEID"] = UUID.Zero;
+            post["VERSIONMIN"] = "0";
+            post["VERSIONMAX"] = "0";
+
             checkResult(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
 
         }

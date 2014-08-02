@@ -57,8 +57,7 @@ namespace ArribaSim.BackendConnectors.Robust.Common
                         throw new InvalidOpenSimResponseSerialization();
 
                     case XmlNodeType.Text:
-                        astring = new AString(reader.ReadContentAsString());
-                        break;
+                        return new AString(reader.ReadContentAsString());
 
                     case XmlNodeType.EndElement:
                         if(reader.Name != tagname)

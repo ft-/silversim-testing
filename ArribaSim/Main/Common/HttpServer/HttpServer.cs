@@ -46,7 +46,8 @@ namespace ArribaSim.Main.Common.HttpServer
         public RwLockedDictionary<string, HttpRequestDelegate> RootUriContentTypeHandlers = new RwLockedDictionary<string, HttpRequestDelegate>();
 
         private TcpListener m_Listener;
-        private uint m_Port;
+        public uint Port { get; private set; }
+        public string ExternalHostName { get; private set; }
 
         private bool m_IsBehindProxy = false;
 
@@ -57,11 +58,12 @@ namespace ArribaSim.Main.Common.HttpServer
                 m_Log.Fatal("HttpListener is not supported on this platform.");
                 return;
             }
-            m_Port = (uint)httpConfig.GetInt("HttpListenerPort", 9000);
+            Port = (uint)httpConfig.GetInt("HttpListenerPort", 9000);
             m_IsBehindProxy = httpConfig.GetBoolean("HasProxy", false);
+            ExternalHostName = httpConfig.GetString("ExternalHostName", "SYSTEMIP");
 
-            m_Listener = new TcpListener(new IPAddress(0), (int)m_Port);
-            m_Log.InfoFormat("[HTTP SERVER]: Adding HTTP Server at port {0}", m_Port);
+            m_Listener = new TcpListener(new IPAddress(0), (int)Port);
+            m_Log.InfoFormat("[HTTP SERVER]: Adding HTTP Server at port {0}", Port);
         }
 
         public void Startup(ConfigurationLoader loader)

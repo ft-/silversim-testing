@@ -27,6 +27,7 @@ using ArribaSim.Scene.Types.Agent;
 using ArribaSim.Scene.Types.Object;
 using ArribaSim.Scene.Types.Parcel;
 using ArribaSim.Scene.Types.Terrain;
+using ArribaSim.Types.Grid;
 using ArribaSim.ServiceInterfaces.Asset;
 using ArribaSim.ServiceInterfaces.Avatar;
 using ArribaSim.ServiceInterfaces.Grid;
@@ -78,6 +79,8 @@ namespace ArribaSim.Scene.Types.Scene
         private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         public UUID ID { get; protected set; }
+        public UUID RegionSecret { get; private set; }
+        public uint RegionPort { get; protected set; }
         public uint SizeX { get; protected set; }
         public uint SizeY { get; protected set; }
         public string Name { get; protected set; }
@@ -100,6 +103,29 @@ namespace ArribaSim.Scene.Types.Scene
         public GridUserServiceInterface GridUserService { get; protected set; }
         public GridServiceInterface GridService { get; protected set; }
         private NotecardCache m_NotecardCache;
+
+        public RegionInfo RegionData
+        {
+            get
+            {
+                RegionInfo reg = new RegionInfo();
+                reg.Access = 0;
+                reg.Flags = RegionFlags.RegionOnline;
+                reg.ID = ID;
+                reg.Location = GridPosition;
+                reg.Name = Name;
+                reg.Owner = Owner;
+                reg.ParcelMapTexture = UUID.Zero;
+                reg.RegionMapTexture = UUID.Zero;
+                reg.RegionSecret = RegionSecret;
+                reg.ScopeID = UUID.Zero;
+                reg.ServerIP = ExternalHostName;
+                reg.ServerPort = RegionPort;
+                reg.Size.X = SizeX;
+                reg.Size.Y = SizeY;
+                return reg;
+            }
+        }
 
         public UUI Owner { get; protected set; }
         public virtual T GetService<T>()
@@ -140,6 +166,7 @@ namespace ArribaSim.Scene.Types.Scene
 
         public SceneInterface()
         {
+            RegionSecret = UUID.Random;
             LastIPAddress = new IPAddress(0);
             m_NotecardCache = new NotecardCache(this);
         }
