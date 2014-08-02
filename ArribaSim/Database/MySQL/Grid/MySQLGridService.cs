@@ -270,7 +270,7 @@ namespace ArribaSim.Database.MySQL.Grid
                 regionData["owner"] = regionInfo.Owner;
                 regionData["AuthenticatingToken"] = regionInfo.AuthenticatingToken;
                 regionData["AuthenticatingPrincipalID"] = regionInfo.AuthenticatingPrincipalID;
-                regionData["flags"] = regionInfo.Flags;
+                regionData["flags"] = (uint)regionInfo.Flags;
                 regionData["ScopeID"] = regionInfo.ScopeID;
 
                 MySQLUtilities.ReplaceInsertInto(conn, "regions", regionData);

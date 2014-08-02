@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using System;
 using System.Collections.Generic;
 
 namespace ArribaSim.Types.Agent
@@ -32,7 +33,7 @@ namespace ArribaSim.Types.Agent
         public uint CircuitCode = 0;
         public string CapsPath = string.Empty;
         public bool IsChild = false;
-        public List<string> ChildrenCapSeeds = new List<string>();
+        public Dictionary<UInt64, string> ChildrenCapSeeds = new Dictionary<UInt64, string>();
         public string MapServerURL = string.Empty;
 
         public CircuitInfo()

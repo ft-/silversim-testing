@@ -49,6 +49,7 @@ namespace ArribaSim.Types.Asset.Format
         Alpha = 13,
         Tattoo = 14,
         Physics = 15,
+        NumWearables = 16,
         Invalid = 255
     }
 

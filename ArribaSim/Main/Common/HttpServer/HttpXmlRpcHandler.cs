@@ -44,34 +44,32 @@ namespace ArribaSim.Main.Common.HttpServer
         public RwLockedDictionary<string, XmlRpcDelegate> XmlRpcMethods = new RwLockedDictionary<string,XmlRpcDelegate>();
         XmlRpcDeserializer m_XmlRpcDeserializer = new XmlRpcDeserializer();
 
-        void RequestHandler(HttpListenerContext context)
+        void RequestHandler(HttpRequest httpreq)
         {
             object o;
             XmlRpcRequest req;
-            if(context.Request.HttpMethod != "POST")
+            if(httpreq.Method != "POST")
             {
-                HttpListenerResponse response = context.Response;
-                response.StatusCode = 405;
-                response.StatusDescription = "Method not allowed";
-                response.OutputStream.Close();
+                HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                httpres.Close();
                 return;
             }
             try
             {
-                using (StreamReader s = new StreamReader(context.Request.InputStream))
+                using (StreamReader s = new StreamReader(httpreq.Body))
                 {
                     o = m_XmlRpcDeserializer.Deserialize(s);
                 }
             }
             catch
             {
-                FaultResponse(context.Response, -32700, "Invalid XML RPC Request");
+                FaultResponse(httpreq.BeginResponse(), -32700, "Invalid XML RPC Request");
                 return;
             }
 
             if(!(o is XmlRpcRequest))
             {
-                FaultResponse(context.Response, -32700, "Invalid XML RPC Request");
+                FaultResponse(httpreq.BeginResponse(), -32700, "Invalid XML RPC Request");
                 return;
             }
 
@@ -87,21 +85,20 @@ namespace ArribaSim.Main.Common.HttpServer
                 catch(Exception e)
                 {
                     m_Log.WarnFormat("[XMLRPC SERVER]: Unexpected exception at XMRPC method {0}: {1}\n{2}", req.MethodName, e.GetType().Name, e.StackTrace.ToString());
-                    FaultResponse(context.Response, -32700, "Internal service error");
+                    FaultResponse(httpreq.BeginResponse(), -32700, "Internal service error");
                     return;
                 }
 
                 byte[] buffer = Encoding.UTF8.GetBytes(res.ToString());
 
-                HttpListenerResponse response = context.Response;
+                HttpResponse response = httpreq.BeginResponse();
                 response.ContentType = "text/xml";
-                response.ContentLength64 = buffer.Length;
-                response.OutputStream.Write(buffer, 0, buffer.Length);
-                response.OutputStream.Close();
+                response.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
+                response.Close();
             }
             else
             {
-                FaultResponse(context.Response, -32601, "Unknown Method");
+                FaultResponse(httpreq.BeginResponse(), -32601, "Unknown Method");
             }
         }
 
@@ -127,7 +124,7 @@ namespace ArribaSim.Main.Common.HttpServer
             XmlRpcMethods.Clear();
         }
 
-        private void FaultResponse(HttpListenerResponse response, int statusCode, string statusMessage)
+        private void FaultResponse(HttpResponse response, int statusCode, string statusMessage)
         {
             string s = String.Format("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
                     "<methodResponse>" +
@@ -151,9 +148,8 @@ namespace ArribaSim.Main.Common.HttpServer
 
             byte[] buffer = Encoding.UTF8.GetBytes(s);
             response.ContentType = "text/xml";
-            response.ContentLength64 = buffer.Length;
-            response.OutputStream.Write(buffer, 0, buffer.Length);
-            response.OutputStream.Close();
+            response.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
+            response.Close();
         }
     }
 }

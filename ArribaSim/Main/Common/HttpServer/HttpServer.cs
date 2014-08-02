@@ -28,6 +28,7 @@ using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using ThreadedClasses;
@@ -38,13 +39,13 @@ namespace ArribaSim.Main.Common.HttpServer
     {
         private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
-        public delegate void HttpRequestDelegate(HttpListenerContext context);
+        public delegate void HttpRequestDelegate(HttpRequest context);
 
         public RwLockedDictionary<string, HttpRequestDelegate> StartsWithUriHandlers = new RwLockedDictionary<string, HttpRequestDelegate>();
         public RwLockedDictionary<string, HttpRequestDelegate> UriHandlers = new RwLockedDictionary<string, HttpRequestDelegate>();
         public RwLockedDictionary<string, HttpRequestDelegate> RootUriContentTypeHandlers = new RwLockedDictionary<string, HttpRequestDelegate>();
 
-        private HttpListener m_Listener;
+        private TcpListener m_Listener;
         private uint m_Port;
 
         public BaseHttpServer(IConfig httpConfig)
@@ -54,18 +55,16 @@ namespace ArribaSim.Main.Common.HttpServer
                 m_Log.Fatal("HttpListener is not supported on this platform.");
                 return;
             }
-            m_Listener = new HttpListener();
             m_Port = (uint)httpConfig.GetInt("HttpListenerPort", 9000);
+            m_Listener = new TcpListener(new IPAddress(0), (int)m_Port);
             m_Log.InfoFormat("[HTTP SERVER]: Adding HTTP Server at port {0}", m_Port);
-            m_Listener.Prefixes.Add(String.Format("http://+:{0}/", m_Port));
         }
 
         public void Startup(ConfigurationLoader loader)
         {
-            //  netsh http add urlacl url=http://+:8008/ user=Everyone listen=yes
             m_Log.InfoFormat("[HTTP SERVER]: Starting HTTP Server");
             m_Listener.Start();
-            m_Listener.BeginGetContext(GetContextCallback, null);
+            m_Listener.BeginAcceptTcpClient(AcceptConnectionCallback, null);
         }
 
         public ShutdownOrder ShutdownOrder 
@@ -85,62 +84,109 @@ namespace ArribaSim.Main.Common.HttpServer
             RootUriContentTypeHandlers.Clear();
         }
 
-        private void GetContextCallback(IAsyncResult ar)
+        private void AcceptConnectionCallback(IAsyncResult ar)
         {
-            HttpListenerContext context = m_Listener.EndGetContext(ar);
-            m_Listener.BeginGetContext(GetContextCallback, null);
-            HttpListenerRequest request = context.Request;
+            TcpClient client = m_Listener.EndAcceptTcpClient(ar);
+            m_Listener.BeginAcceptTcpClient(AcceptConnectionCallback, null);
 
-            HttpRequestDelegate del;
-            HttpListenerResponse response = context.Response;
-            if (request.RawUrl == "/" && RootUriContentTypeHandlers.TryGetValue(request.ContentType, out del))
+            try
             {
-                try
+                while (true)
                 {
-                    del(context);
-                }
-                catch (Exception e)
-                {
-                    m_Log.WarnFormat("[HTTP SERVER]: Unexpected exception at {0} {1}: {1}\n{2}", request.HttpMethod, request.RawUrl, e.GetType().Name, e.StackTrace.ToString());
-                }
-                response.OutputStream.Close();
-            }
-            else if (UriHandlers.TryGetValue(request.RawUrl, out del))
-            {
-                try
-                {
-                    del(context);
-                }
-                catch (Exception e)
-                {
-                    m_Log.WarnFormat("[HTTP SERVER]: Unexpected exception at {0} {1}: {1}\n{2}", request.HttpMethod, request.RawUrl, e.GetType().Name, e.StackTrace.ToString());
-                }
-                response.OutputStream.Close();
-            }
-            else
-            {
-                foreach(KeyValuePair<string, HttpRequestDelegate> kvp in StartsWithUriHandlers)
-                {
-                    if(request.RawUrl.StartsWith(kvp.Key))
+                    HttpRequest req;
+                    try
+                    {
+                        req = new HttpRequest(client.GetStream());
+                    }
+                    catch (HttpResponse.ConnectionCloseException)
+                    {
+                        return;
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.WarnFormat("[HTTP SERVER]: Unexpected exception: {0}\n{1}", e.GetType().Name, e.StackTrace.ToString());
+                        return;
+                    }
+
+                    if ((req.Method == "POST" || req.Method == "PUT") && req.Body == null)
+                    {
+                        HttpResponse res = req.BeginResponse(HttpStatusCode.LengthRequired, "Length Required");
+                        res.Close();
+                    }
+
+                    HttpRequestDelegate del;
+                    if (req.RawUrl == "/" && RootUriContentTypeHandlers.TryGetValue(req.ContentType, out del))
                     {
                         try
                         {
-                            del(context);
+                            del(req);
                         }
-                        catch(Exception e)
+                        catch (HttpResponse.ConnectionCloseException)
                         {
-                            m_Log.WarnFormat("[HTTP SERVER]: Unexpected exception at {0} {1}: {1}\n{2}", request.HttpMethod, request.RawUrl, e.GetType().Name, e.StackTrace.ToString());
+                            return;
                         }
-                        response.OutputStream.Close();
-                        return;
+                        catch (Exception e)
+                        {
+                            m_Log.WarnFormat("[HTTP SERVER]: Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
+                        }
+                        req.Close();
+                    }
+                    else if (UriHandlers.TryGetValue(req.RawUrl, out del))
+                    {
+                        try
+                        {
+                            del(req);
+                        }
+                        catch (HttpResponse.ConnectionCloseException)
+                        {
+                            return;
+                        }
+                        catch (Exception e)
+                        {
+                            m_Log.WarnFormat("[HTTP SERVER]: Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
+                        }
+                        req.Close();
+                    }
+                    else
+                    {
+                        foreach (KeyValuePair<string, HttpRequestDelegate> kvp in StartsWithUriHandlers)
+                        {
+                            if (req.RawUrl.StartsWith(kvp.Key))
+                            {
+                                try
+                                {
+                                    del(req);
+                                }
+                                catch (HttpResponse.ConnectionCloseException)
+                                {
+                                    return;
+                                }
+                                catch (Exception e)
+                                {
+                                    m_Log.WarnFormat("[HTTP SERVER]: Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
+                                }
+                                req.Close();
+                                return;
+                            }
+                        }
+
+                        HttpResponse res = req.BeginResponse(HttpStatusCode.NotFound, "Not found");
+                        byte[] buffer = Encoding.UTF8.GetBytes(ErrorString);
+                        res.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
+                        res.Close();
                     }
                 }
-                byte[] buffer = Encoding.UTF8.GetBytes(ErrorString);
-                response.ContentLength64 = buffer.Length;
-                response.StatusCode = 404;
-                response.StatusDescription = "Not found";
-                response.OutputStream.Write(buffer, 0, buffer.Length);
-                response.OutputStream.Close();
+            }
+            catch (HttpResponse.ConnectionCloseException)
+            {
+            }
+            catch (Exception e)
+            {
+                m_Log.DebugFormat("[HTTP SERVER]: Exception: {0}\n{1}", e.GetType().Name, e.StackTrace.ToString());
+            }
+            finally
+            {
+                client.Close();
             }
         }
 

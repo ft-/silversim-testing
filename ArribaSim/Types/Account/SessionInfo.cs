@@ -29,5 +29,6 @@ namespace ArribaSim.Types.Account
     {
         public UUID SessionID;
         public UUID SecureSessionID;
+        public string ServiceSessionID;
     }
 }

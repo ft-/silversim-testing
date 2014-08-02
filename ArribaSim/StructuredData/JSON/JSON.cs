@@ -205,7 +205,7 @@ namespace ArribaSim.StructuredData.JSON
         }
 
         #region Main JSON Serialization
-        private static string SerializeString(string s)
+        public static string SerializeString(string s)
         {
             string o = string.Empty;
             for(int i = 0; i < s.Length; ++i)

@@ -81,12 +81,14 @@ namespace ArribaSim.Types.Agent
                 }
             }
         }
-        public RwLockedDictionaryAutoAdd<WearableType, RwLockedDictionary<UUID, UUID>> Wearables =
-            new RwLockedDictionaryAutoAdd<WearableType, RwLockedDictionary<UUID, UUID>>(delegate() { return new RwLockedDictionary<UUID, UUID>(); });
+        public RwLockedDictionaryAutoAdd<WearableType, RwLockedList<KeyValuePair<UUID, UUID>>> Wearables =
+            new RwLockedDictionaryAutoAdd<WearableType, RwLockedList<KeyValuePair<UUID, UUID>>>(delegate() { return new RwLockedList<KeyValuePair<UUID, UUID>>(); });
         public RwLockedDictionaryAutoAdd<AttachmentPoint, RwLockedDictionary<UUID, UUID>> Attachments =
             new RwLockedDictionaryAutoAdd<AttachmentPoint, RwLockedDictionary<UUID, UUID>>(delegate() { return new RwLockedDictionary<UUID, UUID>(); });
         private ReaderWriterLock m_VisualParamsLock = new ReaderWriterLock();
         private byte[] m_VisualParams = new byte[] { 33, 61, 85, 23, 58, 127, 63, 85, 63, 42, 0, 85, 63, 36, 85, 95, 153, 63, 34, 0, 63, 109, 88, 132, 63, 136, 81, 85, 103, 136, 127, 0, 150, 150, 150, 127, 0, 0, 0, 0, 0, 127, 0, 0, 255, 127, 114, 127, 99, 63, 127, 140, 127, 127, 0, 0, 0, 191, 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 216, 133, 0, 127, 0, 127, 170, 0, 0, 127, 127, 109, 85, 127, 127, 63, 85, 42, 150, 150, 150, 150, 150, 150, 150, 25, 150, 150, 150, 0, 127, 0, 0, 144, 85, 127, 132, 127, 85, 0, 127, 127, 127, 127, 127, 127, 59, 127, 85, 127, 127, 106, 47, 79, 127, 127, 204, 2, 141, 66, 0, 0, 127, 127, 0, 0, 0, 0, 127, 0, 159, 0, 0, 178, 127, 36, 85, 131, 127, 127, 127, 153, 95, 0, 140, 75, 27, 127, 127, 0, 150, 150, 198, 0, 0, 63, 30, 127, 165, 209, 198, 127, 127, 153, 204, 51, 51, 255, 255, 255, 204, 0, 255, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 0, 150, 150, 150, 150, 150, 0, 127, 127, 150, 150, 150, 150, 150, 150, 150, 150, 0, 0, 150, 51, 132, 150, 150, 150 };
+        public double AvatarHeight;
+        public Int32 Serial = 1;
 
         public readonly static byte[] BakeIndices = new byte[] { 8, 9, 10, 11, 19, 20 };
         public readonly static int MaxVisualParams = 260;
