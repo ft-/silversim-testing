@@ -71,7 +71,7 @@ namespace ArribaSim.Scene.Management.Scene
                 m_RegionNames.Remove(scene.ID);
                 throw;
             }
-            m_Log.InfoFormat("[SCENE MANAGER]: Adding region {0} at {1}", scene.Name, scene.GridPosition);
+            m_Log.InfoFormat("[SCENE MANAGER]: Adding region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
             if (OnRegionAdd != null)
             {
                 var ev = OnRegionAdd; /* events are not exactly thread-safe, so copy the reference first */
@@ -109,7 +109,7 @@ namespace ArribaSim.Scene.Management.Scene
 
         public void Remove(SceneInterface scene)
         {
-            m_Log.InfoFormat("[SCENE MANAGER]: Removing region {0} at {1}", scene.Name, scene.GridPosition);
+            m_Log.InfoFormat("[SCENE MANAGER]: Removing region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
             if (OnRegionRemove != null)
             {
                 var ev = OnRegionRemove; /* events are not exactly thread-safe, so copy the reference first */
