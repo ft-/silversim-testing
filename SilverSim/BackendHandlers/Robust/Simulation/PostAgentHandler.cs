@@ -26,6 +26,8 @@ exception statement from your version.
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.StructuredData.Agent;
+using SilverSim.StructuredData.JSON;
+using SilverSim.Types.Grid;
 using SilverSim.Types;
 using log4net;
 using Nini.Config;
@@ -111,6 +113,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             if (req.Method == "POST")
             {
                 Stream httpBody = req.Body;
+                HttpResponse res;
                 if(req.ContentType == "application/x-gzip")
                 {
                     httpBody = new GZipStream(httpBody, CompressionMode.Decompress);
@@ -122,7 +125,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 else
                 {
                     m_Log.InfoFormat("[ROBUST AGENT HANDLER]: Invalid content for agent message {0}: {1}", req.RawUrl, req.ContentType);
-                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Invalid content for agent message");
+                    res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Invalid content for agent message");
                     res.Close();
                     return;
                 }
@@ -134,16 +137,64 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 catch(Exception e)
                 {
                     m_Log.InfoFormat("[ROBUST AGENT HANDLER]: Deserialization error for agent message {0}\n{1}", req.RawUrl, e.StackTrace.ToString());
-                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, e.Message);
+                    res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, e.Message);
                     res.Close();
                     return;
                 }
+                res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                res.Close();
             }
             else if(req.Method == "PUT")
             {
                 /* this is the rather nasty HTTP variant of the UDP AgentPosition messaging */
-                HttpResponse res = req.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
-                res.Close();
+                Stream httpBody = req.Body;
+                if (req.ContentType == "application/x-gzip")
+                {
+                    httpBody = new GZipStream(httpBody, CompressionMode.Decompress);
+                }
+                else if (req.ContentType == "application/json")
+                {
+
+                }
+                else
+                {
+                    m_Log.InfoFormat("[ROBUST AGENT HANDLER]: Invalid content for agent message {0}: {1}", req.RawUrl, req.ContentType);
+                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Invalid content for agent message");
+                    res.Close();
+                    return;
+                }
+
+                IValue json;
+
+                try
+                {
+                    json = JSON.Deserialize(httpBody);
+                }
+                catch (Exception e)
+                {
+                    m_Log.InfoFormat("[ROBUST AGENT HANDLER]: Deserialization error for agent message {0}\n{1}", req.RawUrl, e.StackTrace.ToString());
+                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, e.Message);
+                    res.Close();
+                    return;
+                }
+
+                Map param = (Map)json;
+                string msgType = param["messageType"].ToString();
+                if(msgType == "AgentData")
+                {
+                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                    res.Close();
+                }
+                else if (msgType == "AgentPosition")
+                {
+                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                    res.Close();
+                }
+                else
+                {
+                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                    res.Close();
+                }
             }
             else if(req.Method == "DELETE")
             {
