@@ -137,14 +137,32 @@ namespace SilverSim.StructuredData.JSON
             for (; ;)
             {
                 array.Add(ParseValue(io));
-                c = (char)io.Read();
+                do
+                {
+                    c = (char)io.Read();
+                } while (char.IsWhiteSpace(c));
+
                 if(c == ']')
                 {
                     return array;
                 }
                 else if(c==',')
                 {
+                    int bc = io.Peek();
+                    if(bc == -1)
+                    {
+                        throw new InvalidJSONSerialization();
+                    }
+                    c = (char)bc;
 
+                    if(char.IsWhiteSpace(c))
+                    {
+                        do
+                        {
+                            c = (char)io.Read();
+                            c = (char)io.Peek();
+                        } while (char.IsWhiteSpace(c));
+                    }
                 }
                 else
                 {
@@ -174,14 +192,32 @@ namespace SilverSim.StructuredData.JSON
                     throw new InvalidJSONSerialization();
                 }
                 map[key.ToString()] = ParseValue(io);
-                c = (char)io.Read();
+                do
+                {
+                    c = (char)io.Read();
+                } while(char.IsWhiteSpace(c));
+
                 if(c == '}')
                 {
                     return map;
                 }
                 else if(c == ',')
                 {
+                    int bc = io.Peek();
+                    if(bc == -1)
+                    {
+                        throw new InvalidJSONSerialization();
+                    }
+                    c = (char)bc;
 
+                    if(char.IsWhiteSpace(c))
+                    {
+                        do
+                        {
+                            c = (char)io.Read();
+                            c = (char)io.Peek();
+                        } while (char.IsWhiteSpace(c));
+                    }
                 }
                 else
                 {

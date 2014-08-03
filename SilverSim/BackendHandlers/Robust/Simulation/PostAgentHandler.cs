@@ -133,7 +133,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 }
                 catch(Exception e)
                 {
-                    m_Log.InfoFormat("[ROBUST AGENT HANDLER]: Deserialization error for agent message {0}", req.RawUrl);
+                    m_Log.InfoFormat("[ROBUST AGENT HANDLER]: Deserialization error for agent message {0}\n{1}", req.RawUrl, e.StackTrace.ToString());
                     HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, e.Message);
                     res.Close();
                     return;

@@ -83,7 +83,7 @@ namespace SilverSim.StructuredData.Agent
 
             /*-----------------------------------------------------------------*/
             /* Circuit Info */
-            agentparams.Circuit.CircuitCode = parms["CircuitCode"].AsUInt;
+            agentparams.Circuit.CircuitCode = parms["circuit_code"].AsUInt;
             agentparams.Circuit.CapsPath = parms["caps_path"].ToString();
             agentparams.Circuit.IsChild = parms["child"].AsBoolean;
             AnArray children_seeds = (AnArray)parms["children_seeds"];
@@ -173,8 +173,8 @@ namespace SilverSim.StructuredData.Agent
             /*-----------------------------------------------------------------*/
             /* Appearance */
             Map appearancePack = (Map)parms["packed_appearance"];
-            agentparams.Appearance.AvatarHeight = appearancePack["AvatarHeight"].AsReal;
-            agentparams.Appearance.Serial = appearancePack["Serial"].AsInt;
+            agentparams.Appearance.AvatarHeight = appearancePack["height"].AsReal;
+            //agentparams.Appearance.Serial = appearancePack["serial"].AsInt;
 
             {
                 AnArray vParams = (AnArray)appearancePack["visualparams"];
@@ -189,7 +189,7 @@ namespace SilverSim.StructuredData.Agent
             }
 
             {
-                AnArray texArray = (AnArray)parms["hashes"];
+                AnArray texArray = (AnArray)appearancePack["textures"];
                 int i;
                 for (i = 0; i < AppearanceInfo.AvatarTextureData.TextureCount; ++i)
                 {
@@ -199,10 +199,19 @@ namespace SilverSim.StructuredData.Agent
 
             {
                 int i;
-                AnArray wearables = (AnArray)parms["wearables"];
+                AnArray wearables = (AnArray)appearancePack["wearables"];
                 for (i = 0; i < (int)WearableType.NumWearables; ++i)
                 {
-                    foreach (IValue val in (AnArray)wearables[i])
+                    AnArray ar;
+                    try
+                    {
+                        ar = (AnArray)wearables[i];
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                    foreach (IValue val in ar)
                     {
                         KeyValuePair<UUID, UUID> kvp;
                         Map wp = (Map)val;
@@ -221,7 +230,7 @@ namespace SilverSim.StructuredData.Agent
             }
 
             {
-                foreach(IValue apv in (AnArray)parms["attachments"])
+                foreach (IValue apv in (AnArray)appearancePack["attachments"])
                 {
                     Map ap = (Map)apv;
                     agentparams.Appearance.Attachments[(AttachmentPoint)uint.Parse(ap["point"].ToString())][ap["item"].AsUUID] = UUID.Zero;
@@ -341,8 +350,8 @@ namespace SilverSim.StructuredData.Agent
             w.Write("],");
 
             w.Write("\"packed_appearance\":{");
-            WriteJSONValue(w, "AvatarHeight", Appearance.AvatarHeight); w.Write(",");
-            WriteJSONValue(w, "Serial", Appearance.Serial); w.Write(",");
+            WriteJSONValue(w, "height", Appearance.AvatarHeight); w.Write(",");
+            WriteJSONValue(w, "serial", Appearance.Serial); w.Write(",");
             string vParams = string.Empty;
             foreach(byte v in Appearance.VisualParams)
             {
@@ -353,7 +362,7 @@ namespace SilverSim.StructuredData.Agent
                 vParams += v.ToString();
             }
             WriteJSONString(w, "visualparams", vParams); w.Write(",");
-            w.Write("\"hashes\":[");
+            w.Write("\"textures\":[");
             prefix = "";
             {
                 int i;

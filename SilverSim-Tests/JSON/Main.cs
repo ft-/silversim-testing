@@ -22,6 +22,7 @@ namespace Tests.SilverSim.LSLParser
       "\"dateProperty\": \"2011-09-23\"" +
    "}," +
    "\"arrayOfObjects\": [" +
+    "[" +
       "{" +
          "\"item\": 1" +
       "}," +
@@ -31,6 +32,7 @@ namespace Tests.SilverSim.LSLParser
       "{" +
          "\"item\": 3" +
       "}" +
+      "]"+
    "]," +
    "\"arrayOfIntegers\": [" +
       "1," +
