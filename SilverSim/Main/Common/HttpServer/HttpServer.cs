@@ -93,7 +93,15 @@ namespace SilverSim.Main.Common.HttpServer
 
         private void AcceptConnectionCallback(IAsyncResult ar)
         {
-            TcpClient client = m_Listener.EndAcceptTcpClient(ar);
+            TcpClient client;
+            try
+            {
+                client = m_Listener.EndAcceptTcpClient(ar);
+            }
+            catch(ObjectDisposedException)
+            {
+                return;
+            }
             m_Listener.BeginAcceptTcpClient(AcceptConnectionCallback, null);
             try
             {

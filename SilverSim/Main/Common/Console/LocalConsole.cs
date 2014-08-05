@@ -75,6 +75,10 @@ namespace SilverSim.Main.Common.Console
         public void Shutdown()
         {
             m_Shutdown = true;
+            lock (m_InputThread)
+            {
+                m_InputThread.Abort();
+            }
         }
 
         public override void Write(string text)
@@ -502,20 +506,25 @@ namespace SilverSim.Main.Common.Console
         private void PromptThread()
         {
             Thread.CurrentThread.Name = "Console Input Thread";
-            for (; !m_Shutdown; )
+
+            for ( ;; )
             {
                 string cmd = ReadLine(CmdPrompt, true);
 
-                if(cmd == string.Empty)
+                if (cmd == string.Empty)
                 {
                     continue;
                 }
 
-                if(m_CmdHistory.Count >= 100)
+                if (m_CmdHistory.Count >= 100)
                 {
                     m_CmdHistory.RemoveAt(0);
                 }
                 m_CmdHistory.Add(cmd);
+                lock (m_InputThread)
+                {
+                    CmdIO.CommandRegistry.ExecuteCommand(GetCmdLine(cmd), this);
+                }
             }
         }
         #endregion

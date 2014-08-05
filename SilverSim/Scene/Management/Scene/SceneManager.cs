@@ -23,6 +23,8 @@ exception statement from your version.
 
 */
 
+using SilverSim.Scene.Types.Scene;
+
 namespace SilverSim.Scene.Management.Scene
 {
     public static class SceneManager

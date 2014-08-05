@@ -43,6 +43,14 @@ namespace SilverSim.Scene.Management.Scene
         {
         }
 
+        public void RemoveAll()
+        {
+            foreach(UUID id in m_RegionNames.Keys1)
+            {
+                Remove(base[id]);
+            }
+        }
+
         public SceneInterface this[GridVector gv]
         {
             get

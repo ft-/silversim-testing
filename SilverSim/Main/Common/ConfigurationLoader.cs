@@ -37,6 +37,7 @@ using System.Reflection;
 using System.Threading;
 using System.Xml;
 using ThreadedClasses;
+using SilverSim.Scene.Management.Scene;
 
 namespace SilverSim.Main.Common
 {
@@ -585,6 +586,8 @@ namespace SilverSim.Main.Common
             m_Sources.Enqueue(new CFG_IniResourceSource(defaultsIniName));
             AddSource(mainConfig);
 
+            CmdIO.CommandRegistry.Commands.Add("shutdown", ShutdownCommand);
+
             while(m_Sources.Count != 0)
             {
                 CFG_ISource source = m_Sources.Dequeue();
@@ -692,17 +695,41 @@ namespace SilverSim.Main.Common
             m_ShutdownEvent.Set();
         }
 
+        public void ShutdownCommand(List<string> args, CmdIO.TTY io)
+        {
+            m_ShutdownEvent.Set();
+        }
+
         public void Shutdown()
         {
             CommandManager.ClearCommands();
-            SortedList<ShutdownOrder, IPluginShutdown> shutdownList = new SortedList<ShutdownOrder, IPluginShutdown>();
+            List<IPluginShutdown> shutdownLogoutAgentsList = new List<IPluginShutdown>();
+            List<IPluginShutdown> shutdownLogoutRegionsList = new List<IPluginShutdown>();
+            List<IPluginShutdown> shutdownAnyList = new List<IPluginShutdown>();
 
             foreach(IPluginShutdown s in GetServices<IPluginShutdown>().Values)
             {
-                shutdownList.Add(s.ShutdownOrder, s);
+                switch(s.ShutdownOrder)
+                {
+                    case ShutdownOrder.Any: shutdownAnyList.Add(s); break;
+                    case ShutdownOrder.LogoutAgents: shutdownLogoutAgentsList.Add(s); break;
+                    case ShutdownOrder.LogoutRegion: shutdownLogoutRegionsList.Add(s); break;
+                }
             }
 
-            foreach(IPluginShutdown s in shutdownList.Values)
+            foreach (IPluginShutdown s in shutdownLogoutAgentsList)
+            {
+                s.Shutdown();
+            }
+
+            SceneManager.Scenes.RemoveAll();
+
+            foreach (IPluginShutdown s in shutdownLogoutRegionsList)
+            {
+                s.Shutdown();
+            }
+
+            foreach (IPluginShutdown s in shutdownAnyList)
             {
                 s.Shutdown();
             }
