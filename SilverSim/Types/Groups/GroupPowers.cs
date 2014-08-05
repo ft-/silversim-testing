@@ -23,9 +23,11 @@ exception statement from your version.
 
 */
 
+using System;
+
 namespace SilverSim.Types.Groups
 {
-    public enum GroupPowers : ulong
+    [Flags] public enum GroupPowers : ulong
     {
         None = 0,
         Invite = 2,

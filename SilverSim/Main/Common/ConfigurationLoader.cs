@@ -23,12 +23,12 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common.HttpServer;
-using SilverSim.Scene.ServiceInterfaces.RegionLoader;
-using SilverSim.ServiceInterfaces.Database;
 using log4net;
 using log4net.Config;
 using Nini.Config;
+using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.ServiceInterfaces.RegionLoader;
+using SilverSim.ServiceInterfaces.Database;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -617,44 +617,50 @@ namespace SilverSim.Main.Common
             if (logConfigFile != String.Empty)
             {
                 XmlConfigurator.Configure(new System.IO.FileInfo(logConfigFile));
-                m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-                m_Log.InfoFormat("[MAIN]: configured log4net using \"{0}\" as configuration file",
+                m_Log = LogManager.GetLogger("MAIN");
+                m_Log.InfoFormat("configured log4net using \"{0}\" as configuration file",
                                  logConfigFile);
             }
             else
             {
                 XmlConfigurator.Configure();
-                m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
-                m_Log.Info("[MAIN]: configured log4net using defaults");
+                m_Log = LogManager.GetLogger("MAIN");
+                m_Log.Info("configured log4net using defaults");
             }
 
-            m_Log.Info("[MAIN]: Loading specified modules");
+            IConfig consoleConfig = m_Config.Configs["Console"];
+            if (null == consoleConfig || consoleConfig.GetBoolean("EnableLocalConsole", true))
+            {
+                PluginInstances.Add("LocalConsole", new Console.LocalConsole());
+            }
+
+            m_Log.Info("Loading specified modules");
             LoadModules();
 
-            m_Log.Info("[MAIN]: Verifying Database connectivity");
+            m_Log.Info("Verifying Database connectivity");
             Dictionary<string, IDBServiceInterface> dbInterfaces = GetServices<IDBServiceInterface>();
             foreach (KeyValuePair<string, IDBServiceInterface> p in dbInterfaces)
             {
-                m_Log.InfoFormat("[MAIN]: -> {0}", p.Key);
+                m_Log.InfoFormat("-> {0}", p.Key);
                 try
                 {
                     p.Value.VerifyConnection();
                 }
                 catch(Exception e)
                 {
-                    m_Log.FatalFormat("[MAIN]: Database connection verification for {0} failed", p.Key);
+                    m_Log.FatalFormat("Database connection verification for {0} failed", p.Key);
                     throw e;
                 }
             }
 
-            m_Log.Info("[MAIN]: Process Migrations of all database modules");
+            m_Log.Info("Process Migrations of all database modules");
             foreach (KeyValuePair<string, IDBServiceInterface> p in dbInterfaces)
             {
-                m_Log.InfoFormat("[MAIN]: -> {0}", p.Key);
+                m_Log.InfoFormat("-> {0}", p.Key);
                 p.Value.ProcessMigrations();
             }
 
-            m_Log.Info("[MAIN]: Initializing HTTP Server");
+            m_Log.Info("Initializing HTTP Server");
             IConfig httpConfig = m_Config.Configs["Network"];
             if(null == httpConfig)
             {
@@ -665,17 +671,18 @@ namespace SilverSim.Main.Common
             PluginInstances.Add("HttpServer", new BaseHttpServer(httpConfig));
             PluginInstances.Add("XmlRpcServer", new HttpXmlRpcHandler());
 
-            m_Log.Info("[MAIN]: Starting modules");
+            m_Log.Info("Starting modules");
             foreach(IPlugin instance in PluginInstances.Values)
             {
                 instance.Startup(this);
             }
 
-            m_Log.Info("[MAIN]: Loading regions");
+            m_Log.Info("Loading regions");
             foreach(IRegionLoaderInterface regionLoader in GetServices<IRegionLoaderInterface>().Values)
             {
                 regionLoader.LoadRegions();
             }
+
         }
         #endregion
 

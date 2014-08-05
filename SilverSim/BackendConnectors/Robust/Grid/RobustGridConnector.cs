@@ -23,17 +23,16 @@ exception statement from your version.
 
 */
 
+using HttpClasses;
+using log4net;
+using Nini.Config;
 using SilverSim.BackendConnectors.Robust.Common;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
-using HttpClasses;
-using log4net;
-using Nini.Config;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace SilverSim.BackendConnectors.Robust.Grid
 {
@@ -309,7 +308,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
     #region Factory
     public class RobustGridConnectorFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("ROBUST GRID CONNECTOR");
         public RobustGridConnectorFactory()
         {
 

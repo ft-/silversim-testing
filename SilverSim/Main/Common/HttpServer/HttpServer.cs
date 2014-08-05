@@ -29,7 +29,6 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Text;
 using ThreadedClasses;
 
@@ -37,7 +36,7 @@ namespace SilverSim.Main.Common.HttpServer
 {
     public class BaseHttpServer : IPlugin, IPluginShutdown
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("HTTP SERVER");
 
         public delegate void HttpRequestDelegate(HttpRequest context);
 
@@ -65,12 +64,12 @@ namespace SilverSim.Main.Common.HttpServer
             m_Listener = new TcpListener(new IPAddress(0), (int)Port);
             m_Listener.Server.Ttl = 128;
 
-            m_Log.InfoFormat("[HTTP SERVER]: Adding HTTP Server at port {0}", Port);
+            m_Log.InfoFormat("Adding HTTP Server at port {0}", Port);
         }
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_Log.InfoFormat("[HTTP SERVER]: Starting HTTP Server");
+            m_Log.InfoFormat("Starting HTTP Server");
             m_Listener.Start();
             m_Listener.BeginAcceptTcpClient(AcceptConnectionCallback, null);
         }
@@ -85,7 +84,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public void Shutdown()
         {
-            m_Log.InfoFormat("[HTTP SERVER]: Stopping HTTP Server");
+            m_Log.InfoFormat("Stopping HTTP Server");
             m_Listener.Stop();
             StartsWithUriHandlers.Clear();
             UriHandlers.Clear();
@@ -112,7 +111,7 @@ namespace SilverSim.Main.Common.HttpServer
                     }
                     catch (Exception e)
                     {
-                        m_Log.WarnFormat("[HTTP SERVER]: Unexpected exception: {0}\n{1}", e.GetType().Name, e.StackTrace.ToString());
+                        m_Log.WarnFormat("Unexpected exception: {0}\n{1}", e.GetType().Name, e.StackTrace.ToString());
                         return;
                     }
 
@@ -135,7 +134,7 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("[HTTP SERVER]: Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
+                            m_Log.WarnFormat("Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
                         }
                         req.Close();
                     }
@@ -151,7 +150,7 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("[HTTP SERVER]: Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
+                            m_Log.WarnFormat("Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
                         }
                         req.Close();
                     }
@@ -171,7 +170,7 @@ namespace SilverSim.Main.Common.HttpServer
                                 }
                                 catch (Exception e)
                                 {
-                                    m_Log.WarnFormat("[HTTP SERVER]: Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
+                                    m_Log.WarnFormat("Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
                                 }
                                 req.Close();
                                 return;
@@ -190,7 +189,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
             catch (Exception e)
             {
-                m_Log.DebugFormat("[HTTP SERVER]: Exception: {0}\n{1}", e.GetType().Name, e.StackTrace.ToString());
+                m_Log.DebugFormat("Exception: {0}\n{1}", e.GetType().Name, e.StackTrace.ToString());
             }
             finally
             {

@@ -23,18 +23,17 @@ exception statement from your version.
 
 */
 
+using HttpClasses;
+using log4net;
+using Nini.Config;
 using SilverSim.BackendConnectors.Robust.Common;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
 using SilverSim.Types.IM;
-using HttpClasses;
-using log4net;
-using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 
 namespace SilverSim.BackendConnectors.Robust.IM
 {
@@ -145,7 +144,7 @@ namespace SilverSim.BackendConnectors.Robust.IM
     #region Factory
     public class RobustOfflineIMConnectorFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("ROBUST OFFLINE IM CONNECTOR");
         public RobustOfflineIMConnectorFactory()
         {
 

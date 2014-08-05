@@ -23,17 +23,16 @@ exception statement from your version.
 
 */
 
+using HttpClasses;
+using log4net;
+using Nini.Config;
 using SilverSim.BackendConnectors.Robust.Common;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
 using SilverSim.Types.Presence;
-using HttpClasses;
-using log4net;
-using Nini.Config;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace SilverSim.BackendConnectors.Robust.Presence
 {
@@ -190,7 +189,7 @@ namespace SilverSim.BackendConnectors.Robust.Presence
     #region Factory
     public class RobustPresenceConnectorFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("ROBUST PRESENCE CONNECTOR");
         public RobustPresenceConnectorFactory()
         {
 

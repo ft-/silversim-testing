@@ -76,7 +76,7 @@ namespace SilverSim.Scene.Types.Scene
 
     public abstract class SceneInterface
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("SCENE");
 
         public UUID ID { get; protected set; }
         public UUID RegionSecret { get; private set; }
@@ -183,7 +183,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     catch (Exception e)
                     {
-                        m_Log.DebugFormat("[SCENE]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
                     }
                 }
             }
@@ -205,7 +205,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     catch (Exception e)
                     {
-                        m_Log.DebugFormat("[SCENE]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
                     }
                 }
             }

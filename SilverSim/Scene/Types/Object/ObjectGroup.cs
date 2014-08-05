@@ -37,7 +37,7 @@ namespace SilverSim.Scene.Types.Object
 {
     public class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject, IDisposable
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("OBJECT GROUP");
 
         #region Events
         public delegate void OnUpdateDelegate(ObjectGroup objgroup, int flags);
@@ -94,7 +94,7 @@ namespace SilverSim.Scene.Types.Object
                     }
                     catch (Exception e)
                     {
-                        m_Log.DebugFormat("[OBJECT GROUP]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
                     }
                 }
             }

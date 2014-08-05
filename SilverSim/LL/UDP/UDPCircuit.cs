@@ -23,17 +23,16 @@ exception statement from your version.
 
 */
 
+using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Types.IM;
-using log4net;
 using System;
 using System.Collections.Generic;
 using System.Net;
-using System.Reflection;
 using System.Threading;
 using ThreadedClasses;
 
@@ -41,7 +40,7 @@ namespace SilverSim.LL.UDP
 {
     public class UDPCircuit
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("LLUDP CIRCUIT");
         private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
         public UInt32 CircuitCode { get; private set; }
         public UUID SessionID = UUID.Zero;
@@ -53,7 +52,7 @@ namespace SilverSim.LL.UDP
         private Thread m_TxThread = null;
         private int __SequenceNumber = 0;
         private NonblockingQueue<UInt32> m_AckList = new NonblockingQueue<UInt32>();
-        private LindenUDPServer m_Server;
+        private LLUDPServer m_Server;
         public EndPoint RemoteEndPoint;
         private RwLockedDictionary<byte, int> m_PingSendTicks = new RwLockedDictionary<byte, int>();
 
@@ -66,7 +65,7 @@ namespace SilverSim.LL.UDP
         }
 
         public RwLockedDictionary<UInt32, UDPPacket> m_UnackedPackets = new RwLockedDictionary<uint, UDPPacket>();
-        public UDPCircuit(LindenUDPServer server, UInt32 circuitcode)
+        public UDPCircuit(LLUDPServer server, UInt32 circuitcode)
         {
             m_Server = server;
             CircuitCode = circuitcode;
@@ -353,7 +352,7 @@ namespace SilverSim.LL.UDP
             }
             catch(Exception e)
             {
-                m_Log.ErrorFormat("[UDP CIRCUIT] : {0} at {1}", e.ToString(), e.StackTrace.ToString());
+                m_Log.ErrorFormat("{0} at {1}", e.ToString(), e.StackTrace.ToString());
             }
         }
         #endregion

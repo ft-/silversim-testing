@@ -23,16 +23,15 @@ exception statement from your version.
 
 */
 
+using log4net;
+using MySql.Data.MySqlClient;
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
-using log4net;
-using MySql.Data.MySqlClient;
-using Nini.Config;
 using System.Collections.Generic;
-using System.Reflection;
 
 namespace SilverSim.Database.MySQL.Grid
 {
@@ -40,7 +39,7 @@ namespace SilverSim.Database.MySQL.Grid
     class MySQLGridService : GridServiceInterface, IDBServiceInterface, IPlugin
     {
         string m_ConnectionString;
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRID SERVICE");
         private bool m_DeleteOnUnregister;
         private bool m_AllowDuplicateRegionNames;
 
@@ -591,7 +590,7 @@ namespace SilverSim.Database.MySQL.Grid
     #region Factory
     class MySQLGridServiceFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRID SERVICE");
         public MySQLGridServiceFactory()
         {
 

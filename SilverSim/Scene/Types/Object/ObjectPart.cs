@@ -36,7 +36,7 @@ namespace SilverSim.Scene.Types.Object
 {
     public class ObjectPart : IObject, IDisposable
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("OBJECT PART");
 
         #region Events
         public delegate void OnUpdateDelegate(ObjectPart part, int changed);
@@ -211,7 +211,7 @@ namespace SilverSim.Scene.Types.Object
                     }
                     catch (Exception e)
                     {
-                        m_Log.DebugFormat("[OBJECT PART]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
                     }
                 }
             }
@@ -230,7 +230,7 @@ namespace SilverSim.Scene.Types.Object
                     }
                     catch (Exception e)
                     {
-                        m_Log.DebugFormat("[OBJECT PART]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
                     }
                 }
             }

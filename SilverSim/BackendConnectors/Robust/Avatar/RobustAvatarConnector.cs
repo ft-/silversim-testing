@@ -23,16 +23,15 @@ exception statement from your version.
 
 */
 
+using HttpClasses;
+using log4net;
+using Nini.Config;
 using SilverSim.BackendConnectors.Robust.Common;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.Types;
-using HttpClasses;
-using log4net;
-using Nini.Config;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using System.Xml;
 
 namespace SilverSim.BackendConnectors.Robust.Avatar
@@ -202,7 +201,7 @@ namespace SilverSim.BackendConnectors.Robust.Avatar
     #region Factory
     public class RobustAvatarConnectorFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("ROBUST AVATAR CONNECTOR");
         public RobustAvatarConnectorFactory()
         {
 

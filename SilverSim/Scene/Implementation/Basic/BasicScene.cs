@@ -56,7 +56,7 @@ namespace SilverSim.Scene.Implementation.Basic
         protected internal RwLockedDictionary<UUID, ObjectPart> m_Primitives = new RwLockedDictionary<UUID,ObjectPart>();
         protected internal RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
         protected internal RwLockedDictionary<UUID, ParcelInfo> m_Parcels = new RwLockedDictionary<UUID, ParcelInfo>();
-        private LindenUDPServer m_UDPServer;
+        private LLUDPServer m_UDPServer;
         #endregion
 
         #region Interface wrappers
@@ -212,7 +212,7 @@ namespace SilverSim.Scene.Implementation.Basic
             GridUserServiceInterface gridUserService,
             RegionInfo ri)
         {
-            m_UDPServer = new LindenUDPServer(new IPAddress(0), (int)ri.ServerPort, imService, chatService);
+            m_UDPServer = new LLUDPServer(new IPAddress(0), (int)ri.ServerPort, imService, chatService);
             PresenceService = presenceService;
             AvatarService = avatarService;
             GroupsService = groupsService;

@@ -23,9 +23,9 @@ exception statement from your version.
 
 */
 
+using log4net;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
-using log4net;
 using System;
 using System.Reflection;
 using ThreadedClasses;
@@ -34,7 +34,7 @@ namespace SilverSim.Scene.Management.Scene
 {
     public class SceneList : RwLockedDoubleDictionary<UUID, ulong, SceneInterface>
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("SCENE MANAGER");
         public event Action<SceneInterface> OnRegionAdd;
         public event Action<SceneInterface> OnRegionRemove;
         private RwLockedBiDiMappingDictionary<UUID, string> m_RegionNames = new RwLockedBiDiMappingDictionary<UUID,string>();
@@ -71,7 +71,7 @@ namespace SilverSim.Scene.Management.Scene
                 m_RegionNames.Remove(scene.ID);
                 throw;
             }
-            m_Log.InfoFormat("[SCENE MANAGER]: Adding region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
+            m_Log.InfoFormat("Adding region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
             if (OnRegionAdd != null)
             {
                 var ev = OnRegionAdd; /* events are not exactly thread-safe, so copy the reference first */
@@ -85,7 +85,7 @@ namespace SilverSim.Scene.Management.Scene
                         }
                         catch (Exception e)
                         {
-                            m_Log.DebugFormat("[SCENE MANAGER]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                            m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
                         }
                     }
                 }
@@ -109,7 +109,7 @@ namespace SilverSim.Scene.Management.Scene
 
         public void Remove(SceneInterface scene)
         {
-            m_Log.InfoFormat("[SCENE MANAGER]: Removing region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
+            m_Log.InfoFormat("Removing region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
             if (OnRegionRemove != null)
             {
                 var ev = OnRegionRemove; /* events are not exactly thread-safe, so copy the reference first */
@@ -123,7 +123,7 @@ namespace SilverSim.Scene.Management.Scene
                         }
                         catch (Exception e)
                         {
-                            m_Log.DebugFormat("[SCENE MANAGER]: Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                            m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
                         }
                     }
                 }

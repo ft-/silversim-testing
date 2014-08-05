@@ -100,7 +100,7 @@ namespace SilverSim.Main.IM
     #region Factory
     public class IMServiceHandlerFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("IM SERVICE");
         public IMServiceHandlerFactory()
         {
 

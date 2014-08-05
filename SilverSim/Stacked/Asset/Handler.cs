@@ -23,12 +23,12 @@ exception statement from your version.
 
 */
 
+using log4net;
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
-using log4net;
-using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
@@ -66,7 +66,7 @@ namespace SilverSim.Stacked.Asset
 
     public class Handler : AssetServiceInterface, IPlugin
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("STACKED ASSET");
         private List<AssetServiceInterface> m_ServiceList = new List<AssetServiceInterface>();
         private List<string> m_ServiceNameList;
         private string m_ServiceName;
@@ -89,7 +89,7 @@ namespace SilverSim.Stacked.Asset
                 }
                 catch
                 {
-                    m_Log.ErrorFormat("[{0}]: Invalid service module in section {1}", m_ServiceName, serviceName);
+                    m_Log.ErrorFormat("{0} => Invalid service module in section {1}", m_ServiceName, serviceName);
                     throw new ConfigurationLoader.ConfigurationError();
                 }
             }
@@ -225,7 +225,7 @@ namespace SilverSim.Stacked.Asset
     #region Factory Implementation
     public class HandlerFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("STACKED ASSET");
         public HandlerFactory()
         {
         }

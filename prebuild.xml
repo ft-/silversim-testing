@@ -450,6 +450,7 @@
       <Reference name="SilverSim.Main.Common"/>
       <Reference name="SilverSim.Scene.Management"/>
       <Reference name="SilverSim.StructuredData"/>
+      <Reference name="SilverSim.LL.Messages"/>
       <Reference name="Nini" path="../../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../../bin/"/>
       <Reference name="Nwc.XmlRpc" path="../../../../bin/"/>

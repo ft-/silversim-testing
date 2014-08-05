@@ -23,17 +23,16 @@ exception statement from your version.
 
 */
 
+using HttpClasses;
+using log4net;
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
-using HttpClasses;
-using log4net;
-using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Xml;
 
@@ -539,7 +538,7 @@ namespace SilverSim.BackendConnectors.Robust.Asset
     #region Factory
     public class RobustAssetConnectorFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("ROBUST ASSET CONNECTOR");
         public RobustAssetConnectorFactory()
         {
 

@@ -27,8 +27,6 @@ using log4net;
 using Nwc.XmlRpc;
 using System;
 using System.IO;
-using System.Net;
-using System.Reflection;
 using System.Text;
 using System.Xml;
 using ThreadedClasses;
@@ -37,7 +35,7 @@ namespace SilverSim.Main.Common.HttpServer
 {
     public class HttpXmlRpcHandler : IPlugin, IPluginShutdown
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("XMLRPC SERVER");
 
         public delegate XmlRpcResponse XmlRpcDelegate(XmlRpcRequest req);
 
@@ -84,7 +82,7 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 catch(Exception e)
                 {
-                    m_Log.WarnFormat("[XMLRPC SERVER]: Unexpected exception at XMRPC method {0}: {1}\n{2}", req.MethodName, e.GetType().Name, e.StackTrace.ToString());
+                    m_Log.WarnFormat("Unexpected exception at XMRPC method {0}: {1}\n{2}", req.MethodName, e.GetType().Name, e.StackTrace.ToString());
                     FaultResponse(httpreq.BeginResponse(), -32700, "Internal service error");
                     return;
                 }
@@ -112,7 +110,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_Log.Info("[XMLRPC SERVER]: Initializing XMLRPC Handler");
+            m_Log.Info("Initializing XMLRPC Handler");
             BaseHttpServer server = loader.GetService<BaseHttpServer>("HttpServer");
             server.RootUriContentTypeHandlers["text/xml"] = RequestHandler;
             server.RootUriContentTypeHandlers["application/xml"] = RequestHandler;
@@ -120,7 +118,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public void Shutdown()
         {
-            m_Log.Info("[XMLRPC SERVER]: Deinitializing XMLRPC Handler");
+            m_Log.Info("Deinitializing XMLRPC Handler");
             XmlRpcMethods.Clear();
         }
 

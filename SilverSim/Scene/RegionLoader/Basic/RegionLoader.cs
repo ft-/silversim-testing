@@ -51,7 +51,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
         private GridServiceInterface m_RegionService;
         private SceneFactoryInterface m_SceneFactory;
         private uint m_HttpPort = 0;
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("REGION LOADER");
 
         #region Constructor
         public RegionLoaderService(string regionStorage, string regionCfg)
@@ -110,7 +110,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
 
             foreach(RegionInfo ri in m_RegionService.GetOnlineRegions())
             {
-                m_Log.InfoFormat("[REGION LOADER]: Starting Region {0}", ri.Name);
+                m_Log.InfoFormat("Starting Region {0}", ri.Name);
                 SceneManager.Scenes.Add(m_SceneFactory.Instantiate(ri));
             }
         }

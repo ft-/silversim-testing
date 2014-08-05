@@ -23,18 +23,16 @@ exception statement from your version.
 
 */
 
+using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.IM;
-using SilverSim.Types;
 using SilverSim.Types.IM;
-using log4net;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Threading;
 using ThreadedClasses;
 
@@ -54,9 +52,9 @@ namespace SilverSim.LL.UDP
     #endregion
 
     #region LLUDP Server
-    public class LindenUDPServer : IDisposable
+    public class LLUDPServer : IDisposable
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("LLUDP SERVER");
         IPAddress m_BindAddress;
         int m_BindPort;
         Socket m_UdpSocket;
@@ -68,7 +66,7 @@ namespace SilverSim.LL.UDP
         BlockingQueue<IScriptEvent> m_ChatQueue = new BlockingQueue<IScriptEvent>();
         Thread m_ChatThread;
 
-        public LindenUDPServer(IPAddress bindAddress, int port, IMServiceInterface imService, ChatServiceInterface chatService)
+        public LLUDPServer(IPAddress bindAddress, int port, IMServiceInterface imService, ChatServiceInterface chatService)
         {
             m_IMService = imService;
             m_ChatService = chatService;
@@ -91,7 +89,7 @@ namespace SilverSim.LL.UDP
             }
             catch (SocketException)
             {
-                m_Log.Debug("[LLUDP SERVER]: Failed to increase default TTL");
+                m_Log.Debug("Failed to increase default TTL");
             }
 
             /* since Win 2000, there is a WSAECONNRESET, we do not want that in our code */
@@ -109,7 +107,7 @@ namespace SilverSim.LL.UDP
             m_ChatThread = new Thread(ChatSendHandler);
             m_ChatThread.Start();
             m_UdpSocket.Bind(ep);
-            m_Log.InfoFormat("[LLUDP SERVER]: Initialized UDP Server at {0}:{1}", bindAddress.ToString(), port);
+            m_Log.InfoFormat("Initialized UDP Server at {0}:{1}", bindAddress.ToString(), port);
         }
 
         public void SendMessageToCircuit(UInt32 circuitcode, Message m)
@@ -164,7 +162,7 @@ namespace SilverSim.LL.UDP
                 {
                     m_InboundRunning = true;
                     BeginUdpReceive();
-                    m_Log.InfoFormat("[LLUDP SERVER]: Started at {0}:{1}", m_BindAddress.ToString(), m_BindPort);
+                    m_Log.InfoFormat("Started at {0}:{1}", m_BindAddress.ToString(), m_BindPort);
                 }
                 catch(Exception e)
                 {
@@ -180,7 +178,7 @@ namespace SilverSim.LL.UDP
             {
                 if(m_InboundRunning)
                 {
-                    m_Log.InfoFormat("[LLUDP SERVER]: Stopped at {0}:{1}", m_BindAddress.ToString(), m_BindPort);
+                    m_Log.InfoFormat("Stopped at {0}:{1}", m_BindAddress.ToString(), m_BindPort);
                 }
                 m_InboundRunning = false;
             }
@@ -314,7 +312,7 @@ namespace SilverSim.LL.UDP
             catch(Exception e)
             {
                 /* we catch all issues here */
-                m_Log.ErrorFormat("[LLUDP SERVER]: Exception {0} => {1} at {2}", e.GetType().Name, e.ToString(), e.StackTrace.ToString());
+                m_Log.ErrorFormat("Exception {0} => {1} at {2}", e.GetType().Name, e.ToString(), e.StackTrace.ToString());
             }
             /* return the buffer to the pool */
             m_InboundBufferQueue.Enqueue(pck);

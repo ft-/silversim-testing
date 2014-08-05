@@ -23,20 +23,19 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common;
-using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using SilverSim.ServiceInterfaces.Database;
 using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
-using System.Reflection;
+using SilverSim.Main.Common;
+using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.ServiceInterfaces.Database;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
     #region Service Implementation
     public class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
         private string m_ConnectionString;
         private MySQLSimulationDataObjectStorage m_ObjectStorage;
         private MySQLSimulationDataParcelStorage m_ParcelStorage;
@@ -131,7 +130,7 @@ namespace SilverSim.Database.MySQL.SimulationData
     #region Factory
     public class MySQLSimulationDataServiceFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
         public MySQLSimulationDataServiceFactory()
         {
 

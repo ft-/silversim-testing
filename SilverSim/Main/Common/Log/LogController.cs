@@ -23,24 +23,22 @@ exception statement from your version.
 
 */
 
-namespace SilverSim.Types.Groups
+using log4net.Appender;
+using log4net.Core;
+using ThreadedClasses;
+
+namespace SilverSim.Main.Common.Log
 {
-    public class GroupRole
+    public class LogController : AppenderSkeleton
     {
-        public UUID GroupID = UUID.Zero;
-        public UUID ID = UUID.Zero;
-        public string Name = string.Empty;
-        public string Description = string.Empty;
-        public string Title = string.Empty;
-        public GroupPowers Powers;
+        public static RwLockedList<BlockingQueue<LoggingEvent>> Queues = new RwLockedList<BlockingQueue<LoggingEvent>>();
 
-        #region Informational fields
-        public int Members = 0;
-        #endregion
-
-        public GroupRole()
+        protected override void Append(LoggingEvent loggingEvent)
         {
-
+            Queues.ForEach(delegate(BlockingQueue<LoggingEvent> q)
+            {
+                q.Enqueue(loggingEvent);
+            });
         }
     }
 }

@@ -40,7 +40,7 @@ namespace SilverSim.Database.MySQL.Asset
     #region Service Implementation
     public class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");
 
         private string m_ConnectionString;
         private MySQLAssetMetadataService m_MetadataService;
@@ -232,8 +232,7 @@ namespace SilverSim.Database.MySQL.Asset
                     if (asset.Name.Length > MAX_ASSET_NAME)
                     {
                         assetName = asset.Name.Substring(0, MAX_ASSET_NAME);
-                        m_Log.WarnFormat(
-                            "[ASSET DB]: Name '{0}' for asset {1} truncated from {2} to {3} characters on add",
+                        m_Log.WarnFormat("Name '{0}' for asset {1} truncated from {2} to {3} characters on add",
                             asset.Name, asset.ID, asset.Name.Length, assetName.Length);
                     }
 
@@ -241,8 +240,7 @@ namespace SilverSim.Database.MySQL.Asset
                     if (asset.Description.Length > MAX_ASSET_DESC)
                     {
                         assetDescription = asset.Description.Substring(0, MAX_ASSET_DESC);
-                        m_Log.WarnFormat(
-                            "[ASSET DB]: Description '{0}' for asset {1} truncated from {2} to {3} characters on add",
+                        m_Log.WarnFormat("Description '{0}' for asset {1} truncated from {2} to {3} characters on add",
                             asset.Description, asset.ID, asset.Description.Length, assetDescription.Length);
                     }
 
@@ -269,8 +267,7 @@ namespace SilverSim.Database.MySQL.Asset
                     catch (Exception e)
                     {
                         m_Log.Error(
-                            string.Format(
-                                "[ASSET DB]: MySQL failure creating asset {0} with name {1}.  Exception  ",
+                            string.Format("MySQL failure creating asset {0} with name {1}.  Exception  ",
                                 asset.ID, asset.Name)
                             , e);
                         throw new AssetStoreFailed(asset.ID);
@@ -338,7 +335,7 @@ id, name, description, assetType, local, temporary, create_time, access_time, as
     #region Factory
     public class MySQLAssetServiceFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");
         public MySQLAssetServiceFactory()
         {
 

@@ -23,14 +23,13 @@ exception statement from your version.
 
 */
 
+using log4net;
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
-using log4net;
-using Nini.Config;
 using System.Collections.Generic;
-using System.Reflection;
 using ThreadedClasses;
 
 namespace SilverSim.Database.Null.Grid
@@ -38,7 +37,7 @@ namespace SilverSim.Database.Null.Grid
     #region Service Implementation
     class NullGridService : GridServiceInterface, IPlugin
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("NULL REGION SERVICE");
         private bool m_DeleteOnUnregister;
         private bool m_AllowDuplicateRegionNames;
         private RwLockedDictionary<UUID, RegionInfo> m_RegionList = new RwLockedDictionary<UUID, RegionInfo>();
@@ -371,7 +370,6 @@ namespace SilverSim.Database.Null.Grid
     #region Factory
     class NullGridServiceFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
         public NullGridServiceFactory()
         {
 

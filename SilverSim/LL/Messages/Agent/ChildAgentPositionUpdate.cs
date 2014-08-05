@@ -23,24 +23,37 @@ exception statement from your version.
 
 */
 
-namespace SilverSim.Types.Groups
+using SilverSim.Types;
+using System;
+
+namespace SilverSim.LL.Messages.Agent
 {
-    public class GroupRole
+    public class ChildAgentPositionUpdate : Message
     {
-        public UUID GroupID = UUID.Zero;
-        public UUID ID = UUID.Zero;
-        public string Name = string.Empty;
-        public string Description = string.Empty;
-        public string Title = string.Empty;
-        public GroupPowers Powers;
+        public UInt64 RegionHandle;
+        public UInt32 ViewerCircuitCode;
+        public UUID AgentID;
+        public UUID SessionID;
+        public Vector3 AgentPosition;
+        public Vector3 AgentVelocity;
+        public Vector3 Center;
+        public Vector3 Size;
+        public Vector3 AtAxis;
+        public Vector3 LeftAxis;
+        public Vector3 UpAxis;
+        public bool ChangedGrid;
 
-        #region Informational fields
-        public int Members = 0;
-        #endregion
-
-        public GroupRole()
+        public ChildAgentPositionUpdate()
         {
 
+        }
+
+        public virtual new MessageType Number
+        {
+            get
+            {
+                return MessageType.ChildAgentPositionUpdate;
+            }
         }
     }
 }

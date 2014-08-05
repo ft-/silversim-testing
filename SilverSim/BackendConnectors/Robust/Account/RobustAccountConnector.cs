@@ -171,7 +171,7 @@ namespace SilverSim.BackendConnectors.Robust.Account
     #region Factory
     public class RobustAccountConnectorFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+        private static readonly ILog m_Log = LogManager.GetLogger("ROBUST ACCOUNT CONNECTOR");
         public RobustAccountConnectorFactory()
         {
 
