@@ -489,7 +489,7 @@ namespace SilverSim.Main.Common.Console
         #region Console Threads
         private void LogThread()
         {
-            Thread.CurrentThread.Name = "Console Log Thread";
+            Thread.CurrentThread.Name = "Local Console Log Thread";
             for (; !m_Shutdown; )
             {
                 try
@@ -505,7 +505,7 @@ namespace SilverSim.Main.Common.Console
 
         private void PromptThread()
         {
-            Thread.CurrentThread.Name = "Console Input Thread";
+            Thread.CurrentThread.Name = "Local Console Input Thread";
 
             for ( ;; )
             {
