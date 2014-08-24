@@ -42,6 +42,7 @@ namespace SilverSim.LL.Messages
         public delegate void Send(UInt32 circuitCode, Message m);
         public UUID CircuitSessionID = UUID.Zero;
         public UUID CircuitAgentID = UUID.Zero;
+        public UUID CircuitSceneID = UUID.Zero;
 
         public MessagePriority Type
         {

@@ -229,6 +229,7 @@ namespace SilverSim.LL.UDP
                         m.ReceivedOnCircuitCode = CircuitCode;
                         m.CircuitAgentID = new UUID(AgentID);
                         m.CircuitSessionID = new UUID(SessionID);
+                        m.CircuitSceneID = new UUID(Scene.ID);
 
                         /* we keep the circuit relatively dumb so that we have no other logic than how to send and receive messages to the viewer */
                         m_Server.RouteReceivedMessage(m);

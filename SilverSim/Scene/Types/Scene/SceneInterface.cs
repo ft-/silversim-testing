@@ -35,6 +35,7 @@ using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
+using SilverSim.LL.Messages;
 using log4net;
 using System;
 using System.Collections.Generic;
@@ -228,6 +229,10 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
         }
+        #endregion
+
+        #region Scene LL Message interface
+        public abstract void HandleSimulatorMessage(Message m);
         #endregion
     }
 }

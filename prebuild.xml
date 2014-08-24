@@ -243,6 +243,7 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
+      <Reference name="SilverSim.LL.Messages"/>
       <Reference name="SilverSim.Types"/>
       <Reference name="SilverSim.ServiceInterfaces"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
@@ -679,6 +680,7 @@
       <Reference name="SilverSim.Scene.Management"/>
       <Reference name="SilverSim.Main.Common"/>
       <Reference name="SilverSim.LL.UDP"/>
+      <Reference name="SilverSim.LL.Messages"/>
       <Reference name="HttpClasses" path="../../../../bin/"/>
       <Reference name="Nini" path="../../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../../bin/"/>

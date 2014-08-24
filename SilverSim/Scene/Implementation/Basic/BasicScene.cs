@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.LL.UDP;
+using SilverSim.LL.Messages;
 using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Agent;
@@ -212,7 +213,7 @@ namespace SilverSim.Scene.Implementation.Basic
             GridUserServiceInterface gridUserService,
             RegionInfo ri)
         {
-            m_UDPServer = new LLUDPServer(new IPAddress(0), (int)ri.ServerPort, imService, chatService);
+            m_UDPServer = new LLUDPServer(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
             PresenceService = presenceService;
             AvatarService = avatarService;
             GroupsService = groupsService;
@@ -259,6 +260,7 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             IMRouter.SceneIM.Remove(IMSend);
             m_UDPServer.Shutdown();
+            m_UDPServer = null;
         }
         #endregion
 
@@ -356,6 +358,19 @@ namespace SilverSim.Scene.Implementation.Basic
             }
 
             return true;
+        }
+        #endregion
+
+        #region Scene LL Message interface
+        public override void HandleSimulatorMessage(Message m)
+        {
+            switch(m.Number)
+            {
+                case MessageType.ObjectGrab: /* => simulator */
+                case MessageType.ObjectGrabUpdate: /* => simulator */
+                case MessageType.ObjectDeGrab: /* => simulator */
+                    break;
+            }
         }
         #endregion
     }

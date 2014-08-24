@@ -101,7 +101,14 @@ namespace SilverSim.Main.Common.Console
 
                 if (bufferWidth > 0 && left >= bufferWidth)
                 {
-                    System.Console.CursorLeft = bufferWidth - 1;
+                    try
+                    {
+                        System.Console.CursorLeft = bufferWidth - 1;
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
 
@@ -119,7 +126,14 @@ namespace SilverSim.Main.Common.Console
                 }
             }
 
-            System.Console.CursorTop = top;
+            try
+            {
+                System.Console.CursorTop = top;
+            }
+            catch
+            {
+
+            }
 
             return top;
         }
@@ -137,7 +151,14 @@ namespace SilverSim.Main.Common.Console
                 int bufferHeight = System.Console.BufferHeight;
                 if (bufferHeight > 0 && top >= bufferHeight)
                 {
-                    System.Console.CursorTop = bufferHeight - 1;
+                    try
+                    {
+                        System.Console.CursorTop = bufferHeight - 1;
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
 
@@ -155,7 +176,14 @@ namespace SilverSim.Main.Common.Console
                 }
             }
 
-            System.Console.CursorLeft = left;
+            try
+            {
+                System.Console.CursorLeft = left;
+            }
+            catch
+            {
+
+            }
 
             return left;
         }

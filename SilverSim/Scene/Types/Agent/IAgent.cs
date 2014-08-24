@@ -33,6 +33,7 @@ using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
+using SilverSim.Types;
 using SilverSim.Types.IM;
 
 namespace SilverSim.Scene.Types.Agent
@@ -42,6 +43,8 @@ namespace SilverSim.Scene.Types.Agent
         string DisplayName { get; set; }
         string FirstName { get; set; }
         string LastName { get; set; }
+        UUID SceneID { get; set; }
+
         bool IMSend(GridInstantMessage im);
 
         int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
