@@ -637,6 +637,10 @@ namespace SilverSim.Main.Common
                 PluginInstances.Add("LocalConsole", new Console.LocalConsole());
             }
 
+            m_Log.InfoFormat("Simulator: {0}", VersionInfo.ProductName);
+            m_Log.InfoFormat("Version: {0}", VersionInfo.Version);
+            m_Log.InfoFormat("Runtime: {0} {1}", VersionInfo.RuntimeInformation, VersionInfo.MachineWidth);
+
             m_Log.Info("Loading specified modules");
             LoadModules();
 

@@ -45,7 +45,7 @@ namespace SilverSim.LL.UDP
         public UInt32 CircuitCode { get; private set; }
         public UUID SessionID = UUID.Zero;
         public UUID AgentID = UUID.Zero;
-        public IAgent Agent = null;
+        public LLAgent Agent = null;
         public SceneInterface Scene = null;
         private BlockingQueue<Message> m_TxQueue = new BlockingQueue<Message>();
         private bool m_TxRunning = false;

@@ -35,6 +35,7 @@ using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
 using SilverSim.Types.IM;
+using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Agent
 {
@@ -51,6 +52,11 @@ namespace SilverSim.Scene.Types.Agent
         {
             get;
             set;
+        }
+
+        AgentAttachments Attachments
+        {
+            get;
         }
 
         AssetServiceInterface AssetService
