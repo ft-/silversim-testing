@@ -27,6 +27,7 @@ using log4net;
 using log4net.Config;
 using Nini.Config;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Main.Common.Caps;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
 using SilverSim.ServiceInterfaces.Database;
 using System;
@@ -677,6 +678,7 @@ namespace SilverSim.Main.Common
 
             PluginInstances.Add("HttpServer", new BaseHttpServer(httpConfig));
             PluginInstances.Add("XmlRpcServer", new HttpXmlRpcHandler());
+            PluginInstances.Add("CapsRedirector", new CapsHttpRedirector());
 
             m_Log.Info("Starting modules");
             foreach(IPlugin instance in PluginInstances.Values)

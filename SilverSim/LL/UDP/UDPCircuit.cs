@@ -27,6 +27,8 @@ using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Main.Common.HttpServer;
+using SilverSim.Main.Common.Caps;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Types.IM;
@@ -55,6 +57,8 @@ namespace SilverSim.LL.UDP
         private LLUDPServer m_Server;
         public EndPoint RemoteEndPoint;
         private RwLockedDictionary<byte, int> m_PingSendTicks = new RwLockedDictionary<byte, int>();
+        private RwLockedDictionary<string, UUID> m_RegisteredCapabilities = new RwLockedDictionary<string, UUID>();
+        private CapsHttpRedirector m_CapsRedirector;
 
         private uint NextSequenceNumber
         {
@@ -65,10 +69,11 @@ namespace SilverSim.LL.UDP
         }
 
         public RwLockedDictionary<UInt32, UDPPacket> m_UnackedPackets = new RwLockedDictionary<uint, UDPPacket>();
-        public UDPCircuit(LLUDPServer server, UInt32 circuitcode)
+        public UDPCircuit(LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector)
         {
             m_Server = server;
             CircuitCode = circuitcode;
+            m_CapsRedirector = capsredirector;
         }
 
         #region Receive Logic
@@ -356,6 +361,32 @@ namespace SilverSim.LL.UDP
                 m_Log.ErrorFormat("{0} at {1}", e.ToString(), e.StackTrace.ToString());
             }
         }
+        #endregion
+
+        #region Capabilities register
+        public void AddCapability(string type, UUID id, Action<HttpRequest> del)
+        {
+            m_RegisteredCapabilities.Add(type, id);
+            try
+            {
+                m_CapsRedirector.Caps[type].Add(id, del);
+            }
+            catch
+            {
+                m_RegisteredCapabilities.Remove(type);
+                throw;
+            }
+        }
+
+        public bool RemoveCapability(string type, UUID id)
+        {
+            if (m_RegisteredCapabilities.Remove(id))
+            {
+                return m_CapsRedirector.Caps[type].Remove(id);
+            }
+            return false;
+        }
+
         #endregion
     }
 }

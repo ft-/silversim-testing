@@ -168,8 +168,10 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="SilverSim.Types"/>
+      <Reference name="SilverSim.Main.Common"/>
       <Reference name="SilverSim.ServiceInterfaces"/>
       <Reference name="SilverSim.Scene.Types"/>
+      <Reference name="SilverSim.StructuredData"/>
       <Reference name="SilverSim.Scene.ServiceInterfaces"/>
       <Reference name="SilverSim.LL.Messages"/>
       <Reference name="ThreadedClasses" path="../../../bin/"/>
