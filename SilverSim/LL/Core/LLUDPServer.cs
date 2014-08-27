@@ -38,7 +38,7 @@ using System.Threading;
 using ThreadedClasses;
 using SilverSim.Types;
 
-namespace SilverSim.LL.UDP
+namespace SilverSim.LL.Core
 {
     #region Rx Buffer
     public class UDPReceivePacket : UDPPacket
@@ -61,7 +61,7 @@ namespace SilverSim.LL.UDP
         int m_BindPort;
         Socket m_UdpSocket;
         NonblockingQueue<UDPReceivePacket> m_InboundBufferQueue = new NonblockingQueue<UDPReceivePacket>();
-        RwLockedDoubleDictionary<EndPoint, uint, UDPCircuit> m_Circuits = new RwLockedDoubleDictionary<EndPoint, uint, UDPCircuit>();
+        RwLockedDoubleDictionary<EndPoint, uint, Circuit> m_Circuits = new RwLockedDoubleDictionary<EndPoint, uint, Circuit>();
         bool m_InboundRunning = false;
         IMServiceInterface m_IMService;
         ChatServiceInterface m_ChatService;
@@ -120,7 +120,7 @@ namespace SilverSim.LL.UDP
 
         public void SendMessageToCircuit(UInt32 circuitcode, Message m)
         {
-            UDPCircuit circuit;
+            Circuit circuit;
             if(m_Circuits.TryGetValue(circuitcode, out circuit))
             {
                 circuit.SendMessage(m);
@@ -214,7 +214,7 @@ namespace SilverSim.LL.UDP
 
         void UdpReceiveEndHandler(IAsyncResult ar)
         {
-            UDPCircuit circuit;
+            Circuit circuit;
             UDPReceivePacket pck = (UDPReceivePacket)ar.AsyncState;
             try
             {

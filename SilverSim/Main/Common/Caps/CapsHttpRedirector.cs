@@ -34,6 +34,7 @@ namespace SilverSim.Main.Common.Caps
     public class CapsHttpRedirector : IPlugin, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("CAPS HTTP REDIRECTOR");
+        private BaseHttpServer m_HttpServer;
 
         public readonly RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUID, Action<HttpRequest>>> Caps = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUID, Action<HttpRequest>>>(delegate() { return new RwLockedDictionary<UUID, Action<HttpRequest>>();});
 
@@ -123,11 +124,27 @@ namespace SilverSim.Main.Common.Caps
             }
         }
 
+        public string ExternalHostName
+        {
+            get
+            {
+                return m_HttpServer.ExternalHostName;
+            }
+        }
+
+        public uint Port
+        {
+            get
+            {
+                return m_HttpServer.Port;
+            }
+        }
+
         public void Startup(ConfigurationLoader loader)
         {
             m_Log.Info("Initializing Caps Http Redirector");
-            BaseHttpServer server = loader.GetService<BaseHttpServer>("HttpServer");
-            server.UriHandlers["/CAPS/"] = RequestHandler;
+            m_HttpServer = loader.GetService<BaseHttpServer>("HttpServer");
+            m_HttpServer.UriHandlers["/CAPS/"] = RequestHandler;
         }
 
         public void Shutdown()

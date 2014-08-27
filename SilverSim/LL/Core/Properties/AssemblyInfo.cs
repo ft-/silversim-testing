@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SilverSim.LL.UDP")]
+[assembly: AssemblyTitle("SilverSim.LL.Core")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("SilverSim Development")]
-[assembly: AssemblyProduct("SilverSim.LL.UDP")]
+[assembly: AssemblyProduct("SilverSim.LL.Core")]
 [assembly: AssemblyCopyright("Affero GPLv3 License + Link Exception")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]

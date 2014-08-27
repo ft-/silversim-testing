@@ -42,6 +42,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -104,6 +105,9 @@ namespace SilverSim.Scene.Types.Scene
         public GridUserServiceInterface GridUserService { get; protected set; }
         public GridServiceInterface GridService { get; protected set; }
         private NotecardCache m_NotecardCache;
+
+        /* do not put any other than ICapabilityInterface into this list */
+        public readonly RwLockedDictionary<string, object> SceneCapabilities = new RwLockedDictionary<string, object>();
 
         public RegionInfo RegionData
         {

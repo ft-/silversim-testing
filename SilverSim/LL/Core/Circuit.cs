@@ -34,13 +34,16 @@ using SilverSim.Types;
 using SilverSim.Types.IM;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
+using System.Text;
 using System.Threading;
 using ThreadedClasses;
+using SilverSim.StructuredData.LLSD;
 
-namespace SilverSim.LL.UDP
+namespace SilverSim.LL.Core
 {
-    public class UDPCircuit
+    public class Circuit : IDisposable
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LLUDP CIRCUIT");
         private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
@@ -48,7 +51,7 @@ namespace SilverSim.LL.UDP
         public UUID SessionID = UUID.Zero;
         public UUID AgentID = UUID.Zero;
         public LLAgent Agent = null;
-        public SceneInterface Scene = null;
+        private SceneInterface m_Scene;
         private BlockingQueue<Message> m_TxQueue = new BlockingQueue<Message>();
         private bool m_TxRunning = false;
         private Thread m_TxThread = null;
@@ -59,6 +62,7 @@ namespace SilverSim.LL.UDP
         private RwLockedDictionary<byte, int> m_PingSendTicks = new RwLockedDictionary<byte, int>();
         private RwLockedDictionary<string, UUID> m_RegisteredCapabilities = new RwLockedDictionary<string, UUID>();
         private CapsHttpRedirector m_CapsRedirector;
+        private object m_SceneSetLock = new object();
 
         private uint NextSequenceNumber
         {
@@ -68,12 +72,59 @@ namespace SilverSim.LL.UDP
             }
         }
 
+        public SceneInterface Scene
+        {
+            get
+            {
+                return m_Scene;
+            }
+
+            set
+            {
+                lock (m_SceneSetLock)
+                {
+                    if (null != m_Scene)
+                    {
+                        foreach (KeyValuePair<string, object> kvp in m_Scene.SceneCapabilities)
+                        {
+                            if (kvp.Value is ICapabilityInterface)
+                            {
+                                ICapabilityInterface iface = (ICapabilityInterface)(kvp.Value);
+                                RemoveCapability(iface.CapabilityName);
+                            }
+                        }
+                    }
+                    m_Scene = value;
+                    if (null != m_Scene)
+                    {
+                        UUID sceneCapID = UUID.Random;
+                        foreach (KeyValuePair<string, object> kvp in m_Scene.SceneCapabilities)
+                        {
+                            if (kvp.Value is ICapabilityInterface)
+                            {
+                                ICapabilityInterface iface = (ICapabilityInterface)(kvp.Value);
+                                AddCapability(iface.CapabilityName, sceneCapID, iface.HttpRequestHandler);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         public RwLockedDictionary<UInt32, UDPPacket> m_UnackedPackets = new RwLockedDictionary<uint, UDPPacket>();
-        public UDPCircuit(LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector)
+        public Circuit(LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector, UUID regionSeedID)
         {
             m_Server = server;
             CircuitCode = circuitcode;
             m_CapsRedirector = capsredirector;
+            AddCapability("SEED", regionSeedID, RegionSeedHandler);
+            Scene = server.Scene;
+        }
+
+        ~Circuit()
+        {
+            Scene = null;
+            Dispose();
         }
 
         #region Receive Logic
@@ -363,7 +414,7 @@ namespace SilverSim.LL.UDP
         }
         #endregion
 
-        #region Capabilities register
+        #region Capabilities registration
         public void AddCapability(string type, UUID id, Action<HttpRequest> del)
         {
             m_RegisteredCapabilities.Add(type, id);
@@ -378,15 +429,83 @@ namespace SilverSim.LL.UDP
             }
         }
 
-        public bool RemoveCapability(string type, UUID id)
+        public bool RemoveCapability(string type)
         {
-            if (m_RegisteredCapabilities.Remove(id))
+            UUID id;
+            if (m_RegisteredCapabilities.Remove(type, out id))
             {
                 return m_CapsRedirector.Caps[type].Remove(id);
             }
             return false;
         }
 
+        public void Dispose()
+        {
+            Scene = null;
+            foreach(KeyValuePair<string, UUID> kvp in m_RegisteredCapabilities)
+            {
+                m_CapsRedirector.Caps[kvp.Key].Remove(kvp.Value);
+            }
+            m_RegisteredCapabilities.Clear();
+        }
+        
+        public void RegionSeedHandler(HttpRequest httpreq)
+        {
+            IValue o;
+            if(httpreq.Method != "POST")
+            {
+                httpreq.BeginResponse(SilverSim.Main.Common.HttpServer.HttpStatusCode.MethodNotAllowed, "Method not allowed").Close();
+                return;
+            }
+
+            try
+            {
+                o = LLSD_XML.Deserialize(httpreq.Body);
+            }
+            catch
+            {
+                httpreq.BeginResponse(SilverSim.Main.Common.HttpServer.HttpStatusCode.UnprocessableEntity, "Unprocessable entity").Close();
+                return;
+            }
+            if(!(o is AnArray))
+            {
+                httpreq.BeginResponse(SilverSim.Main.Common.HttpServer.HttpStatusCode.UnprocessableEntity, "Unprocessable entity").Close();
+                return;
+            }
+
+            Dictionary<string, string> capsUri = new Dictionary<string, string>();
+            foreach(IValue v in (AnArray)o)
+            {
+                UUID capsID;
+                if(v.ToString() == "SEED")
+                {
+
+                }
+                else if (m_RegisteredCapabilities.TryGetValue(v.ToString(), out capsID))
+                {
+                    capsUri[v.ToString()] = string.Format("http://{0}:{1}/CAPS/{2}/{3}", m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port,
+                        v.ToString(), capsID);
+                }
+            }
+
+            HttpResponse res = httpreq.BeginResponse();
+            using(TextWriter tw = new StreamWriter(res.GetOutputStream(), Encoding.UTF8))
+            {
+                tw.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
+                tw.Write("<llsd>");
+                tw.Write("<map>");
+                foreach(KeyValuePair<string, string> kvp in capsUri)
+                {
+                    tw.Write(string.Format("<key>{0}</key><string>{1}</string>", 
+                            System.Xml.XmlConvert.EncodeName(kvp.Key), 
+                            System.Xml.XmlConvert.EncodeName(kvp.Value)
+                        ));
+                }
+                tw.Write("</map>");
+                tw.Write("</llsd>");
+            }
+            res.Close();
+        }
         #endregion
     }
 }

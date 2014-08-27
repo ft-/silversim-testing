@@ -47,7 +47,7 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.LL.Messages;
 using ThreadedClasses;
 
-namespace SilverSim.LL.UDP
+namespace SilverSim.LL.Core
 {
     public class LLAgent : IAgent, IDisposable
     {
@@ -65,7 +65,7 @@ namespace SilverSim.LL.UDP
         #endregion
 
         /* Circuits: UUID is SceneID */
-        public readonly RwLockedDoubleDictionary<UInt32, UUID, UDPCircuit> Circuits = new RwLockedDoubleDictionary<UInt32, UUID, UDPCircuit>();
+        public readonly RwLockedDoubleDictionary<UInt32, UUID, Circuit> Circuits = new RwLockedDoubleDictionary<UInt32, UUID, Circuit>();
         public readonly RwLockedDictionary<GridVector, string> KnownChildAgentURIs = new RwLockedDictionary<GridVector, string>();
 
         #region IObject Calls
@@ -874,7 +874,7 @@ namespace SilverSim.LL.UDP
                 case MessageType.RegionHandshakeReply:
                     {
                         Messages.Region.RegionHandshakeReply rhr = (Messages.Region.RegionHandshakeReply)m;
-                        UDPCircuit circuit;
+                        Circuit circuit;
                         if (Circuits.TryGetValue(rhr.ReceivedOnCircuitCode, out circuit))
                         {
                             /* Add our agent to scene */
@@ -886,7 +886,7 @@ namespace SilverSim.LL.UDP
                 case MessageType.CompleteAgentMovement:
                     {
                         Messages.Circuit.CompleteAgentMovement cam = (Messages.Circuit.CompleteAgentMovement)m;
-                        UDPCircuit circuit;
+                        Circuit circuit;
                         if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
                         {
                             /* switch agent region */

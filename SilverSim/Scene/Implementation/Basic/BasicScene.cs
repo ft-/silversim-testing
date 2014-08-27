@@ -23,7 +23,7 @@ exception statement from your version.
 
 */
 
-using SilverSim.LL.UDP;
+using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
 using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.ServiceInterfaces.Chat;
