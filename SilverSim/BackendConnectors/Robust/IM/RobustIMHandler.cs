@@ -99,7 +99,7 @@ namespace SilverSim.BackendConnectors.Robust.IM
             m_IMService.Send(im);
             try
             {
-                e.WaitOne(10000);
+                e.WaitOne(15000);
             }
             catch
             {

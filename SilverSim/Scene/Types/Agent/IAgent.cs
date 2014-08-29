@@ -35,6 +35,7 @@ using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
 using SilverSim.Types.IM;
+using SilverSim.LL.Messages;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Agent
@@ -103,5 +104,7 @@ namespace SilverSim.Scene.Types.Agent
         {
             get;
         }
+
+        void HandleAgentMessage(Message m);
     }
 }

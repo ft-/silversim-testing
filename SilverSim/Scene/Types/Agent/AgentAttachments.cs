@@ -23,14 +23,10 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Scene.Types.Scene;
+using SilverSim.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
-using ThreadedClasses;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace SilverSim.Scene.Types.Agent

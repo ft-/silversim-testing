@@ -25,11 +25,11 @@ exception statement from your version.
 
 using log4net;
 using SilverSim.LL.Messages;
-using SilverSim.Scene.Types.Agent;
-using SilverSim.Scene.Types.Scene;
-using SilverSim.Main.Common.HttpServer;
 using SilverSim.Main.Common.Caps;
+using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
 using SilverSim.Types.IM;
 using System;
@@ -39,13 +39,12 @@ using System.Net;
 using System.Text;
 using System.Threading;
 using ThreadedClasses;
-using SilverSim.StructuredData.LLSD;
 
 namespace SilverSim.LL.Core
 {
     public class Circuit : IDisposable
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("LLUDP CIRCUIT");
+        private static readonly ILog m_Log = LogManager.GetLogger("LL CIRCUIT");
         private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
         public UInt32 CircuitCode { get; private set; }
         public UUID SessionID = UUID.Zero;
@@ -81,7 +80,7 @@ namespace SilverSim.LL.Core
 
             set
             {
-                lock (m_SceneSetLock)
+                lock (m_SceneSetLock) /* scene change serialization */
                 {
                     if (null != m_Scene)
                     {

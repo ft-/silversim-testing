@@ -33,11 +33,33 @@ using SilverSim.StructuredData.JSON;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Agent;
+using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Grid;
+using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.ServiceInterfaces.Friends;
+using SilverSim.ServiceInterfaces.IM;
+using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.Presence;
+using SilverSim.ServiceInterfaces.Profile;
+using SilverSim.ServiceInterfaces.UserAgents;
+using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.Types.Groups;
+using SilverSim.LL.Core;
+using SilverSim.LL.Caps;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using SilverSim.BackendConnectors.Robust.Account;
+using SilverSim.BackendConnectors.Robust.Asset;
+using SilverSim.BackendConnectors.Robust.Avatar;
+using SilverSim.BackendConnectors.Robust.Grid;
+using SilverSim.BackendConnectors.Robust.GridUser;
+using SilverSim.BackendConnectors.Robust.IM;
+using SilverSim.BackendConnectors.Robust.Inventory;
+using SilverSim.BackendConnectors.Robust.Presence;
 
 namespace SilverSim.BackendHandlers.Robust.Simulation
 {
@@ -46,6 +68,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ROBUST AGENT HANDLER");
         private BaseHttpServer m_HttpServer;
+        private Main.Common.Caps.CapsHttpRedirector m_CapsRedirector;
         public PostAgentHandler()
         {
 
@@ -56,6 +79,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             m_Log.Info("Initializing agent post handler");
             m_HttpServer = loader.HttpServer;
             m_HttpServer.StartsWithUriHandlers.Add("/agent/", AgentPostHandler);
+
+            m_CapsRedirector = loader.GetService<Main.Common.Caps.CapsHttpRedirector>("CapsRedirector");
         }
 
         public ShutdownOrder ShutdownOrder
@@ -133,9 +158,10 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     return;
                 }
 
+                PostData agentPost;
                 try
                 {
-                    PostData agentPost = PostData.Deserialize(httpBody);
+                     agentPost = PostData.Deserialize(httpBody);
                 }
                 catch(Exception e)
                 {
@@ -144,7 +170,62 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     res.Close();
                     return;
                 }
-                res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+
+                SceneInterface scene;
+                if(!Scene.Management.Scene.SceneManager.Scenes.TryGetValue(agentPost.Destination.ID, out scene))
+                {
+                    m_Log.InfoFormat("No destination for agent {0}", req.RawUrl);
+                    res = req.BeginResponse(HttpStatusCode.NotFound, "Not Found");
+                    res.Close();
+                    return;
+                }
+
+                AssetServiceInterface assetService = new RobustAssetConnector(agentPost.Account.ServiceURLs["AssetServerURI"]);
+                InventoryServiceInterface inventoryService = new RobustInventoryConnector(agentPost.Account.ServiceURLs["InventoryServerURI"]);
+                GroupsServiceInterface groupsService = scene.GroupsService;
+                ProfileServiceInterface profileService = null;
+                UserAgentServiceInterface userAgentService = null;
+                PresenceServiceInterface presenceService = scene.PresenceService;
+                GridUserServiceInterface gridUserService = scene.GridUserService;
+                GridServiceInterface gridService = scene.GridService;
+                FriendsServiceInterface friendsService = null;
+
+                LLAgent agent = new LLAgent(
+                    agentPost.Account.Principal.ID,
+                    assetService,
+                    inventoryService,
+                    groupsService,
+                    profileService,
+                    friendsService,
+                    userAgentService,
+                    presenceService,
+                    gridUserService,
+                    gridService);
+
+                LLUDPServer udpServer = (LLUDPServer)scene.UDPServer;
+
+                Circuit circuit = new Circuit(udpServer, agentPost.Circuit.CircuitCode, m_CapsRedirector, agentPost.Circuit.CapsPath);
+
+                try
+                {
+                    scene.Add(agent);
+                    try
+                    {
+                        udpServer.AddCircuit(circuit);
+                    }
+                    catch
+                    {
+                        scene.Remove(agent);
+                        throw;
+                    }
+                }
+                catch (Exception e)
+                {
+                    res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, e.Message);
+                    res.Close();
+                    return;
+                }
+                res = req.BeginResponse();
                 res.Close();
             }
             else if(req.Method == "PUT")
@@ -401,8 +482,40 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 Vector3.TryParse(args["sit_offset"].AsString(), out SitOffset);
                      */
 
-                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
-                    res.Close();
+                    SceneInterface scene;
+                    if (Scene.Management.Scene.SceneManager.Scenes.TryGetValue(childAgentData.RegionHandle, out scene))
+                    {
+                        IAgent agent;
+                        HttpResponse res;
+                        try
+                        {
+                            agent = scene.Agents[childAgentData.AgentID];
+                        }
+                        catch
+                        {
+                            res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                            res.Close();
+                            return;
+                        }
+
+                        try
+                        {
+                            agent.HandleAgentMessage(childAgentData);
+                            res = req.BeginResponse();
+                            res.Close();
+                        }
+                        catch
+                        {
+                            res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                            res.Close();
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                        res.Close();
+                    }
                 }
                 else if (msgType == "AgentPosition")
                 {
@@ -421,9 +534,41 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     childAgentPosition.UpAxis = param["up_axis"].AsVector3;
                     childAgentPosition.ChangedGrid = param["changed_grid"].AsBoolean;
                     /* Far and Throttles are extra in opensim so we have to cope with these on sending */
+                    
+                    SceneInterface scene;
+                    if (Scene.Management.Scene.SceneManager.Scenes.TryGetValue(childAgentPosition.RegionHandle, out scene))
+                    {
+                        IAgent agent;
+                        HttpResponse res;
+                        try
+                        {
+                            agent = scene.Agents[childAgentPosition.AgentID];
+                        }
+                        catch
+                        {
+                            res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                            res.Close();
+                            return;
+                        }
 
-                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
-                    res.Close();
+                        try
+                        {
+                            agent.HandleAgentMessage(childAgentPosition);
+                            res = req.BeginResponse();
+                            res.Close();
+                        }
+                        catch
+                        {
+                            res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                            res.Close();
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                        res.Close();
+                    }
                 }
                 else
                 {

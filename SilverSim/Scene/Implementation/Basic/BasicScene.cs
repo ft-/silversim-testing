@@ -265,6 +265,7 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Properties
+
         public override ISceneObjects Objects
         {
             get
@@ -303,6 +304,15 @@ namespace SilverSim.Scene.Implementation.Basic
                 return m_SceneParcels;
             }    
         }
+
+        public override ILLUDPServer UDPServer
+        {
+            get
+            {
+                return m_UDPServer;
+            }
+        }
+
         #endregion
 
         #region Add and Remove

@@ -23,11 +23,12 @@ exception statement from your version.
 
 */
 
+using log4net;
+using SilverSim.LL.Messages;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Parcel;
 using SilverSim.Scene.Types.Terrain;
-using SilverSim.Types.Grid;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.Grid;
@@ -35,13 +36,11 @@ using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
-using SilverSim.LL.Messages;
-using log4net;
+using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Scene
@@ -196,6 +195,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public abstract void Add(IObject obj);
         public abstract bool Remove(IObject obj);
+
+        public abstract ILLUDPServer UDPServer { get; }
 
         public void TriggerIPChanged(IPAddress ip)
         {

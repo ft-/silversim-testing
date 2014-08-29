@@ -26,9 +26,10 @@ exception statement from your version.
 using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.Scene.ServiceInterfaces.Chat;
-using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.IM;
+using SilverSim.Types;
 using SilverSim.Types.IM;
 using System;
 using System.Collections.Generic;
@@ -36,7 +37,6 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using ThreadedClasses;
-using SilverSim.Types;
 
 namespace SilverSim.LL.Core
 {
@@ -54,7 +54,7 @@ namespace SilverSim.LL.Core
     #endregion
 
     #region LLUDP Server
-    public class LLUDPServer : IDisposable
+    public class LLUDPServer : IDisposable, ILLUDPServer
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LLUDP SERVER");
         IPAddress m_BindAddress;
@@ -716,6 +716,11 @@ namespace SilverSim.LL.Core
             {
                 m_ChatService.Send(ev);
             }
+        }
+
+        public void AddCircuit(Circuit c)
+        {
+            m_Circuits.Add(c.RemoteEndPoint, c.CircuitCode, c);
         }
     }
     #endregion

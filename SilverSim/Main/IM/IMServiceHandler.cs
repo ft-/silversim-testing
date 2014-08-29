@@ -52,7 +52,7 @@ namespace SilverSim.Main.IM
             {
                 while(true)
                 {
-                    GridInstantMessage im = m_Queue.Dequeue(5000);
+                    GridInstantMessage im = m_Queue.Dequeue(1000);
                     try
                     {
                         IMRouter.Send(im);

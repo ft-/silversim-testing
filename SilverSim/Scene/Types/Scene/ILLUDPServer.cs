@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SilverSim.Scene.Types.Agent
+namespace SilverSim.Scene.Types.Scene
 {
-    public enum AttachmentPoint : byte
+    public interface ILLUDPServer
     {
     }
 }
