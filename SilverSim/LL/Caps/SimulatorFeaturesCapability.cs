@@ -23,10 +23,11 @@ exception statement from your version.
 
 */
 
+using SilverSim.LL.Core;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
-using SilverSim.LL.Core;
+using System.Net;
 
 namespace SilverSim.LL.Caps
 {

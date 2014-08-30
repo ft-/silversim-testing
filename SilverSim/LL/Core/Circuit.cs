@@ -453,7 +453,7 @@ namespace SilverSim.LL.Core
             IValue o;
             if(httpreq.Method != "POST")
             {
-                httpreq.BeginResponse(SilverSim.Main.Common.HttpServer.HttpStatusCode.MethodNotAllowed, "Method not allowed").Close();
+                httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed").Close();
                 return;
             }
 
@@ -463,12 +463,12 @@ namespace SilverSim.LL.Core
             }
             catch
             {
-                httpreq.BeginResponse(SilverSim.Main.Common.HttpServer.HttpStatusCode.UnprocessableEntity, "Unprocessable entity").Close();
+                httpreq.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type").Close();
                 return;
             }
             if(!(o is AnArray))
             {
-                httpreq.BeginResponse(SilverSim.Main.Common.HttpServer.HttpStatusCode.UnprocessableEntity, "Unprocessable entity").Close();
+                httpreq.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type").Close();
                 return;
             }
 

@@ -27,6 +27,7 @@ using log4net;
 using Nwc.XmlRpc;
 using System;
 using System.IO;
+using System.Net;
 using System.Text;
 using System.Xml;
 using ThreadedClasses;

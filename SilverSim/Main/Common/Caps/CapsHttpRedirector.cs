@@ -27,6 +27,7 @@ using log4net;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using System;
+using System.Net;
 using ThreadedClasses;
 
 namespace SilverSim.Main.Common.Caps

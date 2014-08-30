@@ -26,6 +26,7 @@ exception statement from your version.
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 
 namespace SilverSim.Main.Common.HttpServer
 {

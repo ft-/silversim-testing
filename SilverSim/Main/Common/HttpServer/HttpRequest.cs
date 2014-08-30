@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -197,7 +198,7 @@ namespace SilverSim.Main.Common.HttpServer
                 MajorVersion = 1;
                 MinorVersion = 1;
                 ConnectionMode = ConnectionModeEnum.Close;
-                HttpResponse res = BeginResponse(HttpStatusCode.HTTPVersionNotSupported, "HTTP Version not supported");
+                HttpResponse res = BeginResponse(HttpStatusCode.HttpVersionNotSupported, "HTTP Version not supported");
                 res.Close();
             }
             if(MinorVersion > 1)
@@ -205,7 +206,7 @@ namespace SilverSim.Main.Common.HttpServer
                 MajorVersion = 1;
                 MinorVersion = 1;
                 ConnectionMode = ConnectionModeEnum.Close;
-                HttpResponse res = BeginResponse(HttpStatusCode.HTTPVersionNotSupported, "HTTP Version not supported");
+                HttpResponse res = BeginResponse(HttpStatusCode.HttpVersionNotSupported, "HTTP Version not supported");
                 res.Close();
             }
 

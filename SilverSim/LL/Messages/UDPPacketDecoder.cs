@@ -157,10 +157,6 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.UUIDNameRequest, Lookup.UUIDNameRequest.Decode);
             PacketTypes.Add(MessageType.UUIDGroupNameRequest, Lookup.UUIDGroupNameRequest.Decode);
 
-            /* UUID to Name Lookup */
-            PacketTypes.Add(MessageType.UUIDNameRequest, Names.UUIDNameRequest.Decode);
-            PacketTypes.Add(MessageType.UUIDGroupNameRequest, Names.UUIDGroupNameRequest.Decode);
-
             /* User */
             PacketTypes.Add(MessageType.GodKickUser, User.GodKickUser.Decode);
             PacketTypes.Add(MessageType.EjectUser, User.EjectUser.Decode);

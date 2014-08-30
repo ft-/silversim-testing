@@ -49,6 +49,7 @@ using SilverSim.Types.Groups;
 using SilverSim.LL.Core;
 using SilverSim.LL.Caps;
 using System;
+using System.Net;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
@@ -166,7 +167,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 catch(Exception e)
                 {
                     m_Log.InfoFormat("Deserialization error for agent message {0}\n{1}", req.RawUrl, e.StackTrace.ToString());
-                    res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, e.Message);
+                    res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, e.Message);
                     res.Close();
                     return;
                 }
@@ -205,6 +206,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 LLUDPServer udpServer = (LLUDPServer)scene.UDPServer;
 
                 Circuit circuit = new Circuit(udpServer, agentPost.Circuit.CircuitCode, m_CapsRedirector, agentPost.Circuit.CapsPath);
+                IPEndPoint ep = new IPEndPoint(IPAddress.Parse(agentPost.Client.ClientIP), 0);
+                circuit.RemoteEndPoint = ep;
 
                 try
                 {
@@ -221,7 +224,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 }
                 catch (Exception e)
                 {
-                    res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, e.Message);
+                    res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, e.Message);
                     res.Close();
                     return;
                 }
@@ -257,7 +260,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 catch (Exception e)
                 {
                     m_Log.InfoFormat("Deserialization error for agent message {0}\n{1}", req.RawUrl, e.StackTrace.ToString());
-                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, e.Message);
+                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, e.Message);
                     res.Close();
                     return;
                 }
@@ -493,7 +496,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                         }
                         catch
                         {
-                            res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                            res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
                             res.Close();
                             return;
                         }
@@ -506,14 +509,14 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                         }
                         catch
                         {
-                            res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                            res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
                             res.Close();
                             return;
                         }
                     }
                     else
                     {
-                        HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                        HttpResponse res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
                         res.Close();
                     }
                 }
@@ -546,7 +549,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                         }
                         catch
                         {
-                            res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                            res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
                             res.Close();
                             return;
                         }
@@ -559,20 +562,20 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                         }
                         catch
                         {
-                            res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                            res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
                             res.Close();
                             return;
                         }
                     }
                     else
                     {
-                        HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                        HttpResponse res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
                         res.Close();
                     }
                 }
                 else
                 {
-                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnprocessableEntity, "Unknown message type");
+                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
                     res.Close();
                 }
             }

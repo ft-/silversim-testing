@@ -46,7 +46,6 @@ namespace SilverSim.StructuredData.Agent
         public CircuitInfo Circuit = new CircuitInfo();
         public AppearanceInfo Appearance = new AppearanceInfo();
         public UserAccount Account = new UserAccount();
-        public Dictionary<string, string> ServiceURLs = new Dictionary<string,string>();
 
         public class InvalidAgentPostSerialization : Exception
         {
@@ -86,11 +85,14 @@ namespace SilverSim.StructuredData.Agent
             agentparams.Circuit.CircuitCode = parms["circuit_code"].AsUInt;
             agentparams.Circuit.CapsPath = parms["caps_path"].ToString();
             agentparams.Circuit.IsChild = parms["child"].AsBoolean;
-            AnArray children_seeds = (AnArray)parms["children_seeds"];
-            foreach(IValue seedv in children_seeds)
+            if(parms.ContainsKey("children_seeds"))
             {
-                Map seed = (Map)seedv;
-                agentparams.Circuit.ChildrenCapSeeds[UInt64.Parse(seed["handle"].ToString())] = seed["seed"].ToString();
+                AnArray children_seeds = (AnArray)parms["children_seeds"];
+                foreach(IValue seedv in children_seeds)
+                {
+                    Map seed = (Map)seedv;
+                    agentparams.Circuit.ChildrenCapSeeds[UInt64.Parse(seed["handle"].ToString())] = seed["seed"].ToString();
+                }
             }
 
             /*-----------------------------------------------------------------*/
@@ -145,7 +147,7 @@ namespace SilverSim.StructuredData.Agent
             {
                 foreach (KeyValuePair<string, IValue> kvp in (Map)(parms["serviceurls"]))
                 {
-                    agentparams.ServiceURLs.Add(kvp.Key, kvp.Value.ToString());
+                    agentparams.Account.ServiceURLs.Add(kvp.Key, kvp.Value.ToString());
                 }
             }
             else if (parms.ContainsKey("service_urls") && parms["service_urls"] is AnArray)
@@ -158,15 +160,15 @@ namespace SilverSim.StructuredData.Agent
                 int i;
                 for (i = 0; i < array.Count; i += 2)
                 {
-                    agentparams.ServiceURLs.Add(array[i].ToString(), array[i + 1].ToString());
+                    agentparams.Account.ServiceURLs.Add(array[i].ToString(), array[i + 1].ToString());
                 }
             }
 
-            if (agentparams.ServiceURLs.ContainsKey("GatekeeperURI"))
+            if (agentparams.Account.ServiceURLs.ContainsKey("GatekeeperURI"))
             {
-                if (agentparams.ServiceURLs["GatekeeperURI"] == "" || agentparams.ServiceURLs["GatekeeperURI"] == "/")
+                if (agentparams.Account.ServiceURLs["GatekeeperURI"] == "" || agentparams.Account.ServiceURLs["GatekeeperURI"] == "/")
                 {
-                    agentparams.ServiceURLs["GatekeeperURI"] = agentparams.ServiceURLs["HomeURI"];
+                    agentparams.Account.ServiceURLs["GatekeeperURI"] = agentparams.Account.ServiceURLs["HomeURI"];
                 }
             }
 
@@ -332,7 +334,7 @@ namespace SilverSim.StructuredData.Agent
             /* Service URLs */
             w.Write("serviceurls:{");
             prefix = "";
-            foreach(KeyValuePair<string, string> kvp in ServiceURLs)
+            foreach (KeyValuePair<string, string> kvp in Account.ServiceURLs)
             {
                 w.Write(prefix);
                 WriteJSONString(w, kvp.Key, kvp.Value);
@@ -341,7 +343,7 @@ namespace SilverSim.StructuredData.Agent
             w.Write("},");
             w.Write("service_urls:[");
             prefix = "";
-            foreach (KeyValuePair<string, string> kvp in ServiceURLs)
+            foreach (KeyValuePair<string, string> kvp in Account.ServiceURLs)
             {
                 w.Write(prefix);
                 w.Write(string.Format("\"{0}\", \"{1}\"", JSON.JSON.SerializeString(kvp.Key), JSON.JSON.SerializeString(kvp.Value)));
