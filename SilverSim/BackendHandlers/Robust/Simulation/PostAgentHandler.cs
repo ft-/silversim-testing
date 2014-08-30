@@ -53,6 +53,7 @@ using System.Net;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Text;
 using SilverSim.BackendConnectors.Robust.Account;
 using SilverSim.BackendConnectors.Robust.Asset;
 using SilverSim.BackendConnectors.Robust.Avatar;
@@ -123,6 +124,22 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             }
         }
 
+        public void DoAgentResponse(HttpRequest req, string reason, bool success)
+        {
+            string success_str = success ? "true" : "false";
+            string caller = req.CallerIP.ToString();
+            string fmt = "{" + string.Format("\"reason\":\"{0}\",\"success\":{1},\"your_ip\":\"{2}\"",
+                reason,
+                success_str,
+                caller) + "}";
+            HttpResponse res = req.BeginResponse();
+            res.ContentType = "application/json";
+            Stream o = res.GetOutputStream();
+            byte[] b = Encoding.UTF8.GetBytes(fmt);
+            o.Write(b, 0, b.Length);
+            res.Close();
+        }
+
         public void AgentPostHandler(HttpRequest req)
         {
             UUID agentID;
@@ -154,7 +171,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 else
                 {
                     m_Log.InfoFormat("Invalid content for agent message {0}: {1}", req.RawUrl, req.ContentType);
-                    res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Invalid content for agent message");
+                    res = req.BeginResponse(HttpStatusCode.BadRequest, "Invalid content for agent message");
                     res.Close();
                     return;
                 }
@@ -167,7 +184,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 catch(Exception e)
                 {
                     m_Log.InfoFormat("Deserialization error for agent message {0}\n{1}", req.RawUrl, e.StackTrace.ToString());
-                    res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, e.Message);
+                    res = req.BeginResponse(HttpStatusCode.BadRequest, e.Message);
                     res.Close();
                     return;
                 }
@@ -224,12 +241,18 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 }
                 catch (Exception e)
                 {
-                    res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, e.Message);
-                    res.Close();
+                    DoAgentResponse(req, e.Message, false);
                     return;
                 }
-                res = req.BeginResponse();
-                res.Close();
+                m_Log.InfoFormat("Agent post request {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Caps {6}",
+                    agentPost.Account.Principal.FirstName,
+                    agentPost.Account.Principal.LastName,
+                    agentPost.Account.Principal.HomeURI,
+                    agentPost.Account.Principal.ID,
+                    agentPost.Destination.TeleportFlags.ToString(),
+                    agentPost.Client.ClientIP,
+                    agentPost.Circuit.CapsPath);
+                DoAgentResponse(req, "authorized", true);
             }
             else if(req.Method == "PUT")
             {
@@ -260,7 +283,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 catch (Exception e)
                 {
                     m_Log.InfoFormat("Deserialization error for agent message {0}\n{1}", req.RawUrl, e.StackTrace.ToString());
-                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, e.Message);
+                    HttpResponse res = req.BeginResponse(HttpStatusCode.BadRequest, e.Message);
                     res.Close();
                     return;
                 }
@@ -496,7 +519,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                         }
                         catch
                         {
-                            res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
+                            res = req.BeginResponse(HttpStatusCode.BadRequest, "Unknown message type");
                             res.Close();
                             return;
                         }
@@ -509,7 +532,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                         }
                         catch
                         {
-                            res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
+                            res = req.BeginResponse(HttpStatusCode.BadRequest, "Unknown message type");
                             res.Close();
                             return;
                         }
@@ -549,7 +572,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                         }
                         catch
                         {
-                            res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
+                            res = req.BeginResponse(HttpStatusCode.BadRequest, "Unknown message type");
                             res.Close();
                             return;
                         }
@@ -562,20 +585,20 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                         }
                         catch
                         {
-                            res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
+                            res = req.BeginResponse(HttpStatusCode.BadRequest, "Unknown message type");
                             res.Close();
                             return;
                         }
                     }
                     else
                     {
-                        HttpResponse res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
+                        HttpResponse res = req.BeginResponse(HttpStatusCode.BadRequest, "Unknown message type");
                         res.Close();
                     }
                 }
                 else
                 {
-                    HttpResponse res = req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unknown message type");
+                    HttpResponse res = req.BeginResponse(HttpStatusCode.BadRequest, "Unknown message type");
                     res.Close();
                 }
             }

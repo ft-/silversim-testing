@@ -201,14 +201,6 @@ namespace SilverSim.Main.Common.HttpServer
                 HttpResponse res = BeginResponse(HttpStatusCode.HttpVersionNotSupported, "HTTP Version not supported");
                 res.Close();
             }
-            if(MinorVersion > 1)
-            {
-                MajorVersion = 1;
-                MinorVersion = 1;
-                ConnectionMode = ConnectionModeEnum.Close;
-                HttpResponse res = BeginResponse(HttpStatusCode.HttpVersionNotSupported, "HTTP Version not supported");
-                res.Close();
-            }
 
             /* Configure connection mode default according to version */
             if(MinorVersion > 0)

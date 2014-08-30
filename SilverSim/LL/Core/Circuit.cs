@@ -461,8 +461,9 @@ namespace SilverSim.LL.Core
             {
                 o = LLSD_XML.Deserialize(httpreq.Body);
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace.ToString());
                 httpreq.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type").Close();
                 return;
             }
@@ -488,23 +489,22 @@ namespace SilverSim.LL.Core
             }
 
             HttpResponse res = httpreq.BeginResponse();
-            using(TextWriter tw = new StreamWriter(res.GetOutputStream(), Encoding.UTF8))
+            Stream tw = res.GetOutputStream();
+            tw.Write(m_Header, 0, m_Header.Length);
+            foreach(KeyValuePair<string, string> kvp in capsUri)
             {
-                tw.Write("<?xml version=\"1.0\" encoding=\"utf-8\"?>");
-                tw.Write("<llsd>");
-                tw.Write("<map>");
-                foreach(KeyValuePair<string, string> kvp in capsUri)
-                {
-                    tw.Write(string.Format("<key>{0}</key><string>{1}</string>", 
-                            System.Xml.XmlConvert.EncodeName(kvp.Key), 
-                            System.Xml.XmlConvert.EncodeName(kvp.Value)
-                        ));
-                }
-                tw.Write("</map>");
-                tw.Write("</llsd>");
+                byte[] data = Encoding.UTF8.GetBytes(string.Format("<key>{0}</key><string>{1}</string>",
+                        System.Xml.XmlConvert.EncodeName(kvp.Key),
+                        System.Xml.XmlConvert.EncodeName(kvp.Value))
+                    );
+                tw.Write(data, 0, data.Length);
             }
+            tw.Write(m_Footer, 0, m_Footer.Length);
             res.Close();
         }
+
+        private static readonly byte[] m_Header = Encoding.UTF8.GetBytes("<?xml version=\"1.0\" encoding=\"utf-8\"?><llsd><map>");
+        private static readonly byte[] m_Footer = Encoding.UTF8.GetBytes("</map></llsd>");
         #endregion
     }
 }

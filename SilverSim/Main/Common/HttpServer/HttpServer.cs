@@ -178,7 +178,7 @@ namespace SilverSim.Main.Common.HttpServer
                                 }
                                 catch (Exception e)
                                 {
-                                    m_Log.WarnFormat("Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
+                                    m_Log.WarnFormat("Unexpected exception at {0} {1}: {2}\n{3}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
                                 }
                                 req.Close();
                                 return;

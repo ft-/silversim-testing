@@ -41,7 +41,7 @@ namespace SilverSim.StructuredData.LLSD
         {
             string elementName = input.Name;
             string data = string.Empty;
-            while(true)
+            while (true)
             {
                 if(!input.Read())
                 {
@@ -54,8 +54,7 @@ namespace SilverSim.StructuredData.LLSD
                         break;
 
                     case XmlNodeType.Text:
-                        data += input.ReadContentAsString();
-                        break;
+                        return input.ReadContentAsString();
 
                     case XmlNodeType.EndElement:
                         if(input.Name != elementName)
