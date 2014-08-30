@@ -210,6 +210,9 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
                 LLAgent agent = new LLAgent(
                     agentPost.Account.Principal.ID,
+                    agentPost.Account.Principal.FirstName,
+                    agentPost.Account.Principal.LastName,
+                    agentPost.Account.Principal.HomeURI,
                     assetService,
                     inventoryService,
                     groupsService,
@@ -225,6 +228,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 Circuit circuit = new Circuit(udpServer, agentPost.Circuit.CircuitCode, m_CapsRedirector, agentPost.Circuit.CapsPath);
                 IPEndPoint ep = new IPEndPoint(IPAddress.Parse(agentPost.Client.ClientIP), 0);
                 circuit.RemoteEndPoint = ep;
+                circuit.AgentID = agentPost.Account.Principal.ID;
+                circuit.SessionID = agentPost.Session.SessionID;
 
                 try
                 {
@@ -244,14 +249,15 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     DoAgentResponse(req, e.Message, false);
                     return;
                 }
-                m_Log.InfoFormat("Agent post request {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Caps {6}",
+                m_Log.DebugFormat("Agent post request {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Caps {6} Circuit {7}",
                     agentPost.Account.Principal.FirstName,
                     agentPost.Account.Principal.LastName,
                     agentPost.Account.Principal.HomeURI,
                     agentPost.Account.Principal.ID,
                     agentPost.Destination.TeleportFlags.ToString(),
                     agentPost.Client.ClientIP,
-                    agentPost.Circuit.CapsPath);
+                    agentPost.Circuit.CapsPath,
+                    agentPost.Circuit.CircuitCode);
                 DoAgentResponse(req, "authorized", true);
             }
             else if(req.Method == "PUT")

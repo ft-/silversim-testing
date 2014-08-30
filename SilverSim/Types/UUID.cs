@@ -56,23 +56,37 @@ namespace SilverSim.Types
 
         public UUID(byte[] source, int pos)
         {
-            byte[] g = new byte[16];
-            Buffer.BlockCopy(source, pos, g, 0, 16);
-            m_Guid = new Guid(g);
+            int a = (source[pos + 0] << 24) | (source[pos + 1] << 16) | (source[pos + 2] << 8) | source[pos + 3];
+            short b = (short)((source[pos + 4] << 8) | source[pos + 5]);
+            short c = (short)((source[pos + 6] << 8) | source[pos + 7]);
+
+            m_Guid = new Guid(a, b, c, source[pos + 8], source[pos + 9], source[pos + 10], source[pos + 11],
+                source[pos + 12], source[pos + 13], source[pos + 14], source[pos + 15]);
         }
         #endregion
 
         public void FromBytes(byte[] source, int pos)
         {
-            byte[] o = new byte[16];
-            Buffer.BlockCopy(source, pos, o, 0, 16);
-            m_Guid = new Guid(o);
+            int a = (source[pos + 0] << 24) | (source[pos + 1] << 16) | (source[pos + 2] << 8) | source[pos + 3];
+            short b = (short)((source[pos + 4] << 8) | source[pos + 5]);
+            short c = (short)((source[pos + 6] << 8) | source[pos + 7]);
+
+            m_Guid = new Guid(a, b, c, source[pos + 8], source[pos + 9], source[pos + 10], source[pos + 11],
+                source[pos + 12], source[pos + 13], source[pos + 14], source[pos + 15]);
         }
 
         public void ToBytes(byte[] dest, int pos)
         {
-            byte[] o = m_Guid.ToByteArray();
-            Buffer.BlockCopy(o, 0, dest, pos, 16);
+            byte[] bytes = m_Guid.ToByteArray();
+            dest[pos + 0] = bytes[3];
+            dest[pos + 1] = bytes[2];
+            dest[pos + 2] = bytes[1];
+            dest[pos + 3] = bytes[0];
+            dest[pos + 4] = bytes[5];
+            dest[pos + 5] = bytes[4];
+            dest[pos + 6] = bytes[7];
+            dest[pos + 7] = bytes[6];
+            Buffer.BlockCopy(bytes, 8, dest, pos + 8, 8);
         }
 
         public static UUID Parse(string val)

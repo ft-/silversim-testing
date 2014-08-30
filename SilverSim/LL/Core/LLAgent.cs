@@ -811,6 +811,9 @@ namespace SilverSim.LL.Core
         #endregion
 
         public LLAgent(UUID agentID,
+            string firstName,
+            string lastName,
+            Uri homeURI,
             AssetServiceInterface assetService,
             InventoryServiceInterface inventoryService,
             GroupsServiceInterface groupsService,
@@ -831,6 +834,9 @@ namespace SilverSim.LL.Core
             m_PresenceService = presenceService;
             m_GridUserService = gridUserService;
             m_GridService = gridService;
+            HomeURI = homeURI;
+            FirstName = firstName;
+            LastName = lastName;
         }
 
         ~LLAgent()

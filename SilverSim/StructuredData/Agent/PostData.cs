@@ -105,7 +105,8 @@ namespace SilverSim.StructuredData.Agent
             agentparams.Destination.Position = parms["start_pos"].AsVector3;
             if (parms.ContainsKey("teleport_flags"))
             {
-                agentparams.Destination.TeleportFlags = (TeleportFlags)(parms["teleport_flags"].AsUInt);
+                uint tpflags = parms["teleport_flags"].AsUInt;
+                agentparams.Destination.TeleportFlags = (TeleportFlags)(tpflags);
             }
             else
             {

@@ -173,9 +173,9 @@ namespace SilverSim.Types
         public AString AsString { get { return new AString(m_Value); } }
         public UUID AsUUID { get { return new UUID(m_Value); } }
         public Vector3 AsVector3 { get { return Vector3.Parse(m_Value); } }
-        public uint AsUInt { get { return m_Value != "" ? (uint)1 : 0; } }
-        public int AsInt { get { return m_Value != "" ? 1 : 0; } }
-        public ulong AsULong { get { return m_Value != "" ? (ulong)1 : 0; } }
+        public uint AsUInt { get { return uint.Parse(m_Value); } }
+        public int AsInt { get { return int.Parse(m_Value); } }
+        public ulong AsULong { get { return ulong.Parse(m_Value); } }
         #endregion
 
         private readonly static CultureInfo EnUsCulture = new CultureInfo("en-us");

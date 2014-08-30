@@ -244,15 +244,18 @@ namespace SilverSim.LL.Core
                     MessageType mType = pck.ReadMessageType();
                     if (MessageType.UseCircuitCode == mType)
                     {
+                        UInt32 circuitcode = pck.ReadUInt32();
                         /* it is, so we have actually to look for the circuitcode and set up the remote endpoint here */
-                        if (m_Circuits.TryGetValue(pck.ReadUInt32(), out circuit))
+                        if (m_Circuits.TryGetValue(circuitcode, out circuit))
                         {
+                            UUID sessionID = pck.ReadUUID();
+                            UUID agentID = pck.ReadUUID();
                             /* there it is check for SessionID and AgentID */
-                            if (!circuit.SessionID.Equals(pck.ReadUUID()))
+                            if (!circuit.SessionID.Equals(sessionID))
                             {
                                 /* no match on SessionID */
                             }
-                            else if (!circuit.AgentID.Equals(pck.ReadUUID()))
+                            else if (!circuit.AgentID.Equals(agentID))
                             {
                                 /* no match on AgentID */
                             }
