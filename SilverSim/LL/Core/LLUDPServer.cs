@@ -192,6 +192,11 @@ namespace SilverSim.LL.Core
                 }
                 m_InboundRunning = false;
             }
+            foreach(Circuit c in m_Circuits.Values)
+            {
+                c.Stop();
+                c.Dispose();
+            }
         }
 
         #region UDP Receive Handler
