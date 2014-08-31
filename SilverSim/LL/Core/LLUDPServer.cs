@@ -776,6 +776,21 @@ namespace SilverSim.LL.Core
         public void AddCircuit(Circuit c)
         {
             m_Circuits.Add(c.RemoteEndPoint, c.CircuitCode, c);
+            try
+            {
+                m_Agents.Add(c.AgentID, c.Agent);
+            }
+            catch
+            {
+                m_Circuits.Remove(c.RemoteEndPoint, c.CircuitCode);
+                throw;
+            }
+        }
+
+        public void RemoveCircuit(Circuit c)
+        {
+            m_Agents.Remove(c.AgentID);
+            m_Circuits.Remove(c.RemoteEndPoint, c.CircuitCode);
         }
     }
     #endregion

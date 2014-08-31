@@ -123,6 +123,7 @@ namespace SilverSim.LL.Core
 
         ~Circuit()
         {
+            Agent = null;
             Scene = null;
             Dispose();
         }
@@ -454,7 +455,12 @@ namespace SilverSim.LL.Core
             {
                 m_CapsRedirector.Caps[kvp.Key].Remove(kvp.Value);
             }
+            if(null != Agent && null != Scene)
+            {
+                Agent.Circuits.Remove(CircuitCode, Scene.ID);
+            }
             m_RegisteredCapabilities.Clear();
+            Agent = null;
         }
         
         public void RegionSeedHandler(HttpRequest httpreq)

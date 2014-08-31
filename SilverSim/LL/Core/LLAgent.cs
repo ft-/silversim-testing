@@ -33,7 +33,9 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using SilverSim.Main.Common;
 using SilverSim.Types.IM;
+using SilverSim.Types.Grid;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -62,6 +64,8 @@ namespace SilverSim.LL.Core
 
         #region LLAgent Properties
         public Uri HomeURI { get; private set; }
+
+        public TeleportFlags TeleportFlags = TeleportFlags.None;
         #endregion
 
         /* Circuits: UUID is SceneID */
@@ -893,10 +897,22 @@ namespace SilverSim.LL.Core
                     {
                         Messages.Circuit.CompleteAgentMovement cam = (Messages.Circuit.CompleteAgentMovement)m;
                         Circuit circuit;
-                        if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
+                        if ((this.TeleportFlags & TeleportFlags.ViaLogin) != 0 && (this.TeleportFlags & TeleportFlags.ViaHGLogin) == 0)
                         {
-                            /* switch agent region */
-                            m_CurrentSceneID = circuit.Scene.ID;
+                            if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
+                            {
+                                /* switch agent region */
+                                m_CurrentSceneID = circuit.Scene.ID;
+
+                                Messages.Circuit.AgentMovementComplete amc = new Messages.Circuit.AgentMovementComplete();
+                                amc.AgentID = cam.AgentID;
+                                amc.ChannelVersion = VersionInfo.SimulatorVersion;
+                                amc.LookAt = new Vector3(1, 1, 0); /* TODO: extract from agent */
+                                amc.Position = new Vector3(128, 128, 23);
+                                amc.SessionID = cam.SessionID;
+
+                                circuit.SendMessage(amc);
+                            }
                         }
                     }
                     break;

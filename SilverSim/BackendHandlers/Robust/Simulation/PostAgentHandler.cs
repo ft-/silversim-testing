@@ -46,6 +46,7 @@ using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.Types.Groups;
+using SilverSim.Types.Grid;
 using SilverSim.LL.Core;
 using SilverSim.LL.Caps;
 using System;
@@ -223,13 +224,17 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     gridUserService,
                     gridService);
 
+                agent.TeleportFlags = agentPost.Destination.TeleportFlags;
+
                 LLUDPServer udpServer = (LLUDPServer)scene.UDPServer;
 
                 Circuit circuit = new Circuit(udpServer, agentPost.Circuit.CircuitCode, m_CapsRedirector, agentPost.Circuit.CapsPath);
                 IPEndPoint ep = new IPEndPoint(IPAddress.Parse(agentPost.Client.ClientIP), 0);
                 circuit.RemoteEndPoint = ep;
+                circuit.Agent = agent;
                 circuit.AgentID = agentPost.Account.Principal.ID;
                 circuit.SessionID = agentPost.Session.SessionID;
+                agent.Circuits.Add(circuit.CircuitCode, circuit.Scene.ID, circuit);
 
                 try
                 {
@@ -246,6 +251,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 }
                 catch (Exception e)
                 {
+                    agent.Circuits.Clear();
                     DoAgentResponse(req, e.Message, false);
                     return;
                 }
