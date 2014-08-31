@@ -172,6 +172,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public SceneInterface()
         {
+            Owner = new UUI();
             RegionSecret = UUID.Random;
             LastIPAddress = new IPAddress(0);
             m_NotecardCache = new NotecardCache(this);

@@ -335,17 +335,32 @@ namespace SilverSim.LL.Core
             {
                 try
                 {
-                    Message m = m_TxQueue.Dequeue(5000);
+                    Message m = m_TxQueue.Dequeue(1000);
                     if (m is CancelTxThread)
                     {
                         break;
+                    }
+                    if(m != null)
+                    {
+                        UDPPacket p = new UDPPacket();
+                        m.Serialize(p);
+                        p.IsReliable = m.IsReliable;
+                        p.SequenceNumber = NextSequenceNumber;
+                        m_Server.SendPacketTo(p, RemoteEndPoint);
+                        p.EnqueuedAtTime = (uint)Environment.TickCount;
+                        p.TransferredAtTime = (uint)Environment.TickCount;
+                        if (m.IsReliable)
+                        {
+                            p.IsResent = true;
+                            m_UnackedPackets[p.SequenceNumber] = p;
+                        }
                     }
                 }
                 catch
                 {
                 }
 
-                if(Environment.TickCount - lastPingTick < 5000)
+                if(Environment.TickCount - lastPingTick >= 5000)
                 {
                     if (!m_PingSendTicks.ContainsKey(pingID))
                     {
@@ -358,7 +373,7 @@ namespace SilverSim.LL.Core
                         m_Server.SendPacketTo(p, RemoteEndPoint);
                     }
                 }
-                if (Environment.TickCount - lastAckTick < 1000)
+                if (Environment.TickCount - lastAckTick >= 1000)
                 {
                     lastAckTick = Environment.TickCount;
                     /* check for acks to be send */
@@ -394,18 +409,11 @@ namespace SilverSim.LL.Core
         }
 
 
-        void SendPacket(UDPPacket p)
-        {
-            p.EnqueuedAtTime = (uint)Environment.TickCount;
-        }
-
         public void SendMessage(Message m)
         {
             try
             {
-                UDPPacket p = new UDPPacket();
-                m.Serialize(p);
-                SendPacket(p);
+                m_TxQueue.Enqueue(m);
             }
             catch(Exception e)
             {

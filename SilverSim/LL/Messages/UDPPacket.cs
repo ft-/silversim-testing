@@ -65,13 +65,13 @@ namespace SilverSim.LL.Messages
             {
                 if (BitConverter.IsLittleEndian)
                 {
-                    byte[] b = BitConverter.GetBytes(SequenceNumber);
+                    byte[] b = BitConverter.GetBytes(value);
                     Array.Reverse(b);
                     Buffer.BlockCopy(b, 0, Data, 1, 4);
                 }
                 else
                 {
-                    Buffer.BlockCopy(BitConverter.GetBytes(SequenceNumber), 0, Data, 1, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(value), 0, Data, 1, 4);
                 }
             }
         }

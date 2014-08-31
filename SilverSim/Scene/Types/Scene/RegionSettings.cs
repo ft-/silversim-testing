@@ -147,6 +147,6 @@ namespace SilverSim.Scene.Types.Scene
 
         public bool Sandbox = false;
 
-        public UUID TelehubObject;
+        public UUID TelehubObject = UUID.Zero;
     }
 }
