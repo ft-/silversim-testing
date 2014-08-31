@@ -277,22 +277,31 @@ namespace SilverSim.LL.Core
                                 {
                                     circuit.Start();
 
+                                    SceneInterface scene = Scene;
                                     Messages.Region.RegionHandshake rh = new Messages.Region.RegionHandshake();
                                     rh.RegionFlags = 0;
-                                    rh.SimAccess = Scene.RegionData.Access;
-                                    rh.SimName = Scene.Name;
-                                    rh.SimOwner = Scene.Owner.ID;
+                                    rh.SimAccess = scene.RegionData.Access;
+                                    rh.SimName = scene.Name;
+                                    rh.SimOwner = scene.Owner.ID;
                                     rh.IsEstateManager = false;
-                                    rh.WaterHeight = 20;
+                                    rh.WaterHeight = scene.RegionSettings.WaterHeight;
                                     rh.BillableFactor = 1;
-                                    rh.TerrainStartHeight00 = 0;
-                                    rh.TerrainStartHeight01 = 10;
-                                    rh.TerrainStartHeight10 = 20;
-                                    rh.TerrainStartHeight11 = 30;
-                                    rh.TerrainHeightRange00 = 10;
-                                    rh.TerrainHeightRange01 = 10;
-                                    rh.TerrainHeightRange10 = 10;
-                                    rh.TerrainHeightRange11 = 10;
+                                    rh.TerrainStartHeight00 = scene.RegionSettings.Elevation1SW;
+                                    rh.TerrainStartHeight01 = scene.RegionSettings.Elevation2SW;
+                                    rh.TerrainStartHeight10 = scene.RegionSettings.Elevation1NW;
+                                    rh.TerrainStartHeight11 = scene.RegionSettings.Elevation2NW;
+                                    rh.TerrainHeightRange00 = scene.RegionSettings.Elevation1SE;
+                                    rh.TerrainHeightRange01 = scene.RegionSettings.Elevation2SE;
+                                    rh.TerrainHeightRange10 = scene.RegionSettings.Elevation1NE;
+                                    rh.TerrainHeightRange11 = scene.RegionSettings.Elevation2NE;
+                                    rh.TerrainBase0 = UUID.Zero;
+                                    rh.TerrainBase1 = UUID.Zero;
+                                    rh.TerrainBase2 = UUID.Zero;
+                                    rh.TerrainBase3 = UUID.Zero;
+                                    rh.TerrainDetail0 = scene.RegionSettings.TerrainTexture1;
+                                    rh.TerrainDetail1 = scene.RegionSettings.TerrainTexture2;
+                                    rh.TerrainDetail2 = scene.RegionSettings.TerrainTexture3;
+                                    rh.TerrainDetail3 = scene.RegionSettings.TerrainTexture4;
                                     rh.RegionID = Scene.ID;
                                     rh.CacheID = UUID.Random;
                                     rh.CPUClassID = 9;
@@ -300,6 +309,12 @@ namespace SilverSim.LL.Core
                                     rh.ColoName = "";
                                     rh.ProductSKU = VersionInfo.SimulatorVersion;
                                     rh.ProductName = VersionInfo.ProductName;
+
+                                    Messages.Region.RegionHandshake.RegionExtDataEntry entry = new Messages.Region.RegionHandshake.RegionExtDataEntry();
+                                    entry.RegionFlagsExtended = 0;
+                                    entry.RegionProtocols = 0; /* 0 => no SSB, 1 => SSB */
+                                    rh.RegionExtData.Add(entry);
+
                                     circuit.SendMessage(rh);
                                 }
                                 catch

@@ -79,6 +79,8 @@ namespace SilverSim.Scene.Types.Scene
     {
         private static readonly ILog m_Log = LogManager.GetLogger("SCENE");
 
+        public readonly RegionSettings RegionSettings = new RegionSettings();
+
         public UUID ID { get; protected set; }
         public UUID RegionSecret { get; private set; }
         public uint RegionPort { get; protected set; }

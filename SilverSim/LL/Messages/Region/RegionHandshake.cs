@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Region
 {
@@ -62,6 +63,14 @@ namespace SilverSim.LL.Messages.Region
         public string ColoName = string.Empty;
         public string ProductSKU = string.Empty;
         public string ProductName = string.Empty;
+
+        public struct RegionExtDataEntry
+        {
+            public UInt64 RegionFlagsExtended;
+            public UInt64 RegionProtocols;
+        }
+
+        public readonly List<RegionExtDataEntry> RegionExtData = new List<RegionExtDataEntry>();
 
         public RegionHandshake()
         {
@@ -109,6 +118,12 @@ namespace SilverSim.LL.Messages.Region
             p.WriteStringLen8(ColoName);
             p.WriteStringLen8(ProductSKU);
             p.WriteStringLen8(ProductName);
+            p.WriteUInt8((byte)RegionExtData.Count);
+            foreach(RegionExtDataEntry e in RegionExtData)
+            {
+                p.WriteUInt64(e.RegionFlagsExtended);
+                p.WriteUInt64(e.RegionProtocols);
+            }
         }
     }
 }
