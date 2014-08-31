@@ -31,20 +31,24 @@ namespace SilverSim.LL.Messages.Agent
 {
     public class CoarseLocationUpdate : Message
     {
-        public byte X = 0;
-        public byte Y = 0;
-        public byte Z = 0;
         public Int16 You = 0;
         public Int16 Prey = 0;
 
-        public List<UUID> AgentData = new List<UUID>();
+        public struct AgentDataEntry
+        {
+            public byte X;
+            public byte Y;
+            public byte Z;
+            public UUID AgentID;
+        }
+        public List<AgentDataEntry> AgentData = new List<AgentDataEntry>();
 
         public CoarseLocationUpdate()
         {
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -52,18 +56,22 @@ namespace SilverSim.LL.Messages.Agent
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
-            p.WriteUInt8(X);
-            p.WriteUInt8(Y);
-            p.WriteUInt8(Z);
+            p.WriteUInt8((byte)AgentData.Count);
+            foreach (AgentDataEntry d in AgentData)
+            {
+                p.WriteUInt8(d.X);
+                p.WriteUInt8(d.Y);
+                p.WriteUInt8(d.Z);
+            }
             p.WriteInt16(You);
             p.WriteInt16(Prey);
             p.WriteUInt8((byte)AgentData.Count);
-            foreach (UUID d in AgentData)
+            foreach (AgentDataEntry d in AgentData)
             {
-                p.WriteStringLen8(d);
+                p.WriteUUID(d.AgentID);
             }
         }
     }

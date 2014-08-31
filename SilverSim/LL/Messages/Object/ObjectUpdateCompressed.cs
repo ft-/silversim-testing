@@ -45,7 +45,7 @@ namespace SilverSim.LL.Messages.Object
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -53,7 +53,7 @@ namespace SilverSim.LL.Messages.Object
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUInt64(RegionHandle);
@@ -62,7 +62,7 @@ namespace SilverSim.LL.Messages.Object
             foreach (ObjData d in ObjectData)
             {
                 p.WriteUInt32(d.UpdateFlags);
-                p.WriteUInt16BE((UInt16)d.Data.Length);
+                p.WriteUInt16((UInt16)d.Data.Length);
                 p.WriteBytes(d.Data);
             }
         }

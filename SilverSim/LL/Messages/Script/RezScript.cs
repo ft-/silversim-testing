@@ -74,7 +74,7 @@ namespace SilverSim.LL.Messages.Script
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {

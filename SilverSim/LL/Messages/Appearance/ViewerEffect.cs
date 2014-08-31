@@ -39,7 +39,7 @@ namespace SilverSim.LL.Messages.Appearance
             public UUID AgentID;
             public byte Type;
             public double Duration;
-            public byte[] EffectColor;
+            public ColorAlpha EffectColor;
             public byte[] TypeData;
         }
 
@@ -50,7 +50,7 @@ namespace SilverSim.LL.Messages.Appearance
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -73,14 +73,19 @@ namespace SilverSim.LL.Messages.Appearance
                 d.AgentID = p.ReadUUID();
                 d.Type = p.ReadUInt8();
                 d.Duration = p.ReadFloat();
-                d.EffectColor = p.ReadBytes(4);
+                byte[] t = p.ReadBytes(4);
+                d.EffectColor = new ColorAlpha();
+                d.EffectColor.R_AsByte = t[0];
+                d.EffectColor.G_AsByte = t[1];
+                d.EffectColor.B_AsByte = t[2];
+                d.EffectColor.A_AsByte = t[3];
                 d.TypeData = p.ReadBytes(p.ReadUInt8());
             }
 
             return m;
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
@@ -93,7 +98,7 @@ namespace SilverSim.LL.Messages.Appearance
                 p.WriteUUID(d.AgentID);
                 p.WriteUInt8(d.Type);
                 p.WriteFloat((float)d.Duration);
-                p.WriteBytes(d.EffectColor);
+                p.WriteBytes(d.EffectColor.AsByte);
                 p.WriteUInt8((byte)d.TypeData.Length);
                 p.WriteBytes(d.TypeData);
             }

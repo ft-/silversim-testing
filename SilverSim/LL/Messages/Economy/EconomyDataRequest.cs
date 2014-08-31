@@ -32,7 +32,7 @@ namespace SilverSim.LL.Messages.Economy
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {

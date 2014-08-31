@@ -34,7 +34,7 @@ namespace SilverSim.LL.Messages.Circuit
         public UUID SessionID;
         public Vector3 Position;
         public Vector3 LookAt;
-        public UInt64 RegionHandle;
+        public GridVector GridPosition;
         public UInt32 Timestamp;
         public string ChannelVersion;
 
@@ -43,7 +43,7 @@ namespace SilverSim.LL.Messages.Circuit
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -51,14 +51,14 @@ namespace SilverSim.LL.Messages.Circuit
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
             p.WriteVector3f(Position);
             p.WriteVector3f(LookAt);
-            p.WriteUInt64(RegionHandle);
+            p.WriteUInt64(GridPosition.RegionHandle);
             p.WriteUInt32(Timestamp);
             p.WriteStringLen16(ChannelVersion);
         }

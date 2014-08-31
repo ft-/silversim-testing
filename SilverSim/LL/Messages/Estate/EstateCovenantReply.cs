@@ -40,7 +40,7 @@ namespace SilverSim.LL.Messages.Estate
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -48,5 +48,13 @@ namespace SilverSim.LL.Messages.Estate
             }
         }
 
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteMessageType(Number);
+            p.WriteUUID(CovenantID);
+            p.WriteUInt32(CovenantTimestamp);
+            p.WriteStringLen8(EstateName);
+            p.WriteUUID(EstateOwnerID);
+        }
     }
 }

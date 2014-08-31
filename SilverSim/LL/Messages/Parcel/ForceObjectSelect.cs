@@ -37,7 +37,7 @@ namespace SilverSim.LL.Messages.Parcel
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -45,7 +45,7 @@ namespace SilverSim.LL.Messages.Parcel
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteBoolean(ResetList);

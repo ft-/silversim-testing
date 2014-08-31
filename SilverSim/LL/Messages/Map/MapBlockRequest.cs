@@ -45,7 +45,7 @@ namespace SilverSim.LL.Messages.Map
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {

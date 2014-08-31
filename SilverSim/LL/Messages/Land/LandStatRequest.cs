@@ -42,7 +42,7 @@ namespace SilverSim.LL.Messages.Land
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {

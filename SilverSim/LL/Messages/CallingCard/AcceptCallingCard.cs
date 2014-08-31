@@ -41,7 +41,7 @@ namespace SilverSim.LL.Messages.CallingCard
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {

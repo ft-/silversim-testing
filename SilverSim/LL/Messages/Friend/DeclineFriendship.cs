@@ -38,7 +38,7 @@ namespace SilverSim.LL.Messages.Friend
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {

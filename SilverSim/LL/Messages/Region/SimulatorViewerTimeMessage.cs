@@ -45,7 +45,7 @@ namespace SilverSim.LL.Messages.Region
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -53,7 +53,7 @@ namespace SilverSim.LL.Messages.Region
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUInt64(UsecSinceStart);

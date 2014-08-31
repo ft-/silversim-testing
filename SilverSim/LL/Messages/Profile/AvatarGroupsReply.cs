@@ -54,7 +54,7 @@ namespace SilverSim.LL.Messages.Profile
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -62,7 +62,7 @@ namespace SilverSim.LL.Messages.Profile
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);

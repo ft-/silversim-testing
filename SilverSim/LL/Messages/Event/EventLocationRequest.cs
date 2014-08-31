@@ -38,7 +38,7 @@ namespace SilverSim.LL.Messages.Event
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {

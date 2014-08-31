@@ -49,7 +49,7 @@ namespace SilverSim.LL.Messages.Avatar
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -57,7 +57,7 @@ namespace SilverSim.LL.Messages.Avatar
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUUID(Sender);
@@ -65,7 +65,7 @@ namespace SilverSim.LL.Messages.Avatar
             p.WriteUInt8((byte)ObjectData.Count);
             foreach (ObjData d in ObjectData)
             {
-                p.WriteUInt16BE((UInt16)d.TextureEntry.Length);
+                p.WriteUInt16((UInt16)d.TextureEntry.Length);
                 p.WriteBytes(d.TextureEntry);
             }
             p.WriteUInt8((byte)VisualParams.Length);

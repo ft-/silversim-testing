@@ -39,7 +39,7 @@ namespace SilverSim.LL.Messages.Appearance
         {
             public UUID ItemID;
             public UUID AssetID;
-            public byte WearableType;
+            public SilverSim.Types.Asset.Format.WearableType WearableType;
         }
 
         public List<WearableDataEntry> WearableData = new List<WearableDataEntry>();
@@ -49,7 +49,7 @@ namespace SilverSim.LL.Messages.Appearance
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -57,7 +57,7 @@ namespace SilverSim.LL.Messages.Appearance
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
@@ -68,7 +68,7 @@ namespace SilverSim.LL.Messages.Appearance
             {
                 p.WriteUUID(d.ItemID);
                 p.WriteUUID(d.AssetID);
-                p.WriteUInt8(d.WearableType);
+                p.WriteUInt8((byte)d.WearableType);
             }
         }
     }

@@ -44,7 +44,7 @@ namespace SilverSim.LL.Messages.Search
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {

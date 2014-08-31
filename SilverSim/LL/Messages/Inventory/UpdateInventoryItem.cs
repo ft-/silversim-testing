@@ -72,7 +72,7 @@ namespace SilverSim.LL.Messages.Inventory
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -120,7 +120,7 @@ namespace SilverSim.LL.Messages.Inventory
             return m;
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);

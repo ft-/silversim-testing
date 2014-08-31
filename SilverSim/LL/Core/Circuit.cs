@@ -268,7 +268,7 @@ namespace SilverSim.LL.Core
                         im.Timestamp = Date.UnixTimeToDateTime(pck.ReadUInt32());
                         im.FromAgent.FullName = pck.ReadStringLen8();
                         im.Message = pck.ReadStringLen8();
-                        im.BinaryBucket = pck.ReadBytes(pck.ReadUInt16BE());
+                        im.BinaryBucket = pck.ReadBytes(pck.ReadUInt16());
                         /* TODO: pass on to IMService, add onresult to the im */
                         m_Server.RouteIM(im);
                     }

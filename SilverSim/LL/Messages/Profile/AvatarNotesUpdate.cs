@@ -44,7 +44,7 @@ namespace SilverSim.LL.Messages.Profile
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {

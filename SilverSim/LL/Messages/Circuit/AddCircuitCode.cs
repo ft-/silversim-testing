@@ -37,7 +37,7 @@ namespace SilverSim.LL.Messages.Circuit
         public UUID SessionID;
         public UUID AgentID;
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {

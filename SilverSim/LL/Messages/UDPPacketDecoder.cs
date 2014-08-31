@@ -153,9 +153,9 @@ namespace SilverSim.LL.Messages
             /* Estate */
             PacketTypes.Add(MessageType.EstateCovenantRequest, Estate.EstateCovenantRequest.Decode);
 
-            /* Lookup */
-            PacketTypes.Add(MessageType.UUIDNameRequest, Lookup.UUIDNameRequest.Decode);
-            PacketTypes.Add(MessageType.UUIDGroupNameRequest, Lookup.UUIDGroupNameRequest.Decode);
+            /* Names */
+            PacketTypes.Add(MessageType.UUIDNameRequest, Names.UUIDNameRequest.Decode);
+            PacketTypes.Add(MessageType.UUIDGroupNameRequest, Names.UUIDGroupNameRequest.Decode);
 
             /* User */
             PacketTypes.Add(MessageType.GodKickUser, User.GodKickUser.Decode);

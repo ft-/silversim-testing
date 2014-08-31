@@ -52,7 +52,7 @@ namespace SilverSim.LL.Messages.Economy
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -60,7 +60,7 @@ namespace SilverSim.LL.Messages.Economy
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteInt32(ObjectCapacity);

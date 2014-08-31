@@ -431,6 +431,7 @@ namespace SilverSim.LL.Messages
                     Data[DataPos++] = b;
                 }
             }
+            DataLength = DataPos;
         }
 
         #region Bool
@@ -482,6 +483,7 @@ namespace SilverSim.LL.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+                DataLength = DataPos += 8;
             }
         }
         #endregion
@@ -506,6 +508,7 @@ namespace SilverSim.LL.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+                DataLength = DataPos += 8;
             }
         }
 
@@ -546,6 +549,7 @@ namespace SilverSim.LL.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+                DataLength = DataPos += 4;
             }
         }
 
@@ -602,6 +606,7 @@ namespace SilverSim.LL.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+                DataLength = DataPos += 4;
             }
         }
         #endregion
@@ -642,46 +647,7 @@ namespace SilverSim.LL.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-            }
-        }
-        #endregion
-
-        #region UInt16 Big Endian
-        public UInt16 ReadUInt16BE()
-        {
-            if (IsZeroEncoded)
-            {
-                byte[] buf = ReadZeroEncoded(2);
-                if (BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(buf);
-                }
-                return BitConverter.ToUInt16(buf, 0);
-            }
-            UInt16 val = BitConverter.ToUInt16(Data, DataPos);
-            DataPos += 2;
-            return val;
-        }
-
-        public void WriteUInt16BE(UInt16 val)
-        {
-            if (IsZeroEncoded)
-            {
-                byte[] buf = BitConverter.GetBytes(val);
-                if (BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(buf);
-                }
-                WriteZeroEncoded(buf);
-            }
-            else
-            {
-                byte[] buf = BitConverter.GetBytes(val);
-                if (BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(buf);
-                }
-                Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+                DataLength = DataPos += 2;
             }
         }
         #endregion
@@ -722,6 +688,7 @@ namespace SilverSim.LL.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+                DataLength = DataPos += 2;
             }
         }
         #endregion
@@ -759,6 +726,7 @@ namespace SilverSim.LL.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+                DataLength = DataPos += 1;
             }
         }
         #endregion
@@ -796,6 +764,7 @@ namespace SilverSim.LL.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+                DataLength = DataPos += 1;
             }
         }
         #endregion
@@ -836,6 +805,7 @@ namespace SilverSim.LL.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+                DataLength = DataPos += 8;
             }
         }
         #endregion
@@ -876,6 +846,7 @@ namespace SilverSim.LL.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+                DataLength = DataPos += 4;
             }
         }
         #endregion
@@ -885,27 +856,27 @@ namespace SilverSim.LL.Messages
         {
             byte len = ReadUInt8();
             byte[] buf = ReadBytes(len);
-            return Encoding.UTF8.GetString(buf);
+            return Encoding.UTF8.GetString(buf, 0, len - 1);
         }
 
         public void WriteStringLen8(string val)
         {
-            byte[] buf = Encoding.UTF8.GetBytes(val);
+            byte[] buf = Encoding.UTF8.GetBytes(val + "\0");
             WriteUInt8((byte)buf.Length);
             WriteBytes(buf);
         }
 
         public string ReadStringLen16()
         {
-            UInt16 len = ReadUInt16BE();
+            UInt16 len = ReadUInt16();
             byte[] buf = ReadBytes(len);
-            return Encoding.UTF8.GetString(buf);
+            return Encoding.UTF8.GetString(buf, 0, len - 1);
         }
 
         public void WriteStringLen16(string val)
         {
-            byte[] buf = Encoding.UTF8.GetBytes(val);
-            WriteUInt16BE((UInt16)buf.Length);
+            byte[] buf = Encoding.UTF8.GetBytes(val + "\0");
+            WriteUInt16((UInt16)buf.Length);
             WriteBytes(buf);
         }
         #endregion
@@ -933,7 +904,7 @@ namespace SilverSim.LL.Messages
             else
             {
                 val.ToBytes(Data, DataPos);
-                DataPos += 16;
+                DataLength = DataPos += 16;
             }
         }
         #endregion
@@ -963,7 +934,7 @@ namespace SilverSim.LL.Messages
             else
             {
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataPos += buf.Length;
+                DataLength = DataPos += buf.Length;
             }
         }
         #endregion

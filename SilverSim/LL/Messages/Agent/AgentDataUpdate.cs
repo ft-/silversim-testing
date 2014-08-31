@@ -34,19 +34,19 @@ namespace SilverSim.LL.Messages.Agent
     public class AgentDataUpdate : Message
     {
         public UUID AgentID;
-        public string FirstName;
-        public string LastName;
-        public string GroupTitle;
+        public string FirstName = string.Empty;
+        public string LastName = string.Empty;
+        public string GroupTitle = string.Empty;
         public UUID ActiveGroupID;
         public UInt64 GroupPowers;
-        public string GroupName;
+        public string GroupName = string.Empty;
 
         public AgentDataUpdate()
         {
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -54,7 +54,7 @@ namespace SilverSim.LL.Messages.Agent
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);

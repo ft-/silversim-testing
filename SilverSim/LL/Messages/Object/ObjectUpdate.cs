@@ -91,7 +91,7 @@ namespace SilverSim.LL.Messages.Object
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -99,7 +99,7 @@ namespace SilverSim.LL.Messages.Object
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUInt64(RegionHandle);
@@ -137,12 +137,12 @@ namespace SilverSim.LL.Messages.Object
                 p.WriteUInt16(d.ProfileBegin);
                 p.WriteUInt16(d.ProfileEnd);
                 p.WriteUInt16(d.ProfileHollow);
-                p.WriteUInt16BE((ushort)d.TextureEntry.Length);
+                p.WriteUInt16((ushort)d.TextureEntry.Length);
                 p.WriteBytes(d.TextureEntry);
                 p.WriteUInt8((byte)d.TextureAnim.Length);
                 p.WriteBytes(d.TextureAnim);
                 p.WriteStringLen16(d.NameValue);
-                p.WriteUInt16BE((ushort)d.Data.Length);
+                p.WriteUInt16((ushort)d.Data.Length);
                 p.WriteBytes(d.Data);
                 p.WriteStringLen8(d.Text);
                 p.WriteUInt8((byte)Math.Floor(d.TextColor.R * 255));

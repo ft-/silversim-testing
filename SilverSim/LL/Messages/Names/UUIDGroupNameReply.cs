@@ -43,7 +43,7 @@ namespace SilverSim.LL.Messages.Names
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -51,7 +51,7 @@ namespace SilverSim.LL.Messages.Names
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUInt8((byte)UUIDNameBlock.Count);

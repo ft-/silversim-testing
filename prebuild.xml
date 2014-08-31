@@ -461,6 +461,7 @@
       <Reference name="SilverSim.LL.Messages"/>
       <Reference name="SilverSim.LL.Core"/>
       <Reference name="SilverSim.LL.Caps"/>
+      <Reference name="SilverSim.BackendConnectors.Robust"/>
       <Reference name="Nini" path="../../../../bin/"/>
       <Reference name="ThreadedClasses" path="../../../../bin/"/>
       <Reference name="Nwc.XmlRpc" path="../../../../bin/"/>

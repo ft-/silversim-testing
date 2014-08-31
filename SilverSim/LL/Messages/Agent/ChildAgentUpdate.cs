@@ -23,13 +23,11 @@ exception statement from your version.
 
 */
 
+using SilverSim.Types;
+using SilverSim.Types.Agent;
+using SilverSim.Types.Groups;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
-using SilverSim.Types.Groups;
-using SilverSim.Types.Agent;
 
 namespace SilverSim.LL.Messages.Agent
 {
@@ -103,7 +101,7 @@ namespace SilverSim.LL.Messages.Agent
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {

@@ -36,7 +36,7 @@ namespace SilverSim.LL.Messages.Appearance
         public struct WearableDataEntry
         {
             public UUID ItemID;
-            public byte WearableType;
+            public SilverSim.Types.Asset.Format.WearableType WearableType;
         }
 
         public List<WearableDataEntry> WearableData = new List<WearableDataEntry>();
@@ -46,7 +46,7 @@ namespace SilverSim.LL.Messages.Appearance
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -65,7 +65,7 @@ namespace SilverSim.LL.Messages.Appearance
             {
                 WearableDataEntry d = new WearableDataEntry();
                 d.ItemID = p.ReadUUID();
-                d.WearableType = p.ReadUInt8();
+                d.WearableType = (SilverSim.Types.Asset.Format.WearableType)p.ReadUInt8();
                 m.WearableData.Add(d);
             }
 

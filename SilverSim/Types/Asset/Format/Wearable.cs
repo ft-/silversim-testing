@@ -31,7 +31,7 @@ using System.Text;
 
 namespace SilverSim.Types.Asset.Format
 {
-    public enum WearableType : uint
+    public enum WearableType : byte
     {
         Shape = 0,
         Skin = 1,

@@ -90,6 +90,83 @@ namespace SilverSim.Types
                 return new Vector3(R, G, B);
             }
         }
+
+        public byte R_AsByte
+        {
+            get
+            {
+                if(R > 1)
+                {
+                    return 255;
+                }
+                else if(R < 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (byte)(R * 255);
+                }
+            }
+            set
+            {
+                R = value / 255f;
+            }
+        }
+
+        public byte G_AsByte
+        {
+            get
+            {
+                if (G > 1)
+                {
+                    return 255;
+                }
+                else if (G < 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (byte)(G * 255);
+                }
+            }
+            set
+            {
+                G = value / 255f;
+            }
+        }
+
+        public byte B_AsByte
+        {
+            get
+            {
+                if (B > 1)
+                {
+                    return 255;
+                }
+                else if (B < 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (byte)(B * 255);
+                }
+            }
+            set
+            {
+                B = value / 255f;
+            }
+        }
+
+        public new byte[] AsByte
+        {
+            get
+            {
+                return new byte[] { R_AsByte, G_AsByte, B_AsByte };
+            }
+        }
         #endregion
     }
 
@@ -133,6 +210,40 @@ namespace SilverSim.Types
             G = v.G;
             B = v.B;
             A = v.A;
+        }
+        #endregion
+
+        #region Properties
+
+        public byte A_AsByte
+        {
+            get
+            {
+                if (A > 1)
+                {
+                    return 255;
+                }
+                else if (A < 0)
+                {
+                    return 0;
+                }
+                else
+                {
+                    return (byte)(A * 255);
+                }
+            }
+            set
+            {
+                A = value / 255f;
+            }
+        }
+
+        public new byte[] AsByte
+        {
+            get
+            {
+                return new byte[] { R_AsByte, G_AsByte, B_AsByte, A_AsByte };
+            }
         }
         #endregion
     }

@@ -37,7 +37,7 @@ namespace SilverSim.LL.Messages.LayerData
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -45,11 +45,11 @@ namespace SilverSim.LL.Messages.LayerData
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUInt8(LayerType);
-            p.WriteUInt16BE((UInt16)Data.Length);
+            p.WriteUInt16((UInt16)Data.Length);
             p.WriteBytes(Data);
         }
     }

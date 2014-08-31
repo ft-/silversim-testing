@@ -39,7 +39,7 @@ namespace SilverSim.LL.Messages.Image
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -47,12 +47,12 @@ namespace SilverSim.LL.Messages.Image
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUUID(ID);
             p.WriteUInt16(Packet);
-            p.WriteUInt16BE((UInt16)Data.Length);
+            p.WriteUInt16((UInt16)Data.Length);
             p.WriteBytes(Data);
         }
     }

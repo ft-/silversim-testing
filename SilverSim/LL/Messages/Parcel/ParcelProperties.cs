@@ -86,7 +86,7 @@ namespace SilverSim.LL.Messages.Parcel
 
         }
 
-        public virtual new MessageType Number
+        public override MessageType Number
         {
             get
             {
@@ -94,7 +94,7 @@ namespace SilverSim.LL.Messages.Parcel
             }
         }
 
-        public new void Serialize(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteInt32(RequestResult);
@@ -112,7 +112,7 @@ namespace SilverSim.LL.Messages.Parcel
             p.WriteInt32(RentPrice);
             p.WriteVector3f(AABBMin);
             p.WriteVector3f(AABBMax);
-            p.WriteUInt16BE((UInt16)Bitmap.Length);
+            p.WriteUInt16((UInt16)Bitmap.Length);
             p.WriteBytes(Bitmap);
             p.WriteInt32(Area);
             p.WriteUInt8(Status);
