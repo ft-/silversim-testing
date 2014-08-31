@@ -150,6 +150,11 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.GodUpdateRegionInfo, Region.GodUpdateRegionInfo.Decode);
             PacketTypes.Add(MessageType.RegionHandshakeReply, Region.RegionHandshakeReply.Decode);
 
+            /* Generic */
+            PacketTypes.Add(MessageType.GodlikeMessage, Generic.GodlikeMessage.Decode);
+            PacketTypes.Add(MessageType.EstateOwnerMessage, Generic.EstateOwnerMessage.Decode);
+            PacketTypes.Add(MessageType.GenericMessage, Generic.GenericMessage.Decode);
+
             /* Estate */
             PacketTypes.Add(MessageType.EstateCovenantRequest, Estate.EstateCovenantRequest.Decode);
 
