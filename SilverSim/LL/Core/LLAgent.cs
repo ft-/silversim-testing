@@ -23,30 +23,25 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using SilverSim.LL.Messages;
+using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Script;
-using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Types;
-using SilverSim.Main.Common;
-using SilverSim.Types.IM;
-using SilverSim.Types.Grid;
-using SilverSim.ServiceInterfaces.Account;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Inventory;
-using SilverSim.ServiceInterfaces.Groups;
-using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.Friends;
-using SilverSim.ServiceInterfaces.UserAgents;
-using SilverSim.ServiceInterfaces.Presence;
-using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.LL.Messages;
+using SilverSim.ServiceInterfaces.GridUser;
+using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.Presence;
+using SilverSim.ServiceInterfaces.Profile;
+using SilverSim.ServiceInterfaces.UserAgents;
+using SilverSim.Types;
+using SilverSim.Types.Grid;
+using SilverSim.Types.IM;
+using System;
 using ThreadedClasses;
 
 namespace SilverSim.LL.Core
