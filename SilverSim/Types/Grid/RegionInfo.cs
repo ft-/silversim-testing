@@ -45,7 +45,7 @@ namespace SilverSim.Types.Grid
         public uint ServerPort = 0;
         public UUID RegionMapTexture = UUID.Zero;
         public UUID ParcelMapTexture = UUID.Zero;
-        public uint Access = 0;
+        public byte Access = 0;
         public string RegionSecret = string.Empty;
         public UUI Owner = UUI.Unknown;
         public RegionFlags Flags = 0;

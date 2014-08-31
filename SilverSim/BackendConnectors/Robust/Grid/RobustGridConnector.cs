@@ -296,7 +296,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
             r.ServerPort = map["serverPort"].AsUInt;
             r.RegionMapTexture = map["regionMapTexture"].AsUUID;
             r.ParcelMapTexture = map["parcelMapTexture"].AsUUID;
-            r.Access = map["access"].AsUInt;
+            r.Access = (byte)map["access"].AsUInt;
             r.RegionSecret = map["regionSecret"].ToString();
             r.Owner.ID = map["owner_uuid"].AsUUID;
             return r;

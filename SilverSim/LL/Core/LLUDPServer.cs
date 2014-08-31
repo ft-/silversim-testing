@@ -30,6 +30,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
+using SilverSim.Main.Common;
 using SilverSim.Types.IM;
 using System;
 using System.Collections.Generic;
@@ -275,6 +276,31 @@ namespace SilverSim.LL.Core
                                 try
                                 {
                                     circuit.Start();
+
+                                    Messages.Region.RegionHandshake rh = new Messages.Region.RegionHandshake();
+                                    rh.RegionFlags = 0;
+                                    rh.SimAccess = Scene.RegionData.Access;
+                                    rh.SimName = Scene.Name;
+                                    rh.SimOwner = Scene.Owner.ID;
+                                    rh.IsEstateManager = false;
+                                    rh.WaterHeight = 20;
+                                    rh.BillableFactor = 1;
+                                    rh.TerrainStartHeight00 = 0;
+                                    rh.TerrainStartHeight01 = 10;
+                                    rh.TerrainStartHeight10 = 20;
+                                    rh.TerrainStartHeight11 = 30;
+                                    rh.TerrainHeightRange00 = 10;
+                                    rh.TerrainHeightRange01 = 10;
+                                    rh.TerrainHeightRange10 = 10;
+                                    rh.TerrainHeightRange11 = 10;
+                                    rh.RegionID = Scene.ID;
+                                    rh.CacheID = UUID.Random;
+                                    rh.CPUClassID = 9;
+                                    rh.CPURatio = 1;
+                                    rh.ColoName = "";
+                                    rh.ProductSKU = VersionInfo.SimulatorVersion;
+                                    rh.ProductName = VersionInfo.ProductName;
+                                    circuit.SendMessage(rh);
                                 }
                                 catch
                                 {

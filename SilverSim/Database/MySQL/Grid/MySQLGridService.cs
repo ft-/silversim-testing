@@ -188,7 +188,7 @@ namespace SilverSim.Database.MySQL.Grid
             ri.RegionMapTexture = dbReader["regionMapTexture"].ToString();
             ri.ServerHttpPort = (uint)dbReader["serverHttpPort"];
             ri.Owner = new UUI(dbReader["owner"].ToString());
-            ri.Access = (uint)dbReader["access"];
+            ri.Access = (byte)(uint)dbReader["access"];
             ri.ScopeID = dbReader["ScopeID"].ToString();
             ri.Size.X = (uint)dbReader["sizeX"];
             ri.Size.Y = (uint)dbReader["sizeY"];
@@ -264,7 +264,7 @@ namespace SilverSim.Database.MySQL.Grid
                 regionData["serverPort"] = regionInfo.ServerPort;
                 regionData["regionMapTexture"] = regionInfo.RegionMapTexture;
                 regionData["parcelMapTexture"] = regionInfo.ParcelMapTexture;
-                regionData["access"] = regionInfo.Access;
+                regionData["access"] = (uint)regionInfo.Access;
                 regionData["regionSecret"] = regionInfo.RegionSecret;
                 regionData["owner"] = regionInfo.Owner;
                 regionData["AuthenticatingToken"] = regionInfo.AuthenticatingToken;
