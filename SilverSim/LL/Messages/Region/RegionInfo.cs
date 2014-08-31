@@ -32,6 +32,8 @@ namespace SilverSim.LL.Messages.Region
         public UInt32 HardMaxAgents = 0;
         public UInt32 HardMaxObjects = 0;
 
+        public List<UInt64> RegionFlagsExtended = new List<UInt64>();
+
         public RegionInfo()
         {
 
@@ -48,6 +50,8 @@ namespace SilverSim.LL.Messages.Region
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
             p.WriteStringLen8(SimName);
             p.WriteUInt32(EstateID);
             p.WriteUInt32(ParentEstateID);
@@ -76,6 +80,11 @@ namespace SilverSim.LL.Messages.Region
             p.WriteUInt32(MaxAgents);
             p.WriteUInt32(HardMaxAgents);
             p.WriteUInt32(HardMaxObjects);
+            p.WriteUInt8((byte)RegionFlagsExtended.Count);
+            foreach(UInt64 v in RegionFlagsExtended)
+            {
+                p.WriteUInt64(v);
+            }
         }
     }
 }

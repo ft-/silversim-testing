@@ -62,6 +62,7 @@ namespace SilverSim.LL.Core
         private RwLockedDictionary<string, UUID> m_RegisteredCapabilities = new RwLockedDictionary<string, UUID>();
         private CapsHttpRedirector m_CapsRedirector;
         private object m_SceneSetLock = new object();
+        public int LastMeasuredLatencyTickCount { get; private set; }
 
         private uint NextSequenceNumber
         {
@@ -178,7 +179,7 @@ namespace SilverSim.LL.Core
                     int timesent;
                     if(m_PingSendTicks.Remove(ackPingID, out timesent))
                     {
-                        Agent.LastMeasuredLatencyTickCount = (timesent - Environment.TickCount) / 2;
+                        LastMeasuredLatencyTickCount = (timesent - Environment.TickCount) / 2;
                     }
                     break;
 

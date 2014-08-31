@@ -24,28 +24,19 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using System;
 
-namespace SilverSim.LL.Messages.Event
+namespace SilverSim.LL.Messages.Generic
 {
-    public class EventInfoReply : Message
+    public class GenericMessage : Message
     {
         public UUID AgentID;
-        public UInt32 EventID;
-        public string Creator;
-        public string Name;
-        public string Category;
-        public string Desc;
-        public string Date;
-        public UInt32 DateUTC;
-        public UInt32 Duration;
-        public UInt32 Cover;
-        public UInt32 Amount;
-        public string SimName;
-        public Vector3 GlobalPos;
-        public UInt32 EventFlags;
+        public UUID SessionID;
+        public UUID TransactionID;
+        public string Method;
+        public UUID Invoice;
+        public byte[] ParamList = new byte[0];
 
-        public EventInfoReply()
+        public GenericMessage()
         {
 
         }
@@ -54,7 +45,7 @@ namespace SilverSim.LL.Messages.Event
         {
             get
             {
-                return MessageType.EventInfoReply;
+                return MessageType.GenericMessage;
             }
         }
 
@@ -62,19 +53,25 @@ namespace SilverSim.LL.Messages.Event
         {
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
-            p.WriteUInt32(EventID);
-            p.WriteStringLen8(Creator);
-            p.WriteStringLen8(Name);
-            p.WriteStringLen8(Category);
-            p.WriteStringLen16(Desc);
-            p.WriteStringLen8(Date);
-            p.WriteUInt32(DateUTC);
-            p.WriteUInt32(Duration);
-            p.WriteUInt32(Cover);
-            p.WriteUInt32(Amount);
-            p.WriteStringLen8(SimName);
-            p.WriteVector3d(GlobalPos);
-            p.WriteUInt32(EventFlags);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(TransactionID);
+            p.WriteStringLen8(Method);
+            p.WriteUUID(Invoice);
+            p.WriteUInt8((byte)ParamList.Length);
+            p.WriteBytes(ParamList);
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            GenericMessage m = new GenericMessage();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.TransactionID = p.ReadUUID();
+            m.Method = p.ReadStringLen8();
+            m.Invoice = p.ReadUUID();
+            m.ParamList = p.ReadBytes((int)(uint)p.ReadUInt8());
+
+            return m;
         }
     }
 }

@@ -26,6 +26,7 @@ namespace Tests.PacketSendTest
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.Bind(new IPEndPoint(new IPAddress(0), 9300));
 
+#if TESTED
             {
                 Msg.Agent.AgentDataUpdate m = new Msg.Agent.AgentDataUpdate();
                 m.GroupPowers = 10;
@@ -313,6 +314,371 @@ namespace Tests.PacketSendTest
                 m.AgentID = TestUUID;
                 m.ErrorMessage = "Error Message";
                 m.TransactionID = TestUUID;
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Economy.EconomyData m = new Msg.Economy.EconomyData();
+                m.ObjectCount = 1;
+                m.ObjectCapacity = 1;
+                m.PriceEnergyUnit = 2;
+                m.PriceObjectClaim = 3;
+                m.PricePublicObjectDecay = 4;
+                m.PricePublicObjectDelete = 5;
+                m.PriceParcelClaim = 6;
+                m.PriceParcelClaimFactor = 7;
+                m.PriceUpload = 8;
+                m.PriceRentLight = 9;
+                m.TeleportMinPrice = 10;
+                m.TeleportPriceExponent = 11;
+                m.EnergyEfficiency = 12;
+                m.PriceObjectRent = 13;
+                m.PriceObjectScaleFactor = 14;
+                m.PriceParcelRent = 15;
+                m.PriceGroupCreate = 16;
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Estate.EstateCovenantReply m = new Msg.Estate.EstateCovenantReply();
+                m.CovenantID = TestUUID;
+                m.CovenantTimestamp = 100;
+                m.EstateName = "Estate";
+                m.EstateOwnerID = TestUUID;
+
+                sendMessage(m);
+            }
+#endif
+            {
+                Msg.Event.EventInfoReply m = new Msg.Event.EventInfoReply();
+                m.AgentID = TestUUID;
+                m.Amount = 10;
+                m.Category = "1";
+                m.Cover = 1;
+                m.Creator = TestUUID;
+                m.Date = "1";
+                m.DateUTC = 100;
+                m.Desc = "Desc";
+                m.Duration = 10;
+                m.EventFlags = 10;
+                m.EventID = 100;
+                m.Name = "Name";
+                m.SimName = "SimName";
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Event.EventLocationReply m = new Msg.Event.EventLocationReply();
+                m.QueryID = TestUUID;
+                m.Success = true;
+                m.RegionID = TestUUID;
+                m.RegionPos = new Vector3(1, 2, 3);
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.God.GrantGodlikePowers m = new Msg.God.GrantGodlikePowers();
+                m.AgentID = TestUUID;
+                m.SessionID = TestUUID;
+                m.GodLevel = 255;
+                m.Token = TestUUID;
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Image.ImageData m = new Msg.Image.ImageData();
+                m.Codec = 1;
+                m.Data = new byte[10] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+                m.ID = TestUUID;
+                m.Packets = 10;
+                m.Size = 1024;
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Image.ImagePacket m = new Msg.Image.ImagePacket();
+                m.Packet = 1;
+                m.Data = new byte[10] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 };
+                m.ID = TestUUID;
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Land.LandStatReply m = new Msg.Land.LandStatReply();
+                Msg.Land.LandStatReply.ReportDataEntry e;
+                
+                e = new Msg.Land.LandStatReply.ReportDataEntry();
+                e.Location = new Vector3(1, 2, 3);
+                e.OwnerName = "Owner Name";
+                e.Score = 10;
+                e.TaskID = TestUUID;
+                e.TaskLocalID = 10;
+                e.TaskName = "Task Name";
+                m.ReportData.Add(e);
+
+                e = new Msg.Land.LandStatReply.ReportDataEntry();
+                e.Location = new Vector3(1, 2, 3);
+                e.OwnerName = "Owner Name";
+                e.Score = 10;
+                e.TaskID = TestUUID;
+                e.TaskLocalID = 10;
+                e.TaskName = "Task Name";
+                m.ReportData.Add(e);
+
+                m.ReportType = 1;
+                m.RequestFlags = 10;
+                m.TotalObjectCount = 1000;
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Names.UUIDGroupNameReply m = new Msg.Names.UUIDGroupNameReply();
+                Msg.Names.UUIDGroupNameReply.Data e;
+
+                e = new Msg.Names.UUIDGroupNameReply.Data();
+                e.GroupName = "Group Name";
+                e.ID = TestUUID;
+
+                m.UUIDNameBlock.Add(e);
+
+                e = new Msg.Names.UUIDGroupNameReply.Data();
+                e.GroupName = "Group Name 2";
+                e.ID = TestUUID;
+
+                m.UUIDNameBlock.Add(e);
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Names.UUIDNameReply m = new Msg.Names.UUIDNameReply();
+                Msg.Names.UUIDNameReply.Data e;
+
+                e = new Msg.Names.UUIDNameReply.Data();
+                e.FirstName = "First Name";
+                e.LastName = "Last Name";
+                e.ID = TestUUID;
+
+                m.UUIDNameBlock.Add(e);
+
+                e = new Msg.Names.UUIDNameReply.Data();
+                e.FirstName = "First Name";
+                e.LastName = "Last Name";
+                e.ID = TestUUID;
+
+                m.UUIDNameBlock.Add(e);
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Region.RegionHandshake m = new Msg.Region.RegionHandshake();
+                
+                m.RegionFlags = 3;
+                m.SimAccess = 4;
+                m.SimName = "SimName";
+                m.SimOwner = TestUUID;
+                m.IsEstateManager = true;
+                m.WaterHeight = 22f;
+                m.BillableFactor = 10f;
+                m.CacheID = TestUUID;
+                m.TerrainBase0 = TestUUID;
+                m.TerrainBase1 = TestUUID;
+                m.TerrainBase2 = TestUUID;
+                m.TerrainBase3 = TestUUID;
+                m.TerrainDetail0 = TestUUID;
+                m.TerrainDetail1 = TestUUID;
+                m.TerrainDetail2 = TestUUID;
+                m.TerrainDetail3 = TestUUID;
+                m.TerrainStartHeight00 = 0f;
+                m.TerrainStartHeight01 = 1f;
+                m.TerrainStartHeight10 = 2f;
+                m.TerrainStartHeight11 = 3f;
+                m.TerrainHeightRange00 = 0f;
+                m.TerrainHeightRange01 = 1f;
+                m.TerrainHeightRange10 = 2f;
+                m.TerrainHeightRange11 = 3f;
+
+                m.RegionID = TestUUID;
+
+                m.CPUClassID = 9;
+                m.CPURatio = 1;
+                m.ColoName = "ColoName";
+                m.ProductSKU = "ProductSKU";
+                m.ProductName = "ProductName";
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Region.RegionInfo m = new Msg.Region.RegionInfo();
+
+                m.AgentID = TestUUID;
+                m.SessionID = TestUUID;
+                m.SimName = "SimName";
+                m.EstateID = 100;
+                m.ParentEstateID = 1;
+                m.RegionFlags = 10;
+                m.SimAccess = 3;
+                m.MaxAgents = 40;
+                m.BillableFactor = 1;
+                m.ObjectBonusFactor = 1;
+                m.WaterHeight = 20;
+                m.TerrainLowerLimit = -100;
+                m.TerrainRaiseLimit = 100;
+                m.PricePerMeter = 100;
+                m.RedirectGridX = 101;
+                m.RedirectGridY = 102;
+                m.UseEstateSun = true;
+                m.SunHour = 10;
+                m.ProductSKU = "ProductSKU";
+                m.ProductName = "ProductName";
+                m.HardMaxAgents = 40;
+                m.HardMaxObjects = 100;
+                m.RegionFlagsExtended.Add(55);
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Region.SimulatorViewerTimeMessage m = new Msg.Region.SimulatorViewerTimeMessage();
+
+                m.SecPerDay = 10;
+                m.SecPerYear = 100;
+                m.SunAngVelocity = new Vector3(1, 2, 3);
+                m.SunDirection = new Vector3(1, 2, 3);
+                m.SunPhase = 100;
+                m.UsecSinceStart = 100;
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Script.LoadURL m = new Msg.Script.LoadURL();
+
+                m.ObjectID = TestUUID;
+                m.ObjectName = "Primitive";
+                m.OwnerID = TestUUID;
+                m.OwnerIsGroup = false;
+                m.URL = "http://example.com/";
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Script.ScriptDialog m = new Msg.Script.ScriptDialog();
+
+                m.Buttons.Add("1");
+                m.Buttons.Add("2");
+                m.Buttons.Add("3");
+                m.ChatChannel = 10;
+                m.FirstName = "First";
+                m.ImageID = TestUUID;
+                m.LastName = "Last";
+                m.Message = "Message";
+                m.ObjectID = TestUUID;
+                m.ObjectName = "Object";
+                m.OwnerData.Add(TestUUID);
+                m.OwnerData.Add(TestUUID);
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Script.ScriptQuestion m = new Msg.Script.ScriptQuestion();
+
+                m.TaskID = TestUUID;
+                m.ItemID = TestUUID;
+                m.ObjectName = "Object";
+                m.ObjectOwner = TestUUID;
+                m.Questions = 55;
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Script.ScriptRunningReply m = new Msg.Script.ScriptRunningReply();
+
+                m.IsRunning = true;
+                m.ItemID = TestUUID;
+                m.ObjectID = TestUUID;
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Simulator.SimStats m = new Msg.Simulator.SimStats();
+
+                m.ObjectCapacity = 10;
+                m.PID = 10;
+                m.RegionFlags = 10;
+                m.RegionX = 10;
+                m.RegionY = 10;
+                Msg.Simulator.SimStats.Data d;
+
+                d = new Msg.Simulator.SimStats.Data();
+                d.StatID = 10;
+                d.StatValue = 10;
+                m.Stat.Add(d);
+
+                d = new Msg.Simulator.SimStats.Data();
+                d.StatID = 20;
+                d.StatValue = 20;
+                m.Stat.Add(d);
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.TaskInventory.ReplyTaskInventory m = new Msg.TaskInventory.ReplyTaskInventory();
+
+                m.TaskID = TestUUID;
+                m.Serial = 10;
+                m.Filename = "Filename";
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Generic.EstateOwnerMessage m = new Msg.Generic.EstateOwnerMessage();
+
+                m.AgentID = TestUUID;
+                m.Invoice = TestUUID;
+                m.Method = "Estate Owner";
+                m.ParamList = new byte[10];
+                m.SessionID = TestUUID;
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Generic.GodlikeMessage m = new Msg.Generic.GodlikeMessage();
+
+                m.AgentID = TestUUID;
+                m.Invoice = TestUUID;
+                m.Method = "Godlike";
+                m.ParamList = new byte[10];
+                m.SessionID = TestUUID;
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Generic.GenericMessage m = new Msg.Generic.GenericMessage();
+
+                m.AgentID = TestUUID;
+                m.Invoice = TestUUID;
+                m.Method = "Generic";
+                m.ParamList = new byte[10];
+                m.SessionID = TestUUID;
 
                 sendMessage(m);
             }
