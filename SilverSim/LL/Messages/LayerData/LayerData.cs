@@ -29,7 +29,19 @@ namespace SilverSim.LL.Messages.LayerData
 {
     public class LayerData : Message
     {
-        public byte LayerType = 0;
+        public enum LayerDataType : byte
+        {
+            Land = 0x4C,
+            LandExtended = 0x4D,
+            Water = 0x57,
+            WaterExtended = 0x58,
+            Wind = 0x37,
+            WindExtended = 0x39,
+            Cloud = 0x38,
+            CloudExtended = 0x3A
+        }
+
+        public LayerDataType LayerType = 0;
         public byte[] Data = new byte[0];
 
         public LayerData()
@@ -48,7 +60,7 @@ namespace SilverSim.LL.Messages.LayerData
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
-            p.WriteUInt8(LayerType);
+            p.WriteUInt8((byte)LayerType);
             p.WriteUInt16((UInt16)Data.Length);
             p.WriteBytes(Data);
         }

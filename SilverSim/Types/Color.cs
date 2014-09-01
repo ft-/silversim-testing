@@ -160,7 +160,7 @@ namespace SilverSim.Types
             }
         }
 
-        public new byte[] AsByte
+        public virtual byte[] AsByte
         {
             get
             {
@@ -211,6 +211,14 @@ namespace SilverSim.Types
             B = v.B;
             A = v.A;
         }
+
+        public ColorAlpha(byte[] b)
+        {
+            R = b[0] / 255f;
+            G = b[1] / 255f;
+            B = b[2] / 255f;
+            A = b[3] / 255f;
+        }
         #endregion
 
         #region Properties
@@ -238,7 +246,7 @@ namespace SilverSim.Types
             }
         }
 
-        public new byte[] AsByte
+        public override byte[] AsByte
         {
             get
             {
