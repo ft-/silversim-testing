@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.LL.Caps;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
 using SilverSim.Scene.Management.IM;
@@ -237,6 +238,7 @@ namespace SilverSim.Scene.Implementation.Basic
             ExternalHostName = ri.ServerIP;
             RegionPort = ri.ServerPort;
             m_UDPServer.Start();
+            SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeaturesCapability("", true));
         }
         #endregion
 

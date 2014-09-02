@@ -398,11 +398,13 @@ namespace SilverSim.StructuredData.LLSD
 
         public static void Serialize(IValue value, Stream output)
         {
-            XmlTextWriter text = new XmlTextWriter(output, Encoding.UTF8);
+            XmlTextWriter text = new XmlTextWriter(output, UTF8NoBOM);
             text.WriteStartElement("llsd");
             SerializeInternal(value, text);
             text.WriteEndElement();
+            text.Flush();
         }
 
+        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
     }
 }

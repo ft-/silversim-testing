@@ -76,6 +76,7 @@ namespace SilverSim.LL.Caps
             else
             {
                 res = httpreq.BeginResponse();
+                res.ContentType = "application/llsd+xml";
                 LLSD_XML.Serialize(Features, res.GetOutputStream());
             }
 

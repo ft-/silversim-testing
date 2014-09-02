@@ -38,6 +38,7 @@ using System.IO;
 using System.Net;
 using System.Text;
 using System.Threading;
+using System.Xml;
 using ThreadedClasses;
 
 namespace SilverSim.LL.Core
@@ -504,22 +505,28 @@ namespace SilverSim.LL.Core
             }
 
             HttpResponse res = httpreq.BeginResponse();
+            res.ContentType = "application/llsd+xml";
             Stream tw = res.GetOutputStream();
-            tw.Write(m_Header, 0, m_Header.Length);
+            XmlTextWriter text = new XmlTextWriter(tw, UTF8NoBOM);
+            text.WriteStartElement("llsd");
+            text.WriteStartElement("map");
             foreach(KeyValuePair<string, string> kvp in capsUri)
             {
-                byte[] data = Encoding.UTF8.GetBytes(string.Format("<key>{0}</key><string>{1}</string>",
-                        System.Xml.XmlConvert.EncodeName(kvp.Key),
-                        System.Xml.XmlConvert.EncodeName(kvp.Value))
-                    );
-                tw.Write(data, 0, data.Length);
+                text.WriteStartElement("key");
+                text.WriteString(kvp.Key);
+                text.WriteEndElement();
+                text.WriteStartElement("string");
+                text.WriteString(kvp.Value);
+                text.WriteEndElement();
             }
-            tw.Write(m_Footer, 0, m_Footer.Length);
+            text.WriteEndElement();
+            text.WriteEndElement();
+            text.Flush();
+            
             res.Close();
         }
 
-        private static readonly byte[] m_Header = Encoding.UTF8.GetBytes("<?xml version=\"1.0\" encoding=\"utf-8\"?><llsd><map>");
-        private static readonly byte[] m_Footer = Encoding.UTF8.GetBytes("</map></llsd>");
+        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
         #endregion
     }
 }
