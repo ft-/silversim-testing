@@ -37,6 +37,7 @@ namespace SilverSim.LL.Messages
             /* Agent */
             PacketTypes.Add(MessageType.TrackAgent, Agent.TrackAgent.Decode);
             PacketTypes.Add(MessageType.AgentUpdate, Agent.AgentUpdate.Decode);
+            PacketTypes.Add(MessageType.AgentDataUpdateRequest, Agent.AgentDataUpdateRequest.Decode);
 
             /* Appearance */
             PacketTypes.Add(MessageType.AgentWearablesRequest, Appearance.AgentWearablesRequest.Decode);

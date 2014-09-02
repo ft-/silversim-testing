@@ -154,10 +154,6 @@ namespace SilverSim.LL.Core
                 m_AckList.Enqueue(pck.SequenceNumber);
             }
 
-            {
-                m_Log.DebugFormat("testing {0}", mType.ToString());
-            }
-
             /* we know the message type now, so we have to decode it when possible */
             switch(mType)
             { 
@@ -286,6 +282,10 @@ namespace SilverSim.LL.Core
 
                 default:
                     UDPPacketDecoder.PacketDecoderDelegate del;
+                    if(mType == MessageType.AgentDataUpdateRequest)
+                    {
+                        m_Log.Debug("AgentdataUpdateRequest");
+                    }
                     if(m_PacketDecoder.PacketTypes.TryGetValue(mType, out del))
                     {
                         Message m = del(pck);
