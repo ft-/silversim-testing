@@ -917,6 +917,23 @@ namespace SilverSim.LL.Core
                     /* agent wants to logout */
                     break;
 
+                case MessageType.AgentDataUpdateRequest:
+                    Messages.Agent.AgentDataUpdateRequest adur = (Messages.Agent.AgentDataUpdateRequest)m;
+                    if(adur.AgentID == ID && adur.SessionID == adur.CircuitSessionID)
+                    {
+                        Circuit circuit;
+                        if (Circuits.TryGetValue(adur.ReceivedOnCircuitCode, out circuit))
+                        {
+                            Messages.Agent.AgentDataUpdate adu = new Messages.Agent.AgentDataUpdate();
+                            //TODO: adu.ActiveGroupID;
+                            adu.AgentID = ID;
+                            adu.FirstName = FirstName;
+                            adu.LastName = LastName;
+                            //TODO: adu.GroupTitle;
+                            circuit.SendMessage(adu);
+                        }
+                    }
+                    break;
             }
         }
 

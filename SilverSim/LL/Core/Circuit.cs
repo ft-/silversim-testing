@@ -137,6 +137,8 @@ namespace SilverSim.LL.Core
              */
             MessageType mType = pck.ReadMessageType();
 
+            m_Log.DebugFormat("Packet {0} => {1}, IsZeroEncoded {2}", mType.ToString(), (uint)mType, pck.IsZeroEncoded.ToString());
+
             /* do we have some acks from the packet's end? */
             if(null != acknumbers)
             {
@@ -150,6 +152,10 @@ namespace SilverSim.LL.Core
             {
                 /* we have to ack */
                 m_AckList.Enqueue(pck.SequenceNumber);
+            }
+
+            {
+                m_Log.DebugFormat("testing {0}", mType.ToString());
             }
 
             /* we know the message type now, so we have to decode it when possible */

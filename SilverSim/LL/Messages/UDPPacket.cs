@@ -437,8 +437,7 @@ namespace SilverSim.LL.Messages
         #region Bool
         public bool ReadBoolean()
         {
-            DataPos += 1;
-            return Data[DataPos - 1] != 0;
+            return ReadUInt8() != 0;
         }
 
         public void WriteBoolean(bool b)

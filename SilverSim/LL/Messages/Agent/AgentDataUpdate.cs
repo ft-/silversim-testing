@@ -37,7 +37,7 @@ namespace SilverSim.LL.Messages.Agent
         public string FirstName = string.Empty;
         public string LastName = string.Empty;
         public string GroupTitle = string.Empty;
-        public UUID ActiveGroupID;
+        public UUID ActiveGroupID = UUID.Zero;
         public UInt64 GroupPowers;
         public string GroupName = string.Empty;
 

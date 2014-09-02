@@ -209,6 +209,7 @@ namespace SilverSim.LL.Core
             try
             {
                 pck = m_InboundBufferQueue.Dequeue();
+                pck.Reset();
             }
             catch
             {
@@ -486,6 +487,7 @@ namespace SilverSim.LL.Core
             m_Routing[MessageType.AgentSetAppearance] = HandleAgentMessage;
             m_Routing[MessageType.AgentAnimation] = HandleAgentMessage;
             m_Routing[MessageType.AgentRequestSit] = HandleAgentMessage;
+            m_Routing[MessageType.AgentDataUpdateRequest] = HandleAgentMessage;
 
             /* Appearance */
             m_Routing[MessageType.AgentWearablesRequest] = HandleAgentMessage;
