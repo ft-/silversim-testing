@@ -23,45 +23,27 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SilverSim.Types;
+using SilverSim.Types.Economy;
 
-namespace SilverSim.LL.Messages.Image
+namespace SilverSim.ServiceInterfaces.Economy
 {
-    public class ImagePacket : Message
+    public abstract class EconomyServiceInterface
     {
-        public UUID ID = UUID.Zero;
-        public UInt16 Packet = 0;
-        public byte[] Data = new byte[0];
+        public interface MoneyBalanceAccessor
+        {
+            Int32 this[UUID agentID, UUID sessionID] { get; set; }
+        }
 
-        public ImagePacket()
+        public EconomyServiceInterface()
         {
 
         }
 
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ImagePacket;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteMessageType(Number);
-            p.WriteUUID(ID);
-            p.WriteUInt16(Packet);
-            p.WriteUInt16((UInt16)Data.Length);
-            p.WriteBytes(Data);
-        }
+        public abstract MoneyBalanceAccessor MoneyBalance { get; }
     }
 }

@@ -61,6 +61,9 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.SetScriptRunning, Script.SetScriptRunning.Decode);
             PacketTypes.Add(MessageType.ScriptReset, Script.ScriptReset.Decode);
             PacketTypes.Add(MessageType.RezScript, Script.RezScript.Decode);
+
+            /* Image */
+            PacketTypes.Add(MessageType.RequestImage, Image.RequestImage.Decode);
             
             /* Parcel */
             PacketTypes.Add(MessageType.ParcelPropertiesRequest, Parcel.ParcelPropertiesRequest.Decode);
@@ -201,6 +204,8 @@ namespace SilverSim.LL.Messages
             
             /* Economy */
             PacketTypes.Add(MessageType.EconomyDataRequest, Economy.EconomyDataRequest.Decode);
+            PacketTypes.Add(MessageType.MoneyBalanceRequest, Economy.MoneyBalanceRequest.Decode);
+            PacketTypes.Add(MessageType.MoneyTransferRequest, Economy.MoneyTransferRequest.Decode);
 
             /* Search */
             PacketTypes.Add(MessageType.AvatarPickerRequest, Search.AvatarPickerRequest.Decode);

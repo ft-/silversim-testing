@@ -64,6 +64,14 @@ namespace SilverSim.LL.Messages.Search
             }
         }
 
+        public override bool IsReliable
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);

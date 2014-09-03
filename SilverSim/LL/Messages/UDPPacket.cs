@@ -427,6 +427,7 @@ namespace SilverSim.LL.Messages
                     {
                         Data[DataPos++] = 0;
                         Data[DataPos++] = zleCount;
+                        zleCount = 0;
                     }
                     Data[DataPos++] = b;
                 }
@@ -710,20 +711,12 @@ namespace SilverSim.LL.Messages
         {
             if (IsZeroEncoded)
             {
-                byte[] buf = BitConverter.GetBytes(val);
-                if (!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(buf);
-                }
+                byte[] buf = new byte[] { val };
                 WriteZeroEncoded(buf);
             }
             else
             {
-                byte[] buf = BitConverter.GetBytes(val);
-                if (!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(buf);
-                }
+                byte[] buf = new byte[]{val};
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
                 DataLength = DataPos += 1;
             }
@@ -748,20 +741,12 @@ namespace SilverSim.LL.Messages
         {
             if (IsZeroEncoded)
             {
-                byte[] buf = BitConverter.GetBytes(val);
-                if (!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(buf);
-                }
+                byte[] buf = new byte[] { (byte)val };
                 WriteZeroEncoded(buf);
             }
             else
             {
-                byte[] buf = BitConverter.GetBytes(val);
-                if (!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(buf);
-                }
+                byte[] buf = new byte[] { (byte)val };
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
                 DataLength = DataPos += 1;
             }

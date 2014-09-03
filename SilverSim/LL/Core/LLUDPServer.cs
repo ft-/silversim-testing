@@ -25,12 +25,12 @@ exception statement from your version.
 
 using log4net;
 using SilverSim.LL.Messages;
+using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
-using SilverSim.Main.Common;
 using SilverSim.Types.IM;
 using System;
 using System.Collections.Generic;
@@ -55,7 +55,7 @@ namespace SilverSim.LL.Core
     #endregion
 
     #region LLUDP Server
-    public class LLUDPServer : IDisposable, ILLUDPServer
+    public partial class LLUDPServer : IDisposable, ILLUDPServer
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LLUDP SERVER");
         IPAddress m_BindAddress;
@@ -488,6 +488,10 @@ namespace SilverSim.LL.Core
             m_Routing[MessageType.AgentAnimation] = HandleAgentMessage;
             m_Routing[MessageType.AgentRequestSit] = HandleAgentMessage;
             m_Routing[MessageType.AgentDataUpdateRequest] = HandleAgentMessage;
+
+            /* Economy */
+            m_Routing[MessageType.EconomyDataRequest] = HandleSimulatorMessageLocally;
+            m_Routing[MessageType.MoneyBalanceRequest] = HandleAgentMessage;
 
             /* Appearance */
             m_Routing[MessageType.AgentWearablesRequest] = HandleAgentMessage;

@@ -17,6 +17,15 @@ namespace Tests.PacketSendTest
         {
             Msg.UDPPacket p = new Msg.UDPPacket();
             m.Serialize(p);
+            p.Flush();
+            socket.SendTo(p.Data, p.DataLength, SocketFlags.None, DestinationEndPoint);
+        }
+        private static void sendMessage(Msg.Message m, bool zeroFlag)
+        {
+            Msg.UDPPacket p = new Msg.UDPPacket();
+            p.IsZeroEncoded = zeroFlag;
+            m.Serialize(p);
+            p.Flush();
             socket.SendTo(p.Data, p.DataLength, SocketFlags.None, DestinationEndPoint);
         }
         private static readonly UUID TestUUID = new UUID("00112233-1122-1122-1122-001122334455");
@@ -26,6 +35,12 @@ namespace Tests.PacketSendTest
             socket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
             socket.Bind(new IPEndPoint(new IPAddress(0), 9300));
 
+            {
+                Msg.Economy.MoneyBalanceReply m = new Msg.Economy.MoneyBalanceReply();
+                m.MoneyBalance = 1000;
+                m.Amount = 1000;
+                sendMessage(m, true);
+            }
 #if TESTED
             {
                 Msg.Agent.AgentDataUpdate m = new Msg.Agent.AgentDataUpdate();
@@ -350,7 +365,7 @@ namespace Tests.PacketSendTest
 
                 sendMessage(m);
             }
-#endif
+
             {
                 Msg.Event.EventInfoReply m = new Msg.Event.EventInfoReply();
                 m.AgentID = TestUUID;
@@ -682,6 +697,7 @@ namespace Tests.PacketSendTest
 
                 sendMessage(m);
             }
+#endif
         }
     }
 }

@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;

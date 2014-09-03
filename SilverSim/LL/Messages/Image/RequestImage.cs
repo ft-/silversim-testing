@@ -25,16 +25,27 @@ exception statement from your version.
 
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Image
 {
-    public class ImagePacket : Message
+    public class RequestImage : Message
     {
-        public UUID ID = UUID.Zero;
-        public UInt16 Packet = 0;
-        public byte[] Data = new byte[0];
+        public UUID AgentID;
+        public UUID SessionID;
 
-        public ImagePacket()
+        public struct RequestImageEntry
+        {
+            public UUID ImageID;
+            public sbyte DiscardLevel;
+            public double DownloadPriority;
+            public UInt32 Packet;
+            public byte Type;
+        }
+
+        public readonly List<RequestImageEntry> RequestImageList = new List<RequestImageEntry>();
+
+        public RequestImage()
         {
 
         }
@@ -43,25 +54,29 @@ namespace SilverSim.LL.Messages.Image
         {
             get
             {
-                return MessageType.ImagePacket;
+                return MessageType.RequestImage;
             }
         }
 
-        public override bool IsReliable
+        public static RequestImage Decode(UDPPacket p)
         {
-            get
+            RequestImage m = new RequestImage();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+
+            uint count = p.ReadUInt8();
+            for (uint idx = 0; idx < count; ++idx)
             {
-                return true;
+                RequestImageEntry e = new RequestImageEntry();
+                e.ImageID = p.ReadUUID();
+                e.DiscardLevel = p.ReadInt8();
+                e.DownloadPriority = p.ReadFloat();
+                e.Packet = p.ReadUInt32();
+                e.Type = p.ReadUInt8();
+                m.RequestImageList.Add(e);
             }
-        }
 
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteMessageType(Number);
-            p.WriteUUID(ID);
-            p.WriteUInt16(Packet);
-            p.WriteUInt16((UInt16)Data.Length);
-            p.WriteBytes(Data);
+            return m;
         }
     }
 }

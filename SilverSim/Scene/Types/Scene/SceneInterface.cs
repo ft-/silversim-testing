@@ -29,8 +29,10 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Parcel;
 using SilverSim.Scene.Types.Terrain;
+using SilverSim.Types.Economy;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Avatar;
+using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
@@ -75,7 +77,7 @@ namespace SilverSim.Scene.Types.Scene
         ParcelInfo this[Vector3 position] { get; }
     }
 
-    public abstract class SceneInterface
+    public abstract partial class SceneInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("SCENE");
 
@@ -105,6 +107,8 @@ namespace SilverSim.Scene.Types.Scene
         public PresenceServiceInterface PresenceService { get; protected set; }
         public GridUserServiceInterface GridUserService { get; protected set; }
         public GridServiceInterface GridService { get; protected set; }
+        public EconomyServiceInterface EconomyService { get; protected set; }
+        public EconomyInfo EconomyData { get; protected set; }
         private NotecardCache m_NotecardCache;
 
         /* do not put any other than ICapabilityInterface into this list */
@@ -163,6 +167,10 @@ namespace SilverSim.Scene.Types.Scene
             else if(typeof(T).IsAssignableFrom(typeof(NotecardCache)))
             {
                 return (T)(object)m_NotecardCache;
+            }
+            else if(typeof(T).IsAssignableFrom(typeof(EconomyServiceInterface)))
+            {
+                return (T)(object)EconomyService;
             }
             else
             {

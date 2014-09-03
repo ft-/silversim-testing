@@ -29,27 +29,35 @@ namespace SilverSim.LL.Messages.Economy
 {
     public class EconomyData : Message
     {
-        public Int32 ObjectCapacity;
-        public Int32 ObjectCount;
-        public Int32 PriceEnergyUnit;
-        public Int32 PriceObjectClaim;
-        public Int32 PricePublicObjectDecay;
-        public Int32 PricePublicObjectDelete;
-        public Int32 PriceParcelClaim;
-        public double PriceParcelClaimFactor;
-        public Int32 PriceUpload;
-        public Int32 PriceRentLight;
-        public Int32 TeleportMinPrice;
-        public double TeleportPriceExponent;
-        public double EnergyEfficiency;
-        public double PriceObjectRent;
-        public double PriceObjectScaleFactor;
-        public Int32 PriceParcelRent;
-        public Int32 PriceGroupCreate;
+        public Int32 ObjectCapacity = 0;
+        public Int32 ObjectCount = 0;
+        public Int32 PriceEnergyUnit = 0;
+        public Int32 PriceObjectClaim = 0;
+        public Int32 PricePublicObjectDecay = 0;
+        public Int32 PricePublicObjectDelete = 0;
+        public Int32 PriceParcelClaim = 0;
+        public double PriceParcelClaimFactor = 1;
+        public Int32 PriceUpload = 0;
+        public Int32 PriceRentLight = 0;
+        public Int32 TeleportMinPrice = 0;
+        public double TeleportPriceExponent = 0;
+        public double EnergyEfficiency = 0;
+        public double PriceObjectRent = 0;
+        public double PriceObjectScaleFactor = 1;
+        public Int32 PriceParcelRent = 0;
+        public Int32 PriceGroupCreate = 0;
 
         public EconomyData()
         {
 
+        }
+
+        public override bool IsReliable
+        {
+            get
+            {
+                return true;
+            }
         }
 
         public override MessageType Number

@@ -58,6 +58,14 @@ namespace SilverSim.LL.Messages.Event
             }
         }
 
+        public override bool IsReliable
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);

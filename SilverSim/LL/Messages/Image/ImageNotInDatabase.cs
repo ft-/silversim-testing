@@ -25,16 +25,17 @@ exception statement from your version.
 
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace SilverSim.LL.Messages.Image
 {
-    public class ImagePacket : Message
+    public class ImageNotInDatabase : Message
     {
         public UUID ID = UUID.Zero;
-        public UInt16 Packet = 0;
-        public byte[] Data = new byte[0];
 
-        public ImagePacket()
+        public ImageNotInDatabase()
         {
 
         }
@@ -43,7 +44,7 @@ namespace SilverSim.LL.Messages.Image
         {
             get
             {
-                return MessageType.ImagePacket;
+                return MessageType.ImageNotInDatabase;
             }
         }
 
@@ -59,9 +60,6 @@ namespace SilverSim.LL.Messages.Image
         {
             p.WriteMessageType(Number);
             p.WriteUUID(ID);
-            p.WriteUInt16(Packet);
-            p.WriteUInt16((UInt16)Data.Length);
-            p.WriteBytes(Data);
         }
     }
 }

@@ -26,15 +26,23 @@ exception statement from your version.
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.Image
+namespace SilverSim.LL.Messages.Economy
 {
-    public class ImagePacket : Message
+    public class MoneyTransferRequest : Message
     {
-        public UUID ID = UUID.Zero;
-        public UInt16 Packet = 0;
-        public byte[] Data = new byte[0];
+        public UUID AgentID;
+        public UUID SessionID;
 
-        public ImagePacket()
+        public UUID SourceID;
+        public UUID DestID;
+        public byte Flags;
+        public Int32 Amount;
+        public byte AggregatePermNextOwner;
+        public byte AggregatePermInventory;
+        public Int32 TransactionType;
+        public string Description;
+
+        public MoneyTransferRequest()
         {
 
         }
@@ -43,25 +51,25 @@ namespace SilverSim.LL.Messages.Image
         {
             get
             {
-                return MessageType.ImagePacket;
+                return MessageType.MoneyTransferRequest;
             }
         }
 
-        public override bool IsReliable
+        public static Message Decode(UDPPacket p)
         {
-            get
-            {
-                return true;
-            }
-        }
+            MoneyTransferRequest m = new MoneyTransferRequest();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.SourceID = p.ReadUUID();
+            m.DestID = p.ReadUUID();
+            m.Flags = p.ReadUInt8();
+            m.Amount = p.ReadInt32();
+            m.AggregatePermNextOwner = p.ReadUInt8();
+            m.AggregatePermInventory = p.ReadUInt8();
+            m.TransactionType = p.ReadInt32();
+            m.Description = p.ReadStringLen8();
 
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteMessageType(Number);
-            p.WriteUUID(ID);
-            p.WriteUInt16(Packet);
-            p.WriteUInt16((UInt16)Data.Length);
-            p.WriteBytes(Data);
+            return m;
         }
     }
 }

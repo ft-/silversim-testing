@@ -64,6 +64,8 @@ namespace SilverSim.LL.Messages
         }
         #endregion
 
+        public bool ForceZeroFlag = false;
+
         #region Overloaded methods
         public virtual bool IsReliable
         {

@@ -23,45 +23,33 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.Image
+namespace SilverSim.Types.Economy
 {
-    public class ImagePacket : Message
+    public class EconomyInfo
     {
-        public UUID ID = UUID.Zero;
-        public UInt16 Packet = 0;
-        public byte[] Data = new byte[0];
+        public Int32 ObjectCapacity = 0;
+        public Int32 ObjectCount = 0;
+        public Int32 PriceEnergyUnit = 0;
+        public Int32 PriceObjectClaim = 0;
+        public Int32 PricePublicObjectDecay = 0;
+        public Int32 PricePublicObjectDelete = 0;
+        public Int32 PriceParcelClaim = 0;
+        public double PriceParcelClaimFactor = 1;
+        public Int32 PriceUpload = 0;
+        public Int32 PriceRentLight = 0;
+        public Int32 TeleportMinPrice = 0;
+        public double TeleportPriceExponent = 0;
+        public double EnergyEfficiency = 0;
+        public double PriceObjectRent = 0;
+        public double PriceObjectScaleFactor = 1;
+        public Int32 PriceParcelRent = 0;
+        public Int32 PriceGroupCreate = 0;
 
-        public ImagePacket()
+        public EconomyInfo()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ImagePacket;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteMessageType(Number);
-            p.WriteUUID(ID);
-            p.WriteUInt16(Packet);
-            p.WriteUInt16((UInt16)Data.Length);
-            p.WriteBytes(Data);
         }
     }
 }

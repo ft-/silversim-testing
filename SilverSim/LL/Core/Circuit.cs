@@ -351,7 +351,9 @@ namespace SilverSim.LL.Core
                     if(m != null)
                     {
                         UDPPacket p = new UDPPacket();
+                        p.IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag;
                         m.Serialize(p);
+                        p.Flush();
                         p.IsReliable = m.IsReliable;
                         p.SequenceNumber = NextSequenceNumber;
                         m_Server.SendPacketTo(p, RemoteEndPoint);

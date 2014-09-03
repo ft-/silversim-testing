@@ -23,12 +23,9 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types.Friends;
 using SilverSim.Types;
+using SilverSim.Types.Friends;
+using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Friends
 {

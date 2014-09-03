@@ -30,6 +30,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
@@ -876,6 +877,41 @@ namespace SilverSim.LL.Core
         {
             switch (m.Number)
             {
+                case MessageType.MoneyBalanceRequest:
+                    {
+                        Messages.Economy.MoneyBalanceRequest mbr = (Messages.Economy.MoneyBalanceRequest)m;
+                        if (mbr.AgentID == ID && mbr.SessionID == mbr.CircuitSessionID)
+                        {
+                            Circuit circuit;
+                            if (Circuits.TryGetValue(mbr.ReceivedOnCircuitCode, out circuit))
+                            {
+                                Messages.Economy.MoneyBalanceReply mbrep = new Messages.Economy.MoneyBalanceReply();
+                                mbrep.ForceZeroFlag = true; /* lots of NUL at the end of the message */
+                                mbrep.AgentID = mbr.AgentID;
+                                mbrep.TransactionID = mbr.TransactionID;
+                                try
+                                {
+                                    EconomyServiceInterface economyService = circuit.Scene.EconomyService;
+                                    if(economyService != null)
+                                    {
+                                        mbrep.MoneyBalance = economyService.MoneyBalance[mbrep.AgentID, mbrep.CircuitSessionID];
+                                    }
+                                    else
+                                    {
+                                        mbrep.MoneyBalance = 0;
+                                    }
+                                    mbrep.TransactionSuccess = true;
+                                }
+                                catch
+                                {
+                                    mbrep.TransactionSuccess = false;
+                                }
+                                circuit.SendMessage(mbrep);
+                            }
+                        }
+                    }
+                    break;
+
                 case MessageType.RegionHandshakeReply:
                     {
                         Messages.Region.RegionHandshakeReply rhr = (Messages.Region.RegionHandshakeReply)m;

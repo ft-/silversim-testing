@@ -24,17 +24,16 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using System;
 
-namespace SilverSim.LL.Messages.Image
+namespace SilverSim.LL.Messages.Economy
 {
-    public class ImagePacket : Message
+    public class MoneyBalanceRequest : Message
     {
-        public UUID ID = UUID.Zero;
-        public UInt16 Packet = 0;
-        public byte[] Data = new byte[0];
+        public UUID AgentID;
+        public UUID SessionID;
+        public UUID TransactionID;
 
-        public ImagePacket()
+        public MoneyBalanceRequest()
         {
 
         }
@@ -43,25 +42,18 @@ namespace SilverSim.LL.Messages.Image
         {
             get
             {
-                return MessageType.ImagePacket;
+                return MessageType.MoneyBalanceRequest;
             }
         }
 
-        public override bool IsReliable
+        public static Message Decode(UDPPacket p)
         {
-            get
-            {
-                return true;
-            }
-        }
+            MoneyBalanceRequest m = new MoneyBalanceRequest();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.TransactionID = p.ReadUUID();
 
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteMessageType(Number);
-            p.WriteUUID(ID);
-            p.WriteUInt16(Packet);
-            p.WriteUInt16((UInt16)Data.Length);
-            p.WriteBytes(Data);
+            return m;
         }
     }
 }
