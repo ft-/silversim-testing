@@ -23,13 +23,11 @@ exception statement from your version.
 
 */
 
+using HttpClasses;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.StructuredData.AssetXml;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
-using HttpClasses;
-using System;
-using System.IO;
-using System.Xml;
 
 namespace SilverSim.BackendConnectors.Robust.Asset
 {
