@@ -107,5 +107,8 @@ namespace SilverSim.Scene.Types.Agent
         }
 
         void HandleAgentMessage(Message m);
+
+        void SendMessageIfRootAgent(Message m, UUID fromSceneID);
+        void SendMessageAlways(Message m, UUID fromSceneID);
     }
 }

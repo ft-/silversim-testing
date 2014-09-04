@@ -990,5 +990,23 @@ namespace SilverSim.LL.Core
         {
 
         }
+
+        public void SendMessageIfRootAgent(Message m, UUID fromSceneID)
+        {
+            if(fromSceneID == m_CurrentSceneID)
+            {
+                SendMessageAlways(m, fromSceneID);
+            }
+        }
+
+        public void SendMessageAlways(Message m, UUID fromSceneID)
+        {
+            Circuit circuit;
+            if(Circuits.TryGetValue(fromSceneID, out circuit))
+            {
+                circuit.SendMessage(m);
+            }
+        }
+
     }
 }
