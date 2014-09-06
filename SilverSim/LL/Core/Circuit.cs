@@ -64,6 +64,11 @@ namespace SilverSim.LL.Core
         private CapsHttpRedirector m_CapsRedirector;
         private object m_SceneSetLock = new object();
         public int LastMeasuredLatencyTickCount { get; private set; }
+        private uint m_LogoutReplySeqNo = 0;
+        private bool m_LogoutReplySent = false;
+        private object m_LogoutReplyLock = new object(); /* this is only for guarding access sequence to m_LogoutReply* variables */
+        private int m_LogoutReplySentAtTime;
+        private int m_LastReceivedPacketAtTime;
 
         private uint NextSequenceNumber
         {
@@ -120,6 +125,7 @@ namespace SilverSim.LL.Core
             m_CapsRedirector = capsredirector;
             AddCapability("SEED", regionSeedID, RegionSeedHandler);
             Scene = server.Scene;
+            m_LastReceivedPacketAtTime = Environment.TickCount;
         }
 
         ~Circuit()
@@ -137,7 +143,7 @@ namespace SilverSim.LL.Core
              */
             MessageType mType = pck.ReadMessageType();
 
-            m_Log.DebugFormat("Packet {0} => {1}, IsZeroEncoded {2}", mType.ToString(), (uint)mType, pck.IsZeroEncoded.ToString());
+            m_LastReceivedPacketAtTime = Environment.TickCount;
 
             /* do we have some acks from the packet's end? */
             if(null != acknumbers)
@@ -145,6 +151,19 @@ namespace SilverSim.LL.Core
                 foreach(UInt32 ackno in acknumbers)
                 {
                     m_UnackedPackets.Remove(ackno);
+
+                    lock (m_LogoutReplyLock)
+                    {
+                        if (ackno == m_LogoutReplySeqNo && m_LogoutReplySent)
+                        {
+                            m_Log.InfoFormat("Logout of agent {0} completed", Agent.ID);
+                            Stop();
+                            ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
+                            Agent = null;
+                            Scene = null;
+                            return;
+                        }
+                    }
                 }
             }
 
@@ -162,7 +181,21 @@ namespace SilverSim.LL.Core
 
                     for(uint i = 0; i < pck.ReadUInt8(); ++i)
                     {
-                        m_UnackedPackets.Remove(pck.ReadUInt32());
+                        uint ackno = pck.ReadUInt32();
+                        m_UnackedPackets.Remove(ackno);
+
+                        lock (m_LogoutReplyLock)
+                        {
+                            if (ackno == m_LogoutReplySeqNo && m_LogoutReplySent)
+                            {
+                                m_Log.InfoFormat("Logout of agent {0} completed", Agent.ID);
+                                Stop();
+                                ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
+                                Agent = null;
+                                Scene = null;
+                                return;
+                            }
+                        }
                     }
                     break;
 
@@ -364,10 +397,37 @@ namespace SilverSim.LL.Core
                             p.IsResent = true;
                             m_UnackedPackets[p.SequenceNumber] = p;
                         }
+                        if(m.Number == MessageType.LogoutReply)
+                        {
+                            lock (m_LogoutReplyLock)
+                            {
+                                m_LogoutReplySeqNo = p.SequenceNumber;
+                                m_LogoutReplySentAtTime = Environment.TickCount;
+                                m_LogoutReplySent = true;
+                            }
+                        }
                     }
                 }
                 catch
                 {
+                }
+
+                if (Environment.TickCount - m_LastReceivedPacketAtTime >= 60000)
+                {
+                    m_Log.InfoFormat("Packet Timeout for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
+                    ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
+                    Agent = null;
+                    Scene = null;
+                    return;
+                }
+
+                if (Environment.TickCount - m_LogoutReplySentAtTime >= 10000 && m_LogoutReplySent)
+                {
+                    m_Log.InfoFormat("LogoutReply for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
+                    ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
+                    Agent = null;
+                    Scene = null;
+                    return;
                 }
 
                 if(Environment.TickCount - lastPingTick >= 5000)

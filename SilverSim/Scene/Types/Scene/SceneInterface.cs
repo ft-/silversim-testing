@@ -91,7 +91,6 @@ namespace SilverSim.Scene.Types.Scene
         public string Name { get; protected set; }
         public IPAddress LastIPAddress { get; protected set; }
         public string ExternalHostName { get; protected set; }
-        public TerrainMap Terrain { get; protected set; }
         public GridVector GridPosition { get; protected set; }
         public abstract ISceneObjects Objects { get; }
         public abstract ISceneObjectGroups ObjectGroups { get; }
@@ -171,6 +170,14 @@ namespace SilverSim.Scene.Types.Scene
             else if(typeof(T).IsAssignableFrom(typeof(EconomyServiceInterface)))
             {
                 return (T)(object)EconomyService;
+            }
+            else if(typeof(T).IsAssignableFrom(typeof(EnvironmentController)))
+            {
+                return (T)(object)Environment;
+            }
+            else if (typeof(T).IsAssignableFrom(typeof(TerrainController)))
+            {
+                return (T)(object)Terrain;
             }
             else
             {

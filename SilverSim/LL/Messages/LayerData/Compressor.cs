@@ -32,32 +32,59 @@ namespace SilverSim.LL.Messages.LayerData
     {
         public static LayerData ToLayerMessage(LayerPatch[] patches, Messages.LayerData.LayerData.LayerDataType type)
         {
+            return ToLayerMessage(patches, type, 0, patches.Length);
+        }
+
+        public static LayerData ToLayerMessage(LayerPatch[] patches, Messages.LayerData.LayerData.LayerDataType type, int offset, int length)
+        {
             Messages.LayerData.LayerData layer = new Messages.LayerData.LayerData();
             layer.LayerType = type;
 
+            bool extended = false;
+            switch(type)
+            {
+                case LayerData.LayerDataType.CloudExtended:
+                case LayerData.LayerDataType.LandExtended:
+                case LayerData.LayerDataType.WaterExtended:
+                case LayerData.LayerDataType.WindExtended:
+                    extended = true;
+                    break;
+
+                default:
+                    break;
+            }
+
             GroupHeader header = new GroupHeader();
             header.Stride = STRIDE;
-            header.PatchSize = TERRAIN_PATCH_SIZE;
+            header.PatchSize = LAYER_PATCH_NUM_XY_ENTRIES;
             header.Type = type;
 
             // Should be enough to fit even the most poorly packed data
-            byte[] data = new byte[patches.Length * TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE * 2];
+            byte[] data = new byte[patches.Length * LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES * 2];
             BitPacker bitpack = new BitPacker(data, 0);
             bitpack.PackBits(header.Stride, 16);
             bitpack.PackBits(header.PatchSize, 8);
             bitpack.PackBits((uint)header.Type, 8);
 
-            for (int i = 0; i < patches.Length; i++)
+            for (int i = 0; i < length; i++)
             {
-                if (patches[i].Data.Length != TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE)
+                if (patches[i + offset].Data.Length != LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES)
                 {
                     throw new ArgumentException("Patch data must be a 16x16 array");
                 }
 
                 PatchHeader pheader = PrescanPatch(patches[i].Data);
                 pheader.QuantWBits = 136;
-                pheader.PatchIDs = (patches[i].Y & 0x1F);
-                pheader.PatchIDs += (patches[i].X << 5);
+                if (extended)
+                {
+                    pheader.PatchIDs = (patches[i].Y & 0xFFFF);
+                    pheader.PatchIDs += (patches[i].X << 16);
+                }
+                else
+                {
+                    pheader.PatchIDs = (patches[i].Y & 0x1F);
+                    pheader.PatchIDs += (patches[i].X << 5);
+                }
 
                 // NOTE: No idea what prequant and postquant should be or what they do
                 int[] patch = CompressPatch(patches[i].Data, pheader, 10);
@@ -79,9 +106,9 @@ namespace SilverSim.LL.Messages.LayerData
             float zmax = -99999999.0f;
             float zmin = 99999999.0f;
 
-            for (int j = 0; j < TERRAIN_PATCH_SIZE; j++)
+            for (int j = 0; j < LAYER_PATCH_NUM_XY_ENTRIES; j++)
             {
-                for (int i = 0; i < TERRAIN_PATCH_SIZE; i++)
+                for (int i = 0; i < LAYER_PATCH_NUM_XY_ENTRIES; i++)
                 {
                     float val = patch[j, i];
                     if (val > zmax)
@@ -161,7 +188,7 @@ namespace SilverSim.LL.Messages.LayerData
             int temp;
             bool eob;
 
-            if (postquant > TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE || postquant < 0)
+            if (postquant > LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES || postquant < 0)
             {
                 //Logger.Log("Postquant is outside the range of allowed values in EncodePatch()", Helpers.LogLevel.Error);
                 return;
@@ -169,10 +196,10 @@ namespace SilverSim.LL.Messages.LayerData
 
             if (postquant != 0)
             {
-                patch[TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE - postquant] = 0;
+                patch[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES - postquant] = 0;
             }
 
-            for (int i = 0; i < TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE; i++)
+            for (int i = 0; i < LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES; i++)
             {
                 eob = false;
                 temp = patch[i];
@@ -181,7 +208,7 @@ namespace SilverSim.LL.Messages.LayerData
                 {
                     eob = true;
 
-                    for (int j = i; j < TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE - postquant; j++)
+                    for (int j = i; j < LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES - postquant; j++)
                     {
                         if (patch[j] != 0)
                         {
@@ -231,7 +258,7 @@ namespace SilverSim.LL.Messages.LayerData
         #region Actual compression
         private static int[] CompressPatch(float[,] patchData, PatchHeader header, int prequant)
         {
-            float[] block = new float[TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE];
+            float[] block = new float[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
             int wordsize = prequant;
             float oozrange = 1.0f / (float)header.Range;
             float range = (float)(1 << prequant);
@@ -242,22 +269,22 @@ namespace SilverSim.LL.Messages.LayerData
             header.QuantWBits |= (prequant - 2) << 4;
 
             int k = 0;
-            for (int j = 0; j < TERRAIN_PATCH_SIZE; j++)
+            for (int j = 0; j < LAYER_PATCH_NUM_XY_ENTRIES; j++)
             {
-                for (int i = 0; i < TERRAIN_PATCH_SIZE; i++)
+                for (int i = 0; i < LAYER_PATCH_NUM_XY_ENTRIES; i++)
                 {
                     block[k++] = patchData[j, i] * premult - sub;
                 }
             }
 
-            float[] ftemp = new float[TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE];
-            int[] itemp = new int[TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE];
+            float[] ftemp = new float[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
+            int[] itemp = new int[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
 
-            for (int o = 0; o < TERRAIN_PATCH_SIZE; o++)
+            for (int o = 0; o < LAYER_PATCH_NUM_XY_ENTRIES; o++)
             {
                 DCTLine16(block, ftemp, o);
             }
-            for (int o = 0; o < TERRAIN_PATCH_SIZE; o++)
+            for (int o = 0; o < LAYER_PATCH_NUM_XY_ENTRIES; o++)
             {
                 DCTColumn16(ftemp, itemp, o);
             }
@@ -268,22 +295,22 @@ namespace SilverSim.LL.Messages.LayerData
         private static void DCTLine16(float[] linein, float[] lineout, int line)
         {
             float total = 0.0f;
-            int lineSize = line * TERRAIN_PATCH_SIZE;
+            int lineSize = line * LAYER_PATCH_NUM_XY_ENTRIES;
 
-            for (int n = 0; n < TERRAIN_PATCH_SIZE; n++)
+            for (int n = 0; n < LAYER_PATCH_NUM_XY_ENTRIES; n++)
             {
                 total += linein[lineSize + n];
             }
 
             lineout[lineSize] = OO_SQRT2 * total;
 
-            for (int u = 1; u < TERRAIN_PATCH_SIZE; u++)
+            for (int u = 1; u < LAYER_PATCH_NUM_XY_ENTRIES; u++)
             {
                 total = 0.0f;
 
-                for (int n = 0; n < TERRAIN_PATCH_SIZE; n++)
+                for (int n = 0; n < LAYER_PATCH_NUM_XY_ENTRIES; n++)
                 {
-                    total += linein[lineSize + n] * CosineTable16[u * TERRAIN_PATCH_SIZE + n];
+                    total += linein[lineSize + n] * CosineTable16[u * LAYER_PATCH_NUM_XY_ENTRIES + n];
                 }
 
                 lineout[lineSize + u] = total;
@@ -295,23 +322,23 @@ namespace SilverSim.LL.Messages.LayerData
             float total = 0.0f;
             const float oosob = 2.0f / 16.0f;
 
-            for (int n = 0; n < TERRAIN_PATCH_SIZE; n++)
+            for (int n = 0; n < LAYER_PATCH_NUM_XY_ENTRIES; n++)
             {
-                total += linein[TERRAIN_PATCH_SIZE * n + column];
+                total += linein[LAYER_PATCH_NUM_XY_ENTRIES * n + column];
             }
 
             lineout[CopyMatrix16[column]] = (int)(OO_SQRT2 * total * oosob * QuantizeTable16[column]);
 
-            for (int u = 1; u < TERRAIN_PATCH_SIZE; u++)
+            for (int u = 1; u < LAYER_PATCH_NUM_XY_ENTRIES; u++)
             {
                 total = 0.0f;
 
-                for (int n = 0; n < TERRAIN_PATCH_SIZE; n++)
+                for (int n = 0; n < LAYER_PATCH_NUM_XY_ENTRIES; n++)
                 {
-                    total += linein[16 * n + column] * CosineTable16[u * TERRAIN_PATCH_SIZE + n];
+                    total += linein[16 * n + column] * CosineTable16[u * LAYER_PATCH_NUM_XY_ENTRIES + n];
                 }
 
-                lineout[CopyMatrix16[TERRAIN_PATCH_SIZE * u + column]] = (int)(total * oosob * QuantizeTable16[TERRAIN_PATCH_SIZE * u + column]);
+                lineout[CopyMatrix16[LAYER_PATCH_NUM_XY_ENTRIES * u + column]] = (int)(total * oosob * QuantizeTable16[LAYER_PATCH_NUM_XY_ENTRIES * u + column]);
             }
         }
         #endregion

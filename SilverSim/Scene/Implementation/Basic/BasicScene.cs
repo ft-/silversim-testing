@@ -221,7 +221,6 @@ namespace SilverSim.Scene.Implementation.Basic
             AssetService = assetService;
             GridService = gridService;
             GridUserService = gridUserService;
-            Terrain = new TerrainMap(ri.Size.X, ri.Size.Y);
             m_SceneObjects = new BasicSceneObjects(this);
             m_SceneObjectParts = new BasicSceneObjectParts(this);
             m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
@@ -232,6 +231,8 @@ namespace SilverSim.Scene.Implementation.Basic
             GridPosition = ri.Location;
             SizeX = ri.Size.X;
             SizeY = ri.Size.Y;
+            Terrain = new TerrainController(this);
+            Environment = new EnvironmentController(this);
             m_ChatService = chatService;
             IMRouter.SceneIM.Add(IMSend);
             OnRemove += RemoveScene;

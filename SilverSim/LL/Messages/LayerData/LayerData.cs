@@ -65,6 +65,14 @@ namespace SilverSim.LL.Messages.LayerData
             }
         }
 
+        public override bool ZeroFlag
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);

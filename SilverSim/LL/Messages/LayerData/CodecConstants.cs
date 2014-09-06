@@ -56,7 +56,10 @@ namespace SilverSim.LL.Messages.LayerData
             public Messages.LayerData.LayerData.LayerDataType Type;
         }
 
-        public const int TERRAIN_PATCH_SIZE = 16;
+        public const int MAX_PATCHES_PER_MESSAGE = 6;
+
+        public const int LAYER_PATCH_ENTRY_WIDTH = 4;
+        public const int LAYER_PATCH_NUM_XY_ENTRIES = 16;
 
         public const int PATCHES_PER_EDGE = 16;
         public const int END_OF_PATCHES = 97;
@@ -69,17 +72,17 @@ namespace SilverSim.LL.Messages.LayerData
         private const int POSITIVE_VALUE = 0x6;
         private const int NEGATIVE_VALUE = 0x7;
 
-        private static readonly float[] DequantizeTable16 = new float[TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE];
-        private static readonly float[] CosineTable16 = new float[TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE];
-        private static readonly int[] CopyMatrix16 = new int[TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE];
-        private static readonly float[] QuantizeTable16 = new float[TERRAIN_PATCH_SIZE * TERRAIN_PATCH_SIZE];
+        private static readonly float[] DequantizeTable16 = new float[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
+        private static readonly float[] CosineTable16 = new float[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
+        private static readonly int[] CopyMatrix16 = new int[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
+        private static readonly float[] QuantizeTable16 = new float[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
 
 
         static LayerCompressor()
         {
-            for (int j = 0; j < TERRAIN_PATCH_SIZE; j++)
+            for (int j = 0; j < LAYER_PATCH_NUM_XY_ENTRIES; j++)
             {
-                for (int i = 0; i < TERRAIN_PATCH_SIZE; i++)
+                for (int i = 0; i < LAYER_PATCH_NUM_XY_ENTRIES; i++)
                 {
                     DequantizeTable16[j * 16 + i] = 1.0f + 2.0f * (float)(i + j);
                     QuantizeTable16[j * 16 + i] = 1.0f / (1.0f + 2.0f * ((float)i + (float)j));
@@ -88,9 +91,9 @@ namespace SilverSim.LL.Messages.LayerData
 
             const float hposz = (float)Math.PI * 0.5f / 16.0f;
 
-            for (int u = 0; u < TERRAIN_PATCH_SIZE; u++)
+            for (int u = 0; u < LAYER_PATCH_NUM_XY_ENTRIES; u++)
             {
-                for (int n = 0; n < TERRAIN_PATCH_SIZE; n++)
+                for (int n = 0; n < LAYER_PATCH_NUM_XY_ENTRIES; n++)
                 {
                     CosineTable16[u * 16 + n] = (float)Math.Cos((2.0f * (float)n + 1.0f) * (float)u * hposz);
                 }
@@ -103,7 +106,7 @@ namespace SilverSim.LL.Messages.LayerData
                 int j = 0;
                 int count = 0;
 
-                while (i < TERRAIN_PATCH_SIZE && j < TERRAIN_PATCH_SIZE)
+                while (i < LAYER_PATCH_NUM_XY_ENTRIES && j < LAYER_PATCH_NUM_XY_ENTRIES)
                 {
                     CopyMatrix16[j * 16 + i] = count++;
 
@@ -111,7 +114,7 @@ namespace SilverSim.LL.Messages.LayerData
                     {
                         if (right)
                         {
-                            if (i < TERRAIN_PATCH_SIZE - 1) i++;
+                            if (i < LAYER_PATCH_NUM_XY_ENTRIES - 1) i++;
                             else j++;
 
                             right = false;
@@ -119,7 +122,7 @@ namespace SilverSim.LL.Messages.LayerData
                         }
                         else
                         {
-                            if (j < TERRAIN_PATCH_SIZE - 1) j++;
+                            if (j < LAYER_PATCH_NUM_XY_ENTRIES - 1) j++;
                             else i++;
 
                             right = true;
@@ -132,13 +135,13 @@ namespace SilverSim.LL.Messages.LayerData
                         {
                             i++;
                             j--;
-                            if (i == TERRAIN_PATCH_SIZE - 1 || j == 0) diag = false;
+                            if (i == LAYER_PATCH_NUM_XY_ENTRIES - 1 || j == 0) diag = false;
                         }
                         else
                         {
                             i--;
                             j++;
-                            if (j == TERRAIN_PATCH_SIZE - 1 || i == 0) diag = false;
+                            if (j == LAYER_PATCH_NUM_XY_ENTRIES - 1 || i == 0) diag = false;
                         }
                     }
                 }

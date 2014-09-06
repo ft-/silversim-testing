@@ -44,11 +44,13 @@ using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using System;
 using ThreadedClasses;
+using log4net;
 
 namespace SilverSim.LL.Core
 {
     public class LLAgent : IAgent, IDisposable
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("LL AGENT");
         public event Action<IObject> OnPositionChange;
 
         #region Agent fields
@@ -920,6 +922,9 @@ namespace SilverSim.LL.Core
                         {
                             /* Add our agent to scene */
                             circuit.Scene.Add(this);
+                            circuit.Scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
+                            circuit.Scene.Environment.UpdateCloudDataToSingleClient(this);
+                            circuit.Scene.Environment.UpdateWindDataToSingleClient(this);
                         }
                     }
                     break;
@@ -941,8 +946,11 @@ namespace SilverSim.LL.Core
                                 amc.LookAt = new Vector3(1, 1, 0); /* TODO: extract from agent */
                                 amc.Position = new Vector3(128, 128, 23);
                                 amc.SessionID = cam.SessionID;
+                                amc.GridPosition = circuit.Scene.GridPosition;
 
                                 circuit.SendMessage(amc);
+
+                                circuit.Scene.Environment.UpdateWindlightProfileToClient(this);
                             }
                         }
                     }
@@ -951,6 +959,24 @@ namespace SilverSim.LL.Core
                 case MessageType.LogoutRequest:
                     Messages.Circuit.LogoutRequest lr = (Messages.Circuit.LogoutRequest)m;
                     /* agent wants to logout */
+                    m_Log.InfoFormat("Agent {0} {1} ({0}) wants to logout", FirstName, LastName, ID);
+                    foreach(Circuit c in Circuits.Values)
+                    {
+                        c.Scene.Remove(this);
+                        if (c.Scene.ID != lr.CircuitSceneID)
+                        {
+                            c.Stop();
+                            Circuits.Remove(c.CircuitCode, c.Scene.ID);
+                            ((LLUDPServer)c.Scene.UDPServer).RemoveCircuit(c);
+                        }
+                        else
+                        {
+                            Messages.Circuit.LogoutReply lrep = new Messages.Circuit.LogoutReply();
+                            lrep.AgentID = lr.AgentID;
+                            lrep.SessionID = lr.SessionID;
+                            c.SendMessage(lrep);
+                        }
+                    }
                     break;
 
                 case MessageType.AgentDataUpdateRequest:
@@ -1007,6 +1033,5 @@ namespace SilverSim.LL.Core
                 circuit.SendMessage(m);
             }
         }
-
     }
 }

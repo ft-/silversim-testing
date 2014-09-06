@@ -31,5 +31,24 @@ namespace SilverSim.LL.Messages.LayerData
         public int Y;
 
         public float[,] Data = new float[16,16];
+
+        public LayerPatch()
+        {
+
+        }
+
+        public LayerPatch(LayerPatch p)
+        {
+            X = p.X;
+            Y = p.Y;
+            int x, y;
+            for(y = 0; y < 16; ++y)
+            {
+                for(x = 0; x < 16; ++x)
+                {
+                    Data[y, x] = p.Data[y, x];
+                }
+            }
+        }
     }
 }
