@@ -921,7 +921,7 @@ namespace SilverSim.LL.Core
                         if (Circuits.TryGetValue(rhr.ReceivedOnCircuitCode, out circuit))
                         {
                             /* Add our agent to scene */
-                            //circuit.Scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
+                            circuit.Scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
                             //circuit.Scene.Environment.UpdateCloudDataToSingleClient(this);
                             //circuit.Scene.Environment.UpdateWindDataToSingleClient(this);
                         }

@@ -44,6 +44,7 @@ namespace SilverSim.Scene.Types.Scene
         public class TerrainController : IDisposable
         {
             private const int BASE_REGION_SIZE = 256;
+            private double DEFAULT_TERRAIN_HEIGHT = 21;
 
             private SceneInterface m_Scene;
             private ReaderWriterLock m_TerrainRwLock = new ReaderWriterLock();
@@ -56,8 +57,8 @@ namespace SilverSim.Scene.Types.Scene
                 int x;
                 int y;
 
-                int xPatches = (int)scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_SIM_WIDTH;
-                int yPatches = (int)scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_SIM_WIDTH;
+                int xPatches = (int)scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                int yPatches = (int)scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
 
                 m_Scene = scene;
                 m_TerrainPatches = new LayerPatch[yPatches, xPatches];
@@ -68,8 +69,8 @@ namespace SilverSim.Scene.Types.Scene
                     for (x = 0; x < xPatches; ++x)
                     {
                         m_TerrainPatches[y, x] = new LayerPatch();
-                        m_TerrainPatches[y,x].X = x * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                        m_TerrainPatches[y,x].Y = y * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                        m_TerrainPatches[y, x].X = x;
+                        m_TerrainPatches[y, x].Y = y;
                     }
                 }
             }
@@ -90,9 +91,9 @@ namespace SilverSim.Scene.Types.Scene
                     List<LayerData> mlist = new List<LayerData>();
                     List<LayerPatch> dirtyPatches = new List<LayerPatch>();
 
-                    for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_SIM_WIDTH; ++y)
+                    for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
                     {
-                        for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_SIM_WIDTH; ++x)
+                        for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                         {
                             dirtyPatches.Add(new LayerPatch(m_TerrainPatches[y, x]));
                         }

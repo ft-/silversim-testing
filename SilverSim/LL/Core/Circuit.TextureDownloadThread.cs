@@ -128,12 +128,12 @@ namespace SilverSim.LL.Core
                         res = null;
 
                         int offset = IMAGE_FIRST_PACKET_SIZE;
-                        ushort packetno = 2;
+                        ushort packetno = 1;
                         while(offset < asset.Data.Length)
                         {
                             Messages.Image.ImagePacket ip = new Messages.Image.ImagePacket();
                             ip.ID = imageRequest.ImageID;
-                            ip.Packet = packetno++;
+                            ip.Packet = ++packetno;
                             if(asset.Data.Length - offset > IMAGE_PACKET_SIZE)
                             {
                                 ip.Data = new byte[IMAGE_PACKET_SIZE];
@@ -145,6 +145,7 @@ namespace SilverSim.LL.Core
 
                             Buffer.BlockCopy(asset.Data, offset, ip.Data, 0, ip.Data.Length);
                             SendMessage(ip);
+                            offset += IMAGE_PACKET_SIZE;
                         }
                     }
                     else

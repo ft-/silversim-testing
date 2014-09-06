@@ -136,8 +136,8 @@ namespace SilverSim.Scene.Types.Scene
             public EnvironmentController(SceneInterface scene)
             {
                 m_Scene = scene;
-                m_WindData.Speeds = new WindVector[scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH, scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH];
-                m_CloudData.CloudCoverages = new double[scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH, scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH];
+                m_WindData.Speeds = new WindVector[scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+                m_CloudData.CloudCoverages = new double[scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
                 m_SunData.SunDirection = new Vector3();
             }
 
@@ -155,9 +155,9 @@ namespace SilverSim.Scene.Types.Scene
 
                 LayerPatch[] p = new LayerPatch[2 * m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
 
-                for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_SIM_WIDTH; ++y)
+                for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
                 {
-                    for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_SIM_WIDTH; ++x)
+                    for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                     {
                         p[2 * (y * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES + x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES) + 0].Data[y, x] = (float)m_WindData.Speeds[y, x].X;
                         p[2 * (y * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES + x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES) + 1].Data[y, x] = (float)m_WindData.Speeds[y, x].Y;
@@ -167,10 +167,10 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                     {
-                        p[2 * (y * NumTerrainPatchesPerY + x) + 0].X = x * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                        p[2 * (y * NumTerrainPatchesPerY + x) + 0].Y = y * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                        p[2 * (y * NumTerrainPatchesPerY + x) + 1].X = x * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                        p[2 * (y * NumTerrainPatchesPerY + x) + 1].Y = y * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                        p[2 * (y * NumTerrainPatchesPerY + x) + 0].X = x;
+                        p[2 * (y * NumTerrainPatchesPerY + x) + 0].Y = y;
+                        p[2 * (y * NumTerrainPatchesPerY + x) + 1].X = x;
+                        p[2 * (y * NumTerrainPatchesPerY + x) + 1].Y = y;
                     }
                 }
 
@@ -224,11 +224,11 @@ namespace SilverSim.Scene.Types.Scene
                 int y;
                 int x;
                 LayerPatch[] p = new LayerPatch[m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
-                int NumTerrainPatchesPerY = (int)m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH;
+                int NumTerrainPatchesPerY = (int)m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
 
-                for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH; ++y)
+                for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
                 {
-                    for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH; ++x)
+                    for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                     {
                         p[y * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES + x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES].Data[y, x] = (float)m_CloudData.CloudCoverages[y, x];
                     }
@@ -237,8 +237,8 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                     {
-                        p[y * NumTerrainPatchesPerY + x].X = x * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                        p[y * NumTerrainPatchesPerY + x].Y = y * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                        p[y * NumTerrainPatchesPerY + x].X = x;
+                        p[y * NumTerrainPatchesPerY + x].Y = y;
                     }
                 }
 

@@ -493,6 +493,7 @@ namespace SilverSim.LL.Core
                 {
                     m_Log.InfoFormat("Packet Timeout for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
                     ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
+                    Stop();
                     Agent = null;
                     Scene = null;
                     return;
@@ -502,6 +503,7 @@ namespace SilverSim.LL.Core
                 {
                     m_Log.InfoFormat("LogoutReply for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
                     ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
+                    Stop();
                     Agent = null;
                     Scene = null;
                     return;
