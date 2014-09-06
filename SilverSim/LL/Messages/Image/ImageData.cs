@@ -31,7 +31,7 @@ namespace SilverSim.LL.Messages.Image
     public class ImageData : Message
     {
         public UUID ID = UUID.Zero;
-        public byte Codec = 0;
+        public ImageCodec Codec = ImageCodec.Invalid;
         public UInt32 Size = 0;
         public UInt16 Packets = 0;
         public byte[] Data = new byte[0];
@@ -61,7 +61,7 @@ namespace SilverSim.LL.Messages.Image
         {
             p.WriteMessageType(Number);
             p.WriteUUID(ID);
-            p.WriteUInt8(Codec);
+            p.WriteUInt8((byte)Codec);
             p.WriteUInt32(Size);
             p.WriteUInt16(Packets);
             p.WriteUInt16((UInt16)Data.Length);

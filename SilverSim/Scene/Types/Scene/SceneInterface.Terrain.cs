@@ -56,8 +56,8 @@ namespace SilverSim.Scene.Types.Scene
                 int x;
                 int y;
 
-                int xPatches = (int)scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH;
-                int yPatches = (int)scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH;
+                int xPatches = (int)scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_SIM_WIDTH;
+                int yPatches = (int)scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_SIM_WIDTH;
 
                 m_Scene = scene;
                 m_TerrainPatches = new LayerPatch[yPatches, xPatches];
@@ -90,9 +90,9 @@ namespace SilverSim.Scene.Types.Scene
                     List<LayerData> mlist = new List<LayerData>();
                     List<LayerPatch> dirtyPatches = new List<LayerPatch>();
 
-                    for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
+                    for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_SIM_WIDTH; ++y)
                     {
-                        for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
+                        for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_SIM_WIDTH; ++x)
                         {
                             dirtyPatches.Add(new LayerPatch(m_TerrainPatches[y, x]));
                         }
@@ -102,7 +102,7 @@ namespace SilverSim.Scene.Types.Scene
 
                     if (BASE_REGION_SIZE == m_Scene.RegionData.Size.X && BASE_REGION_SIZE == m_Scene.RegionData.Size.Y)
                     {
-                        mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.Wind));
+                        mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.Land));
                     }
                     else
                     {
@@ -111,12 +111,12 @@ namespace SilverSim.Scene.Types.Scene
                         {
                             if (patches.Length - offset > LayerCompressor.MAX_PATCHES_PER_MESSAGE)
                             {
-                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.WindExtended, offset, LayerCompressor.MAX_PATCHES_PER_MESSAGE));
+                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.LandExtended, offset, LayerCompressor.MAX_PATCHES_PER_MESSAGE));
                                 offset += LayerCompressor.MAX_PATCHES_PER_MESSAGE;
                             }
                             else
                             {
-                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.WindExtended, offset, patches.Length - offset));
+                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.LandExtended, offset, patches.Length - offset));
                                 offset = patches.Length;
                             }
                         }
@@ -134,7 +134,7 @@ namespace SilverSim.Scene.Types.Scene
                 List<LayerData> mlist = CompileTerrainData(forceUpdate);
                 foreach (LayerData m in mlist)
                 {
-                    agent.SendMessageIfRootAgent(m, m_Scene.ID);
+                    agent.SendMessageAlways(m, m_Scene.ID);
                 }
             }
 

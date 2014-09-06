@@ -23,37 +23,17 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
-using System;
-
-namespace SilverSim.LL.Messages.Region
+namespace SilverSim.LL.Messages.Image
 {
-    public class RegionHandshakeReply : Message
+    public enum ImageCodec : byte
     {
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
-        public UInt32 Flags = 0;
-
-        public RegionHandshakeReply()
-        {
-
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RegionHandshakeReply;
-            }
-        }
-
-        public static Message Decode(UDPPacket p)
-        {
-            RegionHandshakeReply m = new RegionHandshakeReply();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.Flags = p.ReadUInt32();
-            return m;
-        }
+        Invalid = 0,
+        RGB = 1,
+        J2C = 2,
+        BMP = 3,
+        TGA = 4,
+        JPEG = 5,
+        DXT = 6,
+        PNG = 7
     }
 }

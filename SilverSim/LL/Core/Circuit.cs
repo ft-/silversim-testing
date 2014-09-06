@@ -29,6 +29,7 @@ using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Types.Asset;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
@@ -45,7 +46,7 @@ using SilverSim.Scene.ServiceInterfaces.Chat;
 
 namespace SilverSim.LL.Core
 {
-    public class Circuit : IDisposable
+    public partial class Circuit : IDisposable
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL CIRCUIT");
         private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
@@ -73,6 +74,9 @@ namespace SilverSim.LL.Core
         private int m_LastReceivedPacketAtTime;
         private ChatServiceInterface m_ChatService;
         private ChatServiceInterface.Listener m_ChatListener;
+        private Thread m_TextureDownloadThread;
+        private bool m_TextureDownloadThreadRunning = false;
+        private BlockingQueue<Messages.Image.RequestImage> m_TextureDownloadQueue = new BlockingQueue<Messages.Image.RequestImage>();
 
         private uint NextSequenceNumber
         {
@@ -380,7 +384,16 @@ namespace SilverSim.LL.Core
                         m.CircuitSceneID = new UUID(Scene.ID);
 
                         /* we keep the circuit relatively dumb so that we have no other logic than how to send and receive messages to the viewer */
-                        m_Server.RouteReceivedMessage(m);
+                        switch(m.Number)
+                        {
+                            case MessageType.RequestImage:
+                                m_TextureDownloadQueue.Enqueue((Messages.Image.RequestImage)m);
+                                break;
+
+                            default:
+                                m_Server.RouteReceivedMessage(m);
+                                break;
+                        }
                     }
                     else
                     {
@@ -391,7 +404,7 @@ namespace SilverSim.LL.Core
         }
         #endregion
 
-        #region Transmit Logic
+        #region Thread control logic
         public void Start()
         {
             lock (this)
@@ -401,6 +414,12 @@ namespace SilverSim.LL.Core
                     m_TxThread = new Thread(TransmitThread);
                     m_TxThread.Start(this);
                     m_TxRunning = true;
+                }
+                if(!m_TextureDownloadThreadRunning)
+                {
+                    m_TextureDownloadThread = new Thread(TextureDownloadThread);
+                    m_TextureDownloadThreadRunning = true;
+                    m_TextureDownloadThread.Start(this);
                 }
             }
         }
@@ -413,9 +432,16 @@ namespace SilverSim.LL.Core
                 {
                     m_TxQueue.Enqueue(new CancelTxThread());
                 }
+                if(null != m_TextureDownloadThread)
+                {
+                    m_TextureDownloadThreadRunning = false;
+                    m_TextureDownloadThread = null;
+                }
             }
         }
+        #endregion
 
+        #region LLUDP Packet transmitter
         private void TransmitThread(object param)
         {
             int lastAckTick = Environment.TickCount;
@@ -528,7 +554,7 @@ namespace SilverSim.LL.Core
             }
             m_TxRunning = false;
         }
-
+        #endregion
 
         public void SendMessage(Message m)
         {
@@ -540,32 +566,6 @@ namespace SilverSim.LL.Core
             {
                 m_Log.ErrorFormat("{0} at {1}", e.ToString(), e.StackTrace.ToString());
             }
-        }
-        #endregion
-
-        #region Capabilities registration
-        public void AddCapability(string type, UUID id, Action<HttpRequest> del)
-        {
-            m_RegisteredCapabilities.Add(type, id);
-            try
-            {
-                m_CapsRedirector.Caps[type].Add(id, del);
-            }
-            catch
-            {
-                m_RegisteredCapabilities.Remove(type);
-                throw;
-            }
-        }
-
-        public bool RemoveCapability(string type)
-        {
-            UUID id;
-            if (m_RegisteredCapabilities.Remove(type, out id))
-            {
-                return m_CapsRedirector.Caps[type].Remove(id);
-            }
-            return false;
         }
 
         public void Dispose()
@@ -583,69 +583,5 @@ namespace SilverSim.LL.Core
             Agent = null;
         }
         
-        public void RegionSeedHandler(HttpRequest httpreq)
-        {
-            IValue o;
-            if(httpreq.Method != "POST")
-            {
-                httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed").Close();
-                return;
-            }
-
-            try
-            {
-                o = LLSD_XML.Deserialize(httpreq.Body);
-            }
-            catch(Exception e)
-            {
-                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace.ToString());
-                httpreq.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type").Close();
-                return;
-            }
-            if(!(o is AnArray))
-            {
-                httpreq.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type").Close();
-                return;
-            }
-
-            Dictionary<string, string> capsUri = new Dictionary<string, string>();
-            foreach(IValue v in (AnArray)o)
-            {
-                UUID capsID;
-                if(v.ToString() == "SEED")
-                {
-
-                }
-                else if (m_RegisteredCapabilities.TryGetValue(v.ToString(), out capsID))
-                {
-                    capsUri[v.ToString()] = string.Format("http://{0}:{1}/CAPS/{2}/{3}", m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port,
-                        v.ToString(), capsID);
-                }
-            }
-
-            HttpResponse res = httpreq.BeginResponse();
-            res.ContentType = "application/llsd+xml";
-            Stream tw = res.GetOutputStream();
-            XmlTextWriter text = new XmlTextWriter(tw, UTF8NoBOM);
-            text.WriteStartElement("llsd");
-            text.WriteStartElement("map");
-            foreach(KeyValuePair<string, string> kvp in capsUri)
-            {
-                text.WriteStartElement("key");
-                text.WriteString(kvp.Key);
-                text.WriteEndElement();
-                text.WriteStartElement("string");
-                text.WriteString(kvp.Value);
-                text.WriteEndElement();
-            }
-            text.WriteEndElement();
-            text.WriteEndElement();
-            text.Flush();
-            
-            res.Close();
-        }
-
-        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
-        #endregion
     }
 }

@@ -155,9 +155,9 @@ namespace SilverSim.Scene.Types.Scene
 
                 LayerPatch[] p = new LayerPatch[2 * m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
 
-                for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH; ++y)
+                for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_SIM_WIDTH; ++y)
                 {
-                    for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH; ++x)
+                    for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_SIM_WIDTH; ++x)
                     {
                         p[2 * (y * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES + x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES) + 0].Data[y, x] = (float)m_WindData.Speeds[y, x].X;
                         p[2 * (y * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES + x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES) + 1].Data[y, x] = (float)m_WindData.Speeds[y, x].Y;

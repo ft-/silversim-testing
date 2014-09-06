@@ -234,14 +234,16 @@ namespace SilverSim.BackendConnectors.Robust.Asset
         {
             get
             {
+                Stream stream;
                 try
                 {
-                    return AssetXml.parseAssetData(HttpRequestHandler.DoStreamGetRequest(m_AssetURI + "assets/" + key.ToString(), null, TimeoutMs));
+                    stream = HttpRequestHandler.DoStreamGetRequest(m_AssetURI + "assets/" + key.ToString(), null, TimeoutMs);
                 }
                 catch
                 {
                     throw new AssetNotFound(key);
                 }
+                return AssetXml.parseAssetData(stream);
             }
         }
         #endregion

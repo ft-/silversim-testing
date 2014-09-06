@@ -39,6 +39,10 @@ namespace SilverSim.StructuredData.LLSD
         #region Main LLSD+XML Deserialization
         private static string GetTextNode(XmlTextReader input)
         {
+            if(input.IsEmptyElement)
+            {
+                return string.Empty;
+            }
             string elementName = input.Name;
             string data = string.Empty;
             while (true)

@@ -61,6 +61,8 @@ namespace SilverSim.LL.Messages.LayerData
         public const int LAYER_PATCH_ENTRY_WIDTH = 4;
         public const int LAYER_PATCH_NUM_XY_ENTRIES = 16;
 
+        public const int LAYER_PATCH_SIM_WIDTH = LAYER_PATCH_ENTRY_WIDTH * LAYER_PATCH_NUM_XY_ENTRIES;
+
         public const int PATCHES_PER_EDGE = 16;
         public const int END_OF_PATCHES = 97;
 

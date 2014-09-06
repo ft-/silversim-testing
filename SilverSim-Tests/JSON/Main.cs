@@ -7,9 +7,9 @@ using System.IO;
 using System.Globalization;
 using SilverSim.Types;
 
-namespace Tests.SilverSim.LSLParser
+namespace Tests.SilverSim.JSONTest
 {
-    public static class LSLParserTest
+    public static class JSONTest
     {
         public static void Main(string[] args)
         {

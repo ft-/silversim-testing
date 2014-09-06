@@ -28,6 +28,7 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.StructuredData.AssetXml;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using System.IO;
 
 namespace SilverSim.BackendConnectors.Robust.Asset
 {
@@ -48,14 +49,16 @@ namespace SilverSim.BackendConnectors.Robust.Asset
         {
             get
             {
+                Stream stream;
                 try
                 {
-                    return AssetXml.parseAssetMetadata(HttpRequestHandler.DoStreamGetRequest(m_AssetURI + "assets/" + key.ToString() + "/metadata", null, TimeoutMs));
+                    stream = HttpRequestHandler.DoStreamGetRequest(m_AssetURI + "assets/" + key.ToString() + "/metadata", null, TimeoutMs);
                 }
                 catch
                 {
                     throw new AssetNotFound(key);
                 }
+                return AssetXml.parseAssetMetadata(stream);
             }
         }
         #endregion
