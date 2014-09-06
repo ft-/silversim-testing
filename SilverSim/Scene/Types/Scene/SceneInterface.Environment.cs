@@ -116,12 +116,17 @@ namespace SilverSim.Scene.Types.Scene
 
             public struct WindData
             {
-                public WindVector[,] Speeds;
+                public LayerPatch[,] PatchesX;
+                public LayerPatch[,] PatchesY;
+                public bool[,] PatchesDirty;
+                public ReaderWriterLock ReaderWriterLock;
             }
 
             public struct CloudData
             {
-                public double[,] CloudCoverages;
+                public LayerPatch[,] Patches;
+                public bool[,] PatchesDirty;
+                public ReaderWriterLock ReaderWriterLock;
             }
 
             bool m_WindlightValid = false;
@@ -136,9 +141,40 @@ namespace SilverSim.Scene.Types.Scene
             public EnvironmentController(SceneInterface scene)
             {
                 m_Scene = scene;
-                m_WindData.Speeds = new WindVector[scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
-                m_CloudData.CloudCoverages = new double[scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
                 m_SunData.SunDirection = new Vector3();
+
+                int xPatches = (int)scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                int yPatches = (int)scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+
+                m_WindData.ReaderWriterLock = new ReaderWriterLock();
+                m_CloudData.ReaderWriterLock = new ReaderWriterLock();
+
+                m_WindData.PatchesX = new LayerPatch[yPatches, xPatches];
+                m_WindData.PatchesY = new LayerPatch[yPatches, xPatches];
+                m_CloudData.Patches = new LayerPatch[yPatches, xPatches];
+                m_WindData.PatchesDirty = new bool[yPatches, xPatches];
+                m_CloudData.PatchesDirty = new bool[yPatches, xPatches];
+
+                int x, y;
+
+                for (y = 0; y < yPatches; ++y)
+                {
+                    for (x = 0; x < xPatches; ++x)
+                    {
+                        m_WindData.PatchesX[y, x] = new LayerPatch();
+                        m_WindData.PatchesX[y, x].X = x;
+                        m_WindData.PatchesX[y, x].Y = y;
+
+                        m_WindData.PatchesY[y, x] = new LayerPatch();
+                        m_WindData.PatchesY[y, x].X = x;
+                        m_WindData.PatchesY[y, x].Y = y;
+
+                        m_CloudData.Patches[y, x] = new LayerPatch();
+                        m_CloudData.Patches[y, x].X = x;
+                        m_CloudData.Patches[y, x].Y = y;
+                    }
+                }
+
             }
 
             public void Dispose()
@@ -149,54 +185,52 @@ namespace SilverSim.Scene.Types.Scene
             #region Update of Wind Data
             private List<LayerData> CompileWindData()
             {
-                int y;
-                int x;
-                int NumTerrainPatchesPerY = (int)m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH;
+                m_WindData.ReaderWriterLock.AcquireReaderLock(-1);
+                try
+                {
+                    int y;
+                    int x;
+                    List<LayerData> mlist = new List<LayerData>();
+                    List<LayerPatch> patchesList = new List<LayerPatch>();
 
-                LayerPatch[] p = new LayerPatch[2 * m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
-
-                for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
-                {
-                    for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
+                    for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
                     {
-                        p[2 * (y * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES + x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES) + 0].Data[y, x] = (float)m_WindData.Speeds[y, x].X;
-                        p[2 * (y * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES + x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES) + 1].Data[y, x] = (float)m_WindData.Speeds[y, x].Y;
-                    }
-                }
-                for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
-                {
-                    for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
-                    {
-                        p[2 * (y * NumTerrainPatchesPerY + x) + 0].X = x;
-                        p[2 * (y * NumTerrainPatchesPerY + x) + 0].Y = y;
-                        p[2 * (y * NumTerrainPatchesPerY + x) + 1].X = x;
-                        p[2 * (y * NumTerrainPatchesPerY + x) + 1].Y = y;
-                    }
-                }
-
-                List<LayerData> mlist = new List<LayerData>();
-                if (BASE_REGION_SIZE == m_Scene.RegionData.Size.X && BASE_REGION_SIZE == m_Scene.RegionData.Size.Y)
-                {
-                    mlist.Add(LayerCompressor.ToLayerMessage(p, LayerData.LayerDataType.Wind));
-                }
-                else
-                {
-                    int offset = 0;
-                    while (offset < p.Length)
-                    {
-                        if (p.Length - offset > LayerCompressor.MAX_PATCHES_PER_MESSAGE)
+                        for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                         {
-                            mlist.Add(LayerCompressor.ToLayerMessage(p, LayerData.LayerDataType.WindExtended, offset, LayerCompressor.MAX_PATCHES_PER_MESSAGE));
-                            offset += LayerCompressor.MAX_PATCHES_PER_MESSAGE;
-                        }
-                        else
-                        {
-                            mlist.Add(LayerCompressor.ToLayerMessage(p, LayerData.LayerDataType.WindExtended, offset, p.Length - offset));
-                            offset = p.Length;
+                            patchesList.Add(new LayerPatch(m_WindData.PatchesX[y, x]));
+                            patchesList.Add(new LayerPatch(m_WindData.PatchesY[y, x]));
                         }
                     }
+                    LayerPatch[] patches = new LayerPatch[patchesList.Count];
+                    patchesList.CopyTo(patches);
+
+                    if (BASE_REGION_SIZE == m_Scene.RegionData.Size.X && BASE_REGION_SIZE == m_Scene.RegionData.Size.Y)
+                    {
+                        mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.Wind));
+                    }
+                    else
+                    {
+                        int offset = 0;
+                        while (offset < patches.Length)
+                        {
+                            if (patches.Length - offset > LayerCompressor.MAX_PATCHES_PER_MESSAGE)
+                            {
+                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.WindExtended, offset, LayerCompressor.MAX_PATCHES_PER_MESSAGE));
+                                offset += LayerCompressor.MAX_PATCHES_PER_MESSAGE;
+                            }
+                            else
+                            {
+                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.WindExtended, offset, patches.Length - offset));
+                                offset = patches.Length;
+                            }
+                        }
+                    }
+                    return mlist;
                 }
-                return mlist;
+                finally
+                {
+                    m_WindData.ReaderWriterLock.ReleaseReaderLock();
+                }
             }
 
             public void UpdateWindDataToSingleClient(IAgent agent)
@@ -221,57 +255,51 @@ namespace SilverSim.Scene.Types.Scene
             #region Update of Cloud data
             private List<LayerData> CompileCloudData()
             {
-                int y;
-                int x;
-                LayerPatch[] p = new LayerPatch[m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
-                int NumTerrainPatchesPerY = (int)m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                m_CloudData.ReaderWriterLock.AcquireReaderLock(-1);
+                try
+                {
+                    int y;
+                    int x;
+                    List<LayerData> mlist = new List<LayerData>();
+                    List<LayerPatch> patchesList = new List<LayerPatch>();
 
-                for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
-                {
-                    for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
+                    for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
                     {
-                        p[y * m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES + x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES].Data[y, x] = (float)m_CloudData.CloudCoverages[y, x];
-                    }
-                }
-                for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
-                {
-                    for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
-                    {
-                        p[y * NumTerrainPatchesPerY + x].X = x;
-                        p[y * NumTerrainPatchesPerY + x].Y = y;
-                    }
-                }
-
-                List<LayerData> mlist = new List<LayerData>();
-                if (BASE_REGION_SIZE == m_Scene.RegionData.Size.X && BASE_REGION_SIZE == m_Scene.RegionData.Size.Y)
-                {
-                    mlist.Add(LayerCompressor.ToLayerMessage(p, LayerData.LayerDataType.Cloud));
-                }
-                else
-                {
-                    int offset = 0;
-                    int MaxPatchesPerMessage = LayerCompressor.MAX_PATCHES_PER_MESSAGE;
-                    if(MaxPatchesPerMessage % 2 != 0)
-                    {
-                        --MaxPatchesPerMessage;
-                    }
-
-                    while (offset < p.Length)
-                    {
-                        if (p.Length - offset > MaxPatchesPerMessage)
+                        for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                         {
-                            mlist.Add(LayerCompressor.ToLayerMessage(p, LayerData.LayerDataType.CloudExtended, offset, MaxPatchesPerMessage));
-                            offset += MaxPatchesPerMessage;
-                        }
-                        else
-                        {
-                            mlist.Add(LayerCompressor.ToLayerMessage(p, LayerData.LayerDataType.WindExtended, offset, p.Length - offset));
-                            offset = p.Length;
+                            patchesList.Add(new LayerPatch(m_CloudData.Patches[y, x]));
                         }
                     }
-                }
+                    LayerPatch[] patches = new LayerPatch[patchesList.Count];
+                    patchesList.CopyTo(patches);
 
-                return mlist;
+                    if (BASE_REGION_SIZE == m_Scene.RegionData.Size.X && BASE_REGION_SIZE == m_Scene.RegionData.Size.Y)
+                    {
+                        mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.Cloud));
+                    }
+                    else
+                    {
+                        int offset = 0;
+                        while (offset < patches.Length)
+                        {
+                            if (patches.Length - offset > LayerCompressor.MAX_PATCHES_PER_MESSAGE)
+                            {
+                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.CloudExtended, offset, LayerCompressor.MAX_PATCHES_PER_MESSAGE));
+                                offset += LayerCompressor.MAX_PATCHES_PER_MESSAGE;
+                            }
+                            else
+                            {
+                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.CloudExtended, offset, patches.Length - offset));
+                                offset = patches.Length;
+                            }
+                        }
+                    }
+                    return mlist;
+                }
+                finally
+                {
+                    m_CloudData.ReaderWriterLock.ReleaseReaderLock();
+                }
             }
 
             public void UpdateCloudDataToSingleClient(IAgent agent)

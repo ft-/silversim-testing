@@ -30,6 +30,8 @@ namespace SilverSim.LL.Messages.LayerData
         public int X;
         public int Y;
 
+        public uint Serial = 0; /* we use a serial number similar to other places to know what an agent has already got */
+
         public float[,] Data = new float[16,16];
 
         public LayerPatch()

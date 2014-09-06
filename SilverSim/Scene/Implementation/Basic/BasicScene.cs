@@ -212,7 +212,8 @@ namespace SilverSim.Scene.Implementation.Basic
             AssetServiceInterface assetService,
             GridServiceInterface gridService,
             GridUserServiceInterface gridUserService,
-            RegionInfo ri)
+            RegionInfo ri,
+            Dictionary<string, string> capabilitiesConfig)
         {
             m_UDPServer = new LLUDPServer(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
             PresenceService = presenceService;
@@ -226,6 +227,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
             m_SceneAgents = new DefaultSceneAgentInterface(this);
             m_SceneParcels = new BasicSceneParcels(this);
+            CapabilitiesConfig = capabilitiesConfig;
             ID = ri.ID;
             Name = ri.Name;
             GridPosition = ri.Location;

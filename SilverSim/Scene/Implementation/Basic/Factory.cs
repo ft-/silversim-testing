@@ -38,6 +38,7 @@ using SilverSim.Types;
 using Nini.Config;
 using System.Net;
 using SilverSim.Types.Grid;
+using System.Collections.Generic;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -60,6 +61,7 @@ namespace SilverSim.Scene.Implementation.Basic
         public GridServiceInterface m_GridService;
         public GridUserServiceInterface m_GridUserService;
         public IMServiceInterface m_IMService;
+        public Dictionary<string, string> m_CapabilitiesConfig;
 
         public SceneFactory(IConfig ownConfig)
         {
@@ -71,6 +73,14 @@ namespace SilverSim.Scene.Implementation.Basic
             m_GridServiceName = ownConfig.GetString("GridService", "GridService");
             m_GridUserServiceName = ownConfig.GetString("GridUserService", "GridUserService");
             m_IMServiceName = ownConfig.GetString("IMService", "IMService");
+            m_CapabilitiesConfig = new Dictionary<string, string>();
+            foreach(string key in ownConfig.GetKeys())
+            {
+                if(key.StartsWith("Cap_") && key != "Cap_")
+                {
+                    m_CapabilitiesConfig[key.Substring(4)] = ownConfig.GetString(key);
+                }
+            }
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -95,7 +105,8 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_AssetService, 
                 m_GridService,
                 m_GridUserService, 
-                ri);
+                ri,
+                m_CapabilitiesConfig);
         }
     }
 

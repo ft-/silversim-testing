@@ -50,7 +50,6 @@ namespace SilverSim.Scene.Types.Scene
             private ReaderWriterLock m_TerrainRwLock = new ReaderWriterLock();
 
             private LayerPatch[,] m_TerrainPatches;
-            private bool[,] m_TerrainPatchesDirty;
 
             public TerrainController(SceneInterface scene)
             {
@@ -62,7 +61,6 @@ namespace SilverSim.Scene.Types.Scene
 
                 m_Scene = scene;
                 m_TerrainPatches = new LayerPatch[yPatches, xPatches];
-                m_TerrainPatchesDirty = new bool[yPatches, xPatches];
 
                 for (y = 0; y < yPatches; ++y)
                 {
@@ -183,7 +181,6 @@ namespace SilverSim.Scene.Types.Scene
                     try
                     {
                         m_TerrainPatches[y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES].Data[y, x] = (float)value;
-                        m_TerrainPatchesDirty[y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = true;
                     }
                     finally
                     {

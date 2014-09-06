@@ -109,6 +109,7 @@ namespace SilverSim.Scene.Types.Scene
         public EconomyServiceInterface EconomyService { get; protected set; }
         public EconomyInfo EconomyData { get; protected set; }
         private NotecardCache m_NotecardCache;
+        public Dictionary<string, string> CapabilitiesConfig { get; protected set; }
 
         /* do not put any other than ICapabilityInterface into this list */
         public readonly RwLockedDictionary<string, object> SceneCapabilities = new RwLockedDictionary<string, object>();
@@ -188,6 +189,7 @@ namespace SilverSim.Scene.Types.Scene
         public SceneInterface()
         {
             Owner = new UUI();
+            CapabilitiesConfig = new Dictionary<string, string>();
             RegionSecret = UUID.Random;
             LastIPAddress = new IPAddress(0);
             m_NotecardCache = new NotecardCache(this);
