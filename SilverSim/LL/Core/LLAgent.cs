@@ -1033,5 +1033,15 @@ namespace SilverSim.LL.Core
                 circuit.SendMessage(m);
             }
         }
+
+        public GridVector GetRootAgentGridPosition(GridVector defPos)
+        {
+            Circuit circuit;
+            if(Circuits.TryGetValue(m_CurrentSceneID, out circuit))
+            {
+                return circuit.Scene.GridPosition;
+            }
+            return defPos;
+        }
     }
 }

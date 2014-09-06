@@ -839,13 +839,17 @@ namespace SilverSim.LL.Messages
         public string ReadStringLen8()
         {
             byte len = ReadUInt8();
+            if (len == 0)
+            {
+                return string.Empty;
+            }
             byte[] buf = ReadBytes(len);
-            return Encoding.UTF8.GetString(buf, 0, len - 1);
+            return Encoding.UTF8.GetString(buf, 0, len);
         }
 
         public void WriteStringLen8(string val)
         {
-            byte[] buf = Encoding.UTF8.GetBytes(val + "\0");
+            byte[] buf = Encoding.UTF8.GetBytes(val);
             WriteUInt8((byte)buf.Length);
             WriteBytes(buf);
         }
@@ -853,13 +857,17 @@ namespace SilverSim.LL.Messages
         public string ReadStringLen16()
         {
             UInt16 len = ReadUInt16();
+            if(len == 0)
+            {
+                return string.Empty;
+            }
             byte[] buf = ReadBytes(len);
-            return Encoding.UTF8.GetString(buf, 0, len - 1);
+            return Encoding.UTF8.GetString(buf, 0, len);
         }
 
         public void WriteStringLen16(string val)
         {
-            byte[] buf = Encoding.UTF8.GetBytes(val + "\0");
+            byte[] buf = Encoding.UTF8.GetBytes(val);
             WriteUInt16((UInt16)buf.Length);
             WriteBytes(buf);
         }
@@ -896,7 +904,11 @@ namespace SilverSim.LL.Messages
         #region UUID
         public byte[] ReadBytes(int length)
         {
-            if(IsZeroEncoded)
+            if(length == 0)
+            {
+                return new byte[0];
+            }
+            else if(IsZeroEncoded)
             {
                 return ReadZeroEncoded(length);
             }
@@ -911,7 +923,11 @@ namespace SilverSim.LL.Messages
 
         public void WriteBytes(byte[] buf)
         {
-            if(IsZeroEncoded)
+            if(buf.Length == 0)
+            {
+
+            }
+            else if(IsZeroEncoded)
             {
                 WriteZeroEncoded(buf);
             }

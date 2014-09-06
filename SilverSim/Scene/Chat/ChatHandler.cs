@@ -65,7 +65,27 @@ namespace SilverSim.Scene.Chat
         #region Register Listeners
         public override Listener AddListen(int channel, string name, UUID id, string message, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> send)
         {
-            Listener li = new ListenerInfo(this, channel, name, id, message, getuuid, getpos, send);
+            Listener li = new ListenerInfo(this, channel, name, id, message, getuuid, getpos, send, false);
+
+            ChannelInfo ci = m_Channels.GetOrAddIfNotExists(channel, delegate()
+            {
+                ChannelInfo newci = new ChannelInfo(this);
+                newci.Listeners.Add(li);
+                return newci;
+            });
+
+            /* check whether we had a fresh add of ChannelInfo */
+            if (ci.Listeners.Contains(li))
+            {
+                return li;
+            }
+            ci.Listeners.Add(li);
+            return li;
+        }
+
+        public override Listener AddAgentListen(int channel, string name, UUID id, string message, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> send)
+        {
+            Listener li = new ListenerInfo(this, channel, name, id, message, getuuid, getpos, send, true);
 
             ChannelInfo ci = m_Channels.GetOrAddIfNotExists(channel, delegate()
             {

@@ -53,7 +53,7 @@ namespace SilverSim.Scene.Chat
             string message,
             ChatServiceInterface.GetUUIDDelegate getuuid, 
             Action<ListenEvent> send)
-            : base(handler, channel, name, id, message, getuuid, GetPositionFunc, send)
+            : base(handler, channel, name, id, message, getuuid, GetPositionFunc, send, false)
         {
 
         }

@@ -71,6 +71,8 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
             public abstract void Send(ListenEvent ev);
 
             public abstract bool IsActive { get; set; }
+
+            public abstract bool IsAgent { get; }
         }
 
         #region Constructor
@@ -86,6 +88,8 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
         public delegate UUID GetUUIDDelegate();
 
         public abstract Listener AddListen(int channel, string name, UUID id, string message, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> action);
+
+        public abstract Listener AddAgentListen(int channel, string name, UUID id, string message, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> send);
 
         public const Int32 ListenRegexName = 1;
         public const Int32 ListenRegexMessage = 2;

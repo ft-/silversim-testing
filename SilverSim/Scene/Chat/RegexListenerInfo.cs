@@ -44,6 +44,13 @@ namespace SilverSim.Scene.Chat
         private ChatServiceInterface.GetPositionDelegate m_GetPos;
         private Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
+        public override bool IsAgent
+        {
+            get 
+            {
+                return false;
+            }
+        }
 
         private ChatHandler m_Handler;
 

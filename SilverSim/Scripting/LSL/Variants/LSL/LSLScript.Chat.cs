@@ -44,6 +44,8 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             ev.Channel = channel;
             ev.Type = ListenEvent.ChatType.Shout;
             ev.Message = message;
+            ev.SourceType = ListenEvent.ChatSourceType.Object;
+            ev.OwnerID = llGetOwner();
             sendChat(ev);
         }
 
@@ -53,6 +55,8 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             ev.Channel = channel;
             ev.Type = ListenEvent.ChatType.Say;
             ev.Message = message;
+            ev.SourceType = ListenEvent.ChatSourceType.Object;
+            ev.OwnerID = llGetOwner();
             sendChat(ev);
         }
 
@@ -62,6 +66,8 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             ev.Channel = channel;
             ev.Type = ListenEvent.ChatType.Whisper;
             ev.Message = message;
+            ev.SourceType = ListenEvent.ChatSourceType.Object;
+            ev.OwnerID = llGetOwner();
             sendChat(ev);
         }
 
@@ -72,6 +78,8 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             ev.Type = ListenEvent.ChatType.OwnerSay;
             ev.Message = message;
             ev.TargetID = Part.Group.Owner.ID;
+            ev.SourceType = ListenEvent.ChatSourceType.Object;
+            ev.OwnerID = llGetOwner();
             sendChat(ev);
         }
 
@@ -83,6 +91,8 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
                 ev.Type = ListenEvent.ChatType.Region;
                 ev.Channel = channel;
                 ev.Message = message;
+                ev.OwnerID = llGetOwner();
+                ev.SourceType = ListenEvent.ChatSourceType.Object;
                 sendChat(ev);
             }
         }
@@ -94,6 +104,8 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             ev.Type = ListenEvent.ChatType.Region;
             ev.Message = message;
             ev.TargetID = target;
+            ev.OwnerID = llGetOwner();
+            ev.SourceType = ListenEvent.ChatSourceType.Object;
             sendChat(ev);
         }
 

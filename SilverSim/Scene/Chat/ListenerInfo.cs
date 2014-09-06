@@ -40,6 +40,8 @@ namespace SilverSim.Scene.Chat
         private ChatServiceInterface.GetPositionDelegate m_GetPos;
         private Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
+        private bool m_IsAgent;
+        public override bool IsAgent { get { return m_IsAgent; } }
 
         private ChatHandler m_Handler;
 
@@ -51,8 +53,10 @@ namespace SilverSim.Scene.Chat
             string message,
             ChatServiceInterface.GetUUIDDelegate getuuid, 
             ChatServiceInterface.GetPositionDelegate getpos, 
-            Action<ListenEvent> send)
+            Action<ListenEvent> send,
+            bool isAgent)
         {
+            m_IsAgent = isAgent;
             IsActive = true;
             m_Handler = handler;
             m_Channel = channel;

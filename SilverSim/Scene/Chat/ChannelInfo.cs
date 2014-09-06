@@ -55,7 +55,6 @@ namespace SilverSim.Scene.Chat
                         break;
 
                     case ListenEvent.ChatType.Say:
-
                         if (ev.TargetID.Equals(UUID.Zero))
                         {
                             if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared <= sayDistanceSquared ||
@@ -102,6 +101,26 @@ namespace SilverSim.Scene.Chat
 
                     case ListenEvent.ChatType.OwnerSay:
                         if(listener.GetUUID().Equals(ev.TargetID))
+                        {
+                            listener.Send(ev);
+                        }
+                        break;
+
+                    case ListenEvent.ChatType.StartTyping:
+                    case ListenEvent.ChatType.StopTyping:
+                        if(!listener.IsAgent)
+                        {
+
+                        }
+                        else if (ev.TargetID.Equals(UUID.Zero))
+                        {
+                            if ((ev.GlobalPosition - listener.GetPosition()).LengthSquared <= sayDistanceSquared ||
+                                listener.IsIgnorePosition)
+                            {
+                                listener.Send(ev);
+                            }
+                        }
+                        else if (listener.GetUUID().Equals(ev.TargetID))
                         {
                             listener.Send(ev);
                         }

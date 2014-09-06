@@ -28,6 +28,7 @@ using SilverSim.LL.Messages;
 using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
@@ -40,6 +41,7 @@ using System.Text;
 using System.Threading;
 using System.Xml;
 using ThreadedClasses;
+using SilverSim.Scene.ServiceInterfaces.Chat;
 
 namespace SilverSim.LL.Core
 {
@@ -69,6 +71,8 @@ namespace SilverSim.LL.Core
         private object m_LogoutReplyLock = new object(); /* this is only for guarding access sequence to m_LogoutReply* variables */
         private int m_LogoutReplySentAtTime;
         private int m_LastReceivedPacketAtTime;
+        private ChatServiceInterface m_ChatService;
+        private ChatServiceInterface.Listener m_ChatListener;
 
         private uint NextSequenceNumber
         {
@@ -91,6 +95,13 @@ namespace SilverSim.LL.Core
                 {
                     if (null != m_Scene)
                     {
+                        if(m_ChatListener != null)
+                        {
+                            m_ChatListener.Remove();
+                            m_ChatListener = null;
+                            m_ChatService = null;
+                        }
+                        
                         foreach (KeyValuePair<string, object> kvp in m_Scene.SceneCapabilities)
                         {
                             if (kvp.Value is ICapabilityInterface)
@@ -112,10 +123,56 @@ namespace SilverSim.LL.Core
                                 AddCapability(iface.CapabilityName, sceneCapID, iface.HttpRequestHandler);
                             }
                         }
+
+                        m_ChatService = m_Scene.GetService<ChatServiceInterface>();
+                        if(null != m_ChatService)
+                        {
+                            try
+                            {
+                                m_ChatListener = m_ChatService.AddAgentListen(0, "", UUID.Zero, "", ChatGetAgentUUID, ChatGetAgentPosition, ChatListenerAction);
+                            }
+                            catch
+                            {
+                                m_ChatService = null;
+                            }
+                        }
                     }
                 }
             }
         }
+
+        #region Chat Listener
+        private Vector3 ChatGetAgentPosition()
+        {
+            GridVector thisRegionPos = Scene.GridPosition;
+            GridVector rootAgentRegionPos = Agent.GetRootAgentGridPosition(thisRegionPos);
+            GridVector diff = rootAgentRegionPos - thisRegionPos;
+            Vector3 agentPos = Agent.GlobalPosition;
+            agentPos.X += diff.X;
+            agentPos.Y += diff.Y;
+
+            return agentPos;
+        }
+
+        private UUID ChatGetAgentUUID()
+        {
+            return AgentID;
+        }
+
+        private void ChatListenerAction(ListenEvent le)
+        {
+            Messages.Chat.ChatFromSimulator cfs = new Messages.Chat.ChatFromSimulator();
+            cfs.Audible = Messages.Chat.ChatAudibleLevel.Fully;
+            cfs.ChatType = (Messages.Chat.ChatType)(byte)le.Type;
+            cfs.FromName = le.Name;
+            cfs.Message = le.Message;
+            cfs.Position = le.GlobalPosition;
+            cfs.SourceID = le.ID;
+            cfs.SourceType = (Messages.Chat.ChatSourceType)(byte)le.SourceType;
+            cfs.OwnerID = le.OwnerID;
+            SendMessage(cfs);
+        }
+        #endregion
 
         public RwLockedDictionary<UInt32, UDPPacket> m_UnackedPackets = new RwLockedDictionary<uint, UDPPacket>();
         public Circuit(LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector, UUID regionSeedID)
@@ -263,17 +320,15 @@ namespace SilverSim.LL.Core
                         ListenEvent ev = new ListenEvent();
                         ev.ID = AgentID;
                         ev.Message = pck.ReadStringLen16();
-                        ev.Type = ListenEvent.ChatType.Say;
-                        switch(pck.ReadUInt8())
-                        {
-                            case 0: ev.Type = ListenEvent.ChatType.Whisper; break;
-                            case 2: ev.Type = ListenEvent.ChatType.Shout; break;
-                            default: break;
-                        }
+                        byte type = pck.ReadUInt8();
+
+                        ev.Type = (ListenEvent.ChatType)type;
                         ev.Channel = pck.ReadInt32();
                         ev.GlobalPosition = Agent.GlobalPosition;
                         ev.Name = Agent.Name;
                         ev.TargetID = UUID.Zero;
+                        ev.SourceType = ListenEvent.ChatSourceType.Agent;
+                        ev.OwnerID = AgentID;
                         m_Server.RouteChat(ev);
                     }
                     break;
