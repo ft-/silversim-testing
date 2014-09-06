@@ -315,10 +315,6 @@ namespace SilverSim.LL.Core
 
                 default:
                     UDPPacketDecoder.PacketDecoderDelegate del;
-                    if(mType == MessageType.AgentDataUpdateRequest)
-                    {
-                        m_Log.Debug("AgentdataUpdateRequest");
-                    }
                     if(m_PacketDecoder.PacketTypes.TryGetValue(mType, out del))
                     {
                         Message m = del(pck);
