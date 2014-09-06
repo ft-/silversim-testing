@@ -215,6 +215,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     presenceService,
                     gridUserService,
                     gridService);
+                agent.ServiceURLs = agentPost.Account.ServiceURLs;
 
                 agent.TeleportFlags = agentPost.Destination.TeleportFlags;
 

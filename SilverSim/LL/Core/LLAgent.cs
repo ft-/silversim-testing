@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
@@ -43,8 +44,8 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using System;
+using System.Collections.Generic;
 using ThreadedClasses;
-using log4net;
 
 namespace SilverSim.LL.Core
 {
@@ -702,6 +703,8 @@ namespace SilverSim.LL.Core
         public string DisplayName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+
+        public Dictionary<string, string> ServiceURLs = new Dictionary<string, string>();
 
         public AgentAttachments Attachments
         {

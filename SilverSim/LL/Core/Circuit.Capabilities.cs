@@ -91,9 +91,64 @@ namespace SilverSim.LL.Core
             foreach (IValue v in (AnArray)o)
             {
                 UUID capsID;
+                string capsUriStr = string.Empty;
                 if (v.ToString() == "SEED")
                 {
 
+                }
+                else if(Scene.CapabilitiesConfig.TryGetValue(v.ToString(), out capsUriStr) && capsUriStr != "localhost")
+                {
+                    if(capsUriStr=="")
+                    {
+
+                    }
+                    else
+                    {
+                        char l = (char)0;
+                        string uri = string.Empty;
+                        foreach(char c in capsUriStr)
+                        {
+                            if(l == '%')
+                            {
+                                l = (char)0;
+                                switch(c)
+                                {
+                                    case '%':
+                                        uri += '%';
+                                        break;
+
+                                    case 'r':
+                                        uri += System.Uri.EscapeUriString(Scene.ID);
+                                        break;
+
+                                    case 'u':
+                                        uri += System.Uri.EscapeUriString(Agent.ID);
+                                        break;
+
+                                    case 'h':
+                                        uri += System.Uri.EscapeUriString(Agent.HomeURI.ToString());
+                                        break;
+
+                                    case 's':
+                                        uri += System.Uri.EscapeUriString(SessionID);
+                                        break;
+
+                                    case 'i':
+                                        uri += System.Uri.EscapeUriString(Agent.ServiceURLs["InventoryServerURI"]);
+                                        break;
+                                }
+                            }
+                            else if(c=='%')
+                            {
+                                l = '%';
+                            }
+                            else
+                            {
+                                uri += c;
+                            }
+                        }
+                        capsUri[v.ToString()] = uri;
+                    }
                 }
                 else if (m_RegisteredCapabilities.TryGetValue(v.ToString(), out capsID))
                 {
