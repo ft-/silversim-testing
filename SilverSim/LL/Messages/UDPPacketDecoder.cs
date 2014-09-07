@@ -106,6 +106,7 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.FetchInventory, Inventory.FetchInventory.Decode);
             PacketTypes.Add(MessageType.RemoveInventoryObjects, Inventory.RemoveInventoryObjects.Decode);
             PacketTypes.Add(MessageType.LinkInventoryItem, Inventory.LinkInventoryItem.Decode);
+            PacketTypes.Add(MessageType.RequestInventoryAsset, Inventory.RequestInventoryAsset.Decode);
 
             /* Objects */
             PacketTypes.Add(MessageType.ObjectRotation, Object.ObjectRotation.Decode);

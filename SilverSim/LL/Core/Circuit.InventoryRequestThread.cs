@@ -60,6 +60,28 @@ namespace SilverSim.LL.Core
                 switch(m.Number)
                 {
                     case MessageType.ChangeInventoryItemFlags:
+                        {
+                            Messages.Inventory.ChangeInventoryItemFlags req = (Messages.Inventory.ChangeInventoryItemFlags)m;
+                            if(req.SessionID != SessionID || req.AgentID != AgentID)
+                            {
+                                break;
+                            }
+
+                            foreach(Messages.Inventory.ChangeInventoryItemFlags.InventoryDataEntry d in req.InventoryData)
+                            {
+                                InventoryItem item;
+                                try
+                                {
+                                    item = Agent.InventoryService.Item[AgentID, d.ItemID];
+                                    item.Flags = d.Flags;
+                                    Agent.InventoryService.Item.Update(item);
+                                }
+                                catch
+                                {
+
+                                }
+                            }
+                        }
                         break;
 
                     case MessageType.CopyInventoryFromNotecard:
@@ -429,6 +451,25 @@ namespace SilverSim.LL.Core
                         break;
 
                     case MessageType.MoveInventoryItem:
+                        {
+                            Messages.Inventory.MoveInventoryItem req = (Messages.Inventory.MoveInventoryItem)m;
+                            if (req.SessionID != SessionID || req.AgentID != AgentID)
+                            {
+                                break;
+                            }
+
+                            foreach (Messages.Inventory.MoveInventoryItem.InventoryDataEntry d in req.InventoryData)
+                            {
+                                try
+                                {
+                                    Agent.InventoryService.Item.Move(AgentID, d.ItemID, d.FolderID);
+                                }
+                                catch
+                                {
+
+                                }
+                            }
+                        }
                         break;
 
                     case MessageType.PurgeInventoryDescendents:
@@ -488,6 +529,46 @@ namespace SilverSim.LL.Core
                         break;
 
                     case MessageType.RequestInventoryAsset:
+                        {
+                            Messages.Inventory.RequestInventoryAsset req = (Messages.Inventory.RequestInventoryAsset)m;
+                            Messages.Inventory.InventoryAssetResponse res;
+                            if (req.AgentID != AgentID)
+                            {
+                                break;
+                            }
+
+                            InventoryItem item;
+                            try
+                            {
+                                item = Agent.InventoryService.Item[AgentID, req.ItemID];
+                            }
+                            catch
+                            {
+                                res = new Messages.Inventory.InventoryAssetResponse();
+                                res.AssetID = UUID.Zero;
+                                res.IsReadable = false;
+                                res.QueryID = req.QueryID;
+                                SendMessage(res);
+                                return;
+                            }
+
+                            res = new Messages.Inventory.InventoryAssetResponse();
+                            res.QueryID = req.QueryID;
+
+                            if((0 == (item.Permissions.Current & InventoryItem.PermissionsMask.Modify) &&
+                                item.InventoryType == InventoryType.LSLText) ||
+                                item.InventoryType == InventoryType.LSLBytecode)
+                            {
+                                res.AssetID = UUID.Zero;
+                                res.IsReadable = false;
+                            }
+                            else
+                            {
+                                res.AssetID = item.AssetID;
+                                res.IsReadable = true;
+                            }
+                            SendMessage(res);
+                        }
                         break;
 
                     case MessageType.UpdateInventoryFolder:
