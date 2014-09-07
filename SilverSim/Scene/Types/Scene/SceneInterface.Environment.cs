@@ -218,14 +218,9 @@ namespace SilverSim.Scene.Types.Scene
                     List<LayerData> mlist = new List<LayerData>();
                     List<LayerPatch> patchesList = new List<LayerPatch>();
 
-                    for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
-                    {
-                        for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
-                        {
-                            patchesList.Add(new LayerPatch(m_WindData.PatchX));
-                            patchesList.Add(new LayerPatch(m_WindData.PatchY));
-                        }
-                    }
+                    patchesList.Add(new LayerPatch(m_WindData.PatchX));
+                    patchesList.Add(new LayerPatch(m_WindData.PatchY));
+
                     LayerPatch[] patches = new LayerPatch[patchesList.Count];
                     patchesList.CopyTo(patches);
 
