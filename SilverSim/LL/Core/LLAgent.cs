@@ -49,7 +49,7 @@ using ThreadedClasses;
 
 namespace SilverSim.LL.Core
 {
-    public class LLAgent : IAgent, IDisposable
+    public partial class LLAgent : IAgent, IDisposable
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL AGENT");
         public event Action<IObject> OnPositionChange;
@@ -842,6 +842,7 @@ namespace SilverSim.LL.Core
             HomeURI = homeURI;
             FirstName = firstName;
             LastName = lastName;
+            InitRouting();
         }
 
         ~LLAgent()
@@ -876,6 +877,15 @@ namespace SilverSim.LL.Core
                 m_GridUserService = null;
                 m_GridService = null;
             }
+        }
+
+        private delegate void HandleAgentMessageDelegate(Message m);
+        private readonly Dictionary<MessageType, HandleAgentMessageDelegate> m_AgentMessageRouting = new Dictionary<MessageType, HandleAgentMessageDelegate>();
+
+        void InitRouting()
+        {
+            m_AgentMessageRouting.Add(MessageType.MoneyBalanceRequest, HandleMoneyBalanceRequest);
+            m_AgentMessageRouting.Add(MessageType.AgentDataUpdateRequest, HandleAgentDataUpdateRequest);
         }
 
         public void HandleAgentMessage(Message m)
@@ -980,21 +990,12 @@ namespace SilverSim.LL.Core
                     }
                     break;
 
-                case MessageType.AgentDataUpdateRequest:
-                    Messages.Agent.AgentDataUpdateRequest adur = (Messages.Agent.AgentDataUpdateRequest)m;
-                    if(adur.AgentID == ID && adur.SessionID == adur.CircuitSessionID)
+                default:
+                    /* all others are handled through routing dictionary */
+                    HandleAgentMessageDelegate del;
+                    if(m_AgentMessageRouting.TryGetValue(m.Number, out del))
                     {
-                        Circuit circuit;
-                        if (Circuits.TryGetValue(adur.ReceivedOnCircuitCode, out circuit))
-                        {
-                            Messages.Agent.AgentDataUpdate adu = new Messages.Agent.AgentDataUpdate();
-                            //TODO: adu.ActiveGroupID;
-                            adu.AgentID = ID;
-                            adu.FirstName = FirstName;
-                            adu.LastName = LastName;
-                            //TODO: adu.GroupTitle;
-                            circuit.SendMessage(adu);
-                        }
+                        del(m);
                     }
                     break;
             }

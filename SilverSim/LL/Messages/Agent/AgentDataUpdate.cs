@@ -24,10 +24,8 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Types.Groups;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.LL.Messages.Agent
 {
@@ -38,7 +36,7 @@ namespace SilverSim.LL.Messages.Agent
         public string LastName = string.Empty;
         public string GroupTitle = string.Empty;
         public UUID ActiveGroupID = UUID.Zero;
-        public UInt64 GroupPowers;
+        public GroupPowers GroupPowers;
         public string GroupName = string.Empty;
 
         public AgentDataUpdate()
@@ -62,7 +60,7 @@ namespace SilverSim.LL.Messages.Agent
             p.WriteStringLen8(LastName);
             p.WriteStringLen8(GroupTitle);
             p.WriteUUID(ActiveGroupID);
-            p.WriteUInt64(GroupPowers);
+            p.WriteUInt64((UInt64)GroupPowers);
             p.WriteStringLen8(GroupName);
         }
     }
