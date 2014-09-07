@@ -79,7 +79,7 @@ namespace SilverSim.Main.Common.Caps
 
             string[] parts = httpreq.RawUrl.Substring(1).Split('/');
 
-            if(parts.Length != 3)
+            if(parts.Length < 3)
             {
                 HttpResponse res = httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found");
                 res.Close();

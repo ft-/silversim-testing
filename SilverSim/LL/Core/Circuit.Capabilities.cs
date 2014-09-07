@@ -30,7 +30,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
-using System.Text;
 using System.Xml;
 
 namespace SilverSim.LL.Core
@@ -62,6 +61,76 @@ namespace SilverSim.LL.Core
             return false;
         }
 
+        void WriteKeyValuePair(XmlTextWriter writer, string key, string value)
+        {
+            writer.WriteStartElement("key");
+            writer.WriteValue(key);
+            writer.WriteEndElement();
+            writer.WriteStartElement("string");
+            writer.WriteValue(value);
+            writer.WriteEndElement();
+        }
+
+        void WriteKeyValuePair(XmlTextWriter writer, string key, uint value)
+        {
+            writer.WriteStartElement("key");
+            writer.WriteValue(key);
+            writer.WriteEndElement();
+            writer.WriteStartElement("integer");
+            writer.WriteValue(value);
+            writer.WriteEndElement();
+        }
+
+        void WriteKeyValuePair(XmlTextWriter writer, string key, int value)
+        {
+            writer.WriteStartElement("key");
+            writer.WriteValue(key);
+            writer.WriteEndElement();
+            writer.WriteStartElement("integer");
+            writer.WriteValue(value);
+            writer.WriteEndElement();
+        }
+
+        void WriteKeyValuePair(XmlTextWriter writer, string key, float value)
+        {
+            writer.WriteStartElement("key");
+            writer.WriteValue(key);
+            writer.WriteEndElement();
+            writer.WriteStartElement("real");
+            writer.WriteValue(value);
+            writer.WriteEndElement();
+        }
+
+        void WriteKeyValuePair(XmlTextWriter writer, string key, bool value)
+        {
+            writer.WriteStartElement("key");
+            writer.WriteValue(key);
+            writer.WriteEndElement();
+            writer.WriteStartElement("boolean");
+            writer.WriteValue(value ? "1" : "0");
+            writer.WriteEndElement();
+        }
+
+        void WriteKeyValuePair(XmlTextWriter writer, string key, double value)
+        {
+            writer.WriteStartElement("key");
+            writer.WriteValue(key);
+            writer.WriteEndElement();
+            writer.WriteStartElement("real");
+            writer.WriteValue((float)value);
+            writer.WriteEndElement();
+        }
+
+        void WriteKeyValuePair(XmlTextWriter writer, string key, UUID value)
+        {
+            writer.WriteStartElement("key");
+            writer.WriteValue(key);
+            writer.WriteEndElement();
+            writer.WriteStartElement("uuid");
+            writer.WriteValue(value);
+            writer.WriteEndElement();
+        }
+
         public void RegionSeedHandler(HttpRequest httpreq)
         {
             IValue o;
@@ -78,12 +147,12 @@ namespace SilverSim.LL.Core
             catch (Exception e)
             {
                 m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace.ToString());
-                httpreq.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type").Close();
+                httpreq.BeginResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML").Close();
                 return;
             }
             if (!(o is AnArray))
             {
-                httpreq.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type").Close();
+                httpreq.BeginResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML").Close();
                 return;
             }
 
@@ -134,7 +203,7 @@ namespace SilverSim.LL.Core
                                         break;
 
                                     case 'u':
-                                        uri += System.Uri.EscapeUriString(Agent.ID);
+                                        uri += System.Uri.EscapeUriString(AgentID);
                                         break;
                                 }
                             }
@@ -165,12 +234,7 @@ namespace SilverSim.LL.Core
             text.WriteStartElement("map");
             foreach (KeyValuePair<string, string> kvp in capsUri)
             {
-                text.WriteStartElement("key");
-                text.WriteString(kvp.Key);
-                text.WriteEndElement();
-                text.WriteStartElement("string");
-                text.WriteString(kvp.Value);
-                text.WriteEndElement();
+                WriteKeyValuePair(text, kvp.Key, kvp.Value);
             }
             text.WriteEndElement();
             text.WriteEndElement();
@@ -178,8 +242,36 @@ namespace SilverSim.LL.Core
 
             res.Close();
         }
+        #endregion
 
-        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
+        #region Default Capabilities
+        private bool IsLocalHost(Dictionary<string, string> capConfig, string key)
+        {
+            string val;
+            if(!capConfig.TryGetValue(key, out val))
+            {
+                return true;
+            }
+            return val == "localhost";
+        }
+
+        public void AddDefCapability(string capabilityType, UUID seedID, Action<HttpRequest> del, Dictionary<string, string> capConfig)
+        {
+            if (IsLocalHost(capConfig, capabilityType))
+            {
+                AddCapability(capabilityType, seedID, del);
+            }
+        }
+
+        public void SetupDefaultCapabilities(UUID regionSeedID, Dictionary<string, string> capConfig)
+        {
+            AddDefCapability("FetchInventory2", regionSeedID, Cap_FetchInventory2, capConfig);
+            AddDefCapability("FetchLib2", regionSeedID, Cap_FetchInventory2, capConfig);
+            AddDefCapability("FetchInventoryDescendents2", regionSeedID, Cap_FetchInventoryDescendents2, capConfig);
+            AddDefCapability("FetchLibDescendents2", regionSeedID, Cap_FetchInventoryDescendents2, capConfig);
+            AddDefCapability("GetTexture", regionSeedID, Cap_GetTexture, capConfig);
+            AddDefCapability("GetMesh", regionSeedID, Cap_GetMesh, capConfig);
+        }
         #endregion
     }
 }

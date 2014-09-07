@@ -34,6 +34,7 @@ using SilverSim.Types.IM;
 using System;
 using System.Collections.Generic;
 using System.Net;
+using System.Text;
 using System.Threading;
 using ThreadedClasses;
 
@@ -42,6 +43,7 @@ namespace SilverSim.LL.Core
     public partial class Circuit : IDisposable
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL CIRCUIT");
+        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
         private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
         public UInt32 CircuitCode { get; private set; }
         public UUID SessionID = UUID.Zero;
@@ -183,6 +185,7 @@ namespace SilverSim.LL.Core
             CircuitCode = circuitcode;
             m_CapsRedirector = capsredirector;
             AddCapability("SEED", regionSeedID, RegionSeedHandler);
+            SetupDefaultCapabilities(regionSeedID, server.Scene.CapabilitiesConfig);
             Scene = server.Scene;
             m_LastReceivedPacketAtTime = Environment.TickCount;
         }
