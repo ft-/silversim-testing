@@ -194,6 +194,21 @@ namespace SilverSim.Types
             }
         }
 
+        public uint LLChecksum
+        {
+            get
+            {
+                uint retval = 0;
+                byte[] bytes = m_Guid.ToByteArray();
+
+                retval += (uint)((bytes[3] << 24) + (bytes[2] << 16) + (bytes[1] << 8) + bytes[0]);
+                retval += (uint)((bytes[7] << 24) + (bytes[6] << 16) + (bytes[5] << 8) + bytes[4]);
+                retval += (uint)((bytes[11] << 24) + (bytes[10] << 16) + (bytes[9] << 8) + bytes[8]);
+                retval += (uint)((bytes[15] << 24) + (bytes[14] << 16) + (bytes[13] << 8) + bytes[12]);
+
+                return retval;
+            }
+        }
 
         public static readonly UUID Zero = new UUID("00000000-0000-0000-0000-000000000000");
         #endregion

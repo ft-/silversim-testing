@@ -67,6 +67,14 @@ namespace SilverSim.LL.Messages
         public bool ForceZeroFlag = false;
 
         #region Overloaded methods
+        public virtual string TypeDescription
+        {
+            get
+            {
+                return Number.ToString();
+            }
+        }
+
         public virtual bool IsReliable
         {
             get 

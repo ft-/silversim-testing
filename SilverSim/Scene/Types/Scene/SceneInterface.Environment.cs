@@ -116,22 +116,16 @@ namespace SilverSim.Scene.Types.Scene
 
             public struct WindData
             {
-                public LayerPatch[,] PatchesX;
-                public LayerPatch[,] PatchesY;
+                public LayerPatch PatchX;
+                public LayerPatch PatchY;
                 public ReaderWriterLock ReaderWriterLock;
             }
 
-            public struct CloudData
-            {
-                public LayerPatch[,] Patches;
-                public ReaderWriterLock ReaderWriterLock;
-            }
-
-            class WindlightDataAccessor
+            class WindDataAccessor
             {
                 private EnvironmentController m_Controller;
 
-                public WindlightDataAccessor(EnvironmentController controller)
+                public WindDataAccessor(EnvironmentController controller)
                 {
                     m_Controller = controller;
                 }
@@ -146,14 +140,14 @@ namespace SilverSim.Scene.Types.Scene
                             return wv;
                         }
 
-                        int px = x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                        int py = y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                        int px = x * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES / BASE_REGION_SIZE;
+                        int py = y * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES / BASE_REGION_SIZE;
 
                         m_Controller.m_WindData.ReaderWriterLock.AcquireReaderLock(-1);
                         try
                         {
-                            wv.X = m_Controller.m_WindData.PatchesX[py, px].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
-                            wv.Y = m_Controller.m_WindData.PatchesY[py, px].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+                            wv.X = m_Controller.m_WindData.PatchX.Data[py, px];
+                            wv.Y = m_Controller.m_WindData.PatchY.Data[py, px];
                         }
                         finally
                         {
@@ -168,71 +162,15 @@ namespace SilverSim.Scene.Types.Scene
                             return;
                         }
 
-                        int px = x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                        int py = y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-
+                        int px = x * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES / BASE_REGION_SIZE;
+                        int py = y * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES / BASE_REGION_SIZE;
                         m_Controller.m_WindData.ReaderWriterLock.AcquireWriterLock(-1);
                         try
                         {
-                            m_Controller.m_WindData.PatchesX[py, px].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = (float)value.X;
-                            m_Controller.m_WindData.PatchesY[py, px].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = (float)value.Y;
-                            ++m_Controller.m_WindData.PatchesX[py, px].Serial;
-                            ++m_Controller.m_WindData.PatchesY[py, px].Serial;
-                        }
-                        finally
-                        {
-                            m_Controller.m_WindData.ReaderWriterLock.ReleaseWriterLock();
-                        }
-                    }
-                }
-            }
-
-            class SkyDataAccessor
-            {
-                private EnvironmentController m_Controller;
-
-                public SkyDataAccessor(EnvironmentController controller)
-                {
-                    m_Controller = controller;
-                }
-
-                public double this[int y, int x]
-                {
-                    get
-                    {
-                        if (x >= m_Controller.m_Scene.RegionData.Size.X || y >= m_Controller.m_Scene.RegionData.Size.Y)
-                        {
-                            return 0f;
-                        }
-
-                        int px = x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                        int py = y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-
-                        m_Controller.m_WindData.ReaderWriterLock.AcquireReaderLock(-1);
-                        try
-                        {
-                            return m_Controller.m_CloudData.Patches[py, px].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
-                        }
-                        finally
-                        {
-                            m_Controller.m_WindData.ReaderWriterLock.ReleaseReaderLock();
-                        }
-                    }
-                    set
-                    {
-                        if (x >= m_Controller.m_Scene.RegionData.Size.X || y >= m_Controller.m_Scene.RegionData.Size.Y)
-                        {
-                            return;
-                        }
-
-                        int px = x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                        int py = y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-
-                        m_Controller.m_WindData.ReaderWriterLock.AcquireWriterLock(-1);
-                        try
-                        {
-                            m_Controller.m_CloudData.Patches[py, px].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = (float)value;
-                            ++m_Controller.m_CloudData.Patches[py, px].Serial;
+                            m_Controller.m_WindData.PatchX.Data[py, px] = (float)value.X;
+                            m_Controller.m_WindData.PatchY.Data[py, px] = (float)value.Y;
+                            ++m_Controller.m_WindData.PatchX.Serial;
+                            ++m_Controller.m_WindData.PatchY.Serial;
                         }
                         finally
                         {
@@ -247,7 +185,6 @@ namespace SilverSim.Scene.Types.Scene
             WindlightWaterData m_WaterWindlight = new WindlightWaterData();
             SunData m_SunData = new SunData();
             WindData m_WindData = new WindData();
-            CloudData m_CloudData = new CloudData();
             SceneInterface m_Scene;
             //bool m_SunFixed = false;
 
@@ -260,32 +197,9 @@ namespace SilverSim.Scene.Types.Scene
                 int yPatches = (int)scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
 
                 m_WindData.ReaderWriterLock = new ReaderWriterLock();
-                m_CloudData.ReaderWriterLock = new ReaderWriterLock();
 
-                m_WindData.PatchesX = new LayerPatch[yPatches, xPatches];
-                m_WindData.PatchesY = new LayerPatch[yPatches, xPatches];
-                m_CloudData.Patches = new LayerPatch[yPatches, xPatches];
-
-                int x, y;
-
-                for (y = 0; y < yPatches; ++y)
-                {
-                    for (x = 0; x < xPatches; ++x)
-                    {
-                        m_WindData.PatchesX[y, x] = new LayerPatch();
-                        m_WindData.PatchesX[y, x].X = x;
-                        m_WindData.PatchesX[y, x].Y = y;
-
-                        m_WindData.PatchesY[y, x] = new LayerPatch();
-                        m_WindData.PatchesY[y, x].X = x;
-                        m_WindData.PatchesY[y, x].Y = y;
-
-                        m_CloudData.Patches[y, x] = new LayerPatch();
-                        m_CloudData.Patches[y, x].X = x;
-                        m_CloudData.Patches[y, x].Y = y;
-                    }
-                }
-
+                m_WindData.PatchX = new LayerPatch();
+                m_WindData.PatchY = new LayerPatch();
             }
 
             public void Dispose()
@@ -308,8 +222,8 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                         {
-                            patchesList.Add(new LayerPatch(m_WindData.PatchesX[y, x]));
-                            patchesList.Add(new LayerPatch(m_WindData.PatchesY[y, x]));
+                            patchesList.Add(new LayerPatch(m_WindData.PatchX));
+                            patchesList.Add(new LayerPatch(m_WindData.PatchY));
                         }
                     }
                     LayerPatch[] patches = new LayerPatch[patchesList.Count];
@@ -357,75 +271,6 @@ namespace SilverSim.Scene.Types.Scene
             {
                 List<LayerData> mlist = CompileWindData();
                 foreach (LayerData m in mlist)
-                {
-                    SendToAllClients(m);
-                }
-            }
-            #endregion
-
-            #region Update of Cloud data
-            private List<LayerData> CompileCloudData()
-            {
-                m_CloudData.ReaderWriterLock.AcquireReaderLock(-1);
-                try
-                {
-                    int y;
-                    int x;
-                    List<LayerData> mlist = new List<LayerData>();
-                    List<LayerPatch> patchesList = new List<LayerPatch>();
-
-                    for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
-                    {
-                        for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
-                        {
-                            patchesList.Add(new LayerPatch(m_CloudData.Patches[y, x]));
-                        }
-                    }
-                    LayerPatch[] patches = new LayerPatch[patchesList.Count];
-                    patchesList.CopyTo(patches);
-
-                    if (BASE_REGION_SIZE == m_Scene.RegionData.Size.X && BASE_REGION_SIZE == m_Scene.RegionData.Size.Y)
-                    {
-                        mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.Cloud));
-                    }
-                    else
-                    {
-                        int offset = 0;
-                        while (offset < patches.Length)
-                        {
-                            if (patches.Length - offset > LayerCompressor.MAX_PATCHES_PER_MESSAGE)
-                            {
-                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.CloudExtended, offset, LayerCompressor.MAX_PATCHES_PER_MESSAGE));
-                                offset += LayerCompressor.MAX_PATCHES_PER_MESSAGE;
-                            }
-                            else
-                            {
-                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.CloudExtended, offset, patches.Length - offset));
-                                offset = patches.Length;
-                            }
-                        }
-                    }
-                    return mlist;
-                }
-                finally
-                {
-                    m_CloudData.ReaderWriterLock.ReleaseReaderLock();
-                }
-            }
-
-            public void UpdateCloudDataToSingleClient(IAgent agent)
-            {
-                List<LayerData> mlist = CompileCloudData();
-                foreach (LayerData m in mlist)
-                {
-                    agent.SendMessageAlways(m, m_Scene.ID);
-                }
-            }
-
-            private void UpdateCloudDataToClients()
-            {
-                List<LayerData> mlist = CompileCloudData();
-                foreach(LayerData m in mlist)
                 {
                     SendToAllClients(m);
                 }

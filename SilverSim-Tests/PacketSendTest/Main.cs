@@ -36,12 +36,135 @@ namespace Tests.PacketSendTest
             socket.Bind(new IPEndPoint(new IPAddress(0), 9300));
 
             {
+                Msg.Inventory.InventoryDescendents m = new Msg.Inventory.InventoryDescendents();
+                Msg.Inventory.InventoryDescendents.FolderDataEntry f;
+                
+                f = new Msg.Inventory.InventoryDescendents.FolderDataEntry();
+                f.Name = "Folder 1";
+                f.Type = SilverSim.Types.Inventory.InventoryType.Bodypart;
+                f.ParentID = TestUUID;
+                f.FolderID = TestUUID;
+                m.FolderData.Add(f);
+
+                f = new Msg.Inventory.InventoryDescendents.FolderDataEntry();
+                f.Name = "Folder 2";
+                f.Type = SilverSim.Types.Inventory.InventoryType.Animation;
+                f.ParentID = TestUUID;
+                f.FolderID = TestUUID;
+                m.FolderData.Add(f);
+
+                Msg.Inventory.InventoryDescendents.ItemDataEntry i;
+                
+                i = new Msg.Inventory.InventoryDescendents.ItemDataEntry();
+                i.ItemID = TestUUID;
+                i.FolderID = TestUUID;
+                i.CreatorID = TestUUID;
+                i.OwnerID = TestUUID;
+                i.GroupID = TestUUID;
+                i.BaseMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.OwnerMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.GroupMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.EveryoneMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.NextOwnerMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.IsGroupOwned = true;
+                i.AssetID = TestUUID;
+                i.Type = SilverSim.Types.Asset.AssetType.Animation;
+                i.InvType = SilverSim.Types.Inventory.InventoryType.Animation;
+                i.Flags = 0x55;
+                i.SaleType = SilverSim.Types.Inventory.InventoryItem.SaleInfoData.SaleType.Copy;
+                i.SalePrice = 55;
+                i.Name = "Item 1";
+                i.Description = "Desc 1";
+                i.CreationDate = 100;
+                m.ItemData.Add(i);
+
+                i = new Msg.Inventory.InventoryDescendents.ItemDataEntry();
+                i.ItemID = TestUUID;
+                i.FolderID = TestUUID;
+                i.CreatorID = TestUUID;
+                i.OwnerID = TestUUID;
+                i.GroupID = TestUUID;
+                i.BaseMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.OwnerMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.GroupMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.EveryoneMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.NextOwnerMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.IsGroupOwned = true;
+                i.AssetID = TestUUID;
+                i.Type = SilverSim.Types.Asset.AssetType.Animation;
+                i.InvType = SilverSim.Types.Inventory.InventoryType.Animation;
+                i.Flags = 0x55;
+                i.SaleType = SilverSim.Types.Inventory.InventoryItem.SaleInfoData.SaleType.Copy;
+                i.SalePrice = 55;
+                i.Name = "Item 2";
+                i.Description = "Desc 2";
+                i.CreationDate = 100;
+                m.ItemData.Add(i);
+
+                sendMessage(m);
+            }
+
+            {
+                Msg.Inventory.FetchInventoryReply m = new Msg.Inventory.FetchInventoryReply();
+
+                Msg.Inventory.FetchInventoryReply.ItemDataEntry i;
+
+                i = new Msg.Inventory.FetchInventoryReply.ItemDataEntry();
+                i.ItemID = TestUUID;
+                i.FolderID = TestUUID;
+                i.CreatorID = TestUUID;
+                i.OwnerID = TestUUID;
+                i.GroupID = TestUUID;
+                i.BaseMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.OwnerMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.GroupMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.EveryoneMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.NextOwnerMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.IsGroupOwned = true;
+                i.AssetID = TestUUID;
+                i.Type = SilverSim.Types.Asset.AssetType.Animation;
+                i.InvType = SilverSim.Types.Inventory.InventoryType.Animation;
+                i.Flags = 0x55;
+                i.SaleType = SilverSim.Types.Inventory.InventoryItem.SaleInfoData.SaleType.Copy;
+                i.SalePrice = 55;
+                i.Name = "Item 1";
+                i.Description = "Desc 1";
+                i.CreationDate = 100;
+                m.ItemData.Add(i);
+
+                i = new Msg.Inventory.FetchInventoryReply.ItemDataEntry();
+                i.ItemID = TestUUID;
+                i.FolderID = TestUUID;
+                i.CreatorID = TestUUID;
+                i.OwnerID = TestUUID;
+                i.GroupID = TestUUID;
+                i.BaseMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.OwnerMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.GroupMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.EveryoneMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.NextOwnerMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+                i.IsGroupOwned = true;
+                i.AssetID = TestUUID;
+                i.Type = SilverSim.Types.Asset.AssetType.Animation;
+                i.InvType = SilverSim.Types.Inventory.InventoryType.Animation;
+                i.Flags = 0x55;
+                i.SaleType = SilverSim.Types.Inventory.InventoryItem.SaleInfoData.SaleType.Copy;
+                i.SalePrice = 55;
+                i.Name = "Item 2";
+                i.Description = "Desc 2";
+                i.CreationDate = 100;
+                m.ItemData.Add(i);
+
+                sendMessage(m);
+            }
+#if TESTED
+            {
                 Msg.Economy.MoneyBalanceReply m = new Msg.Economy.MoneyBalanceReply();
                 m.MoneyBalance = 1000;
                 m.Amount = 1000;
                 sendMessage(m, true);
             }
-#if TESTED
+
             {
                 Msg.Agent.AgentDataUpdate m = new Msg.Agent.AgentDataUpdate();
                 m.GroupPowers = 10;

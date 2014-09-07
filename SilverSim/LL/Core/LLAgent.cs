@@ -925,7 +925,6 @@ namespace SilverSim.LL.Core
                         {
                             /* Add our agent to scene */
                             circuit.Scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
-                            circuit.Scene.Environment.UpdateCloudDataToSingleClient(this);
                             circuit.Scene.Environment.UpdateWindDataToSingleClient(this);
                         }
                     }
@@ -1012,11 +1011,6 @@ namespace SilverSim.LL.Core
             }
 
             /* this is for the root agent */
-        }
-
-        public void HandleInventoryMessage(Message m)
-        {
-
         }
 
         public void SendMessageIfRootAgent(Message m, UUID fromSceneID)

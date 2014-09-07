@@ -49,6 +49,14 @@ namespace SilverSim.LL.Messages.LayerData
 
         }
 
+        public override string TypeDescription
+        {
+            get
+            {
+                return Number.ToString()+ "." + LayerType.ToString();
+            }
+        }
+
         public override MessageType Number
         {
             get

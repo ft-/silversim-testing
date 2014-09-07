@@ -67,9 +67,14 @@ namespace SilverSim.LL.Core
         private int m_LastReceivedPacketAtTime;
         private ChatServiceInterface m_ChatService;
         private ChatServiceInterface.Listener m_ChatListener;
+
         private Thread m_TextureDownloadThread;
         private bool m_TextureDownloadThreadRunning = false;
         private BlockingQueue<Messages.Image.RequestImage> m_TextureDownloadQueue = new BlockingQueue<Messages.Image.RequestImage>();
+
+        private Thread m_InventoryThread;
+        private bool m_InventoryThreadRunning = false;
+        private BlockingQueue<Message> m_InventoryRequestQueue = new BlockingQueue<Message>();
 
         private uint NextSequenceNumber
         {
@@ -383,6 +388,24 @@ namespace SilverSim.LL.Core
                                 m_TextureDownloadQueue.Enqueue((Messages.Image.RequestImage)m);
                                 break;
 
+                            case MessageType.CopyInventoryItem:
+                            case MessageType.ChangeInventoryItemFlags:
+                            case MessageType.CreateInventoryFolder:
+                            case MessageType.CreateInventoryItem:
+                            case MessageType.FetchInventory:
+                            case MessageType.FetchInventoryDescendents:
+                            case MessageType.MoveInventoryFolder:
+                            case MessageType.MoveInventoryItem:
+                            case MessageType.PurgeInventoryDescendents:
+                            case MessageType.RemoveInventoryFolder:
+                            case MessageType.RemoveInventoryItem:
+                            case MessageType.RequestInventoryAsset:
+                            case MessageType.UpdateInventoryFolder:
+                            case MessageType.UpdateInventoryItem:
+                            case MessageType.LinkInventoryItem:
+                                m_InventoryRequestQueue.Enqueue(m);
+                                break;
+
                             default:
                                 m_Server.RouteReceivedMessage(m);
                                 break;
@@ -414,6 +437,12 @@ namespace SilverSim.LL.Core
                     m_TextureDownloadThreadRunning = true;
                     m_TextureDownloadThread.Start(this);
                 }
+                if(!m_InventoryThreadRunning)
+                {
+                    m_InventoryThread = new Thread(FetchInventoryThread);
+                    m_InventoryThreadRunning = true;
+                    m_InventoryThread.Start(this);
+                }
             }
         }
 
@@ -430,125 +459,12 @@ namespace SilverSim.LL.Core
                     m_TextureDownloadThreadRunning = false;
                     m_TextureDownloadThread = null;
                 }
-            }
-        }
-        #endregion
-
-        #region LLUDP Packet transmitter
-        private void TransmitThread(object param)
-        {
-            int lastAckTick = Environment.TickCount;
-            int lastPingTick = Environment.TickCount;
-            byte pingID = 0;
-            Thread.CurrentThread.Name = string.Format("LLUDP:Transmitter for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
-
-            while (true)
-            {
-                try
+                if(null != m_InventoryThread)
                 {
-                    Message m = m_TxQueue.Dequeue(1000);
-                    if (m is CancelTxThread)
-                    {
-                        break;
-                    }
-                    if(m != null)
-                    {
-                        UDPPacket p = new UDPPacket();
-                        p.IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag;
-                        m.Serialize(p);
-                        p.Flush();
-                        p.IsReliable = m.IsReliable;
-                        p.SequenceNumber = NextSequenceNumber;
-                        m_Server.SendPacketTo(p, RemoteEndPoint);
-                        p.EnqueuedAtTime = (uint)Environment.TickCount;
-                        p.TransferredAtTime = (uint)Environment.TickCount;
-                        if (m.IsReliable)
-                        {
-                            p.IsResent = true;
-                            m_UnackedPackets[p.SequenceNumber] = p;
-                        }
-                        if(m.Number == MessageType.LogoutReply)
-                        {
-                            lock (m_LogoutReplyLock)
-                            {
-                                m_LogoutReplySeqNo = p.SequenceNumber;
-                                m_LogoutReplySentAtTime = Environment.TickCount;
-                                m_LogoutReplySent = true;
-                            }
-                        }
-                    }
-                }
-                catch
-                {
-                }
-
-                /*
-                if (Environment.TickCount - m_LastReceivedPacketAtTime >= 60000)
-                {
-                    m_Log.InfoFormat("Packet Timeout for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
-                    ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
-                    Stop();
-                    Agent = null;
-                    Scene = null;
-                    return;
-                }*/
-
-                if (Environment.TickCount - m_LogoutReplySentAtTime >= 10000 && m_LogoutReplySent)
-                {
-                    m_Log.InfoFormat("LogoutReply for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
-                    ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
-                    Stop();
-                    Agent = null;
-                    Scene = null;
-                    return;
-                }
-
-                if(Environment.TickCount - lastPingTick >= 5000)
-                {
-                    if (!m_PingSendTicks.ContainsKey(pingID))
-                    {
-                        lastPingTick = Environment.TickCount;
-                        UDPPacket p = new UDPPacket();
-                        p.WriteMessageType(MessageType.StartPingCheck);
-                        p.WriteUInt8(pingID++);
-                        m_PingSendTicks[pingID] = Environment.TickCount;
-                        p.WriteUInt32(0);
-                        m_Server.SendPacketTo(p, RemoteEndPoint);
-                    }
-                }
-                if (Environment.TickCount - lastAckTick >= 1000)
-                {
-                    lastAckTick = Environment.TickCount;
-                    /* check for acks to be send */
-                    int c = m_AckList.Count;
-                    while (c > 0)
-                    {
-                        UDPPacket p = new UDPPacket();
-                        p.WriteMessageType(MessageType.PacketAck);
-                        if (c > 100)
-                        {
-                            p.WriteUInt8(100);
-                            for (int i = 0; i < 100; ++i)
-                            {
-                                p.WriteUInt32(m_AckList.Dequeue());
-                            }
-                            c -= 100;
-                        }
-                        else
-                        {
-                            p.WriteUInt8((byte)c);
-                            for (int i = 0; i < c; ++i)
-                            {
-                                p.WriteUInt32(m_AckList.Dequeue());
-                            }
-                            c = 0;
-                        }
-                        p.SequenceNumber = NextSequenceNumber;
-                        m_Server.SendPacketTo(p, RemoteEndPoint);
-                    }
+                    m_InventoryThreadRunning = false;
+                    m_InventoryThread = null;
                 }
             }
-            m_TxRunning = false;
         }
         #endregion
 

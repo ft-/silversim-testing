@@ -23,22 +23,27 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
-using SilverSim.Types.Asset;
-using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SilverSim.Types;
+using SilverSim.Types.Inventory;
+using SilverSim.Types.Asset;
 
 namespace SilverSim.LL.Messages.Inventory
 {
-    public class FetchInventoryReply : Message
+    public class UpdateCreateInventoryItem : Message
     {
         public UUID AgentID;
+        public bool SimApproved;
+        public UUID TransactionID;
 
         public struct ItemDataEntry
         {
             public UUID ItemID;
             public UUID FolderID;
+            public UInt32 CallbackID;
             public UUID CreatorID;
             public UUID OwnerID;
             public UUID GroupID;
@@ -61,7 +66,7 @@ namespace SilverSim.LL.Messages.Inventory
 
         public List<ItemDataEntry> ItemData = new List<ItemDataEntry>();
 
-        public FetchInventoryReply()
+        public UpdateCreateInventoryItem()
         {
 
         }
@@ -70,7 +75,7 @@ namespace SilverSim.LL.Messages.Inventory
         {
             get
             {
-                return MessageType.FetchInventoryReply;
+                return MessageType.UpdateCreateInventoryItem;
             }
         }
 
@@ -100,6 +105,7 @@ namespace SilverSim.LL.Messages.Inventory
             {
                 p.WriteUUID(d.ItemID);
                 p.WriteUUID(d.FolderID);
+                p.WriteUInt32(d.CallbackID);
                 p.WriteUUID(d.CreatorID);
                 p.WriteUUID(d.OwnerID);
                 p.WriteUUID(d.GroupID);

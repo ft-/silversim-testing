@@ -56,11 +56,11 @@ namespace SilverSim.LL.Messages.Inventory
             public UUID CreatorID;
             public UUID OwnerID;
             public UUID GroupID;
-            public UInt32 BaseMask;
-            public UInt32 OwnerMask;
-            public UInt32 GroupMask;
-            public UInt32 EveryoneMask;
-            public UInt32 NextOwnerMask;
+            public InventoryItem.PermissionsMask BaseMask;
+            public InventoryItem.PermissionsMask OwnerMask;
+            public InventoryItem.PermissionsMask GroupMask;
+            public InventoryItem.PermissionsMask EveryoneMask;
+            public InventoryItem.PermissionsMask NextOwnerMask;
             public bool IsGroupOwned;
             public UUID AssetID;
             public AssetType Type;
@@ -71,7 +71,6 @@ namespace SilverSim.LL.Messages.Inventory
             public string Name;
             public string Description;
             public UInt32 CreationDate;
-            public UInt32 CRC;
         }
 
         public List<ItemDataEntry> ItemData = new List<ItemDataEntry>();
@@ -90,6 +89,14 @@ namespace SilverSim.LL.Messages.Inventory
         }
 
         public override bool IsReliable
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override bool ZeroFlag
         {
             get
             {
@@ -123,11 +130,11 @@ namespace SilverSim.LL.Messages.Inventory
                 p.WriteUUID(d.CreatorID);
                 p.WriteUUID(d.OwnerID);
                 p.WriteUUID(d.GroupID);
-                p.WriteUInt32(d.BaseMask);
-                p.WriteUInt32(d.OwnerMask);
-                p.WriteUInt32(d.GroupMask);
-                p.WriteUInt32(d.EveryoneMask);
-                p.WriteUInt32(d.NextOwnerMask);
+                p.WriteUInt32((uint)d.BaseMask);
+                p.WriteUInt32((uint)d.OwnerMask);
+                p.WriteUInt32((uint)d.GroupMask);
+                p.WriteUInt32((uint)d.EveryoneMask);
+                p.WriteUInt32((uint)d.NextOwnerMask);
                 p.WriteBoolean(d.IsGroupOwned);
                 p.WriteUUID(d.AssetID);
                 p.WriteInt8((sbyte)d.Type);
@@ -138,7 +145,30 @@ namespace SilverSim.LL.Messages.Inventory
                 p.WriteStringLen8(d.Name);
                 p.WriteStringLen8(d.Description);
                 p.WriteUInt32(d.CreationDate);
-                p.WriteUInt32(d.CRC);
+
+                uint checksum = 0;
+
+                checksum += d.AssetID.LLChecksum; // AssetID
+                checksum += d.FolderID.LLChecksum; // FolderID
+                checksum += d.ItemID.LLChecksum; // ItemID
+
+                checksum += d.CreatorID.LLChecksum; // CreatorID
+                checksum += d.OwnerID.LLChecksum; // OwnerID
+                checksum += d.GroupID.LLChecksum; // GroupID
+
+                checksum += (uint)d.OwnerMask;
+                checksum += (uint)d.NextOwnerMask;
+                checksum += (uint)d.EveryoneMask;
+                checksum += (uint)d.GroupMask;
+
+                checksum += d.Flags; // Flags
+                checksum += (uint)d.InvType; // InvType
+                checksum += (uint)d.Type; // Type 
+                checksum += (uint)d.CreationDate; // CreationDate
+                checksum += (uint)d.SalePrice;    // SalePrice
+                checksum += (uint)((uint)d.SaleType * 0x07073096); // SaleType
+
+                p.WriteUInt32(checksum);
             }
         }
     }

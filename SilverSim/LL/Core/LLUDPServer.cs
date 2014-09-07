@@ -408,15 +408,6 @@ namespace SilverSim.LL.Core
             }
         }
 
-        void HandleAgentInventoryMessage(Message m)
-        {
-            LLAgent agent;
-            if (m_Agents.TryGetValue(m.CircuitAgentID, out agent))
-            {
-                agent.HandleInventoryMessage(m);
-            }
-        }
-
         void InitRouting()
         {
             /* Objects */
@@ -461,24 +452,6 @@ namespace SilverSim.LL.Core
             m_Routing[MessageType.GetScriptRunning] = Scene.HandleSimulatorMessage;
             m_Routing[MessageType.SetScriptRunning] = Scene.HandleSimulatorMessage;
             m_Routing[MessageType.ScriptReset] = Scene.HandleSimulatorMessage;
-
-            /* Agent Inventory */
-            m_Routing[MessageType.CopyInventoryFromNotecard] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.UpdateInventoryItem] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.MoveInventoryItem] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.RemoveInventoryItem] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.ChangeInventoryItemFlags] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.CreateInventoryFolder] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.UpdateInventoryFolder] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.MoveInventoryFolder] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.RemoveInventoryFolder] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.FetchInventoryDescendents] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.FetchInventory] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.RemoveInventoryObjects] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.PurgeInventoryDescendents] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.CreateInventoryItem] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.CreateLandmarkForEvent] = HandleAgentInventoryMessage;
-            m_Routing[MessageType.LinkInventoryItem] = HandleAgentInventoryMessage;
 
             /* Agent Update */
             m_Routing[MessageType.AgentUpdate] = HandleAgentUpdateMessage;
