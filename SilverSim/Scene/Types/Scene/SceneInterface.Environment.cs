@@ -213,8 +213,6 @@ namespace SilverSim.Scene.Types.Scene
                 m_WindData.ReaderWriterLock.AcquireReaderLock(-1);
                 try
                 {
-                    int y;
-                    int x;
                     List<LayerData> mlist = new List<LayerData>();
                     List<LayerPatch> patchesList = new List<LayerPatch>();
 
