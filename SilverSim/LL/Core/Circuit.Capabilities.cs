@@ -117,24 +117,24 @@ namespace SilverSim.LL.Core
                                         uri += '%';
                                         break;
 
-                                    case 'r':
-                                        uri += System.Uri.EscapeUriString(Scene.ID);
-                                        break;
-
-                                    case 'u':
-                                        uri += System.Uri.EscapeUriString(Agent.ID);
-                                        break;
-
                                     case 'h':
                                         uri += System.Uri.EscapeUriString(Agent.HomeURI.ToString());
+                                        break;
+
+                                    case 'i':
+                                        uri += System.Uri.EscapeUriString(Agent.ServiceURLs["InventoryServerURI"]);
+                                        break;
+
+                                    case 'r':
+                                        uri += System.Uri.EscapeUriString(Scene.ID);
                                         break;
 
                                     case 's':
                                         uri += System.Uri.EscapeUriString(SessionID);
                                         break;
 
-                                    case 'i':
-                                        uri += System.Uri.EscapeUriString(Agent.ServiceURLs["InventoryServerURI"]);
+                                    case 'u':
+                                        uri += System.Uri.EscapeUriString(Agent.ID);
                                         break;
                                 }
                             }

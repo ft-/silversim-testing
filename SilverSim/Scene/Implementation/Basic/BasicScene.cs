@@ -32,7 +32,6 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Parcel;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Scene.Types.Terrain;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.Grid;
@@ -41,14 +40,13 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
+using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
-using System.Net.Sockets;
 using ThreadedClasses;
-using SilverSim.Types.Grid;
 
 namespace SilverSim.Scene.Implementation.Basic
 {

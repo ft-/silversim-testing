@@ -44,7 +44,7 @@ namespace SilverSim.Scene.Types.Scene
         public class TerrainController : IDisposable
         {
             private const int BASE_REGION_SIZE = 256;
-            private double DEFAULT_TERRAIN_HEIGHT = 21;
+            private const double DEFAULT_TERRAIN_HEIGHT = 21;
 
             private SceneInterface m_Scene;
             private ReaderWriterLock m_TerrainRwLock = new ReaderWriterLock();
@@ -79,6 +79,53 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             #region Update of Terrain Data
+            /*
+        public IList<TerrainPatch> GetTerrainDistanceSorted(Vector3 v)
+        {
+            SortedList<int, TerrainPatch> sorted = new SortedList<int, TerrainPatch>();
+            uint x;
+            uint y;
+
+            if(v.X < 0)
+            {
+                x = 0;
+            }
+            else if(v.X >= SizeX)
+            {
+                x = SizeX - 1;
+            }
+            else
+            {
+                x = (uint)v.X / TERRAIN_PATCH_SIZE;
+            }
+
+            if (v.Y < 0)
+            {
+                y = 0;
+            }
+            else if(v.Y >= SizeY)
+            {
+                y = SizeY - 1;
+            }
+            else
+            {
+                y = (uint)v.Y / TERRAIN_PATCH_SIZE;
+            }
+
+            int distance;
+
+            for(uint py = 0; py < SizeY / TERRAIN_PATCH_SIZE; ++py)
+            {
+                for(uint px = 0; px < SizeX / TERRAIN_PATCH_SIZE; ++px)
+                {
+                    distance = ((int)px - (int)x) * ((int)px - (int)x) + ((int)py - (int)y) * ((int)py - (int)y);
+                    sorted.Add(distance, new TerrainPatch(px, py, m_Map[py * m_PatchCountX + px]));
+                }
+            }
+
+            return sorted.Values;
+        }
+ */
             private List<LayerData> CompileTerrainData(bool force)
             {
                 m_TerrainRwLock.AcquireReaderLock(-1);

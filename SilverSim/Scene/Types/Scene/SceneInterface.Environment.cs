@@ -118,15 +118,128 @@ namespace SilverSim.Scene.Types.Scene
             {
                 public LayerPatch[,] PatchesX;
                 public LayerPatch[,] PatchesY;
-                public bool[,] PatchesDirty;
                 public ReaderWriterLock ReaderWriterLock;
             }
 
             public struct CloudData
             {
                 public LayerPatch[,] Patches;
-                public bool[,] PatchesDirty;
                 public ReaderWriterLock ReaderWriterLock;
+            }
+
+            class WindlightDataAccessor
+            {
+                private EnvironmentController m_Controller;
+
+                public WindlightDataAccessor(EnvironmentController controller)
+                {
+                    m_Controller = controller;
+                }
+
+                public WindVector this[int y, int x]
+                {
+                    get
+                    {
+                        WindVector wv = new WindVector();
+                        if(x >= m_Controller.m_Scene.RegionData.Size.X || y >= m_Controller.m_Scene.RegionData.Size.Y)
+                        {
+                            return wv;
+                        }
+
+                        int px = x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                        int py = y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+
+                        m_Controller.m_WindData.ReaderWriterLock.AcquireReaderLock(-1);
+                        try
+                        {
+                            wv.X = m_Controller.m_WindData.PatchesX[py, px].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+                            wv.Y = m_Controller.m_WindData.PatchesY[py, px].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+                        }
+                        finally
+                        {
+                            m_Controller.m_WindData.ReaderWriterLock.ReleaseReaderLock();
+                        }
+                        return wv;
+                    }
+                    set
+                    {
+                        if (x >= m_Controller.m_Scene.RegionData.Size.X || y >= m_Controller.m_Scene.RegionData.Size.Y)
+                        {
+                            return;
+                        }
+
+                        int px = x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                        int py = y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+
+                        m_Controller.m_WindData.ReaderWriterLock.AcquireWriterLock(-1);
+                        try
+                        {
+                            m_Controller.m_WindData.PatchesX[py, px].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = (float)value.X;
+                            m_Controller.m_WindData.PatchesY[py, px].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = (float)value.Y;
+                            ++m_Controller.m_WindData.PatchesX[py, px].Serial;
+                            ++m_Controller.m_WindData.PatchesY[py, px].Serial;
+                        }
+                        finally
+                        {
+                            m_Controller.m_WindData.ReaderWriterLock.ReleaseWriterLock();
+                        }
+                    }
+                }
+            }
+
+            class SkyDataAccessor
+            {
+                private EnvironmentController m_Controller;
+
+                public SkyDataAccessor(EnvironmentController controller)
+                {
+                    m_Controller = controller;
+                }
+
+                public double this[int y, int x]
+                {
+                    get
+                    {
+                        if (x >= m_Controller.m_Scene.RegionData.Size.X || y >= m_Controller.m_Scene.RegionData.Size.Y)
+                        {
+                            return 0f;
+                        }
+
+                        int px = x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                        int py = y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+
+                        m_Controller.m_WindData.ReaderWriterLock.AcquireReaderLock(-1);
+                        try
+                        {
+                            return m_Controller.m_CloudData.Patches[py, px].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+                        }
+                        finally
+                        {
+                            m_Controller.m_WindData.ReaderWriterLock.ReleaseReaderLock();
+                        }
+                    }
+                    set
+                    {
+                        if (x >= m_Controller.m_Scene.RegionData.Size.X || y >= m_Controller.m_Scene.RegionData.Size.Y)
+                        {
+                            return;
+                        }
+
+                        int px = x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                        int py = y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+
+                        m_Controller.m_WindData.ReaderWriterLock.AcquireWriterLock(-1);
+                        try
+                        {
+                            m_Controller.m_CloudData.Patches[py, px].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = (float)value;
+                            ++m_Controller.m_CloudData.Patches[py, px].Serial;
+                        }
+                        finally
+                        {
+                            m_Controller.m_WindData.ReaderWriterLock.ReleaseWriterLock();
+                        }
+                    }
+                }
             }
 
             bool m_WindlightValid = false;
@@ -152,8 +265,6 @@ namespace SilverSim.Scene.Types.Scene
                 m_WindData.PatchesX = new LayerPatch[yPatches, xPatches];
                 m_WindData.PatchesY = new LayerPatch[yPatches, xPatches];
                 m_CloudData.Patches = new LayerPatch[yPatches, xPatches];
-                m_WindData.PatchesDirty = new bool[yPatches, xPatches];
-                m_CloudData.PatchesDirty = new bool[yPatches, xPatches];
 
                 int x, y;
 
