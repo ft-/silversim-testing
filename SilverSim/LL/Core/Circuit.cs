@@ -26,23 +26,16 @@ exception statement from your version.
 using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.Main.Common.Caps;
-using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Scene.Types.Agent;
-using SilverSim.Types.Asset;
 using SilverSim.Scene.Types.Script.Events;
-using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
 using SilverSim.Types.IM;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Net;
-using System.Text;
 using System.Threading;
-using System.Xml;
 using ThreadedClasses;
-using SilverSim.Scene.ServiceInterfaces.Chat;
 
 namespace SilverSim.LL.Core
 {
