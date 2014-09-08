@@ -82,6 +82,10 @@ namespace SilverSim.StructuredData.LLSD
             switch(input.Name)
             {
                 case "array":
+                    if(input.IsEmptyElement)
+                    {
+                        return new AnArray();
+                    }
                     AnArray array = new AnArray();
                     while(true)
                     {
@@ -112,6 +116,10 @@ namespace SilverSim.StructuredData.LLSD
                     }
 
                 case "boolean":
+                    if(input.IsEmptyElement)
+                    {
+                        return new ABoolean(false);
+                    }
                     string boolstr = GetTextNode(input);
                     if (boolstr == "1")
                     {
@@ -130,6 +138,10 @@ namespace SilverSim.StructuredData.LLSD
                     return new Date(GetTextNode(input));
 
                 case "integer":
+                    if(input.IsEmptyElement)
+                    {
+                        return new Integer();
+                    }
                     return new Integer(Int32.Parse(GetTextNode(input)));
 
                 case "map":
@@ -178,19 +190,38 @@ namespace SilverSim.StructuredData.LLSD
                     }
 
                 case "real":
+                    if(input.IsEmptyElement)
+                    {
+                        return new Real();
+                    }
                     return Real.Parse(GetTextNode(input));
 
                 case "string":
+                    if(input.IsEmptyElement)
+                    {
+                        return new AString();
+                    }
                     return new AString(GetTextNode(input));
 
                 case "undef":
-                    input.Skip();
+                    if (!input.IsEmptyElement)
+                    {
+                        input.Skip();
+                    }
                     return new Undef();
 
                 case "uri":
+                    if(input.IsEmptyElement)
+                    {
+                        return new URI(string.Empty);
+                    }
                     return new URI(GetTextNode(input));
 
                 case "uuid":
+                    if(input.IsEmptyElement)
+                    {
+                        return UUID.Zero;
+                    }
                     return new UUID(GetTextNode(input));
                     
                 default:
