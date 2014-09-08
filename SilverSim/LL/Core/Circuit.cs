@@ -179,13 +179,17 @@ namespace SilverSim.LL.Core
         #endregion
 
         public RwLockedDictionary<UInt32, UDPPacket> m_UnackedPackets = new RwLockedDictionary<uint, UDPPacket>();
-        public Circuit(LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector, UUID regionSeedID)
+        public Circuit(LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector, UUID regionSeedID, Dictionary<string, string> serviceURLs)
         {
             m_Server = server;
             CircuitCode = circuitcode;
             m_CapsRedirector = capsredirector;
+            
+            /* the following two capabilities are mandatory */
             AddCapability("SEED", regionSeedID, RegionSeedHandler);
-            SetupDefaultCapabilities(regionSeedID, server.Scene.CapabilitiesConfig);
+            AddCapability("EventQueueGet", regionSeedID, Cap_EventQueueGet);
+
+            SetupDefaultCapabilities(regionSeedID, server.Scene.CapabilitiesConfig, serviceURLs);
             Scene = server.Scene;
             m_LastReceivedPacketAtTime = Environment.TickCount;
         }
@@ -446,6 +450,7 @@ namespace SilverSim.LL.Core
                     m_InventoryThreadRunning = true;
                     m_InventoryThread.Start(this);
                 }
+                m_EventQueueEnabled = true;
             }
         }
 
@@ -467,6 +472,7 @@ namespace SilverSim.LL.Core
                     m_InventoryThreadRunning = false;
                     m_InventoryThread = null;
                 }
+                m_EventQueueEnabled = false;
             }
         }
         #endregion
@@ -475,7 +481,19 @@ namespace SilverSim.LL.Core
         {
             try
             {
-                m_TxQueue.Enqueue(m);
+                switch(m.Number)
+                {
+                    case MessageType.EnableSimulator:
+                    case MessageType.DisableSimulator:
+                    case MessageType.CrossedRegion:
+                    case MessageType.TeleportFinish:
+                        m_EventQueue.Enqueue(m);
+                        break;
+
+                    default:
+                        m_TxQueue.Enqueue(m);
+                        break;
+                }
             }
             catch(Exception e)
             {

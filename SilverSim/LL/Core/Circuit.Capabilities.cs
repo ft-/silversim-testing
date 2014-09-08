@@ -131,6 +131,80 @@ namespace SilverSim.LL.Core
             writer.WriteEndElement();
         }
 
+        Dictionary<string, string> m_ServiceURLCapabilities = new Dictionary<string, string>();
+
+
+        bool GetCustomCapsUri(string capType, out string uri)
+        {
+            string capsUriStr;
+            uri = string.Empty;
+            if(capType == "EventQueueGet")
+            {
+            }
+            else if (m_ServiceURLCapabilities.TryGetValue(capType, out uri))
+            {
+                return true;
+            }
+            else if (Scene.CapabilitiesConfig.TryGetValue(capType, out capsUriStr) && uri != "localhost")
+            {
+                if (uri == "")
+                {
+                    return true;
+                }
+                else
+                {
+                    char l = (char)0;
+                    foreach(char c in capsUriStr)
+                    {
+                        if(l == '$')
+                        {
+                            l = (char)0;
+                            switch(c)
+                            {
+                                case '$':
+                                    uri += '$';
+                                    break;
+
+                                case 'h':
+                                    uri += System.Uri.EscapeUriString(Agent.HomeURI.ToString());
+                                    break;
+
+                                case 'i':
+                                    uri += System.Uri.EscapeUriString(Agent.ServiceURLs["InventoryServerURI"]);
+                                    break;
+
+                                case 'a':
+                                    uri += System.Uri.EscapeUriString(Agent.ServiceURLs["AssetServerURI"]);
+                                    break;
+
+                                case 'r':
+                                    uri += System.Uri.EscapeUriString(Scene.ID);
+                                    break;
+
+                                case 's':
+                                    uri += System.Uri.EscapeUriString(SessionID);
+                                    break;
+
+                                case 'u':
+                                    uri += System.Uri.EscapeUriString(AgentID);
+                                    break;
+                            }
+                        }
+                        else if (c == '$')
+                        {
+                            l = '$';
+                        }
+                        else
+                        {
+                            uri += c;
+                        }
+                    }
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public void RegionSeedHandler(HttpRequest httpreq)
         {
             IValue o;
@@ -157,6 +231,7 @@ namespace SilverSim.LL.Core
             }
 
             Dictionary<string, string> capsUri = new Dictionary<string, string>();
+
             foreach (IValue v in (AnArray)o)
             {
                 UUID capsID;
@@ -165,59 +240,9 @@ namespace SilverSim.LL.Core
                 {
 
                 }
-                else if(Scene.CapabilitiesConfig.TryGetValue(v.ToString(), out capsUriStr) && capsUriStr != "localhost")
+                else if(GetCustomCapsUri(v.ToString(), out capsUriStr))
                 {
-                    if(capsUriStr=="")
-                    {
-
-                    }
-                    else
-                    {
-                        char l = (char)0;
-                        string uri = string.Empty;
-                        foreach(char c in capsUriStr)
-                        {
-                            if(l == '%')
-                            {
-                                l = (char)0;
-                                switch(c)
-                                {
-                                    case '%':
-                                        uri += '%';
-                                        break;
-
-                                    case 'h':
-                                        uri += System.Uri.EscapeUriString(Agent.HomeURI.ToString());
-                                        break;
-
-                                    case 'i':
-                                        uri += System.Uri.EscapeUriString(Agent.ServiceURLs["InventoryServerURI"]);
-                                        break;
-
-                                    case 'r':
-                                        uri += System.Uri.EscapeUriString(Scene.ID);
-                                        break;
-
-                                    case 's':
-                                        uri += System.Uri.EscapeUriString(SessionID);
-                                        break;
-
-                                    case 'u':
-                                        uri += System.Uri.EscapeUriString(AgentID);
-                                        break;
-                                }
-                            }
-                            else if(c=='%')
-                            {
-                                l = '%';
-                            }
-                            else
-                            {
-                                uri += c;
-                            }
-                        }
-                        capsUri[v.ToString()] = uri;
-                    }
+                    capsUri[v.ToString()] = capsUriStr;
                 }
                 else if (m_RegisteredCapabilities.TryGetValue(v.ToString(), out capsID))
                 {
@@ -235,6 +260,7 @@ namespace SilverSim.LL.Core
             foreach (KeyValuePair<string, string> kvp in capsUri)
             {
                 WriteKeyValuePair(text, kvp.Key, kvp.Value);
+                m_Log.DebugFormat("reported {0} for {1} of agent {2}", kvp.Value, kvp.Key, AgentID);
             }
             text.WriteEndElement();
             text.WriteEndElement();
@@ -263,8 +289,19 @@ namespace SilverSim.LL.Core
             }
         }
 
-        public void SetupDefaultCapabilities(UUID regionSeedID, Dictionary<string, string> capConfig)
+        public void SetupDefaultCapabilities(
+            UUID regionSeedID, 
+            Dictionary<string, string> capConfig,
+            Dictionary<string, string> serviceURLs)
         {
+            /* grid may override the caps through Cap_ ServiceURLs */
+            foreach(KeyValuePair<string, string> kvp in serviceURLs)
+            {
+                if(kvp.Key.StartsWith("Cap_"))
+                {
+                    m_ServiceURLCapabilities.Add(kvp.Key.Substring(4), kvp.Value);
+                }
+            }
             AddDefCapability("FetchInventory2", regionSeedID, Cap_FetchInventory2, capConfig);
             AddDefCapability("FetchLib2", regionSeedID, Cap_FetchInventory2, capConfig);
             AddDefCapability("FetchInventoryDescendents2", regionSeedID, Cap_FetchInventoryDescendents2, capConfig);

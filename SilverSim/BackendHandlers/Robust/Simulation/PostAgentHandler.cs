@@ -221,7 +221,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
                 LLUDPServer udpServer = (LLUDPServer)scene.UDPServer;
 
-                Circuit circuit = new Circuit(udpServer, agentPost.Circuit.CircuitCode, m_CapsRedirector, agentPost.Circuit.CapsPath);
+                Circuit circuit = new Circuit(udpServer, agentPost.Circuit.CircuitCode, m_CapsRedirector, agentPost.Circuit.CapsPath, agent.ServiceURLs);
                 IPEndPoint ep = new IPEndPoint(IPAddress.Parse(agentPost.Client.ClientIP), 0);
                 circuit.RemoteEndPoint = ep;
                 circuit.Agent = agent;
