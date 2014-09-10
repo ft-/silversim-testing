@@ -491,7 +491,14 @@ namespace SilverSim.LL.Core
                         break;
 
                     default:
-                        m_TxQueue.Enqueue(m);
+                        if (m is Messages.Circuit.EstablishAgentCommunication)
+                        {
+                            m_EventQueue.Enqueue(m);
+                        }
+                        else
+                        {
+                            m_TxQueue.Enqueue(m);
+                        }
                         break;
                 }
             }
