@@ -24,64 +24,45 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Script
+namespace SilverSim.LL.Messages.Teleport
 {
-    public class ScriptRunningReply : Message
+    public class TeleportFailed : Message
     {
-        public UUID ObjectID;
-        public UUID ItemID;
-        public bool IsRunning;
+        public UUID AgentID;
+        public string Reason;
 
-        public ScriptRunningReply()
+        public struct AlertInfoEntry
         {
+            public string Message;
+            public string ExtraParams;
+        }
 
+        public List<AlertInfoEntry> AlertInfo = new List<AlertInfoEntry>();
+
+        public TeleportFailed()
+        {
         }
 
         public override MessageType Number
         {
             get
             {
-                return MessageType.ScriptRunningReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
+                return MessageType.TeleportFailed;
             }
         }
 
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
-            p.WriteUUID(ObjectID);
-            p.WriteUUID(ItemID);
-            p.WriteBoolean(IsRunning);
-        }
-
-        public override SilverSim.Types.Map SerializeEQG()
-        {
-            SilverSim.Types.Map script = new SilverSim.Types.Map();
-            script.Add("ObjectID", ObjectID);
-            script.Add("ItemID", ItemID);
-            script.Add("Running", IsRunning);
-            script.Add("Mono", true);
-
-            AnArray scriptArr = new AnArray();
-            scriptArr.Add(script);
-            SilverSim.Types.Map body = new SilverSim.Types.Map();
-            body.Add("Script", scriptArr);
-            return body;
-        }
-
-        public override string NameEQG
-        {
-            get
+            p.WriteUUID(AgentID);
+            p.WriteStringLen8(Reason);
+            p.WriteUInt8((byte)AlertInfo.Count);
+            foreach(AlertInfoEntry e in AlertInfo)
             {
-                return "ScriptRunningReply";
+                p.WriteStringLen8(e.Message);
+                p.WriteStringLen8(e.ExtraParams);
             }
         }
     }

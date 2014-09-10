@@ -23,17 +23,16 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
+using SilverSim.Types.Grid;
+using System;
 
-namespace SilverSim.LL.Messages.Script
+namespace SilverSim.LL.Messages.Teleport
 {
-    public class ScriptRunningReply : Message
+    public class TeleportStart : Message
     {
-        public UUID ObjectID;
-        public UUID ItemID;
-        public bool IsRunning;
+        public TeleportFlags TeleportFlags;
 
-        public ScriptRunningReply()
+        public TeleportStart()
         {
 
         }
@@ -42,7 +41,7 @@ namespace SilverSim.LL.Messages.Script
         {
             get
             {
-                return MessageType.ScriptRunningReply;
+                return MessageType.TeleportStart;
             }
         }
 
@@ -57,32 +56,7 @@ namespace SilverSim.LL.Messages.Script
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
-            p.WriteUUID(ObjectID);
-            p.WriteUUID(ItemID);
-            p.WriteBoolean(IsRunning);
-        }
-
-        public override SilverSim.Types.Map SerializeEQG()
-        {
-            SilverSim.Types.Map script = new SilverSim.Types.Map();
-            script.Add("ObjectID", ObjectID);
-            script.Add("ItemID", ItemID);
-            script.Add("Running", IsRunning);
-            script.Add("Mono", true);
-
-            AnArray scriptArr = new AnArray();
-            scriptArr.Add(script);
-            SilverSim.Types.Map body = new SilverSim.Types.Map();
-            body.Add("Script", scriptArr);
-            return body;
-        }
-
-        public override string NameEQG
-        {
-            get
-            {
-                return "ScriptRunningReply";
-            }
+            p.WriteUInt32((UInt32)TeleportFlags);
         }
     }
 }

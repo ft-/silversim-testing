@@ -211,6 +211,14 @@ namespace SilverSim.LL.Messages
             /* Search */
             PacketTypes.Add(MessageType.AvatarPickerRequest, Search.AvatarPickerRequest.Decode);
             PacketTypes.Add(MessageType.PlacesQuery, Search.PlacesQuery.Decode);
+
+            /* Teleport */
+            PacketTypes.Add(MessageType.TeleportCancel, Teleport.TeleportCancel.Decode);
+            PacketTypes.Add(MessageType.TeleportLureRequest, Teleport.TeleportLureRequest.Decode);
+            PacketTypes.Add(MessageType.StartLure, Teleport.StartLure.Decode);
+            PacketTypes.Add(MessageType.TeleportRequest, Teleport.TeleportRequest.Decode);
+            PacketTypes.Add(MessageType.TeleportLocationRequest, Teleport.TeleportLocationRequest.Decode);
+            PacketTypes.Add(MessageType.TeleportLandmarkRequest, Teleport.TeleportLandmarkRequest.Decode);
         }
     }
 }

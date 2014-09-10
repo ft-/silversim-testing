@@ -93,46 +93,21 @@ namespace SilverSim.LL.Core
                 return;
             }
 
-            Map body = new Map();
-            string message = string.Empty;
+            Map body;
+            string message;
 
-            switch(m.Number)
+            try
             {
-                case MessageType.EnableSimulator:
-                    break;
-
-                case MessageType.DisableSimulator:
-                    break;
-
-                case MessageType.CrossedRegion:
-                    break;
-
-                case MessageType.TeleportFinish:
-                    break;
-
-                case MessageType.ScriptRunningReply:
-                    {
-                        Messages.Script.ScriptRunningReply r = (Messages.Script.ScriptRunningReply)m;
-                        Map script = new Map();
-                        script.Add("ObjectID", r.ObjectID);
-                        script.Add("ItemID", r.ItemID);
-                        script.Add("Running", r.IsRunning);
-                        script.Add("Mono", true);
-
-                        AnArray scriptArr = new AnArray();
-                        scriptArr.Add(script);
-                        body.Add("Script", scriptArr);
-                        message = "ScriptRunningReply";
-                    }
-                    break;
-
-                default:
-                    {
-                        res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:");
-                        res.MinorVersion = 0;
-                        res.Close();
-                        return;
-                    }
+                message = m.NameEQG;
+                body = m.SerializeEQG();
+            }
+            catch(Exception e)
+            {
+                m_Log.DebugFormat("Unsupported message {0} in EventQueueGet: {1}\n{2}", m.GetType().FullName, e.Message, e.StackTrace.ToString());
+                res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:");
+                res.MinorVersion = 0;
+                res.Close();
+                return;
             }
 
             Map result = new Map();

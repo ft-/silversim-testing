@@ -91,6 +91,25 @@ namespace SilverSim.Types
         #endregion
 
         #region Properties
+        public byte[] AsBytes
+        {
+            get
+            {
+                ulong handle = RegionHandle;
+                return new byte[]
+                {
+                    (byte)((handle >> 56) & 0xff),
+                    (byte)((handle >> 48) & 0xff),
+                    (byte)((handle >> 40) & 0xff),
+                    (byte)((handle >> 32) & 0xff),
+                    (byte)((handle >> 24) & 0xff),
+                    (byte)((handle >> 16) & 0xff),
+                    (byte)((handle >> 8) & 0xff),
+                    (byte)(handle & 0xff)
+                };
+            }
+        }
+
         public ulong RegionHandle
         {
             get

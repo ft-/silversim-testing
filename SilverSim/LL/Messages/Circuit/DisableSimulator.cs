@@ -23,17 +23,11 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
-
-namespace SilverSim.LL.Messages.Script
+namespace SilverSim.LL.Messages.Circuit
 {
-    public class ScriptRunningReply : Message
+    public class DisableSimulator : Message
     {
-        public UUID ObjectID;
-        public UUID ItemID;
-        public bool IsRunning;
-
-        public ScriptRunningReply()
+        public DisableSimulator()
         {
 
         }
@@ -42,7 +36,7 @@ namespace SilverSim.LL.Messages.Script
         {
             get
             {
-                return MessageType.ScriptRunningReply;
+                return MessageType.DisableSimulator;
             }
         }
 
@@ -57,31 +51,20 @@ namespace SilverSim.LL.Messages.Script
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
-            p.WriteUUID(ObjectID);
-            p.WriteUUID(ItemID);
-            p.WriteBoolean(IsRunning);
         }
 
         public override SilverSim.Types.Map SerializeEQG()
         {
-            SilverSim.Types.Map script = new SilverSim.Types.Map();
-            script.Add("ObjectID", ObjectID);
-            script.Add("ItemID", ItemID);
-            script.Add("Running", IsRunning);
-            script.Add("Mono", true);
+            SilverSim.Types.Map m = new SilverSim.Types.Map();
 
-            AnArray scriptArr = new AnArray();
-            scriptArr.Add(script);
-            SilverSim.Types.Map body = new SilverSim.Types.Map();
-            body.Add("Script", scriptArr);
-            return body;
+            return m;
         }
 
         public override string NameEQG
         {
             get
             {
-                return "ScriptRunningReply";
+                return "DisableSimulator";
             }
         }
     }

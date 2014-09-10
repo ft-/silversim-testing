@@ -101,7 +101,20 @@ namespace SilverSim.LL.Messages
 
         public virtual void Serialize(UDPPacket p)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
+        }
+
+        public virtual Types.Map SerializeEQG()
+        {
+            throw new NotSupportedException();
+        }
+
+        public virtual string NameEQG
+        {
+            get
+            {
+                throw new NotSupportedException();
+            }
         }
         #endregion
     }
