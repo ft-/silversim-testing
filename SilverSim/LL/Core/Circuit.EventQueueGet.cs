@@ -44,6 +44,7 @@ namespace SilverSim.LL.Core
     {
         BlockingQueue<Message> m_EventQueue = new BlockingQueue<Message>();
         bool m_EventQueueEnabled = true;
+        int m_EventQueueEventId = 0;
 
         void Cap_EventQueueGet(HttpRequest httpreq)
         {
@@ -98,31 +99,50 @@ namespace SilverSim.LL.Core
                 return;
             }
 
-            Map body;
-            string message;
+            AnArray eventarr = new AnArray();
+            int count = m_EventQueue.Count - 1;
 
-            try
+            do
             {
-                message = m.NameEQG;
-                body = m.SerializeEQG();
-            }
-            catch(Exception e)
-            {
-                m_Log.DebugFormat("Unsupported message {0} in EventQueueGet: {1}\n{2}", m.GetType().FullName, e.Message, e.StackTrace.ToString());
-                res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:");
-                res.MinorVersion = 0;
-                using (TextWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+                Map body;
+                string message;
+
+                try
                 {
-                    w.Write("Upstream error: ");
-                    w.Flush();
+                    message = m.NameEQG;
+                    body = m.SerializeEQG();
                 }
-                res.Close();
-                return;
-            }
+                catch (Exception e)
+                {
+                    m_Log.DebugFormat("Unsupported message {0} in EventQueueGet: {1}\n{2}", m.GetType().FullName, e.Message, e.StackTrace.ToString());
+                    res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:");
+                    res.MinorVersion = 0;
+                    using (TextWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+                    {
+                        w.Write("Upstream error: ");
+                        w.Flush();
+                    }
+                    res.Close();
+                    return;
+                }
+                Map ev = new Map();
+                ev.Add("message", message);
+                ev.Add("body", body);
+                eventarr.Add(ev);
+                if(count > 0)
+                {
+                    --count;
+                    m = m_EventQueue.Dequeue(0);
+                }
+                else
+                {
+                    m = null;
+                }
+            } while (m != null);
 
             Map result = new Map();
-            result.Add("message", message);
-            result.Add("body", body);
+            result.Add("id", m_EventQueueEventId);
+            result.Add("boeventsdy", eventarr);
 
             res = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
             res.ContentType = "application/llsd+xml";
