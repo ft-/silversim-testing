@@ -795,8 +795,15 @@ namespace SilverSim.LL.Core
         #endregion
 
         #region IAgent Methods
-        public bool IMSend(GridInstantMessage im)
+        public bool IMSend(GridInstantMessage gim)
         {
+            Circuit c;
+            if(Circuits.TryGetValue(m_CurrentSceneID, out c))
+            {
+                Messages.IM.ImprovedInstantMessage im = new Messages.IM.ImprovedInstantMessage(gim);
+                SendMessageAlways(im, m_CurrentSceneID);
+                return true;
+            }
             return false;
         }
         #endregion

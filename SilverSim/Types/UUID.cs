@@ -145,6 +145,21 @@ namespace SilverSim.Types
             return l.m_Guid != r.m_Guid;
         }
 
+        public static UUID operator^(UUID a, UUID b)
+        {
+            byte[] ab = new byte[16];
+            byte[] bb = new byte[16];
+            a.ToBytes(ab, 0);
+            b.ToBytes(bb, 0);
+
+            for(int i = 0; i < 16; ++i)
+            {
+                ab[i] ^= bb[i];
+            }
+
+            return new UUID(ab, 0);
+        }
+
         public static implicit operator UUID(string val)
         {
             return new UUID(val);
