@@ -377,6 +377,32 @@ namespace SilverSim.LL.Core
                     
                     break;
 
+                case MessageType.TransferRequest:
+                    {
+                        /* we need differentiation here of SimInventoryItem */
+                        Messages.Transfer.TransferRequest m = Messages.Transfer.TransferRequest.Decode(pck);
+                        if(m.SourceType == Messages.Transfer.SourceType.SimInventoryItem)
+                        {
+                            if(m.Params.Length >= 96)
+                            {
+                                UUID taskID = new UUID(m.Params, 48);
+                                if(taskID.Equals(UUID.Zero))
+                                {
+                                    m_InventoryRequestQueue.Enqueue(m);
+                                }
+                                else
+                                {
+                                    m_Server.RouteReceivedMessage(m);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            m_Server.RouteReceivedMessage(m);
+                        }
+                    }
+                    break;
+
                 default:
                     UDPPacketDecoder.PacketDecoderDelegate del;
                     if(m_PacketDecoder.PacketTypes.TryGetValue(mType, out del))

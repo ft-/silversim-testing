@@ -36,7 +36,19 @@ namespace SilverSim.LL.Core
 {
     public partial class Circuit
     {
-        #region Texture Download Thread
+        #region Fetch Inventory Thread
+        private void SendAssetNotFound(Messages.Transfer.TransferRequest req)
+        {
+            Messages.Transfer.TransferInfo res = new Messages.Transfer.TransferInfo();
+            res.ChannelType = 2;
+            res.Status = -2;
+            res.TargetType = 0;
+            res.Params = req.Params;
+            res.Size = 0;
+            res.TransferID = req.TransferID;
+            SendMessage(res);
+        }
+
         private void FetchInventoryThread(object param)
         {
             Thread.CurrentThread.Name = string.Format("LLUDP:Inventory Fetch for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
@@ -80,6 +92,116 @@ namespace SilverSim.LL.Core
                                 {
 
                                 }
+                            }
+                        }
+                        break;
+
+                    case MessageType.TransferRequest:
+                        {
+                            UUID assetID;
+                            Messages.Transfer.TransferRequest req = (Messages.Transfer.TransferRequest)m;
+                            if (req.SourceType == Messages.Transfer.SourceType.SimInventoryItem)
+                            {
+                                UUID taskID = new UUID(req.Params, 48);
+                                UUID itemID = new UUID(req.Params, 64);
+                                assetID = new UUID(req.Params, 80);
+                                InventoryItem item;
+                                try
+                                {
+                                    item = Agent.InventoryService.Item[AgentID, itemID];
+                                }
+                                catch
+                                {
+                                    SendAssetNotFound(req);
+                                    break;
+                                }
+
+                                if (item.AssetType == AssetType.LSLText)
+                                {
+                                    if (0 == ((item.Permissions.Current | item.Permissions.EveryOne) & InventoryItem.PermissionsMask.Modify))
+                                    {
+                                        Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
+                                        res.Message = "Insufficient permissions to view script";
+                                        SendMessage(res);
+                                        SendAssetNotFound(req);
+                                        break;
+                                    }
+                                }
+                                else if (item.AssetID != assetID)
+                                {
+                                    SendAssetNotFound(req);
+                                    break;
+                                }
+                            }
+                            else if(req.SourceType == Messages.Transfer.SourceType.Asset)
+                            {
+                                assetID = new UUID(req.Params, 0);
+                            }
+                            else
+                            {
+                                SendAssetNotFound(req);
+                                break;
+                            }
+
+                            AssetData asset;
+                            try
+                            {
+                                asset = Scene.AssetService[assetID];
+                            }
+                            catch
+                            {
+                                /* let's try the user's asset server */
+                                try
+                                {
+                                    asset = Agent.AssetService[assetID];
+                                    try
+                                    {
+                                        Scene.AssetService.Store(asset);
+                                    }
+                                    catch
+                                    {
+
+                                    }
+                                }
+                                catch
+                                {
+                                    SendAssetNotFound(req);
+                                    break;
+                                }
+                            }
+
+                            Messages.Transfer.TransferInfo ti = new Messages.Transfer.TransferInfo();
+                            ti.Params = req.Params;
+                            ti.ChannelType = 2;
+                            ti.Status = 0;
+                            ti.TargetType = 0;
+                            ti.TransferID = req.TransferID;
+                            SendMessage(ti);
+
+                            const int MAX_PACKET_SIZE = 1100;
+                            int packetNumber = 0;
+                            int assetOffset = 0;
+                            while(assetOffset < asset.Data.Length)
+                            {
+                                Messages.Transfer.TransferPacket tp = new Messages.Transfer.TransferPacket();
+                                tp.Packet = packetNumber++;
+                                tp.ChannelType = 2;
+                                tp.TransferID = req.TransferID;
+                                if(asset.Data.Length - assetOffset > MAX_PACKET_SIZE)
+                                {
+                                    tp.Data = new byte[MAX_PACKET_SIZE];
+                                    Buffer.BlockCopy(asset.Data, assetOffset, tp.Data, 0, MAX_PACKET_SIZE);
+                                    assetOffset -= MAX_PACKET_SIZE;
+                                    tp.Status = 0;
+                                }
+                                else 
+                                {
+                                    tp.Data = new byte[asset.Data.Length - assetOffset];
+                                    Buffer.BlockCopy(asset.Data, assetOffset, tp.Data, 0, asset.Data.Length - assetOffset);
+                                    tp.Status = 1;
+                                    assetOffset = asset.Data.Length;
+                                }
+                                SendMessage(tp);
                             }
                         }
                         break;

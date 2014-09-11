@@ -219,6 +219,10 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.TeleportRequest, Teleport.TeleportRequest.Decode);
             PacketTypes.Add(MessageType.TeleportLocationRequest, Teleport.TeleportLocationRequest.Decode);
             PacketTypes.Add(MessageType.TeleportLandmarkRequest, Teleport.TeleportLandmarkRequest.Decode);
+
+            /* Transfer */
+            PacketTypes.Add(MessageType.TransferRequest, Transfer.TransferRequest.Decode);
+            PacketTypes.Add(MessageType.TransferAbort, Transfer.TransferAbort.Decode);
         }
     }
 }
