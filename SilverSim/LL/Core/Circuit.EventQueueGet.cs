@@ -89,6 +89,11 @@ namespace SilverSim.LL.Core
             {
                 res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:");
                 res.MinorVersion = 0;
+                using(TextWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+                {
+                    w.Write("Upstream error: ");
+                    w.Flush();
+                }
                 res.Close();
                 return;
             }
@@ -106,6 +111,11 @@ namespace SilverSim.LL.Core
                 m_Log.DebugFormat("Unsupported message {0} in EventQueueGet: {1}\n{2}", m.GetType().FullName, e.Message, e.StackTrace.ToString());
                 res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:");
                 res.MinorVersion = 0;
+                using (TextWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+                {
+                    w.Write("Upstream error: ");
+                    w.Flush();
+                }
                 res.Close();
                 return;
             }
