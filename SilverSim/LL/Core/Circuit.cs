@@ -432,10 +432,10 @@ namespace SilverSim.LL.Core
                             case MessageType.PurgeInventoryDescendents:
                             case MessageType.RemoveInventoryFolder:
                             case MessageType.RemoveInventoryItem:
-                            case MessageType.RequestInventoryAsset:
                             case MessageType.UpdateInventoryFolder:
                             case MessageType.UpdateInventoryItem:
                             case MessageType.LinkInventoryItem:
+                            case MessageType.RemoveInventoryObjects:
                                 m_InventoryRequestQueue.Enqueue(m);
                                 break;
 

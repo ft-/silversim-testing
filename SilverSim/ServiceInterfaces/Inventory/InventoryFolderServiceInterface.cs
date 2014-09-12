@@ -53,6 +53,23 @@ namespace SilverSim.ServiceInterfaces.Inventory
         public abstract void Move(UUID PrincipalID, UUID folderID, UUID toFolderID);
         public abstract void Delete(UUID PrincipalID, UUID folderID);
         public abstract void Purge(UUID PrincipalID, UUID folderID);
+        public virtual List<UUID> Delete(UUID PrincipalID, List<UUID> folderIDs)
+        {
+            List<UUID> deleted = new List<UUID>();
+            foreach(UUID folderID in folderIDs)
+            {
+                try
+                {
+                    Delete(PrincipalID, folderID);
+                    deleted.Add(folderID);
+                }
+                catch
+                {
+
+                }
+            }
+            return deleted;
+        }
         #endregion
 
         #region Constructor

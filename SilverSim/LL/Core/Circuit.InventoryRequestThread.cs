@@ -645,46 +645,16 @@ namespace SilverSim.LL.Core
                         }
                         break;
 
-                    case MessageType.RequestInventoryAsset:
+                    case MessageType.RemoveInventoryObjects:
                         {
-                            Messages.Inventory.RequestInventoryAsset req = (Messages.Inventory.RequestInventoryAsset)m;
-                            Messages.Inventory.InventoryAssetResponse res;
-                            if (req.AgentID != AgentID)
+                            Messages.Inventory.RemoveInventoryObjects req = (Messages.Inventory.RemoveInventoryObjects)m;
+                            if (req.SessionID != SessionID || req.AgentID != AgentID)
                             {
                                 break;
                             }
 
-                            InventoryItem item;
-                            try
-                            {
-                                item = Agent.InventoryService.Item[AgentID, req.ItemID];
-                            }
-                            catch
-                            {
-                                res = new Messages.Inventory.InventoryAssetResponse();
-                                res.AssetID = UUID.Zero;
-                                res.IsReadable = false;
-                                res.QueryID = req.QueryID;
-                                SendMessage(res);
-                                return;
-                            }
-
-                            res = new Messages.Inventory.InventoryAssetResponse();
-                            res.QueryID = req.QueryID;
-
-                            if((0 == (item.Permissions.Current & InventoryItem.PermissionsMask.Modify) &&
-                                item.InventoryType == InventoryType.LSLText) ||
-                                item.InventoryType == InventoryType.LSLBytecode)
-                            {
-                                res.AssetID = UUID.Zero;
-                                res.IsReadable = false;
-                            }
-                            else
-                            {
-                                res.AssetID = item.AssetID;
-                                res.IsReadable = true;
-                            }
-                            SendMessage(res);
+                            Agent.InventoryService.Folder.Delete(AgentID, req.FolderIDs);
+                            Agent.InventoryService.Item.Delete(AgentID, req.ItemIDs);
                         }
                         break;
 

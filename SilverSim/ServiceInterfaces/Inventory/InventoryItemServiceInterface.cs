@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
+using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
@@ -42,6 +43,24 @@ namespace SilverSim.ServiceInterfaces.Inventory
 
         public abstract void Delete(UUID PrincipalID, UUID ID);
         public abstract void Move(UUID PrincipalID, UUID ID, UUID newFolder);
+
+        public virtual List<UUID> Delete(UUID PrincipalID, List<UUID> IDs)
+        {
+            List<UUID> deleted = new List<UUID>();
+            foreach(UUID id in IDs)
+            {
+                try
+                {
+                    Delete(PrincipalID, id);
+                    deleted.Add(id);
+                }
+                catch
+                {
+
+                }
+            }
+            return deleted;
+        }
 
         #region Constructor
         public InventoryItemServiceInterface()
