@@ -141,5 +141,10 @@ namespace SilverSim.Scene.Types.Agent
 
         void SendMessageIfRootAgent(Message m, UUID fromSceneID);
         void SendMessageAlways(Message m, UUID fromSceneID);
+
+        bool IsActiveGod
+        {
+            get;
+        }
     }
 }

@@ -690,6 +690,15 @@ namespace SilverSim.LL.Core
 
         public Dictionary<string, string> ServiceURLs = new Dictionary<string, string>();
 
+        private bool m_IsActiveGod = false;
+
+        public bool IsActiveGod
+        {
+            get
+            {
+                return m_IsActiveGod;
+            }
+        }
 
         public int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
         {
@@ -932,6 +941,16 @@ namespace SilverSim.LL.Core
                             if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
                             {
                                 /* switch agent region */
+                                if(m_IsActiveGod)
+                                {
+                                    /* revoke god powers when changing region */
+                                    Messages.God.GrantGodlikePowers gm = new Messages.God.GrantGodlikePowers();
+                                    gm.AgentID = ID;
+                                    gm.SessionID = circuit.SessionID;
+                                    gm.GodLevel = 0;
+                                    gm.Token = UUID.Zero;
+                                    SendMessageIfRootAgent(gm, m_CurrentSceneID);
+                                }
                                 m_CurrentSceneID = circuit.Scene.ID;
 
                                 Messages.Circuit.AgentMovementComplete amc = new Messages.Circuit.AgentMovementComplete();
