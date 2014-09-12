@@ -54,11 +54,11 @@ namespace SilverSim.LL.Messages.Inventory
             public UUID CreatorID;
             public UUID OwnerID;
             public UUID GroupID;
-            public UInt32 BaseMask;
-            public UInt32 OwnerMask;
-            public UInt32 GroupMask;
-            public UInt32 EveryoneMask;
-            public UInt32 NextOwnerMask;
+            public InventoryItem.PermissionsMask BaseMask;
+            public InventoryItem.PermissionsMask OwnerMask;
+            public InventoryItem.PermissionsMask GroupMask;
+            public InventoryItem.PermissionsMask EveryoneMask;
+            public InventoryItem.PermissionsMask NextOwnerMask;
             public bool IsGroupOwned;
             public UUID AssetID;
             public AssetType Type;
@@ -69,7 +69,6 @@ namespace SilverSim.LL.Messages.Inventory
             public string Name;
             public string Description;
             public UInt32 CreationDate;
-            public UInt32 CRC;
         }
 
         public List<ItemDataEntry> ItemData = new List<ItemDataEntry>();
@@ -77,6 +76,58 @@ namespace SilverSim.LL.Messages.Inventory
         public BulkUpdateInventory()
         {
 
+        }
+
+        public void AddInventoryItem(InventoryItem item, UInt32 callbackID)
+        {
+            ItemDataEntry e = new ItemDataEntry();
+            e.ItemID = item.ID;
+            e.CallbackID = callbackID;
+            e.FolderID = item.ParentFolderID;
+            e.CreatorID = item.Creator.ID;
+            e.OwnerID = item.Owner.ID;
+            e.GroupID = item.GroupID;
+            e.BaseMask = item.Permissions.Base | item.Permissions.Current;
+            e.OwnerMask = item.Permissions.Current;
+            e.GroupMask = item.Permissions.Group;
+            e.EveryoneMask = item.Permissions.EveryOne;
+            e.NextOwnerMask = item.Permissions.NextOwner;
+            e.IsGroupOwned = item.GroupOwned;
+            e.AssetID = item.AssetID;
+            e.Type = item.AssetType;
+            e.InvType = item.InventoryType;
+            e.Flags = item.Flags;
+            e.SalePrice = item.SaleInfo.Price;
+            e.SaleType = item.SaleInfo.Type;
+            e.Name = item.Name;
+            e.Description = item.Description;
+            e.CreationDate = (uint)item.CreationDate.DateTimeToUnixTime();
+            ItemData.Add(e);
+        }
+
+        public BulkUpdateInventory(
+            UUID agentID, 
+            UUID transactionID,
+            UInt32 callbackID,
+            InventoryItem item)
+        {
+            AgentID = agentID;
+            TransactionID = transactionID;
+            AddInventoryItem(item, callbackID);
+        }
+
+        public BulkUpdateInventory(
+            UUID agentID,
+            UUID transactionID,
+            UInt32 callbackID,
+            List<InventoryItem> items)
+        {
+            AgentID = agentID;
+            TransactionID = transactionID;
+            foreach (InventoryItem item in items)
+            {
+                AddInventoryItem(item, callbackID);
+            }
         }
 
         public override MessageType Number
@@ -119,11 +170,11 @@ namespace SilverSim.LL.Messages.Inventory
                 p.WriteUUID(d.CreatorID);
                 p.WriteUUID(d.OwnerID);
                 p.WriteUUID(d.GroupID);
-                p.WriteUInt32(d.BaseMask);
-                p.WriteUInt32(d.OwnerMask);
-                p.WriteUInt32(d.GroupMask);
-                p.WriteUInt32(d.EveryoneMask);
-                p.WriteUInt32(d.NextOwnerMask);
+                p.WriteUInt32((UInt32)d.BaseMask);
+                p.WriteUInt32((UInt32)d.OwnerMask);
+                p.WriteUInt32((UInt32)d.GroupMask);
+                p.WriteUInt32((UInt32)d.EveryoneMask);
+                p.WriteUInt32((UInt32)d.NextOwnerMask);
                 p.WriteBoolean(d.IsGroupOwned);
                 p.WriteUUID(d.AssetID);
                 p.WriteInt8((sbyte)d.Type);
@@ -134,7 +185,30 @@ namespace SilverSim.LL.Messages.Inventory
                 p.WriteStringLen8(d.Name);
                 p.WriteStringLen8(d.Description);
                 p.WriteUInt32(d.CreationDate);
-                p.WriteUInt32(d.CRC);
+
+                uint checksum = 0;
+
+                checksum += d.AssetID.LLChecksum; // AssetID
+                checksum += d.FolderID.LLChecksum; // FolderID
+                checksum += d.ItemID.LLChecksum; // ItemID
+
+                checksum += d.CreatorID.LLChecksum; // CreatorID
+                checksum += d.OwnerID.LLChecksum; // OwnerID
+                checksum += d.GroupID.LLChecksum; // GroupID
+
+                checksum += (uint)d.OwnerMask;
+                checksum += (uint)d.NextOwnerMask;
+                checksum += (uint)d.EveryoneMask;
+                checksum += (uint)d.GroupMask;
+
+                checksum += d.Flags; // Flags
+                checksum += (uint)d.InvType; // InvType
+                checksum += (uint)d.Type; // Type 
+                checksum += (uint)d.CreationDate; // CreationDate
+                checksum += (uint)d.SalePrice;    // SalePrice
+                checksum += (uint)((uint)d.SaleType * 0x07073096); // SaleType
+
+                p.WriteUInt32(checksum);
             }
         }
     }

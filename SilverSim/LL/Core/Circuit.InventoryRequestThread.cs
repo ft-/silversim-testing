@@ -257,35 +257,7 @@ namespace SilverSim.LL.Core
                                 try
                                 {
                                     Agent.InventoryService.Item.Add(item);
-                                    Messages.Inventory.UpdateCreateInventoryItem res = new Messages.Inventory.UpdateCreateInventoryItem();
-                                    res.AgentID = AgentID;
-                                    res.SimApproved = true;
-
-                                    Messages.Inventory.UpdateCreateInventoryItem.ItemDataEntry d = new Messages.Inventory.UpdateCreateInventoryItem.ItemDataEntry();
-
-                                    d.ItemID = item.ID;
-                                    d.FolderID = item.ParentFolderID;
-                                    d.CallbackID = reqd.CallbackID;
-                                    d.CreatorID = item.Creator.ID;
-                                    d.OwnerID = item.Owner.ID;
-                                    d.GroupID = item.GroupID;
-                                    d.BaseMask = item.Permissions.Current;
-                                    d.OwnerMask = item.Permissions.Current;
-                                    d.GroupMask = item.Permissions.Group;
-                                    d.EveryoneMask = item.Permissions.EveryOne;
-                                    d.NextOwnerMask = item.Permissions.NextOwner;
-                                    d.IsGroupOwned = item.GroupOwned;
-                                    d.AssetID = item.AssetID;
-                                    d.Type = item.AssetType;
-                                    d.InvType = item.InventoryType;
-                                    d.Flags = item.Flags;
-                                    d.SaleType = item.SaleInfo.Type;
-                                    d.SalePrice = item.SaleInfo.Price;
-                                    d.Name = item.Name;
-                                    d.Description = item.Description;
-                                    d.CreationDate = (uint)item.CreationDate.DateTimeToUnixTime();
-                                    res.ItemData.Add(d);
-                                    SendMessage(res);
+                                    SendMessage(new Messages.Inventory.UpdateCreateInventoryItem(AgentID, true, UUID.Zero, item, reqd.CallbackID));
                                 }
                                 catch
                                 {
@@ -562,36 +534,7 @@ namespace SilverSim.LL.Core
                             try
                             {
                                 Agent.InventoryService.Item.Add(item);
-                                Messages.Inventory.UpdateCreateInventoryItem res = new Messages.Inventory.UpdateCreateInventoryItem();
-                                res.AgentID = AgentID;
-                                res.SimApproved = true;
-                                res.TransactionID = req.TransactionID;
-
-                                Messages.Inventory.UpdateCreateInventoryItem.ItemDataEntry d = new Messages.Inventory.UpdateCreateInventoryItem.ItemDataEntry();
-
-                                d.ItemID = item.ID;
-                                d.FolderID = item.ParentFolderID;
-                                d.CallbackID = req.CallbackID;
-                                d.CreatorID = item.Creator.ID;
-                                d.OwnerID = item.Owner.ID;
-                                d.GroupID = item.GroupID;
-                                d.BaseMask = item.Permissions.Current;
-                                d.OwnerMask = item.Permissions.Current;
-                                d.GroupMask = item.Permissions.Group;
-                                d.EveryoneMask = item.Permissions.EveryOne;
-                                d.NextOwnerMask = item.Permissions.NextOwner;
-                                d.IsGroupOwned = item.GroupOwned;
-                                d.AssetID = item.AssetID;
-                                d.Type = item.AssetType;
-                                d.InvType = item.InventoryType;
-                                d.Flags = item.Flags;
-                                d.SaleType = item.SaleInfo.Type;
-                                d.SalePrice = item.SaleInfo.Price;
-                                d.Name = item.Name;
-                                d.Description = item.Description;
-                                d.CreationDate = (uint)item.CreationDate.DateTimeToUnixTime();
-                                res.ItemData.Add(d);
-                                SendMessage(res);
+                                SendMessage(new Messages.Inventory.UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, req.CallbackID));
                             }
                             catch
                             {
@@ -774,6 +717,132 @@ namespace SilverSim.LL.Core
                         break;
 
                     case MessageType.UpdateInventoryItem:
+                        {
+                            Messages.Inventory.UpdateInventoryItem req = (Messages.Inventory.UpdateInventoryItem)m;
+                            if (req.SessionID != SessionID || req.AgentID != AgentID)
+                            {
+                                break;
+                            }
+
+                            foreach(Messages.Inventory.UpdateInventoryItem.InventoryDataEntry d in req.InventoryData)
+                            {
+                                InventoryItem item;
+                                try
+                                {
+                                    item = Agent.InventoryService.Item[AgentID, d.ItemID];
+                                }
+                                catch
+                                {
+                                    continue;
+                                }
+
+                                if(item.Owner.ID != AgentID)
+                                {
+                                    continue;
+                                }
+
+                                item.Name = d.Name;
+                                item.Description = d.Description;
+
+                                bool sendUpdate = false;
+                                if(d.NextOwnerMask != 0)
+                                {
+                                    InventoryItem.PermissionsData p = new InventoryItem.PermissionsData();
+                                    p.Base = d.BaseMask;
+                                    p.Current = d.OwnerMask;
+                                    p.NextOwner = d.NextOwnerMask;
+                                    p.EveryOne = d.EveryoneMask;
+                                    p.Group = d.GroupMask;
+
+                                    if((item.Permissions.Base & InventoryItem.PermissionsMask.All | InventoryItem.PermissionsMask.Export) != (InventoryItem.PermissionsMask.All | InventoryItem.PermissionsMask.Export) ||
+                                        (item.Permissions.Current & InventoryItem.PermissionsMask.Export) == 0 ||
+                                        item.Creator.ID != item.Owner.ID)
+                                    {
+                                        // If we are not allowed to change it, then force it to the
+                                        // original item's setting and if it was on, also force full perm
+                                        if ((item.Permissions.EveryOne & InventoryItem.PermissionsMask.Export) != 0)
+                                        {
+                                            p.NextOwner = InventoryItem.PermissionsMask.All;
+                                            p.EveryOne |= InventoryItem.PermissionsMask.Export;
+                                        }
+                                        else
+                                        {
+                                            p.EveryOne &= ~InventoryItem.PermissionsMask.Export;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // If the new state is exportable, force full perm
+                                        if ((p.EveryOne & InventoryItem.PermissionsMask.Export) != 0)
+                                        {
+                                            p.NextOwner = InventoryItem.PermissionsMask.All;
+                                        }
+                                    }
+
+                                    if (item.Permissions.NextOwner != (p.NextOwner & item.Permissions.Base))
+                                    {
+                                        item.Permissions.NextOwner = p.NextOwner & item.Permissions.Base;
+                                    }
+
+                                    if (item.Permissions.EveryOne != (p.EveryOne & item.Permissions.Base))
+                                    {
+                                        item.Permissions.EveryOne = p.EveryOne & item.Permissions.Base;
+                                    }
+
+                                    if (item.Permissions.Group != (p.Group & item.Permissions.Base))
+                                    {
+                                        item.Permissions.Group = p.Group & item.Permissions.Base;
+                                    }
+
+                                    item.GroupID = d.GroupID;
+                                    item.GroupOwned = d.IsGroupOwned;
+
+                                    if (d.CreationDate == 0)
+                                    {
+                                        item.CreationDate = new Date();
+                                    }
+                                    else
+                                    {
+                                        item.CreationDate = Date.UnixTimeToDateTime(d.CreationDate);
+                                    }
+
+                                    item.InventoryType = d.InvType;
+
+                                    item.SaleInfo.Price = d.SalePrice;
+                                    item.SaleInfo.Type = d.SaleType;
+
+                                    if (item.InventoryType == InventoryType.Wearable && (d.Flags & 0xf) == 0 && (d.Flags & 0xf) != 0)
+                                    {
+                                        item.Flags = (uint)(item.Flags & 0xfffffff0) | (d.Flags & 0xf);
+                                        sendUpdate = true;
+                                    }
+
+                                    try
+                                    {
+                                        Agent.InventoryService.Item.Update(item);
+                                        SendMessage(new Messages.Inventory.UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, 0));
+                                    }
+                                    catch
+                                    {
+
+                                    }
+                                }
+
+                                if (UUID.Zero != req.TransactionID)
+                                {
+                                    //AgentTransactionsModule.HandleItemUpdateFromTransaction(remoteClient, transactionID, item);
+                                }
+                                else
+                                {
+                                    // In other situations we cannot send out a bulk update here, since this will cause editing of clothing to start 
+                                    // failing frequently.  Possibly this is a race with a separate transaction that uploads the asset.
+                                    if (sendUpdate)
+                                    {
+                                        SendMessage(new Messages.Inventory.BulkUpdateInventory(AgentID, UUID.Zero, 0, item));
+                                    }
+                                }
+                            }
+                        }
                         break;
                 }
             }

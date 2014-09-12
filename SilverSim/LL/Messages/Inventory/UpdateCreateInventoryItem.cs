@@ -71,6 +71,53 @@ namespace SilverSim.LL.Messages.Inventory
 
         }
 
+        public void AddItem(InventoryItem item, UInt32 callbackID)
+        {
+            ItemDataEntry id;
+            id.ItemID = item.ID;
+            id.FolderID = item.ParentFolderID;
+            id.CallbackID = callbackID;
+            id.CreatorID = item.Creator.ID;
+            id.OwnerID = item.Owner.ID;
+            id.GroupID = item.GroupID;
+            id.BaseMask = item.Permissions.Current;
+            id.OwnerMask = item.Permissions.Current;
+            id.GroupMask = item.Permissions.Group;
+            id.EveryoneMask = item.Permissions.EveryOne;
+            id.NextOwnerMask = item.Permissions.NextOwner;
+            id.IsGroupOwned = item.GroupOwned;
+            id.AssetID = item.AssetID;
+            id.Type = item.AssetType;
+            id.InvType = item.InventoryType;
+            id.Flags = item.Flags;
+            id.SaleType = item.SaleInfo.Type;
+            id.SalePrice = item.SaleInfo.Price;
+            id.Name = item.Name;
+            id.Description = item.Description;
+            id.CreationDate = (uint)item.CreationDate.DateTimeToUnixTime();
+            ItemData.Add(id);
+        }
+
+        public UpdateCreateInventoryItem(UUID agentID, bool simApproved, UUID transactionID, InventoryItem item, UInt32 callbackID)
+        {
+            AgentID = agentID;
+            SimApproved = simApproved;
+            TransactionID = transactionID;
+            AddItem(item, callbackID);
+        }
+
+        public UpdateCreateInventoryItem(UUID agentID, bool simApproved, UUID transactionID, List<InventoryItem> items, UInt32 callbackID)
+        {
+            AgentID = agentID;
+            SimApproved = simApproved;
+            TransactionID = transactionID;
+
+            foreach (InventoryItem item in items)
+            {
+                AddItem(item, callbackID);
+            }
+        }
+
         public override MessageType Number
         {
             get
