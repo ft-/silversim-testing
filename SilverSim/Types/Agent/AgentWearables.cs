@@ -36,6 +36,12 @@ namespace SilverSim.Types.Agent
         {
             public UUID ItemID;
             public UUID AssetID;
+
+            public WearableInfo(UUID itemID, UUID assetID)
+            {
+                ItemID = itemID;
+                AssetID = assetID;
+            }
         }
 
         private ReaderWriterLock m_WearablesUpdateLock = new ReaderWriterLock();
@@ -127,7 +133,7 @@ namespace SilverSim.Types.Agent
                 try
                 {
                     List<WearableInfo> wearableList = m_Wearables[type];
-                    if(m_Wearables.Count <= index)
+                    if (wearableList.Count <= index)
                     {
                         if(index >= 5)
                         {

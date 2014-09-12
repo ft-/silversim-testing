@@ -41,7 +41,7 @@ using System;
 namespace SilverSim.Main.IM
 {
     #region Service Implementation
-    public class IMServiceHandler : IMServiceInterface, IPlugin, IPluginShutdown
+    public class IMServiceHandler : IMServiceInterface, IPlugin
     {
         protected internal BlockingQueue<GridInstantMessage> m_Queue = new BlockingQueue<GridInstantMessage>();
         protected internal RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
@@ -85,21 +85,6 @@ namespace SilverSim.Main.IM
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_XmlRpcServer = loader.GetService<HttpXmlRpcHandler>("XmlRpcServer");
-            m_XmlRpcServer.XmlRpcMethods.Add("grid_instant_message", XmlRpc_IM_Handler);
-        }
-
-        public void Shutdown()
-        {
-            m_XmlRpcServer.XmlRpcMethods.Remove("grid_instant_message");
-        }
-
-        public ShutdownOrder ShutdownOrder
-        {
-            get
-            {
-                return ShutdownOrder.Any;
-            }
         }
         #endregion
 
@@ -114,124 +99,6 @@ namespace SilverSim.Main.IM
                     new Thread(IMSendThread).Start(this);
                 }
             }
-        }
-
-        public XmlRpcResponse XmlRpc_IM_Handler(XmlRpcRequest req)
-        {
-            GridInstantMessage gim = new GridInstantMessage();
-            Hashtable requestData = (Hashtable)req.Params[0];
-            bool successful = false;
-
-            try
-            {
-                UUID.TryParse((string)requestData["from_agent_id"], out gim.FromAgent.ID);
-                UUID.TryParse((string)requestData["to_agent_id"], out gim.ToAgent.ID);
-                UUID.TryParse((string)requestData["im_session_id"], out gim.IMSessionID);
-                UUID.TryParse((string)requestData["region_id"], out gim.RegionID);
-
-                try
-                {
-                    gim.Timestamp = Date.UnixTimeToDateTime(uint.Parse((string)requestData["timestamp"]));
-                }
-                catch (ArgumentException) { }
-                catch (FormatException) { }
-                catch (OverflowException) { }
-
-                gim.FromAgent.FullName = (string)requestData["from_agent_name"];
-                gim.Message = (string)requestData["message"];
-                if(gim.Message == null)
-                {
-                    gim.Message = string.Empty;
-                }
-
-                string dialog = (string)requestData["dialog"];
-                if(string.IsNullOrEmpty(dialog))
-                {
-                    gim.Dialog = GridInstantMessageDialog.MessageFromAgent;
-                }
-                else
-                {
-                    byte[] dialogdata = Convert.FromBase64String(dialog);
-                    gim.Dialog = (GridInstantMessageDialog)dialogdata[0];
-                }
-
-                if((string)requestData["from_group"] == "TRUE")
-                {
-                    gim.IsFromGroup = true;
-                }
-
-                string offline = (string)requestData["offline"];
-                if(string.IsNullOrEmpty(offline))
-                {
-                    gim.IsOffline = false;
-                }
-                else
-                {
-                    byte[] offlinedata = Convert.FromBase64String(offline);
-                    gim.IsOffline = offlinedata[0] != 0;
-                }
-
-                try
-                {
-                    gim.ParentEstateID = uint.Parse((string)requestData["parent_estate_id"]);
-                }
-                catch (ArgumentException) { }
-                catch (FormatException) { }
-                catch (OverflowException) { }
-
-                try
-                {
-                    gim.Position.X = float.Parse((string)requestData["position_x"]);
-                }
-                catch (ArgumentException) { }
-                catch (FormatException) { }
-                catch (OverflowException) { }
-
-                try
-                {
-                    gim.Position.Y = float.Parse((string)requestData["position_y"]);
-                }
-                catch (ArgumentException) { }
-                catch (FormatException) { }
-                catch (OverflowException) { }
-
-                try
-                {
-                    gim.Position.Z = float.Parse((string)requestData["position_z"]);
-                }
-                catch (ArgumentException) { }
-                catch (FormatException) { }
-                catch (OverflowException) { }
-
-                string binbucket = (string)requestData["binary_bucket"];
-                if(string.IsNullOrEmpty(binbucket))
-                {
-                    gim.BinaryBucket = new byte[0];
-                }
-                else
-                {
-                    gim.BinaryBucket = Convert.FromBase64String(binbucket);
-                }
-
-                successful = IMRouter.SendSync(gim);
-            }
-            catch(Exception e)
-            {
-                m_Log.Debug("Unexpected exception caught", e);
-                successful = false;
-            }
-            Hashtable respdata = new Hashtable();
-            if(successful)
-            {
-                respdata["success"] = "TRUE";
-            }
-            else
-            {
-                respdata["success"] = "FALSE";
-            }
-            XmlRpcResponse resp = new XmlRpcResponse();
-            resp.Value = respdata;
-            return resp;
         }
         #endregion
     }

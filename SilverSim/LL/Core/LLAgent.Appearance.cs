@@ -41,9 +41,11 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
+using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
+using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using ThreadedClasses;
@@ -93,9 +95,36 @@ namespace SilverSim.LL.Core
 
         private readonly ReaderWriterLock m_VisualParamsLock = new ReaderWriterLock();
         private byte[] m_VisualParams = new byte[] { 33, 61, 85, 23, 58, 127, 63, 85, 63, 42, 0, 85, 63, 36, 85, 95, 153, 63, 34, 0, 63, 109, 88, 132, 63, 136, 81, 85, 103, 136, 127, 0, 150, 150, 150, 127, 0, 0, 0, 0, 0, 127, 0, 0, 255, 127, 114, 127, 99, 63, 127, 140, 127, 127, 0, 0, 0, 191, 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 216, 133, 0, 127, 0, 127, 170, 0, 0, 127, 127, 109, 85, 127, 127, 63, 85, 42, 150, 150, 150, 150, 150, 150, 150, 25, 150, 150, 150, 0, 127, 0, 0, 144, 85, 127, 132, 127, 85, 0, 127, 127, 127, 127, 127, 127, 59, 127, 85, 127, 127, 106, 47, 79, 127, 127, 204, 2, 141, 66, 0, 0, 127, 127, 0, 0, 0, 0, 127, 0, 159, 0, 0, 178, 127, 36, 85, 131, 127, 127, 127, 153, 95, 0, 140, 75, 27, 127, 127, 0, 150, 150, 198, 0, 0, 63, 30, 127, 165, 209, 198, 127, 127, 153, 204, 51, 51, 255, 255, 255, 204, 0, 255, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 0, 150, 150, 150, 150, 150, 0, 127, 127, 150, 150, 150, 150, 150, 150, 150, 150, 0, 0, 150, 51, 132, 150, 150, 150 };
+        private readonly AppearanceInfo.AvatarTextureData m_TextureHashes = new AppearanceInfo.AvatarTextureData();
+        private readonly AppearanceInfo.AvatarTextureData m_Textures = new AppearanceInfo.AvatarTextureData();
         public double AvatarHeight;
-        public Int32 Serial = 1;
+        public UInt32 Serial = 1;
         public readonly static int MaxVisualParams = 260;
+        private const int NUM_AVATAR_TEXTURES = 21;
+
+        public AppearanceInfo.AvatarTextureData Textures
+        {
+            get
+            {
+                return m_Textures;
+            }
+            set
+            {
+                m_Textures.All = value.All;
+            }
+        }
+
+        public AppearanceInfo.AvatarTextureData TextureHashes
+        {
+            get
+            {
+                return m_TextureHashes;
+            }
+            set
+            {
+                m_TextureHashes.All = value.All;
+            }
+        }
 
         public byte[] VisualParams
         {
@@ -140,22 +169,106 @@ namespace SilverSim.LL.Core
                 ai.AvatarHeight = AvatarHeight;
                 //ai.Attachments = Attachments;
                 ai.Serial = Serial;
-                //ai.AvatarTextures;
+                ai.AvatarTextures.All = Textures.All;
                 return ai;
             }
 
             set
             {
+                /* check for assets being valid */
+                Dictionary<WearableType, List<AgentWearables.WearableInfo>> aw = value.Wearables;
+                /*
+                foreach(KeyValuePair<WearableType, List<AgentWearables.WearableInfo>> kvp in aw)
+                {
+                    List<AgentWearables.WearableInfo> lwi = kvp.Value;
+                    for (int c = 0; c < kvp.Value.Count;)
+                    {
+                        if(lwi[c].AssetID.Equals(UUID.Zero))
+                        {
+                            try
+                            {
+                                InventoryItem item = InventoryService.Item[ID, lwi[c].ItemID];
+                                AgentWearables.WearableInfo wi = lwi[c];
+                                wi.AssetID = item.AssetID;
+                                lwi[c++] = wi;
+                            }
+                            catch
+                            {
+                                lwi.RemoveAt(c);
+                            }
+                        }
+                    }
+                }
+                 * */
                 lock (m_AppearanceUpdateLock)
                 {
-                    Wearables = value.Wearables;
+                    Wearables.All = aw;
                     VisualParams = value.VisualParams;
                     Serial = value.Serial;
                     AvatarHeight = value.AvatarHeight;
+                    Textures.All = value.AvatarTextures.All;
                     //value.Attachments;
-                    //value.AvatarTextures;
                 }
             }
+        }
+
+        void HandleAgentWearablesRequest(Messages.Appearance.AgentWearablesRequest m)
+        {
+            if(m.AgentID != ID || m.SessionID != m.CircuitSessionID)
+            {
+                return;
+            }
+
+            Messages.Appearance.AgentWearablesUpdate awu = new Messages.Appearance.AgentWearablesUpdate();
+            awu.AgentID = m.AgentID;
+            awu.SessionID = m.SessionID;
+            awu.SerialNum = Serial;
+            Dictionary<WearableType, List<AgentWearables.WearableInfo>> wearables = Wearables.All;
+            foreach(KeyValuePair<WearableType, List<AgentWearables.WearableInfo>> kvp in wearables)
+            {
+                foreach (AgentWearables.WearableInfo wi in kvp.Value)
+                {
+                    Messages.Appearance.AgentWearablesUpdate.WearableDataEntry d = new Messages.Appearance.AgentWearablesUpdate.WearableDataEntry();
+                    d.ItemID = wi.ItemID;
+                    d.AssetID = wi.AssetID;
+                    d.WearableType = kvp.Key;
+                    awu.WearableData.Add(d);
+                }
+            }
+            SendMessageAlways(awu, m.CircuitSceneID);
+        }
+
+        void HandleAgentIsNowWearing(Messages.Appearance.AgentIsNowWearing m)
+        {
+            if (m.AgentID != ID || m.SessionID != m.CircuitSessionID)
+            {
+                return;
+            }
+
+            Dictionary<WearableType, List<AgentWearables.WearableInfo>> wearables = new Dictionary<WearableType,List<AgentWearables.WearableInfo>>();
+            for(WearableType c = WearableType.Shape; c < WearableType.NumWearables; ++c)
+            {
+                wearables[c] = new List<AgentWearables.WearableInfo>();
+            }
+            foreach(Messages.Appearance.AgentIsNowWearing.WearableDataEntry d in m.WearableData)
+            {
+                try
+                {
+                    InventoryItem item = InventoryService.Item[ID, d.ItemID];
+                    wearables[d.WearableType].Add(new AgentWearables.WearableInfo(d.ItemID, item.AssetID));
+                }
+                catch
+                {
+
+                }
+            }
+
+            Wearables.All = wearables;
+        }
+
+        void HandleAgentCachedTexture(Messages.Appearance.AgentCachedTexture m)
+        {
+
         }
     }
 }

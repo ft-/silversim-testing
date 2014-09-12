@@ -65,19 +65,31 @@ namespace SilverSim.Scene.Types.Agent
         AgentWearables Wearables
         {
             get;
-            set; /* should replace data and not the internal reference */
+            set; /* must not replace data and not the internal reference */
         }
 
         AppearanceInfo Appearance
         {
             get;
-            set; /* should replace data and not the internal reference */
+            set; /* must not replace data and not the internal reference */
         }
 
         byte[] VisualParams
         {
             get;
             set;
+        }
+
+        AppearanceInfo.AvatarTextureData Textures
+        {
+            get;
+            set; /* must not replace data and not the internal reference */
+        }
+
+        AppearanceInfo.AvatarTextureData TextureHashes
+        {
+            get;
+            set; /* must not replace data and not the internal reference */
         }
 
         AssetServiceInterface AssetService

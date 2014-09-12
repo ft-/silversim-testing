@@ -396,6 +396,13 @@ namespace SilverSim.LL.Core
                                 }
                             }
                         }
+                        else if(m.SourceType == Messages.Transfer.SourceType.Asset)
+                        {
+                            if(m.Params.Length >= 20)
+                            {
+                                m_InventoryRequestQueue.Enqueue(m);
+                            }
+                        }
                         else
                         {
                             m_Server.RouteReceivedMessage(m);

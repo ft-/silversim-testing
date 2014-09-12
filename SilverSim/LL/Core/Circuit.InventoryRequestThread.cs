@@ -105,7 +105,6 @@ namespace SilverSim.LL.Core
                             Messages.Transfer.TransferRequest req = (Messages.Transfer.TransferRequest)m;
                             if (req.SourceType == Messages.Transfer.SourceType.SimInventoryItem)
                             {
-                                UUID taskID = new UUID(req.Params, 48);
                                 UUID itemID = new UUID(req.Params, 64);
                                 assetID = new UUID(req.Params, 80);
                                 InventoryItem item;

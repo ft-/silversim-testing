@@ -974,11 +974,15 @@ namespace SilverSim.LL.Core
                     break;
 
                 case MessageType.AgentWearablesRequest:
-                    {
-                    }
+                    HandleAgentWearablesRequest((Messages.Appearance.AgentWearablesRequest)m);
                     break;
 
                 case MessageType.AgentIsNowWearing:
+                    HandleAgentIsNowWearing((Messages.Appearance.AgentIsNowWearing)m);
+                    break;
+
+                case MessageType.AgentCachedTexture:
+                    HandleAgentCachedTexture((Messages.Appearance.AgentCachedTexture)m);
                     break;
 
                 default:

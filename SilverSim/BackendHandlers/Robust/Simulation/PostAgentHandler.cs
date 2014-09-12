@@ -176,7 +176,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 }
                 catch(Exception e)
                 {
-                    m_Log.InfoFormat("Deserialization error for agent message {0}\n{1}", req.RawUrl, e.StackTrace.ToString());
+                    m_Log.InfoFormat("Deserialization error for agent message {0}: {1}: {2}\n{3}", req.RawUrl, e.GetType().FullName, e.Message, e.StackTrace.ToString());
                     res = req.BeginResponse(HttpStatusCode.BadRequest, e.Message);
                     res.Close();
                     return;

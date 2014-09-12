@@ -850,6 +850,12 @@ namespace SilverSim.LL.Messages
         public void WriteStringLen8(string val)
         {
             byte[] buf = Encoding.UTF8.GetBytes(val);
+            if(buf.Length > 255)
+            {
+                byte[] nbuf = new byte[255];
+                Buffer.BlockCopy(buf, 0, nbuf, 0, 255);
+                buf = nbuf;
+            }
             WriteUInt8((byte)buf.Length);
             WriteBytes(buf);
         }
@@ -868,6 +874,12 @@ namespace SilverSim.LL.Messages
         public void WriteStringLen16(string val)
         {
             byte[] buf = Encoding.UTF8.GetBytes(val);
+            if (buf.Length > 65535)
+            {
+                byte[] nbuf = new byte[65535];
+                Buffer.BlockCopy(buf, 0, nbuf, 0, 65535);
+                buf = nbuf;
+            }
             WriteUInt16((UInt16)buf.Length);
             WriteBytes(buf);
         }
