@@ -202,6 +202,7 @@ namespace SilverSim.StructuredData.Agent
 
             {
                 int i;
+                uint n;
                 AnArray wearables = (AnArray)appearancePack["wearables"];
                 for (i = 0; i < (int)WearableType.NumWearables; ++i)
                 {
@@ -214,20 +215,22 @@ namespace SilverSim.StructuredData.Agent
                     {
                         continue;
                     }
+                    n = 0;
                     foreach (IValue val in ar)
                     {
-                        KeyValuePair<UUID, UUID> kvp;
+                        AgentWearables.WearableInfo wi = new AgentWearables.WearableInfo();
                         Map wp = (Map)val;
+                        wi.ItemID = wp["item"].AsUUID;
                         if (wp.ContainsKey("asset"))
                         {
-                            kvp = new KeyValuePair<UUID, UUID>(wp["item"].AsUUID, wp["asset"].AsUUID);
+                            wi.AssetID = wp["asset"].AsUUID;
                         }
                         else
                         {
-                            kvp = new KeyValuePair<UUID, UUID>(wp["item"].AsUUID, UUID.Zero);
+                            wi.AssetID = UUID.Zero;
                         }
                         WearableType type = (WearableType)i;
-                        agentparams.Appearance.Wearables[type].Add(kvp);
+                        agentparams.Appearance.Wearables[type, n++] = wi;
                     }
                 }
             }
@@ -385,18 +388,18 @@ namespace SilverSim.StructuredData.Agent
                     {
                         w.Write(",");
                     }
-                    RwLockedList<KeyValuePair<UUID, UUID>> wearables = Appearance.Wearables[(WearableType)i];
+                    List<AgentWearables.WearableInfo> wearables = Appearance.Wearables[(WearableType)i];
                     w.Write("[");
                     prefix = "";
-                    foreach(KeyValuePair<UUID, UUID> kvp in wearables)
+                    foreach (AgentWearables.WearableInfo wi in wearables)
                     {
                         w.Write(prefix);
                         w.Write("{");
-                        WriteJSONString(w, "item", kvp.Key);
-                        if(kvp.Value != UUID.Zero)
+                        WriteJSONString(w, "item", wi.ItemID);
+                        if(wi.AssetID != UUID.Zero)
                         {
                             w.Write(",");
-                            WriteJSONString(w, "asset", kvp.Value);
+                            WriteJSONString(w, "asset", wi.AssetID);
                         }
                         w.Write("}");
                         prefix=",";

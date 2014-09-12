@@ -35,6 +35,7 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using SilverSim.Types.IM;
 using SilverSim.LL.Messages;
 using ThreadedClasses;
@@ -59,6 +60,24 @@ namespace SilverSim.Scene.Types.Agent
         AgentAttachments Attachments
         {
             get;
+        }
+
+        AgentWearables Wearables
+        {
+            get;
+            set; /* should replace data and not the internal reference */
+        }
+
+        AppearanceInfo Appearance
+        {
+            get;
+            set; /* should replace data and not the internal reference */
+        }
+
+        byte[] VisualParams
+        {
+            get;
+            set;
         }
 
         AssetServiceInterface AssetService

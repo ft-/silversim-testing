@@ -218,6 +218,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 agent.ServiceURLs = agentPost.Account.ServiceURLs;
 
                 agent.TeleportFlags = agentPost.Destination.TeleportFlags;
+                agent.Appearance = agentPost.Appearance;
 
                 LLUDPServer udpServer = (LLUDPServer)scene.UDPServer;
 
@@ -414,6 +415,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
                     {
                         int i;
+                        uint n;
                         AnArray wearables = (AnArray)appearancePack["wearables"];
                         for (i = 0; i < (int)WearableType.NumWearables; ++i)
                         {
@@ -426,20 +428,22 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                             {
                                 continue;
                             }
+                            n = 0;
                             foreach (IValue val in ar)
                             {
-                                KeyValuePair<UUID, UUID> kvp;
                                 Map wp = (Map)val;
+                                AgentWearables.WearableInfo wi = new AgentWearables.WearableInfo();
+                                wi.ItemID = wp["item"].AsUUID;
                                 if (wp.ContainsKey("asset"))
                                 {
-                                    kvp = new KeyValuePair<UUID, UUID>(wp["item"].AsUUID, wp["asset"].AsUUID);
+                                    wi.AssetID = wp["Asset"].AsUUID;
                                 }
                                 else
                                 {
-                                    kvp = new KeyValuePair<UUID, UUID>(wp["item"].AsUUID, UUID.Zero);
+                                    wi.AssetID = UUID.Zero;
                                 }
                                 WearableType type = (WearableType)i;
-                                Appearance.Wearables[type].Add(kvp);
+                                Appearance.Wearables[type, n++] = wi;
                             }
                         }
                     }

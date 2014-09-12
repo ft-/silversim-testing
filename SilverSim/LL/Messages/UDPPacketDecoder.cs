@@ -106,6 +106,8 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.FetchInventory, Inventory.FetchInventory.Decode);
             PacketTypes.Add(MessageType.RemoveInventoryObjects, Inventory.RemoveInventoryObjects.Decode);
             PacketTypes.Add(MessageType.LinkInventoryItem, Inventory.LinkInventoryItem.Decode);
+            PacketTypes.Add(MessageType.ActivateGestures, Gestures.ActiveGestures.Decode);
+            PacketTypes.Add(MessageType.DeactivateGestures, Gestures.DeactiveGestures.Decode);
 
             /* Objects */
             PacketTypes.Add(MessageType.ObjectRotation, Object.ObjectRotation.Decode);
@@ -196,6 +198,7 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.AcceptFriendship, Friend.AcceptFriendship.Decode);
             PacketTypes.Add(MessageType.DeclineFriendship, Friend.DeclineFriendship.Decode);
             PacketTypes.Add(MessageType.TerminateFriendship, Friend.TerminateFriendship.Decode);
+            PacketTypes.Add(MessageType.GrantUserRights, Friend.GrantUserRights.Decode);
 
             /* Calling Card */
             PacketTypes.Add(MessageType.OfferCallingCard, CallingCard.OfferCallingCard.Decode);
@@ -222,6 +225,14 @@ namespace SilverSim.LL.Messages
             /* Transfer */
             PacketTypes.Add(MessageType.TransferRequest, Transfer.TransferRequest.Decode);
             PacketTypes.Add(MessageType.TransferAbort, Transfer.TransferAbort.Decode);
+            PacketTypes.Add(MessageType.AssetUploadRequest, Transfer.AssetUploadRequest.Decode);
+            PacketTypes.Add(MessageType.AssetUploadComplete, Transfer.AssetUploadComplete.Decode);
+
+            /* Start Location */
+            PacketTypes.Add(MessageType.SetStartLocationRequest, StartLocation.SetStartLocationRequest.Decode);
+
+            /* Sound */
+            PacketTypes.Add(MessageType.SoundTrigger, Sound.SoundTrigger.Decode);
         }
     }
 }

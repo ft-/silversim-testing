@@ -23,66 +23,62 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types.Asset.Format;
+using log4net;
+using SilverSim.LL.Messages;
+using SilverSim.Main.Common;
+using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script.Events;
+using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Economy;
+using SilverSim.ServiceInterfaces.Friends;
+using SilverSim.ServiceInterfaces.Grid;
+using SilverSim.ServiceInterfaces.GridUser;
+using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.Presence;
+using SilverSim.ServiceInterfaces.Profile;
+using SilverSim.ServiceInterfaces.UserAgents;
+using SilverSim.Types;
+using SilverSim.Types.Agent;
+using SilverSim.Types.Grid;
+using SilverSim.Types.IM;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using ThreadedClasses;
+using System.Threading;
 
-namespace SilverSim.Types.Agent
+namespace SilverSim.LL.Core
 {
-    public class AppearanceInfo
+    public partial class LLAgent
     {
-        public class AvatarTextureData
+        private readonly AgentAttachments m_Attachments = new AgentAttachments();
+        private readonly AgentWearables m_Wearables = new AgentWearables();
+
+        public Vector3 Size
         {
-            public readonly static int TextureCount = 21;
-            private UUID[] m_AvatarTextures = new UUID[TextureCount];
-            private ReaderWriterLock m_RwLock = new ReaderWriterLock();
-
-            public AvatarTextureData()
+            get
             {
-
+                lock (this)
+                {
+                    return new Vector3(0.3, 0.3, AvatarHeight);
+                }
             }
-
-            public UUID this[int texIndex]
+            set
             {
-                get
-                {
-                    if(texIndex < 0 || texIndex >= TextureCount)
-                    {
-                        throw new KeyNotFoundException();
-                    }
-                    m_RwLock.AcquireReaderLock(-1);
-                    try
-                    {
-                        return m_AvatarTextures[texIndex];
-                    }
-                    finally
-                    {
-                        m_RwLock.ReleaseReaderLock();
-                    }
-                }
-
-                set
-                {
-                    if (texIndex < 0 || texIndex >= TextureCount)
-                    {
-                        throw new KeyNotFoundException();
-                    }
-                    m_RwLock.AcquireWriterLock(-1);
-                    try
-                    {
-                        m_AvatarTextures[texIndex] = value;
-                    }
-                    finally
-                    {
-                        m_RwLock.ReleaseWriterLock();
-                    }
-                }
+                throw new NotImplementedException();
             }
         }
 
-        private AgentWearables m_Wearables = new AgentWearables();
+        public AgentAttachments Attachments
+        {
+            get
+            {
+                return m_Attachments;
+            }
+        }
+
         public AgentWearables Wearables
         {
             get
@@ -95,17 +91,11 @@ namespace SilverSim.Types.Agent
             }
         }
 
-        public RwLockedDictionaryAutoAdd<AttachmentPoint, RwLockedDictionary<UUID, UUID>> Attachments =
-            new RwLockedDictionaryAutoAdd<AttachmentPoint, RwLockedDictionary<UUID, UUID>>(delegate() { return new RwLockedDictionary<UUID, UUID>(); });
-        private ReaderWriterLock m_VisualParamsLock = new ReaderWriterLock();
+        private readonly ReaderWriterLock m_VisualParamsLock = new ReaderWriterLock();
         private byte[] m_VisualParams = new byte[] { 33, 61, 85, 23, 58, 127, 63, 85, 63, 42, 0, 85, 63, 36, 85, 95, 153, 63, 34, 0, 63, 109, 88, 132, 63, 136, 81, 85, 103, 136, 127, 0, 150, 150, 150, 127, 0, 0, 0, 0, 0, 127, 0, 0, 255, 127, 114, 127, 99, 63, 127, 140, 127, 127, 0, 0, 0, 191, 0, 104, 0, 0, 0, 0, 0, 0, 0, 0, 0, 145, 216, 133, 0, 127, 0, 127, 170, 0, 0, 127, 127, 109, 85, 127, 127, 63, 85, 42, 150, 150, 150, 150, 150, 150, 150, 25, 150, 150, 150, 0, 127, 0, 0, 144, 85, 127, 132, 127, 85, 0, 127, 127, 127, 127, 127, 127, 59, 127, 85, 127, 127, 106, 47, 79, 127, 127, 204, 2, 141, 66, 0, 0, 127, 127, 0, 0, 0, 0, 127, 0, 159, 0, 0, 178, 127, 36, 85, 131, 127, 127, 127, 153, 95, 0, 140, 75, 27, 127, 127, 0, 150, 150, 198, 0, 0, 63, 30, 127, 165, 209, 198, 127, 127, 153, 204, 51, 51, 255, 255, 255, 204, 0, 255, 150, 150, 150, 150, 150, 150, 150, 150, 150, 150, 0, 150, 150, 150, 150, 150, 0, 127, 127, 150, 150, 150, 150, 150, 150, 150, 150, 0, 0, 150, 51, 132, 150, 150, 150 };
         public double AvatarHeight;
         public Int32 Serial = 1;
-
-        public readonly static byte[] BakeIndices = new byte[] { 8, 9, 10, 11, 19, 20 };
         public readonly static int MaxVisualParams = 260;
-
-        public readonly AvatarTextureData AvatarTextures = new AvatarTextureData();
 
         public byte[] VisualParams
         {
@@ -135,6 +125,35 @@ namespace SilverSim.Types.Agent
                 finally
                 {
                     m_VisualParamsLock.ReleaseWriterLock();
+                }
+            }
+        }
+
+        private object m_AppearanceUpdateLock = new object();
+        public AppearanceInfo Appearance
+        {
+            get
+            {
+                AppearanceInfo ai = new AppearanceInfo();
+                ai.Wearables = Wearables;
+                ai.VisualParams = VisualParams;
+                ai.AvatarHeight = AvatarHeight;
+                //ai.Attachments = Attachments;
+                ai.Serial = Serial;
+                //ai.AvatarTextures;
+                return ai;
+            }
+
+            set
+            {
+                lock (m_AppearanceUpdateLock)
+                {
+                    Wearables = value.Wearables;
+                    VisualParams = value.VisualParams;
+                    Serial = value.Serial;
+                    AvatarHeight = value.AvatarHeight;
+                    //value.Attachments;
+                    //value.AvatarTextures;
                 }
             }
         }

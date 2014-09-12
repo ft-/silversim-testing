@@ -41,6 +41,7 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using System;
@@ -55,10 +56,8 @@ namespace SilverSim.LL.Core
         public event Action<IObject> OnPositionChange;
 
         #region Agent fields
-        private readonly AgentAttachments m_Attachments = new AgentAttachments();
         private UUID m_AgentID;
         private UUID m_CurrentSceneID;
-        private Vector3 m_AvatarSize = Vector3.Zero;
         #endregion
 
         #region LLAgent Properties
@@ -382,21 +381,6 @@ namespace SilverSim.LL.Core
             }
         }
 
-        public Vector3 Size
-        {
-            get
-            {
-                lock (this)
-                {
-                    return m_AvatarSize;
-                }
-            }
-            set
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         public bool IsInScene(SceneInterface scene)
         {
             lock (this)
@@ -706,14 +690,6 @@ namespace SilverSim.LL.Core
 
         public Dictionary<string, string> ServiceURLs = new Dictionary<string, string>();
 
-        public AgentAttachments Attachments
-        {
-            get
-            {
-                return m_Attachments;
-            }
-        }
-
 
         public int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
         {
@@ -995,6 +971,14 @@ namespace SilverSim.LL.Core
                             c.SendMessage(lrep);
                         }
                     }
+                    break;
+
+                case MessageType.AgentWearablesRequest:
+                    {
+                    }
+                    break;
+
+                case MessageType.AgentIsNowWearing:
                     break;
 
                 default:
