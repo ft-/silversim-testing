@@ -37,6 +37,9 @@ namespace SilverSim.LL.Core
     public partial class Circuit
     {
         #region Fetch Inventory Thread
+        private const int MAX_FOLDERS_PER_PACKET = 6;
+        private const int MAX_ITEMS_PER_PACKET = 5;
+
         private void SendAssetNotFound(Messages.Transfer.TransferRequest req)
         {
             Messages.Transfer.TransferInfo res = new Messages.Transfer.TransferInfo();
@@ -377,7 +380,7 @@ namespace SilverSim.LL.Core
 
                                 res.ItemData.Add(rd);
 
-                                if(res.ItemData.Count == 2)
+                                if(res.ItemData.Count == MAX_ITEMS_PER_PACKET)
                                 {
                                     SendMessage(res);
                                     res = null;
@@ -431,23 +434,40 @@ namespace SilverSim.LL.Core
                                 items = new List<InventoryItem>();
                             }
 
-                            Messages.Inventory.InventoryDescendents res = new Messages.Inventory.InventoryDescendents();
-                            res.AgentID = req.AgentID;
-                            res.FolderID = req.FolderID;
-                            res.OwnerID = thisfolder.Owner.ID;
-                            res.Version = thisfolder.Version;
-                            res.Descendents = folders.Count + items.Count;
+                            Messages.Inventory.InventoryDescendents res = null;
+                            bool message_sent = false;
 
                             if(req.FetchFolders)
                             {
                                 foreach(InventoryFolder folder in folders)
                                 {
+                                    if(null == res)
+                                    {
+                                        res = new Messages.Inventory.InventoryDescendents();
+                                        res.AgentID = req.AgentID;
+                                        res.FolderID = req.FolderID;
+                                        res.OwnerID = thisfolder.Owner.ID;
+                                        res.Version = thisfolder.Version;
+                                        res.Descendents = folders.Count + items.Count;
+                                    }
                                     Messages.Inventory.InventoryDescendents.FolderDataEntry d = new Messages.Inventory.InventoryDescendents.FolderDataEntry();
                                     d.FolderID = folder.ID;
                                     d.ParentID = folder.ParentFolderID;
                                     d.Type = folder.InventoryType;
                                     d.Name = folder.Name;
                                     res.FolderData.Add(d);
+                                    if(res.FolderData.Count == MAX_FOLDERS_PER_PACKET)
+                                    {
+                                        SendMessage(res);
+                                        message_sent = true;
+                                        res = null;
+                                    }
+                                }
+                                if(null != res)
+                                {
+                                    SendMessage(res);
+                                    message_sent = true;
+                                    res = null;
                                 }
                             }
 
@@ -455,6 +475,15 @@ namespace SilverSim.LL.Core
                             {
                                 foreach(InventoryItem item in items)
                                 {
+                                    if (null == res)
+                                    {
+                                        res = new Messages.Inventory.InventoryDescendents();
+                                        res.AgentID = req.AgentID;
+                                        res.FolderID = req.FolderID;
+                                        res.OwnerID = thisfolder.Owner.ID;
+                                        res.Version = thisfolder.Version;
+                                        res.Descendents = folders.Count + items.Count;
+                                    }
                                     Messages.Inventory.InventoryDescendents.ItemDataEntry d = new Messages.Inventory.InventoryDescendents.ItemDataEntry();
 
                                     d.ItemID = item.ID;
@@ -478,9 +507,32 @@ namespace SilverSim.LL.Core
                                     d.Description = item.Description;
                                     d.CreationDate = (uint)item.CreationDate.DateTimeToUnixTime();
                                     res.ItemData.Add(d);
+
+                                    if(res.ItemData.Count == MAX_ITEMS_PER_PACKET)
+                                    {
+                                        SendMessage(res);
+                                        message_sent = true;
+                                        res = null;
+                                    }
+                                }
+                                if(null != res)
+                                {
+                                    SendMessage(res);
+                                    message_sent = true;
+                                    res = null;
                                 }
                             }
-                            SendMessage(res);
+
+                            if (!message_sent)
+                            {
+                                res = new Messages.Inventory.InventoryDescendents();
+                                res.AgentID = req.AgentID;
+                                res.FolderID = req.FolderID;
+                                res.OwnerID = thisfolder.Owner.ID;
+                                res.Version = thisfolder.Version;
+                                res.Descendents = folders.Count + items.Count;
+                                SendMessage(res);
+                            }
                         }
                         break;
 
