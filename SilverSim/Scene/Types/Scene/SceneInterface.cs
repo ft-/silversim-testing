@@ -35,6 +35,7 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Presence;
+using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.Economy;
 using SilverSim.Types.Grid;
@@ -106,6 +107,7 @@ namespace SilverSim.Scene.Types.Scene
         public GridUserServiceInterface GridUserService { get; protected set; }
         public GridServiceInterface GridService { get; protected set; }
         public EconomyServiceInterface EconomyService { get; protected set; }
+        public ServerParamServiceInterface ServerParamService { get; protected set; }
         public EconomyInfo EconomyData { get; protected set; }
         private NotecardCache m_NotecardCache;
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }

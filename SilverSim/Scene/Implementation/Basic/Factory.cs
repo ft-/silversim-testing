@@ -34,6 +34,7 @@ using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Presence;
+using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using Nini.Config;
 using System.Net;
@@ -60,6 +61,7 @@ namespace SilverSim.Scene.Implementation.Basic
         public AssetServiceInterface m_AssetService;
         public GridServiceInterface m_GridService;
         public GridUserServiceInterface m_GridUserService;
+        public ServerParamServiceInterface m_ServerParamService;
         public IMServiceInterface m_IMService;
         public Dictionary<string, string> m_CapabilitiesConfig;
 
@@ -93,6 +95,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
             m_GridUserService = loader.GetService<GridUserServiceInterface>(m_GridUserServiceName);
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
+            m_ServerParamService = loader.GetService<ServerParamServiceInterface>("ServerParamStorage");
         }
 
         public override SceneInterface Instantiate(RegionInfo ri)
@@ -105,6 +108,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_AssetService, 
                 m_GridService,
                 m_GridUserService, 
+                m_ServerParamService,
                 ri,
                 m_CapabilitiesConfig);
         }

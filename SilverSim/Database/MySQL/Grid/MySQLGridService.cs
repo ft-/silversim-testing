@@ -32,6 +32,7 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
+using SilverSim.ServiceInterfaces.ServerParam;
 
 namespace SilverSim.Database.MySQL.Grid
 {
@@ -40,20 +41,33 @@ namespace SilverSim.Database.MySQL.Grid
     {
         string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRID SERVICE");
-        private bool m_DeleteOnUnregister;
-        private bool m_AllowDuplicateRegionNames;
+        private bool DeleteOnUnregister
+        {
+            get
+            {
+                return m_ServerParams.GetBoolean(UUID.Zero, "DeleteOnUnregister", false);
+            }
+        }
+
+        private bool AllowDuplicateRegionNames
+        {
+            get
+            {
+                return m_ServerParams.GetBoolean(UUID.Zero, "AllowDuplicateRegionNames", false);
+            }
+        }
+
+        private ServerParamServiceInterface m_ServerParams;
 
         #region Constructor
-        public MySQLGridService(string connectionString, bool deleteOnUnregister, bool allowDuplicateRegionNames)
+        public MySQLGridService(string connectionString)
         {
             m_ConnectionString = connectionString;
-            m_DeleteOnUnregister = deleteOnUnregister;
-            m_AllowDuplicateRegionNames = allowDuplicateRegionNames;
         }
 
         public void Startup(ConfigurationLoader loader)
         {
-
+            m_ServerParams = loader.GetService<ServerParamServiceInterface>("ServerParamStorage");
         }
         #endregion
 
@@ -208,7 +222,7 @@ namespace SilverSim.Database.MySQL.Grid
             {
                 conn.Open();
 
-                if(!m_AllowDuplicateRegionNames)
+                if(!AllowDuplicateRegionNames)
                 {
                     using(MySqlCommand cmd = new MySqlCommand("SELECT uuid FROM regions WHERE ScopeID LIKE ?scopeid AND regionName LIKE ?name LIMIT 1", conn))
                     {
@@ -282,7 +296,7 @@ namespace SilverSim.Database.MySQL.Grid
             {
                 conn.Open();
 
-                if(m_DeleteOnUnregister)
+                if(DeleteOnUnregister)
                 {
                     /* we handoff most stuff to mysql here */
                     /* first line deletes only when region is not persistent */
@@ -598,9 +612,7 @@ namespace SilverSim.Database.MySQL.Grid
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new MySQLGridService(MySQLUtilities.BuildConnectionString(ownSection, m_Log), 
-                ownSection.GetBoolean("DeleteOnUnregister", false),
-                ownSection.GetBoolean("AllowDuplicateRegionNames", false));
+            return new MySQLGridService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
         }
     }
     #endregion

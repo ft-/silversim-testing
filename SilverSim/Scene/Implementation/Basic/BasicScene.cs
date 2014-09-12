@@ -47,6 +47,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using ThreadedClasses;
+using SilverSim.ServiceInterfaces.ServerParam;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -210,6 +211,7 @@ namespace SilverSim.Scene.Implementation.Basic
             AssetServiceInterface assetService,
             GridServiceInterface gridService,
             GridUserServiceInterface gridUserService,
+            ServerParamServiceInterface serverParamService,
             RegionInfo ri,
             Dictionary<string, string> capabilitiesConfig)
         {
@@ -225,6 +227,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
             m_SceneAgents = new DefaultSceneAgentInterface(this);
             m_SceneParcels = new BasicSceneParcels(this);
+            ServerParamService = serverParamService;
             CapabilitiesConfig = capabilitiesConfig;
             ID = ri.ID;
             Name = ri.Name;

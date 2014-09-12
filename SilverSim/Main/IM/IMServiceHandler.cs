@@ -23,20 +23,15 @@ exception statement from your version.
 
 */
 
+using log4net;
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.IM;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types.IM;
-using SilverSim.Types;
-using log4net;
-using Nini.Config;
-using System.Collections;
-using System.Reflection;
 using System.Threading;
 using ThreadedClasses;
-using Nwc.XmlRpc;
-using System;
 
 namespace SilverSim.Main.IM
 {

@@ -173,6 +173,7 @@
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
       <Reference name="SilverSim.StructuredData" localCopy="false"/>
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
+      <Reference name="SilverSim.Scene.Management" localCopy="false"/>
       <Reference name="SilverSim.LL.Messages" localCopy="false"/>
       <Reference name="SilverSim.LL.Core" localCopy="false"/>
       <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
@@ -203,6 +204,7 @@
       <Reference name="SilverSim.StructuredData" localCopy="false"/>
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
+      <Reference name="SilverSim.Scene.Management" localCopy="false"/>
       <Reference name="SilverSim.LL.Messages" localCopy="false"/>
       <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
       <Reference name="log4net" path="../../../bin/" localCopy="false"/>
@@ -414,7 +416,7 @@
       </Configuration>
 
       <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" localCopy="false"/>
+      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Data"/>
       <Reference name="SilverSim.Types" localCopy="false"/>
@@ -647,7 +649,7 @@
       </Configuration>
 
       <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/"/>
+      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
@@ -725,6 +727,7 @@
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Reference name="Nini" path="../../../bin/" localCopy="false"/>
+      <Reference name="Nwc.XmlRpc" path="../../../bin/" localCopy="false"/>
       <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
@@ -758,6 +761,7 @@
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Scripting.Common" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
+      <Reference name="SilverSim.LL.Messages" localCopy="false"/>
       <Reference name="HttpClasses" path="../../../bin/" localCopy="false"/>
       <Reference name="Nini" path="../../../bin/" localCopy="false"/>
       <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>

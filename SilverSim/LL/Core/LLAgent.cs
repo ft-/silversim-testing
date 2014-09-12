@@ -941,15 +941,16 @@ namespace SilverSim.LL.Core
                             if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
                             {
                                 /* switch agent region */
-                                if(m_IsActiveGod)
+                                if(m_IsActiveGod && !circuit.Scene.IsPossibleGod(new UUI(ID, FirstName, LastName, HomeURI)))
                                 {
-                                    /* revoke god powers when changing region */
+                                    /* revoke god powers when changing region and new region has a different owner */
                                     Messages.God.GrantGodlikePowers gm = new Messages.God.GrantGodlikePowers();
                                     gm.AgentID = ID;
                                     gm.SessionID = circuit.SessionID;
                                     gm.GodLevel = 0;
                                     gm.Token = UUID.Zero;
                                     SendMessageIfRootAgent(gm, m_CurrentSceneID);
+                                    m_IsActiveGod = false;
                                 }
                                 m_CurrentSceneID = circuit.Scene.ID;
 
@@ -1002,6 +1003,10 @@ namespace SilverSim.LL.Core
 
                 case MessageType.AgentCachedTexture:
                     HandleAgentCachedTexture((Messages.Appearance.AgentCachedTexture)m);
+                    break;
+
+                case MessageType.RequestGodlikePowers:
+                    HandleRequestGodlikePowers((Messages.God.RequestGodlikePowers)m);
                     break;
 
                 default:

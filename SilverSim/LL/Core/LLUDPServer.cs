@@ -287,7 +287,7 @@ namespace SilverSim.LL.Core
                                         rh.SimAccess = scene.RegionData.Access;
                                         rh.SimName = scene.Name;
                                         rh.SimOwner = scene.Owner.ID;
-                                        rh.IsEstateManager = false;
+                                        rh.IsEstateManager = scene.IsEstateManager(new UUI(circuit.Agent.ID, circuit.Agent.FirstName, circuit.Agent.LastName, circuit.Agent.HomeURI));
                                         rh.WaterHeight = scene.RegionSettings.WaterHeight;
                                         rh.BillableFactor = 1;
                                         rh.TerrainStartHeight00 = scene.RegionSettings.Elevation1SW;
@@ -452,6 +452,9 @@ namespace SilverSim.LL.Core
             m_Routing[MessageType.GetScriptRunning] = Scene.HandleSimulatorMessage;
             m_Routing[MessageType.SetScriptRunning] = Scene.HandleSimulatorMessage;
             m_Routing[MessageType.ScriptReset] = Scene.HandleSimulatorMessage;
+
+            /* God */
+            m_Routing[MessageType.RequestGodlikePowers] = HandleAgentMessage;
 
             /* Agent Update */
             m_Routing[MessageType.AgentUpdate] = HandleAgentUpdateMessage;
