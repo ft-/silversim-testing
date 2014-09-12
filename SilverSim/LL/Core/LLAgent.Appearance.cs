@@ -177,13 +177,12 @@ namespace SilverSim.LL.Core
             {
                 /* check for assets being valid */
                 Dictionary<WearableType, List<AgentWearables.WearableInfo>> aw = value.Wearables;
-                /*
                 foreach(KeyValuePair<WearableType, List<AgentWearables.WearableInfo>> kvp in aw)
                 {
                     List<AgentWearables.WearableInfo> lwi = kvp.Value;
                     for (int c = 0; c < kvp.Value.Count;)
                     {
-                        if(lwi[c].AssetID.Equals(UUID.Zero))
+                        if (lwi[c].AssetID.Equals(UUID.Zero))
                         {
                             try
                             {
@@ -197,9 +196,12 @@ namespace SilverSim.LL.Core
                                 lwi.RemoveAt(c);
                             }
                         }
+                        else
+                        {
+                            ++c;
+                        }
                     }
                 }
-                 * */
                 lock (m_AppearanceUpdateLock)
                 {
                     Wearables.All = aw;

@@ -270,6 +270,7 @@ namespace SilverSim.LL.Core
 
                     case MessageType.CreateInventoryFolder:
                         {
+                            bool failed = false;
                             Messages.Inventory.CreateInventoryFolder req = (Messages.Inventory.CreateInventoryFolder)m;
                             if(req.SessionID != SessionID || req.AgentID != AgentID)
                             {
@@ -294,8 +295,12 @@ namespace SilverSim.LL.Core
                                 }
                                 catch
                                 {
-
+                                    failed = true;
                                 }
+                            }
+                            if(failed)
+                            {
+                                SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInvFolder"));
                             }
                         }
                         break;

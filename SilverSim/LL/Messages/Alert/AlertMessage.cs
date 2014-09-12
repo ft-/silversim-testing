@@ -43,6 +43,11 @@ namespace SilverSim.LL.Messages.Alert
 
         }
 
+        public AlertMessage(string message)
+        {
+            Message = message;
+        }
+
         public override MessageType Number
         {
             get
