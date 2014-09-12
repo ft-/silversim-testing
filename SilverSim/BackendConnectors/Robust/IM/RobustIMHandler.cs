@@ -78,7 +78,7 @@ namespace SilverSim.BackendConnectors.Robust.IM
                 im.IsFromGroup = bool.Parse(d["from_group"].ToString());
                 byte[] offline = Convert.FromBase64String(d["offline"].ToString());
                 im.IsOffline = offline[0] != 0;
-                im.ParentEstateID = (int)d["parent_estate_id"];
+                im.ParentEstateID = (uint)d["parent_estate_id"];
                 im.Position.X = float.Parse(d["position_x"].ToString());
                 im.Position.Y = float.Parse(d["position_y"].ToString());
                 im.Position.Z = float.Parse(d["position_z"].ToString());

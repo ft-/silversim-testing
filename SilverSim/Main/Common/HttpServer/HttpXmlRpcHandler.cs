@@ -43,6 +43,8 @@ namespace SilverSim.Main.Common.HttpServer
         public RwLockedDictionary<string, XmlRpcDelegate> XmlRpcMethods = new RwLockedDictionary<string,XmlRpcDelegate>();
         XmlRpcDeserializer m_XmlRpcDeserializer = new XmlRpcDeserializer();
 
+        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
+
         void RequestHandler(HttpRequest httpreq)
         {
             object o;
@@ -88,11 +90,13 @@ namespace SilverSim.Main.Common.HttpServer
                     return;
                 }
 
-                byte[] buffer = Encoding.UTF8.GetBytes(res.ToString());
-
                 HttpResponse response = httpreq.BeginResponse();
                 response.ContentType = "text/xml";
-                response.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
+                using(TextWriter tw = new StreamWriter(response.GetOutputStream(), UTF8NoBOM))
+                {
+                    tw.Write(res.ToString());
+                    tw.Flush();
+                }
                 response.Close();
             }
             else

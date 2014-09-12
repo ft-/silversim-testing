@@ -359,7 +359,7 @@ namespace SilverSim.LL.Core
                         pck.ReadBoolean();
                         im.IsFromGroup = false;
                         im.ToAgent.ID = pck.ReadUUID();
-                        im.ParentEstateID = (int)pck.ReadUInt32();
+                        im.ParentEstateID = pck.ReadUInt32();
                         im.RegionID = pck.ReadUUID();
                         im.Position.X = pck.ReadFloat();
                         im.Position.Y = pck.ReadFloat();

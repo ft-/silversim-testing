@@ -123,7 +123,7 @@ namespace SilverSim.BackendConnectors.Robust.IM
                 im.IMSessionID = m["SessionID"].ToString();
                 im.Message = m["Message"].ToString();
                 im.IsOffline = m["Offline"].AsBoolean;
-                im.ParentEstateID = m["EstateID"].AsInt;
+                im.ParentEstateID = m["EstateID"].AsUInt;
                 im.Position = m["Position"].AsVector3;
                 im.RegionID = m["RegionID"].AsString.ToString();
                 im.Timestamp = Date.UnixTimeToDateTime(m["Timestamp"].AsULong);

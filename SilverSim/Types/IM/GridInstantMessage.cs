@@ -37,7 +37,7 @@ namespace SilverSim.Types.IM
         public bool IsOffline;
         public Vector3 Position;
         public byte[] BinaryBucket;
-        public int ParentEstateID;
+        public uint ParentEstateID;
         public UUID RegionID;
         public Date Timestamp;
 
