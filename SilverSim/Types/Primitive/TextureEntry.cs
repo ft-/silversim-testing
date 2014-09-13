@@ -1,0 +1,707 @@
+﻿/*
+
+SilverSim is distributed under the terms of the
+GNU Affero General Public License v3
+with the following clarification and special exception.
+
+Linking this code statically or dynamically with other modules is
+making a combined work based on this code. Thus, the terms and
+conditions of the GNU Affero General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this code give you
+permission to link this code with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module. An independent module is a module which is not derived from
+or based on this code. If you modify this code, you may extend
+this exception to your version of the code, but you are not
+obligated to do so. If you do not wish to do so, delete this
+exception statement from your version.
+
+*/
+
+using System;
+using System.IO;
+
+namespace SilverSim.Types.Primitive
+{
+    public class TextureEntry
+    {
+        public const int MAX_TEXTURE_FACES = 32;
+        public TextureEntryFace[] FaceTextures = new TextureEntryFace[MAX_TEXTURE_FACES];
+        public TextureEntryFace DefaultTexture;
+
+        public TextureEntry()
+        {
+
+        }
+        
+        public TextureEntry(byte[] data, int pos, int length)
+        {
+            FromBytes(data, pos, length);
+        }
+
+        public TextureEntry(byte[] data)
+        {
+            FromBytes(data, 0, data.Length);
+        }
+
+        public TextureEntryFace this[uint index]
+        {
+            get
+            {
+                if (index >= MAX_TEXTURE_FACES)
+                {
+                    throw new IndexOutOfRangeException();
+                }
+
+                if (FaceTextures[index] == null)
+                {
+                    FaceTextures[index] = new TextureEntryFace(DefaultTexture);
+                }
+
+                return FaceTextures[index];
+            }
+        }
+
+        private static float BytesToFloat(byte[] bytes, int pos)
+        {
+            if(!BitConverter.IsLittleEndian)
+            {
+                byte[] newBytes = new byte[4];
+                Buffer.BlockCopy(bytes, pos, newBytes, 0, 4);
+                Array.Reverse(newBytes);
+                bytes = newBytes;
+                pos = 0;
+            }
+            return BitConverter.ToSingle(bytes, 0);
+        }
+
+        private void FloatToBytes(float value, byte[] bufbytes, int pos)
+        {
+            byte[] bytes = BitConverter.GetBytes(value);
+            if (!BitConverter.IsLittleEndian)
+                Array.Reverse(bytes);
+            Buffer.BlockCopy(bytes, 0, bufbytes, pos, 4);
+        }
+
+        private static float TEOffsetFloat(byte[] bytes, int pos)
+        {
+            if (!BitConverter.IsLittleEndian)
+            {
+                byte[] newBytes = new byte[2];
+                Buffer.BlockCopy(bytes, pos, newBytes, 0, 2);
+                Array.Reverse(newBytes);
+                bytes = newBytes;
+                pos = 0;
+            }
+            float offset = (float)BitConverter.ToInt16(bytes, pos);
+            return offset / 32767.0f;
+        }
+
+        private static float TERotationFloat(byte[] bytes, int pos)
+        {
+            const float TWO_PI = 6.283185307179586476925286766559f;
+            return ((float)(bytes[pos] | (bytes[pos + 1] << 8)) / 32768.0f) * TWO_PI;
+        }
+
+        private static float TEGlowFloat(byte[] bytes, int pos)
+        {
+            return (float)bytes[pos] / 255.0f;
+        }
+
+        private void FromBytes(byte[] data, int pos, int length)
+        {
+            if(length < 16)
+            {
+                DefaultTexture = null;
+                return;
+            }
+            else
+            {
+                DefaultTexture = new TextureEntryFace(null);
+            }
+
+            uint bitfieldSize = 0;
+            uint faceBits = 0;
+            int i = pos;
+
+            #region Texture
+            DefaultTexture.TextureID = new UUID(data, i);
+            i += 16;
+
+            while (ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
+            {
+                UUID tmpUUID = new UUID(data, i);
+                i += 16;
+
+                for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
+                {
+                    if ((faceBits & bit) != 0)
+                    {
+                        this[face].TextureID = tmpUUID;
+                    }
+                }
+            }
+            #endregion Texture
+
+            #region Color
+            DefaultTexture.TextureColor = new ColorAlpha(data, i);
+            i += 4;
+
+            while (ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
+            {
+                ColorAlpha tmpColor = new ColorAlpha(data, i);
+                i += 4;
+
+                for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
+                {
+                    if ((faceBits & bit) != 0)
+                    {
+                        this[face].TextureColor = tmpColor;
+                    }
+                }
+            }
+            #endregion Color
+
+            #region RepeatU
+            DefaultTexture.RepeatU = BytesToFloat(data, i);
+            i += 4;
+
+            while (ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
+            {
+                float tmpFloat = BytesToFloat(data, i);
+                i += 4;
+
+                for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
+                {
+                    if ((faceBits & bit) != 0)
+                    {
+                        this[face].RepeatU = tmpFloat;
+                    }
+                }
+            }
+            #endregion RepeatU
+
+            #region RepeatV
+            DefaultTexture.RepeatV = BytesToFloat(data, i);
+            i += 4;
+
+            while (ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
+            {
+                float tmpFloat = BytesToFloat(data, i);
+                i += 4;
+
+                for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
+                {
+                    if ((faceBits & bit) != 0)
+                    {
+                        this[face].RepeatV = tmpFloat;
+                    }
+                }
+            }
+            #endregion RepeatV
+
+            #region OffsetU
+            DefaultTexture.OffsetU = TEOffsetFloat(data, i);
+            i += 2;
+
+            while (ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
+            {
+                float tmpFloat = TEOffsetFloat(data, i);
+                i += 2;
+
+                for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
+                {
+                    if ((faceBits & bit) != 0)
+                    {
+                        this[face].OffsetU = tmpFloat;
+                    }
+                }
+            }
+            #endregion OffsetU
+
+            #region OffsetV
+            DefaultTexture.OffsetV = TEOffsetFloat(data, i);
+            i += 2;
+
+            while (ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
+            {
+                float tmpFloat = TEOffsetFloat(data, i);
+                i += 2;
+
+                for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
+                {
+                    if ((faceBits & bit) != 0)
+                    {
+                        this[face].OffsetV = tmpFloat;
+                    }
+                }
+            }
+            #endregion OffsetV
+
+            #region Rotation
+            DefaultTexture.Rotation = TERotationFloat(data, i);
+            i += 2;
+
+            while (ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
+            {
+                float tmpFloat = TERotationFloat(data, i);
+                i += 2;
+
+                for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
+                {
+                    if ((faceBits & bit) != 0)
+                    {
+                        this[face].Rotation = tmpFloat;
+                    }
+                }
+            }
+            #endregion Rotation
+
+            #region Material
+            DefaultTexture.Material = data[i];
+            i++;
+
+            while (ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
+            {
+                byte tmpByte = data[i];
+                i++;
+
+                for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
+                {
+                    if ((faceBits & bit) != 0)
+                    {
+                        this[face].Material = tmpByte;
+                    }
+                }
+            }
+            #endregion Material
+
+            #region Media
+            DefaultTexture.Media = data[i];
+            i++;
+
+            while (i - pos < length && ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
+            {
+                byte tmpByte = data[i];
+                i++;
+
+                for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
+                {
+                    if ((faceBits & bit) != 0)
+                    {
+                        this[face].Media = tmpByte;
+                    }
+                }
+            }
+            #endregion Media
+
+            #region Glow
+            DefaultTexture.Glow = TEGlowFloat(data, i);
+            i++;
+
+            while (ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
+            {
+                float tmpFloat = TEGlowFloat(data, i);
+                i++;
+
+                for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
+                {
+                    if ((faceBits & bit) != 0)
+                    {
+                        this[face].Glow = tmpFloat;
+                    }
+                }
+            }
+            #endregion Glow
+
+            #region MaterialID
+            if (i - pos + 16 <= length)
+            {
+                DefaultTexture.MaterialID = new UUID(data, i);
+                i += 16;
+
+                while (i - pos + 16 <= length && ReadFaceBitfield(data, ref i, ref faceBits, ref bitfieldSize))
+                {
+                    UUID tmpUUID = new UUID(data, i);
+                    i += 16;
+
+                    for (uint face = 0, bit = 1; face < bitfieldSize; face++, bit <<= 1)
+                    {
+                        if ((faceBits & bit) != 0)
+                        {
+                            this[face].MaterialID = tmpUUID;
+                        }
+                    }
+                }
+            }
+            #endregion MaterialID
+        }
+
+
+        private static byte TEGlowByte(float glow)
+        {
+            return (byte)(glow * 255.0f);
+        }
+
+        private static short TEOffsetShort(float offset)
+        {
+            offset = Math.Min(Math.Max(offset, -1.0f), 1.0f);
+            offset *= 32767.0f;
+            return (short)Math.Round(offset);
+        }
+
+        private static short TERotationShort(float rotation)
+        {
+            const float TWO_PI = 6.283185307179586476925286766559f;
+            return (short)Math.Round(((Math.IEEERemainder(rotation, TWO_PI) / TWO_PI) * 32768.0f) + 0.5f);
+        }
+
+        public static implicit operator byte[](TextureEntry e)
+        {
+            return e.GetBytes();
+        }
+
+        public byte[] GetBytes()
+        {
+            if (DefaultTexture == null)
+                return new byte[0];
+
+            using (MemoryStream memStream = new MemoryStream())
+            {
+                using (BinaryWriter binWriter = new BinaryWriter(memStream))
+                {
+                    #region Bitfield Setup
+
+                    uint[] textures = new uint[FaceTextures.Length];
+                    InitializeArray(ref textures);
+                    uint[] texturecolors = new uint[FaceTextures.Length];
+                    InitializeArray(ref texturecolors);
+                    uint[] repeatus = new uint[FaceTextures.Length];
+                    InitializeArray(ref repeatus);
+                    uint[] repeatvs = new uint[FaceTextures.Length];
+                    InitializeArray(ref repeatvs);
+                    uint[] offsetus = new uint[FaceTextures.Length];
+                    InitializeArray(ref offsetus);
+                    uint[] offsetvs = new uint[FaceTextures.Length];
+                    InitializeArray(ref offsetvs);
+                    uint[] rotations = new uint[FaceTextures.Length];
+                    InitializeArray(ref rotations);
+                    uint[] materials = new uint[FaceTextures.Length];
+                    InitializeArray(ref materials);
+                    uint[] medias = new uint[FaceTextures.Length];
+                    InitializeArray(ref medias);
+                    uint[] glows = new uint[FaceTextures.Length];
+                    InitializeArray(ref glows);
+                    uint[] materialIDs = new uint[FaceTextures.Length];
+                    InitializeArray(ref materialIDs);
+
+                    for (int i = 0; i < FaceTextures.Length; i++)
+                    {
+                        if (FaceTextures[i] == null) continue;
+
+                        if (FaceTextures[i].TextureID != DefaultTexture.TextureID)
+                        {
+                            if (textures[i] == UInt32.MaxValue)
+                            {
+                                textures[i] = 0;
+                            }
+                            textures[i] |= (uint)(1 << i);
+                        }
+                        if (FaceTextures[i].TextureColor != DefaultTexture.TextureColor)
+                        {
+                            if (texturecolors[i] == UInt32.MaxValue)
+                            {
+                                texturecolors[i] = 0;
+                            }
+                            texturecolors[i] |= (uint)(1 << i);
+                        }
+                        if (FaceTextures[i].RepeatU != DefaultTexture.RepeatU)
+                        {
+                            if (repeatus[i] == UInt32.MaxValue)
+                            {
+                                repeatus[i] = 0;
+                            }
+                            repeatus[i] |= (uint)(1 << i);
+                        }
+                        if (FaceTextures[i].RepeatV != DefaultTexture.RepeatV)
+                        {
+                            if (repeatvs[i] == UInt32.MaxValue)
+                            {
+                                repeatvs[i] = 0;
+                            }
+                            repeatvs[i] |= (uint)(1 << i);
+                        }
+                        if (TEOffsetShort(FaceTextures[i].OffsetU) != TEOffsetShort(DefaultTexture.OffsetU))
+                        {
+                            if (offsetus[i] == UInt32.MaxValue)
+                            {
+                                offsetus[i] = 0;
+                            }
+                            offsetus[i] |= (uint)(1 << i);
+                        }
+                        if (TEOffsetShort(FaceTextures[i].OffsetV) != TEOffsetShort(DefaultTexture.OffsetV))
+                        {
+                            if (offsetvs[i] == UInt32.MaxValue)
+                            {
+                                offsetvs[i] = 0;
+                            }
+                            offsetvs[i] |= (uint)(1 << i);
+                        }
+                        if (TERotationShort(FaceTextures[i].Rotation) != TERotationShort(DefaultTexture.Rotation))
+                        {
+                            if (rotations[i] == UInt32.MaxValue)
+                            {
+                                rotations[i] = 0;
+                            }
+                            rotations[i] |= (uint)(1 << i);
+                        }
+                        if (FaceTextures[i].Material != DefaultTexture.Material)
+                        {
+                            if (materials[i] == UInt32.MaxValue)
+                            {
+                                materials[i] = 0;
+                            }
+                            materials[i] |= (uint)(1 << i);
+                        }
+                        if (FaceTextures[i].Media != DefaultTexture.Media)
+                        {
+                            if (medias[i] == UInt32.MaxValue)
+                            {
+                                medias[i] = 0;
+                            }
+                            medias[i] |= (uint)(1 << i);
+                        }
+                        if (TEGlowByte(FaceTextures[i].Glow) != TEGlowByte(DefaultTexture.Glow))
+                        {
+                            if (glows[i] == UInt32.MaxValue)
+                            {
+                                glows[i] = 0;
+                            }
+                            glows[i] |= (uint)(1 << i);
+                        }
+                        if (FaceTextures[i].MaterialID != DefaultTexture.MaterialID)
+                        {
+                            if (materialIDs[i] == UInt32.MaxValue) materialIDs[i] = 0;
+                            materialIDs[i] |= (uint)(1 << i);
+                        }
+                    }
+
+                    #endregion Bitfield Setup
+
+                    #region Texture
+                    binWriter.Write(DefaultTexture.TextureID.GetBytes());
+                    for (int i = 0; i < textures.Length; i++)
+                    {
+                        if (textures[i] != UInt32.MaxValue)
+                        {
+                            binWriter.Write(GetFaceBitfieldBytes(textures[i]));
+                            binWriter.Write(FaceTextures[i].TextureID.GetBytes());
+                        }
+                    }
+                    binWriter.Write((byte)0);
+                    #endregion Texture
+
+                    #region Color
+                    // Serialize the color bytes inverted to optimize for zerocoding
+                    binWriter.Write(DefaultTexture.TextureColor.AsByte);
+                    for (int i = 0; i < texturecolors.Length; i++)
+                    {
+                        if (texturecolors[i] != UInt32.MaxValue)
+                        {
+                            binWriter.Write(GetFaceBitfieldBytes(texturecolors[i]));
+                            // Serialize the color bytes inverted to optimize for zerocoding
+                            binWriter.Write(FaceTextures[i].TextureColor.AsByte);
+                        }
+                    }
+                    binWriter.Write((byte)0);
+                    #endregion Color
+
+                    #region RepeatU
+                    binWriter.Write(DefaultTexture.RepeatU);
+                    for (int i = 0; i < repeatus.Length; i++)
+                    {
+                        if (repeatus[i] != UInt32.MaxValue)
+                        {
+                            binWriter.Write(GetFaceBitfieldBytes(repeatus[i]));
+                            binWriter.Write(FaceTextures[i].RepeatU);
+                        }
+                    }
+                    binWriter.Write((byte)0);
+                    #endregion RepeatU
+
+                    #region RepeatV
+                    binWriter.Write(DefaultTexture.RepeatV);
+                    for (int i = 0; i < repeatvs.Length; i++)
+                    {
+                        if (repeatvs[i] != UInt32.MaxValue)
+                        {
+                            binWriter.Write(GetFaceBitfieldBytes(repeatvs[i]));
+                            binWriter.Write(FaceTextures[i].RepeatV);
+                        }
+                    }
+                    binWriter.Write((byte)0);
+                    #endregion RepeatV
+
+                    #region OffsetU
+                    binWriter.Write(TEOffsetShort(DefaultTexture.OffsetU));
+                    for (int i = 0; i < offsetus.Length; i++)
+                    {
+                        if (offsetus[i] != UInt32.MaxValue)
+                        {
+                            binWriter.Write(GetFaceBitfieldBytes(offsetus[i]));
+                            binWriter.Write(TEOffsetShort(FaceTextures[i].OffsetU));
+                        }
+                    }
+                    binWriter.Write((byte)0);
+                    #endregion OffsetU
+
+                    #region OffsetV
+                    binWriter.Write(TEOffsetShort(DefaultTexture.OffsetV));
+                    for (int i = 0; i < offsetvs.Length; i++)
+                    {
+                        if (offsetvs[i] != UInt32.MaxValue)
+                        {
+                            binWriter.Write(GetFaceBitfieldBytes(offsetvs[i]));
+                            binWriter.Write(TEOffsetShort(FaceTextures[i].OffsetV));
+                        }
+                    }
+                    binWriter.Write((byte)0);
+                    #endregion OffsetV
+
+                    #region Rotation
+                    binWriter.Write(TERotationShort(DefaultTexture.Rotation));
+                    for (int i = 0; i < rotations.Length; i++)
+                    {
+                        if (rotations[i] != UInt32.MaxValue)
+                        {
+                            binWriter.Write(GetFaceBitfieldBytes(rotations[i]));
+                            binWriter.Write(TERotationShort(FaceTextures[i].Rotation));
+                        }
+                    }
+                    binWriter.Write((byte)0);
+                    #endregion Rotation
+
+                    #region Material
+                    binWriter.Write(DefaultTexture.Material);
+                    for (int i = 0; i < materials.Length; i++)
+                    {
+                        if (materials[i] != UInt32.MaxValue)
+                        {
+                            binWriter.Write(GetFaceBitfieldBytes(materials[i]));
+                            binWriter.Write(FaceTextures[i].Material);
+                        }
+                    }
+                    binWriter.Write((byte)0);
+                    #endregion Material
+
+                    #region Media
+                    binWriter.Write(DefaultTexture.Media);
+                    for (int i = 0; i < medias.Length; i++)
+                    {
+                        if (medias[i] != UInt32.MaxValue)
+                        {
+                            binWriter.Write(GetFaceBitfieldBytes(medias[i]));
+                            binWriter.Write(FaceTextures[i].Media);
+                        }
+                    }
+                    binWriter.Write((byte)0);
+                    #endregion Media
+
+                    #region Glow
+                    binWriter.Write(TEGlowByte(DefaultTexture.Glow));
+                    for (int i = 0; i < glows.Length; i++)
+                    {
+                        if (glows[i] != UInt32.MaxValue)
+                        {
+                            binWriter.Write(GetFaceBitfieldBytes(glows[i]));
+                            binWriter.Write(TEGlowByte(FaceTextures[i].Glow));
+                        }
+                    }
+                    binWriter.Write((byte)0);
+                    #endregion Glow
+
+                    #region MaterialID
+                    binWriter.Write(DefaultTexture.MaterialID.GetBytes());
+                    for (int i = 0; i < materialIDs.Length; i++)
+                    {
+                        if (materialIDs[i] != UInt32.MaxValue)
+                        {
+                            binWriter.Write(GetFaceBitfieldBytes(materialIDs[i]));
+                            binWriter.Write(FaceTextures[i].MaterialID.GetBytes());
+                        }
+                    }
+                    #endregion MaterialID
+
+                    return memStream.ToArray();
+                }
+            }
+        }
+
+        #region Helpers
+
+        private void InitializeArray(ref uint[] array)
+        {
+            for (int i = 0; i < array.Length; i++)
+            {
+                array[i] = UInt32.MaxValue;
+            }
+        }
+
+        private bool ReadFaceBitfield(byte[] data, ref int pos, ref uint faceBits, ref uint bitfieldSize)
+        {
+            faceBits = 0;
+            bitfieldSize = 0;
+
+            if (pos >= data.Length)
+            {
+                return false;
+            }
+
+            byte b = 0;
+            do
+            {
+                b = data[pos];
+                faceBits = (faceBits << 7) | (uint)(b & 0x7F);
+                bitfieldSize += 7;
+                pos++;
+            } while ((b & 0x80) != 0);
+
+            return (faceBits != 0);
+        }
+
+        private byte[] GetFaceBitfieldBytes(uint bitfield)
+        {
+            int byteLength = 0;
+            uint tmpBitfield = bitfield;
+
+            while (tmpBitfield != 0)
+            {
+                tmpBitfield >>= 7;
+                byteLength++;
+            }
+
+            if (byteLength == 0)
+            {
+                return new byte[1] { 0 };
+            }
+
+            byte[] bytes = new byte[byteLength];
+            for (int i = 0; i < byteLength; i++)
+            {
+                bytes[i] = (byte)((bitfield >> (7 * (byteLength - i - 1))) & 0x7F);
+                if (i < byteLength - 1)
+                {
+                    bytes[i] |= 0x80;
+                }
+            }
+            return bytes;
+        }
+
+        #endregion Helpers
+    }
+}
