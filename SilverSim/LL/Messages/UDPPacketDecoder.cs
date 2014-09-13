@@ -44,6 +44,7 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.AgentIsNowWearing, Appearance.AgentIsNowWearing.Decode);
             PacketTypes.Add(MessageType.AgentCachedTexture, Appearance.AgentCachedTexture.Decode);
             PacketTypes.Add(MessageType.ViewerEffect, Appearance.ViewerEffect.Decode);
+            PacketTypes.Add(MessageType.AgentSetAppearance, Appearance.AgentSetAppearance.Decode);
 
             /* God */
             PacketTypes.Add(MessageType.RequestGodlikePowers, God.RequestGodlikePowers.Decode);

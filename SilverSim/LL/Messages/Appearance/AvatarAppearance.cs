@@ -29,20 +29,25 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Avatar
+namespace SilverSim.LL.Messages.Appearance
 {
     public class AvatarAppearance : Message
     {
         public UUID Sender = UUID.Zero;
         public bool IsTrial = false;
 
-        public struct ObjData
-        {
-            public byte[] TextureEntry;
-        }
-        public List<ObjData> ObjectData = new List<ObjData>();
+        public byte[] TextureEntry;
 
         public byte[] VisualParams;
+
+        public struct AppearanceDataEntry
+        {
+            public byte AppearanceVersion;
+            public Int32 CofVersion;
+            public UInt32 Flags;
+        }
+
+        public List<AppearanceDataEntry> AppearanceData = new List<AppearanceDataEntry>();
 
         public AvatarAppearance()
         {
@@ -57,19 +62,30 @@ namespace SilverSim.LL.Messages.Avatar
             }
         }
 
+        public override bool IsReliable
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteUUID(Sender);
             p.WriteBoolean(IsTrial);
-            p.WriteUInt8((byte)ObjectData.Count);
-            foreach (ObjData d in ObjectData)
-            {
-                p.WriteUInt16((UInt16)d.TextureEntry.Length);
-                p.WriteBytes(d.TextureEntry);
-            }
+            p.WriteUInt16((UInt16)TextureEntry.Length);
+            p.WriteBytes(TextureEntry);
             p.WriteUInt8((byte)VisualParams.Length);
             p.WriteBytes(VisualParams);
+            p.WriteUInt8((byte)AppearanceData.Count);
+            foreach(AppearanceDataEntry d in AppearanceData)
+            {
+                p.WriteUInt8(d.AppearanceVersion);
+                p.WriteInt32(d.CofVersion);
+                p.WriteUInt32(d.Flags);
+            }
         }
     }
 }
