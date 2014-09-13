@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.Types;
+using SilverSim.Types.Grid;
 
 namespace SilverSim.LL.Messages.Region
 {
@@ -14,7 +15,7 @@ namespace SilverSim.LL.Messages.Region
         public string SimName = string.Empty;
         public UInt32 EstateID = 0;
         public UInt32 ParentEstateID = 0;
-        public UInt32 RegionFlags = 0;
+        public RegionFlags RegionFlags = 0;
         public byte SimAccess = 0;
         public UInt32 MaxAgents = 0;
         public double BillableFactor = 0;
@@ -63,7 +64,7 @@ namespace SilverSim.LL.Messages.Region
             p.WriteStringLen8(SimName);
             p.WriteUInt32(EstateID);
             p.WriteUInt32(ParentEstateID);
-            p.WriteUInt32(RegionFlags);
+            p.WriteUInt32((uint)RegionFlags);
             p.WriteUInt8(SimAccess);
             if (MaxAgents > 255)
             {

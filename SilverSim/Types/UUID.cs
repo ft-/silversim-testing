@@ -89,6 +89,13 @@ namespace SilverSim.Types
             Buffer.BlockCopy(bytes, 8, dest, pos + 8, 8);
         }
 
+        public byte[] GetBytes()
+        {
+            byte[] n = new byte[16];
+            ToBytes(n, 0);
+            return n;
+        }
+
         public static UUID Parse(string val)
         {
             return new UUID(val);

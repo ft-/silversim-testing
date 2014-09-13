@@ -158,6 +158,8 @@ namespace SilverSim.Scene.Types.Object
     {
         event Action<IObject> OnPositionChange;
 
+        UInt32 LocalID { get; set; }
+
         #region Properties
         UUID ID
         {

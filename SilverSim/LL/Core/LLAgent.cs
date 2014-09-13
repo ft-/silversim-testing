@@ -61,6 +61,7 @@ namespace SilverSim.LL.Core
         #endregion
 
         #region LLAgent Properties
+        public UInt32 LocalID { get; set; }
         public Uri HomeURI { get; private set; }
 
         public TeleportFlags TeleportFlags = TeleportFlags.None;
@@ -928,6 +929,7 @@ namespace SilverSim.LL.Core
                             /* Add our agent to scene */
                             circuit.Scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
                             circuit.Scene.Environment.UpdateWindDataToSingleClient(this);
+                            circuit.Scene.SendAgentObjectToAllAgents(this);
                         }
                     }
                     break;
@@ -958,11 +960,22 @@ namespace SilverSim.LL.Core
                                 amc.AgentID = cam.AgentID;
                                 amc.ChannelVersion = VersionInfo.SimulatorVersion;
                                 amc.LookAt = new Vector3(1, 1, 0); /* TODO: extract from agent */
-                                amc.Position = new Vector3(128, 128, 23);
+                                amc.Position = GlobalPosition;
                                 amc.SessionID = cam.SessionID;
                                 amc.GridPosition = circuit.Scene.GridPosition;
 
                                 circuit.SendMessage(amc);
+
+                                Messages.Agent.CoarseLocationUpdate clu = new Messages.Agent.CoarseLocationUpdate();
+                                clu.You = 0;
+                                clu.Prey = -1;
+                                Messages.Agent.CoarseLocationUpdate.AgentDataEntry ad = new Messages.Agent.CoarseLocationUpdate.AgentDataEntry();
+                                ad.X = (byte)(uint)GlobalPosition.X;
+                                ad.Y = (byte)(uint)GlobalPosition.Y;
+                                ad.Z = (byte)(uint)GlobalPosition.Z;
+                                ad.AgentID = ID;
+                                clu.AgentData.Add(ad);
+                                circuit.SendMessage(clu);
 
                                 circuit.Scene.Environment.UpdateWindlightProfileToClient(this);
                             }
@@ -1007,6 +1020,19 @@ namespace SilverSim.LL.Core
 
                 case MessageType.RequestGodlikePowers:
                     HandleRequestGodlikePowers((Messages.God.RequestGodlikePowers)m);
+                    break;
+
+                case MessageType.MuteListRequest:
+                    {
+                        Messages.MuteList.MuteListRequest req = (Messages.MuteList.MuteListRequest)m;
+                        if(req.AgentID != ID || req.SessionID != m.CircuitSessionID)
+                        {
+                            return;
+                        }
+                        Messages.MuteList.UseCachedMuteList res = new Messages.MuteList.UseCachedMuteList();
+                        res.AgentID = req.AgentID;
+                        SendMessageAlways(res, m.CircuitSceneID);
+                    }
                     break;
 
                 default:

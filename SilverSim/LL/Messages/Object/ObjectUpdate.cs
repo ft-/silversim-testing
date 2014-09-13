@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
 
@@ -37,13 +38,13 @@ namespace SilverSim.LL.Messages.Object
             public byte State;
             public UUID FullID;
             public UInt32 CRC;
-            public byte PCode;
+            public PrimitiveCode PCode;
             public byte Material;
             public byte ClickAction;
             public Vector3 Scale;
             public byte[] ObjectData;
             public UInt32 ParentID;
-            public UInt32 UpdateFlags;
+            public PrimitiveFlags UpdateFlags;
             public byte PathCurve;
             public byte ProfileCurve;
             public UInt16 PathBegin; // 0 to 1, quanta = 0.01
@@ -81,8 +82,8 @@ namespace SilverSim.LL.Messages.Object
             public Vector3 JointAxisOrAnchor;
         }
 
-        public UInt64 RegionHandle;
-        public UInt16 TimeDilation;
+        public GridVector GridPosition;
+        public UInt16 TimeDilation = 65535;
 
         public List<ObjData> ObjectData = new List<ObjData>();
 
@@ -110,7 +111,7 @@ namespace SilverSim.LL.Messages.Object
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
-            p.WriteUInt64(RegionHandle);
+            p.WriteUInt64(GridPosition.RegionHandle);
             p.WriteUInt16(TimeDilation);
             p.WriteUInt8((byte)ObjectData.Count);
             foreach (ObjData d in ObjectData)
@@ -119,14 +120,14 @@ namespace SilverSim.LL.Messages.Object
                 p.WriteUInt8(d.State);
                 p.WriteUUID(d.FullID);
                 p.WriteUInt32(d.CRC);
-                p.WriteUInt8(d.PCode);
+                p.WriteUInt8((byte)d.PCode);
                 p.WriteUInt8(d.Material);
                 p.WriteUInt8(d.ClickAction);
                 p.WriteVector3f(d.Scale);
                 p.WriteUInt8((byte)d.ObjectData.Length);
                 p.WriteBytes(d.ObjectData);
                 p.WriteUInt32(d.ParentID);
-                p.WriteUInt32(d.UpdateFlags);
+                p.WriteUInt32((uint)d.UpdateFlags);
                 p.WriteUInt8(d.PathCurve);
                 p.WriteUInt8(d.ProfileCurve);
                 p.WriteUInt16(d.PathBegin);

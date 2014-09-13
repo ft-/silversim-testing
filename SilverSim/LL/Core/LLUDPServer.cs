@@ -448,6 +448,14 @@ namespace SilverSim.LL.Core
             m_Routing[MessageType.RequestPayPrice] = Scene.HandleSimulatorMessage;
             m_Routing[MessageType.ObjectIncludeInSearch] = Scene.HandleSimulatorMessage;
 
+            /* Regions */
+            m_Routing[MessageType.RegionHandleRequest] = Scene.HandleSimulatorMessage;
+
+            /* Mute List */
+            m_Routing[MessageType.MuteListRequest] = HandleAgentMessage;
+            m_Routing[MessageType.UpdateMuteListEntry] = HandleAgentMessage;
+            m_Routing[MessageType.RemoveMuteListEntry] = HandleAgentMessage;
+
             /* Scripts */
             m_Routing[MessageType.GetScriptRunning] = Scene.HandleSimulatorMessage;
             m_Routing[MessageType.SetScriptRunning] = Scene.HandleSimulatorMessage;
@@ -773,6 +781,19 @@ namespace SilverSim.LL.Core
         {
             m_Agents.Remove(c.AgentID);
             m_Circuits.Remove(c.RemoteEndPoint, c.CircuitCode);
+        }
+
+        public void SendMessageToAgent(UUID agentID, Message m)
+        {
+            try
+            {
+                LLAgent agent = m_Agents[agentID];
+                agent.Circuits[Scene.ID].SendMessage(m);
+            }
+            catch
+            {
+
+            }
         }
     }
     #endregion

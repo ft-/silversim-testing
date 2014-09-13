@@ -651,6 +651,117 @@ namespace SilverSim.Types
 
         #endregion Operators
 
+        #region Byte conversion
+        public byte[] AsByte
+        {
+            get
+            {
+                byte[] bytes = new byte[12];
+                ToBytes(bytes, 0);
+                return bytes;
+            }
+            set
+            {
+                FromBytes(value, 0, true);
+            }
+        }
+
+        public void FromBytes(byte[] byteArray, int pos, bool normalized)
+        {
+            if (!normalized)
+            {
+                if (!BitConverter.IsLittleEndian)
+                {
+                    // Big endian architecture
+                    byte[] conversionBuffer = new byte[16];
+
+                    Buffer.BlockCopy(byteArray, pos, conversionBuffer, 0, 16);
+
+                    Array.Reverse(conversionBuffer, 0, 4);
+                    Array.Reverse(conversionBuffer, 4, 4);
+                    Array.Reverse(conversionBuffer, 8, 4);
+                    Array.Reverse(conversionBuffer, 12, 4);
+
+                    X = BitConverter.ToSingle(conversionBuffer, 0);
+                    Y = BitConverter.ToSingle(conversionBuffer, 4);
+                    Z = BitConverter.ToSingle(conversionBuffer, 8);
+                    W = BitConverter.ToSingle(conversionBuffer, 12);
+                }
+                else
+                {
+                    // Little endian architecture
+                    X = BitConverter.ToSingle(byteArray, pos);
+                    Y = BitConverter.ToSingle(byteArray, pos + 4);
+                    Z = BitConverter.ToSingle(byteArray, pos + 8);
+                    W = BitConverter.ToSingle(byteArray, pos + 12);
+                }
+            }
+            else
+            {
+                if (!BitConverter.IsLittleEndian)
+                {
+                    // Big endian architecture
+                    byte[] conversionBuffer = new byte[16];
+
+                    Buffer.BlockCopy(byteArray, pos, conversionBuffer, 0, 12);
+
+                    Array.Reverse(conversionBuffer, 0, 4);
+                    Array.Reverse(conversionBuffer, 4, 4);
+                    Array.Reverse(conversionBuffer, 8, 4);
+
+                    X = BitConverter.ToSingle(conversionBuffer, 0);
+                    Y = BitConverter.ToSingle(conversionBuffer, 4);
+                    Z = BitConverter.ToSingle(conversionBuffer, 8);
+                }
+                else
+                {
+                    // Little endian architecture
+                    X = BitConverter.ToSingle(byteArray, pos);
+                    Y = BitConverter.ToSingle(byteArray, pos + 4);
+                    Z = BitConverter.ToSingle(byteArray, pos + 8);
+                }
+
+                double xyzsum = 1f - X * X - Y * Y - Z * Z;
+                W = (xyzsum > 0f) ? Math.Sqrt(xyzsum) : 0f;
+            }
+        }
+        public void ToBytes(byte[] dest, int pos)
+        {
+            double norm = Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
+
+            if (norm != 0f)
+            {
+                norm = 1f / norm;
+
+                double x, y, z;
+                if (W >= 0f)
+                {
+                    x = X; y = Y; z = Z;
+                }
+                else
+                {
+                    x = -X; y = -Y; z = -Z;
+                }
+
+                Buffer.BlockCopy(BitConverter.GetBytes((float)(norm * x)), 0, dest, pos + 0, 4);
+                Buffer.BlockCopy(BitConverter.GetBytes((float)(norm * y)), 0, dest, pos + 4, 4);
+                Buffer.BlockCopy(BitConverter.GetBytes((float)(norm * z)), 0, dest, pos + 8, 4);
+
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(dest, pos + 0, 4);
+                    Array.Reverse(dest, pos + 4, 4);
+                    Array.Reverse(dest, pos + 8, 4);
+                }
+            }
+            else
+            {
+                throw new InvalidOperationException(String.Format(
+                    "Quaternion {0} has been normalized to zero", ToString()));
+            }
+        }
+        #endregion
+
         #region Helpers
         public ABoolean AsBoolean { get { return new ABoolean(Length >= Single.Epsilon); } }
         public Integer AsInteger { get { return new Integer((int)Length); } }

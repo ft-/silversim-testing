@@ -107,9 +107,9 @@ namespace SilverSim.Scene.Types.Scene
 
             public bool MoveNext()
             {
-                if (m_Enum.MoveNext())
+                if (!m_Enum.MoveNext())
                 {
-                    return true;
+                    return false;
                 }
                 while (!(m_Enum.Current is ObjectGroup))
                 {

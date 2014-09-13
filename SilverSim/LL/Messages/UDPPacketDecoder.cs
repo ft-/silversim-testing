@@ -46,6 +46,11 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.ViewerEffect, Appearance.ViewerEffect.Decode);
             PacketTypes.Add(MessageType.AgentSetAppearance, Appearance.AgentSetAppearance.Decode);
 
+            /* Mute List */
+            PacketTypes.Add(MessageType.MuteListRequest, MuteList.MuteListRequest.Decode);
+            PacketTypes.Add(MessageType.UpdateMuteListEntry, MuteList.UpdateMuteListEntry.Decode);
+            PacketTypes.Add(MessageType.RemoveMuteListEntry, MuteList.RemoveMuteListEntry.Decode);
+
             /* God */
             PacketTypes.Add(MessageType.RequestGodlikePowers, God.RequestGodlikePowers.Decode);
 
@@ -156,6 +161,7 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.RequestRegionInfo, Region.RequestRegionInfo.Decode);
             PacketTypes.Add(MessageType.GodUpdateRegionInfo, Region.GodUpdateRegionInfo.Decode);
             PacketTypes.Add(MessageType.RegionHandshakeReply, Region.RegionHandshakeReply.Decode);
+            PacketTypes.Add(MessageType.RegionHandleRequest, Region.RegionHandleRequest.Decode);
 
             /* Generic */
             PacketTypes.Add(MessageType.GodlikeMessage, Generic.GodlikeMessage.Decode);

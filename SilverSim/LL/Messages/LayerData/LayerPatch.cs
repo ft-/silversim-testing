@@ -52,5 +52,17 @@ namespace SilverSim.LL.Messages.LayerData
                 }
             }
         }
+
+        public float this[int x, int y]
+        {
+            get
+            {
+                return Data[y, x];
+            }
+            set
+            {
+                Data[y, x] = value;
+            }
+        }
     }
 }

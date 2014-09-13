@@ -44,6 +44,8 @@ namespace SilverSim.Scene.Types.Object
         public event Action<IObject> OnPositionChange;
         #endregion
 
+        public UInt32 LocalID { get; set; }
+
         #region Fields
         private UUID m_ID = UUID.Zero;
         private string m_Name = string.Empty;

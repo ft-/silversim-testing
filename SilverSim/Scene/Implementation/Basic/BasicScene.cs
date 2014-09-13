@@ -48,6 +48,7 @@ using System.Collections.Generic;
 using System.Net;
 using ThreadedClasses;
 using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.Main.Common;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -243,6 +244,8 @@ namespace SilverSim.Scene.Implementation.Basic
             RegionPort = ri.ServerPort;
             m_UDPServer.Start();
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeaturesCapability("", true));
+
+            m_PacketHandlers[MessageType.RequestRegionInfo] = HandleRequestRegionInfo;
         }
         #endregion
 
@@ -329,6 +332,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 ObjectGroup objgroup = (ObjectGroup)obj;
                 List<UUID> removeAgain = new List<UUID>();
 
+                AddNewLocalID(objgroup);
                 try
                 {
                     foreach (ObjectPart objpart in objgroup.Values)
@@ -344,11 +348,20 @@ namespace SilverSim.Scene.Implementation.Basic
                     {
                         m_Primitives.Remove(objpart);
                     }
+                    RemoveLocalID(objgroup);
                 }
             }
             else
             {
-                m_Objects.Add(obj.ID, obj);
+                AddNewLocalID(obj);
+                try
+                {
+                    m_Objects.Add(obj.ID, obj);
+                }
+                catch
+                {
+                    RemoveLocalID(obj);
+                }
             }
         }
 
@@ -367,10 +380,12 @@ namespace SilverSim.Scene.Implementation.Basic
                     m_Primitives.Remove(objpart.ID);
                 }
                 m_Objects.Remove(objgroup.ID);
+                RemoveLocalID(objgroup);
             }
             else
             {
                 m_Objects.Remove(obj.ID);
+                RemoveLocalID(obj);
             }
 
             return true;
@@ -378,6 +393,7 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Scene LL Message interface
+#if OLD
         public override void HandleSimulatorMessage(Message m)
         {
             switch(m.Number)
@@ -387,6 +403,42 @@ namespace SilverSim.Scene.Implementation.Basic
                 case MessageType.ObjectDeGrab: /* => simulator */
                     break;
             }
+        }
+#endif
+
+        public void HandleRequestRegionInfo(Message m)
+        {
+            SilverSim.LL.Messages.Region.RequestRegionInfo req = (SilverSim.LL.Messages.Region.RequestRegionInfo)m;
+            if(req.SessionID != req.CircuitSessionID || req.AgentID != req.CircuitAgentID)
+            {
+                return;
+            }
+
+            SilverSim.LL.Messages.Region.RegionInfo res = new LL.Messages.Region.RegionInfo();
+            res.AgentID = req.AgentID;
+            res.SessionID = req.SessionID;
+
+            res.SimName = RegionData.Name;
+            res.EstateID = 1; /* TODO: */
+            res.ParentEstateID = 1; /* TODO: */
+            res.RegionFlags = RegionData.Flags;
+            res.SimAccess = RegionData.Access;
+            res.MaxAgents = 40;
+            res.BillableFactor = 1;
+            res.ObjectBonusFactor = 1;
+            res.WaterHeight = 21;
+            res.TerrainRaiseLimit = 100;
+            res.TerrainLowerLimit = 0;
+            res.PricePerMeter = 1;
+            res.RedirectGridX = 0;
+            res.RedirectGridY = 0;
+            res.UseEstateSun = true;
+            res.SunHour = 1;
+            res.ProductSKU = VersionInfo.SimulatorVersion;
+            res.ProductName = VersionInfo.ProductName;
+            res.RegionFlagsExtended.Add(0);
+
+            UDPServer.SendMessageToAgent(req.AgentID, res);
         }
         #endregion
     }

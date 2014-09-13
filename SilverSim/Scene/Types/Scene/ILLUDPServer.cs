@@ -23,9 +23,13 @@ exception statement from your version.
 
 */
 
+using SilverSim.LL.Messages;
+using SilverSim.Types;
+
 namespace SilverSim.Scene.Types.Scene
 {
     public interface ILLUDPServer
     {
+        void SendMessageToAgent(UUID agentID, Message m);
     }
 }

@@ -73,7 +73,7 @@ namespace SilverSim.LL.Messages.LayerData
                     throw new ArgumentException("Patch data must be a 16x16 array");
                 }
 
-                PatchHeader pheader = PrescanPatch(patches[i].Data);
+                PatchHeader pheader = PrescanPatch(patches[i]);
                 pheader.QuantWBits = 136;
                 if (extended)
                 {
@@ -87,8 +87,8 @@ namespace SilverSim.LL.Messages.LayerData
                 }
 
                 // NOTE: No idea what prequant and postquant should be or what they do
-                int[] patch = CompressPatch(patches[i].Data, pheader, 10);
-                int wbits = EncodePatchHeader(bitpack, pheader, patch);
+                int[] patch = CompressPatch(patches[i], pheader, 10);
+                int wbits = EncodePatchHeader(bitpack, pheader, patch, extended);
                 EncodePatch(bitpack, patch, 0, wbits);
             }
 
@@ -100,17 +100,17 @@ namespace SilverSim.LL.Messages.LayerData
             return layer;
         }
 
-        private static PatchHeader PrescanPatch(float[,] patch)
+        private static PatchHeader PrescanPatch(LayerPatch patch)
         {
             PatchHeader header = new PatchHeader();
             float zmax = -99999999.0f;
             float zmin = 99999999.0f;
 
-            for (int j = 0; j < LAYER_PATCH_NUM_XY_ENTRIES; j++)
+            for (int y = 0; y < LAYER_PATCH_NUM_XY_ENTRIES; y++)
             {
-                for (int i = 0; i < LAYER_PATCH_NUM_XY_ENTRIES; i++)
+                for (int x = 0; x < LAYER_PATCH_NUM_XY_ENTRIES; x++)
                 {
-                    float val = patch[j, i];
+                    float val = patch[x, y];
                     if (val > zmax)
                     {
                         zmax = val;
@@ -128,7 +128,7 @@ namespace SilverSim.LL.Messages.LayerData
             return header;
         }
 
-        private static int EncodePatchHeader(BitPacker output, PatchHeader header, int[] patch)
+        private static int EncodePatchHeader(BitPacker output, PatchHeader header, int[] patch, bool extended)
         {
             int temp;
             int wbits = (header.QuantWBits & 0x0f) + 2;
@@ -178,7 +178,14 @@ namespace SilverSim.LL.Messages.LayerData
             output.PackBits(header.QuantWBits, 8);
             output.FloatValue = header.DCOffset;
             output.PackBits(header.Range, 16);
-            output.PackBits(header.PatchIDs, 10);
+            if (extended)
+            {
+                output.PackBits(header.PatchIDs, 32);
+            }
+            else
+            {
+                output.PackBits(header.PatchIDs, 10);
+            }
 
             return wbits;
         }
@@ -256,7 +263,7 @@ namespace SilverSim.LL.Messages.LayerData
         }
 
         #region Actual compression
-        private static int[] CompressPatch(float[,] patchData, PatchHeader header, int prequant)
+        private static int[] CompressPatch(LayerPatch patchData, PatchHeader header, int prequant)
         {
             float[] block = new float[LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES];
             int wordsize = prequant;
@@ -269,11 +276,11 @@ namespace SilverSim.LL.Messages.LayerData
             header.QuantWBits |= (prequant - 2) << 4;
 
             int k = 0;
-            for (int j = 0; j < LAYER_PATCH_NUM_XY_ENTRIES; j++)
+            for (int y = 0; y < LAYER_PATCH_NUM_XY_ENTRIES; y++)
             {
-                for (int i = 0; i < LAYER_PATCH_NUM_XY_ENTRIES; i++)
+                for (int x = 0; x < LAYER_PATCH_NUM_XY_ENTRIES; x++)
                 {
-                    block[k++] = patchData[j, i] * premult - sub;
+                    block[k++] = patchData[x, y] * premult - sub;
                 }
             }
 

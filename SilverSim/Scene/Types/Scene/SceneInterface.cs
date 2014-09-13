@@ -115,6 +115,8 @@ namespace SilverSim.Scene.Types.Scene
         /* do not put any other than ICapabilityInterface into this list */
         public readonly RwLockedDictionary<string, object> SceneCapabilities = new RwLockedDictionary<string, object>();
 
+        protected readonly RwLockedDictionary<MessageType, Action<Message>> m_PacketHandlers = new RwLockedDictionary<MessageType, Action<Message>>();
+
         public RegionInfo RegionData
         {
             get
@@ -194,6 +196,7 @@ namespace SilverSim.Scene.Types.Scene
             RegionSecret = UUID.Random;
             LastIPAddress = new IPAddress(0);
             m_NotecardCache = new NotecardCache(this);
+            m_PacketHandlers[MessageType.RegionHandleRequest] = HandleRegionHandleRequest;
         }
 
         public void InvokeOnRemove()
@@ -238,6 +241,51 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        private readonly RwLockedDictionary<UInt32, IObject> m_LocalIDs = new RwLockedDictionary<uint, IObject>();
+        private UInt32 m_LastLocalID = 0;
+        private object m_LastLocalIDLock = new object();
+
+        private UInt32 NextLocalID
+        {
+            get
+            {
+                UInt32 newLocalID;
+                lock(m_LastLocalIDLock)
+                {
+                    ++m_LastLocalID;
+                    if(0 == m_LastLocalID)
+                    {
+                        ++m_LastLocalID;
+                    }
+                    newLocalID = m_LastLocalID;
+                }
+                return newLocalID;
+            }
+        }
+
+        protected void AddNewLocalID(IObject v)
+        {
+            do
+            {
+                try
+                {
+                    UInt32 localID = NextLocalID;
+                    m_LocalIDs.Add(localID, v);
+                    v.LocalID = localID;
+                    break;
+                }
+                catch
+                {
+
+                }
+            } while (true);
+        }
+
+        protected void RemoveLocalID(IObject v)
+        {
+            m_LocalIDs.Remove(v.LocalID);
+        }
+
         #region Dynamic IP Support
         public void CheckExternalNameLookup()
         {
@@ -258,7 +306,14 @@ namespace SilverSim.Scene.Types.Scene
         #endregion
 
         #region Scene LL Message interface
-        public abstract void HandleSimulatorMessage(Message m);
+        public void HandleSimulatorMessage(Message m)
+        {
+            Action<Message> del;
+            if(m_PacketHandlers.TryGetValue(m.Number, out del))
+            {
+                del(m);
+            }
+        }
         #endregion
     }
 }

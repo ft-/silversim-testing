@@ -145,27 +145,26 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     LayerPatch[] patches = new LayerPatch[dirtyPatches.Count];
                     dirtyPatches.CopyTo(patches);
+                    LayerData.LayerDataType layerType = LayerData.LayerDataType.Land;
 
-                    if (BASE_REGION_SIZE == m_Scene.RegionData.Size.X && BASE_REGION_SIZE == m_Scene.RegionData.Size.Y)
+                    if (BASE_REGION_SIZE < m_Scene.RegionData.Size.X || BASE_REGION_SIZE < m_Scene.RegionData.Size.Y)
                     {
-                        mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.Land));
+                        layerType = LayerData.LayerDataType.LandExtended;
                     }
-                    else
+                    int offset = 0;
+                    while (offset < patches.Length)
                     {
-                        int offset = 0;
-                        while (offset < patches.Length)
+                        int remaining;
+                        if (layerType == LayerData.LayerDataType.Land)
                         {
-                            if (patches.Length - offset > LayerCompressor.MAX_PATCHES_PER_MESSAGE)
-                            {
-                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.LandExtended, offset, LayerCompressor.MAX_PATCHES_PER_MESSAGE));
-                                offset += LayerCompressor.MAX_PATCHES_PER_MESSAGE;
-                            }
-                            else
-                            {
-                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.LandExtended, offset, patches.Length - offset));
-                                offset = patches.Length;
-                            }
+                            remaining = patches.Length - offset;
                         }
+                        else
+                        {
+                            remaining = Math.Min(patches.Length - offset, LayerCompressor.MAX_PATCHES_PER_MESSAGE);
+                        }
+                        mlist.Add(LayerCompressor.ToLayerMessage(patches, layerType, offset, remaining));
+                        offset += remaining;
                     }
                     return mlist;
                 }

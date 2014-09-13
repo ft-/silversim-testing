@@ -219,6 +219,14 @@ namespace SilverSim.Types
             B = b[2] / 255f;
             A = b[3] / 255f;
         }
+
+        public ColorAlpha(byte[] b, int pos)
+        {
+            R = b[pos + 0] / 255f;
+            G = b[pos + 1] / 255f;
+            B = b[pos + 2] / 255f;
+            A = b[pos + 3] / 255f;
+        }
         #endregion
 
         #region Properties

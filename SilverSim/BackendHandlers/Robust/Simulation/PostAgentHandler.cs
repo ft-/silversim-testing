@@ -219,6 +219,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
                 agent.TeleportFlags = agentPost.Destination.TeleportFlags;
                 agent.Appearance = agentPost.Appearance;
+                agent.GlobalPosition = new Vector3(128, 128, 23);
 
                 LLUDPServer udpServer = (LLUDPServer)scene.UDPServer;
 

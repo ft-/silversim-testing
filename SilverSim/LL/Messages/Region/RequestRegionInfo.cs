@@ -27,7 +27,7 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Region
 {
-    class RequestRegionInfo : Message
+    public class RequestRegionInfo : Message
     {
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;

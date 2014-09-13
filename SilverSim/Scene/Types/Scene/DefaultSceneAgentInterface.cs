@@ -111,9 +111,9 @@ namespace SilverSim.Scene.Types.Scene
 
             public bool MoveNext()
             {
-                if (m_Enum.MoveNext())
+                if(!m_Enum.MoveNext())
                 {
-                    return true;
+                    return false;
                 }
                 while (!(m_Enum.Current.GetType().GetInterfaces().Contains(typeof(IAgent))) || !((IObject)m_Enum.Current).IsInScene(m_Scene))
                 {
