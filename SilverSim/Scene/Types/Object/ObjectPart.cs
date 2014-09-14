@@ -70,6 +70,8 @@ namespace SilverSim.Scene.Types.Object
         private byte[] m_ParticleSystem = new byte[0];
         private ReaderWriterLock m_ParticleSystemLock = new ReaderWriterLock();
 
+        public int ScriptAccessPin = 0;
+
         public ParticleSystem ParticleSystem
         {
             get

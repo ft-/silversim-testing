@@ -235,6 +235,8 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                                 objpart.ParticleSystemBytes = MySQLUtilities.GetBytes(dbReader, "ParticleSystem");
 
+                                objpart.ScriptAccessPin = (int)dbReader["ScriptAccessPin"];
+
                                 LoadInventory(objpart);
                                 objgroup.Add((int)dbReader["LinkNumber"], objpart.ID, objpart);
                             }
@@ -396,7 +398,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["ShapeTwist"] = ps.Twist;
             p["ShapeType"] = (int)ps.Type;
 
-            p["ParticleSystem"] = objpart.ParticleSystem;
+            p["ParticleSystem"] = objpart.ParticleSystemBytes;
+
+            p["ScriptAccessPin"] = objpart.ScriptAccessPin;
 
             MySQLUtilities.ReplaceInsertInto(connection, "prims", p);
         }
