@@ -233,7 +233,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 ps.Type = (PrimitiveShapeType)(int)dbReader["ShapeType"];
                                 objpart.Shape = ps;
 
-                                objpart.ParticleSystem = MySQLUtilities.GetArray(dbReader, "ParticleSystem");
+                                objpart.ParticleSystemBytes = MySQLUtilities.GetBytes(dbReader, "ParticleSystem");
 
                                 LoadInventory(objpart);
                                 objgroup.Add((int)dbReader["LinkNumber"], objpart.ID, objpart);

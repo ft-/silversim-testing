@@ -243,18 +243,13 @@ namespace SilverSim.Database.MySQL
             return (int)dbReader[prefix] != 0;
         }
 
-        public static AnArray GetArray(MySqlDataReader dbReader, string prefix)
+        public static byte[] GetBytes(MySqlDataReader dbReader, string prefix)
         {
-            byte[] data = (byte[])dbReader[prefix];
-            using(MemoryStream stream = new MemoryStream(data))
+            if(dbReader[prefix] is DBNull)
             {
-                IValue val = LLSD_Binary.Deserialize(stream);
-                if(!(val is AnArray))
-                {
-                    throw new InvalidDataException("Storage data is broken");
-                }
-                return (AnArray)val;
+                return new byte[0];
             }
+            return (byte[])dbReader[prefix];
         }
         #endregion
 
