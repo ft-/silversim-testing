@@ -100,13 +100,23 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public void SendKillObjectToAgents(UInt32 agentLocalID, List<UInt32> attachments)
+        public void SendKillObjectToAgents(List<UInt32> localids)
         {
             SilverSim.LL.Messages.Object.KillObject m = new LL.Messages.Object.KillObject();
-            m.LocalIDs.Add(agentLocalID);
-            m.LocalIDs.AddRange(attachments);
+            m.LocalIDs.AddRange(localids);
             
             foreach(IAgent a in Agents)
+            {
+                a.SendMessageAlways(m, ID);
+            }
+        }
+
+        public void SendKillObjectToAgents(UInt32 localid)
+        {
+            SilverSim.LL.Messages.Object.KillObject m = new LL.Messages.Object.KillObject();
+            m.LocalIDs.Add(localid);
+
+            foreach (IAgent a in Agents)
             {
                 a.SendMessageAlways(m, ID);
             }

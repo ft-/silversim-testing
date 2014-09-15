@@ -49,6 +49,7 @@ using System.Net;
 using ThreadedClasses;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Main.Common;
+using System.Linq;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -393,17 +394,29 @@ namespace SilverSim.Scene.Implementation.Basic
             if (obj is ObjectGroup)
             {
                 ObjectGroup objgroup = (ObjectGroup)obj;
+                List<UInt32> localids = new List<UInt32>();
 
                 foreach (ObjectPart objpart in objgroup.Values)
                 {
                     m_Primitives.Remove(objpart.ID);
+                    localids.Add(objpart.LocalID);
                 }
                 m_Objects.Remove(objgroup.ID);
+                SendKillObjectToAgents(localids);
                 RemoveLocalID(objgroup);
+            }
+            else if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
+            {
+                IAgent agent = (IAgent)obj;
+                /* TODO: add attachments */
+                m_Objects.Remove(agent.ID);
+                SendKillObjectToAgents(agent.LocalID);
+                RemoveLocalID(agent);
             }
             else
             {
                 m_Objects.Remove(obj.ID);
+                SendKillObjectToAgents(obj.LocalID);
                 RemoveLocalID(obj);
             }
 
