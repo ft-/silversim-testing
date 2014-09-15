@@ -32,11 +32,11 @@ using System.Linq;
 
 namespace SilverSim.Scene.Types.Scene
 {
-    public class DefaultSceneAgentInterface : ISceneAgents
+    public class DefaultSceneRootAgentInterface : ISceneAgents
     {
         private SceneInterface m_Scene;
 
-        public DefaultSceneAgentInterface(SceneInterface scene)
+        public DefaultSceneRootAgentInterface(SceneInterface scene)
         {
             m_Scene = scene;
         }
@@ -59,7 +59,7 @@ namespace SilverSim.Scene.Types.Scene
             get
             {
                 IObject obj = m_Scene.Objects[id];
-                if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
+                if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)) && obj.IsInScene(m_Scene))
                 {
                     return (IAgent)obj;
                 }
@@ -115,7 +115,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     return false;
                 }
-                while (!(m_Enum.Current.GetType().GetInterfaces().Contains(typeof(IAgent))))
+                while (!(m_Enum.Current.GetType().GetInterfaces().Contains(typeof(IAgent))) || !((IObject)m_Enum.Current).IsInScene(m_Scene))
                 {
                     if (!m_Enum.MoveNext())
                     {

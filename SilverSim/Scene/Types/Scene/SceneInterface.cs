@@ -51,6 +51,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         IObject this[UUID id] { get; }
         void ForEach(Vector3 pos, double maxdistance, Action<IObject> d);
+        int Count { get; }
     }
 
     public interface ISceneObjectGroups : IEnumerable<ObjectGroup>
@@ -96,6 +97,7 @@ namespace SilverSim.Scene.Types.Scene
         public abstract ISceneObjectGroups ObjectGroups { get; }
         public abstract ISceneObjectParts Primitives { get; }
         public abstract ISceneAgents Agents { get; }
+        public abstract ISceneAgents RootAgents { get; }
         public abstract ISceneParcels Parcels { get; }
         public event Action<SceneInterface> OnRemove;
         public delegate void IPChangedDelegate(SceneInterface scene, IPAddress address);

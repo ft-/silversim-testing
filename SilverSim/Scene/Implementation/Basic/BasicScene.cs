@@ -79,6 +79,14 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
             }
 
+            public int Count
+            {
+                get
+                {
+                    return m_Scene.m_Objects.Count;
+                }
+            }
+
             public void ForEach(Vector3 pos, double maxdistance, Action<IObject> d)
             {
                 double maxDistanceSquared = maxdistance * maxdistance;
@@ -187,6 +195,7 @@ namespace SilverSim.Scene.Implementation.Basic
         private BasicSceneObjectParts m_SceneObjectParts;
         private DefaultSceneObjectGroupInterface m_SceneObjectGroups;
         private DefaultSceneAgentInterface m_SceneAgents;
+        private DefaultSceneRootAgentInterface m_SceneRootAgents;
 
         public override T GetService<T>()
         {
@@ -227,6 +236,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_SceneObjectParts = new BasicSceneObjectParts(this);
             m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
             m_SceneAgents = new DefaultSceneAgentInterface(this);
+            m_SceneRootAgents = new DefaultSceneRootAgentInterface(this);
             m_SceneParcels = new BasicSceneParcels(this);
             ServerParamService = serverParamService;
             CapabilitiesConfig = capabilitiesConfig;
@@ -290,6 +300,15 @@ namespace SilverSim.Scene.Implementation.Basic
                 return m_SceneAgents;
             }
         }
+
+        public override ISceneAgents RootAgents
+        {
+            get 
+            {
+                return m_SceneRootAgents;
+            }
+        }
+
         public override ISceneObjectGroups ObjectGroups 
         { 
             get

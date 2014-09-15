@@ -26,7 +26,6 @@ exception statement from your version.
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
-using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.IM;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types.IM;
@@ -75,8 +74,6 @@ namespace SilverSim.Main.IM
         {
             m_MaxThreads = maxThreads;
         }
-
-        private HttpXmlRpcHandler m_XmlRpcServer;
 
         public void Startup(ConfigurationLoader loader)
         {
