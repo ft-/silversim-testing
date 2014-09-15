@@ -49,6 +49,8 @@ namespace SilverSim.Scene.Types.Scene
             d.NameValue = string.Format("FirstName STRING RW SV {0}\nLastName STRING RW SV {1}\nTitle STRING RW SV {2}", agent.FirstName, agent.LastName, "");
             d.ObjectData = new byte[76];
             agent.Position.ToBytes(d.ObjectData, 16);
+            agent.Velocity.ToBytes(d.ObjectData, 28);
+            agent.Acceleration.ToBytes(d.ObjectData, 40);
             /*
             data.CollisionPlane.ToBytes(objectData, 0);
             data.OffsetPosition.ToBytes(objectData, 16);
