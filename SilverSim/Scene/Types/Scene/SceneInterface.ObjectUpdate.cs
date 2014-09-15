@@ -97,7 +97,6 @@ namespace SilverSim.Scene.Types.Scene
             SilverSim.LL.Messages.Object.ObjectUpdate m = AgentToObjectUpdate(agent);
             foreach (IAgent a in Agents)
             {
-                m_Log.DebugFormat("Sending Agent ObjectUpdate to {0} for {1}", a.ID, agent.ID);
                 a.SendMessageAlways(m, ID);
             }
         }
