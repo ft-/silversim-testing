@@ -43,6 +43,19 @@ namespace SilverSim.ServiceInterfaces.Grid
         }
     }
 
+    public class GridRegionNotFoundException : Exception
+    {
+        public GridRegionNotFoundException()
+        {
+
+        }
+        public GridRegionNotFoundException(string message)
+            : base(message)
+        {
+
+        }
+    }
+
     public class GridServiceInaccessibleException : Exception
     {
         public GridServiceInaccessibleException()

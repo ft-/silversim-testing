@@ -177,7 +177,11 @@ namespace SilverSim.BackendConnectors.Robust.Grid
                 if(i is Map)
                 {
                     Map m = (Map)i;
-                    rl.Add(Deserialize(m));
+                    RegionInfo r = Deserialize(m);
+                    if (r != null)
+                    {
+                        rl.Add(r);
+                    }
                 }
             }
             return rl;
@@ -188,7 +192,12 @@ namespace SilverSim.BackendConnectors.Robust.Grid
             IValue i = map["result"];
             if(i is Map)
             {
-                return Deserialize((Map)i);
+                RegionInfo r = Deserialize((Map)i);
+                if(r == null)
+                {
+                    throw new GridRegionNotFoundException();
+                }
+                return r;
             }
             else
             {
@@ -299,6 +308,12 @@ namespace SilverSim.BackendConnectors.Robust.Grid
             r.Access = (byte)map["access"].AsUInt;
             r.RegionSecret = map["regionSecret"].ToString();
             r.Owner.ID = map["owner_uuid"].AsUUID;
+            if(!Uri.IsWellFormedUriString(r.ServerURI, UriKind.Absolute) ||
+                r.ServerPort == 0 ||
+                r.ServerHttpPort == 0)
+            {
+                return null;
+            }
             return r;
         }
         #endregion
