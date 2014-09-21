@@ -844,6 +844,14 @@ namespace SilverSim.LL.Messages
                 return string.Empty;
             }
             byte[] buf = ReadBytes(len);
+            while(len > 0)
+            {
+                if(buf[len - 1] != 0)
+                {
+                    break;
+                }
+                len--;
+            }
             return Encoding.UTF8.GetString(buf, 0, len);
         }
 
@@ -868,6 +876,14 @@ namespace SilverSim.LL.Messages
                 return string.Empty;
             }
             byte[] buf = ReadBytes(len);
+            while (len > 0)
+            {
+                if (buf[len - 1] != 0)
+                {
+                    break;
+                }
+                len--;
+            }
             return Encoding.UTF8.GetString(buf, 0, len);
         }
 

@@ -104,6 +104,7 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.CopyInventoryItem, Inventory.CopyInventoryItem.Decode);
             PacketTypes.Add(MessageType.RemoveInventoryItem, Inventory.RemoveInventoryItem.Decode);
             PacketTypes.Add(MessageType.ChangeInventoryItemFlags, Inventory.ChangeInventoryItemFlags.Decode);
+            PacketTypes.Add(MessageType.CreateInventoryItem, Inventory.CreateInventoryItem.Decode);
             PacketTypes.Add(MessageType.CreateInventoryFolder, Inventory.CreateInventoryFolder.Decode);
             PacketTypes.Add(MessageType.UpdateInventoryFolder, Inventory.UpdateInventoryFolder.Decode);
             PacketTypes.Add(MessageType.MoveInventoryFolder, Inventory.MoveInventoryFolder.Decode);

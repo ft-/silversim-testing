@@ -23,27 +23,32 @@ exception statement from your version.
 
 */
 
+using SilverSim.Types.Inventory;
 using SilverSim.Types;
-using System;
+using SilverSim.Types.Asset;
+using SilverSim.Types.Asset.Format;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using System;
 
 namespace SilverSim.LL.Messages.Inventory
 {
-    public class MoveInventoryFolder : Message
+    public class CreateInventoryItem : Message
     {
         public UUID AgentID;
         public UUID SessionID;
-        public bool Stamp;
-        public struct InventoryDataEntry
-        {
-            public UUID FolderID;
-            public UUID ParentID;
-        }
-        public List<InventoryDataEntry> InventoryData = new List<InventoryDataEntry>();
 
-        public MoveInventoryFolder()
+        public UInt32 CallbackID;
+        public UUID FolderID;
+        public UUID TransactionID;
+        public InventoryItem.PermissionsMask NextOwnerMask;
+        public AssetType AssetType;
+        public InventoryType InvType;
+        public WearableType WearableType;
+        public string Name;
+        public string Description;
+
+
+        public CreateInventoryItem()
         {
 
         }
@@ -52,25 +57,25 @@ namespace SilverSim.LL.Messages.Inventory
         {
             get
             {
-                return MessageType.MoveInventoryFolder;
+                return MessageType.CreateInventoryItem;
             }
         }
 
         public static Message Decode(UDPPacket p)
         {
-            MoveInventoryFolder m = new MoveInventoryFolder();
+            CreateInventoryItem m = new CreateInventoryItem();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
-            m.Stamp = p.ReadBoolean();
 
-            uint c = p.ReadUInt8();
-            for (uint i = 0; i < c; ++i)
-            {
-                InventoryDataEntry d = new InventoryDataEntry();
-                d.FolderID = p.ReadUUID();
-                d.ParentID = p.ReadUUID();
-                m.InventoryData.Add(d);
-            }
+            m.CallbackID = p.ReadUInt32();
+            m.FolderID = p.ReadUUID();
+            m.TransactionID = p.ReadUUID();
+            m.NextOwnerMask = (InventoryItem.PermissionsMask)p.ReadUInt32();
+            m.AssetType = (AssetType)p.ReadUInt8();
+            m.InvType = (InventoryType)p.ReadUInt8();
+            m.WearableType = (WearableType)p.ReadUInt8();
+            m.Name = p.ReadStringLen8();
+            m.Description = p.ReadStringLen8();
 
             return m;
         }

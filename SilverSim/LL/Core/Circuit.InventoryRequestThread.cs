@@ -533,8 +533,10 @@ namespace SilverSim.LL.Core
                                 Agent.InventoryService.Item.Add(item);
                                 SendMessage(new Messages.Inventory.UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, req.CallbackID));
                             }
-                            catch
+                            catch(Exception e)
                             {
+                                m_Log.DebugFormat("LinkInventoryItem failed {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace.ToString());
+
                                 Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
                                 res.Message = "Failed to create item";
                                 SendMessage(res);
@@ -556,9 +558,9 @@ namespace SilverSim.LL.Core
                                 {
                                     Agent.InventoryService.Folder.Move(AgentID, d.FolderID, d.ParentID);
                                 }
-                                catch
+                                catch(Exception e)
                                 {
-
+                                    m_Log.DebugFormat("MoveInventoryFolder failed {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace.ToString());
                                 }
                             }
                         }
@@ -578,9 +580,9 @@ namespace SilverSim.LL.Core
                                 {
                                     Agent.InventoryService.Item.Move(AgentID, d.ItemID, d.FolderID);
                                 }
-                                catch
+                                catch (Exception e)
                                 {
-
+                                    m_Log.DebugFormat("MoveInventoryItem failed {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace.ToString());
                                 }
                             }
                         }
