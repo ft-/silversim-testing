@@ -23,11 +23,10 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
-using System.Collections.Generic;
+using SilverSim.Types.Inventory;
 using System;
 
 namespace SilverSim.LL.Messages.Inventory

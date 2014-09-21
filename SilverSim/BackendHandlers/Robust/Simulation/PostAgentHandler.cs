@@ -74,6 +74,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             public string PresenceServerURI = string.Empty;
             public string AvatarServerURI = string.Empty;
             public string FriendsServerURI = string.Empty;
+            public string GatekeeperURI = string.Empty;
             public readonly List<UUID> ValidForSims = new List<UUID>(); /* if empty, all sims are valid */
 
             public GridParameterMap()
@@ -85,6 +86,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             {
                 GridParameterMap m = new GridParameterMap();
                 m.HomeURI = HomeURI;
+                m.GatekeeperURI = GatekeeperURI;
                 m.AssetServerURI = AssetServerURI;
                 m.InventoryServerURI = InventoryServerURI;
                 m.GridUserServerURI = GridUserServerURI;
@@ -134,6 +136,11 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     else if (map.GridUserServerURI != "" && !Uri.IsWellFormedUriString(map.GridUserServerURI, UriKind.Absolute))
                     {
                         m_Log.WarnFormat("Skipping section {0} for invalid URI in GridUserServerURI {1}", section.Name, map.GridUserServerURI);
+                        continue;
+                    }
+                    else if (map.GatekeeperURI != "" && !Uri.IsWellFormedUriString(map.GatekeeperURI, UriKind.Absolute))
+                    {
+                        m_Log.WarnFormat("Skipping section {0} for invalid URI in GatekeeperURI {1}", section.Name, map.GatekeeperURI);
                         continue;
                     }
                     else if (map.PresenceServerURI != "" && !Uri.IsWellFormedUriString(map.PresenceServerURI, UriKind.Absolute))
@@ -333,6 +340,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
                 string assetServerURI = agentPost.Account.ServiceURLs["AssetServerURI"];
                 string inventoryServerURI = agentPost.Account.ServiceURLs["InventoryServerURI"];
+                string gatekeeperURI = scene.GatekeeperURI;
 
                 ProfileServiceInterface profileService = null;
                 UserAgentServiceInterface userAgentService = null;
@@ -345,6 +353,10 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 {
                     assetServerURI = gridparams.AssetServerURI;
                     inventoryServerURI = gridparams.InventoryServerURI;
+                    if (!string.IsNullOrEmpty(gridparams.GatekeeperURI))
+                    {
+                        gatekeeperURI = gridparams.GatekeeperURI;
+                    }
                 }
 
                 AssetServiceInterface assetService = new RobustAssetConnector(assetServerURI);
@@ -374,7 +386,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
                 LLUDPServer udpServer = (LLUDPServer)scene.UDPServer;
 
-                Circuit circuit = new Circuit(udpServer, agentPost.Circuit.CircuitCode, m_CapsRedirector, agentPost.Circuit.CapsPath, agent.ServiceURLs);
+                Circuit circuit = new Circuit(udpServer, agentPost.Circuit.CircuitCode, m_CapsRedirector, agentPost.Circuit.CapsPath, agent.ServiceURLs, gatekeeperURI);
                 IPEndPoint ep = new IPEndPoint(IPAddress.Parse(agentPost.Client.ClientIP), 0);
                 circuit.RemoteEndPoint = ep;
                 circuit.Agent = agent;

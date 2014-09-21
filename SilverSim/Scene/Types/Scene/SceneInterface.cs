@@ -110,6 +110,7 @@ namespace SilverSim.Scene.Types.Scene
         public EconomyInfo EconomyData { get; protected set; }
         private NotecardCache m_NotecardCache;
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }
+        public string GatekeeperURI { get; protected set; }
 
         /* do not put any other than ICapabilityInterface into this list */
         public readonly RwLockedDictionary<string, object> SceneCapabilities = new RwLockedDictionary<string, object>();

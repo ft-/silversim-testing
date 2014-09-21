@@ -31,6 +31,9 @@ using System;
 using System.Threading;
 using System.Collections.Generic;
 using SilverSim.LL.Messages;
+using System.IO;
+using SilverSim.Scene.Types.Scene;
+using System.Text;
 
 namespace SilverSim.LL.Core
 {
@@ -266,6 +269,10 @@ namespace SilverSim.LL.Core
                                 }
                             }
                         }
+                        break;
+
+                    case MessageType.CreateInventoryItem:
+                        HandleCreateInventoryItem((Messages.Inventory.CreateInventoryItem)m);
                         break;
 
                     case MessageType.CreateInventoryFolder:
@@ -538,7 +545,7 @@ namespace SilverSim.LL.Core
                                 m_Log.DebugFormat("LinkInventoryItem failed {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace.ToString());
 
                                 Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                                res.Message = "Failed to create item";
+                                res.Message = "ALERT: CantCreateInventory";
                                 SendMessage(res);
                             }
                         }
@@ -814,6 +821,121 @@ namespace SilverSim.LL.Core
                         }
                         break;
                 }
+            }
+        }
+
+        private void HandleCreateInventoryItem(Messages.Inventory.CreateInventoryItem req)
+        {
+            if (req.SessionID != SessionID || req.AgentID != AgentID)
+            {
+                return;
+            }
+            if (req.TransactionID == UUID.Zero)
+            {
+                InventoryFolder folder;
+                InventoryItem item;
+                try
+                {
+                    /* check availability for folder first before doing anything else */
+                    folder = Agent.InventoryService.Folder[AgentID, req.FolderID];
+                }
+                catch
+                {
+                    SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateInventory"));
+                    return;
+                }
+
+                item = new InventoryItem();
+                item.InventoryType = req.InvType;
+                item.AssetType = req.AssetType;
+                item.Description = req.Description;
+                item.Name = req.Name;
+                item.Owner = Agent.Owner;
+                item.Creator = Agent.Owner;
+                item.SaleInfo.Type = InventoryItem.SaleInfoData.SaleType.NoSale;
+                item.SaleInfo.Price = 0;
+                item.SaleInfo.PermMask = InventoryItem.PermissionsMask.All;
+                item.ParentFolderID = req.FolderID;
+
+                item.Permissions.Base = InventoryItem.PermissionsMask.All | InventoryItem.PermissionsMask.Export;
+                item.Permissions.Current = InventoryItem.PermissionsMask.All | InventoryItem.PermissionsMask.Export;
+                item.Permissions.Group = InventoryItem.PermissionsMask.None;
+                item.Permissions.EveryOne = InventoryItem.PermissionsMask.None;
+                item.Permissions.NextOwner = req.NextOwnerMask;
+
+                if(item.InventoryType == InventoryType.Landmark)
+                {
+                    Vector3 pos = Agent.GlobalPosition;
+                    string lm_data;
+                    UUID curSceneID = Agent.SceneID;
+                    SceneInterface curScene;
+                    try
+                    {
+                        curScene = Agent.Circuits[curSceneID].Scene;
+                    }
+                    catch
+                    {
+                        SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateLandmark"));
+                        return;
+                    }
+                    
+                    if (!string.IsNullOrEmpty(GatekeeperURI))
+                    {
+                        item.Name = "HG " + item.Name;
+                        item.Description += " @" + GatekeeperURI;
+
+                        lm_data = String.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\ngatekeeper {5}\n",
+                                            curScene.ID,
+                                            pos.X, pos.Y, pos.Z,
+                                            curScene.RegionData.Location.RegionHandle,
+                                            GatekeeperURI);
+                    }
+                    else
+                    {
+                        lm_data = String.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\n",
+                                            curScene.ID,
+                                            pos.X, pos.Y, pos.Z,
+                                            curScene.RegionData.Location.RegionHandle);
+                    }
+
+                    AssetData asset = new AssetData();
+                    asset.Description = item.Description;
+                    asset.Name = item.Name;
+                    asset.Data = Encoding.ASCII.GetBytes(lm_data);
+                    asset.Creator = Agent.Owner;
+                    asset.Type = AssetType.Landmark;
+                    asset.ID = UUID.Random;
+                    try
+                    {
+                        Agent.AssetService.Store(asset);
+                    }
+                    catch(Exception e)
+                    {
+                        SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateLandmark"));
+                        m_Log.Error("Failed to create asset for landmark", e);
+                        return;
+                    }
+                    try
+                    {
+                        Agent.InventoryService.Item.Add(item);
+                    }
+                    catch(Exception e)
+                    {
+                        SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateLandmark"));
+                        m_Log.Error("Failed to create inventory item for landmark", e);
+                        return;
+                    }
+                    SendMessage(new Messages.Inventory.UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, req.CallbackID));
+                }
+                else
+                {
+                    SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateInventory"));
+                    return;
+                }
+            }
+            else
+            {
+
             }
         }
         #endregion

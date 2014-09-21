@@ -77,6 +77,7 @@ namespace SilverSim.LL.Core
         private Thread m_InventoryThread;
         private bool m_InventoryThreadRunning = false;
         private BlockingQueue<Message> m_InventoryRequestQueue = new BlockingQueue<Message>();
+        public string GatekeeperURI { get; protected set; }
 
         private uint NextSequenceNumber
         {
@@ -179,11 +180,12 @@ namespace SilverSim.LL.Core
         #endregion
 
         public RwLockedDictionary<UInt32, UDPPacket> m_UnackedPackets = new RwLockedDictionary<uint, UDPPacket>();
-        public Circuit(LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector, UUID regionSeedID, Dictionary<string, string> serviceURLs)
+        public Circuit(LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector, UUID regionSeedID, Dictionary<string, string> serviceURLs, string gatekeeperURI)
         {
             m_Server = server;
             CircuitCode = circuitcode;
             m_CapsRedirector = capsredirector;
+            GatekeeperURI = gatekeeperURI;
             
             /* the following two capabilities are mandatory */
             AddCapability("SEED", regionSeedID, RegionSeedHandler);

@@ -71,19 +71,23 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             post["AssetID"] = item.AssetID;
             post["CreatorId"] = item.Creator.ID;
             post["GroupID"] = item.GroupID;
+            post["GroupOwned"] = item.GroupOwned.ToString();
             post["Folder"] = item.ParentFolderID;
             post["Owner"] = item.Owner.ID;
-            post["AssetType"] = item.AssetType.ToString();
-            post["BasePermissions"] = item.Permissions.Base.ToString();
-            post["CreationDate"] = item.CreationDate.DateTimeToUnixTime().ToString();
+            post["Name"] = item.Name;
+            post["InvType"] = ((int)item.InventoryType).ToString();
+            post["AssetType"] = ((uint)item.AssetType).ToString();
+            post["BasePermissions"] = ((uint)item.Permissions.Base).ToString();
+            post["CreationDate"] = ((uint)item.CreationDate.DateTimeToUnixTime()).ToString();
             post["CreatorData"] = item.Creator.CreatorData;
-            post["CurrentPermissions"] = item.Permissions.Current.ToString();
+            post["CurrentPermissions"] = ((uint)item.Permissions.Current).ToString();
+            post["GroupPermissions"] = ((uint)item.Permissions.Group).ToString();
             post["Description"] = item.Description;
-            post["EveryOnePermissions"] = item.Permissions.EveryOne.ToString();
+            post["EveryOnePermissions"] = ((uint)item.Permissions.EveryOne).ToString();
             post["Flags"] = item.Flags.ToString();
-            post["NextPermissions"] = item.Permissions.NextOwner.ToString();
-            post["SalePrice"] = item.SaleInfo.Price.ToString();
-            post["SaleType"] = item.SaleInfo.Type.ToString();
+            post["NextPermissions"] = ((uint)item.Permissions.NextOwner).ToString();
+            post["SalePrice"] = ((uint)item.SaleInfo.Price).ToString();
+            post["SaleType"] = ((uint)item.SaleInfo.Type).ToString();
 
             return post;
         }
