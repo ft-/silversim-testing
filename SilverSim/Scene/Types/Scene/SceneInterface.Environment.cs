@@ -222,26 +222,18 @@ namespace SilverSim.Scene.Types.Scene
                     LayerPatch[] patches = new LayerPatch[patchesList.Count];
                     patchesList.CopyTo(patches);
 
-                    if (BASE_REGION_SIZE == m_Scene.RegionData.Size.X && BASE_REGION_SIZE == m_Scene.RegionData.Size.Y)
+                    LayerData.LayerDataType layerType = LayerData.LayerDataType.Wind;
+
+                    if (BASE_REGION_SIZE < m_Scene.RegionData.Size.X || BASE_REGION_SIZE < m_Scene.RegionData.Size.Y)
                     {
-                        mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.Wind));
+                        layerType = LayerData.LayerDataType.WindExtended;
                     }
-                    else
+                    int offset = 0;
+                    while (offset < patches.Length)
                     {
-                        int offset = 0;
-                        while (offset < patches.Length)
-                        {
-                            if (patches.Length - offset > LayerCompressor.MAX_PATCHES_PER_MESSAGE)
-                            {
-                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.WindExtended, offset, LayerCompressor.MAX_PATCHES_PER_MESSAGE));
-                                offset += LayerCompressor.MAX_PATCHES_PER_MESSAGE;
-                            }
-                            else
-                            {
-                                mlist.Add(LayerCompressor.ToLayerMessage(patches, LayerData.LayerDataType.WindExtended, offset, patches.Length - offset));
-                                offset = patches.Length;
-                            }
-                        }
+                        int remaining = Math.Min(patches.Length - offset, 2);
+                        mlist.Add(LayerCompressor.ToLayerMessage(patches, layerType, offset, remaining));
+                        offset += remaining;
                     }
                     return mlist;
                 }

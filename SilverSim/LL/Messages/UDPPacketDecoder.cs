@@ -115,6 +115,7 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.LinkInventoryItem, Inventory.LinkInventoryItem.Decode);
             PacketTypes.Add(MessageType.ActivateGestures, Gestures.ActiveGestures.Decode);
             PacketTypes.Add(MessageType.DeactivateGestures, Gestures.DeactiveGestures.Decode);
+            PacketTypes.Add(MessageType.PurgeInventoryDescendents, Inventory.PurgeInventoryDescendents.Decode);
 
             /* Objects */
             PacketTypes.Add(MessageType.ObjectRotation, Object.ObjectRotation.Decode);
