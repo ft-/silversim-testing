@@ -57,6 +57,7 @@ namespace SilverSim.LL.Messages.LayerData
         }
 
         public const int MAX_PATCHES_PER_MESSAGE = 4;
+        public const int MESSAGES_PER_WIND_LAYER_PACKET = 2;
 
         public const int LAYER_PATCH_ENTRY_WIDTH = 4;
         public const int LAYER_PATCH_NUM_XY_ENTRIES = 16;
