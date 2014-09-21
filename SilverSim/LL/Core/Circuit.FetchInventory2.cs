@@ -104,11 +104,13 @@ namespace SilverSim.LL.Core
                 httpreq.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type").Close();
                 return;
             }
-            if (!(o is AnArray))
+            if (!(o is Map))
             {
                 httpreq.BeginResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML").Close();
                 return;
             }
+
+            Map reqmap = (Map)o;
 
             HttpResponse res = httpreq.BeginResponse();
             XmlTextWriter text = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM);
@@ -123,7 +125,7 @@ namespace SilverSim.LL.Core
             text.WriteEndElement();
             bool wroteheader = false;
 
-            foreach(IValue iv in (AnArray)o)
+            foreach(IValue iv in (AnArray)reqmap["items"])
             {
                 if(!(iv is Map))
                 {
