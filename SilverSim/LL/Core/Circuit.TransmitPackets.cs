@@ -92,6 +92,10 @@ namespace SilverSim.LL.Core
                 /* make high packets pass low priority packets */
                 foreach(Queue<Message> q in QueueList)
                 {
+                    if(q.Count == 0)
+                    {
+                        continue;
+                    }
                     try
                     {
                         m = q.Dequeue();

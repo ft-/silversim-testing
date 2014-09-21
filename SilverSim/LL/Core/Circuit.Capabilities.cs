@@ -260,7 +260,6 @@ namespace SilverSim.LL.Core
             foreach (KeyValuePair<string, string> kvp in capsUri)
             {
                 WriteKeyValuePair(text, kvp.Key, kvp.Value);
-                m_Log.DebugFormat("reported {0} for {1} of agent {2}", kvp.Value, kvp.Key, AgentID);
             }
             text.WriteEndElement();
             text.WriteEndElement();

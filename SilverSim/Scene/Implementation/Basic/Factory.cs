@@ -47,20 +47,14 @@ namespace SilverSim.Scene.Implementation.Basic
     {
         public ChatServiceFactoryInterface m_ChatFactory;
         public string m_ChatFactoryName;
-        public string m_PresenceServiceName;
-        public string m_AvatarServiceName;
         public string m_GroupsServiceName;
         public string m_AssetServiceName;
         public string m_GridServiceName;
-        public string m_GridUserServiceName;
         public string m_IMServiceName;
 
-        public PresenceServiceInterface m_PresenceService;
-        public AvatarServiceInterface m_AvatarService;
         public GroupsServiceInterface m_GroupsService = null;
         public AssetServiceInterface m_AssetService;
         public GridServiceInterface m_GridService;
-        public GridUserServiceInterface m_GridUserService;
         public ServerParamServiceInterface m_ServerParamService;
         public IMServiceInterface m_IMService;
         public Dictionary<string, string> m_CapabilitiesConfig;
@@ -68,12 +62,9 @@ namespace SilverSim.Scene.Implementation.Basic
         public SceneFactory(IConfig ownConfig)
         {
             m_ChatFactoryName = ownConfig.GetString("ChatService", "Chat");
-            m_PresenceServiceName = ownConfig.GetString("PresenceService", "PresenceService");
-            m_AvatarServiceName = ownConfig.GetString("AvatarService", "AvatarService");
             m_GroupsServiceName = ownConfig.GetString("GroupsService", "GroupsService");
             m_AssetServiceName = ownConfig.GetString("AssetService", "AssetService");
             m_GridServiceName = ownConfig.GetString("GridService", "GridService");
-            m_GridUserServiceName = ownConfig.GetString("GridUserService", "GridUserService");
             m_IMServiceName = ownConfig.GetString("IMService", "IMService");
             m_CapabilitiesConfig = new Dictionary<string, string>();
             foreach(string key in ownConfig.GetKeys())
@@ -88,12 +79,9 @@ namespace SilverSim.Scene.Implementation.Basic
         public void Startup(ConfigurationLoader loader)
         {
             m_ChatFactory = loader.GetService<ChatServiceFactoryInterface>(m_ChatFactoryName);
-            m_PresenceService = loader.GetService<PresenceServiceInterface>(m_PresenceServiceName);
-            m_AvatarService = loader.GetService<AvatarServiceInterface>(m_AvatarServiceName);
             m_GroupsService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
             m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
-            m_GridUserService = loader.GetService<GridUserServiceInterface>(m_GridUserServiceName);
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
             m_ServerParamService = loader.GetService<ServerParamServiceInterface>("ServerParamStorage");
         }
@@ -102,12 +90,9 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             return new BasicScene(m_ChatFactory.Instantiate(), 
                 m_IMService, 
-                m_PresenceService,
-                m_AvatarService, 
                 m_GroupsService, 
                 m_AssetService, 
                 m_GridService,
-                m_GridUserService, 
                 m_ServerParamService,
                 ri,
                 m_CapabilitiesConfig);

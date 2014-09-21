@@ -41,7 +41,7 @@ namespace SilverSim.LL.Core
         void WriteInventoryItem(InventoryItem item, XmlTextWriter writer)
         {
             WriteKeyValuePair(writer, "asset_id", item.AssetID);
-            WriteKeyValuePair(writer, "created_at", item.CreationDate.DateTimeToUnixTime());
+            WriteKeyValuePair(writer, "created_at", (uint)item.CreationDate.DateTimeToUnixTime());
             WriteKeyValuePair(writer, "desc", item.Description);
             WriteKeyValuePair(writer, "flags", item.Flags);
             WriteKeyValuePair(writer, "item_id", item.ID);

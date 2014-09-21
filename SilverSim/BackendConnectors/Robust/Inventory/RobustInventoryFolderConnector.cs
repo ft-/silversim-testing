@@ -54,7 +54,11 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
                 post["ID"] = key;
                 post["METHOD"] = "GETFOLDER";
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
-                if (!(map["folder"] is Map))
+                if(!map.ContainsKey("folder"))
+                {
+                    throw new InventoryInaccessible();
+                }
+                else if (!(map["folder"] is Map))
                 {
                     throw new InventoryInaccessible();
                 }

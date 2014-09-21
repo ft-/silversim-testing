@@ -33,14 +33,10 @@ namespace SilverSim.LL.Messages.Inventory
     {
         public UUID AgentID;
         public UUID SessionID;
-        public struct InventoryDataEntry
-        {
-            public UUID FolderID;
-            public UUID ParentID;
-            public InventoryType Type;
-            public string Name;
-        }
-        public List<InventoryDataEntry> InventoryData = new List<InventoryDataEntry>();
+        public UUID FolderID;
+        public UUID ParentFolderID;
+        public InventoryType FolderType;
+        public string FolderName;
 
         public CreateInventoryFolder()
         {
@@ -61,16 +57,10 @@ namespace SilverSim.LL.Messages.Inventory
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
 
-            uint c = p.ReadUInt8();
-            for (uint i = 0; i < c; ++i)
-            {
-                InventoryDataEntry d = new InventoryDataEntry();
-                d.FolderID = p.ReadUUID();
-                d.ParentID = p.ReadUUID();
-                d.Type = (InventoryType)p.ReadInt8();
-                d.Name = p.ReadStringLen8();
-                m.InventoryData.Add(d);
-            }
+            m.FolderID = p.ReadUUID();
+            m.ParentFolderID = p.ReadUUID();
+            m.FolderType = (InventoryType)p.ReadInt8();
+            m.FolderName = p.ReadStringLen8();
 
             return m;
         }

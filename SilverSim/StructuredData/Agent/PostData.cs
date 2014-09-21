@@ -173,6 +173,18 @@ namespace SilverSim.StructuredData.Agent
                 }
             }
 
+            if(agentparams.Account.ServiceURLs.ContainsKey("HomeURI"))
+            {
+                try
+                {
+                    agentparams.Account.Principal.HomeURI = new Uri(agentparams.Account.ServiceURLs["HomeURI"]);
+                }
+                catch
+                {
+
+                }
+            }
+
             /*-----------------------------------------------------------------*/
             /* Appearance */
             Map appearancePack = (Map)parms["packed_appearance"];

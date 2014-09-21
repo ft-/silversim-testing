@@ -193,7 +193,7 @@ namespace SilverSim.LL.Core
                                 {
                                     tp.Data = new byte[MAX_PACKET_SIZE];
                                     Buffer.BlockCopy(asset.Data, assetOffset, tp.Data, 0, MAX_PACKET_SIZE);
-                                    assetOffset -= MAX_PACKET_SIZE;
+                                    assetOffset += MAX_PACKET_SIZE;
                                     tp.Status = 0;
                                 }
                                 else 
@@ -270,36 +270,29 @@ namespace SilverSim.LL.Core
 
                     case MessageType.CreateInventoryFolder:
                         {
-                            bool failed = false;
                             Messages.Inventory.CreateInventoryFolder req = (Messages.Inventory.CreateInventoryFolder)m;
                             if(req.SessionID != SessionID || req.AgentID != AgentID)
                             {
                                 break;
                             }
 
-                            foreach (Messages.Inventory.CreateInventoryFolder.InventoryDataEntry d in req.InventoryData)
+                            try
                             {
-                                try
-                                {
 
-                                    InventoryFolder folder;
-                                    folder = Agent.InventoryService.Folder[AgentID, d.ParentID];
-                                    folder = new InventoryFolder();
-                                    folder.ID = d.FolderID;
-                                    folder.InventoryType = d.Type;
-                                    folder.Name = d.Name;
-                                    folder.Owner = Agent.Owner;
-                                    folder.ParentFolderID = d.ParentID;
-                                    folder.Version = 1;
-                                    Agent.InventoryService.Folder.Add(AgentID, folder);
-                                }
-                                catch
-                                {
-                                    failed = true;
-                                }
+                                InventoryFolder folder;
+                                folder = Agent.InventoryService.Folder[AgentID, req.ParentFolderID];
+                                folder = new InventoryFolder();
+                                folder.ID = req.FolderID;
+                                folder.InventoryType = req.FolderType;
+                                folder.Name = req.FolderName;
+                                folder.Owner = Agent.Owner;
+                                folder.ParentFolderID = req.ParentFolderID;
+                                folder.Version = 1;
+                                Agent.InventoryService.Folder.Add(AgentID, folder);
                             }
-                            if(failed)
+                            catch(Exception e)
                             {
+                                m_Log.DebugFormat("Cannot create inventory folder: {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace.ToString());
                                 SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInvFolder"));
                             }
                         }

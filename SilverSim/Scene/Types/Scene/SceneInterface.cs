@@ -104,9 +104,6 @@ namespace SilverSim.Scene.Types.Scene
         public event IPChangedDelegate OnIPChanged;
         public AssetServiceInterface AssetService { get; protected set; }
         public GroupsServiceInterface GroupsService { get; protected set; }
-        public AvatarServiceInterface AvatarService { get; protected set; }
-        public PresenceServiceInterface PresenceService { get; protected set; }
-        public GridUserServiceInterface GridUserService { get; protected set; }
         public GridServiceInterface GridService { get; protected set; }
         public EconomyServiceInterface EconomyService { get; protected set; }
         public ServerParamServiceInterface ServerParamService { get; protected set; }
@@ -152,18 +149,6 @@ namespace SilverSim.Scene.Types.Scene
             else if(typeof(T).IsAssignableFrom(typeof(GroupsServiceInterface)))
             {
                 return (T)(object)GroupsService;
-            }
-            else if(typeof(T).IsAssignableFrom(typeof(AvatarServiceInterface)))
-            {
-                return (T)(object)AvatarService;
-            }
-            else if (typeof(T).IsAssignableFrom(typeof(PresenceServiceInterface)))
-            {
-                return (T)(object)PresenceService;
-            }
-            else if (typeof(T).IsAssignableFrom(typeof(GridUserServiceInterface)))
-            {
-                return (T)(object)GridUserService;
             }
             else if (typeof(T).IsAssignableFrom(typeof(GridServiceInterface)))
             {

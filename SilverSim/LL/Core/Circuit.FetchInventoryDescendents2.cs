@@ -106,11 +106,12 @@ namespace SilverSim.LL.Core
                 httpreq.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type").Close();
                 return;
             }
-            if (!(o is AnArray))
+            if (!(o is Map))
             {
                 httpreq.BeginResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML").Close();
                 return;
             }
+            Map reqmap = (Map)o;
 
             HttpResponse res = httpreq.BeginResponse();
             XmlTextWriter text = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM);
@@ -125,7 +126,7 @@ namespace SilverSim.LL.Core
             text.WriteEndElement();
             bool wroteheader = false;
 
-            foreach (IValue iv in (AnArray)o)
+            foreach (IValue iv in (AnArray)reqmap["folders"])
             {
                 if (!(iv is Map))
                 {
@@ -139,7 +140,8 @@ namespace SilverSim.LL.Core
                 {
                     continue;
                 }
-                UUID folderid = itemmap["item_id"].AsUUID;
+                UUID folderid = itemmap["folder_id"].AsUUID;
+                UUID ownerid = itemmap["owner_id"].AsUUID;
                 bool fetch_folders = itemmap["fetch_folders"].AsBoolean;
                 bool fetch_items = itemmap["fetch_items"].AsBoolean;
 
@@ -157,7 +159,7 @@ namespace SilverSim.LL.Core
                 List<InventoryItem> childitems;
                 try
                 {
-                    childfolders = Agent.InventoryService.Folder.getFolders(AgentID, folderid);
+                    childfolders = Agent.InventoryService.Folder.getFolders(ownerid, folderid);
                 }
                 catch
                 {

@@ -55,6 +55,7 @@ using System.IO;
 using System.IO.Compression;
 using System.Net;
 using System.Text;
+using ThreadedClasses;
 
 namespace SilverSim.BackendHandlers.Robust.Simulation
 {
@@ -64,6 +65,39 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
         private static readonly ILog m_Log = LogManager.GetLogger("ROBUST AGENT HANDLER");
         private BaseHttpServer m_HttpServer;
         private Main.Common.Caps.CapsHttpRedirector m_CapsRedirector;
+        private class GridParameterMap : ICloneable
+        {
+            public string HomeURI;
+            public string AssetServerURI;
+            public string InventoryServerURI;
+            public string GridUserServerURI = string.Empty;
+            public string PresenceServerURI = string.Empty;
+            public string AvatarServerURI = string.Empty;
+            public string FriendsServerURI = string.Empty;
+            public readonly List<UUID> ValidForSims = new List<UUID>(); /* if empty, all sims are valid */
+
+            public GridParameterMap()
+            {
+
+            }
+
+            public object Clone()
+            {
+                GridParameterMap m = new GridParameterMap();
+                m.HomeURI = HomeURI;
+                m.AssetServerURI = AssetServerURI;
+                m.InventoryServerURI = InventoryServerURI;
+                m.GridUserServerURI = GridUserServerURI;
+                m.PresenceServerURI = PresenceServerURI;
+                m.AvatarServerURI = AvatarServerURI;
+                m.FriendsServerURI = FriendsServerURI;
+                m.ValidForSims.AddRange(ValidForSims);
+                return m;
+            }
+        }
+
+        private readonly RwLockedList<GridParameterMap> m_GridParameterMap = new RwLockedList<GridParameterMap>();
+
         public PostAgentHandler()
         {
 
@@ -74,6 +108,92 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             m_Log.Info("Initializing agent post handler");
             m_HttpServer = loader.HttpServer;
             m_HttpServer.StartsWithUriHandlers.Add("/agent/", AgentPostHandler);
+
+            foreach(IConfig section in loader.Config.Configs)
+            {
+                if(section.Name.StartsWith("RobustGrid-"))
+                {
+                    if(!section.Contains("HomeURI") || !section.Contains("AssetServerURI") || !section.Contains("InventoryServerURI"))
+                    {
+                        m_Log.WarnFormat("Skipping section {0} for missing entries (HomeURI, AssetServerURI and InventoryServerURI are required)", section.Name);
+                        continue;
+                    }
+                    GridParameterMap map = new GridParameterMap();
+                    map.HomeURI = section.GetString("HomeURI");
+                    map.AssetServerURI = section.GetString("AssetServerURI");
+                    map.GridUserServerURI = section.GetString("GridUserServerURI", string.Empty);
+                    map.PresenceServerURI = section.GetString("PresenceServerURI", string.Empty);
+                    map.AvatarServerURI = section.GetString("AvatarServerURI", string.Empty);
+                    map.InventoryServerURI = section.GetString("InventoryServerURI");
+
+                    if (!Uri.IsWellFormedUriString(map.HomeURI, UriKind.Absolute))
+                    {
+                        m_Log.WarnFormat("Skipping section {0} for invalid URI in HomeURI {1}", section.Name, map.HomeURI);
+                        continue;
+                    }
+                    else if (map.GridUserServerURI != "" && !Uri.IsWellFormedUriString(map.GridUserServerURI, UriKind.Absolute))
+                    {
+                        m_Log.WarnFormat("Skipping section {0} for invalid URI in GridUserServerURI {1}", section.Name, map.GridUserServerURI);
+                        continue;
+                    }
+                    else if (map.PresenceServerURI != "" && !Uri.IsWellFormedUriString(map.PresenceServerURI, UriKind.Absolute))
+                    {
+                        m_Log.WarnFormat("Skipping section {0} for invalid URI in PresenceServerURI {1}", section.Name, map.PresenceServerURI);
+                        continue;
+                    }
+                    else if (map.AvatarServerURI != "" && !Uri.IsWellFormedUriString(map.AvatarServerURI, UriKind.Absolute))
+                    {
+                        m_Log.WarnFormat("Skipping section {0} for invalid URI in AvatarServerURI {1}", section.Name, map.AvatarServerURI);
+                        continue;
+                    }
+                    else if (!Uri.IsWellFormedUriString(map.AssetServerURI, UriKind.Absolute))
+                    {
+                        m_Log.WarnFormat("Skipping section {0} for invalid URI in AssetServerURI {1}", section.Name, map.AssetServerURI);
+                        continue;
+                    }
+                    else if (!Uri.IsWellFormedUriString(map.InventoryServerURI, UriKind.Absolute))
+                    {
+                        m_Log.WarnFormat("Skipping section {0} for invalid URI in InventoryServerURI {1}", section.Name, map.InventoryServerURI);
+                        continue;
+                    }
+
+                    if(section.Contains("ValidFor"))
+                    {
+                        string[] sims = section.GetString("ValidFor", "").Split(new char[]{','}, StringSplitOptions.RemoveEmptyEntries);
+                        if(sims.Length != 0)
+                        {
+                            foreach(string sim in sims)
+                            {
+                                UUID id;
+                                try
+                                {
+                                    id = UUID.Parse(sim.Trim());
+                                }
+                                catch
+                                {
+                                    m_Log.ErrorFormat("Invalid UUID {0} encountered within ValidFor in section {1}", sim, section.Name);
+                                    continue;
+                                }
+                                map.ValidForSims.Add(id);
+                            }
+                            if(map.ValidForSims.Count == 0)
+                            {
+                                m_Log.WarnFormat("Grid Parameter Map section {0} will be valid for all sims", section.Name);
+                            }
+                        }
+                    }
+                    m_GridParameterMap.Add(map);
+                    foreach(string key in section.GetKeys())
+                    {
+                        if(key.StartsWith("Alias-"))
+                        {
+                            GridParameterMap map2 = (GridParameterMap)map.Clone();
+                            map2.HomeURI = section.GetString(key);
+                            m_GridParameterMap.Add(map2);
+                        }
+                    }
+                }
+            }
 
             m_CapsRedirector = loader.GetService<Main.Common.Caps.CapsHttpRedirector>("CapsRedirector");
         }
@@ -115,6 +235,26 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     action = parts[3];
                 }
             }
+        }
+
+        GridParameterMap FindGridParameterMap(string homeURI, SceneInterface scene)
+        {
+            foreach (GridParameterMap map in m_GridParameterMap)
+            {
+                /* some grids have weird ideas about how to map their URIs, so we need this checking for whether the grid name starts with it */
+                if (map.HomeURI.StartsWith(homeURI))
+                {
+                    if (map.ValidForSims.Count != 0)
+                    {
+                        if (!map.ValidForSims.Contains(scene.ID))
+                        {
+                            continue;
+                        }
+                    }
+                    return map;
+                }
+            }
+            return null;
         }
 
         public void DoAgentResponse(HttpRequest req, string reason, bool success)
@@ -191,15 +331,26 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     return;
                 }
 
-                AssetServiceInterface assetService = new RobustAssetConnector(agentPost.Account.ServiceURLs["AssetServerURI"]);
-                InventoryServiceInterface inventoryService = new RobustInventoryConnector(agentPost.Account.ServiceURLs["InventoryServerURI"]);
-                GroupsServiceInterface groupsService = scene.GroupsService;
+                string assetServerURI = agentPost.Account.ServiceURLs["AssetServerURI"];
+                string inventoryServerURI = agentPost.Account.ServiceURLs["InventoryServerURI"];
+
                 ProfileServiceInterface profileService = null;
                 UserAgentServiceInterface userAgentService = null;
-                PresenceServiceInterface presenceService = scene.PresenceService;
-                GridUserServiceInterface gridUserService = scene.GridUserService;
-                GridServiceInterface gridService = scene.GridService;
+                PresenceServiceInterface presenceService = null;
+                GridUserServiceInterface gridUserService = null;
                 FriendsServiceInterface friendsService = null;
+
+                GridParameterMap gridparams = FindGridParameterMap(agentPost.Account.Principal.HomeURI.ToString(), scene);
+                if(gridparams != null)
+                {
+                    assetServerURI = gridparams.AssetServerURI;
+                    inventoryServerURI = gridparams.InventoryServerURI;
+                }
+
+                AssetServiceInterface assetService = new RobustAssetConnector(assetServerURI);
+                InventoryServiceInterface inventoryService = new RobustInventoryConnector(inventoryServerURI);
+                GroupsServiceInterface groupsService = scene.GroupsService;
+                GridServiceInterface gridService = scene.GridService;
 
                 LLAgent agent = new LLAgent(
                     agentPost.Account.Principal.ID,
@@ -246,6 +397,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 }
                 catch (Exception e)
                 {
+                    m_Log.Debug("Failed agent post", e);
                     agent.Circuits.Clear();
                     DoAgentResponse(req, e.Message, false);
                     return;

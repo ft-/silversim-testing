@@ -85,7 +85,18 @@ namespace SilverSim.BackendConnectors.Robust.Common
                     case XmlNodeType.Element:
                         if(reader.GetAttribute("type") == "List")
                         {
-                            map[reader.Name] = parseMap(reader);
+                            if (reader.IsEmptyElement)
+                            {
+                                map[reader.Name] = new Map();
+                            }
+                            else
+                            {
+                                map[reader.Name] = parseMap(reader);
+                            }
+                        }
+                        else if(reader.IsEmptyElement)
+                        {
+                            map[reader.Name] = new AString();
                         }
                         else
                         {
@@ -120,6 +131,10 @@ namespace SilverSim.BackendConnectors.Robust.Common
                         if(reader.Name != "ServerResponse")
                         {
                             throw new InvalidOpenSimResponseSerialization();
+                        }
+                        else if(reader.IsEmptyElement)
+                        {
+                            return new Map();
                         }
                         else
                         {
