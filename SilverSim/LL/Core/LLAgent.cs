@@ -934,6 +934,10 @@ namespace SilverSim.LL.Core
                     }
                     break;
 
+                case MessageType.AgentSetAppearance:
+                    HandleSetAgentAppearance((Messages.Appearance.AgentSetAppearance)m);
+                    break;
+
                 case MessageType.CompleteAgentMovement:
                     {
                         Messages.Circuit.CompleteAgentMovement cam = (Messages.Circuit.CompleteAgentMovement)m;

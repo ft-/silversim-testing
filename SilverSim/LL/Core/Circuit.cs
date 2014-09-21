@@ -203,6 +203,11 @@ namespace SilverSim.LL.Core
             Dispose();
         }
 
+        static Circuit()
+        {
+            InitializeTransmitQueueRouting();
+        }
+
         #region Receive Logic
         public void PacketReceived(EndPoint ep, UDPPacket pck, List<UInt32> acknumbers)
         {

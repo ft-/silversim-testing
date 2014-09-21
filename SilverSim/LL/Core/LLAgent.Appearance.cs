@@ -46,6 +46,7 @@ using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Types.Inventory;
+using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
 using ThreadedClasses;
@@ -101,6 +102,7 @@ namespace SilverSim.LL.Core
         public UInt32 Serial = 1;
         public readonly static int MaxVisualParams = 260;
         private const int NUM_AVATAR_TEXTURES = 21;
+        private byte[] m_TextureEntry = new byte[0];
 
         public AppearanceInfo.AvatarTextureData Textures
         {
@@ -212,6 +214,47 @@ namespace SilverSim.LL.Core
                     //value.Attachments;
                 }
             }
+        }
+
+        void HandleSetAgentAppearance(Messages.Appearance.AgentSetAppearance m)
+        {
+            if (m.AgentID != ID || m.SessionID != m.CircuitSessionID)
+            {
+                return;
+            }
+
+            foreach(Messages.Appearance.AgentSetAppearance.WearableDataEntry d in m.WearableData)
+            {
+                TextureHashes[d.TextureIndex] = d.CacheID;
+            }
+
+            TextureEntry te = new TextureEntry(m.ObjectData);
+            int tidx;
+            if (te.DefaultTexture != null)
+            {
+                for (tidx = 0; tidx < Math.Min(te.FaceTextures.Length, NUM_AVATAR_TEXTURES); ++tidx)
+                {
+                    if (te.FaceTextures[tidx] != null)
+                    {
+                        Textures[tidx] = te.FaceTextures[tidx].TextureID;
+                    }
+                    else
+                    {
+                        Textures[tidx] = te.DefaultTexture.TextureID;
+                    }
+                }
+            }
+
+            m_TextureEntry = m.ObjectData;
+            
+            VisualParams = m.VisualParams;
+            Messages.Appearance.AvatarAppearance res = new Messages.Appearance.AvatarAppearance();
+            res.Sender = ID;
+            res.IsTrial = false;
+            res.VisualParams = VisualParams;
+            res.TextureEntry = m_TextureEntry;
+
+            SendMessageAlways(res, SceneID);
         }
 
         void HandleAgentWearablesRequest(Messages.Appearance.AgentWearablesRequest m)

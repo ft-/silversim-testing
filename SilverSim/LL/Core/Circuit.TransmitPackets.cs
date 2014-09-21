@@ -33,20 +33,42 @@ namespace SilverSim.LL.Core
     public partial class Circuit
     {
         #region LLUDP Packet transmitter
+        enum QueueOutType : uint
+        {
+            High,
+            LandLayerData,
+            WindLayerData,
+            GenericLayerData,
+            Medium,
+            Low,
+
+            NumQueues, /* must be last */
+        }
+        private readonly Dictionary<MessageType, QueueOutType> m_QueueOutTable = new Dictionary<MessageType, QueueOutType>();
+        static void InitializeTransmitQueueRouting()
+        {
+        }
+
         private void TransmitThread(object param)
         {
             int lastAckTick = Environment.TickCount;
             int lastPingTick = Environment.TickCount;
             byte pingID = 0;
             Thread.CurrentThread.Name = string.Format("LLUDP:Transmitter for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
-            Queue<Message> LowPriorityQueue = new Queue<Message>();
-            Queue<Message> HighPriorityQueue = new Queue<Message>();
-            Queue<Message> MediumPriorityQueue = new Queue<Message>();
-            List<Queue<Message>> QueueList = new List<Queue<Message>>(); ;
+            Queue<Message> LowPriorityQueue;
+            Queue<Message> HighPriorityQueue;
+            Queue<Message> MediumPriorityQueue;
+            Queue<Message>[] QueueList = new Queue<Message>[(uint)QueueOutType.NumQueues];
+            QueueOutType qroutidx;
 
-            QueueList.Add(HighPriorityQueue);
-            QueueList.Add(MediumPriorityQueue);
-            QueueList.Add(LowPriorityQueue);
+            for (uint qidx = 0; qidx < (uint)QueueOutType.NumQueues; ++qidx)
+            {
+                QueueList[qidx] = new Queue<Message>();
+            }
+
+            HighPriorityQueue = QueueList[(uint)QueueOutType.High];
+            MediumPriorityQueue = QueueList[(uint)QueueOutType.Medium];
+            LowPriorityQueue = QueueList[(uint)QueueOutType.Low];
 
             while (true)
             {
@@ -71,7 +93,32 @@ namespace SilverSim.LL.Core
                     {
                         break;
                     }
-                    if(m.Number < MessageType.Medium)
+
+                    if(m_QueueOutTable.TryGetValue(m.Number, out qroutidx))
+                    {
+                        QueueList[(uint)qroutidx].Enqueue(m);
+                    }
+                    else if (m.Number == MessageType.LayerData)
+                    {
+                        Messages.LayerData.LayerData ld =(Messages.LayerData.LayerData)m;
+                        switch(ld.LayerType)
+                        {
+                            case Messages.LayerData.LayerData.LayerDataType.Land:
+                            case Messages.LayerData.LayerData.LayerDataType.LandExtended:
+                                QueueList[(uint)QueueOutType.LandLayerData].Enqueue(m);
+                                break;
+
+                            case Messages.LayerData.LayerData.LayerDataType.Wind:
+                            case Messages.LayerData.LayerData.LayerDataType.WindExtended:
+                                QueueList[(uint)QueueOutType.WindLayerData].Enqueue(m);
+                                break;
+
+                            default:
+                                QueueList[(uint)QueueOutType.GenericLayerData].Enqueue(m);
+                                break;
+                        }
+                    }
+                    else if (m.Number < MessageType.Medium)
                     {
                         HighPriorityQueue.Enqueue(m);
                     }
