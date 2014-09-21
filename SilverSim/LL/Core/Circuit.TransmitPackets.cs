@@ -186,7 +186,6 @@ namespace SilverSim.LL.Core
                     }
                 }
 
-                /*
                 if (Environment.TickCount - m_LastReceivedPacketAtTime >= 60000)
                 {
                     m_Log.InfoFormat("Packet Timeout for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
@@ -195,7 +194,7 @@ namespace SilverSim.LL.Core
                     Agent = null;
                     Scene = null;
                     return;
-                }*/
+                }
 
                 if (Environment.TickCount - m_LogoutReplySentAtTime >= 10000 && m_LogoutReplySent)
                 {
