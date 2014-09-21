@@ -154,15 +154,7 @@ namespace SilverSim.Scene.Types.Scene
                     int offset = 0;
                     while (offset < patches.Length)
                     {
-                        int remaining;
-                        if (layerType == LayerData.LayerDataType.Land)
-                        {
-                            remaining = patches.Length - offset;
-                        }
-                        else
-                        {
-                            remaining = Math.Min(patches.Length - offset, LayerCompressor.MAX_PATCHES_PER_MESSAGE);
-                        }
+                        int remaining = Math.Min(patches.Length - offset, LayerCompressor.MAX_PATCHES_PER_MESSAGE);
                         mlist.Add(LayerCompressor.ToLayerMessage(patches, layerType, offset, remaining));
                         offset += remaining;
                     }
@@ -210,9 +202,7 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         throw new KeyNotFoundException();
                     }
-                    x /= LayerCompressor.LAYER_PATCH_ENTRY_WIDTH;
-                    y /= LayerCompressor.LAYER_PATCH_ENTRY_WIDTH;
-                    return m_TerrainPatches[y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES].Data[y, x];
+                    return m_TerrainPatches[y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
                 }
                 set
                 {
@@ -221,12 +211,10 @@ namespace SilverSim.Scene.Types.Scene
                         throw new KeyNotFoundException();
                     }
 
-                    x /= LayerCompressor.LAYER_PATCH_ENTRY_WIDTH;
-                    y /= LayerCompressor.LAYER_PATCH_ENTRY_WIDTH;
                     m_TerrainRwLock.AcquireWriterLock(-1);
                     try
                     {
-                        m_TerrainPatches[y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES].Data[y, x] = (float)value;
+                        m_TerrainPatches[y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = (float)value;
                     }
                     finally
                     {
