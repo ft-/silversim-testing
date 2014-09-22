@@ -104,7 +104,7 @@ namespace SilverSim.LL.Core
 
             do
             {
-                Map body;
+                IValue body;
                 string message;
 
                 try
@@ -142,7 +142,7 @@ namespace SilverSim.LL.Core
 
             Map result = new Map();
             result.Add("id", m_EventQueueEventId);
-            result.Add("boeventsdy", eventarr);
+            result.Add("events", eventarr);
 
             res = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
             res.ContentType = "application/llsd+xml";

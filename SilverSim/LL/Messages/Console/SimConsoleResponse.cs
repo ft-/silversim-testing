@@ -23,48 +23,37 @@ exception statement from your version.
 
 */
 
-namespace SilverSim.LL.Messages.Circuit
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SilverSim.Types;
+
+namespace SilverSim.LL.Messages.Console
 {
-    public class DisableSimulator : Message
+    public class SimConsoleResponse : Message
     {
-        public DisableSimulator()
-        {
+        public string Message;
 
+        public SimConsoleResponse()
+        {
         }
 
-        public override MessageType Number
+        public SimConsoleResponse(string message)
         {
-            get
-            {
-                return MessageType.DisableSimulator;
-            }
+            Message = message;
         }
 
-        public override bool IsReliable
+        public override IValue SerializeEQG()
         {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteMessageType(Number);
-        }
-
-        public override SilverSim.Types.IValue SerializeEQG()
-        {
-            SilverSim.Types.Map m = new SilverSim.Types.Map();
-
-            return m;
+            return new AString(Message);
         }
 
         public override string NameEQG
         {
             get
             {
-                return "DisableSimulator";
+                return "SimConsoleResponse";
             }
         }
     }

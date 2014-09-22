@@ -78,7 +78,7 @@ namespace SilverSim.LL.Messages.Teleport
             p.WriteUInt32((UInt32)TeleportFlags);
         }
 
-        public override SilverSim.Types.Map SerializeEQG()
+        public override SilverSim.Types.IValue SerializeEQG()
         {
             SilverSim.Types.Map m = new SilverSim.Types.Map();
             m.Add("AgentID", AgentID);

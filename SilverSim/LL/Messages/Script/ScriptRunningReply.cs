@@ -62,7 +62,7 @@ namespace SilverSim.LL.Messages.Script
             p.WriteBoolean(IsRunning);
         }
 
-        public override SilverSim.Types.Map SerializeEQG()
+        public override SilverSim.Types.IValue SerializeEQG()
         {
             SilverSim.Types.Map script = new SilverSim.Types.Map();
             script.Add("ObjectID", ObjectID);

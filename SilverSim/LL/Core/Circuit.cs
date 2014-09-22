@@ -527,18 +527,12 @@ namespace SilverSim.LL.Core
                     case MessageType.DisableSimulator:
                     case MessageType.CrossedRegion:
                     case MessageType.TeleportFinish:
+                    case 0: /* only Event Queue support */
                         m_EventQueue.Enqueue(m);
                         break;
 
                     default:
-                        if (m is Messages.Circuit.EstablishAgentCommunication)
-                        {
-                            m_EventQueue.Enqueue(m);
-                        }
-                        else
-                        {
-                            m_TxQueue.Enqueue(m);
-                        }
+                        m_TxQueue.Enqueue(m);
                         break;
                 }
             }

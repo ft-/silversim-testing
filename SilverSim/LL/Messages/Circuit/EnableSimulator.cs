@@ -67,7 +67,7 @@ namespace SilverSim.LL.Messages.Circuit
             p.WriteUInt16(SimPort);
         }
 
-        public override SilverSim.Types.Map SerializeEQG()
+        public override SilverSim.Types.IValue SerializeEQG()
         {
             SilverSim.Types.Map i = new SilverSim.Types.Map();
             i.Add("Handle", new BinaryData(GridPosition.AsBytes));

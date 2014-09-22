@@ -104,7 +104,7 @@ namespace SilverSim.LL.Messages
             throw new NotSupportedException();
         }
 
-        public virtual Types.Map SerializeEQG()
+        public virtual Types.IValue SerializeEQG()
         {
             throw new NotSupportedException();
         }
