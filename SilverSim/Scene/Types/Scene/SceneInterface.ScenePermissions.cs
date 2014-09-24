@@ -32,5 +32,20 @@ namespace SilverSim.Scene.Types.Scene
 
             return false;
         }
+
+        public bool IsSimConsoleAllowed(UUI agent)
+        {
+            if(IsPossibleGod(agent))
+            {
+                return true;
+            }
+
+            if (ServerParamService.GetBoolean(ID, "estate_manager_is_simconsole_user", false) && IsEstateManager(agent))
+            {
+                return true;
+            }
+
+            return false;
+        }
     }
 }

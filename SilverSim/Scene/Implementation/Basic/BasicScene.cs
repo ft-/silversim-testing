@@ -222,6 +222,7 @@ namespace SilverSim.Scene.Implementation.Basic
             ServerParamServiceInterface serverParamService,
             RegionInfo ri,
             Dictionary<string, string> capabilitiesConfig)
+        : base(ri.Size.X, ri.Size.Y)
         {
             m_UDPServer = new LLUDPServer(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
             GroupsService = groupsService;
@@ -238,8 +239,6 @@ namespace SilverSim.Scene.Implementation.Basic
             ID = ri.ID;
             Name = ri.Name;
             GridPosition = ri.Location;
-            SizeX = ri.Size.X;
-            SizeY = ri.Size.Y;
             Terrain = new TerrainController(this);
             Environment = new EnvironmentController(this);
             m_ChatService = chatService;

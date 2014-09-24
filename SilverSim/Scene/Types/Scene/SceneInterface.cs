@@ -87,8 +87,8 @@ namespace SilverSim.Scene.Types.Scene
         public UUID ID { get; protected set; }
         public UUID RegionSecret { get; private set; }
         public uint RegionPort { get; protected set; }
-        public uint SizeX { get; protected set; }
-        public uint SizeY { get; protected set; }
+        public uint SizeX { get; private set; }
+        public uint SizeY { get; private set; }
         public string Name { get; protected set; }
         public IPAddress LastIPAddress { get; protected set; }
         public string ExternalHostName { get; protected set; }
@@ -177,14 +177,19 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public SceneInterface()
+        private const uint PARCEL_BLOCK_SIZE = 4;
+
+        public SceneInterface(UInt32 sizeX, UInt32 sizeY)
         {
+            SizeX = sizeX;
+            SizeY = sizeY;
             Owner = new UUI();
             CapabilitiesConfig = new Dictionary<string, string>();
             RegionSecret = UUID.Random;
             LastIPAddress = new IPAddress(0);
             m_NotecardCache = new NotecardCache(this);
             m_PacketHandlers[MessageType.RegionHandleRequest] = HandleRegionHandleRequest;
+            InitializeParcelLayer();
         }
 
         public void InvokeOnRemove()

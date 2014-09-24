@@ -126,7 +126,7 @@ namespace SilverSim.Scene.Types.Parcel
         public ParcelCategory Category = ParcelCategory.None;
         public Date ClaimDate = new Date();
         public int ClaimPrice = 0;
-        public UUID GlobalID = UUID.Zero;
+        public UUID GlobalID = UUID.Random;
         public UUID GroupID = UUID.Zero;
         public bool GroupOwned = false;
         public string Description = string.Empty;
@@ -148,10 +148,139 @@ namespace SilverSim.Scene.Types.Parcel
         public URI MusicURI = null;
         public UUI Owner = new UUI();
         public UUID SnapshotID = UUID.Zero;
+        public Int32 SalePrice;
 
         public ParcelInfo()
         {
 
+        }
+
+        /*
+        public UUID ParcelID;
+        public Int32 LocalID;
+        public UUI Owner;
+        public bool IsGroupOwned;
+        public string Name;
+        public string Description;
+        public Int32 ActualArea;
+        public Int32 BillableArea;
+        public byte Flags;
+        public Vector3 GlobalPos = Vector3.Zero;
+        public string SimName;
+        public UUID SnapshotID;
+        public double Dwell;
+        public Int32 SalePrice;
+        public UInt32 AuctionID;
+        public Date ClaimDate = new Date();
+        public Int32 ClaimPrice;
+        public Int32 RentPrice;
+        public Vector3 AABBMin;
+        public Vector3 AABBMax;
+        public Int32 Area;
+        public ParcelStatus Status;
+        public double ParcelPrimBonus;
+        public Int32 OtherCleanTime;
+        public ParcelFlags ParcelFlags;
+        public string MusicURL;
+        public string MediaURL;
+        public UUID MediaID;
+        public byte MediaAutoScale;
+        public UUID GroupID;
+        public Int32 PassPrice;
+        public double PassHours;
+        public UUID AuthBuyerID;
+         */
+
+        internal byte[,] m_LandBitmap;
+        internal ReaderWriterLock m_LandBitmapRwLock = new ReaderWriterLock();
+        internal int m_BitmapWidth;
+        internal int m_BitmapHeight;
+
+        public class ParcelDataLandBitmap
+        {
+            byte[,] m_LandBitmap;
+            int m_BitmapWidth;
+            int m_BitmapHeight;
+            ReaderWriterLock m_LandBitmapRwLock;
+
+            public ParcelDataLandBitmap(byte[,] landBitmap, int bitmapWidth, int bitmapHeight, ReaderWriterLock landBitmapRwLock)
+            {
+                m_LandBitmap = landBitmap;
+                m_BitmapWidth = bitmapWidth;
+                m_BitmapHeight = bitmapHeight;
+                m_LandBitmapRwLock = landBitmapRwLock;
+            }
+
+            public byte[] Data
+            {
+                get
+                {
+                    m_LandBitmapRwLock.AcquireReaderLock(-1);
+                    try
+                    {
+                        byte[] b = new byte[m_LandBitmap.Length];
+                        Buffer.BlockCopy(m_LandBitmap, 0, b, 0, m_LandBitmap.Length);
+                        return b;
+                    }
+                    finally
+                    {
+                        m_LandBitmapRwLock.ReleaseReaderLock();
+                    }
+                }
+            }
+
+            public bool this[int x, int y]
+            {
+                get
+                {
+                    if (x < m_BitmapWidth && y < m_BitmapHeight)
+                    {
+                        return 0 != (m_LandBitmap[y, x / m_BitmapWidth] & (1 << (x % 8)));
+                    }
+                    else
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                }
+                set
+                {
+                    if (x < m_BitmapWidth && y < m_BitmapHeight)
+                    {
+                        m_LandBitmapRwLock.AcquireWriterLock(-1);
+                        try
+                        {
+                            byte b = m_LandBitmap[y, x / m_BitmapWidth];
+                            if (value)
+                            {
+                                b |= (byte)(1 << (x % 8));
+                            }
+                            else
+                            {
+                                b &= (byte)(~(1 << (x % 8)));
+                            }
+                            m_LandBitmap[y, x / m_BitmapWidth] = b;
+                        }
+                        finally
+                        {
+                            m_LandBitmapRwLock.ReleaseWriterLock();
+                        }
+                    }
+                    else
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                }
+            }
+        }
+
+        public ParcelDataLandBitmap LandBitmap { get; private set; }
+
+        public ParcelInfo(int bitmapWidth, int bitmapHeight)
+        {
+            m_LandBitmap = new byte[bitmapHeight, bitmapWidth];
+            m_BitmapWidth = bitmapWidth;
+            m_BitmapHeight = bitmapHeight;
+            LandBitmap = new ParcelDataLandBitmap(m_LandBitmap, m_BitmapWidth, m_BitmapHeight, m_LandBitmapRwLock);
         }
     }
 }
