@@ -150,11 +150,6 @@ namespace SilverSim.Scene.Types.Parcel
         public UUID SnapshotID = UUID.Zero;
         public Int32 SalePrice;
 
-        public ParcelInfo()
-        {
-
-        }
-
         /*
         public UUID ParcelID;
         public Int32 LocalID;

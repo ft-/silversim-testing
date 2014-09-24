@@ -24,7 +24,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             m_ParcelLayer = new Int32[SizeY / PARCEL_BLOCK_SIZE, SizeX / PARCEL_BLOCK_SIZE];
             m_ParcelLayerDirty = new bool[(SizeY / PARCEL_BLOCK_SIZE) * (SizeX / PARCEL_BLOCK_SIZE) / 1024];
-            ParcelInfo pi = new ParcelInfo();
+            ParcelInfo pi = new ParcelInfo((int)(SizeX / PARCEL_BLOCK_SIZE), (int)(SizeY / PARCEL_BLOCK_SIZE));
             pi.Name = "My Parcel";
             pi.Owner = Owner;
             m_Parcels.Add(pi.GlobalID, pi.LocalID, pi);
