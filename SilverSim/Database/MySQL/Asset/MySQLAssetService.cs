@@ -44,14 +44,14 @@ namespace SilverSim.Database.MySQL.Asset
 
         private string m_ConnectionString;
         private MySQLAssetMetadataService m_MetadataService;
-        private MySQLAssetReferencesService m_ReferencesService;
+        private DefaultAssetReferencesService m_ReferencesService;
 
         #region Constructor
         public MySQLAssetService(string connectionString)
         {
             m_ConnectionString = connectionString;
             m_MetadataService = new MySQLAssetMetadataService(connectionString);
-            m_ReferencesService = new MySQLAssetReferencesService(connectionString);
+            m_ReferencesService = new DefaultAssetReferencesService(this);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -318,7 +318,6 @@ namespace SilverSim.Database.MySQL.Asset
 id, name, description, assetType, local, temporary, create_time, access_time, asset_flags, CreatorID, data
              */
             MySQLUtilities.ProcessMigrations(m_ConnectionString, "assets", Migrations_Assets, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "assetreferences", Migrations_References, m_Log);
         }
 
         private static readonly string[] Migrations_Assets = new string[]
@@ -337,14 +336,6 @@ id, name, description, assetType, local, temporary, create_time, access_time, as
                     "data LONGBLOB," + 
                     "PRIMARY KEY(id)" + 
                     ") ROW_FORMAT=DYNAMIC"
-        };
-
-        private static readonly string[] Migrations_References = new string[]
-        {
-            "CREATE TABLE %tablename% (" +
-                    "id CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                    "to_id CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                    "PRIMARY KEY(id, to))"
         };
         #endregion
 
