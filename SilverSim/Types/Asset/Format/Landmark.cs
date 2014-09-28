@@ -45,7 +45,7 @@ namespace SilverSim.Types.Asset.Format
 
         public Landmark(AssetData asset)
         {
-            string input = Encoding.UTF8.GetString(asset.Data);
+            string input = Encoding.ASCII.GetString(asset.Data);
             input = input.Replace('\t', ' ');
             string[] lines = input.Split('\n');
             string[] versioninfo = lines[0].Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries);
@@ -100,7 +100,7 @@ namespace SilverSim.Types.Asset.Format
                     v.Location.RegionHandle);
             }
 
-            asset.Data = Encoding.UTF8.GetBytes(landmarkdata);
+            asset.Data = Encoding.ASCII.GetBytes(landmarkdata);
             asset.Type = AssetType.Landmark;
             asset.Name = "Landmark";
             return asset;

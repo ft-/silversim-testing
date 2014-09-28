@@ -1477,49 +1477,107 @@ namespace SilverSim.Scene.Types.Object
                 {
                     case PrimitiveShapeType.Box:
                         ret = 6;
-                        if (hasCut) ret += 2;
-                        if (hasHollow) ret += 1;
+                        if (hasCut)
+                        {
+                            ret += 2;
+                        }
+                        if (hasHollow)
+                        {
+                            ret += 1;
+                        }
                         break;
                     case PrimitiveShapeType.Cylinder:
                         ret = 3;
-                        if (hasCut) ret += 2;
-                        if (hasHollow) ret += 1;
+                        if (hasCut)
+                        {
+                            ret += 2;
+                        }
+                        if (hasHollow)
+                        {
+                            ret += 1;
+                        }
                         break;
                     case PrimitiveShapeType.Prism:
                         ret = 5;
-                        if (hasCut) ret += 2;
-                        if (hasHollow) ret += 1;
+                        if (hasCut)
+                        {
+                            ret += 2;
+                        }
+                        if (hasHollow)
+                        {
+                            ret += 1;
+                        }
                         break;
                     case PrimitiveShapeType.Sphere:
                         ret = 1;
-                        if (hasCut) ret += 2;
-                        if (hasDimple) ret += 2;
-                        if (hasHollow) ret += 1;
+                        if (hasCut)
+                        {
+                            ret += 2;
+                        }
+                        if (hasDimple)
+                        {
+                            ret += 2;
+                        }
+                        if (hasHollow)
+                        {
+                            ret += 1;
+                        }
                         break;
                     case PrimitiveShapeType.Torus:
                         ret = 1;
-                        if (hasCut) ret += 2;
-                        if (hasProfileCut) ret += 2;
-                        if (hasHollow) ret += 1;
+                        if (hasCut)
+                        {
+                            ret += 2;
+                        }
+                        if (hasProfileCut)
+                        {
+                            ret += 2;
+                        }
+                        if (hasHollow)
+                        {
+                            ret += 1;
+                        }
                         break;
                     case PrimitiveShapeType.Tube:
                         ret = 4;
-                        if (hasCut) ret += 2;
-                        if (hasProfileCut) ret += 2;
-                        if (hasHollow) ret += 1;
+                        if (hasCut)
+                        {
+                            ret += 2;
+                        }
+                        if (hasProfileCut)
+                        {
+                            ret += 2;
+                        }
+                        if (hasHollow)
+                        {
+                            ret += 1;
+                        }
                         break;
                     case PrimitiveShapeType.Ring:
                         ret = 3;
-                        if (hasCut) ret += 2;
-                        if (hasProfileCut) ret += 2;
-                        if (hasHollow) ret += 1;
+                        if (hasCut)
+                        {
+                            ret += 2;
+                        }
+                        if (hasProfileCut)
+                        {
+                            ret += 2;
+                        }
+                        if (hasHollow)
+                        {
+                            ret += 1;
+                        }
                         break;
                     case PrimitiveShapeType.Sculpt:
                         // Special mesh handling
                         if (Shape.SculptType == PrimitiveSculptType.Mesh)
+                        {
                             ret = 32; // if it's a mesh then max 32 faces
+                        }
                         else
+                        {
                             ret = 1; // if it's a sculpt then max 1 face
+                        }
                         break;
                 }
 
@@ -1529,7 +1587,7 @@ namespace SilverSim.Scene.Types.Object
 
         public ICollection<TextureEntryFace> GetFaces(int face)
         {
-            if(face  == ALL_SIDES)
+            if(face == ALL_SIDES)
             {
                 List<TextureEntryFace> list = new List<TextureEntryFace>();
                 for (int i = 0; i < NumberOfSides; ++i)

@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -31,7 +32,7 @@ using SilverSim.Types.Inventory;
 
 namespace SilverSim.Types.Asset.Format
 {
-    public class Notecard
+    public class Notecard : IReferencesAccessor
     {
         public NotecardInventory Inventory = null;
         public string Text = string.Empty;
@@ -55,6 +56,21 @@ namespace SilverSim.Types.Asset.Format
                     return;
                 }
                 readNotecard(assetdata);
+            }
+        }
+        #endregion
+
+        #region References
+        public List<UUID> References
+        {
+            get
+            {
+                List<UUID> reflist = new List<UUID>();
+                foreach(NotecardInventoryItem item in Inventory.Values)
+                {
+                    reflist.Add(item.AssetID);
+                }
+                return reflist;
             }
         }
         #endregion

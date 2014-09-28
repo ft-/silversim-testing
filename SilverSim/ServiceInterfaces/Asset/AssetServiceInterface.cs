@@ -51,6 +51,13 @@ namespace SilverSim.ServiceInterfaces.Asset
         }
         #endregion
 
+        #region References interface
+        public abstract AssetReferencesServiceInterface References
+        {
+            get;
+        }
+        #endregion
+
         #region Store asset method
         public abstract void Store(AssetData asset);
         #endregion

@@ -23,49 +23,47 @@ exception statement from your version.
 
 */
 
+using HttpClasses;
+using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.StructuredData.AssetXml;
+using SilverSim.Types;
+using SilverSim.Types.Asset;
+using System;
 using System.Collections.Generic;
+using System.IO;
+using ThreadedClasses;
 
-namespace SilverSim.Types.Asset
+namespace SilverSim.BackendConnectors.Robust.Asset
 {
-    public class AssetData : AssetMetadata, Format.IReferencesAccessor
+    public class RobustAssetReferencesConnector : AssetReferencesServiceInterface, IDisposable
     {
-        public byte[] Data = new byte[0];
+        public RobustAssetConnector m_Connector;
+        private readonly RwLockedDictionary<UUID, List<UUID>> m_ReferencesCache = new RwLockedDictionary<UUID, List<UUID>>();
 
-        public AssetData() : base()
+        public void Dispose()
         {
-
+            m_Connector = null;
         }
 
-        #region References accessor
-        public List<UUID> References
+        public RobustAssetReferencesConnector(RobustAssetConnector connector)
+        {
+            m_Connector = connector;
+        }
+
+        public override List<UUID> this[UUID asset]
         {
             get
             {
-                switch(Type)
+                List<UUID> result;
+                if(m_ReferencesCache.TryGetValue(asset, out result))
                 {
-                    case AssetType.Bodypart:
-                    case AssetType.Clothing:
-                        return new Format.Wearable(this).References;
-
-                    case AssetType.Gesture:
-                        break;
-
-                    case AssetType.Material:
-                        break;
-
-                    case AssetType.Notecard:
-                        return new Format.Notecard(this).References;
-
-                    case AssetType.Object:
-                        break;
-
-                    default:
-                        break;
+                    /* this action is cheaper than re-requesting the asset over and over again */
+                    return new List<UUID>(result);
                 }
 
-                return new List<UUID>();
+                AssetData data = m_Connector[asset];
+                return new List<UUID>(m_ReferencesCache[asset] = data.References);
             }
         }
-        #endregion
     }
 }

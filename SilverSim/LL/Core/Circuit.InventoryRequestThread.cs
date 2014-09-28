@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Types.Asset;
+using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
 using SilverSim.Types;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -866,7 +867,6 @@ namespace SilverSim.LL.Core
                 if(item.InventoryType == InventoryType.Landmark)
                 {
                     Vector3 pos = Agent.GlobalPosition;
-                    string lm_data;
                     UUID curSceneID = Agent.SceneID;
                     SceneInterface curScene;
                     try
@@ -878,32 +878,20 @@ namespace SilverSim.LL.Core
                         SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateLandmark"));
                         return;
                     }
-                    
+
+                    Landmark lm = new Landmark();
                     if (!string.IsNullOrEmpty(GatekeeperURI))
                     {
-                        item.Name = "HG " + item.Name;
-                        item.Description += " @" + GatekeeperURI;
-
-                        lm_data = String.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\ngatekeeper {5}\n",
-                                            curScene.ID,
-                                            pos.X, pos.Y, pos.Z,
-                                            curScene.RegionData.Location.RegionHandle,
-                                            GatekeeperURI);
+                        lm.GatekeeperURI = new URI(GatekeeperURI);
                     }
-                    else
-                    {
-                        lm_data = String.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\n",
-                                            curScene.ID,
-                                            pos.X, pos.Y, pos.Z,
-                                            curScene.RegionData.Location.RegionHandle);
-                    }
+                    lm.LocalPos = pos;
+                    lm.RegionID = curSceneID;
+                    lm.Location = curScene.RegionData.Location;
 
-                    AssetData asset = new AssetData();
+                    AssetData asset = lm;
                     asset.Description = item.Description;
                     asset.Name = item.Name;
-                    asset.Data = Encoding.ASCII.GetBytes(lm_data);
                     asset.Creator = Agent.Owner;
-                    asset.Type = AssetType.Landmark;
                     asset.ID = UUID.Random;
                     try
                     {

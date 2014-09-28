@@ -63,6 +63,7 @@ namespace SilverSim.BackendConnectors.Robust.Asset
         }
         private string m_AssetURI;
         private RobustAssetMetadataConnector m_MetadataService;
+        private RobustAssetReferencesConnector m_ReferencesService;
 
         #region Constructor
         public RobustAssetConnector(string uri)
@@ -75,6 +76,7 @@ namespace SilverSim.BackendConnectors.Robust.Asset
 
             m_AssetURI = uri;
             m_MetadataService = new RobustAssetMetadataConnector(uri);
+            m_ReferencesService = new RobustAssetReferencesConnector(this);
             m_MetadataService.TimeoutMs = m_TimeoutMs;
         }
 
@@ -254,6 +256,16 @@ namespace SilverSim.BackendConnectors.Robust.Asset
             get
             {
                 return m_MetadataService;
+            }
+        }
+        #endregion
+
+        #region References interface
+        public override AssetReferencesServiceInterface References
+        {
+            get
+            {
+                return m_ReferencesService;
             }
         }
         #endregion

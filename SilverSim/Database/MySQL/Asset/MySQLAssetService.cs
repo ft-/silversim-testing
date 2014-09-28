@@ -44,12 +44,14 @@ namespace SilverSim.Database.MySQL.Asset
 
         private string m_ConnectionString;
         private MySQLAssetMetadataService m_MetadataService;
+        private MySQLAssetReferencesService m_ReferencesService;
 
         #region Constructor
         public MySQLAssetService(string connectionString)
         {
             m_ConnectionString = connectionString;
             m_MetadataService = new MySQLAssetMetadataService(connectionString);
+            m_ReferencesService = new MySQLAssetReferencesService(connectionString);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -215,6 +217,16 @@ namespace SilverSim.Database.MySQL.Asset
         }
         #endregion
 
+        #region References interface
+        public override AssetReferencesServiceInterface References
+        {
+            get
+            {
+                return m_ReferencesService;
+            }
+        }
+        #endregion
+
         #region Store asset method
         public override void Store(AssetData asset)
         {
@@ -305,10 +317,11 @@ namespace SilverSim.Database.MySQL.Asset
             /*
 id, name, description, assetType, local, temporary, create_time, access_time, asset_flags, CreatorID, data
              */
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "assets", Migrations, m_Log);
+            MySQLUtilities.ProcessMigrations(m_ConnectionString, "assets", Migrations_Assets, m_Log);
+            MySQLUtilities.ProcessMigrations(m_ConnectionString, "assetreferences", Migrations_References, m_Log);
         }
 
-        private static readonly string[] Migrations = new string[]
+        private static readonly string[] Migrations_Assets = new string[]
         {
             "CREATE TABLE %tablename% (" +
                     "id CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
@@ -324,6 +337,14 @@ id, name, description, assetType, local, temporary, create_time, access_time, as
                     "data LONGBLOB," + 
                     "PRIMARY KEY(id)" + 
                     ") ROW_FORMAT=DYNAMIC"
+        };
+
+        private static readonly string[] Migrations_References = new string[]
+        {
+            "CREATE TABLE %tablename% (" +
+                    "id CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                    "to_id CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                    "PRIMARY KEY(id, to))"
         };
         #endregion
 

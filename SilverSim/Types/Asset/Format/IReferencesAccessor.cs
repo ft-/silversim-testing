@@ -25,47 +25,13 @@ exception statement from your version.
 
 using System.Collections.Generic;
 
-namespace SilverSim.Types.Asset
+namespace SilverSim.Types.Asset.Format
 {
-    public class AssetData : AssetMetadata, Format.IReferencesAccessor
+    public interface IReferencesAccessor
     {
-        public byte[] Data = new byte[0];
-
-        public AssetData() : base()
+        List<UUID> References
         {
-
+            get;
         }
-
-        #region References accessor
-        public List<UUID> References
-        {
-            get
-            {
-                switch(Type)
-                {
-                    case AssetType.Bodypart:
-                    case AssetType.Clothing:
-                        return new Format.Wearable(this).References;
-
-                    case AssetType.Gesture:
-                        break;
-
-                    case AssetType.Material:
-                        break;
-
-                    case AssetType.Notecard:
-                        return new Format.Notecard(this).References;
-
-                    case AssetType.Object:
-                        break;
-
-                    default:
-                        break;
-                }
-
-                return new List<UUID>();
-            }
-        }
-        #endregion
     }
 }

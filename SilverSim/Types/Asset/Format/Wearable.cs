@@ -53,7 +53,7 @@ namespace SilverSim.Types.Asset.Format
         Invalid = 255
     }
 
-    public class Wearable
+    public class Wearable : IReferencesAccessor
     {
         public string Name = string.Empty;
         public string Description = string.Empty;
@@ -218,6 +218,16 @@ namespace SilverSim.Types.Asset.Format
                         }
                     }
                 }
+            }
+        }
+        #endregion
+
+        #region References
+        public List<UUID> References
+        {
+            get
+            {
+                return new List<UUID>(Textures.Values);
             }
         }
         #endregion
