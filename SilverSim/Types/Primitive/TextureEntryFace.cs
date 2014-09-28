@@ -24,10 +24,11 @@ exception statement from your version.
 */
 
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.Types.Primitive
 {
-    public class TextureEntryFace : ICloneable
+    public class TextureEntryFace : ICloneable, Asset.Format.IReferencesAccessor
     {
         private ColorAlpha m_TextureColor = new ColorAlpha(1, 1, 1, 1);
         private float m_RepeatU = 1;
@@ -57,6 +58,19 @@ namespace SilverSim.Types.Primitive
         // +----------+
         private const byte MEDIA_MASK = 0x01;
         private const byte TEX_MAP_MASK = 0x06;
+
+        #region References accessor
+        public List<UUID> References
+        {
+            get
+            {
+                List<UUID> reflist = new List<UUID>();
+                reflist.Add(m_TextureID);
+                reflist.Add(m_MaterialID);
+                return reflist;
+            }
+        }
+        #endregion
 
         internal byte Material
         {

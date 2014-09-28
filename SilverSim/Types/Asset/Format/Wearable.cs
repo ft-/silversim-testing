@@ -227,7 +227,15 @@ namespace SilverSim.Types.Asset.Format
         {
             get
             {
-                return new List<UUID>(Textures.Values);
+                List<UUID> refs = new List<UUID>();
+                foreach(UUID tex in Textures.Values)
+                {
+                    if(!refs.Contains(tex))
+                    {
+                        refs.Add(tex);
+                    }
+                }
+                return refs;
             }
         }
         #endregion

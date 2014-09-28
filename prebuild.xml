@@ -108,29 +108,6 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="SilverSim.StructuredData" path="SilverSim/StructuredData" type="Library">
-      <Configuration name="Release">
-        <Options>
-          <OutputPath>../../bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug">
-        <Options>
-          <OutputPath>../../bin/</OutputPath>
-        </Options>
-      </Configuration>
-
-      <ReferencePath>../../bin/</ReferencePath>
-      <Reference name="System"/>
-      <Reference name="System.Core"/>
-      <Reference name="System.Xml"/>
-      <Reference name="SilverSim.Types" localCopy="false"/>
-      <Reference name="ThreadedClasses" localCopy="false"/>
-      <Files>
-        <Match pattern="*.cs" recurse="true"/>
-      </Files>
-    </Project>
-
     <Project frameworkVersion="v4_0" name="SilverSim.LL.Messages" path="SilverSim/LL/Messages" type="Library">
       <Configuration name="Release">
         <Options>
@@ -171,7 +148,6 @@
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
-      <Reference name="SilverSim.StructuredData" localCopy="false"/>
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
       <Reference name="SilverSim.LL.Messages" localCopy="false"/>
@@ -201,7 +177,6 @@
       <Reference name="SilverSim.Types" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
-      <Reference name="SilverSim.StructuredData" localCopy="false"/>
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
@@ -229,6 +204,7 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="SilverSim.Types" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
       </Files>
@@ -360,7 +336,6 @@
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
-      <Reference name="SilverSim.StructuredData" localCopy="false"/>
       <Reference name="Nini" path="../../../bin/" localCopy="false"/>
       <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
       <Reference name="Nwc.XmlRpc" path="../../../bin/" localCopy="false"/>
@@ -393,7 +368,6 @@
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
-      <Reference name="SilverSim.StructuredData" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Reference name="MySQL.Data" path="../../../bin/" localCopy="false"/>
       <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
@@ -423,7 +397,6 @@
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
-      <Reference name="SilverSim.StructuredData" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Reference name="MySQL.Data" path="../../../bin/" localCopy="false"/>
       <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
@@ -459,7 +432,6 @@
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
-      <Reference name="SilverSim.StructuredData" localCopy="false"/>
       <Reference name="SilverSim.LL.Messages" localCopy="false"/>
       <Reference name="SilverSim.LL.Core" localCopy="false"/>
       <Reference name="SilverSim.LL.Caps" localCopy="false"/>
@@ -495,7 +467,6 @@
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
       <Reference name="SilverSim.Types" localCopy="false"/>
-      <Reference name="SilverSim.StructuredData" localCopy="false"/>
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>

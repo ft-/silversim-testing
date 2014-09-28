@@ -30,7 +30,7 @@ using System.Text;
 
 namespace SilverSim.Types.Primitive
 {
-    public class ParticleSystem
+    public class ParticleSystem : Asset.Format.IReferencesAccessor
     {
         public enum SourcePattern : byte
         {
@@ -191,6 +191,21 @@ namespace SilverSim.Types.Primitive
         public const byte LegacyDataBlockSize = 86;
         public const byte SysDataSize = 68;
         public const byte PartDataSize = 18;
+
+        #region References accessor
+        public List<UUID> References
+        {
+            get
+            {
+                List<UUID> reflist = new List<UUID>();
+                if(Texture != UUID.Zero)
+                {
+                    reflist.Add(Texture);
+                }
+                return reflist;
+            }
+        }
+        #endregion
 
         /// <summary>
         /// Can this particle system be packed in a legacy compatible way

@@ -27,6 +27,14 @@ using System;
 
 namespace SilverSim.Types.Asset.Format
 {
+    public class NotAMaterialFormat : Exception
+    {
+        public NotAMaterialFormat()
+        {
+
+        }
+    }
+
     public class NotANotecardFormat : Exception
     {
         public NotANotecardFormat()
@@ -46,6 +54,14 @@ namespace SilverSim.Types.Asset.Format
     public class NotAWearableFormat : Exception
     {
         public NotAWearableFormat()
+        {
+
+        }
+    }
+
+    public class NotAGestureFormat : Exception
+    {
+        public NotAGestureFormat()
         {
 
         }

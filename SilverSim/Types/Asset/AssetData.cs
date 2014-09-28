@@ -48,16 +48,16 @@ namespace SilverSim.Types.Asset
                         return new Format.Wearable(this).References;
 
                     case AssetType.Gesture:
-                        break;
+                        return new Format.Gesture(this).References;
 
                     case AssetType.Material:
-                        break;
+                        return new Format.Material(this).References;
 
                     case AssetType.Notecard:
                         return new Format.Notecard(this).References;
 
                     case AssetType.Object:
-                        break;
+                        return Format.ObjectReferenceDecoder.GetReferences(this);
 
                     default:
                         break;

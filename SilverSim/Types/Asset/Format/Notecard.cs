@@ -68,7 +68,10 @@ namespace SilverSim.Types.Asset.Format
                 List<UUID> reflist = new List<UUID>();
                 foreach(NotecardInventoryItem item in Inventory.Values)
                 {
-                    reflist.Add(item.AssetID);
+                    if (!reflist.Contains(item.AssetID))
+                    {
+                        reflist.Add(item.AssetID);
+                    }
                 }
                 return reflist;
             }

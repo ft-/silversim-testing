@@ -16,7 +16,6 @@
     <Reference name="SilverSim.Types"/>
     <Reference name="SilverSim.Scripting.LSL"/>
     <Reference name="SilverSim.Scripting.Common"/>
-    <Reference name="SilverSim.StructuredData"/>
     <Files>
         <Match pattern="*.cs" recurse="true"/>
     </Files>

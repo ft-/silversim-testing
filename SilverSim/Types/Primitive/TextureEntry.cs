@@ -24,11 +24,12 @@ exception statement from your version.
 */
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace SilverSim.Types.Primitive
 {
-    public class TextureEntry
+    public class TextureEntry : Asset.Format.IReferencesAccessor
     {
         public const int MAX_TEXTURE_FACES = 32;
         public TextureEntryFace[] FaceTextures = new TextureEntryFace[MAX_TEXTURE_FACES];
@@ -48,6 +49,39 @@ namespace SilverSim.Types.Primitive
         {
             FromBytes(data, 0, data.Length);
         }
+
+        #region References accessor
+        public List<UUID> References
+        {
+            get
+            {
+                List<UUID> reflist = new List<UUID>();
+                foreach(UUID id in DefaultTexture.References)
+                {
+                    if(!reflist.Contains(id))
+                    {
+                        reflist.Add(id);
+                    }
+                }
+
+                foreach (TextureEntryFace face in FaceTextures)
+                {
+                    if (face != null)
+                    {
+                        foreach (UUID id in face.References)
+                        {
+                            if (!reflist.Contains(id))
+                            {
+                                reflist.Add(id);
+                            }
+                        }
+                    }
+                }
+
+                return reflist;
+            }
+        }
+        #endregion
 
         public TextureEntryFace this[uint index]
         {
