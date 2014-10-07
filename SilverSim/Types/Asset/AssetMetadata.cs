@@ -23,8 +23,11 @@ exception statement from your version.
 
 */
 
+using System;
+
 namespace SilverSim.Types.Asset
 {
+    [Serializable]
     public class AssetMetadata
     {
         public UUID ID = UUID.Zero;

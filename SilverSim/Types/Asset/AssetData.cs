@@ -23,10 +23,12 @@ exception statement from your version.
 
 */
 
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Types.Asset
 {
+    [Serializable]
     public class AssetData : AssetMetadata, Format.IReferencesAccessor
     {
         public byte[] Data = new byte[0];

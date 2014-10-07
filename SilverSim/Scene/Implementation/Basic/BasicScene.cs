@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.LL.Caps;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
+using SilverSim.Main.Common;
 using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Agent;
@@ -33,23 +34,19 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Parcel;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
-using SilverSim.ServiceInterfaces.Presence;
+using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using ThreadedClasses;
-using SilverSim.ServiceInterfaces.ServerParam;
-using SilverSim.Main.Common;
-using System.Linq;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
