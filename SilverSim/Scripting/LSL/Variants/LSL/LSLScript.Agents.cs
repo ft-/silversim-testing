@@ -72,21 +72,24 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
 
         public Vector3 llGetAgentSize(UUID id)
         {
-            IAgent agent;
-            try
+            lock (this)
             {
-                agent = Part.Group.Scene.Agents[id];
-            }
-            catch
-            {
+                IAgent agent;
+                try
+                {
+                    agent = Part.Group.Scene.Agents[id];
+                }
+                catch
+                {
+                    return Vector3.Zero;
+                }
+
+                if (agent.IsInScene(Part.Group.Scene))
+                {
+                    return agent.Size;
+                }
                 return Vector3.Zero;
             }
-
-            if(agent.IsInScene(Part.Group.Scene))
-            {
-                return agent.Size;
-            }
-            return Vector3.Zero;
         }
     }
 }

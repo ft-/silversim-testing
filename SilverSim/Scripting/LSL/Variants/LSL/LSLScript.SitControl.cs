@@ -39,24 +39,30 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
         #region Sit Targets
         void llSitTarget(Vector3 offset, Quaternion rot)
         {
-            Part.SitTargetOffset = offset;
-            Part.SitTargetOrientation = rot;
+            lock (this)
+            {
+                Part.SitTargetOffset = offset;
+                Part.SitTargetOrientation = rot;
+            }
         }
 
         void llLinkSitTarget(int link, Vector3 offset, Quaternion rot)
         {
             ObjectPart part;
-            if (link == LINK_THIS)
+            lock (this)
             {
-                part = Part;
-            }
-            else if (!Part.Group.TryGetValue(link, out part))
-            {
-                return;
-            }
+                if (link == LINK_THIS)
+                {
+                    part = Part;
+                }
+                else if (!Part.Group.TryGetValue(link, out part))
+                {
+                    return;
+                }
 
-            part.SitTargetOffset = offset;
-            part.SitTargetOrientation = rot;
+                part.SitTargetOffset = offset;
+                part.SitTargetOrientation = rot;
+            }
         }
         #endregion
 

@@ -39,7 +39,7 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             {
                 if(item.AssetType == AssetType.LSLText || item.AssetType == AssetType.LSLBytecode)
                 {
-                    IScriptInstance si = item.ScriptInstance;
+                    ScriptInstance si = item.ScriptInstance;
 
                     if(si != null)
                     {
@@ -51,51 +51,54 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
 
         public void llMessageLinked(int link, int num, string str, UUID id)
         {
-            LinkMessageEvent ev = new LinkMessageEvent();
-            ev.SenderNumber = Part.LinkNumber;
-            ev.TargetNumber = link;
-            ev.Number = num;
-            ev.Data = str;
-            ev.Id = id;
+            lock (this)
+            {
+                LinkMessageEvent ev = new LinkMessageEvent();
+                ev.SenderNumber = Part.LinkNumber;
+                ev.TargetNumber = link;
+                ev.Number = num;
+                ev.Data = str;
+                ev.Id = id;
 
-            if(link == LINK_THIS)
-            { 
-                enqueue_to_scripts(Part, ev);
-            }
-            else if(link == LINK_ROOT)
-            {
-                enqueue_to_scripts(Part.Group.RootPart, ev);
-            }
-            else if(link == LINK_SET)
-            {
-                foreach(ObjectPart part in Part.Group.Values)
+                if (link == LINK_THIS)
                 {
-                    enqueue_to_scripts(part, ev);
+                    enqueue_to_scripts(Part, ev);
                 }
-            }
-            else if(link == LINK_ALL_OTHERS)
-            {
-                foreach(ObjectPart part in Part.Group.Values)
+                else if (link == LINK_ROOT)
                 {
-                    if(part != Part)
+                    enqueue_to_scripts(Part.Group.RootPart, ev);
+                }
+                else if (link == LINK_SET)
+                {
+                    foreach (ObjectPart part in Part.Group.Values)
                     {
                         enqueue_to_scripts(part, ev);
                     }
                 }
-            }
-            else if(link == LINK_ROOT)
-            {
-                foreach(ObjectPart part in Part.Group.Values)
+                else if (link == LINK_ALL_OTHERS)
                 {
-                    if(part != Part.Group.RootPart)
+                    foreach (ObjectPart part in Part.Group.Values)
                     {
-                        enqueue_to_scripts(part, ev);
+                        if (part != Part)
+                        {
+                            enqueue_to_scripts(part, ev);
+                        }
                     }
                 }
-            }
-            else
-            {
-                enqueue_to_scripts(Part.Group[link], ev);
+                else if (link == LINK_ROOT)
+                {
+                    foreach (ObjectPart part in Part.Group.Values)
+                    {
+                        if (part != Part.Group.RootPart)
+                        {
+                            enqueue_to_scripts(part, ev);
+                        }
+                    }
+                }
+                else
+                {
+                    enqueue_to_scripts(Part.Group[link], ev);
+                }
             }
         }
     }

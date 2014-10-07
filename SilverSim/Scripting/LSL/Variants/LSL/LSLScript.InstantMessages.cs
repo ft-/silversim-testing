@@ -42,7 +42,10 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             im.RegionID = Part.Group.Scene.ID;
             im.Message = message;
             im.OnResult = delegate(GridInstantMessage imret, bool success) { };
-            imservice.Send(im);
+            lock (this)
+            {
+                imservice.Send(im);
+            }
         }
     }
 }

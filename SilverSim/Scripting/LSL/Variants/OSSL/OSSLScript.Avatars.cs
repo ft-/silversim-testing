@@ -35,15 +35,18 @@ namespace SilverSim.Scripting.LSL.Variants.OSSL
         {
             AnArray res = new AnArray();
 
-            foreach(IAgent agent in Part.Group.Scene.Agents)
+            lock (this)
             {
-                if(agent.ID == Part.Group.Scene.Owner.ID)
+                foreach (IAgent agent in Part.Group.Scene.Agents)
                 {
-                    continue;
+                    if (agent.ID == Part.Group.Scene.Owner.ID)
+                    {
+                        continue;
+                    }
+                    res.Add(agent.ID);
+                    res.Add(agent.GlobalPosition);
+                    res.Add(agent.Name);
                 }
-                res.Add(agent.ID);
-                res.Add(agent.GlobalPosition);
-                res.Add(agent.Name);
             }
             return res;
         }
@@ -54,9 +57,12 @@ namespace SilverSim.Scripting.LSL.Variants.OSSL
         {
             AnArray res = new AnArray();
 
-            foreach (IAgent agent in Part.Group.Scene.Agents)
+            lock (this)
             {
-                res.Add(agent.Name);
+                foreach (IAgent agent in Part.Group.Scene.Agents)
+                {
+                    res.Add(agent.Name);
+                }
             }
             return res;
         }

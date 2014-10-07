@@ -34,9 +34,12 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
     {
         private void sendChat(ListenEvent ev)
         {
-            ev.ID = Part.Group.ID;
-            ev.Name = Part.Group.Name;
-            Part.Group.Scene.GetService<ChatServiceInterface>().Send(ev);
+            lock (this)
+            {
+                ev.ID = Part.Group.ID;
+                ev.Name = Part.Group.Name;
+                Part.Group.Scene.GetService<ChatServiceInterface>().Send(ev);
+            }
         }
         public void llShout(int channel, string message)
         {
@@ -116,66 +119,78 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
 
         public Integer llListen(int channel, string name, UUID id, string msg)
         {
-            if(m_Listeners.Count >= MaxListenerHandles)
+            lock (this)
             {
-                return new Integer(-1);
-            }
-            ChatServiceInterface chatservice = Part.Group.Scene.GetService<ChatServiceInterface>();
-
-            int newhandle = 0;
-            ChatServiceInterface.Listener l;
-            for (newhandle = 0; newhandle < MaxListenerHandles; ++newhandle )
-            {
-                if(!m_Listeners.TryGetValue(newhandle, out l))
+                if (m_Listeners.Count >= MaxListenerHandles)
                 {
-                    l = chatservice.AddListen(
-                        channel, 
-                        name, 
-                        id, 
-                        msg, 
-                        delegate() { return Part.ID; },
-                        delegate() { return Part.GlobalPosition; }, 
-                        onListen);
-                    try
+                    return new Integer(-1);
+                }
+                ChatServiceInterface chatservice = Part.Group.Scene.GetService<ChatServiceInterface>();
+
+                int newhandle = 0;
+                ChatServiceInterface.Listener l;
+                for (newhandle = 0; newhandle < MaxListenerHandles; ++newhandle)
+                {
+                    if (!m_Listeners.TryGetValue(newhandle, out l))
                     {
-                        m_Listeners.Add(newhandle, l);
-                        return new Integer(newhandle);
-                    }
-                    catch
-                    {
-                        l.Remove();
-                        return new Integer(-1);
+                        l = chatservice.AddListen(
+                            channel,
+                            name,
+                            id,
+                            msg,
+                            delegate() { return Part.ID; },
+                            delegate() { return Part.GlobalPosition; },
+                            onListen);
+                        try
+                        {
+                            m_Listeners.Add(newhandle, l);
+                            return new Integer(newhandle);
+                        }
+                        catch
+                        {
+                            l.Remove();
+                            return new Integer(-1);
+                        }
                     }
                 }
+                return new Integer(-1);
             }
-            return new Integer(-1);
         }
 
         public void llListenRemove(int handle)
         {
             ChatServiceInterface.Listener l;
-            if(m_Listeners.Remove(handle, out l))
+            lock (this)
             {
-                l.Remove();
+                if (m_Listeners.Remove(handle, out l))
+                {
+                    l.Remove();
+                }
             }
         }
 
         public void llListenControl(int handle, int active)
         {
             ChatServiceInterface.Listener l;
-            if(m_Listeners.TryGetValue(handle, out l))
+            lock (this)
             {
-                l.IsActive = active != 0;
+                if (m_Listeners.TryGetValue(handle, out l))
+                {
+                    l.IsActive = active != 0;
+                }
             }
         }
 
         public void ResetListeners()
         {
             ICollection<ChatServiceInterface.Listener> coll = m_Listeners.Values;
-            m_Listeners.Clear();
-            foreach (ChatServiceInterface.Listener l in coll)
+            lock (this)
             {
-                l.Remove();
+                m_Listeners.Clear();
+                foreach (ChatServiceInterface.Listener l in coll)
+                {
+                    l.Remove();
+                }
             }
         }
     }

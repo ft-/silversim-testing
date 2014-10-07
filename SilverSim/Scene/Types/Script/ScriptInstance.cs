@@ -30,17 +30,36 @@ using System.Threading;
 
 namespace SilverSim.Scene.Types.Script
 {
-    public interface IScriptInstance : IDisposable
+    public abstract class ScriptInstance : IDisposable
     {
-        void PostEvent(IScriptEvent e);
-        bool IsRunning { get; set; }
+        public abstract void PostEvent(IScriptEvent e);
+        public abstract bool IsRunning { get; set; }
+        public bool IsAborting { get; private set; }
         /* Remove and Dispose must deregister all possible handles */
-        void Remove();
-        void Reset();
+        public abstract void Remove();
+        public abstract void Reset();
 
-        void ProcessEvent();
-        bool HasEventsPending { get; }
+        public abstract void Dispose();
 
-        ObjectPart Part { get; }
+        public abstract void ProcessEvent();
+        public abstract bool HasEventsPending { get; }
+        public IScriptWorkerThreadPool ThreadPool { get; set; }
+
+        public abstract ObjectPart Part { get; }
+
+        public ScriptInstance()
+        {
+            IsAborting = false;
+        }
+
+        public void Abort()
+        {
+            IsRunning = false;
+            IsAborting = true;
+            if (null != ThreadPool)
+            {
+                ThreadPool.AbortScript(this);
+            }
+        }
     }
 }

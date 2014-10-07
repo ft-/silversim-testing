@@ -30,13 +30,16 @@ namespace SilverSim.Scripting.LSL.Variants.OSSL
         #region osGetInventoryDesc
         public string osGetInventoryDesc(string item)
         {
-            try
+            lock (this)
             {
-                return Part.Inventory[item].Description;
-            }
-            catch
-            {
-                return string.Empty;
+                try
+                {
+                    return Part.Inventory[item].Description;
+                }
+                catch
+                {
+                    return string.Empty;
+                }
             }
         }
         #endregion

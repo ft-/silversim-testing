@@ -35,7 +35,10 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
     {
         public string llGetRegionName()
         {
-            return Part.Group.Scene.Name;
+            lock (this)
+            {
+                return Part.Group.Scene.Name;
+            }
         }
 
         public string llGetSimulatorHostname()

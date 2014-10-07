@@ -38,14 +38,20 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
 
         private void OnTimerEvent(object sender, ElapsedEventArgs e)
         {
-            PostEvent(new TimerEvent());
+            lock (this)
+            {
+                PostEvent(new TimerEvent());
+            }
         }
 
         public void llSetTimerEvent(double sec)
         {
-            m_Timer.Enabled = false;
-            m_Timer.Interval = sec;
-            m_Timer.Enabled = sec > 0.01;
+            lock (this)
+            {
+                m_Timer.Enabled = false;
+                m_Timer.Interval = sec;
+                m_Timer.Enabled = sec > 0.01;
+            }
         }
     }
 }

@@ -39,35 +39,38 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
         {
             ObjectPartInventoryItem item;
             ObjectPart.CollisionSoundParam para = new ObjectPart.CollisionSoundParam();
-            
-            if (impact_volume < 0f) impact_volume = 0f;
-            if (impact_volume > 1f) impact_volume = 1f;
 
-            para.ImpactVolume = impact_volume;
-
-            if (Part.Inventory.TryGetValue(impact_sound, out item))
+            lock (this)
             {
-                if (item.AssetType == AssetType.Sound || item.AssetType == AssetType.SoundWAV)
+                if (impact_volume < 0f) impact_volume = 0f;
+                if (impact_volume > 1f) impact_volume = 1f;
+
+                para.ImpactVolume = impact_volume;
+
+                if (Part.Inventory.TryGetValue(impact_sound, out item))
                 {
-                    para.ImpactSound = item.AssetID;
-                    Part.CollisionSound = para;
+                    if (item.AssetType == AssetType.Sound || item.AssetType == AssetType.SoundWAV)
+                    {
+                        para.ImpactSound = item.AssetID;
+                        Part.CollisionSound = para;
+                    }
+                    else
+                    {
+                        llShout(DEBUG_CHANNEL, string.Format("Inventory item {0} does not reference a sound", impact_sound));
+                    }
                 }
                 else
                 {
-                    llShout(DEBUG_CHANNEL, string.Format("Inventory item {0} does not reference a sound", impact_sound));
-                }
-            }
-            else
-            {
-                UUID id;
-                if (UUID.TryParse(impact_sound, out id))
-                {
-                    para.ImpactSound = id;
-                    Part.CollisionSound = para;
-                }
-                else
-                {
-                    llShout(DEBUG_CHANNEL, string.Format("'{0}' does not reference an inventory item nor a key", impact_sound));
+                    UUID id;
+                    if (UUID.TryParse(impact_sound, out id))
+                    {
+                        para.ImpactSound = id;
+                        Part.CollisionSound = para;
+                    }
+                    else
+                    {
+                        llShout(DEBUG_CHANNEL, string.Format("'{0}' does not reference an inventory item nor a key", impact_sound));
+                    }
                 }
             }
         }

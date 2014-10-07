@@ -45,39 +45,49 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
         public void llRemoveInventory(string item)
         {
             ObjectPartInventoryItem resitem;
-            if (Part.Inventory.TryGetValue(item, out resitem))
+            lock (this)
             {
-                IScriptInstance si = resitem.ScriptInstance;
-
-                if (si != null)
+                if (Part.Inventory.TryGetValue(item, out resitem))
                 {
-                    si.Remove();
+                    ScriptInstance si = resitem.ScriptInstance;
+
+                    if (si != null)
+                    {
+                        si.Abort();
+                        si.Remove();
+                    }
+                    Part.Inventory.Remove(resitem.ID);
                 }
-                Part.Inventory.Remove(resitem.ID);
             }
         }
 
         public UUID llGetInventoryCreator(string item)
         {
-            try
+            lock (this)
             {
-                return Part.Inventory[item].Creator.ID;
-            }
-            catch
-            {
-                return UUID.Zero;
+                try
+                {
+                    return Part.Inventory[item].Creator.ID;
+                }
+                catch
+                {
+                    return UUID.Zero;
+                }
             }
         }
 
         public UUID llGetInventoryKey(string item)
         {
-            try
+            lock (this)
             {
-                return Part.Inventory[item].ID;
-            }
-            catch
-            {
-                return UUID.Zero;
+                try
+                {
+                    return Part.Inventory[item].ID;
+                }
+                catch
+                {
+                    return UUID.Zero;
+                }
             }
         }
 
@@ -88,11 +98,14 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
 
         public int llGetInventoryNumber(int type)
         {
-            if (type == -1)
+            lock (this)
             {
-                return Part.Inventory.Count;
+                if (type == -1)
+                {
+                    return Part.Inventory.Count;
+                }
+                return Part.Inventory.CountType((Types.Inventory.InventoryType)type);
             }
-            return Part.Inventory.CountType((Types.Inventory.InventoryType)type);
         }
 
         public int llGetInventoryPermMask(string item, int category)
@@ -102,13 +115,16 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
 
         public int llGetInventoryType(string name)
         {
-            try
+            lock (this)
             {
-                return (int)Part.Inventory[name.ToString()].InventoryType;
-            }
-            catch
-            {
-                return -1;
+                try
+                {
+                    return (int)Part.Inventory[name.ToString()].InventoryType;
+                }
+                catch
+                {
+                    return -1;
+                }
             }
         }
     }

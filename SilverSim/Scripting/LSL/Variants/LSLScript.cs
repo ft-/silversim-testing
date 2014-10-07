@@ -34,7 +34,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Scripting.LSL.Variants.LSL
 {
-    public partial class LSLScript : IScriptInstance
+    public partial class LSLScript : ScriptInstance
     {
         public class ResetScriptException : Exception
         {
@@ -116,7 +116,7 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             }
         }
 
-        public void Dispose()
+        public override void Dispose()
         {
             m_Part.OnUpdate -= OnPrimUpdate;
             m_Part.OnPositionChange -= OnPrimPositionUpdate;
@@ -132,7 +132,7 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             m_Part = null;
         }
 
-        public ObjectPart Part
+        public override ObjectPart Part
         {
             get
             {
@@ -140,26 +140,26 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             }
         }
 
-        public void PostEvent(IScriptEvent e)
+        public override void PostEvent(IScriptEvent e)
         {
-            if (IsRunning)
+            if (IsRunning && !IsAborting)
             {
                 m_Events.Enqueue(e);
             }
         }
 
-        public void Reset()
+        public override void Reset()
         {
-            if (IsRunning)
+            if (IsRunning && !IsAborting)
             {
                 m_Events.Enqueue(new ResetScriptEvent());
                 /* TODO: add to script thread pool */
             }
         }
 
-        public bool IsRunning { get; set; }
+        public override bool IsRunning { get; set; }
 
-        public void Remove()
+        public override void Remove()
         {
             m_Part.OnUpdate -= OnPrimUpdate;
             m_Part.OnPositionChange -= OnPrimPositionUpdate;
@@ -173,7 +173,7 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             m_Part = null;
         }
 
-        public void ProcessEvent()
+        public override void ProcessEvent()
         {
             IScriptEvent ev;
             try
@@ -403,7 +403,7 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             }
         }
 
-        public bool HasEventsPending
+        public override bool HasEventsPending
         { 
             get
             {

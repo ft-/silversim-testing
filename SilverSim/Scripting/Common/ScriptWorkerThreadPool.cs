@@ -30,12 +30,23 @@ using ThreadedClasses;
 
 namespace SilverSim.Scripting.Common
 {
-    public sealed class ScriptWorkerThreadPool
+    public sealed class ScriptWorkerThreadPool : IScriptWorkerThreadPool
     {
-        private BlockingQueue<IScriptInstance> m_ScriptTriggerQueue = new BlockingQueue<IScriptInstance>();
-        private RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
+        private BlockingQueue<ScriptInstance> m_ScriptTriggerQueue = new BlockingQueue<ScriptInstance>();
         private int m_MinimumThreads = 2;
         private int m_MaximumThreads = 150;
+        public class ScriptThreadContext
+        {
+            public ScriptInstance CurrentScriptInstance = null;
+            public Thread ScriptThread;
+            public ScriptWorkerThreadPool ThreadPool;
+
+            public ScriptThreadContext()
+            {
+
+            }
+        }
+        private RwLockedList<ScriptThreadContext> m_Threads = new RwLockedList<ScriptThreadContext>();
 
         public int MinimumThreads
         {
@@ -82,14 +93,17 @@ namespace SilverSim.Scripting.Common
             MaximumThreads = maximumThreads;
 
             for (int threadCount = 0; threadCount < m_MinimumThreads; ++threadCount)
-            { 
-                Thread t = new Thread(ThreadMain);
-                t.Start(this);
-                m_Threads.Add(t);
+            {
+                ScriptThreadContext tc = new ScriptThreadContext();
+                tc.ScriptThread = new Thread(ThreadMain);
+                tc.ScriptThread.Name = "Script Worker";
+                tc.ThreadPool = this;
+                tc.ScriptThread.Start(tc);
+                m_Threads.Add(tc);
             }
         }
 
-        public void PostScript(IScriptInstance i)
+        public void PostScript(ScriptInstance i)
         {
             /* Do not enqueue the already queued script */
             if(m_ScriptTriggerQueue.Contains(i))
@@ -104,9 +118,12 @@ namespace SilverSim.Scripting.Common
                 {
                     try
                     {
-                        Thread t = new Thread(ThreadMain);
-                        t.Start(this);
-                        m_Threads.Add(t);
+                        ScriptThreadContext tc = new ScriptThreadContext();
+                        tc.ScriptThread = new Thread(ThreadMain);
+                        tc.ThreadPool = this;
+                        tc.ScriptThread.Name = "Script Worker";
+                        tc.ScriptThread.Start(tc);
+                        m_Threads.Add(tc);
                     }
                     catch
                     {
@@ -116,10 +133,30 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        public void AbortScript(ScriptInstance script)
+        {
+            m_Threads.ForEach(delegate(ScriptThreadContext tc)
+            {
+                lock (tc)
+                {
+                    if (tc.CurrentScriptInstance == script)
+                    {
+                        /* we can actually abort that script without killing the worker thread here */
+                        /* care for the deletion guards here */
+                        lock (tc.CurrentScriptInstance)
+                        {
+                            tc.ScriptThread.Abort();
+                        }
+                    }
+                }
+            });
+        }
+
         private void ThreadMain(object obj)
         {
+            ScriptThreadContext tc = (ScriptThreadContext)obj;
             ScriptWorkerThreadPool pool = (ScriptWorkerThreadPool) obj;
-            IScriptInstance ev;
+            ScriptInstance ev;
             while (true)
             {
                 try
@@ -132,14 +169,31 @@ namespace SilverSim.Scripting.Common
                     {
                         if (m_Threads.Count > m_MinimumThreads)
                         {
-                            m_Threads.Remove(Thread.CurrentThread);
+                            m_Threads.Remove(tc);
                             return;
                         }
                     }
                     return;
                 }
 
-                ev.ProcessEvent();
+                try
+                {
+                    lock (tc)
+                    {
+                        ev.ThreadPool = this;
+                        tc.CurrentScriptInstance = ev;
+                    }
+                    ev.ProcessEvent();
+                    lock(tc)
+                    {
+                        tc.CurrentScriptInstance = null;
+                    }
+                }
+                catch(ThreadAbortException)
+                {
+                    /* no in script event should abort us */
+                    Thread.ResetAbort();
+                }
 
                 if (ev.HasEventsPending)
                 {

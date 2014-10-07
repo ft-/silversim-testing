@@ -38,71 +38,110 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
 
         public UUID llGetKey()
         {
-            return Part.ID;
+            lock (this)
+            {
+                return Part.ID;
+            }
         }
 
         public void llAllowInventoryDrop(int add)
         {
-            Part.IsAllowedDrop = add != 0;
+            lock (this)
+            {
+                Part.IsAllowedDrop = add != 0;
+            }
         }
 
         public AnArray llGetLinkPrimitiveParams(int link, AnArray param)
         {
             AnArray parout = new AnArray();
-            Part.Group.GetPrimitiveParams(Part.LinkNumber, link, param.GetEnumerator(), ref parout);
+            lock (this)
+            {
+                Part.Group.GetPrimitiveParams(Part.LinkNumber, link, param.GetEnumerator(), ref parout);
+            }
             return parout;
         }
 
         public AnArray llGetPrimitiveParams(AnArray param)
         {
             AnArray parout = new AnArray();
-            Part.Group.GetPrimitiveParams(Part.LinkNumber, LINK_THIS, param.GetEnumerator(), ref parout);
+            lock (this)
+            {
+                Part.Group.GetPrimitiveParams(Part.LinkNumber, LINK_THIS, param.GetEnumerator(), ref parout);
+            }
             return parout;
         }
 
         public Vector3 llGetLocalPos()
         {
-            return Part.LocalPosition;
+            lock (this)
+            {
+                return Part.LocalPosition;
+            }
         }
 
         public Vector3 llGetPos()
         {
-            return Part.Position;
+            lock (this)
+            {
+                return Part.Position;
+            }
         }
 
         public Vector3 llGetRootPosition()
         {
-            return Part.Group.Position;
+            lock (this)
+            {
+                return Part.Group.Position;
+            }
         }
 
         public Quaternion llGetRootRotation()
         {
-            return Part.Group.RootPart.Rotation;
+            lock (this)
+            {
+                return Part.Group.RootPart.Rotation;
+            }
         }
 
         public Quaternion llGetRot()
         {
-            return Part.Rotation;
+            lock (this)
+            {
+                return Part.Rotation;
+            }
         }
 
         public Vector3 llGetScale()
         {
-            return Part.Size;
+            lock (this)
+            {
+                return Part.Size;
+            }
         }
 
         public void llPassCollisions(int pass)
         {
-            Part.IsPassCollisions = pass != 0;
+            lock (this)
+            {
+                Part.IsPassCollisions = pass != 0;
+            }
         }
 
         public void llPassTouches(int pass)
         {
-            Part.IsPassTouches = pass != 0;
+            lock (this)
+            {
+                Part.IsPassTouches = pass != 0;
+            }
         }
 
         public void llSetClickAction(int action)
         {
-            Part.ClickAction = (ClickActionType)action;
+            lock (this)
+            {
+                Part.ClickAction = (ClickActionType)action;
+            }
         }
 
         public void llSetPayPrice(int price, AnArray quick_pay_buttons)
@@ -112,27 +151,42 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
 
         public void llSetPos(Vector3 pos)
         {
-            Part.Position = pos;
+            lock (this)
+            {
+                Part.Position = pos;
+            }
         }
 
         public void llSetPrimitiveParams(AnArray rules)
         {
-            Part.Group.SetPrimitiveParams(Part.LinkNumber, LINK_THIS, rules.GetMarkEnumerator());
+            lock (this)
+            {
+                Part.Group.SetPrimitiveParams(Part.LinkNumber, LINK_THIS, rules.GetMarkEnumerator());
+            }
         }
 
         public void llSetLinkPrimitiveParams(int linkTarget, AnArray rules)
         {
-            Part.Group.SetPrimitiveParams(Part.LinkNumber, linkTarget, rules.GetMarkEnumerator());
+            lock (this)
+            {
+                Part.Group.SetPrimitiveParams(Part.LinkNumber, linkTarget, rules.GetMarkEnumerator());
+            }
         }
 
         public void llSetScale(Vector3 size)
         {
-            Part.Size = size;
+            lock (this)
+            {
+                Part.Size = size;
+            }
         }
 
         public void llSetSitText(string text)
         {
-            Part.Group.RootPart.SitText = text;
+            lock (this)
+            {
+                Part.Group.RootPart.SitText = text;
+            }
         }
 
         public void llSetText(string text, Color color, double alpha)
@@ -140,12 +194,18 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             ObjectPart.TextParam tp = new ObjectPart.TextParam();
             tp.Text = text;
             tp.TextColor = new ColorAlpha(color, alpha);
-            Part.Text = tp;
+            lock (this)
+            {
+                Part.Text = tp;
+            }
         }
 
         public void llSetTouchText(string text)
         {
-            Part.Group.RootPart.TouchText = text;
+            lock (this)
+            {
+                Part.Group.RootPart.TouchText = text;
+            }
         }
 
         public void llTargetOmega(Vector3 axis, double spinrate, double gain)
@@ -154,7 +214,10 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             op.Axis = axis;
             op.Spinrate = spinrate;
             op.Gain = gain;
-            Part.Omega = op;
+            lock (this)
+            {
+                Part.Omega = op;
+            }
         }
         #endregion
     }

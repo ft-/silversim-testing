@@ -39,62 +39,68 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
 
         public UUID llGetNotecardLine(string name, int line)
         {
-            ObjectPartInventoryItem item;
-            if (Part.Inventory.TryGetValue(name, out item))
+            lock (this)
             {
-                if (item.InventoryType != InventoryType.Notecard)
+                ObjectPartInventoryItem item;
+                if (Part.Inventory.TryGetValue(name, out item))
                 {
-                    throw new Exception(string.Format("Inventory item {0} is not a notecard", name));
-                }
-                else
-                {
-                    UUID query = UUID.Random;
-
-                    Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
-                    string[] lines = nc.Text.Split('\n');
-                    DataserverEvent e = new DataserverEvent();
-                    if (line >= lines.Length || line < 0)
+                    if (item.InventoryType != InventoryType.Notecard)
                     {
-                        e.Data = EOF;
+                        throw new Exception(string.Format("Inventory item {0} is not a notecard", name));
+                    }
+                    else
+                    {
+                        UUID query = UUID.Random;
+
+                        Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
+                        string[] lines = nc.Text.Split('\n');
+                        DataserverEvent e = new DataserverEvent();
+                        if (line >= lines.Length || line < 0)
+                        {
+                            e.Data = EOF;
+                            e.QueryID = query;
+                            Part.PostEvent(e);
+                            return query;
+                        }
+
+                        e.Data = lines[line];
                         e.QueryID = query;
                         Part.PostEvent(e);
                         return query;
                     }
-
-                    e.Data = lines[line];
-                    e.QueryID = query;
-                    Part.PostEvent(e);
-                    return query;
                 }
-            }
-            else
-            {
-                throw new Exception(string.Format("Inventory item {0} does not exist", name));
+                else
+                {
+                    throw new Exception(string.Format("Inventory item {0} does not exist", name));
+                }
             }
         }
 
         public UUID llGetNumberOfNotecardLines(string name)
         {
             ObjectPartInventoryItem item;
-            if (Part.Inventory.TryGetValue(name, out item))
+            lock (this)
             {
-                if (item.InventoryType != InventoryType.Notecard)
+                if (Part.Inventory.TryGetValue(name, out item))
                 {
-                    throw new Exception(string.Format("Inventory item {0} is not a notecard", name));
+                    if (item.InventoryType != InventoryType.Notecard)
+                    {
+                        throw new Exception(string.Format("Inventory item {0} is not a notecard", name));
+                    }
+                    else
+                    {
+                        UUID query = UUID.Random;
+                        Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
+                        DataserverEvent e = new DataserverEvent();
+                        e.Data = nc.Text.Split('\n').Length.ToString();
+                        e.QueryID = query;
+                        return query;
+                    }
                 }
                 else
                 {
-                    UUID query = UUID.Random;
-                    Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
-                    DataserverEvent e = new DataserverEvent();
-                    e.Data = nc.Text.Split('\n').Length.ToString();
-                    e.QueryID = query;
-                    return query;
+                    throw new Exception(string.Format("Inventory item {0} does not exist", name));
                 }
-            }
-            else
-            {
-                throw new Exception(string.Format("Inventory item {0} does not exist", name));
             }
         }
     }

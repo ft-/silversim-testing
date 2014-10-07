@@ -54,13 +54,16 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
 
             m.OwnerData.Add(Part.Group.Owner.ID);
 
-            try
+            lock (this)
             {
-                Part.Group.Scene.Agents[avatar].SendMessageAlways(m, Part.Group.Scene.ID);
-            }
-            catch
-            {
+                try
+                {
+                    Part.Group.Scene.Agents[avatar].SendMessageAlways(m, Part.Group.Scene.ID);
+                }
+                catch
+                {
 
+                }
             }
         }
 
@@ -80,13 +83,16 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             m.Message = message;
             m.URL = url;
 
-            try
+            lock (this)
             {
-                Part.Group.Scene.Agents[avatar].SendMessageAlways(m, Part.Group.Scene.ID);
-            }
-            catch
-            {
+                try
+                {
+                    Part.Group.Scene.Agents[avatar].SendMessageAlways(m, Part.Group.Scene.ID);
+                }
+                catch
+                {
 
+                }
             }
         }
     }

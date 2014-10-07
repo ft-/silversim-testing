@@ -49,11 +49,13 @@ namespace SilverSim.Scene.Implementation.Basic
         public string m_ChatFactoryName;
         public string m_GroupsServiceName;
         public string m_AssetServiceName;
+        public string m_AssetCacheServiceName;
         public string m_GridServiceName;
         public string m_IMServiceName;
 
         public GroupsServiceInterface m_GroupsService = null;
         public AssetServiceInterface m_AssetService;
+        public AssetServiceInterface m_AssetCacheService;
         public GridServiceInterface m_GridService;
         public ServerParamServiceInterface m_ServerParamService;
         public IMServiceInterface m_IMService;
@@ -64,6 +66,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_ChatFactoryName = ownConfig.GetString("ChatService", "Chat");
             m_GroupsServiceName = ownConfig.GetString("GroupsService", "GroupsService");
             m_AssetServiceName = ownConfig.GetString("AssetService", "AssetService");
+            m_AssetCacheServiceName = ownConfig.GetString("AssetCacheService", m_AssetServiceName);
             m_GridServiceName = ownConfig.GetString("GridService", "GridService");
             m_IMServiceName = ownConfig.GetString("IMService", "IMService");
             m_CapabilitiesConfig = new Dictionary<string, string>();
@@ -81,6 +84,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_ChatFactory = loader.GetService<ChatServiceFactoryInterface>(m_ChatFactoryName);
             m_GroupsService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
             m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
+            m_AssetCacheService = loader.GetService<AssetServiceInterface>(m_AssetCacheServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
             m_ServerParamService = loader.GetService<ServerParamServiceInterface>("ServerParamStorage");
@@ -91,7 +95,8 @@ namespace SilverSim.Scene.Implementation.Basic
             return new BasicScene(m_ChatFactory.Instantiate(), 
                 m_IMService, 
                 m_GroupsService, 
-                m_AssetService, 
+                m_AssetService,
+                m_AssetCacheService,
                 m_GridService,
                 m_ServerParamService,
                 ri,

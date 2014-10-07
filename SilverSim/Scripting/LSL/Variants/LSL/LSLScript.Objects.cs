@@ -52,23 +52,35 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
         public AnArray llGetObjectDetails(AnArray param)
         {
             AnArray parout = new AnArray();
-            Part.Group.GetObjectDetails(param.GetEnumerator(), ref parout);
+            lock (this)
+            {
+                Part.Group.GetObjectDetails(param.GetEnumerator(), ref parout);
+            }
             return parout;
         }
 
         public string llGetObjectName()
         {
-            return Part.Group.Description;
+            lock (this)
+            {
+                return Part.Group.Description;
+            }
         }
 
         public void llSetObjectDesc(string desc)
         {
-            Part.Group.Description = desc;
+            lock (this)
+            {
+                Part.Group.Description = desc;
+            }
         }
 
         public void llSetObjectName(string name)
         {
-            Part.Group.Name = name;
+            lock (this)
+            {
+                Part.Group.Name = name;
+            }
         }
 
         public int llSetRegionPos(Vector3 pos)
@@ -78,60 +90,81 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
 
         public Vector3 llGetVel()
         {
-            return Part.Group.Velocity;
+            lock (this)
+            {
+                return Part.Group.Velocity;
+            }
         }
 
         public UUID llGetOwner()
         {
-            return Part.Group.Owner.ID;
+            lock (this)
+            {
+                return Part.Group.Owner.ID;
+            }
         }
 
         public UUID llGetOwnerKey(UUID id)
         {
-            ObjectPart part;
-            try
+            lock (this)
             {
-                part = Part.Group.Scene.Primitives[id];
+                ObjectPart part;
+                try
+                {
+                    part = Part.Group.Scene.Primitives[id];
+                }
+                catch
+                {
+                    return id;
+                }
+                return part.Owner.ID;
             }
-            catch
-            {
-                return id;
-            }
-            return part.Owner.ID;
         }
 
         public int llGetNumberOfPrims()
         {
-            return Part.Group.Count;
+            lock (this)
+            {
+                return Part.Group.Count;
+            }
         }
 
         public UUID llGetLinkKey(int link)
         {
-            if(link == LINK_THIS)
+            lock (this)
             {
-                return Part.ID;
-            }
-            else
-            {
-                return Part.Group[link].ID;
+                if (link == LINK_THIS)
+                {
+                    return Part.ID;
+                }
+                else
+                {
+                    return Part.Group[link].ID;
+                }
             }
         }
 
         public string llGetLinkName(int link)
         {
-            if (link == LINK_THIS)
+            lock (this)
             {
-                return Part.Name;
-            }
-            else
-            {
-                return Part.Group[link].Name;
+                if (link == LINK_THIS)
+                {
+                    return Part.Name;
+                }
+                else
+                {
+                    return Part.Group[link].Name;
+                }
             }
         }
 
         public int llGetLinkNumber()
         {
-            return Part.LinkNumber;
+            lock (this)
+            {
+                return Part.LinkNumber;
+            }
         }
     }
 }

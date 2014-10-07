@@ -54,34 +54,37 @@ namespace SilverSim.Scripting.LSL.Variants.OSSL
 
         public void osMakeNotecard(string notecardName, string contents)
         {
-            Notecard nc = new Notecard();
-            nc.Text = contents;
-            AssetData asset = nc;
-            asset.ID = UUID.Random;
-            asset.Name = notecardName;
-            asset.Creator = Part.Group.Owner;
-            asset.Description = "osMakeNotecard";
-            Part.Group.Scene.AssetService.Store(asset);
-            ObjectPartInventoryItem item = new ObjectPartInventoryItem(asset);
-            item.ParentFolderID = Part.ID;
-
-            for(uint i = 0; i < 1000; ++i)
+            lock (this)
             {
-                if (i == 0)
+                Notecard nc = new Notecard();
+                nc.Text = contents;
+                AssetData asset = nc;
+                asset.ID = UUID.Random;
+                asset.Name = notecardName;
+                asset.Creator = Part.Group.Owner;
+                asset.Description = "osMakeNotecard";
+                Part.Group.Scene.AssetService.Store(asset);
+                ObjectPartInventoryItem item = new ObjectPartInventoryItem(asset);
+                item.ParentFolderID = Part.ID;
+
+                for (uint i = 0; i < 1000; ++i)
                 {
-                    item.Name = notecardName;
-                }
-                else
-                {
-                    item.Name = string.Format("{0} {1}", notecardName, i);
-                }
-                try
-                {
-                    Part.Inventory.Add(item.ID, item.Name, item);
-                }
-                catch
-                {
-                    return;
+                    if (i == 0)
+                    {
+                        item.Name = notecardName;
+                    }
+                    else
+                    {
+                        item.Name = string.Format("{0} {1}", notecardName, i);
+                    }
+                    try
+                    {
+                        Part.Inventory.Add(item.ID, item.Name, item);
+                    }
+                    catch
+                    {
+                        return;
+                    }
                 }
             }
             throw new Exception(string.Format("Could not store notecard with name {0}", notecardName));
@@ -91,22 +94,25 @@ namespace SilverSim.Scripting.LSL.Variants.OSSL
         #region osGetNotecard
         public string osGetNotecard(string name)
         {
-            ObjectPartInventoryItem item;
-            if (Part.Inventory.TryGetValue(name, out item))
+            lock (this)
             {
-                if (item.InventoryType != InventoryType.Notecard)
+                ObjectPartInventoryItem item;
+                if (Part.Inventory.TryGetValue(name, out item))
                 {
-                    throw new Exception(string.Format("Inventory item {0} is not a notecard", name));
+                    if (item.InventoryType != InventoryType.Notecard)
+                    {
+                        throw new Exception(string.Format("Inventory item {0} is not a notecard", name));
+                    }
+                    else
+                    {
+                        Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
+                        return nc.Text;
+                    }
                 }
                 else
                 {
-                    Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
-                    return nc.Text;
+                    throw new Exception(string.Format("Inventory item {0} does not exist", name));
                 }
-            }
-            else
-            {
-                throw new Exception(string.Format("Inventory item {0} does not exist", name));
             }
         }
         #endregion
@@ -115,26 +121,29 @@ namespace SilverSim.Scripting.LSL.Variants.OSSL
         public string osGetNotecardLine(string name, int line)
         {
             ObjectPartInventoryItem item;
-            if (Part.Inventory.TryGetValue(name, out item))
+            lock (this)
             {
-                if (item.InventoryType != InventoryType.Notecard)
+                if (Part.Inventory.TryGetValue(name, out item))
                 {
-                    throw new Exception(string.Format("Inventory item {0} is not a notecard", name));
+                    if (item.InventoryType != InventoryType.Notecard)
+                    {
+                        throw new Exception(string.Format("Inventory item {0} is not a notecard", name));
+                    }
+                    else
+                    {
+                        Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
+                        string[] lines = nc.Text.Split('\n');
+                        if (line >= lines.Length || line < 0)
+                        {
+                            return EOF;
+                        }
+                        return lines[line];
+                    }
                 }
                 else
                 {
-                    Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
-                    string[] lines = nc.Text.Split('\n');
-                    if(line >= lines.Length || line < 0)
-                    {
-                        return EOF;
-                    }
-                    return lines[line];
+                    throw new Exception(string.Format("Inventory item {0} does not exist", name));
                 }
-            }
-            else
-            {
-                throw new Exception(string.Format("Inventory item {0} does not exist", name));
             }
         }
         #endregion
@@ -143,21 +152,24 @@ namespace SilverSim.Scripting.LSL.Variants.OSSL
         public int osGetNumberOfNotecardLines(string name)
         {
             ObjectPartInventoryItem item;
-            if (Part.Inventory.TryGetValue(name, out item))
+            lock (this)
             {
-                if (item.InventoryType != InventoryType.Notecard)
+                if (Part.Inventory.TryGetValue(name, out item))
                 {
-                    throw new Exception(string.Format("Inventory item {0} is not a notecard", name));
+                    if (item.InventoryType != InventoryType.Notecard)
+                    {
+                        throw new Exception(string.Format("Inventory item {0} is not a notecard", name));
+                    }
+                    else
+                    {
+                        Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
+                        return nc.Text.Split('\n').Length;
+                    }
                 }
                 else
                 {
-                    Notecard nc = Part.Group.Scene.GetService<NotecardCache>()[item.AssetID];
-                    return nc.Text.Split('\n').Length;
+                    throw new Exception(string.Format("Inventory item {0} does not exist", name));
                 }
-            }
-            else
-            {
-                throw new Exception(string.Format("Inventory item {0} does not exist", name));
             }
         }
         #endregion

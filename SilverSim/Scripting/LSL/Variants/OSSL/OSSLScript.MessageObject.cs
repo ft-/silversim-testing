@@ -37,11 +37,14 @@ namespace SilverSim.Scripting.LSL.Variants.OSSL
         {
             CheckThreatLevel(MethodBase.GetCurrentMethod().Name, ThreatLevelType.Low);
 
-            IObject obj = Part.Group.Scene.Objects[objectUUID];
-            DataserverEvent ev = new DataserverEvent();
-            ev.Data = message;
-            ev.QueryID = Part.Group.ID;
-            obj.PostEvent(ev);
+            lock (this)
+            {
+                IObject obj = Part.Group.Scene.Objects[objectUUID];
+                DataserverEvent ev = new DataserverEvent();
+                ev.Data = message;
+                ev.QueryID = Part.Group.ID;
+                obj.PostEvent(ev);
+            }
         }
         #endregion
     }

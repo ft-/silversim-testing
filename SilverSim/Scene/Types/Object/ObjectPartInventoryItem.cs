@@ -97,11 +97,11 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Fields
-        private IScriptInstance m_ScriptInstance = null;
+        private ScriptInstance m_ScriptInstance = null;
         #endregion
 
         #region Properties
-        public IScriptInstance ScriptInstance
+        public ScriptInstance ScriptInstance
         {
             get
             {

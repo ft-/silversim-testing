@@ -102,7 +102,9 @@ namespace SilverSim.Scene.Types.Scene
         public event Action<SceneInterface> OnRemove;
         public delegate void IPChangedDelegate(SceneInterface scene, IPAddress address);
         public event IPChangedDelegate OnIPChanged;
-        public AssetServiceInterface AssetService { get; protected set; }
+        public AssetServiceInterface TemporaryAssetService { get; protected set; }
+        public AssetServiceInterface PersistentAssetService { get; protected set; }
+        public AssetServiceInterface AssetService { get; private set; }
         public GroupsServiceInterface GroupsService { get; protected set; }
         public GridServiceInterface GridService { get; protected set; }
         public EconomyServiceInterface EconomyService { get; protected set; }

@@ -46,30 +46,33 @@ namespace SilverSim.Scripting.LSL.Variants.OSSL
             }
             ChatServiceInterface chatservice = Part.Group.Scene.GetService<ChatServiceInterface>();
 
-            int newhandle = 0;
-            ChatServiceInterface.Listener l;
-            for (newhandle = 0; newhandle < MaxListenerHandles; ++newhandle)
+            lock (this)
             {
-                if (!m_Listeners.TryGetValue(newhandle, out l))
+                int newhandle = 0;
+                ChatServiceInterface.Listener l;
+                for (newhandle = 0; newhandle < MaxListenerHandles; ++newhandle)
                 {
-                    l = chatservice.AddListenRegex(
-                        channel,
-                        name,
-                        id,
-                        msg,
-                        regexBitfield,
-                        delegate() { return Part.ID; },
-                        delegate() { return Part.GlobalPosition; },
-                        onListen);
-                    try
+                    if (!m_Listeners.TryGetValue(newhandle, out l))
                     {
-                        m_Listeners.Add(newhandle, l);
-                        return newhandle;
-                    }
-                    catch
-                    {
-                        l.Remove();
-                        return -1;
+                        l = chatservice.AddListenRegex(
+                            channel,
+                            name,
+                            id,
+                            msg,
+                            regexBitfield,
+                            delegate() { return Part.ID; },
+                            delegate() { return Part.GlobalPosition; },
+                            onListen);
+                        try
+                        {
+                            m_Listeners.Add(newhandle, l);
+                            return newhandle;
+                        }
+                        catch
+                        {
+                            l.Remove();
+                            return -1;
+                        }
                     }
                 }
             }
