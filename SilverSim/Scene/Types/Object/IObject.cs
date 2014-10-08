@@ -103,13 +103,16 @@ namespace SilverSim.Scene.Types.Object
         Sculpt = 7
     }
 
-    public enum PrimitiveSculptType : int
+    [Flags]
+    public enum PrimitiveSculptType : byte
     {
         Sphere = 1,
         Torus = 2,
         Plane = 3,
         Cylinder = 4,
-        Mesh = 5
+        Mesh = 5,
+        Invert = 64,
+        Mirror = 128
     }
 
     public enum PrimitiveHoleShape : int
