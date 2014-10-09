@@ -157,7 +157,7 @@ namespace SilverSim.LL.Messages.Object
                 p.WriteUInt8((byte)Math.Floor(d.TextColor.R * 255));
                 p.WriteUInt8((byte)Math.Floor(d.TextColor.G * 255));
                 p.WriteUInt8((byte)Math.Floor(d.TextColor.B * 255));
-                p.WriteUInt8((byte)Math.Floor(d.TextColor.A * 255));
+                p.WriteUInt8((byte)(255 - Math.Floor(d.TextColor.A * 255)));
                 p.WriteStringLen8(d.MediaURL);
                 p.WriteUInt8((byte)d.PSBlock.Length);
                 p.WriteBytes(d.PSBlock);

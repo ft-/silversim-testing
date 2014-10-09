@@ -23,15 +23,15 @@ exception statement from your version.
 
 */
 
+using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using ThreadedClasses;
-using log4net;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -69,6 +69,7 @@ namespace SilverSim.Scene.Types.Object
         public SceneInterface Scene { get; set; }
         private Vector3 m_Acceleration = new Vector3();
         private Vector3 m_AngularVelocity = new Vector3();
+        public AttachmentPoint AttachPoint = AttachmentPoint.NotAttached;
 
         #region Constructor
         public ObjectGroup()
@@ -789,5 +790,13 @@ namespace SilverSim.Scene.Types.Object
             });
         }
         #endregion
+
+        public byte[] TerseData
+        {
+            get
+            {
+                throw new NotImplementedException();
+            }
+        }
     }
 }

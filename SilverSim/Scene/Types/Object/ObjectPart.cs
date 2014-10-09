@@ -1229,6 +1229,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                bool sculptChanged = false;
                 lock(m_Shape)
                 {
                     m_Shape.Type = value.Type;
@@ -1244,11 +1245,19 @@ namespace SilverSim.Scene.Types.Object
                     m_Shape.Revolutions = value.Revolutions;
                     m_Shape.RadiusOffset = value.RadiusOffset;
                     m_Shape.Skew = value.Skew;
+                    if(m_Shape.SculptMap != value.SculptMap || m_Shape.SculptType != value.SculptType)
+                    {
+                        sculptChanged = true;
+                    }
                     m_Shape.SculptMap = new UUID(value.SculptMap);
                     m_Shape.SculptType = value.SculptType;
                     m_Shape.IsSculptInverted = value.IsSculptInverted;
                     m_Shape.IsSculptMirrored = value.IsSculptMirrored;
                     m_Shape.HoleSize = value.HoleSize;
+                }
+                if(sculptChanged)
+                {
+                    UpdateExtraParams();
                 }
                 IsChanged = true;
                 TriggerOnUpdate((int)ChangedEvent.ChangedFlags.Shape);
@@ -2339,5 +2348,80 @@ namespace SilverSim.Scene.Types.Object
             });
         }
         #endregion
+
+        private void ToUInt16Bytes(double val, double min, double max, byte[] buf, int pos)
+        {
+            if(val < min)
+            {
+                val = min;
+            }
+            else if(val > max)
+            {
+                val = max;
+            }
+            val -= min;
+            val = val * 65535 / (max - min);
+            byte[] b = BitConverter.GetBytes((UInt16)val);
+            if(!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(b);
+            }
+            Buffer.BlockCopy(b, 0, buf, pos, 2);
+        }
+
+        public byte[] TerseData
+        {
+            get
+            {
+                int pos = 0;
+                byte[] data = new byte[44];
+                {
+                    byte[] b = BitConverter.GetBytes(LocalID);
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(b);
+                    }
+                    Buffer.BlockCopy(b, 0, data, pos, 4);
+                    pos += 4;
+                }
+
+                data[pos++] = (byte)Group.AttachPoint;
+                data[pos++] = 0;
+                Position.ToBytes(data, pos);
+                pos += 12;
+                Vector3 vel = Velocity;
+                ToUInt16Bytes(vel.X, -128f, 128f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(vel.Y, -128f, 128f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(vel.Z, -128f, 128f, data, pos);
+                pos += 2;
+                Vector3 accel = Acceleration;
+                ToUInt16Bytes(accel.X, -64f, 64f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(accel.Y, -64f, 64f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(accel.Z, -64f, 64f, data, pos);
+                pos += 2;
+                Quaternion rot = Rotation;
+                ToUInt16Bytes(rot.X, -1f, 1f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(rot.Y, -1f, 1f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(rot.Z, -1f, 1f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(rot.W, -1f, 1f, data, pos);
+                pos += 2;
+                Vector3 angvel = AngularVelocity;
+                ToUInt16Bytes(angvel.X, -64f, 64f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(angvel.Y, -64f, 64f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(angvel.Z, -64f, 64f, data, pos);
+                pos += 2;
+
+                return data;
+            }
+        }
     }
 }

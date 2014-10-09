@@ -248,6 +248,11 @@ namespace SilverSim.Scene.Types.Object
         }
 
         bool IsInScene(SceneInterface scene);
+
+        byte[] TerseData
+        {
+            get;
+        }
         #endregion
 
         #region Methods

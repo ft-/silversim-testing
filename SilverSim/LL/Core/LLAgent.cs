@@ -60,6 +60,8 @@ namespace SilverSim.LL.Core
         private UUID m_CurrentSceneID;
         #endregion
 
+        public Vector4 CollisionPlane { get; set; }
+
         #region LLAgent Properties
         public UInt32 LocalID { get; set; }
         public Uri HomeURI { get; private set; }
@@ -822,6 +824,7 @@ namespace SilverSim.LL.Core
             GridUserServiceInterface gridUserService,
             GridServiceInterface gridService)
         {
+            CollisionPlane = Vector4.UnitW;
             m_AgentID = agentID;
             m_AssetService = assetService;
             m_InventoryService = inventoryService;
@@ -1089,6 +1092,100 @@ namespace SilverSim.LL.Core
                 return circuit.Scene.GridPosition;
             }
             return defPos;
+        }
+
+        private void ToUInt16Bytes(double val, double min, double max, byte[] buf, int pos)
+        {
+            if (val < min)
+            {
+                val = min;
+            }
+            else if (val > max)
+            {
+                val = max;
+            }
+            val -= min;
+            val = val * 65535 / (max - min);
+            byte[] b = BitConverter.GetBytes((UInt16)val);
+            if (!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(b);
+            }
+            Buffer.BlockCopy(b, 0, buf, pos, 2);
+        }
+
+        public byte[] TerseData
+        {
+            get
+            {
+                Quaternion rotation = Rotation;
+                if(SittingOnObject == null)
+                {
+                    rotation.X = 0;
+                    rotation.Y = 0;
+                }
+                Vector3 angvel = AngularVelocity;
+                Vector3 vel = Velocity;
+                Vector3 accel = Acceleration;
+
+                byte[] data = new byte[60];
+                int pos = 0;
+                {
+                    byte[] b = BitConverter.GetBytes(LocalID);
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(b);
+                    }
+                    Buffer.BlockCopy(b, 0, data, pos, 4);
+                    pos += 4;
+                }
+                data[pos++] = 0; //State
+                data[pos++] = 1;
+
+                /* Collision Plane */
+                Vector4 collPlane = CollisionPlane;
+                if(collPlane == Vector4.Zero)
+                {
+                    collPlane = Vector4.UnitW;
+                }
+                collPlane.ToBytes(data, pos);
+                pos += 16;
+
+                Position.ToBytes(data, pos);
+                pos += 12;
+
+                ToUInt16Bytes(vel.X, -128f, 128f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(vel.Y, -128f, 128f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(vel.Z, -128f, 128f, data, pos);
+                pos += 2;
+
+                ToUInt16Bytes(accel.X, -64, 64f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(accel.Y, -64, 64f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(accel.Z, -64, 64f, data, pos);
+                pos += 2;
+
+                ToUInt16Bytes(rotation.X, -1f, 1f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(rotation.Y, -1f, 1f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(rotation.Z, -1f, 1f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(rotation.W, -1f, 1f, data, pos);
+                pos += 2;
+
+                ToUInt16Bytes(angvel.X, -64f, 64f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(angvel.Y, -64f, 64f, data, pos);
+                pos += 2;
+                ToUInt16Bytes(angvel.Z, -64f, 64f, data, pos);
+                pos += 2;
+
+                return data;
+            }
         }
     }
 }

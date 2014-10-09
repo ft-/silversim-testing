@@ -25,8 +25,10 @@ exception statement from your version.
 
 namespace SilverSim.Types.Agent
 {
-    public enum AttachmentPoint : int
+    public enum AttachmentPoint : byte
     {
+        NotAttached = 0,
+
         Chest = 1,
         Head = 2,
         LeftShoulder = 3,

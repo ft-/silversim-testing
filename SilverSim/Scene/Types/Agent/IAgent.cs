@@ -57,6 +57,12 @@ namespace SilverSim.Scene.Types.Agent
             set;
         }
 
+        Vector4 CollisionPlane
+        {
+            get;
+            set;
+        }
+
         AgentAttachments Attachments
         {
             get;
