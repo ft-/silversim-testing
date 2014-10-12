@@ -369,23 +369,634 @@ namespace SilverSim.Scene.Types.Object
 
             #region Fields
             public PrimitiveShapeType Type = PrimitiveShapeType.Box;
-            public PrimitiveHoleShape HoleShape = PrimitiveHoleShape.Default;
-            public Vector3 Cut = new Vector3(0, 1, 0);
-            public double Hollow = 0f;
-            public Vector3 Twist = Vector3.Zero;
-            public Vector3 TopSize = Vector3.Zero;
-            public Vector3 TopShear = Vector3.Zero;
-            public Vector3 Dimple = Vector3.Zero;
-            public Vector3 AdvancedCut = Vector3.Zero;
-            public Vector3 Taper = Vector3.Zero;
-            public Vector3 HoleSize = Vector3.Zero;
-            public double Revolutions = 1f;
-            public double RadiusOffset = 0f;
-            public double Skew = 0f;
+
             public UUID SculptMap = UUID.Zero;
             public PrimitiveSculptType SculptType = PrimitiveSculptType.Sphere;
             public bool IsSculptInverted = false;
             public bool IsSculptMirrored = false;
+
+            public void ToPrimitiveParams(AnArray paramList)
+            {
+                paramList.Add((int)Type);
+                if (Type == PrimitiveShapeType.Sculpt)
+                {
+                    paramList.Add(SculptMap);
+                    int sculptFlags = (int)SculptType;
+                    if (IsSculptInverted)
+                    {
+                        sculptFlags |= 0x40;
+                    }
+                    if (IsSculptMirrored)
+                    {
+                        sculptFlags |= 0x80;
+                    }
+                    paramList.Add(sculptFlags);
+                }
+                else
+                {
+#if OLD
+                    paramList.Add((int)HoleShape);
+                    paramList.Add(Cut);
+                    paramList.Add(Hollow);
+                    paramList.Add(Twist);
+                    switch (Type)
+                    {
+                        case PrimitiveShapeType.Box:
+                        case PrimitiveShapeType.Cylinder:
+                        case PrimitiveShapeType.Prism:
+                            paramList.Add(TopSize);
+                            paramList.Add(TopShear);
+                            break;
+
+                        case PrimitiveShapeType.Sphere:
+                            paramList.Add(Dimple);
+                            break;
+
+                        case PrimitiveShapeType.Torus:
+                        case PrimitiveShapeType.Tube:
+                        case PrimitiveShapeType.Ring:
+                            paramList.Add(HoleSize);
+                            paramList.Add(TopShear);
+                            paramList.Add(AdvancedCut);
+                            paramList.Add(Taper);
+                            paramList.Add(Revolutions);
+                            paramList.Add(RadiusOffset);
+                            paramList.Add(Skew);
+                            break;
+                    }
+#endif
+                }
+            }
+
+            public static PrimitiveShape FromPrimitiveParams(AnArray.MarkEnumerator enumerator)
+            {
+                PrimitiveShape shape = new PrimitiveShape();
+                shape.Type = (PrimitiveShapeType)ParamsHelper.GetInteger(enumerator, "PRIM_TYPE");
+                if (shape.Type == PrimitiveShapeType.Sculpt)
+                {
+                    shape.SculptMap = ParamsHelper.GetKey(enumerator, "PRIM_TYPE");
+                    int sculptFlags = ParamsHelper.GetInteger(enumerator, "PRIM_TYPE");
+                    shape.SculptType = (PrimitiveSculptType)(sculptFlags & 0x0F);
+                    shape.IsSculptInverted = (sculptFlags & 0x40) != 0;
+                    shape.IsSculptMirrored = (sculptFlags & 0x80) != 0;
+                }
+                else
+                {
+                    PrimitiveHoleShape holeShape = (PrimitiveHoleShape)ParamsHelper.GetInteger(enumerator, "PRIM_TYPE");
+                    if(holeShape != PrimitiveHoleShape.Circle &&
+                        holeShape != PrimitiveHoleShape.Default &&
+                        holeShape != PrimitiveHoleShape.Square &&
+                        holeShape != PrimitiveHoleShape.Triangle)
+                    {
+                        holeShape = PrimitiveHoleShape.Default;
+                    }
+                    PrimitiveProfileShape profileShape = PrimitiveProfileShape.Circle;
+                    PrimitiveExtrusion extrusion = PrimitiveExtrusion.Straight;
+                    switch (shape.Type)
+                    {
+                        case PrimitiveShapeType.Box:
+                            profileShape = PrimitiveProfileShape.Square;
+                            extrusion = PrimitiveExtrusion.Straight;
+                            break;
+
+                        case PrimitiveShapeType.Cylinder:
+                            profileShape = PrimitiveProfileShape.Circle;
+                            extrusion = PrimitiveExtrusion.Straight;
+                            break;
+
+                        case PrimitiveShapeType.Prism:
+                            profileShape = PrimitiveProfileShape.EquilateralTriangle;
+                            extrusion = PrimitiveExtrusion.Straight;
+                            break;
+
+                        case PrimitiveShapeType.Sphere:
+                            profileShape = PrimitiveProfileShape.HalfCircle;
+                            extrusion = PrimitiveExtrusion.Curve1;
+                            break;
+
+                        case PrimitiveShapeType.Torus:
+                            profileShape = PrimitiveProfileShape.Circle;
+                            extrusion = PrimitiveExtrusion.Curve1;
+                            break;
+
+                        case PrimitiveShapeType.Tube:
+                            profileShape = PrimitiveProfileShape.Square;
+                            extrusion = PrimitiveExtrusion.Curve1;
+                            break;
+
+                        case PrimitiveShapeType.Ring:
+                            profileShape = PrimitiveProfileShape.EquilateralTriangle;
+                            extrusion = PrimitiveExtrusion.Curve1;
+                            break;
+
+                        case PrimitiveShapeType.Sculpt:
+                            extrusion = PrimitiveExtrusion.Curve1;
+                            break;
+                    }
+
+                    shape.PathCurve = (byte)extrusion;
+                    shape.ProfileCurve = (byte)holeShape;
+                    shape.ProfileCurve |= (byte)profileShape;
+                    Vector3 cut = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
+                    double hollow = ParamsHelper.GetDouble(enumerator, "PRIM_TYPE");
+                    Vector3 twist = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
+
+                    if (cut.X < 0f)
+                    {
+                        cut.X = 0f;
+                    }
+                    if (cut.X > 1f)
+                    {
+                        cut.X = 1f;
+                    }
+                    if (cut.Y < 0f)
+                    {
+                        cut.Y = 0f;
+                    }
+                    if (cut.Y > 1f)
+                    {
+                        cut.Y = 1f;
+                    }
+                    if (cut.Y - cut.X < 0.05f)
+                    {
+                        cut.Y = cut.Y - 0.05f;
+                        if (cut.X < 0.0f)
+                        {
+                            cut.X = 0.0f;
+                            cut.Y = 0.05f;
+                        }
+                    }
+                    shape.ProfileBegin = (ushort)(50000 * cut.X);
+                    shape.ProfileEnd = (ushort)(50000 * (1 - cut.Y));
+
+                    if (hollow < 0f)
+                    {
+                        hollow = 0f;
+                    }
+                    // If the prim is a Cylinder, Prism, Sphere, Torus or Ring (or not a
+                    // Box or Tube) and the hole shape is a square, hollow is limited to
+                    // a max of 70%. The viewer performs its own check on this value but
+                    // we need to do it here also so llGetPrimitiveParams can have access
+                    // to the correct value.
+                    if (profileShape != PrimitiveProfileShape.Square &&
+                        holeShape == PrimitiveHoleShape.Square)
+                    {
+                        if (hollow > 0.70f)
+                        {
+                            hollow = 0.70f;
+                        }
+                    }
+                    // Otherwise, hollow is limited to 95%.
+                    else
+                    {
+                        if (hollow > 0.95f)
+                        {
+                            hollow = 0.95f;
+                        }
+                    }
+                    shape.ProfileHollow = (ushort)(50000 * hollow);
+                    if (twist.X < -1.0f)
+                    {
+                        twist.X = -1.0f;
+                    }
+                    if (twist.X > 1.0f)
+                    {
+                        twist.X = 1.0f;
+                    }
+                    if (twist.Y < -1.0f)
+                    {
+                        twist.Y = -1.0f;
+                    }
+                    if (twist.Y > 1.0f)
+                    {
+                        twist.Y = 1.0f;
+                    }
+
+                    double tempFloat = (100.0d * twist.X);
+                    shape.PathTwistBegin = (sbyte)tempFloat;
+                    tempFloat = (100.0d * twist.Y);
+                    shape.PathTwist = (sbyte)tempFloat;
+
+                    Vector3 topSize;
+                    Vector3 topShear;
+                    Vector3 holeSize;
+                    Vector3 dimple;
+
+                    switch (shape.Type)
+                    {
+                        case PrimitiveShapeType.Box:
+                        case PrimitiveShapeType.Cylinder:
+                        case PrimitiveShapeType.Prism:
+                            topSize = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
+                            topShear = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
+
+                            if (topSize.X < 0f)
+                            {
+                                topSize.X = 0f;
+                            }
+                            if (topSize.X > 2f)
+                            {
+                                topSize.X = 2f;
+                            }
+                            if (topSize.Y < 0f)
+                            {
+                                topSize.Y = 0f;
+                            }
+                            if (topSize.Y > 2f)
+                            {
+                                topSize.Y = 2f;
+                            }
+                            tempFloat = (float)(100.0d * (2.0d - topSize.X));
+                            shape.PathScaleX = (byte)tempFloat;
+                            tempFloat = (float)(100.0d * (2.0d - topSize.Y));
+                            shape.PathScaleY = (byte)tempFloat;
+                            if (topShear.X < -0.5f)
+                            {
+                                topShear.X = -0.5f;
+                            }
+                            if (topShear.X > 0.5f)
+                            {
+                                topShear.X = 0.5f;
+                            }
+                            if (topShear.Y < -0.5f)
+                            {
+                                topShear.Y = -0.5f;
+                            }
+                            if (topShear.Y > 0.5f)
+                            {
+                                topShear.Y = 0.5f;
+                            }
+                            tempFloat = (float)(100.0d * topShear.X);
+                            shape.PathShearX = (byte)tempFloat;
+                            tempFloat = (float)(100.0d * topShear.Y);
+                            shape.PathShearY = (byte)tempFloat;
+                            break;
+
+                        case PrimitiveShapeType.Sphere:
+                            dimple = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
+
+                            // profile/path swapped for a sphere
+                            shape.PathBegin = shape.ProfileBegin;
+                            shape.PathEnd = shape.ProfileEnd;
+
+                            shape.PathScaleX = 100;
+                            shape.PathScaleY = 100;
+
+                            if (dimple.X < 0f)
+                            {
+                                dimple.X = 0f;
+                            }
+                            if (dimple.X > 1f)
+                            {
+                                dimple.X = 1f;
+                            }
+                            if (dimple.Y < 0f)
+                            {
+                                dimple.Y = 0f;
+                            }
+                            if (dimple.Y > 1f)
+                            {
+                                dimple.Y = 1f;
+                            }
+                            if (dimple.Y - cut.X < 0.05f)
+                            {
+                                dimple.X = cut.Y - 0.05f;
+                            }
+                            shape.ProfileBegin = (ushort)(50000 * dimple.X);
+                            shape.ProfileEnd = (ushort)(50000 * (1 - dimple.Y));
+                            break;
+
+                        case PrimitiveShapeType.Torus:
+                        case PrimitiveShapeType.Tube:
+                        case PrimitiveShapeType.Ring:
+                            holeSize = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
+                            topShear = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
+                            Vector3 advancedCut = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
+                            Vector3 taper = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
+                            double revolutions = ParamsHelper.GetDouble(enumerator, "PRIM_TYPE");
+                            double radiusOffset = ParamsHelper.GetDouble(enumerator, "PRIM_TYPE");
+                            double skew = ParamsHelper.GetDouble(enumerator, "PRIM_TYPE");
+
+                            // profile/path swapped for a torrus, tube, ring
+                            shape.PathBegin = shape.ProfileBegin;
+                            shape.PathEnd = shape.ProfileEnd;
+
+                            if (holeSize.X < 0.05f)
+                            {
+                                holeSize.X = 0.05f;
+                            }
+                            if (holeSize.X > 1f)
+                            {
+                                holeSize.X = 1f;
+                            }
+                            if (holeSize.Y < 0.05f)
+                            {
+                                holeSize.Y = 0.05f;
+                            }
+                            if (holeSize.Y > 0.5f)
+                            {
+                                holeSize.Y = 0.5f;
+                            }
+                            tempFloat = (float)(100.0d * (2.0d - holeSize.X));
+                            shape.PathScaleX = (byte)tempFloat;
+                            tempFloat = (float)(100.0d * (2.0d - holeSize.Y));
+                            shape.PathScaleY = (byte)tempFloat;
+                            if (topShear.X < -0.5f)
+                            {
+                                topShear.X = -0.5f;
+                            }
+                            if (topShear.X > 0.5f)
+                            {
+                                topShear.X = 0.5f;
+                            }
+                            if (topShear.Y < -0.5f)
+                            {
+                                topShear.Y = -0.5f;
+                            }
+                            if (topShear.Y > 0.5f)
+                            {
+                                topShear.Y = 0.5f;
+                            }
+                            tempFloat = (float)(100.0d * topShear.X);
+                            shape.PathShearX = (byte)tempFloat;
+                            tempFloat = (float)(100.0d * topShear.Y);
+                            shape.PathShearY = (byte)tempFloat;
+                            if (advancedCut.X < 0f)
+                            {
+                                advancedCut.X = 0f;
+                            }
+                            if (advancedCut.X > 1f)
+                            {
+                                advancedCut.X = 1f;
+                            }
+                            if (advancedCut.Y < 0f)
+                            {
+                                advancedCut.Y = 0f;
+                            }
+                            if (advancedCut.Y > 1f)
+                            {
+                                advancedCut.Y = 1f;
+                            }
+                            if (advancedCut.Y - advancedCut.X < 0.05f)
+                            {
+                                advancedCut.X = advancedCut.Y - 0.05f;
+                                if (advancedCut.X < 0.0f)
+                                {
+                                    advancedCut.X = 0.0f;
+                                    advancedCut.Y = 0.05f;
+                                }
+                            }
+                            shape.ProfileBegin = (ushort)(50000 * advancedCut.X);
+                            shape.ProfileEnd = (ushort)(50000 * (1 - advancedCut.Y));
+                            if (taper.X < -1f)
+                            {
+                                taper.X = -1f;
+                            }
+                            if (taper.X > 1f)
+                            {
+                                taper.X = 1f;
+                            }
+                            if (taper.Y < -1f)
+                            {
+                                taper.Y = -1f;
+                            }
+                            if (taper.Y > 1f)
+                            {
+                                taper.Y = 1f;
+                            }
+                            tempFloat = (float)(100.0d * taper.X);
+                            shape.PathTaperX = (sbyte)tempFloat;
+                            tempFloat = (float)(100.0d * taper.Y);
+                            shape.PathTaperY = (sbyte)tempFloat;
+                            if (revolutions < 1f)
+                            {
+                                revolutions = 1f;
+                            }
+                            if (revolutions > 4f)
+                            {
+                                revolutions = 4f;
+                            }
+                            tempFloat = 66.66667f * (revolutions - 1.0f);
+                            shape.PathRevolutions = (byte)tempFloat;
+                            // limits on radiusoffset depend on revolutions and hole size (how?) seems like the maximum range is 0 to 1
+                            if (radiusOffset < 0f)
+                            {
+                                radiusOffset = 0f;
+                            }
+                            if (radiusOffset > 1f)
+                            {
+                                radiusOffset = 1f;
+                            }
+                            tempFloat = 100.0f * radiusOffset;
+                            shape.PathRadiusOffset = (sbyte)tempFloat;
+                            if (skew < -0.95f)
+                            {
+                                skew = -0.95f;
+                            }
+                            if (skew > 0.95f)
+                            {
+                                skew = 0.95f;
+                            }
+                            tempFloat = 100.0f * skew;
+                            shape.PathSkew = (sbyte)tempFloat;
+                            break;
+
+                        default:
+                            throw new ArgumentException(String.Format("Invalid primitive type {0}", shape.Type));
+                    }
+                }
+
+                return shape;
+            }
+
+            public int NumberOfSides
+            {
+                get
+                {
+                    int ret = 0;
+                    bool hasCut;
+                    bool hasHollow;
+                    bool hasDimple;
+                    bool hasProfileCut;
+
+                    PrimitiveShapeType primType = Type;
+                    if (primType == PrimitiveShapeType.Box
+                        ||
+                        primType == PrimitiveShapeType.Cylinder
+                        ||
+                        primType == PrimitiveShapeType.Prism)
+                    {
+
+                        hasCut = (ProfileBegin > 0) || (ProfileEnd > 0);
+                    }
+                    else
+                    {
+                        hasCut = (PathBegin > 0) || (PathEnd > 0);
+                    }
+
+                    hasHollow = ProfileHollow > 0;
+                    hasDimple = (ProfileBegin > 0) || (ProfileEnd > 0); // taken from llSetPrimitiveParms
+                    hasProfileCut = hasDimple; // is it the same thing?
+
+                    switch (primType)
+                    {
+                        case PrimitiveShapeType.Box:
+                            ret = 6;
+                            if (hasCut)
+                            {
+                                ret += 2;
+                            }
+                            if (hasHollow)
+                            {
+                                ret += 1;
+                            }
+                            break;
+                        case PrimitiveShapeType.Cylinder:
+                            ret = 3;
+                            if (hasCut)
+                            {
+                                ret += 2;
+                            }
+                            if (hasHollow)
+                            {
+                                ret += 1;
+                            }
+                            break;
+                        case PrimitiveShapeType.Prism:
+                            ret = 5;
+                            if (hasCut)
+                            {
+                                ret += 2;
+                            }
+                            if (hasHollow)
+                            {
+                                ret += 1;
+                            }
+                            break;
+                        case PrimitiveShapeType.Sphere:
+                            ret = 1;
+                            if (hasCut)
+                            {
+                                ret += 2;
+                            }
+                            if (hasDimple)
+                            {
+                                ret += 2;
+                            }
+                            if (hasHollow)
+                            {
+                                ret += 1;
+                            }
+                            break;
+                        case PrimitiveShapeType.Torus:
+                            ret = 1;
+                            if (hasCut)
+                            {
+                                ret += 2;
+                            }
+                            if (hasProfileCut)
+                            {
+                                ret += 2;
+                            }
+                            if (hasHollow)
+                            {
+                                ret += 1;
+                            }
+                            break;
+                        case PrimitiveShapeType.Tube:
+                            ret = 4;
+                            if (hasCut)
+                            {
+                                ret += 2;
+                            }
+                            if (hasProfileCut)
+                            {
+                                ret += 2;
+                            }
+                            if (hasHollow)
+                            {
+                                ret += 1;
+                            }
+                            break;
+                        case PrimitiveShapeType.Ring:
+                            ret = 3;
+                            if (hasCut)
+                            {
+                                ret += 2;
+                            }
+                            if (hasProfileCut)
+                            {
+                                ret += 2;
+                            }
+                            if (hasHollow)
+                            {
+                                ret += 1;
+                            }
+                            break;
+                        case PrimitiveShapeType.Sculpt:
+                            // Special mesh handling
+                            if (SculptType == PrimitiveSculptType.Mesh)
+                            {
+                                ret = 32; // if it's a mesh then max 32 faces
+                            }
+                            else
+                            {
+                                ret = 1; // if it's a sculpt then max 1 face
+                            }
+                            break;
+                    }
+
+                    return ret;
+                }
+            }
+            public ushort PathBegin;
+            public byte PathCurve;
+            public ushort PathEnd;
+            public sbyte PathRadiusOffset;
+            public byte PathRevolutions;
+            public byte PathScaleX;
+            public byte PathScaleY;
+            public byte PathShearX;
+            public byte PathShearY;
+            public sbyte PathSkew;
+            public sbyte PathTaperX;
+            public sbyte PathTaperY;
+            public sbyte PathTwist;
+            public sbyte PathTwistBegin;
+            public ushort ProfileBegin;
+            public byte ProfileCurve;
+            public ushort ProfileEnd;
+            public ushort ProfileHollow;
+
+            public void CopyFrom(PrimitiveShape shape)
+            {
+                Type = shape.Type;
+                SculptMap = shape.SculptMap;
+                SculptType = shape.SculptType;
+                IsSculptInverted = shape.IsSculptInverted;
+                IsSculptMirrored = shape.IsSculptMirrored;
+
+                PathBegin = shape.PathBegin;
+                PathCurve = shape.PathCurve;
+                PathEnd = shape.PathEnd;
+                PathRadiusOffset = shape.PathRadiusOffset;
+                PathRevolutions = shape.PathRevolutions;
+                PathScaleX = shape.PathScaleX;
+                PathScaleY = shape.PathScaleY;
+                PathShearX = shape.PathShearX;
+                PathShearY = shape.PathShearY;
+                PathSkew = shape.PathSkew;
+                PathTaperX = shape.PathTaperX;
+                PathTaperY = shape.PathTaperY;
+                PathTwist = shape.PathTwist;
+                PathTwistBegin = shape.PathTwistBegin;
+                ProfileBegin = shape.ProfileBegin;
+                ProfileCurve = shape.ProfileCurve;
+                ProfileEnd = shape.ProfileEnd;
+                ProfileHollow = shape.ProfileHollow;
+                ProfileEnd = shape.ProfileEnd;
+            }
+
             #endregion
         }
         private readonly PrimitiveShape m_Shape = new PrimitiveShape();
@@ -1289,24 +1900,7 @@ namespace SilverSim.Scene.Types.Object
                 PrimitiveShape res = new PrimitiveShape();
                 lock(m_Shape)
                 {
-                    res.Type = m_Shape.Type;
-                    res.HoleShape = m_Shape.HoleShape;
-                    res.Cut = m_Shape.Cut;
-                    res.Hollow = m_Shape.Hollow;
-                    res.Twist = m_Shape.Twist;
-                    res.TopSize = m_Shape.TopSize;
-                    res.TopShear = m_Shape.TopShear;
-                    res.Dimple = m_Shape.Dimple;
-                    res.AdvancedCut = m_Shape.AdvancedCut;
-                    res.Taper = m_Shape.Taper;
-                    res.Revolutions = m_Shape.Revolutions;
-                    res.RadiusOffset = m_Shape.RadiusOffset;
-                    res.Skew = m_Shape.Skew;
-                    res.SculptMap = new UUID(m_Shape.SculptMap);
-                    res.SculptType = m_Shape.SculptType;
-                    res.IsSculptInverted = m_Shape.IsSculptInverted;
-                    res.IsSculptMirrored = m_Shape.IsSculptMirrored;
-                    res.HoleSize = m_Shape.HoleSize;
+                    res.CopyFrom(m_Shape);
                 }
                 return res;
             }
@@ -1315,28 +1909,11 @@ namespace SilverSim.Scene.Types.Object
                 bool sculptChanged = false;
                 lock(m_Shape)
                 {
-                    m_Shape.Type = value.Type;
-                    m_Shape.HoleShape = value.HoleShape;
-                    m_Shape.Cut = value.Cut;
-                    m_Shape.Hollow = value.Hollow;
-                    m_Shape.Twist = value.Twist;
-                    m_Shape.TopSize = value.TopSize;
-                    m_Shape.TopShear = value.TopShear;
-                    m_Shape.Dimple = value.Dimple;
-                    m_Shape.AdvancedCut = value.AdvancedCut;
-                    m_Shape.Taper = value.Taper;
-                    m_Shape.Revolutions = value.Revolutions;
-                    m_Shape.RadiusOffset = value.RadiusOffset;
-                    m_Shape.Skew = value.Skew;
                     if(m_Shape.SculptMap != value.SculptMap || m_Shape.SculptType != value.SculptType)
                     {
                         sculptChanged = true;
                     }
-                    m_Shape.SculptMap = new UUID(value.SculptMap);
-                    m_Shape.SculptType = value.SculptType;
-                    m_Shape.IsSculptInverted = value.IsSculptInverted;
-                    m_Shape.IsSculptMirrored = value.IsSculptMirrored;
-                    m_Shape.HoleSize = value.HoleSize;
+                    m_Shape.CopyFrom(value);
                 }
                 if(sculptChanged)
                 {
@@ -1674,56 +2251,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Type:
-                    {
-                        PrimitiveShape shape = Shape;
-                        paramList.Add((int)shape.Type);
-                        if(shape.Type == PrimitiveShapeType.Sculpt)
-                        {
-                            paramList.Add(shape.SculptMap);
-                            int sculptFlags = (int)shape.SculptType;
-                            if(shape.IsSculptInverted)
-                            {
-                                sculptFlags |= 0x40;
-                            }
-                            if(shape.IsSculptMirrored)
-                            {
-                                sculptFlags |= 0x80;
-                            }
-                            paramList.Add(sculptFlags);
-                        }
-                        else
-                        {
-                            paramList.Add((int)shape.HoleShape);
-                            paramList.Add(shape.Cut);
-                            paramList.Add(shape.Hollow);
-                            paramList.Add(shape.Twist);
-                            switch (shape.Type)
-                            {
-                                case PrimitiveShapeType.Box:
-                                case PrimitiveShapeType.Cylinder:
-                                case PrimitiveShapeType.Prism:
-                                    paramList.Add(shape.TopSize);
-                                    paramList.Add(shape.TopShear);
-                                    break;
-
-                                case PrimitiveShapeType.Sphere:
-                                    paramList.Add(shape.Dimple);
-                                    break;
-
-                                case PrimitiveShapeType.Torus:
-                                case PrimitiveShapeType.Tube:
-                                case PrimitiveShapeType.Ring:
-                                    paramList.Add(shape.HoleSize);
-                                    paramList.Add(shape.TopShear);
-                                    paramList.Add(shape.AdvancedCut);
-                                    paramList.Add(shape.Taper);
-                                    paramList.Add(shape.Revolutions);
-                                    paramList.Add(shape.RadiusOffset);
-                                    paramList.Add(shape.Skew);
-                                    break;
-                            }
-                        }
-                    }
+                    Shape.ToPrimitiveParams(paramList);
                     break;
 
                 case PrimitiveParamsType.Slice:
@@ -1907,140 +2435,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                int ret = 0;
-                bool hasCut;
-                bool hasHollow;
-                bool hasDimple;
-                bool hasProfileCut;
-
-                PrimitiveShapeType primType = Shape.Type;
-                if (primType == PrimitiveShapeType.Box
-                    ||
-                    primType == PrimitiveShapeType.Cylinder
-                    ||
-                    primType == PrimitiveShapeType.Prism)
-                {
-
-                    hasCut = (Shape.Cut.X > 0) || (Shape.Cut.Y < 1);
-                }
-                else
-                {
-                    hasCut = (Shape.Cut.X > 0) || (Shape.Cut.Y < 1);
-                }
-
-                hasHollow = Shape.Hollow > 0;
-                hasDimple = (Shape.Cut.X > 0) || (Shape.Cut.Y < 1); // taken from llSetPrimitiveParms
-                hasProfileCut = hasDimple; // is it the same thing?
-
-                switch (primType)
-                {
-                    case PrimitiveShapeType.Box:
-                        ret = 6;
-                        if (hasCut)
-                        {
-                            ret += 2;
-                        }
-                        if (hasHollow)
-                        {
-                            ret += 1;
-                        }
-                        break;
-                    case PrimitiveShapeType.Cylinder:
-                        ret = 3;
-                        if (hasCut)
-                        {
-                            ret += 2;
-                        }
-                        if (hasHollow)
-                        {
-                            ret += 1;
-                        }
-                        break;
-                    case PrimitiveShapeType.Prism:
-                        ret = 5;
-                        if (hasCut)
-                        {
-                            ret += 2;
-                        }
-                        if (hasHollow)
-                        {
-                            ret += 1;
-                        }
-                        break;
-                    case PrimitiveShapeType.Sphere:
-                        ret = 1;
-                        if (hasCut)
-                        {
-                            ret += 2;
-                        }
-                        if (hasDimple)
-                        {
-                            ret += 2;
-                        }
-                        if (hasHollow)
-                        {
-                            ret += 1;
-                        }
-                        break;
-                    case PrimitiveShapeType.Torus:
-                        ret = 1;
-                        if (hasCut)
-                        {
-                            ret += 2;
-                        }
-                        if (hasProfileCut)
-                        {
-                            ret += 2;
-                        }
-                        if (hasHollow)
-                        {
-                            ret += 1;
-                        }
-                        break;
-                    case PrimitiveShapeType.Tube:
-                        ret = 4;
-                        if (hasCut)
-                        {
-                            ret += 2;
-                        }
-                        if (hasProfileCut)
-                        {
-                            ret += 2;
-                        }
-                        if (hasHollow)
-                        {
-                            ret += 1;
-                        }
-                        break;
-                    case PrimitiveShapeType.Ring:
-                        ret = 3;
-                        if (hasCut)
-                        {
-                            ret += 2;
-                        }
-                        if (hasProfileCut)
-                        {
-                            ret += 2;
-                        }
-                        if (hasHollow)
-                        {
-                            ret += 1;
-                        }
-                        break;
-                    case PrimitiveShapeType.Sculpt:
-                        // Special mesh handling
-                        if (Shape.SculptType == PrimitiveSculptType.Mesh)
-                        {
-                            ret = 32; // if it's a mesh then max 32 faces
-                        }
-                        else
-                        {
-                            ret = 1; // if it's a sculpt then max 1 face
-                        }
-                        break;
-                }
-
-                return ret;
+                return Shape.NumberOfSides;
             }
         }
 
@@ -2076,54 +2471,7 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.Type:
-                    {
-                        PrimitiveShape shape = Shape;
-                        shape.Type = (PrimitiveShapeType)ParamsHelper.GetInteger(enumerator, "PRIM_TYPE");
-                        if (shape.Type == PrimitiveShapeType.Sculpt)
-                        {
-                            shape.SculptMap = ParamsHelper.GetKey(enumerator, "PRIM_TYPE");
-                            int sculptFlags = ParamsHelper.GetInteger(enumerator, "PRIM_TYPE");
-                            shape.SculptType = (PrimitiveSculptType)(sculptFlags & 0x0F);
-                            shape.IsSculptInverted = (sculptFlags & 0x40) != 0;
-                            shape.IsSculptMirrored = (sculptFlags & 0x80) != 0;
-                        }
-                        else
-                        {
-                            shape.HoleShape = (PrimitiveHoleShape)ParamsHelper.GetInteger(enumerator, "PRIM_TYPE");
-                            shape.Cut = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
-                            shape.Hollow = ParamsHelper.GetDouble(enumerator, "PRIM_TYPE");
-                            shape.Twist = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
-                            switch (shape.Type)
-                            {
-                                case PrimitiveShapeType.Box:
-                                case PrimitiveShapeType.Cylinder:
-                                case PrimitiveShapeType.Prism:
-                                    shape.TopSize = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
-                                    shape.TopShear = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
-                                    break;
-
-                                case PrimitiveShapeType.Sphere:
-                                    shape.Dimple = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
-                                    break;
-
-                                case PrimitiveShapeType.Torus:
-                                case PrimitiveShapeType.Tube:
-                                case PrimitiveShapeType.Ring:
-                                    shape.HoleSize = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
-                                    shape.TopShear = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
-                                    shape.AdvancedCut = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
-                                    shape.Taper = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
-                                    shape.Revolutions = ParamsHelper.GetDouble(enumerator, "PRIM_TYPE");
-                                    shape.RadiusOffset = ParamsHelper.GetDouble(enumerator, "PRIM_TYPE");
-                                    shape.Skew = ParamsHelper.GetDouble(enumerator, "PRIM_TYPE");
-                                    break;
-
-                                default:
-                                    throw new ArgumentException(String.Format("Invalid primitive type {0}", shape.Type));
-                            }
-                            Shape = shape;
-                        }
-                    }
+                    Shape = PrimitiveShape.FromPrimitiveParams(enumerator);
                     break;
 
                 case PrimitiveParamsType.Slice:

@@ -214,6 +214,27 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 objpart.Flexible = fp;
 
                                 ObjectPart.PrimitiveShape ps = new ObjectPart.PrimitiveShape();
+                                /*
+            public ushort PathBegin;
+            public byte PathCurve;
+            public ushort PathEnd;
+            public sbyte PathRadiusOffset;
+            public byte PathRevolutions;
+            public byte PathScaleX;
+            public byte PathScaleY;
+            public byte PathShearX;
+            public byte PathShearY;
+            public sbyte PathSkew;
+            public sbyte PathTaperX;
+            public sbyte PathTaperY;
+            public sbyte PathTwist;
+            public sbyte PathTwistBegin;
+            public ushort ProfileBegin;
+            public byte ProfileCurve;
+            public ushort ProfileEnd;
+            public ushort ProfileHollow;
+                                 */
+#if TODO
                                 ps.AdvancedCut = MySQLUtilities.GetVector(dbReader, "ShapeAdvancedCut");
                                 ps.Cut = MySQLUtilities.GetVector(dbReader, "ShapeCut");
                                 ps.Dimple = MySQLUtilities.GetVector(dbReader, "ShapeDimple");
@@ -233,7 +254,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 ps.Twist = MySQLUtilities.GetVector(dbReader, "ShapeTwist");
                                 ps.Type = (PrimitiveShapeType)(int)dbReader["ShapeType"];
                                 objpart.Shape = ps;
-
+#endif
                                 objpart.ParticleSystemBytes = MySQLUtilities.GetBytes(dbReader, "ParticleSystem");
 
                                 objpart.ScriptAccessPin = (int)dbReader["ScriptAccessPin"];
@@ -340,6 +361,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         private void UpdateObjectPart(MySqlConnection connection, ObjectPart objpart)
         {
+            if(objpart.Group.IsTemporary || objpart.Group.IsTempOnRez)
+            {
+                return;
+            }
             Dictionary<string, object> p = new Dictionary<string, object>();
             p["ID"] = objpart.ID;
             p["Position"] = objpart.Position;
@@ -380,6 +405,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["FlexibleForce"] = fp.Force;
 
             ObjectPart.PrimitiveShape ps = objpart.Shape;
+#if TODO
             p["ShapeAdvancedCut"] = ps.AdvancedCut;
             p["ShapeCut"] = ps.Cut;
             p["ShapeDimple"] = ps.Dimple;
@@ -398,7 +424,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["ShapeTopSize"] = ps.TopSize;
             p["ShapeTwist"] = ps.Twist;
             p["ShapeType"] = (int)ps.Type;
-
+#endif
             p["ParticleSystem"] = objpart.ParticleSystemBytes;
 
             p["ScriptAccessPin"] = objpart.ScriptAccessPin;

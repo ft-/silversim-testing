@@ -156,7 +156,25 @@ namespace SilverSim.Types.Primitive
         Mirror = 128
     }
 
-    public enum PrimitiveHoleShape : int
+    public enum PrimitiveProfileShape : byte
+    {
+        Circle = 0,
+        Square = 1,
+        IsometricTriangle = 2,
+        EquilateralTriangle = 3,
+        RightTriangle = 4,
+        HalfCircle = 5
+    }
+
+    public enum PrimitiveExtrusion : byte
+    {
+        Straight = 16,
+        Curve1 = 32,
+        Curve2 = 48,
+        Flexible = 128
+    }
+
+    public enum PrimitiveHoleShape : byte
     {
         Default = 0x00,
         Circle = 0x10,

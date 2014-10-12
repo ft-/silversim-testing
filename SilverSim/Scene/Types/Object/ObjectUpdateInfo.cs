@@ -31,6 +31,20 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        private int clampSignedTo(double val, double imin, double imax, int omin, int omax)
+        {
+            double range = val * (omax - omin) / (imax - imin);
+            range += omin;
+            return (int)range;
+        }
+
+        private uint clampUnsignedTo(double val, double imin, double imax, uint omin, uint omax)
+        {
+            double range = val * (omax - omin) / (imax - imin);
+            range += omin;
+            return (uint)range;
+        }
+
         public SilverSim.LL.Messages.Object.ObjectUpdate.ObjData SerializeFull()
         {
             lock(this)
@@ -64,24 +78,25 @@ namespace SilverSim.Scene.Types.Object
                     m_Part.AngularVelocity.ToBytes(m.ObjectData, 48);
                     m.OwnerID = m_Part.Owner.ID;
                     m.ParentID = m_Part.Group.RootPart.LocalID;
-                    m.PathBegin = 0;
-                    m.PathEnd = 0;
-                    m.PathRadiusOffset = 0;
-                    m.PathRevolutions = 0;
-                    m.PathScaleX = 0;
-                    m.PathScaleY = 0;
-                    m.PathShearX = 0;
-                    m.PathShearY = 0;
-                    m.PathSkew = 0;
-                    m.PathTaperX = 0;
-                    m.PathTaperY = 0;
-                    m.PathTwist = 0;
-                    m.PathTwistBegin = 0;
+                    ObjectPart.PrimitiveShape shape = m_Part.Shape;
+                    m.PathBegin = shape.PathBegin;
+                    m.PathEnd = shape.PathEnd;
+                    m.PathRadiusOffset = shape.PathRadiusOffset;
+                    m.PathRevolutions = shape.PathRevolutions;
+                    m.PathScaleX = shape.PathScaleX;
+                    m.PathScaleY = shape.PathScaleY;
+                    m.PathShearX = shape.PathShearX;
+                    m.PathShearY = shape.PathShearY;
+                    m.PathSkew = shape.PathSkew;
+                    m.PathTaperX = shape.PathTaperX;
+                    m.PathTaperY = shape.PathTaperY;
+                    m.PathTwist = shape.PathTwist;
+                    m.PathTwistBegin = shape.PathTwistBegin;
                     m.PCode = 0;
-                    m.ProfileBegin = 0;
-                    m.ProfileCurve = 0;
-                    m.ProfileEnd = 0;
-                    m.ProfileHollow = 0;
+                    m.ProfileBegin = shape.ProfileBegin;
+                    m.ProfileCurve = shape.ProfileCurve;
+                    m.ProfileEnd = shape.ProfileEnd;
+                    m.ProfileHollow = shape.ProfileHollow;
                     m.PSBlock = m_Part.ParticleSystemBytes;
                     m.Radius = 0;
                     m.Scale = m_Part.Size;
@@ -92,6 +107,13 @@ namespace SilverSim.Scene.Types.Object
                     m.TextureAnim = new byte[0];
                     m.TextureEntry = m_Part.TextureEntryBytes;
                     m.UpdateFlags = 0;
+
+                    if(m_Part.Shape.SculptType == SilverSim.Types.Primitive.PrimitiveSculptType.Mesh)
+                    {
+                        m.ProfileBegin = 12500;
+                        m.ProfileEnd = 0;
+                        m.ProfileHollow = 27500;
+                    }
 
                     return m;
                 }
