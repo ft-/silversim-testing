@@ -96,7 +96,7 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
 
         }
 
-        private void OnPrimUpdate(ObjectPart part, int flags)
+        private void OnPrimUpdate(ObjectPart part, ChangedEvent.ChangedFlags flags)
         {
             if(flags != 0)
             {
@@ -106,7 +106,7 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
             }
         }
 
-        private void OnGroupUpdate(ObjectGroup group, int flags)
+        private void OnGroupUpdate(ObjectGroup group, ChangedEvent.ChangedFlags flags)
         {
             if (flags != 0)
             {
@@ -211,7 +211,7 @@ namespace SilverSim.Scripting.LSL.Variants.LSL
                 else if (ev is ChangedEvent)
                 {
                     ChangedEvent e = (ChangedEvent)ev;
-                    m_CurrentState.changed(new Integer(e.Flags));
+                    m_CurrentState.changed(new Integer((int)e.Flags));
                 }
                 else if (ev is CollisionEvent)
                 {

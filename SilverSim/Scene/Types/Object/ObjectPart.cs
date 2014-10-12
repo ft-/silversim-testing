@@ -33,7 +33,6 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
-using SilverSim.Types.Primitive;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -42,14 +41,30 @@ namespace SilverSim.Scene.Types.Object
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT PART");
 
         #region Events
-        public delegate void OnUpdateDelegate(ObjectPart part, int changed);
+        public delegate void OnUpdateDelegate(ObjectPart part, ChangedEvent.ChangedFlags changed);
         public event OnUpdateDelegate OnUpdate;
         public event Action<IObject> OnPositionChange;
         #endregion
 
-        public UInt32 LocalID { get; set; }
+        private UInt32 m_LocalID;
+        public UInt32 LocalID 
+        {
+            get
+            {
+                return m_LocalID;
+            }
+            set
+            {
+                lock(this)
+                {
+                    m_ObjectUpdateInfo.LocalID = value;
+                    m_LocalID = value;
+                }
+            }
+        }
 
         #region Fields
+        private ObjectUpdateInfo m_ObjectUpdateInfo;
         private UUID m_ID = UUID.Zero;
         private string m_Name = string.Empty;
         private string m_Description = string.Empty;
@@ -77,6 +92,43 @@ namespace SilverSim.Scene.Types.Object
         private ReaderWriterLock m_ExtraParamsLock = new ReaderWriterLock();
 
         public int ScriptAccessPin = 0;
+
+        private bool m_IsFacelightDisabled = false;
+        private bool m_IsAttachmentLightsDisabled = false;
+
+        private bool IsFacelightDisabled
+        {
+            get
+            {
+                return m_IsFacelightDisabled;
+            }
+            set
+            {
+                lock(this)
+                {
+                    m_IsFacelightDisabled = value;
+                }
+                UpdateExtraParams();
+                TriggerOnUpdate(0);
+            }
+        }
+
+        private bool IsAttachmentLightsDisabled
+        {
+            get
+            {
+                return m_IsAttachmentLightsDisabled;
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_IsAttachmentLightsDisabled = value;
+                }
+                UpdateExtraParams();
+                TriggerOnUpdate(0);
+            }
+        }
 
         public TextureEntry TextureEntry
         {
@@ -360,17 +412,33 @@ namespace SilverSim.Scene.Types.Object
             Group = null;
             IsChanged = false;
             Inventory = new ObjectPartInventory();
+            m_ObjectUpdateInfo = new ObjectUpdateInfo(this);
         }
         #endregion
 
         #region Dispose
         public void Dispose()
         {
+            m_ObjectUpdateInfo.KillObject();
+            Group.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
         }
         #endregion
 
-        private void TriggerOnUpdate(int flags)
+        public void SendKillObject()
         {
+            m_ObjectUpdateInfo.KillObject();
+            Group.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+        }
+
+        public void SendObjectUpdate()
+        {
+            Group.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+        }
+
+        internal void TriggerOnUpdate(ChangedEvent.ChangedFlags flags)
+        {
+            Group.OriginalAssetID = UUID.Zero;
+
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
@@ -386,6 +454,9 @@ namespace SilverSim.Scene.Types.Object
                     }
                 }
             }
+
+            m_ObjectUpdateInfo.IncSerialNumber();
+            Group.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
         }
 
         private void TriggerOnPositionChange()
@@ -405,6 +476,7 @@ namespace SilverSim.Scene.Types.Object
                     }
                 }
             }
+            Group.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
         }
 
         public AssetServiceInterface AssetService /* specific for attachments usage */
@@ -580,7 +652,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_IsAllowedDrop = value;
                 IsChanged = true;
-                TriggerOnUpdate((int)ChangedEvent.ChangedFlags.AllowedDrop);
+                TriggerOnUpdate(ChangedEvent.ChangedFlags.AllowedDrop);
             }
         }
 
@@ -669,7 +741,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_PhysicsShapeType = value;
                 IsChanged = true;
-                TriggerOnUpdate((int)ChangedEvent.ChangedFlags.Shape);
+                TriggerOnUpdate(ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -727,7 +799,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Size = value;
                 }
                 IsChanged = true;
-                TriggerOnUpdate((int)ChangedEvent.ChangedFlags.Scale);
+                TriggerOnUpdate(ChangedEvent.ChangedFlags.Scale);
             }
         }
 
@@ -747,7 +819,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Slice = value;
                 }
                 IsChanged = true;
-                TriggerOnUpdate((int)ChangedEvent.ChangedFlags.Shape);
+                TriggerOnUpdate(ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -1017,7 +1089,9 @@ namespace SilverSim.Scene.Types.Object
                     updatebytes[i++] = (byte) shape.SculptType;
                 }
 
-                if(light.IsLight)
+                if (light.IsLight &&
+                    (!m_IsAttachmentLightsDisabled || Group.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.NotAttached) &&
+                    (!m_IsFacelightDisabled || (Group.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.LeftHand && Group.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.RightHand)))
                 {
                     updatebytes[i++] = (byte)(LightEP % 256);
                     updatebytes[i++] = (byte)(LightEP / 256);
@@ -1116,7 +1190,7 @@ namespace SilverSim.Scene.Types.Object
                 }
                 UpdateExtraParams();
                 IsChanged = true;
-                TriggerOnUpdate((int)ChangedEvent.ChangedFlags.Shape);
+                TriggerOnUpdate(ChangedEvent.ChangedFlags.Shape);
             }
         }
 
@@ -1269,7 +1343,7 @@ namespace SilverSim.Scene.Types.Object
                     UpdateExtraParams();
                 }
                 IsChanged = true;
-                TriggerOnUpdate((int)ChangedEvent.ChangedFlags.Shape);
+                TriggerOnUpdate(ChangedEvent.ChangedFlags.Shape);
             }
         }
 

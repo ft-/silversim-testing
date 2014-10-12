@@ -39,11 +39,20 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using ThreadedClasses;
+using SilverSim.Scene.Types.Object;
 
 namespace SilverSim.LL.Core
 {
     public partial class LLUDPServer
     {
+        public void ScheduleUpdate(ObjectUpdateInfo info)
+        {
+            m_Circuits.ForEach(delegate(Circuit circ)
+            {
+                circ.ScheduleUpdate(info);
+            });
+        }
+
         void HandleSimulatorMessageLocally(Message m)
         {
             Circuit circuit;

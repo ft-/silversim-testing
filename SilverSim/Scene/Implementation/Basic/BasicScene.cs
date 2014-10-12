@@ -344,15 +344,20 @@ namespace SilverSim.Scene.Implementation.Basic
                 ObjectGroup objgroup = (ObjectGroup)obj;
                 List<UUID> removeAgain = new List<UUID>();
 
-                AddNewLocalID(objgroup);
                 try
                 {
                     foreach (ObjectPart objpart in objgroup.Values)
                     {
+                        AddNewLocalID(objgroup);
                         m_Primitives.Add(objpart.ID, objpart);
                         removeAgain.Add(objpart.ID);
                     }
                     m_Objects.Add(objgroup.ID, objgroup);
+
+                    foreach(ObjectPart objpart in objgroup.Values)
+                    {
+                        objpart.SendObjectUpdate();
+                    }
                 }
                 catch
                 {
@@ -386,15 +391,13 @@ namespace SilverSim.Scene.Implementation.Basic
             if (obj is ObjectGroup)
             {
                 ObjectGroup objgroup = (ObjectGroup)obj;
-                List<UInt32> localids = new List<UInt32>();
 
                 foreach (ObjectPart objpart in objgroup.Values)
                 {
                     m_Primitives.Remove(objpart.ID);
-                    localids.Add(objpart.LocalID);
+                    objpart.SendKillObject();
                 }
                 m_Objects.Remove(objgroup.ID);
-                SendKillObjectToAgents(localids);
                 RemoveLocalID(objgroup);
             }
             else if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))

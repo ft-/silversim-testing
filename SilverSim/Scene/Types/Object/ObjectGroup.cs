@@ -42,12 +42,22 @@ namespace SilverSim.Scene.Types.Object
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT GROUP");
 
         #region Events
-        public delegate void OnUpdateDelegate(ObjectGroup objgroup, int flags);
+        public delegate void OnUpdateDelegate(ObjectGroup objgroup, ChangedEvent.ChangedFlags flags);
         public event OnUpdateDelegate OnUpdate;
         public event Action<IObject> OnPositionChange;
         #endregion
 
-        public UInt32 LocalID { get; set; }
+        public UInt32 LocalID 
+        { 
+            get
+            {
+                return RootPart.LocalID;
+            }
+            set
+            {
+                RootPart.LocalID = value;
+            }
+        }
 
         public const int LINK_SET = -1;
         public const int LINK_ALL_OTHERS = -2;
@@ -126,7 +136,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private void TriggerOnUpdate(int flags)
+        private void TriggerOnUpdate(ChangedEvent.ChangedFlags flags)
         {
             OriginalAssetID = UUID.Zero;
 
@@ -145,6 +155,8 @@ namespace SilverSim.Scene.Types.Object
                     }
                 }
             }
+
+            RootPart.TriggerOnUpdate(flags);
         }
 
         #region Properties
@@ -328,7 +340,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Owner = value;
                 }
                 IsChanged = true;
-                TriggerOnUpdate( (int)ChangedEvent.ChangedFlags.Owner);
+                TriggerOnUpdate(ChangedEvent.ChangedFlags.Owner);
             }
         }
 

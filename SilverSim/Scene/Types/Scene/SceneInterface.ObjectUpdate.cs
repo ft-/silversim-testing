@@ -29,6 +29,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Types.Primitive;
+using SilverSim.Scene.Types.Object;
 using SilverSim.LL.Messages;
 using SilverSim.Types;
 
@@ -36,6 +37,11 @@ namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
+        public void ScheduleUpdate(ObjectUpdateInfo objinfo)
+        {
+
+        }
+
         private SilverSim.LL.Messages.Object.ObjectUpdate AgentToObjectUpdate(IAgent agent)
         {
             SilverSim.LL.Messages.Object.ObjectUpdate m = new LL.Messages.Object.ObjectUpdate();

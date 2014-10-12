@@ -43,7 +43,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     SilverSim.LL.Messages.Object.ObjectUpdate.ObjData m = new LL.Messages.Object.ObjectUpdate.ObjData();
                     m.ClickAction = m_Part.ClickAction;
-                    m.CRC = 1;
+                    m.CRC = (uint)m_SerialNumber;
                     m.ExtraParams = m_Part.ExtraParamsBytes;
                     m.Flags = 0;
                     m.FullID = m_Part.ID;
@@ -56,7 +56,12 @@ namespace SilverSim.Scene.Types.Object
                     m.Material = m_Part.Material;
                     m.MediaURL = "";
                     m.NameValue = m_Part.Name;
-                    m.ObjectData = new byte[0];
+                    m.ObjectData = new byte[60];
+                    m_Part.Position.ToBytes(m.ObjectData, 0);
+                    m_Part.Velocity.ToBytes(m.ObjectData, 12);
+                    m_Part.Acceleration.ToBytes(m.ObjectData, 24);
+                    m_Part.Rotation.ToBytes(m.ObjectData, 36);
+                    m_Part.AngularVelocity.ToBytes(m.ObjectData, 48);
                     m.OwnerID = m_Part.Owner.ID;
                     m.ParentID = m_Part.Group.RootPart.LocalID;
                     m.PathBegin = 0;
@@ -116,6 +121,21 @@ namespace SilverSim.Scene.Types.Object
             get
             {
                 return m_Killed;
+            }
+        }
+
+        public bool IsPhysics
+        {
+            get
+            {
+                lock(this)
+                {
+                    if(m_Part != null && !m_Killed)
+                    {
+                        return m_Part.Group.IsPhysics;
+                    }
+                }
+                return false;
             }
         }
 

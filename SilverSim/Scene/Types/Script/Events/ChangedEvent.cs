@@ -23,11 +23,14 @@ exception statement from your version.
 
 */
 
+using System;
+
 namespace SilverSim.Scene.Types.Script.Events
 {
     public struct ChangedEvent : IScriptEvent
     {
-        public enum ChangedFlags
+        [Flags]
+        public enum ChangedFlags : int
         {
             Inventory = 0x001,
             Color = 0x002,
@@ -43,6 +46,6 @@ namespace SilverSim.Scene.Types.Script.Events
             Media = 0x800
         }
 
-        public int Flags;
+        public ChangedFlags Flags;
     }
 }
