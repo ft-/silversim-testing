@@ -82,4 +82,86 @@ namespace SilverSim.Types.Primitive
         MaterialID = 1 << 10,
         All = 0xFFFFFFFF
     }
+
+    public enum ClickActionType : byte
+    {
+        None = 0,
+        Touch = 0,
+        Sit = 1,
+        Buy = 2,
+        Pay = 3,
+        Open = 4,
+        Play = 5,
+        OpenMedia = 6,
+        Zoom = 7
+    }
+
+    public enum PrimitiveParamsType : int
+    {
+        Name = 27,
+        Desc = 28,
+        Type = 9,
+        Slice = 35,
+        PhysicsShapeType = 30,
+        Material = 2,
+        Physics = 3,
+        TempOnRez = 4,
+        Phantom = 5,
+        Position = 6,
+        PosLocal = 33,
+        Rotation = 8,
+        RotLocal = 29,
+        Size = 7,
+        Texture = 17,
+        Text = 26,
+        Color = 18,
+        BumpShiny = 19,
+        PointLight = 23,
+        FullBright = 20,
+        Flexible = 21,
+        TexGen = 22,
+        Glow = 25,
+        Omega = 32,
+        LinkTarget = 34,
+    }
+
+    public enum PrimitivePhysicsShapeType : int
+    {
+        Prim = 0,
+        None = 1,
+        Convex = 2,
+    }
+
+    public enum PrimitiveShapeType : int
+    {
+        Box = 0,
+        Cylinder = 1,
+        Prism = 2,
+        Sphere = 3,
+        Torus = 4,
+        Tube = 5,
+        Ring = 6,
+        Sculpt = 7
+    }
+
+    [Flags]
+    public enum PrimitiveSculptType : byte
+    {
+        Sphere = 1,
+        Torus = 2,
+        Plane = 3,
+        Cylinder = 4,
+        Mesh = 5,
+        Invert = 64,
+        Mirror = 128
+    }
+
+    public enum PrimitiveHoleShape : int
+    {
+        Default = 0x00,
+        Circle = 0x10,
+        Square = 0x20,
+        Triangle = 0x30
+    }
+
 }

@@ -44,22 +44,15 @@ namespace SilverSim.Scene.Types.Scene
             d.ExtraParams = new byte[1];
             d.FullID = agent.ID;
             d.LocalID = agent.LocalID;
-            d.Material = (byte)PrimitiveMaterial.Flesh;
+            d.Material = PrimitiveMaterial.Flesh;
             d.MediaURL = "";
             d.NameValue = string.Format("FirstName STRING RW SV {0}\nLastName STRING RW SV {1}\nTitle STRING RW SV {2}", agent.FirstName, agent.LastName, "");
             d.ObjectData = new byte[76];
             agent.CollisionPlane.ToBytes(d.ObjectData, 0);
-            agent.GlobalPosition.ToBytes(d.ObjectData, 16);
+            agent.Position.ToBytes(d.ObjectData, 16);
             agent.Velocity.ToBytes(d.ObjectData, 28);
             agent.Acceleration.ToBytes(d.ObjectData, 40);
             Vector3.Zero.ToBytes(d.ObjectData, 64); /* set to zero as per SL ObjectUpdate definition for the 76 byte format */
-            /*
-            data.CollisionPlane.ToBytes(objectData, 0);
-            data.OffsetPosition.ToBytes(objectData, 16);
-//            data.Velocity.ToBytes(objectData, 28);
-//            data.Acceleration.ToBytes(objectData, 40);
-            //data.AngularVelocity.ToBytes(objectData, 64);
-             */
             Quaternion rot = agent.Rotation;
             //if(!agent.SittingOnObject)
             {

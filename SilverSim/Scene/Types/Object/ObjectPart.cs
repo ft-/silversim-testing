@@ -23,16 +23,17 @@ exception statement from your version.
 
 */
 
+using log4net;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
-using ThreadedClasses;
-using log4net;
-using System.Reflection;
 using System.Threading;
+using ThreadedClasses;
+using SilverSim.Types.Primitive;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -76,7 +77,6 @@ namespace SilverSim.Scene.Types.Object
         private ReaderWriterLock m_ExtraParamsLock = new ReaderWriterLock();
 
         public int ScriptAccessPin = 0;
-
 
         public TextureEntry TextureEntry
         {
@@ -406,6 +406,15 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
         }
+
+        public AssetServiceInterface AssetService /* specific for attachments usage */
+        {
+            get
+            {
+                return Group.AssetService;
+            }
+        }
+
 
         #region Properties
         public ObjectGroup Group { get; private set; }

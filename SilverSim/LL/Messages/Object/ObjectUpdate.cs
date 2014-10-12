@@ -32,15 +32,20 @@ namespace SilverSim.LL.Messages.Object
 {
     public class ObjectUpdate : Message
     {
-        public struct ObjData
+        public class ObjData
         {
+            public ObjData()
+            {
+
+            }
+
             public UInt32 LocalID;
             public byte State;
             public UUID FullID;
             public UInt32 CRC;
             public PrimitiveCode PCode;
-            public byte Material;
-            public byte ClickAction;
+            public PrimitiveMaterial Material;
+            public ClickActionType ClickAction;
             public Vector3 Scale;
             public byte[] ObjectData;
             public UInt32 ParentID;
@@ -121,8 +126,8 @@ namespace SilverSim.LL.Messages.Object
                 p.WriteUUID(d.FullID);
                 p.WriteUInt32(d.CRC);
                 p.WriteUInt8((byte)d.PCode);
-                p.WriteUInt8(d.Material);
-                p.WriteUInt8(d.ClickAction);
+                p.WriteUInt8((byte)d.Material);
+                p.WriteUInt8((byte)d.ClickAction);
                 p.WriteVector3f(d.Scale);
                 p.WriteUInt8((byte)d.ObjectData.Length);
                 p.WriteBytes(d.ObjectData);

@@ -23,12 +23,9 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Types;
+using SilverSim.Types.Primitive;
 
 namespace SilverSim.Scripting.LSL.Variants.LSL
 {

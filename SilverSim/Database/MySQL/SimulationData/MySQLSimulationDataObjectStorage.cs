@@ -23,13 +23,14 @@ exception statement from your version.
 
 */
 
+using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
-using System;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
-using MySql.Data.MySqlClient;
+using SilverSim.Types.Primitive;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.SimulationData

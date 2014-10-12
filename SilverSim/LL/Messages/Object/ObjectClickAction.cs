@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using SilverSim.Types.Primitive;
 
 namespace SilverSim.LL.Messages.Object
 {
@@ -34,7 +35,7 @@ namespace SilverSim.LL.Messages.Object
         public struct Data
         {
             public UInt32 ObjectLocalID;
-            public byte ClickAction;
+            public ClickActionType ClickAction;
         }
 
         public UUID AgentID = UUID.Zero;
@@ -65,7 +66,7 @@ namespace SilverSim.LL.Messages.Object
             {
                 Data d = new Data();
                 d.ObjectLocalID = p.ReadUInt32();
-                d.ClickAction = p.ReadUInt8();
+                d.ClickAction = (ClickActionType)p.ReadUInt8();
                 m.ObjectData.Add(d);
             }
 

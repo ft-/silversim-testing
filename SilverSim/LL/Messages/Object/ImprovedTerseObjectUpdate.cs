@@ -11,8 +11,13 @@ namespace SilverSim.LL.Messages.Object
         public UInt64 RegionHandle = 0;
         public UInt16 TimeDilation = 0;
 
-        public struct ObjData
+        public class ObjData
         {
+            public ObjData()
+            {
+
+            }
+
             public byte[] Data;
             public byte[] TextureEntry;
         }

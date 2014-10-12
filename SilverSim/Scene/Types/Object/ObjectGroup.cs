@@ -27,8 +27,10 @@ using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
+using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
 using ThreadedClasses;
@@ -63,10 +65,32 @@ namespace SilverSim.Scene.Types.Object
         private UUI m_Owner = UUI.Unknown;
         private UUI m_Creator = UUI.Unknown;
         private UUI m_LastOwner = UUI.Unknown;
+        private UUID m_OriginalAssetID = UUID.Zero; /* necessary for reducing asset re-generation */
         private Date m_CreationDate = new Date();
         protected internal RwLockedBiDiMappingDictionary<IAgent, ObjectPart> m_SittingAgents = new RwLockedBiDiMappingDictionary<IAgent, ObjectPart>();
         public AgentSittingInterface AgentSitting { get; private set; }
         public SceneInterface Scene { get; set; }
+
+        AssetServiceInterface m_AssetService = null;
+        public AssetServiceInterface AssetService /* specific for attachments usage */
+        { 
+            get
+            {
+                if (null == m_AssetService)
+                {
+                    return Scene.AssetService;
+                }
+                else
+                {
+                    return m_AssetService;
+                }
+            }
+            set
+            {
+                /* set is specific for attachments to reduce immediate rezzing load */
+                m_AssetService = value;
+            }
+        }
         private Vector3 m_Acceleration = new Vector3();
         private Vector3 m_AngularVelocity = new Vector3();
         public AttachmentPoint AttachPoint = AttachmentPoint.NotAttached;
@@ -84,8 +108,28 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
+        public UUID OriginalAssetID /* will be set to UUID.Zero when anything has been changed */
+        {
+            get
+            {
+                lock(this)
+                {
+                    return m_OriginalAssetID;
+                }
+            }
+            set
+            {
+                lock(this)
+                {
+                    m_OriginalAssetID = value;
+                }
+            }
+        }
+
         private void TriggerOnUpdate(int flags)
         {
+            OriginalAssetID = UUID.Zero;
+
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
