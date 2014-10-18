@@ -86,6 +86,12 @@ namespace SilverSim.Scene.Types.Agent
             set;
         }
 
+        IObject SittingOnObject
+        {
+            get;
+            set;
+        }
+
         AppearanceInfo.AvatarTextureData Textures
         {
             get;

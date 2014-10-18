@@ -28,6 +28,7 @@ using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using ThreadedClasses;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -90,18 +91,45 @@ namespace SilverSim.Scene.Types.Object
             return n;
         }
 
-        public int CountScripts()
+        public int CountScripts
         {
-            int n = 0;
-            foreach (ObjectPartInventoryItem item in this.Values)
+            get
             {
-                if (item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
+                int n = 0;
+                foreach (ObjectPartInventoryItem item in this.Values)
                 {
-                    ++n;
+                    if (item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
+                    {
+                        ++n;
+                    }
                 }
-            }
 
-            return n;
+                return n;
+            }
+        }
+
+        public int CountRunningScripts
+        {
+            get
+            {
+                int n = 0;
+                foreach (ObjectPartInventoryItem item in this.Values)
+                {
+                    if (item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
+                    {
+                        ScriptInstance script = item.ScriptInstance;
+                        if(script != null)
+                        {
+                            if(script.IsRunning)
+                            {
+                                ++n;
+                            }
+                        }
+                    }
+                }
+
+                return n;
+            }
         }
 
         #endregion

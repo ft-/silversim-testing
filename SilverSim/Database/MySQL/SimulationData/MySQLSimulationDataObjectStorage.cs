@@ -183,13 +183,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 objpart.Material = (PrimitiveMaterial)(int)dbReader["Material"];
                                 objpart.Size = MySQLUtilities.GetVector(dbReader, "Size");
                                 objpart.Slice = MySQLUtilities.GetVector(dbReader, "Slice");
-                                
 
-                                ObjectPart.OmegaParam op = new ObjectPart.OmegaParam();
-                                op.Axis = MySQLUtilities.GetVector(dbReader, "OmegaAxis");
-                                op.Spinrate = (double)dbReader["OmegaSpinRate"];
-                                op.Gain = (double)dbReader["OmegaGain"];
-                                objpart.Omega = op;
+                                objpart.MediaURL = (string)dbReader["MediaURL"];
+
+                                objpart.AngularVelocity = MySQLUtilities.GetVector(dbReader, "AngularVelocity");
 
                                 ObjectPart.PointLightParam lp = new ObjectPart.PointLightParam();
                                 lp.IsLight = MySQLUtilities.GetBoolean(dbReader, "LightEnabled");
@@ -214,47 +211,32 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 objpart.Flexible = fp;
 
                                 ObjectPart.PrimitiveShape ps = new ObjectPart.PrimitiveShape();
-                                /*
-            public ushort PathBegin;
-            public byte PathCurve;
-            public ushort PathEnd;
-            public sbyte PathRadiusOffset;
-            public byte PathRevolutions;
-            public byte PathScaleX;
-            public byte PathScaleY;
-            public byte PathShearX;
-            public byte PathShearY;
-            public sbyte PathSkew;
-            public sbyte PathTaperX;
-            public sbyte PathTaperY;
-            public sbyte PathTwist;
-            public sbyte PathTwistBegin;
-            public ushort ProfileBegin;
-            public byte ProfileCurve;
-            public ushort ProfileEnd;
-            public ushort ProfileHollow;
-                                 */
-#if TODO
-                                ps.AdvancedCut = MySQLUtilities.GetVector(dbReader, "ShapeAdvancedCut");
-                                ps.Cut = MySQLUtilities.GetVector(dbReader, "ShapeCut");
-                                ps.Dimple = MySQLUtilities.GetVector(dbReader, "ShapeDimple");
-                                ps.HoleShape = (PrimitiveHoleShape)(int)dbReader["ShapeHoleShape"];
-                                ps.HoleSize = MySQLUtilities.GetVector(dbReader, "ShapeHoleSize");
-                                ps.Hollow = (double)dbReader["ShapeHollow"];
+
+                                ps.PathBegin = (ushort)(uint)dbReader["PathBegin"];
+                                ps.PathCurve = (byte)(uint)dbReader["PathCurve"];
+                                ps.PathEnd = (ushort)(uint)dbReader["PathEnd"];
+                                ps.PathRadiusOffset = (sbyte)(int)dbReader["PathRadiusOffset"];
+                                ps.PathRevolutions = (byte)(uint)dbReader["PathRevolutions"];
+                                ps.PathScaleX = (byte)(uint)dbReader["PathScaleX"];
+                                ps.PathScaleY = (byte)(uint)dbReader["PathScaleY"];
+                                ps.PathShearX = (byte)(uint)dbReader["PathShearX"];
+                                ps.PathShearY = (byte)(uint)dbReader["PathShearY"];
+                                ps.PathSkew = (sbyte)(int)dbReader["PathSkew"];
+                                ps.PathTaperX = (sbyte)(int)dbReader["PathTaperX"];
+                                ps.PathTaperY = (sbyte)(int)dbReader["PathTaperY"];
+                                ps.PathTwist = (sbyte)(int)dbReader["PathTwist"];
+                                ps.PathTwistBegin = (sbyte)(int)dbReader["PathTwistBegin"];
+                                ps.ProfileBegin = (ushort)(uint)dbReader["ProfileBegin"];
+                                ps.ProfileCurve = (byte)(uint)dbReader["ProfileCurve"];
+                                ps.ProfileEnd = (ushort)(uint)dbReader["ProfileEnd"];
+                                ps.ProfileHollow = (ushort)(uint)dbReader["ProfileHollow"];
                                 ps.IsSculptInverted = MySQLUtilities.GetBoolean(dbReader, "IsShapeSculptInverted");
                                 ps.IsSculptMirrored = MySQLUtilities.GetBoolean(dbReader, "IsShapeSculptMirrored");
-                                ps.RadiusOffset = (double)dbReader["ShapeRadiusOffset"];
-                                ps.Revolutions = (double)dbReader["ShapeRevolutions"];
                                 ps.SculptMap = (string)dbReader["ShapeSculptMap"];
                                 ps.SculptType = (PrimitiveSculptType)(int)dbReader["ShapeSculptType"];
-                                ps.Skew = (double)dbReader["ShapeSkew"];
-                                ps.Taper = MySQLUtilities.GetVector(dbReader, "ShapeTaper");
-                                ps.TopShear = MySQLUtilities.GetVector(dbReader, "ShapeTopShear");
-                                ps.TopSize = MySQLUtilities.GetVector(dbReader, "ShapeTopSize");
-                                ps.Twist = MySQLUtilities.GetVector(dbReader, "ShapeTwist");
                                 ps.Type = (PrimitiveShapeType)(int)dbReader["ShapeType"];
                                 objpart.Shape = ps;
-#endif
+
                                 objpart.ParticleSystemBytes = MySQLUtilities.GetBytes(dbReader, "ParticleSystem");
 
                                 objpart.ScriptAccessPin = (int)dbReader["ScriptAccessPin"];
@@ -379,11 +361,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["Material"] = (int)objpart.Material;
             p["Size"] = objpart.Size;
             p["Slice"] = objpart.Slice;
+            p["MediaURL"] = objpart.MediaURL;
 
-            ObjectPart.OmegaParam op = objpart.Omega;
-            p["OmegaAxis"] = op.Axis;
-            p["OmegaSpinRate"] = op.Spinrate;
-            p["OmegaGain"] = op.Gain;
+            p["AngularVelocity"] = objpart.AngularVelocity;
 
             ObjectPart.PointLightParam lp = objpart.PointLight;
             p["LightEnabled"] = lp.IsLight;
@@ -405,26 +385,35 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["FlexibleForce"] = fp.Force;
 
             ObjectPart.PrimitiveShape ps = objpart.Shape;
-#if TODO
-            p["ShapeAdvancedCut"] = ps.AdvancedCut;
-            p["ShapeCut"] = ps.Cut;
-            p["ShapeDimple"] = ps.Dimple;
-            p["ShapeHoleShape"] = (int)ps.HoleShape;
-            p["ShapeHoleSize"] = ps.HoleSize;
-            p["ShapeHollow"] = ps.Hollow;
             p["IsShapeSculptInverted"] = ps.IsSculptInverted;
             p["IsShapeSculptMirrored"] = ps.IsSculptMirrored;
-            p["ShapeRadiusOffset"] = ps.RadiusOffset;
-            p["ShapeRevolutions"] = ps.Revolutions;
             p["ShapeSculptMap"] = ps.SculptMap;
             p["ShapeSculptType"] = (int)ps.SculptType;
-            p["ShapeSkew"] = ps.Skew;
-            p["ShapeTaper"] = ps.Taper;
-            p["ShapeTopShear"] = ps.TopShear;
-            p["ShapeTopSize"] = ps.TopSize;
-            p["ShapeTwist"] = ps.Twist;
             p["ShapeType"] = (int)ps.Type;
-#endif
+            p["PathBegin"] = ps.PathBegin;
+            p["PathCurve"] = ps.PathCurve;
+            p["PathEnd"] = ps.PathEnd;
+            p["PathRadiusOffset"] = ps.PathRadiusOffset;
+            p["PathRevolutions"] = ps.PathRevolutions;
+            p["PathScaleX"] = ps.PathScaleX;
+            p["PathScaleY"] = ps.PathScaleY;
+            p["PathShearX"] = ps.PathShearX;
+            p["PathshearY"] = ps.PathShearY;
+            p["PathSkew"] = ps.PathSkew;
+            p["PathTaperX"] = ps.PathTaperX;
+            p["PathTaperY"] = ps.PathTaperY;
+            p["PathTwist"] = ps.PathTwist;
+            p["PathTwistBegin"] = ps.PathTwistBegin;
+            p["ProfileBegin"] = ps.ProfileBegin;
+            p["ProfileCurve"] = ps.ProfileCurve;
+            p["ProfileEnd"] = ps.ProfileEnd;
+            p["ProfileHollow"] = ps.ProfileHollow;
+            p["IsShapeSculptInverted"] = ps.IsSculptInverted ? 1 : 0;
+            p["IsShapeSculptMirrored"] = ps.IsSculptMirrored ? 1 : 0;
+            p["ShapeSculptMap"] = ps.SculptMap;
+            p["ShapeSculptType"] = (int)ps.SculptType;
+            p["ShapeType"] = (int)ps.Type;
+
             p["ParticleSystem"] = objpart.ParticleSystemBytes;
 
             p["ScriptAccessPin"] = objpart.ScriptAccessPin;

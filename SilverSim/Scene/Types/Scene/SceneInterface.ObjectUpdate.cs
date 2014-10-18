@@ -60,14 +60,19 @@ namespace SilverSim.Scene.Types.Scene
             agent.Acceleration.ToBytes(d.ObjectData, 40);
             Vector3.Zero.ToBytes(d.ObjectData, 64); /* set to zero as per SL ObjectUpdate definition for the 76 byte format */
             Quaternion rot = agent.Rotation;
-            //if(!agent.SittingOnObject)
+            IObject sittingobj = agent.SittingOnObject;
+            if(sittingobj == null)
             {
                 rot.X = 0;
                 rot.Y = 0;
+                d.ParentID = 0;
+            }
+            else
+            {
+                d.ParentID = sittingobj.LocalID;
             }
             rot.ToBytes(d.ObjectData, 52);
             
-            d.ParentID = 0;
             d.PathCurve = 16;
             d.PathScaleX = 100;
             d.PathScaleY = 100;

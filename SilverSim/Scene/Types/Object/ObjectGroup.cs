@@ -80,6 +80,7 @@ namespace SilverSim.Scene.Types.Object
         protected internal RwLockedBiDiMappingDictionary<IAgent, ObjectPart> m_SittingAgents = new RwLockedBiDiMappingDictionary<IAgent, ObjectPart>();
         public AgentSittingInterface AgentSitting { get; private set; }
         public SceneInterface Scene { get; set; }
+        public UUID FromItemID = UUID.Zero; /* used for attachments */
 
         AssetServiceInterface m_AssetService = null;
         public AssetServiceInterface AssetService /* specific for attachments usage */
@@ -740,7 +741,14 @@ namespace SilverSim.Scene.Types.Object
                         break;
                     
                     case ObjectDetailsType.RunningScriptCount:
-                        paramList.Add(0);
+                        {
+                            int n = 0;
+                            foreach(ObjectPart obj in this.Values)
+                            {
+                                n += obj.Inventory.CountRunningScripts;
+                            }
+                            paramList.Add(n);
+                        }
                         break;
 
                     case ObjectDetailsType.TotalScriptCount:
@@ -748,7 +756,7 @@ namespace SilverSim.Scene.Types.Object
                             int n = 0;
                             foreach(ObjectPart obj in this.Values)
                             {
-                                n += obj.Inventory.CountScripts();
+                                n += obj.Inventory.CountScripts;
                             }
                             paramList.Add(n);
                         }
@@ -787,7 +795,7 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case ObjectDetailsType.AttachedPoint:
-                        paramList.Add(0);
+                        paramList.Add((int)AttachPoint);
                         break;
 
                     case ObjectDetailsType.PathfindingType:

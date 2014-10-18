@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using SilverSim.LL.Messages;
 using SilverSim.Types;
+using SilverSim.Types.Primitive;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -59,24 +60,30 @@ namespace SilverSim.Scene.Types.Object
                     m.ClickAction = m_Part.ClickAction;
                     m.CRC = (uint)m_SerialNumber;
                     m.ExtraParams = m_Part.ExtraParamsBytes;
-                    m.Flags = 0;
                     m.FullID = m_Part.ID;
-                    m.Gain = 0;
                     m.JointAxisOrAnchor = Vector3.Zero;
                     m.JointPivot = Vector3.Zero;
                     m.JointType = 0;
                     m.LocalID = m_Part.LocalID;
-                    m.LoopedSound = UUID.Zero;
                     m.Material = m_Part.Material;
-                    m.MediaURL = "";
-                    m.NameValue = m_Part.Name;
+                    m.MediaURL = m_Part.MediaURL;
+                    if (m_Part.Group.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.NotAttached)
+                    {
+                        m.NameValue = string.Format("AttachItemID STRING RW SV {0}", m_Part.Group.FromItemID);
+                        m.State = (byte)(((byte)m_Part.Group.AttachPoint % 16) * 16 + (((byte)m_Part.Group.AttachPoint / 16)));
+                    }
+                    else
+                    {
+                        m.NameValue = m_Part.Name;
+                        m.State = 0;
+                        //m.State = m_Part.Group.RootPart.Shape.State;
+                    }
                     m.ObjectData = new byte[60];
                     m_Part.Position.ToBytes(m.ObjectData, 0);
                     m_Part.Velocity.ToBytes(m.ObjectData, 12);
                     m_Part.Acceleration.ToBytes(m.ObjectData, 24);
                     m_Part.Rotation.ToBytes(m.ObjectData, 36);
                     m_Part.AngularVelocity.ToBytes(m.ObjectData, 48);
-                    m.OwnerID = m_Part.Owner.ID;
                     m.ParentID = m_Part.Group.RootPart.LocalID;
                     ObjectPart.PrimitiveShape shape = m_Part.Shape;
                     m.PathBegin = shape.PathBegin;
@@ -92,21 +99,54 @@ namespace SilverSim.Scene.Types.Object
                     m.PathTaperY = shape.PathTaperY;
                     m.PathTwist = shape.PathTwist;
                     m.PathTwistBegin = shape.PathTwistBegin;
-                    m.PCode = 0;
+                    m.PCode = shape.PCode;
                     m.ProfileBegin = shape.ProfileBegin;
                     m.ProfileCurve = shape.ProfileCurve;
                     m.ProfileEnd = shape.ProfileEnd;
                     m.ProfileHollow = shape.ProfileHollow;
                     m.PSBlock = m_Part.ParticleSystemBytes;
-                    m.Radius = 0;
                     m.Scale = m_Part.Size;
-                    m.State = 0;
                     ObjectPart.TextParam textparam = m_Part.Text;
                     m.Text = textparam.Text;
                     m.TextColor = textparam.TextColor;
                     m.TextureAnim = new byte[0];
                     m.TextureEntry = m_Part.TextureEntryBytes;
                     m.UpdateFlags = 0;
+
+                    if(m_Part.IsAllowedDrop)
+                    {
+                        m.UpdateFlags |= PrimitiveFlags.AllowInventoryDrop;
+                    }
+                    if(m_Part.Inventory.Count == 0)
+                    {
+                        m.UpdateFlags |= PrimitiveFlags.InventoryEmpty;
+                    }
+                    if(m_Part.Group.IsPhysics)
+                    {
+                        m.UpdateFlags |= PrimitiveFlags.Physics;
+                    }
+                    if(m_Part.Inventory.CountScripts != 0)
+                    {
+                        m.UpdateFlags |= PrimitiveFlags.Scripted;
+                    }
+
+                    m.LoopedSound = UUID.Zero;
+                    m.OwnerID = m_Part.Owner.ID;
+                    m.Gain = 0;
+                    m.Radius = 0;
+                    m.Flags = 0;
+
+                    switch (shape.PCode)
+                    {
+                        case PrimitiveCode.Grass:
+                        case PrimitiveCode.Tree:
+                        case PrimitiveCode.NewTree:
+                            m.Data = new byte[] { shape.State };
+                            break;
+                        default:
+                            m.Data = new byte[0];
+                            break;
+                    }
 
                     if(m_Part.Shape.SculptType == SilverSim.Types.Primitive.PrimitiveSculptType.Mesh)
                     {
