@@ -118,6 +118,10 @@ namespace SilverSim.LL.Core
                                 Messages.Object.ObjectUpdate.ObjData od = ui.SerializeFull();
                                 if(od != null)
                                 {
+                                    if(od.OwnerID == AgentID)
+                                    {
+                                        od.UpdateFlags |= Types.Primitive.PrimitiveFlags.ObjectYouOwner;
+                                    }
                                     Messages.Object.ObjectUpdate m = new Messages.Object.ObjectUpdate();
                                     m.ObjectData.Add(od);
                                     m.TimeDilation = 65535;

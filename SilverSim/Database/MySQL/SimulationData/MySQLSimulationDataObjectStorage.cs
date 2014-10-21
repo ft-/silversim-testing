@@ -23,9 +23,11 @@ exception statement from your version.
 
 */
 
+using log4net;
 using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
+using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
@@ -35,8 +37,10 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
-    public class MySQLSimulationDataObjectStorage : SimulationDataObjectStorageInterface
+    public class MySQLSimulationDataObjectStorage : SimulationDataObjectStorageInterface, IDBServiceInterface
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRID SERVICE");
+
         public string m_ConnectionString;
         public MySQLSimulationDataObjectStorage(string connectionString)
         {
@@ -197,8 +201,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 objpart.PointLight = lp;
 
                                 ObjectPart.TextParam tp = new ObjectPart.TextParam();
-                                tp.Text = (string)dbReader["Text"];
-                                tp.TextColor = MySQLUtilities.GetColorAlpha(dbReader, "TextColor");
+                                tp.Text = (string)dbReader["HoverText"];
+                                tp.TextColor = MySQLUtilities.GetColorAlpha(dbReader, "HoverTextColor");
                                 objpart.Text = tp;
 
                                 ObjectPart.FlexibleParam fp = new ObjectPart.FlexibleParam();
@@ -209,6 +213,18 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 fp.Wind = (double)dbReader["FlexibleWind"];
                                 fp.Force = MySQLUtilities.GetVector(dbReader, "FlexibleForce");
                                 objpart.Flexible = fp;
+
+                                ObjectPart.SoundParam sound = new ObjectPart.SoundParam();
+                                sound.SoundID = (string)dbReader["LoopedSound"];
+                                sound.Radius = (double)dbReader["SoundRadius"];
+                                sound.Gain = (double)dbReader["SoundGain"];
+                                sound.Flags = (PrimitiveSoundFlags)(uint)dbReader["SoundFlags"];
+                                objpart.Sound = sound;
+
+                                ObjectPart.CollisionSoundParam collisionsound = new ObjectPart.CollisionSoundParam();
+                                collisionsound.ImpactSound = (string)dbReader["ImpactSound"];
+                                collisionsound.ImpactVolume = (double)dbReader["ImpactVolume"];
+                                objpart.CollisionSound = collisionsound;
 
                                 ObjectPart.PrimitiveShape ps = new ObjectPart.PrimitiveShape();
 
@@ -373,8 +389,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["LightFalloff"] = lp.Falloff;
 
             ObjectPart.TextParam tp = objpart.Text;
-            p["Text"] = tp.Text;
-            p["TextColor"] = tp.TextColor;
+            p["HoverText"] = tp.Text;
+            p["HoverTextColor"] = tp.TextColor;
 
             ObjectPart.FlexibleParam fp = objpart.Flexible;
             p["IsFlexible"] = fp.IsFlexible;
@@ -383,6 +399,16 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["FlexibleSoftness"] = fp.Softness;
             p["FlexibleWind"] = fp.Wind;
             p["FlexibleForce"] = fp.Force;
+
+            ObjectPart.SoundParam sound = objpart.Sound;
+            p["LoopedSound"] = sound.SoundID;
+            p["SoundRadius"] = sound.Radius;
+            p["SoundGain"] = sound.Gain;
+            p["SoundFlags"] = sound.Flags;
+
+            ObjectPart.CollisionSoundParam collisionsound = objpart.CollisionSound;
+            p["ImpactSound"] = collisionsound.ImpactSound;
+            p["ImpactVolume"] = collisionsound.ImpactVolume;
 
             ObjectPart.PrimitiveShape ps = objpart.Shape;
             p["IsShapeSculptInverted"] = ps.IsSculptInverted;
@@ -421,6 +447,115 @@ namespace SilverSim.Database.MySQL.SimulationData
             MySQLUtilities.ReplaceInsertInto(connection, "prims", p);
         }
 
+        #endregion
+
+        public void VerifyConnection()
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+            }
+        }
+
+        #region Migrations
+        public void ProcessMigrations()
+        {
+            MySQLUtilities.ProcessMigrations(m_ConnectionString, "prims", PrimsMigrations, m_Log);
+            MySQLUtilities.ProcessMigrations(m_ConnectionString, "primitems", PrimItemsMigrations, m_Log);
+        }
+
+        private static readonly string[] PrimItemsMigrations = new string[]{
+            "CREATE TABLE %tablename% (" +
+                "PrimID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "InventoryID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "Name VARCHAR(255) NOT NULL," +
+                "Description VARCHAR(255) NOT NULL DEFAULT ''," +
+                "Flags INT(11) NOT NULL DEFAULT '0'," +
+                "AssetId CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "AssetType INT NOT NULL DEFAULT '0'," +
+                "CreationDate BIGINT(20) NOT NULL DEFAULT '0'," +
+                "Creator VARCHAR(255)," +
+                "GroupID VARCHAR(255)," +
+                "GroupOwned INT(1) UNSIGNED NOT NULL," +
+                "InventoryType INT(11) NOT NULL DEFAULT '0'," +
+                "LastOwner VARCHAR(255) NOT NULL DEFAULT ''," +
+                "Owner VARCHAR(255) NOT NULL," +
+                "ParentFolderID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "BasePermissions INT(11) UNSIGNED NOT NULL DEFAULT '0'," + 
+                "CurrentPermissions INT(11) UNSIGNED NOT NULL DEFAULT '0'," + 
+                "EveryOnePermissions INT(11) UNSIGNED NOT NULL DEFAULT '0'," + 
+                "GroupPermissions INT(11) UNSIGNED NOT NULL DEFAULT '0'," + 
+                "NextOwnerPermissions INT(11) UNSIGNED NOT NULL DEFAULT '0'," + 
+                "SaleType INT(11) NOT NULL DEFAULT '0'," +
+                "SalePrice INT(11) NOT NULL DEFAULT '0'," +
+                "SalePermMask INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
+                "PRIMARY KEY(PrimID, InventoryID)," +
+                "KEY primID (PrimID)"
+        };
+
+        private static readonly string[] PrimsMigrations = new string[] {
+            "CREATE TABLE %tablename% (" +
+                "ID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "RootPartID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "Position VARCHAR(255) NOT NULL," +
+                "Rotation VARCHAR(255) NOT NULL," +
+                "SitText TEXT DEFAULT ''," +
+                "TouchText TEXT DEFAULT ''," +
+                "Name VARCHAR(255) NOT NULL ''," +
+                "Description TEXT DEFAULT ''," +
+                "SitTargetOffset VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
+                "SitTargetOrientation VARCHAR(255) NOT NULL DEFAULT '<0,0,0,1>'," +
+                "ShapeType INT(11) NOT NULL DEFAULT '0'," +
+                "Material INT(11) NOT NULL DEFAULT '0'," +
+                "Size VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
+                "Slice VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
+                "MediaURL VARCHAR(255) NOT NULL DEFAULT ''," +
+                "AngularVelocity VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
+                "LightEnabled INT(1) NOT NULL DEFAULT '0'," +
+                "LightColor VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
+                "LightIntensity REAL NOT NULL DEFAULT '0'," +
+                "LightRadius REAL NOT NULL DEFAULT '0'," +
+                "LightFalloff REAL NOT NULL DEFAULT '0'," +
+                "HoverText TEXT DEFAULT ''," +
+                "HoverTextColor VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
+                "IsFlexible INT(1) NOT NULL DEFAULT '0'," +
+                "FlexibleFriction REAL NOT NULL DEFAULT '0'," +
+                "FlexibleGravity REAL NOT NULL DEFAULT '0'," +
+                "FlexibleSoftness INT(11) NOT NULL DEFAULT '0'," +
+                "FlexibleWind REAL NOT NULL DEFAULT '0'," +
+                "LoopedSound CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "SoundRadius REAL NOT NULL DEFAULT '0'," +
+                "SoundGain REAL NOT NULL DEFAULT '0'," +
+                "SoundFlags INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
+                "ImpactSound CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "ImpactVolume REAL NOT NULL DEFALT '0'," +
+                "PathBegin INT(11) UNSIGNED NOT NULL," +
+                "PathCurve INT(11) UNSIGNED NOT NULL," +
+                "PathEnd INT(11) UNSIGNED NOT NULL," +
+                "PathRadiusOffset INT(11) NOT NULL," +
+                "PathRevolutions INT(11) UNSIGNED NOT NULL," + 
+                "PathScaleX INT(11) UNSIGNED NOT NULL," +
+                "PathScaleY INT(11) UNSIGNED NOT NULL," +
+                "PathShearX INT(11) UNSIGNED NOT NULL," +
+                "PathShearY INT(11) UNSIGNED NOT NULL," +
+                "PathSkew INT(11) NOT NULL," +
+                "PathTaperX INT(11) NOT NULL," +
+                "PathTaperY INT(11) NOT NULL," +
+                "PathTwist INT(11) NOT NULL," +
+                "PathTwistBegin INT(11) NOT NULL," +
+                "ProfileBegin INT(11) UNSIGNED NOT NULL," +
+                "ProfileCurve INT(11) UNSIGNED NOT NULL," +
+                "ProfileEnd INT(11) UNSIGNED NOT NULL," +
+                "ProfileHollow INT(11) UNSIGNED NOT NULL," +
+                "IsShapeSculptInverted INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
+                "IsShapeSculptMirrored INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
+                "ShapeSculptMap CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "ShapeSculptType INT(11) NOT NULL DEFAULT '0'," +
+                "ShapeType INT(11) NOT NULL DEFAULT '0'," +
+                "ParticleSystem BLOB," +
+                "ScriptAccessPin INT(11) NOT NULL DEFAULT '0'," +
+                "PRIMARY KEY(ID, RootPartID)"
+        };
         #endregion
     }
 }

@@ -56,6 +56,34 @@ namespace SilverSim.Scene.Types.Object
         }
         private readonly SoundParam m_Sound = new SoundParam();
 
+        public SoundParam Sound
+        {
+            get
+            {
+                SoundParam p = new SoundParam();
+                lock(m_Sound)
+                {
+                    p.Flags = m_Sound.Flags;
+                    p.Gain = m_Sound.Gain;
+                    p.Radius = m_Sound.Radius;
+                    p.SoundID = m_Sound.SoundID;
+                }
+                return p;
+            }
+            set
+            {
+                lock(m_Sound)
+                {
+                    m_Sound.SoundID = value.SoundID;
+                    m_Sound.Gain = value.Gain;
+                    m_Sound.Radius = value.Radius;
+                    m_Sound.Flags = value.Flags;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
         public class CollisionSoundParam
         {
             #region Constructor

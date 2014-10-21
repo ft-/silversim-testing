@@ -78,7 +78,7 @@ namespace SilverSim.LL.Messages.Object
             public byte[] PSBlock;
             public byte[] ExtraParams;
             public UUID LoopedSound;
-            public UUID OwnerID; // HACK object's owner id, only set if non-null sound, for muting
+            public UUID OwnerID;
             public double Gain;
             public PrimitiveSoundFlags Flags;
             public double Radius;
@@ -169,7 +169,14 @@ namespace SilverSim.LL.Messages.Object
                 p.WriteUInt8((byte)d.ExtraParams.Length);
                 p.WriteBytes(d.ExtraParams);
                 p.WriteUUID(d.LoopedSound);
-                p.WriteUUID(d.OwnerID);
+                if (d.LoopedSound == UUID.Zero)
+                {
+                    p.WriteUUID(UUID.Zero);
+                }
+                else
+                {
+                    p.WriteUUID(d.OwnerID);
+                }
                 p.WriteFloat((float)d.Gain);
                 p.WriteUInt8((byte)d.Flags);
                 p.WriteFloat((float)d.Radius);
