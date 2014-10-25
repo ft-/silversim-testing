@@ -106,7 +106,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     "Creator VARCHAR(255)," +
                     "Description VARCHAR(255)," + 
                     "Flags INT(11) NOT NULL," +
-                    "GroupID VARCHAR(255) NOT NULL," +
+                    "Group VARCHAR(255) NOT NULL," +
                     "GroupOwned INT(1) NOT NULL DEFAULT '0'," +
                     "ParentFolderID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," + 
                     "BasePermissions INT(11) NOT NULL UNSIGNED DEFAULT '0'," +

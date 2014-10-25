@@ -83,7 +83,7 @@ namespace SilverSim.Scene.Types.Object
             Creator = new UUI(item.Creator);
             Description = item.Description;
             Flags = item.Flags;
-            GroupID = new UUID(item.GroupID);
+            Group = new UGI(item.Group);
             GroupOwned = item.GroupOwned;
             ID = new UUID(item.ID);
             InventoryType = item.InventoryType;

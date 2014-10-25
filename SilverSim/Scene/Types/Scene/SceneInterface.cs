@@ -102,7 +102,7 @@ namespace SilverSim.Scene.Types.Scene
         public AssetServiceInterface TemporaryAssetService { get; protected set; }
         public AssetServiceInterface PersistentAssetService { get; protected set; }
         public AssetServiceInterface AssetService { get; private set; }
-        public GroupsServiceInterface GroupsService { get; protected set; }
+        public GroupsNameServiceInterface GroupsNameService { get; protected set; }
         public GridServiceInterface GridService { get; protected set; }
         public EconomyServiceInterface EconomyService { get; protected set; }
         public ServerParamServiceInterface ServerParamService { get; protected set; }
@@ -146,9 +146,9 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return (T)(object)AssetService;
             }
-            else if(typeof(T).IsAssignableFrom(typeof(GroupsServiceInterface)))
+            else if(typeof(T).IsAssignableFrom(typeof(GroupsNameServiceInterface)))
             {
-                return (T)(object)GroupsService;
+                return (T)(object)GroupsNameService;
             }
             else if (typeof(T).IsAssignableFrom(typeof(GridServiceInterface)))
             {

@@ -53,7 +53,15 @@ namespace SilverSim.Database.Null.Groups
             throw new NotSupportedException();
         }
 
-        public GroupInfo this[UUI requestingAgent, UUID groupID]
+        public UGI this[UUID groupID]
+        {
+            get
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+        public GroupInfo this[UUI requestingAgent, UGI group]
         {
             get
             {

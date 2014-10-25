@@ -63,7 +63,7 @@ namespace SilverSim.Types.Asset.Format
         public UUI Creator = new UUI();
         public UUI LastOwner = new UUI();
         public UUI Owner = new UUI();
-        public UUID GroupID = new UUID();
+        public UGI Group = new UGI();
         InventoryItem.PermissionsData Permissions;
         InventoryItem.SaleInfoData SaleInfo;
 
@@ -174,7 +174,7 @@ namespace SilverSim.Types.Asset.Format
                         }
                         else if(para[0] == "group_id")
                         {
-                            GroupID = para[1];
+                            Group.ID = para[1];
                         }
 
                         if(++idx == lines.Length)
@@ -277,7 +277,7 @@ namespace SilverSim.Types.Asset.Format
                     Creator.ID,
                     Owner.ID,
                     LastOwner.ID,
-                    GroupID,
+                    Group.ID,
                     SaleInfo.TypeName,
                     SaleInfo.Price,
                     (uint)Type);

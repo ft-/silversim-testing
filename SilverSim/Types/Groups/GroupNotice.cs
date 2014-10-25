@@ -27,7 +27,7 @@ namespace SilverSim.Types.Groups
 {
     public class GroupNotice
     {
-        public UUID GroupID = UUID.Zero;
+        public UGI Group = UGI.Unknown;
         public UUID ID = UUID.Zero;
         public Date Timestamp = new Date();
         public string FromName = string.Empty;

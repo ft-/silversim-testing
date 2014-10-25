@@ -143,7 +143,7 @@ namespace SilverSim.Types.Asset.Format
                 }
                 else if(data[0] == "group_id")
                 {
-                    item.GroupID = data[1];
+                    item.Group.ID = data[1];
                 }
                 else
                 {

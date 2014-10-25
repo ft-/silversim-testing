@@ -112,7 +112,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             item.Creator = new UUI((string)dbReader["Creator"]);
                             item.Description = (string)dbReader["Description"];
                             item.Flags = (uint)dbReader["Flags"];
-                            item.GroupID = (string)dbReader["GroupID"];
+                            item.Group = new UGI((string)dbReader["Group"]);
                             item.GroupOwned = (int)dbReader["GroupOwned"] != 0;
                             item.ID = (string)dbReader["InventoryID"];
                             item.InventoryType = (InventoryType)(int)dbReader["InventoryType"];
@@ -143,7 +143,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RootPartID LIKE ?id ORDER BY LinkNumber", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE ID LIKE ?id", connection))
                     {
                         cmd.Parameters.AddWithValue("?id", key);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
@@ -162,7 +162,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             objgroup.Owner = new UUI((string)dbReader["Owner"]);
                             objgroup.LastOwner = new UUI((string)dbReader["LastOwner"]);
                             objgroup.Creator = new UUI((string)dbReader["Creator"]);
-                            objgroup.GroupID = (string)dbReader["GroupID"];
+                            objgroup.Group = new UGI((string)dbReader["Group"]);
                         }
                     }
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RootPartID LIKE ?id ORDER BY LinkNumber", connection))
@@ -269,7 +269,11 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         public override void UpdateObjectGroup(ObjectGroup objgroup)
         {
-
+            using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                UpdateObjectGroup(connection, objgroup);
+            }
         }
 
         public override void UpdateObjectPart(ObjectPart objpart)
@@ -339,7 +343,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["Creator"] = item.Creator;
             p["Description"] = item.Description;
             p["Flags"] = item.Flags;
-            p["GroupID"] = item.GroupID;
+            p["Group"] = item.Group;
             p["GroupOwned"] = item.GroupOwned;
             p["ID"] = item.ID;
             p["InventoryType"] = (int)item.InventoryType;
@@ -355,6 +359,26 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["SalePermMask"] = item.SaleInfo.PermMask;
 
             MySQLUtilities.ReplaceInsertInto(connection, "primitems", p);
+        }
+
+        private void UpdateObjectGroup(MySqlConnection connection, ObjectGroup objgroup)
+        {
+            if(objgroup.IsTemporary || objgroup.IsTempOnRez)
+            {
+                return;
+            }
+            Dictionary<string, object> p = new Dictionary<string, object>();
+            p["ID"] = objgroup.ID;
+            p["IsVolumeDetect"] = objgroup.IsVolumeDetect ? 1 : 0;
+            p["IsPhantom"] = objgroup.IsPhantom ? 1 : 0;
+            p["IsPhysics"] = objgroup.IsPhysics ? 1 : 0;
+            p["IsTempOnRez"] = objgroup.IsTempOnRez ? 1 : 0;
+            p["Owner"] = objgroup.Owner.ToString();
+            p["LastOwner"] = objgroup.LastOwner.ToString();
+            p["Creator"] = objgroup.Creator.ToString();
+            p["Group"] = objgroup.Group.ToString();
+
+            MySQLUtilities.ReplaceInsertInto(connection, "objects", p);
         }
 
         private void UpdateObjectPart(MySqlConnection connection, ObjectPart objpart)
@@ -475,7 +499,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "AssetType INT NOT NULL DEFAULT '0'," +
                 "CreationDate BIGINT(20) NOT NULL DEFAULT '0'," +
                 "Creator VARCHAR(255)," +
-                "GroupID VARCHAR(255)," +
+                "Group VARCHAR(255)," +
                 "GroupOwned INT(1) UNSIGNED NOT NULL," +
                 "InventoryType INT(11) NOT NULL DEFAULT '0'," +
                 "LastOwner VARCHAR(255) NOT NULL DEFAULT ''," +

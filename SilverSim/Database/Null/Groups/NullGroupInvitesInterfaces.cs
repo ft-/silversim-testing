@@ -46,7 +46,7 @@ namespace SilverSim.Database.Null.Groups
             }
         }
 
-        public List<GroupInvite> this[UUI requestingAgent, UUID groupID, UUID roleID, UUI principal]
+        public List<GroupInvite> this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
         {
             get
             {
@@ -62,7 +62,7 @@ namespace SilverSim.Database.Null.Groups
             }
         }
 
-        public List<GroupInvite> GetByGroup(UUI requestingAgent, UUID groupID)
+        public List<GroupInvite> GetByGroup(UUI requestingAgent, UGI group)
         {
             return new List<GroupInvite>();
         }

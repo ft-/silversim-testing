@@ -71,7 +71,7 @@ namespace SilverSim.Scene.Types.Object
         private bool m_IsPhantom = false;
         private bool m_IsVolumeDetect = false;
         private Vector3 m_Velocity = Vector3.Zero;
-        private UUID m_GroupID = UUID.Zero;
+        private UGI m_Group = UGI.Unknown;
         private UUI m_Owner = UUI.Unknown;
         private UUI m_Creator = UUI.Unknown;
         private UUI m_LastOwner = UUI.Unknown;
@@ -286,20 +286,20 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public UUID GroupID
+        public UGI Group
         {
             get
             {
                 lock (this)
                 {
-                    return new UUID(m_GroupID);
+                    return new UGI(m_Group);
                 }
             }
             set
             {
                 lock (this)
                 {
-                    m_GroupID = new UUID(value);
+                    m_Group = new UGI(value);
                 }
                 IsChanged = true;
                 TriggerOnUpdate(0);
@@ -733,7 +733,7 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case ObjectDetailsType.Group:
-                        paramList.Add(GroupID);
+                        paramList.Add(Group.ID);
                         break;
 
                     case ObjectDetailsType.Creator:

@@ -68,7 +68,7 @@ namespace SilverSim.LL.Core
             WriteKeyValuePair(writer, "base_mask", (uint)item.Permissions.Base);
             WriteKeyValuePair(writer, "creator_id", item.Creator.ID);
             WriteKeyValuePair(writer, "everyone_mask", (uint)item.Permissions.EveryOne);
-            WriteKeyValuePair(writer, "group_id", item.GroupID);
+            WriteKeyValuePair(writer, "group_id", item.Group.ID);
             WriteKeyValuePair(writer, "group_mask", (uint)item.Permissions.Group);
             WriteKeyValuePair(writer, "is_owner_group", item.GroupOwned);
             WriteKeyValuePair(writer, "next_owner_mask", (uint)item.Permissions.NextOwner);

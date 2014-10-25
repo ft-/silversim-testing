@@ -23,12 +23,9 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
+using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Groups
 {
@@ -40,10 +37,16 @@ namespace SilverSim.ServiceInterfaces.Groups
             void Update(UUI requestingAgent, GroupInfo group);
             void Delete(UUI requestingAgent, GroupInfo group);
 
-            GroupInfo this[UUI requestingAgent, UUID groupID]
+            UGI this[UUID groupID]
             {
                 get;
             }
+
+            GroupInfo this[UUI requestingAgent, UGI group]
+            {
+                get;
+            }
+
             GroupInfo this[UUI requestingAgent, string groupName]
             {
                 get;
@@ -54,12 +57,12 @@ namespace SilverSim.ServiceInterfaces.Groups
 
         public interface IGroupMembersInterface
         {
-            GroupMember this[UUI requestingAgent, UUID groupID, UUI principal]
+            GroupMember this[UUI requestingAgent, UGI group, UUI principal]
             {
                 get;
             }
 
-            List<GroupMember> this[UUI requestingAgent, UUID groupID]
+            List<GroupMember> this[UUI requestingAgent, UGI group]
             {
                 get;
             }
@@ -69,41 +72,41 @@ namespace SilverSim.ServiceInterfaces.Groups
                 get;
             }
 
-            void Add(UUI requestingAgent, UUID groupID, UUI principal);
-            void Update(UUI requestingAgent, UUID groupID, UUI principal);
-            void Delete(UUI requestingAgent, UUID groupID, UUI principal);
+            void Add(UUI requestingAgent, UGI group, UUI principal);
+            void Update(UUI requestingAgent, UGI group, UUI principal);
+            void Delete(UUI requestingAgent, UGI group, UUI principal);
         }
 
         public interface IGroupRolesInterface
         {
-            GroupRole this[UUI requestingAgent, UUID groupID, UUID roleID]
+            GroupRole this[UUI requestingAgent, UGI group, UUID roleID]
             {
                 get;
             }
-            List<GroupRole> this[UUI requestingAgent, UUID groupID, UUI principal]
+            List<GroupRole> this[UUI requestingAgent, UGI group, UUI principal]
             {
                 get;
             }
 
             void Add(UUI requestingAgent, GroupRole role);
             void Update(UUI requestingAgent, GroupRole role);
-            void Delete(UUI requestingAgent, UUID groupID, UUID roleID);
+            void Delete(UUI requestingAgent, UGI group, UUID roleID);
         }
 
         public interface IGroupRolemembersInterface
         {
-            GroupRolemember this[UUI requestingAgent, UUID groupID, UUID roleID, UUI principal]
+            GroupRolemember this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
             {
                 get;
             }
 
-            List<GroupRolemember> this[UUI requestingAgent, UUID groupID, UUID roleID]
+            List<GroupRolemember> this[UUI requestingAgent, UGI group, UUID roleID]
             {
                 get;
             }
 
             void Add(UUI requestingAgent, GroupRolemember rolemember);
-            void Delete(UUI requestingAgent, UUID groupID, UUID roleID, UUI principal);
+            void Delete(UUI requestingAgent, UGI group, UUID roleID, UUI principal);
         }
 
         public interface IGroupSelectInterface
@@ -121,8 +124,8 @@ namespace SilverSim.ServiceInterfaces.Groups
             {
                 get;
             }
-            
-            List<GroupInvite> this[UUI requestingAgent, UUID groupID, UUID roleID, UUI principal]
+
+            List<GroupInvite> this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
             {
                 get;
             }
@@ -132,7 +135,7 @@ namespace SilverSim.ServiceInterfaces.Groups
                 get;
             }
 
-            List<GroupInvite> GetByGroup(UUI requestingAgent, UUID groupID);
+            List<GroupInvite> GetByGroup(UUI requestingAgent, UGI group);
 
             void Add(UUI requestingAgent, GroupInvite invite);
             void Update(UUI requestingAgent, GroupInvite invite);
@@ -142,7 +145,7 @@ namespace SilverSim.ServiceInterfaces.Groups
 
         public interface IGroupNoticesInterface
         {
-            List<GroupNotice> GetNotices(UUI requestingAgent, UUID groupID);
+            List<GroupNotice> GetNotices(UUI requestingAgent, UGI group);
 
             GroupNotice this[UUI requestingAgent, UUID groupNoticeID]
             {

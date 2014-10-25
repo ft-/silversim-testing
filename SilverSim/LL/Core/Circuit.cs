@@ -453,6 +453,10 @@ namespace SilverSim.LL.Core
                                 m_InventoryRequestQueue.Enqueue(m);
                                 break;
 
+                            case MessageType.UUIDGroupNameRequest:
+                                GroupNameLookup((Messages.Names.UUIDGroupNameRequest)m);
+                                break;
+
                             default:
                                 m_Server.RouteReceivedMessage(m);
                                 break;

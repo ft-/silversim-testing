@@ -34,6 +34,12 @@ namespace SilverSim.LL.Messages.Names
         {
             public UUID ID;
             public string GroupName;
+
+            public Data(UGI group)
+            {
+                ID = group.ID;
+                GroupName = group.GroupName;
+            }
         }
 
         public List<Data> UUIDNameBlock = new List<Data>();

@@ -23,31 +23,34 @@ exception statement from your version.
 
 */
 
-namespace SilverSim.Types.Groups
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SilverSim.Types;
+using SilverSim.Types.Groups;
+
+namespace SilverSim.ServiceInterfaces.Groups
 {
-    public class GroupInfo
+    public abstract class GroupsNameServiceInterface
     {
-        public UGI ID = UGI.Unknown;
-        public string Name = "";
-        public string Charter = "";
-        public string Location = "";
-        public UUID InsigniaID = UUID.Zero;
-        public UUI FounderID = UUI.Unknown;
-        public int MembershipFee = 0;
-        public bool IsOpenEnrollment = false;
-        public bool IsShownInList = false;
-        public bool IsAllowPublish = false;
-        public bool IsMaturePublish = false;
-        public UUID OwnerRoleID = UUID.Zero;
-
-        #region Informational fields
-        public int MemberCount = 0;
-        public int RoleCount = 0;
-        #endregion
-
-        public GroupInfo()
+        public GroupsNameServiceInterface()
         {
 
+        }
+
+        public abstract UGI this[UUID groupID]
+        {
+            get;
+        }
+
+        public abstract List<UGI> GetGroupsByName(string groupName, int limit);
+
+        public abstract void Store(UGI group);
+        
+        public void Store(GroupInfo group)
+        {
+            Store(group.ID);
         }
     }
 }

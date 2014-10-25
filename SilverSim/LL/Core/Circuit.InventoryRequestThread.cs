@@ -338,7 +338,7 @@ namespace SilverSim.LL.Core
                                 rd.FolderID = item.ParentFolderID;
                                 rd.CreatorID = item.Creator.ID;
                                 rd.OwnerID = item.Owner.ID;
-                                rd.GroupID = item.GroupID;
+                                rd.GroupID = item.Group.ID;
                                 rd.BaseMask = item.Permissions.Current;
                                 rd.OwnerMask = item.Permissions.Current;
                                 rd.GroupMask = item.Permissions.Group;
@@ -467,7 +467,7 @@ namespace SilverSim.LL.Core
                                     d.FolderID = item.ParentFolderID;
                                     d.CreatorID = item.Creator.ID;
                                     d.OwnerID = item.Owner.ID;
-                                    d.GroupID = item.GroupID;
+                                    d.GroupID = item.Group.ID;
                                     d.BaseMask = item.Permissions.Current;
                                     d.OwnerMask = item.Permissions.Current;
                                     d.GroupMask = item.Permissions.Group;
@@ -771,7 +771,14 @@ namespace SilverSim.LL.Core
                                         item.Permissions.Group = p.Group & item.Permissions.Base;
                                     }
 
-                                    item.GroupID = d.GroupID;
+                                    try
+                                    {
+                                        item.Group = Agent.GroupsService.Groups[Agent.Owner, d.GroupID].ID;
+                                    }
+                                    catch
+                                    {
+                                        item.Group.ID = d.GroupID;
+                                    }
                                     item.GroupOwned = d.IsGroupOwned;
 
                                     if (d.CreationDate == 0)

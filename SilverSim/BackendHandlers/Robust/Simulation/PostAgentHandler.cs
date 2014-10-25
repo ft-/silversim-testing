@@ -359,9 +359,9 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     }
                 }
 
+                GroupsServiceInterface groupsService = null;
                 AssetServiceInterface assetService = new RobustAssetConnector(assetServerURI);
-                InventoryServiceInterface inventoryService = new RobustInventoryConnector(inventoryServerURI);
-                GroupsServiceInterface groupsService = scene.GroupsService;
+                InventoryServiceInterface inventoryService = new RobustInventoryConnector(inventoryServerURI, groupsService);
                 GridServiceInterface gridService = scene.GridService;
 
                 LLAgent agent = new LLAgent(

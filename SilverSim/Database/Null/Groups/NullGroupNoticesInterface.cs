@@ -33,7 +33,7 @@ namespace SilverSim.Database.Null.Groups
 {
     class GroupNoticesInterface : GroupsServiceInterface.IGroupNoticesInterface
     {
-        public List<GroupNotice> GetNotices(UUI requestingAgent, UUID groupID)
+        public List<GroupNotice> GetNotices(UUI requestingAgent, UGI group)
         {
             return new List<GroupNotice>();
         }

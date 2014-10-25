@@ -86,7 +86,7 @@ namespace SilverSim.LL.Messages.Inventory
             e.FolderID = item.ParentFolderID;
             e.CreatorID = item.Creator.ID;
             e.OwnerID = item.Owner.ID;
-            e.GroupID = item.GroupID;
+            e.GroupID = item.Group.ID;
             e.BaseMask = item.Permissions.Base | item.Permissions.Current;
             e.OwnerMask = item.Permissions.Current;
             e.GroupMask = item.Permissions.Group;

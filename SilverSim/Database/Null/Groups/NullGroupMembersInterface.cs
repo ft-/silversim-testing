@@ -38,7 +38,7 @@ namespace SilverSim.Database.Null.Groups
 
         }
 
-        public GroupMember this[UUI requestingAgent, UUID groupID, UUI principal]
+        public GroupMember this[UUI requestingAgent, UGI group, UUI principal]
         {
             get
             {
@@ -46,7 +46,7 @@ namespace SilverSim.Database.Null.Groups
             }
         }
 
-        public List<GroupMember> this[UUI requestingAgent, UUID groupID]
+        public List<GroupMember> this[UUI requestingAgent, UGI group]
         {
             get
             {
@@ -62,17 +62,17 @@ namespace SilverSim.Database.Null.Groups
             }
         }
 
-        public void Add(UUI requestingAgent, UUID groupID, UUI principal)
+        public void Add(UUI requestingAgent, UGI group, UUI principal)
         {
             throw new NotSupportedException();
         }
 
-        public void Update(UUI requestingAgent, UUID groupID, UUI principal)
+        public void Update(UUI requestingAgent, UGI group, UUI principal)
         {
             throw new NotSupportedException();
         }
 
-        public void Delete(UUI requestingAgent, UUID groupID, UUI principal)
+        public void Delete(UUI requestingAgent, UGI group, UUI principal)
         {
             throw new NotSupportedException();
         }

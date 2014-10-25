@@ -119,7 +119,7 @@ namespace SilverSim.Types.Inventory
         #endregion
 
         #region Group Information
-        public UUID GroupID = UUID.Zero;
+        public UGI Group = UGI.Unknown;
         public bool GroupOwned = false;
         #endregion
 
@@ -147,7 +147,7 @@ namespace SilverSim.Types.Inventory
             Creator = new UUI(item.Creator);
             Description = item.Description;
             Flags = item.Flags;
-            GroupID = new UUID(item.GroupID);
+            Group = new UGI(item.Group);
             GroupOwned = item.GroupOwned;
             ID = new UUID(item.ID);
             InventoryType = item.InventoryType;
@@ -167,7 +167,7 @@ namespace SilverSim.Types.Inventory
             Creator = new UUI(item.Creator);
             Description = item.Description;
             Flags = item.Flags;
-            GroupID = new UUID(item.GroupID);
+            Group = new UGI(item.Group);
             GroupOwned = item.GroupOwned;
             ID = id;
             InventoryType = item.InventoryType;

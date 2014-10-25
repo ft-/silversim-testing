@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.BackendConnectors.Robust.Common;
+using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
@@ -36,10 +37,12 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
     {
         private string m_InventoryURI;
         public int TimeoutMs = 20000;
+        private GroupsServiceInterface m_GroupsService;
 
         #region Constructor
-        public RobustInventoryItemConnector(string uri)
+        public RobustInventoryItemConnector(string uri, GroupsServiceInterface groupsService)
         {
+            m_GroupsService = groupsService;
             m_InventoryURI = uri;
         }
         #endregion
@@ -59,7 +62,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
                     throw new InventoryInaccessible();
                 }
 
-                return RobustInventoryConnector.ItemFromMap((Map)map["item"]);
+                return RobustInventoryConnector.ItemFromMap((Map)map["item"], m_GroupsService);
             }
         }
         #endregion
@@ -70,7 +73,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             post["ID"] = item.ID;
             post["AssetID"] = item.AssetID;
             post["CreatorId"] = item.Creator.ID;
-            post["GroupID"] = item.GroupID;
+            post["GroupID"] = item.Group.ID;
             post["GroupOwned"] = item.GroupOwned.ToString();
             post["Folder"] = item.ParentFolderID;
             post["Owner"] = item.Owner.ID;

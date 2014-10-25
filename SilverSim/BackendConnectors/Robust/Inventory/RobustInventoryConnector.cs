@@ -28,6 +28,7 @@ using log4net;
 using Nini.Config;
 using SilverSim.BackendConnectors.Robust.Common;
 using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
@@ -42,6 +43,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         private string m_InventoryURI;
         private RobustInventoryFolderConnector m_FolderService;
         private RobustInventoryItemConnector m_ItemService;
+        private GroupsServiceInterface m_GroupsService;
         private int m_TimeoutMs = 20000;
 
         #region Constructor
@@ -53,9 +55,24 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             }
             uri += "xinventory";
             m_InventoryURI = uri;
-            m_ItemService = new RobustInventoryItemConnector(uri);
+            m_ItemService = new RobustInventoryItemConnector(uri, null);
             m_ItemService.TimeoutMs = m_TimeoutMs;
-            m_FolderService = new RobustInventoryFolderConnector(uri);
+            m_FolderService = new RobustInventoryFolderConnector(uri, null);
+            m_FolderService.TimeoutMs = m_TimeoutMs;
+        }
+
+        public RobustInventoryConnector(string uri, GroupsServiceInterface groupsService)
+        {
+            m_GroupsService = groupsService;
+            if (!uri.EndsWith("/"))
+            {
+                uri += "/";
+            }
+            uri += "xinventory";
+            m_InventoryURI = uri;
+            m_ItemService = new RobustInventoryItemConnector(uri, m_GroupsService);
+            m_ItemService.TimeoutMs = m_TimeoutMs;
+            m_FolderService = new RobustInventoryFolderConnector(uri, m_GroupsService);
             m_FolderService.TimeoutMs = m_TimeoutMs;
         }
 
@@ -112,7 +129,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             {
                 if(i.Value is Map)
                 {
-                    items.Add(ItemFromMap((Map)i.Value));
+                    items.Add(ItemFromMap((Map)i.Value, m_GroupsService));
                 }
             }
             return items;
@@ -120,7 +137,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         #endregion
 
         #region Map converson
-        public static InventoryFolder FolderFromMap(Map map)
+        internal static InventoryFolder FolderFromMap(Map map)
         {
             InventoryFolder folder = new InventoryFolder();
             folder.ID = map["ID"].AsUUID;
@@ -131,7 +148,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             folder.ParentFolderID = map["ParentID"].AsUUID;
             return folder;
         }
-        public static InventoryItem ItemFromMap(Map map)
+        internal static InventoryItem ItemFromMap(Map map, GroupsServiceInterface groupsService)
         {
             InventoryItem item = new InventoryItem();
             item.ID = map["ID"].AsUUID;
@@ -145,7 +162,21 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             item.Permissions.EveryOne = (InventoryItem.PermissionsMask)map["EveryOnePermissions"].AsUInt;
             item.Flags = map["Flags"].AsUInt;
             item.ParentFolderID = map["Folder"].AsUUID;
-            item.GroupID = map["GroupID"].AsUUID;
+            if (groupsService != null)
+            {
+                try
+                {
+                    item.Group = groupsService.Groups[map["GroupID"].AsUUID];
+                }
+                catch
+                {
+                    item.Group.ID = map["GroupID"].AsUUID;
+                }
+            }
+            else
+            {
+                item.Group.ID = map["GroupID"].AsUUID;
+            }
             item.GroupOwned = map["GroupOwned"].AsBoolean;
             item.Permissions.Group = (InventoryItem.PermissionsMask)map["GroupPermissions"].AsUInt;
             item.InventoryType = (InventoryType) map["InvType"].AsInt;

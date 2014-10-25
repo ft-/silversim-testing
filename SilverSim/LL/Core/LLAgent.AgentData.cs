@@ -61,19 +61,19 @@ namespace SilverSim.LL.Core
                 if (Circuits.TryGetValue(adur.ReceivedOnCircuitCode, out circuit))
                 {
                     Messages.Agent.AgentDataUpdate adu = new Messages.Agent.AgentDataUpdate();
-                    if(null != circuit.Scene.GroupsService)
+                    if(null != circuit.Agent.GroupsService)
                     {
                         try
                         {
                             GroupInfo gi;
                             GroupMember gm;
                             GroupRole gr;
-                            adu.ActiveGroupID = circuit.Scene.GroupsService.ActiveGroup[Owner, Owner];
+                            adu.ActiveGroupID = circuit.Agent.GroupsService.ActiveGroup[Owner, Owner];
                             if (adu.ActiveGroupID != UUID.Zero)
                             {
-                                gi = circuit.Scene.GroupsService.Groups[Owner, adu.ActiveGroupID];
-                                gm = circuit.Scene.GroupsService.Members[Owner, adu.ActiveGroupID, Owner];
-                                gr = circuit.Scene.GroupsService.Roles[Owner, adu.ActiveGroupID, gm.SelectedRoleID];
+                                gi = circuit.Agent.GroupsService.Groups[Owner, adu.ActiveGroupID];
+                                gm = circuit.Agent.GroupsService.Members[Owner, gi.ID, Owner];
+                                gr = circuit.Agent.GroupsService.Roles[Owner, gi.ID, gm.SelectedRoleID];
                                 adu.GroupName = gi.Name;
                                 adu.GroupTitle = gr.Title;
                                 adu.GroupPowers = gr.Powers;

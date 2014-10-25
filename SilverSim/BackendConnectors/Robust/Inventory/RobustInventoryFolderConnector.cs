@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.BackendConnectors.Robust.Common;
+using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
@@ -36,10 +37,12 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
     {
         private string m_InventoryURI;
         public int TimeoutMs = 20000;
+        private GroupsServiceInterface m_GroupsService;
 
         #region Constructor
-        public RobustInventoryFolderConnector(string uri)
+        public RobustInventoryFolderConnector(string uri, GroupsServiceInterface groupsService)
         {
+            m_GroupsService = groupsService;
             m_InventoryURI = uri;
         }
         #endregion
@@ -132,7 +135,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             {
                 if (i.Value is Map)
                 {
-                    items.Add(RobustInventoryConnector.ItemFromMap((Map)i.Value));
+                    items.Add(RobustInventoryConnector.ItemFromMap((Map)i.Value, m_GroupsService));
                 }
             }
             return items;

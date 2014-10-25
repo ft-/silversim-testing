@@ -38,7 +38,7 @@ namespace SilverSim.Database.Null.Groups
 
         }
 
-        public GroupRolemember this[UUI requestingAgent, UUID groupID, UUID roleID, UUI principal]
+        public GroupRolemember this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
         {
             get
             {
@@ -46,7 +46,7 @@ namespace SilverSim.Database.Null.Groups
             }
         }
 
-        public List<GroupRolemember> this[UUI requestingAgent, UUID groupID, UUID roleID]
+        public List<GroupRolemember> this[UUI requestingAgent, UGI group, UUID roleID]
         {
             get
             {
@@ -59,7 +59,7 @@ namespace SilverSim.Database.Null.Groups
             throw new NotSupportedException();
         }
 
-        public void Delete(UUI requestingAgent, UUID groupID, UUID roleID, UUI principal)
+        public void Delete(UUI requestingAgent, UGI groupID, UUID roleID, UUI principal)
         {
             throw new NotSupportedException();
         }

@@ -213,7 +213,7 @@ namespace SilverSim.Scene.Implementation.Basic
         public BasicScene(
             ChatServiceInterface chatService, 
             IMServiceInterface imService,
-            GroupsServiceInterface groupsService,
+            GroupsNameServiceInterface groupsNameService,
             AssetServiceInterface persistentAssetService,
             AssetServiceInterface temporaryAssetService,
             GridServiceInterface gridService,
@@ -223,7 +223,7 @@ namespace SilverSim.Scene.Implementation.Basic
         : base(ri.Size.X, ri.Size.Y)
         {
             m_UDPServer = new LLUDPServer(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
-            GroupsService = groupsService;
+            GroupsNameService = groupsNameService;
             PersistentAssetService = persistentAssetService;
             TemporaryAssetService = temporaryAssetService;
             GridService = gridService;

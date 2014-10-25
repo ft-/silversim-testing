@@ -47,13 +47,13 @@ namespace SilverSim.Scene.Implementation.Basic
     {
         public ChatServiceFactoryInterface m_ChatFactory;
         public string m_ChatFactoryName;
-        public string m_GroupsServiceName;
+        public string m_GroupsNameServiceName;
         public string m_AssetServiceName;
         public string m_AssetCacheServiceName;
         public string m_GridServiceName;
         public string m_IMServiceName;
 
-        public GroupsServiceInterface m_GroupsService = null;
+        public GroupsNameServiceInterface m_GroupsNameService = null;
         public AssetServiceInterface m_AssetService;
         public AssetServiceInterface m_AssetCacheService;
         public GridServiceInterface m_GridService;
@@ -64,7 +64,7 @@ namespace SilverSim.Scene.Implementation.Basic
         public SceneFactory(IConfig ownConfig)
         {
             m_ChatFactoryName = ownConfig.GetString("ChatService", "Chat");
-            m_GroupsServiceName = ownConfig.GetString("GroupsService", "GroupsService");
+            m_GroupsNameServiceName = ownConfig.GetString("GroupsNameService", "GroupsNameService");
             m_AssetServiceName = ownConfig.GetString("AssetService", "AssetService");
             m_AssetCacheServiceName = ownConfig.GetString("AssetCacheService", m_AssetServiceName);
             m_GridServiceName = ownConfig.GetString("GridService", "GridService");
@@ -82,7 +82,7 @@ namespace SilverSim.Scene.Implementation.Basic
         public void Startup(ConfigurationLoader loader)
         {
             m_ChatFactory = loader.GetService<ChatServiceFactoryInterface>(m_ChatFactoryName);
-            m_GroupsService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
+            m_GroupsNameService = loader.GetService<GroupsNameServiceInterface>(m_GroupsNameServiceName);
             m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
             m_AssetCacheService = loader.GetService<AssetServiceInterface>(m_AssetCacheServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
@@ -94,7 +94,7 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             return new BasicScene(m_ChatFactory.Instantiate(), 
                 m_IMService, 
-                m_GroupsService, 
+                m_GroupsNameService, 
                 m_AssetService,
                 m_AssetCacheService,
                 m_GridService,

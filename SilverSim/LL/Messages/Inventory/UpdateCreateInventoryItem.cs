@@ -79,7 +79,7 @@ namespace SilverSim.LL.Messages.Inventory
             id.CallbackID = callbackID;
             id.CreatorID = item.Creator.ID;
             id.OwnerID = item.Owner.ID;
-            id.GroupID = item.GroupID;
+            id.GroupID = item.Group.ID;
             id.BaseMask = item.Permissions.Current;
             id.OwnerMask = item.Permissions.Current;
             id.GroupMask = item.Permissions.Group;
