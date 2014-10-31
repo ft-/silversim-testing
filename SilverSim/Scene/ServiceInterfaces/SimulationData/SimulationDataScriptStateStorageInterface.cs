@@ -23,26 +23,26 @@ exception statement from your version.
 
 */
 
+using log4net;
+using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
-using SilverSim.Types.Parcel;
+using SilverSim.Types.Asset;
+using SilverSim.Types.Inventory;
+using SilverSim.Types.Primitive;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
-    public abstract class SimulationDataParcelStorageInterface
+    public abstract class SimulationDataScriptStateStorageInterface
     {
-        #region Constructor
-        public SimulationDataParcelStorageInterface()
+        public SimulationDataScriptStateStorageInterface()
         {
-        }
-        #endregion
 
-        public abstract ParcelInfo this[UUID regionID, UUID parcelID]
-        {
-            get;
         }
-        public abstract List<UUID> ParcelsInRegion(UUID key);
 
-        public abstract void Store(ParcelInfo parcel);
+        /* setting value to null will delete the entry */
+        public abstract string this[UUID regionID, UUID primID, UUID itemID] { get; set; }
     }
 }

@@ -39,6 +39,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         private string m_ConnectionString;
         private MySQLSimulationDataObjectStorage m_ObjectStorage;
         private MySQLSimulationDataParcelStorage m_ParcelStorage;
+        private MySQLSimulationDataScriptStateStorage m_ScriptStateStorage;
 
         #region Constructor
         public MySQLSimulationDataStorage(string connectionString)
@@ -46,6 +47,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_ConnectionString = connectionString;
             m_ObjectStorage = new MySQLSimulationDataObjectStorage(connectionString);
             m_ParcelStorage = new MySQLSimulationDataParcelStorage(connectionString);
+            m_ScriptStateStorage = new MySQLSimulationDataScriptStateStorage(connectionString);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -70,6 +72,13 @@ namespace SilverSim.Database.MySQL.SimulationData
                 return m_ParcelStorage;
             }
         }
+        public override SimulationDataScriptStateStorageInterface ScriptStates
+        {
+            get 
+            {
+                return m_ScriptStateStorage;
+            }
+        }
         #endregion
 
         #region IDBServiceInterface
@@ -83,46 +92,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         public void ProcessMigrations()
         {
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "primitems", MigrationsPrimitems, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "prims", MigrationsPrims, m_Log);
-            MySQLUtilities.ProcessMigrations(m_ConnectionString, "parcels", MigrationsParcels, m_Log);
+            m_ObjectStorage.ProcessMigrations();
+            m_ScriptStateStorage.ProcessMigrations();
+            m_ParcelStorage.ProcessMigrations();
         }
-
-        private static readonly string[] MigrationsPrims =
-        {
-
-        };
-
-        public static readonly string[] MigrationsPrimitems =
-        {
-            "CREATE TABLE %tablename% (" +
-                    "InventoryID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                    "InventoryType INT(11) NOT NULL," +
-                    "Name VARCHAR(64) NOT NULL," +
-                    "Owner VARCHAR(255) NOT NULL," +
-                    "AssetID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                    "AssetType INT(11) NOT NULL," + 
-                    "CreationDate BIGINT(20) NOT NULL," +
-                    "Creator VARCHAR(255)," +
-                    "Description VARCHAR(255)," + 
-                    "Flags INT(11) NOT NULL," +
-                    "Group VARCHAR(255) NOT NULL," +
-                    "GroupOwned INT(1) NOT NULL DEFAULT '0'," +
-                    "ParentFolderID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," + 
-                    "BasePermissions INT(11) NOT NULL UNSIGNED DEFAULT '0'," +
-                    "CurrentPermissions INT(11) NOT NULL UNSIGNED DEFAULT '0'," +
-                    "EveryOnePermissions INT(11) NOT NULL UNSIGNED DEFAULT '0'," +
-                    "GroupPermissions INT(11) NOT NULL UNSIGNED DEFAULT '0'," +
-                    "NextOwnerPermissions INT(11) NOT NULL UNSIGNED DEFAULT '0'," +
-                    "SaleType INT(1) NOT NULL DEFAULT '0'," +
-                    "SalePrice INT(11) NOT NULL DEFAULT '0'," +
-                    "SalePermMask INT(11) NOT NULL UNSIGNED DEFAULT '0')"
-        };
-
-        private static readonly string[] MigrationsParcels =
-        {
-
-        };
         #endregion
     }
     #endregion

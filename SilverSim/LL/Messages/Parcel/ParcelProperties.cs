@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Types.Parcel;
 using System;
 
 namespace SilverSim.LL.Messages.Parcel
@@ -47,7 +48,7 @@ namespace SilverSim.LL.Messages.Parcel
         public Vector3 AABBMax;
         public byte[] Bitmap = new byte[0];
         public Int32 Area;
-        public byte Status;
+        public ParcelStatus Status;
         public Int32 SimWideMaxPrims;
         public Int32 SimWideTotalPrims;
         public Int32 MaxPrims;
@@ -58,7 +59,7 @@ namespace SilverSim.LL.Messages.Parcel
         public Int32 SelectedPrims;
         public double ParcelPrimBonus;
         public Int32 OtherCleanTime;
-        public UInt32 ParcelFlags;
+        public ParcelFlags ParcelFlags;
         public Int32 SalePrice;
         public string Name;
         public string Desc;
@@ -69,12 +70,12 @@ namespace SilverSim.LL.Messages.Parcel
         public UUID GroupID;
         public Int32 PassPrice;
         public double PassHours;
-        public byte Category;
+        public ParcelCategory Category;
         public UUID AuthBuyerID;
         public UUID SnapshotID;
         public Vector3 UserLocation;
         public Vector3 UserLookAt;
-        public byte LandingType;
+        public TeleportLandingType LandingType;
         public bool RegionPushOverride;
         public bool RegionDenyAnonymous;
         public bool RegionDenyIdentified;
@@ -123,7 +124,7 @@ namespace SilverSim.LL.Messages.Parcel
             p.WriteUInt16((UInt16)Bitmap.Length);
             p.WriteBytes(Bitmap);
             p.WriteInt32(Area);
-            p.WriteUInt8(Status);
+            p.WriteUInt8((byte)Status);
             p.WriteInt32(SimWideMaxPrims);
             p.WriteInt32(SimWideTotalPrims);
             p.WriteInt32(MaxPrims);
@@ -134,7 +135,7 @@ namespace SilverSim.LL.Messages.Parcel
             p.WriteInt32(SelectedPrims);
             p.WriteFloat((float)ParcelPrimBonus);
             p.WriteInt32(OtherCleanTime);
-            p.WriteUInt32(ParcelFlags);
+            p.WriteUInt32((UInt32)ParcelFlags);
             p.WriteInt32(SalePrice);
             p.WriteStringLen8(Name);
             p.WriteStringLen8(Desc);
@@ -145,12 +146,12 @@ namespace SilverSim.LL.Messages.Parcel
             p.WriteUUID(GroupID);
             p.WriteInt32(PassPrice);
             p.WriteFloat((float)PassHours);
-            p.WriteUInt8(Category);
+            p.WriteUInt8((byte)Category);
             p.WriteUUID(AuthBuyerID);
             p.WriteUUID(SnapshotID);
             p.WriteVector3f(UserLocation);
             p.WriteVector3f(UserLookAt);
-            p.WriteUInt8(LandingType);
+            p.WriteUInt8((byte)LandingType);
             p.WriteBoolean(RegionPushOverride);
             p.WriteBoolean(RegionDenyAnonymous);
             p.WriteBoolean(RegionDenyIdentified);

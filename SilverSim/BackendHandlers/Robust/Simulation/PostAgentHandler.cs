@@ -56,15 +56,18 @@ using System.IO.Compression;
 using System.Net;
 using System.Text;
 using ThreadedClasses;
+using SilverSim.ServiceInterfaces.ServerParam;
 
 namespace SilverSim.BackendHandlers.Robust.Simulation
 {
     #region Service Implementation
     public class PostAgentHandler : IPlugin, IPluginShutdown
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("ROBUST AGENT HANDLER");
+        protected static readonly ILog m_Log = LogManager.GetLogger("ROBUST AGENT HANDLER");
         private BaseHttpServer m_HttpServer;
+        protected ServerParamServiceInterface m_ServerParams;
         private Main.Common.Caps.CapsHttpRedirector m_CapsRedirector;
+
         private class GridParameterMap : ICloneable
         {
             public string HomeURI;
@@ -100,16 +103,24 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
         private readonly RwLockedList<GridParameterMap> m_GridParameterMap = new RwLockedList<GridParameterMap>();
 
+        private string m_AgentBaseURL = "/agent/";
+
         public PostAgentHandler()
         {
 
         }
 
-        public void Startup(ConfigurationLoader loader)
+        protected PostAgentHandler(string agentBaseURL)
         {
-            m_Log.Info("Initializing agent post handler");
+            m_AgentBaseURL = agentBaseURL;
+        }
+
+        public virtual void Startup(ConfigurationLoader loader)
+        {
+            m_Log.Info("Initializing agent post handler for " + m_AgentBaseURL);
+            m_ServerParams = loader.GetService<ServerParamServiceInterface>("ServerParamStorage");
             m_HttpServer = loader.HttpServer;
-            m_HttpServer.StartsWithUriHandlers.Add("/agent/", AgentPostHandler);
+            m_HttpServer.StartsWithUriHandlers.Add(m_AgentBaseURL, AgentPostHandler);
 
             foreach(IConfig section in loader.Config.Configs)
             {
@@ -213,9 +224,9 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             }
         }
 
-        public void Shutdown()
+        public virtual void Shutdown()
         {
-            m_HttpServer.StartsWithUriHandlers.Remove("/agent/");
+            m_HttpServer.StartsWithUriHandlers.Remove(m_AgentBaseURL);
         }
 
         private void GetAgentParams(string uri, out UUID agentID, out UUID regionID, out string action)
@@ -280,6 +291,11 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             res.Close();
         }
 
+        protected virtual void CheckScenePerms(UUID sceneID)
+        {
+
+        }
+
         public void AgentPostHandler(HttpRequest req)
         {
             UUID agentID;
@@ -331,6 +347,18 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
                 SceneInterface scene;
                 if(!Scene.Management.Scene.SceneManager.Scenes.TryGetValue(agentPost.Destination.ID, out scene))
+                {
+                    m_Log.InfoFormat("No destination for agent {0}", req.RawUrl);
+                    res = req.BeginResponse(HttpStatusCode.NotFound, "Not Found");
+                    res.Close();
+                    return;
+                }
+
+                try
+                {
+                    CheckScenePerms(agentPost.Destination.ID);
+                }
+                catch
                 {
                     m_Log.InfoFormat("No destination for agent {0}", req.RawUrl);
                     res = req.BeginResponse(HttpStatusCode.NotFound, "Not Found");

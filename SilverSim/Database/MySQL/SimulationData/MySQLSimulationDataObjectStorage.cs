@@ -39,7 +39,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     public class MySQLSimulationDataObjectStorage : SimulationDataObjectStorageInterface, IDBServiceInterface
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRID SERVICE");
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
 
         public string m_ConnectionString;
         public MySQLSimulationDataObjectStorage(string connectionString)
@@ -135,7 +135,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        public override ObjectGroup this[UUID key]
+        public override ObjectGroup this[UUID regionID, UUID key]
         {
             get
             {
@@ -143,8 +143,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE ID LIKE ?id", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE ?regionid AND ID LIKE ?id", connection))
                     {
+                        cmd.Parameters.AddWithValue("?regionid", regionID);
                         cmd.Parameters.AddWithValue("?id", key);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
@@ -183,7 +184,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 objpart.SitTargetOffset = MySQLUtilities.GetVector(dbReader, "SitTargetOffset");
                                 objpart.SitTargetOrientation = MySQLUtilities.GetQuaternion(dbReader, "SitTargetOrientation");
 
-                                objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)(int)dbReader["ShapeType"];
+                                objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)(int)dbReader["PhysicsShapeType"];
                                 objpart.Material = (PrimitiveMaterial)(int)dbReader["Material"];
                                 objpart.Size = MySQLUtilities.GetVector(dbReader, "Size");
                                 objpart.Slice = MySQLUtilities.GetVector(dbReader, "Slice");
@@ -363,7 +364,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         private void UpdateObjectGroup(MySqlConnection connection, ObjectGroup objgroup)
         {
-            if(objgroup.IsTemporary || objgroup.IsTempOnRez)
+            if(objgroup.IsTemporary)
             {
                 return;
             }
@@ -484,9 +485,26 @@ namespace SilverSim.Database.MySQL.SimulationData
         #region Migrations
         public void ProcessMigrations()
         {
+            MySQLUtilities.ProcessMigrations(m_ConnectionString, "objects", ObjectsMigrations, m_Log);
             MySQLUtilities.ProcessMigrations(m_ConnectionString, "prims", PrimsMigrations, m_Log);
             MySQLUtilities.ProcessMigrations(m_ConnectionString, "primitems", PrimItemsMigrations, m_Log);
         }
+
+        private static readonly string[] ObjectsMigrations = new string[]{
+            "CREATE TABLE %tablename% (" +
+                "RegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "ID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "IsVolumeDetect TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'," +
+                "IsPhantom TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'," +
+                "IsPhysics TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'," +
+                "IsTempOnRez TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'," +
+                "`Owner` VARCHAR(255) NOT NULL DEFAULT ''," +
+                "LastOwner VARCHAR(255) NOT NULL DEFAULT ''," +
+                "Creator VARCHAR(255) NOT NULL DEFAULT ''," +
+                "`Group` VARCHAR(255) NOT NULL DEFAULT ''," +
+                "PRIMARY KEY(ID)" +
+            ")"
+        };
 
         private static readonly string[] PrimItemsMigrations = new string[]{
             "CREATE TABLE %tablename% (" +
@@ -499,11 +517,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "AssetType INT NOT NULL DEFAULT '0'," +
                 "CreationDate BIGINT(20) NOT NULL DEFAULT '0'," +
                 "Creator VARCHAR(255)," +
-                "Group VARCHAR(255)," +
+                "`Group` VARCHAR(255)," +
                 "GroupOwned INT(1) UNSIGNED NOT NULL," +
                 "InventoryType INT(11) NOT NULL DEFAULT '0'," +
                 "LastOwner VARCHAR(255) NOT NULL DEFAULT ''," +
-                "Owner VARCHAR(255) NOT NULL," +
+                "`Owner` VARCHAR(255) NOT NULL," +
                 "ParentFolderID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "BasePermissions INT(11) UNSIGNED NOT NULL DEFAULT '0'," + 
                 "CurrentPermissions INT(11) UNSIGNED NOT NULL DEFAULT '0'," + 
@@ -514,7 +532,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "SalePrice INT(11) NOT NULL DEFAULT '0'," +
                 "SalePermMask INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
                 "PRIMARY KEY(PrimID, InventoryID)," +
-                "KEY primID (PrimID)"
+                "KEY primID (PrimID))"
         };
 
         private static readonly string[] PrimsMigrations = new string[] {
@@ -523,13 +541,13 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "RootPartID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "Position VARCHAR(255) NOT NULL," +
                 "Rotation VARCHAR(255) NOT NULL," +
-                "SitText TEXT DEFAULT ''," +
-                "TouchText TEXT DEFAULT ''," +
-                "Name VARCHAR(255) NOT NULL ''," +
-                "Description TEXT DEFAULT ''," +
+                "SitText TEXT," +
+                "TouchText TEXT," +
+                "Name VARCHAR(255) NOT NULL DEFAULT ''," +
+                "Description VARCHAR(255) NOT NULL DEFAULT ''," +
                 "SitTargetOffset VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
                 "SitTargetOrientation VARCHAR(255) NOT NULL DEFAULT '<0,0,0,1>'," +
-                "ShapeType INT(11) NOT NULL DEFAULT '0'," +
+                "PhysicsShapeType INT(11) NOT NULL DEFAULT '0'," +
                 "Material INT(11) NOT NULL DEFAULT '0'," +
                 "Size VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
                 "Slice VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
@@ -540,7 +558,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "LightIntensity REAL NOT NULL DEFAULT '0'," +
                 "LightRadius REAL NOT NULL DEFAULT '0'," +
                 "LightFalloff REAL NOT NULL DEFAULT '0'," +
-                "HoverText TEXT DEFAULT ''," +
+                "HoverText TEXT," +
                 "HoverTextColor VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
                 "IsFlexible INT(1) NOT NULL DEFAULT '0'," +
                 "FlexibleFriction REAL NOT NULL DEFAULT '0'," +
@@ -552,7 +570,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "SoundGain REAL NOT NULL DEFAULT '0'," +
                 "SoundFlags INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
                 "ImpactSound CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "ImpactVolume REAL NOT NULL DEFALT '0'," +
+                "ImpactVolume REAL NOT NULL DEFAULT '0'," +
                 "PathBegin INT(11) UNSIGNED NOT NULL," +
                 "PathCurve INT(11) UNSIGNED NOT NULL," +
                 "PathEnd INT(11) UNSIGNED NOT NULL," +
@@ -578,7 +596,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "ShapeType INT(11) NOT NULL DEFAULT '0'," +
                 "ParticleSystem BLOB," +
                 "ScriptAccessPin INT(11) NOT NULL DEFAULT '0'," +
-                "PRIMARY KEY(ID, RootPartID)"
+                "PRIMARY KEY(ID, RootPartID))"
         };
         #endregion
     }

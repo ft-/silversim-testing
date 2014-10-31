@@ -28,10 +28,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using SilverSim.Types;
 
-namespace SilverSim.Scene.Types.Parcel
+namespace SilverSim.Types.Parcel
 {
+    [Flags]
     public enum ObjectReturnType : uint
     {
         None = 0,
@@ -55,6 +55,7 @@ namespace SilverSim.Scene.Types.Parcel
         Direct = 2
     }
 
+    [Flags]
     public enum ParcelFlags : uint
     {
         None = 0,
@@ -91,15 +92,15 @@ namespace SilverSim.Scene.Types.Parcel
         DenyAgeUnverified = (uint)1 << 31
     }
 
-    public enum ParcelStatus : int
+    public enum ParcelStatus : byte
     {
-        None = -1,
+        None = 0xFF,
         Leased = 0,
         LeasePending = 1,
         Abandoned = 2
     }
 
-    public enum ParcelCategory : int
+    public enum ParcelCategory : byte
     {
         None = 0,
         LL,
@@ -115,7 +116,7 @@ namespace SilverSim.Scene.Types.Parcel
         Shopping,
         Stage,
         Other,
-        Any = -1
+        Any = 0xFF
     }
 
     public class ParcelInfo
@@ -126,19 +127,19 @@ namespace SilverSim.Scene.Types.Parcel
         public ParcelCategory Category = ParcelCategory.None;
         public Date ClaimDate = new Date();
         public int ClaimPrice = 0;
-        public UUID GlobalID = UUID.Random;
-        public UUID GroupID = UUID.Zero;
+        public UUID ID = UUID.Random;
+        public UGI Group = UGI.Unknown;
         public bool GroupOwned = false;
         public string Description = string.Empty;
-        public uint Flags = (uint)ParcelFlags.AllowFly |
-                            (uint)ParcelFlags.AllowLandmark |
-                            (uint)ParcelFlags.AllowAPrimitiveEntry |
-                            (uint)ParcelFlags.AllowDeedToGroup |
-                            (uint)ParcelFlags.AllowTerraform |
-                            (uint)ParcelFlags.CreateObjects |
-                            (uint)ParcelFlags.AllowOtherScripts |
-                            (uint)ParcelFlags.SoundLocal |
-                            (uint)ParcelFlags.AllowVoiceChat;
+        public ParcelFlags Flags = ParcelFlags.AllowFly |
+                            ParcelFlags.AllowLandmark |
+                            ParcelFlags.AllowAPrimitiveEntry |
+                            ParcelFlags.AllowDeedToGroup |
+                            ParcelFlags.AllowTerraform |
+                            ParcelFlags.CreateObjects |
+                            ParcelFlags.AllowOtherScripts |
+                            ParcelFlags.SoundLocal |
+                            ParcelFlags.AllowVoiceChat;
         public TeleportLandingType LandingType = TeleportLandingType.None;
         public Vector3 LandingPosition = Vector3.Zero;
         public Vector3 LandingLookAt = Vector3.Zero;
@@ -146,45 +147,22 @@ namespace SilverSim.Scene.Types.Parcel
         public ParcelStatus Status = ParcelStatus.Leased;
         public int LocalID = 0;
         public URI MusicURI = null;
+        public URI MediaURI = null;
+        public UUID MediaID;
         public UUI Owner = new UUI();
         public UUID SnapshotID = UUID.Zero;
         public Int32 SalePrice;
-
-        /*
-        public UUID ParcelID;
-        public Int32 LocalID;
-        public UUI Owner;
-        public bool IsGroupOwned;
-        public string Name;
-        public string Description;
-        public Int32 ActualArea;
-        public Int32 BillableArea;
-        public byte Flags;
-        public Vector3 GlobalPos = Vector3.Zero;
-        public string SimName;
-        public UUID SnapshotID;
-        public double Dwell;
-        public Int32 SalePrice;
-        public UInt32 AuctionID;
-        public Date ClaimDate = new Date();
-        public Int32 ClaimPrice;
-        public Int32 RentPrice;
+        public Int32 OtherCleanTime;
+        public byte MediaAutoScale;
+        public Int32 RentPrice = 0;
         public Vector3 AABBMin;
         public Vector3 AABBMax;
-        public Int32 Area;
-        public ParcelStatus Status;
         public double ParcelPrimBonus;
-        public Int32 OtherCleanTime;
-        public ParcelFlags ParcelFlags;
-        public string MusicURL;
-        public string MediaURL;
-        public UUID MediaID;
-        public byte MediaAutoScale;
-        public UUID GroupID;
         public Int32 PassPrice;
         public double PassHours;
-        public UUID AuthBuyerID;
-         */
+        public Int32 ActualArea;
+        public Int32 BillableArea;
+        public double Dwell;
 
         internal byte[,] m_LandBitmap;
         internal ReaderWriterLock m_LandBitmapRwLock = new ReaderWriterLock();

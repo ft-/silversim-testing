@@ -31,9 +31,9 @@ using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Parcel;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
@@ -41,6 +41,7 @@ using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
+using SilverSim.Types.Parcel;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -219,6 +220,7 @@ namespace SilverSim.Scene.Implementation.Basic
             GridServiceInterface gridService,
             ServerParamServiceInterface serverParamService,
             RegionInfo ri,
+            List<AvatarNameServiceInterface> avatarNameServices,
             Dictionary<string, string> capabilitiesConfig)
         : base(ri.Size.X, ri.Size.Y)
         {
@@ -235,6 +237,10 @@ namespace SilverSim.Scene.Implementation.Basic
             m_SceneParcels = new BasicSceneParcels(this);
             ServerParamService = serverParamService;
             CapabilitiesConfig = capabilitiesConfig;
+            foreach (AvatarNameServiceInterface avNameService in avatarNameServices)
+            {
+                AvatarNameServices.Add(avNameService);
+            }
             ID = ri.ID;
             Name = ri.Name;
             GridPosition = ri.Location;

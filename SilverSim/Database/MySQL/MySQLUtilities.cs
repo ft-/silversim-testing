@@ -85,54 +85,54 @@ namespace SilverSim.Database.MySQL
 
                 if (kvp.Value is Vector3)
                 {
-                    q1 += kvp.Key.ToString() + "X,";
+                    q1 += "`" + kvp.Key.ToString() + "X`,";
                     q2 += "?" + kvp.Key.ToString() + "X,";
-                    q1 += kvp.Key.ToString() + "Y,";
+                    q1 += "`" + kvp.Key.ToString() + "Y`,";
                     q2 += "?" + kvp.Key.ToString() + "Y,";
-                    q1 += kvp.Key.ToString() + "Z";
+                    q1 += "`" + kvp.Key.ToString() + "Z`";
                     q2 += "?" + kvp.Key.ToString() + "Z";
                 }
                 else if(kvp.Value is GridVector)
                 {
-                    q1 += kvp.Key.ToString() + "X,";
+                    q1 += "`" + kvp.Key.ToString() + "X`,";
                     q2 += "?" + kvp.Key.ToString() + "X,";
-                    q1 += kvp.Key.ToString() + "Y";
+                    q1 += "`" + kvp.Key.ToString() + "Y`";
                     q2 += "?" + kvp.Key.ToString() + "Y";
                 }
                 else if (kvp.Value is Quaternion)
                 {
-                    q1 += kvp.Key.ToString() + "X,";
+                    q1 += "`" + kvp.Key.ToString() + "X`,";
                     q2 += "?" + kvp.Key.ToString() + "X,";
-                    q1 += kvp.Key.ToString() + "Y,";
+                    q1 += "`" + kvp.Key.ToString() + "Y`,";
                     q2 += "?" + kvp.Key.ToString() + "Y,";
-                    q1 += kvp.Key.ToString() + "Z,";
+                    q1 += "`" + kvp.Key.ToString() + "Z`,";
                     q2 += "?" + kvp.Key.ToString() + "Z,";
-                    q1 += kvp.Key.ToString() + "W";
+                    q1 += "`" + kvp.Key.ToString() + "W`";
                     q2 += "?" + kvp.Key.ToString() + "W";
                 }
                 else if(kvp.Value is Color)
                 {
-                    q1 += kvp.Key.ToString() + "Red,";
+                    q1 += "`" + kvp.Key.ToString() + "Red`,";
                     q2 += "?" + kvp.Key.ToString() + "Red,";
-                    q1 += kvp.Key.ToString() + "Green,";
+                    q1 += "`" + kvp.Key.ToString() + "Green`,";
                     q2 += "?" + kvp.Key.ToString() + "Green,";
-                    q1 += kvp.Key.ToString() + "Blue";
+                    q1 += "`" + kvp.Key.ToString() + "Blue`";
                     q2 += "?" + kvp.Key.ToString() + "Blue";
                 }
                 else if (kvp.Value is ColorAlpha)
                 {
-                    q1 += kvp.Key.ToString() + "Red,";
+                    q1 += "`" + kvp.Key.ToString() + "Red`,";
                     q2 += "?" + kvp.Key.ToString() + "Red,";
-                    q1 += kvp.Key.ToString() + "Green,";
+                    q1 += "`" + kvp.Key.ToString() + "Green`,";
                     q2 += "?" + kvp.Key.ToString() + "Green,";
-                    q1 += kvp.Key.ToString() + "Blue,";
+                    q1 += "`" + kvp.Key.ToString() + "Blue`,";
                     q2 += "?" + kvp.Key.ToString() + "Blue,";
-                    q1 += kvp.Key.ToString() + "Alpha";
+                    q1 += "`" + kvp.Key.ToString() + "Alpha`";
                     q2 += "?" + kvp.Key.ToString() + "Alpha";
                 }
                 else
                 {
-                    q1 += kvp.Key.ToString();
+                    q1 += "`" + kvp.Key.ToString() + "`";
                     q2 += "?" + kvp.Key.ToString();
                 }
             }

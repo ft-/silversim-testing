@@ -24,25 +24,28 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using SilverSim.Types.Parcel;
-using System.Collections.Generic;
 
-namespace SilverSim.Scene.ServiceInterfaces.SimulationData
+namespace SilverSim.ServiceInterfaces.AvatarName
 {
-    public abstract class SimulationDataParcelStorageInterface
+    public abstract class AvatarNameServiceInterface
     {
-        #region Constructor
-        public SimulationDataParcelStorageInterface()
+        public class NameData
         {
-        }
-        #endregion
+            public UUI ID = UUI.Unknown;
+            public bool Authoritative = false;
 
-        public abstract ParcelInfo this[UUID regionID, UUID parcelID]
+            public NameData()
+            {
+
+            }
+        }
+
+        public AvatarNameServiceInterface()
         {
-            get;
-        }
-        public abstract List<UUID> ParcelsInRegion(UUID key);
 
-        public abstract void Store(ParcelInfo parcel);
+        }
+
+        public abstract NameData this[UUID key] { get; set; } /* setting to null clears an entry if supported */
+        /* if setting is not supported, the set access is ignored */
     }
 }

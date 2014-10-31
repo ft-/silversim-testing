@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Types.Parcel;
 using System;
 
 namespace SilverSim.LL.Messages.Parcel
@@ -35,7 +36,7 @@ namespace SilverSim.LL.Messages.Parcel
 
         public Int32 LocalID = 0;
         public UInt32 Flags = 0;
-        public UInt32 ParcelFlags = 0;
+        public ParcelFlags ParcelFlags = ParcelFlags.None;
         public Int32 SalePrice = 0;
         public string Name = string.Empty;
         public string Description = string.Empty;
@@ -46,12 +47,12 @@ namespace SilverSim.LL.Messages.Parcel
         public UUID GroupID = UUID.Zero;
         public Int32 PassPrice = 0;
         public double PassHours = 0;
-        public byte Category = 0;
+        public ParcelCategory Category = 0;
         public UUID AuthBuyerID = UUID.Zero;
         public UUID SnapshotID = UUID.Zero;
         public Vector3 UserLocation = Vector3.Zero;
         public Vector3 UserLookAt = Vector3.Zero;
-        public byte LandingType = 0;
+        public TeleportLandingType LandingType = 0;
 
         public ParcelPropertiesUpdate()
         {
@@ -73,7 +74,7 @@ namespace SilverSim.LL.Messages.Parcel
             m.SessionID = p.ReadUUID();
             m.LocalID = p.ReadInt32();
             m.Flags = p.ReadUInt32();
-            m.ParcelFlags = p.ReadUInt32();
+            m.ParcelFlags = (ParcelFlags)p.ReadUInt32();
             m.SalePrice = p.ReadInt32();
             m.Name = p.ReadStringLen8();
             m.Description = p.ReadStringLen8();
@@ -83,7 +84,7 @@ namespace SilverSim.LL.Messages.Parcel
             m.GroupID = p.ReadUUID();
             m.PassPrice = p.ReadInt32();
             m.PassHours = p.ReadFloat();
-            m.Category = p.ReadUInt8();
+            m.Category = (ParcelCategory)p.ReadUInt8();
             m.AuthBuyerID = p.ReadUUID();
             m.SnapshotID = p.ReadUUID();
             m.UserLocation.X = p.ReadFloat();
@@ -92,7 +93,7 @@ namespace SilverSim.LL.Messages.Parcel
             m.UserLookAt.X = p.ReadFloat();
             m.UserLookAt.Y = p.ReadFloat();
             m.UserLookAt.Z = p.ReadFloat();
-            m.LandingType = p.ReadUInt8();
+            m.LandingType = (TeleportLandingType)p.ReadUInt8();
             return m;
         }
     }

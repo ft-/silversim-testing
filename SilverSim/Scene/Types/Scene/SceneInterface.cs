@@ -27,15 +27,16 @@ using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Parcel;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.Types;
 using SilverSim.Types.Economy;
 using SilverSim.Types.Grid;
+using SilverSim.Types.Parcel;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -103,6 +104,8 @@ namespace SilverSim.Scene.Types.Scene
         public AssetServiceInterface PersistentAssetService { get; protected set; }
         public AssetServiceInterface AssetService { get; private set; }
         public GroupsNameServiceInterface GroupsNameService { get; protected set; }
+        public AvatarNameServiceInterface AvatarNameService { get; private set; }
+        public readonly RwLockedList<AvatarNameServiceInterface> AvatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
         public GridServiceInterface GridService { get; protected set; }
         public EconomyServiceInterface EconomyService { get; protected set; }
         public ServerParamServiceInterface ServerParamService { get; protected set; }
@@ -146,6 +149,10 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return (T)(object)AssetService;
             }
+            else if(typeof(T).IsAssignableFrom(typeof(AvatarNameServiceInterface)))
+            {
+                return (T)(object)AvatarNameService;
+            }
             else if(typeof(T).IsAssignableFrom(typeof(GroupsNameServiceInterface)))
             {
                 return (T)(object)GroupsNameService;
@@ -182,6 +189,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             SizeX = sizeX;
             SizeY = sizeY;
+            AvatarNameService = new DefaultAvatarNameService(AvatarNameServices);
             Owner = new UUI();
             CapabilitiesConfig = new Dictionary<string, string>();
             RegionSecret = UUID.Random;

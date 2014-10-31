@@ -57,6 +57,10 @@ namespace SilverSim.LL.Core
                     }
                 }
             }
+            if (rep.UUIDNameBlock.Count != 0)
+            {
+                SendMessage(rep);
+            }
         }
     }
 }

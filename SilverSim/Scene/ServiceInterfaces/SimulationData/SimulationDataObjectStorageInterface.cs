@@ -37,7 +37,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         }
         #endregion
 
-        public abstract ObjectGroup this[UUID key]
+        public abstract ObjectGroup this[UUID regionID, UUID objectID]
         {
             get;
         }

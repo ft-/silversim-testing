@@ -48,6 +48,11 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             get;
         }
 
+        public abstract SimulationDataScriptStateStorageInterface ScriptStates
+        {
+            get;
+        }
+
         public void StoreScene(SceneInterface scene)
         {
             #region Store Objects
