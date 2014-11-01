@@ -61,7 +61,7 @@ namespace SilverSim.Scene.Implementation.Basic
         #region Fields
         protected internal RwLockedDictionary<UUID, ObjectPart> m_Primitives = new RwLockedDictionary<UUID,ObjectPart>();
         protected internal RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
-        protected internal RwLockedDictionary<UUID, ParcelInfo> m_Parcels = new RwLockedDictionary<UUID, ParcelInfo>();
+        protected internal RwLockedDoubleDictionary<UUID, int, ParcelInfo> m_Parcels = new RwLockedDoubleDictionary<UUID, int, ParcelInfo>();
         private LLUDPServer m_UDPServer;
         private Thread m_LoaderThread = null;
         private object m_LoaderThreadLock = new object();
@@ -474,7 +474,7 @@ namespace SilverSim.Scene.Implementation.Basic
                             lock (m_LoaderThreadLock)
                             {
                                 ParcelInfo pi = m_SimulationDataStorage.Parcels[ID, parcelid];
-                                m_Parcels.Add(pi.ID, pi);
+                                m_Parcels.Add(pi.ID, pi.LocalID, pi);
                             }
                         }
                         catch (Exception e)
@@ -505,7 +505,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     pi.ClaimDate = new Date();
                     pi.Status = ParcelStatus.Leased;
                     m_SimulationDataStorage.Parcels.Store(ID, pi);
-                    m_Parcels.Add(pi.ID, pi);
+                    m_Parcels.Add(pi.ID, pi.LocalID, pi);
                     m_Log.InfoFormat("Auto-generated default parcel for {1} ({2})", parcels.Count, RegionData.Name, ID);
                 }
                 else if (parcels.Count == 1)
