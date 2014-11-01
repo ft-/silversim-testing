@@ -23,10 +23,7 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.Types;
 
 namespace SilverSim.LL.Core
@@ -55,6 +52,32 @@ namespace SilverSim.LL.Core
                     catch
                     {
                     }
+                }
+            }
+            if (rep.UUIDNameBlock.Count != 0)
+            {
+                SendMessage(rep);
+            }
+        }
+
+        public void UserNameLookup(Messages.Names.UUIDNameRequest req)
+        {
+            Messages.Names.UUIDNameReply rep = new Messages.Names.UUIDNameReply();
+
+            foreach (UUID id in req.UUIDNameBlock)
+            {
+                try
+                {
+                    Messages.Names.UUIDNameReply.Data d = new Messages.Names.UUIDNameReply.Data();
+                    AvatarNameServiceInterface.NameData nd = Scene.AvatarNameService[id];
+                    d.ID = nd.ID.ID;
+                    d.FirstName = nd.ID.FirstName;
+                    d.LastName = nd.ID.LastName;
+                    rep.UUIDNameBlock.Add(d);
+                }
+                catch
+                {
+                    /* TODO: eventually make up an AvatarName lookup based on ServiceURLs */
                 }
             }
             if (rep.UUIDNameBlock.Count != 0)

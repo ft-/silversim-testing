@@ -113,6 +113,9 @@ namespace SilverSim.Scene.Types.Scene
         private NotecardCache m_NotecardCache;
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }
         public string GatekeeperURI { get; protected set; }
+        public bool IsSceneEnabled { get; protected set; }
+
+        public abstract void LoadSceneAsync();
 
         /* do not put any other than ICapabilityInterface into this list */
         public readonly RwLockedDictionary<string, object> SceneCapabilities = new RwLockedDictionary<string, object>();
@@ -187,6 +190,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public SceneInterface(UInt32 sizeX, UInt32 sizeY)
         {
+            IsSceneEnabled = false;
             SizeX = sizeX;
             SizeY = sizeY;
             AvatarNameService = new DefaultAvatarNameService(AvatarNameServices);

@@ -172,6 +172,11 @@ namespace SilverSim.Types
             return new UUID(val);
         }
 
+        public static implicit operator UUID(Guid val)
+        {
+            return new UUID(val);
+        }
+
         public static implicit operator string(UUID val)
         {
             return val.ToString();

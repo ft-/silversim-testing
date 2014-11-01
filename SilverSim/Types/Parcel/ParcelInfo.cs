@@ -176,6 +176,22 @@ namespace SilverSim.Types.Parcel
             int m_BitmapHeight;
             ReaderWriterLock m_LandBitmapRwLock;
 
+            public int BitmapWidth
+            {
+                get
+                {
+                    return m_BitmapWidth;
+                }
+            }
+
+            public int BitmapHeight
+            {
+                get
+                {
+                    return m_BitmapHeight;
+                }
+            }
+
             public ParcelDataLandBitmap(byte[,] landBitmap, int bitmapWidth, int bitmapHeight, ReaderWriterLock landBitmapRwLock)
             {
                 m_LandBitmap = landBitmap;
@@ -198,6 +214,37 @@ namespace SilverSim.Types.Parcel
                     finally
                     {
                         m_LandBitmapRwLock.ReleaseReaderLock();
+                    }
+                }
+
+                set
+                {
+                    try
+                    {
+                        m_LandBitmapRwLock.AcquireWriterLock(-1);
+                        if (value.Length == m_LandBitmap.Length)
+                        {
+                            Buffer.BlockCopy(value, 0, m_LandBitmap, 0, m_LandBitmap.Length);
+                        }
+                        else
+                        {
+                            throw new ArgumentException("Parcel Bitmap size does not match");
+                        }
+                    }
+                    finally
+                    {
+                        m_LandBitmapRwLock.ReleaseWriterLock();
+                    }
+                }
+            }
+
+            public void SetAllBits()
+            {
+                for(int x = 0; x < m_BitmapWidth / 8; ++x)
+                {
+                    for(int y = 0; y < m_BitmapHeight; ++y)
+                    {
+                        m_LandBitmap[y, x] = 0xFF;
                     }
                 }
             }
@@ -250,7 +297,7 @@ namespace SilverSim.Types.Parcel
 
         public ParcelInfo(int bitmapWidth, int bitmapHeight)
         {
-            m_LandBitmap = new byte[bitmapHeight, bitmapWidth];
+            m_LandBitmap = new byte[bitmapHeight, bitmapWidth / 8];
             m_BitmapWidth = bitmapWidth;
             m_BitmapHeight = bitmapHeight;
             LandBitmap = new ParcelDataLandBitmap(m_LandBitmap, m_BitmapWidth, m_BitmapHeight, m_LandBitmapRwLock);

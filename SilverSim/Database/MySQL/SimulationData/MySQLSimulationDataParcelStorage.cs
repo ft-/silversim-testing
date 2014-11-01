@@ -29,6 +29,7 @@ using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using System.Collections.Generic;
+using System;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -49,7 +50,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT ParcelID FROM parcels WHERE RegionID LIKE ?regionID AND ParcelID LIKE ?parcelID", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM parcels WHERE RegionID LIKE ?regionID AND ParcelID LIKE ?parcelID", connection))
                     {
                         cmd.Parameters.AddWithValue("?regionID", regionID);
                         cmd.Parameters.AddWithValue("?parcelID", parcelID);
@@ -61,44 +62,46 @@ namespace SilverSim.Database.MySQL.SimulationData
                             }
 
                             ParcelInfo pi = new ParcelInfo((int)dbReader["BitmapWidth"], (int)dbReader["BitmapHeight"]);
-                            pi.Area = (int)dbReader["Area"];
+                            pi.Area = (int)(ulong)dbReader["Area"];
                             pi.AuctionID = (uint)dbReader["AuctionID"];
                             pi.AuthBuyer = new UUI((string)dbReader["AuthBuyer"]);
-                            pi.Category = (ParcelCategory)(uint)dbReader["Category"];
+                            pi.Category = (ParcelCategory)(int)dbReader["Category"];
                             pi.ClaimDate = Date.UnixTimeToDateTime((ulong)dbReader["ClaimDate"]);
                             pi.ClaimPrice = (int)dbReader["ClaimPrice"];
-                            pi.ID = (string)dbReader["ParcelID"];
+                            pi.ID = MySQLUtilities.GetUUID(dbReader, "ParcelID");
                             pi.Group = new UGI((string)dbReader["Group"]);
                             pi.GroupOwned = MySQLUtilities.GetBoolean(dbReader, "IsGroupOwned");
-                            pi.Description =(string)dbReader["Description"];
+                            pi.Description = (string)dbReader["Description"];
                             pi.Flags = (ParcelFlags)(uint)dbReader["Flags"];
-                            pi.LandingType = (TeleportLandingType)(uint)dbReader["LandingType"];
+                            pi.LandingType = (TeleportLandingType)(int)dbReader["LandingType"];
                             pi.LandingPosition = MySQLUtilities.GetVector(dbReader, "LandingPosition");
                             pi.LandingLookAt = MySQLUtilities.GetVector(dbReader, "LandingLookAt");
                             pi.Name = (string)dbReader["Name"];
-#if defs
-        public ParcelStatus Status = ParcelStatus.Leased;
-        public int LocalID = 0;
-        public URI MusicURI = null;
-        public URI MediaURI = null;
-        public UUID MediaID;
-        public UUI Owner = new UUI();
-        public UUID SnapshotID = UUID.Zero;
-        public Int32 SalePrice;
-        public Int32 OtherCleanTime;
-        public byte MediaAutoScale;
-        public Int32 RentPrice = 0;
-        public Vector3 AABBMin;
-        public Vector3 AABBMax;
-        public double ParcelPrimBonus;
-        public Int32 PassPrice;
-        public double PassHours;
-        public Int32 ActualArea;
-        public Int32 BillableArea;
-        public double Dwell;
-
-        internal byte[,] m_LandBitmap;
-#endif
+                            pi.LocalID = (int)dbReader["LocalID"];
+                            if (!string.IsNullOrEmpty((string)dbReader["MusicURI"]))
+                            {
+                                pi.MusicURI = new URI((string)dbReader["MusicURI"]);
+                            }
+                            if (!string.IsNullOrEmpty((string)dbReader["MediaURI"]))
+                            {
+                                pi.MediaURI = new URI((string)dbReader["MediaURI"]);
+                            }
+                            pi.MediaID = MySQLUtilities.GetUUID(dbReader, "MediaID");
+                            pi.Owner.FullName = (string)dbReader["Owner"];
+                            pi.SnapshotID = MySQLUtilities.GetUUID(dbReader, "SnapshotID");
+                            pi.SalePrice = (int)dbReader["SalePrice"];
+                            pi.OtherCleanTime = (int)(int)dbReader["OtherCleanTime"];
+                            pi.MediaAutoScale = (byte)(uint)dbReader["MediaAutoScale"];
+                            pi.RentPrice = (int)dbReader["RentPrice"];
+                            pi.AABBMin = MySQLUtilities.GetVector(dbReader, "AABBMin");
+                            pi.AABBMax = MySQLUtilities.GetVector(dbReader, "AABBMax");
+                            pi.ParcelPrimBonus = (double)dbReader["ParcelPrimBonus"];
+                            pi.PassPrice = (int)dbReader["PassPrice"];
+                            pi.PassHours = (double)dbReader["PassHours"];
+                            pi.ActualArea = (int)(ulong)dbReader["ActualArea"];
+                            pi.BillableArea = (int)(ulong)dbReader["BillAbleArea"];
+                            pi.LandBitmap.Data = (byte[])dbReader["Bitmap"];
+                            pi.Status = (ParcelStatus)(int)dbReader["Status"];
                             return pi;
                         }
                     }
@@ -119,7 +122,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     {
                         while (dbReader.Read())
                         {
-                            parcels.Add(new UUID((string)dbReader["ParcelID"]));
+                            parcels.Add(new UUID((Guid)dbReader["ParcelID"]));
                         }
                     }
                 }
@@ -127,9 +130,51 @@ namespace SilverSim.Database.MySQL.SimulationData
             return parcels;
         }
 
-        public override void Store(ParcelInfo parcel)
+        public override void Store(UUID regionID, ParcelInfo parcel)
         {
-
+            Dictionary<string, object> p = new Dictionary<string, object>();
+            p["RegionID"] = regionID;
+            p["ParcelID"] = parcel.ID;
+            p["LocalID"] = parcel.LocalID;
+            p["Bitmap"] = parcel.LandBitmap.Data;
+            p["BitmapWidth"] = parcel.LandBitmap.BitmapWidth;
+            p["BitmapHeight"] = parcel.LandBitmap.BitmapHeight;
+            p["Name"] = parcel.Name;
+            p["Description"] = parcel.Description;
+            p["Owner"] = parcel.Owner;
+            p["IsGroupOwned"] = parcel.GroupOwned;
+            p["Area"] = parcel.Area;
+            p["AuctionID"] = parcel.AuctionID;
+            p["AuthBuyer"] = parcel.AuthBuyer;
+            p["Category"] = (int)parcel.Category;
+            p["ClaimDate"] = parcel.ClaimDate.AsULong;
+            p["ClaimPrice"] = parcel.ClaimPrice;
+            p["Group"] = parcel.Group;
+            p["Flags"] = (uint)parcel.Flags;
+            p["LandingType"] = (int)parcel.LandingType;
+            p["LandingPosition"] = parcel.LandingPosition;
+            p["LandingLookAt"] = parcel.LandingLookAt;
+            p["Status"] = (int)parcel.Status;
+            p["MusicURI"] = parcel.MusicURI;
+            p["MediaURI"] = parcel.MediaURI;
+            p["MediaID"] = parcel.MediaID;
+            p["SnapshotID"] = parcel.SnapshotID;
+            p["SalePrice"] = parcel.SalePrice;
+            p["OtherCleanTime"] = parcel.OtherCleanTime;
+            p["MediaAutoScale"] = parcel.MediaAutoScale;
+            p["RentPrice"] = parcel.RentPrice;
+            p["AABBMin"] = parcel.AABBMin;
+            p["AABBMax"] = parcel.AABBMax;
+            p["ParcelPrimBonus"] = parcel.ParcelPrimBonus;
+            p["PassPrice"] = parcel.PassPrice;
+            p["PassHours"] = parcel.PassHours;
+            p["ActualArea"] = parcel.ActualArea;
+            p["BillableArea"] = parcel.BillableArea;
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                MySQLUtilities.ReplaceInsertInto(connection, "parcels", p);
+            }
         }
 
         public void VerifyConnection()
@@ -162,7 +207,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "AuctionID INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
                 "AuthBuyer VARCHAR(255) NOT NULL DEFAULT ''," +
                 "Category INT(11) NOT NULL DEFAULT '0'," +
-                "ClaimDate BIGINT(20) NOT NULL DEFAULT '0'," +
+                "ClaimDate BIGINT(20) UNSIGNED NOT NULL DEFAULT '0'," +
                 "ClaimPrice INT(11) NOT NULL DEFAULT '0'," +
                 "`Group` VARCHAR(255) NOT NULL DEFAULT ''," +
                 "Flags INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
@@ -180,7 +225,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "SnapshotID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "SalePrice INT(11) NOT NULL DEFAULT '0'," +
                 "OtherCleanTime INT(11) NOT NULL DEFAULT '0'," +
-                "MediaAutoScale INT(11) NOT NULL DEFAULT '0'," +
+                "MediaAutoScale INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
                 "RentPrice INT(11) NOT NULL DEFAULT '0'," +
                 "AABBMinX DOUBLE NOT NULL DEFAULT '0'," +
                 "AABBMinY DOUBLE NOT NULL DEFAULT '0'," +
@@ -191,8 +236,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "ParcelPrimBonus DOUBLE NOT NULL DEFAULT '1'," +
                 "PassPrice INT(11) NOT NULL DEFAULT '0'," +
                 "PassHours DOUBLE NOT NULL DEFAULT '0'," +
-                "ActualArea INT(11) NOT NULL DEFAULT '0'," +
-                "BillableArea INT(11) NOT NULL DEFAULT '0'," +
+                "ActualArea BIGINT(20) UNSIGNED NOT NULL DEFAULT '0'," +
+                "BillableArea BIGINT(20) UNSIGNED NOT NULL DEFAULT '0'," +
                 "PRIMARY KEY(RegionID, ParcelID)," +
                 "KEY ParcelNames (RegionID, `Name`)," +
                 "UNIQUE KEY LocalIDs (RegionID, LocalID))"

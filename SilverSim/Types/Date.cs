@@ -53,7 +53,7 @@ namespace SilverSim.Types
 
         public Date()
         {
-
+            m_Value = DateTime.UtcNow;
         }
 
         public Date(DateTime v)

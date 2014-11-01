@@ -23,22 +23,18 @@ exception statement from your version.
 
 */
 
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
-using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.ServerParam;
-using SilverSim.Types;
-using Nini.Config;
-using System.Net;
+using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
 
@@ -53,6 +49,7 @@ namespace SilverSim.Scene.Implementation.Basic
         public string m_AssetCacheServiceName;
         public string m_GridServiceName;
         public string m_IMServiceName;
+        public string m_SimulationDataStorageName;
         public List<string> m_AvatarNameServiceNames = new List<string>();
 
         public GroupsNameServiceInterface m_GroupsNameService = null;
@@ -61,6 +58,7 @@ namespace SilverSim.Scene.Implementation.Basic
         public GridServiceInterface m_GridService;
         public ServerParamServiceInterface m_ServerParamService;
         public IMServiceInterface m_IMService;
+        public SimulationDataStorageInterface m_SimulationDataStorage;
         public Dictionary<string, string> m_CapabilitiesConfig;
         public List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
 
@@ -72,6 +70,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_AssetCacheServiceName = ownConfig.GetString("AssetCacheService", m_AssetServiceName);
             m_GridServiceName = ownConfig.GetString("GridService", "GridService");
             m_IMServiceName = ownConfig.GetString("IMService", "IMService");
+            m_SimulationDataStorageName = ownConfig.GetString("SimulationDataStorage", "SimulationDataStorage");
             string avatarNameServices = ownConfig.GetString("AvatarNameServices", "");
             foreach(string p in avatarNameServices.Split(','))
             {
@@ -100,6 +99,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
             m_ServerParamService = loader.GetService<ServerParamServiceInterface>("ServerParamStorage");
+            m_SimulationDataStorage = loader.GetService<SimulationDataStorageInterface>(m_SimulationDataStorageName);
             foreach(string servicename in m_AvatarNameServiceNames)
             {
                 m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(servicename));
@@ -117,6 +117,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_ServerParamService,
                 ri,
                 m_AvatarNameServices,
+                m_SimulationDataStorage,
                 m_CapabilitiesConfig);
         }
     }

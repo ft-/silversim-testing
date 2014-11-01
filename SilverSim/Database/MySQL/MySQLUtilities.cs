@@ -76,121 +76,133 @@ namespace SilverSim.Database.MySQL
             bool first = true;
             foreach(KeyValuePair<string, object> kvp in vals)
             {
-                if (!first)
+                if (kvp.Value != null)
                 {
-                    q1 += ",";
-                    q2 += ",";
+                    if (!first)
+                    {
+                        q1 += ",";
+                        q2 += ",";
+                    }
+                    first = false;
                 }
-                first = false;
 
                 if (kvp.Value is Vector3)
                 {
                     q1 += "`" + kvp.Key.ToString() + "X`,";
-                    q2 += "?" + kvp.Key.ToString() + "X,";
+                    q2 += "?v_" + kvp.Key.ToString() + "X,";
                     q1 += "`" + kvp.Key.ToString() + "Y`,";
-                    q2 += "?" + kvp.Key.ToString() + "Y,";
+                    q2 += "?v_" + kvp.Key.ToString() + "Y,";
                     q1 += "`" + kvp.Key.ToString() + "Z`";
-                    q2 += "?" + kvp.Key.ToString() + "Z";
+                    q2 += "?v_" + kvp.Key.ToString() + "Z";
                 }
                 else if(kvp.Value is GridVector)
                 {
                     q1 += "`" + kvp.Key.ToString() + "X`,";
-                    q2 += "?" + kvp.Key.ToString() + "X,";
+                    q2 += "?v_" + kvp.Key.ToString() + "X,";
                     q1 += "`" + kvp.Key.ToString() + "Y`";
-                    q2 += "?" + kvp.Key.ToString() + "Y";
+                    q2 += "?v_" + kvp.Key.ToString() + "Y";
                 }
                 else if (kvp.Value is Quaternion)
                 {
                     q1 += "`" + kvp.Key.ToString() + "X`,";
-                    q2 += "?" + kvp.Key.ToString() + "X,";
+                    q2 += "?v_" + kvp.Key.ToString() + "X,";
                     q1 += "`" + kvp.Key.ToString() + "Y`,";
-                    q2 += "?" + kvp.Key.ToString() + "Y,";
+                    q2 += "?v_" + kvp.Key.ToString() + "Y,";
                     q1 += "`" + kvp.Key.ToString() + "Z`,";
-                    q2 += "?" + kvp.Key.ToString() + "Z,";
+                    q2 += "?v_" + kvp.Key.ToString() + "Z,";
                     q1 += "`" + kvp.Key.ToString() + "W`";
-                    q2 += "?" + kvp.Key.ToString() + "W";
+                    q2 += "?v_" + kvp.Key.ToString() + "W";
                 }
                 else if(kvp.Value is Color)
                 {
                     q1 += "`" + kvp.Key.ToString() + "Red`,";
-                    q2 += "?" + kvp.Key.ToString() + "Red,";
+                    q2 += "?v_" + kvp.Key.ToString() + "Red,";
                     q1 += "`" + kvp.Key.ToString() + "Green`,";
-                    q2 += "?" + kvp.Key.ToString() + "Green,";
+                    q2 += "?v_" + kvp.Key.ToString() + "Green,";
                     q1 += "`" + kvp.Key.ToString() + "Blue`";
-                    q2 += "?" + kvp.Key.ToString() + "Blue";
+                    q2 += "?v_" + kvp.Key.ToString() + "Blue";
                 }
                 else if (kvp.Value is ColorAlpha)
                 {
                     q1 += "`" + kvp.Key.ToString() + "Red`,";
-                    q2 += "?" + kvp.Key.ToString() + "Red,";
+                    q2 += "?v_" + kvp.Key.ToString() + "Red,";
                     q1 += "`" + kvp.Key.ToString() + "Green`,";
-                    q2 += "?" + kvp.Key.ToString() + "Green,";
+                    q2 += "?v_" + kvp.Key.ToString() + "Green,";
                     q1 += "`" + kvp.Key.ToString() + "Blue`,";
-                    q2 += "?" + kvp.Key.ToString() + "Blue,";
+                    q2 += "?v_" + kvp.Key.ToString() + "Blue,";
                     q1 += "`" + kvp.Key.ToString() + "Alpha`";
-                    q2 += "?" + kvp.Key.ToString() + "Alpha";
+                    q2 += "?v_" + kvp.Key.ToString() + "Alpha";
+                }
+                else if(kvp.Value == null)
+                {
+                    /* skip */
                 }
                 else
                 {
                     q1 += "`" + kvp.Key.ToString() + "`";
-                    q2 += "?" + kvp.Key.ToString();
+                    q2 += "?v_" + kvp.Key.ToString();
                 }
             }
 
-            using(MySqlCommand command = new MySqlCommand(q1 + q2 + ")", connection))
+            string query = q1 + q2 + ")";
+            using(MySqlCommand command = new MySqlCommand(query, connection))
             {
                 foreach (KeyValuePair<string, object> kvp in vals)
                 {
                     if (kvp.Value is Vector3)
                     {
-                        command.Parameters.AddWithValue("?" + kvp.Key + "X", ((Vector3)kvp.Value).X);
-                        command.Parameters.AddWithValue("?" + kvp.Key + "Y", ((Vector3)kvp.Value).Y);
-                        command.Parameters.AddWithValue("?" + kvp.Key + "Z", ((Vector3)kvp.Value).Z);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "X", ((Vector3)kvp.Value).X);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "Y", ((Vector3)kvp.Value).Y);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "Z", ((Vector3)kvp.Value).Z);
                     }
                     else if(kvp.Value is GridVector)
                     {
-                        command.Parameters.AddWithValue("?" + kvp.Key + "X", ((GridVector)kvp.Value).X);
-                        command.Parameters.AddWithValue("?" + kvp.Key + "Y", ((GridVector)kvp.Value).Y);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "X", ((GridVector)kvp.Value).X);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "Y", ((GridVector)kvp.Value).Y);
                     }
                     else if (kvp.Value is Quaternion)
                     {
-                        command.Parameters.AddWithValue("?" + kvp.Key + "X", ((Quaternion)kvp.Value).X);
-                        command.Parameters.AddWithValue("?" + kvp.Key + "Y", ((Quaternion)kvp.Value).Y);
-                        command.Parameters.AddWithValue("?" + kvp.Key + "Z", ((Quaternion)kvp.Value).Z);
-                        command.Parameters.AddWithValue("?" + kvp.Key + "W", ((Quaternion)kvp.Value).W);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "X", ((Quaternion)kvp.Value).X);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "Y", ((Quaternion)kvp.Value).Y);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "Z", ((Quaternion)kvp.Value).Z);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "W", ((Quaternion)kvp.Value).W);
                     }
                     else if (kvp.Value is Color)
                     {
-                        command.Parameters.AddWithValue("?" + kvp.Key + "Red", ((Color)kvp.Value).R);
-                        command.Parameters.AddWithValue("?" + kvp.Key + "Green", ((Color)kvp.Value).G);
-                        command.Parameters.AddWithValue("?" + kvp.Key + "Blue", ((Color)kvp.Value).B);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "Red", ((Color)kvp.Value).R);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "Green", ((Color)kvp.Value).G);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "Blue", ((Color)kvp.Value).B);
                     }
                     else if (kvp.Value is ColorAlpha)
                     {
-                        command.Parameters.AddWithValue("?" + kvp.Key + "Red", ((ColorAlpha)kvp.Value).R);
-                        command.Parameters.AddWithValue("?" + kvp.Key + "Green", ((ColorAlpha)kvp.Value).G);
-                        command.Parameters.AddWithValue("?" + kvp.Key + "Blue", ((ColorAlpha)kvp.Value).B);
-                        command.Parameters.AddWithValue("?" + kvp.Key + "Alpha", ((ColorAlpha)kvp.Value).A);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "Red", ((ColorAlpha)kvp.Value).R);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "Green", ((ColorAlpha)kvp.Value).G);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "Blue", ((ColorAlpha)kvp.Value).B);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key + "Alpha", ((ColorAlpha)kvp.Value).A);
                     }
                     else if(kvp.Value is bool)
                     {
-                        command.Parameters.AddWithValue("?" + kvp.Key, (bool)kvp.Value ? 1 : 0);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key, (bool)kvp.Value ? 1 : 0);
                     }
                     else if(kvp.Value is AnArray)
                     {
                         using(MemoryStream stream = new MemoryStream())
                         {
                             LLSD_Binary.Serialize((AnArray)kvp.Value, stream);
-                            command.Parameters.AddWithValue("?" + kvp.Key, stream.GetBuffer());
+                            command.Parameters.AddWithValue("?v_" + kvp.Key, stream.GetBuffer());
                         }
                     }
                     else if(kvp.Value is Date)
                     {
-                        command.Parameters.AddWithValue("?" + kvp.Key, ((Date)kvp.Value).AsULong);
+                        command.Parameters.AddWithValue("?v_" + kvp.Key, ((Date)kvp.Value).AsULong);
+                    }
+                    else if(kvp.Value == null)
+                    {
+                        /* skip */
                     }
                     else
                     {
-                        command.Parameters.AddWithValue("?" + kvp.Key, kvp.Value.ToString());
+                        command.Parameters.AddWithValue("?v_" + kvp.Key, kvp.Value);
                     }
                 }
                 command.ExecuteNonQuery();
@@ -199,6 +211,23 @@ namespace SilverSim.Database.MySQL
         #endregion
 
         #region Data parsers
+        public static UUID GetUUID(MySqlDataReader dbReader, string prefix)
+        {
+            object v = dbReader[prefix];
+            if(v is Guid)
+            {
+                return new UUID((Guid)v);
+            }
+            else if(v is string)
+            {
+                return new UUID((string)v);
+            }
+            else
+            {
+                throw new InvalidCastException("GetUUID could not convert value for " + prefix);
+            }
+        }
+
         public static Date GetDate(MySqlDataReader dbReader, string prefix)
         {
             return Date.UnixTimeToDateTime((ulong)dbReader[prefix]);
@@ -240,7 +269,27 @@ namespace SilverSim.Database.MySQL
 
         public static bool GetBoolean(MySqlDataReader dbReader, string prefix)
         {
-            return (int)dbReader[prefix] != 0;
+            object o = dbReader[prefix];
+            if(o is uint)
+            {
+                return (uint)o != 0;
+            }
+            else if(o is int)
+            {
+                return (int)o != 0;
+            }
+            else if(o is sbyte)
+            {
+                return (sbyte)o != 0;
+            }
+            else if (o is byte)
+            {
+                return (byte)o != 0;
+            }
+            else
+            {
+                throw new InvalidCastException("GetBoolean could not convert value for " + prefix + ": got type " + o.GetType().FullName);
+            }
         }
 
         public static byte[] GetBytes(MySqlDataReader dbReader, string prefix)

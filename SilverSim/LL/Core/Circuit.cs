@@ -457,6 +457,10 @@ namespace SilverSim.LL.Core
                                 GroupNameLookup((Messages.Names.UUIDGroupNameRequest)m);
                                 break;
 
+                            case MessageType.UUIDNameRequest:
+                                UserNameLookup((Messages.Names.UUIDNameRequest)m);
+                                break;
+
                             default:
                                 m_Server.RouteReceivedMessage(m);
                                 break;

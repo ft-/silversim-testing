@@ -43,6 +43,6 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         }
         public abstract List<UUID> ParcelsInRegion(UUID key);
 
-        public abstract void Store(ParcelInfo parcel);
+        public abstract void Store(UUID regionID, ParcelInfo parcel);
     }
 }

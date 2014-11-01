@@ -31,6 +31,7 @@ using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types.Grid;
 using SilverSim.Types;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
 using SilverSim.Scene.ServiceInterfaces.Scene;
@@ -111,7 +112,9 @@ namespace SilverSim.Scene.RegionLoader.Basic
             foreach(RegionInfo ri in m_RegionService.GetOnlineRegions())
             {
                 m_Log.InfoFormat("Starting Region {0}", ri.Name);
-                SceneManager.Scenes.Add(m_SceneFactory.Instantiate(ri));
+                SceneInterface si = m_SceneFactory.Instantiate(ri);
+                SceneManager.Scenes.Add(si);
+                si.LoadSceneAsync();
             }
         }
     }
