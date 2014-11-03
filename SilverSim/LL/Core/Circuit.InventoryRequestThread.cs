@@ -174,7 +174,7 @@ namespace SilverSim.LL.Core
                                 }
                                 catch(Exception e2)
                                 {
-                                    m_Log.DebugFormat("Failed to download asset (TransferPacket): {0} or {1}", e1.Message, e2.Message);
+                                    m_Log.DebugFormat("Failed to download asset {0} (TransferPacket): {1} or {2}", assetID, e1.Message, e2.Message);
                                     SendAssetNotFound(req);
                                     break;
                                 }
