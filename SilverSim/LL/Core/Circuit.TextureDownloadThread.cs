@@ -72,6 +72,7 @@ namespace SilverSim.LL.Core
                             try
                             {
                                 /* let us try to store the image locally */
+                                asset.Temporary = true;
                                 Scene.AssetService.Store(asset);
                             }
                             catch(Exception e3)

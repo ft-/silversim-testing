@@ -152,6 +152,7 @@ namespace SilverSim.LL.Core
                                 break;
                             }
 
+                            /* let us prefer the scene's asset service */
                             AssetData asset;
                             try
                             {
@@ -165,6 +166,8 @@ namespace SilverSim.LL.Core
                                     asset = Agent.AssetService[assetID];
                                     try
                                     {
+                                        /* let us try to store the asset locally */
+                                        asset.Temporary = true;
                                         Scene.AssetService.Store(asset);
                                     }
                                     catch(Exception e3)

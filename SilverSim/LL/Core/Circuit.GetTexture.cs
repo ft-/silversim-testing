@@ -51,9 +51,26 @@ namespace SilverSim.LL.Core
             }
 
             UUID textureID;
+            if(parts[3].Substring(0, 1) != "?")
+            {
+                httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
+                return;
+            }
+
+            string texturereq = parts[3].Substring(1);
+            string[] texreq = texturereq.Split('&');
+            string texID = string.Empty;
+
+            foreach(string texreqentry in texreq)
+            {
+                if(texreqentry.StartsWith("texture_id="))
+                {
+                    texID = texreqentry.Substring(11);
+                }
+            }
             try
             {
-                textureID = UUID.Parse(parts[3]);
+                textureID = UUID.Parse(texID);
             }
             catch
             {
@@ -95,6 +112,7 @@ namespace SilverSim.LL.Core
                     try
                     {
                         /* try to store the asset on our sim's asset service */
+                        asset.Temporary = true;
                         Scene.AssetService.Store(asset);
                     }
                     catch(Exception e3)
