@@ -67,7 +67,7 @@ namespace SilverSim.LL.Core
                     {
                         try
                         {
-                            /* no we try the agent's asset service */
+                            /* now we try the agent's asset service */
                             asset = Agent.AssetService[imageRequest.ImageID];
                             try
                             {
@@ -81,7 +81,7 @@ namespace SilverSim.LL.Core
                         }
                         catch (Exception e2)
                         {
-                            m_Log.DebugFormat("Failed to download image: {0} or {1}", e1.Message, e2.Message);
+                            m_Log.DebugFormat("Failed to download image (RequestImage): {0} or {1}", e1.Message, e2.Message);
                             Messages.Image.ImageNotInDatabase failres = new Messages.Image.ImageNotInDatabase();
                             failres.ID = imageRequest.ImageID;
                             SendMessage(failres);

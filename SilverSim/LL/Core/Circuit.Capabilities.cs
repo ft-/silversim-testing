@@ -307,6 +307,7 @@ namespace SilverSim.LL.Core
             AddDefCapability("FetchLibDescendents2", regionSeedID, Cap_FetchInventoryDescendents2, capConfig);
             AddDefCapability("GetTexture", regionSeedID, Cap_GetTexture, capConfig);
             AddDefCapability("GetMesh", regionSeedID, Cap_GetMesh, capConfig);
+            AddDefCapability("UploadBakedTexture", regionSeedID, Cap_UploadBakedTexture, capConfig);
         }
         #endregion
     }

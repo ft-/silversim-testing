@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using System;
 using System.IO;
 using System.Net;
 
@@ -86,7 +87,7 @@ namespace SilverSim.LL.Core
                 /* let us prefer the sim asset service */
                 asset = Scene.AssetService[textureID];
             }
-            catch
+            catch(Exception e1)
             {
                 try
                 {
@@ -101,8 +102,9 @@ namespace SilverSim.LL.Core
 
                     }
                 }
-                catch
+                catch(Exception e2)
                 {
+                    m_Log.DebugFormat("Failed to download image (Cap_GetTexture): {0} or {1}", e1.Message, e2.Message);
                     httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
                     return;
                 }
@@ -110,6 +112,10 @@ namespace SilverSim.LL.Core
 
             if(asset.Type != AssetType.Texture)
             {
+                if(asset.Type != AssetType.Mesh)
+                {
+                    m_Log.DebugFormat("Failed to download image (Cap_GetTexture): Viewer for AgentID {0} tried to download non-texture asset", AgentID);
+                }
                 httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
                 return;
             }

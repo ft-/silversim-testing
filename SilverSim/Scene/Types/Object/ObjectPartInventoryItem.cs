@@ -62,7 +62,7 @@ namespace SilverSim.Scene.Types.Object
                 case AssetType.LSLText: InventoryType = InventoryType.LSLText; break;
                 case AssetType.Notecard: InventoryType = InventoryType.Notecard; break;
                 case AssetType.Sound: InventoryType = InventoryType.Sound; break;
-                case AssetType.SoundWAV: InventoryType = InventoryType.SoundWAV; break;
+                case AssetType.SoundWAV: InventoryType = InventoryType.Sound; break;
                 case AssetType.Texture: InventoryType = InventoryType.Texture; break;
                 case AssetType.TextureTGA: InventoryType = InventoryType.TextureTGA; break;
                 default: InventoryType = InventoryType.Unknown; break;

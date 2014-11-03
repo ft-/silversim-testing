@@ -63,15 +63,10 @@ namespace SilverSim.LL.Messages
             }
             set
             {
+                Buffer.BlockCopy(BitConverter.GetBytes(value), 0, Data, 1, 4);
                 if (BitConverter.IsLittleEndian)
                 {
-                    byte[] b = BitConverter.GetBytes(value);
-                    Array.Reverse(b);
-                    Buffer.BlockCopy(b, 0, Data, 1, 4);
-                }
-                else
-                {
-                    Buffer.BlockCopy(BitConverter.GetBytes(value), 0, Data, 1, 4);
+                    Array.Reverse(Data, 1, 4);
                 }
             }
         }
@@ -217,24 +212,14 @@ namespace SilverSim.LL.Messages
                     }
 
                     List<UInt32> acknumbers = new List<uint>();
-                    byte[] shortbuf = null;
-                    if(!BitConverter.IsLittleEndian)
-                    {
-                        shortbuf = new byte[4];
-                    }
 
                     for (uint ackidx = 0; ackidx < numacks; ++ackidx)
                     {
-                        if(BitConverter.IsLittleEndian)
+                        if(!BitConverter.IsLittleEndian)
                         {
-                            acknumbers.Add(BitConverter.ToUInt32(ackbuf, (int)ackidx * 4));
+                            Array.Reverse(ackbuf, (int)ackidx * 4, 4);
                         }
-                        else
-                        {
-                            Buffer.BlockCopy(ackbuf, (int)ackidx * 4, shortbuf, 0, 4);
-                            Array.Reverse(shortbuf);
-                            acknumbers.Add(BitConverter.ToUInt32(shortbuf, 0));
-                        }
+                        acknumbers.Add(BitConverter.ToUInt32(ackbuf, (int)ackidx * 4));
                     }
 
                     /* we consumed those appended acks, so remove that flag */

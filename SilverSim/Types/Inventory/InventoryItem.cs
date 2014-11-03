@@ -272,7 +272,6 @@ namespace SilverSim.Types.Inventory
                     case "lslbyte": InventoryType = InventoryType.LSLBytecode; break;
                     case "txtr_tga": InventoryType = InventoryType.TextureTGA; break;
                     case "bodypart": InventoryType = InventoryType.Bodypart; break;
-                    case "snd_wav": InventoryType = InventoryType.SoundWAV; break;
                     case "animatn": InventoryType = InventoryType.Animation; break;
                     case "gesture": InventoryType = InventoryType.Gesture; break;
                     case "simstate": InventoryType = InventoryType.Simstate; break;

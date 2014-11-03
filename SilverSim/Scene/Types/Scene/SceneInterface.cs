@@ -193,6 +193,7 @@ namespace SilverSim.Scene.Types.Scene
             IsSceneEnabled = false;
             SizeX = sizeX;
             SizeY = sizeY;
+            AssetService = new DefaultAssetService(this);
             AvatarNameService = new DefaultAvatarNameService(AvatarNameServices);
             Owner = new UUI();
             CapabilitiesConfig = new Dictionary<string, string>();
