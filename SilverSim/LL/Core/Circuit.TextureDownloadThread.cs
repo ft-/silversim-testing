@@ -74,9 +74,9 @@ namespace SilverSim.LL.Core
                                 /* let us try to store the image locally */
                                 Scene.AssetService.Store(asset);
                             }
-                            catch
+                            catch(Exception e3)
                             {
-
+                                m_Log.DebugFormat("Failed to store asset {0} locally (RequestImage): {1}", imageRequest.ImageID, e3.Message);
                             }
                         }
                         catch (Exception e2)

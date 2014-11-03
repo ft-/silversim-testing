@@ -74,11 +74,11 @@ namespace SilverSim.LL.Core
                         j2k_accepted = true;
                     }
                 }
-            }
-            if(!j2k_accepted)
-            {
-                httpreq.BeginResponse(HttpStatusCode.NotAcceptable, "Not acceptable").Close();
-                return;
+                if (!j2k_accepted)
+                {
+                    httpreq.BeginResponse(HttpStatusCode.NotAcceptable, "Not acceptable").Close();
+                    return;
+                }
             }
 
             AssetData asset;
@@ -97,9 +97,9 @@ namespace SilverSim.LL.Core
                         /* try to store the asset on our sim's asset service */
                         Scene.AssetService.Store(asset);
                     }
-                    catch
+                    catch(Exception e3)
                     {
-
+                        m_Log.DebugFormat("Failed to store asset {0} locally (Cap_GetTexture): {1}", textureID, e3.Message);
                     }
                 }
                 catch(Exception e2)

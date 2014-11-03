@@ -116,8 +116,9 @@ namespace SilverSim.LL.Core
                                 {
                                     item = Agent.InventoryService.Item[AgentID, itemID];
                                 }
-                                catch
+                                catch(Exception e)
                                 {
+                                    m_Log.DebugFormat("Failed to request inventory asset (TransferRequest) for Agent {0}: {1}", AgentID, e.Message);
                                     SendAssetNotFound(req);
                                     break;
                                 }
@@ -135,6 +136,7 @@ namespace SilverSim.LL.Core
                                 }
                                 else if (item.AssetID != assetID)
                                 {
+                                    m_Log.DebugFormat("Failed to request inventory asset (TransferRequest) for Agent {0}: Provided AssetID != Item AssetID", AgentID);
                                     SendAssetNotFound(req);
                                     break;
                                 }
@@ -145,6 +147,7 @@ namespace SilverSim.LL.Core
                             }
                             else
                             {
+                                m_Log.DebugFormat("Failed to request (TransferRequest) for Agent {0}: Provided AssetID != Item AssetID", AgentID);
                                 SendAssetNotFound(req);
                                 break;
                             }
@@ -154,7 +157,7 @@ namespace SilverSim.LL.Core
                             {
                                 asset = Scene.AssetService[assetID];
                             }
-                            catch
+                            catch(Exception e1)
                             {
                                 /* let's try the user's asset server */
                                 try
@@ -164,13 +167,14 @@ namespace SilverSim.LL.Core
                                     {
                                         Scene.AssetService.Store(asset);
                                     }
-                                    catch
+                                    catch(Exception e3)
                                     {
-
+                                        m_Log.DebugFormat("Failed to store asset {0} locally (TransferPacket): {1}", assetID, e3.Message);
                                     }
                                 }
-                                catch
+                                catch(Exception e2)
                                 {
+                                    m_Log.DebugFormat("Failed to download asset (TransferPacket): {0} or {1}", e1.Message, e2.Message);
                                     SendAssetNotFound(req);
                                     break;
                                 }
