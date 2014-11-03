@@ -127,6 +127,11 @@ namespace SilverSim.StructuredData.AssetXml
                         switch (reader.Name)
                         {
                             case "Data":
+                                if(reader.IsEmptyElement)
+                                {
+                                    asset.Data = new byte[0];
+                                }
+                                else
                                 {
                                     string base64 = getValue(reader);
 
@@ -143,11 +148,25 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "Name":
-                                asset.Name = getValue(reader);
+                                if (reader.IsEmptyElement)
+                                {
+                                    asset.Name = "";
+                                }
+                                else
+                                {
+                                    asset.Name = getValue(reader);
+                                }
                                 break;
 
                             case "Description":
-                                asset.Description = getValue(reader);
+                                if (reader.IsEmptyElement)
+                                {
+                                    asset.Description = "";
+                                }
+                                else
+                                {
+                                    asset.Description = getValue(reader);
+                                }
                                 break;
 
                             case "Type":
@@ -163,7 +182,14 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "CreatorID":
-                                asset.Creator = new UUI(getValue(reader));
+                                if (reader.IsEmptyElement)
+                                {
+                                    asset.Creator = UUI.Unknown;
+                                }
+                                else
+                                {
+                                    asset.Creator = new UUI(getValue(reader));
+                                }
                                 break;
 
                             case "Flags":
