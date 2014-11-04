@@ -161,8 +161,9 @@ namespace SilverSim.LL.Core
                 {
                     childfolders = Agent.InventoryService.Folder.getFolders(ownerid, folderid);
                 }
-                catch
+                catch(Exception e)
                 {
+                    m_Log.DebugFormat("Inventory.Folder.getFolders failed for {0}/{1}: {2}", ownerid, folderid, e.Message);
                     childfolders = new List<InventoryFolder>();
                 }
 
@@ -170,8 +171,9 @@ namespace SilverSim.LL.Core
                 {
                     childitems = Agent.InventoryService.Folder.getItems(AgentID, folderid);
                 }
-                catch
+                catch(Exception e)
                 {
+                    m_Log.DebugFormat("Inventory.Folder.getItems failed for {0}/{1}: {2}", ownerid, folderid, e.Message);
                     childitems = new List<InventoryItem>();
                 }
 

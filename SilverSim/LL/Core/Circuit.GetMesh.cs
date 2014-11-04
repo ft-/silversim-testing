@@ -57,9 +57,27 @@ namespace SilverSim.LL.Core
             }
 
             UUID meshID;
+            if (parts[3].Substring(0, 1) != "?")
+            {
+                httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
+                return;
+            }
+
+            string meshreq = parts[3].Substring(1);
+            string[] texreq = meshreq.Split('&');
+            string mID = string.Empty;
+
+            foreach (string texreqentry in texreq)
+            {
+                if (texreqentry.StartsWith("mesh_id="))
+                {
+                    mID = texreqentry.Substring(8);
+                }
+            }
+
             try
             {
-                meshID = UUID.Parse(parts[3]);
+                meshID = UUID.Parse(mID);
             }
             catch
             {
