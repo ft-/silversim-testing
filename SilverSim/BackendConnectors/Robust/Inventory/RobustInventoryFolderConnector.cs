@@ -100,7 +100,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["PRINCIPAL"] = PrincipalID;
             post["FOLDER"] = key;
-            post["METHOD"] = "GETFOLDERITEMS";
+            post["METHOD"] = "GETFOLDERCONTENT";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
             if (!(map["FOLDERS"] is Map))
             {

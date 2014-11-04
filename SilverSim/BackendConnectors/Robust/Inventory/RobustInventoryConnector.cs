@@ -40,6 +40,8 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
     #region Service Implementation
     public class RobustInventoryConnector : InventoryServiceInterface, IPlugin
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("ROBUST INVENTORY");
+
         private string m_InventoryURI;
         private RobustInventoryFolderConnector m_FolderService;
         private RobustInventoryItemConnector m_ItemService;
@@ -156,7 +158,14 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             item.AssetType = (AssetType)map["AssetType"].AsInt;
             item.Permissions.Base = (InventoryItem.PermissionsMask)map["BasePermissions"].AsUInt;
             item.CreationDate = Date.UnixTimeToDateTime(map["CreationDate"].AsULong);
-            item.Creator = new UUI(map["CreatorId"].AsUUID, map["CreatorData"].AsString.ToString());
+            if (map["CreatorData"].AsString.ToString() == "")
+            {
+                item.Creator.ID = map["CreatorId"].AsUUID;
+            }
+            else
+            {
+                item.Creator = new UUI(map["CreatorId"].AsUUID, map["CreatorData"].AsString.ToString());
+            }
             item.Permissions.Current = (InventoryItem.PermissionsMask)map["CurrentPermissions"].AsUInt;
             item.Description = map["Description"].AsString.ToString();
             item.Permissions.EveryOne = (InventoryItem.PermissionsMask)map["EveryOnePermissions"].AsUInt;

@@ -122,7 +122,7 @@ namespace SilverSim.LL.Core
                 }
                 catch(Exception e2)
                 {
-                    m_Log.DebugFormat("Failed to download image {0} (Cap_GetTexture): {1} or {2}", textureID, e1.Message, e2.Message);
+                    //m_Log.DebugFormat("Failed to download image {0} (Cap_GetTexture): {1} or {2}\nA: {3}\nB: {4}", textureID, e1.Message, e2.Message, e1.StackTrace.ToString(), e2.StackTrace.ToString());
                     httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
                     return;
                 }

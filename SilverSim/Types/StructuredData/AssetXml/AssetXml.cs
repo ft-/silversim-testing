@@ -174,11 +174,17 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "Local":
-                                asset.Local = bool.Parse(getValue(reader));
+                                if (!reader.IsEmptyElement)
+                                {
+                                    asset.Local = bool.Parse(getValue(reader));
+                                }
                                 break;
 
                             case "Temporary":
-                                asset.Temporary = bool.Parse(getValue(reader));
+                                if (!reader.IsEmptyElement)
+                                {
+                                    asset.Temporary = bool.Parse(getValue(reader));
+                                }
                                 break;
 
                             case "CreatorID":
@@ -188,7 +194,15 @@ namespace SilverSim.StructuredData.AssetXml
                                 }
                                 else
                                 {
-                                    asset.Creator = new UUI(getValue(reader));
+                                    string creatorID = getValue(reader);
+                                    try
+                                    {
+                                        asset.Creator = new UUI(creatorID);
+                                    }
+                                    catch
+                                    {
+                                        asset.Creator = UUI.Unknown;
+                                    }
                                 }
                                 break;
 
