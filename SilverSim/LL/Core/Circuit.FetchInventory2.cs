@@ -65,7 +65,7 @@ namespace SilverSim.LL.Core
             }
             basePermissions |= (uint)item.Permissions.EveryOne;
 
-            WriteKeyValuePair(writer, "base_mask", (uint)item.Permissions.Base);
+            WriteKeyValuePair(writer, "base_mask", (uint)basePermissions);
             WriteKeyValuePair(writer, "creator_id", item.Creator.ID);
             WriteKeyValuePair(writer, "everyone_mask", (uint)item.Permissions.EveryOne);
             WriteKeyValuePair(writer, "group_id", item.Group.ID);

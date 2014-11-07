@@ -146,6 +146,8 @@ namespace SilverSim.LL.Messages.Inventory
         {
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
+            p.WriteBoolean(SimApproved);
+            p.WriteUUID(TransactionID);
 
             p.WriteUInt8((byte)ItemData.Count);
             foreach (ItemDataEntry d in ItemData)

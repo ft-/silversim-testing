@@ -187,7 +187,7 @@ namespace SilverSim.LL.Core
                             ti.Params = req.Params;
                             ti.ChannelType = 2;
                             ti.Status = 0;
-                            ti.TargetType = 0;
+                            ti.TargetType = (int)req.SourceType;
                             ti.TransferID = req.TransferID;
                             SendMessage(ti);
 
