@@ -177,10 +177,18 @@ namespace SilverSim.LL.Core
                                 }
                                 catch(Exception e2)
                                 {
-                                    m_Log.DebugFormat("Failed to download asset {0} (TransferPacket): {1} or {2}", assetID, e1.Message, e2.Message);
+                                    if (m_Server.LogAssetFailures)
+                                    {
+                                        m_Log.DebugFormat("Failed to download asset {0} (TransferPacket): {1} or {2}", assetID, e1.Message, e2.Message);
+                                    }
                                     SendAssetNotFound(req);
                                     break;
                                 }
+                            }
+
+                            if(m_Server.LogTransferPacket)
+                            {
+                                m_Log.DebugFormat("Starting to download asset {0} (TransferPacket)", assetID);
                             }
 
                             Messages.Transfer.TransferInfo ti = new Messages.Transfer.TransferInfo();
@@ -189,6 +197,7 @@ namespace SilverSim.LL.Core
                             ti.Status = 0;
                             ti.TargetType = (int)req.SourceType;
                             ti.TransferID = req.TransferID;
+                            ti.Size = asset.Data.Length;
                             SendMessage(ti);
 
                             const int MAX_PACKET_SIZE = 1100;

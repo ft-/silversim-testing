@@ -82,7 +82,10 @@ namespace SilverSim.LL.Core
                         }
                         catch (Exception e2)
                         {
-                            //m_Log.DebugFormat("Failed to download image {0} (RequestImage): {1} or {2}\nA: {3}\nB: {4}", imageRequest.ImageID, e1.Message, e2.Message, e1.StackTrace.ToString(), e2.StackTrace.ToString());
+                            if (m_Server.LogAssetFailures)
+                            {
+                                m_Log.DebugFormat("Failed to download image {0} (RequestImage): {1} or {2}\nA: {3}\nB: {4}", imageRequest.ImageID, e1.Message, e2.Message, e1.StackTrace.ToString(), e2.StackTrace.ToString());
+                            }
                             Messages.Image.ImageNotInDatabase failres = new Messages.Image.ImageNotInDatabase();
                             failres.ID = imageRequest.ImageID;
                             SendMessage(failres);

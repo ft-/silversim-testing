@@ -73,6 +73,8 @@ namespace SilverSim.LL.Core
         private object m_UseCircuitCodeProcessingLock = new object();
         
         public SceneInterface Scene { get; private set; }
+        public bool LogAssetFailures = true;
+        public bool LogTransferPacket = true;
 
         public LLUDPServer(IPAddress bindAddress, int port, IMServiceInterface imService, ChatServiceInterface chatService, SceneInterface scene)
         {
