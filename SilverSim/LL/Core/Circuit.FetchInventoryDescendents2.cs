@@ -37,8 +37,8 @@ namespace SilverSim.LL.Core
     public partial class Circuit
     {
         void WriteInventoryFolder(XmlTextWriter writer, InventoryFolder folder, 
-            bool fetch_folders, List<InventoryFolder> folders, 
-            bool fetch_items, List<InventoryItem> items)
+            bool fetch_folders, List<InventoryFolder> folders,
+            bool fetch_items, List<InventoryItem> items, List<InventoryItem> linkeditems)
         {
             writer.WriteStartElement("map");
             WriteKeyValuePair(writer, "agent_id", folder.Owner.ID);
@@ -64,6 +64,7 @@ namespace SilverSim.LL.Core
                     {
                         WriteKeyValuePair(writer, "type", -1);
                     }
+                    WriteKeyValuePair(writer, "preferred_type", -1);
                     writer.WriteEndElement();
                 }
                 writer.WriteEndElement();
@@ -74,6 +75,15 @@ namespace SilverSim.LL.Core
                 writer.WriteValue("items");
                 writer.WriteEndElement();
                 writer.WriteStartElement("array");
+                if(linkeditems != null)
+                {
+                    foreach (InventoryItem childitem in linkeditems)
+                    {
+                        writer.WriteStartElement("map");
+                        WriteInventoryItem(childitem, writer);
+                        writer.WriteEndElement();
+                    }
+                }
                 foreach (InventoryItem childitem in items)
                 {
                     writer.WriteStartElement("map");
@@ -118,12 +128,6 @@ namespace SilverSim.LL.Core
             List<UUID> badfolders = new List<UUID>();
             text.WriteStartElement("llsd");
             text.WriteStartElement("map");
-            text.WriteStartElement("key");
-            text.WriteValue("agent_id");
-            text.WriteEndElement();
-            text.WriteStartElement("uuid");
-            text.WriteValue(AgentID);
-            text.WriteEndElement();
             bool wroteheader = false;
 
             foreach (IValue iv in (AnArray)reqmap["folders"])
@@ -157,6 +161,7 @@ namespace SilverSim.LL.Core
                 }
                 List<InventoryFolder> childfolders;
                 List<InventoryItem> childitems;
+                List<InventoryItem> linkeditems = new List<InventoryItem>();
                 try
                 {
                     childfolders = Agent.InventoryService.Folder.getFolders(ownerid, folderid);
@@ -177,6 +182,24 @@ namespace SilverSim.LL.Core
                     childitems = new List<InventoryItem>();
                 }
 
+                foreach(InventoryItem item in childitems)
+                {
+                    if(item.AssetType == Types.Asset.AssetType.Link)
+                    {
+                        try
+                        {
+                            linkeditems.Add(Agent.InventoryService.Item[ownerid, item.AssetID]);
+                        }
+                        catch
+                        {
+                            /* item missing */
+                        }
+                    }
+                    else if(item.AssetType == Types.Asset.AssetType.LinkFolder)
+                    {
+
+                    }
+                }
                 if (!wroteheader)
                 {
                     wroteheader = true;
@@ -185,7 +208,7 @@ namespace SilverSim.LL.Core
                     text.WriteEndElement();
                     text.WriteStartElement("array");
                 }
-                WriteInventoryFolder(text, folder, fetch_folders, childfolders, fetch_items, childitems);
+                WriteInventoryFolder(text, folder, fetch_folders, childfolders, fetch_items, childitems, linkeditems);
             }
             if (wroteheader)
             {

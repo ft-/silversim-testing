@@ -59,8 +59,8 @@ namespace SilverSim.LL.Messages.Names
             foreach(Data d in UUIDNameBlock)
             {
                 p.WriteUUID(d.ID);
-                p.WriteStringLen8(d.FirstName);
-                p.WriteStringLen8(d.LastName);
+                p.WriteStringLen8(d.FirstName + "\0");
+                p.WriteStringLen8(d.LastName + "\0");
             }
         }
     }

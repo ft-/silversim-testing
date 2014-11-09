@@ -77,7 +77,7 @@ namespace SilverSim.LL.Core
             writer.WriteEndElement();
 
             writer.WriteStartElement("key");
-            writer.WriteValue("permissions");
+            writer.WriteValue("sale_info");
             writer.WriteEndElement();
             writer.WriteStartElement("map");
             WriteKeyValuePair(writer, "sale_price", item.SaleInfo.Price);
