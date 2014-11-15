@@ -233,6 +233,7 @@
       <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+        <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
       </Files>
     </Project>
 

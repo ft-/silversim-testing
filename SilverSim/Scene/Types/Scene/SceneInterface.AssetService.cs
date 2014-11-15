@@ -51,7 +51,14 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     catch
                     {
-                        return m_Scene.PersistentAssetService.Metadata[key];
+                        try
+                        {
+                            return m_Scene.PersistentAssetService.Metadata[key];
+                        }
+                        catch
+                        {
+                            return ResourceAssets.Metadata[key];
+                        }
                     }
                 }
             }
@@ -76,7 +83,14 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     catch
                     {
-                        return m_Scene.PersistentAssetService.References[key];
+                        try
+                        {
+                            return m_Scene.PersistentAssetService.References[key];
+                        }
+                        catch
+                        {
+                            return ResourceAssets.References[key];
+                        }
                     }
                 }
             }
@@ -121,7 +135,14 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     catch
                     {
-                        return m_Scene.PersistentAssetService[key];
+                        try
+                        {
+                            return m_Scene.PersistentAssetService[key];
+                        }
+                        catch
+                        {
+                            return ResourceAssets[key];
+                        }
                     }
                 }
             }
@@ -163,6 +184,13 @@ namespace SilverSim.Scene.Types.Scene
                         asset1[kvp.Key] = true;
                     }
                 }
+                foreach (KeyValuePair<UUID, bool> kvp in ResourceAssets.exists(assets))
+                {
+                    if(kvp.Value)
+                    {
+                        asset1[kvp.Key] = true;
+                    }
+                }
                 return asset1;
             }
 
@@ -174,7 +202,14 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 catch
                 {
-                    m_Scene.PersistentAssetService.exists(key);
+                    try
+                    {
+                        m_Scene.PersistentAssetService.exists(key);
+                    }
+                    catch
+                    {
+                        ResourceAssets.exists(key);
+                    }
                 }
             }
 
