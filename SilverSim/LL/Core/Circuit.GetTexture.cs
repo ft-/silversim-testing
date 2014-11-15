@@ -27,6 +27,7 @@ using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net;
 
@@ -122,7 +123,10 @@ namespace SilverSim.LL.Core
                 }
                 catch(Exception e2)
                 {
-                    //m_Log.DebugFormat("Failed to download image {0} (Cap_GetTexture): {1} or {2}\nA: {3}\nB: {4}", textureID, e1.Message, e2.Message, e1.StackTrace.ToString(), e2.StackTrace.ToString());
+                    if (m_Server.LogAssetFailures)
+                    {
+                        m_Log.DebugFormat("Failed to download image {0} (Cap_GetTexture): {1} or {2}\nA: {3}\nB: {4}", textureID, e1.Message, e2.Message, e1.StackTrace.ToString(), e2.StackTrace.ToString());
+                    }
                     httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
                     return;
                 }
@@ -132,16 +136,81 @@ namespace SilverSim.LL.Core
             {
                 if(asset.Type != AssetType.Mesh)
                 {
-                    m_Log.DebugFormat("Failed to download image (Cap_GetTexture): Viewer for AgentID {0} tried to download non-texture asset", AgentID);
+                    m_Log.DebugFormat("Failed to download image (Cap_GetTexture): Viewer for AgentID {0} tried to download non-texture asset ({1})", AgentID, asset.Type.ToString());
                 }
                 httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
                 return;
             }
 
-            HttpResponse httpres = httpreq.BeginResponse();
-            Stream o = httpres.GetOutputStream(asset.Data.LongLength);
-            o.Write(asset.Data, 0, asset.Data.Length);
-            httpres.Close();
+            if (httpreq.ContainsHeader("Range"))
+            {
+                HttpResponse httpres;
+                Stream o;
+                List<KeyValuePair<int, int>> contentranges = new List<KeyValuePair<int, int>>();
+
+                string[] ranges = httpreq["Range"].Split(' ');
+                foreach(string range in ranges)
+                {
+                    string[] p = range.Split('=');
+                    if(p.Length != 2)
+                    {
+                        httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                        return;
+                    }
+                    string[] v = p[1].Split('-');
+                    if(v.Length != 2)
+                    {
+                        httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                        return;
+                    }
+
+                    if(v[0] != "bytes")
+                    {
+                        httpres = httpreq.BeginResponse();
+                        o = httpres.GetOutputStream(asset.Data.LongLength);
+                        o.Write(asset.Data, 0, asset.Data.Length);
+                        httpres.Close();
+                        return;
+                    }
+
+                    try
+                    {
+                        int start = int.Parse(v[0]);
+                        int end = int.Parse(v[1]);
+                        if(start > end)
+                        {
+                            httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                            return;
+                        }
+                        if(start >= asset.Data.Length || end >= asset.Data.Length)
+                        {
+                            httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                            return;
+                        }
+                        contentranges.Add(new KeyValuePair<int, int>(start, end));
+                    }
+                    catch
+                    {
+                        httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                        return;
+                    }
+                }
+
+                httpres = httpreq.BeginResponse();
+                o = httpres.GetOutputStream(asset.Data.LongLength);
+                foreach(KeyValuePair<int, int> range in contentranges)
+                {
+                    o.Write(asset.Data, range.Key, range.Value - range.Key + 1);
+                }
+                httpres.Close();
+            }
+            else
+            {
+                HttpResponse httpres = httpreq.BeginResponse();
+                Stream o = httpres.GetOutputStream(asset.Data.LongLength);
+                o.Write(asset.Data, 0, asset.Data.Length);
+                httpres.Close();
+            }
         }
     }
 }

@@ -119,10 +119,75 @@ namespace SilverSim.LL.Core
                 return;
             }
 
-            HttpResponse httpres = httpreq.BeginResponse();
-            Stream o = httpres.GetOutputStream(asset.Data.LongLength);
-            o.Write(asset.Data, 0, asset.Data.Length);
-            httpres.Close();
+            if (httpreq.ContainsHeader("Range"))
+            {
+                HttpResponse httpres;
+                Stream o;
+                List<KeyValuePair<int, int>> contentranges = new List<KeyValuePair<int, int>>();
+
+                string[] ranges = httpreq["Range"].Split(' ');
+                foreach (string range in ranges)
+                {
+                    string[] p = range.Split('=');
+                    if (p.Length != 2)
+                    {
+                        httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                        return;
+                    }
+                    string[] v = p[1].Split('-');
+                    if (v.Length != 2)
+                    {
+                        httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                        return;
+                    }
+
+                    if (v[0] != "bytes")
+                    {
+                        httpres = httpreq.BeginResponse();
+                        o = httpres.GetOutputStream(asset.Data.LongLength);
+                        o.Write(asset.Data, 0, asset.Data.Length);
+                        httpres.Close();
+                        return;
+                    }
+
+                    try
+                    {
+                        int start = int.Parse(v[0]);
+                        int end = int.Parse(v[1]);
+                        if (start > end)
+                        {
+                            httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                            return;
+                        }
+                        if (start >= asset.Data.Length || end >= asset.Data.Length)
+                        {
+                            httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                            return;
+                        }
+                        contentranges.Add(new KeyValuePair<int, int>(start, end));
+                    }
+                    catch
+                    {
+                        httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                        return;
+                    }
+                }
+
+                httpres = httpreq.BeginResponse();
+                o = httpres.GetOutputStream(asset.Data.LongLength);
+                foreach (KeyValuePair<int, int> range in contentranges)
+                {
+                    o.Write(asset.Data, range.Key, range.Value - range.Key + 1);
+                }
+                httpres.Close();
+            }
+            else
+            {
+                HttpResponse httpres = httpreq.BeginResponse();
+                Stream o = httpres.GetOutputStream(asset.Data.LongLength);
+                o.Write(asset.Data, 0, asset.Data.Length);
+                httpres.Close();
+            }
         }
     }
 }
