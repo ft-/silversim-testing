@@ -61,7 +61,7 @@ namespace SilverSim.BackendConnectors.Robust.Presence
         }
         #endregion
 
-        public override PresenceInfo this[UUID sessionID]
+        public override PresenceInfo this[UUID sessionID, UUID userID]
         {
             get
             {
@@ -107,7 +107,7 @@ namespace SilverSim.BackendConnectors.Robust.Presence
             }
         }
 
-        public override PresenceInfo this[UUID sessionID, SetType reportType]
+        public override PresenceInfo this[UUID sessionID, UUID userID, SetType reportType]
         {
             set
             {

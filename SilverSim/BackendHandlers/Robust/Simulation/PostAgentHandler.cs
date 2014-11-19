@@ -58,6 +58,7 @@ using System.Text;
 using ThreadedClasses;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.BackendConnectors.Robust.GridUser;
+using SilverSim.BackendConnectors.Robust.Presence;
 
 namespace SilverSim.BackendHandlers.Robust.Simulation
 {
@@ -68,7 +69,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
         private BaseHttpServer m_HttpServer;
         protected ServerParamServiceInterface m_ServerParams;
         private Main.Common.Caps.CapsHttpRedirector m_CapsRedirector;
-        private string m_DefaultGridUserServiceURI = string.Empty;
+        private string m_DefaultGridUserServerURI = string.Empty;
+        private string m_DefaultPresenceServerURI = string.Empty;
 
         private class GridParameterMap : ICloneable
         {
@@ -109,7 +111,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
         public PostAgentHandler(IConfig ownSection)
         {
-            m_DefaultGridUserServiceURI = ownSection.GetString("DefaultGridUserServiceURI", string.Empty);
+            m_DefaultGridUserServerURI = ownSection.GetString("DefaultGridUserServerURI", string.Empty);
+            m_DefaultPresenceServerURI = ownSection.GetString("DefaultPresenceServerURI", string.Empty);
         }
 
         protected PostAgentHandler(string agentBaseURL, IConfig ownSection)
@@ -136,7 +139,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     GridParameterMap map = new GridParameterMap();
                     map.HomeURI = section.GetString("HomeURI");
                     map.AssetServerURI = section.GetString("AssetServerURI");
-                    map.GridUserServerURI = section.GetString("GridUserServerURI", m_DefaultGridUserServiceURI);
+                    map.GridUserServerURI = section.GetString("GridUserServerURI", m_DefaultGridUserServerURI);
                     map.PresenceServerURI = section.GetString("PresenceServerURI", string.Empty);
                     map.AvatarServerURI = section.GetString("AvatarServerURI", string.Empty);
                     map.InventoryServerURI = section.GetString("InventoryServerURI");
@@ -391,6 +394,18 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     {
                         gridUserService = new RobustGridUserConnector(gridparams.GridUserServerURI);
                     }
+                    if(!string.IsNullOrEmpty(gridparams.PresenceServerURI))
+                    {
+                        presenceService = new RobustPresenceConnector(gridparams.PresenceServerURI, agentPost.Account.Principal.HomeURI.ToString());
+                    }
+                }
+                else if(string.IsNullOrEmpty(m_DefaultPresenceServerURI))
+                {
+                    presenceService = new RobustHGOnlyPresenceConnector(agentPost.Account.Principal.HomeURI.ToString());
+                }
+                else
+                {
+                    presenceService = new RobustHGPresenceConnector(m_DefaultPresenceServerURI, agentPost.Account.Principal.HomeURI.ToString());
                 }
 
                 GroupsServiceInterface groupsService = null;

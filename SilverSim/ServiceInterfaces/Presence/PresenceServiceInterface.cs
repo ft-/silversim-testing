@@ -65,13 +65,13 @@ namespace SilverSim.ServiceInterfaces.Presence
 
         }
 
-        public abstract PresenceInfo this[UUID sessionID]
+        public abstract PresenceInfo this[UUID sessionID, UUID userID]
         {
             get;
             set; /* setting null means logout, != null not allowed */
         }
 
-        public abstract PresenceInfo this[UUID sessionID, SetType reportType]
+        public abstract PresenceInfo this[UUID sessionID, UUID userID, SetType reportType]
         {
             set; /* setting null means logout, != null login message */
         }

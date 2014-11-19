@@ -63,7 +63,7 @@ namespace SilverSim.LL.Core
                 }
                 try
                 {
-                    Agent.PresenceService[SessionID, ServiceInterfaces.Presence.PresenceServiceInterface.SetType.Login] = null;
+                    Agent.PresenceService[SessionID, Agent.Owner.ID] = null;
                 }
                 catch
                 {
