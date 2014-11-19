@@ -37,7 +37,7 @@ using System.Collections.Generic;
 namespace SilverSim.BackendConnectors.Robust.GridUser
 {
     #region Service Implementation
-    class RobustGridUserConnector : GridUserServiceInterface, IPlugin
+    public class RobustGridUserConnector : GridUserServiceInterface, IPlugin
     {
         public int TimeoutMs { get; set; }
         string m_GridUserURI;
@@ -155,7 +155,7 @@ namespace SilverSim.BackendConnectors.Robust.GridUser
             checkResult(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridUserURI, null, post, false, TimeoutMs)));
         }
 
-        public override void SetPosition(UUI userID, UUI lastRegionID, Vector3 lastPosition, Vector3 lastLookAt)
+        public override void SetPosition(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["UserID"] = userID;

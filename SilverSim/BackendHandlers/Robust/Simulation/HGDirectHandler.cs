@@ -66,8 +66,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
     {
         private HttpXmlRpcHandler m_XmlRpcServer;
 
-        public PostAgentHGDirectHandler()
-            : base("/foreignagent/")
+        public PostAgentHGDirectHandler(IConfig ownSection)
+            : base("/foreignagent/", ownSection)
         {
 
         }
@@ -180,7 +180,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new PostAgentHGDirectHandler();
+            return new PostAgentHGDirectHandler(ownSection);
         }
     }
     #endregion

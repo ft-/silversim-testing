@@ -49,6 +49,34 @@ namespace SilverSim.LL.Core
         {
         }
 
+        private void TerminateCircuit()
+        {
+            if (Agent.IsInScene(Scene))
+            {
+                try
+                {
+                    Agent.GridUserService.LoggedOut(Agent.Owner, Scene.ID, Agent.GlobalPosition, Agent.LookAt);
+                }
+                catch
+                {
+
+                }
+                try
+                {
+                    Agent.PresenceService[SessionID, ServiceInterfaces.Presence.PresenceServiceInterface.SetType.Login] = null;
+                }
+                catch
+                {
+
+                }
+            }
+            ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
+            Stop();
+            Agent = null;
+            Scene = null;
+            return;
+        }
+
         private void TransmitThread(object param)
         {
             int lastAckTick = Environment.TickCount;
@@ -189,20 +217,14 @@ namespace SilverSim.LL.Core
                 if (Environment.TickCount - m_LastReceivedPacketAtTime >= 60000)
                 {
                     m_Log.InfoFormat("Packet Timeout for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
-                    ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
-                    Stop();
-                    Agent = null;
-                    Scene = null;
+                    TerminateCircuit();
                     return;
                 }
 
                 if (Environment.TickCount - m_LogoutReplySentAtTime >= 10000 && m_LogoutReplySent)
                 {
                     m_Log.InfoFormat("LogoutReply for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
-                    ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
-                    Stop();
-                    Agent = null;
-                    Scene = null;
+                    TerminateCircuit();
                     return;
                 }
 

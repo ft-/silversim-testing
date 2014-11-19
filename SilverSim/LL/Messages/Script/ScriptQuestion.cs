@@ -35,6 +35,7 @@ namespace SilverSim.LL.Messages.Script
         public string ObjectName;
         public string ObjectOwner;
         public UInt32 Questions;
+        public UUID ExperienceID = UUID.Zero;
 
         public ScriptQuestion()
         {
@@ -65,6 +66,7 @@ namespace SilverSim.LL.Messages.Script
             p.WriteStringLen8(ObjectName);
             p.WriteStringLen8(ObjectOwner);
             p.WriteUInt32(Questions);
+            p.WriteUUID(ExperienceID);
         }
     }
 }

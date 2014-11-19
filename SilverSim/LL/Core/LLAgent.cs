@@ -137,6 +137,13 @@ namespace SilverSim.LL.Core
 
         public UUI Group { get; set;  }
 
+
+        public Vector3 LookAt
+        {
+            get;
+            set;
+        }
+
         public UUI Owner
         {
             get

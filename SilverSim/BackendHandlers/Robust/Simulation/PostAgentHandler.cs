@@ -57,6 +57,7 @@ using System.Net;
 using System.Text;
 using ThreadedClasses;
 using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.BackendConnectors.Robust.GridUser;
 
 namespace SilverSim.BackendHandlers.Robust.Simulation
 {
@@ -67,6 +68,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
         private BaseHttpServer m_HttpServer;
         protected ServerParamServiceInterface m_ServerParams;
         private Main.Common.Caps.CapsHttpRedirector m_CapsRedirector;
+        private string m_DefaultGridUserServiceURI = string.Empty;
 
         private class GridParameterMap : ICloneable
         {
@@ -105,12 +107,12 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
         private string m_AgentBaseURL = "/agent/";
 
-        public PostAgentHandler()
+        public PostAgentHandler(IConfig ownSection)
         {
-
+            m_DefaultGridUserServiceURI = ownSection.GetString("DefaultGridUserServiceURI", string.Empty);
         }
 
-        protected PostAgentHandler(string agentBaseURL)
+        protected PostAgentHandler(string agentBaseURL, IConfig ownSection)
         {
             m_AgentBaseURL = agentBaseURL;
         }
@@ -134,7 +136,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     GridParameterMap map = new GridParameterMap();
                     map.HomeURI = section.GetString("HomeURI");
                     map.AssetServerURI = section.GetString("AssetServerURI");
-                    map.GridUserServerURI = section.GetString("GridUserServerURI", string.Empty);
+                    map.GridUserServerURI = section.GetString("GridUserServerURI", m_DefaultGridUserServiceURI);
                     map.PresenceServerURI = section.GetString("PresenceServerURI", string.Empty);
                     map.AvatarServerURI = section.GetString("AvatarServerURI", string.Empty);
                     map.InventoryServerURI = section.GetString("InventoryServerURI");
@@ -385,6 +387,10 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     {
                         gatekeeperURI = gridparams.GatekeeperURI;
                     }
+                    if(!string.IsNullOrEmpty(gridparams.GridUserServerURI))
+                    {
+                        gridUserService = new RobustGridUserConnector(gridparams.GridUserServerURI);
+                    }
                 }
 
                 GroupsServiceInterface groupsService = null;
@@ -441,6 +447,14 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     agent.Circuits.Clear();
                     DoAgentResponse(req, e.Message, false);
                     return;
+                }
+                try
+                {
+                    gridUserService.SetPosition(agent.Owner, scene.ID, agent.GlobalPosition, agent.LookAt);
+                }
+                catch(Exception)
+                {
+
                 }
                 m_Log.DebugFormat("Agent post request {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Caps {6} Circuit {7}",
                     agentPost.Account.Principal.FirstName,
@@ -833,7 +847,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new PostAgentHandler();
+            return new PostAgentHandler(ownSection);
         }
     }
     #endregion

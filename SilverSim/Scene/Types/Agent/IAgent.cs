@@ -158,5 +158,11 @@ namespace SilverSim.Scene.Types.Agent
         {
             get;
         }
+
+        Vector3 LookAt
+        {
+            get;
+            set;
+        }
     }
 }

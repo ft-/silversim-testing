@@ -63,6 +63,6 @@ namespace SilverSim.ServiceInterfaces.GridUser
         public abstract void LoggedIn(UUI userID);
         public abstract void LoggedOut(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt);
         public abstract void SetHome(UUI userID, UUID homeRegionID, Vector3 homePosition, Vector3 homeLookAt);
-        public abstract void SetPosition(UUI userID, UUI lastRegionID, Vector3 lastPosition, Vector3 lastLookAt);
+        public abstract void SetPosition(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt);
     }
 }

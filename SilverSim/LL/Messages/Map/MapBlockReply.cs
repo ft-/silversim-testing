@@ -48,6 +48,14 @@ namespace SilverSim.LL.Messages.Map
 
         public List<DataEntry> Data = new List<DataEntry>();
 
+        public struct SizeInfo
+        {
+            public UInt16 X;
+            public UInt16 Y;
+        }
+
+        public List<SizeInfo> Size = new List<SizeInfo>();
+
         public MapBlockReply()
         {
 
@@ -77,6 +85,12 @@ namespace SilverSim.LL.Messages.Map
                 p.WriteUInt8(d.WaterHeight);
                 p.WriteUInt8(d.Agents);
                 p.WriteUUID(d.MapImageID);
+            }
+            p.WriteUInt8((byte)Size.Count);
+            foreach(SizeInfo d in Size)
+            {
+                p.WriteUInt16(d.X);
+                p.WriteUInt16(d.Y);
             }
         }
     }
