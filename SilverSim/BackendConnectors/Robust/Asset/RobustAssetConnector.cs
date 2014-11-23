@@ -64,6 +64,7 @@ namespace SilverSim.BackendConnectors.Robust.Asset
         private string m_AssetURI;
         private RobustAssetMetadataConnector m_MetadataService;
         private DefaultAssetReferencesService m_ReferencesService;
+        private bool m_EnableCompression = false;
 
         #region Constructor
         public RobustAssetConnector(string uri)
@@ -78,6 +79,21 @@ namespace SilverSim.BackendConnectors.Robust.Asset
             m_MetadataService = new RobustAssetMetadataConnector(uri);
             m_ReferencesService = new DefaultAssetReferencesService(this);
             m_MetadataService.TimeoutMs = m_TimeoutMs;
+        }
+
+        public RobustAssetConnector(string uri, bool enableCompression)
+        {
+            if (!uri.EndsWith("/"))
+            {
+                uri += "/";
+            }
+            uri += "";
+
+            m_AssetURI = uri;
+            m_MetadataService = new RobustAssetMetadataConnector(uri);
+            m_ReferencesService = new DefaultAssetReferencesService(this);
+            m_MetadataService.TimeoutMs = m_TimeoutMs;
+            m_EnableCompression = enableCompression;
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -341,7 +357,7 @@ namespace SilverSim.BackendConnectors.Robust.Asset
                     st.Write(block, 0, block.Length);
                 }
                 st.Write(footer, 0, footer.Length);
-            }, false, TimeoutMs);
+            }, m_EnableCompression, TimeoutMs);
         }
         #endregion
 
