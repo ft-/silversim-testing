@@ -313,7 +313,24 @@ namespace SilverSim.LL.Core
 
         void HandleAgentCachedTexture(Messages.Appearance.AgentCachedTexture m)
         {
+            if (m.AgentID != ID || m.SessionID != m.CircuitSessionID)
+            {
+                return;
+            }
 
+            Messages.Appearance.AgentCachedTextureResponse res = new Messages.Appearance.AgentCachedTextureResponse();
+            res.AgentID = m.AgentID;
+            res.SessionID = m.SessionID;
+            res.SerialNum = ++Serial;
+            res.WearableData = new List<Messages.Appearance.AgentCachedTextureResponse.WearableDataEntry>((int)WearableType.NumWearables);
+
+            /* respond with no caching at all for now */
+            foreach(Messages.Appearance.AgentCachedTexture.WearableDataEntry wde in m.WearableData)
+            {
+                res.WearableData.Add(new Messages.Appearance.AgentCachedTextureResponse.WearableDataEntry(wde.TextureIndex, UUID.Zero));
+            }
+
+            SendMessageAlways(res, m.CircuitSceneID);
         }
     }
 }

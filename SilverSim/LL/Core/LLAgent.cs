@@ -140,8 +140,16 @@ namespace SilverSim.LL.Core
 
         public Vector3 LookAt
         {
-            get;
-            set;
+            get
+            {
+                Vector3 angle = new Vector3(1, 0, 0);
+                return angle * Rotation + Position;
+            }
+            set
+            {
+                Vector3 delta = (value - Position).Normalize();
+                Rotation = Quaternion.CreateFromEulers(new Vector3(0, 0, Math.Atan2(delta.Y, delta.X)));
+            }
         }
 
         public UUI Owner

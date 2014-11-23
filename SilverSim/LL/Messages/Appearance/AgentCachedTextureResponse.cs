@@ -35,13 +35,20 @@ namespace SilverSim.LL.Messages.Appearance
     {
         public UUID AgentID;
         public UUID SessionID;
-        public Int32 SerialNum;
+        public UInt32 SerialNum;
 
         public struct WearableDataEntry
         {
             public UUID TextureID;
             public byte TextureIndex;
             public string HostName;
+
+            public WearableDataEntry(byte textureIndex, UUID textureID)
+            {
+                TextureIndex = textureIndex;
+                TextureID = textureID;
+                HostName = "";
+            }
         }
 
         public List<WearableDataEntry> WearableData = new List<WearableDataEntry>();
@@ -72,7 +79,7 @@ namespace SilverSim.LL.Messages.Appearance
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(SessionID);
-            p.WriteInt32(SerialNum);
+            p.WriteUInt32(SerialNum);
 
             p.WriteUInt8((byte)WearableData.Count);
             foreach (WearableDataEntry d in WearableData)
