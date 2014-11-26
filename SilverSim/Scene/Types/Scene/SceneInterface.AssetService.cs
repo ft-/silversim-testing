@@ -27,6 +27,7 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System.Collections.Generic;
+using System.IO;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -62,6 +63,51 @@ namespace SilverSim.Scene.Types.Scene
                             md.Local = false;
                             md.Temporary = false;
                             return md;
+                        }
+                    }
+                }
+            }
+        }
+
+        private class DefaultAssetDataService : AssetDataServiceInterface
+        {
+            SceneInterface m_Scene;
+
+            public DefaultAssetDataService(SceneInterface scene)
+            {
+                m_Scene = scene;
+            }
+
+            public override Stream this[UUID key]
+            {
+                get
+                {
+                    try
+                    {
+                        return m_Scene.TemporaryAssetService.Data[key];
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            return m_Scene.PersistentAssetService.Data[key];
+                        }
+                        catch
+                        {
+                            AssetData ad = ResourceAssets[key];
+                            try
+                            {
+                                /* store these permanently */
+                                ad.Local = false;
+                                ad.Temporary = false;
+                                ad.Description = "Embedded Asset";
+                                m_Scene.PersistentAssetService.Store(ad);
+                            }
+                            catch
+                            {
+
+                            }
+                            return new MemoryStream(ad.Data);
                         }
                     }
                 }
@@ -104,12 +150,14 @@ namespace SilverSim.Scene.Types.Scene
         {
             SceneInterface m_Scene;
             DefaultAssetMetadataService m_MetadataService;
+            DefaultAssetDataService m_DataService;
             DefaultAssetReferencesService m_ReferencesService;
 
             public DefaultAssetService(SceneInterface si)
             {
                 m_Scene = si;
                 m_MetadataService = new DefaultAssetMetadataService(si);
+                m_DataService = new DefaultAssetDataService(si);
                 m_ReferencesService = new DefaultAssetReferencesService(si);
             }
 
@@ -126,6 +174,14 @@ namespace SilverSim.Scene.Types.Scene
                 get
                 {
                     return m_ReferencesService;
+                }
+            }
+
+            public override AssetDataServiceInterface Data
+            {
+                get
+                {
+                    return m_DataService;
                 }
             }
 

@@ -23,60 +23,39 @@ exception statement from your version.
 
 */
 
+using HttpClasses;
+using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
-using SilverSim.Types.Asset;
-using System.Collections.Generic;
+using System.IO;
 
-namespace SilverSim.ServiceInterfaces.Asset
+namespace SilverSim.BackendConnectors.Robust.Asset
 {
-    public abstract class AssetServiceInterface
+    public class RobustAssetDataConnector : AssetDataServiceInterface
     {
-        #region Exists methods
-        public abstract void exists(UUID key);
-        public abstract Dictionary<UUID, bool> exists(List<UUID> assets);
-        #endregion
+        public int TimeoutMs = 20000;
+        private string m_AssetURI;
 
-        #region Accessors
-        public abstract AssetData this[UUID key]
+        #region Constructor
+        public RobustAssetDataConnector(string uri)
         {
-            get;
-        }
-
-        #endregion
-
-        #region Metadata interface
-        public abstract AssetMetadataServiceInterface Metadata
-        {
-            get;
+            m_AssetURI = uri;
         }
         #endregion
 
-        #region References interface
-        public abstract AssetReferencesServiceInterface References
+        #region Metadata accessors
+        public override Stream this[UUID key]
         {
-            get;
-        }
-        #endregion
-
-        #region Data interface
-        public abstract AssetDataServiceInterface Data
-        {
-            get;
-        }
-        #endregion
-
-        #region Store asset method
-        public abstract void Store(AssetData asset);
-        #endregion
-
-        #region Delete asset method
-        public abstract void Delete(UUID id);
-        #endregion
-
-        #region Constructors
-        public AssetServiceInterface()
-        {
-
+            get
+            {
+                try
+                {
+                    return HttpRequestHandler.DoStreamGetRequest(m_AssetURI + "assets/" + key.ToString() + "/data", null, TimeoutMs);
+                }
+                catch
+                {
+                    throw new AssetNotFound(key);
+                }
+            }
         }
         #endregion
     }

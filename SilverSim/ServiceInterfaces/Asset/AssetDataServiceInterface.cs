@@ -25,56 +25,21 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Types.Asset;
-using System.Collections.Generic;
+using System.IO;
 
 namespace SilverSim.ServiceInterfaces.Asset
 {
-    public abstract class AssetServiceInterface
+    public abstract class AssetDataServiceInterface
     {
-        #region Exists methods
-        public abstract void exists(UUID key);
-        public abstract Dictionary<UUID, bool> exists(List<UUID> assets);
-        #endregion
-
-        #region Accessors
-        public abstract AssetData this[UUID key]
-        {
-            get;
-        }
-
-        #endregion
-
-        #region Metadata interface
-        public abstract AssetMetadataServiceInterface Metadata
+        #region Data accessors
+        public abstract Stream this[UUID key]
         {
             get;
         }
         #endregion
 
-        #region References interface
-        public abstract AssetReferencesServiceInterface References
-        {
-            get;
-        }
-        #endregion
-
-        #region Data interface
-        public abstract AssetDataServiceInterface Data
-        {
-            get;
-        }
-        #endregion
-
-        #region Store asset method
-        public abstract void Store(AssetData asset);
-        #endregion
-
-        #region Delete asset method
-        public abstract void Delete(UUID id);
-        #endregion
-
-        #region Constructors
-        public AssetServiceInterface()
+        #region Constructor
+        public AssetDataServiceInterface()
         {
 
         }

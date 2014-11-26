@@ -93,15 +93,36 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        private class ResourceAssetDataService : AssetDataServiceInterface
+        {
+            ResourceAssetAccessor m_ResourceAssets;
+
+            public ResourceAssetDataService(ResourceAssetAccessor resourceAssets)
+            {
+                m_ResourceAssets = resourceAssets;
+            }
+
+            public override Stream this[UUID key]
+            {
+                get
+                {
+                    AssetData ad = m_ResourceAssets.getAsset(key);
+                    return new MemoryStream(ad.Data);
+                }
+            }
+        }
+
         private class ResourceAssetService : AssetServiceInterface
         {
             ResourceAssetAccessor m_ResourceAssets;
             ResourceAssetMetadataService m_MetadataService;
+            ResourceAssetDataService m_DataService;
             SilverSim.ServiceInterfaces.Asset.DefaultAssetReferencesService m_ReferencesService;
 
             public ResourceAssetService()
             {
                 m_ResourceAssets = new ResourceAssetAccessor();
+                m_DataService = new ResourceAssetDataService(m_ResourceAssets);
                 m_MetadataService = new ResourceAssetMetadataService(m_ResourceAssets);
                 m_ReferencesService = new SilverSim.ServiceInterfaces.Asset.DefaultAssetReferencesService(this);
             }
@@ -119,6 +140,14 @@ namespace SilverSim.Scene.Types.Scene
                 get
                 {
                     return m_ReferencesService;
+                }
+            }
+
+            public override AssetDataServiceInterface Data
+            {
+                get
+                {
+                    return m_DataService;
                 }
             }
 

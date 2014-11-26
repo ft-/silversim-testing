@@ -45,12 +45,14 @@ namespace SilverSim.Database.MySQL.Asset
         private string m_ConnectionString;
         private MySQLAssetMetadataService m_MetadataService;
         private DefaultAssetReferencesService m_ReferencesService;
+        private MySQLAssetDataService m_DataService;
 
         #region Constructor
         public MySQLAssetService(string connectionString)
         {
             m_ConnectionString = connectionString;
             m_MetadataService = new MySQLAssetMetadataService(connectionString);
+            m_DataService = new MySQLAssetDataService(connectionString);
             m_ReferencesService = new DefaultAssetReferencesService(this);
         }
 
@@ -223,6 +225,16 @@ namespace SilverSim.Database.MySQL.Asset
             get
             {
                 return m_ReferencesService;
+            }
+        }
+        #endregion
+
+        #region Data interface
+        public override AssetDataServiceInterface Data
+        {
+            get
+            {
+                return m_DataService;
             }
         }
         #endregion
