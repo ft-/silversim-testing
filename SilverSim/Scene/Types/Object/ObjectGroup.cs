@@ -397,19 +397,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this)
-                {
-                    return m_AngularVelocity;
-                }
+                return RootPart.AngularVelocity;
             }
             set
             {
-                lock (this)
-                {
-                    m_AngularVelocity = value;
-                }
-                IsChanged = true;
-                TriggerOnUpdate(0);
+                RootPart.AngularVelocity = value;
             }
         }
 

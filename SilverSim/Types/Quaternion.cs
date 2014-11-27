@@ -567,6 +567,38 @@ namespace SilverSim.Types
             return System.String.Format(EnUsCulture, "<{0},{1},{2},{3}>", X, Y, Z, W);
         }
 
+        public string X_String
+        {
+            get
+            {
+                return System.String.Format(EnUsCulture, "{0", X);
+            }
+        }
+
+        public string Y_String
+        {
+            get
+            {
+                return System.String.Format(EnUsCulture, "{0", Y);
+            }
+        }
+
+        public string Z_String
+        {
+            get
+            {
+                return System.String.Format(EnUsCulture, "{0", Z);
+            }
+        }
+
+        public string W_String
+        {
+            get
+            {
+                return System.String.Format(EnUsCulture, "{0", W);
+            }
+        }
+
         #endregion Overrides
 
         #region Operators

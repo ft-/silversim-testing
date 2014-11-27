@@ -81,6 +81,9 @@ namespace SilverSim.Scene.Types.Object
         private ClickActionType m_ClickAction = ClickActionType.None;
         private bool m_IsPassCollisions = false;
         private bool m_IsPassTouches = false;
+        private Vector3 m_LastAttachedPos = Vector3.Zero;
+        private Vector3 m_AngularVelocity = Vector3.Zero;
+        private Vector3 m_Velocity = Vector3.Zero;
 
         public int ScriptAccessPin = 0;
 
@@ -234,21 +237,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                if(Group != null)
-                {
-                    return Group.Velocity;
-                }
-                else
-                {
-                    return Vector3.Zero;
-                }
+                return m_Velocity;
             }
             set
             {
-                if(Group != null)
-                {
-                    Group.Velocity = value;
-                }
+                m_Velocity = value;
             }
         }
 
@@ -256,21 +249,18 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                if (Group != null)
+                lock (this)
                 {
-                    return Group.AngularVelocity;
-                }
-                else
-                {
-                    return Vector3.Zero;
+                    return m_AngularVelocity;
                 }
             }
             set
             {
-                if (Group != null)
+                lock (this)
                 {
-                    Group.AngularVelocity = value;
+                    m_AngularVelocity = value;
                 }
+                TriggerOnUpdate(0);
             }
         }
 

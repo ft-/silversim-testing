@@ -292,6 +292,30 @@ namespace SilverSim.Types
             return string.Format(EnUsCulture, "<{0},{1},{2}>", X, Y, Z);
         }
 
+        public string X_String
+        {
+            get
+            {
+                return string.Format(EnUsCulture, "{0}", X);
+            }
+        }
+
+        public string Y_String
+        {
+            get
+            {
+                return string.Format(EnUsCulture, "{0}", Y);
+            }
+        }
+
+        public string Z_String
+        {
+            get
+            {
+                return string.Format(EnUsCulture, "{0}", Z);
+            }
+        }
+
         #region Operators
         public static bool operator ==(Vector3 value1, Vector3 value2)
         {
