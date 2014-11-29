@@ -405,8 +405,8 @@ namespace SilverSim.Scene.Types.Object
                 }
 
                 if (light.IsLight &&
-                    (!m_IsAttachmentLightsDisabled || Group.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.NotAttached) &&
-                    (!m_IsFacelightDisabled || (Group.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.LeftHand && Group.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.RightHand)))
+                    (!m_IsAttachmentLightsDisabled || ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.NotAttached) &&
+                    (!m_IsFacelightDisabled || (ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.LeftHand && ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.RightHand)))
                 {
                     updatebytes[i++] = (byte)(LightEP % 256);
                     updatebytes[i++] = (byte)(LightEP / 256);

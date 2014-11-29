@@ -67,10 +67,10 @@ namespace SilverSim.Scene.Types.Object
                     m.LocalID = m_Part.LocalID;
                     m.Material = m_Part.Material;
                     m.MediaURL = m_Part.MediaURL;
-                    if (m_Part.Group.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.NotAttached)
+                    if (m_Part.ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.NotAttached)
                     {
-                        m.NameValue = string.Format("AttachItemID STRING RW SV {0}", m_Part.Group.FromItemID);
-                        m.State = (byte)(((byte)m_Part.Group.AttachPoint % 16) * 16 + (((byte)m_Part.Group.AttachPoint / 16)));
+                        m.NameValue = string.Format("AttachItemID STRING RW SV {0}", m_Part.ObjectGroup.FromItemID);
+                        m.State = (byte)(((byte)m_Part.ObjectGroup.AttachPoint % 16) * 16 + (((byte)m_Part.ObjectGroup.AttachPoint / 16)));
                     }
                     else
                     {
@@ -84,7 +84,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Part.Acceleration.ToBytes(m.ObjectData, 24);
                     m_Part.Rotation.ToBytes(m.ObjectData, 36);
                     m_Part.AngularVelocity.ToBytes(m.ObjectData, 48);
-                    m.ParentID = m_Part.Group.RootPart.LocalID;
+                    m.ParentID = m_Part.ObjectGroup.RootPart.LocalID;
                     ObjectPart.PrimitiveShape shape = m_Part.Shape;
                     m.PathBegin = shape.PathBegin;
                     m.PathEnd = shape.PathEnd;
@@ -121,7 +121,7 @@ namespace SilverSim.Scene.Types.Object
                     {
                         m.UpdateFlags |= PrimitiveFlags.InventoryEmpty;
                     }
-                    if(m_Part.Group.IsPhysics)
+                    if(m_Part.ObjectGroup.IsPhysics)
                     {
                         m.UpdateFlags |= PrimitiveFlags.Physics;
                     }
@@ -194,7 +194,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     if(m_Part != null && !m_Killed)
                     {
-                        return m_Part.Group.IsPhysics;
+                        return m_Part.ObjectGroup.IsPhysics;
                     }
                 }
                 return false;

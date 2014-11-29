@@ -23,10 +23,12 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Types;
 using System;
 using System.Threading;
+using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Script
 {
@@ -42,10 +44,17 @@ namespace SilverSim.Scene.Types.Script
         public abstract void Dispose();
 
         public abstract void ProcessEvent();
+        public abstract void ShoutError(string msg);
         public abstract bool HasEventsPending { get; }
         public IScriptWorkerThreadPool ThreadPool { get; set; }
+        public delegate void StateChangeEventDelegate();
+        public delegate void DisposeEventDelegate();
+        public event StateChangeEventDelegate OnStateChange;
+        public event DisposeEventDelegate OnDispose;
 
         public abstract ObjectPart Part { get; }
+
+        public abstract double ExecutionTime { get; set; }
 
         public ScriptInstance()
         {
@@ -61,5 +70,110 @@ namespace SilverSim.Scene.Types.Script
                 ThreadPool.AbortScript(this);
             }
         }
+
+        public void TriggerOnStateChange()
+        {
+            var ev = OnStateChange; /* events are not exactly thread-safe, so copy the reference first */
+            if (ev != null)
+            {
+                foreach (StateChangeEventDelegate del in ev.GetInvocationList())
+                {
+                    try
+                    {
+                        del();
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
+
+        public void TriggerOnDispose()
+        {
+            var ev = OnDispose; /* events are not exactly thread-safe, so copy the reference first */
+            if (ev != null)
+            {
+                foreach (StateChangeEventDelegate del in ev.GetInvocationList())
+                {
+                    try
+                    {
+                        del();
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
+
+        public class Permissions
+        {
+            public RwLockedList<UUI> Creators = new RwLockedList<UUI>();
+            public RwLockedList<UUI> Owners = new RwLockedList<UUI>();
+            public bool IsAllowedForParcelOwner;
+            public bool IsAllowedForParcelMember;
+            public bool IsAllowedForEstateOwner;
+            public bool IsAllowedForEstateManager;
+
+            public Permissions()
+            {
+
+            }
+        }
+
+        #region Threat Level System
+        public enum ThreatLevelType : uint
+        {
+            None = 0,
+            Nuisance = 1,
+            VeryLow = 2,
+            Low = 3,
+            Moderate = 4,
+            High = 5,
+            VeryHigh = 6,
+            Severe = 7
+        }
+
+        public ThreatLevelType ThreatLevel { get; protected set; }
+
+        public static readonly RwLockedDictionary<string, Permissions> OSSLPermissions = new RwLockedDictionary<string, Permissions>();
+
+        public void CheckThreatLevel(string name, ThreatLevelType level)
+        {
+            if ((int)level >= (int)ThreatLevel)
+            {
+                return;
+            }
+
+            Permissions perms;
+            if (OSSLPermissions.TryGetValue(name, out perms))
+            {
+                if (perms.Creators.Contains(Part.ObjectGroup.RootPart.Creator))
+                {
+                    return;
+                }
+                if (perms.Owners.Contains(Part.ObjectGroup.Owner))
+                {
+                    return;
+                }
+                /* TODO: implement parcel rights */
+
+                if (perms.IsAllowedForEstateOwner)
+                {
+                    if (Part.ObjectGroup.Scene.Owner == Part.ObjectGroup.Owner)
+                    {
+                        return;
+                    }
+                }
+
+                if (perms.IsAllowedForEstateManager)
+                {
+                    /* TODO: implement estate managers */
+                }
+            }
+            throw new Exception(string.Format("Function {0} not allowed", name));
+        }
+        #endregion
     }
 }

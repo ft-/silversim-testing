@@ -84,6 +84,14 @@ namespace SilverSim.Scene.Types.Object
         private Vector3 m_LastAttachedPos = Vector3.Zero;
         private Vector3 m_AngularVelocity = Vector3.Zero;
         private Vector3 m_Velocity = Vector3.Zero;
+        private UUI m_Creator = UUI.Unknown;
+        private Date m_CreationDate = new Date();
+
+        private ObjectPartInventoryItem.PermissionsMask m_BaseMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+        private ObjectPartInventoryItem.PermissionsMask m_OwnerMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+        private ObjectPartInventoryItem.PermissionsMask m_GroupMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.None;
+        private ObjectPartInventoryItem.PermissionsMask m_EveryoneMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.None;
+        private ObjectPartInventoryItem.PermissionsMask m_NextOwnerMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
 
         public int ScriptAccessPin = 0;
 
@@ -106,7 +114,7 @@ namespace SilverSim.Scene.Types.Object
         #region Constructor
         public ObjectPart()
         {
-            Group = null;
+            ObjectGroup = null;
             IsChanged = false;
             Inventory = new ObjectPartInventory();
             m_ObjectUpdateInfo = new ObjectUpdateInfo(this);
@@ -117,24 +125,24 @@ namespace SilverSim.Scene.Types.Object
         public void Dispose()
         {
             m_ObjectUpdateInfo.KillObject();
-            Group.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+            ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
         }
         #endregion
 
         public void SendKillObject()
         {
             m_ObjectUpdateInfo.KillObject();
-            Group.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+            ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
         }
 
         public void SendObjectUpdate()
         {
-            Group.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+            ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
         }
 
         internal void TriggerOnUpdate(ChangedEvent.ChangedFlags flags)
         {
-            Group.OriginalAssetID = UUID.Zero;
+            ObjectGroup.OriginalAssetID = UUID.Zero;
 
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
@@ -153,7 +161,7 @@ namespace SilverSim.Scene.Types.Object
             }
 
             m_ObjectUpdateInfo.IncSerialNumber();
-            Group.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+            ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
         }
 
         private void TriggerOnPositionChange()
@@ -173,20 +181,161 @@ namespace SilverSim.Scene.Types.Object
                     }
                 }
             }
-            Group.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+            ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
         }
 
         public AssetServiceInterface AssetService /* specific for attachments usage */
         {
             get
             {
-                return Group.AssetService;
+                return ObjectGroup.AssetService;
             }
         }
 
 
         #region Properties
-        public ObjectGroup Group { get; private set; }
+        public ObjectPartInventoryItem.PermissionsMask BaseMask
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_BaseMask;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_BaseMask = value;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public ObjectPartInventoryItem.PermissionsMask OwnerMask
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_OwnerMask;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_OwnerMask = value;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public ObjectPartInventoryItem.PermissionsMask GroupMask
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_GroupMask;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_GroupMask = value;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public ObjectPartInventoryItem.PermissionsMask EveryoneMask
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_EveryoneMask;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_EveryoneMask = value;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public ObjectPartInventoryItem.PermissionsMask NextOwnerMask
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_NextOwnerMask;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_NextOwnerMask = value;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public Date CreationDate
+        {
+            get
+            {
+                lock (this)
+                {
+                    return new Date(m_CreationDate);
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_CreationDate = new Date(value);
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public UUI Creator
+        {
+            get
+            {
+                lock (this)
+                {
+                    return new UUI(m_Creator);
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_Creator = value;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+
+        public ObjectGroup ObjectGroup { get; private set; }
         public ObjectPartInventory Inventory { get; private set; }
 
         public bool IsChanged { get; private set; }
@@ -268,9 +417,9 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                if(Group != null)
+                if(ObjectGroup != null)
                 {
-                    return Group.Acceleration;
+                    return ObjectGroup.Acceleration;
                 }
                 else
                 {
@@ -279,9 +428,9 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                if(Group != null)
+                if(ObjectGroup != null)
                 {
-                    Group.Acceleration = value;
+                    ObjectGroup.Acceleration = value;
                 }
             }
         }
@@ -304,7 +453,7 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                ObjectGroup grp = Group;
+                ObjectGroup grp = ObjectGroup;
                 if(grp != null)
                 {
                     try
@@ -386,17 +535,17 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                if (Group != null)
+                if (ObjectGroup != null)
                 {
-                    return Group.Owner;
+                    return ObjectGroup.Owner;
                 }
                 return UUI.Unknown;
             }
             set
             {
-                if(Group != null)
+                if(ObjectGroup != null)
                 {
-                    Group.Owner = value;
+                    ObjectGroup.Owner = value;
                 }
             }
         }
@@ -559,11 +708,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(this)
                 {
-                    if(Group != null)
+                    if(ObjectGroup != null)
                     {
-                        if(this != Group.RootPart)
+                        if(this != ObjectGroup.RootPart)
                         {
-                            return m_GlobalPosition - Group.RootPart.GlobalPosition;
+                            return m_GlobalPosition - ObjectGroup.RootPart.GlobalPosition;
                         }
                         else
                         {
@@ -580,11 +729,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(this)
                 {
-                    if (Group != null)
+                    if (ObjectGroup != null)
                     {
-                        if (this != Group.RootPart)
+                        if (this != ObjectGroup.RootPart)
                         {
-                            m_GlobalPosition = value + Group.RootPart.GlobalPosition;
+                            m_GlobalPosition = value + ObjectGroup.RootPart.GlobalPosition;
                         }
                         else
                         {
@@ -629,11 +778,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    if (Group != null)
+                    if (ObjectGroup != null)
                     {
-                        if (this != Group.RootPart)
+                        if (this != ObjectGroup.RootPart)
                         {
-                            return m_GlobalPosition - Group.RootPart.GlobalPosition;
+                            return m_GlobalPosition - ObjectGroup.RootPart.GlobalPosition;
                         }
                         else
                         {
@@ -650,11 +799,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    if (Group != null)
+                    if (ObjectGroup != null)
                     {
-                        if (this != Group.RootPart)
+                        if (this != ObjectGroup.RootPart)
                         {
-                            m_GlobalPosition = value + Group.RootPart.GlobalPosition;
+                            m_GlobalPosition = value + ObjectGroup.RootPart.GlobalPosition;
                         }
                         else
                         {
@@ -680,11 +829,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    if (Group != null)
+                    if (ObjectGroup != null)
                     {
-                        if (this != Group.RootPart)
+                        if (this != ObjectGroup.RootPart)
                         {
-                            return m_GlobalRotation / Group.RootPart.GlobalRotation;
+                            return m_GlobalRotation / ObjectGroup.RootPart.GlobalRotation;
                         }
                         else
                         {
@@ -701,11 +850,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    if (Group != null)
+                    if (ObjectGroup != null)
                     {
-                        if (this != Group.RootPart)
+                        if (this != ObjectGroup.RootPart)
                         {
-                            m_GlobalRotation = value * Group.RootPart.GlobalRotation;
+                            m_GlobalRotation = value * ObjectGroup.RootPart.GlobalRotation;
                         }
                         else
                         {
@@ -750,11 +899,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    if (Group != null)
+                    if (ObjectGroup != null)
                     {
-                        if (this != Group.RootPart)
+                        if (this != ObjectGroup.RootPart)
                         {
-                            return m_GlobalRotation / Group.RootPart.GlobalRotation;
+                            return m_GlobalRotation / ObjectGroup.RootPart.GlobalRotation;
                         }
                         else
                         {
@@ -771,11 +920,11 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    if (Group != null)
+                    if (ObjectGroup != null)
                     {
-                        if (this != Group.RootPart)
+                        if (this != ObjectGroup.RootPart)
                         {
-                            m_GlobalRotation = value * Group.RootPart.GlobalRotation;
+                            m_GlobalRotation = value * ObjectGroup.RootPart.GlobalRotation;
                         }
                         else
                         {
@@ -799,11 +948,11 @@ namespace SilverSim.Scene.Types.Object
         {
             lock(this)
             {
-                if(Group != null)
+                if(ObjectGroup != null)
                 {
                     throw new ArgumentException();
                 }
-                Group = group;
+                ObjectGroup = group;
             }
         }
 
@@ -811,7 +960,7 @@ namespace SilverSim.Scene.Types.Object
         {
             lock (this)
             {
-                Group = null;
+                ObjectGroup = null;
             }
         }
         #endregion
@@ -819,7 +968,7 @@ namespace SilverSim.Scene.Types.Object
         #region Object Details Methods
         public void GetObjectDetails(AnArray.Enumerator enumerator, ref AnArray paramList)
         {
-            Group.GetObjectDetails(enumerator, ref paramList);
+            ObjectGroup.GetObjectDetails(enumerator, ref paramList);
         }
         #endregion
 
@@ -872,7 +1021,7 @@ namespace SilverSim.Scene.Types.Object
                     pos += 4;
                 }
 
-                data[pos++] = (byte)Group.AttachPoint;
+                data[pos++] = (byte)ObjectGroup.AttachPoint;
                 data[pos++] = 0;
                 Position.ToBytes(data, pos);
                 pos += 12;

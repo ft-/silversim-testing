@@ -162,7 +162,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                             objgroup.IsTempOnRez = MySQLUtilities.GetBoolean(dbReader, "IsTempOnRez");
                             objgroup.Owner = new UUI((string)dbReader["Owner"]);
                             objgroup.LastOwner = new UUI((string)dbReader["LastOwner"]);
-                            objgroup.Creator = new UUI((string)dbReader["Creator"]);
                             objgroup.Group = new UGI((string)dbReader["Group"]);
                         }
                     }
@@ -183,6 +182,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 objpart.Description = (string)dbReader["Description"];
                                 objpart.SitTargetOffset = MySQLUtilities.GetVector(dbReader, "SitTargetOffset");
                                 objpart.SitTargetOrientation = MySQLUtilities.GetQuaternion(dbReader, "SitTargetOrientation");
+                                objpart.Creator = new UUI((string)dbReader["Creator"]);
+                                objpart.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
 
                                 objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)(int)dbReader["PhysicsShapeType"];
                                 objpart.Material = (PrimitiveMaterial)(int)dbReader["Material"];
@@ -376,7 +377,6 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["IsTempOnRez"] = objgroup.IsTempOnRez ? 1 : 0;
             p["Owner"] = objgroup.Owner.ToString();
             p["LastOwner"] = objgroup.LastOwner.ToString();
-            p["Creator"] = objgroup.Creator.ToString();
             p["Group"] = objgroup.Group.ToString();
 
             MySQLUtilities.ReplaceInsertInto(connection, "objects", p);
@@ -384,7 +384,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         private void UpdateObjectPart(MySqlConnection connection, ObjectPart objpart)
         {
-            if(objpart.Group.IsTemporary || objpart.Group.IsTempOnRez)
+            if(objpart.ObjectGroup.IsTemporary || objpart.ObjectGroup.IsTempOnRez)
             {
                 return;
             }
@@ -403,6 +403,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["Size"] = objpart.Size;
             p["Slice"] = objpart.Slice;
             p["MediaURL"] = objpart.MediaURL;
+            p["Creator"] = objpart.Creator.ToString();
+            p["CreationDate"] = objpart.CreationDate.AsULong;
 
             p["AngularVelocity"] = objpart.AngularVelocity;
 
@@ -500,10 +502,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "IsTempOnRez TINYINT(1) UNSIGNED NOT NULL DEFAULT '0'," +
                 "`Owner` VARCHAR(255) NOT NULL DEFAULT ''," +
                 "LastOwner VARCHAR(255) NOT NULL DEFAULT ''," +
-                "Creator VARCHAR(255) NOT NULL DEFAULT ''," +
                 "`Group` VARCHAR(255) NOT NULL DEFAULT ''," +
                 "PRIMARY KEY(ID)" +
-            ")"
+            ")",
         };
 
         private static readonly string[] PrimItemsMigrations = new string[]{
@@ -543,6 +544,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "Rotation VARCHAR(255) NOT NULL," +
                 "SitText TEXT," +
                 "TouchText TEXT," +
+                "Creator VARCHAR(255) NOT NULL DEFAULT ''," +
+                "CreationDate BIGINT(20) NOT NULL DEFAULT '0'," +
                 "Name VARCHAR(255) NOT NULL DEFAULT ''," +
                 "Description VARCHAR(255) NOT NULL DEFAULT ''," +
                 "SitTargetOffset VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +

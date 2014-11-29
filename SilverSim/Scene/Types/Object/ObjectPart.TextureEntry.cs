@@ -34,6 +34,10 @@ namespace SilverSim.Scene.Types.Object
         private TextureEntry m_TextureEntry = new TextureEntry();
         private byte[] m_TextureEntryBytes = new byte[0];
         private ReaderWriterLock m_TextureEntryLock = new ReaderWriterLock();
+
+        private byte[] m_TextureAnimationBytes = new byte[0];
+        private ReaderWriterLock m_TextureAnimationLock = new ReaderWriterLock();
+
         private string m_MediaURL = string.Empty;
 
         public string MediaURL
@@ -85,7 +89,7 @@ namespace SilverSim.Scene.Types.Object
                 m_TextureEntryLock.AcquireWriterLock(-1);
                 try
                 {
-                    m_TextureEntry = value;
+                    m_TextureEntry = copy;
                     m_TextureEntryBytes = value.GetBytes();
                 }
                 finally
@@ -122,6 +126,79 @@ namespace SilverSim.Scene.Types.Object
                 finally
                 {
                     m_TextureEntryLock.ReleaseWriterLock();
+                }
+            }
+        }
+
+        public TextureAnimationEntry TextureAnimation
+        {
+            get
+            {
+                m_TextureAnimationLock.AcquireReaderLock(-1);
+                try
+                {
+                    return new TextureAnimationEntry(m_TextureAnimationBytes, 0);
+                }
+                finally
+                {
+                    m_TextureAnimationLock.ReleaseReaderLock();
+                }
+            }
+            set
+            {
+                if (value != null ? (value.Flags & TextureAnimationEntry.TextureAnimMode.ANIM_ON) == 0 : true)
+                {
+                    m_TextureAnimationLock.AcquireWriterLock(-1);
+                    try
+                    {
+                        m_TextureAnimationBytes = new byte[0];
+                    }
+                    finally
+                    {
+                        m_TextureAnimationLock.ReleaseWriterLock();
+                    }
+                }
+                else
+                {
+                    m_TextureAnimationLock.AcquireWriterLock(-1);
+                    try
+                    {
+                        m_TextureAnimationBytes = value.GetBytes();
+                    }
+                    finally
+                    {
+                        m_TextureAnimationLock.ReleaseWriterLock();
+                    }
+                }
+            }
+        }
+
+        public byte[] TextureAnimationBytes
+        {
+            get
+            {
+                m_TextureAnimationLock.AcquireReaderLock(-1);
+                try
+                {
+                    byte[] b = new byte[m_TextureAnimationBytes.Length];
+                    Buffer.BlockCopy(m_TextureEntryBytes, 0, b, 0, m_TextureAnimationBytes.Length);
+                    return b;
+                }
+                finally
+                {
+                    m_TextureAnimationLock.ReleaseReaderLock();
+                }
+            }
+            set
+            {
+                m_TextureAnimationLock.AcquireWriterLock(-1);
+                try
+                {
+                    m_TextureAnimationBytes = value;
+                }
+                finally
+                {
+                    m_TextureAnimationLock.ReleaseWriterLock();
                 }
             }
         }

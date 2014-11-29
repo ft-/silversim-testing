@@ -113,79 +113,79 @@ namespace SilverSim.Types.Primitive
             OneMinusSourceAlpha = 9,
         }
 
-        public uint CRC;
+        public uint CRC = 0;
         /// <summary>Particle Flags</summary>
         /// <remarks>There appears to be more data packed in to this area
         /// for many particle systems. It doesn't appear to be flag values
         /// and serialization breaks unless there is a flag for every
         /// possible bit so it is left as an unsigned integer</remarks>
-        public uint PartFlags;
+        public uint PartFlags = 0;
         /// <summary><seealso cref="T:SourcePattern"/> pattern of particles</summary>
-        public SourcePattern Pattern;
+        public SourcePattern Pattern = SourcePattern.None;
         /// <summary>A <see langword="float"/> representing the maximimum age (in seconds) particle will be displayed</summary>
         /// <remarks>Maximum value is 30 seconds</remarks>
-        public float MaxAge;
+        public float MaxAge = 10;
         /// <summary>A <see langword="float"/> representing the number of seconds, 
         /// from when the particle source comes into view, 
         /// or the particle system's creation, that the object will emits particles; 
         /// after this time period no more particles are emitted</summary>
-        public float StartAge;
+        public float StartAge = 0;
         /// <summary>A <see langword="float"/> in radians that specifies where particles will not be created</summary>
-        public float InnerAngle;
+        public float InnerAngle = 0;
         /// <summary>A <see langword="float"/> in radians that specifies where particles will be created</summary>
-        public float OuterAngle;
+        public float OuterAngle = 0;
         /// <summary>A <see langword="float"/> representing the number of seconds between burts.</summary>
-        public float BurstRate;
+        public float BurstRate = 0.1f;
         /// <summary>A <see langword="float"/> representing the number of meters
         /// around the center of the source where particles will be created.</summary>
-        public float BurstRadius;
+        public float BurstRadius = 0;
         /// <summary>A <see langword="float"/> representing in seconds, the minimum speed between bursts of new particles 
         /// being emitted</summary>
-        public float BurstSpeedMin;
+        public float BurstSpeedMin = 1;
         /// <summary>A <see langword="float"/> representing in seconds the maximum speed of new particles being emitted.</summary>
-        public float BurstSpeedMax;
+        public float BurstSpeedMax = 1;
         /// <summary>A <see langword="byte"/> representing the maximum number of particles emitted per burst</summary>
-        public byte BurstPartCount;
+        public byte BurstPartCount = 1;
         /// <summary>A <see cref="T:Vector3"/> which represents the velocity (speed) from the source which particles are emitted</summary>
-        public Vector3 AngularVelocity;
+        public Vector3 AngularVelocity = Vector3.Zero;
         /// <summary>A <see cref="T:Vector3"/> which represents the Acceleration from the source which particles are emitted</summary>
-        public Vector3 PartAcceleration;
+        public Vector3 PartAcceleration = Vector3.Zero;
         /// <summary>The <see cref="T:UUID"/> Key of the texture displayed on the particle</summary>
-        public UUID Texture;
+        public UUID Texture = UUID.Zero;
         /// <summary>The <see cref="T:UUID"/> Key of the specified target object or avatar particles will follow</summary>
-        public UUID Target;
+        public UUID Target = UUID.Zero;
         /// <summary>Flags of particle from <seealso cref="T:ParticleDataFlags"/></summary>
-        public ParticleDataFlags PartDataFlags;
+        public ParticleDataFlags PartDataFlags = ParticleDataFlags.None;
         /// <summary>Max Age particle system will emit particles for</summary>
-        public float PartMaxAge;
+        public float PartMaxAge = 0;
         /// <summary>The <see cref="T:Color4"/> the particle has at the beginning of its lifecycle</summary>
-        public ColorAlpha PartStartColor;
+        public ColorAlpha PartStartColor = ColorAlpha.White;
         /// <summary>The <see cref="T:Color4"/> the particle has at the ending of its lifecycle</summary>
-        public ColorAlpha PartEndColor;
+        public ColorAlpha PartEndColor = ColorAlpha.White;
         /// <summary>A <see langword="float"/> that represents the starting X size of the particle</summary>
         /// <remarks>Minimum value is 0, maximum value is 4</remarks>
-        public float PartStartScaleX;
+        public float PartStartScaleX = 1;
         /// <summary>A <see langword="float"/> that represents the starting Y size of the particle</summary>
         /// <remarks>Minimum value is 0, maximum value is 4</remarks>
-        public float PartStartScaleY;
+        public float PartStartScaleY = 1;
         /// <summary>A <see langword="float"/> that represents the ending X size of the particle</summary>
         /// <remarks>Minimum value is 0, maximum value is 4</remarks>
-        public float PartEndScaleX;
+        public float PartEndScaleX = 1;
         /// <summary>A <see langword="float"/> that represents the ending Y size of the particle</summary>
         /// <remarks>Minimum value is 0, maximum value is 4</remarks>
-        public float PartEndScaleY;
+        public float PartEndScaleY = 1;
 
         /// <summary>A <see langword="float"/> that represents the start glow value</summary>
         /// <remarks>Minimum value is 0, maximum value is 1</remarks>
-        public float PartStartGlow;
+        public float PartStartGlow = 0;
         /// <summary>A <see langword="float"/> that represents the end glow value</summary>
         /// <remarks>Minimum value is 0, maximum value is 1</remarks>
-        public float PartEndGlow;
+        public float PartEndGlow = 0;
 
         /// <summary>OpenGL blend function to use at particle source</summary>
-        public byte BlendFuncSource;
+        public BlendFunc BlendFuncSource = BlendFunc.SourceAlpha;
         /// <summary>OpenGL blend function to use at particle destination</summary>
-        public byte BlendFuncDest;
+        public BlendFunc BlendFuncDest = BlendFunc.OneMinusSourceAlpha;
 
         public const byte MaxDataBlockSize = 98;
         public const byte LegacyDataBlockSize = 86;
@@ -223,7 +223,12 @@ namespace SilverSim.Types.Primitive
 
         public bool HasBlendFunc()
         {
-            return BlendFuncSource != (byte)BlendFunc.SourceAlpha || BlendFuncDest != (byte)BlendFunc.OneMinusSourceAlpha;
+            return BlendFuncSource != BlendFunc.SourceAlpha || BlendFuncDest != BlendFunc.OneMinusSourceAlpha;
+        }
+
+        public ParticleSystem()
+        {
+
         }
 
         /// <summary>
@@ -235,8 +240,8 @@ namespace SilverSim.Types.Primitive
         {
             PartStartGlow = 0f;
             PartEndGlow = 0f;
-            BlendFuncSource = (byte)BlendFunc.SourceAlpha;
-            BlendFuncDest = (byte)BlendFunc.OneMinusSourceAlpha;
+            BlendFuncSource = BlendFunc.SourceAlpha;
+            BlendFuncDest = BlendFunc.OneMinusSourceAlpha;
 
             CRC = PartFlags = 0;
             Pattern = SourcePattern.None;
@@ -279,8 +284,8 @@ namespace SilverSim.Types.Primitive
                 if ((PartDataFlags & ParticleDataFlags.DataBlend) == ParticleDataFlags.DataBlend)
                 {
                     if (pack.Data.Length - pack.BytePos < 2) return;
-                    BlendFuncSource = (byte)pack.UnpackUnsignedBits(8);
-                    BlendFuncDest = (byte)pack.UnpackUnsignedBits(8);
+                    BlendFuncSource = (BlendFunc)pack.UnpackUnsignedBits(8);
+                    BlendFuncDest = (BlendFunc)pack.UnpackUnsignedBits(8);
                 }
 
             }
@@ -364,8 +369,8 @@ namespace SilverSim.Types.Primitive
 
                 if (HasBlendFunc())
                 {
-                    pack.PackBits(BlendFuncSource, 8);
-                    pack.PackBits(BlendFuncDest, 8);
+                    pack.PackBits((byte)BlendFuncSource, 8);
+                    pack.PackBits((byte)BlendFuncDest, 8);
                 }
             }
 

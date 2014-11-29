@@ -73,10 +73,8 @@ namespace SilverSim.Scene.Types.Object
         private Vector3 m_Velocity = Vector3.Zero;
         private UGI m_Group = UGI.Unknown;
         private UUI m_Owner = UUI.Unknown;
-        private UUI m_Creator = UUI.Unknown;
         private UUI m_LastOwner = UUI.Unknown;
         private UUID m_OriginalAssetID = UUID.Zero; /* necessary for reducing asset re-generation */
-        private Date m_CreationDate = new Date();
         protected internal RwLockedBiDiMappingDictionary<IAgent, ObjectPart> m_SittingAgents = new RwLockedBiDiMappingDictionary<IAgent, ObjectPart>();
         public AgentSittingInterface AgentSitting { get; private set; }
         public SceneInterface Scene { get; set; }
@@ -103,7 +101,6 @@ namespace SilverSim.Scene.Types.Object
             }
         }
         private Vector3 m_Acceleration = new Vector3();
-        private Vector3 m_AngularVelocity = new Vector3();
         public AttachmentPoint AttachPoint = AttachmentPoint.NotAttached;
 
         #region Constructor
@@ -212,26 +209,6 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public Date CreationDate
-        {
-            get
-            {
-                lock(this)
-                {
-                    return new Date(m_CreationDate);
-                }
-            }
-            set
-            {
-                lock(this)
-                {
-                    m_CreationDate = new Date(value);
-                }
-                IsChanged = true;
-                TriggerOnUpdate(0);
-            }
-        }
-
         public Vector3 Size
         {
             get
@@ -305,6 +282,7 @@ namespace SilverSim.Scene.Types.Object
                 TriggerOnUpdate(0);
             }
         }
+
         public UUI LastOwner
         {
             get
@@ -342,26 +320,6 @@ namespace SilverSim.Scene.Types.Object
                 }
                 IsChanged = true;
                 TriggerOnUpdate(ChangedEvent.ChangedFlags.Owner);
-            }
-        }
-
-        public UUI Creator
-        {
-            get
-            {
-                lock (this)
-                {
-                    return new UUI(m_Creator);
-                }
-            }
-            set
-            {
-                lock (this)
-                {
-                    m_Creator = value;
-                }
-                IsChanged = true;
-                TriggerOnUpdate(0);
             }
         }
 
@@ -729,7 +687,7 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case ObjectDetailsType.Creator:
-                        paramList.Add(Creator.ID);
+                        paramList.Add(RootPart.Creator.ID);
                         break;
                     
                     case ObjectDetailsType.RunningScriptCount:

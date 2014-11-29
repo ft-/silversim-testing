@@ -112,7 +112,14 @@ namespace SilverSim.Scene.Types.StructuredData
 
         private static void Serialize(XmlTextWriter writer, string name, byte[] v)
         {
-            writer.WriteElementString(name, Convert.ToBase64String(v));
+            if (v.Length == 0)
+            {
+                writer.WriteElementString(name, "");
+            }
+            else
+            {
+                writer.WriteElementString(name, Convert.ToBase64String(v));
+            }
         }
 
         private static void Serialize(XmlTextWriter writer, string name, UUID v)
@@ -135,7 +142,7 @@ namespace SilverSim.Scene.Types.StructuredData
             writer.WriteStartElement("SceneObjectPart");
 
             Serialize(writer, "AllowedDrop", part.IsAllowedDrop);
-            Serialize(writer, "CreatorID", UUID.Zero);
+            Serialize(writer, "CreatorID", part.Creator.ID);
             Serialize(writer, "FolderID", UUID.Zero);
             Serialize(writer, "InventorySerial", 1);
             Serialize(writer, "", part.ID);
@@ -186,7 +193,7 @@ namespace SilverSim.Scene.Types.StructuredData
             Serialize(writer, "ProfileEnd", shape.ProfileEnd);
             Serialize(writer, "ProfileHollow", shape.ProfileHollow);
             Serialize(writer, "State", shape.State);
-            Serialize(writer, "LastAttachPoint", (uint)part.Group.AttachPoint);
+            Serialize(writer, "LastAttachPoint", (uint)part.ObjectGroup.AttachPoint);
             /*
             <ProfileShape>Square</ProfileShape>
             <HollowShape>Same</HollowShape>
@@ -224,21 +231,21 @@ namespace SilverSim.Scene.Types.StructuredData
             Serialize(writer, "SitTargetPosition", part.SitTargetOffset);
             Serialize(writer, "SitTargetOrientationLL", part.SitTargetOrientation);
             Serialize(writer, "SitTargetPositionLL", part.SitTargetOffset);
-            Serialize(writer, "ParentID", part.Group.RootPart.LinkNumber);
-            //Serialize(writer, "CreationDate", (uint)part.Group.CreationDate.DateTimeToUnixTime); /* check for prim logic */
+            Serialize(writer, "ParentID", part.ObjectGroup.RootPart.LinkNumber);
+            Serialize(writer, "CreationDate", part.CreationDate.AsUInt); /* check for prim logic */
             Serialize(writer, "Category", "0");
             Serialize(writer, "SalePrice", "0");
             Serialize(writer, "ObjectSaleType", "0");
             Serialize(writer, "OwnershipCost", "0");
-            Serialize(writer, "GroupID", part.Group.Group.ID);
-            Serialize(writer, "OwnerID", part.Group.Owner.ID);
-            Serialize(writer, "LastOwnerID", part.Group.LastOwner.ID);
+            Serialize(writer, "GroupID", part.ObjectGroup.Group.ID);
+            Serialize(writer, "OwnerID", part.ObjectGroup.Owner.ID);
+            Serialize(writer, "LastOwnerID", part.ObjectGroup.LastOwner.ID);
+            Serialize(writer, "BaseMask", (uint)part.BaseMask);
+            Serialize(writer, "OwnerMask", (uint)part.OwnerMask);
+            Serialize(writer, "GroupMask", (uint)part.GroupMask);
+            Serialize(writer, "EveryoneMask", (uint)part.EveryoneMask);
+            Serialize(writer, "NextOwnerMask", (uint)part.NextOwnerMask);
             /*
-          <BaseMask>647168</BaseMask>
-          <OwnerMask>647168</OwnerMask>
-          <GroupMask>0</GroupMask>
-          <EveryoneMask>0</EveryoneMask>
-          <NextOwnerMask>532480</NextOwnerMask>
           <Flags>None</Flags>
              */
             ObjectPart.CollisionSoundParam collparam = part.CollisionSound;
@@ -252,11 +259,8 @@ namespace SilverSim.Scene.Types.StructuredData
           </AttachedPos>
           */
             //Serialize(writer, "AttachedPos", part.Group.AttachedPos);
-            /*
-            <TextureAnimation>
-            </TextureAnimation>
-            */
-              Serialize(writer, "ParticleSystem", part.ParticleSystemBytes);
+            Serialize(writer, "TextureAnimation", part.TextureAnimationBytes);
+            Serialize(writer, "ParticleSystem", part.ParticleSystemBytes);
             /*
             <PayPrice0>-2</PayPrice0>
             <PayPrice1>-2</PayPrice1>
@@ -264,7 +268,7 @@ namespace SilverSim.Scene.Types.StructuredData
             <PayPrice3>-2</PayPrice3>
             <PayPrice4>-2</PayPrice4>
               */
-            Serialize(writer, "CreatorData", part.Group.Creator.CreatorData);
+            Serialize(writer, "CreatorData", part.Creator.CreatorData);
             writer.WriteEndElement();
         }
     }
