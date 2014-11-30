@@ -72,6 +72,10 @@ namespace SilverSim.Main.Common
             }
         }
 
+        public void AddPlugin(string name, IPlugin plugin)
+        {
+            PluginInstances.Add("$" + name, plugin);
+        }
 
         public T GetService<T>(string serviceName)
         {
@@ -679,6 +683,16 @@ namespace SilverSim.Main.Common
             PluginInstances.Add("HttpServer", new BaseHttpServer(httpConfig));
             PluginInstances.Add("XmlRpcServer", new HttpXmlRpcHandler());
             PluginInstances.Add("CapsRedirector", new CapsHttpRedirector());
+
+            m_Log.Info("Initing extra modules");
+            foreach (IPlugin instance in PluginInstances.Values)
+            {
+                if(instance.GetType().GetInterfaces().Contains(typeof(IPluginSubFactory)))
+                {
+                    IPluginSubFactory subfact = (IPluginSubFactory)instance;
+                    subfact.AddPlugins(this);
+                }
+            }
 
             m_Log.Info("Starting modules");
             foreach(IPlugin instance in PluginInstances.Values)

@@ -23,20 +23,10 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
-
-namespace SilverSim.Scripting.LSL.Variants.ASSL
+namespace SilverSim.Main.Common
 {
-    public partial class ASSLScript
+    public interface IPluginSubFactory
     {
-        [APILevel(APIFlags.ASSL)]
-        public void asLogListen(int onChannel, int enable)
-        {
-
-        }
+        void AddPlugins(ConfigurationLoader loader);
     }
 }

@@ -92,6 +92,23 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         public const int PRIM_MEDIA_CONTROLS_MINI = 1;
 
         [APILevel(APIFlags.LSL)]
+        public const int LSL_STATUS_OK = 0;
+        [APILevel(APIFlags.LSL)]
+        public const int LSL_STATUS_MALFORMED_PARAMS = 1000;
+        [APILevel(APIFlags.LSL)]
+        public const int LSL_STATUS_TYPE_MISMATCH = 1001;
+        [APILevel(APIFlags.LSL)]
+        public const int LSL_STATUS_BOUNDS_ERROR = 1002;
+        [APILevel(APIFlags.LSL)]
+        public const int LSL_STATUS_NOT_FOUND = 1003;
+        [APILevel(APIFlags.LSL)]
+        public const int LSL_STATUS_NOT_SUPPORTED = 1004;
+        [APILevel(APIFlags.LSL)]
+        public const int LSL_STATUS_INTERNAL_ERROR = 1999;
+        [APILevel(APIFlags.LSL)]
+        public const int LSL_STATUS_WHITELIST_FAILED = 2001;
+
+        [APILevel(APIFlags.LSL)]
         public AnArray llGetPrimMediaParams(int face, AnArray param)
         {
 #warning Implement llGetPrimMediaParams(int, AnArray)

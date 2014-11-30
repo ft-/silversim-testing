@@ -82,6 +82,12 @@ namespace SilverSim.Scripting.LSL.API.Chat
             }
         }
 
+        [APILevel(APIFlags.OSSL)]
+        public const int OS_LISTEN_REGEX_NAME = 0x1;
+
+        [APILevel(APIFlags.OSSL)]
+        public const int OS_LISTEN_REGEX_MESSAGE = 0x2;
+
         [APILevel(APIFlags.LSL)]
         public void llShout(int channel, string message)
         {
@@ -230,11 +236,6 @@ namespace SilverSim.Scripting.LSL.API.Chat
                 }
             }
         }
-
-        [APILevel(APIFlags.OSSL)]
-        public const int OS_LISTEN_REGEX_NAME = 1;
-        [APILevel(APIFlags.OSSL)]
-        public const int OS_LISTEN_REGEX_MESSAGE = 2;
 
         #region osListenRegex
         [APILevel(APIFlags.OSSL)]

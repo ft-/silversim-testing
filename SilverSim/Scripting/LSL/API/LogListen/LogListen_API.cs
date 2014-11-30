@@ -26,12 +26,10 @@ exception statement from your version.
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
-using System;
 
-namespace SilverSim.Scripting.LSL.API.Region
+namespace SilverSim.Scripting.LSL.API.LogListen
 {
-    [ScriptApiName("Region")]
-    public partial class Region_API : MarshalByRefObject, IScriptApi, IPlugin
+    public partial class LogListen_API
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -49,23 +47,10 @@ namespace SilverSim.Scripting.LSL.API.Region
 
         }
 
-        [APILevel(APIFlags.LSL)]
-        public const int REGION_FLAG_ALLOW_DAMAGE = 0x1;
-        [APILevel(APIFlags.LSL)]
-        public const int REGION_FLAG_FIXED_SUN = 0x10;
-        [APILevel(APIFlags.LSL)]
-        public const int REGION_FLAG_BLOCK_TERRAFORM = 0x40;
-        [APILevel(APIFlags.LSL)]
-        public const int REGION_FLAG_SANDBOX = 0x100;
-        [APILevel(APIFlags.LSL)]
-        public const int REGION_FLAG_DISABLE_COLLISIONS = 0x1000;
-        [APILevel(APIFlags.LSL)]
-        public const int REGION_FLAG_DISABLE_PHYSICS = 0x4000;
-        [APILevel(APIFlags.LSL)]
-        public const int REGION_FLAG_BLOCK_FLY = 0x80000;
-        [APILevel(APIFlags.LSL)]
-        public const int REGION_FLAG_ALLOW_DIRECT_TELEPORT = 0x100000;
-        [APILevel(APIFlags.LSL)]
-        public const int REGION_FLAG_RESTRICT_PUSHOBJECT = 0x400000;         
+        [APILevel(APIFlags.ASSL)]
+        public void asLogListen(int onChannel, int enable)
+        {
+
+        }
     }
 }

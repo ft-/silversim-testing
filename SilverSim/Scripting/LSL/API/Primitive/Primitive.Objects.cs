@@ -34,6 +34,55 @@ namespace SilverSim.Scripting.LSL.API.Primitive
     public partial class Primitive_API
     {
         [APILevel(APIFlags.LSL)]
+        public const int OBJECT_UNKNOWN_DETAIL = -1;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_NAME = 1;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_DESC = 2;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_POS = 3;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_ROT = 4;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_VELOCITY = 5;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_OWNER = 6;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_GROUP = 7;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_CREATOR = 8;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_RUNNING_SCRIPT_COUNT = 9;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_TOTAL_SCRIPT_COUNT = 10;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_SCRIPT_MEMORY = 11;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_SCRIPT_TIME = 12;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_PRIM_EQUIVALENCE = 13;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_SERVER_COST = 14;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_STREAMING_COST = 15;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_PHYSICS_COST = 16;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_CHARACTER_TIME = 17;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_ROOT = 18;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_ATTACHED_POINT = 19;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_PATHFINDING_TYPE = 20;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_PHYSICS = 21;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_PHANTOM = 22;
+        [APILevel(APIFlags.LSL)]
+        public const int OBJECT_TEMP_ON_REZ = 23;
+
+        [APILevel(APIFlags.LSL)]
         public Vector3 llGetCenterOfMass()
         {
 #warning Implement llGetCenterOfMass()

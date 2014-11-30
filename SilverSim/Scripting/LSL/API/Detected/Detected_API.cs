@@ -50,5 +50,12 @@ namespace SilverSim.Scripting.LSL.API.Detected
         {
 
         }
+
+        [APILevel(APIFlags.LSL)]
+        public const int TOUCH_INVALID_FACE = -1;
+        [APILevel(APIFlags.LSL)]
+        public static readonly Vector3 TOUCH_INVALID_TEXCOORD = new Vector3(-1.0, -1.0, 0.0);
+        [APILevel(APIFlags.LSL)]
+        public static readonly Vector3 TOUCH_INVALID_VECTOR = Vector3.Zero;
     }
 }

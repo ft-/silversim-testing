@@ -245,5 +245,17 @@ namespace SilverSim.Scripting.LSL
         {
 
         }
+
+        [APILevel(APIFlags.LSL)]
+        public virtual void experience_permissions(UUID agent_id)
+        {
+
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public virtual void experience_permissions_denied(UUID agent_id, int reason)
+        {
+
+        }
     }
 }
