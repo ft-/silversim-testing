@@ -92,13 +92,13 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         [APILevel(APIFlags.LSL)]
         public UUID llGetCreator()
         {
-            return Part.ObjectGroup.RootPart.Creator.ID;
+            return Part.Creator.ID;
         }
 
         [APILevel(APIFlags.LSL)]
         public string llGetObjectDesc()
         {
-            return Part.ObjectGroup.Name;
+            return Part.Name;
         }
 
         [APILevel(APIFlags.LSL)]
@@ -117,7 +117,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         {
             lock (this)
             {
-                return Part.ObjectGroup.Description;
+                return Part.Description;
             }
         }
 
@@ -126,7 +126,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         {
             lock (this)
             {
-                Part.ObjectGroup.Description = desc;
+                Part.Description = desc;
             }
         }
 
@@ -135,7 +135,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         {
             lock (this)
             {
-                Part.ObjectGroup.Name = name;
+                Part.Name = name;
             }
         }
 
