@@ -24,36 +24,37 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.API.Region
 {
     public partial class Region_API
     {
         [APILevel(APIFlags.LSL)]
-        public string llGetRegionName()
+        public string llGetRegionName(ScriptInstance Instance)
         {
-            lock (this)
+            lock (Instance)
             {
-                return Part.ObjectGroup.Scene.Name;
+                return Instance.Part.ObjectGroup.Scene.Name;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llGetSimulatorHostname()
+        public string llGetSimulatorHostname(ScriptInstance Instance)
         {
 #warning Implement llGetSimulatorHostname()
             return string.Empty;
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llGetRegionCorner()
+        public Vector3 llGetRegionCorner(ScriptInstance Instance)
         {
 #warning Implement llGetRegionCorner()
             return Vector3.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llRequestSimulatorData(string region, int data)
+        public UUID llRequestSimulatorData(ScriptInstance Instance, string region, int data)
         {
 #warning Implement llRequestSimulatorData()
             return UUID.Zero;

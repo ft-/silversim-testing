@@ -23,12 +23,16 @@ exception statement from your version.
 
 */
 
+using SilverSim.Types;
 using SilverSim.Types.Asset;
+using System.IO;
 
 namespace SilverSim.Scene.Types.Script
 {
     public interface IScriptCompiler
     {
-        IScriptAssembly Compile(AssetData asset);
+        IScriptAssembly Compile(UUI user, AssetData asset);
+
+        IScriptAssembly Compile(UUI user, TextReader reader, int linenumber = 1);
     }
 }

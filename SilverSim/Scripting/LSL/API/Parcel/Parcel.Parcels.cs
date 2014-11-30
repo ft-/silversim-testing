@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.Types;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.API.Parcel
 {
@@ -65,69 +66,69 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         public const int PARCEL_DETAILS_CLAIMDATE = 10;
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llGetParcelDetails(Vector3 pos, AnArray param)
+        public static AnArray llGetParcelDetails(ScriptInstance Instance, Vector3 pos, AnArray param)
         {
 #warning Implement llGetParcelDetails(Vector3, AnArray)
             return new AnArray();
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llGetParcelFlags(Vector3 pos)
+        public static int llGetParcelFlags(ScriptInstance Instance, Vector3 pos)
         {
 #warning Implement llGetParcelFlags(Vector3)
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llGetParcelMaxPrims(Vector3 pos, int sim_wide)
+        public static int llGetParcelMaxPrims(ScriptInstance Instance, Vector3 pos, int sim_wide)
         {
 #warning Implement llGetParcelMaxPrims(Vector3, int)
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llGetParcelMusicURL()
+        public static string llGetParcelMusicURL(ScriptInstance Instance)
         {
 #warning Implement llGetParcelMusicURL()
             return string.Empty;
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetParcelMusicURL(string url)
+        public static void llSetParcelMusicURL(ScriptInstance Instance, string url)
         {
 #warning Implement llSetParcelMusicURL(string)
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llReturnObjectsByID(AnArray objects)
+        public static int llReturnObjectsByID(ScriptInstance Instance, AnArray objects)
         {
 #warning Implement llReturnObjectsByID(AnArray)
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llReturnObjectsByOwner(UUID owner, int scope)
+        public static int llReturnObjectsByOwner(ScriptInstance Instance, UUID owner, int scope)
         {
 #warning Implement llReturnObjectsByOwner(UUID, int)
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetLandOwnerAt(Vector3 pos)
+        public static UUID llGetLandOwnerAt(ScriptInstance Instance, Vector3 pos)
         {
 #warning Implement llGetLandOwnerAt(Vector3)
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llGetParcelPrimCount(Vector3 pos, int category, int sim_wide)
+        public static int llGetParcelPrimCount(ScriptInstance Instance, Vector3 pos, int category, int sim_wide)
         {
 #warning Implement llGetParcelPrimCount(Vector3, int, int)
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llGetParcelPrimOwners(Vector3 pos)
+        public static AnArray llGetParcelPrimOwners(ScriptInstance Instance, Vector3 pos)
         {
 #warning Implement llGetParcelPrimOwners(Vector3)
             return new AnArray();

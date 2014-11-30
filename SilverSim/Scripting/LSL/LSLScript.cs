@@ -29,6 +29,8 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
+using System.Timers;
+using System.Reflection;
 using System.Collections.Generic;
 using ThreadedClasses;
 
@@ -37,13 +39,26 @@ namespace SilverSim.Scripting.LSL
     public class Script : ScriptInstance
     {
         private ObjectPart m_Part;
+        private ObjectPartInventoryItem m_Item;
         private NonblockingQueue<IScriptEvent> m_Events = new NonblockingQueue<IScriptEvent>();
         internal List<DetectInfo> m_Detected = new List<DetectInfo>();
         private Dictionary<string, LSLState> m_States = new Dictionary<string, LSLState>();
         private LSLState m_CurrentState = null;
-        public Integer StartParameter = new Integer();
-        protected RwLockedDictionary<int, ChatServiceInterface.Listener> m_Listeners = new RwLockedDictionary<int, ChatServiceInterface.Listener>();
+        public int StartParameter = new Integer();
+        internal RwLockedDictionary<int, ChatServiceInterface.Listener> m_Listeners = new RwLockedDictionary<int, ChatServiceInterface.Listener>();
         private double m_ExecutionTime = 0;
+        protected bool UseMessageObjectEvent = false;
+
+        public readonly Timer Timer = new Timer();
+
+        private void OnTimerEvent(object sender, ElapsedEventArgs e)
+        {
+            lock (this)
+            {
+                PostEvent(new TimerEvent());
+            }
+        }
+
 
         public override double ExecutionTime
         {
@@ -62,9 +77,10 @@ namespace SilverSim.Scripting.LSL
             m_States.Add(name, state);
         }
 
-        public Script(ObjectPart part)
+        public Script(ObjectPart part, ObjectPartInventoryItem item)
         {
             m_Part = part;
+            m_Item = item;
             m_Part.OnUpdate += OnPrimUpdate;
             m_Part.OnPositionChange += OnPrimPositionUpdate;
             m_Part.ObjectGroup.OnUpdate += OnGroupUpdate;
@@ -109,6 +125,10 @@ namespace SilverSim.Scripting.LSL
             m_Part.ObjectGroup.OnPositionChange -= OnGroupPositionUpdate;
 
             IsRunning = false;
+            lock (this)
+            {
+                Timer.Enabled = false;
+            }
             TriggerOnStateChange();
             TriggerOnDispose();
             m_Events.Clear();
@@ -122,6 +142,14 @@ namespace SilverSim.Scripting.LSL
             get
             {
                 return m_Part;
+            }
+        }
+
+        public override ObjectPartInventoryItem Item 
+        {
+            get
+            {
+                return m_Item;
             }
         }
 
@@ -158,6 +186,23 @@ namespace SilverSim.Scripting.LSL
             m_Part = null;
         }
 
+        private Dictionary<string, MethodInfo> m_CurrentStateMethods = new Dictionary<string, MethodInfo>();
+
+        private void InvokeStateEvent(string name, params object[] param)
+        {
+            MethodInfo mi;
+            if (!m_CurrentStateMethods.TryGetValue(name, out mi))
+            {
+                mi = m_CurrentState.GetType().GetMethod(name);
+                m_CurrentStateMethods.Add(name, mi);
+            }
+
+            if (null != mi)
+            {
+                mi.Invoke(m_CurrentState, param);
+            }
+        }
+
         public override void ProcessEvent()
         {
             IScriptEvent ev;
@@ -167,7 +212,7 @@ namespace SilverSim.Scripting.LSL
                 if(m_CurrentState == null)
                 {
                     m_CurrentState = m_States["default"];
-                    m_CurrentState.state_entry();
+                    InvokeStateEvent("state_entry");
                 }
             }
             catch
@@ -181,22 +226,22 @@ namespace SilverSim.Scripting.LSL
                 if (ev is AtRotTargetEvent)
                 {
                     AtRotTargetEvent e = (AtRotTargetEvent)ev;
-                    m_CurrentState.at_rot_target(new Integer(e.Handle), e.TargetRotation, e.OurRotation);
+                    InvokeStateEvent("at_rot_target", e.TargetRotation, e.OurRotation);
                 }
                 else if (ev is AttachEvent)
                 {
                     AttachEvent e = (AttachEvent)ev;
-                    m_CurrentState.attach(e.ObjectID);
+                    InvokeStateEvent("attach", e.ObjectID);
                 }
                 else if (ev is AtTargetEvent)
                 {
                     AtTargetEvent e = (AtTargetEvent)ev;
-                    m_CurrentState.at_target(new Integer(e.Handle), e.TargetPosition, e.OurPosition);
+                    InvokeStateEvent("at_target", e.Handle, e.TargetPosition, e.OurPosition);
                 }
                 else if (ev is ChangedEvent)
                 {
                     ChangedEvent e = (ChangedEvent)ev;
-                    m_CurrentState.changed(new Integer((int)e.Flags));
+                    m_CurrentState.GetType().GetMethod("changed").Invoke(m_CurrentState, new object[] {(int)e.Flags});
                 }
                 else if (ev is CollisionEvent)
                 {
@@ -204,15 +249,15 @@ namespace SilverSim.Scripting.LSL
                     switch(((CollisionEvent)ev).Type)
                     {
                         case CollisionEvent.CollisionType.Start:
-                            m_CurrentState.collision_start(new Integer(m_Detected.Count));
+                            InvokeStateEvent("collision_start", m_Detected.Count);
                             break;
 
                         case CollisionEvent.CollisionType.End:
-                            m_CurrentState.collision_end(new Integer(m_Detected.Count));
+                            InvokeStateEvent("collision_end", m_Detected.Count);
                             break;
 
                         case CollisionEvent.CollisionType.Continuous:
-                            m_CurrentState.collision(new Integer(m_Detected.Count));
+                            InvokeStateEvent("collision", m_Detected.Count);
                             break;
 
                         default:
@@ -222,22 +267,34 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is DataserverEvent)
                 {
                     DataserverEvent e = (DataserverEvent)ev;
-                    m_CurrentState.dataserver(e.QueryID, e.Data);
+                    InvokeStateEvent("dataserver", e.QueryID, e.Data);
+                }
+                else if(ev is MessageObjectEvent)
+                {
+                    MessageObjectEvent e = (MessageObjectEvent)ev;
+                    if (UseMessageObjectEvent)
+                    {
+                        InvokeStateEvent("object_message", e.ObjectID, e.Data);
+                    }
+                    else
+                    {
+                        InvokeStateEvent("dataserver", e.ObjectID, e.Data);
+                    }
                 }
                 else if (ev is EmailEvent)
                 {
                     EmailEvent e = (EmailEvent)ev;
-                    m_CurrentState.email(e.Time, e.Address, e.Subject, e.Message, e.NumberLeft);
+                    InvokeStateEvent("email", e.Time, e.Address, e.Subject, e.Message, e.NumberLeft);
                 }
                 else if (ev is HttpRequestEvent)
                 {
                     HttpRequestEvent e = (HttpRequestEvent)ev;
-                    m_CurrentState.http_request(e.RequestID, e.Method, e.Body);
+                    InvokeStateEvent("http_request", e.RequestID, e.Method, e.Body);
                 }
                 else if (ev is HttpResponseEvent)
                 {
                     HttpResponseEvent e = (HttpResponseEvent)ev;
-                    m_CurrentState.http_response(e.RequestID, e.Status, e.Metadata, e.Body);
+                    InvokeStateEvent("http_response", e.RequestID, e.Status, e.Metadata, e.Body);
                 }
                 else if (ev is LandCollisionEvent)
                 {
@@ -245,15 +302,15 @@ namespace SilverSim.Scripting.LSL
                     switch(e.Type)
                     {
                         case LandCollisionEvent.CollisionType.Start:
-                            m_CurrentState.land_collision_start(e.Position);
+                            InvokeStateEvent("land_collision_start", e.Position);
                             break;
 
                         case LandCollisionEvent.CollisionType.End:
-                            m_CurrentState.land_collision_end(e.Position);
+                            InvokeStateEvent("land_collision_end", e.Position);
                             break;
 
                         case LandCollisionEvent.CollisionType.Continuous:
-                            m_CurrentState.land_collision(e.Position);
+                            InvokeStateEvent("land_collision", e.Position);
                             break;
 
                         default:
@@ -263,58 +320,58 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is LinkMessageEvent)
                 {
                     LinkMessageEvent e = (LinkMessageEvent)ev;
-                    m_CurrentState.link_message(e.SenderNumber, e.Number, e.Data, e.Id);
+                    InvokeStateEvent("link_message", e.SenderNumber, e.Number, e.Data, e.Id);
                 }
                 else if (ev is ListenEvent)
                 {
                     ListenEvent e = (ListenEvent)ev;
-                    m_CurrentState.listen(e.Channel, e.Name, e.ID, e.Message);
+                    InvokeStateEvent("listen", e.Channel, e.Name, e.ID, e.Message);
                 }
                 else if (ev is MoneyEvent)
                 {
                     MoneyEvent e = (MoneyEvent)ev;
-                    m_CurrentState.money(e.ID, e.Amount);
+                    InvokeStateEvent("money", e.ID, e.Amount);
                 }
                 else if (ev is MovingEndEvent)
                 {
-                    m_CurrentState.moving_end();
+                    InvokeStateEvent("moving_end");
                 }
                 else if (ev is MovingStartEvent)
                 {
-                    m_CurrentState.moving_start();
+                    InvokeStateEvent("moving_start");
                 }
                 else if (ev is NoSensorEvent)
                 {
-                    m_CurrentState.no_sensor();
+                    InvokeStateEvent("no_sensor");
                 }
                 else if (ev is NotAtRotTargetEvent)
                 {
-                    m_CurrentState.not_at_rot_target();
+                    InvokeStateEvent("not_at_rot_target");
                 }
                 else if (ev is NotAtTargetEvent)
                 {
-                    m_CurrentState.not_at_target();
+                    InvokeStateEvent("not_at_target");
                 }
                 else if (ev is ObjectRezEvent)
                 {
                     ObjectRezEvent e = (ObjectRezEvent)ev;
-                    m_CurrentState.object_rez(e.ObjectID);
+                    InvokeStateEvent("object_rez", e.ObjectID);
                 }
                 else if (ev is OnRezEvent)
                 {
                     OnRezEvent e = (OnRezEvent)ev;
                     StartParameter = new Integer(e.StartParam);
-                    m_CurrentState.on_rez(new Integer(e.StartParam));
+                    InvokeStateEvent("on_rez", e.StartParam);
                 }
                 else if (ev is PathUpdateEvent)
                 {
                     PathUpdateEvent e = (PathUpdateEvent)ev;
-                    m_CurrentState.path_update(new Integer(e.Type), e.Reserved);
+                    InvokeStateEvent("path_update", e.Type, e.Reserved);
                 }
                 else if (ev is RemoteDataEvent)
                 {
                     RemoteDataEvent e =(RemoteDataEvent)ev;
-                    m_CurrentState.remote_data(e.Type, e.Channel, e.MessageID, e.Sender, e.IData, e.SData);
+                    InvokeStateEvent("remote_data", e.Type, e.Channel, e.MessageID, e.Sender, e.IData, e.SData);
                 }
                 else if (ev is ResetScriptEvent)
                 {
@@ -323,13 +380,13 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is RuntimePermissionsEvent)
                 {
                     RuntimePermissionsEvent e = (RuntimePermissionsEvent)ev;
-                    m_CurrentState.run_time_permissions(new Integer(e.Permissions));
+                    InvokeStateEvent("run_time_permissions", e.Permissions);
                 }
                 else if (ev is SensorEvent)
                 {
                     SensorEvent e = (SensorEvent)ev;
                     m_Detected = e.Data;
-                    m_CurrentState.sensor(new Integer(m_Detected.Count));
+                    InvokeStateEvent("sensor", m_Detected.Count);
                 }
                 else if (ev is TouchEvent)
                 {
@@ -338,15 +395,15 @@ namespace SilverSim.Scripting.LSL
                     switch(e.Type)
                     {
                         case TouchEvent.TouchType.Start:
-                            m_CurrentState.touch_start(m_Detected.Count);
+                            InvokeStateEvent("touch_start", m_Detected.Count);
                             break;
 
                         case TouchEvent.TouchType.End:
-                            m_CurrentState.touch_end(m_Detected.Count);
+                            InvokeStateEvent("touch_end", m_Detected.Count);
                             break;
 
                         case TouchEvent.TouchType.Continuous:
-                            m_CurrentState.touch(m_Detected.Count);
+                            InvokeStateEvent("touch", m_Detected.Count);
                             break;
 
                         default:
@@ -364,17 +421,20 @@ namespace SilverSim.Scripting.LSL
                     m_ExecutionTime = 0f;
                 }
                 m_CurrentState = m_States["default"];
+                m_CurrentStateMethods.Clear();
+                StartParameter = 0;
                 startticks = Environment.TickCount;
-                m_CurrentState.state_entry();
+                InvokeStateEvent("state_entry");
             }
             catch(ChangeStateException e)
             {
                 TriggerOnStateChange();
                 TriggerOnDispose();
                 m_Events.Clear();
-                m_CurrentState.state_exit();
+                InvokeStateEvent("state_exit");
                 m_CurrentState = m_States[e.NewState];
-                m_CurrentState.state_entry();
+                m_CurrentStateMethods.Clear();
+                InvokeStateEvent("state_entry");
             }
             catch(Exception e)
             {
@@ -395,6 +455,12 @@ namespace SilverSim.Scripting.LSL
                 return m_Events.Count != 0;
             }
         }
+
+        internal void onListen(ListenEvent ev)
+        {
+            PostEvent(ev);
+        }
+
 
         public override void ShoutError(string message)
         {

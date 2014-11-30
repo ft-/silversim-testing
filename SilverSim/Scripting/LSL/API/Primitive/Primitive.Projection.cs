@@ -41,13 +41,13 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         /// Set parameters for light projection in host prim 
         /// </summary>
         [APILevel(APIFlags.OSSL)]
-        public void osSetProjectionParams(bool projection, UUID texture, double fov, double focus, double amb)
+        public static void osSetProjectionParams(ScriptInstance Instance, bool projection, UUID texture, double fov, double focus, double amb)
         {
-            osSetLinkProjectionParams(LINK_THIS, projection, texture, fov, focus, amb);
+            osSetLinkProjectionParams(Instance, LINK_THIS, projection, texture, fov, focus, amb);
         }
 
         [APILevel(APIFlags.OSSL)]
-        public void osSetLinkProjectionParams(int link, bool projection, UUID texture, double fov, double focus, double amb)
+        public static void osSetLinkProjectionParams(ScriptInstance Instance, int link, bool projection, UUID texture, double fov, double focus, double amb)
         {
             ObjectPart.ProjectionParam p = new ObjectPart.ProjectionParam();
             p.IsProjecting = projection;
@@ -56,7 +56,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
             p.ProjectionFocus = focus;
             p.ProjectionAmbience = amb;
 
-            foreach(ObjectPart part in GetLinkTargets(link))
+            foreach(ObjectPart part in GetLinkTargets(Instance, link))
             {
                 part.Projection = p;
             }
@@ -66,7 +66,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         /// Set parameters for light projection with uuid of target prim
         /// </summary>
         [APILevel(APIFlags.OSSL)]
-        public void osSetProjectionParams(UUID prim, bool projection, UUID texture, double fov, double focus, double amb)
+        public static void osSetProjectionParams(ScriptInstance Instance, UUID prim, bool projection, UUID texture, double fov, double focus, double amb)
         {
             lock (Instance)
             {
@@ -78,13 +78,13 @@ namespace SilverSim.Scripting.LSL.API.Primitive
                 ObjectPart part;
                 if (prim == UUID.Zero)
                 {
-                    part = Part;
+                    part = Instance.Part;
                 }
                 else
                 {
                     try
                     {
-                        part = Part.ObjectGroup.Scene.Primitives[prim];
+                        part = Instance.Part.ObjectGroup.Scene.Primitives[prim];
                     }
                     catch
                     {

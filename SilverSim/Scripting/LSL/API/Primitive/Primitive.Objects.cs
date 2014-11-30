@@ -83,96 +83,99 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         public const int OBJECT_TEMP_ON_REZ = 23;
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llGetCenterOfMass()
+        public static Vector3 llGetCenterOfMass(ScriptInstance Instance)
         {
 #warning Implement llGetCenterOfMass()
             return Vector3.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetCreator()
+        public static UUID llGetCreator(ScriptInstance Instance)
         {
-            return Part.Creator.ID;
+            lock (Instance)
+            {
+                return Instance.Part.Creator.ID;
+            }
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llGetObjectDesc()
+        public static string llGetObjectDesc(ScriptInstance Instance)
         {
-            return Part.Name;
+            lock(Instance) return Instance.Part.Name;
         }
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llGetObjectDetails(AnArray param)
+        public static AnArray llGetObjectDetails(ScriptInstance Instance, AnArray param)
         {
             AnArray parout = new AnArray();
-            lock (this)
+            lock (Instance)
             {
-                Part.ObjectGroup.GetObjectDetails(param.GetEnumerator(), ref parout);
+                Instance.Part.ObjectGroup.GetObjectDetails(param.GetEnumerator(), ref parout);
             }
             return parout;
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llGetObjectName()
+        public static string llGetObjectName(ScriptInstance Instance)
         {
-            lock (this)
+            lock (Instance)
             {
-                return Part.Description;
+                return Instance.Part.Description;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetObjectDesc(string desc)
+        public static void llSetObjectDesc(ScriptInstance Instance, string desc)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.Description = desc;
+                Instance.Part.Description = desc;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetObjectName(string name)
+        public static void llSetObjectName(ScriptInstance Instance, string name)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.Name = name;
+                Instance.Part.Name = name;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llSetRegionPos(Vector3 pos)
+        public static int llSetRegionPos(ScriptInstance Instance, Vector3 pos)
         {
 #warning Implement llSetRegionPos(Vector3)
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llGetVel()
-        {
-            lock (this)
-            {
-                return Part.ObjectGroup.Velocity;
-            }
-        }
-
-        [APILevel(APIFlags.LSL)]
-        public UUID llGetOwner()
+        public static Vector3 llGetVel(ScriptInstance Instance)
         {
             lock (Instance)
             {
-                return Part.ObjectGroup.Owner.ID;
+                return Instance.Part.ObjectGroup.Velocity;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetOwnerKey(UUID id)
+        public static UUID llGetOwner(ScriptInstance Instance)
+        {
+            lock (Instance)
+            {
+                return Instance.Part.ObjectGroup.Owner.ID;
+            }
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public static UUID llGetOwnerKey(ScriptInstance Instance, UUID id)
         {
             lock (Instance)
             {
                 ObjectPart part;
                 try
                 {
-                    part = Part.ObjectGroup.Scene.Primitives[id];
+                    part = Instance.Part.ObjectGroup.Scene.Primitives[id];
                 }
                 catch
                 {
@@ -183,67 +186,71 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llGetNumberOfPrims()
+        public static int llGetNumberOfPrims(ScriptInstance Instance)
         {
-            lock (this)
+            lock (Instance)
             {
-                return Part.ObjectGroup.Count;
+                return Instance.Part.ObjectGroup.Count;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetLinkKey(int link)
+        public static UUID llGetLinkKey(ScriptInstance Instance, int link)
         {
-            lock (this)
+            lock (Instance)
             {
                 if (link == LINK_THIS)
                 {
-                    return Part.ID;
+                    return Instance.Part.ID;
                 }
                 else
                 {
-                    return Part.ObjectGroup[link].ID;
+                    return Instance.Part.ObjectGroup[link].ID;
                 }
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llGetLinkName(int link)
+        public static string llGetLinkName(ScriptInstance Instance, int link)
         {
-            lock (this)
+            lock (Instance)
             {
                 if (link == LINK_THIS)
                 {
-                    return Part.Name;
+                    return Instance.Part.Name;
                 }
                 else
                 {
-                    return Part.ObjectGroup[link].Name;
+                    return Instance.Part.ObjectGroup[link].Name;
                 }
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llGetLinkNumber()
+        public static int llGetLinkNumber(ScriptInstance Instance)
         {
-            lock (this)
+            lock (Instance)
             {
-                return Part.LinkNumber;
+                return Instance.Part.LinkNumber;
             }
         }
 
         #region osMessageObject
+        [APILevel(APIFlags.ASSL)]
+        [StateEventDelegate]
+        public delegate void object_message(UUID id, string data);
+
         [APILevel(APIFlags.OSSL)]
-        public void osMessageObject(UUID objectUUID, string message)
+        public static void osMessageObject(ScriptInstance Instance, UUID objectUUID, string message)
         {
-            lock (this)
+            lock (Instance)
             {
                 Instance.CheckThreatLevel(MethodBase.GetCurrentMethod().Name, ScriptInstance.ThreatLevelType.Low);
 
-                IObject obj = Part.ObjectGroup.Scene.Objects[objectUUID];
-                DataserverEvent ev = new DataserverEvent();
+                IObject obj = Instance.Part.ObjectGroup.Scene.Objects[objectUUID];
+                MessageObjectEvent ev = new MessageObjectEvent();
                 ev.Data = message;
-                ev.QueryID = Part.ObjectGroup.ID;
+                ev.ObjectID = Instance.Part.ObjectGroup.ID;
                 obj.PostEvent(ev);
             }
         }

@@ -32,17 +32,12 @@ using System;
 namespace SilverSim.Scripting.LSL.API.Experience
 {
     [ScriptApiName("Experience")]
+    [LSLImplementation]
     public partial class Experience_API : MarshalByRefObject, IScriptApi
     {
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        Script Instance;
-
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
+        public Experience_API()
         {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = (Script)instance;
+
         }
 
         [APILevel(APIFlags.LSL)]
@@ -81,37 +76,37 @@ namespace SilverSim.Scripting.LSL.API.Experience
         public const int XP_ERROR_MATURITY_EXCEEDED = 16;
 
         [APILevel(APIFlags.LSL)]
-        public int llAgentInExperience(UUID agent)
+        public static int llAgentInExperience(ScriptInstance Instance, UUID agent)
         {
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llCreateKeyValue(string k, string v)
+        public static UUID llCreateKeyValue(ScriptInstance Instance, string k, string v)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llDataSizeKeyValue()
+        public static UUID llDataSizeKeyValue(ScriptInstance Instance)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llDeleteKeyValue(string k)
+        public static UUID llDeleteKeyValue(ScriptInstance Instance, string k)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llGetExperienceDetails(UUID experience_id)
+        public static AnArray llGetExperienceDetails(ScriptInstance Instance, UUID experience_id)
         {
             return new AnArray();
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llGetExperienceErrorMessage(int error)
+        public static string llGetExperienceErrorMessage(ScriptInstance Instance, int error)
         {
             switch(error)
             {
@@ -137,43 +132,33 @@ namespace SilverSim.Scripting.LSL.API.Experience
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llKeyCountKeyValue()
+        public static UUID llKeyCountKeyValue(ScriptInstance Instance)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llKeysKeyValue(int first, int count)
+        public static UUID llKeysKeyValue(ScriptInstance Instance, int first, int count)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llReadKeyValue(string k)
+        public static UUID llReadKeyValue(ScriptInstance Instance, string k)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llRequestExperiencePermissions(UUID agent, string name /* unused */)
+        public static void llRequestExperiencePermissions(ScriptInstance Instance, UUID agent, string name /* unused */)
         {
 
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llUpdateKeyValue(string k, string v, int checked_orig, string original_value)
+        public static UUID llUpdateKeyValue(ScriptInstance Instance, string k, string v, int checked_orig, string original_value)
         {
             return UUID.Zero;
-        }
-    }
-
-    [ScriptApiName("Experience")]
-    public class Experience_API_Factory : ScriptApiFactory
-    {
-        public Experience_API_Factory()
-            : base(typeof(Experience_API))
-        {
-
         }
     }
 }

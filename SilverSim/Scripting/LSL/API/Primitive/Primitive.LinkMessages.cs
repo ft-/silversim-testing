@@ -33,7 +33,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
 {
     public partial class Primitive_API
     {
-        private void enqueue_to_scripts(ObjectPart part, LinkMessageEvent ev)
+        private static void enqueue_to_scripts(ObjectPart part, LinkMessageEvent ev)
         {
             foreach(ObjectPartInventoryItem item in part.Inventory.Values)
             {
@@ -50,20 +50,20 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llMessageLinked(int link, int num, string str, UUID id)
+        public static void llMessageLinked(ScriptInstance Instance, int link, int num, string str, UUID id)
         {
-            lock (this)
+            lock (Instance)
             {
                 LinkMessageEvent ev = new LinkMessageEvent();
-                ev.SenderNumber = Part.LinkNumber;
+                ev.SenderNumber = Instance.Part.LinkNumber;
                 ev.TargetNumber = link;
                 ev.Number = num;
                 ev.Data = str;
                 ev.Id = id;
 
-                foreach (ObjectPart part in GetLinkTargets(link))
+                foreach (ObjectPart part in GetLinkTargets(Instance, link))
                 {
-                    enqueue_to_scripts(Part, ev);
+                    enqueue_to_scripts(part, ev);
                 }
             }
         }

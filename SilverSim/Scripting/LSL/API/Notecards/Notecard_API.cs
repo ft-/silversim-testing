@@ -23,35 +23,18 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common;
-using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using System;
 
 namespace SilverSim.Scripting.LSL.API.Notecards
 {
     [ScriptApiName("Notecard")]
-    public class Notecard_API_Factory : ScriptApiFactory
-    {
-        public Notecard_API_Factory()
-            : base(typeof(Notecard_API))
-        {
-
-        }
-    }
-
-    [ScriptApiName("Notecard")]
+    [LSLImplementation]
     public partial class Notecard_API : MarshalByRefObject, IScriptApi
     {
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        ScriptInstance Instance;
-
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
+        public Notecard_API()
         {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = instance;
+
         }
     }
 }

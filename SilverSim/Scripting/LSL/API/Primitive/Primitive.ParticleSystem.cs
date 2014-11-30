@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
+using SilverSim.Scene.Types.Script;
 using System;
 
 namespace SilverSim.Scripting.LSL.API.Primitive
@@ -133,7 +134,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         [APILevel(APIFlags.LSL)]
         public const int PSYS_SRC_PATTERN_ANGLE_CONE_EMPTY = 16;
 
-        private float ValidParticleScale(double value)
+        private static float ValidParticleScale(double value)
         {
             if (value > 4.0f) return 4.0f;
             if (value < 0f) return 0f;
@@ -141,7 +142,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llLinkParticleSystem(int link, AnArray rules)
+        public static void llLinkParticleSystem(ScriptInstance Instance, int link, AnArray rules)
         {
             ParticleSystem ps = new ParticleSystem();
 
@@ -384,7 +385,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
                     case PSYS_SRC_TEXTURE:
                         try
                         {
-                            ps.Texture = getTextureAssetID(value.ToString());
+                            ps.Texture = getTextureAssetID(Instance, value.ToString());
                         }
                         catch(InvalidOperationException)
                         {
@@ -478,7 +479,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
                         }
                         else
                         {
-                            ps.Target = Part.ID;
+                            ps.Target = Instance.Part.ID;
                         }
                         break;
 
@@ -528,7 +529,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
 
             lock (Instance)
             {
-                foreach (ObjectPart part in GetLinkTargets(link))
+                foreach (ObjectPart part in GetLinkTargets(Instance, link))
                 {
                     part.ParticleSystem = ps;
                 }
@@ -536,9 +537,9 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llParticleSystem(AnArray rules)
+        public static void llParticleSystem(ScriptInstance Instance, AnArray rules)
         {
-            llLinkParticleSystem(LINK_THIS, rules);
+            llLinkParticleSystem(Instance, LINK_THIS, rules);
         }
     }
 }

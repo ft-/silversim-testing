@@ -23,8 +23,6 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common;
-using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using System;
@@ -32,31 +30,17 @@ using System;
 namespace SilverSim.Scripting.LSL.API.XMLRPC
 {
     [ScriptApiName("XMLRPC")]
-    public class XMLRPC_API_Factory : ScriptApiFactory
-    {
-        public XMLRPC_API_Factory()
-            : base(typeof(XMLRPC_API))
-        {
-
-        }
-    }
-
-    [ScriptApiName("XMLRPC")]
+    [LSLImplementation]
     public class XMLRPC_API : MarshalByRefObject, IScriptApi
     {
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        ScriptInstance Instance;
 
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
+        public XMLRPC_API()
         {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = instance;
+
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llCloseRemoteDataChannel(UUID key)
+        public static void llCloseRemoteDataChannel(ScriptInstance Instance, UUID key)
         {
 #warning Implement llCloseRemoteDataChannel(UUID)
         }

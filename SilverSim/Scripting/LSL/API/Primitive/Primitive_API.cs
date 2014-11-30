@@ -23,7 +23,6 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
@@ -33,38 +32,18 @@ using System.Collections.Generic;
 namespace SilverSim.Scripting.LSL.API.Primitive
 {
     [ScriptApiName("Primitive")]
-    public class Primitive_API_Factory : ScriptApiFactory
-    {
-        public Primitive_API_Factory()
-            : base(typeof(Primitive_API))
-        {
-
-        }
-    }
-
-    [ScriptApiName("Primitive")]
+    [LSLImplementation]
     public partial class Primitive_API : MarshalByRefObject, IScriptApi
     {
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        ScriptInstance Instance;
-
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
-        {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = instance;
-        }
-
-        public UUID getTextureAssetID(string item)
+        public static UUID getTextureAssetID(ScriptInstance Instance, string item)
         {
             UUID assetID;
             if (!UUID.TryParse(item, out assetID))
             {
                 /* must be an inventory item */
-                lock (this)
+                lock (Instance)
                 {
-                    ObjectPartInventoryItem i = Part.Inventory[item];
+                    ObjectPartInventoryItem i = Instance.Part.Inventory[item];
                     if (i.InventoryType != Types.Inventory.InventoryType.Texture)
                     {
                         throw new InvalidOperationException(string.Format("Inventory item {0} is not a texture", item));
@@ -301,26 +280,26 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         [APILevel(APIFlags.LSL)]
         public const string TEXTURE_MEDIA = "8b5fec65-8d8d-9dc5-cda8-8fdf2716e361";
 
-        protected List<ObjectPart> GetLinkTargets(int link)
+        protected static List<ObjectPart> GetLinkTargets(ScriptInstance Instance, int link)
         {
             List<ObjectPart> list = new List<ObjectPart>();
             if (link == LINK_THIS)
             {
-                list.Add(Part);
+                list.Add(Instance.Part);
             }
             else if (link == LINK_ROOT)
             {
-                list.Add(Part.ObjectGroup.RootPart);
+                list.Add(Instance.Part.ObjectGroup.RootPart);
             }
             else if (link == LINK_SET)
             {
-                list.AddRange(Part.ObjectGroup.Values);
+                list.AddRange(Instance.Part.ObjectGroup.Values);
             }
             else if (link == LINK_ALL_OTHERS)
             {
-                foreach (ObjectPart part in Part.ObjectGroup.Values)
+                foreach (ObjectPart part in Instance.Part.ObjectGroup.Values)
                 {
-                    if (part != Part)
+                    if (part != Instance.Part)
                     {
                         list.Add(part);
                     }
@@ -328,10 +307,15 @@ namespace SilverSim.Scripting.LSL.API.Primitive
             }
             else
             {
-                list.Add(Part.ObjectGroup[link]);
+                list.Add(Instance.Part.ObjectGroup[link]);
             }
 
             return list;
+        }
+
+        public Primitive_API()
+        {
+
         }
     }
 }

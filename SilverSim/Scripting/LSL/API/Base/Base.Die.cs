@@ -27,13 +27,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.API.Base
 {
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public void llDie()
+        public static void llDie(ScriptInstance Instance)
         {
 #warning Implement llDie()
         }

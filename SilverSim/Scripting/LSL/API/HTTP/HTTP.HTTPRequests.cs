@@ -28,13 +28,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.Types;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.APIs.HTTP
 {
     public partial class HTTP_API
     {
         [APILevel(APIFlags.LSL)]
-        public UUID llHTTPRequest(string url, AnArray parameters, string body)
+        public static UUID llHTTPRequest(ScriptInstance Instance, string url, AnArray parameters, string body)
         {
 #warning Implement llHTTPRequest(string, AnArray, string)
             return UUID.Zero;

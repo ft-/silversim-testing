@@ -26,35 +26,168 @@ exception statement from your version.
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Types;
 using System;
 
 namespace SilverSim.Scripting.LSL.API.Base
 {
     [ScriptApiName("Base")]
-    public partial class Base_API : MarshalByRefObject, IScriptApi, IDisposable
+    [LSLImplementation]
+    public partial class Base_API : MarshalByRefObject, IScriptApi
     {
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        ScriptInstance Instance;
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void at_rot_target(int handle, Quaternion targetrot, Quaternion ourrot);
 
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
-        {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = instance;
-        }
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void at_target(int tnum, Vector3 targetpos, Vector3 ourpos);
 
-        public void Dispose()
-        {
-            m_Timer.Enabled = false;
-        }
-    }
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void attach(UUID id);
 
-    [ScriptApiName("Base")]
-    public class Base_API_Factory : ScriptApiFactory
-    {
-        public Base_API_Factory()
-            : base(typeof(Base_API))
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void changed(int change);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void collision(int num_detected);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void collision_end(int num_detected);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void collision_start(int num_detected);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void control(UUID id, int level, int edge);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void dataserver(UUID queryid, string data);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void email(string time, string address, string subject, string message, int num_left);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void http_request(UUID request_id, string method, string body);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void http_response(UUID request_id, int status, AnArray metadata, string body);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void land_collision(Vector3 pos);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void land_collision_end(Vector3 pos);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void land_collision_start(Vector3 pos);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void link_message(int sender_num, int num, string str, UUID id);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void listen(int channel, string name, UUID id, string message);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void money(UUID id, int amount);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void moving_end();
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void moving_start();
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void no_sensor();
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void not_at_rot_target();
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void not_at_target();
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void object_rez(UUID id);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void on_rez(int start_param);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void path_update(int type, AnArray reserved);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void remote_data(int event_type, UUID channel, UUID message_id, string sender, int idata, string sdata);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void run_time_permissions(int perm);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void sensor(int num_detected);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void state_entry();
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void state_exit();
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void timer();
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void touch(int num_detected);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void touch_end(int num_detected);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void touch_start(int num_detected);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void transaction_result(UUID id, int success, string data);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void experience_permissions(UUID agent_id);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void experience_permissions_denied(UUID agent_id, int reason);
+
+        public Base_API()
         {
 
         }

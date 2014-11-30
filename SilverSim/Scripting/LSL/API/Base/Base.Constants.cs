@@ -36,7 +36,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         [APILevel(APIFlags.LSL)]
         public const int FALSE = 0;
         [APILevel(APIFlags.LSL)]
-        public string NULL_KEY = "00000000-0000-0000-0000-000000000000";
+        public const string NULL_KEY = "00000000-0000-0000-0000-000000000000";
 
         [APILevel(APIFlags.LSL)]
         public static readonly Vector3 ZERO_VECTOR = Vector3.Zero;

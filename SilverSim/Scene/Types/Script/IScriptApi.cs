@@ -52,6 +52,5 @@ namespace SilverSim.Scene.Types.Script
 
     public interface IScriptApi
     {
-        void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem);
     }
 }

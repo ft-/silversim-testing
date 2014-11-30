@@ -29,6 +29,7 @@ using SilverSim.Types;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
+using SilverSim.Scene.Types.Script;
 using System;
 using System.Reflection;
 
@@ -38,7 +39,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
     {
         #region osMakeNotecard
         [APILevel(APIFlags.OSSL)]
-        public void osMakeNotecard(string notecardName, AnArray contents)
+        public static void osMakeNotecard(ScriptInstance Instance, string notecardName, AnArray contents)
         {
             string nc = string.Empty;
 
@@ -50,24 +51,24 @@ namespace SilverSim.Scripting.LSL.API.Notecards
                 }
                 nc += val.ToString();
             }
-            osMakeNotecard(notecardName, nc);
+            osMakeNotecard(Instance, notecardName, nc);
         }
 
         [APILevel(APIFlags.OSSL)]
-        public void osMakeNotecard(string notecardName, string contents)
+        public static void osMakeNotecard(ScriptInstance Instance, string notecardName, string contents)
         {
-            lock (this)
+            lock (Instance)
             {
                 Notecard nc = new Notecard();
                 nc.Text = contents;
                 AssetData asset = nc;
                 asset.ID = UUID.Random;
                 asset.Name = notecardName;
-                asset.Creator = Part.ObjectGroup.Owner;
+                asset.Creator = Instance.Part.ObjectGroup.Owner;
                 asset.Description = "osMakeNotecard";
-                Part.ObjectGroup.Scene.AssetService.Store(asset);
+                Instance.Part.ObjectGroup.Scene.AssetService.Store(asset);
                 ObjectPartInventoryItem item = new ObjectPartInventoryItem(asset);
-                item.ParentFolderID = Part.ID;
+                item.ParentFolderID = Instance.Part.ID;
 
                 for (uint i = 0; i < 1000; ++i)
                 {
@@ -81,7 +82,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
                     }
                     try
                     {
-                        Part.Inventory.Add(item.ID, item.Name, item);
+                        Instance.Part.Inventory.Add(item.ID, item.Name, item);
                     }
                     catch
                     {
@@ -95,12 +96,12 @@ namespace SilverSim.Scripting.LSL.API.Notecards
 
         #region osGetNotecard
         [APILevel(APIFlags.OSSL)]
-        public string osGetNotecard(string name)
+        public static string osGetNotecard(ScriptInstance Instance, string name)
         {
-            lock (this)
+            lock (Instance)
             {
                 ObjectPartInventoryItem item;
-                if (Part.Inventory.TryGetValue(name, out item))
+                if (Instance.Part.Inventory.TryGetValue(name, out item))
                 {
                     if (item.InventoryType != InventoryType.Notecard)
                     {
@@ -108,7 +109,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
                     }
                     else
                     {
-                        Notecard nc = Part.ObjectGroup.Scene.GetService<NotecardCache>()[item.AssetID];
+                        Notecard nc = Instance.Part.ObjectGroup.Scene.GetService<NotecardCache>()[item.AssetID];
                         return nc.Text;
                     }
                 }
@@ -122,12 +123,12 @@ namespace SilverSim.Scripting.LSL.API.Notecards
 
         #region osGetNotecardLine
         [APILevel(APIFlags.OSSL)]
-        public string osGetNotecardLine(string name, int line)
+        public static string osGetNotecardLine(ScriptInstance Instance, string name, int line)
         {
             ObjectPartInventoryItem item;
-            lock (this)
+            lock (Instance)
             {
-                if (Part.Inventory.TryGetValue(name, out item))
+                if (Instance.Part.Inventory.TryGetValue(name, out item))
                 {
                     if (item.InventoryType != InventoryType.Notecard)
                     {
@@ -135,7 +136,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
                     }
                     else
                     {
-                        Notecard nc = Part.ObjectGroup.Scene.GetService<NotecardCache>()[item.AssetID];
+                        Notecard nc = Instance.Part.ObjectGroup.Scene.GetService<NotecardCache>()[item.AssetID];
                         string[] lines = nc.Text.Split('\n');
                         if (line >= lines.Length || line < 0)
                         {
@@ -154,12 +155,12 @@ namespace SilverSim.Scripting.LSL.API.Notecards
 
         #region osGetNumberOfNotecardLines
         [APILevel(APIFlags.OSSL)]
-        public int osGetNumberOfNotecardLines(string name)
+        public static int osGetNumberOfNotecardLines(ScriptInstance Instance, string name)
         {
             ObjectPartInventoryItem item;
-            lock (this)
+            lock (Instance)
             {
-                if (Part.Inventory.TryGetValue(name, out item))
+                if (Instance.Part.Inventory.TryGetValue(name, out item))
                 {
                     if (item.InventoryType != InventoryType.Notecard)
                     {
@@ -167,7 +168,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
                     }
                     else
                     {
-                        Notecard nc = Part.ObjectGroup.Scene.GetService<NotecardCache>()[item.AssetID];
+                        Notecard nc = Instance.Part.ObjectGroup.Scene.GetService<NotecardCache>()[item.AssetID];
                         return nc.Text.Split('\n').Length;
                     }
                 }

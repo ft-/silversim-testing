@@ -24,13 +24,14 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.API.Base
 {
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public void llResetTime()
+        public static void llResetTime(ScriptInstance Instance)
         {
             lock(Instance)
             {
@@ -39,7 +40,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llGetTime()
+        public static double llGetTime(ScriptInstance Instance)
         {
             double v;
             lock (Instance)
@@ -50,7 +51,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llGetAndResetTime()
+        public static double llGetAndResetTime(ScriptInstance Instance)
         {
             double old;
             lock(Instance)

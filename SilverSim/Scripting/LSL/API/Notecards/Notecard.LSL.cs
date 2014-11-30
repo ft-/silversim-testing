@@ -27,6 +27,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
 using System;
@@ -38,12 +39,12 @@ namespace SilverSim.Scripting.LSL.API.Notecards
         public const string EOF = "\n\n\n";
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetNotecardLine(string name, int line)
+        public static UUID llGetNotecardLine(ScriptInstance Instance, string name, int line)
         {
-            lock (this)
+            lock (Instance)
             {
                 ObjectPartInventoryItem item;
-                if (Part.Inventory.TryGetValue(name, out item))
+                if (Instance.Part.Inventory.TryGetValue(name, out item))
                 {
                     if (item.InventoryType != InventoryType.Notecard)
                     {
@@ -54,20 +55,20 @@ namespace SilverSim.Scripting.LSL.API.Notecards
                         UUID query = UUID.Random;
 
 #warning Move this code out of here as it should be async to the script
-                        Notecard nc = Part.ObjectGroup.Scene.GetService<NotecardCache>()[item.AssetID];
+                        Notecard nc = Instance.Part.ObjectGroup.Scene.GetService<NotecardCache>()[item.AssetID];
                         string[] lines = nc.Text.Split('\n');
                         DataserverEvent e = new DataserverEvent();
                         if (line >= lines.Length || line < 0)
                         {
                             e.Data = EOF;
                             e.QueryID = query;
-                            Part.PostEvent(e);
+                            Instance.Part.PostEvent(e);
                             return query;
                         }
 
                         e.Data = lines[line];
                         e.QueryID = query;
-                        Part.PostEvent(e);
+                        Instance.Part.PostEvent(e);
                         return query;
                     }
                 }
@@ -79,12 +80,12 @@ namespace SilverSim.Scripting.LSL.API.Notecards
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetNumberOfNotecardLines(string name)
+        public static UUID llGetNumberOfNotecardLines(ScriptInstance Instance, string name)
         {
             ObjectPartInventoryItem item;
-            lock (this)
+            lock (Instance)
             {
-                if (Part.Inventory.TryGetValue(name, out item))
+                if (Instance.Part.Inventory.TryGetValue(name, out item))
                 {
                     if (item.InventoryType != InventoryType.Notecard)
                     {
@@ -94,7 +95,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
                     {
                         UUID query = UUID.Random;
 #warning Move this code out of here as it should be async to the script
-                        Notecard nc = Part.ObjectGroup.Scene.GetService<NotecardCache>()[item.AssetID];
+                        Notecard nc = Instance.Part.ObjectGroup.Scene.GetService<NotecardCache>()[item.AssetID];
                         DataserverEvent e = new DataserverEvent();
                         e.Data = nc.Text.Split('\n').Length.ToString();
                         e.QueryID = query;

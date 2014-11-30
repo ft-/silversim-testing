@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.ServiceInterfaces.IM;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using SilverSim.Types.IM;
 
@@ -32,19 +33,20 @@ namespace SilverSim.Scripting.LSL.APIs.IM
     public partial class IM_API
     {
         [APILevel(APIFlags.LSL)]
-        public void llInstantMessage(UUID user, string message)
+        public static void llInstantMessage(ScriptInstance Instance, UUID user, string message)
         {
-            IMServiceInterface imservice = Part.ObjectGroup.Scene.GetService<IMServiceInterface>();
-            GridInstantMessage im = new GridInstantMessage();
-            im.FromAgent.ID = Part.ObjectGroup.ID;
-            im.FromAgent.FullName = Part.ObjectGroup.Name;
-            im.ToAgent.ID = user;
-            im.Position = Part.ObjectGroup.GlobalPosition;
-            im.RegionID = Part.ObjectGroup.Scene.ID;
-            im.Message = message;
-            im.OnResult = delegate(GridInstantMessage imret, bool success) { };
-            lock (Instance)
+            lock(Instance)
             {
+                IMServiceInterface imservice = Instance.Part.ObjectGroup.Scene.GetService<IMServiceInterface>();
+                GridInstantMessage im = new GridInstantMessage();
+                im.FromAgent.ID = Instance.Part.ObjectGroup.ID;
+                im.FromAgent.FullName = Instance.Part.ObjectGroup.Name;
+                im.ToAgent.ID = user;
+                im.Position = Instance.Part.ObjectGroup.GlobalPosition;
+                im.RegionID = Instance.Part.ObjectGroup.Scene.ID;
+                im.Message = message;
+                im.OnResult = delegate(GridInstantMessage imret, bool success) { };
+
                 imservice.Send(im);
             }
         }

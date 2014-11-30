@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 
@@ -36,7 +37,7 @@ namespace SilverSim.Scripting.LSL.API.Sound
     public partial class Sound_API
     {
         [APILevel(APIFlags.LSL)]
-        public void llCollisionSound(string impact_sound, double impact_volume)
+        public static void llCollisionSound(ScriptInstance Instance, string impact_sound, double impact_volume)
         {
             ObjectPart.CollisionSoundParam para = new ObjectPart.CollisionSoundParam();
 
@@ -48,8 +49,8 @@ namespace SilverSim.Scripting.LSL.API.Sound
                 para.ImpactVolume = impact_volume;
                 try
                 {
-                    para.ImpactSound = getSoundAssetID(impact_sound);
-                    Part.CollisionSound = para;
+                    para.ImpactSound = getSoundAssetID(Instance, impact_sound);
+                    Instance.Part.CollisionSound = para;
                 }
                 catch
                 {
@@ -59,73 +60,73 @@ namespace SilverSim.Scripting.LSL.API.Sound
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llLoopSound(string sound, double volume)
+        public static void llLoopSound(ScriptInstance Instance, string sound, double volume)
         {
 #warning Implement llLoopSound(string, double)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llLoopSoundMaster(string sound, double volume)
+        public static void llLoopSoundMaster(ScriptInstance Instance, string sound, double volume)
         {
 #warning Implement llLoopSoundMaster(string, double)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llLoopSoundSlave(string sound, double volume)
+        public static void llLoopSoundSlave(ScriptInstance Instance, string sound, double volume)
         {
 #warning Implement llLoopSoundSlave(string, double)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llPreloadSound(string sound)
+        public static void llPreloadSound(ScriptInstance Instance, string sound)
         {
 #warning Implement llPreloadSound(string)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llStopSound()
+        public static void llStopSound(ScriptInstance Instance)
         {
 #warning Implement llStopSound()
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llPlaySound(string sound, double volume)
+        public static void llPlaySound(ScriptInstance Instance, string sound, double volume)
         {
 #warning Implement llPlaySound(string, double)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llPlaySoundSlave(string sound, double volume)
+        public static void llPlaySoundSlave(ScriptInstance Instance, string sound, double volume)
         {
 #warning Implement llPlaySoundSlave(string, double)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llTriggerSound(string sound, double volume)
+        public static void llTriggerSound(ScriptInstance Instance, string sound, double volume)
         {
 #warning Implement llTriggerSound(string, double)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llTriggerSoundLimited(string sound, double volume, Vector3 top_north_east, Vector3 bottom_south_west)
+        public static void llTriggerSoundLimited(ScriptInstance Instance, string sound, double volume, Vector3 top_north_east, Vector3 bottom_south_west)
         {
 #warning Implement llTriggerSoundLimited(string, double, Vector3, Vector3)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llAdjustSoundVolume(double volume)
+        public static void llAdjustSoundVolume(ScriptInstance Instance, double volume)
         {
 #warning Implement llAdjustSoundVolume(double)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetSoundQueueing(int queue)
+        public static void llSetSoundQueueing(ScriptInstance Instance, int queue)
         {
-            Part.IsSoundQueueing = queue != 0;
+            lock (Instance) Instance.Part.IsSoundQueueing = queue != 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetSoundRadius(double radius)
+        public static void llSetSoundRadius(ScriptInstance Instance, double radius)
         {
 #warning Implement llSetSoundRadius(double)
         }

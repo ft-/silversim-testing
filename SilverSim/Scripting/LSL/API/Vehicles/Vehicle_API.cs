@@ -23,8 +23,6 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common;
-using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using System;
@@ -32,37 +30,22 @@ using System;
 namespace SilverSim.Scripting.LSL.API.Vehicles
 {
     [ScriptApiName("Vehicle")]
-    public class Vehicle_API_Factory : ScriptApiFactory
-    {
-        public Vehicle_API_Factory()
-            : base(typeof(Vehicle_API))
-        {
-
-        }
-    }
-
-    [ScriptApiName("Vehicle")]
+    [LSLImplementation]
     public class Vehicle_API : MarshalByRefObject, IScriptApi
     {
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        ScriptInstance Instance;
-
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
+        public Vehicle_API()
         {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = instance;
+
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetVehicleFlags(int flags)
+        public static void llSetVehicleFlags(ScriptInstance Instance, int flags)
         {
 #warning Implement llSetVehicleFlags(int)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llRemoveVehicleFlags(int flags)
+        public static void llRemoveVehicleFlags(ScriptInstance Instance, int flags)
         {
 #warning Implement llRemoveVehicleFlags(int)
         }
@@ -103,7 +86,7 @@ namespace SilverSim.Scripting.LSL.API.Vehicles
         public const int VEHICLE_VERTICAL_ATTRACTION_TIMESCALE = 37;
 
         [APILevel(APIFlags.LSL)]
-        public void llSetVehicleFloatParam(int param, double value)
+        public static void llSetVehicleFloatParam(ScriptInstance Instance, int param, double value)
         {
 #warning Implement llSetVehicleFloatParam(int, double)
         }
@@ -111,7 +94,7 @@ namespace SilverSim.Scripting.LSL.API.Vehicles
         [APILevel(APIFlags.LSL)]
         public const int VEHICLE_REFERENCE_FRAME = 44;
         [APILevel(APIFlags.LSL)]
-        public void llSetVehicleRotationParam(int param, Quaternion rot)
+        public static void llSetVehicleRotationParam(ScriptInstance Instance, int param, Quaternion rot)
         {
 #warning Implement llSetVehicleRotationParam(int, Quaternion)
         }
@@ -129,7 +112,7 @@ namespace SilverSim.Scripting.LSL.API.Vehicles
         [APILevel(APIFlags.LSL)]
         public const int VEHICLE_TYPE_BALLOON = 5;
         [APILevel(APIFlags.LSL)]
-        public void llSetVehicleType(int type)
+        public static void llSetVehicleType(ScriptInstance Instance, int type)
         {
 #warning Implement llSetVehicleType(int)
         }
@@ -145,7 +128,7 @@ namespace SilverSim.Scripting.LSL.API.Vehicles
         [APILevel(APIFlags.LSL)]
         public const int VEHICLE_LINEAR_MOTOR_OFFSET = 20;
         [APILevel(APIFlags.LSL)]
-        public void llSetVehicleVectorParam(int param, Vector3 vec)
+        public static void llSetVehicleVectorParam(ScriptInstance Instance, int param, Vector3 vec)
         {
 #warning Implement llSetVehicleVectorParam(int, Vector3)
         }

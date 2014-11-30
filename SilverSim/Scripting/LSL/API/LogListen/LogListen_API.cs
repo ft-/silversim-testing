@@ -30,33 +30,17 @@ using System;
 
 namespace SilverSim.Scripting.LSL.API.LogListen
 {
-
     [ScriptApiName("LogListen")]
-    public class LogListen_API_Factory : ScriptApiFactory
+    [LSLImplementation]
+    public class LogListen_API : MarshalByRefObject, IScriptApi
     {
-        public LogListen_API_Factory()
-            : base(typeof(LogListen_API))
+        public LogListen_API()
         {
 
-        }
-    }
-
-    [ScriptApiName("LogListen")]
-    public partial class LogListen_API : MarshalByRefObject, IScriptApi
-    {
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        ScriptInstance Instance;
-
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
-        {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = instance;
         }
 
         [APILevel(APIFlags.ASSL)]
-        public void asLogListen(int onChannel, int enable)
+        public static void asLogListen(ScriptInstance Instance, int onChannel, int enable)
         {
 
         }

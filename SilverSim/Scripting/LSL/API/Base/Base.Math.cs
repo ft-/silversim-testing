@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.Types;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.API.Base
 {
@@ -47,7 +48,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         public const double SQRT2 = 1.414213538f;
 
         [APILevel(APIFlags.LSL)]
-        public int llAbs(int v)
+        public static int llAbs(ScriptInstance Instance, int v)
         {
             if(v < 0)
             {
@@ -60,97 +61,97 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llAcos(double v)
+        public static double llAcos(ScriptInstance Instance, double v)
         {
             return Math.Acos(v);
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llAsin(double v)
+        public static double llAsin(ScriptInstance Instance, double v)
         {
             return Math.Asin(v);
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llAtan2(double y, double x)
+        public static double llAtan2(ScriptInstance Instance, double y, double x)
         {
             return Math.Atan2(y, x);
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llCos(double v)
+        public static double llCos(ScriptInstance Instance, double v)
         {
             return Math.Cos(v);
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llFabs(double v)
+        public static double llFabs(ScriptInstance Instance, double v)
         {
             return Math.Abs(v);
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llLog(double v)
+        public static double llLog(ScriptInstance Instance, double v)
         {
             return Math.Log(v);
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llLog10(double v)
+        public static double llLog10(ScriptInstance Instance, double v)
         {
             return Math.Log10(v);
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llPow(double bas, double exponent)
+        public static double llPow(ScriptInstance Instance, double bas, double exponent)
         {
             return Math.Pow(bas, exponent);
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llSin(double v)
+        public static double llSin(ScriptInstance Instance, double v)
         {
             return Math.Sin(v);
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llSqrt(double v)
+        public static double llSqrt(ScriptInstance Instance, double v)
         {
             return Math.Sqrt(v);
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llTan(double v)
+        public static double llTan(ScriptInstance Instance, double v)
         {
             return Math.Tan(v);
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llVecDist(Vector3 a, Vector3 b)
+        public static double llVecDist(ScriptInstance Instance, Vector3 a, Vector3 b)
         {
             return (a - b).Length;
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llVecMag(Vector3 v)
+        public static double llVecMag(ScriptInstance Instance, Vector3 v)
         {
             return v.Length;
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llVecNorm(Vector3 v)
+        public static Vector3 llVecNorm(ScriptInstance Instance, Vector3 v)
         {
             return v / v.Length;
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llModPow(int a, int b, int c)
+        public static int llModPow(ScriptInstance Instance, int a, int b, int c)
         {
             return ((int)Math.Pow(a, b)) % c;
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llRot2Euler(Quaternion q)
+        public static Vector3 llRot2Euler(ScriptInstance Instance, Quaternion q)
         {
             double roll, pitch, yaw;
 
@@ -159,7 +160,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llRot2Angle(Quaternion r)
+        public static double llRot2Angle(ScriptInstance Instance, Quaternion r)
         {
             /* based on http://wiki.secondlife.com/wiki/LlRot2Angle */
             double s2 = r.Z * r.Z; // square of the s-element
@@ -174,25 +175,25 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llRot2Axis(Quaternion q)
+        public static Vector3 llRot2Axis(ScriptInstance Instance, Quaternion q)
         {
-            return llVecNorm(new Vector3(q.X, q.Y, q.Z)) * Math.Sign(q.W);
+            return llVecNorm(Instance, new Vector3(q.X, q.Y, q.Z)) * Math.Sign(q.W);
         }
 
         [APILevel(APIFlags.LSL)]
-        public Quaternion llAxisAngle2Rot(Vector3 axis, double angle)
+        public static Quaternion llAxisAngle2Rot(ScriptInstance Instance, Vector3 axis, double angle)
         {
             return Quaternion.CreateFromAxisAngle(axis, angle);
         }
 
         [APILevel(APIFlags.LSL)]
-        public Quaternion llEuler2Rot(Vector3 v)
+        public static Quaternion llEuler2Rot(ScriptInstance Instance, Vector3 v)
         {
             return Quaternion.CreateFromEulers(v);
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llAngleBetween(Quaternion a, Quaternion b)
+        public static double llAngleBetween(ScriptInstance Instance, Quaternion a, Quaternion b)
         {   /* based on http://wiki.secondlife.com/wiki/LlAngleBetween */
             Quaternion r = b / a;
             double s2 = r.W * r.W;
@@ -209,7 +210,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public Quaternion llAxes2Rot(Vector3 fwd, Vector3 left, Vector3 up)
+        public static Quaternion llAxes2Rot(ScriptInstance Instance, Vector3 fwd, Vector3 left, Vector3 up)
         {
             double s;
             double t = fwd.X + left.Y + up.Z + 1.0;
@@ -254,7 +255,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llRot2Fwd(Quaternion r)
+        public static Vector3 llRot2Fwd(ScriptInstance Instance, Quaternion r)
         {
             double x, y, z, sq;
             sq = r.LengthSquared;
@@ -274,7 +275,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llRot2Left(Quaternion r)
+        public static Vector3 llRot2Left(ScriptInstance Instance, Quaternion r)
         {
             double x, y, z, sq;
 
@@ -295,7 +296,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llRot2Up(Quaternion r)
+        public static Vector3 llRot2Up(ScriptInstance Instance, Quaternion r)
         {
             double x, y, z, sq;
 
@@ -316,32 +317,32 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public Quaternion llRotBetween(Vector3 a, Vector3 b)
+        public static Quaternion llRotBetween(ScriptInstance Instance, Vector3 a, Vector3 b)
         {
             return Quaternion.RotBetween(a, b);
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llFloor(double f)
+        public static int llFloor(ScriptInstance Instance, double f)
         {
             return (int)Math.Floor(f);
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llCeil(double f)
+        public static int llCeil(ScriptInstance Instance, double f)
         {
             return (int)Math.Ceiling(f);
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llRound(double f)
+        public static int llRound(ScriptInstance Instance, double f)
         {
             return (int)Math.Round(f, MidpointRounding.AwayFromZero);
         }
 
         private static Random random = new Random();
         [APILevel(APIFlags.LSL)]
-        public double llFrand(double mag)
+        public static double llFrand(ScriptInstance Instance, double mag)
         {
             return random.NextDouble() * mag;
         }

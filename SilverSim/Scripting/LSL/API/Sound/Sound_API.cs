@@ -23,7 +23,6 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
@@ -32,38 +31,18 @@ using System;
 namespace SilverSim.Scripting.LSL.API.Sound
 {
     [ScriptApiName("Sound")]
-    public class Sound_API_Factory : ScriptApiFactory
-    {
-        public Sound_API_Factory()
-            : base(typeof(Sound_API))
-        {
-
-        }
-    }
-
-    [ScriptApiName("Sound")]
+    [LSLImplementation]
     public partial class Sound_API : MarshalByRefObject, IScriptApi
     {
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        ScriptInstance Instance;
-
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
-        {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = instance;
-        }
-
-        public UUID getSoundAssetID(string item)
+        public static UUID getSoundAssetID(ScriptInstance Instance, string item)
         {
             UUID assetID;
             if (!UUID.TryParse(item, out assetID))
             {
                 /* must be an inventory item */
-                lock (this)
+                lock (Instance)
                 {
-                    ObjectPartInventoryItem i = Part.Inventory[item];
+                    ObjectPartInventoryItem i = Instance.Part.Inventory[item];
                     if (i.InventoryType != Types.Inventory.InventoryType.Sound)
                     {
                         throw new InvalidOperationException(string.Format("Inventory item {0} is not a sound", item));
@@ -74,5 +53,9 @@ namespace SilverSim.Scripting.LSL.API.Sound
             return assetID;
         }
 
+        public Sound_API()
+        {
+
+        }
     }
 }

@@ -33,14 +33,16 @@ namespace SilverSim.Scripting.LSL
     [Flags]
     public enum APIFlags
     {
+        None = 0,
         LSL = 1 << 0,
         LightShare = 1 << 1,
         OSSL = 1 << 2,
-        ASSL = 1 << 3
+        ASSL = 1 << 3,
+        ASSL_Admin = 1 << 4
     }
 
     [Serializable]
-    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field, Inherited = false)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Delegate, Inherited = false)]
     public class APILevel : Attribute
     {
         public readonly APIFlags Flags;
@@ -55,6 +57,26 @@ namespace SilverSim.Scripting.LSL
     public class ExecutedOnStateChange : Attribute
     {
         public ExecutedOnStateChange()
+        {
+
+        }
+    }
+
+    [Serializable]
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    public class LSLImplementation : Attribute
+    {
+        public LSLImplementation()
+        {
+
+        }
+    }
+
+    [Serializable]
+    [AttributeUsage(AttributeTargets.Delegate, Inherited = false)]
+    public class StateEventDelegate : Attribute
+    {
+        public StateEventDelegate()
         {
 
         }

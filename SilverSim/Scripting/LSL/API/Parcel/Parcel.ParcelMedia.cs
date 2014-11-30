@@ -23,17 +23,13 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 
 namespace SilverSim.Scripting.LSL.API.Parcel
 {
     public partial class Parcel_API
     {
-
         [APILevel(APIFlags.LSL)]
         public const int PARCEL_MEDIA_COMMAND_STOP = 0;
         [APILevel(APIFlags.LSL)]
@@ -64,13 +60,13 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         public const int PARCEL_MEDIA_COMMAND_LOOP_SET = 13;
 
         [APILevel(APIFlags.LSL)]
-        public void llParcelMediaCommandList(AnArray commandList)
+        public static void llParcelMediaCommandList(ScriptInstance Instance, AnArray commandList)
         {
 
         }
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llParcelMediaQuery(AnArray query)
+        public static AnArray llParcelMediaQuery(ScriptInstance Instance, AnArray query)
         {
             return new AnArray();
         }

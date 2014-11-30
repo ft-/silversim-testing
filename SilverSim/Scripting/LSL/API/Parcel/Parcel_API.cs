@@ -31,29 +31,9 @@ using System;
 namespace SilverSim.Scripting.LSL.API.Parcel
 {
     [ScriptApiName("Parcel")]
-    public class Parcel_API_Factory : ScriptApiFactory
-    {
-        public Parcel_API_Factory()
-            : base(typeof(Parcel_API))
-        {
-
-        }
-    }
-
-    [ScriptApiName("Parcel")]
+    [LSLImplementation]
     public partial class Parcel_API : MarshalByRefObject, IScriptApi
     {
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        ScriptInstance Instance;
-
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
-        {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = instance;
-        }
-
         [APILevel(APIFlags.LSL)]
         public const int PARCEL_FLAG_ALLOW_FLY = 0x1;                           
         [APILevel(APIFlags.LSL)]
@@ -86,5 +66,10 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         public const int PARCEL_FLAG_ALLOW_ALL_OBJECT_ENTRY = 0x8000000;
         [APILevel(APIFlags.LSL)]
         public const int PARCEL_FLAG_ALLOW_GROUP_OBJECT_ENTRY = 0x10000000;    
+
+        public Parcel_API()
+        {
+
+        }
     }
 }

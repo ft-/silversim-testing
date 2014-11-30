@@ -25,6 +25,7 @@ exception statement from your version.
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace SilverSim.Types.Asset
 {
@@ -36,6 +37,14 @@ namespace SilverSim.Types.Asset
         public AssetData() : base()
         {
 
+        }
+
+        public Stream InputStream
+        {
+            get
+            {
+                return new MemoryStream(Data);
+            }
         }
 
         #region References accessor

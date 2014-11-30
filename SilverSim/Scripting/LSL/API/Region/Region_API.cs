@@ -23,37 +23,15 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common;
-using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using System;
 
 namespace SilverSim.Scripting.LSL.API.Region
 {
     [ScriptApiName("Region")]
-    public class Region_API_Factory : ScriptApiFactory
-    {
-        public Region_API_Factory()
-            : base(typeof(Region_API))
-        {
-
-        }
-    }
-
-    [ScriptApiName("Region")]
+    [LSLImplementation]
     public partial class Region_API : MarshalByRefObject, IScriptApi
     {
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        ScriptInstance Instance;
-
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
-        {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = instance;
-        }
-
         [APILevel(APIFlags.LSL)]
         public const int REGION_FLAG_ALLOW_DAMAGE = 0x1;
         [APILevel(APIFlags.LSL)]
@@ -71,6 +49,11 @@ namespace SilverSim.Scripting.LSL.API.Region
         [APILevel(APIFlags.LSL)]
         public const int REGION_FLAG_ALLOW_DIRECT_TELEPORT = 0x100000;
         [APILevel(APIFlags.LSL)]
-        public const int REGION_FLAG_RESTRICT_PUSHOBJECT = 0x400000;         
+        public const int REGION_FLAG_RESTRICT_PUSHOBJECT = 0x400000;   
+      
+        public Region_API()
+        {
+
+        }
     }
 }

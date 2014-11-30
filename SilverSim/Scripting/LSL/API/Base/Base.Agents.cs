@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 
 namespace SilverSim.Scripting.LSL.API.Base
@@ -31,9 +32,9 @@ namespace SilverSim.Scripting.LSL.API.Base
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public int llGetRegionAgentCount()
+        public static int llGetRegionAgentCount(ScriptInstance Instance)
         {
-            return Part.ObjectGroup.Scene.Agents.Count;
+            return Instance.Part.ObjectGroup.Scene.Agents.Count;
         }
 
         [APILevel(APIFlags.LSL)]
@@ -53,45 +54,45 @@ namespace SilverSim.Scripting.LSL.API.Base
         public const int PAYMENT_INFO_USED = 0x2;
 
         [APILevel(APIFlags.LSL)]
-        public UUID llRequestAgentData(UUID id, int data)
+        public static UUID llRequestAgentData(ScriptInstance Instance, UUID id, int data)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llRequestDisplayName(UUID id)
+        public static UUID llRequestDisplayName(ScriptInstance Instance, UUID id)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llRequestUsername(UUID id)
+        public static UUID llRequestUsername(ScriptInstance Instance, UUID id)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llGetDisplayName(UUID id)
+        public static string llGetDisplayName(ScriptInstance Instance, UUID id)
         {
             return string.Empty;
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llGetAgentSize(UUID id)
+        public static Vector3 llGetAgentSize(ScriptInstance Instance, UUID id)
         {
             lock (Instance)
             {
                 IAgent agent;
                 try
                 {
-                    agent = Part.ObjectGroup.Scene.Agents[id];
+                    agent = Instance.Part.ObjectGroup.Scene.Agents[id];
                 }
                 catch
                 {
                     return Vector3.Zero;
                 }
 
-                if (agent.IsInScene(Part.ObjectGroup.Scene))
+                if (agent.IsInScene(Instance.Part.ObjectGroup.Scene))
                 {
                     return agent.Size;
                 }
@@ -101,15 +102,15 @@ namespace SilverSim.Scripting.LSL.API.Base
 
         #region osGetAvatarList
         [APILevel(APIFlags.OSSL)]
-        public AnArray osGetAvatarList()
+        public static AnArray osGetAvatarList(ScriptInstance Instance)
         {
             AnArray res = new AnArray();
 
-            lock (this)
+            lock (Instance)
             {
-                foreach (IAgent agent in Part.ObjectGroup.Scene.Agents)
+                foreach (IAgent agent in Instance.Part.ObjectGroup.Scene.Agents)
                 {
-                    if (agent.ID == Part.ObjectGroup.Scene.Owner.ID)
+                    if (agent.ID == Instance.Part.ObjectGroup.Scene.Owner.ID)
                     {
                         continue;
                     }
@@ -124,13 +125,13 @@ namespace SilverSim.Scripting.LSL.API.Base
 
         #region osGetAgents
         [APILevel(APIFlags.OSSL)]
-        public AnArray osGetAgents()
+        public static AnArray osGetAgents(ScriptInstance Instance)
         {
             AnArray res = new AnArray();
 
-            lock (this)
+            lock (Instance)
             {
-                foreach (IAgent agent in Part.ObjectGroup.Scene.Agents)
+                foreach (IAgent agent in Instance.Part.ObjectGroup.Scene.Agents)
                 {
                     res.Add(agent.Name);
                 }

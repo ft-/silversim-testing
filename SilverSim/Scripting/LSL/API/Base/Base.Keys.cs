@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Scene.Types.Script;
 using System;
 
 namespace SilverSim.Scripting.LSL.API.Base
@@ -31,14 +32,14 @@ namespace SilverSim.Scripting.LSL.API.Base
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public UUID llGenerateKey()
+        public static UUID llGenerateKey(ScriptInstance Instance)
         {
             return UUID.Random;
         }
 
         #region osIsUUID
         [APILevel(APIFlags.OSSL)]
-        public int osIsUUID(string input)
+        public static int osIsUUID(ScriptInstance Instance, string input)
         {
             Guid v;
             return Guid.TryParse(input, out v) ? TRUE : FALSE;

@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.API.Primitive
 {
@@ -34,208 +35,208 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         #region Primitives
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetKey()
+        public static UUID llGetKey(ScriptInstance Instance)
         {
-            lock (this)
+            lock (Instance)
             {
-                return Part.ID;
+                return Instance.Part.ID;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llAllowInventoryDrop(int add)
+        public static void llAllowInventoryDrop(ScriptInstance Instance, int add)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.IsAllowedDrop = add != 0;
+                Instance.Part.IsAllowedDrop = add != 0;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llGetLinkPrimitiveParams(int link, AnArray param)
+        public static AnArray llGetLinkPrimitiveParams(ScriptInstance Instance, int link, AnArray param)
         {
             AnArray parout = new AnArray();
-            lock (this)
+            lock (Instance)
             {
-                Part.ObjectGroup.GetPrimitiveParams(Part.LinkNumber, link, param.GetEnumerator(), ref parout);
+                Instance.Part.ObjectGroup.GetPrimitiveParams(Instance.Part.LinkNumber, link, param.GetEnumerator(), ref parout);
             }
             return parout;
         }
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llGetPrimitiveParams(AnArray param)
+        public static AnArray llGetPrimitiveParams(ScriptInstance Instance, AnArray param)
         {
             AnArray parout = new AnArray();
-            lock (this)
+            lock (Instance)
             {
-                Part.ObjectGroup.GetPrimitiveParams(Part.LinkNumber, LINK_THIS, param.GetEnumerator(), ref parout);
+                Instance.Part.ObjectGroup.GetPrimitiveParams(Instance.Part.LinkNumber, LINK_THIS, param.GetEnumerator(), ref parout);
             }
             return parout;
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llGetLocalPos()
+        public static Vector3 llGetLocalPos(ScriptInstance Instance)
         {
-            lock (this)
+            lock (Instance)
             {
-                return Part.LocalPosition;
+                return Instance.Part.LocalPosition;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llGetPos()
+        public static Vector3 llGetPos(ScriptInstance Instance)
         {
-            lock (this)
+            lock (Instance)
             {
-                return Part.Position;
+                return Instance.Part.Position;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llGetRootPosition()
+        public static Vector3 llGetRootPosition(ScriptInstance Instance)
         {
-            lock (this)
+            lock (Instance)
             {
-                return Part.ObjectGroup.Position;
+                return Instance.Part.ObjectGroup.Position;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public Quaternion llGetRootRotation()
+        public static Quaternion llGetRootRotation(ScriptInstance Instance)
         {
-            lock (this)
+            lock (Instance)
             {
-                return Part.ObjectGroup.RootPart.Rotation;
+                return Instance.Part.ObjectGroup.RootPart.Rotation;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public Quaternion llGetRot()
+        public static Quaternion llGetRot(ScriptInstance Instance)
         {
-            lock (this)
+            lock (Instance)
             {
-                return Part.Rotation;
+                return Instance.Part.Rotation;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llGetScale()
+        public static Vector3 llGetScale(ScriptInstance Instance)
         {
-            lock (this)
+            lock (Instance)
             {
-                return Part.Size;
+                return Instance.Part.Size;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llPassCollisions(int pass)
+        public static void llPassCollisions(ScriptInstance Instance, int pass)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.IsPassCollisions = pass != 0;
+                Instance.Part.IsPassCollisions = pass != 0;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llPassTouches(int pass)
+        public static void llPassTouches(ScriptInstance Instance, int pass)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.IsPassTouches = pass != 0;
+                Instance.Part.IsPassTouches = pass != 0;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetClickAction(int action)
+        public static void llSetClickAction(ScriptInstance Instance, int action)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.ClickAction = (ClickActionType)action;
+                Instance.Part.ClickAction = (ClickActionType)action;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetPayPrice(int price, AnArray quick_pay_buttons)
+        public static void llSetPayPrice(ScriptInstance Instance, int price, AnArray quick_pay_buttons)
         {
 #warning Implement llSetPayPrice(int, AnArray)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetPos(Vector3 pos)
+        public static void llSetPos(ScriptInstance Instance, Vector3 pos)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.Position = pos;
+                Instance.Part.Position = pos;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetPrimitiveParams(AnArray rules)
+        public static void llSetPrimitiveParams(ScriptInstance Instance, AnArray rules)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.ObjectGroup.SetPrimitiveParams(Part.LinkNumber, LINK_THIS, rules.GetMarkEnumerator());
+                Instance.Part.ObjectGroup.SetPrimitiveParams(Instance.Part.LinkNumber, LINK_THIS, rules.GetMarkEnumerator());
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetLinkPrimitiveParams(int linkTarget, AnArray rules)
+        public static void llSetLinkPrimitiveParams(ScriptInstance Instance, int linkTarget, AnArray rules)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.ObjectGroup.SetPrimitiveParams(Part.LinkNumber, linkTarget, rules.GetMarkEnumerator());
+                Instance.Part.ObjectGroup.SetPrimitiveParams(Instance.Part.LinkNumber, linkTarget, rules.GetMarkEnumerator());
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetScale(Vector3 size)
+        public static void llSetScale(ScriptInstance Instance, Vector3 size)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.Size = size;
+                Instance.Part.Size = size;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetSitText(string text)
+        public static void llSetSitText(ScriptInstance Instance, string text)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.ObjectGroup.RootPart.SitText = text;
+                Instance.Part.ObjectGroup.RootPart.SitText = text;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetText(string text, Color color, double alpha)
+        public static void llSetText(ScriptInstance Instance, string text, Color color, double alpha)
         {
             ObjectPart.TextParam tp = new ObjectPart.TextParam();
             tp.Text = text;
             tp.TextColor = new ColorAlpha(color, alpha);
-            lock (this)
+            lock (Instance)
             {
-                Part.Text = tp;
+                Instance.Part.Text = tp;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetTouchText(string text)
+        public static void llSetTouchText(ScriptInstance Instance, string text)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.ObjectGroup.RootPart.TouchText = text;
+                Instance.Part.ObjectGroup.RootPart.TouchText = text;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llTargetOmega(Vector3 axis, double spinrate, double gain)
+        public static void llTargetOmega(ScriptInstance Instance, Vector3 axis, double spinrate, double gain)
         {
             ObjectPart.OmegaParam op = new ObjectPart.OmegaParam();
             op.Axis = axis;
             op.Spinrate = spinrate;
             op.Gain = gain;
-            lock (this)
+            lock (Instance)
             {
-                Part.Omega = op;
+                Instance.Part.Omega = op;
             }
         }
         #endregion

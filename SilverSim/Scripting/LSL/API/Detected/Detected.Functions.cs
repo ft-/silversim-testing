@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.API.Detected
 {
@@ -33,192 +34,209 @@ namespace SilverSim.Scripting.LSL.API.Detected
          * The other option of implementing this would have been to make it a namespace class of the Script class.
          */
         [APILevel(APIFlags.LSL)]
-        public Vector3 llDetectedGrab(int number)
+        public static Vector3 llDetectedGrab(ScriptInstance Instance, int number)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].GrabOffset;
+                    return script.m_Detected[number].GrabOffset;
                 }
                 return Vector3.Zero;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llDetectedGroup(int number)
+        public static int llDetectedGroup(ScriptInstance Instance, int number)
         {
 #warning Implement llDetectedGroup(int)
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llDetectedKey(int number)
+        public static UUID llDetectedKey(ScriptInstance Instance, int number)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].Object.ID;
+                    return script.m_Detected[number].Object.ID;
                 }
                 return UUID.Zero;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llDetectedLinkNumber(int number)
+        public static int llDetectedLinkNumber(ScriptInstance Instance, int number)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].LinkNumber;
+                    return script.m_Detected[number].LinkNumber;
                 }
                 return -1;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llDetectedName(int number)
+        public static string llDetectedName(ScriptInstance Instance, int number)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].Object.Name;
+                    return script.m_Detected[number].Object.Name;
                 }
                 return string.Empty;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llDetectedOwner(int number)
+        public static UUID llDetectedOwner(ScriptInstance Instance, int number)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].Object.Owner.ID;
+                    return script.m_Detected[number].Object.Owner.ID;
                 }
                 return UUID.Zero;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llDetectedPos(int number)
+        public static Vector3 llDetectedPos(ScriptInstance Instance, int number)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].Object.GlobalPosition;
+                    return script.m_Detected[number].Object.GlobalPosition;
                 }
                 return Vector3.Zero;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public Quaternion llDetectedRot(int number)
+        public static Quaternion llDetectedRot(ScriptInstance Instance, int number)
         {
-            lock (this)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].Object.GlobalRotation;
+                    return script.m_Detected[number].Object.GlobalRotation;
                 }
                 return Quaternion.Identity;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llDetectedTouchBinormal(int number)
+        public static Vector3 llDetectedTouchBinormal(ScriptInstance Instance, int number)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].TouchBinormal;
+                    return script.m_Detected[number].TouchBinormal;
                 }
                 return Vector3.Zero;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llDetectedTouchFace(int number)
+        public static int llDetectedTouchFace(ScriptInstance Instance, int number)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].TouchFace;
+                    return script.m_Detected[number].TouchFace;
                 }
                 return -1;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llDetectedTouchNormal(int number)
+        public static Vector3 llDetectedTouchNormal(ScriptInstance Instance, int number)
         {
-            lock (this)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].TouchNormal;
+                    return script.m_Detected[number].TouchNormal;
                 }
                 return Vector3.Zero;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llDetectedTouchPos(int number)
+        public static Vector3 llDetectedTouchPos(ScriptInstance Instance, int number)
         {
-            if (Instance.m_Detected.Count > number && number >= 0)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                return Instance.m_Detected[number].TouchPosition;
+                if (script.m_Detected.Count > number && number >= 0)
+                {
+                    return script.m_Detected[number].TouchPosition;
+                }
             }
             return Vector3.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llDetectedTouchST(int number)
+        public static Vector3 llDetectedTouchST(ScriptInstance Instance, int number)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].TouchST;
+                    return script.m_Detected[number].TouchST;
                 }
                 return Vector3.Zero;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llDetectedTouchUV(int number)
+        public static Vector3 llDetectedTouchUV(ScriptInstance Instance, int number)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].TouchUV;
+                    return script.m_Detected[number].TouchUV;
                 }
                 return Vector3.Zero;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llDetectedType(int number)
+        public static int llDetectedType(ScriptInstance Instance, int number)
         {
 #warning Implement llDetectedType(int)
             return 0;
         }
 
-        public Vector3 llDetectedVel(int number)
+        public static Vector3 llDetectedVel(ScriptInstance Instance, int number)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (Instance.m_Detected.Count > number && number >= 0)
+                if (script.m_Detected.Count > number && number >= 0)
                 {
-                    return Instance.m_Detected[number].Object.Velocity;
+                    return script.m_Detected[number].Object.Velocity;
                 }
                 return Vector3.Zero;
             }

@@ -29,6 +29,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.API.Primitive
 {
@@ -82,30 +83,30 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         public const int CAMERA_FOCUS_LOCKED = 22;
 
         [APILevel(APIFlags.LSL)]
-        public void llSetCameraAtOffset(Vector3 offset)
+        public static void llSetCameraAtOffset(ScriptInstance Instance, Vector3 offset)
         {
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetLinkCamera(int link, Vector3 eye, Vector3 at)
-        {
-
-        }
-
-        [APILevel(APIFlags.LSL)]
-        public void llSetCameraOffset(Vector3 offset)
+        public static void llSetLinkCamera(ScriptInstance Instance, int link, Vector3 eye, Vector3 at)
         {
 
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llClearCameraParams()
+        public static void llSetCameraOffset(ScriptInstance Instance, Vector3 offset)
         {
 
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetCameraParams(AnArray rules)
+        public static void llClearCameraParams(ScriptInstance Instance)
+        {
+
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public static void llSetCameraParams(ScriptInstance Instance, AnArray rules)
         {
 
         }

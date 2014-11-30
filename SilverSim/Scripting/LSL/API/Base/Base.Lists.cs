@@ -24,13 +24,14 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.API.Base
 {
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public AnArray llDeleteSubList(AnArray src, int start, int end)
+        public static AnArray llDeleteSubList(ScriptInstance Instance, AnArray src, int start, int end)
         {
             if (start < 0)
             {
@@ -88,7 +89,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llList2List(AnArray src, int start, int end)
+        public static AnArray llList2List(ScriptInstance Instance, AnArray src, int start, int end)
         {
             if (start < 0)
             {
@@ -146,7 +147,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public double llList2Float(AnArray src, int index)
+        public static double llList2Float(ScriptInstance Instance, AnArray src, int index)
         {
             if(index < 0)
             {
@@ -162,7 +163,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llList2Integer(AnArray src, int index)
+        public static int llList2Integer(ScriptInstance Instance, AnArray src, int index)
         {
             if (index < 0)
             {
@@ -178,7 +179,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llList2Key(AnArray src, int index)
+        public static UUID llList2Key(ScriptInstance Instance, AnArray src, int index)
         {
             if (index < 0)
             {
@@ -194,7 +195,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public Quaternion llList2Rot(AnArray src, int index)
+        public static Quaternion llList2Rot(ScriptInstance Instance, AnArray src, int index)
         {
             if (index < 0)
             {
@@ -210,7 +211,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llList2String(AnArray src, int index)
+        public static string llList2String(ScriptInstance Instance, AnArray src, int index)
         {
             if (index < 0)
             {
@@ -226,7 +227,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llList2Vector(AnArray src, int index)
+        public static Vector3 llList2Vector(ScriptInstance Instance, AnArray src, int index)
         {
             if (index < 0)
             {
@@ -242,7 +243,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llDumpList2String(AnArray src, string separator)
+        public static string llDumpList2String(ScriptInstance Instance, AnArray src, string separator)
         {
             string s = string.Empty;
 
@@ -258,9 +259,9 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llList2CSV(AnArray src)
+        public static string llList2CSV(ScriptInstance Instance, AnArray src)
         {
-            return llDumpList2String(src, ", ");
+            return llDumpList2String(Instance, src, ", ");
         }
 
         [APILevel(APIFlags.LSL)]
@@ -279,7 +280,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         public const int TYPE_INVALID = 0;
 
         [APILevel(APIFlags.LSL)]
-        public int llGetListEntryType(AnArray src, int index)
+        public static int llGetListEntryType(ScriptInstance Instance, AnArray src, int index)
         {
             if (index < 0)
             {
@@ -295,12 +296,12 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llGetListLength(AnArray src)
+        public static int llGetListLength(ScriptInstance Instance, AnArray src)
         {
             return src.Count;
         }
 
-        private AnArray ParseString2List(string src, AnArray separators, AnArray spacers, bool keepNulls)
+        private static AnArray ParseString2List(ScriptInstance Instance, string src, AnArray separators, AnArray spacers, bool keepNulls)
         {
             AnArray res = new AnArray();
             string value = null;
@@ -412,19 +413,19 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llParseString2List(string src, AnArray separators, AnArray spacers)
+        public static AnArray llParseString2List(ScriptInstance Instance, string src, AnArray separators, AnArray spacers)
         {
-            return ParseString2List(src, separators, spacers, false);
+            return ParseString2List(Instance, src, separators, spacers, false);
         }
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llParseStringKeepNulls(string src, AnArray separators, AnArray spacers)
+        public static AnArray llParseStringKeepNulls(ScriptInstance Instance, string src, AnArray separators, AnArray spacers)
         {
-            return ParseString2List(src, separators, spacers, true);
+            return ParseString2List(Instance, src, separators, spacers, true);
         }
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llCSV2List(string src)
+        public static AnArray llCSV2List(ScriptInstance Instance, string src)
         {
             bool wsconsume = true;
             bool inbracket = false;

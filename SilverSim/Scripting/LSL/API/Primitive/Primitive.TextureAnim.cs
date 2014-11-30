@@ -30,6 +30,7 @@ using System.Text;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.API.Primitive
 {
@@ -37,7 +38,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
     {
         #region Texture Animation
         [APILevel(APIFlags.LSL)]
-        void llSetLinkTextureAnim(int link, int mode, int face, int sizeX, int sizeY, double start, double length, double rate)
+        public static void llSetLinkTextureAnim(ScriptInstance Instance, int link, int mode, int face, int sizeX, int sizeY, double start, double length, double rate)
         {
             TextureAnimationEntry te = new TextureAnimationEntry();
             te.Flags = (TextureAnimationEntry.TextureAnimMode)mode;
@@ -48,16 +49,16 @@ namespace SilverSim.Scripting.LSL.API.Primitive
             te.Length = (float)length;
             te.Rate = (float)rate;
 
-            foreach(ObjectPart part in GetLinkTargets(link))
+            foreach(ObjectPart part in GetLinkTargets(Instance, link))
             {
                 part.TextureAnimation = te;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        void llSetTextureAnim(int mode, int face, int sizeX, int sizeY, double start, double length, double rate)
+        public static void llSetTextureAnim(ScriptInstance Instance, int mode, int face, int sizeX, int sizeY, double start, double length, double rate)
         {
-            llSetLinkTextureAnim(LINK_THIS, mode, face, sizeX, sizeY, start, length, rate);
+            llSetLinkTextureAnim(Instance, LINK_THIS, mode, face, sizeX, sizeY, start, length, rate);
         }
         #endregion
     }

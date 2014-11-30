@@ -32,27 +32,12 @@ using System;
 namespace SilverSim.Scripting.LSL.API.LightShare
 {
     [ScriptApiName("LightShare")]
-    public class LS_API_Factory : ScriptApiFactory
-    {
-        public LS_API_Factory()
-            : base(typeof(LS_API))
-        {
-
-        }
-    }
-
-    [ScriptApiName("LightShare")]
+    [LSLImplementation]
     public class LS_API : MarshalByRefObject, IScriptApi
     {
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        ScriptInstance Instance;
-
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
+        public LS_API()
         {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = instance;
+
         }
 
         [APILevel(APIFlags.LightShare)]
@@ -131,27 +116,27 @@ namespace SilverSim.Scripting.LSL.API.LightShare
         public const int WL_SUN_MOON_POSITION = 36;
 
         [APILevel(APIFlags.LightShare)]
-        public AnArray lsGetWindlightScene(AnArray rules)
+        public static AnArray lsGetWindlightScene(ScriptInstance Instance, AnArray rules)
         {
 #warning Implement lsGetWindlightScene(AnArray)
             return new AnArray();
         }
 
         [APILevel(APIFlags.LightShare)]
-        public int lsSetWindlightScene(AnArray rules)
+        public static int lsSetWindlightScene(ScriptInstance Instance, AnArray rules)
         {
 #warning Implement lsSetWindlightScene(AnArray)
             return 0;
         }
 
         [APILevel(APIFlags.LightShare)]
-        public void lsClearWindlightScene()
+        public static void lsClearWindlightScene(ScriptInstance Instance)
         {
 #warning Implement lsClearWindlightScene()
         }
 
         [APILevel(APIFlags.LightShare)]
-        public int lsSetWindlightSceneTargeted(AnArray rules, UUID target)
+        public static int lsSetWindlightSceneTargeted(ScriptInstance Instance, AnArray rules, UUID target)
         {
 #warning Implement lsSetWindlightSceneTargeted(AnArray, UUID)
             return 0;

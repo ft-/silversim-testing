@@ -24,17 +24,50 @@ exception statement from your version.
 */
 
 using SilverSim.Main.Common;
+using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Types;
 using System;
+using System.Collections.Generic;
+using ThreadedClasses;
 
-namespace SilverSim.Scripting.LSL.API.HTTP
+namespace SilverSim.Scripting.LSL.API.Chat
 {
-    [ScriptApiName("HTTP")]
     [LSLImplementation]
-    public partial class HTTP_API : MarshalByRefObject, IScriptApi
+    [ScriptApiName("Chat")]
+    public partial class Chat_API : MarshalByRefObject, IScriptApi
     {
-        public HTTP_API()
+        [APILevel(APIFlags.LSL)]
+        public const int PUBLIC_CHANNEL = 0;
+        [APILevel(APIFlags.LSL)]
+        public const int DEBUG_CHANNEL = 0x7FFFFFFF;
+
+        private static UUID getOwner(ScriptInstance Instance)
+        {
+            lock (Instance)
+            {
+                return Instance.Part.ObjectGroup.Owner.ID;
+            }
+        }
+
+        private static void sendChat(ScriptInstance Instance, ListenEvent ev)
+        {
+            lock (Instance)
+            {
+                ev.ID = Instance.Part.ObjectGroup.ID;
+                ev.Name = Instance.Part.ObjectGroup.Name;
+                Instance.Part.ObjectGroup.Scene.GetService<ChatServiceInterface>().Send(ev);
+            }
+        }
+
+        [APILevel(APIFlags.OSSL)]
+        public const int OS_LISTEN_REGEX_NAME = 0x1;
+        [APILevel(APIFlags.OSSL)]
+        public const int OS_LISTEN_REGEX_MESSAGE = 0x2;
+
+        public Chat_API()
         {
 
         }

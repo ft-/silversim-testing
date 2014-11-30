@@ -23,31 +23,21 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scene.Types.Script.Events;
-using System.Timers;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.API.Base
 {
     public partial class Base_API
     {
-        private Timer m_Timer = new Timer();
-
-        private void OnTimerEvent(object sender, ElapsedEventArgs e)
-        {
-            lock (Instance)
-            {
-                Instance.PostEvent(new TimerEvent());
-            }
-        }
-
         [APILevel(APIFlags.LSL)]
-        public void llSetTimerEvent(double sec)
+        public static void llSetTimerEvent(ScriptInstance Instance, double sec)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                m_Timer.Enabled = false;
-                m_Timer.Interval = sec;
-                m_Timer.Enabled = sec > 0.01;
+                script.Timer.Enabled = false;
+                script.Timer.Interval = sec;
+                script.Timer.Enabled = sec > 0.01;
             }
         }
     }

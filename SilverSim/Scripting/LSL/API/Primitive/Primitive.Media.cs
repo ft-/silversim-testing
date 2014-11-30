@@ -28,22 +28,23 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.Types;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL.API.Primitive
 {
     public partial class Primitive_API
     {
         [APILevel(APIFlags.LSL)]
-        public int llClearLinkMedia(int link, int face)
+        public static int llClearLinkMedia(ScriptInstance Instance, int link, int face)
         {
 #warning Implement llClearLinkMedia(int, int)
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llClearPrimMedia(int face)
+        public static int llClearPrimMedia(ScriptInstance Instance, int face)
         {
-            return llClearLinkMedia(LINK_THIS, face);
+            return llClearLinkMedia(Instance, LINK_THIS, face);
         }
 
         [APILevel(APIFlags.LSL)]
@@ -109,7 +110,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         public const int LSL_STATUS_WHITELIST_FAILED = 2001;
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llGetPrimMediaParams(int face, AnArray param)
+        public static AnArray llGetPrimMediaParams(ScriptInstance Instance, int face, AnArray param)
         {
 #warning Implement llGetPrimMediaParams(int, AnArray)
             return new AnArray();
@@ -133,16 +134,16 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         public const int STATUS_WHITELIST_FAILED = 2001;
 
         [APILevel(APIFlags.LSL)]
-        public int llSetLinkMedia(int link, int face, AnArray param)
+        public static int llSetLinkMedia(ScriptInstance Instance, int link, int face, AnArray param)
         {
 #warning Implement llSetLinkMedia(int, int, AnArray)
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llSetPrimMediaParams(int face, AnArray param)
+        public static int llSetPrimMediaParams(ScriptInstance Instance, int face, AnArray param)
         {
-            return llSetLinkMedia(LINK_THIS, face, param);
+            return llSetLinkMedia(Instance, LINK_THIS, face, param);
         }
     }
 }

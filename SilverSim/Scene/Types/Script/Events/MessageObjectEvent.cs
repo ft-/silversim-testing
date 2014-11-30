@@ -23,33 +23,13 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Script;
-using System.Reflection;
+using SilverSim.Types;
 
-namespace SilverSim.Main.Common
+namespace SilverSim.Scene.Types.Script.Events
 {
-    public abstract class ScriptApiFactory : IPlugin
+    public class MessageObjectEvent : IScriptEvent
     {
-        Type ApiType;
-
-        public ScriptApiFactory(Type type)
-        {
-            ApiType = type;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
-        }
-
-        public IScriptApi CreateApi(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem item)
-        {
-            throw new NotImplementedException();
-        }
+        public UUID ObjectID;
+        public string Data;
     }
 }

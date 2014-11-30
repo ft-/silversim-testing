@@ -34,13 +34,13 @@ namespace SilverSim.Scripting.LSL.API.Base
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public string llGetScriptName()
+        public static string llGetScriptName(ScriptInstance Instance)
         {
-            lock (this)
+            lock (Instance)
             {
                 try
                 {
-                    return ScriptItem.Name;
+                    return Instance.Item.Name;
                 }
                 catch
                 {
@@ -50,19 +50,19 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llResetScript()
+        public static void llResetScript(ScriptInstance Instance)
         {
             throw new ResetScriptException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llResetOtherScript(string name)
+        public static void llResetOtherScript(ScriptInstance Instance, string name)
         {
-            lock (this)
+            lock (Instance)
             {
                 ObjectPartInventoryItem item;
                 ScriptInstance si;
-                if (Part.Inventory.TryGetValue(name, out item))
+                if (Instance.Part.Inventory.TryGetValue(name, out item))
                 {
                     si = item.ScriptInstance;
                     if (item.InventoryType != InventoryType.LSLText && item.InventoryType != InventoryType.LSLBytecode)
@@ -86,13 +86,13 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llGetScriptState(string script)
+        public static int llGetScriptState(ScriptInstance Instance, string script)
         {
             ObjectPartInventoryItem item;
             ScriptInstance si;
-            lock (this)
+            lock (Instance)
             {
-                if (Part.Inventory.TryGetValue(script, out item))
+                if (Instance.Part.Inventory.TryGetValue(script, out item))
                 {
                     si = item.ScriptInstance;
                     if (item.InventoryType != InventoryType.LSLText && item.InventoryType != InventoryType.LSLBytecode)
@@ -116,13 +116,13 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetScriptState(string script, int running)
+        public static void llSetScriptState(ScriptInstance Instance, string script, int running)
         {
             ObjectPartInventoryItem item;
             ScriptInstance si;
-            lock (this)
+            lock (Instance)
             {
-                if (Part.Inventory.TryGetValue(script, out item))
+                if (Instance.Part.Inventory.TryGetValue(script, out item))
                 {
                     si = item.ScriptInstance;
                     if (item.InventoryType != InventoryType.LSLText && item.InventoryType != InventoryType.LSLBytecode)

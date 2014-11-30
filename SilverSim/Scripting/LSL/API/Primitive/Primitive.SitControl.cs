@@ -38,26 +38,26 @@ namespace SilverSim.Scripting.LSL.API.Primitive
     {
         #region Sit Targets
         [APILevel(APIFlags.LSL)]
-        void llSitTarget(Vector3 offset, Quaternion rot)
+        public static void llSitTarget(ScriptInstance Instance, Vector3 offset, Quaternion rot)
         {
-            lock (this)
+            lock (Instance)
             {
-                Part.SitTargetOffset = offset;
-                Part.SitTargetOrientation = rot;
+                Instance.Part.SitTargetOffset = offset;
+                Instance.Part.SitTargetOrientation = rot;
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        void llLinkSitTarget(int link, Vector3 offset, Quaternion rot)
+        public static void llLinkSitTarget(ScriptInstance Instance, int link, Vector3 offset, Quaternion rot)
         {
             ObjectPart part;
-            lock (this)
+            lock (Instance)
             {
                 if (link == LINK_THIS)
                 {
-                    part = Part;
+                    part = Instance.Part;
                 }
-                else if (!Part.ObjectGroup.TryGetValue(link, out part))
+                else if (!Instance.Part.ObjectGroup.TryGetValue(link, out part))
                 {
                     return;
                 }
@@ -70,26 +70,26 @@ namespace SilverSim.Scripting.LSL.API.Primitive
 
         #region Sit control
         [APILevel(APIFlags.LSL)]
-        public UUID llAvatarOnSitTarget()
+        public static UUID llAvatarOnSitTarget(ScriptInstance Instance)
         {
-            return llAvatarOnLinkSitTarget(LINK_THIS);
+            return llAvatarOnLinkSitTarget(Instance, LINK_THIS);
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llAvatarOnLinkSitTarget(int link)
+        public static UUID llAvatarOnLinkSitTarget(ScriptInstance Instance, int link)
         {
 #warning Implement llAvatarOnLinkSitTarget(int)
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llForceMouselook(int mouselook)
+        public static void llForceMouselook(ScriptInstance Instance, int mouselook)
         {
 #warning Implement llForceMouselook(int)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llUnSit(UUID id)
+        public static void llUnSit(ScriptInstance Instance, UUID id)
         {
 #warning Implement llUnSit(UUID)
         }

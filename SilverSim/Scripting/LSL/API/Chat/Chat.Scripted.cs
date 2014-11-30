@@ -35,115 +35,64 @@ using ThreadedClasses;
 
 namespace SilverSim.Scripting.LSL.API.Chat
 {
-    [ScriptApiName("Chat")]
-    public class Chat_API_Factory : ScriptApiFactory
-    {
-        public Chat_API_Factory()
-            : base(typeof(Chat_API))
-        {
-
-        }
-    }
-
-    [ScriptApiName("Chat")]
-    public partial class Chat_API : MarshalByRefObject, IScriptApi
+    public partial class Chat_API
     {
         public static int MaxListenerHandles = 64;
 
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        ScriptInstance Instance;
-
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
-        {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = instance;
-        }
-
-        protected RwLockedDictionary<int, ChatServiceInterface.Listener> m_Listeners = new RwLockedDictionary<int, ChatServiceInterface.Listener>();
-
         [APILevel(APIFlags.LSL)]
-        public const int PUBLIC_CHANNEL = 0;
-        [APILevel(APIFlags.LSL)]
-        public const int DEBUG_CHANNEL = 0x7FFFFFFF;
-
-        [APILevel(APIFlags.LSL)]
-        private UUID getOwner()
-        {
-            lock (Instance)
-            {
-                return Part.ObjectGroup.Owner.ID;
-            }
-        }
-
-        private void sendChat(ListenEvent ev)
-        {
-            lock (Instance)
-            {
-                ev.ID = Part.ObjectGroup.ID;
-                ev.Name = Part.ObjectGroup.Name;
-                Part.ObjectGroup.Scene.GetService<ChatServiceInterface>().Send(ev);
-            }
-        }
-
-        [APILevel(APIFlags.OSSL)]
-        public const int OS_LISTEN_REGEX_NAME = 0x1;
-
-        [APILevel(APIFlags.OSSL)]
-        public const int OS_LISTEN_REGEX_MESSAGE = 0x2;
-
-        [APILevel(APIFlags.LSL)]
-        public void llShout(int channel, string message)
+        public static void llShout(ScriptInstance Instance, int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;
             ev.Type = ListenEvent.ChatType.Shout;
             ev.Message = message;
             ev.SourceType = ListenEvent.ChatSourceType.Object;
-            ev.OwnerID = getOwner();
-            sendChat(ev);
+            ev.OwnerID = getOwner(Instance);
+            sendChat(Instance, ev);
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSay(int channel, string message)
+        public static void llSay(ScriptInstance Instance, int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;
             ev.Type = ListenEvent.ChatType.Say;
             ev.Message = message;
             ev.SourceType = ListenEvent.ChatSourceType.Object;
-            ev.OwnerID = getOwner();
-            sendChat(ev);
+            ev.OwnerID = getOwner(Instance);
+            sendChat(Instance, ev);
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llWhisper(int channel, string message)
+        public static void llWhisper(ScriptInstance Instance, int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;
             ev.Type = ListenEvent.ChatType.Whisper;
             ev.Message = message;
             ev.SourceType = ListenEvent.ChatSourceType.Object;
-            ev.OwnerID = getOwner();
-            sendChat(ev);
+            ev.OwnerID = getOwner(Instance);
+            sendChat(Instance, ev);
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llOwnerSay(string message)
+        public static void llOwnerSay(ScriptInstance Instance, string message)
         {
-            ListenEvent ev = new ListenEvent();
-            ev.Channel = PUBLIC_CHANNEL;
-            ev.Type = ListenEvent.ChatType.OwnerSay;
-            ev.Message = message;
-            ev.TargetID = Part.ObjectGroup.Owner.ID;
-            ev.SourceType = ListenEvent.ChatSourceType.Object;
-            ev.OwnerID = getOwner();
-            sendChat(ev);
+            lock (Instance)
+            {
+                ListenEvent ev = new ListenEvent();
+                ev.Channel = PUBLIC_CHANNEL;
+                ev.Type = ListenEvent.ChatType.OwnerSay;
+                ev.Message = message;
+                ev.TargetID = Instance.Part.ObjectGroup.Owner.ID;
+                ev.SourceType = ListenEvent.ChatSourceType.Object;
+                ev.OwnerID = getOwner(Instance);
+                sendChat(Instance, ev);
+            }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llRegionSay(int channel, string message)
+        public static void llRegionSay(ScriptInstance Instance, int channel, string message)
         {
             if (channel != PUBLIC_CHANNEL)
             {
@@ -151,58 +100,54 @@ namespace SilverSim.Scripting.LSL.API.Chat
                 ev.Type = ListenEvent.ChatType.Region;
                 ev.Channel = channel;
                 ev.Message = message;
-                ev.OwnerID = getOwner();
+                ev.OwnerID = getOwner(Instance);
                 ev.SourceType = ListenEvent.ChatSourceType.Object;
-                sendChat(ev);
+                sendChat(Instance, ev);
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llRegionSayTo(UUID target, int channel, string message)
+        public static void llRegionSayTo(ScriptInstance Instance, UUID target, int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;
             ev.Type = ListenEvent.ChatType.Region;
             ev.Message = message;
             ev.TargetID = target;
-            ev.OwnerID = getOwner();
+            ev.OwnerID = getOwner(Instance);
             ev.SourceType = ListenEvent.ChatSourceType.Object;
-            sendChat(ev);
-        }
-
-        protected void onListen(ListenEvent ev)
-        {
-            Instance.PostEvent(ev);
+            sendChat(Instance, ev);
         }
 
         [APILevel(APIFlags.LSL)]
-        public Integer llListen(int channel, string name, UUID id, string msg)
+        public static Integer llListen(ScriptInstance Instance, int channel, string name, UUID id, string msg)
         {
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                if (m_Listeners.Count >= MaxListenerHandles)
+                if (script.m_Listeners.Count >= MaxListenerHandles)
                 {
                     return new Integer(-1);
                 }
-                ChatServiceInterface chatservice = Part.ObjectGroup.Scene.GetService<ChatServiceInterface>();
+                ChatServiceInterface chatservice = Instance.Part.ObjectGroup.Scene.GetService<ChatServiceInterface>();
 
                 int newhandle = 0;
                 ChatServiceInterface.Listener l;
                 for (newhandle = 0; newhandle < MaxListenerHandles; ++newhandle)
                 {
-                    if (!m_Listeners.TryGetValue(newhandle, out l))
+                    if (!script.m_Listeners.TryGetValue(newhandle, out l))
                     {
                         l = chatservice.AddListen(
                             channel,
                             name,
                             id,
                             msg,
-                            delegate() { return Part.ID; },
-                            delegate() { return Part.GlobalPosition; },
-                            onListen);
+                            delegate() { return Instance.Part.ID; },
+                            delegate() { return Instance.Part.GlobalPosition; },
+                            script.onListen);
                         try
                         {
-                            m_Listeners.Add(newhandle, l);
+                            script.m_Listeners.Add(newhandle, l);
                             return new Integer(newhandle);
                         }
                         catch
@@ -217,12 +162,13 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llListenRemove(int handle)
+        public static void llListenRemove(ScriptInstance Instance, int handle)
         {
+            Script script = (Script)Instance;
             ChatServiceInterface.Listener l;
-            lock (Instance)
+            lock (script)
             {
-                if (m_Listeners.Remove(handle, out l))
+                if (script.m_Listeners.Remove(handle, out l))
                 {
                     l.Remove();
                 }
@@ -230,12 +176,13 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llListenControl(int handle, int active)
+        public static void llListenControl(ScriptInstance Instance, int handle, int active)
         {
+            Script script = (Script)Instance;
             ChatServiceInterface.Listener l;
-            lock (Instance)
+            lock (script)
             {
-                if (m_Listeners.TryGetValue(handle, out l))
+                if (script.m_Listeners.TryGetValue(handle, out l))
                 {
                     l.IsActive = active != 0;
                 }
@@ -244,21 +191,22 @@ namespace SilverSim.Scripting.LSL.API.Chat
 
         #region osListenRegex
         [APILevel(APIFlags.OSSL)]
-        public int osListenRegex(int channel, string name, UUID id, string msg, int regexBitfield)
+        public static int osListenRegex(ScriptInstance Instance, int channel, string name, UUID id, string msg, int regexBitfield)
         {
-            if (m_Listeners.Count >= MaxListenerHandles)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                return -1;
-            }
-            ChatServiceInterface chatservice = Part.ObjectGroup.Scene.GetService<ChatServiceInterface>();
+                if (script.m_Listeners.Count >= MaxListenerHandles)
+                {
+                    return -1;
+                }
+                ChatServiceInterface chatservice = Instance.Part.ObjectGroup.Scene.GetService<ChatServiceInterface>();
 
-            lock (Instance)
-            {
                 int newhandle = 0;
                 ChatServiceInterface.Listener l;
                 for (newhandle = 0; newhandle < MaxListenerHandles; ++newhandle)
                 {
-                    if (!m_Listeners.TryGetValue(newhandle, out l))
+                    if (!script.m_Listeners.TryGetValue(newhandle, out l))
                     {
                         l = chatservice.AddListenRegex(
                             channel,
@@ -266,12 +214,12 @@ namespace SilverSim.Scripting.LSL.API.Chat
                             id,
                             msg,
                             regexBitfield,
-                            delegate() { return Part.ID; },
-                            delegate() { return Part.GlobalPosition; },
-                            onListen);
+                            delegate() { return Instance.Part.ID; },
+                            delegate() { return Instance.Part.GlobalPosition; },
+                            script.onListen);
                         try
                         {
-                            m_Listeners.Add(newhandle, l);
+                            script.m_Listeners.Add(newhandle, l);
                             return newhandle;
                         }
                         catch
@@ -287,12 +235,13 @@ namespace SilverSim.Scripting.LSL.API.Chat
         #endregion
 
         [ExecutedOnStateChange]
-        public void ResetListeners()
+        public static void ResetListeners(ScriptInstance Instance)
         {
-            ICollection<ChatServiceInterface.Listener> coll = m_Listeners.Values;
-            lock (Instance)
+            Script script = (Script)Instance;
+            lock (script)
             {
-                m_Listeners.Clear();
+                ICollection<ChatServiceInterface.Listener> coll = script.m_Listeners.Values;
+                script.m_Listeners.Clear();
                 foreach (ChatServiceInterface.Listener l in coll)
                 {
                     l.Remove();

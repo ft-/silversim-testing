@@ -32,7 +32,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Script
 {
-    public abstract class ScriptInstance : IDisposable
+    public abstract class ScriptInstance : MarshalByRefObject, IDisposable
     {
         public abstract void PostEvent(IScriptEvent e);
         public abstract bool IsRunning { get; set; }
@@ -51,6 +51,8 @@ namespace SilverSim.Scene.Types.Script
         public delegate void DisposeEventDelegate();
         public event StateChangeEventDelegate OnStateChange;
         public event DisposeEventDelegate OnDispose;
+
+        public abstract ObjectPartInventoryItem Item { get; }
 
         public abstract ObjectPart Part { get; }
 
