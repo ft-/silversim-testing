@@ -37,7 +37,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
 {
     [LSLImplementation]
     [ScriptApiName("Chat")]
-    public partial class Chat_API : MarshalByRefObject, IScriptApi
+    public partial class Chat_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         [APILevel(APIFlags.LSL)]
         public const int PUBLIC_CHANNEL = 0;
@@ -68,6 +68,11 @@ namespace SilverSim.Scripting.LSL.API.Chat
         public const int OS_LISTEN_REGEX_MESSAGE = 0x2;
 
         public Chat_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

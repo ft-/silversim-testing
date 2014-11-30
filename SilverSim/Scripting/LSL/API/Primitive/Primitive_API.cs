@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
@@ -33,7 +34,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
 {
     [ScriptApiName("Primitive")]
     [LSLImplementation]
-    public partial class Primitive_API : MarshalByRefObject, IScriptApi
+    public partial class Primitive_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         public static UUID getTextureAssetID(ScriptInstance Instance, string item)
         {
@@ -314,6 +315,11 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         public Primitive_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

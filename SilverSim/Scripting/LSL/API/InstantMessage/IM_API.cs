@@ -32,9 +32,14 @@ namespace SilverSim.Scripting.LSL.APIs.IM
 {
     [ScriptApiName("InstantMessage")]
     [LSLImplementation]
-    public partial class IM_API : MarshalByRefObject, IScriptApi
+    public partial class IM_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         public IM_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

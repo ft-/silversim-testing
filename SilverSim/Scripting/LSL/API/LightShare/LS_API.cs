@@ -33,9 +33,14 @@ namespace SilverSim.Scripting.LSL.API.LightShare
 {
     [ScriptApiName("LightShare")]
     [LSLImplementation]
-    public class LS_API : MarshalByRefObject, IScriptApi
+    public class LS_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         public LS_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

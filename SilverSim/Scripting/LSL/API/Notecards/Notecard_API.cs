@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Script;
 using System;
 
@@ -30,9 +31,14 @@ namespace SilverSim.Scripting.LSL.API.Notecards
 {
     [ScriptApiName("Notecard")]
     [LSLImplementation]
-    public partial class Notecard_API : MarshalByRefObject, IScriptApi
+    public partial class Notecard_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         public Notecard_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

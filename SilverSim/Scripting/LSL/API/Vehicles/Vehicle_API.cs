@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using System;
@@ -31,9 +32,14 @@ namespace SilverSim.Scripting.LSL.API.Vehicles
 {
     [ScriptApiName("Vehicle")]
     [LSLImplementation]
-    public class Vehicle_API : MarshalByRefObject, IScriptApi
+    public class Vehicle_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         public Vehicle_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

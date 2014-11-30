@@ -33,7 +33,7 @@ namespace SilverSim.Scripting.LSL.API.Base
 {
     [ScriptApiName("Base")]
     [LSLImplementation]
-    public partial class Base_API : MarshalByRefObject, IScriptApi
+    public partial class Base_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
@@ -188,6 +188,11 @@ namespace SilverSim.Scripting.LSL.API.Base
         public delegate void experience_permissions_denied(UUID agent_id, int reason);
 
         public Base_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

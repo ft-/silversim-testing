@@ -32,9 +32,14 @@ namespace SilverSim.Scripting.LSL.API.LogListen
 {
     [ScriptApiName("LogListen")]
     [LSLImplementation]
-    public class LogListen_API : MarshalByRefObject, IScriptApi
+    public class LogListen_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         public LogListen_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

@@ -47,7 +47,7 @@ namespace SilverSim.Scene.Types.Script
         public abstract void ShoutError(string msg);
         public abstract bool HasEventsPending { get; }
         public IScriptWorkerThreadPool ThreadPool { get; set; }
-        public delegate void StateChangeEventDelegate();
+        public delegate void StateChangeEventDelegate(ScriptInstance si);
         public delegate void DisposeEventDelegate();
         public event StateChangeEventDelegate OnStateChange;
         public event DisposeEventDelegate OnDispose;
@@ -82,7 +82,7 @@ namespace SilverSim.Scene.Types.Script
                 {
                     try
                     {
-                        del();
+                        del(this);
                     }
                     catch
                     {
@@ -96,7 +96,7 @@ namespace SilverSim.Scene.Types.Script
             var ev = OnDispose; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                foreach (StateChangeEventDelegate del in ev.GetInvocationList())
+                foreach (DisposeEventDelegate del in ev.GetInvocationList())
                 {
                     try
                     {

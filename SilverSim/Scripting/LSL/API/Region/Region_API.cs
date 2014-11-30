@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Script;
 using System;
 
@@ -30,7 +31,7 @@ namespace SilverSim.Scripting.LSL.API.Region
 {
     [ScriptApiName("Region")]
     [LSLImplementation]
-    public partial class Region_API : MarshalByRefObject, IScriptApi
+    public partial class Region_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         [APILevel(APIFlags.LSL)]
         public const int REGION_FLAG_ALLOW_DAMAGE = 0x1;
@@ -52,6 +53,11 @@ namespace SilverSim.Scripting.LSL.API.Region
         public const int REGION_FLAG_RESTRICT_PUSHOBJECT = 0x400000;   
       
         public Region_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

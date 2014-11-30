@@ -31,6 +31,7 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
+using System.Collections;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -42,7 +43,8 @@ namespace SilverSim.Scripting.LSL
         private static readonly ILog m_Log = LogManager.GetLogger("LSL COMPILER");
         List<IScriptApi> m_Apis = new List<IScriptApi>();
         Dictionary<string, FieldInfo> m_Constants = new Dictionary<string, FieldInfo>();
-        Dictionary<string, MethodInfo> m_Methods = new Dictionary<string, MethodInfo>();
+        List<MethodInfo> m_Methods = new List<MethodInfo>();
+        List<Script.StateChangeEventDelegate> m_StateChangeDelegates = new List<ScriptInstance.StateChangeEventDelegate>();
 
         public LSLCompiler()
         {
@@ -107,7 +109,26 @@ namespace SilverSim.Scripting.LSL
                     {
                         if (attr is APILevel && (m.Attributes & MethodAttributes.Static) != 0)
                         {
-                            m_Methods.Add(m.Name, m);
+                            ParameterInfo[] pi = m.GetParameters();
+                            if (pi.Length >= 1)
+                            {
+                                if (pi[0].ParameterType.Equals(typeof(ScriptInstance)))
+                                {
+                                    m_Methods.Add(m);
+                                }
+                            }
+                        }
+                        if (attr is ExecutedOnStateChange && (m.Attributes & MethodAttributes.Static) != 0)
+                        {
+                            ParameterInfo[] pi = m.GetParameters();
+                            if(pi.Length == 1)
+                            {
+                                if(pi[0].ParameterType.Equals(typeof(ScriptInstance)))
+                                {
+                                    Delegate d = Delegate.CreateDelegate(typeof(Script.StateChangeEventDelegate), null, m);
+                                    m_StateChangeDelegates.Add((Script.StateChangeEventDelegate)d);
+                                }
+                            }
                         }
                     }
                 }

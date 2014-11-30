@@ -32,9 +32,14 @@ namespace SilverSim.Scripting.LSL.API.HTTP
 {
     [ScriptApiName("HTTP")]
     [LSLImplementation]
-    public partial class HTTP_API : MarshalByRefObject, IScriptApi
+    public partial class HTTP_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         public HTTP_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

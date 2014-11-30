@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
@@ -32,7 +33,7 @@ namespace SilverSim.Scripting.LSL.API.Sound
 {
     [ScriptApiName("Sound")]
     [LSLImplementation]
-    public partial class Sound_API : MarshalByRefObject, IScriptApi
+    public partial class Sound_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         public static UUID getSoundAssetID(ScriptInstance Instance, string item)
         {
@@ -54,6 +55,11 @@ namespace SilverSim.Scripting.LSL.API.Sound
         }
 
         public Sound_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

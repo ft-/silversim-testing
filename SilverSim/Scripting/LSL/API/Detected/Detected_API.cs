@@ -33,7 +33,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
 {
     [ScriptApiName("Detected")]
     [LSLImplementation]
-    public partial class Detected_API : MarshalByRefObject, IScriptApi
+    public partial class Detected_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         [APILevel(APIFlags.LSL)]
         public const int TOUCH_INVALID_FACE = -1;
@@ -43,6 +43,11 @@ namespace SilverSim.Scripting.LSL.API.Detected
         public static readonly Vector3 TOUCH_INVALID_VECTOR = Vector3.Zero;
 
         public Detected_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

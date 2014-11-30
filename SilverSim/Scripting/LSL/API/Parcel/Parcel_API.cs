@@ -32,7 +32,7 @@ namespace SilverSim.Scripting.LSL.API.Parcel
 {
     [ScriptApiName("Parcel")]
     [LSLImplementation]
-    public partial class Parcel_API : MarshalByRefObject, IScriptApi
+    public partial class Parcel_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         [APILevel(APIFlags.LSL)]
         public const int PARCEL_FLAG_ALLOW_FLY = 0x1;                           
@@ -68,6 +68,11 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         public const int PARCEL_FLAG_ALLOW_GROUP_OBJECT_ENTRY = 0x10000000;    
 
         public Parcel_API()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
         {
 
         }

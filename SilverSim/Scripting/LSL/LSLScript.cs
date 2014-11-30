@@ -77,7 +77,7 @@ namespace SilverSim.Scripting.LSL
             m_States.Add(name, state);
         }
 
-        public Script(ObjectPart part, ObjectPartInventoryItem item)
+        public Script(ObjectPart part, ObjectPartInventoryItem item, List<Delegate> stateChangeDelegates)
         {
             m_Part = part;
             m_Item = item;
