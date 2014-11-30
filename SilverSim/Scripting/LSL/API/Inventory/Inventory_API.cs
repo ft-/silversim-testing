@@ -23,17 +23,27 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scene.Types.Agent;
+using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using System;
-using SilverSim.Main.Common;
 
 namespace SilverSim.Scripting.LSL.API.Inventory
 {
+
     [ScriptApiName("Inventory")]
-    public partial class Inventory_API : MarshalByRefObject, IScriptApi, IPlugin
+    public class Inventory_API_Factory : ScriptApiFactory
+    {
+        public Inventory_API_Factory()
+            : base(typeof(Inventory_API))
+        {
+
+        }
+    }
+
+    [ScriptApiName("Inventory")]
+    public partial class Inventory_API : MarshalByRefObject, IScriptApi
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -44,11 +54,6 @@ namespace SilverSim.Scripting.LSL.API.Inventory
             Part = part;
             ScriptItem = scriptItem;
             Instance = instance;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
         }
 
         [APILevel(APIFlags.LSL)]

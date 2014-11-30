@@ -23,17 +23,16 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scene.Types.Agent;
+using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using System;
-using SilverSim.Main.Common;
 
 namespace SilverSim.Scripting.LSL.API.Experience
 {
     [ScriptApiName("Experience")]
-    public partial class Experience_API : MarshalByRefObject, IScriptApi, IPlugin
+    public partial class Experience_API : MarshalByRefObject, IScriptApi
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -44,11 +43,6 @@ namespace SilverSim.Scripting.LSL.API.Experience
             Part = part;
             ScriptItem = scriptItem;
             Instance = (Script)instance;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
         }
 
         [APILevel(APIFlags.LSL)]
@@ -170,6 +164,16 @@ namespace SilverSim.Scripting.LSL.API.Experience
         public UUID llUpdateKeyValue(string k, string v, int checked_orig, string original_value)
         {
             return UUID.Zero;
+        }
+    }
+
+    [ScriptApiName("Experience")]
+    public class Experience_API_Factory : ScriptApiFactory
+    {
+        public Experience_API_Factory()
+            : base(typeof(Experience_API))
+        {
+
         }
     }
 }

@@ -77,6 +77,7 @@
       <Reference name="SilverSim.Types" localCopy="false"/>
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
+      <Reference name="SilverSim.Scene.Types" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
       <Reference name="Nwc.XmlRpc" localCopy="false"/>
       <Files>

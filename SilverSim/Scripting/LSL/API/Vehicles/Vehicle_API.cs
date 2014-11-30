@@ -32,7 +32,17 @@ using System;
 namespace SilverSim.Scripting.LSL.API.Vehicles
 {
     [ScriptApiName("Vehicle")]
-    public class Vehicle_API : MarshalByRefObject, IScriptApi, IPlugin
+    public class Vehicle_API_Factory : ScriptApiFactory
+    {
+        public Vehicle_API_Factory()
+            : base(typeof(Vehicle_API))
+        {
+
+        }
+    }
+
+    [ScriptApiName("Vehicle")]
+    public class Vehicle_API : MarshalByRefObject, IScriptApi
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -43,11 +53,6 @@ namespace SilverSim.Scripting.LSL.API.Vehicles
             Part = part;
             ScriptItem = scriptItem;
             Instance = instance;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
         }
 
         [APILevel(APIFlags.LSL)]

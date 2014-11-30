@@ -33,7 +33,17 @@ using System.Collections.Generic;
 namespace SilverSim.Scripting.LSL.API.Primitive
 {
     [ScriptApiName("Primitive")]
-    public partial class Primitive_API : MarshalByRefObject, IScriptApi, IPlugin
+    public class Primitive_API_Factory : ScriptApiFactory
+    {
+        public Primitive_API_Factory()
+            : base(typeof(Primitive_API))
+        {
+
+        }
+    }
+
+    [ScriptApiName("Primitive")]
+    public partial class Primitive_API : MarshalByRefObject, IScriptApi
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -44,11 +54,6 @@ namespace SilverSim.Scripting.LSL.API.Primitive
             Part = part;
             ScriptItem = scriptItem;
             Instance = instance;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
         }
 
         public UUID getTextureAssetID(string item)

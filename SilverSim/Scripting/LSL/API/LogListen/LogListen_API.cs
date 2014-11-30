@@ -26,10 +26,23 @@ exception statement from your version.
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
+using System;
 
 namespace SilverSim.Scripting.LSL.API.LogListen
 {
-    public partial class LogListen_API
+
+    [ScriptApiName("LogListen")]
+    public class LogListen_API_Factory : ScriptApiFactory
+    {
+        public LogListen_API_Factory()
+            : base(typeof(LogListen_API))
+        {
+
+        }
+    }
+
+    [ScriptApiName("LogListen")]
+    public partial class LogListen_API : MarshalByRefObject, IScriptApi
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -40,11 +53,6 @@ namespace SilverSim.Scripting.LSL.API.LogListen
             Part = part;
             ScriptItem = scriptItem;
             Instance = instance;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
         }
 
         [APILevel(APIFlags.ASSL)]

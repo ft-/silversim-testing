@@ -32,7 +32,17 @@ using System;
 namespace SilverSim.Scripting.LSL.API.LightShare
 {
     [ScriptApiName("LightShare")]
-    public class LS_API : MarshalByRefObject, IScriptApi, IPlugin
+    public class LS_API_Factory : ScriptApiFactory
+    {
+        public LS_API_Factory()
+            : base(typeof(LS_API))
+        {
+
+        }
+    }
+
+    [ScriptApiName("LightShare")]
+    public class LS_API : MarshalByRefObject, IScriptApi
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -43,11 +53,6 @@ namespace SilverSim.Scripting.LSL.API.LightShare
             Part = part;
             ScriptItem = scriptItem;
             Instance = instance;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
         }
 
         [APILevel(APIFlags.LightShare)]

@@ -23,17 +23,15 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scene.Types.Agent;
+using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
-using SilverSim.Types;
 using System;
-using SilverSim.Main.Common;
 
 namespace SilverSim.Scripting.LSL.API.Base
 {
     [ScriptApiName("Base")]
-    public partial class Base_API : MarshalByRefObject, IScriptApi, IDisposable, IPlugin
+    public partial class Base_API : MarshalByRefObject, IScriptApi, IDisposable
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -46,14 +44,19 @@ namespace SilverSim.Scripting.LSL.API.Base
             Instance = instance;
         }
 
-        public void Startup(ConfigurationLoader loader)
-        {
-
-        }
-
         public void Dispose()
         {
             m_Timer.Enabled = false;
+        }
+    }
+
+    [ScriptApiName("Base")]
+    public class Base_API_Factory : ScriptApiFactory
+    {
+        public Base_API_Factory()
+            : base(typeof(Base_API))
+        {
+
         }
     }
 }

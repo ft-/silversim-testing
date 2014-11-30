@@ -29,6 +29,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Main.Common;
 using Nini.Config;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types.Asset;
 using System.Reflection;
@@ -37,6 +38,8 @@ namespace SilverSim.Scripting.LSL
 {
     public class LSLCompiler : IScriptCompiler, IPlugin, IPluginSubFactory
     {
+        List<ScriptApiFactory> m_Apis = new List<ScriptApiFactory>();
+
         public LSLCompiler()
         {
 
@@ -47,16 +50,14 @@ namespace SilverSim.Scripting.LSL
             Type[] types = GetType().Assembly.GetTypes();
             foreach(Type type in types)
             {
-                if (type.GetInterfaces().Contains(typeof(IPluginFactory)))
+                if (type.IsSubclassOf(typeof(ScriptApiFactory)))
                 {
                     foreach(System.Attribute attr in System.Attribute.GetCustomAttributes(type))
                     {
                         if(attr is ScriptApiName)
                         {
-                            object o = GetType().Assembly.CreateInstance(type.FullName);
-                            ConstructorInfo mi = type.GetConstructor(new Type[0]);
-                            mi.Invoke(o, new object[0]);
-                            loader.AddPlugin(((ScriptApiName)attr).Name, (IPlugin)o);
+                            ScriptApiFactory factory = (ScriptApiFactory)Activator.CreateInstance(type);
+                            loader.AddPlugin(((ScriptApiName)attr).Name, factory);
                         }
                     }
                 }
@@ -65,7 +66,17 @@ namespace SilverSim.Scripting.LSL
 
         public void Startup(ConfigurationLoader loader)
         {
-
+            List<ScriptApiFactory> apis = loader.GetServicesByValue<ScriptApiFactory>();
+            foreach (ScriptApiFactory api in apis)
+            {
+                foreach (System.Attribute attr in System.Attribute.GetCustomAttributes(api.GetType()))
+                {
+                    if (attr is APILevel && !m_Apis.Contains(api))
+                    {
+                        m_Apis.Add(api);
+                    }
+                }
+            }
         }
 
         public IScriptAssembly Compile(AssetData asset)

@@ -31,7 +31,17 @@ using System;
 namespace SilverSim.Scripting.LSL.API.Notecards
 {
     [ScriptApiName("Notecard")]
-    public partial class Notecard_API : MarshalByRefObject, IScriptApi, IPlugin
+    public class Notecard_API_Factory : ScriptApiFactory
+    {
+        public Notecard_API_Factory()
+            : base(typeof(Notecard_API))
+        {
+
+        }
+    }
+
+    [ScriptApiName("Notecard")]
+    public partial class Notecard_API : MarshalByRefObject, IScriptApi
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -42,11 +52,6 @@ namespace SilverSim.Scripting.LSL.API.Notecards
             Part = part;
             ScriptItem = scriptItem;
             Instance = instance;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
         }
     }
 }

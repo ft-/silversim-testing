@@ -36,7 +36,17 @@ using ThreadedClasses;
 namespace SilverSim.Scripting.LSL.API.Chat
 {
     [ScriptApiName("Chat")]
-    public partial class Chat_API : MarshalByRefObject, IScriptApi, IPlugin
+    public class Chat_API_Factory : ScriptApiFactory
+    {
+        public Chat_API_Factory()
+            : base(typeof(Chat_API))
+        {
+
+        }
+    }
+
+    [ScriptApiName("Chat")]
+    public partial class Chat_API : MarshalByRefObject, IScriptApi
     {
         public static int MaxListenerHandles = 64;
 
@@ -49,11 +59,6 @@ namespace SilverSim.Scripting.LSL.API.Chat
             Part = part;
             ScriptItem = scriptItem;
             Instance = instance;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
         }
 
         protected RwLockedDictionary<int, ChatServiceInterface.Listener> m_Listeners = new RwLockedDictionary<int, ChatServiceInterface.Listener>();

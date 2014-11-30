@@ -23,35 +23,33 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
-using System;
+using System.Reflection;
 
-namespace SilverSim.Scripting.LSL.API.HTTP
+namespace SilverSim.Main.Common
 {
-    [ScriptApiName("HTTP")]
-    public class HTTP_API : MarshalByRefObject, IScriptApi
+    public abstract class ScriptApiFactory : IPlugin
     {
-        ObjectPart Part;
-        ObjectPartInventoryItem ScriptItem;
-        ScriptInstance Instance;
+        Type ApiType;
 
-        public void Initialize(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem scriptItem)
+        public ScriptApiFactory(Type type)
         {
-            Part = part;
-            ScriptItem = scriptItem;
-            Instance = instance;
+            ApiType = type;
         }
-    }
 
-    [ScriptApiName("HTTP")]
-    public class HTTP_API_Factory : ScriptApiFactory
-    {
-        public HTTP_API_Factory()
-            : base(typeof(HTTP_API))
+        public void Startup(ConfigurationLoader loader)
         {
 
+        }
+
+        public IScriptApi CreateApi(ScriptInstance instance, ObjectPart part, ObjectPartInventoryItem item)
+        {
+            throw new NotImplementedException();
         }
     }
 }

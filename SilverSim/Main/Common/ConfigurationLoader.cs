@@ -87,6 +87,19 @@ namespace SilverSim.Main.Common
             return (T)module;
         }
 
+        public List<T> GetServicesByValue<T>()
+        {
+            List<T> list = new List<T>();
+            foreach (IPlugin module in PluginInstances.Values)
+            {
+                if (typeof(T).IsAssignableFrom(module.GetType()))
+                {
+                    list.Add((T)module);
+                }
+            }
+            return list;
+        }
+
         public BaseHttpServer HttpServer
         {
             get

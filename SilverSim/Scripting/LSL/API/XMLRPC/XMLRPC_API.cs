@@ -32,7 +32,17 @@ using System;
 namespace SilverSim.Scripting.LSL.API.XMLRPC
 {
     [ScriptApiName("XMLRPC")]
-    public class XMLRPC_API : MarshalByRefObject, IScriptApi, IPlugin
+    public class XMLRPC_API_Factory : ScriptApiFactory
+    {
+        public XMLRPC_API_Factory()
+            : base(typeof(XMLRPC_API))
+        {
+
+        }
+    }
+
+    [ScriptApiName("XMLRPC")]
+    public class XMLRPC_API : MarshalByRefObject, IScriptApi
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -43,11 +53,6 @@ namespace SilverSim.Scripting.LSL.API.XMLRPC
             Part = part;
             ScriptItem = scriptItem;
             Instance = instance;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
         }
 
         [APILevel(APIFlags.LSL)]

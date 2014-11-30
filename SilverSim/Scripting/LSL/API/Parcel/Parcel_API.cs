@@ -31,7 +31,17 @@ using System;
 namespace SilverSim.Scripting.LSL.API.Parcel
 {
     [ScriptApiName("Parcel")]
-    public partial class Parcel_API : MarshalByRefObject, IScriptApi, IPlugin
+    public class Parcel_API_Factory : ScriptApiFactory
+    {
+        public Parcel_API_Factory()
+            : base(typeof(Parcel_API))
+        {
+
+        }
+    }
+
+    [ScriptApiName("Parcel")]
+    public partial class Parcel_API : MarshalByRefObject, IScriptApi
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -42,11 +52,6 @@ namespace SilverSim.Scripting.LSL.API.Parcel
             Part = part;
             ScriptItem = scriptItem;
             Instance = instance;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
         }
 
         [APILevel(APIFlags.LSL)]

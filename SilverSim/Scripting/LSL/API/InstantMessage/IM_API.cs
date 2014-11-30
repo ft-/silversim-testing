@@ -31,7 +31,7 @@ using System;
 namespace SilverSim.Scripting.LSL.APIs.IM
 {
     [ScriptApiName("InstantMessage")]
-    public partial class IM_API : MarshalByRefObject, IScriptApi, IPlugin
+    public partial class IM_API : MarshalByRefObject, IScriptApi
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -43,8 +43,13 @@ namespace SilverSim.Scripting.LSL.APIs.IM
             ScriptItem = scriptItem;
             Instance = instance;
         }
+    }
 
-        public void Startup(ConfigurationLoader loader)
+    [ScriptApiName("InstantMessage")]
+    public class IM_API_Factory : ScriptApiFactory
+    {
+        public IM_API_Factory()
+            : base(typeof(IM_API))
         {
 
         }

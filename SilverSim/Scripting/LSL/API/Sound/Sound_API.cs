@@ -32,7 +32,17 @@ using System;
 namespace SilverSim.Scripting.LSL.API.Sound
 {
     [ScriptApiName("Sound")]
-    public partial class Sound_API : MarshalByRefObject, IScriptApi, IPlugin
+    public class Sound_API_Factory : ScriptApiFactory
+    {
+        public Sound_API_Factory()
+            : base(typeof(Sound_API))
+        {
+
+        }
+    }
+
+    [ScriptApiName("Sound")]
+    public partial class Sound_API : MarshalByRefObject, IScriptApi
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -43,11 +53,6 @@ namespace SilverSim.Scripting.LSL.API.Sound
             Part = part;
             ScriptItem = scriptItem;
             Instance = instance;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
         }
 
         public UUID getSoundAssetID(string item)

@@ -31,7 +31,17 @@ using System;
 namespace SilverSim.Scripting.LSL.API.Region
 {
     [ScriptApiName("Region")]
-    public partial class Region_API : MarshalByRefObject, IScriptApi, IPlugin
+    public class Region_API_Factory : ScriptApiFactory
+    {
+        public Region_API_Factory()
+            : base(typeof(Region_API))
+        {
+
+        }
+    }
+
+    [ScriptApiName("Region")]
+    public partial class Region_API : MarshalByRefObject, IScriptApi
     {
         ObjectPart Part;
         ObjectPartInventoryItem ScriptItem;
@@ -42,11 +52,6 @@ namespace SilverSim.Scripting.LSL.API.Region
             Part = part;
             ScriptItem = scriptItem;
             Instance = instance;
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-
         }
 
         [APILevel(APIFlags.LSL)]
