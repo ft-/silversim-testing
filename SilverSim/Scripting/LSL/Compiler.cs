@@ -60,13 +60,12 @@ namespace SilverSim.Scripting.LSL
             {
                 if (typeof(IScriptApi).IsAssignableFrom(type))
                 {
-                    foreach (System.Attribute attr in System.Attribute.GetCustomAttributes(type))
+                    System.Attribute scriptApiAttr = System.Attribute.GetCustomAttribute(type, typeof(ScriptApiName));
+                    System.Attribute impTagAttr = System.Attribute.GetCustomAttribute(type, typeof(LSLImplementation));
+                    if (null != impTagAttr && null != scriptApiAttr)
                     {
-                        if (attr is ScriptApiName)
-                        {
-                            IPlugin factory = (IPlugin)Activator.CreateInstance(type);
-                            loader.AddPlugin(((ScriptApiName)attr).Name, factory);
-                        }
+                        IPlugin factory = (IPlugin)Activator.CreateInstance(type);
+                        loader.AddPlugin(((ScriptApiName)scriptApiAttr).Name, factory);
                     }
                 }
             }
@@ -77,12 +76,10 @@ namespace SilverSim.Scripting.LSL
             List<IScriptApi> apis = loader.GetServicesByValue<IScriptApi>();
             foreach (IScriptApi api in apis)
             {
-                foreach (System.Attribute attr in System.Attribute.GetCustomAttributes(api.GetType()))
+                System.Attribute attr = System.Attribute.GetCustomAttribute(api.GetType(), typeof(LSLImplementation));
+                if(attr != null && !m_Apis.Contains(api))
                 {
-                    if (attr is LSLImplementation && !m_Apis.Contains(api))
-                    {
-                        m_Apis.Add(api);
-                    }
+                    m_Apis.Add(api);
                 }
             }
 
@@ -90,9 +87,10 @@ namespace SilverSim.Scripting.LSL
             {
                 foreach (FieldInfo f in api.GetType().GetFields())
                 {
-                    foreach (System.Attribute attr in System.Attribute.GetCustomAttributes(f))
+                    System.Attribute attr = System.Attribute.GetCustomAttribute(f, typeof(APILevel));
+                    if(attr != null)
                     {
-                        if (attr is APILevel && (f.Attributes & FieldAttributes.Static) != 0)
+                        if ((f.Attributes & FieldAttributes.Static) != 0)
                         {
                             if ((f.Attributes & FieldAttributes.InitOnly) != 0 || (f.Attributes & FieldAttributes.Literal) != 0)
                             {
@@ -108,20 +106,19 @@ namespace SilverSim.Scripting.LSL
 
                 foreach(Type t in api.GetType().GetNestedTypes(BindingFlags.Public).Where(t => t.BaseType == typeof(MulticastDelegate)))
                 {
-                    foreach (System.Attribute attr in System.Attribute.GetCustomAttributes(t))
+                    System.Attribute attr = System.Attribute.GetCustomAttribute(t, typeof(APILevel));
+                    if(attr != null)
                     {
-                        if (attr is APILevel)
-                        {
-                            m_EventDelegates.Add(t.Name, t.GetMethod("Invoke"));
-                        }
+                        m_EventDelegates.Add(t.Name, t.GetMethod("Invoke"));
                     }
                 }
 
                 foreach (MethodInfo m in api.GetType().GetMethods())
                 {
-                    foreach (System.Attribute attr in System.Attribute.GetCustomAttributes(m))
+                    System.Attribute attr = System.Attribute.GetCustomAttribute(m, typeof(APILevel));
+                    if(attr != null)
                     {
-                        if (attr is APILevel && (m.Attributes & MethodAttributes.Static) != 0)
+                        if ((m.Attributes & MethodAttributes.Static) != 0)
                         {
                             ParameterInfo[] pi = m.GetParameters();
                             if (pi.Length >= 1)
@@ -132,16 +129,18 @@ namespace SilverSim.Scripting.LSL
                                 }
                             }
                         }
-                        if (attr is ExecutedOnStateChange && (m.Attributes & MethodAttributes.Static) != 0)
+                    }
+
+                    attr = System.Attribute.GetCustomAttribute(m, typeof(ExecutedOnStateChange));
+                    if (attr != null && (m.Attributes & MethodAttributes.Static) != 0)
+                    {
+                        ParameterInfo[] pi = m.GetParameters();
+                        if(pi.Length == 1)
                         {
-                            ParameterInfo[] pi = m.GetParameters();
-                            if(pi.Length == 1)
+                            if(pi[0].ParameterType.Equals(typeof(ScriptInstance)))
                             {
-                                if(pi[0].ParameterType.Equals(typeof(ScriptInstance)))
-                                {
-                                    Delegate d = Delegate.CreateDelegate(typeof(Script.StateChangeEventDelegate), null, m);
-                                    m_StateChangeDelegates.Add((Script.StateChangeEventDelegate)d);
-                                }
+                                Delegate d = Delegate.CreateDelegate(typeof(Script.StateChangeEventDelegate), null, m);
+                                m_StateChangeDelegates.Add((Script.StateChangeEventDelegate)d);
                             }
                         }
                     }
