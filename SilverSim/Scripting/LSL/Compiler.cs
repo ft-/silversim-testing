@@ -32,6 +32,7 @@ using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
 using System.Collections;
+using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -44,6 +45,7 @@ namespace SilverSim.Scripting.LSL
         List<IScriptApi> m_Apis = new List<IScriptApi>();
         Dictionary<string, FieldInfo> m_Constants = new Dictionary<string, FieldInfo>();
         List<MethodInfo> m_Methods = new List<MethodInfo>();
+        Dictionary<string, MethodInfo> m_EventDelegates = new Dictionary<string, MethodInfo>();
         List<Script.StateChangeEventDelegate> m_StateChangeDelegates = new List<ScriptInstance.StateChangeEventDelegate>();
 
         public LSLCompiler()
@@ -103,6 +105,18 @@ namespace SilverSim.Scripting.LSL
                         }
                     }
                 }
+
+                foreach(Type t in api.GetType().GetNestedTypes(BindingFlags.Public).Where(t => t.BaseType == typeof(MulticastDelegate)))
+                {
+                    foreach (System.Attribute attr in System.Attribute.GetCustomAttributes(t))
+                    {
+                        if (attr is APILevel)
+                        {
+                            m_EventDelegates.Add(t.Name, t.GetMethod("Invoke"));
+                        }
+                    }
+                }
+
                 foreach (MethodInfo m in api.GetType().GetMethods())
                 {
                     foreach (System.Attribute attr in System.Attribute.GetCustomAttributes(m))
