@@ -26,13 +26,24 @@ exception statement from your version.
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System.IO;
+using System;
+using System.Collections.Generic;
 
 namespace SilverSim.Scene.Types.Script
 {
+    public class CompilerException : Exception
+    {
+        public int LineNumber;
+
+        public CompilerException(int linenumber, string message)
+            :base(message)
+        {
+            LineNumber = linenumber;
+        }
+    }
+
     public interface IScriptCompiler
     {
-        IScriptAssembly Compile(UUI user, AssetData asset);
-
-        IScriptAssembly Compile(UUI user, TextReader reader, int linenumber = 1);
+        IScriptAssembly Compile(AppDomain appDom, UUI user, List<string> shbangs, UUID assetID, TextReader reader, int linenumber = 1);
     }
 }

@@ -29,6 +29,6 @@ namespace SilverSim.Scene.Types.Script
 {
     public interface IScriptAssembly
     {
-        ScriptInstance Instantiate(ObjectPart objpart);
+        ScriptInstance Instantiate(ObjectPart objpart, ObjectPartInventoryItem item);
     }
 }

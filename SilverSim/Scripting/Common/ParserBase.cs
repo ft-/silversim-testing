@@ -98,12 +98,12 @@ namespace SilverSim.Scripting.Common
         protected int cur_linenumber;
         protected string cur_filename;
 
-        public void push(TextReader stream, string filename)
+        public void push(TextReader stream, string filename, int lineNumber = 1)
         {
             ParserInput pi = new ParserInput();
             pi.FileName = filename;
             pi.Reader = stream;
-            pi.LineNumberCounter = 1;
+            pi.LineNumberCounter = lineNumber;
             m_ParserInputs.Add(pi);
         }
 

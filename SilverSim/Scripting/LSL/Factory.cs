@@ -25,6 +25,12 @@ exception statement from your version.
 
 using Nini.Config;
 using SilverSim.Main.Common;
+using System.IO;
+using System;
+using System.Text;
+using System.Collections.Generic;
+using SilverSim.Types;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL
 {

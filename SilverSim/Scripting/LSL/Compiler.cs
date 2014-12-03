@@ -36,6 +36,8 @@ using System.Linq;
 using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
+using SilverSim.Scripting.Common;
+using System.Text;
 
 namespace SilverSim.Scripting.LSL
 {
@@ -47,10 +49,19 @@ namespace SilverSim.Scripting.LSL
         List<MethodInfo> m_Methods = new List<MethodInfo>();
         Dictionary<string, MethodInfo> m_EventDelegates = new Dictionary<string, MethodInfo>();
         List<Script.StateChangeEventDelegate> m_StateChangeDelegates = new List<ScriptInstance.StateChangeEventDelegate>();
+        List<string> m_ReservedWords = new List<string>();
+        List<string> m_MethodNames = new List<string>();
+        
 
         public LSLCompiler()
         {
-
+            m_ReservedWords.Add("integer");
+            m_ReservedWords.Add("vector");
+            m_ReservedWords.Add("list");
+            m_ReservedWords.Add("float");
+            m_ReservedWords.Add("string");
+            m_ReservedWords.Add("key");
+            m_ReservedWords.Add("rotation");
         }
 
         public void AddPlugins(ConfigurationLoader loader)
@@ -146,6 +157,466 @@ namespace SilverSim.Scripting.LSL
                     }
                 }
             }
+
+#if TEST_CODE
+            #region Test Code
+            string test = "test(vector a, float b, string c, integer d, list e, key f) {" +
+                    "{llSay(PUBLIC_CHANNEL, \"Hello\");}" +
+                    "integer f;\n" +
+                    "}\n" +
+                    "default {\n" +
+                    "state_entry()\n{\n" +
+                    "test(\n);\n" +
+                    "}}";
+            using (Stream s = new MemoryStream(Encoding.UTF8.GetBytes(test)))
+            {
+                List<string> shbangs = new List<string>();
+                shbangs.Add("//#!Mode: ASSL");
+                shbangs.Add("//#!Enable: Admin");
+                IScriptAssembly t = Compile(AppDomain.CurrentDomain, UUI.Unknown, shbangs, UUID.Zero, new StreamReader(s));
+            }
+            #endregion
+#endif
+        }
+
+        class LSLScriptAssembly : IScriptAssembly
+        {
+            Dictionary<string, Type> m_States;
+            public LSLScriptAssembly(Assembly assembly, Dictionary<string, Type> states)
+            {
+                m_States = states;
+            }
+
+            public ScriptInstance Instantiate(ObjectPart objpart, ObjectPartInventoryItem item)
+            {
+                throw new NotImplementedException();
+            }
+        }
+
+        class CompileState
+        {
+            public APIFlags AcceptedFlags;
+            //public ModuleBuilder Module;
+            public Dictionary<string, string> m_VariableDeclarations = new Dictionary<string,string>();
+            public Dictionary<string, string> m_VariableInitValues = new Dictionary<string,string>();
+            public List<List<string>> m_LocalVariables = new List<List<string>>();
+            public Dictionary<string, List<List<string>>> m_Functions = new Dictionary<string, List<List<string>>>();
+            public Dictionary<string, Dictionary<string, List<List<string>>>> m_States = new Dictionary<string, Dictionary<string, List<List<string>>>>();
+
+            public CompileState()
+            {
+
+            }
+        }
+
+        private void throwParserException(Parser p, string message)
+        {
+            string fname;
+            int lineno;
+            p.getfileinfo(out fname, out lineno);
+            throw new CompilerException(lineno, message);
+        }
+
+        private void checkValidName(Parser p, string type, string name)
+        {
+            if(name.Length == 0)
+            {
+                throwParserException(p, string.Format("{1} name '{0}' is not valid.", name, type));
+            }
+            if (name[0] != '_' && !(name[0] >= 'a' && name[0] <= 'z') && !(name[0] >= 'A' && name[0] <= 'Z') && name[0] != '_' && name[0] != '$')
+            {
+                throwParserException(p, string.Format("{1} name '{0}' is not valid.", name, type));
+            }
+            foreach(char c in name.Substring(1))
+            {
+                if (!(name[0] >= 'a' && name[0] <= 'z') && !(name[0] >= 'A' && name[0] <= 'Z') && name[0] != '_' && name[0] != '$')
+                {
+                    throwParserException(p, string.Format("{1} name '{0}' is not valid.", name, type));
+                }
+            }
+        }
+
+        private void checkUsedName(CompileState cs, Parser p, string type, string name)
+        {
+            checkValidName(p, type, name);
+            if(m_ReservedWords.Contains(name))
+            {
+                throwParserException(p, string.Format("{1} cannot be declared as '{0}'. '{0}' is a reserved word.", name, type));
+            }
+            else if(m_MethodNames.Contains(name))
+            {
+                throwParserException(p, string.Format("{1} cannot be declared as '{0}'. '{0}' is an already defined function name.", name, type));
+            }
+            else if(m_Constants.ContainsKey(name))
+            {
+                throwParserException(p, string.Format("{1} cannot be declared as '{0}'. '{0}' is an already defined constant.", name, type));
+            }
+            else if (m_EventDelegates.ContainsKey(name))
+            {
+                throwParserException(p, string.Format("{1} cannot be declared as '{0}'. '{0}' is an already defined constant.", name, type));
+            }
+            else if(cs.m_VariableDeclarations.ContainsKey(name))
+            {
+                throwParserException(p, string.Format("{1} cannot be declared as '{0}'. '{0}' is an already defined as user variable.", name, type));
+            }
+            else if (cs.m_Functions.ContainsKey(name))
+            {
+                throwParserException(p, string.Format("{1} cannot be declared as '{0}'. '{0}' is an already defined as user function.", name, type));
+            }
+            if(cs.m_LocalVariables[cs.m_LocalVariables.Count - 1].Contains(name))
+            {
+                throwParserException(p, string.Format("{1} cannot be declared as '{0}'. '{0}' is an already defined as local variable in the same block.", name, type));
+            }
+        }
+
+        struct FuncParamInfo
+        {
+            public Type Type;
+            public string Name;
+        }
+
+        List<FuncParamInfo> checkFunctionParameters(CompileState cs, Parser p, List<string> arguments)
+        {
+            List<FuncParamInfo> funcParams = new List<FuncParamInfo>();
+            if(cs.m_LocalVariables.Count != 0)
+            {
+                throwParserException(p, "Internal parser error");
+            }
+            cs.m_LocalVariables.Add(new List<string>());
+            if(arguments.Count == 1 && arguments[0] == ")")
+            {
+                return funcParams;
+            }
+            for(int i = 0; i < arguments.Count; i += 3)
+            {
+                FuncParamInfo fp = new FuncParamInfo();
+                switch (arguments[i])
+                {
+                    case "integer":
+                        fp.Type = typeof(int);
+                        break;
+
+                    case "vector":
+                        fp.Type = typeof(Vector3);
+                        break;
+
+                    case "list":
+                        fp.Type = typeof(AnArray);
+                        break;
+
+                    case "float":
+                        fp.Type = typeof(double);
+                        break;
+
+                    case "string":
+                        fp.Type = typeof(string);
+                        break;
+
+                    case "key":
+                        fp.Type = typeof(UUID);
+                        break;
+
+                    case "rotation":
+                        fp.Type = typeof(Quaternion);
+                        break;
+
+                    default:
+                        throwParserException(p, string.Format("Invalid type for parameter {0}", i / 3));
+                        break;
+                }
+
+                checkUsedName(cs, p, "Parameter", arguments[i + 1]);
+                cs.m_LocalVariables[0].Add(arguments[i + 1]);
+                fp.Name = arguments[i + 1];
+                funcParams.Add(fp);
+
+                if (arguments[i + 2] == ",")
+                {
+                }
+                else if(arguments[i + 2] == ")")
+                {
+                    if(i + 3 != arguments.Count)
+                    {
+                        throwParserException(p, string.Format("Missing ')' at the end of function declaration"));
+                    }
+                    return funcParams;
+                }
+            }
+            throwParserException(p, string.Format("Missing ')' at the end of function declaration"));
+            return null;
+        }
+
+        void parseBlock(CompileState compileState, Parser p, List<List<string>> block, bool addNewLocals = false)
+        {
+            if(addNewLocals)
+            {
+                compileState.m_LocalVariables.Add(new List<string>());
+            }
+            for (; ; )
+            {
+                List<string> args = new List<string>();
+                try
+                {
+                    p.read(args);
+                }
+                catch (ParserBase.EndOfStringException)
+                {
+                    throwParserException(p, "Missing '\"' at the end of string");
+                }
+                catch (ParserBase.EndOfFileException)
+                {
+                    throwParserException(p, "Premature end of script");
+                }
+                if (args.Count == 0)
+                {
+                    /* should not happen but better be safe here */
+                }
+                else if (args[args.Count - 1] == ";")
+                {
+                    switch (args[0])
+                    {
+                        case "integer":
+                        case "vector":
+                        case "list":
+                        case "float":
+                        case "string":
+                        case "key":
+                        case "rotation":
+                            checkUsedName(compileState, p, "Local Variable", args[1]);
+                            compileState.m_LocalVariables[compileState.m_LocalVariables.Count - 1].Add(args[1]);
+                            if(args[2] != ";" && args[2] != "=")
+                            {
+                                throwParserException(p, string.Format("Expecting '=' or ';' after variable name {0}", args[1]));
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                    block.Add(args);
+                }
+                else if (args[args.Count - 1] == "{")
+                {
+                    block.Add(args);
+                    parseBlock(compileState, p, block, true);
+                }
+                else if (args[0] == "}")
+                {
+                    compileState.m_LocalVariables.RemoveAt(compileState.m_LocalVariables.Count - 1);
+                    return;
+                }
+            }
+        }
+
+        void parseState(CompileState compileState, Parser p, string stateName)
+        {
+            compileState.m_States.Add(stateName, new Dictionary<string, List<List<string>>>());
+            for (; ; )
+            {
+                List<string> args = new List<string>();
+                try
+                {
+                    p.read(args);
+                }
+                catch (ParserBase.EndOfStringException)
+                {
+                    throwParserException(p, "Missing '\"' at the end of string");
+                }
+                catch (ParserBase.EndOfFileException)
+                {
+                    throwParserException(p, "Missing '}' at end of script");
+                }
+                if (args.Count == 0)
+                {
+                    /* should not happen but better be safe here */
+                }
+                else if (args[args.Count - 1] == ";")
+                {
+                    throwParserException(p, string.Format("Neither variable declarations nor statements allowed outside of event functions. Offending state {0}.", stateName));
+                }
+                else if (args[args.Count - 1] == "{")
+                {
+                    if(!m_EventDelegates.ContainsKey(args[0]))
+                    {
+                        throwParserException(p, string.Format("'{0}' is not a valid event.", args[0]));
+                    }
+                    List<FuncParamInfo> fp = checkFunctionParameters(compileState, p, args.GetRange(2, args.Count - 3));
+                    MethodInfo m = m_EventDelegates[args[0]];
+                    ParameterInfo[] pi = m.GetParameters();
+                    if(fp.Count != pi.Length)
+                    {
+                        throwParserException(p, string.Format("'{0}' does not have the correct parameters.", args[0]));
+                    }
+                    int i;
+                    for(i = 0; i < fp.Count; ++i)
+                    {
+                        if(!fp[i].Type.Equals(pi[i].ParameterType))
+                        {
+                            throwParserException(p, string.Format("'{0}' does not match in parameter types", args[0]));
+                        }
+                    }
+                    if(compileState.m_States[stateName].ContainsKey(args[0]))
+                    {
+                        throwParserException(p, string.Format("Event '{0}' already defined", args[0]));
+                    }
+                    List<List<string>> stateList = new List<List<string>>();
+                    compileState.m_States[stateName].Add(args[0], stateList);
+                    stateList.Add(args);
+                    parseBlock(compileState, p, stateList);
+                }
+                else if (args[0] == "}")
+                {
+                    return;
+                }
+            }
+        }
+
+        public IScriptAssembly Compile(AppDomain appDom, UUI user, List<string> shbangs, UUID assetID, TextReader reader, int lineNumber = 1)
+        {
+            CompileState compileState = new CompileState();
+            compileState.AcceptedFlags = APIFlags.OSSL | APIFlags.LSL | APIFlags.LightShare;
+            APIFlags extraflags = APIFlags.None;
+            foreach(string shbang in shbangs)
+            { 
+                if (shbang.StartsWith("//#!Mode:"))
+                {
+                    /* we got a sh-bang here, it is a lot safer than what OpenSimulator uses */
+                    string mode = shbang.Substring(9).Trim().ToUpper();
+                    if (mode == "LSL")
+                    {
+                        compileState.AcceptedFlags = APIFlags.LSL;
+                    }
+                    else if (mode == "ASSL")
+                    {
+                        compileState.AcceptedFlags = APIFlags.ASSL;
+                    }
+                }
+                else if (shbang.StartsWith("//#!Enable:"))
+                {
+                    string api = shbang.Substring(11).Trim().ToLower();
+                    if (api == "admin")
+                    {
+                        extraflags |= APIFlags.ASSL_Admin;
+                    }
+                }
+                compileState.AcceptedFlags |= extraflags;
+            }
+
+            Parser p = new Parser();
+            p.push(reader, "", lineNumber);
+            
+            for (; ;)
+            {
+                List<string> args = new List<string>();
+                try
+                {
+                    p.read(args);
+                }
+                catch(ParserBase.EndOfStringException)
+                {
+                    throwParserException(p, "Missing '\"' at the end of string");
+                }
+                catch(ParserBase.EndOfFileException)
+                {
+                    break;
+                }
+                if(args.Count == 0)
+                {
+                    /* should not happen but better be safe here */
+                }
+                else if(args[args.Count - 1] == ";")
+                {
+                    /* variable definition */
+                    if(args[2] != "=" && args[2] != ";")
+                    {
+                        throwParserException(p, "Invalid variable definition. Either ';' or an expression preceeded by '='");
+                    }
+                    switch (args[0])
+                    {
+                        case "integer":
+                        case "vector":
+                        case "list":
+                        case "float":
+                        case "string":
+                        case "key":
+                        case "rotation":
+                            checkUsedName(compileState, p, "Variable", args[1]);
+                            break;
+
+                        default:
+                            throwParserException(p, string.Format("Invalid variable definition. Wrong type {0}.", args[0]));
+                            break;
+                    }
+                }
+                else if (args[args.Count - 1] == "{")
+                {
+                    if(args[0] == "default")
+                    {
+                        /* default state begin */
+                        if(args[1] != "{")
+                        {
+                            throwParserException(p, "Invalid default state declaration");
+                        }
+                        parseState(compileState, p, "default");
+                    }
+                    else if(args[0] == "state")
+                    {
+                        /* state begin */
+                        if(args[1] == "default")
+                        {
+                            throwParserException(p, "default state cannot be declared with state");
+                        }
+                        checkValidName(p, "State", args[1]);
+                        if(compileState.m_States.ContainsKey(args[1]))
+                        {
+                            throwParserException(p, "state definition cannot be declared twice");
+                        }
+
+                        if(args[2] != "{")
+                        {
+                            throwParserException(p, "Invalid state declaration");
+                        }
+                        parseState(compileState, p, args[1]);
+                    }
+                    else
+                    {
+                        List<FuncParamInfo> fp;
+                        List<List<string>> funcList = new List<List<string>>();
+                        /* either type or function name */
+                        switch (args[0])
+                        {
+                            case "integer":
+                            case "vector":
+                            case "list":
+                            case "float":
+                            case "string":
+                            case "key":
+                            case "rotation":
+                                checkUsedName(compileState, p, "Function", args[1]);
+                                fp = checkFunctionParameters(compileState, p, args.GetRange(3, args.Count - 3));
+                                funcList.Add(args);
+                                parseBlock(compileState, p, funcList);
+                                break;
+
+                            default:
+                                fp = checkFunctionParameters(compileState, p, args.GetRange(2, args.Count - 3));
+                                args.Insert(0, "void");
+                                funcList.Add(args);
+                                parseBlock(compileState, p, funcList);
+                                break;
+                        }
+                    }
+                }
+                else if (args[0] == "}")
+                {
+                    throwParserException(p, "'}' found without matching '{'");
+                }
+            }
+            throw new NotImplementedException();
+        }
+    }
+}
+
 
 #if EXAMPLARY_CODE_FOR_CREATING_DYNAMIC_ASSEMBLIES            
             AssemblyName aName = new AssemblyName("SilverSim.Scripting.LSL.Script");
@@ -283,58 +754,3 @@ namespace SilverSim.Scripting.LSL
 
             mb.CreateGlobalFunctions();
 #endif
-        }
-
-        public IScriptAssembly Compile(UUI user, AssetData asset)
-        {
-            using (TextReader reader = new StreamReader(asset.InputStream))
-            {
-                return Compile(user, reader);
-            }
-        }
-
-        public IScriptAssembly Compile(UUI user, TextReader reader, int lineNumber = 1)
-        {
-            APIFlags acceptedflags = APIFlags.OSSL | APIFlags.LSL | APIFlags.LightShare;
-            APIFlags extraflags = APIFlags.None;
-            string input = reader.ReadLine();
-            while(input.StartsWith("//#!"))
-            {
-                if (input.StartsWith("//#!Mode:"))
-                {
-                    /* we got a sh-bang here, it is a lot safer than what OpenSimulator uses */
-                    string mode = input.Substring(9).Trim();
-                    if (mode == "LSL")
-                    {
-                        acceptedflags = APIFlags.LSL;
-                    }
-                    else if (mode == "ASSL")
-                    {
-                        acceptedflags = APIFlags.ASSL;
-                    }
-                }
-                else if(input.StartsWith("//#!Enable:"))
-                {
-                    string api = input.Substring(11).Trim();
-                    if(api == "Admin")
-                    {
-                        extraflags |= APIFlags.ASSL_Admin;
-                    }
-                }
-
-                ++lineNumber;
-                input = reader.ReadLine();
-            }
-            acceptedflags |= extraflags;
-
-            while (null != input)
-            {
-
-                
-                ++lineNumber;
-                input = reader.ReadLine();
-            }
-            throw new NotImplementedException();
-        }
-    }
-}
