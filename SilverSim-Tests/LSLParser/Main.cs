@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.Scripting.LSL;
-using SilverSim.Scripting.Common.ExpressionTree;
+using SilverSim.Scripting.Common.Expression;
 using System.IO;
 
 namespace Tests.SilverSim.LSLParser
@@ -14,6 +14,7 @@ namespace Tests.SilverSim.LSLParser
         {
             List<char> multilslops = new List<char>();
             List<char> singlelslops = new List<char>();
+            List<char> numericchars = new List<char>();
             singlelslops.Add('~');
             multilslops.Add('+');
             multilslops.Add('-');
@@ -24,7 +25,8 @@ namespace Tests.SilverSim.LSLParser
             multilslops.Add('>');
             multilslops.Add('=');
             multilslops.Add('&');
-            multilslops.Add('|');
+            multilslops.Add('|'); 
+            multilslops.Add('^');
             singlelslops.Add('.');
             singlelslops.Add('(');
             singlelslops.Add(')');
@@ -32,6 +34,120 @@ namespace Tests.SilverSim.LSLParser
             singlelslops.Add(']');
             singlelslops.Add('!');
             singlelslops.Add(',');
+            singlelslops.Add('@');
+            numericchars.Add('.');
+            numericchars.Add('a');
+            numericchars.Add('b');
+            numericchars.Add('c');
+            numericchars.Add('d');
+            numericchars.Add('e');
+            numericchars.Add('f');
+            numericchars.Add('A');
+            numericchars.Add('B');
+            numericchars.Add('C');
+            numericchars.Add('D');
+            numericchars.Add('E');
+            numericchars.Add('F');
+            numericchars.Add('x');
+            numericchars.Add('+');
+            numericchars.Add('-');
+
+            List<string> reservedWords = new List<string>();
+            reservedWords.Add("for");
+            reservedWords.Add("if");
+            reservedWords.Add("while");
+            reservedWords.Add("do");
+            reservedWords.Add("jump");
+            reservedWords.Add("return");
+            reservedWords.Add("state");
+            reservedWords.Add("integer");
+            reservedWords.Add("float");
+            reservedWords.Add("string");
+            reservedWords.Add("key");
+            reservedWords.Add("list");
+            reservedWords.Add("vector");
+            reservedWords.Add("rotation");
+            List<Dictionary<string, Resolver.OperatorType>> operators = new List<Dictionary<string, Resolver.OperatorType>>();
+            Dictionary<string, string> blockOps = new Dictionary<string,string>();
+            blockOps.Add("(", ")");
+            blockOps.Add("[", "]");
+
+            Dictionary<string, Resolver.OperatorType> plist;
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("@", Resolver.OperatorType.LeftUnary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("++", Resolver.OperatorType.RightUnary);
+            plist.Add("--", Resolver.OperatorType.RightUnary);
+            plist.Add(".", Resolver.OperatorType.Binary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("++", Resolver.OperatorType.LeftUnary);
+            plist.Add("--", Resolver.OperatorType.LeftUnary);
+            plist.Add("+", Resolver.OperatorType.LeftUnary);
+            plist.Add("-", Resolver.OperatorType.LeftUnary);
+            plist.Add("!", Resolver.OperatorType.LeftUnary);
+            plist.Add("~", Resolver.OperatorType.LeftUnary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("*", Resolver.OperatorType.Binary);
+            plist.Add("/", Resolver.OperatorType.Binary);
+            plist.Add("%", Resolver.OperatorType.Binary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("+", Resolver.OperatorType.Binary);
+            plist.Add("-", Resolver.OperatorType.Binary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("<<", Resolver.OperatorType.Binary);
+            plist.Add(">>", Resolver.OperatorType.Binary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("<", Resolver.OperatorType.Binary);
+            plist.Add("<=", Resolver.OperatorType.Binary);
+            plist.Add(">", Resolver.OperatorType.Binary);
+            plist.Add(">=", Resolver.OperatorType.Binary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("==", Resolver.OperatorType.Binary);
+            plist.Add("!=", Resolver.OperatorType.Binary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("&", Resolver.OperatorType.Binary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("^", Resolver.OperatorType.Binary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("|", Resolver.OperatorType.Binary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("&&", Resolver.OperatorType.Binary);
+            plist.Add("||", Resolver.OperatorType.Binary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("=", Resolver.OperatorType.Binary);
+            plist.Add("+=", Resolver.OperatorType.Binary);
+            plist.Add("-=", Resolver.OperatorType.Binary);
+            plist.Add("*=", Resolver.OperatorType.Binary);
+            plist.Add("/=", Resolver.OperatorType.Binary);
+            plist.Add("%=", Resolver.OperatorType.Binary);
+
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("=", Resolver.OperatorType.Binary);
+            plist.Add("+=", Resolver.OperatorType.Binary);
+            plist.Add("-=", Resolver.OperatorType.Binary);
+            plist.Add("*=", Resolver.OperatorType.Binary);
+            plist.Add("/=", Resolver.OperatorType.Binary);
+            plist.Add("%=", Resolver.OperatorType.Binary);
+            plist.Add("&=", Resolver.OperatorType.Binary);
+            plist.Add("^=", Resolver.OperatorType.Binary);
+            plist.Add("|=", Resolver.OperatorType.Binary);
+            plist.Add("<<=", Resolver.OperatorType.Binary);
+            plist.Add(">>=", Resolver.OperatorType.Binary);
+
+
+            Resolver resolver = new Resolver(reservedWords, operators, blockOps);
             
             foreach(string arg in args)
             {
@@ -62,12 +178,24 @@ namespace Tests.SilverSim.LSLParser
                         System.Console.WriteLine();
 
                         System.Console.Write("O:" + parser.getfileinfo().LineNumber.ToString()+ ": ");
-                        Tree tree = new Tree(arguments, multilslops, singlelslops);
+                        Tree tree = new Tree(arguments.GetRange(0, arguments.Count - 1), multilslops, singlelslops, numericchars);
                         foreach (Tree ent in tree.SubTree)
                         {
-                            System.Console.Write(ent.Value + " ");
+                            if (ent.Type == Tree.EntryType.StringValue)
+                            {
+                                System.Console.Write("\"" + ent.Entry + "\" ");
+                            }
+                            else
+                            {
+                                System.Console.Write(ent.Entry + " ");
+                            }
                         }
                         System.Console.WriteLine();
+
+                        if (arguments[arguments.Count - 1] == ";")
+                        {
+                            resolver.Process(tree);
+                        }
                     }
                 }
                 catch (Parser.EndOfFileException)

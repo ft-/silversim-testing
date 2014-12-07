@@ -64,6 +64,15 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        public class ParenthesisMismatchError : Exception
+        {
+            public ParenthesisMismatchError()
+                : base("')' has no matching '('")
+            {
+
+            }
+        }
+
         public class FileIoError : Exception
         {
             public FileIoError()

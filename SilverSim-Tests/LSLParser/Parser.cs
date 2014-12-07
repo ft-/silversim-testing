@@ -45,6 +45,7 @@ namespace SilverSim.Scripting.LSL
             begin();
             args.Clear();
             bool is_preprocess = false;
+            int parenthesislevel = 0;
 
             for(;;)
             {
@@ -70,7 +71,7 @@ redo:
                         if(0 != token.Length)
                             args.Add(token);
                         args.Add(";");
-                        if(args.Count != 0)
+                        if (args.Count != 0 && parenthesislevel == 0)
                             return;
                         break;
 
@@ -134,8 +135,6 @@ redo:
                     case ',':       /* special tokens (all these do not make up compound literals) */
                     case '~':
                     case '?':
-                    case '(':
-                    case ')':
                     case '\\':
                     case '[':
                     case ']':
@@ -144,7 +143,27 @@ redo:
                         token = "";
                         args.Add(new string(new char[] {c}));
                         break;
-                
+
+                    case '(':
+                        ++parenthesislevel;
+                        if(0 != token.Length)
+                            args.Add(token);
+                        token = "";
+                        args.Add(new string(new char[] {c}));
+                        break;
+
+                    case ')':
+                        if(parenthesislevel == 0)
+                        {
+                            throw new ParenthesisMismatchError();
+                        }
+                        --parenthesislevel;
+                        if(0 != token.Length)
+                            args.Add(token);
+                        token = "";
+                        args.Add(new string(new char[] {c}));
+                        break;
+
                     case '<':
                         if(is_preprocess)
                         {
@@ -278,17 +297,19 @@ redo:
             for(int argi = 0; argi < args.Count; ++argi)
             {
                 int i;
-                char c;
+                char c = '\0';
+                char lastc = '\0';
                 int curlength = args[argi].Length;
                 for(i = 0; i < curlength;)
                 {
+                    lastc = c;
                     c = args[argi][i];
                     /* ignore strings first */
                     if('\"' == c)
                         break;
                     else if('\'' == c)
                         break;
-                    else if('+' == c)
+                    else if ('+' == c)
                     {
                         if(i > 0)
                         {
@@ -364,7 +385,7 @@ redo:
                         else
                             ++i;
                     }
-                    else if('-' == c)
+                    else if ('-' == c && ((lastc != 'e' && lastc != 'E') || args.Count == 0 || !char.IsDigit(args[argi][0])))
                     {
                         if(i > 0)
                         {

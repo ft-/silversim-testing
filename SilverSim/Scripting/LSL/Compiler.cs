@@ -37,6 +37,7 @@ using System.IO;
 using System.Reflection;
 using System.Reflection.Emit;
 using SilverSim.Scripting.Common;
+using SilverSim.Scripting.Common.Expression;
 using System.Text;
 
 namespace SilverSim.Scripting.LSL
@@ -51,6 +52,9 @@ namespace SilverSim.Scripting.LSL
         List<Script.StateChangeEventDelegate> m_StateChangeDelegates = new List<ScriptInstance.StateChangeEventDelegate>();
         List<string> m_ReservedWords = new List<string>();
         List<string> m_MethodNames = new List<string>();
+        List<char> m_SingleOps = new List<char>();
+        List<char> m_MultiOps = new List<char>();
+        List<char> m_NumericChars = new List<char>();
         
 
         public LSLCompiler()
@@ -62,6 +66,52 @@ namespace SilverSim.Scripting.LSL
             m_ReservedWords.Add("string");
             m_ReservedWords.Add("key");
             m_ReservedWords.Add("rotation");
+            m_ReservedWords.Add("if");
+            m_ReservedWords.Add("while");
+            m_ReservedWords.Add("jump");
+            m_ReservedWords.Add("for");
+            m_ReservedWords.Add("do");
+            m_ReservedWords.Add("return");
+            m_ReservedWords.Add("state");
+
+            m_MultiOps.Add('+');
+            m_MultiOps.Add('-');
+            m_MultiOps.Add('*');
+            m_MultiOps.Add('/');
+            m_MultiOps.Add('%');
+            m_MultiOps.Add('<');
+            m_MultiOps.Add('>');
+            m_MultiOps.Add('=');
+            m_MultiOps.Add('&');
+            m_MultiOps.Add('|');
+            m_MultiOps.Add('^');
+
+            m_SingleOps.Add('~');
+            m_SingleOps.Add('.');
+            m_SingleOps.Add('(');
+            m_SingleOps.Add(')');
+            m_SingleOps.Add('[');
+            m_SingleOps.Add(']');
+            m_SingleOps.Add('!');
+            m_SingleOps.Add(',');
+            m_SingleOps.Add('@');
+
+            m_NumericChars.Add('.');
+            m_NumericChars.Add('A');
+            m_NumericChars.Add('B');
+            m_NumericChars.Add('C');
+            m_NumericChars.Add('D');
+            m_NumericChars.Add('E');
+            m_NumericChars.Add('F');
+            m_NumericChars.Add('a');
+            m_NumericChars.Add('b');
+            m_NumericChars.Add('c');
+            m_NumericChars.Add('d');
+            m_NumericChars.Add('e');
+            m_NumericChars.Add('f');
+            m_NumericChars.Add('x');
+            m_NumericChars.Add('+');
+            m_NumericChars.Add('-');
         }
 
         public void AddPlugins(ConfigurationLoader loader)
