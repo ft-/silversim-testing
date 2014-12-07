@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using System;
 using System.Collections.Generic;
 
@@ -39,7 +40,7 @@ namespace SilverSim.LL.Messages.Object
 
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
-        public byte AttachmentPoint = 0;
+        public AttachmentPoint AttachmentPoint = 0;
 
         public List<Data> ObjectData = new List<Data>();
 
@@ -61,7 +62,7 @@ namespace SilverSim.LL.Messages.Object
             ObjectAttach m = new ObjectAttach();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
-            m.AttachmentPoint = p.ReadUInt8();
+            m.AttachmentPoint = (AttachmentPoint)p.ReadUInt8();
 
             uint c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)

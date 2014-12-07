@@ -873,7 +873,11 @@ namespace SilverSim.Scripting.LSL
             ASSL_Operators.Add(opsubtree);
 
             opsubtree = new List<OperatorInfo>();
-            opsubtree.Add(new OperatorInfo("->", OperatorInfo.OperatorType.Binary));
+            opsubtree.Add(new OperatorInfo(",", OperatorInfo.OperatorType.Binary));
+            LSL_Operators.Add(opsubtree);
+            ASSL_Operators.Add(opsubtree);
+
+            opsubtree = new List<OperatorInfo>();
             opsubtree.Add(new OperatorInfo("++", OperatorInfo.OperatorType.RightUnary));
             opsubtree.Add(new OperatorInfo("--", OperatorInfo.OperatorType.RightUnary));
             opsubtree.Add(new OperatorInfo(".", OperatorInfo.OperatorType.Binary));
@@ -943,17 +947,7 @@ namespace SilverSim.Scripting.LSL
 
             opsubtree = new List<OperatorInfo>();
             opsubtree.Add(new OperatorInfo("&&", OperatorInfo.OperatorType.Binary));
-            LSL_Operators.Add(opsubtree);
-            ASSL_Operators.Add(opsubtree);
-
-            opsubtree = new List<OperatorInfo>();
             opsubtree.Add(new OperatorInfo("||", OperatorInfo.OperatorType.Binary));
-            LSL_Operators.Add(opsubtree);
-            ASSL_Operators.Add(opsubtree);
-
-            opsubtree = new List<OperatorInfo>();
-            opsubtree.Add(new OperatorInfo("?", OperatorInfo.OperatorType.Binary));
-            opsubtree.Add(new OperatorInfo(":", OperatorInfo.OperatorType.Binary));
             LSL_Operators.Add(opsubtree);
             ASSL_Operators.Add(opsubtree);
 
@@ -978,11 +972,6 @@ namespace SilverSim.Scripting.LSL
             opsubtree.Add(new OperatorInfo("|=", OperatorInfo.OperatorType.Binary));
             opsubtree.Add(new OperatorInfo("<<=", OperatorInfo.OperatorType.Binary));
             opsubtree.Add(new OperatorInfo(">>=", OperatorInfo.OperatorType.Binary));
-            ASSL_Operators.Add(opsubtree);
-
-            opsubtree = new List<OperatorInfo>();
-            opsubtree.Add(new OperatorInfo(",", OperatorInfo.OperatorType.Binary));
-            LSL_Operators.Add(opsubtree);
             ASSL_Operators.Add(opsubtree);
 
             foreach(List<OperatorInfo> ops in ASSL_Operators)

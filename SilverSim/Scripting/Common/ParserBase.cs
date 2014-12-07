@@ -105,11 +105,20 @@ namespace SilverSim.Scripting.Common
             pi.Reader = stream;
             pi.LineNumberCounter = lineNumber;
             m_ParserInputs.Add(pi);
+            cur_linenumber = pi.LineNumberCounter;
+            cur_filename = pi.FileName;
         }
 
         public void pop()
         {
             m_ParserInputs.RemoveAt(m_ParserInputs.Count - 1);
+
+            if(m_ParserInputs.Count != 0)
+            {
+                ParserInput pi = m_ParserInputs[m_ParserInputs.Count - 1];
+                cur_linenumber = pi.LineNumberCounter;
+                cur_filename = pi.FileName;
+            }
         }
 
         public void begin()
@@ -118,22 +127,6 @@ namespace SilverSim.Scripting.Common
             {
                 throw new StackEmptyException();
             }
-
-            ParserInput pi = m_ParserInputs[m_ParserInputs.Count - 1];
-            cur_linenumber = pi.LineNumberCounter;
-            cur_filename = pi.FileName;
-        }
-
-        public void update()
-        {
-            if(m_ParserInputs.Count == 0)
-            {
-                throw new StackEmptyException();
-            }
-
-            ParserInput pi = m_ParserInputs[m_ParserInputs.Count - 1];
-            cur_linenumber = pi.LineNumberCounter;
-            cur_filename = pi.FileName;
         }
 
         public void getfileinfo(out string filename, out int linenumber)
@@ -143,9 +136,30 @@ namespace SilverSim.Scripting.Common
                 throw new StackEmptyException();
             }
 
-            ParserInput pi = m_ParserInputs[m_ParserInputs.Count - 1];
-            linenumber = pi.LineNumberCounter;
-            filename = pi.FileName;
+            linenumber = cur_linenumber;
+            filename = cur_filename;
+        }
+
+        public struct FileInfo
+        {
+            public string FileName;
+            public int LineNumber;
+
+            public FileInfo(string filename, int linenumber)
+            {
+                FileName = filename;
+                LineNumber = linenumber;
+            }
+        }
+
+        public FileInfo getfileinfo()
+        {
+            if (m_ParserInputs.Count == 0)
+            {
+                throw new StackEmptyException();
+            }
+
+            return new FileInfo(cur_filename, cur_linenumber);
         }
 
         public char readc()
@@ -178,7 +192,7 @@ namespace SilverSim.Scripting.Common
                 {
                     if(c == '\n')
                     {
-                        ++pi.LineNumberCounter;
+                        ++cur_linenumber;
                     }
                     return (char)c;
                 }

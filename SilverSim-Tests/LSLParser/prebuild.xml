@@ -13,7 +13,6 @@
 
     <ReferencePath>../../bin/</ReferencePath>
     <Reference name="System"/>
-    <Reference name="SilverSim.Scripting.LSL"/>
     <Reference name="SilverSim.Scripting.Common"/>
     <Files>
         <Match pattern="*.cs" recurse="true"/>
