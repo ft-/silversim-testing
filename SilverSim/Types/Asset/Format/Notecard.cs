@@ -36,6 +36,7 @@ namespace SilverSim.Types.Asset.Format
     {
         public NotecardInventory Inventory = null;
         public string Text = string.Empty;
+        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
 
         #region Constructors
         public Notecard()
@@ -71,6 +72,81 @@ namespace SilverSim.Types.Asset.Format
                     if (!reflist.Contains(item.AssetID))
                     {
                         reflist.Add(item.AssetID);
+                    }
+                }
+
+                if(Text.StartsWith("<llsd>"))
+                {
+                    byte[] d = UTF8NoBOM.GetBytes(Text);
+                    /* could be an agent appearance notecard, so let us try that */
+                    IValue iv;
+                    using (Stream i = new MemoryStream(d))
+                    {
+                        iv = SilverSim.StructuredData.LLSD.LLSD_XML.Deserialize(i);
+                    }
+                    if (iv is Map)
+                    {
+                        Map im = (Map)iv;
+                        if (im.ContainsKey("serial") && im.ContainsKey("height") &&
+                            im.ContainsKey("wearables") &&
+                            im.ContainsKey("textures") &&
+                            im.ContainsKey("visualparams") &&
+                            im.ContainsKey("attachments"))
+                        {
+                            try
+                            {
+                                if (im["wearables"] is AnArray)
+                                {
+                                    foreach (IValue w in (AnArray)im["wearables"])
+                                    {
+                                        if (w is AnArray)
+                                        {
+                                            foreach (IValue wi in (AnArray)w)
+                                            {
+                                                if (wi is Map)
+                                                {
+                                                    try
+                                                    {
+                                                        UUID assetID = ((Map)wi)["asset"].AsUUID;
+                                                        if (!reflist.Contains(assetID))
+                                                        {
+                                                            reflist.Add(assetID);
+                                                        }
+                                                    }
+                                                    catch
+                                                    {
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                                if (im["attachments"] is AnArray)
+                                {
+                                    foreach (IValue a in (AnArray)im["attachments"])
+                                    {
+                                        if (a is Map)
+                                        {
+                                            try
+                                            {
+                                                UUID assetID = ((Map)a)["asset"].AsUUID;
+                                                if (!reflist.Contains(assetID))
+                                                {
+                                                    reflist.Add(assetID);
+                                                }
+                                            }
+                                            catch
+                                            {
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            catch
+                            {
+
+                            }
+                        }
                     }
                 }
                 return reflist;
@@ -435,9 +511,9 @@ namespace SilverSim.Types.Asset.Format
 
                 notecard += "}\n";
             }
-            byte[] TextData = Encoding.UTF8.GetBytes(v.Text);
+            byte[] TextData = UTF8NoBOM.GetBytes(v.Text);
             notecard += String.Format("Text length {0}\n", TextData.Length);
-            byte[] NotecardHeader = Encoding.UTF8.GetBytes(notecard);
+            byte[] NotecardHeader = UTF8NoBOM.GetBytes(notecard);
 
             AssetData asset = new AssetData();
             asset.Data = new byte[TextData.Length + NotecardHeader.Length + 2];
