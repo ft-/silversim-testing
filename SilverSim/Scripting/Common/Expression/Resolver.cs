@@ -170,7 +170,7 @@ namespace SilverSim.Scripting.Common.Expression
             }
         }
 
-        public void identifyFunctions(Tree nt)
+        void identifyFunctions(Tree nt)
         {
             foreach(Tree sub in nt.SubTree)
             {
@@ -345,7 +345,69 @@ namespace SilverSim.Scripting.Common.Expression
             }
         }
 
-        public void identifyOps(Tree nt)
+        bool isValidLeftHand(Tree nt)
+        {
+            switch(nt.Type)
+            {
+                case Tree.EntryType.OperatorRightUnary:
+                case Tree.EntryType.StringValue:
+                case Tree.EntryType.Value:
+                case Tree.EntryType.Function:
+                case Tree.EntryType.Declaration:
+                case Tree.EntryType.Unknown:
+                case Tree.EntryType.Level:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        bool isValidRightHand(Tree nt)
+        {
+            switch(nt.Type)
+            {
+                case Tree.EntryType.OperatorLeftUnary:
+                case Tree.EntryType.StringValue:
+                case Tree.EntryType.Value:
+                case Tree.EntryType.Function:
+                case Tree.EntryType.Declaration:
+                case Tree.EntryType.Unknown:
+                case Tree.EntryType.Level:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        bool isValidUnaryLeft(Tree nt)
+        {
+            switch(nt.Type)
+            {
+                case Tree.EntryType.Unknown:
+                case Tree.EntryType.Value:
+                case Tree.EntryType.StringValue:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        bool isValidUnaryRight(Tree nt)
+        {
+            switch(nt.Type)
+            {
+                case Tree.EntryType.Unknown:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
+        void identifyOps(Tree nt)
         {
             int pos;
 
@@ -354,12 +416,12 @@ namespace SilverSim.Scripting.Common.Expression
                 identifyOps(st);
             }
 
-            for (pos = 0; pos < nt.SubTree.Count; ++pos)
+            foreach (Dictionary<string, OperatorType> oilist in m_Operators)
             {
-                Tree st = nt.SubTree[pos];
-                if (st.Type == Tree.EntryType.OperatorUnknown)
+                for (pos = 0; pos < nt.SubTree.Count; ++pos)
                 {
-                    foreach (Dictionary<string, OperatorType> oilist in m_Operators)
+                    Tree st = nt.SubTree[pos];
+                    if (st.Type == Tree.EntryType.OperatorUnknown)
                     {
                         OperatorType optype;
                         if(oilist.TryGetValue(st.Entry, out optype))
@@ -369,45 +431,33 @@ namespace SilverSim.Scripting.Common.Expression
                                 case OperatorType.Binary:
                                     if (pos > 0 && pos < nt.SubTree.Count - 1)
                                     {
-                                        if(nt.SubTree[pos - 1].Type != Tree.EntryType.OperatorUnknown &&
-                                            nt.SubTree[pos - 1].Type != Tree.EntryType.OperatorRightUnary &&
-                                            nt.SubTree[pos - 1].Type != Tree.EntryType.OperatorLeftUnary &&
-                                            nt.SubTree[pos - 1].Type != Tree.EntryType.OperatorBinary &&
-                                            nt.SubTree[pos + 1].Type != Tree.EntryType.OperatorUnknown)
+                                        if(isValidLeftHand(nt.SubTree[pos - 1]) &&
+                                            isValidRightHand(nt.SubTree[pos + 1]))
                                         {
                                             st.Type = Tree.EntryType.OperatorBinary;
                                         }
                                     }
                                     break;
                                 case OperatorType.LeftUnary:
-                                    if(pos == 0)
+                                    if(pos == 0 && pos < nt.SubTree.Count - 1)
                                     {
-                                        if (nt.SubTree[pos + 1].Type != Tree.EntryType.OperatorUnknown)
+                                        if(isValidUnaryLeft(nt.SubTree[pos + 1]))
                                         {
                                             st.Type = Tree.EntryType.OperatorLeftUnary;
                                         }
                                     }
-                                    else if(pos > 0 && 
-                                        nt.SubTree[pos - 1].Type != Tree.EntryType.OperatorUnknown &&
-                                        nt.SubTree[pos - 1].Type != Tree.EntryType.OperatorBinary)
+                                    else if (pos > 0 && pos < nt.SubTree.Count - 1 &&
+                                        (nt.SubTree[pos - 1].Type != Tree.EntryType.OperatorUnknown ||
+                                        nt.SubTree[pos - 1].Type != Tree.EntryType.OperatorBinary) &&
+                                        isValidUnaryRight(nt.SubTree[pos + 1]))
                                     {
-
-                                    }
-                                    else if (pos < nt.SubTree.Count - 1)
-                                    {
-                                        if (nt.SubTree[pos + 1].Type != Tree.EntryType.OperatorUnknown)
-                                        {
-                                            st.Type = Tree.EntryType.OperatorLeftUnary;
-                                        }
+                                        st.Type = Tree.EntryType.OperatorLeftUnary;
                                     }
                                     break;
                                 case OperatorType.RightUnary:
-                                    if (pos < nt.SubTree.Count - 1)
+                                    if (pos > 0)
                                     {
-                                        if (nt.SubTree[pos + 1].Type != Tree.EntryType.OperatorUnknown &&
-                                            nt.SubTree[pos + 1].Type != Tree.EntryType.OperatorRightUnary &&
-                                            nt.SubTree[pos + 1].Type != Tree.EntryType.OperatorLeftUnary &&
-                                            nt.SubTree[pos + 1].Type != Tree.EntryType.OperatorBinary)
+                                        if (isValidUnaryRight(nt.SubTree[pos - 1]))
                                         {
                                             st.Type = Tree.EntryType.OperatorRightUnary;
                                         }
@@ -442,7 +492,6 @@ namespace SilverSim.Scripting.Common.Expression
                                 tree.SubTree[pos].ProcessedOpSort = true;
                                 tree.SubTree.RemoveAt(pos + 1);
                                 tree.SubTree.RemoveAt(pos - 1);
-                                --pos;
                             }
                             else
                             {
@@ -451,8 +500,10 @@ namespace SilverSim.Scripting.Common.Expression
                             break;
 
                         case Tree.EntryType.OperatorLeftUnary:
-                            if (plist.ContainsKey(tree.SubTree[pos].Entry))
+                            if (plist.ContainsKey(tree.SubTree[pos].Entry) &&
+                                !tree.SubTree[pos].ProcessedOpSort)
                             {
+                                tree.SubTree[pos].ProcessedOpSort = true;
                                 tree.SubTree[pos].SubTree.Add(tree.SubTree[pos + 1]);
                                 tree.SubTree.RemoveAt(pos + 1);
                             }
@@ -463,8 +514,10 @@ namespace SilverSim.Scripting.Common.Expression
                             break;
 
                         case Tree.EntryType.OperatorRightUnary:
-                            if (plist.ContainsKey(tree.SubTree[pos].Entry))
+                            if (plist.ContainsKey(tree.SubTree[pos].Entry) &&
+                                !tree.SubTree[pos].ProcessedOpSort)
                             {
+                                tree.SubTree[pos].ProcessedOpSort = true;
                                 tree.SubTree[pos].SubTree.Add(tree.SubTree[pos - 1]);
                                 tree.SubTree.RemoveAt(pos - 1);
                             }

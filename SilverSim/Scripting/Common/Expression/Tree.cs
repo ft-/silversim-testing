@@ -44,10 +44,13 @@ namespace SilverSim.Scripting.Common.Expression
             OperatorBinary,
             ReservedWord,
             Invalid,
+            Typecast,
             Function,
             FunctionArgument,
             Declaration,
             DeclarationArgument,
+            Vector,
+            Rotation,
             Separator,
             LevelBegin, /* intermediate step */
             LevelEnd, /* intermediate step */
@@ -67,19 +70,19 @@ namespace SilverSim.Scripting.Common.Expression
             {
 
             }
+
+            public abstract ValueBase Negate();
         }
 
         public abstract class ConstantValue : ValueBase
         {
-            public abstract ValueBase Negate();
-            public abstract ValueBase Clone();
         }
 
         public class ConstantValueInt : ConstantValue
         {
-            public Int64 Value;
+            public int Value;
 
-            public ConstantValueInt(Int64 value)
+            public ConstantValueInt(int value)
             {
                 Value = value;
             }
@@ -88,30 +91,25 @@ namespace SilverSim.Scripting.Common.Expression
             {
                 if (str.StartsWith("0x"))
                 {
-                    Value = Int64.Parse(str, NumberStyles.HexNumber);
+                    Value = int.Parse(str, NumberStyles.HexNumber);
                 }
                 else if (str.StartsWith("0"))
                 {
                 }
                 else
                 {
-                    Value = Int64.Parse(str);
+                    Value = int.Parse(str);
                 }
             }
 
             public new string ToString()
             {
-                return Value.ToString();
+                return Value.ToString(CultureInfo.InvariantCulture);
             }
 
             public override ValueBase Negate()
             {
                 return new ConstantValueInt(-Value);
-            }
-
-            public override ValueBase Clone()
-            {
-                return new ConstantValueInt(Value);
             }
         }
 
@@ -125,17 +123,12 @@ namespace SilverSim.Scripting.Common.Expression
 
             public new string ToString()
             {
-                return Value.ToString();
+                return Value.ToString(CultureInfo.InvariantCulture);
             }
 
             public override ValueBase Negate()
             {
                 return new ConstantValueFloat(-Value);
-            }
-
-            public override ValueBase Clone()
-            {
-                return new ConstantValueFloat(Value);
             }
         }
 
@@ -154,16 +147,11 @@ namespace SilverSim.Scripting.Common.Expression
 
             public override ValueBase Negate()
             {
-                throw new NotSupportedException();
-            }
-
-            public override ValueBase Clone()
-            {
-                return new ConstantValueString(Value);
+                throw new NotSupportedException("strings cannot be negated");
             }
         }
 
-        ValueBase Value;
+        public ValueBase Value;
 
 
         public Tree()
