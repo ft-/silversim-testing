@@ -55,7 +55,8 @@ namespace SilverSim.Scripting.Common.Expression
             LevelBegin, /* intermediate step */
             LevelEnd, /* intermediate step */
             Level,
-            ExpressionTree
+            ExpressionTree,
+            Variable
         }
 
         public bool ProcessedOpSort = false;

@@ -687,13 +687,40 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
+        void solveVariables(CompileState cs, Tree tree)
+        {
+            foreach(Tree st in tree.SubTree)
+            {
+                solveVariables(cs, tree);
+
+                if(st.Type == Tree.EntryType.Unknown)
+                {
+                    if(cs.m_VariableDeclarations.ContainsKey(st.Entry))
+                    {
+                        st.Type = Tree.EntryType.Variable;
+                    }
+                    foreach(List<string> vars in cs.m_LocalVariables)
+                    {
+                        if (vars.Contains(st.Entry))
+                        {
+                            st.Type = Tree.EntryType.Variable;
+                        }
+                    }
+                }
+            }
+        }
+
         void solveConstantOperations(Tree tree)
         {
             foreach(Tree st in tree.SubTree)
             {
                 solveConstantOperations(st);
 
-                if(st.Type == Tree.EntryType.Vector)
+                if(st.Entry != "<")
+                {
+
+                }
+                else if(st.Type == Tree.EntryType.Vector)
                 {
                     if(st.SubTree[0].SubTree[0].Value != null &&
                         st.SubTree[1].SubTree[0].Value != null &&
@@ -1270,11 +1297,12 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
-        void solveTree(Tree resolvetree)
+        void solveTree(CompileState cs, Tree resolvetree)
         {
             m_Resolver.Process(resolvetree);
             solveDeclarations(resolvetree);
             solveTypecasts(resolvetree);
+            solveVariables(cs, resolvetree);
             solveConstantOperations(resolvetree);
         }
 
