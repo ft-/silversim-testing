@@ -190,8 +190,8 @@ namespace SilverSim.LL.Core
                             p.IsReliable = m.IsReliable;
                             p.SequenceNumber = NextSequenceNumber;
                             m_Server.SendPacketTo(p, RemoteEndPoint);
-                            p.EnqueuedAtTime = (uint)Environment.TickCount;
-                            p.TransferredAtTime = (uint)Environment.TickCount;
+                            p.EnqueuedAtTime = Environment.TickCount;
+                            p.TransferredAtTime = Environment.TickCount;
                             if (m.IsReliable)
                             {
                                 p.IsResent = true;

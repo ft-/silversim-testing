@@ -282,6 +282,17 @@ namespace SilverSim.LL.Core
                     newpck.SequenceNumber = NextSequenceNumber;
                     m_Server.SendPacketTo(newpck, ep);
                     /* check for unacks */
+                    foreach(KeyValuePair<uint,UDPPacket> keyval in m_UnackedPackets)
+                    {
+                        if(Environment.TickCount - keyval.Value.TransferredAtTime > 1000)
+                        {
+                            if (keyval.Value.ResentCount++ < 5)
+                            {
+                                keyval.Value.TransferredAtTime = Environment.TickCount;
+                                m_Server.SendPacketTo(keyval.Value, RemoteEndPoint);
+                            }
+                        }
+                    }
                     break;
 
                 case MessageType.CompletePingCheck:

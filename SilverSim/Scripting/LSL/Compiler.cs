@@ -726,7 +726,24 @@ namespace SilverSim.Scripting.LSL
                         st.SubTree[1].SubTree[0].Value != null &&
                         st.SubTree[2].SubTree[0].Value != null)
                     {
+                        double[] v = new double[3];
+                        for(int idx = 0; idx < 3; ++idx)
+                        {
+                            if(st.SubTree[idx].SubTree[0].Value is Tree.ConstantValueFloat)
+                            {
+                                v[idx] = ((Tree.ConstantValueFloat)st.SubTree[idx].SubTree[0].Value).Value;
+                            }
+                            else if(st.SubTree[idx].SubTree[0].Value is Tree.ConstantValueInt)
+                            {
+                                v[idx] = ((Tree.ConstantValueInt)st.SubTree[idx].SubTree[0].Value).Value;
+                            }
+                            else
+                            {
+                                throw new Resolver.ResolverException("constant vector cannot contain other values than float or int");
+                            }
+                        }
 
+                        st.Value = new ConstantValueVector(new Vector3(v[0], v[1], v[2]));
                     }
                 }
                 else if(st.Type == Tree.EntryType.Rotation)
@@ -736,6 +753,24 @@ namespace SilverSim.Scripting.LSL
                         st.SubTree[2].SubTree[0].Value != null &&
                         st.SubTree[3].SubTree[0].Value != null)
                     {
+                        double[] v = new double[4];
+                        for (int idx = 0; idx < 4; ++idx)
+                        {
+                            if (st.SubTree[idx].SubTree[0].Value is Tree.ConstantValueFloat)
+                            {
+                                v[idx] = ((Tree.ConstantValueFloat)st.SubTree[idx].SubTree[0].Value).Value;
+                            }
+                            else if (st.SubTree[idx].SubTree[0].Value is Tree.ConstantValueInt)
+                            {
+                                v[idx] = ((Tree.ConstantValueInt)st.SubTree[idx].SubTree[0].Value).Value;
+                            }
+                            else
+                            {
+                                throw new Resolver.ResolverException("constant rotation cannot contain other values than float or int");
+                            }
+                        }
+
+                        st.Value = new ConstantValueRotation(new Quaternion(v[0], v[1], v[2], v[3]));
 
                     }
                 }

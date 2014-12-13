@@ -242,8 +242,8 @@ namespace SilverSim.LL.Core
                 }
             }
 
-            pck.TransferredAtTime = (uint)Environment.TickCount;
-            pck.EnqueuedAtTime = (uint)Environment.TickCount;
+            pck.TransferredAtTime = Environment.TickCount;
+            pck.EnqueuedAtTime = Environment.TickCount;
 
             /* we do not want to spend time on decoding packets that are unknown where they belong */
             if(!m_Circuits.TryGetValue(pck.RemoteEndPoint, out circuit))

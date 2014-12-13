@@ -42,8 +42,9 @@ namespace SilverSim.LL.Messages
 
         public int DataPos = 6;
 
-        public uint TransferredAtTime = 0;
-        public uint EnqueuedAtTime = 0;
+        public int TransferredAtTime = 0;
+        public int EnqueuedAtTime = 0;
+        public uint ResentCount = 0;
 
         public UInt32 SequenceNumber
         {

@@ -198,6 +198,22 @@ namespace SilverSim.LL.Core
                             ti.TargetType = (int)req.SourceType;
                             ti.TransferID = req.TransferID;
                             ti.Size = asset.Data.Length;
+                            if(req.SourceType == Messages.Transfer.SourceType.Asset)
+                            {
+                                ti.Params = new byte[20];
+                                assetID.ToBytes(ti.Params, 0);
+                                int assetType = (int)asset.Type;
+                                byte[] b = BitConverter.GetBytes(assetType);
+                                if(!BitConverter.IsLittleEndian)
+                                {
+                                    Array.Reverse(b);
+                                }
+                                Array.Copy(b, 0, ti.Params, 16, 4);
+                            }
+                            else if(req.SourceType == Messages.Transfer.SourceType.SimInventoryItem)
+                            {
+                                ti.Params = req.Params;
+                            }
                             SendMessage(ti);
 
                             const int MAX_PACKET_SIZE = 1100;
