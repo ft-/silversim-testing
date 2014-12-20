@@ -74,22 +74,29 @@ namespace SilverSim.Scripting.LSL.API.Permissions
         [APILevel(APIFlags.LSL)]
         public void llRequestPermissions(ScriptInstance Instance, UUID agentID, int permissions)
         {
-            ScriptQuestion m = new ScriptQuestion();
-            m.ExperienceID = UUID.Zero;
-            m.ItemID = Instance.Item.ID;
-            m.ObjectOwner = Instance.Part.Owner.ID;
-            m.Questions = (UInt32)permissions;
-            m.TaskID = Instance.Part.ID;
-            IAgent a;
-            try
+            if (agentID == UUID.Zero || permissions == 0)
             {
-                a = Instance.Part.ObjectGroup.Scene.Agents[agentID];
+                Instance.RevokePermissions(agentID, (UInt32)permissions);
             }
-            catch
+            else
             {
-                return;
+                ScriptQuestion m = new ScriptQuestion();
+                m.ExperienceID = UUID.Zero;
+                m.ItemID = Instance.Item.ID;
+                m.ObjectOwner = Instance.Part.Owner.ID;
+                m.Questions = (UInt32)permissions;
+                m.TaskID = Instance.Part.ID;
+                IAgent a;
+                try
+                {
+                    a = Instance.Part.ObjectGroup.Scene.Agents[agentID];
+                }
+                catch
+                {
+                    return;
+                }
+                a.SendMessageAlways(m, Instance.Part.ObjectGroup.Scene.ID);
             }
-            a.SendMessageAlways(m, Instance.Part.ObjectGroup.Scene.ID);
         }
 
         [ExecutedOnScriptReset]

@@ -38,6 +38,7 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.TrackAgent, Agent.TrackAgent.Decode);
             PacketTypes.Add(MessageType.AgentUpdate, Agent.AgentUpdate.Decode);
             PacketTypes.Add(MessageType.AgentDataUpdateRequest, Agent.AgentDataUpdateRequest.Decode);
+            PacketTypes.Add(MessageType.AgentAnimation, Agent.AgentAnimation.Decode);
 
             /* Appearance */
             PacketTypes.Add(MessageType.AgentWearablesRequest, Appearance.AgentWearablesRequest.Decode);
@@ -67,6 +68,7 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.SetScriptRunning, Script.SetScriptRunning.Decode);
             PacketTypes.Add(MessageType.ScriptReset, Script.ScriptReset.Decode);
             PacketTypes.Add(MessageType.RezScript, Script.RezScript.Decode);
+            PacketTypes.Add(MessageType.ScriptAnswerYes, Script.ScriptAnswerYes.Decode);
 
             /* Image */
             PacketTypes.Add(MessageType.RequestImage, Image.RequestImage.Decode);

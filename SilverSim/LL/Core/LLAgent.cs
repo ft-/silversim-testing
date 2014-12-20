@@ -854,6 +854,7 @@ namespace SilverSim.LL.Core
             FirstName = firstName;
             LastName = lastName;
             InitRouting();
+            InitAnimations();
         }
 
         ~LLAgent()
@@ -897,6 +898,7 @@ namespace SilverSim.LL.Core
         {
             m_AgentMessageRouting.Add(MessageType.MoneyBalanceRequest, HandleMoneyBalanceRequest);
             m_AgentMessageRouting.Add(MessageType.AgentDataUpdateRequest, HandleAgentDataUpdateRequest);
+            m_AgentMessageRouting.Add(MessageType.AgentAnimation, HandleAgentAnimation);
         }
 
         public void HandleAgentMessage(Message m)
@@ -949,6 +951,7 @@ namespace SilverSim.LL.Core
                             circuit.Scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
                             circuit.Scene.Environment.UpdateWindDataToSingleClient(this);
                             circuit.Scene.SendAgentObjectToAllAgents(this);
+                            SendAnimations();
                         }
                     }
                     break;

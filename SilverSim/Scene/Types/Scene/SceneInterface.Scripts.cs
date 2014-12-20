@@ -23,26 +23,9 @@ exception statement from your version.
 
 */
 
-using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Script;
-using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
-using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Economy;
-using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.Groups;
-using SilverSim.ServiceInterfaces.ServerParam;
-using SilverSim.ServiceInterfaces.AvatarName;
-using SilverSim.Types;
-using SilverSim.Types.Economy;
-using SilverSim.Types.Grid;
-using SilverSim.Types.Parcel;
-using System;
-using System.Collections.Generic;
-using System.Net;
-using System.Net.Sockets;
-using ThreadedClasses;
 using SilverSim.Scene.Types.Script.Events;
 
 namespace SilverSim.Scene.Types.Scene

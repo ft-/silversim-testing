@@ -164,5 +164,12 @@ namespace SilverSim.Scene.Types.Agent
             get;
             set;
         }
+
+        void ResetAnimationOverride(string anim_state);
+        void SetAnimationOverride(string anim_state, UUID anim);
+        string GetAnimationOverride(string anim_state);
+        void PlayAnimation(UUID anim, UUID objectid);
+        void StopAnimation(UUID anim, UUID objectid);
+        void SetDefaultAnimation(string anim_state);
     }
 }

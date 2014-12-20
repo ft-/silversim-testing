@@ -36,12 +36,21 @@ namespace SilverSim.LL.Messages.Avatar
         {
             public UUID AnimID;
             public UInt32 AnimSequenceID;
+            public AnimationData(UUID animID, UInt32 seqID)
+            {
+                AnimID = animID;
+                AnimSequenceID = seqID;
+            }
         }
         public List<AnimationData> AnimationList = new List<AnimationData>();
 
         public struct AnimationSourceData
         {
             public UUID ObjectID;
+            public AnimationSourceData(UUID objectID)
+            {
+                ObjectID = objectID;
+            }
         }
         public List<AnimationSourceData> AnimationSourceList = new List<AnimationSourceData>();
 

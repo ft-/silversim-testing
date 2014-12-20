@@ -31,6 +31,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Types.Primitive;
 using SilverSim.Scene.Types.Object;
 using SilverSim.LL.Messages;
+using SilverSim.LL.Messages.Avatar;
 using SilverSim.Types;
 
 namespace SilverSim.Scene.Types.Scene
@@ -104,6 +105,21 @@ namespace SilverSim.Scene.Types.Scene
             foreach (IAgent a in Agents)
             {
                 a.SendMessageAlways(m, ID);
+            }
+        }
+
+        public void SendAgentAnimToAllAgents(AvatarAnimation areq)
+        {
+            foreach (IAgent a in Agents)
+            {
+                if (ID == areq.Sender)
+                {
+                    a.SendMessageIfRootAgent(areq, ID);
+                }
+                else
+                {
+                    a.SendMessageAlways(areq, ID);
+                }
             }
         }
 
