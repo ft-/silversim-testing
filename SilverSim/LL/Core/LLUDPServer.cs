@@ -462,6 +462,8 @@ namespace SilverSim.LL.Core
             m_Routing[MessageType.GetScriptRunning] = Scene.HandleSimulatorMessage;
             m_Routing[MessageType.SetScriptRunning] = Scene.HandleSimulatorMessage;
             m_Routing[MessageType.ScriptReset] = Scene.HandleSimulatorMessage;
+            m_Routing[MessageType.ScriptAnswerYes] = Scene.HandleSimulatorMessage;
+            m_Routing[MessageType.RevokePermissions] = Scene.HandleSimulatorMessage;
 
             /* God */
             m_Routing[MessageType.RequestGodlikePowers] = HandleAgentMessage;

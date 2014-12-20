@@ -63,6 +63,16 @@ namespace SilverSim.Scripting.LSL
     }
 
     [Serializable]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+    public class ExecutedOnScriptReset : Attribute
+    {
+        public ExecutedOnScriptReset()
+        {
+
+        }
+    }
+
+    [Serializable]
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class LSLImplementation : Attribute
     {

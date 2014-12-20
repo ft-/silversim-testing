@@ -48,6 +48,8 @@ namespace SilverSim.Scripting.LSL
         internal RwLockedDictionary<int, ChatServiceInterface.Listener> m_Listeners = new RwLockedDictionary<int, ChatServiceInterface.Listener>();
         private double m_ExecutionTime = 0;
         protected bool UseMessageObjectEvent = false;
+        internal UUID PermissionsKey = UUID.Zero;
+        internal UInt32 Permissions = 0;
 
         public readonly Timer Timer = new Timer();
 
@@ -187,6 +189,14 @@ namespace SilverSim.Scripting.LSL
         }
 
         private Dictionary<string, MethodInfo> m_CurrentStateMethods = new Dictionary<string, MethodInfo>();
+
+        public override void RevokePermissions(UUID permissionsKey, UInt32 permissions)
+        {
+            if(permissionsKey == PermissionsKey)
+            {
+                Permissions = 0;
+            }
+        }
 
         private void InvokeStateEvent(string name, params object[] param)
         {
@@ -380,6 +390,8 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is RuntimePermissionsEvent)
                 {
                     RuntimePermissionsEvent e = (RuntimePermissionsEvent)ev;
+                    Permissions = e.Permissions;
+                    PermissionsKey = e.PermissionsKey;
                     InvokeStateEvent("run_time_permissions", e.Permissions);
                 }
                 else if (ev is SensorEvent)

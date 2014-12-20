@@ -23,29 +23,47 @@ exception statement from your version.
 
 */
 
+using SilverSim.Main.Common;
+using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.Scene.Types.Script.Events
+namespace SilverSim.Scripting.LSL.API.AnimationOverride
 {
-    public struct RuntimePermissionsEvent : IScriptEvent
+    [ScriptApiName("AnimationOverride")]
+    [LSLImplementation]
+    public partial class AnimationOverride_API : MarshalByRefObject, IScriptApi, IPlugin
     {
-        public enum RuntimePermissions : int
+        public AnimationOverride_API()
         {
-            Debit = 0x2,
-            TakeControls = 0x4,
-            TriggerAnimation = 0x10,
-            Attach = 0x20,
-            ChangeLinks = 0x80,
-            TrackCamera = 0x400,
-            ControlCamera = 0x800,
-            Teleport = 0x1000,
-            SilentEstateManagement = 0x4000,
-            OverrideAnimations = 0x8000,
-            ReturnObjects = 0x10000
+
         }
 
-        public UInt32 Permissions;
-        public UUID PermissionsKey;
+        public void Startup(ConfigurationLoader loader)
+        {
+
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public const int PERMISSION_OVERRIDE_ANIMATIONS = 0x8000;
+
+        [APILevel(APIFlags.LSL)]
+        public void llSetAnimationOverride(ScriptInstance instance, string anim_state, string anim)
+        {
+
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public string llGetAnimationOverride(ScriptInstance instance, string anim_state)
+        {
+            return anim_state;
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public void llResetAnimationOverride(ScriptInstance instance, string anim_state)
+        {
+
+        }
     }
 }

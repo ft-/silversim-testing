@@ -49,7 +49,7 @@ namespace SilverSim.LL.Core
             Messages.Transfer.TransferInfo res = new Messages.Transfer.TransferInfo();
             res.ChannelType = 2;
             res.Status = -2;
-            res.TargetType = 0;
+            res.TargetType = (int)req.SourceType;
             res.Params = req.Params;
             res.Size = 0;
             res.TransferID = req.TransferID;

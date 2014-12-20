@@ -201,6 +201,7 @@ namespace SilverSim.Scene.Types.Scene
             LastIPAddress = new IPAddress(0);
             m_NotecardCache = new NotecardCache(this);
             m_PacketHandlers[MessageType.RegionHandleRequest] = HandleRegionHandleRequest;
+            m_PacketHandlers[MessageType.ScriptAnswerYes] = HandleScriptAnswerYes;
             InitializeParcelLayer();
         }
 

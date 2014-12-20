@@ -97,7 +97,15 @@ namespace SilverSim.Scripting.LSL.API.Notecards
 #warning Move this code out of here as it should be async to the script
                         Notecard nc = Instance.Part.ObjectGroup.Scene.GetService<NotecardCache>()[item.AssetID];
                         DataserverEvent e = new DataserverEvent();
-                        e.Data = nc.Text.Split('\n').Length.ToString();
+                        int n = 1;
+                        foreach(char c in nc.Text)
+                        {
+                            if(c=='\n')
+                            {
+                                ++n;
+                            }
+                        }
+                        e.Data = n.ToString();
                         e.QueryID = query;
                         return query;
                     }

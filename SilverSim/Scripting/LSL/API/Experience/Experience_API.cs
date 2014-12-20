@@ -81,6 +81,14 @@ namespace SilverSim.Scripting.LSL.API.Experience
         public const int XP_ERROR_MATURITY_EXCEEDED = 16;
 
         [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void experience_permissions(UUID agent_id);
+
+        [APILevel(APIFlags.LSL)]
+        [StateEventDelegate]
+        public delegate void experience_permissions_denied(UUID agent_id, int reason);
+
+        [APILevel(APIFlags.LSL)]
         public static int llAgentInExperience(ScriptInstance Instance, UUID agent)
         {
             return 0;

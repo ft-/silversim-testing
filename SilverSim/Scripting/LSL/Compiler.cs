@@ -50,6 +50,7 @@ namespace SilverSim.Scripting.LSL
         List<MethodInfo> m_Methods = new List<MethodInfo>();
         Dictionary<string, MethodInfo> m_EventDelegates = new Dictionary<string, MethodInfo>();
         List<Script.StateChangeEventDelegate> m_StateChangeDelegates = new List<ScriptInstance.StateChangeEventDelegate>();
+        List<Script.ScriptResetEventDelegate> m_ScriptResetDelegates = new List<ScriptInstance.ScriptResetEventDelegate>();
         List<string> m_ReservedWords = new List<string>();
         List<string> m_MethodNames = new List<string>();
         List<char> m_SingleOps = new List<char>();
@@ -202,6 +203,20 @@ namespace SilverSim.Scripting.LSL
                             {
                                 Delegate d = Delegate.CreateDelegate(typeof(Script.StateChangeEventDelegate), null, m);
                                 m_StateChangeDelegates.Add((Script.StateChangeEventDelegate)d);
+                            }
+                        }
+                    }
+
+                    attr = System.Attribute.GetCustomAttribute(m, typeof(ExecutedOnScriptReset));
+                    if (attr != null && (m.Attributes & MethodAttributes.Static) != 0)
+                    {
+                        ParameterInfo[] pi = m.GetParameters();
+                        if (pi.Length == 1)
+                        {
+                            if (pi[0].ParameterType.Equals(typeof(ScriptInstance)))
+                            {
+                                Delegate d = Delegate.CreateDelegate(typeof(Script.ScriptResetEventDelegate), null, m);
+                                m_ScriptResetDelegates.Add((Script.ScriptResetEventDelegate)d);
                             }
                         }
                     }

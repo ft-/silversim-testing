@@ -145,10 +145,6 @@ namespace SilverSim.Scripting.LSL.API.Base
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void run_time_permissions(int perm);
-
-        [APILevel(APIFlags.LSL)]
-        [StateEventDelegate]
         public delegate void sensor(int num_detected);
 
         [APILevel(APIFlags.LSL)]
@@ -178,14 +174,6 @@ namespace SilverSim.Scripting.LSL.API.Base
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
         public delegate void transaction_result(UUID id, int success, string data);
-
-        [APILevel(APIFlags.LSL)]
-        [StateEventDelegate]
-        public delegate void experience_permissions(UUID agent_id);
-
-        [APILevel(APIFlags.LSL)]
-        [StateEventDelegate]
-        public delegate void experience_permissions_denied(UUID agent_id, int reason);
 
         public Base_API()
         {

@@ -777,6 +777,54 @@ namespace SilverSim.Scene.Types.Object
                     paramList.Add(Size);
                     break;
 
+                case PrimitiveParamsType.AlphaMode:
+                    m_TextureEntryLock.AcquireReaderLock(-1);
+                    try
+                    {
+                        ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_ALPHAMODE"));
+                        foreach (TextureEntryFace face in faces)
+                        {
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.AlphaMode, ref paramList);
+                        }
+                    }
+                    finally
+                    {
+                        m_TextureEntryLock.ReleaseReaderLock();
+                    }
+                    break;
+
+                case PrimitiveParamsType.Normal:
+                    m_TextureEntryLock.AcquireReaderLock(-1);
+                    try
+                    {
+                        ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_NORMAL"));
+                        foreach (TextureEntryFace face in faces)
+                        {
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.Normal, ref paramList);
+                        }
+                    }
+                    finally
+                    {
+                        m_TextureEntryLock.ReleaseReaderLock();
+                    }
+                    break;
+
+                case PrimitiveParamsType.Specular:
+                    m_TextureEntryLock.AcquireReaderLock(-1);
+                    try
+                    {
+                        ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR"));
+                        foreach (TextureEntryFace face in faces)
+                        {
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.Specular, ref paramList);
+                        }
+                    }
+                    finally
+                    {
+                        m_TextureEntryLock.ReleaseReaderLock();
+                    }
+                    break;
+
                 case PrimitiveParamsType.Texture:
                     m_TextureEntryLock.AcquireReaderLock(-1);
                     try
@@ -997,6 +1045,63 @@ namespace SilverSim.Scene.Types.Object
                     Size = ParamsHelper.GetVector(enumerator, "PRIM_SIZE");
                     break;
 
+                case PrimitiveParamsType.AlphaMode:
+                    m_TextureEntryLock.AcquireWriterLock(-1);
+                    try
+                    {
+                        ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_ALPHAMODE"));
+                        enumerator.MarkPosition();
+                        foreach (TextureEntryFace face in faces)
+                        {
+                            enumerator.GoToMarkPosition();
+                            SetTexPrimitiveParams(face, PrimitiveParamsType.AlphaMode, enumerator);
+                        }
+                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                    }
+                    finally
+                    {
+                        m_TextureEntryLock.ReleaseWriterLock();
+                    }
+                    break;
+
+                case PrimitiveParamsType.Normal:
+                    m_TextureEntryLock.AcquireWriterLock(-1);
+                    try
+                    {
+                        ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_NORMAL"));
+                        enumerator.MarkPosition();
+                        foreach (TextureEntryFace face in faces)
+                        {
+                            enumerator.GoToMarkPosition();
+                            SetTexPrimitiveParams(face, PrimitiveParamsType.Normal, enumerator);
+                        }
+                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                    }
+                    finally
+                    {
+                        m_TextureEntryLock.ReleaseWriterLock();
+                    }
+                    break;
+
+                case PrimitiveParamsType.Specular:
+                    m_TextureEntryLock.AcquireWriterLock(-1);
+                    try
+                    {
+                        ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR"));
+                        enumerator.MarkPosition();
+                        foreach (TextureEntryFace face in faces)
+                        {
+                            enumerator.GoToMarkPosition();
+                            SetTexPrimitiveParams(face, PrimitiveParamsType.Specular, enumerator);
+                        }
+                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                    }
+                    finally
+                    {
+                        m_TextureEntryLock.ReleaseWriterLock();
+                    }
+                    break;
+
                 case PrimitiveParamsType.Texture:
                     m_TextureEntryLock.AcquireWriterLock(-1);
                     try
@@ -1197,6 +1302,15 @@ namespace SilverSim.Scene.Types.Object
                     paramList.Add(face.Glow);
                     break;
 
+                case PrimitiveParamsType.AlphaMode:
+                    throw new ArgumentException("PRIM_ALPHAMODE not yet supported for llGetPrimitiveParams");
+
+                case PrimitiveParamsType.Normal:
+                    throw new ArgumentException("PRIM_NORMAL not yet supported for llGetPrimitiveParams");
+
+                case PrimitiveParamsType.Specular:
+                    throw new ArgumentException("PRIM_SPECULAR not yet supported for llGetPrimitiveParams");
+
                 default:
                     throw new ArgumentException(String.Format("Internal error! Primitive parameter type {0} should not be passed to PrimitiveFace", type));
             }
@@ -1244,6 +1358,15 @@ namespace SilverSim.Scene.Types.Object
                 case PrimitiveParamsType.Glow:
                     face.Glow = (float)ParamsHelper.GetDouble(enumerator, "PRIM_GLOW");
                     break;
+
+                case PrimitiveParamsType.AlphaMode:
+                    throw new ArgumentException("PRIM_ALPHAMODE not yet supported for llSetPrimitiveParams");
+
+                case PrimitiveParamsType.Normal:
+                    throw new ArgumentException("PRIM_NORMAL not yet supported for llSetPrimitiveParams");
+
+                case PrimitiveParamsType.Specular:
+                    throw new ArgumentException("PRIM_SPECULAR not yet supported for llSetPrimitiveParams");
 
                 default:
                     throw new ArgumentException(String.Format("Internal error! Primitive parameter type {0} should not be passed to PrimitiveFace", type));

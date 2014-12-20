@@ -25,27 +25,43 @@ exception statement from your version.
 
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace SilverSim.Scene.Types.Script.Events
+namespace SilverSim.LL.Messages.Script
 {
-    public struct RuntimePermissionsEvent : IScriptEvent
+    public class ScriptAnswerYes : Message
     {
-        public enum RuntimePermissions : int
+        public UUID AgentID = UUID.Zero;
+        public UUID SessionID = UUID.Zero;
+        public UUID TaskID = UUID.Zero;
+        public UUID ItemID = UUID.Zero;
+        public UInt32 Questions = 0;
+
+        public ScriptAnswerYes()
         {
-            Debit = 0x2,
-            TakeControls = 0x4,
-            TriggerAnimation = 0x10,
-            Attach = 0x20,
-            ChangeLinks = 0x80,
-            TrackCamera = 0x400,
-            ControlCamera = 0x800,
-            Teleport = 0x1000,
-            SilentEstateManagement = 0x4000,
-            OverrideAnimations = 0x8000,
-            ReturnObjects = 0x10000
+
         }
 
-        public UInt32 Permissions;
-        public UUID PermissionsKey;
+        public override MessageType Number
+        {
+            get
+            {
+                return MessageType.ScriptAnswerYes;
+            }
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ScriptAnswerYes m = new ScriptAnswerYes();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.TaskID = p.ReadUUID();
+            m.ItemID = p.ReadUUID();
+            m.Questions = p.ReadUInt32();
+
+            return m;
+        }
     }
 }

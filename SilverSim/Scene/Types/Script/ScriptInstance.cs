@@ -48,6 +48,7 @@ namespace SilverSim.Scene.Types.Script
         public abstract bool HasEventsPending { get; }
         public IScriptWorkerThreadPool ThreadPool { get; set; }
         public delegate void StateChangeEventDelegate(ScriptInstance si);
+        public delegate void ScriptResetEventDelegate(ScriptInstance si);
         public delegate void DisposeEventDelegate();
         public event StateChangeEventDelegate OnStateChange;
         public event DisposeEventDelegate OnDispose;
@@ -72,6 +73,8 @@ namespace SilverSim.Scene.Types.Script
                 ThreadPool.AbortScript(this);
             }
         }
+
+        public abstract void RevokePermissions(UUID permissionsKey, UInt32 permissions);
 
         public void TriggerOnStateChange()
         {

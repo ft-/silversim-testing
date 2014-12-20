@@ -123,6 +123,9 @@ namespace SilverSim.Types.Primitive
         Glow = 25,
         Omega = 32,
         LinkTarget = 34,
+        Specular = 36,
+        Normal = 37,
+        AlphaMode = 38
     }
 
     public enum PrimitivePhysicsShapeType : int
