@@ -910,7 +910,22 @@ namespace SilverSim.LL.Core
 
         public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID)
         {
-            
+            ScriptPermissions autoGrant = ScriptPermissions.None;
+            if (SittingOnObject.ID == itemID || part.ObjectGroup.AttachPoint != Types.Agent.AttachmentPoint.NotAttached)
+            {
+                autoGrant |= ScriptPermissions.ControlCamera;
+                autoGrant |= ScriptPermissions.TakeControls;
+                autoGrant |= ScriptPermissions.TrackCamera;
+            }
+            if(part.ObjectGroup.AttachPoint != Types.Agent.AttachmentPoint.NotAttached)
+            {
+                autoGrant |= ScriptPermissions.OverrideAnimations;
+                autoGrant |= ScriptPermissions.Attach;
+            }
+            if((permissions & autoGrant) == permissions)
+            {
+                return permissions;
+            }
             ScriptQuestion m = new ScriptQuestion();
             m.ExperienceID = UUID.Zero;
             m.ItemID = itemID;
