@@ -29,6 +29,7 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
@@ -902,13 +903,14 @@ namespace SilverSim.LL.Core
             m_AgentMessageRouting.Add(MessageType.AgentAnimation, HandleAgentAnimation);
         }
 
-        public UInt32 RequestPermissions(ObjectPart part, UUID itemID, UInt32 permissions)
+        public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)
         {
             return RequestPermissions(part, itemID, permissions, UUID.Zero);
         }
 
-        public UInt32 RequestPermissions(ObjectPart part, UUID itemID, UInt32 permissions, UUID experienceID)
+        public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID)
         {
+            
             ScriptQuestion m = new ScriptQuestion();
             m.ExperienceID = UUID.Zero;
             m.ItemID = itemID;
@@ -916,7 +918,7 @@ namespace SilverSim.LL.Core
             m.Questions = (UInt32)permissions;
             m.TaskID = part.ID;
             SendMessageAlways(m, part.ObjectGroup.Scene.ID);
-            return 0;
+            return ScriptPermissions.None;
         }
 
         public void RevokePermissions(UUID sourceID, UUID itemID)

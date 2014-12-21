@@ -85,7 +85,7 @@ namespace SilverSim.Scene.Types.Scene
                             Script.ScriptInstance instance = i.ScriptInstance;
                             if(instance != null)
                             {
-                                instance.RevokePermissions(req.AgentID, req.ObjectPermissions);
+                                instance.RevokePermissions(req.AgentID, (Script.ScriptPermissions)req.ObjectPermissions);
                             }
                         });
                     });

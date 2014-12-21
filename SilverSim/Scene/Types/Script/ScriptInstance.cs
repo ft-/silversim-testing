@@ -74,7 +74,7 @@ namespace SilverSim.Scene.Types.Script
             }
         }
 
-        public abstract void RevokePermissions(UUID permissionsKey, UInt32 permissions);
+        public abstract void RevokePermissions(UUID permissionsKey, ScriptPermissions permissions);
 
         public void TriggerOnStateChange()
         {

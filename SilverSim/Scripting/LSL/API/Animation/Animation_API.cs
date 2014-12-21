@@ -54,7 +54,7 @@ namespace SilverSim.Scripting.LSL.API.Animation
         {
             IAgent agent;
             Script script = (Script)instance;
-            if ((script.m_ScriptPermissions & Script.ScriptPermissions.TriggerAnimation) == 0 ||
+            if ((script.m_ScriptPermissions & ScriptPermissions.TriggerAnimation) == 0 ||
                 script.m_ScriptPermissionsKey == UUID.Zero)
             {
                 return;
@@ -77,7 +77,7 @@ namespace SilverSim.Scripting.LSL.API.Animation
         {
             IAgent agent;
             Script script = (Script)instance;
-            if ((script.m_ScriptPermissions & Script.ScriptPermissions.TriggerAnimation) == 0 ||
+            if ((script.m_ScriptPermissions & ScriptPermissions.TriggerAnimation) == 0 ||
                 script.m_ScriptPermissionsKey == UUID.Zero)
             {
                 return;

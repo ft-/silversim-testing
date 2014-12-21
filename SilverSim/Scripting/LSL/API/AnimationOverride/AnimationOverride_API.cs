@@ -54,7 +54,7 @@ namespace SilverSim.Scripting.LSL.API.AnimationOverride
         {
             IAgent agent;
             Script script = (Script)instance;
-            if((script.m_ScriptPermissions & Script.ScriptPermissions.OverrideAnimations) == 0 ||
+            if((script.m_ScriptPermissions & ScriptPermissions.OverrideAnimations) == 0 ||
                 script.m_ScriptPermissionsKey == UUID.Zero)
             {
                 return;
@@ -84,8 +84,8 @@ namespace SilverSim.Scripting.LSL.API.AnimationOverride
         {
             IAgent agent;
             Script script = (Script)instance;
-            if (((script.m_ScriptPermissions & Script.ScriptPermissions.OverrideAnimations) == 0 &&
-                (script.m_ScriptPermissions & Script.ScriptPermissions.TriggerAnimation) == 0) ||
+            if (((script.m_ScriptPermissions & ScriptPermissions.OverrideAnimations) == 0 &&
+                (script.m_ScriptPermissions & ScriptPermissions.TriggerAnimation) == 0) ||
                 script.m_ScriptPermissionsKey == UUID.Zero)
             {
                 return string.Empty;
@@ -109,7 +109,7 @@ namespace SilverSim.Scripting.LSL.API.AnimationOverride
         {
             IAgent agent;
             Script script = (Script)instance;
-            if ((script.m_ScriptPermissions & Script.ScriptPermissions.OverrideAnimations) == 0 ||
+            if ((script.m_ScriptPermissions & ScriptPermissions.OverrideAnimations) == 0 ||
                 script.m_ScriptPermissionsKey == UUID.Zero)
             {
                 return;

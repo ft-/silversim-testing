@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Script;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
@@ -172,8 +173,8 @@ namespace SilverSim.Scene.Types.Agent
         void PlayAnimation(UUID anim, UUID objectid);
         void StopAnimation(UUID anim, UUID objectid);
 
-        UInt32 RequestPermissions(ObjectPart part, UUID itemID, UInt32 permissions);
-        UInt32 RequestPermissions(ObjectPart part, UUID itemID, UInt32 permissions, UUID experienceID);
+        ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions);
+        ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID);
         void RevokePermissions(UUID sourceID, UUID itemID);
     }
 }

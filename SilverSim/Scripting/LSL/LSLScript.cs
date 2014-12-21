@@ -51,22 +51,6 @@ namespace SilverSim.Scripting.LSL
         protected bool UseMessageObjectEvent = false;
         internal UUID m_ScriptPermissionsKey = UUID.Zero;
 
-        [Flags]
-        public enum ScriptPermissions : uint
-        {
-            None = 0,
-            Debit = 0x00000002,
-            TakeControls = 0x00000004,
-            TriggerAnimation = 0x00000010,
-            Attach = 0x00000020,
-            ChangeLinks = 0x00000080,
-            TrackCamera = 0x00000400,
-            ControlCamera = 0x00000800,
-            Teleport = 0x00001000,
-            SilentEstateManagement = 0x00004000,
-            OverrideAnimations = 0x00008000,
-            ReturnObjects = 0x00010000
-        }
         internal ScriptPermissions m_ScriptPermissions = ScriptPermissions.None;
 
         public readonly Timer Timer = new Timer();
@@ -208,7 +192,7 @@ namespace SilverSim.Scripting.LSL
 
         private Dictionary<string, MethodInfo> m_CurrentStateMethods = new Dictionary<string, MethodInfo>();
 
-        public override void RevokePermissions(UUID permissionsKey, UInt32 permissions)
+        public override void RevokePermissions(UUID permissionsKey, ScriptPermissions permissions)
         {
             if(permissionsKey == m_ScriptPermissionsKey && m_ScriptPermissionsKey != UUID.Zero)
             {
