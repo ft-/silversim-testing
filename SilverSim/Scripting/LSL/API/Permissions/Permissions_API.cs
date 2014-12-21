@@ -57,7 +57,7 @@ namespace SilverSim.Scripting.LSL.API.Permissions
             Script script = (Script)Instance;
             lock (script)
             {
-                return (int)script.Permissions;
+                return (int)script.m_ScriptPermissions;
             }
         }
 
@@ -67,35 +67,40 @@ namespace SilverSim.Scripting.LSL.API.Permissions
             Script script = (Script)Instance;
             lock (script)
             {
-                return script.PermissionsKey;
+                return script.m_ScriptPermissionsKey;
             }
         }
 
         [APILevel(APIFlags.LSL)]
         public void llRequestPermissions(ScriptInstance Instance, UUID agentID, int permissions)
         {
-            if (agentID == UUID.Zero || permissions == 0)
+            Script script = (Script)Instance;
+            lock(Instance)
             {
-                Instance.RevokePermissions(agentID, (UInt32)permissions);
-            }
-            else
-            {
-                ScriptQuestion m = new ScriptQuestion();
-                m.ExperienceID = UUID.Zero;
-                m.ItemID = Instance.Item.ID;
-                m.ObjectOwner = Instance.Part.Owner.ID;
-                m.Questions = (UInt32)permissions;
-                m.TaskID = Instance.Part.ID;
-                IAgent a;
-                try
+                if (agentID == UUID.Zero || permissions == 0)
                 {
-                    a = Instance.Part.ObjectGroup.Scene.Agents[agentID];
+                    Instance.RevokePermissions(agentID, (UInt32)permissions);
                 }
-                catch
+                else
                 {
-                    return;
+                    IAgent a;
+                    try
+                    {
+                        a = Instance.Part.ObjectGroup.Scene.Agents[agentID];
+                    }
+                    catch
+                    {
+                        script.m_ScriptPermissionsKey = UUID.Zero;
+                        script.m_ScriptPermissions = 0;
+                        return;
+                    }
+                    UInt32 perms = a.RequestPermissions(Instance.Part, Instance.Item.ID, (UInt32)permissions);
+                    if (perms != 0)
+                    {
+                        script.m_ScriptPermissions = (Script.ScriptPermissions)perms;
+                        script.m_ScriptPermissionsKey = agentID;
+                    }
                 }
-                a.SendMessageAlways(m, Instance.Part.ObjectGroup.Scene.ID);
             }
         }
 
@@ -105,8 +110,8 @@ namespace SilverSim.Scripting.LSL.API.Permissions
             Script script = (Script)Instance;
             lock (script)
             {
-                script.Permissions = 0;
-                script.PermissionsKey = UUID.Zero;
+                script.m_ScriptPermissions = 0;
+                script.m_ScriptPermissionsKey = UUID.Zero;
             }
         }
     }

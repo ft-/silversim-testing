@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
@@ -48,8 +49,25 @@ namespace SilverSim.Scripting.LSL
         internal RwLockedDictionary<int, ChatServiceInterface.Listener> m_Listeners = new RwLockedDictionary<int, ChatServiceInterface.Listener>();
         private double m_ExecutionTime = 0;
         protected bool UseMessageObjectEvent = false;
-        internal UUID PermissionsKey = UUID.Zero;
-        internal UInt32 Permissions = 0;
+        internal UUID m_ScriptPermissionsKey = UUID.Zero;
+
+        [Flags]
+        public enum ScriptPermissions : uint
+        {
+            None = 0,
+            Debit = 0x00000002,
+            TakeControls = 0x00000004,
+            TriggerAnimation = 0x00000010,
+            Attach = 0x00000020,
+            ChangeLinks = 0x00000080,
+            TrackCamera = 0x00000400,
+            ControlCamera = 0x00000800,
+            Teleport = 0x00001000,
+            SilentEstateManagement = 0x00004000,
+            OverrideAnimations = 0x00008000,
+            ReturnObjects = 0x00010000
+        }
+        internal ScriptPermissions m_ScriptPermissions = ScriptPermissions.None;
 
         public readonly Timer Timer = new Timer();
 
@@ -192,9 +210,21 @@ namespace SilverSim.Scripting.LSL
 
         public override void RevokePermissions(UUID permissionsKey, UInt32 permissions)
         {
-            if(permissionsKey == PermissionsKey)
+            if(permissionsKey == m_ScriptPermissionsKey && m_ScriptPermissionsKey != UUID.Zero)
             {
-                Permissions = 0;
+                IAgent agent;
+                try
+                {
+                    agent = Part.ObjectGroup.Scene.Agents[m_ScriptPermissionsKey];
+                }
+                catch
+                {
+                   return;
+                }
+                agent.RevokePermissions(Part.ID, Item.ID);
+                m_ScriptPermissions = ScriptPermissions.None;
+                m_ScriptPermissionsKey = UUID.Zero;
+                
             }
         }
 
@@ -390,9 +420,9 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is RuntimePermissionsEvent)
                 {
                     RuntimePermissionsEvent e = (RuntimePermissionsEvent)ev;
-                    Permissions = e.Permissions;
-                    PermissionsKey = e.PermissionsKey;
-                    InvokeStateEvent("run_time_permissions", e.Permissions);
+                    m_ScriptPermissions = (ScriptPermissions)e.Permissions;
+                    m_ScriptPermissionsKey = e.PermissionsKey;
+                    InvokeStateEvent("run_time_permissions", m_ScriptPermissions);
                 }
                 else if (ev is SensorEvent)
                 {

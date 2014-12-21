@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using System;
 
@@ -49,15 +50,49 @@ namespace SilverSim.Scripting.LSL.API.Animation
         public const int PERMISSION_TRIGGER_ANIMATION = 0x10;
 
         [APILevel(APIFlags.LSL)]
-        public void llStartAnimation(string anim)
+        public void llStartAnimation(ScriptInstance instance, string anim)
         {
+            IAgent agent;
+            Script script = (Script)instance;
+            if ((script.m_ScriptPermissions & Script.ScriptPermissions.TriggerAnimation) == 0 ||
+                script.m_ScriptPermissionsKey == UUID.Zero)
+            {
+                return;
+            }
+            try
+            {
+                agent = instance.Part.ObjectGroup.Scene.Agents[script.m_ScriptPermissionsKey];
+            }
+            catch
+            {
+                instance.ShoutError("llStartAnimation: permission granter not in region");
+                return;
+            }
 
+            agent.PlayAnimation(anim, instance.Part.ID);
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llStopAnimation(string anim)
+        public void llStopAnimation(ScriptInstance instance, string anim)
         {
+            IAgent agent;
+            Script script = (Script)instance;
+            if ((script.m_ScriptPermissions & Script.ScriptPermissions.TriggerAnimation) == 0 ||
+                script.m_ScriptPermissionsKey == UUID.Zero)
+            {
+                return;
+            }
+            try
+            {
+                agent = instance.Part.ObjectGroup.Scene.Agents[script.m_ScriptPermissionsKey];
+            }
+            catch
+            {
+                instance.ShoutError("llStopAnimation: permission granter not in region");
+                return;
+            }
 
+            agent.StopAnimation(anim, instance.Part.ID);
         }
     }
 }

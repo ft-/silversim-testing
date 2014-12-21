@@ -28,6 +28,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using System;
+using SilverSim.Scene.Types.Agent;
 
 namespace SilverSim.Scripting.LSL.API.AnimationOverride
 {
@@ -51,19 +52,79 @@ namespace SilverSim.Scripting.LSL.API.AnimationOverride
         [APILevel(APIFlags.LSL)]
         public void llSetAnimationOverride(ScriptInstance instance, string anim_state, string anim)
         {
+            IAgent agent;
+            Script script = (Script)instance;
+            if((script.m_ScriptPermissions & Script.ScriptPermissions.OverrideAnimations) == 0 ||
+                script.m_ScriptPermissionsKey == UUID.Zero)
+            {
+                return;
+            }
+            try
+            {
+                agent = instance.Part.ObjectGroup.Scene.Agents[script.m_ScriptPermissionsKey];
+            }
+            catch
+            {
+                instance.ShoutError("llSetAnimationOverride: permission granter not in region");
+                return;
+            }
 
+            try
+            {
+                agent.SetAnimationOverride(anim_state, anim);
+            }
+            catch(Exception e)
+            {
+                instance.ShoutError(e.Message);
+            }
         }
 
         [APILevel(APIFlags.LSL)]
         public string llGetAnimationOverride(ScriptInstance instance, string anim_state)
         {
+            IAgent agent;
+            Script script = (Script)instance;
+            if (((script.m_ScriptPermissions & Script.ScriptPermissions.OverrideAnimations) == 0 &&
+                (script.m_ScriptPermissions & Script.ScriptPermissions.TriggerAnimation) == 0) ||
+                script.m_ScriptPermissionsKey == UUID.Zero)
+            {
+                return string.Empty;
+            }
+            try
+            {
+                agent = instance.Part.ObjectGroup.Scene.Agents[script.m_ScriptPermissionsKey];
+            }
+            catch
+            {
+                instance.ShoutError("llSetAnimationOverride: permission granter not in region");
+                return string.Empty;
+            }
+
+            agent.ResetAnimationOverride(anim_state);
             return anim_state;
         }
 
         [APILevel(APIFlags.LSL)]
         public void llResetAnimationOverride(ScriptInstance instance, string anim_state)
         {
+            IAgent agent;
+            Script script = (Script)instance;
+            if ((script.m_ScriptPermissions & Script.ScriptPermissions.OverrideAnimations) == 0 ||
+                script.m_ScriptPermissionsKey == UUID.Zero)
+            {
+                return;
+            }
+            try
+            {
+                agent = instance.Part.ObjectGroup.Scene.Agents[script.m_ScriptPermissionsKey];
+            }
+            catch
+            {
+                instance.ShoutError("llSetAnimationOverride: permission granter not in region");
+                return;
+            }
 
+            agent.ResetAnimationOverride(anim_state);
         }
     }
 }

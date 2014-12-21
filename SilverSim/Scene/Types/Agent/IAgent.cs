@@ -38,6 +38,7 @@ using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.IM;
 using SilverSim.LL.Messages;
+using System;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Agent
@@ -170,6 +171,9 @@ namespace SilverSim.Scene.Types.Agent
         string GetAnimationOverride(string anim_state);
         void PlayAnimation(UUID anim, UUID objectid);
         void StopAnimation(UUID anim, UUID objectid);
-        void SetDefaultAnimation(string anim_state);
+
+        UInt32 RequestPermissions(ObjectPart part, UUID itemID, UInt32 permissions);
+        UInt32 RequestPermissions(ObjectPart part, UUID itemID, UInt32 permissions, UUID experienceID);
+        void RevokePermissions(UUID sourceID, UUID itemID);
     }
 }

@@ -44,6 +44,7 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Types.Primitive;
+using SilverSim.LL.Messages.Script;
 using System;
 using System.Collections.Generic;
 using ThreadedClasses;
@@ -899,6 +900,28 @@ namespace SilverSim.LL.Core
             m_AgentMessageRouting.Add(MessageType.MoneyBalanceRequest, HandleMoneyBalanceRequest);
             m_AgentMessageRouting.Add(MessageType.AgentDataUpdateRequest, HandleAgentDataUpdateRequest);
             m_AgentMessageRouting.Add(MessageType.AgentAnimation, HandleAgentAnimation);
+        }
+
+        public UInt32 RequestPermissions(ObjectPart part, UUID itemID, UInt32 permissions)
+        {
+            return RequestPermissions(part, itemID, permissions, UUID.Zero);
+        }
+
+        public UInt32 RequestPermissions(ObjectPart part, UUID itemID, UInt32 permissions, UUID experienceID)
+        {
+            ScriptQuestion m = new ScriptQuestion();
+            m.ExperienceID = UUID.Zero;
+            m.ItemID = itemID;
+            m.ObjectOwner = part.Owner.ID;
+            m.Questions = (UInt32)permissions;
+            m.TaskID = part.ID;
+            SendMessageAlways(m, part.ObjectGroup.Scene.ID);
+            return 0;
+        }
+
+        public void RevokePermissions(UUID sourceID, UUID itemID)
+        {
+            m_AnimationController.RevokePermissions(sourceID);
         }
 
         public void HandleAgentMessage(Message m)
