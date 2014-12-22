@@ -933,7 +933,8 @@ namespace SilverSim.LL.Core
             ScriptQuestion m = new ScriptQuestion();
             m.ExperienceID = UUID.Zero;
             m.ItemID = itemID;
-            m.ObjectOwner = part.Owner.ID;
+            m.ObjectName = part.ObjectGroup.Name;
+            m.ObjectOwner = part.Owner.FullName;
             m.Questions = (UInt32)permissions;
             m.TaskID = part.ID;
             SendMessageAlways(m, part.ObjectGroup.Scene.ID);
