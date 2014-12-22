@@ -50,7 +50,7 @@ namespace SilverSim.Scripting.LSL.API.AnimationOverride
         public const int PERMISSION_OVERRIDE_ANIMATIONS = 0x8000;
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetAnimationOverride(ScriptInstance instance, string anim_state, string anim)
+        public void llSetAnimationOverride(ScriptInstance instance, string anim_state, string anim)
         {
             IAgent agent;
             Script script = (Script)instance;
@@ -80,7 +80,7 @@ namespace SilverSim.Scripting.LSL.API.AnimationOverride
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llGetAnimationOverride(ScriptInstance instance, string anim_state)
+        public string llGetAnimationOverride(ScriptInstance instance, string anim_state)
         {
             IAgent agent;
             Script script = (Script)instance;
@@ -105,7 +105,7 @@ namespace SilverSim.Scripting.LSL.API.AnimationOverride
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llResetAnimationOverride(ScriptInstance instance, string anim_state)
+        public void llResetAnimationOverride(ScriptInstance instance, string anim_state)
         {
             IAgent agent;
             Script script = (Script)instance;

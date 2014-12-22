@@ -34,7 +34,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
          * The other option of implementing this would have been to make it a namespace class of the Script class.
          */
         [APILevel(APIFlags.LSL)]
-        public static Vector3 llDetectedGrab(ScriptInstance Instance, int number)
+        public Vector3 llDetectedGrab(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -48,14 +48,14 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llDetectedGroup(ScriptInstance Instance, int number)
+        public int llDetectedGroup(ScriptInstance Instance, int number)
         {
 #warning Implement llDetectedGroup(int)
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llDetectedKey(ScriptInstance Instance, int number)
+        public UUID llDetectedKey(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -69,7 +69,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llDetectedLinkNumber(ScriptInstance Instance, int number)
+        public int llDetectedLinkNumber(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -83,7 +83,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llDetectedName(ScriptInstance Instance, int number)
+        public string llDetectedName(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -97,7 +97,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llDetectedOwner(ScriptInstance Instance, int number)
+        public UUID llDetectedOwner(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -111,7 +111,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static Vector3 llDetectedPos(ScriptInstance Instance, int number)
+        public Vector3 llDetectedPos(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -125,7 +125,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static Quaternion llDetectedRot(ScriptInstance Instance, int number)
+        public Quaternion llDetectedRot(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -139,7 +139,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static Vector3 llDetectedTouchBinormal(ScriptInstance Instance, int number)
+        public Vector3 llDetectedTouchBinormal(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -153,7 +153,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llDetectedTouchFace(ScriptInstance Instance, int number)
+        public int llDetectedTouchFace(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -167,7 +167,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static Vector3 llDetectedTouchNormal(ScriptInstance Instance, int number)
+        public Vector3 llDetectedTouchNormal(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -181,7 +181,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static Vector3 llDetectedTouchPos(ScriptInstance Instance, int number)
+        public Vector3 llDetectedTouchPos(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -195,7 +195,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static Vector3 llDetectedTouchST(ScriptInstance Instance, int number)
+        public Vector3 llDetectedTouchST(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -209,7 +209,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static Vector3 llDetectedTouchUV(ScriptInstance Instance, int number)
+        public Vector3 llDetectedTouchUV(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -223,13 +223,13 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llDetectedType(ScriptInstance Instance, int number)
+        public int llDetectedType(ScriptInstance Instance, int number)
         {
 #warning Implement llDetectedType(int)
             return 0;
         }
 
-        public static Vector3 llDetectedVel(ScriptInstance Instance, int number)
+        public Vector3 llDetectedVel(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)

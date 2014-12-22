@@ -32,7 +32,7 @@ namespace SilverSim.Scripting.LSL.API.Base
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public static int llGetRegionAgentCount(ScriptInstance Instance)
+        public int llGetRegionAgentCount(ScriptInstance Instance)
         {
             return Instance.Part.ObjectGroup.Scene.Agents.Count;
         }
@@ -54,31 +54,31 @@ namespace SilverSim.Scripting.LSL.API.Base
         public const int PAYMENT_INFO_USED = 0x2;
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llRequestAgentData(ScriptInstance Instance, UUID id, int data)
+        public UUID llRequestAgentData(ScriptInstance Instance, UUID id, int data)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llRequestDisplayName(ScriptInstance Instance, UUID id)
+        public UUID llRequestDisplayName(ScriptInstance Instance, UUID id)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llRequestUsername(ScriptInstance Instance, UUID id)
+        public UUID llRequestUsername(ScriptInstance Instance, UUID id)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llGetDisplayName(ScriptInstance Instance, UUID id)
+        public string llGetDisplayName(ScriptInstance Instance, UUID id)
         {
             return string.Empty;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static Vector3 llGetAgentSize(ScriptInstance Instance, UUID id)
+        public Vector3 llGetAgentSize(ScriptInstance Instance, UUID id)
         {
             lock (Instance)
             {
@@ -102,7 +102,7 @@ namespace SilverSim.Scripting.LSL.API.Base
 
         #region osGetAvatarList
         [APILevel(APIFlags.OSSL)]
-        public static AnArray osGetAvatarList(ScriptInstance Instance)
+        public AnArray osGetAvatarList(ScriptInstance Instance)
         {
             AnArray res = new AnArray();
 
@@ -125,7 +125,7 @@ namespace SilverSim.Scripting.LSL.API.Base
 
         #region osGetAgents
         [APILevel(APIFlags.OSSL)]
-        public static AnArray osGetAgents(ScriptInstance Instance)
+        public AnArray osGetAgents(ScriptInstance Instance)
         {
             AnArray res = new AnArray();
 

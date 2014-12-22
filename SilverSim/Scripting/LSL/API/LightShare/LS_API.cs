@@ -121,27 +121,27 @@ namespace SilverSim.Scripting.LSL.API.LightShare
         public const int WL_SUN_MOON_POSITION = 36;
 
         [APILevel(APIFlags.LightShare)]
-        public static AnArray lsGetWindlightScene(ScriptInstance Instance, AnArray rules)
+        public AnArray lsGetWindlightScene(ScriptInstance Instance, AnArray rules)
         {
 #warning Implement lsGetWindlightScene(AnArray)
             return new AnArray();
         }
 
         [APILevel(APIFlags.LightShare)]
-        public static int lsSetWindlightScene(ScriptInstance Instance, AnArray rules)
+        public int lsSetWindlightScene(ScriptInstance Instance, AnArray rules)
         {
 #warning Implement lsSetWindlightScene(AnArray)
             return 0;
         }
 
         [APILevel(APIFlags.LightShare)]
-        public static void lsClearWindlightScene(ScriptInstance Instance)
+        public void lsClearWindlightScene(ScriptInstance Instance)
         {
 #warning Implement lsClearWindlightScene()
         }
 
         [APILevel(APIFlags.LightShare)]
-        public static int lsSetWindlightSceneTargeted(ScriptInstance Instance, AnArray rules, UUID target)
+        public int lsSetWindlightSceneTargeted(ScriptInstance Instance, AnArray rules, UUID target)
         {
 #warning Implement lsSetWindlightSceneTargeted(AnArray, UUID)
             return 0;

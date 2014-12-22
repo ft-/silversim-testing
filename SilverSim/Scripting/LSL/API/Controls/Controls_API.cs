@@ -54,7 +54,7 @@ namespace SilverSim.Scripting.LSL.API.Controls
         public delegate void control(UUID id, int level, int edge);
 
         [APILevel(APIFlags.LSL)]
-        public static void llTakeControls(ScriptInstance instance, int controls, int accept, int pass_on)
+        public void llTakeControls(ScriptInstance instance, int controls, int accept, int pass_on)
         {
             Script script = (Script)instance;
             if((script.m_ScriptPermissions & ScriptPermissions.TakeControls) == 0 ||
@@ -77,7 +77,7 @@ namespace SilverSim.Scripting.LSL.API.Controls
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llReleaseControls(ScriptInstance instance)
+        public void llReleaseControls(ScriptInstance instance)
         {
             IAgent agent;
             Script script = (Script)instance;

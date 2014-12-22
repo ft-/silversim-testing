@@ -47,7 +47,7 @@ namespace SilverSim.Scripting.LSL
         private static readonly ILog m_Log = LogManager.GetLogger("LSL COMPILER");
         List<IScriptApi> m_Apis = new List<IScriptApi>();
         Dictionary<string, FieldInfo> m_Constants = new Dictionary<string, FieldInfo>();
-        List<MethodInfo> m_Methods = new List<MethodInfo>();
+        List<KeyValuePair<IScriptApi, MethodInfo>> m_Methods = new List<KeyValuePair<IScriptApi,MethodInfo>>();
         Dictionary<string, MethodInfo> m_EventDelegates = new Dictionary<string, MethodInfo>();
         List<Script.StateChangeEventDelegate> m_StateChangeDelegates = new List<ScriptInstance.StateChangeEventDelegate>();
         List<Script.ScriptResetEventDelegate> m_ScriptResetDelegates = new List<ScriptInstance.ScriptResetEventDelegate>();
@@ -180,14 +180,15 @@ namespace SilverSim.Scripting.LSL
                     System.Attribute attr = System.Attribute.GetCustomAttribute(m, typeof(APILevel));
                     if(attr != null)
                     {
-                        if ((m.Attributes & MethodAttributes.Static) != 0)
+                        ParameterInfo[] pi = m.GetParameters();
+                        if (pi.Length >= 1)
                         {
-                            ParameterInfo[] pi = m.GetParameters();
-                            if (pi.Length >= 1)
+                            if (pi[0].ParameterType.Equals(typeof(ScriptInstance)))
                             {
-                                if (pi[0].ParameterType.Equals(typeof(ScriptInstance)))
+                                m_Methods.Add(new KeyValuePair<IScriptApi,MethodInfo>(api, m));
+                                if(!m_MethodNames.Contains(m.Name))
                                 {
-                                    m_Methods.Add(m);
+                                    m_MethodNames.Add(m.Name);
                                 }
                             }
                         }

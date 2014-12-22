@@ -97,19 +97,19 @@ namespace SilverSim.Scripting.LSL.API.Inventory
         public const string EOF = "\n\n\n";
 
         [APILevel(APIFlags.LSL)]
-        public static void llGiveInventory(ScriptInstance Instance, UUID destination, string inventory)
+        public void llGiveInventory(ScriptInstance Instance, UUID destination, string inventory)
         {
 #warning Implement llGiveInventory(UUID, string)
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llGiveInventoryList(ScriptInstance Instance, UUID target, string folder, AnArray inventory)
+        public void llGiveInventoryList(ScriptInstance Instance, UUID target, string folder, AnArray inventory)
         {
 #warning Implement llGiveInventory(UUID, string, AnArray)
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llRemoveInventory(ScriptInstance Instance, string item)
+        public void llRemoveInventory(ScriptInstance Instance, string item)
         {
             ObjectPartInventoryItem resitem;
             lock (Instance)
@@ -129,7 +129,7 @@ namespace SilverSim.Scripting.LSL.API.Inventory
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llGetInventoryCreator(ScriptInstance Instance, string item)
+        public UUID llGetInventoryCreator(ScriptInstance Instance, string item)
         {
             lock (Instance)
             {
@@ -145,7 +145,7 @@ namespace SilverSim.Scripting.LSL.API.Inventory
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llGetInventoryKey(ScriptInstance Instance, string item)
+        public UUID llGetInventoryKey(ScriptInstance Instance, string item)
         {
             lock (Instance)
             {
@@ -161,7 +161,7 @@ namespace SilverSim.Scripting.LSL.API.Inventory
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llGetInventoryName(ScriptInstance Instance, int type, int number)
+        public string llGetInventoryName(ScriptInstance Instance, int type, int number)
         {
             lock(Instance)
             {
@@ -185,7 +185,7 @@ namespace SilverSim.Scripting.LSL.API.Inventory
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llGetInventoryNumber(ScriptInstance Instance, int type)
+        public int llGetInventoryNumber(ScriptInstance Instance, int type)
         {
             lock (Instance)
             {
@@ -198,13 +198,13 @@ namespace SilverSim.Scripting.LSL.API.Inventory
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llGetInventoryPermMask(ScriptInstance Instance, string item, int category)
+        public int llGetInventoryPermMask(ScriptInstance Instance, string item, int category)
         {
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llGetInventoryType(ScriptInstance Instance, string name)
+        public int llGetInventoryType(ScriptInstance Instance, string name)
         {
             lock (Instance)
             {
@@ -221,7 +221,7 @@ namespace SilverSim.Scripting.LSL.API.Inventory
 
         #region osGetInventoryDesc
         [APILevel(APIFlags.OSSL)]
-        public static string osGetInventoryDesc(ScriptInstance Instance, string item)
+        public string osGetInventoryDesc(ScriptInstance Instance, string item)
         {
             lock (Instance)
             {

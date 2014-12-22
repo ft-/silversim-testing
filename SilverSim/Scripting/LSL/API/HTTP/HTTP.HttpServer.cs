@@ -35,21 +35,21 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
     public partial class HTTP_API
     {
         [APILevel(APIFlags.LSL)]
-        public static UUID llRequestURL(ScriptInstance Instance)
+        public UUID llRequestURL(ScriptInstance Instance)
         {
 #warning Implement llRequestURL()
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llReleaseURL(ScriptInstance Instance, UUID id)
+        public void llReleaseURL(ScriptInstance Instance, UUID id)
         {
 #warning Implement llReleaseURL()
 
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llRequestSecureURL(ScriptInstance Instance)
+        public UUID llRequestSecureURL(ScriptInstance Instance)
         {
 #warning Implement llRequestSecureURL()
             return UUID.Zero;

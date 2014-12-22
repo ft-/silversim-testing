@@ -36,7 +36,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
     [LSLImplementation]
     public partial class Primitive_API : MarshalByRefObject, IScriptApi, IPlugin
     {
-        public static UUID getTextureAssetID(ScriptInstance Instance, string item)
+        public UUID getTextureAssetID(ScriptInstance Instance, string item)
         {
             UUID assetID;
             if (!UUID.TryParse(item, out assetID))
@@ -281,7 +281,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         [APILevel(APIFlags.LSL)]
         public const string TEXTURE_MEDIA = "8b5fec65-8d8d-9dc5-cda8-8fdf2716e361";
 
-        protected static List<ObjectPart> GetLinkTargets(ScriptInstance Instance, int link)
+        protected List<ObjectPart> GetLinkTargets(ScriptInstance Instance, int link)
         {
             List<ObjectPart> list = new List<ObjectPart>();
             if (link == LINK_THIS)

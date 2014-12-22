@@ -35,7 +35,7 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
     public partial class HTTP_API
     {
         [APILevel(APIFlags.LSL)]
-        public static UUID llHTTPRequest(ScriptInstance Instance, string url, AnArray parameters, string body)
+        public UUID llHTTPRequest(ScriptInstance Instance, string url, AnArray parameters, string body)
         {
 #warning Implement llHTTPRequest(string, AnArray, string)
             return UUID.Zero;

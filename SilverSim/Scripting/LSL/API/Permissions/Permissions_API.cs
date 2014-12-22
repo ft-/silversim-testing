@@ -108,7 +108,7 @@ namespace SilverSim.Scripting.LSL.API.Permissions
         }
 
         [ExecutedOnScriptReset]
-        public static void ResetPermissions(ScriptInstance Instance)
+        public void ResetPermissions(ScriptInstance Instance)
         {
             Script script = (Script)Instance;
             lock (script)

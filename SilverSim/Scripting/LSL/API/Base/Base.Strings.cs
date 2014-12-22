@@ -31,7 +31,7 @@ namespace SilverSim.Scripting.LSL.API.Base
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public static string llDeleteSubString(ScriptInstance Instance, string src, int start, int end)
+        public string llDeleteSubString(ScriptInstance Instance, string src, int start, int end)
         {
             if (start < 0)
             {
@@ -71,25 +71,25 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llToLower(ScriptInstance Instance, string s)
+        public string llToLower(ScriptInstance Instance, string s)
         {
             return s.ToLower();
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llToUpper(ScriptInstance Instance, string s)
+        public string llToUpper(ScriptInstance Instance, string s)
         {
             return s.ToUpper();
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llUnescapeURL(ScriptInstance Instance, string url)
+        public string llUnescapeURL(ScriptInstance Instance, string url)
         {
             return Uri.UnescapeDataString(url);
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llEscapeURL(ScriptInstance Instance, string url)
+        public string llEscapeURL(ScriptInstance Instance, string url)
         {
             return Uri.EscapeDataString(url);
         }
@@ -104,7 +104,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         private static readonly char[] trimchars = new char[] { ' ', '\t', '\r', '\n' };
 
         [APILevel(APIFlags.LSL)]
-        public static string llStringTrim(ScriptInstance Instance, string src, int type)
+        public string llStringTrim(ScriptInstance Instance, string src, int type)
         {
             switch(type & STRING_TRIM)
             {
@@ -124,19 +124,19 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llStringLength(ScriptInstance Instance, string src)
+        public int llStringLength(ScriptInstance Instance, string src)
         {
             return src.Length;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llSubStringIndex(ScriptInstance Instance, string source, string pattern)
+        public int llSubStringIndex(ScriptInstance Instance, string source, string pattern)
         {
             return source.IndexOf(pattern);
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llGetSubstring(ScriptInstance Instance, string src, int start, int end)
+        public string llGetSubstring(ScriptInstance Instance, string src, int start, int end)
         {
             if(start < 0)
             {

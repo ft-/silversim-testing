@@ -34,7 +34,7 @@ namespace SilverSim.Scripting.LSL.API.Base
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public static string llGetScriptName(ScriptInstance Instance)
+        public string llGetScriptName(ScriptInstance Instance)
         {
             lock (Instance)
             {
@@ -50,13 +50,13 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llResetScript(ScriptInstance Instance)
+        public void llResetScript(ScriptInstance Instance)
         {
             throw new ResetScriptException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llResetOtherScript(ScriptInstance Instance, string name)
+        public void llResetOtherScript(ScriptInstance Instance, string name)
         {
             lock (Instance)
             {
@@ -86,7 +86,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llGetScriptState(ScriptInstance Instance, string script)
+        public int llGetScriptState(ScriptInstance Instance, string script)
         {
             ObjectPartInventoryItem item;
             ScriptInstance si;
@@ -116,7 +116,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetScriptState(ScriptInstance Instance, string script, int running)
+        public void llSetScriptState(ScriptInstance Instance, string script, int running)
         {
             ObjectPartInventoryItem item;
             ScriptInstance si;

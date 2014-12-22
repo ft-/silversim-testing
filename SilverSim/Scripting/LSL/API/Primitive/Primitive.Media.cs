@@ -31,14 +31,14 @@ namespace SilverSim.Scripting.LSL.API.Primitive
     public partial class Primitive_API
     {
         [APILevel(APIFlags.LSL)]
-        public static int llClearLinkMedia(ScriptInstance Instance, int link, int face)
+        public int llClearLinkMedia(ScriptInstance Instance, int link, int face)
         {
 #warning Implement llClearLinkMedia(int, int)
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llClearPrimMedia(ScriptInstance Instance, int face)
+        public int llClearPrimMedia(ScriptInstance Instance, int face)
         {
             return llClearLinkMedia(Instance, LINK_THIS, face);
         }
@@ -106,7 +106,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         public const int LSL_STATUS_WHITELIST_FAILED = 2001;
 
         [APILevel(APIFlags.LSL)]
-        public static AnArray llGetPrimMediaParams(ScriptInstance Instance, int face, AnArray param)
+        public AnArray llGetPrimMediaParams(ScriptInstance Instance, int face, AnArray param)
         {
 #warning Implement llGetPrimMediaParams(int, AnArray)
             return new AnArray();
@@ -130,14 +130,14 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         public const int STATUS_WHITELIST_FAILED = 2001;
 
         [APILevel(APIFlags.LSL)]
-        public static int llSetLinkMedia(ScriptInstance Instance, int link, int face, AnArray param)
+        public int llSetLinkMedia(ScriptInstance Instance, int link, int face, AnArray param)
         {
 #warning Implement llSetLinkMedia(int, int, AnArray)
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llSetPrimMediaParams(ScriptInstance Instance, int face, AnArray param)
+        public int llSetPrimMediaParams(ScriptInstance Instance, int face, AnArray param)
         {
             return llSetLinkMedia(Instance, LINK_THIS, face, param);
         }

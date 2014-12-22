@@ -45,13 +45,13 @@ namespace SilverSim.Scripting.LSL.API.Vehicles
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetVehicleFlags(ScriptInstance Instance, int flags)
+        public void llSetVehicleFlags(ScriptInstance Instance, int flags)
         {
 #warning Implement llSetVehicleFlags(int)
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llRemoveVehicleFlags(ScriptInstance Instance, int flags)
+        public void llRemoveVehicleFlags(ScriptInstance Instance, int flags)
         {
 #warning Implement llRemoveVehicleFlags(int)
         }
@@ -92,7 +92,7 @@ namespace SilverSim.Scripting.LSL.API.Vehicles
         public const int VEHICLE_VERTICAL_ATTRACTION_TIMESCALE = 37;
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetVehicleFloatParam(ScriptInstance Instance, int param, double value)
+        public void llSetVehicleFloatParam(ScriptInstance Instance, int param, double value)
         {
 #warning Implement llSetVehicleFloatParam(int, double)
         }
@@ -100,7 +100,7 @@ namespace SilverSim.Scripting.LSL.API.Vehicles
         [APILevel(APIFlags.LSL)]
         public const int VEHICLE_REFERENCE_FRAME = 44;
         [APILevel(APIFlags.LSL)]
-        public static void llSetVehicleRotationParam(ScriptInstance Instance, int param, Quaternion rot)
+        public void llSetVehicleRotationParam(ScriptInstance Instance, int param, Quaternion rot)
         {
 #warning Implement llSetVehicleRotationParam(int, Quaternion)
         }
@@ -118,7 +118,7 @@ namespace SilverSim.Scripting.LSL.API.Vehicles
         [APILevel(APIFlags.LSL)]
         public const int VEHICLE_TYPE_BALLOON = 5;
         [APILevel(APIFlags.LSL)]
-        public static void llSetVehicleType(ScriptInstance Instance, int type)
+        public void llSetVehicleType(ScriptInstance Instance, int type)
         {
 #warning Implement llSetVehicleType(int)
         }
@@ -134,7 +134,7 @@ namespace SilverSim.Scripting.LSL.API.Vehicles
         [APILevel(APIFlags.LSL)]
         public const int VEHICLE_LINEAR_MOTOR_OFFSET = 20;
         [APILevel(APIFlags.LSL)]
-        public static void llSetVehicleVectorParam(ScriptInstance Instance, int param, Vector3 vec)
+        public void llSetVehicleVectorParam(ScriptInstance Instance, int param, Vector3 vec)
         {
 #warning Implement llSetVehicleVectorParam(int, Vector3)
         }

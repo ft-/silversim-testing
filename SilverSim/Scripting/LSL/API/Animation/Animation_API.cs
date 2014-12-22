@@ -50,7 +50,7 @@ namespace SilverSim.Scripting.LSL.API.Animation
         public const int PERMISSION_TRIGGER_ANIMATION = 0x10;
 
         [APILevel(APIFlags.LSL)]
-        public static void llStartAnimation(ScriptInstance instance, string anim)
+        public void llStartAnimation(ScriptInstance instance, string anim)
         {
             IAgent agent;
             Script script = (Script)instance;
@@ -73,7 +73,7 @@ namespace SilverSim.Scripting.LSL.API.Animation
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llStopAnimation(ScriptInstance instance, string anim)
+        public void llStopAnimation(ScriptInstance instance, string anim)
         {
             IAgent agent;
             Script script = (Script)instance;

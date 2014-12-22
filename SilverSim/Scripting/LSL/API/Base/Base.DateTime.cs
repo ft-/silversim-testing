@@ -35,7 +35,7 @@ namespace SilverSim.Scripting.LSL.API.Base
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public static string llGetTimestamp(ScriptInstance Instance)
+        public string llGetTimestamp(ScriptInstance Instance)
         {
             return DateTime.Now.ToUniversalTime().ToString("yyyy-MM-ddTHH:mm:ss.fffffffZ");
         }

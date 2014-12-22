@@ -39,7 +39,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
     {
         #region osMakeNotecard
         [APILevel(APIFlags.OSSL)]
-        public static void osMakeNotecard(ScriptInstance Instance, string notecardName, AnArray contents)
+        public void osMakeNotecard(ScriptInstance Instance, string notecardName, AnArray contents)
         {
             string nc = string.Empty;
 
@@ -55,7 +55,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
         }
 
         [APILevel(APIFlags.OSSL)]
-        public static void osMakeNotecard(ScriptInstance Instance, string notecardName, string contents)
+        public void osMakeNotecard(ScriptInstance Instance, string notecardName, string contents)
         {
             lock (Instance)
             {
@@ -96,7 +96,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
 
         #region osGetNotecard
         [APILevel(APIFlags.OSSL)]
-        public static string osGetNotecard(ScriptInstance Instance, string name)
+        public string osGetNotecard(ScriptInstance Instance, string name)
         {
             lock (Instance)
             {
@@ -123,7 +123,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
 
         #region osGetNotecardLine
         [APILevel(APIFlags.OSSL)]
-        public static string osGetNotecardLine(ScriptInstance Instance, string name, int line)
+        public string osGetNotecardLine(ScriptInstance Instance, string name, int line)
         {
             ObjectPartInventoryItem item;
             lock (Instance)
@@ -155,7 +155,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
 
         #region osGetNumberOfNotecardLines
         [APILevel(APIFlags.OSSL)]
-        public static int osGetNumberOfNotecardLines(ScriptInstance Instance, string name)
+        public int osGetNumberOfNotecardLines(ScriptInstance Instance, string name)
         {
             ObjectPartInventoryItem item;
             lock (Instance)

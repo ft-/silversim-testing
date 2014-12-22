@@ -32,7 +32,7 @@ namespace SilverSim.Scripting.LSL.API.Base
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public static string llIntegerToBase64(ScriptInstance Instance, int number)
+        public string llIntegerToBase64(ScriptInstance Instance, int number)
         {
             byte[] b = BitConverter.GetBytes(number);
             if (BitConverter.IsLittleEndian)
@@ -43,7 +43,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public static int llBase64ToInteger(ScriptInstance Instance, string s)
+        public int llBase64ToInteger(ScriptInstance Instance, string s)
         {
             if (s.Length > 8)
             {
@@ -59,21 +59,21 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llStringToBase64(ScriptInstance Instance, string str)
+        public string llStringToBase64(ScriptInstance Instance, string str)
         {
             byte[] b = Encoding.UTF8.GetBytes(str);
             return System.Convert.ToBase64String(b);
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llBase64ToString(ScriptInstance Instance, string str)
+        public string llBase64ToString(ScriptInstance Instance, string str)
         {
             byte[] b = System.Convert.FromBase64String(str);
             return Encoding.UTF8.GetString(b);
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llXorBase64(ScriptInstance Instance, string str1, string str2)
+        public string llXorBase64(ScriptInstance Instance, string str1, string str2)
         {
             byte[] a = System.Convert.FromBase64String(str1);
             byte[] b = System.Convert.FromBase64String(str2);

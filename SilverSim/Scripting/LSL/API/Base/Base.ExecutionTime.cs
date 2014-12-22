@@ -31,7 +31,7 @@ namespace SilverSim.Scripting.LSL.API.Base
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public static void llResetTime(ScriptInstance Instance)
+        public void llResetTime(ScriptInstance Instance)
         {
             lock(Instance)
             {
@@ -40,7 +40,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public static double llGetTime(ScriptInstance Instance)
+        public double llGetTime(ScriptInstance Instance)
         {
             double v;
             lock (Instance)
@@ -51,7 +51,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public static double llGetAndResetTime(ScriptInstance Instance)
+        public double llGetAndResetTime(ScriptInstance Instance)
         {
             double old;
             lock(Instance)

@@ -45,7 +45,7 @@ namespace SilverSim.Scripting.LSL.API.LogListen
         }
 
         [APILevel(APIFlags.ASSL)]
-        public static void asLogListen(ScriptInstance Instance, int onChannel, int enable)
+        public void asLogListen(ScriptInstance Instance, int onChannel, int enable)
         {
 
         }

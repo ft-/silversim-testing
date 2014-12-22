@@ -46,7 +46,7 @@ namespace SilverSim.Scripting.LSL.API.XMLRPC
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llCloseRemoteDataChannel(ScriptInstance Instance, UUID key)
+        public void llCloseRemoteDataChannel(ScriptInstance Instance, UUID key)
         {
 #warning Implement llCloseRemoteDataChannel(UUID)
         }

@@ -83,38 +83,24 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         public const int CAMERA_FOCUS_LOCKED = 22;
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetCameraAtOffset(ScriptInstance Instance, Vector3 offset)
+        public void llSetCameraAtOffset(ScriptInstance Instance, Vector3 offset)
         {
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetLinkCamera(ScriptInstance Instance, int link, Vector3 eye, Vector3 at)
-        {
-
-        }
-
-        [APILevel(APIFlags.LSL)]
-        public static void llSetCameraOffset(ScriptInstance Instance, Vector3 offset)
+        public void llSetLinkCamera(ScriptInstance Instance, int link, Vector3 eye, Vector3 at)
         {
 
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llClearCameraParams(ScriptInstance Instance)
+        public void llSetCameraOffset(ScriptInstance Instance, Vector3 offset)
         {
-            lock (Instance)
-            {
-                Script script = (Script)Instance;
-                if (script.m_ScriptPermissionsKey != UUID.Zero && (script.m_ScriptPermissions & ScriptPermissions.ControlCamera) != 0)
-                {
-
-                }
-            }
 
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetCameraParams(ScriptInstance Instance, AnArray rules)
+        public void llClearCameraParams(ScriptInstance Instance)
         {
             lock (Instance)
             {
@@ -128,7 +114,21 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public static Vector3 llGetCameraPos(ScriptInstance Instance)
+        public void llSetCameraParams(ScriptInstance Instance, AnArray rules)
+        {
+            lock (Instance)
+            {
+                Script script = (Script)Instance;
+                if (script.m_ScriptPermissionsKey != UUID.Zero && (script.m_ScriptPermissions & ScriptPermissions.ControlCamera) != 0)
+                {
+
+                }
+            }
+
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public Vector3 llGetCameraPos(ScriptInstance Instance)
         {
             Script script = (Script)Instance;
             if (script.m_ScriptPermissionsKey != UUID.Zero && (script.m_ScriptPermissions & ScriptPermissions.TrackCamera) != 0)
@@ -139,7 +139,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public static Quaternion llGetCameraRot(ScriptInstance Instance)
+        public Quaternion llGetCameraRot(ScriptInstance Instance)
         {
             Script script = (Script)Instance;
             if (script.m_ScriptPermissionsKey != UUID.Zero && (script.m_ScriptPermissions & ScriptPermissions.TrackCamera) != 0)

@@ -32,14 +32,14 @@ namespace SilverSim.Scripting.LSL.API.Base
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public static UUID llGenerateKey(ScriptInstance Instance)
+        public UUID llGenerateKey(ScriptInstance Instance)
         {
             return UUID.Random;
         }
 
         #region osIsUUID
         [APILevel(APIFlags.OSSL)]
-        public static int osIsUUID(ScriptInstance Instance, string input)
+        public int osIsUUID(ScriptInstance Instance, string input)
         {
             Guid v;
             return Guid.TryParse(input, out v) ? TRUE : FALSE;

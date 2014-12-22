@@ -35,7 +35,7 @@ namespace SilverSim.Scripting.LSL.API.Sound
     [LSLImplementation]
     public partial class Sound_API : MarshalByRefObject, IScriptApi, IPlugin
     {
-        public static UUID getSoundAssetID(ScriptInstance Instance, string item)
+        public UUID getSoundAssetID(ScriptInstance Instance, string item)
         {
             UUID assetID;
             if (!UUID.TryParse(item, out assetID))

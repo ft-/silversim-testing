@@ -40,7 +40,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         public static int MaxListenerHandles = 64;
 
         [APILevel(APIFlags.LSL)]
-        public static void llShout(ScriptInstance Instance, int channel, string message)
+        public void llShout(ScriptInstance Instance, int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;
@@ -52,7 +52,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llSay(ScriptInstance Instance, int channel, string message)
+        public void llSay(ScriptInstance Instance, int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;
@@ -64,7 +64,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llWhisper(ScriptInstance Instance, int channel, string message)
+        public void llWhisper(ScriptInstance Instance, int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;
@@ -76,7 +76,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llOwnerSay(ScriptInstance Instance, string message)
+        public void llOwnerSay(ScriptInstance Instance, string message)
         {
             lock (Instance)
             {
@@ -92,7 +92,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llRegionSay(ScriptInstance Instance, int channel, string message)
+        public void llRegionSay(ScriptInstance Instance, int channel, string message)
         {
             if (channel != PUBLIC_CHANNEL)
             {
@@ -107,7 +107,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llRegionSayTo(ScriptInstance Instance, UUID target, int channel, string message)
+        public void llRegionSayTo(ScriptInstance Instance, UUID target, int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;
@@ -120,7 +120,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
-        public static Integer llListen(ScriptInstance Instance, int channel, string name, UUID id, string msg)
+        public Integer llListen(ScriptInstance Instance, int channel, string name, UUID id, string msg)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -162,7 +162,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llListenRemove(ScriptInstance Instance, int handle)
+        public void llListenRemove(ScriptInstance Instance, int handle)
         {
             Script script = (Script)Instance;
             ChatServiceInterface.Listener l;
@@ -176,7 +176,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llListenControl(ScriptInstance Instance, int handle, int active)
+        public void llListenControl(ScriptInstance Instance, int handle, int active)
         {
             Script script = (Script)Instance;
             ChatServiceInterface.Listener l;
@@ -191,7 +191,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
 
         #region osListenRegex
         [APILevel(APIFlags.OSSL)]
-        public static int osListenRegex(ScriptInstance Instance, int channel, string name, UUID id, string msg, int regexBitfield)
+        public int osListenRegex(ScriptInstance Instance, int channel, string name, UUID id, string msg, int regexBitfield)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -235,7 +235,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         #endregion
 
         [ExecutedOnStateChange]
-        public static void ResetListeners(ScriptInstance Instance)
+        public void ResetListeners(ScriptInstance Instance)
         {
             Script script = (Script)Instance;
             lock (script)

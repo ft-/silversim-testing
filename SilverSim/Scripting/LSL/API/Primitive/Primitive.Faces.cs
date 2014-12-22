@@ -34,13 +34,13 @@ namespace SilverSim.Scripting.LSL.API.Primitive
     {
         #region Faces
         [APILevel(APIFlags.LSL)]
-        public static int llGetNumberOfSides(ScriptInstance Instance)
+        public int llGetNumberOfSides(ScriptInstance Instance)
         {
             return Instance.Part.NumberOfSides;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static double llGetAlpha(ScriptInstance Instance, int face)
+        public double llGetAlpha(ScriptInstance Instance, int face)
         {
             lock (Instance)
             {
@@ -57,13 +57,13 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetAlpha(ScriptInstance Instance, double alpha, int faces)
+        public void llSetAlpha(ScriptInstance Instance, double alpha, int faces)
         {
             llSetLinkAlpha(Instance, LINK_THIS, alpha, faces);
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetLinkAlpha(ScriptInstance Instance, int link, double alpha, int face)
+        public void llSetLinkAlpha(ScriptInstance Instance, int link, double alpha, int face)
         {
             if (alpha < 0) alpha = 0;
             if (alpha > 1) alpha = 1;
@@ -99,13 +99,13 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetTexture(ScriptInstance Instance, string texture, int face)
+        public void llSetTexture(ScriptInstance Instance, string texture, int face)
         {
             llSetLinkTexture(Instance, LINK_THIS, texture, face);
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetLinkTexture(ScriptInstance Instance, int link, string texture, int face)
+        public void llSetLinkTexture(ScriptInstance Instance, int link, string texture, int face)
         {
             UUID textureID = getTextureAssetID(Instance, texture);
 
@@ -140,19 +140,19 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public static Vector3 llGetColor(ScriptInstance Instance, int face)
+        public Vector3 llGetColor(ScriptInstance Instance, int face)
         {
             return Vector3.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetColor(ScriptInstance Instance, Vector3 color, int face)
+        public void llSetColor(ScriptInstance Instance, Vector3 color, int face)
         {
             llSetLinkColor(Instance, LINK_THIS, color, face);
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llSetLinkColor(ScriptInstance Instance, int link, Vector3 color, int face)
+        public void llSetLinkColor(ScriptInstance Instance, int link, Vector3 color, int face)
         {
             if (color.X < 0) color.X = 0;
             if (color.X > 1) color.X = 1;

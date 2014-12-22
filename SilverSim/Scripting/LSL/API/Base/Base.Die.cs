@@ -34,7 +34,7 @@ namespace SilverSim.Scripting.LSL.API.Base
     public partial class Base_API
     {
         [APILevel(APIFlags.LSL)]
-        public static void llDie(ScriptInstance Instance)
+        public void llDie(ScriptInstance Instance)
         {
 #warning Implement llDie()
         }

@@ -54,7 +54,7 @@ namespace SilverSim.Scripting.LSL.API.Money
         public delegate void transaction_result(UUID id, int success, string data);
 
         [APILevel(APIFlags.LSL)]
-        public static void llGiveMoney(ScriptInstance instance, UUID destination, int amount)
+        public void llGiveMoney(ScriptInstance instance, UUID destination, int amount)
         {
             Script script = (Script)instance;
             if((script.m_ScriptPermissions & ScriptPermissions.Debit) == 0 ||
@@ -66,7 +66,7 @@ namespace SilverSim.Scripting.LSL.API.Money
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llTransferLindenDollars(ScriptInstance instance, UUID destination, int amount)
+        public UUID llTransferLindenDollars(ScriptInstance instance, UUID destination, int amount)
         {
             Script script = (Script)instance;
             if ((script.m_ScriptPermissions & ScriptPermissions.Debit) == 0 ||

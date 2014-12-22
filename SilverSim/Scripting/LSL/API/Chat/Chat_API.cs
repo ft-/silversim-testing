@@ -44,7 +44,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         [APILevel(APIFlags.LSL)]
         public const int DEBUG_CHANNEL = 0x7FFFFFFF;
 
-        private static UUID getOwner(ScriptInstance Instance)
+        private UUID getOwner(ScriptInstance Instance)
         {
             lock (Instance)
             {
@@ -52,7 +52,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
             }
         }
 
-        private static void sendChat(ScriptInstance Instance, ListenEvent ev)
+        private void sendChat(ScriptInstance Instance, ListenEvent ev)
         {
             lock (Instance)
             {

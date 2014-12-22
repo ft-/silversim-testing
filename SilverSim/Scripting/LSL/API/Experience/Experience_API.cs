@@ -89,37 +89,37 @@ namespace SilverSim.Scripting.LSL.API.Experience
         public delegate void experience_permissions_denied(UUID agent_id, int reason);
 
         [APILevel(APIFlags.LSL)]
-        public static int llAgentInExperience(ScriptInstance Instance, UUID agent)
+        public int llAgentInExperience(ScriptInstance Instance, UUID agent)
         {
             return 0;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llCreateKeyValue(ScriptInstance Instance, string k, string v)
+        public UUID llCreateKeyValue(ScriptInstance Instance, string k, string v)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llDataSizeKeyValue(ScriptInstance Instance)
+        public UUID llDataSizeKeyValue(ScriptInstance Instance)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llDeleteKeyValue(ScriptInstance Instance, string k)
+        public UUID llDeleteKeyValue(ScriptInstance Instance, string k)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static AnArray llGetExperienceDetails(ScriptInstance Instance, UUID experience_id)
+        public AnArray llGetExperienceDetails(ScriptInstance Instance, UUID experience_id)
         {
             return new AnArray();
         }
 
         [APILevel(APIFlags.LSL)]
-        public static string llGetExperienceErrorMessage(ScriptInstance Instance, int error)
+        public string llGetExperienceErrorMessage(ScriptInstance Instance, int error)
         {
             switch(error)
             {
@@ -145,31 +145,31 @@ namespace SilverSim.Scripting.LSL.API.Experience
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llKeyCountKeyValue(ScriptInstance Instance)
+        public UUID llKeyCountKeyValue(ScriptInstance Instance)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llKeysKeyValue(ScriptInstance Instance, int first, int count)
+        public UUID llKeysKeyValue(ScriptInstance Instance, int first, int count)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llReadKeyValue(ScriptInstance Instance, string k)
+        public UUID llReadKeyValue(ScriptInstance Instance, string k)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llRequestExperiencePermissions(ScriptInstance Instance, UUID agent, string name /* unused */)
+        public void llRequestExperiencePermissions(ScriptInstance Instance, UUID agent, string name /* unused */)
         {
 
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llUpdateKeyValue(ScriptInstance Instance, string k, string v, int checked_orig, string original_value)
+        public UUID llUpdateKeyValue(ScriptInstance Instance, string k, string v, int checked_orig, string original_value)
         {
             return UUID.Zero;
         }

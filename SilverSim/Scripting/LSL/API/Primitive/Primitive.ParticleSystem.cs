@@ -142,7 +142,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llLinkParticleSystem(ScriptInstance Instance, int link, AnArray rules)
+        public void llLinkParticleSystem(ScriptInstance Instance, int link, AnArray rules)
         {
             ParticleSystem ps = new ParticleSystem();
 
@@ -537,7 +537,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llParticleSystem(ScriptInstance Instance, AnArray rules)
+        public void llParticleSystem(ScriptInstance Instance, AnArray rules)
         {
             llLinkParticleSystem(Instance, LINK_THIS, rules);
         }

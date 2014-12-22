@@ -39,7 +39,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
         public const string EOF = "\n\n\n";
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llGetNotecardLine(ScriptInstance Instance, string name, int line)
+        public UUID llGetNotecardLine(ScriptInstance Instance, string name, int line)
         {
             lock (Instance)
             {
@@ -80,7 +80,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
         }
 
         [APILevel(APIFlags.LSL)]
-        public static UUID llGetNumberOfNotecardLines(ScriptInstance Instance, string name)
+        public UUID llGetNumberOfNotecardLines(ScriptInstance Instance, string name)
         {
             ObjectPartInventoryItem item;
             lock (Instance)
