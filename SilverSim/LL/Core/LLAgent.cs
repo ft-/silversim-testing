@@ -936,9 +936,9 @@ namespace SilverSim.LL.Core
             return ScriptPermissions.None;
         }
 
-        public void RevokePermissions(UUID sourceID, UUID itemID)
+        public void RevokePermissions(UUID sourceID, UUID itemID, ScriptPermissions permissions)
         {
-            m_AnimationController.RevokePermissions(sourceID);
+            m_AnimationController.RevokePermissions(sourceID, permissions);
         }
 
         public void HandleAgentMessage(Message m)

@@ -205,10 +205,12 @@ namespace SilverSim.Scripting.LSL
                 {
                    return;
                 }
-                agent.RevokePermissions(Part.ID, Item.ID);
-                m_ScriptPermissions = ScriptPermissions.None;
-                m_ScriptPermissionsKey = UUID.Zero;
-                
+                agent.RevokePermissions(Part.ID, Item.ID, (~permissions) & (m_ScriptPermissions));
+                m_ScriptPermissions &= (~permissions);
+                if (ScriptPermissions.None == m_ScriptPermissions)
+                {
+                    m_ScriptPermissionsKey = UUID.Zero;
+                }
             }
         }
 
@@ -404,6 +406,15 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is RuntimePermissionsEvent)
                 {
                     RuntimePermissionsEvent e = (RuntimePermissionsEvent)ev;
+                    if(e.PermissionsKey != Item.Owner.ID)
+                    {
+                        e.Permissions &= (~((uint)(ScriptPermissions.Debit | ScriptPermissions.SilentEstateManagement | ScriptPermissions.ChangeLinks)));
+                    }
+                    if(e.PermissionsKey != Item.Owner.ID)
+                    {
+#warning Add group support here (also allowed are group owners)
+                        e.Permissions &= (~((uint)ScriptPermissions.ReturnObjects));
+                    }
                     m_ScriptPermissions = (ScriptPermissions)e.Permissions;
                     m_ScriptPermissionsKey = e.PermissionsKey;
                     InvokeStateEvent("run_time_permissions", m_ScriptPermissions);
@@ -440,7 +451,7 @@ namespace SilverSim.Scripting.LSL
             catch(ResetScriptException)
             {
                 TriggerOnStateChange();
-                TriggerOnDispose();
+                TriggerOnScriptReset();
                 m_Events.Clear();
                 lock(this)
                 {
@@ -455,7 +466,6 @@ namespace SilverSim.Scripting.LSL
             catch(ChangeStateException e)
             {
                 TriggerOnStateChange();
-                TriggerOnDispose();
                 m_Events.Clear();
                 InvokeStateEvent("state_exit");
                 m_CurrentState = m_States[e.NewState];

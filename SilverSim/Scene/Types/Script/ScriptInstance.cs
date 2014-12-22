@@ -52,6 +52,7 @@ namespace SilverSim.Scene.Types.Script
         public delegate void DisposeEventDelegate();
         public event StateChangeEventDelegate OnStateChange;
         public event DisposeEventDelegate OnDispose;
+        public event ScriptResetEventDelegate OnScriptReset;
 
         public abstract ObjectPartInventoryItem Item { get; }
 
@@ -76,12 +77,30 @@ namespace SilverSim.Scene.Types.Script
 
         public abstract void RevokePermissions(UUID permissionsKey, ScriptPermissions permissions);
 
-        public void TriggerOnStateChange()
+        protected void TriggerOnStateChange()
         {
             var ev = OnStateChange; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
                 foreach (StateChangeEventDelegate del in ev.GetInvocationList())
+                {
+                    try
+                    {
+                        del(this);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+        }
+
+        protected void TriggerOnScriptReset()
+        {
+            var ev = OnScriptReset; /* events are not exactly thread-safe, so copy the reference first */
+            if (ev != null)
+            {
+                foreach (ScriptResetEventDelegate del in ev.GetInvocationList())
                 {
                     try
                     {

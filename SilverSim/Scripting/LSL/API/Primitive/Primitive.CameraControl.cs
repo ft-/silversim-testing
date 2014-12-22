@@ -102,12 +102,28 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         [APILevel(APIFlags.LSL)]
         public static void llClearCameraParams(ScriptInstance Instance)
         {
+            lock (Instance)
+            {
+                Script script = (Script)Instance;
+                if (script.m_ScriptPermissionsKey != UUID.Zero && (script.m_ScriptPermissions & ScriptPermissions.ControlCamera) != 0)
+                {
+
+                }
+            }
 
         }
 
         [APILevel(APIFlags.LSL)]
         public static void llSetCameraParams(ScriptInstance Instance, AnArray rules)
         {
+            lock (Instance)
+            {
+                Script script = (Script)Instance;
+                if (script.m_ScriptPermissionsKey != UUID.Zero && (script.m_ScriptPermissions & ScriptPermissions.ControlCamera) != 0)
+                {
+
+                }
+            }
 
         }
     }

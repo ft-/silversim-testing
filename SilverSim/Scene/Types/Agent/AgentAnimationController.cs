@@ -114,20 +114,23 @@ namespace SilverSim.Scene.Types.Agent
             m_SendAnimations(m);
         }
 
-        public void RevokePermissions(UUID sourceID)
+        public void RevokePermissions(UUID sourceID, Script.ScriptPermissions permissions)
         {
             int i;
-            lock (this)
+            if ((permissions & Script.ScriptPermissions.TriggerAnimation) != 0)
             {
-                for (i = 0; i < m_ActiveAnimations.Count;)
+                lock (this)
                 {
-                    if(m_ActiveAnimations[i].SourceID == sourceID)
+                    for (i = 0; i < m_ActiveAnimations.Count; )
                     {
-                        m_ActiveAnimations.RemoveAt(i);
-                    }
-                    else
-                    {
-                        ++i;
+                        if (m_ActiveAnimations[i].SourceID == sourceID)
+                        {
+                            m_ActiveAnimations.RemoveAt(i);
+                        }
+                        else
+                        {
+                            ++i;
+                        }
                     }
                 }
             }
