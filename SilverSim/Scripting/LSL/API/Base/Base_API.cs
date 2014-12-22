@@ -65,10 +65,6 @@ namespace SilverSim.Scripting.LSL.API.Base
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void control(UUID id, int level, int edge);
-
-        [APILevel(APIFlags.LSL)]
-        [StateEventDelegate]
         public delegate void dataserver(UUID queryid, string data);
 
         [APILevel(APIFlags.LSL)]

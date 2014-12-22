@@ -26,17 +26,17 @@ exception statement from your version.
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
-using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using System;
+using SilverSim.Scene.Types.Agent;
 
-namespace SilverSim.Scripting.LSL.API.Animation
+namespace SilverSim.Scripting.LSL.API.Controls
 {
-    [ScriptApiName("Animation")]
+    [ScriptApiName("Controls")]
     [LSLImplementation]
-    public partial class Animation_API : MarshalByRefObject, IScriptApi, IPlugin
+    public partial class Controls_API : MarshalByRefObject, IScriptApi, IPlugin
     {
-        public Animation_API()
+        public Controls_API()
         {
 
         }
@@ -47,52 +47,51 @@ namespace SilverSim.Scripting.LSL.API.Animation
         }
 
         [APILevel(APIFlags.LSL)]
-        public const int PERMISSION_TRIGGER_ANIMATION = 0x10;
+        public const int PERMISSION_TAKE_CONTROLS = 0x4;
 
         [APILevel(APIFlags.LSL)]
-        public static void llStartAnimation(ScriptInstance instance, string anim)
+        [StateEventDelegate]
+        public delegate void control(UUID id, int level, int edge);
+
+        [APILevel(APIFlags.LSL)]
+        public static void llTakeControls(ScriptInstance instance, int controls, int accept, int pass_on)
         {
-            IAgent agent;
             Script script = (Script)instance;
-            if ((script.m_ScriptPermissions & ScriptPermissions.TriggerAnimation) == 0 ||
+            if((script.m_ScriptPermissions & ScriptPermissions.TakeControls) == 0 ||
                 script.m_ScriptPermissionsKey == UUID.Zero)
             {
                 return;
             }
+#if NOT_IMPLEMENTED
+            IAgent agent;
             try
             {
                 agent = instance.Part.ObjectGroup.Scene.Agents[script.m_ScriptPermissionsKey];
             }
             catch
             {
-                instance.ShoutError("llStartAnimation: permission granter not in region");
+                instance.ShoutError("llTakeControls: permission granter not in region");
                 return;
             }
-
-            agent.PlayAnimation(anim, instance.Part.ID);
+#endif
         }
 
         [APILevel(APIFlags.LSL)]
-        public static void llStopAnimation(ScriptInstance instance, string anim)
+        public static void llReleaseControls(ScriptInstance instance)
         {
             IAgent agent;
             Script script = (Script)instance;
-            if ((script.m_ScriptPermissions & ScriptPermissions.TriggerAnimation) == 0 ||
-                script.m_ScriptPermissionsKey == UUID.Zero)
-            {
-                return;
-            }
+            script.m_ScriptPermissions &= (~ScriptPermissions.TakeControls);
             try
             {
                 agent = instance.Part.ObjectGroup.Scene.Agents[script.m_ScriptPermissionsKey];
             }
             catch
             {
-                instance.ShoutError("llStopAnimation: permission granter not in region");
+                instance.ShoutError("llTakeControls: permission granter not in region");
                 return;
             }
-
-            agent.StopAnimation(anim, instance.Part.ID);
+            agent.RevokePermissions(script.Part.ID, script.Item.ID, ScriptPermissions.TakeControls);
         }
     }
 }

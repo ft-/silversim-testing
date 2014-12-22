@@ -138,7 +138,25 @@ namespace SilverSim.Scene.Types.Agent
 
         public void ResetAnimationOverride(string anim_state)
         {
-            if (m_AnimStates.Contains<string>(anim_state))
+            if ("ALL" == anim_state)
+            {
+                lock (this)
+                {
+                    if (m_AnimationOverride[m_CurrentDefaultAnimation] != m_DefaultAnimationOverride[m_CurrentDefaultAnimation])
+                    {
+                        StopAnimation(m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
+                    }
+                    foreach (string animstate in m_AnimStates)
+                    {
+                        m_AnimationOverride[animstate] = m_DefaultAnimationOverride[animstate];
+                    }
+                    if (m_AnimationOverride[m_CurrentDefaultAnimation] != m_DefaultAnimationOverride[m_CurrentDefaultAnimation])
+                    {
+                        PlayAnimation(m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
+                    }
+                }
+            }
+            else if (m_AnimStates.Contains<string>(anim_state))
             {
                 lock (this)
                 {

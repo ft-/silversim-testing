@@ -126,5 +126,27 @@ namespace SilverSim.Scripting.LSL.API.Primitive
             }
 
         }
+
+        [APILevel(APIFlags.LSL)]
+        public static Vector3 llGetCameraPos(ScriptInstance Instance)
+        {
+            Script script = (Script)Instance;
+            if (script.m_ScriptPermissionsKey != UUID.Zero && (script.m_ScriptPermissions & ScriptPermissions.TrackCamera) != 0)
+            {
+
+            }
+            return Vector3.Zero;
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public static Quaternion llGetCameraRot(ScriptInstance Instance)
+        {
+            Script script = (Script)Instance;
+            if (script.m_ScriptPermissionsKey != UUID.Zero && (script.m_ScriptPermissions & ScriptPermissions.TrackCamera) != 0)
+            {
+
+            }
+            return Quaternion.Identity;
+        }
     }
 }
