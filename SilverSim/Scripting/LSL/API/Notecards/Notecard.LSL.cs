@@ -25,13 +25,12 @@ exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
-using SilverSim.Scene.Types.Script;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
 using System;
-using System.Threading;
 using System.Runtime.Remoting.Messaging;
 
 namespace SilverSim.Scripting.LSL.API.Notecards

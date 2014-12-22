@@ -23,15 +23,11 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.Chat;
-using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
-using ThreadedClasses;
 
 namespace SilverSim.Scripting.LSL.API.Chat
 {

@@ -24,14 +24,11 @@ exception statement from your version.
 */
 
 using SilverSim.Main.Common;
-using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.ServiceInterfaces.Money;
 using SilverSim.Types;
 using System;
-using System.Threading;
-using SilverSim.Scene.Types.Agent;
-using SilverSim.ServiceInterfaces.Money;
 using System.Runtime.Remoting.Messaging;
 
 namespace SilverSim.Scripting.LSL.API.Money

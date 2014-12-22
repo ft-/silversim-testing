@@ -24,13 +24,11 @@ exception statement from your version.
 */
 
 using SilverSim.Main.Common;
-using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
-using SilverSim.LL.Messages.Script;
-using SilverSim.Scene.Types.Agent;
 
 namespace SilverSim.Scripting.LSL.API.Permissions
 {

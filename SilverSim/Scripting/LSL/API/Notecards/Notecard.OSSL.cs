@@ -25,13 +25,12 @@ exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Types;
-using SilverSim.Types.Asset.Format;
-using SilverSim.Types.Asset;
-using SilverSim.Types.Inventory;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Types;
+using SilverSim.Types.Asset;
+using SilverSim.Types.Asset.Format;
+using SilverSim.Types.Inventory;
 using System;
-using System.Reflection;
 
 namespace SilverSim.Scripting.LSL.API.Notecards
 {
