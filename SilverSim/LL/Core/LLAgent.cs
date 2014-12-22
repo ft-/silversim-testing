@@ -931,7 +931,7 @@ namespace SilverSim.LL.Core
                 return permissions;
             }
             ScriptQuestion m = new ScriptQuestion();
-            m.ExperienceID = UUID.Zero;
+            m.ExperienceID = experienceID;
             m.ItemID = itemID;
             m.ObjectName = part.ObjectGroup.Name;
             m.ObjectOwner = part.Owner.FullName;
