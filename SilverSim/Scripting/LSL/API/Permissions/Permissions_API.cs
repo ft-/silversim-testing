@@ -99,7 +99,7 @@ namespace SilverSim.Scripting.LSL.API.Permissions
                     if (perms != ScriptPermissions.None)
                     {
                         RuntimePermissionsEvent e = new RuntimePermissionsEvent();
-                        e.Permissions = (uint)perms;
+                        e.Permissions = perms;
                         e.PermissionsKey = agentID;
                         script.PostEvent(e);
                     }

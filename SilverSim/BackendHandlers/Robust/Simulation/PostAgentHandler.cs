@@ -413,20 +413,23 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 InventoryServiceInterface inventoryService = new RobustInventoryConnector(inventoryServerURI, groupsService);
                 GridServiceInterface gridService = scene.GridService;
 
+                AgentServiceList serviceList = new AgentServiceList();
+                serviceList.Add(assetService);
+                serviceList.Add(inventoryService);
+                serviceList.Add(groupsService);
+                serviceList.Add(profileService);
+                serviceList.Add(friendsService);
+                serviceList.Add(userAgentService);
+                serviceList.Add(presenceService);
+                serviceList.Add(gridUserService);
+                serviceList.Add(gridService);
+
                 LLAgent agent = new LLAgent(
                     agentPost.Account.Principal.ID,
                     agentPost.Account.Principal.FirstName,
                     agentPost.Account.Principal.LastName,
                     agentPost.Account.Principal.HomeURI,
-                    assetService,
-                    inventoryService,
-                    groupsService,
-                    profileService,
-                    friendsService,
-                    userAgentService,
-                    presenceService,
-                    gridUserService,
-                    gridService);
+                    serviceList);
                 agent.ServiceURLs = agentPost.Account.ServiceURLs;
 
                 agent.TeleportFlags = agentPost.Destination.TeleportFlags;

@@ -59,7 +59,7 @@ namespace SilverSim.Scene.Types.Scene
 
             RuntimePermissionsEvent e = new RuntimePermissionsEvent();
             e.PermissionsKey = req.AgentID;
-            e.Permissions = req.Questions;
+            e.Permissions = (Script.ScriptPermissions)req.Questions;
 
             instance.PostEvent(e);
         }

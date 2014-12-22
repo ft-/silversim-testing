@@ -24,29 +24,12 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using SilverSim.Scene.Types.Script;
-using System;
 
 namespace SilverSim.Scene.Types.Script.Events
 {
-    public struct RuntimePermissionsEvent : IScriptEvent
+    public struct TransactionResultEvent : IScriptEvent
     {
-        public enum RuntimePermissions : int
-        {
-            Debit = 0x2,
-            TakeControls = 0x4,
-            TriggerAnimation = 0x10,
-            Attach = 0x20,
-            ChangeLinks = 0x80,
-            TrackCamera = 0x400,
-            ControlCamera = 0x800,
-            Teleport = 0x1000,
-            SilentEstateManagement = 0x4000,
-            OverrideAnimations = 0x8000,
-            ReturnObjects = 0x10000
-        }
-
-        public ScriptPermissions Permissions;
-        public UUID PermissionsKey;
+        public UUID TransactionID;
+        public bool Success;
     }
 }

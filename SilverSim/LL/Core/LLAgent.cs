@@ -38,6 +38,7 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.Money;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
@@ -797,6 +798,14 @@ namespace SilverSim.LL.Core
                 return m_GridService;
             }
         }
+
+        public MoneyServiceInterface MoneyService
+        {
+            get
+            {
+                return m_MoneyService;
+            }
+        }
         #endregion
 
         #region IAgent Methods
@@ -824,6 +833,7 @@ namespace SilverSim.LL.Core
         private PresenceServiceInterface m_PresenceService;
         private GridUserServiceInterface m_GridUserService;
         private GridServiceInterface m_GridService;
+        private MoneyServiceInterface m_MoneyService;
 
         #endregion
 
@@ -831,27 +841,21 @@ namespace SilverSim.LL.Core
             string firstName,
             string lastName,
             Uri homeURI,
-            AssetServiceInterface assetService,
-            InventoryServiceInterface inventoryService,
-            GroupsServiceInterface groupsService,
-            ProfileServiceInterface profileService,
-            FriendsServiceInterface friendsService,
-            UserAgentServiceInterface userAgentService,
-            PresenceServiceInterface presenceService,
-            GridUserServiceInterface gridUserService,
-            GridServiceInterface gridService)
+            AgentServiceList serviceList
+            )
         {
             CollisionPlane = Vector4.UnitW;
             m_AgentID = agentID;
-            m_AssetService = assetService;
-            m_InventoryService = inventoryService;
-            m_GroupsService = groupsService;
-            m_ProfileService = profileService;
-            m_FriendsService = friendsService;
-            m_UserAgentService = userAgentService;
-            m_PresenceService = presenceService;
-            m_GridUserService = gridUserService;
-            m_GridService = gridService;
+            m_AssetService = serviceList.Get<AssetServiceInterface>();
+            m_InventoryService = serviceList.Get<InventoryServiceInterface>();
+            m_GroupsService = serviceList.Get<GroupsServiceInterface>();
+            m_ProfileService = serviceList.Get<ProfileServiceInterface>();
+            m_FriendsService = serviceList.Get<FriendsServiceInterface>();
+            m_UserAgentService = serviceList.Get<UserAgentServiceInterface>();
+            m_PresenceService = serviceList.Get<PresenceServiceInterface>();
+            m_GridUserService = serviceList.Get<GridUserServiceInterface>();
+            m_GridService = serviceList.Get<GridServiceInterface>();
+            m_MoneyService = serviceList.Get<MoneyServiceInterface>();
             HomeURI = homeURI;
             FirstName = firstName;
             LastName = lastName;

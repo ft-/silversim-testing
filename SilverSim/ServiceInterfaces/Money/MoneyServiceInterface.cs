@@ -38,17 +38,10 @@ namespace SilverSim.ServiceInterfaces.Money
 
         }
 
-        public delegate void TransactionResultDelegate(UUID transactionId, int success);
+        public abstract int GetBalance(UUI agentID);
 
-        public abstract void GiveMoney(
-            UUI fromID, 
-            UUI toID,
-            int amount,
-            TransactionResultDelegate del,
-            UUID transactionID);
+        public abstract void ChargeAmount(UUI agentID, int amount, Action processOperation); /* exception from action results into abort */
 
-        public int GetBalance(UUI agentID);
-
-        public abstract void ApplyCharge(UUI agentID, int amount, Action processOperation); /* exception from action results into abort */
+        public abstract void IncreaseAmount(UUI agentID, int amount);
     }
 }

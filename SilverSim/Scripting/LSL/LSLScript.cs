@@ -408,12 +408,16 @@ namespace SilverSim.Scripting.LSL
                     RuntimePermissionsEvent e = (RuntimePermissionsEvent)ev;
                     if(e.PermissionsKey != Item.Owner.ID)
                     {
-                        e.Permissions &= (~((uint)(ScriptPermissions.Debit | ScriptPermissions.SilentEstateManagement | ScriptPermissions.ChangeLinks)));
+                        e.Permissions &= ~(ScriptPermissions.Debit | ScriptPermissions.SilentEstateManagement | ScriptPermissions.ChangeLinks);
                     }
                     if(e.PermissionsKey != Item.Owner.ID)
                     {
 #warning Add group support here (also allowed are group owners)
-                        e.Permissions &= (~((uint)ScriptPermissions.ReturnObjects));
+                        e.Permissions &= ~ScriptPermissions.ReturnObjects;
+                    }
+                    if(Item.GroupOwned)
+                    {
+                        e.Permissions &= ~ScriptPermissions.Debit;
                     }
                     m_ScriptPermissions = (ScriptPermissions)e.Permissions;
                     m_ScriptPermissionsKey = e.PermissionsKey;

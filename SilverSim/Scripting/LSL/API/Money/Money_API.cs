@@ -26,9 +26,11 @@ exception statement from your version.
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.ServiceInterfaces.Money;
 
 namespace SilverSim.Scripting.LSL.API.Money
 {
@@ -53,6 +55,36 @@ namespace SilverSim.Scripting.LSL.API.Money
         [StateEventDelegate]
         public delegate void transaction_result(UUID id, int success, string data);
 
+
+        public void TransferMoney(UUID transactionID, IAgent source, IAgent destination, int amount, ScriptInstance instance)
+        {
+            TransactionResultEvent ev = new TransactionResultEvent();
+            ev.Success = false;
+            ev.TransactionID = transactionID;
+
+            if(source.MoneyService == null ||
+                destination.MoneyService == null)
+            {
+                instance.PostEvent(ev);
+            }
+            else
+            {
+                try
+                {
+                    source.MoneyService.ChargeAmount(source.Owner, amount,
+                        delegate()
+                        {
+                            destination.MoneyService.IncreaseAmount(destination.Owner, amount);
+                        });
+                    ev.Success = true;
+                }
+                catch
+                {
+
+                }
+                instance.PostEvent(ev);
+            }
+        }
         [APILevel(APIFlags.LSL)]
         public void llGiveMoney(ScriptInstance instance, UUID destination, int amount)
         {

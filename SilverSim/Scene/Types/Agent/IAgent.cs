@@ -32,6 +32,7 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.Money;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
@@ -147,6 +148,11 @@ namespace SilverSim.Scene.Types.Agent
         }
 
         GridServiceInterface GridService
+        {
+            get;
+        }
+
+        MoneyServiceInterface MoneyService
         {
             get;
         }
