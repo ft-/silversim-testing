@@ -29,8 +29,10 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
+using System.Threading;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.ServiceInterfaces.Money;
+using System.Runtime.Remoting.Messaging;
 
 namespace SilverSim.Scripting.LSL.API.Money
 {
@@ -55,26 +57,33 @@ namespace SilverSim.Scripting.LSL.API.Money
         [StateEventDelegate]
         public delegate void transaction_result(UUID id, int success, string data);
 
+        delegate void TransferMoneyDelegate(UUID transactionID, MoneyServiceInterface sourceservice, UUI sourceid, 
+            MoneyServiceInterface destinationservice, UUI destinationid, int amount, ScriptInstance instance);
 
-        public void TransferMoney(UUID transactionID, IAgent source, IAgent destination, int amount, ScriptInstance instance)
+        public void TransferMoney(UUID transactionID, MoneyServiceInterface sourceservice, UUI sourceid, 
+            MoneyServiceInterface destinationservice, UUI destinationid, int amount, ScriptInstance instance)
         {
             TransactionResultEvent ev = new TransactionResultEvent();
             ev.Success = false;
             ev.TransactionID = transactionID;
 
-            if(source.MoneyService == null ||
-                destination.MoneyService == null)
+            if(sourceservice == null ||
+                destinationservice == null ||
+                destinationid == UUI.Unknown)
             {
-                instance.PostEvent(ev);
+                if (instance != null)
+                {
+                    instance.PostEvent(ev);
+                }
             }
             else
             {
                 try
                 {
-                    source.MoneyService.ChargeAmount(source.Owner, amount,
+                    sourceservice.ChargeAmount(sourceid, amount,
                         delegate()
                         {
-                            destination.MoneyService.IncreaseAmount(destination.Owner, amount);
+                            destinationservice.IncreaseAmount(destinationid, amount);
                         });
                     ev.Success = true;
                 }
@@ -82,9 +91,27 @@ namespace SilverSim.Scripting.LSL.API.Money
                 {
 
                 }
-                instance.PostEvent(ev);
+                if (instance != null)
+                {
+                    instance.PostEvent(ev);
+                }
             }
         }
+
+        void TransferMoneyEnd(IAsyncResult ar)
+        {
+            AsyncResult result = (AsyncResult)ar;
+            TransferMoneyDelegate caller = (TransferMoneyDelegate)result.AsyncDelegate;
+            caller.EndInvoke(ar);
+        }
+
+        void InvokeTransferMoney(UUID transactionID, MoneyServiceInterface sourceservice, UUI sourceid, 
+            MoneyServiceInterface destinationservice, UUI destinationid, int amount, ScriptInstance instance)
+        {
+            TransferMoneyDelegate d = TransferMoney;
+            d.BeginInvoke(transactionID, sourceservice, sourceid, destinationservice, destinationid, amount, instance, TransferMoneyEnd, this);
+        }
+
         [APILevel(APIFlags.LSL)]
         public void llGiveMoney(ScriptInstance instance, UUID destination, int amount)
         {
