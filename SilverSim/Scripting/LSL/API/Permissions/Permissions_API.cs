@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
 using SilverSim.LL.Messages.Script;
@@ -97,8 +98,10 @@ namespace SilverSim.Scripting.LSL.API.Permissions
                     ScriptPermissions perms = a.RequestPermissions(Instance.Part, Instance.Item.ID, (ScriptPermissions)permissions);
                     if (perms != ScriptPermissions.None)
                     {
-                        script.m_ScriptPermissions = (ScriptPermissions)perms;
-                        script.m_ScriptPermissionsKey = agentID;
+                        RuntimePermissionsEvent e = new RuntimePermissionsEvent();
+                        e.Permissions = (uint)perms;
+                        e.PermissionsKey = agentID;
+                        script.PostEvent(e);
                     }
                 }
             }

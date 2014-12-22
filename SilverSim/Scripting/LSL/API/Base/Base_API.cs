@@ -167,10 +167,6 @@ namespace SilverSim.Scripting.LSL.API.Base
         [StateEventDelegate]
         public delegate void touch_start(int num_detected);
 
-        [APILevel(APIFlags.LSL)]
-        [StateEventDelegate]
-        public delegate void transaction_result(UUID id, int success, string data);
-
         public Base_API()
         {
 
