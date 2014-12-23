@@ -44,6 +44,10 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         }
 
+        public abstract void Login(UUI agentID, UUID sessionID);
+
+        public abstract void Logout(UUI agentID, UUID sessionID);
+
         public abstract MoneyBalanceAccessor MoneyBalance { get; }
 
         public abstract void ChargeAmount(UUI agentID, int amount, Action processOperation); /* exception from action results into abort */

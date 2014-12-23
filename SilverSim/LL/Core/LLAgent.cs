@@ -67,6 +67,7 @@ namespace SilverSim.LL.Core
         #region LLAgent Properties
         public UInt32 LocalID { get; set; }
         public Uri HomeURI { get; private set; }
+        public UUID SessionID { get; private set; }
 
         public TeleportFlags TeleportFlags = TeleportFlags.None;
         #endregion
@@ -840,11 +841,13 @@ namespace SilverSim.LL.Core
             string firstName,
             string lastName,
             Uri homeURI,
+            UUID sessionID,
             AgentServiceList serviceList
             )
         {
             CollisionPlane = Vector4.UnitW;
             m_AgentID = agentID;
+            SessionID = sessionID;
             m_AssetService = serviceList.Get<AssetServiceInterface>();
             m_InventoryService = serviceList.Get<InventoryServiceInterface>();
             m_GroupsService = serviceList.Get<GroupsServiceInterface>();
@@ -860,12 +863,20 @@ namespace SilverSim.LL.Core
             LastName = lastName;
             InitRouting();
             InitAnimations();
+            if (m_EconomyService != null)
+            {
+                m_EconomyService.Login(Owner, SessionID);
+            }
         }
 
         ~LLAgent()
         {
             lock (this)
             {
+                if (m_EconomyService != null)
+                {
+                    m_EconomyService.Logout(Owner, SessionID);
+                }
                 m_SittingOnObject = null;
                 m_AssetService = null;
                 m_InventoryService = null;
@@ -883,6 +894,10 @@ namespace SilverSim.LL.Core
         {
             lock (this)
             {
+                if (m_EconomyService != null)
+                {
+                    m_EconomyService.Logout(Owner, SessionID);
+                }
                 m_SittingOnObject = null;
                 m_AssetService = null;
                 m_InventoryService = null;
