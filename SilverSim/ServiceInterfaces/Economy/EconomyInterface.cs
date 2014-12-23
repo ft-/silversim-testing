@@ -90,7 +90,7 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         public interface MoneyBalanceAccessor
         {
-            Int32 this[UUI agentID, UUID sessionID] { get; set; }
+            Int32 this[UUI agentID] { get; set; }
         }
 
         public EconomyServiceInterface()
@@ -98,9 +98,9 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         }
 
-        public abstract void Login(UUI agentID, UUID sessionID);
+        public abstract void Login(UUI agentID, UUID sessionID, UUID secureSessionID);
 
-        public abstract void Logout(UUI agentID, UUID sessionID);
+        public abstract void Logout(UUI agentID, UUID sessionID, UUID secureSessionID);
 
         public abstract MoneyBalanceAccessor MoneyBalance { get; }
 

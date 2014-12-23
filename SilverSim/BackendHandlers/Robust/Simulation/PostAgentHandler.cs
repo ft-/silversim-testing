@@ -430,6 +430,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     agentPost.Account.Principal.LastName,
                     agentPost.Account.Principal.HomeURI,
                     agentPost.Session.SessionID,
+                    agentPost.Session.SecureSessionID,
                     serviceList);
                 agent.ServiceURLs = agentPost.Account.ServiceURLs;
 

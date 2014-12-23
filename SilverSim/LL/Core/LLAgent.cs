@@ -837,17 +837,21 @@ namespace SilverSim.LL.Core
 
         #endregion
 
+        UUID m_SecureSessionID;
+
         public LLAgent(UUID agentID,
             string firstName,
             string lastName,
             Uri homeURI,
             UUID sessionID,
+            UUID secureSessionID,
             AgentServiceList serviceList
             )
         {
             CollisionPlane = Vector4.UnitW;
             m_AgentID = agentID;
             SessionID = sessionID;
+            m_SecureSessionID = secureSessionID;
             m_AssetService = serviceList.Get<AssetServiceInterface>();
             m_InventoryService = serviceList.Get<InventoryServiceInterface>();
             m_GroupsService = serviceList.Get<GroupsServiceInterface>();
@@ -865,7 +869,7 @@ namespace SilverSim.LL.Core
             InitAnimations();
             if (m_EconomyService != null)
             {
-                m_EconomyService.Login(Owner, SessionID);
+                m_EconomyService.Login(Owner, SessionID, m_SecureSessionID);
             }
         }
 
@@ -875,7 +879,7 @@ namespace SilverSim.LL.Core
             {
                 if (m_EconomyService != null)
                 {
-                    m_EconomyService.Logout(Owner, SessionID);
+                    m_EconomyService.Logout(Owner, SessionID, m_SecureSessionID);
                 }
                 m_SittingOnObject = null;
                 m_AssetService = null;
@@ -896,7 +900,7 @@ namespace SilverSim.LL.Core
             {
                 if (m_EconomyService != null)
                 {
-                    m_EconomyService.Logout(Owner, SessionID);
+                    m_EconomyService.Logout(Owner, SessionID, m_SecureSessionID);
                 }
                 m_SittingOnObject = null;
                 m_AssetService = null;
@@ -981,7 +985,7 @@ namespace SilverSim.LL.Core
                                     EconomyServiceInterface economyService = circuit.Scene.EconomyService;
                                     if(economyService != null)
                                     {
-                                        mbrep.MoneyBalance = economyService.MoneyBalance[Owner, mbrep.CircuitSessionID];
+                                        mbrep.MoneyBalance = economyService.MoneyBalance[Owner];
                                     }
                                     else
                                     {
