@@ -47,7 +47,7 @@ namespace SilverSim.LL.Core
                         EconomyServiceInterface economyService = circuit.Scene.EconomyService;
                         if (economyService != null)
                         {
-                            mbrep.MoneyBalance = economyService.MoneyBalance[mbrep.AgentID, mbrep.CircuitSessionID];
+                            mbrep.MoneyBalance = economyService.MoneyBalance[Owner, mbrep.CircuitSessionID];
                         }
                         else
                         {

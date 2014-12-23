@@ -26,7 +26,7 @@ exception statement from your version.
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
-using SilverSim.ServiceInterfaces.Money;
+using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.Types;
 using System;
 using System.Runtime.Remoting.Messaging;
@@ -54,11 +54,11 @@ namespace SilverSim.Scripting.LSL.API.Money
         [StateEventDelegate]
         public delegate void transaction_result(UUID id, int success, string data);
 
-        delegate void TransferMoneyDelegate(UUID transactionID, MoneyServiceInterface sourceservice, UUI sourceid, 
-            MoneyServiceInterface destinationservice, UUI destinationid, int amount, ScriptInstance instance);
+        delegate void TransferMoneyDelegate(UUID transactionID, EconomyServiceInterface sourceservice, UUI sourceid, 
+            EconomyServiceInterface destinationservice, UUI destinationid, int amount, ScriptInstance instance);
 
-        public void TransferMoney(UUID transactionID, MoneyServiceInterface sourceservice, UUI sourceid, 
-            MoneyServiceInterface destinationservice, UUI destinationid, int amount, ScriptInstance instance)
+        public void TransferMoney(UUID transactionID, EconomyServiceInterface sourceservice, UUI sourceid,
+            EconomyServiceInterface destinationservice, UUI destinationid, int amount, ScriptInstance instance)
         {
             TransactionResultEvent ev = new TransactionResultEvent();
             ev.Success = false;
@@ -102,8 +102,8 @@ namespace SilverSim.Scripting.LSL.API.Money
             caller.EndInvoke(ar);
         }
 
-        void InvokeTransferMoney(UUID transactionID, MoneyServiceInterface sourceservice, UUI sourceid, 
-            MoneyServiceInterface destinationservice, UUI destinationid, int amount, ScriptInstance instance)
+        void InvokeTransferMoney(UUID transactionID, EconomyServiceInterface sourceservice, UUI sourceid,
+            EconomyServiceInterface destinationservice, UUI destinationid, int amount, ScriptInstance instance)
         {
             TransferMoneyDelegate d = TransferMoney;
             d.BeginInvoke(transactionID, sourceservice, sourceid, destinationservice, destinationid, amount, instance, TransferMoneyEnd, this);

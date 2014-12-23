@@ -38,7 +38,6 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
-using SilverSim.ServiceInterfaces.Money;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
@@ -799,11 +798,11 @@ namespace SilverSim.LL.Core
             }
         }
 
-        public MoneyServiceInterface MoneyService
+        public EconomyServiceInterface EconomyService
         {
             get
             {
-                return m_MoneyService;
+                return m_EconomyService;
             }
         }
         #endregion
@@ -833,7 +832,7 @@ namespace SilverSim.LL.Core
         private PresenceServiceInterface m_PresenceService;
         private GridUserServiceInterface m_GridUserService;
         private GridServiceInterface m_GridService;
-        private MoneyServiceInterface m_MoneyService;
+        private EconomyServiceInterface m_EconomyService;
 
         #endregion
 
@@ -855,7 +854,7 @@ namespace SilverSim.LL.Core
             m_PresenceService = serviceList.Get<PresenceServiceInterface>();
             m_GridUserService = serviceList.Get<GridUserServiceInterface>();
             m_GridService = serviceList.Get<GridServiceInterface>();
-            m_MoneyService = serviceList.Get<MoneyServiceInterface>();
+            m_EconomyService = serviceList.Get<EconomyServiceInterface>();
             HomeURI = homeURI;
             FirstName = firstName;
             LastName = lastName;
@@ -967,7 +966,7 @@ namespace SilverSim.LL.Core
                                     EconomyServiceInterface economyService = circuit.Scene.EconomyService;
                                     if(economyService != null)
                                     {
-                                        mbrep.MoneyBalance = economyService.MoneyBalance[mbrep.AgentID, mbrep.CircuitSessionID];
+                                        mbrep.MoneyBalance = economyService.MoneyBalance[Owner, mbrep.CircuitSessionID];
                                     }
                                     else
                                     {

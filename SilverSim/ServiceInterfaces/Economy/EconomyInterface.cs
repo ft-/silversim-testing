@@ -36,7 +36,7 @@ namespace SilverSim.ServiceInterfaces.Economy
     {
         public interface MoneyBalanceAccessor
         {
-            Int32 this[UUID agentID, UUID sessionID] { get; set; }
+            Int32 this[UUI agentID, UUID sessionID] { get; set; }
         }
 
         public EconomyServiceInterface()
@@ -45,5 +45,9 @@ namespace SilverSim.ServiceInterfaces.Economy
         }
 
         public abstract MoneyBalanceAccessor MoneyBalance { get; }
+
+        public abstract void ChargeAmount(UUI agentID, int amount, Action processOperation); /* exception from action results into abort */
+
+        public abstract void IncreaseAmount(UUI agentID, int amount);
     }
 }
