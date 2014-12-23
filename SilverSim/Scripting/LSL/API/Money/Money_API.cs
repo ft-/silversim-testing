@@ -77,10 +77,10 @@ namespace SilverSim.Scripting.LSL.API.Money
             {
                 try
                 {
-                    sourceservice.ChargeAmount(sourceid, amount,
+                    sourceservice.ChargeAmount(sourceid, EconomyServiceInterface.TransactionType.ObjectPays, amount,
                         delegate()
                         {
-                            destinationservice.IncreaseAmount(destinationid, amount);
+                            destinationservice.IncreaseAmount(destinationid, EconomyServiceInterface.TransactionType.ObjectPays, amount);
                         });
                     ev.Success = true;
                 }
