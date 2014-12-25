@@ -54,12 +54,14 @@ namespace SilverSim.Scripting.LSL.API.Money
         [StateEventDelegate]
         public delegate void transaction_result(UUID id, int success, string data);
 
-        delegate void TransferMoneyDelegate(UUID transactionID, EconomyServiceInterface sourceservice, UUI sourceid, 
-            EconomyServiceInterface destinationservice, UUI destinationid, int amount, ScriptInstance instance);
+        delegate void TransferMoneyDelegate(UUID transactionID, UUI sourceid, 
+            UUI destinationid, int amount, ScriptInstance instance);
 
-        public void TransferMoney(UUID transactionID, EconomyServiceInterface sourceservice, UUI sourceid,
-            EconomyServiceInterface destinationservice, UUI destinationid, int amount, ScriptInstance instance)
+        public void TransferMoney(UUID transactionID, UUI sourceid,
+            UUI destinationid, int amount, ScriptInstance instance)
         {
+            EconomyServiceInterface sourceservice = null;
+            EconomyServiceInterface destinationservice = null;
             TransactionResultEvent ev = new TransactionResultEvent();
             ev.Success = false;
             ev.TransactionID = transactionID;
@@ -102,11 +104,11 @@ namespace SilverSim.Scripting.LSL.API.Money
             caller.EndInvoke(ar);
         }
 
-        void InvokeTransferMoney(UUID transactionID, EconomyServiceInterface sourceservice, UUI sourceid,
-            EconomyServiceInterface destinationservice, UUI destinationid, int amount, ScriptInstance instance)
+        void InvokeTransferMoney(UUID transactionID, UUI sourceid,
+            UUI destinationid, int amount, ScriptInstance instance)
         {
             TransferMoneyDelegate d = TransferMoney;
-            d.BeginInvoke(transactionID, sourceservice, sourceid, destinationservice, destinationid, amount, instance, TransferMoneyEnd, this);
+            d.BeginInvoke(transactionID, sourceid, destinationid, amount, instance, TransferMoneyEnd, this);
         }
 
         [APILevel(APIFlags.LSL)]
