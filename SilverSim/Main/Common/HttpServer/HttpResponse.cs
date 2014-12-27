@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.IO.Compression;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -52,6 +53,7 @@ namespace SilverSim.Main.Common.HttpServer
         private bool m_IsHeaderSent = false;
         private Stream ResponseBody = null;
         private bool IsChunkedAccepted = false;
+        private List<string> AcceptedEncodings = null;
 
         public string ContentType
         {
@@ -75,6 +77,15 @@ namespace SilverSim.Main.Common.HttpServer
             StatusCode = statusCode;
             StatusDescription = statusDescription;
             IsChunkedAccepted = request.ContainsHeader("TE");
+            if(request.ContainsHeader("Accept"))
+            {
+                string[] parts = request["Accept"].Split(new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries);
+                AcceptedEncodings = new List<string>();
+                foreach(string part in parts)
+                {
+                    AcceptedEncodings.Add(part.Trim());
+                }
+            }
         }
 
         private void SendHeaders()
@@ -127,12 +138,18 @@ namespace SilverSim.Main.Common.HttpServer
             return ResponseBody = new HttpResponseBodyStream(m_Output, contentLength);
         }
 
-        public Stream GetOutputStream()
+        public Stream GetOutputStream(bool disableCompression = false)
         {
+            bool gzipEnable = false;
             if (!m_IsHeaderSent)
             {
                 IsCloseConnection = true;
                 Headers["Connection"] = "close";
+                if(!disableCompression && AcceptedEncodings.Contains("gzip"))
+                {
+                    gzipEnable = true;
+                    Headers["Content-Encoding"] = "gzip";
+                }
                 SendHeaders();
             }
             else
@@ -140,6 +157,10 @@ namespace SilverSim.Main.Common.HttpServer
                 throw new InvalidOperationException();
             }
 
+            if(gzipEnable)
+            {
+                return new GZipStream(m_Output, CompressionMode.Compress);
+            }
             return m_Output;
         }
 
