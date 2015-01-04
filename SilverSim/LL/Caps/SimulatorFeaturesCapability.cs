@@ -43,7 +43,7 @@ namespace SilverSim.LL.Caps
             }
         }
 
-        public SimulatorFeaturesCapability(string searchUrl, bool exportSupported)
+        public SimulatorFeaturesCapability(string searchUrl, string gridName, string gridURL, bool exportSupported)
         {
             Features.Add("MeshRezEnabled", true);
             Features.Add("MeshUploadEnabled", true);
@@ -54,7 +54,16 @@ namespace SilverSim.LL.Caps
             typesMap.Add("prim", true);
             Features.Add("PhysicsShapeTypes", typesMap);
             Map extrasMap = new Map();
-            if(searchUrl != "")
+            if (!string.IsNullOrEmpty(gridURL))
+            {
+                extrasMap.Add("GridURL", gridURL);
+            }
+            if (!string.IsNullOrEmpty(gridName))
+            {
+                extrasMap.Add("GridName", gridName);
+            }
+
+            if(!string.IsNullOrEmpty(searchUrl))
             {
                 extrasMap.Add("search-server-url", searchUrl);
             }

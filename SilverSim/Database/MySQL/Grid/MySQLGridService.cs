@@ -569,6 +569,12 @@ namespace SilverSim.Database.MySQL.Grid
 
             return result;
         }
+
+        public override Dictionary<string, string> GetGridExtraFeatures()
+        {
+            return new Dictionary<string, string>();
+        }
+
         #endregion
 
         private static readonly string[] Migrations = new string[]{

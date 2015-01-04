@@ -119,6 +119,7 @@ namespace SilverSim.ServiceInterfaces.Grid
         public abstract List<RegionInfo> GetAllRegions(UUID ScopeID);
         public abstract List<RegionInfo> GetOnlineRegions(UUID ScopeID);
         public abstract List<RegionInfo> GetOnlineRegions();
+        public abstract Dictionary<string, string> GetGridExtraFeatures();
 
         public abstract List<RegionInfo> SearchRegionsByName(UUID ScopeID, string searchString);
         #endregion

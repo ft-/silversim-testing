@@ -363,6 +363,12 @@ namespace SilverSim.Database.Null.Grid
 
             return result;
         }
+
+        public override Dictionary<string, string> GetGridExtraFeatures()
+        {
+            return new Dictionary<string, string>();
+        }
+
         #endregion
     }
     #endregion

@@ -262,7 +262,7 @@ namespace SilverSim.Scene.Implementation.Basic
             ExternalHostName = ri.ServerIP;
             RegionPort = ri.ServerPort;
             m_UDPServer.Start();
-            SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeaturesCapability("", true));
+            SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeaturesCapability("", "", "", true));
 
             m_PacketHandlers[MessageType.RequestRegionInfo] = HandleRequestRegionInfo;
         }

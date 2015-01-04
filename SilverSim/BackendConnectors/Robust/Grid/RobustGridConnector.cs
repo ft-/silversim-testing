@@ -290,6 +290,24 @@ namespace SilverSim.BackendConnectors.Robust.Grid
             return DeserializeList(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
         }
 
+        public override Dictionary<string, string> GetGridExtraFeatures()
+        {
+            Dictionary<string, string> post = new Dictionary<string, string>();
+            post["METHOD"] = "get_grid_extra_features";
+            IValue v = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs));
+            if(!(v is Map))
+            {
+                throw new NotSupportedException();
+            }
+            Map m = (Map)v;
+            Dictionary<string, string> res = new Dictionary<string, string>();
+            foreach(KeyValuePair<string, IValue> kvp in m)
+            {
+                res[kvp.Key] = kvp.Value.ToString();
+            }
+            return res;
+        }
+
         private RegionInfo Deserialize(Map map)
         {
             RegionInfo r = new RegionInfo();

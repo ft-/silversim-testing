@@ -52,7 +52,7 @@ namespace SilverSim.LL.Core
                 /* Upload start */
                 Map llsdreply = new Map();
                 llsdreply.Add("state", new AString("upload"));
-                llsdreply.Add("uploader", httpreq.RawUrl + "/Upload");
+                llsdreply.Add("uploader", httpreq.RawUrl + "/Upload/" + UUID.Random);
 
                 HttpResponse httpres = httpreq.BeginResponse();
                 Stream outStream = httpres.GetOutputStream();

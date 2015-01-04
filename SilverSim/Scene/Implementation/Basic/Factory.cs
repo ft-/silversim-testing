@@ -42,25 +42,25 @@ namespace SilverSim.Scene.Implementation.Basic
 {
     class SceneFactory : SceneFactoryInterface, IPlugin
     {
-        public ChatServiceFactoryInterface m_ChatFactory;
-        public string m_ChatFactoryName;
-        public string m_GroupsNameServiceName;
-        public string m_AssetServiceName;
-        public string m_AssetCacheServiceName;
-        public string m_GridServiceName;
-        public string m_IMServiceName;
-        public string m_SimulationDataStorageName;
-        public List<string> m_AvatarNameServiceNames = new List<string>();
+        ChatServiceFactoryInterface m_ChatFactory;
+        string m_ChatFactoryName;
+        string m_GroupsNameServiceName;
+        string m_AssetServiceName;
+        string m_AssetCacheServiceName;
+        string m_GridServiceName;
+        string m_IMServiceName;
+        string m_SimulationDataStorageName;
+        List<string> m_AvatarNameServiceNames = new List<string>();
 
-        public GroupsNameServiceInterface m_GroupsNameService = null;
-        public AssetServiceInterface m_AssetService;
-        public AssetServiceInterface m_AssetCacheService;
-        public GridServiceInterface m_GridService;
-        public ServerParamServiceInterface m_ServerParamService;
-        public IMServiceInterface m_IMService;
-        public SimulationDataStorageInterface m_SimulationDataStorage;
-        public Dictionary<string, string> m_CapabilitiesConfig;
-        public List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
+        GroupsNameServiceInterface m_GroupsNameService = null;
+        AssetServiceInterface m_AssetService;
+        AssetServiceInterface m_AssetCacheService;
+        GridServiceInterface m_GridService;
+        ServerParamServiceInterface m_ServerParamService;
+        IMServiceInterface m_IMService;
+        SimulationDataStorageInterface m_SimulationDataStorage;
+        Dictionary<string, string> m_CapabilitiesConfig;
+        List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
 
         public SceneFactory(IConfig ownConfig)
         {
