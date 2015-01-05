@@ -58,7 +58,7 @@ namespace SilverSim.Main.Common.CmdIO
             }
             catch (Exception)
             {
-                io.WriteFormatted("Invalid load command '{0}'", args[0]);
+                io.WriteFormatted("Unsupported load command '{0}'", args[1]);
                 return;
             }
 
@@ -87,7 +87,7 @@ namespace SilverSim.Main.Common.CmdIO
             }
             catch (Exception)
             {
-                io.WriteFormatted("Invalid load command '{0}'", args[0]);
+                io.WriteFormatted("Unsupported save command '{0}'", args[1]);
                 return;
             }
 
