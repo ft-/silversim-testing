@@ -61,6 +61,7 @@ namespace SilverSim.Scene.Types.Scene
     public interface ISceneObjectParts : IEnumerable<ObjectPart>
     {
         ObjectPart this[UUID id] { get; }
+        ObjectPart this[UInt32 localId] { get; }
         int Count { get; }
     }
 

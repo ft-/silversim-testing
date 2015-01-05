@@ -29,9 +29,9 @@ using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
 using System.Net;
 
-namespace SilverSim.LL.Caps
+namespace SilverSim.LL.Core.Capabilities
 {
-    public class SimulatorFeaturesCapability : ICapabilityInterface
+    public class SimulatorFeatures : ICapabilityInterface
     {
         public static readonly Map Features = new Map();
 
@@ -43,7 +43,7 @@ namespace SilverSim.LL.Caps
             }
         }
 
-        public SimulatorFeaturesCapability(string searchUrl, string gridName, string gridURL, bool exportSupported)
+        public SimulatorFeatures(string searchUrl, string gridName, string gridURL, bool exportSupported)
         {
             Features.Add("MeshRezEnabled", true);
             Features.Add("MeshUploadEnabled", true);

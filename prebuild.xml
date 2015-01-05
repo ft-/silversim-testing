@@ -130,35 +130,6 @@
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="SilverSim.LL.Caps" path="SilverSim/LL/Caps" type="Library">
-      <Configuration name="Release">
-        <Options>
-          <OutputPath>../../../bin/</OutputPath>
-        </Options>
-      </Configuration>
-      <Configuration name="Debug">
-        <Options>
-          <OutputPath>../../../bin/</OutputPath>
-        </Options>
-      </Configuration>
-
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="System"/>
-      <Reference name="System.Core"/>
-      <Reference name="SilverSim.Types" localCopy="false"/>
-      <Reference name="SilverSim.Main.Common" localCopy="false"/>
-      <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
-      <Reference name="SilverSim.Scene.Types" localCopy="false"/>
-      <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
-      <Reference name="SilverSim.Scene.Management" localCopy="false"/>
-      <Reference name="SilverSim.LL.Messages" localCopy="false"/>
-      <Reference name="SilverSim.LL.Core" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
-      <Files>
-        <Match pattern="*.cs" recurse="true"/>
-      </Files>
-    </Project>
-
     <Project frameworkVersion="v4_0" name="SilverSim.LL.Core" path="SilverSim/LL/Core" type="Library">
       <Configuration name="Release">
         <Options>
@@ -436,7 +407,6 @@
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
       <Reference name="SilverSim.LL.Messages" localCopy="false"/>
       <Reference name="SilverSim.LL.Core" localCopy="false"/>
-      <Reference name="SilverSim.LL.Caps" localCopy="false"/>
       <Reference name="SilverSim.BackendConnectors.Robust" localCopy="false"/>
       <Reference name="Nini" path="../../../../bin/" localCopy="false"/>
       <Reference name="ThreadedClasses" path="../../../../bin/" localCopy="false"/>
@@ -636,7 +606,6 @@
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
-      <Reference name="SilverSim.LL.Caps" localCopy="false"/>
       <Reference name="SilverSim.LL.Core" localCopy="false"/>
       <Reference name="SilverSim.LL.Messages" localCopy="false"/>
       <Reference name="HttpClasses" path="../../../../bin/" localCopy="false"/>

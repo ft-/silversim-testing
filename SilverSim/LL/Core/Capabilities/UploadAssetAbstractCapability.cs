@@ -191,6 +191,7 @@ namespace SilverSim.LL.Core.Capabilities
                     llsderrorreply.Add("message", e.Message);
 
                     HttpResponse httperrorres = httpreq.BeginResponse();
+                    httperrorres.ContentType = "application/llsd+xml";
                     Stream outErrorStream = httperrorres.GetOutputStream();
                     LLSD_XML.Serialize(llsderrorreply, outErrorStream);
                     httperrorres.Close();
@@ -202,6 +203,7 @@ namespace SilverSim.LL.Core.Capabilities
                     llsderrorreply.Add("state", "insufficient funds");
 
                     HttpResponse httperrorres = httpreq.BeginResponse();
+                    httperrorres.ContentType = "application/llsd+xml";
                     Stream outErrorStream = httperrorres.GetOutputStream();
                     LLSD_XML.Serialize(llsderrorreply, outErrorStream);
                     httperrorres.Close();
@@ -213,14 +215,11 @@ namespace SilverSim.LL.Core.Capabilities
                     return;
                 }
 
-                if(!llsdreply.ContainsKey("item_id"))
-                {
-                    llsdreply.Add("item_id", UUID.Zero);
-                }
                 llsdreply.Add("new_asset", asset.ID);
                 llsdreply.Add("state", "complete");
 
                 HttpResponse httpres = httpreq.BeginResponse();
+                httpres.ContentType = "application/llsd+xml";
                 Stream outStream = httpres.GetOutputStream();
                 LLSD_XML.Serialize(llsdreply, outStream);
                 httpres.Close();

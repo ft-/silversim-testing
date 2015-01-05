@@ -25,6 +25,8 @@ exception statement from your version.
 
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
@@ -33,60 +35,76 @@ using ThreadedClasses;
 
 namespace SilverSim.LL.Core.Capabilities
 {
-    public class UpdateNotecardAgentInventory : UploadAssetAbstractCapability
+    public class UpdateGestureTaskInventory : UploadAssetAbstractCapability
     {
-        private InventoryServiceInterface m_InventoryService;
-        private AssetServiceInterface m_AssetService;
-        private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
+        class TransactionInfo
+        {
+            public UUID TaskID;
+            public UUID ItemID;
+
+            public TransactionInfo(UUID taskID, UUID itemID)
+            {
+                TaskID = taskID;
+                ItemID = itemID;
+            }
+        }
+
+        private UUI m_Agent;
+        private SceneInterface m_Scene;
+        private readonly RwLockedDictionary<UUID, TransactionInfo> m_Transactions = new RwLockedDictionary<UUID, TransactionInfo>();
 
         public override string CapabilityName
         {
             get
             {
-                return "UpdateNotecardAgentInventory";
+                return "UpdateGestureTaskInventory";
             }
         }
 
-        public UpdateNotecardAgentInventory(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
-            : base(creator)
+        public UpdateGestureTaskInventory(UUI agent, SceneInterface scene)
+            : base(agent)
         {
-            m_InventoryService = inventoryService;
-            m_AssetService = assetService;
+            m_Agent = agent;
+            m_Scene = scene;
         }
 
         public override UUID GetUploaderID(Map reqmap)
         {
             UUID transaction = UUID.Random;
-            m_Transactions.Add(transaction, reqmap["item_id"].AsUUID);
+            m_Transactions.Add(transaction, new TransactionInfo(reqmap["task_id"].AsUUID, reqmap["item_id"].AsUUID));
             return transaction;
         }
 
         public override Map UploadedData(UUID transactionID, AssetData data)
         {
-            KeyValuePair<UUID, UUID> kvp;
-            if(m_Transactions.RemoveIf(transactionID, delegate(UUID v) { return true; }, out kvp))
+            KeyValuePair<UUID, TransactionInfo> kvp;
+            if (m_Transactions.RemoveIf(transactionID, delegate(TransactionInfo v) { return true; }, out kvp))
             {
                 Map m = new Map();
-                InventoryItem item;
+                ObjectPartInventoryItem item;
+                ObjectPart part = m_Scene.Primitives[kvp.Value.TaskID];
                 try
                 {
-                    item = m_InventoryService.Item[m_Creator.ID, kvp.Value];
+                    item = part.Inventory[kvp.Value.ItemID];
                 }
                 catch
                 {
                     throw new UrlNotFoundException();
                 }
 
-                if(item.AssetType != data.Type)
+                if (item.AssetType != data.Type)
                 {
                     throw new UrlNotFoundException();
                 }
 
                 item.AssetID = data.ID;
+                data.Creator = item.Creator;
+                data.Name = item.Name;
+                item.ID = UUID.Random;
 
                 try
                 {
-                    m_AssetService.Store(data);
+                    m_Scene.AssetService.Store(data);
                 }
                 catch
                 {
@@ -95,7 +113,8 @@ namespace SilverSim.LL.Core.Capabilities
 
                 try
                 {
-                    m_InventoryService.Item.Update(item);
+                    part.Inventory.Remove(kvp.Value.ItemID);
+                    part.Inventory.Add(item.ID, item.Name, item);
                 }
                 catch
                 {
@@ -117,27 +136,27 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        protected override bool AssetIsLocal 
-        { 
+        protected override bool AssetIsLocal
+        {
             get
             {
                 return false;
             }
         }
 
-        protected override bool AssetIsTemporary 
-        { 
+        protected override bool AssetIsTemporary
+        {
             get
             {
                 return false;
             }
         }
 
-        protected override AssetType NewAssetType 
-        { 
+        protected override AssetType NewAssetType
+        {
             get
             {
-                return AssetType.Notecard;
+                return AssetType.Gesture;
             }
         }
     }

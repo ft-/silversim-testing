@@ -24,7 +24,7 @@ exception statement from your version.
 */
 
 using log4net;
-using SilverSim.LL.Caps;
+using SilverSim.LL.Core.Capabilities;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
 using SilverSim.Main.Common;
@@ -59,7 +59,7 @@ namespace SilverSim.Scene.Implementation.Basic
         private static readonly ILog m_Log = LogManager.GetLogger("BASIC SCENE");
 
         #region Fields
-        protected internal RwLockedDictionary<UUID, ObjectPart> m_Primitives = new RwLockedDictionary<UUID,ObjectPart>();
+        protected internal RwLockedDoubleDictionary<UUID, UInt32, ObjectPart> m_Primitives = new RwLockedDoubleDictionary<UUID,UInt32,ObjectPart>();
         protected internal RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
         protected internal RwLockedDoubleDictionary<UUID, int, ParcelInfo> m_Parcels = new RwLockedDoubleDictionary<UUID, int, ParcelInfo>();
         private LLUDPServer m_UDPServer;
@@ -130,6 +130,14 @@ namespace SilverSim.Scene.Implementation.Basic
                 get
                 {
                     return m_Scene.m_Primitives[id];
+                }
+            }
+
+            public ObjectPart this[UInt32 localID]
+            {
+                get
+                {
+                    return m_Scene.m_Primitives[localID];
                 }
             }
 
@@ -262,7 +270,7 @@ namespace SilverSim.Scene.Implementation.Basic
             ExternalHostName = ri.ServerIP;
             RegionPort = ri.ServerPort;
             m_UDPServer.Start();
-            SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeaturesCapability("", "", "", true));
+            SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures("", "", "", true));
 
             m_PacketHandlers[MessageType.RequestRegionInfo] = HandleRequestRegionInfo;
         }
@@ -370,15 +378,15 @@ namespace SilverSim.Scene.Implementation.Basic
             if(obj is ObjectGroup)
             {
                 ObjectGroup objgroup = (ObjectGroup)obj;
-                List<UUID> removeAgain = new List<UUID>();
+                List<ObjectPart> removeAgain = new List<ObjectPart>();
 
                 try
                 {
                     foreach (ObjectPart objpart in objgroup.Values)
                     {
-                        AddNewLocalID(objgroup);
-                        m_Primitives.Add(objpart.ID, objpart);
-                        removeAgain.Add(objpart.ID);
+                        AddNewLocalID(objpart);
+                        m_Primitives.Add(objpart.ID, objpart.LocalID, objpart);
+                        removeAgain.Add(objpart);
                     }
                     m_Objects.Add(objgroup.ID, objgroup);
 
@@ -389,11 +397,11 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
                 catch
                 {
-                    foreach (UUID objpart in removeAgain)
+                    foreach (ObjectPart objpart in removeAgain)
                     {
-                        m_Primitives.Remove(objpart);
+                        m_Primitives.Remove(objpart.ID);
+                        RemoveLocalID(objpart);
                     }
-                    RemoveLocalID(objgroup);
                 }
             }
             else
@@ -424,9 +432,9 @@ namespace SilverSim.Scene.Implementation.Basic
                 {
                     m_Primitives.Remove(objpart.ID);
                     objpart.SendKillObject();
+                    RemoveLocalID(objpart);
                 }
                 m_Objects.Remove(objgroup.ID);
-                RemoveLocalID(objgroup);
             }
             else if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
             {
