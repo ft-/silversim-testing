@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Types.Script;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
@@ -180,6 +181,6 @@ namespace SilverSim.Scene.Types.Agent
 
         ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions);
         ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID);
-        void RevokePermissions(UUID sourceID, UUID itemID, Script.ScriptPermissions permissions);
+        void RevokePermissions(UUID sourceID, UUID itemID, ScriptPermissions permissions);
     }
 }

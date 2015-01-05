@@ -27,6 +27,7 @@ using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Script;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Types.Script;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -59,7 +60,7 @@ namespace SilverSim.Scene.Types.Scene
 
             RuntimePermissionsEvent e = new RuntimePermissionsEvent();
             e.PermissionsKey = req.AgentID;
-            e.Permissions = (Script.ScriptPermissions)req.Questions;
+            e.Permissions = (ScriptPermissions)req.Questions;
 
             instance.PostEvent(e);
         }
@@ -85,7 +86,7 @@ namespace SilverSim.Scene.Types.Scene
                             Script.ScriptInstance instance = i.ScriptInstance;
                             if(instance != null)
                             {
-                                instance.RevokePermissions(req.AgentID, (Script.ScriptPermissions)req.ObjectPermissions);
+                                instance.RevokePermissions(req.AgentID, (ScriptPermissions)req.ObjectPermissions);
                             }
                         });
                     });

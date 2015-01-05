@@ -27,6 +27,7 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
+using SilverSim.Types.Script;
 using System;
 using SilverSim.Scene.Types.Agent;
 

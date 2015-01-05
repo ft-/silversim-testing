@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
+using SilverSim.Types.Script;
 using System;
 using System.Threading;
 using ThreadedClasses;

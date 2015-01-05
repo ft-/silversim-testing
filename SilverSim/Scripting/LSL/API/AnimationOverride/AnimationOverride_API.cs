@@ -27,6 +27,7 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
+using SilverSim.Types.Script;
 using System;
 
 namespace SilverSim.Scripting.LSL.API.AnimationOverride

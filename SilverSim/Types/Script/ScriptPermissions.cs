@@ -25,7 +25,7 @@ exception statement from your version.
 
 using System;
 
-namespace SilverSim.Scene.Types.Script
+namespace SilverSim.Types.Script
 {
     [Flags]
     public enum ScriptPermissions : uint

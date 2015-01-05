@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.Types;
+using SilverSim.Types.Script;
 using SilverSim.LL.Messages.Agent;
 using SilverSim.LL.Messages.Avatar;
 
@@ -114,10 +115,10 @@ namespace SilverSim.Scene.Types.Agent
             m_SendAnimations(m);
         }
 
-        public void RevokePermissions(UUID sourceID, Script.ScriptPermissions permissions)
+        public void RevokePermissions(UUID sourceID, ScriptPermissions permissions)
         {
             int i;
-            if ((permissions & Script.ScriptPermissions.TriggerAnimation) != 0)
+            if ((permissions & ScriptPermissions.TriggerAnimation) != 0)
             {
                 lock (this)
                 {

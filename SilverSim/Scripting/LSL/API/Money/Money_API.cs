@@ -28,6 +28,7 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.Types;
+using SilverSim.Types.Script;
 using System;
 using System.Runtime.Remoting.Messaging;
 

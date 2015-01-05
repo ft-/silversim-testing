@@ -29,6 +29,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
+using SilverSim.Types.Script;
 using System;
 using System.Timers;
 using System.Reflection;
