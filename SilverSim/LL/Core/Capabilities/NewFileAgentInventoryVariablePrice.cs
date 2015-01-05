@@ -36,21 +36,22 @@ using ThreadedClasses;
 
 namespace SilverSim.LL.Core.Capabilities
 {
-    public class UpdateNotecardAgentInventory : UploadAssetAbstractCapability
+    public class NewFileAgentInventory : UploadAssetAbstractCapability
     {
         private InventoryServiceInterface m_InventoryService;
         private AssetServiceInterface m_AssetService;
-        private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
+
+        private readonly RwLockedDictionary<UUID, InventoryItem> m_Transactions = new RwLockedDictionary<UUID, InventoryItem>();
 
         public override string CapabilityName
         {
             get
             {
-                return "UpdateNotecardAgentInventory";
+                return "NewFileAgentInventory";
             }
         }
 
-        public UpdateNotecardAgentInventory(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
+        public NewFileAgentInventory(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
             : base(creator)
         {
             m_InventoryService = inventoryService;
@@ -60,32 +61,36 @@ namespace SilverSim.LL.Core.Capabilities
         public override UUID GetUploaderID(Map reqmap)
         {
             UUID transaction = UUID.Random;
-            m_Transactions.Add(transaction, reqmap["item_id"].AsUUID);
+            InventoryItem item = new InventoryItem();
+            item.ID = UUID.Random;
+            item.Description = reqmap["description"].ToString();
+            item.Name = reqmap["name"].ToString();
+            item.ParentFolderID = reqmap["folder_id"].AsUUID;
+            item.AssetTypeName = reqmap["asset_type"].ToString();
+            item.InventoryTypeName = reqmap["inventory_type"].ToString();
+            item.LastOwner = m_Creator;
+            item.Owner = m_Creator;
+            item.Creator = m_Creator;
+            item.Permissions.Base = InventoryItem.PermissionsMask.All;
+            item.Permissions.Current = InventoryItem.PermissionsMask.Every;
+            item.Permissions.EveryOne = (InventoryItem.PermissionsMask)reqmap["everyone_mask"].AsUInt;
+            item.Permissions.Group = (InventoryItem.PermissionsMask)reqmap["group_mask"].AsUInt;
+            item.Permissions.NextOwner = (InventoryItem.PermissionsMask)reqmap["next_owner_mask"].AsUInt;
+            m_Transactions.Add(transaction, item);
             return transaction;
         }
 
         public override Map UploadedData(UUID transactionID, AssetData data)
         {
-            KeyValuePair<UUID, UUID> kvp;
-            if(m_Transactions.RemoveIf(transactionID, delegate(UUID v) { return true; }, out kvp))
+            KeyValuePair<UUID, InventoryItem> kvp;
+            if (m_Transactions.RemoveIf(transactionID, delegate(InventoryItem v) { return true; }, out kvp))
             {
                 Map m = new Map();
-                InventoryItem item;
-                try
-                {
-                    item = m_InventoryService.Item[m_Creator.ID, kvp.Value];
-                }
-                catch
-                {
-                    throw new UrlNotFoundException();
-                }
-
-                if(item.AssetType != data.Type)
-                {
-                    throw new UrlNotFoundException();
-                }
-
-                item.AssetID = data.ID;
+                m.Add("new_inventory_item", kvp.Value.ID.ToString());
+                kvp.Value.AssetID = data.ID;
+                data.Type = kvp.Value.AssetType;
+                data.Name = kvp.Value.Name;
+                data.Description = kvp.Value.Description;
 
                 try
                 {
@@ -98,7 +103,7 @@ namespace SilverSim.LL.Core.Capabilities
 
                 try
                 {
-                    m_InventoryService.Item.Update(item);
+                    m_InventoryService.Item.Update(kvp.Value);
                 }
                 catch
                 {
@@ -120,27 +125,27 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        protected override bool AssetIsLocal 
-        { 
+        protected override bool AssetIsLocal
+        {
             get
             {
                 return false;
             }
         }
 
-        protected override bool AssetIsTemporary 
-        { 
+        protected override bool AssetIsTemporary
+        {
             get
             {
                 return false;
             }
         }
 
-        protected override AssetType NewAssetType 
-        { 
+        protected override AssetType NewAssetType
+        {
             get
             {
-                return AssetType.Notecard;
+                return AssetType.Unknown;
             }
         }
     }

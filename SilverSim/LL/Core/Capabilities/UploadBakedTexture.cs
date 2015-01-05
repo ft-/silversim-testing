@@ -36,9 +36,8 @@ using ThreadedClasses;
 
 namespace SilverSim.LL.Core.Capabilities
 {
-    public class UpdateNotecardAgentInventory : UploadAssetAbstractCapability
+    public class UploadBakedTexture : UploadAssetAbstractCapability
     {
-        private InventoryServiceInterface m_InventoryService;
         private AssetServiceInterface m_AssetService;
         private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
 
@@ -46,47 +45,36 @@ namespace SilverSim.LL.Core.Capabilities
         {
             get
             {
-                return "UpdateNotecardAgentInventory";
+                return "UploadBakedTexture";
             }
         }
 
-        public UpdateNotecardAgentInventory(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
+        public UploadBakedTexture(UUI creator, AssetServiceInterface assetService)
             : base(creator)
         {
-            m_InventoryService = inventoryService;
             m_AssetService = assetService;
         }
 
         public override UUID GetUploaderID(Map reqmap)
         {
             UUID transaction = UUID.Random;
-            m_Transactions.Add(transaction, reqmap["item_id"].AsUUID);
+            m_Transactions.Add(transaction, UUID.Zero);
             return transaction;
         }
 
         public override Map UploadedData(UUID transactionID, AssetData data)
         {
             KeyValuePair<UUID, UUID> kvp;
-            if(m_Transactions.RemoveIf(transactionID, delegate(UUID v) { return true; }, out kvp))
+            if (m_Transactions.RemoveIf(transactionID, delegate(UUID v) { return true; }, out kvp))
             {
                 Map m = new Map();
-                InventoryItem item;
-                try
-                {
-                    item = m_InventoryService.Item[m_Creator.ID, kvp.Value];
-                }
-                catch
+
+                if (data.Type != NewAssetType)
                 {
                     throw new UrlNotFoundException();
                 }
 
-                if(item.AssetType != data.Type)
-                {
-                    throw new UrlNotFoundException();
-                }
-
-                item.AssetID = data.ID;
-
+                data.Name = "Baked Texture for Agent " + m_Creator.ToString();
                 try
                 {
                     m_AssetService.Store(data);
@@ -96,14 +84,6 @@ namespace SilverSim.LL.Core.Capabilities
                     throw new UploadErrorException("Failed to store asset");
                 }
 
-                try
-                {
-                    m_InventoryService.Item.Update(item);
-                }
-                catch
-                {
-                    throw new UploadErrorException("Failed to store inventory item");
-                }
                 return m;
             }
             else
@@ -116,31 +96,31 @@ namespace SilverSim.LL.Core.Capabilities
         {
             get
             {
-                return UUID.Random;
+                return UUID.RandomFixedFirst(0xFFFFFFFF);
             }
         }
 
-        protected override bool AssetIsLocal 
-        { 
+        protected override bool AssetIsLocal
+        {
             get
             {
-                return false;
+                return true;
             }
         }
 
-        protected override bool AssetIsTemporary 
-        { 
+        protected override bool AssetIsTemporary
+        {
             get
             {
-                return false;
+                return true;
             }
         }
 
-        protected override AssetType NewAssetType 
-        { 
+        protected override AssetType NewAssetType
+        {
             get
             {
-                return AssetType.Notecard;
+                return AssetType.Texture;
             }
         }
     }

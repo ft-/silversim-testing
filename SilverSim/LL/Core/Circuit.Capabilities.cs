@@ -288,6 +288,15 @@ namespace SilverSim.LL.Core
             }
         }
 
+        public delegate ICapabilityInterface DefCapabilityInstantiate(LLAgent agent);
+        public void AddDefCapabilityFactory(string capabilityType, UUID seedID, DefCapabilityInstantiate del, Dictionary<string, string> capConfig)
+        {
+            if(IsLocalHost(capConfig, capabilityType))
+            {
+                AddCapability(capabilityType, seedID, del(Agent).HttpRequestHandler);
+            }
+        }
+
         public void SetupDefaultCapabilities(
             UUID regionSeedID, 
             Dictionary<string, string> capConfig,
@@ -307,7 +316,14 @@ namespace SilverSim.LL.Core
             AddDefCapability("FetchLibDescendents2", regionSeedID, Cap_FetchInventoryDescendents2, capConfig);
             AddDefCapability("GetTexture", regionSeedID, Cap_GetTexture, capConfig);
             AddDefCapability("GetMesh", regionSeedID, Cap_GetMesh, capConfig);
-            AddDefCapability("UploadBakedTexture", regionSeedID, Cap_UploadBakedTexture, capConfig);
+            AddDefCapability("GetMesh2", regionSeedID, Cap_GetMesh, capConfig);
+            AddDefCapability("CreateInventoryCategory", regionSeedID, Cap_CreateInventoryCategory, capConfig);
+            AddDefCapabilityFactory("UploadBakedTexture", regionSeedID, delegate(LLAgent agent) { return new Capabilities.UploadBakedTexture(agent.Owner, agent.AssetService); }, capConfig);
+            AddDefCapabilityFactory("NewFileAgentInventory", regionSeedID, delegate(LLAgent agent) { return new Capabilities.NewFileAgentInventory(agent.Owner, agent.InventoryService, agent.AssetService); }, capConfig);
+            AddDefCapabilityFactory("NewFileAgentInventoryVariablePrice", regionSeedID, delegate(LLAgent agent) { return new Capabilities.NewFileAgentInventoryVariablePrice(agent.Owner, agent.InventoryService, agent.AssetService); }, capConfig);
+            AddDefCapabilityFactory("UpdateGestureAgentInventory", regionSeedID, delegate(LLAgent agent) { return new Capabilities.UpdateGestureAgentInventory(agent.Owner, agent.InventoryService, agent.AssetService); }, capConfig);
+            AddDefCapabilityFactory("UpdateNotecardAgentInventory", regionSeedID, delegate(LLAgent agent) { return new Capabilities.UpdateNotecardAgentInventory(agent.Owner, agent.InventoryService, agent.AssetService); }, capConfig);
+            AddDefCapabilityFactory("UpdateScriptAgent", regionSeedID, delegate(LLAgent agent) { return new Capabilities.UpdateScriptAgent(agent.Owner, agent.InventoryService, agent.AssetService); }, capConfig);
         }
         #endregion
     }

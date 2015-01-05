@@ -31,21 +31,16 @@ using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using System.Net;
 using System.Xml;
-using System.IO;
 using SilverSim.StructuredData.LLSD;
 using SilverSim.Types.Inventory;
-using SilverSim.Types.Asset;
-using ThreadedClasses;
-using SilverSim.LL.Messages;
-using SilverSim.Main.Common.CmdIO;
 
 namespace SilverSim.LL.Core
 {
     public partial class Circuit
     {
-        void Cap_SimConsoleAsync(HttpRequest httpreq)
+        public void Cap_CreateInventoryCategory(HttpRequest httpreq)
         {
-            IValue iv;
+            IValue o;
             if (httpreq.Method != "POST")
             {
                 httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed").Close();
@@ -54,55 +49,46 @@ namespace SilverSim.LL.Core
 
             try
             {
-                iv = LLSD_XML.Deserialize(httpreq.Body);
+                o = LLSD_XML.Deserialize(httpreq.Body);
             }
             catch (Exception e)
             {
                 m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace.ToString());
-                httpreq.BeginResponse(HttpStatusCode.BadRequest, "Bad Request").Close();
+                httpreq.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type").Close();
+                return;
+            }
+            if (!(o is Map))
+            {
+                httpreq.BeginResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML").Close();
                 return;
             }
 
-            if (!(iv is AString))
+            Map reqmap = (Map)o;
+            InventoryFolder folder = new InventoryFolder();
+            folder.ID = reqmap["folder_id"].AsUUID;
+            folder.ParentFolderID = reqmap["parent_id"].AsUUID;
+            folder.InventoryType = (InventoryType)reqmap["type"].AsInt;
+            folder.Name = reqmap["name"].ToString();
+            folder.Version = 1;
+
+            try
             {
-                httpreq.BeginResponse(HttpStatusCode.BadRequest, "Bad Request").Close();
+                Agent.InventoryService.Folder.Add(AgentID, folder);
+            }
+            catch
+            {
+                httpreq.BeginResponse(HttpStatusCode.InternalServerError, "Internal Server Error").Close();
                 return;
             }
 
-            string message = iv.ToString();
-            SimConsoleAsyncTTY tty = new SimConsoleAsyncTTY(this);
-            if (!Scene.IsSimConsoleAllowed(Agent.Owner))
-            {
-                tty.WriteFormatted("SimConsole not allowed for agent {0} {1}\n", Agent.Owner.FirstName, Agent.Owner.LastName);
-            }
-            else
-            {
-                CommandRegistry.ExecuteCommand(tty.GetCmdLine(message), tty, Scene.ID);
-            }
-
-            HttpResponse res;
-            res = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
-            res.ContentType = "application/llsd+xml";
-            Stream o = res.GetOutputStream();
-            LLSD_XML.Serialize(new BinaryData(new byte[1] { 0 }), o);
+            Map resmap = new Map();
+            resmap.Add("folder_id", folder.ID);
+            resmap.Add("parent_id", folder.ParentFolderID);
+            resmap.Add("type", (int)folder.InventoryType);
+            resmap.Add("name", folder.Name);
+            HttpResponse res = httpreq.BeginResponse();
+            LLSD_XML.Serialize(resmap, res.GetOutputStream());
             res.Close();
-
-        }
-
-        class SimConsoleAsyncTTY : TTY
-        {
-            Circuit m_Circuit;
-            public SimConsoleAsyncTTY(Circuit c)
-            {
-                m_Circuit = c;
-            }
-
-            public override void Write(string text)
-            {
-                Messages.Console.SimConsoleResponse res = new Messages.Console.SimConsoleResponse();
-                res.Message = text;
-                m_Circuit.SendMessage(res);
-            }
         }
     }
 }

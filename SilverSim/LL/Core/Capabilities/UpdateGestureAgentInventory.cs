@@ -95,7 +95,7 @@ namespace SilverSim.LL.Core.Capabilities
                 }
                 catch
                 {
-                    throw new Exception("Failed");
+                    throw new UploadErrorException("Failed to store asset");
                 }
 
                 try
@@ -104,7 +104,7 @@ namespace SilverSim.LL.Core.Capabilities
                 }
                 catch
                 {
-                    throw new Exception("Failed");
+                    throw new UploadErrorException("Failed to store inventory item");
                 }
                 return m;
             }

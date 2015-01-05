@@ -58,6 +58,23 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
+        protected class InsufficientFundsException : Exception
+        {
+            public InsufficientFundsException()
+            {
+
+            }
+        }
+
+        protected class UploadErrorException : Exception
+        {
+            public UploadErrorException(string message)
+                : base(message)
+            {
+
+            }
+        }
+
         public void HttpRequestHandler(HttpRequest httpreq)
         {
             UUID transactionID;
@@ -91,6 +108,29 @@ namespace SilverSim.LL.Core.Capabilities
                 try
                 {
                     uploadID = GetUploaderID(reqmap);
+                }
+                catch(UploadErrorException e)
+                {
+                    Map llsderrorreply = new Map();
+                    llsderrorreply.Add("state", "error");
+                    llsderrorreply.Add("message", e.Message);
+
+                    HttpResponse httperrorres = httpreq.BeginResponse();
+                    Stream outErrorStream = httperrorres.GetOutputStream();
+                    LLSD_XML.Serialize(llsderrorreply, outErrorStream);
+                    httperrorres.Close();
+                    return;
+                }
+                catch(InsufficientFundsException)
+                {
+                    Map llsderrorreply = new Map();
+                    llsderrorreply.Add("state", "insufficient funds");
+
+                    HttpResponse httperrorres = httpreq.BeginResponse();
+                    Stream outErrorStream = httperrorres.GetOutputStream();
+                    LLSD_XML.Serialize(llsderrorreply, outErrorStream);
+                    httperrorres.Close();
+                    return;
                 }
                 catch
                 {
@@ -144,12 +184,39 @@ namespace SilverSim.LL.Core.Capabilities
                     httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
                     return;
                 }
+                catch (UploadErrorException e)
+                {
+                    Map llsderrorreply = new Map();
+                    llsderrorreply.Add("state", "error");
+                    llsderrorreply.Add("message", e.Message);
+
+                    HttpResponse httperrorres = httpreq.BeginResponse();
+                    Stream outErrorStream = httperrorres.GetOutputStream();
+                    LLSD_XML.Serialize(llsderrorreply, outErrorStream);
+                    httperrorres.Close();
+                    return;
+                }
+                catch (InsufficientFundsException)
+                {
+                    Map llsderrorreply = new Map();
+                    llsderrorreply.Add("state", "insufficient funds");
+
+                    HttpResponse httperrorres = httpreq.BeginResponse();
+                    Stream outErrorStream = httperrorres.GetOutputStream();
+                    LLSD_XML.Serialize(llsderrorreply, outErrorStream);
+                    httperrorres.Close();
+                    return;
+                }
                 catch
                 {
                     httpreq.BeginResponse(HttpStatusCode.InternalServerError, "Internal Server Error").Close();
                     return;
                 }
 
+                if(!llsdreply.ContainsKey("item_id"))
+                {
+                    llsdreply.Add("item_id", UUID.Zero);
+                }
                 llsdreply.Add("new_asset", asset.ID);
                 llsdreply.Add("state", "complete");
 

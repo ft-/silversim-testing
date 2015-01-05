@@ -30,6 +30,7 @@ using SilverSim.Main.Common.HttpServer;
 using SilverSim.Main.Common.Caps;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
 using SilverSim.ServiceInterfaces.Database;
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -728,9 +729,16 @@ namespace SilverSim.Main.Common
             m_ShutdownEvent.Set();
         }
 
-        public void ShutdownCommand(List<string> args, CmdIO.TTY io)
+        public void ShutdownCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
-            m_ShutdownEvent.Set();
+            if (limitedToScene != UUID.Zero)
+            {
+                io.WriteFormatted("shutdown not allowed from restricted console");
+            }
+            else
+            {
+                m_ShutdownEvent.Set();
+            }
         }
 
         public void Shutdown()

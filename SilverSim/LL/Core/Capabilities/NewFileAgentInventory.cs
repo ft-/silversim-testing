@@ -36,7 +36,7 @@ using ThreadedClasses;
 
 namespace SilverSim.LL.Core.Capabilities
 {
-    public class NewFileAgentInventory : UploadAssetAbstractCapability
+    public class NewFileAgentInventoryVariablePrice : UploadAssetAbstractCapability
     {
         private InventoryServiceInterface m_InventoryService;
         private AssetServiceInterface m_AssetService;
@@ -47,11 +47,11 @@ namespace SilverSim.LL.Core.Capabilities
         {
             get
             {
-                return "NewFileAgentInventory";
+                return "NewFileAgentInventoryVariablePrice";
             }
         }
 
-        public NewFileAgentInventory(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
+        public NewFileAgentInventoryVariablePrice(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
             : base(creator)
         {
             m_InventoryService = inventoryService;
@@ -71,10 +71,11 @@ namespace SilverSim.LL.Core.Capabilities
             item.LastOwner = m_Creator;
             item.Owner = m_Creator;
             item.Creator = m_Creator;
-            item.Permissions.Base = InventoryItem.PermissionsMask.None;
+            item.Permissions.Base = InventoryItem.PermissionsMask.All;
             item.Permissions.Current = InventoryItem.PermissionsMask.Every;
-            item.Permissions.Group = InventoryItem.PermissionsMask.None;
-            item.Permissions.NextOwner = InventoryItem.PermissionsMask.None;
+            item.Permissions.EveryOne = (InventoryItem.PermissionsMask)reqmap["everyone_mask"].AsUInt;
+            item.Permissions.Group = (InventoryItem.PermissionsMask)reqmap["group_mask"].AsUInt;
+            item.Permissions.NextOwner = (InventoryItem.PermissionsMask)reqmap["next_owner_mask"].AsUInt;
             m_Transactions.Add(transaction, item);
             return transaction;
         }
@@ -97,7 +98,7 @@ namespace SilverSim.LL.Core.Capabilities
                 }
                 catch
                 {
-                    throw new Exception("Failed");
+                    throw new UploadErrorException("Could not store asset");
                 }
 
                 try
@@ -106,7 +107,7 @@ namespace SilverSim.LL.Core.Capabilities
                 }
                 catch
                 {
-                    throw new Exception("Failed");
+                    throw new UploadErrorException("Could not store inventory item");
                 }
                 return m;
             }
