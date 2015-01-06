@@ -122,26 +122,6 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
-        public override void Dispose()
-        {
-            m_Part.OnUpdate -= OnPrimUpdate;
-            m_Part.OnPositionChange -= OnPrimPositionUpdate;
-            m_Part.ObjectGroup.OnUpdate -= OnGroupUpdate;
-            m_Part.ObjectGroup.OnPositionChange -= OnGroupPositionUpdate;
-
-            IsRunning = false;
-            lock (this)
-            {
-                Timer.Enabled = false;
-            }
-            TriggerOnStateChange();
-            TriggerOnDispose();
-            m_Events.Clear();
-
-            m_States.Clear();
-            m_Part = null;
-        }
-
         public override ObjectPart Part
         {
             get
@@ -184,8 +164,6 @@ namespace SilverSim.Scripting.LSL
             m_Part.ObjectGroup.OnUpdate -= OnGroupUpdate;
             m_Part.ObjectGroup.OnPositionChange -= OnGroupPositionUpdate;
             IsRunning = false;
-            TriggerOnStateChange();
-            TriggerOnDispose();
             m_Events.Clear();
             m_States.Clear();
             m_Part = null;

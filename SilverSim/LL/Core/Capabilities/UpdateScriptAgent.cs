@@ -27,8 +27,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.Scripting.Common;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types;
@@ -72,7 +75,6 @@ namespace SilverSim.LL.Core.Capabilities
             if (m_Transactions.RemoveIf(transactionID, delegate(UUID v) { return true; }, out kvp))
             {
                 Map m = new Map();
-                m.Add("compiled", true);
                 InventoryItem item;
                 try
                 {
@@ -114,6 +116,26 @@ namespace SilverSim.LL.Core.Capabilities
                 {
                     throw new UploadErrorException("Failed to store inventory item");
                 }
+
+                try
+                {
+                    using (TextReader reader = new StreamReader(data.InputStream))
+                    {
+                        ScriptLoader.SyntaxCheck(item.Owner, data);
+                    }
+                    m.Add("compiled", true);
+                }
+                catch(CompilerException e)
+                {
+                    AnArray errors = new AnArray();
+                    foreach(KeyValuePair<int, string> line in e.Messages)
+                    {
+                        errors.Add(string.Format("{0}:{1}", kvp.Key, kvp.Value));
+                    }
+                    m.Add("errors", errors);
+                    m.Add("compiled", false);
+                }
+                   
                 return m;
             }
             else

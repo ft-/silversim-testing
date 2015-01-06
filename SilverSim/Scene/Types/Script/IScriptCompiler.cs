@@ -33,17 +33,36 @@ namespace SilverSim.Scene.Types.Script
 {
     public class CompilerException : Exception
     {
-        public int LineNumber;
+        public Dictionary<int, string> Messages = new Dictionary<int,string>();
 
         public CompilerException(int linenumber, string message)
             :base(message)
         {
-            LineNumber = linenumber;
+            Messages.Add(linenumber, message);
+        }
+
+        public CompilerException(Dictionary<int, string> messages)
+        {
+            Messages = messages;
+        }
+
+        public new string Message
+        {
+            get
+            {
+                string o = string.Empty;
+                foreach(KeyValuePair<int, string> m in Messages)
+                {
+                    o += string.Format("{0}:{1}", m.Key, m.Value);
+                }
+                return o;
+            }
         }
     }
 
     public interface IScriptCompiler
     {
-        IScriptAssembly Compile(AppDomain appDom, UUI user, List<string> shbangs, UUID assetID, TextReader reader, int linenumber = 1);
+        IScriptAssembly Compile(AppDomain appDom, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1);
+        void SyntaxCheck(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1);
     }
 }

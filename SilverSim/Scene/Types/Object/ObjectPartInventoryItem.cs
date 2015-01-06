@@ -111,12 +111,19 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(this)
                 {
-                    m_ScriptInstance.Dispose();
                     m_ScriptInstance = value;
-                    if(m_ScriptInstance != null)
-                    {
-                        m_ScriptInstance.IsRunning = true;
-                    }
+                }
+            }
+        }
+        public ScriptInstance RemoveScriptInstance
+        {
+            get
+            {
+                lock(this)
+                {
+                    ScriptInstance instance = m_ScriptInstance;
+                    m_ScriptInstance = null;
+                    return instance;
                 }
             }
         }
@@ -126,7 +133,11 @@ namespace SilverSim.Scene.Types.Object
         {
             lock(this)
             {
-                m_ScriptInstance.Dispose();
+                if (m_ScriptInstance != null)
+                {
+                    m_ScriptInstance.Abort();
+                    m_ScriptInstance.Remove();
+                }
             }
         }
     }

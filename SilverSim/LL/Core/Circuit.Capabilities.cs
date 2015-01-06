@@ -324,6 +324,7 @@ namespace SilverSim.LL.Core
             AddDefCapabilityFactory("UpdateGestureAgentInventory", regionSeedID, delegate(LLAgent agent) { return new Capabilities.UpdateGestureAgentInventory(agent, agent.InventoryService, agent.AssetService); }, capConfig);
             AddDefCapabilityFactory("UpdateNotecardAgentInventory", regionSeedID, delegate(LLAgent agent) { return new Capabilities.UpdateNotecardAgentInventory(agent, agent.InventoryService, agent.AssetService); }, capConfig);
             AddDefCapabilityFactory("UpdateScriptAgent", regionSeedID, delegate(LLAgent agent) { return new Capabilities.UpdateScriptAgent(agent, agent.InventoryService, agent.AssetService); }, capConfig);
+            AddDefCapabilityFactory("UpdateScriptTask", regionSeedID, delegate(LLAgent agent) { return new Capabilities.UpdateScriptTask(agent, Scene); }, capConfig);
             AddDefCapabilityFactory("UpdateGestureTaskInventory", regionSeedID, delegate(LLAgent agent) { return new Capabilities.UpdateGestureTaskInventory(agent, Scene); }, capConfig);
             AddDefCapabilityFactory("UpdateNotecardTaskInventory", regionSeedID, delegate(LLAgent agent) { return new Capabilities.UpdateNotecardTaskInventory(agent, Scene); }, capConfig);
             //AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, delegate(LLAgent agent) { return new Capabilities.ParcelNavigateMedia(agent.Owner, Scene); }, capConfig);

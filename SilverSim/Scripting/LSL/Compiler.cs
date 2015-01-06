@@ -324,6 +324,7 @@ namespace SilverSim.Scripting.LSL
             }
             #endregion
 #endif
+            SilverSim.Scripting.Common.CompilerRegistry.ScriptCompilers["lsl"] = this;
         }
 
         class LSLScriptAssembly : IScriptAssembly
@@ -1356,18 +1357,18 @@ namespace SilverSim.Scripting.LSL
             solveVariables(cs, resolvetree);
             solveConstantOperations(resolvetree);
         }
-
-        public IScriptAssembly Compile(AppDomain appDom, UUI user, List<string> shbangs, UUID assetID, TextReader reader, int lineNumber = 1)
+        
+        CompileState Preprocess(UUI user, Dictionary<int, string> shbangs, TextReader reader, int lineNumber = 1)
         {
             CompileState compileState = new CompileState();
             compileState.AcceptedFlags = APIFlags.OSSL | APIFlags.LSL | APIFlags.LightShare;
             APIFlags extraflags = APIFlags.None;
-            foreach(string shbang in shbangs)
+            foreach(KeyValuePair<int, string> shbang in shbangs)
             { 
-                if (shbang.StartsWith("//#!Mode:"))
+                if (shbang.Value.StartsWith("//#!Mode:"))
                 {
                     /* we got a sh-bang here, it is a lot safer than what OpenSimulator uses */
-                    string mode = shbang.Substring(9).Trim().ToUpper();
+                    string mode = shbang.Value.Substring(9).Trim().ToUpper();
                     if (mode == "LSL")
                     {
                         compileState.AcceptedFlags = APIFlags.LSL;
@@ -1377,9 +1378,9 @@ namespace SilverSim.Scripting.LSL
                         compileState.AcceptedFlags = APIFlags.ASSL;
                     }
                 }
-                else if (shbang.StartsWith("//#!Enable:"))
+                else if (shbang.Value.StartsWith("//#!Enable:"))
                 {
-                    string api = shbang.Substring(11).Trim().ToLower();
+                    string api = shbang.Value.Substring(11).Trim().ToLower();
                     if (api == "admin")
                     {
                         extraflags |= APIFlags.ASSL_Admin;
@@ -1498,6 +1499,17 @@ namespace SilverSim.Scripting.LSL
                     throwParserException(p, "'}' found without matching '{'");
                 }
             }
+            return compileState;
+        }
+
+        public void SyntaxCheck(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1)
+        {
+            Preprocess(user, shbangs, reader, linenumber);
+        }
+
+        public IScriptAssembly Compile(AppDomain appDom, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int lineNumber = 1)
+        {
+            CompileState compileState = Preprocess(user, shbangs, reader, lineNumber);
             throw new NotImplementedException();
         }
     }

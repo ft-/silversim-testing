@@ -27,11 +27,15 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scripting.Common;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
 using ThreadedClasses;
+using System.IO;
+using System;
 
 namespace SilverSim.LL.Core.Capabilities
 {
@@ -41,11 +45,15 @@ namespace SilverSim.LL.Core.Capabilities
         {
             public UUID TaskID;
             public UUID ItemID;
+            public bool IsScriptRunning;
+            public UUID ExperienceID;
 
-            public TransactionInfo(UUID taskID, UUID itemID)
+            public TransactionInfo(UUID taskID, UUID itemID, bool isScriptRunning, UUID experienceID)
             {
                 TaskID = taskID;
                 ItemID = itemID;
+                IsScriptRunning = isScriptRunning;
+                ExperienceID = experienceID;
             }
         }
 
@@ -71,7 +79,12 @@ namespace SilverSim.LL.Core.Capabilities
         public override UUID GetUploaderID(Map reqmap)
         {
             UUID transaction = UUID.Random;
-            m_Transactions.Add(transaction, new TransactionInfo(reqmap["task_id"].AsUUID, reqmap["item_id"].AsUUID));
+            UUID experienceID = UUID.Zero;
+            if(reqmap.ContainsKey("experience"))
+            {
+                experienceID = reqmap["experience"].AsUUID;
+            }
+            m_Transactions.Add(transaction, new TransactionInfo(reqmap["task_id"].AsUUID, reqmap["item_id"].AsUUID, reqmap["is_script_running"].AsBoolean, experienceID));
             return transaction;
         }
 
@@ -106,6 +119,7 @@ namespace SilverSim.LL.Core.Capabilities
                     throw new UploadErrorException("Not allowed to modify script");
                 }
 
+                UUID oldAssetID = item.AssetID;
                 item.AssetID = data.ID;
                 data.Creator = item.Creator;
                 data.Name = item.Name;
@@ -120,8 +134,17 @@ namespace SilverSim.LL.Core.Capabilities
                     throw new UploadErrorException("Failed to store asset");
                 }
 
+                ScriptInstance instance;
                 try
                 {
+                    instance = item.RemoveScriptInstance;
+                    if(instance != null)
+                    {
+                        instance.Abort();
+                        instance.Remove();
+                        ScriptLoader.Remove(oldAssetID, instance);
+                    }
+                    item.ScriptInstance.Remove();
                     part.Inventory.Remove(kvp.Value.ItemID);
                     part.Inventory.Add(item.ID, item.Name, item);
                 }
@@ -129,6 +152,32 @@ namespace SilverSim.LL.Core.Capabilities
                 {
                     throw new UploadErrorException("Failed to store inventory item");
                 }
+
+                try
+                {
+                    using (TextReader reader = new StreamReader(data.InputStream))
+                    {
+                        //instance = ScriptLoader.Load(part, item, item.Owner, data);
+                        ScriptLoader.SyntaxCheck(item.Owner, data);
+                    }
+                    //item.ScriptInstance = instance;
+                    if(kvp.Value.IsScriptRunning)
+                    {
+#warning implement thread pool connection
+                    }
+                    m.Add("compiled", true);
+                }
+                catch (CompilerException e)
+                {
+                    AnArray errors = new AnArray();
+                    foreach (KeyValuePair<int, string> line in e.Messages)
+                    {
+                        errors.Add(string.Format("{0}:{1}", kvp.Key, kvp.Value));
+                    }
+                    m.Add("errors", errors);
+                    m.Add("compiled", false);
+                }
+
                 return m;
             }
             else

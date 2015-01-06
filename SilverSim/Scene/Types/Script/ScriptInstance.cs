@@ -33,7 +33,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Script
 {
-    public abstract class ScriptInstance : MarshalByRefObject, IDisposable
+    public abstract class ScriptInstance : MarshalByRefObject
     {
         public abstract void PostEvent(IScriptEvent e);
         public abstract bool IsRunning { get; set; }
@@ -42,17 +42,13 @@ namespace SilverSim.Scene.Types.Script
         public abstract void Remove();
         public abstract void Reset();
 
-        public abstract void Dispose();
-
         public abstract void ProcessEvent();
         public abstract void ShoutError(string msg);
         public abstract bool HasEventsPending { get; }
         public IScriptWorkerThreadPool ThreadPool { get; set; }
         public delegate void StateChangeEventDelegate(ScriptInstance si);
         public delegate void ScriptResetEventDelegate(ScriptInstance si);
-        public delegate void DisposeEventDelegate();
         public event StateChangeEventDelegate OnStateChange;
-        public event DisposeEventDelegate OnDispose;
         public event ScriptResetEventDelegate OnScriptReset;
 
         public abstract ObjectPartInventoryItem Item { get; }
@@ -106,24 +102,6 @@ namespace SilverSim.Scene.Types.Script
                     try
                     {
                         del(this);
-                    }
-                    catch
-                    {
-                    }
-                }
-            }
-        }
-
-        public void TriggerOnDispose()
-        {
-            var ev = OnDispose; /* events are not exactly thread-safe, so copy the reference first */
-            if (ev != null)
-            {
-                foreach (DisposeEventDelegate del in ev.GetInvocationList())
-                {
-                    try
-                    {
-                        del();
                     }
                     catch
                     {

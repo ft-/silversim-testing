@@ -24,7 +24,10 @@ exception statement from your version.
 */
 
 using SilverSim.Scene.Types.Script;
+using SilverSim.Types;
 using System;
+using System.Collections.Generic;
+using System.IO;
 using ThreadedClasses;
 
 namespace SilverSim.Scripting.Common
@@ -68,6 +71,105 @@ namespace SilverSim.Scripting.Common
                         m_ScriptCompilers.Add(name, value);
                     }
                 }
+            }
+
+            private IScriptAssembly Compile(AppDomain appDom, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1)
+            {
+                string language = DefaultCompilerName;
+                bool useDefault = true;
+                int lineno = 0;
+                foreach (KeyValuePair<int, string> shbang in shbangs)
+                {
+                    if (shbang.Value.StartsWith("//#!Engine:"))
+                    {
+                        /* we got a sh-bang here, it is a lot safer than what OpenSimulator uses */
+                        language = shbang.Value.Substring(11).Trim().ToUpper();
+                        useDefault = false;
+                        lineno = shbang.Key;
+                    }
+                }
+
+                if(useDefault)
+                {
+                    shbangs.Add(-1, string.Format("//#!Engine:{0}", language));
+                }
+
+                IScriptCompiler compiler;
+                try
+                {
+                    compiler = this[language];
+                }
+                catch
+                {
+                    throw new CompilerException(lineno, "Unknown engine specified");
+                }
+                return compiler.Compile(appDom, user, shbangs, assetID, reader, linenumber);
+            }
+
+            private void SyntaxCheck(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1)
+            {
+                string language = DefaultCompilerName;
+                bool useDefault = true;
+                int lineno = 0;
+                foreach (KeyValuePair<int, string> shbang in shbangs)
+                {
+                    if (shbang.Value.StartsWith("//#!Engine:"))
+                    {
+                        /* we got a sh-bang here, it is a lot safer than what OpenSimulator uses */
+                        language = shbang.Value.Substring(11).Trim().ToUpper();
+                        useDefault = false;
+                        lineno = shbang.Key;
+                    }
+                }
+
+                if (useDefault)
+                {
+                    shbangs.Add(-1, string.Format("//#!Engine:{0}", language));
+                }
+
+                IScriptCompiler compiler;
+                try
+                {
+                    compiler = this[language];
+                }
+                catch
+                {
+                    throw new CompilerException(lineno, "Unknown engine specified");
+                }
+                compiler.SyntaxCheck(user, shbangs, assetID, reader, linenumber);
+            }
+
+            internal IScriptAssembly Compile(AppDomain appDom, UUI user, UUID assetID, TextReader reader)
+            {
+                int linenumber = 1;
+                Dictionary<int, string> shbangs = new Dictionary<int, string>();
+                while (reader.Peek() == '/')
+                {
+                    string shbang = reader.ReadLine();
+                    if (shbang.StartsWith("//#!"))
+                    {
+                        shbangs.Add(linenumber, shbang);
+                    }
+                    ++linenumber;
+                }
+
+                return Compile(appDom, user, shbangs, assetID, reader, linenumber);
+            }
+
+            internal void SyntaxCheck(UUI user, UUID assetID, TextReader reader)
+            {
+                int linenumber = 1;
+                Dictionary<int, string> shbangs = new Dictionary<int, string>();
+                while(reader.Peek() == '/')
+                {
+                    string shbang = reader.ReadLine();
+                    if(shbang.StartsWith("//#!"))
+                    {
+                        shbangs.Add(linenumber, shbang);
+                    }
+                    ++linenumber;
+                }
+                SyntaxCheck(user, shbangs, assetID, reader, linenumber);
             }
         }
 
