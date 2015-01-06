@@ -71,11 +71,11 @@ namespace SilverSim.LL.Core.Capabilities
             item.LastOwner = m_Creator;
             item.Owner = m_Creator;
             item.Creator = m_Creator;
-            item.Permissions.Base = InventoryItem.PermissionsMask.All;
-            item.Permissions.Current = InventoryItem.PermissionsMask.Every;
-            item.Permissions.EveryOne = (InventoryItem.PermissionsMask)reqmap["everyone_mask"].AsUInt;
-            item.Permissions.Group = (InventoryItem.PermissionsMask)reqmap["group_mask"].AsUInt;
-            item.Permissions.NextOwner = (InventoryItem.PermissionsMask)reqmap["next_owner_mask"].AsUInt;
+            item.Permissions.Base = InventoryPermissionsMask.All;
+            item.Permissions.Current = InventoryPermissionsMask.Every;
+            item.Permissions.EveryOne = (InventoryPermissionsMask)reqmap["everyone_mask"].AsUInt;
+            item.Permissions.Group = (InventoryPermissionsMask)reqmap["group_mask"].AsUInt;
+            item.Permissions.NextOwner = (InventoryPermissionsMask)reqmap["next_owner_mask"].AsUInt;
             m_Transactions.Add(transaction, item);
             return transaction;
         }

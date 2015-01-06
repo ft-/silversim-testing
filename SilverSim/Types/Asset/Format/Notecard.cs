@@ -187,23 +187,23 @@ namespace SilverSim.Types.Asset.Format
                 string[] data = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
                 if(data[0] == "base_mask")
                 {
-                        item.Permissions.Base = (InventoryItem.PermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                        item.Permissions.Base = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
                 }
                 else if(data[0] == "owner_mask")
                 {
-                    item.Permissions.Current = (InventoryItem.PermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                    item.Permissions.Current = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
                 }
                 else if(data[0] == "group_mask")
                 {
-                    item.Permissions.Group = (InventoryItem.PermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                    item.Permissions.Group = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
                 }
                 else if(data[0] == "everyone_mask")
                 {
-                    item.Permissions.EveryOne = (InventoryItem.PermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                    item.Permissions.EveryOne = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
                 }
                 else if(data[0] == "next_owner_mask")
                 {
-                    item.Permissions.NextOwner = (InventoryItem.PermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                    item.Permissions.NextOwner = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
                 }
                 else if(data[0] == "creator_id")
                 {
@@ -253,7 +253,7 @@ namespace SilverSim.Types.Asset.Format
                 }
                 else if(data[0] == "perm_mask")
                 {
-                    item.SaleInfo.PermMask = (InventoryItem.PermissionsMask)uint.Parse(data[1]);
+                    item.SaleInfo.PermMask = (InventoryPermissionsMask)uint.Parse(data[1]);
                 }
                 else
                 {

@@ -68,11 +68,11 @@ namespace SilverSim.Scene.Types.Object
                 default: InventoryType = InventoryType.Unknown; break;
             }
             Owner = asset.Creator;
-            Permissions.Base = InventoryItem.PermissionsMask.Every;
-            Permissions.Current = InventoryItem.PermissionsMask.Every;
-            Permissions.EveryOne = InventoryItem.PermissionsMask.None;
-            Permissions.Group = InventoryItem.PermissionsMask.None;
-            Permissions.NextOwner = InventoryItem.PermissionsMask.Every;
+            Permissions.Base = InventoryPermissionsMask.Every;
+            Permissions.Current = InventoryPermissionsMask.Every;
+            Permissions.EveryOne = InventoryPermissionsMask.None;
+            Permissions.Group = InventoryPermissionsMask.None;
+            Permissions.NextOwner = InventoryPermissionsMask.Every;
         }
 
         public ObjectPartInventoryItem(InventoryItem item)

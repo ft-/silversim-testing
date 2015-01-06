@@ -23,78 +23,88 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Object;
+using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
-using SilverSim.Types;
+using System.Collections.Generic;
 using ThreadedClasses;
 
 namespace SilverSim.LL.Core.Capabilities
 {
-    public class NewFileAgentInventory : UploadAssetAbstractCapability
+    public class UpdateScriptTask : UploadAssetAbstractCapability
     {
-        private InventoryServiceInterface m_InventoryService;
-        private AssetServiceInterface m_AssetService;
+        class TransactionInfo
+        {
+            public UUID TaskID;
+            public UUID ItemID;
 
-        private readonly RwLockedDictionary<UUID, InventoryItem> m_Transactions = new RwLockedDictionary<UUID, InventoryItem>();
+            public TransactionInfo(UUID taskID, UUID itemID)
+            {
+                TaskID = taskID;
+                ItemID = itemID;
+            }
+        }
+
+        private UUI m_Agent;
+        private SceneInterface m_Scene;
+        private readonly RwLockedDictionary<UUID, TransactionInfo> m_Transactions = new RwLockedDictionary<UUID, TransactionInfo>();
 
         public override string CapabilityName
         {
             get
             {
-                return "NewFileAgentInventory";
+                return "UpdateScriptTask";
             }
         }
 
-        public NewFileAgentInventory(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
-            : base(creator)
+        public UpdateScriptTask(UUI agent, SceneInterface scene)
+            : base(agent)
         {
-            m_InventoryService = inventoryService;
-            m_AssetService = assetService;
+            m_Agent = agent;
+            m_Scene = scene;
         }
 
         public override UUID GetUploaderID(Map reqmap)
         {
             UUID transaction = UUID.Random;
-            InventoryItem item = new InventoryItem();
-            item.ID = UUID.Random;
-            item.Description = reqmap["description"].ToString();
-            item.Name = reqmap["name"].ToString();
-            item.ParentFolderID = reqmap["folder_id"].AsUUID;
-            item.AssetTypeName = reqmap["asset_type"].ToString();
-            item.InventoryTypeName = reqmap["inventory_type"].ToString();
-            item.LastOwner = m_Creator;
-            item.Owner = m_Creator;
-            item.Creator = m_Creator;
-            item.Permissions.Base = InventoryPermissionsMask.All;
-            item.Permissions.Current = InventoryPermissionsMask.Every;
-            item.Permissions.EveryOne = (InventoryPermissionsMask)reqmap["everyone_mask"].AsUInt;
-            item.Permissions.Group = (InventoryPermissionsMask)reqmap["group_mask"].AsUInt;
-            item.Permissions.NextOwner = (InventoryPermissionsMask)reqmap["next_owner_mask"].AsUInt;
-            m_Transactions.Add(transaction, item);
+            m_Transactions.Add(transaction, new TransactionInfo(reqmap["task_id"].AsUUID, reqmap["item_id"].AsUUID));
             return transaction;
         }
 
         public override Map UploadedData(UUID transactionID, AssetData data)
         {
-            KeyValuePair<UUID, InventoryItem> kvp;
-            if (m_Transactions.RemoveIf(transactionID, delegate(InventoryItem v) { return true; }, out kvp))
+            KeyValuePair<UUID, TransactionInfo> kvp;
+            if (m_Transactions.RemoveIf(transactionID, delegate(TransactionInfo v) { return true; }, out kvp))
             {
                 Map m = new Map();
-                m.Add("new_inventory_item", kvp.Value.ID.ToString());
-                kvp.Value.AssetID = data.ID;
-                data.Type = kvp.Value.AssetType;
-                data.Name = kvp.Value.Name;
-                data.Description = kvp.Value.Description;
+                ObjectPartInventoryItem item;
+                ObjectPart part = m_Scene.Primitives[kvp.Value.TaskID];
+                try
+                {
+                    item = part.Inventory[kvp.Value.ItemID];
+                }
+                catch
+                {
+                    throw new UrlNotFoundException();
+                }
+
+                if (item.AssetType != data.Type)
+                {
+                    throw new UrlNotFoundException();
+                }
+
+                item.AssetID = data.ID;
+                data.Creator = item.Creator;
+                data.Name = item.Name;
+                item.ID = UUID.Random;
 
                 try
                 {
-                    m_AssetService.Store(data);
+                    m_Scene.AssetService.Store(data);
                 }
                 catch
                 {
@@ -103,7 +113,8 @@ namespace SilverSim.LL.Core.Capabilities
 
                 try
                 {
-                    m_InventoryService.Item.Update(kvp.Value);
+                    part.Inventory.Remove(kvp.Value.ItemID);
+                    part.Inventory.Add(item.ID, item.Name, item);
                 }
                 catch
                 {
@@ -145,7 +156,7 @@ namespace SilverSim.LL.Core.Capabilities
         {
             get
             {
-                return AssetType.Unknown;
+                return AssetType.Notecard;
             }
         }
     }

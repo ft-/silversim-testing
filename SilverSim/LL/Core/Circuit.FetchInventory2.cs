@@ -57,7 +57,7 @@ namespace SilverSim.LL.Core
             uint basePermissions = (uint)item.Permissions.Base;
             if (AgentID == item.Creator.ID)
             {
-                basePermissions |= (uint)InventoryItem.PermissionsMask.Transfer | (uint)InventoryItem.PermissionsMask.Copy | (uint)InventoryItem.PermissionsMask.Modify;
+                basePermissions |= (uint)InventoryPermissionsMask.Transfer | (uint)InventoryPermissionsMask.Copy | (uint)InventoryPermissionsMask.Modify;
             }
             if (AgentID == item.Owner.ID)
             {

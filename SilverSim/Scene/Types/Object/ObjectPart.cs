@@ -28,6 +28,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
+using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
@@ -87,11 +88,11 @@ namespace SilverSim.Scene.Types.Object
         private UUI m_Creator = UUI.Unknown;
         private Date m_CreationDate = new Date();
 
-        private ObjectPartInventoryItem.PermissionsMask m_BaseMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
-        private ObjectPartInventoryItem.PermissionsMask m_OwnerMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
-        private ObjectPartInventoryItem.PermissionsMask m_GroupMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.None;
-        private ObjectPartInventoryItem.PermissionsMask m_EveryoneMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.None;
-        private ObjectPartInventoryItem.PermissionsMask m_NextOwnerMask = SilverSim.Types.Inventory.InventoryItem.PermissionsMask.All;
+        private SilverSim.Types.Inventory.InventoryPermissionsMask m_BaseMask = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
+        private SilverSim.Types.Inventory.InventoryPermissionsMask m_OwnerMask = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
+        private SilverSim.Types.Inventory.InventoryPermissionsMask m_GroupMask = SilverSim.Types.Inventory.InventoryPermissionsMask.None;
+        private SilverSim.Types.Inventory.InventoryPermissionsMask m_EveryoneMask = SilverSim.Types.Inventory.InventoryPermissionsMask.None;
+        private SilverSim.Types.Inventory.InventoryPermissionsMask m_NextOwnerMask = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
 
         public int ScriptAccessPin = 0;
 
@@ -194,7 +195,7 @@ namespace SilverSim.Scene.Types.Object
 
 
         #region Properties
-        public ObjectPartInventoryItem.PermissionsMask BaseMask
+        public InventoryPermissionsMask BaseMask
         {
             get
             {
@@ -214,7 +215,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public ObjectPartInventoryItem.PermissionsMask OwnerMask
+        public InventoryPermissionsMask OwnerMask
         {
             get
             {
@@ -234,7 +235,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public ObjectPartInventoryItem.PermissionsMask GroupMask
+        public InventoryPermissionsMask GroupMask
         {
             get
             {
@@ -254,7 +255,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public ObjectPartInventoryItem.PermissionsMask EveryoneMask
+        public InventoryPermissionsMask EveryoneMask
         {
             get
             {
@@ -274,7 +275,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public ObjectPartInventoryItem.PermissionsMask NextOwnerMask
+        public InventoryPermissionsMask NextOwnerMask
         {
             get
             {

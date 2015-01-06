@@ -47,11 +47,11 @@ namespace SilverSim.LL.Messages.Inventory
             public UUID CreatorID;
             public UUID OwnerID;
             public UUID GroupID;
-            public InventoryItem.PermissionsMask BaseMask;
-            public InventoryItem.PermissionsMask OwnerMask;
-            public InventoryItem.PermissionsMask GroupMask;
-            public InventoryItem.PermissionsMask EveryoneMask;
-            public InventoryItem.PermissionsMask NextOwnerMask;
+            public InventoryPermissionsMask BaseMask;
+            public InventoryPermissionsMask OwnerMask;
+            public InventoryPermissionsMask GroupMask;
+            public InventoryPermissionsMask EveryoneMask;
+            public InventoryPermissionsMask NextOwnerMask;
             public bool IsGroupOwned;
             public UUID AssetID;
             public AssetType Type;

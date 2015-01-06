@@ -64,13 +64,13 @@ namespace SilverSim.Types.Asset.Format
         public UUI LastOwner = new UUI();
         public UUI Owner = new UUI();
         public UGI Group = new UGI();
-        InventoryItem.PermissionsData Permissions;
+        PermissionsData Permissions;
         InventoryItem.SaleInfoData SaleInfo;
 
         #region Constructors
         public Wearable()
         {
-            SaleInfo.PermMask = (InventoryItem.PermissionsMask)0x7FFFFFFF;
+            SaleInfo.PermMask = (InventoryPermissionsMask)0x7FFFFFFF;
         }
 
         public Wearable(AssetData asset)
@@ -83,7 +83,7 @@ namespace SilverSim.Types.Asset.Format
                 throw new NotAWearableFormat();
             }
 
-            SaleInfo.PermMask = (InventoryItem.PermissionsMask)0x7FFFFFFF;
+            SaleInfo.PermMask = (InventoryPermissionsMask)0x7FFFFFFF;
 
             Name = lines[1].Trim();
             Description = lines[2].Trim();
@@ -142,23 +142,23 @@ namespace SilverSim.Types.Asset.Format
                         }
                         else if(para[0] == "base_mask")
                         {
-                            Permissions.Base = (InventoryItem.PermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
+                            Permissions.Base = (InventoryPermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
                         }
                         else if(para[0] == "owner_mask")
                         {
-                            Permissions.Current = (InventoryItem.PermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
+                            Permissions.Current = (InventoryPermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
                         }
                         else if(para[0] == "group_mask")
                         {
-                            Permissions.Group = (InventoryItem.PermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
+                            Permissions.Group = (InventoryPermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
                         }
                         else if(para[0] == "everyone_mask")
                         {
-                            Permissions.EveryOne = (InventoryItem.PermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
+                            Permissions.EveryOne = (InventoryPermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
                         }
                         else if(para[0] == "next_owner_mask")
                         {
-                            Permissions.NextOwner = (InventoryItem.PermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
+                            Permissions.NextOwner = (InventoryPermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
                         }
                         else if(para[0] == "creator_id")
                         {
@@ -209,7 +209,7 @@ namespace SilverSim.Types.Asset.Format
                         }
                         else if (para[0] == "perm_mask")
                         {
-                            SaleInfo.PermMask = (InventoryItem.PermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
+                            SaleInfo.PermMask = (InventoryPermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
                         }
 
                         if (++idx == lines.Length)

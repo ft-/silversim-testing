@@ -125,7 +125,7 @@ namespace SilverSim.LL.Core
 
                                 if (item.AssetType == AssetType.LSLText)
                                 {
-                                    if (0 == ((item.Permissions.Current | item.Permissions.EveryOne) & InventoryItem.PermissionsMask.Modify))
+                                    if (0 == ((item.Permissions.Current | item.Permissions.EveryOne) & InventoryPermissionsMask.Modify))
                                     {
                                         Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
                                         res.Message = "Insufficient permissions to view script";
@@ -261,7 +261,7 @@ namespace SilverSim.LL.Core
                                 try
                                 {
                                     item = Agent.InventoryService.Item[reqd.OldAgentID, reqd.OldItemID];
-                                    if((item.Permissions.Current & InventoryItem.PermissionsMask.Copy) == 0)
+                                    if((item.Permissions.Current & InventoryPermissionsMask.Copy) == 0)
                                     {
                                         /* skip item */
                                         continue;
@@ -273,7 +273,7 @@ namespace SilverSim.LL.Core
                                     }
                                     if(item.Owner.ID != Agent.Owner.ID)
                                     {
-                                        if((item.Permissions.Current & InventoryItem.PermissionsMask.Transfer) == 0)
+                                        if((item.Permissions.Current & InventoryPermissionsMask.Transfer) == 0)
                                         {
                                             continue;
                                         }
@@ -563,11 +563,11 @@ namespace SilverSim.LL.Core
                             item.AssetID = req.OldItemID;
                             item.AssetType = req.AssetType;
                             item.InventoryType = req.InvType;
-                            item.Permissions.Base = InventoryItem.PermissionsMask.All | InventoryItem.PermissionsMask.Export;
-                            item.Permissions.Current = InventoryItem.PermissionsMask.All | InventoryItem.PermissionsMask.Export;
-                            item.Permissions.EveryOne = InventoryItem.PermissionsMask.All;
-                            item.Permissions.NextOwner = InventoryItem.PermissionsMask.All | InventoryItem.PermissionsMask.Export;
-                            item.Permissions.Group = InventoryItem.PermissionsMask.All | InventoryItem.PermissionsMask.Export;
+                            item.Permissions.Base = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
+                            item.Permissions.Current = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
+                            item.Permissions.EveryOne = InventoryPermissionsMask.All;
+                            item.Permissions.NextOwner = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
+                            item.Permissions.Group = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
                             try
                             {
                                 Agent.InventoryService.Item.Add(item);
@@ -756,35 +756,35 @@ namespace SilverSim.LL.Core
                                 bool sendUpdate = false;
                                 if(d.NextOwnerMask != 0)
                                 {
-                                    InventoryItem.PermissionsData p = new InventoryItem.PermissionsData();
+                                    PermissionsData p = new PermissionsData();
                                     p.Base = d.BaseMask;
                                     p.Current = d.OwnerMask;
                                     p.NextOwner = d.NextOwnerMask;
                                     p.EveryOne = d.EveryoneMask;
                                     p.Group = d.GroupMask;
 
-                                    if((item.Permissions.Base & InventoryItem.PermissionsMask.All | InventoryItem.PermissionsMask.Export) != (InventoryItem.PermissionsMask.All | InventoryItem.PermissionsMask.Export) ||
-                                        (item.Permissions.Current & InventoryItem.PermissionsMask.Export) == 0 ||
+                                    if((item.Permissions.Base & InventoryPermissionsMask.All | InventoryPermissionsMask.Export) != (InventoryPermissionsMask.All | InventoryPermissionsMask.Export) ||
+                                        (item.Permissions.Current & InventoryPermissionsMask.Export) == 0 ||
                                         item.Creator.ID != item.Owner.ID)
                                     {
                                         // If we are not allowed to change it, then force it to the
                                         // original item's setting and if it was on, also force full perm
-                                        if ((item.Permissions.EveryOne & InventoryItem.PermissionsMask.Export) != 0)
+                                        if ((item.Permissions.EveryOne & InventoryPermissionsMask.Export) != 0)
                                         {
-                                            p.NextOwner = InventoryItem.PermissionsMask.All;
-                                            p.EveryOne |= InventoryItem.PermissionsMask.Export;
+                                            p.NextOwner = InventoryPermissionsMask.All;
+                                            p.EveryOne |= InventoryPermissionsMask.Export;
                                         }
                                         else
                                         {
-                                            p.EveryOne &= ~InventoryItem.PermissionsMask.Export;
+                                            p.EveryOne &= ~InventoryPermissionsMask.Export;
                                         }
                                     }
                                     else
                                     {
                                         // If the new state is exportable, force full perm
-                                        if ((p.EveryOne & InventoryItem.PermissionsMask.Export) != 0)
+                                        if ((p.EveryOne & InventoryPermissionsMask.Export) != 0)
                                         {
-                                            p.NextOwner = InventoryItem.PermissionsMask.All;
+                                            p.NextOwner = InventoryPermissionsMask.All;
                                         }
                                     }
 
@@ -894,13 +894,13 @@ namespace SilverSim.LL.Core
                 item.Creator = Agent.Owner;
                 item.SaleInfo.Type = InventoryItem.SaleInfoData.SaleType.NoSale;
                 item.SaleInfo.Price = 0;
-                item.SaleInfo.PermMask = InventoryItem.PermissionsMask.All;
+                item.SaleInfo.PermMask = InventoryPermissionsMask.All;
                 item.ParentFolderID = req.FolderID;
 
-                item.Permissions.Base = InventoryItem.PermissionsMask.All | InventoryItem.PermissionsMask.Export;
-                item.Permissions.Current = InventoryItem.PermissionsMask.All | InventoryItem.PermissionsMask.Export;
-                item.Permissions.Group = InventoryItem.PermissionsMask.None;
-                item.Permissions.EveryOne = InventoryItem.PermissionsMask.None;
+                item.Permissions.Base = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
+                item.Permissions.Current = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
+                item.Permissions.Group = InventoryPermissionsMask.None;
+                item.Permissions.EveryOne = InventoryPermissionsMask.None;
                 item.Permissions.NextOwner = req.NextOwnerMask;
 
                 if(item.InventoryType == InventoryType.Landmark)

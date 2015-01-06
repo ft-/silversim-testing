@@ -39,7 +39,7 @@ namespace SilverSim.LL.Messages.Inventory
         public UInt32 CallbackID;
         public UUID FolderID;
         public UUID TransactionID;
-        public InventoryItem.PermissionsMask NextOwnerMask;
+        public InventoryPermissionsMask NextOwnerMask;
         public AssetType AssetType;
         public InventoryType InvType;
         public WearableType WearableType;
@@ -69,7 +69,7 @@ namespace SilverSim.LL.Messages.Inventory
             m.CallbackID = p.ReadUInt32();
             m.FolderID = p.ReadUUID();
             m.TransactionID = p.ReadUUID();
-            m.NextOwnerMask = (InventoryItem.PermissionsMask)p.ReadUInt32();
+            m.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
             m.AssetType = (AssetType)p.ReadUInt8();
             m.InvType = (InventoryType)p.ReadUInt8();
             m.WearableType = (WearableType)p.ReadUInt8();

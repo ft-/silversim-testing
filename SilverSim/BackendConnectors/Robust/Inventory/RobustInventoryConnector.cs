@@ -156,7 +156,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             item.ID = map["ID"].AsUUID;
             item.AssetID = map["AssetID"].AsUUID;
             item.AssetType = (AssetType)map["AssetType"].AsInt;
-            item.Permissions.Base = (InventoryItem.PermissionsMask)map["BasePermissions"].AsUInt;
+            item.Permissions.Base = (InventoryPermissionsMask)map["BasePermissions"].AsUInt;
             item.CreationDate = Date.UnixTimeToDateTime(map["CreationDate"].AsULong);
             if (map["CreatorData"].AsString.ToString() == "")
             {
@@ -166,9 +166,9 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             {
                 item.Creator = new UUI(map["CreatorId"].AsUUID, map["CreatorData"].AsString.ToString());
             }
-            item.Permissions.Current = (InventoryItem.PermissionsMask)map["CurrentPermissions"].AsUInt;
+            item.Permissions.Current = (InventoryPermissionsMask)map["CurrentPermissions"].AsUInt;
             item.Description = map["Description"].AsString.ToString();
-            item.Permissions.EveryOne = (InventoryItem.PermissionsMask)map["EveryOnePermissions"].AsUInt;
+            item.Permissions.EveryOne = (InventoryPermissionsMask)map["EveryOnePermissions"].AsUInt;
             item.Flags = map["Flags"].AsUInt;
             item.ParentFolderID = map["Folder"].AsUUID;
             if (groupsService != null)
@@ -187,10 +187,10 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
                 item.Group.ID = map["GroupID"].AsUUID;
             }
             item.GroupOwned = map["GroupOwned"].AsBoolean;
-            item.Permissions.Group = (InventoryItem.PermissionsMask)map["GroupPermissions"].AsUInt;
+            item.Permissions.Group = (InventoryPermissionsMask)map["GroupPermissions"].AsUInt;
             item.InventoryType = (InventoryType) map["InvType"].AsInt;
             item.Name = map["Name"].AsString.ToString();
-            item.Permissions.NextOwner = (InventoryItem.PermissionsMask)map["NextPermissions"].AsUInt;
+            item.Permissions.NextOwner = (InventoryPermissionsMask)map["NextPermissions"].AsUInt;
             item.Owner.ID = map["Owner"].AsUUID;
             item.SaleInfo.Price = map["SalePrice"].AsInt;
             item.SaleInfo.Type = (InventoryItem.SaleInfoData.SaleType) map["SaleType"].AsUInt;
