@@ -118,12 +118,20 @@ namespace SilverSim.Scripting.LSL.API.Inventory
                 {
                     ScriptInstance si = resitem.ScriptInstance;
 
-                    if (si != null)
-                    {
-                        si.Abort();
-                        si.Remove();
-                    }
                     Instance.Part.Inventory.Remove(resitem.ID);
+                    if (si == Instance)
+                    {
+                        throw new ScriptAbortException();
+                    }
+                    else if (si != null)
+                    {
+                        si = resitem.RemoveScriptInstance;
+                        if (si != null)
+                        {
+                            si.Abort();
+                            si.Remove();
+                        }
+                    }
                 }
             }
         }

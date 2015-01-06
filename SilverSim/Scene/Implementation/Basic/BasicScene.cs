@@ -40,7 +40,10 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Scene.Types.Script;
+using SilverSim.Scripting.Common;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Types.Parcel;
@@ -418,7 +421,28 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        public override bool Remove(IObject obj)
+        void RemoveAllScripts(ScriptInstance instance, ObjectPart part)
+        {
+            foreach (ObjectPartInventoryItem item in part.Inventory.Values)
+            {
+                if (item.AssetType == AssetType.LSLText)
+                {
+                    ScriptInstance script = item.ScriptInstance;
+                    if (script != instance && script != null)
+                    {
+                        script = item.RemoveScriptInstance;
+                        if (script != null)
+                        {
+                            script.Abort();
+                            script.Remove();
+                            ScriptLoader.Remove(item.AssetID, script);
+                        }
+                    }
+                }
+            }
+        }
+
+        public override bool Remove(IObject obj, ScriptInstance instance = null)
         {
             if(!m_Objects.ContainsValue(obj))
             {

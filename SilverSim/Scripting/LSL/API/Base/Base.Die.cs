@@ -28,6 +28,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Object;
+using SilverSim.Scripting.Common;
 
 namespace SilverSim.Scripting.LSL.API.Base
 {
@@ -36,7 +38,9 @@ namespace SilverSim.Scripting.LSL.API.Base
         [APILevel(APIFlags.LSL)]
         public void llDie(ScriptInstance Instance)
         {
-#warning Implement llDie()
+            Instance.AbortBegin();
+            Instance.Part.ObjectGroup.Scene.Remove(Instance.Part.ObjectGroup, Instance);
+            throw new ScriptAbortException();
         }
     }
 }

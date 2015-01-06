@@ -209,6 +209,13 @@ namespace SilverSim.LL.Core
 
         void RezActualScript(Circuit circuit, ObjectPart part, RezScript req, AssetData data)
         {
+            if(!part.CheckPermissions(Owner, Group, InventoryPermissionsMask.Modify))
+            {
+                Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
+                res.Message = "ALERT: NoPermModifyObject";
+                circuit.SendMessage(res);
+                return;
+            }
             ObjectPartInventoryItem item = new ObjectPartInventoryItem();
             item.Name = req.InventoryBlock.Name;
             item.AssetID = data.ID;

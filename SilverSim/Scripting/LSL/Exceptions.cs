@@ -13,14 +13,6 @@ namespace SilverSim.Scripting.LSL
         }
     }
 
-    public class AbortScriptException : Exception
-    {
-        public AbortScriptException()
-        {
-
-        }
-    }
-
     public class ChangeStateException : Exception
     {
         public string NewState { get; private set; }

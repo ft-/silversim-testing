@@ -607,6 +607,7 @@
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
+      <Reference name="SilverSim.Scripting.Common" localCopy="false"/>
       <Reference name="SilverSim.LL.Core" localCopy="false"/>
       <Reference name="SilverSim.LL.Messages" localCopy="false"/>
       <Reference name="HttpClasses" path="../../../../bin/" localCopy="false"/>

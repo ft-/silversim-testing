@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Object;
 using System;
 using System.Threading;
 using ThreadedClasses;
@@ -193,6 +194,20 @@ namespace SilverSim.Scripting.Common
                 {
                     /* no in script event should abort us */
                     Thread.ResetAbort();
+                    ObjectPartInventoryItem item = ev.Item;
+                    ScriptInstance instance = item.ScriptInstance;
+                    item.ScriptInstance = null;
+                    instance.Remove();
+                    ScriptLoader.Remove(item.AssetID, instance);
+                }
+                catch(ScriptAbortException)
+                {
+                    ObjectPartInventoryItem item = ev.Item;
+                    ScriptInstance instance = item.ScriptInstance;
+                    instance.AbortBegin();
+                    instance.Remove();
+                    item.ScriptInstance = null;
+                    ScriptLoader.Remove(item.AssetID, instance);
                 }
 
                 if (ev.HasEventsPending)

@@ -225,7 +225,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         public abstract void Add(IObject obj);
-        public abstract bool Remove(IObject obj);
+        public abstract bool Remove(IObject obj, Script.ScriptInstance instance = null);
 
         public abstract ILLUDPServer UDPServer { get; }
 
