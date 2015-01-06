@@ -35,6 +35,7 @@ namespace SilverSim.LL.Core.Capabilities
 {
     public class UpdateNotecardAgentInventory : UploadAssetAbstractCapability
     {
+        LLAgent m_Agent;
         private InventoryServiceInterface m_InventoryService;
         private AssetServiceInterface m_AssetService;
         private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
@@ -47,9 +48,10 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        public UpdateNotecardAgentInventory(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
-            : base(creator)
+        public UpdateNotecardAgentInventory(LLAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
+            : base(agent.Owner)
         {
+            m_Agent = agent;
             m_InventoryService = inventoryService;
             m_AssetService = assetService;
         }
@@ -80,6 +82,11 @@ namespace SilverSim.LL.Core.Capabilities
                 if(item.AssetType != data.Type)
                 {
                     throw new UrlNotFoundException();
+                }
+
+                if(!item.CheckPermissions(m_Agent.Owner, m_Agent.Group, InventoryPermissionsMask.Modify))
+                {
+                    throw new UploadErrorException("Not allowed to modify notecard");
                 }
 
                 item.AssetID = data.ID;

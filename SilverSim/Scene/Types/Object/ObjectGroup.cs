@@ -70,11 +70,13 @@ namespace SilverSim.Scene.Types.Object
         private bool m_IsPhysics = false;
         private bool m_IsPhantom = false;
         private bool m_IsVolumeDetect = false;
+        private bool m_IsGroupOwned = false;
         private Vector3 m_Velocity = Vector3.Zero;
         private UGI m_Group = UGI.Unknown;
         private UUI m_Owner = UUI.Unknown;
         private UUI m_LastOwner = UUI.Unknown;
         private UUID m_OriginalAssetID = UUID.Zero; /* necessary for reducing asset re-generation */
+        private UUID m_NextOwnerAssetID = UUID.Zero; /* necessary for reducing asset re-generation */
         protected internal RwLockedBiDiMappingDictionary<IAgent, ObjectPart> m_SittingAgents = new RwLockedBiDiMappingDictionary<IAgent, ObjectPart>();
         public AgentSittingInterface AgentSitting { get; private set; }
         public SceneInterface Scene { get; set; }
@@ -134,9 +136,28 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public UUID NextOwnerAssetID /* will be set to UUID.Zero when anything has been changed */
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_NextOwnerAssetID;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_NextOwnerAssetID = value;
+                }
+            }
+        }
+
         private void TriggerOnUpdate(ChangedEvent.ChangedFlags flags)
         {
             OriginalAssetID = UUID.Zero;
+            NextOwnerAssetID = UUID.Zero;
 
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
@@ -232,6 +253,23 @@ namespace SilverSim.Scene.Types.Object
                 m_IsPhantom = value;
                 IsChanged = true;
                 TriggerOnUpdate(0);
+            }
+        }
+
+        public bool IsGroupOwned
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_IsGroupOwned;
+                }
+            }
+            set
+            {
+                m_IsGroupOwned = value;
+                IsChanged = true;
+                TriggerOnUpdate(ChangedEvent.ChangedFlags.Owner);
             }
         }
 

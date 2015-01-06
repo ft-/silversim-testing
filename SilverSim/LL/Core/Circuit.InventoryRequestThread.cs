@@ -756,7 +756,7 @@ namespace SilverSim.LL.Core
                                 bool sendUpdate = false;
                                 if(d.NextOwnerMask != 0)
                                 {
-                                    PermissionsData p = new PermissionsData();
+                                    InventoryPermissionsData p = new InventoryPermissionsData();
                                     p.Base = d.BaseMask;
                                     p.Current = d.OwnerMask;
                                     p.NextOwner = d.NextOwnerMask;

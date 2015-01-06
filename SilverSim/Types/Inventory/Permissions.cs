@@ -19,7 +19,7 @@ namespace SilverSim.Types.Inventory
         Every = 0x7FFFFFFF
     }
 
-    public struct PermissionsData
+    public struct InventoryPermissionsData
     {
         public InventoryPermissionsMask Base;
         public InventoryPermissionsMask Current;
@@ -35,11 +35,11 @@ namespace SilverSim.Types.Inventory
             }
             else if(accessor == owner)
             {
-                return (wanted & Current) == wanted;
+                return (wanted & Base & Current) == wanted;
             }
             else
             {
-                return (wanted & EveryOne) == wanted;
+                return (wanted & Base & EveryOne) == wanted;
             }
         }
 
@@ -51,11 +51,11 @@ namespace SilverSim.Types.Inventory
             }
             else if(accessorgroup == ownergroup)
             {
-                return (wanted & Group) == wanted;
+                return (wanted & Base & Group) == wanted;
             }
             else
             {
-                return (wanted & EveryOne) == wanted;
+                return (wanted & Base & EveryOne) == wanted;
             }
         }
     }

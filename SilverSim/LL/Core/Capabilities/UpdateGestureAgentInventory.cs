@@ -35,6 +35,7 @@ namespace SilverSim.LL.Core.Capabilities
 {
     public class UpdateGestureAgentInventory : UploadAssetAbstractCapability
     {
+        LLAgent m_Agent;
         private InventoryServiceInterface m_InventoryService;
         private AssetServiceInterface m_AssetService;
         private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
@@ -47,11 +48,12 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        public UpdateGestureAgentInventory(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
-            : base(creator)
+        public UpdateGestureAgentInventory(LLAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
+            : base(agent.Owner)
         {
             m_InventoryService = inventoryService;
             m_AssetService = assetService;
+            m_Agent = agent;
         }
 
         public override UUID GetUploaderID(Map reqmap)
@@ -82,6 +84,10 @@ namespace SilverSim.LL.Core.Capabilities
                     throw new UrlNotFoundException();
                 }
 
+                if(!item.CheckPermissions(m_Agent.Owner, m_Agent.Group, InventoryPermissionsMask.Modify))
+                {
+                    throw new UploadErrorException("Not allowed to modify gesture");
+                }
                 item.AssetID = data.ID;
                 data.Creator = item.Creator;
                 data.Name = item.Name;

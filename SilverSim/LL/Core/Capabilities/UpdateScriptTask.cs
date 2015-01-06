@@ -49,7 +49,7 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        private UUI m_Agent;
+        private LLAgent m_Agent;
         private SceneInterface m_Scene;
         private readonly RwLockedDictionary<UUID, TransactionInfo> m_Transactions = new RwLockedDictionary<UUID, TransactionInfo>();
 
@@ -61,8 +61,8 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        public UpdateScriptTask(UUI agent, SceneInterface scene)
-            : base(agent)
+        public UpdateScriptTask(LLAgent agent, SceneInterface scene)
+            : base(agent.Owner)
         {
             m_Agent = agent;
             m_Scene = scene;
@@ -95,6 +95,15 @@ namespace SilverSim.LL.Core.Capabilities
                 if (item.AssetType != data.Type)
                 {
                     throw new UrlNotFoundException();
+                }
+
+                if(!part.CheckPermissions(m_Agent.Owner, m_Agent.Group, InventoryPermissionsMask.Modify))
+                {
+                    throw new UploadErrorException("Not allowed to modify script");
+                }
+                if(!item.CheckPermissions(m_Agent.Owner, m_Agent.Group, InventoryPermissionsMask.Modify))
+                {
+                    throw new UploadErrorException("Not allowed to modify script");
                 }
 
                 item.AssetID = data.ID;

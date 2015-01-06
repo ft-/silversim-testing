@@ -38,6 +38,7 @@ namespace SilverSim.LL.Core.Capabilities
 {
     public class UpdateScriptAgent : UploadAssetAbstractCapability
     {
+        private LLAgent m_Agent;
         private InventoryServiceInterface m_InventoryService;
         private AssetServiceInterface m_AssetService;
         private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
@@ -50,9 +51,10 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        public UpdateScriptAgent(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
-            : base(creator)
+        public UpdateScriptAgent(LLAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
+            : base(agent.Owner)
         {
+            m_Agent = agent;
             m_InventoryService = inventoryService;
             m_AssetService = assetService;
         }
@@ -84,6 +86,11 @@ namespace SilverSim.LL.Core.Capabilities
                 if (item.AssetType != data.Type)
                 {
                     throw new UrlNotFoundException();
+                }
+
+                if (!item.CheckPermissions(m_Agent.Owner, m_Agent.Group, InventoryPermissionsMask.Modify))
+                {
+                    throw new UploadErrorException("Not allowed to modify script");
                 }
 
                 item.AssetID = data.ID;

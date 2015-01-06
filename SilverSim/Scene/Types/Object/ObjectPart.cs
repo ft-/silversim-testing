@@ -88,11 +88,7 @@ namespace SilverSim.Scene.Types.Object
         private UUI m_Creator = UUI.Unknown;
         private Date m_CreationDate = new Date();
 
-        private SilverSim.Types.Inventory.InventoryPermissionsMask m_BaseMask = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
-        private SilverSim.Types.Inventory.InventoryPermissionsMask m_OwnerMask = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
-        private SilverSim.Types.Inventory.InventoryPermissionsMask m_GroupMask = SilverSim.Types.Inventory.InventoryPermissionsMask.None;
-        private SilverSim.Types.Inventory.InventoryPermissionsMask m_EveryoneMask = SilverSim.Types.Inventory.InventoryPermissionsMask.None;
-        private SilverSim.Types.Inventory.InventoryPermissionsMask m_NextOwnerMask = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
+        private SilverSim.Types.Inventory.InventoryPermissionsData m_Permissions = new SilverSim.Types.Inventory.InventoryPermissionsData();
 
         public int ScriptAccessPin = 0;
 
@@ -115,6 +111,12 @@ namespace SilverSim.Scene.Types.Object
         #region Constructor
         public ObjectPart()
         {
+            m_Permissions.Base = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
+            m_Permissions.Current = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
+            m_Permissions.Group = SilverSim.Types.Inventory.InventoryPermissionsMask.None;
+            m_Permissions.EveryOne = SilverSim.Types.Inventory.InventoryPermissionsMask.None;
+            m_Permissions.NextOwner = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
+
             ObjectGroup = null;
             IsChanged = false;
             Inventory = new ObjectPartInventory();
@@ -127,6 +129,20 @@ namespace SilverSim.Scene.Types.Object
         {
             m_ObjectUpdateInfo.KillObject();
             ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+        }
+        #endregion
+
+        #region Permissions
+        public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted)
+        {
+            if (ObjectGroup.IsGroupOwned)
+            {
+                return m_Permissions.CheckGroupPermissions(Creator, ObjectGroup.Group, accessor, accessorgroup, wanted);
+            }
+            else
+            {
+                return m_Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
+            }
         }
         #endregion
 
@@ -201,14 +217,14 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    return m_BaseMask;
+                    return m_Permissions.Base;
                 }
             }
             set
             {
                 lock (this)
                 {
-                    m_BaseMask = value;
+                    m_Permissions.Base = value;
                 }
                 IsChanged = true;
                 TriggerOnUpdate(0);
@@ -221,14 +237,14 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    return m_OwnerMask;
+                    return m_Permissions.Current;
                 }
             }
             set
             {
                 lock (this)
                 {
-                    m_OwnerMask = value;
+                    m_Permissions.Current = value;
                 }
                 IsChanged = true;
                 TriggerOnUpdate(0);
@@ -241,14 +257,14 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    return m_GroupMask;
+                    return m_Permissions.Group;
                 }
             }
             set
             {
                 lock (this)
                 {
-                    m_GroupMask = value;
+                    m_Permissions.Group = value;
                 }
                 IsChanged = true;
                 TriggerOnUpdate(0);
@@ -261,14 +277,14 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    return m_EveryoneMask;
+                    return m_Permissions.EveryOne;
                 }
             }
             set
             {
                 lock (this)
                 {
-                    m_EveryoneMask = value;
+                    m_Permissions.EveryOne = value;
                 }
                 IsChanged = true;
                 TriggerOnUpdate(0);
@@ -281,14 +297,14 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    return m_NextOwnerMask;
+                    return m_Permissions.NextOwner;
                 }
             }
             set
             {
                 lock (this)
                 {
-                    m_NextOwnerMask = value;
+                    m_Permissions.NextOwner = value;
                 }
                 IsChanged = true;
                 TriggerOnUpdate(0);

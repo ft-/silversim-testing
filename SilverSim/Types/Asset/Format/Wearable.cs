@@ -64,7 +64,7 @@ namespace SilverSim.Types.Asset.Format
         public UUI LastOwner = new UUI();
         public UUI Owner = new UUI();
         public UGI Group = new UGI();
-        PermissionsData Permissions;
+        InventoryPermissionsData Permissions;
         InventoryItem.SaleInfoData SaleInfo;
 
         #region Constructors

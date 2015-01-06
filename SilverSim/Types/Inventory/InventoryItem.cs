@@ -47,7 +47,19 @@ namespace SilverSim.Types.Inventory
         #endregion
 
         #region Permissions
-        public PermissionsData Permissions;
+        public InventoryPermissionsData Permissions;
+
+        public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted)
+        {
+            if(GroupOwned)
+            {
+                return Permissions.CheckGroupPermissions(Creator, Group, accessor, accessorgroup, wanted);
+            }
+            else
+            {
+                return Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
+            }
+        }
         #endregion
 
         #region SaleInfo
