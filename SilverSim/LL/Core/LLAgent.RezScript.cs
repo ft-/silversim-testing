@@ -172,6 +172,14 @@ namespace SilverSim.LL.Core
                 }
             }
 
+            if (data.Type != AssetType.LSLText)
+            {
+                Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
+                res.Message = "Unable to rez a non-script asset as script";
+                circuit.SendMessage(res);
+                return;
+            }
+
             RezActualScript(circuit, part, req, data);
 
             if(0 == (item.Permissions.Current & InventoryPermissionsMask.Copy))
