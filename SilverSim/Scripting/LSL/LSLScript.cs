@@ -446,6 +446,12 @@ namespace SilverSim.Scripting.LSL
                 startticks = Environment.TickCount;
                 InvokeStateEvent("state_entry");
             }
+            catch(AbortScriptException e)
+            {
+                AbortBegin();
+                m_Events.Clear();
+                Abort();
+            }
             catch(ChangeStateException e)
             {
                 TriggerOnStateChange();

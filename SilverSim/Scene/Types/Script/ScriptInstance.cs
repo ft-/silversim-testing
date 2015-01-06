@@ -62,6 +62,12 @@ namespace SilverSim.Scene.Types.Script
             IsAborting = false;
         }
 
+        protected void AbortBegin()
+        {
+            IsRunning = false;
+            IsAborting = true;
+        }
+
         public void Abort()
         {
             IsRunning = false;
