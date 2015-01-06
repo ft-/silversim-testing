@@ -267,9 +267,17 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_IsGroupOwned = value;
-                IsChanged = true;
-                TriggerOnUpdate(ChangedEvent.ChangedFlags.Owner);
+                bool changed = false;
+                lock (this)
+                {
+                    changed = m_IsGroupOwned != value;
+                    m_IsGroupOwned = value;
+                }
+                if (changed)
+                {
+                    IsChanged = true;
+                    TriggerOnUpdate(ChangedEvent.ChangedFlags.Owner);
+                }
             }
         }
 
