@@ -157,14 +157,10 @@ namespace SilverSim.LL.Core.Capabilities
                 {
                     using (TextReader reader = new StreamReader(data.InputStream))
                     {
-                        //instance = ScriptLoader.Load(part, item, item.Owner, data);
-                        ScriptLoader.SyntaxCheck(item.Owner, data);
+                        instance = ScriptLoader.Load(part, item, item.Owner, data);
                     }
-                    //item.ScriptInstance = instance;
-                    if(kvp.Value.IsScriptRunning)
-                    {
-#warning implement thread pool connection
-                    }
+                    item.ScriptInstance = instance;
+                    item.ScriptInstance.IsRunning = kvp.Value.IsScriptRunning;
                     m.Add("compiled", true);
                 }
                 catch (CompilerException e)

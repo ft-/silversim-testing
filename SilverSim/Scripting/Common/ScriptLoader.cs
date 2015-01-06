@@ -60,7 +60,7 @@ namespace SilverSim.Scripting.Common
                 {
                     using (TextReader reader = new StreamReader(data.InputStream))
                     {
-                        AppDomain appDom = AppDomain.CreateDomain("Script Domain " + data.ID.ToString());
+                        AppDomain appDom = AppDomain.CreateDomain("Script Domain " + data.ID.ToString(), AppDomain.CurrentDomain.Evidence);
                         m_LoadedDomains.Add(data.ID, appDom);
                         return CompilerRegistry.ScriptCompilers.Compile(appDom, user, data.ID, reader);
                     }

@@ -66,9 +66,10 @@ namespace SilverSim.Scene.Types.Script
         {
             IsRunning = false;
             IsAborting = true;
-            if (null != ThreadPool)
+            IScriptWorkerThreadPool pool = ThreadPool;
+            if (null != pool)
             {
-                ThreadPool.AbortScript(this);
+                pool.AbortScript(this);
             }
         }
 
