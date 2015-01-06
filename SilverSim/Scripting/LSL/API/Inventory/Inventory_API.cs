@@ -27,6 +27,8 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
+using SilverSim.Types.Script;
+using SilverSim.Types.Inventory;
 using System;
 
 namespace SilverSim.Scripting.LSL.API.Inventory
@@ -206,8 +208,47 @@ namespace SilverSim.Scripting.LSL.API.Inventory
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llGetInventoryPermMask(ScriptInstance Instance, string item, int category)
+        public int llGetInventoryPermMask(ScriptInstance Instance, string name, int category)
         {
+            lock(Instance)
+            {
+                try
+                {
+                    ObjectPartInventoryItem item = Instance.Part.Inventory[name];
+                    InventoryPermissionsMask mask;
+                    switch(category)
+                    {
+                        case MASK_BASE:
+                            mask = item.Permissions.Base;
+                            break;
+
+                        case MASK_EVERYONE:
+                            mask = item.Permissions.EveryOne;
+                            break;
+
+                        case MASK_GROUP:
+                            mask = item.Permissions.Group;
+                            break;
+
+                        case MASK_NEXT:
+                            mask = item.Permissions.NextOwner;
+                            break;
+
+                        case MASK_OWNER:
+                            mask = item.Permissions.Current;
+                            break;
+
+                        default:
+                            mask = InventoryPermissionsMask.None;
+                            break;
+                    }
+                    return (int)(UInt32)mask;
+                }
+                catch
+                {
+                    throw new Exception(string.Format("Inventory item {0} does not exist", name));
+                }
+            }
             return 0;
         }
 
@@ -218,7 +259,7 @@ namespace SilverSim.Scripting.LSL.API.Inventory
             {
                 try
                 {
-                    return (int)Instance.Part.Inventory[name.ToString()].InventoryType;
+                    return (int)Instance.Part.Inventory[name].InventoryType;
                 }
                 catch
                 {
