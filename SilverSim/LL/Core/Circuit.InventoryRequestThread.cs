@@ -56,6 +56,18 @@ namespace SilverSim.LL.Core
             SendMessage(res);
         }
 
+        private void SendAssetInsufficientPermissions(Messages.Transfer.TransferRequest req)
+        {
+            Messages.Transfer.TransferInfo res = new Messages.Transfer.TransferInfo();
+            res.ChannelType = 2;
+            res.Status = -5;
+            res.TargetType = (int)req.SourceType;
+            res.Params = req.Params;
+            res.Size = 0;
+            res.TransferID = req.TransferID;
+            SendMessage(res);
+        }
+
         private void FetchInventoryThread(object param)
         {
             Thread.CurrentThread.Name = string.Format("LLUDP:Inventory Fetch for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
@@ -127,10 +139,7 @@ namespace SilverSim.LL.Core
                                 {
                                     if (0 == ((item.Permissions.Current | item.Permissions.EveryOne) & InventoryPermissionsMask.Modify))
                                     {
-                                        Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                                        res.Message = "Insufficient permissions to view script";
-                                        SendMessage(res);
-                                        SendAssetNotFound(req);
+                                        SendAssetInsufficientPermissions(req);
                                         break;
                                     }
                                 }

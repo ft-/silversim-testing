@@ -923,6 +923,7 @@ namespace SilverSim.LL.Core
             m_AgentMessageRouting.Add(MessageType.MoneyBalanceRequest, HandleMoneyBalanceRequest);
             m_AgentMessageRouting.Add(MessageType.AgentDataUpdateRequest, HandleAgentDataUpdateRequest);
             m_AgentMessageRouting.Add(MessageType.AgentAnimation, HandleAgentAnimation);
+            m_AgentMessageRouting.Add(MessageType.RezScript, HandleRezScript);
         }
 
         public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)

@@ -30,6 +30,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Script;
 
 namespace SilverSim.LL.Messages.Script
 {
@@ -49,11 +50,11 @@ namespace SilverSim.LL.Messages.Script
             public UUID CreatorID;
             public UUID OwnerID;
             public UUID GroupID;
-            public UInt32 BaseMask;
-            public UInt32 OwnerMask;
-            public UInt32 GroupMask;
-            public UInt32 EveryoneMask;
-            public UInt32 NextOwnerMask;
+            public InventoryPermissionsMask BaseMask;
+            public InventoryPermissionsMask OwnerMask;
+            public InventoryPermissionsMask GroupMask;
+            public InventoryPermissionsMask EveryoneMask;
+            public InventoryPermissionsMask NextOwnerMask;
             public bool IsGroupOwned;
             public UUID TransactionID;
             public AssetType AssetType;
@@ -94,11 +95,11 @@ namespace SilverSim.LL.Messages.Script
             m.InventoryBlock.FolderID = p.ReadUUID();
             m.InventoryBlock.CreatorID = p.ReadUUID();
             m.InventoryBlock.OwnerID = p.ReadUUID();
-            m.InventoryBlock.BaseMask = p.ReadUInt32();
-            m.InventoryBlock.OwnerMask = p.ReadUInt32();
-            m.InventoryBlock.GroupMask = p.ReadUInt32();
-            m.InventoryBlock.EveryoneMask = p.ReadUInt32();
-            m.InventoryBlock.NextOwnerMask = p.ReadUInt32();
+            m.InventoryBlock.BaseMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.InventoryBlock.OwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.InventoryBlock.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.InventoryBlock.EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.InventoryBlock.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
             m.InventoryBlock.IsGroupOwned = p.ReadBoolean();
             m.InventoryBlock.TransactionID = p.ReadUUID();
             m.InventoryBlock.AssetType = (AssetType)p.ReadInt8();

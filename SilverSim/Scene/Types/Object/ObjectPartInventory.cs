@@ -134,6 +134,28 @@ namespace SilverSim.Scene.Types.Object
 
         #endregion
 
+        public void Add(ObjectPartInventoryItem item, bool nameChangeAllowed = true)
+        {
+            lock(this)
+            {
+                if (nameChangeAllowed)
+                {
+                    int index = 1;
+                    string name = item.Name;
+                    while (ContainsKey(name))
+                    {
+                        name = string.Format("{0} {1}", item.Name, index++);
+                        if (index > 1000)
+                        {
+                            throw new InvalidOperationException();
+                        }
+                    }
+                    item.Name = name;
+                }
+                Add(item.ID, item.Name, item);
+            }
+        }
+
         #region Overrides
         public new void Add(UUID key1, string key2, ObjectPartInventoryItem item)
         {
