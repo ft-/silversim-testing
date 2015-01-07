@@ -2,7 +2,7 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-[assembly: AssemblyProduct("SilverSim")]
+[assembly: AssemblyProduct("SilverSim/Arriba")]
 [assembly: AssemblyCompany("SilverSim Development")]
 [assembly: AssemblyCopyright("Affero GPLv3 License + Link Exception")]
 [assembly: AssemblyTrademark("")]
