@@ -36,44 +36,45 @@
     <!-- Core Logic Code -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="SilverSim.Main.Simulator" path="SilverSim/Main/Simulator" type="Exe">
+    <Project frameworkVersion="v4_0" name="SilverSim.Main.Simulator" path="SilverSim/Main.Simulator" type="Exe">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
+      <ReferencePath>../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="SilverSim.Main.Common" path="SilverSim/Main/Common" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Main.Common" path="SilverSim/Main.Common" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
+      <ReferencePath>../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Xml"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="SilverSim.Types" localCopy="false"/>
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
@@ -83,6 +84,7 @@
       <Files>
         <Match pattern="*.cs" recurse="true"/>
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
@@ -106,43 +108,45 @@
       <Reference name="Nini" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="SilverSim.LL.Messages" path="SilverSim/LL/Messages" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.LL.Messages" path="SilverSim/LL.Messages" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
+      <ReferencePath>../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="SilverSim.Types" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="SilverSim.LL.Core" path="SilverSim/LL/Core" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.LL.Core" path="SilverSim/LL.Core" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
+      <ReferencePath>../../bin/</ReferencePath>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
@@ -154,10 +158,11 @@
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
       <Reference name="SilverSim.LL.Messages" localCopy="false"/>
       <Reference name="SilverSim.Scripting.Common" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
@@ -180,107 +185,112 @@
       <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Types" path="SilverSim/Scene/Types" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Types" path="SilverSim/Scene.Types" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
       <Reference name="SilverSim.LL.Messages" localCopy="false"/>
       <Reference name="SilverSim.Types" localCopy="false"/>
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="SilverSim.Scene.ServiceInterfaces" path="SilverSim/Scene/ServiceInterfaces" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.ServiceInterfaces" path="SilverSim/Scene.ServiceInterfaces" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="SilverSim.Types" localCopy="false"/>
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Management" path="SilverSim/Scene/Management" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Management" path="SilverSim/Scene.Management" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="SilverSim.Types" localCopy="false"/>
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="SilverSim.Scripting.Common" path="SilverSim/Scripting/Common" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scripting.Common" path="SilverSim/Scripting.Common" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/</OutputPath>
+          <OutputPath>../../bin/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="SilverSim.Types" localCopy="false"/>
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
@@ -288,20 +298,20 @@
     <!-- Grid Simulator Plugins -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Registration" path="SilverSim/Scene/Registration" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Registration" path="SilverSim/Scene.Registration" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
@@ -310,11 +320,12 @@
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nwc.XmlRpc" path="../../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nwc.XmlRpc" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
     
@@ -322,20 +333,20 @@
     <!-- Database Plugins -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="SilverSim.Database.MySQL" path="SilverSim/Database/MySQL" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Database.MySQL" path="SilverSim/Database.MySQL" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Data"/>
       <Reference name="SilverSim.Types" localCopy="false"/>
@@ -343,28 +354,29 @@
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
-      <Reference name="MySQL.Data" path="../../../bin/" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
+      <Reference name="MySQL.Data" path="../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="SilverSim.Database.Null" path="SilverSim/Database/Null" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Database.Null" path="SilverSim/Database.Null" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Data"/>
       <Reference name="SilverSim.Types" localCopy="false"/>
@@ -372,11 +384,12 @@
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
-      <Reference name="MySQL.Data" path="../../../bin/" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
+      <Reference name="MySQL.Data" path="../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
@@ -384,20 +397,20 @@
     <!-- Handler Plugins -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="SilverSim.BackendHandlers.Robust.Simulation" path="SilverSim/BackendHandlers/Robust/Simulation" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.BackendHandlers.Robust.Simulation" path="SilverSim/BackendHandlers.Robust.Simulation" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
@@ -409,12 +422,13 @@
       <Reference name="SilverSim.LL.Messages" localCopy="false"/>
       <Reference name="SilverSim.LL.Core" localCopy="false"/>
       <Reference name="SilverSim.BackendConnectors.Robust" localCopy="false"/>
-      <Reference name="Nini" path="../../../../bin/" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../../bin/" localCopy="false"/>
-      <Reference name="Nwc.XmlRpc" path="../../../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nwc.XmlRpc" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
@@ -422,20 +436,20 @@
     <!-- Connector Plugins -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="SilverSim.BackendConnectors.Robust" path="SilverSim/BackendConnectors/Robust" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.BackendConnectors.Robust" path="SilverSim/BackendConnectors.Robust" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
@@ -444,30 +458,31 @@
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
-      <Reference name="HttpClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nwc.XmlRpc" path="../../../bin/" localCopy="false"/>
+      <Reference name="HttpClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nwc.XmlRpc" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="SilverSim.BackendConnectors.Flotsam" path="SilverSim/BackendConnectors/Flotsam" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.BackendConnectors.Flotsam" path="SilverSim/BackendConnectors.Flotsam" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
@@ -476,29 +491,30 @@
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
-      <Reference name="HttpClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nwc.XmlRpc" path="../../../bin/" localCopy="false"/>
+      <Reference name="HttpClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nwc.XmlRpc" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
-    <Project frameworkVersion="v4_0" name="SilverSim.BackendConnectors.OpenSimProfile" path="SilverSim/BackendConnectors/OpenSimProfile" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.BackendConnectors.OpenSimProfile" path="SilverSim/BackendConnectors.OpenSimProfile" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
@@ -507,12 +523,13 @@
       <Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
-      <Reference name="HttpClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nwc.XmlRpc" path="../../../bin/" localCopy="false"/>
+      <Reference name="HttpClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nwc.XmlRpc" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
 
@@ -520,20 +537,20 @@
     <!-- Simulator Plugins -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Chat" path="SilverSim/Scene/Chat" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Chat" path="SilverSim/Scene.Chat" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
@@ -542,29 +559,30 @@
       <Reference name="SilverSim.Scene.Types" localCopy="false"/>
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
-      <Reference name="HttpClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
+      <Reference name="HttpClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
     
-    <Project frameworkVersion="v4_0" name="SilverSim.Scene.RegionLoader" path="SilverSim/Scene/RegionLoader" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.RegionLoader" path="SilverSim/Scene.RegionLoader" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
@@ -574,30 +592,31 @@
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
-      <Reference name="Nwc.XmlRpc" path="../../../bin/" localCopy="false"/>
-      <Reference name="HttpClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
+      <Reference name="Nwc.XmlRpc" path="../../bin/" localCopy="false"/>
+      <Reference name="HttpClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
         <Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
     
-    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Implementation.Basic" path="SilverSim/Scene/Implementation/Basic" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scene.Implementation.Basic" path="SilverSim/Scene.Implementation.Basic" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
@@ -610,28 +629,29 @@
       <Reference name="SilverSim.Scripting.Common" localCopy="false"/>
       <Reference name="SilverSim.LL.Core" localCopy="false"/>
       <Reference name="SilverSim.LL.Messages" localCopy="false"/>
-      <Reference name="HttpClasses" path="../../../../bin/" localCopy="false"/>
-      <Reference name="Nini" path="../../../../bin/" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../../bin/" localCopy="false"/>
+      <Reference name="HttpClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
     
-    <Project frameworkVersion="v4_0" name="SilverSim.Main.IM" path="SilverSim/Main/IM" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Main.IM" path="SilverSim/Main.IM" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
@@ -641,11 +661,12 @@
       <Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
       <Reference name="SilverSim.Scene.Management" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nwc.XmlRpc" path="../../../bin/" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
+      <Reference name="Nwc.XmlRpc" path="../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
     
@@ -653,20 +674,20 @@
     <!-- Scripting Plugins -->
     <!-- ******************************************************************* -->
     
-    <Project frameworkVersion="v4_0" name="SilverSim.Scripting.LSL" path="SilverSim/Scripting/LSL" type="Library">
+    <Project frameworkVersion="v4_0" name="SilverSim.Scripting.LSL" path="SilverSim/Scripting.LSL" type="Library">
       <Configuration name="Release">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
       <Configuration name="Debug">
         <Options>
-          <OutputPath>../../../bin/plugins/</OutputPath>
+          <OutputPath>../../bin/plugins/</OutputPath>
         </Options>
       </Configuration>
 
-      <ReferencePath>../../../bin/</ReferencePath>
-      <Reference name="log4net" path="../../../bin/" localCopy="false"/>
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="System.Xml"/>
@@ -677,11 +698,12 @@
       <Reference name="SilverSim.Scripting.Common" localCopy="false"/>
       <Reference name="SilverSim.Main.Common" localCopy="false"/>
       <Reference name="SilverSim.LL.Messages" localCopy="false"/>
-      <Reference name="HttpClasses" path="../../../bin/" localCopy="false"/>
-      <Reference name="Nini" path="../../../bin/" localCopy="false"/>
-      <Reference name="ThreadedClasses" path="../../../bin/" localCopy="false"/>
+      <Reference name="HttpClasses" path="../../bin/" localCopy="false"/>
+      <Reference name="Nini" path="../../bin/" localCopy="false"/>
+      <Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
       </Files>
     </Project>
     

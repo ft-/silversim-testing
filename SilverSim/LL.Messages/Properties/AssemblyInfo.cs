@@ -3,7 +3,7 @@
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("SilverSim.ServiceInterfaces")]
+[assembly: AssemblyTitle("SilverSim.LL.Messages")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.ServiceInterfaces")]
+[assembly: AssemblyProduct("SilverSim.LL.Messages")]
