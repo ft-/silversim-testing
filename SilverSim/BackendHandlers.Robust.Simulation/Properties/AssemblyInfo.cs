@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.BackendHandlers.Robust.Simulation")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.BackendHandlers.Robust.Simulation")]

@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.Simulator")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.Simulator")]

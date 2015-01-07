@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.Scripting.LSL")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.Scripting.LSL")]

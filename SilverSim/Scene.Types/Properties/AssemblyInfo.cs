@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.Scene.Types")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.Scene.Types")]

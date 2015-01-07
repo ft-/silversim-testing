@@ -398,9 +398,23 @@ namespace SilverSim.Main.Common
             });
             return result;
         }
+
+        SilverSim.Types.Assembly.InterfaceVersion GetInterfaceVersion(Assembly assembly)
+        {
+            foreach(object o in assembly.GetCustomAttributes(false))
+            {
+                if(o is SilverSim.Types.Assembly.InterfaceVersion)
+                {
+                    return (SilverSim.Types.Assembly.InterfaceVersion)o;
+                }
+            }
+            m_Log.FatalFormat("Assembly {0} misses InterfaceVersion information", assembly.FullName);
+            throw new ConfigurationError();
+        }
  
         private void LoadModules()
         {
+            SilverSim.Types.Assembly.InterfaceVersion ownVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
             foreach (IConfig config in m_Config.Configs)
             {
                 if (config.Contains("IsTemplate"))
@@ -427,6 +441,13 @@ namespace SilverSim.Main.Common
                         catch
                         {
                             m_Log.FatalFormat("Failed to load module {0}", assemblyname);
+                            throw new ConfigurationError();
+                        }
+
+                        SilverSim.Types.Assembly.InterfaceVersion loadedVersion = GetInterfaceVersion(assembly);
+                        if(loadedVersion.Version != ownVersion.Version)
+                        {
+                            m_Log.FatalFormat("Failed to load module {0}: interface version mismatch: {2} != {1}", assemblyname, ownVersion, loadedVersion);
                             throw new ConfigurationError();
                         }
 

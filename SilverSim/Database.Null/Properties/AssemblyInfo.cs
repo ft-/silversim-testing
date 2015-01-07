@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.Database.Null")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.Database.Null")]

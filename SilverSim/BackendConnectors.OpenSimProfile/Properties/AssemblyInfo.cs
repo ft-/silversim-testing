@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.BackendConnectors.OpenSimProfile")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.BackendConnectors.OpenSimProfile")]

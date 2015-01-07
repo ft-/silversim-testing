@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.Scene.Chat")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.Scene.Chat")]

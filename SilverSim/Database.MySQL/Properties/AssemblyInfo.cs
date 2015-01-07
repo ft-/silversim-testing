@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.Database.MySQL")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.Database.MySQL")]

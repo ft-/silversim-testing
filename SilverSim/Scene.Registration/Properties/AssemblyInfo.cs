@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.Scene.Registration")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.Scene.Registration")]

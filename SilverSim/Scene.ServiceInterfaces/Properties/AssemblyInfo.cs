@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.Scene.ServiceInterfaces")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.Scene.ServiceInterfaces")]

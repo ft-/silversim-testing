@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.LL.Messages")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.LL.Messages")]

@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.Scene.RegionLoader")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.Scene.RegionLoader")]

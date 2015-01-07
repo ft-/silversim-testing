@@ -6,4 +6,3 @@
 [assembly: AssemblyTitle("SilverSim.LL.Core")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyProduct("SilverSim.LL.Core")]
