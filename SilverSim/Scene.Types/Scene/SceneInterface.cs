@@ -27,12 +27,13 @@ using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Physics;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.ServerParam;
-using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.Types;
 using SilverSim.Types.Economy;
 using SilverSim.Types.Grid;
@@ -117,6 +118,38 @@ namespace SilverSim.Scene.Types.Scene
         public bool IsSceneEnabled { get; protected set; }
 
         public abstract void LoadSceneAsync();
+
+        #region Physics
+        IPhysicsScene m_PhysicsScene = DummyPhysicsScene.SharedInstance;
+        object m_PhysicsSceneChangeLock = new object();
+
+        public IPhysicsScene PhysicsScene
+        {
+            get
+            {
+                lock (m_PhysicsSceneChangeLock)
+                {
+                    return m_PhysicsScene;
+                }
+            }
+            set
+            {
+                if(value == null)
+                {
+                    throw new ArgumentNullException();
+                }
+                lock (m_PhysicsSceneChangeLock)
+                {
+                    m_PhysicsScene.RemoveAll();
+                    m_PhysicsScene = value;
+                    foreach(ObjectPart p in Primitives)
+                    {
+                        m_PhysicsScene.Add(p);
+                    }
+                }
+            }
+        }
+        #endregion
 
         /* do not put any other than ICapabilityInterface into this list */
         public readonly RwLockedDictionary<string, object> SceneCapabilities = new RwLockedDictionary<string, object>();

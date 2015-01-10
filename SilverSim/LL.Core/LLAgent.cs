@@ -29,6 +29,7 @@ using SilverSim.LL.Messages.Script;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
@@ -865,6 +866,7 @@ namespace SilverSim.LL.Core
             HomeURI = homeURI;
             FirstName = firstName;
             LastName = lastName;
+            PhysicsActor = DummyPhysicsObject.SharedInstance;
             InitRouting();
             InitAnimations();
             if (m_EconomyService != null)
@@ -914,6 +916,28 @@ namespace SilverSim.LL.Core
                 m_GridService = null;
             }
         }
+
+        #region Physics Linkage
+        IPhysicsObject m_PhysicsActor = DummyPhysicsObject.SharedInstance;
+
+        public IPhysicsObject PhysicsActor
+        {
+            get
+            {
+                lock(this)
+                {
+                    return PhysicsActor;
+                }
+            }
+            set
+            {
+                lock(this)
+                {
+                    PhysicsActor = value;
+                }
+            }
+        }
+        #endregion
 
         private delegate void HandleAgentMessageDelegate(Message m);
         private readonly Dictionary<MessageType, HandleAgentMessageDelegate> m_AgentMessageRouting = new Dictionary<MessageType, HandleAgentMessageDelegate>();

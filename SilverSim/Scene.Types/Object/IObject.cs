@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
@@ -161,6 +162,12 @@ namespace SilverSim.Scene.Types.Object
         byte[] TerseData
         {
             get;
+        }
+
+        IPhysicsObject PhysicsActor
+        {
+            get;
+            set;
         }
         #endregion
 

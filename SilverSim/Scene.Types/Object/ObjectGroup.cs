@@ -25,6 +25,7 @@ exception statement from your version.
 
 using log4net;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
@@ -67,9 +68,6 @@ namespace SilverSim.Scene.Types.Object
 
         private bool m_IsTempOnRez = false;
         private bool m_IsTemporary = false;
-        private bool m_IsPhysics = false;
-        private bool m_IsPhantom = false;
-        private bool m_IsVolumeDetect = false;
         private bool m_IsGroupOwned = false;
         private Vector3 m_Velocity = Vector3.Zero;
         private UGI m_Group = UGI.Unknown;
@@ -110,11 +108,31 @@ namespace SilverSim.Scene.Types.Object
         {
             AgentSitting = new AgentSittingInterface(this);
             IsChanged = false;
+            PhysicsActor = DummyPhysicsObject.SharedInstance;
         }
 
         public void Dispose()
         {
             Scene = null;
+        }
+        #endregion
+
+        #region Physics Linkage
+        IPhysicsObject m_PhysicsActor = DummyPhysicsObject.SharedInstance;
+
+        public IPhysicsObject PhysicsActor
+        {
+            get
+            {
+                lock (this)
+                {
+                    return RootPart.PhysicsActor;
+                }
+            }
+            set
+            {
+                throw new InvalidOperationException();
+            }
         }
         #endregion
 
@@ -246,11 +264,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_IsPhantom;
+                return PhysicsActor.IsPhantom;
             }
             set
             {
-                m_IsPhantom = value;
+                PhysicsActor.IsPhantom = value;
                 IsChanged = true;
                 TriggerOnUpdate(0);
             }
@@ -285,11 +303,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_IsPhysics;
+                return PhysicsActor.IsPhysicsActive;
             }
             set
             {
-                m_IsPhysics = value;
+                PhysicsActor.IsPhysicsActive = value;
                 IsChanged = true;
                 TriggerOnUpdate(0);
             }
@@ -299,11 +317,11 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                return m_IsVolumeDetect;
+                return PhysicsActor.IsVolumeDetect;
             }
             set
             {
-                m_IsVolumeDetect = value;
+                PhysicsActor.IsVolumeDetect = value;
                 IsChanged = true;
                 TriggerOnUpdate(0);
             }

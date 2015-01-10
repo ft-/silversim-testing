@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using log4net;
+using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
@@ -32,7 +33,6 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
@@ -142,6 +142,36 @@ namespace SilverSim.Scene.Types.Object
             else
             {
                 return m_Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
+            }
+        }
+        #endregion
+
+        #region Physics Linkage
+        IPhysicsObject m_PhysicsActor = DummyPhysicsObject.SharedInstance;
+
+        public IPhysicsObject PhysicsActor
+        {
+            get
+            {
+                lock(this)
+                {
+                    return m_PhysicsActor;
+                }
+            }
+            set
+            {
+                if(value == null)
+                {
+                    throw new ArgumentNullException();
+                }
+                lock(this)
+                {
+                    if(m_PhysicsActor.IsPhysicsActive)
+                    {
+                        throw new InvalidOperationException("PhysicsObject must be deactivated before removing");
+                    }
+                    m_PhysicsActor = value;
+                }
             }
         }
         #endregion
