@@ -33,7 +33,11 @@ namespace SilverSim.Types.Inventory
             {
                 return true;
             }
-            else if(accessor == owner)
+            else if (wanted == InventoryPermissionsMask.None)
+            {
+                return false;
+            }
+            else if (accessor == owner)
             {
                 return (wanted & Base & Current) == wanted;
             }
@@ -48,6 +52,10 @@ namespace SilverSim.Types.Inventory
             if(accessor == creator)
             {
                 return true;
+            }
+            else if(wanted == InventoryPermissionsMask.None)
+            {
+                return false;
             }
             else if(accessorgroup == ownergroup)
             {

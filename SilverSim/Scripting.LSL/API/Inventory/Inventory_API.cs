@@ -249,7 +249,6 @@ namespace SilverSim.Scripting.LSL.API.Inventory
                     throw new Exception(string.Format("Inventory item {0} does not exist", name));
                 }
             }
-            return 0;
         }
 
         [APILevel(APIFlags.LSL)]

@@ -31,10 +31,20 @@ namespace SilverSim.LL.Messages.Object
 {
     public class DeRezObject : Message
     {
+        public enum DeRezAction : byte
+        {
+            SaveToExistingUserInventoryItem = 0,
+            TakeCopy = 1,
+            Take = 4,
+            GodTakeCopy = 5,
+            Delete = 6,
+            Return = 9
+        }
+
         public UUID AgentID;
         public UUID SessionID;
         public UUID GroupID;
-        public byte Destination;
+        public DeRezAction Destination;
         public UUID DestinationID;
         public UUID TransactionID;
         public byte PacketCount;
@@ -62,7 +72,7 @@ namespace SilverSim.LL.Messages.Object
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
             m.GroupID = p.ReadUUID();
-            m.Destination = p.ReadUInt8();
+            m.Destination = (DeRezAction)p.ReadUInt8();
             m.DestinationID = p.ReadUUID();
             m.TransactionID = p.ReadUUID();
             m.PacketCount = p.ReadUInt8();

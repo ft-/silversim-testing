@@ -1181,6 +1181,12 @@ namespace SilverSim.LL.Core
             }
         }
 
+        public void SendAlertMessage(string msg, UUID fromSceneID)
+        {
+            SilverSim.LL.Messages.Alert.AlertMessage m = new Messages.Alert.AlertMessage(msg);
+            SendMessageAlways(m, fromSceneID);
+        }
+
         public void SendMessageAlways(Message m, UUID fromSceneID)
         {
             Circuit circuit;

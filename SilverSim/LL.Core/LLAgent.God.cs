@@ -5,6 +5,7 @@ using System.Text;
 using SilverSim.Types;
 using SilverSim.LL;
 using SilverSim.Scene.Types;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Management.Scene;
 
 namespace SilverSim.LL.Core
