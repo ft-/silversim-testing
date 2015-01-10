@@ -50,9 +50,9 @@ namespace SilverSim.LL.Messages.Object
             public bool RezSelected;
             public bool RemoveItem;
             public UInt32 ItemFlags;
-            public UInt32 GroupMask;
-            public UInt32 EveryoneMask;
-            public UInt32 NextOwnerMask;
+            public InventoryPermissionsMask GroupMask;
+            public InventoryPermissionsMask EveryoneMask;
+            public InventoryPermissionsMask NextOwnerMask;
         }
 
         public RezDataS RezData;
@@ -97,9 +97,9 @@ namespace SilverSim.LL.Messages.Object
             m.RezData.RezSelected = p.ReadBoolean();
             m.RezData.RemoveItem = p.ReadBoolean();
             m.RezData.ItemFlags = p.ReadUInt32();
-            m.RezData.GroupMask = p.ReadUInt32();
-            m.RezData.EveryoneMask = p.ReadUInt32();
-            m.RezData.NextOwnerMask = p.ReadUInt32();
+            m.RezData.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.RezData.EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.RezData.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
 
             m.NotecardData.NotecardItemID = p.ReadUUID();
             m.NotecardData.ObjectID = p.ReadUUID();

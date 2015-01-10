@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using SilverSim.Types.Inventory;
 
 namespace SilverSim.LL.Messages.Object
 {
@@ -36,7 +37,7 @@ namespace SilverSim.LL.Messages.Object
             public UInt32 ObjectLocalID;
             public byte Field;
             public byte Set;
-            public UInt32 Mask;
+            public InventoryPermissionsMask Mask;
         }
 
         public UUID AgentID = UUID.Zero;
@@ -74,7 +75,7 @@ namespace SilverSim.LL.Messages.Object
                 d.ObjectLocalID = p.ReadUInt32();
                 d.Field = p.ReadUInt8();
                 d.Set = p.ReadUInt8();
-                d.Mask = p.ReadUInt32();
+                d.Mask = (InventoryPermissionsMask)p.ReadUInt32();
                 m.ObjectData.Add(d);
             }
             return m;

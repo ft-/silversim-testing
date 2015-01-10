@@ -47,9 +47,9 @@ namespace SilverSim.LL.Messages.Object
             public bool RezSelected;
             public bool RemoveItem;
             public UInt32 ItemFlags;
-            public UInt32 GroupMask;
-            public UInt32 EveryoneMask;
-            public UInt32 NextOwnerMask;
+            public InventoryPermissionsMask GroupMask;
+            public InventoryPermissionsMask EveryoneMask;
+            public InventoryPermissionsMask NextOwnerMask;
         }
 
         public RezDataS RezData;
@@ -61,11 +61,11 @@ namespace SilverSim.LL.Messages.Object
             public UUID CreatorID;
             public UUID OwnerID;
             public UUID GroupID;
-            public UInt32 BaseMask;
-            public UInt32 OwnerMask;
-            public UInt32 GroupMask;
-            public UInt32 EveryoneMask;
-            public UInt32 NextOwnerMask;
+            public InventoryPermissionsMask BaseMask;
+            public InventoryPermissionsMask OwnerMask;
+            public InventoryPermissionsMask GroupMask;
+            public InventoryPermissionsMask EveryoneMask;
+            public InventoryPermissionsMask NextOwnerMask;
             public bool IsGroupOwned;
             public UUID TransactionID;
             public AssetType AssetType;
@@ -110,19 +110,19 @@ namespace SilverSim.LL.Messages.Object
             m.RezData.RezSelected = p.ReadBoolean();
             m.RezData.RemoveItem = p.ReadBoolean();
             m.RezData.ItemFlags = p.ReadUInt32();
-            m.RezData.GroupMask = p.ReadUInt32();
-            m.RezData.EveryoneMask = p.ReadUInt32();
-            m.RezData.NextOwnerMask = p.ReadUInt32();
+            m.RezData.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.RezData.EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.RezData.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
             m.InventoryData.ItemID = p.ReadUUID();
             m.InventoryData.FolderID = p.ReadUUID();
             m.InventoryData.CreatorID = p.ReadUUID();
             m.InventoryData.OwnerID = p.ReadUUID();
             m.InventoryData.GroupID = p.ReadUUID();
-            m.InventoryData.BaseMask = p.ReadUInt32();
-            m.InventoryData.OwnerMask = p.ReadUInt32();
-            m.InventoryData.GroupMask = p.ReadUInt32();
-            m.InventoryData.EveryoneMask = p.ReadUInt32();
-            m.InventoryData.NextOwnerMask = p.ReadUInt32();
+            m.InventoryData.BaseMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.InventoryData.OwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.InventoryData.GroupMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.InventoryData.EveryoneMask = (InventoryPermissionsMask)p.ReadUInt32();
+            m.InventoryData.NextOwnerMask = (InventoryPermissionsMask)p.ReadUInt32();
             m.InventoryData.IsGroupOwned = p.ReadBoolean();
             m.InventoryData.TransactionID = p.ReadUUID();
             m.InventoryData.AssetType = (AssetType)p.ReadInt8();
