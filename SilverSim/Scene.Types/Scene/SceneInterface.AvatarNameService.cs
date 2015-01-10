@@ -44,6 +44,52 @@ namespace SilverSim.Scene.Types.Scene
                 m_ServiceList = serviceList;
             }
 
+            public override NameData this[string firstName, string lastName]
+            {
+                get 
+                {
+                    NameData nd = null;
+                    bool notFoundFirst = false;
+                    foreach (AvatarNameServiceInterface service in m_ServiceList)
+                    {
+                        try
+                        {
+                            nd = service[firstName, lastName];
+                            if (!nd.Authoritative)
+                            {
+                                notFoundFirst = true;
+                            }
+                            else
+                            {
+                                break;
+                            }
+                        }
+                        catch
+                        {
+                            notFoundFirst = true;
+                        }
+                    }
+                    if (null == nd)
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    if (notFoundFirst && nd.Authoritative)
+                    {
+                        foreach (AvatarNameServiceInterface service in m_ServiceList)
+                        {
+                            try
+                            {
+                                service[nd.ID.ID] = nd;
+                            }
+                            catch
+                            {
+                                /* ignore errors here */
+                            }
+                        }
+                    }
+                    return nd;
+                }
+            }
             public override NameData this[UUID key]
             {
                 get

@@ -63,6 +63,32 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
         }
         #endregion
 
+        public override NameData this[string firstName, string lastName] 
+        { 
+            get
+            {
+                Dictionary<string, string> post = new Dictionary<string, string>();
+                post["FirstName"] = firstName;
+                post["LastName"] = lastName;
+                post["SCOPEID"] = m_ScopeID;
+                post["METHOD"] = "getaccount";
+                Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_UserAccountURI, null, post, false, TimeoutMs));
+                if (!(map["result"] is Map))
+                {
+                    throw new KeyNotFoundException();
+                }
+
+                Map m = (Map)(map["result"]);
+                NameData nd = new NameData();
+                nd.ID.FirstName = m["FirstName"].ToString();
+                nd.ID.LastName = m["LastName"].ToString();
+                nd.ID.ID = m["PrincipalID"].ToString();
+                nd.ID.HomeURI = new Uri(m_HomeURI);
+                nd.Authoritative = true;
+                return nd;
+            }
+        }
+
         public override NameData this[UUID accountID]
         {
             get

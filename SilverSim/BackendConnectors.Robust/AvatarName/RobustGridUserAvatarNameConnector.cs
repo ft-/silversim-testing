@@ -68,6 +68,14 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
             return info;
         }
 
+        public override NameData this[string firstName, string lastName] 
+        { 
+            get
+            {
+                throw new KeyNotFoundException();
+            }
+        }
+
         public override NameData this[UUID userID]
         {
             get

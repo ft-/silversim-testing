@@ -55,6 +55,38 @@ namespace SilverSim.Database.MySQL.AvatarName
         #endregion
 
         #region Accessors
+        public override NameData this[string firstName, string lastName]
+        {
+            get
+            {
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                {
+                    connection.Open();
+
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?firstName AND LastName LIKE ?lastName", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?firstName", firstName);
+                        cmd.Parameters.AddWithValue("?lastName", lastName);
+                        using (MySqlDataReader dbreader = cmd.ExecuteReader())
+                        {
+                            if (!dbreader.Read())
+                            {
+                                throw new KeyNotFoundException();
+                            }
+                            NameData nd = new NameData();
+                            nd.ID.ID = (string)dbreader["AvatarID"];
+                            nd.ID.HomeURI = new Uri((string)dbreader["HomeURI"]);
+                            nd.ID.FirstName = (string)dbreader["FirstName"];
+                            nd.ID.LastName = (string)dbreader["LastName"];
+                            nd.Authoritative = true;
+                            return nd;
+                        }
+                    }
+                }
+            }
+        }
+
+
         public override NameData this[UUID key]
         {
             get

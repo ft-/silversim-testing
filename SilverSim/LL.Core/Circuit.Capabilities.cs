@@ -318,6 +318,7 @@ namespace SilverSim.LL.Core
             AddDefCapability("GetMesh", regionSeedID, Cap_GetMesh, capConfig);
             AddDefCapability("GetMesh2", regionSeedID, Cap_GetMesh, capConfig);
             AddDefCapability("CreateInventoryCategory", regionSeedID, Cap_CreateInventoryCategory, capConfig);
+            AddDefCapability("GetDisplayNames", regionSeedID, Cap_GetDisplayNames, capConfig);
             AddDefCapabilityFactory("UploadBakedTexture", regionSeedID, delegate(LLAgent agent) { return new Capabilities.UploadBakedTexture(agent.Owner, agent.AssetService); }, capConfig);
             AddDefCapabilityFactory("NewFileAgentInventory", regionSeedID, delegate(LLAgent agent) { return new Capabilities.NewFileAgentInventory(agent.Owner, agent.InventoryService, agent.AssetService); }, capConfig);
             AddDefCapabilityFactory("NewFileAgentInventoryVariablePrice", regionSeedID, delegate(LLAgent agent) { return new Capabilities.NewFileAgentInventoryVariablePrice(agent.Owner, agent.InventoryService, agent.AssetService); }, capConfig);
