@@ -257,6 +257,25 @@ namespace SilverSim.LL.Core
             }
         }
 
+        private Vector3 m_AngularAcceleration = Vector3.Zero;
+        public Vector3 AngularAcceleration
+        {
+            get
+            {
+                lock(this)
+                {
+                    return m_AngularAcceleration;
+                }
+            }
+            set
+            {
+                lock(this)
+                {
+                    m_AngularAcceleration = value;
+                }
+            }
+        }
+
         public Vector3 GlobalPosition
         {
             get

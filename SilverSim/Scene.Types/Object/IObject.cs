@@ -133,6 +133,12 @@ namespace SilverSim.Scene.Types.Object
             set;
         }
 
+        Vector3 AngularAcceleration 
+        { 
+            get; 
+            set; 
+        }
+
         Quaternion GlobalRotation
         {
             get;

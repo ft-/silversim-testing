@@ -482,6 +482,28 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public Vector3 AngularAcceleration
+        {
+            get
+            {
+                if (ObjectGroup != null)
+                {
+                    return ObjectGroup.AngularAcceleration;
+                }
+                else
+                {
+                    return Vector3.Zero;
+                }
+            }
+            set
+            {
+                if (ObjectGroup != null)
+                {
+                    ObjectGroup.AngularAcceleration = value;
+                }
+            }
+        }
+
         public bool IsSoundQueueing
         {
             get

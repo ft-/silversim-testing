@@ -49,7 +49,20 @@ namespace SilverSim.Scene.Types.Physics
             { 
             } 
         }
+
+        public Vector3 AppliedForce { set { } }
+        public Vector3 AppliedTorque { set { } }
+        public Vector3 LinearImpulse { set { } }
+        public Vector3 AngularImpulse { set { } }
         #endregion
+
+        public double Mass 
+        { 
+            get
+            {
+                return 0;
+            }
+        }
 
         public bool IsPhysicsActive 
         {

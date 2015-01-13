@@ -100,7 +100,8 @@ namespace SilverSim.Scene.Types.Object
                 m_AssetService = value;
             }
         }
-        private Vector3 m_Acceleration = new Vector3();
+        private Vector3 m_Acceleration = Vector3.Zero;
+        private Vector3 m_AngularAcceleration = Vector3.Zero;
         public AttachmentPoint AttachPoint = AttachmentPoint.NotAttached;
 
         #region Constructor
@@ -208,6 +209,20 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_Acceleration = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public Vector3 AngularAcceleration
+        {
+            get
+            {
+                return m_AngularAcceleration;
+            }
+            set
+            {
+                m_AngularAcceleration = value;
                 IsChanged = true;
                 TriggerOnUpdate(0);
             }

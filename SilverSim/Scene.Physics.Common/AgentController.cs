@@ -23,17 +23,20 @@ exception statement from your version.
 
 */
 
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
 
 namespace SilverSim.Scene.Physics.Common
 {
-    public abstract class AgentController : IAgentPhysicsObject
+    public abstract class AgentController : CommonPhysicsController, IAgentPhysicsObject
     {
-        public AgentController()
-        {
+        IAgent m_Agent;
 
+        public AgentController(IAgent agent)
+        {
+            m_Agent = agent;
         }
 
         public abstract Vector3 LinearVelocity { set; }
@@ -48,6 +51,15 @@ namespace SilverSim.Scene.Physics.Common
             set
             {
 
+            }
+        }
+
+
+        public double Mass
+        {
+            get
+            {
+                return 2;
             }
         }
 
@@ -135,6 +147,87 @@ namespace SilverSim.Scene.Physics.Common
             }
             set
             {
+            }
+        }
+
+        Vector3 m_AppliedForce = Vector3.Zero;
+        Vector3 m_AppliedTorque = Vector3.Zero;
+
+        public Vector3 AppliedForce
+        {
+            set
+            {
+                lock (this)
+                {
+                    m_AppliedForce = value;
+                }
+            }
+        }
+
+        public Vector3 AppliedTorque
+        {
+            set
+            {
+                lock (this)
+                {
+                    m_AppliedTorque = value;
+                }
+            }
+        }
+
+        Vector3 m_LinearImpulse = Vector3.Zero;
+        public Vector3 LinearImpulse
+        {
+            set
+            {
+                lock (this)
+                {
+                    m_LinearImpulse = value;
+                }
+            }
+        }
+
+        Vector3 m_AngularImpulse = Vector3.Zero;
+        public Vector3 AngularImpulse
+        {
+            set
+            {
+                lock (this)
+                {
+                    m_AngularImpulse = value;
+                }
+            }
+        }
+
+        public void Process(double dt)
+        {
+            if (IsPhysicsActive)
+            {
+                Vector3 linearForce = Vector3.Zero;
+                Vector3 angularTorque = Vector3.Zero;
+
+                linearForce += BuoyancyMotor(m_Agent, dt);
+                linearForce += GravityMotor(m_Agent, dt);
+                linearForce += HoverMotor(m_Agent, dt);
+
+                lock (this)
+                {
+                    linearForce += m_AppliedForce;
+                    angularTorque += m_AppliedTorque;
+                    linearForce += m_LinearImpulse;
+                    m_LinearImpulse = Vector3.Zero;
+                    angularTorque += m_AngularImpulse;
+                    m_AngularImpulse = Vector3.Zero;
+                }
+
+                /* process acceleration and velocity */
+                m_Agent.Acceleration = linearForce / Mass;
+#warning implement inertia applied mass correctly
+                m_Agent.AngularAcceleration = angularTorque / Mass;
+
+                /* we need to scale the accelerations towards timescale */
+                m_Agent.Velocity += m_Agent.Acceleration * dt;
+                m_Agent.AngularVelocity += m_Agent.AngularAcceleration * dt;
             }
         }
     }

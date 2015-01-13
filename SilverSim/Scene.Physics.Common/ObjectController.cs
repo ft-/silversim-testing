@@ -34,7 +34,7 @@ using SilverSim.Types;
 
 namespace SilverSim.Scene.Physics.Common
 {
-    public abstract class ObjectController : IPhysicsObject
+    public abstract class ObjectController : CommonPhysicsController, IPhysicsObject
     {
         protected ObjectPart m_Part;
         bool m_Phantom;
@@ -93,6 +93,16 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+
+        public double Mass
+        {
+            get
+            {
+#warning Implement Mass
+                return 1;
+            }
+        }
+
         public bool ContributesToCollisionSurfaceAsChild
         {
             get
@@ -117,7 +127,7 @@ namespace SilverSim.Scene.Physics.Common
             public Vector3 AngularMotorDirection;
             public Vector3 LinearFrictionTimescale;
             public Vector3 LinearMotorDirection;
-            public Vector3 MotorOffset;
+            public Vector3 LinearMotorOffset;
 
             public double AngularDeflectionEfficiency;
             public double AngularDeflectionTimescale;
@@ -334,11 +344,26 @@ namespace SilverSim.Scene.Physics.Common
         {
             get
             {
-                return Quaternion.Identity;
+                switch(id)
+                {
+                    case VehicleRotationParamId.ReferenceFrame:
+                        return m_Vehicle.ReferenceFrame;
+
+                    default:
+                        throw new KeyNotFoundException();
+                }
             }
             set
             {
+                switch(id)
+                {
+                    case VehicleRotationParamId.ReferenceFrame:
+                        m_Vehicle.ReferenceFrame = value;
+                        break;
 
+                    default:
+                        throw new KeyNotFoundException();
+                }
             }
         }
 
@@ -346,10 +371,54 @@ namespace SilverSim.Scene.Physics.Common
         {
             get
             {
-                return Vector3.Zero;
+                switch(id)
+                {
+                    case VehicleVectorParamId.AngularFrictionTimescale:
+                        return m_Vehicle.AngularFrictionTimescale;
+
+                    case VehicleVectorParamId.AngularMotorDirection:
+                        return m_Vehicle.AngularMotorDirection;
+
+                    case VehicleVectorParamId.LinearFrictionTimescale:
+                        return m_Vehicle.LinearFrictionTimescale;
+
+                    case VehicleVectorParamId.LinearMotorDirection:
+                        return m_Vehicle.LinearMotorDirection;
+                        
+                    case VehicleVectorParamId.LinearMotorOffset:
+                        return m_Vehicle.LinearMotorOffset;
+
+                    default:
+                        throw new KeyNotFoundException();
+                }
             }
             set
             {
+                switch (id)
+                {
+                    case VehicleVectorParamId.AngularFrictionTimescale:
+                        m_Vehicle.AngularFrictionTimescale = value;
+                        break;
+
+                    case VehicleVectorParamId.AngularMotorDirection:
+                        m_Vehicle.AngularMotorDirection = value;
+                        break;
+
+                    case VehicleVectorParamId.LinearFrictionTimescale:
+                        m_Vehicle.LinearFrictionTimescale = value;
+                        break;
+
+                    case VehicleVectorParamId.LinearMotorDirection:
+                        m_Vehicle.LinearMotorDirection = value;
+                        break;
+
+                    case VehicleVectorParamId.LinearMotorOffset:
+                        m_Vehicle.LinearMotorOffset = value;
+                        break;
+
+                    default:
+                        throw new KeyNotFoundException();
+                }
             }
         }
 
@@ -357,10 +426,187 @@ namespace SilverSim.Scene.Physics.Common
         {
             get
             {
-                return 0;
+                switch(id)
+                {
+                    case VehicleFloatParamId.AngularDeflectionEfficiency:
+                        return m_Vehicle.AngularDeflectionEfficiency;
+
+                    case VehicleFloatParamId.AngularDeflectionTimescale:
+                        return m_Vehicle.AngularDeflectionTimescale;
+
+                    case VehicleFloatParamId.AngularMotorDecayTimescale:
+                        return m_Vehicle.AngularMotorDecayTimescale;
+
+                    case VehicleFloatParamId.AngularMotorTimescale:
+                        return m_Vehicle.AngularMotorTimescale;
+
+                    case VehicleFloatParamId.BankingEfficiency:
+                        return m_Vehicle.BankingEfficiency;
+
+                    case VehicleFloatParamId.BankingMix:
+                        return m_Vehicle.BankingMix;
+
+                    case VehicleFloatParamId.BankingTimescale:
+                        return m_Vehicle.BankingTimescale;
+
+                    case VehicleFloatParamId.Buoyancy:
+                        return m_Vehicle.Buoyancy;
+
+                    case VehicleFloatParamId.HoverHeight:
+                        return m_Vehicle.HoverHeight;
+
+                    case VehicleFloatParamId.HoverEfficiency:
+                        return m_Vehicle.HoverEfficiency;
+
+                    case VehicleFloatParamId.HoverTimescale:
+                        return m_Vehicle.HoverTimescale;
+
+                    case VehicleFloatParamId.LinearDeflectionEfficiency:
+                        return m_Vehicle.LinearDeflectionEfficiency;
+
+                    case VehicleFloatParamId.LinearDeflectionTimescale:
+                        return m_Vehicle.LinearDeflectionTimescale;
+
+                    case VehicleFloatParamId.LinearMotorDecayTimescale:
+                        return m_Vehicle.LinearMotorDecayTimescale;
+
+                    case VehicleFloatParamId.LinearMotorTimescale:
+                        return m_Vehicle.LinearMotorTimescale;
+
+                    case VehicleFloatParamId.VerticalAttractionEfficiency:
+                        return m_Vehicle.VerticalAttractionEfficiency;
+
+                    case VehicleFloatParamId.VerticalAttractionTimescale:
+                        return m_Vehicle.VerticalAttractionTimescale;
+
+                    default:
+                        throw new KeyNotFoundException();
+                }
             }
             set
             {
+                switch (id)
+                {
+                    case VehicleFloatParamId.AngularDeflectionEfficiency:
+                        m_Vehicle.AngularDeflectionEfficiency = value;
+                        break;
+
+                    case VehicleFloatParamId.AngularDeflectionTimescale:
+                        m_Vehicle.AngularDeflectionTimescale = value;
+                        break;
+
+                    case VehicleFloatParamId.AngularMotorDecayTimescale:
+                        m_Vehicle.AngularMotorDecayTimescale = value;
+                        break;
+
+                    case VehicleFloatParamId.AngularMotorTimescale:
+                        m_Vehicle.AngularMotorTimescale = value;
+                        break;
+
+                    case VehicleFloatParamId.BankingEfficiency:
+                        m_Vehicle.BankingEfficiency = value;
+                        break;
+
+                    case VehicleFloatParamId.BankingMix:
+                        m_Vehicle.BankingMix = value;
+                        break;
+
+                    case VehicleFloatParamId.BankingTimescale:
+                        m_Vehicle.BankingTimescale = value;
+                        break;
+
+                    case VehicleFloatParamId.Buoyancy:
+                        m_Vehicle.Buoyancy = value;
+                        break;
+
+                    case VehicleFloatParamId.HoverHeight:
+                        m_Vehicle.HoverHeight = value;
+                        break;
+
+                    case VehicleFloatParamId.HoverEfficiency:
+                        m_Vehicle.HoverEfficiency = value;
+                        break;
+
+                    case VehicleFloatParamId.HoverTimescale:
+                        m_Vehicle.HoverTimescale = value;
+                        break;
+
+                    case VehicleFloatParamId.LinearDeflectionEfficiency:
+                        m_Vehicle.LinearDeflectionEfficiency = value;
+                        break;
+
+                    case VehicleFloatParamId.LinearDeflectionTimescale:
+                        m_Vehicle.LinearDeflectionTimescale = value;
+                        break;
+
+                    case VehicleFloatParamId.LinearMotorDecayTimescale:
+                        m_Vehicle.LinearMotorDecayTimescale = value;
+                        break;
+
+                    case VehicleFloatParamId.LinearMotorTimescale:
+                        m_Vehicle.LinearMotorTimescale = value;
+                        break;
+
+                    case VehicleFloatParamId.VerticalAttractionEfficiency:
+                        m_Vehicle.VerticalAttractionEfficiency = value;
+                        break;
+
+                    case VehicleFloatParamId.VerticalAttractionTimescale:
+                        m_Vehicle.VerticalAttractionTimescale = value;
+                        break;
+
+                    default:
+                        throw new KeyNotFoundException();
+                }
+            }
+        }
+
+        Vector3 m_AppliedForce = Vector3.Zero;
+        Vector3 m_AppliedTorque = Vector3.Zero;
+
+        public Vector3 AppliedForce 
+        { 
+            set
+            {
+                lock (this)
+                {
+                    m_AppliedForce = value;
+                }
+            }
+        }
+
+        public Vector3 AppliedTorque 
+        { 
+            set
+            {
+                lock (this)
+                {
+                    m_AppliedTorque = value;
+                }
+            }
+        }
+
+        Vector3 m_LinearImpulse = Vector3.Zero;
+        public Vector3 LinearImpulse 
+        { 
+            set
+            {
+                lock(this)
+                {
+                    m_LinearImpulse = value;
+                }
+            }
+        }
+
+        Vector3 m_AngularImpulse = Vector3.Zero;
+        public Vector3 AngularImpulse 
+        {
+            set
+            {
+                lock(this)
+                {
+                    m_AngularImpulse = value;
+                }
             }
         }
 
@@ -368,31 +614,39 @@ namespace SilverSim.Scene.Physics.Common
         {
             if(IsPhysicsActive)
             {
-                switch(m_Vehicle.VehicleType)
+                if(m_Vehicle.VehicleType == Types.Physics.Vehicle.VehicleType.None)
                 {
-                    case Types.Physics.Vehicle.VehicleType.None:
-                        return;
-
-                    case Types.Physics.Vehicle.VehicleType.Sled:
-                        break;
-
-                    case Types.Physics.Vehicle.VehicleType.Car:
-                        break;
-
-                    case Types.Physics.Vehicle.VehicleType.Boat:
-                        break;
-
-                    case Types.Physics.Vehicle.VehicleType.Airplane:
-                        break;
-
-                    case Types.Physics.Vehicle.VehicleType.Balloon:
-                        break;
-
-                    default:
-                        break;
+                    return;
                 }
+
+                Vector3 linearForce = Vector3.Zero;
+                Vector3 angularTorque = Vector3.Zero;
+
+                linearForce += BuoyancyMotor(m_Part, dt);
+                linearForce += GravityMotor(m_Part, dt);
+                linearForce += HoverMotor(m_Part, dt);
+
+                lock(this)
+                {
+                    linearForce += m_AppliedForce;
+                    angularTorque += m_AppliedTorque;
+                    linearForce += m_LinearImpulse;
+                    m_LinearImpulse = Vector3.Zero;
+                    angularTorque += m_AngularImpulse;
+                    m_AngularImpulse = Vector3.Zero;
+                }
+
+                /* process acceleration and velocity */
+                m_Part.Acceleration = linearForce / Mass;
+#warning implement inertia applied mass correctly
+                m_Part.AngularAcceleration = angularTorque / Mass;
+
+                /* we need to scale the accelerations towards timescale */
+                m_Part.Velocity += m_Part.Acceleration * dt;
+                m_Part.AngularVelocity += m_Part.AngularAcceleration * dt;
             }
         }
+
         #endregion
     }
 }

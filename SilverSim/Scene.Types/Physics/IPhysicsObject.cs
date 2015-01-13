@@ -33,10 +33,16 @@ namespace SilverSim.Scene.Types.Physics
         /* position, acceleration, velocity (angular and linear) is pushed to target object when IsPhysicsActive equals true */
         Vector3 LinearVelocity { set; }
         Vector3 AngularVelocity { set; }
+        Vector3 AppliedForce { set; }
+        Vector3 AppliedTorque { set; }
+        Vector3 LinearImpulse { set; }
+        Vector3 AngularImpulse { set; }
+
         bool IsPhysicsActive { get; set; } /* disables updates of object */
         bool IsPhantom { get; set; }
         bool IsVolumeDetect { get; set; }
         bool ContributesToCollisionSurfaceAsChild { get; set; } /* set to true when physics object contributes to collision surface in link sets as child prim */
+        double Mass { get; }
 
         VehicleType VehicleType { get; set; }
         VehicleFlags VehicleFlags { get; set; }
