@@ -23,17 +23,13 @@ exception statement from your version.
 
 */
 
-using SilverSim.LL.Messages;
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.StructuredData.LLSD;
-using SilverSim.Types;
-using System.Collections.Generic;
-using System;
-using System.IO;
-using System.Xml;
-using System.Net;
-using ThreadedClasses;
 using SilverSim.ServiceInterfaces.AvatarName;
+using SilverSim.Types;
+using System;
+using System.Collections.Generic;
+using System.Net;
+using System.Xml;
 
 namespace SilverSim.LL.Core
 {
@@ -52,11 +48,12 @@ namespace SilverSim.LL.Core
             {
                 username = nd.ID.FirstName + "." + nd.ID.LastName;
             }
+            string utcstring = DateTime.Now.AddDays(1).ToUniversalTime().ToString("yyyy\\-MM\\-dd\\THH\\-mm\\-ss\\Z");
             WriteKeyValuePair(writer, "string", username);
             WriteKeyValuePair(writer, "key", "display_name");
             WriteKeyValuePair(writer, "string", username);
             WriteKeyValuePair(writer, "key", "display_name_next_update");
-            WriteKeyValuePair(writer, "string", "1970-01-01T00:00:00Z");
+            WriteKeyValuePair(writer, "string", utcstring);
             WriteKeyValuePair(writer, "key", "legacy_first_name");
             WriteKeyValuePair(writer, "string", nd.ID.FirstName);
             WriteKeyValuePair(writer, "key", "legacy_last_name");
