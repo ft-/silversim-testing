@@ -155,7 +155,41 @@ namespace SilverSim.Scripting.LSL.API.Physics
         {
 #warning Implement llApplyRotationalImpulse
         }
-        
+
+        [APILevel(APIFlags.LSL)]
+        public void llSetVelocity(ScriptInstance Instance, Vector3 velocity, int local)
+        {
+            lock (Instance)
+            {
+                /* we leave the physics check out here since it has an interesting use */
+                if (local != 0)
+                {
+                    Instance.Part.ObjectGroup.Velocity = velocity / Instance.Part.ObjectGroup.GlobalRotation;
+                }
+                else
+                {
+                    Instance.Part.ObjectGroup.Velocity = velocity;
+                }
+            }
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public void llSetAngularVelocity(ScriptInstance Instance, Vector3 initial_omega, int local)
+        {
+            lock (Instance)
+            {
+                /* we leave the physics check out here since it has an interesting use */
+                if (local != 0)
+                {
+                    Instance.Part.ObjectGroup.AngularVelocity = initial_omega / Instance.Part.ObjectGroup.GlobalRotation;
+                }
+                else
+                {
+                    Instance.Part.ObjectGroup.AngularVelocity = initial_omega;
+                }
+            }
+        }
+
         [APILevel(APIFlags.LSL)]
         public AnArray llGetPhysicsMaterial(ScriptInstance Instance)
         {
