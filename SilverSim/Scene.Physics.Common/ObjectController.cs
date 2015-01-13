@@ -51,8 +51,8 @@ namespace SilverSim.Scene.Physics.Common
 
         public abstract void UpdateCollisionInfo();
 
-        public abstract Vector3 LinearVelocity { set; }
-        public abstract Vector3 AngularVelocity { set; }
+        public abstract Vector3 DeltaLinearVelocity { set; }
+        public abstract Vector3 DeltaAngularVelocity { set; }
         public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
         public bool IsPhantom
         {
@@ -642,8 +642,8 @@ namespace SilverSim.Scene.Physics.Common
                 m_Part.AngularAcceleration = angularTorque / Mass;
 
                 /* we need to scale the accelerations towards timescale */
-                m_Part.Velocity += m_Part.Acceleration * dt;
-                m_Part.AngularVelocity += m_Part.AngularAcceleration * dt;
+                DeltaLinearVelocity = m_Part.Acceleration * dt;
+                DeltaAngularVelocity = m_Part.AngularAcceleration * dt;
             }
         }
 

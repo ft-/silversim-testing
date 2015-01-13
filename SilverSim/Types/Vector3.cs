@@ -363,6 +363,11 @@ namespace SilverSim.Types
             return vec;
         }
 
+        public static Vector3 operator /(Vector3 vec, Quaternion rot)
+        {
+            return vec * (-rot);
+        }
+
         public static Vector3 operator *(Vector3 vector, Matrix4 matrix)
         {
             return Transform(vector, matrix);

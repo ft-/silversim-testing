@@ -36,14 +36,14 @@ namespace SilverSim.Scene.Types.Physics
         }
 
         #region Injecting parameters properties
-        public Vector3 LinearVelocity 
+        public Vector3 DeltaLinearVelocity 
         { 
             set 
             { 
             }
         }
 
-        public Vector3 AngularVelocity 
+        public Vector3 DeltaAngularVelocity 
         {
             set 
             { 
@@ -61,6 +61,18 @@ namespace SilverSim.Scene.Types.Physics
             get
             {
                 return 0;
+            }
+        }
+
+        public double Buoyancy
+        {
+            get
+            {
+                return 0f;
+            }
+            set
+            {
+
             }
         }
 

@@ -39,8 +39,8 @@ namespace SilverSim.Scene.Physics.Common
             m_Agent = agent;
         }
 
-        public abstract Vector3 LinearVelocity { set; }
-        public abstract Vector3 AngularVelocity { set; }
+        public abstract Vector3 DeltaLinearVelocity { set; }
+        public abstract Vector3 DeltaAngularVelocity { set; }
         public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
         public bool IsPhantom 
         {
@@ -226,8 +226,8 @@ namespace SilverSim.Scene.Physics.Common
                 m_Agent.AngularAcceleration = angularTorque / Mass;
 
                 /* we need to scale the accelerations towards timescale */
-                m_Agent.Velocity += m_Agent.Acceleration * dt;
-                m_Agent.AngularVelocity += m_Agent.AngularAcceleration * dt;
+                DeltaLinearVelocity = m_Agent.Acceleration * dt;
+                DeltaAngularVelocity = m_Agent.AngularAcceleration * dt;
             }
         }
     }

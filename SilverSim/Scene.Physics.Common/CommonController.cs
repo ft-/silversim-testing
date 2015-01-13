@@ -49,6 +49,27 @@ namespace SilverSim.Scene.Physics.Common
 
         double m_Buoyancy = 0f;
 
+        public double Buoyancy 
+        {
+            get
+            {
+                return m_Buoyancy;
+            }
+
+            set
+            {
+                if(value < 0)
+                {
+                    m_Buoyancy = 0;
+                }
+                else
+                {
+                    m_Buoyancy = value;
+                }
+            }
+        }
+
+
         protected Vector3 BuoyancyMotor(IObject obj, double dt)
         {
             return new Vector3(0, 0, -m_Buoyancy * obj.PhysicsActor.Mass * GravityAccelerationConstant);
