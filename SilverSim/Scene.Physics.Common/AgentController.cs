@@ -76,6 +76,46 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        public VehicleFlags VehicleFlags 
+        {
+            get
+            {
+                return VehicleFlags.None;
+            }
+            set
+            {
+
+            }
+        }
+
+        public VehicleFlags SetVehicleFlags
+        {
+            set
+            {
+
+            }
+        }
+
+        public VehicleFlags ClearVehicleFlags
+        {
+            set
+            {
+
+            }
+        }
+
+        public Quaternion this[VehicleRotationParamId id]
+        {
+            get
+            {
+                return Quaternion.Identity;
+            }
+            set
+            {
+
+            }
+        }
+
         public Vector3 this[VehicleVectorParamId id] 
         {
             get

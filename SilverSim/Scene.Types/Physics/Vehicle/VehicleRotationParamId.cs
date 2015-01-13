@@ -25,12 +25,8 @@ exception statement from your version.
 
 namespace SilverSim.Scene.Types.Physics.Vehicle
 {
-    public enum VehicleVectorParamId : int
+    public enum VehicleRotationParamId : int
     {
-        AngularFrictionTimescale = 17,
-        AngularMotorDirection = 19,
-        LinearFrictionTimeTimescale = 16,
-        LinearMotorDirection = 18,
-        LinearMotorOffset = 20
+        ReferenceFrame = 44
     }
 }

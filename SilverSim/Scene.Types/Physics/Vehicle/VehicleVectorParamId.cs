@@ -23,27 +23,14 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
-using SilverSim.Scene.Types.Physics.Vehicle;
-
-namespace SilverSim.Scene.Types.Physics
+namespace SilverSim.Scene.Types.Physics.Vehicle
 {
-    public interface IPhysicsObject
+    public enum VehicleVectorParamId : int
     {
-        /* position, acceleration, velocity (angular and linear) is pushed to target object when IsPhysicsActive equals true */
-        Vector3 LinearVelocity { set; }
-        Vector3 AngularVelocity { set; }
-        bool IsPhysicsActive { get; set; } /* disables updates of object */
-        bool IsPhantom { get; set; }
-        bool IsVolumeDetect { get; set; }
-        bool ContributesToCollisionSurfaceAsChild { get; set; } /* set to true when physics object contributes to collision surface in link sets as child prim */
-
-        VehicleType VehicleType { get; set; }
-        VehicleFlags VehicleFlags { get; set; }
-        VehicleFlags SetVehicleFlags { set; }
-        VehicleFlags ClearVehicleFlags { set; }
-        Quaternion this[VehicleRotationParamId id] { get; set; }
-        Vector3 this[VehicleVectorParamId id] { get; set; }
-        double this[VehicleFloatParamId id] { get; set; }
+        AngularFrictionTimescale = 17,
+        AngularMotorDirection = 19,
+        LinearFrictionTimescale = 16,
+        LinearMotorDirection = 18,
+        LinearMotorOffset = 20
     }
 }

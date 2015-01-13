@@ -23,27 +23,23 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
-using SilverSim.Scene.Types.Physics.Vehicle;
+using System;
 
-namespace SilverSim.Scene.Types.Physics
+namespace SilverSim.Scene.Types.Physics.Vehicle
 {
-    public interface IPhysicsObject
+    [Flags]
+    public enum VehicleFlags : int
     {
-        /* position, acceleration, velocity (angular and linear) is pushed to target object when IsPhysicsActive equals true */
-        Vector3 LinearVelocity { set; }
-        Vector3 AngularVelocity { set; }
-        bool IsPhysicsActive { get; set; } /* disables updates of object */
-        bool IsPhantom { get; set; }
-        bool IsVolumeDetect { get; set; }
-        bool ContributesToCollisionSurfaceAsChild { get; set; } /* set to true when physics object contributes to collision surface in link sets as child prim */
-
-        VehicleType VehicleType { get; set; }
-        VehicleFlags VehicleFlags { get; set; }
-        VehicleFlags SetVehicleFlags { set; }
-        VehicleFlags ClearVehicleFlags { set; }
-        Quaternion this[VehicleRotationParamId id] { get; set; }
-        Vector3 this[VehicleVectorParamId id] { get; set; }
-        double this[VehicleFloatParamId id] { get; set; }
+        None = 0,
+        NoDeflectionUp = 0x0001,
+        LimitRollOnly = 0x0002,
+        HoverWaterOnly = 0x0004,
+        HoverTerrainOnly = 0x0008,
+        HoverGlobalHeight = 0x0010,
+        HoverUpOnly = 0x0020,
+        LimitMotorUp = 0x0040,
+        MouselookSteer = 0x0080,
+        MouselookBank = 0x0100,
+        CameraDecoupled = 0x0200
     }
 }
