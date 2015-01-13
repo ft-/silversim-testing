@@ -139,21 +139,55 @@ namespace SilverSim.Scripting.LSL.API.Physics
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llPushObject(UUID target, Vector3 impulse, Vector3 ang_impulse, int local)
+        public void llPushObject(ScriptInstance Instance, UUID target, Vector3 impulse, Vector3 ang_impulse, int local)
         {
 #warning Implement llPushObject
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llApplyImpulse(Vector3 momentum, int local)
+        public void llApplyImpulse(ScriptInstance Instance, Vector3 momentum, int local)
         {
 #warning Implement llApplyImpulse
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llApplyRotationalImpulse(Vector3 ang_impulse, int local)
+        public void llApplyRotationalImpulse(ScriptInstance Instance, Vector3 ang_impulse, int local)
         {
 #warning Implement llApplyRotationalImpulse
+        }
+        
+        [APILevel(APIFlags.LSL)]
+        public AnArray llGetPhysicsMaterial(ScriptInstance Instance)
+        {
+#warning Implement llGetPhysicsMaterial
+            return new AnArray();
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public const int DENSITY = 1;
+        [APILevel(APIFlags.LSL)]
+        public const int FRICTION = 2;
+        [APILevel(APIFlags.LSL)]
+        public const int RESTITUTION = 4;
+        [APILevel(APIFlags.LSL)]
+        public const int GRAVITY_MULTIPLIER = 8;
+
+        [APILevel(APIFlags.LSL)]
+        public void llSetPhysicsMaterial(ScriptInstance Instance, int mask, double gravity_multiplier, double restitution, double friction, double density)
+        {
+#warning Implement llSetPhysicsMaterial
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public void llSetHoverHeight(ScriptInstance Instance, double height, int water, double tau)
+        {
+#warning Implement llSetHoverHeight
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public void llStopHover(ScriptInstance Instance)
+        {
+#warning Implement llStopHover
         }
     }
 }
