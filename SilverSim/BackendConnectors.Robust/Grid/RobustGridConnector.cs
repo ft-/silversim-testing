@@ -314,6 +314,14 @@ namespace SilverSim.BackendConnectors.Robust.Grid
             r.ID = map["uuid"].ToString();
             r.Location.X = map["locX"].AsUInt;
             r.Location.Y = map["locY"].AsUInt;
+            if(map.ContainsKey("flags"))
+            {
+                r.Flags = (RegionFlags)map["flags"].AsUInt;
+            }
+            else
+            {
+                r.Flags = RegionFlags.RegionOnline;
+            }
             r.Size.X = map["sizeX"].AsUInt;
             r.Size.Y = map["sizeY"].AsUInt;
             r.Name = map["regionName"].ToString();
