@@ -419,7 +419,7 @@ namespace SilverSim.BackendConnectors.Robust.Asset
                 m_Log.FatalFormat("Missing 'URI' in section {0}", ownSection.Name);
                 throw new ConfigurationLoader.ConfigurationError();
             }
-            return new RobustAssetConnector(ownSection.GetString("URI"));
+            return new RobustAssetConnector(ownSection.GetString("URI"), ownSection.GetBoolean("EnableCompressedStoreRequest", false));
         }
     }
     #endregion
