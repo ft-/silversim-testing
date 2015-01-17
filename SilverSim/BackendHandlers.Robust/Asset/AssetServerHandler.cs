@@ -317,7 +317,20 @@ namespace SilverSim.BackendHandlers.Robust.Asset
 
                 HttpResponse res = req.BeginResponse();
                 res.ContentType = data.ContentType;
-                Stream st = res.GetOutputStream();
+                bool compressionEnabled = true;
+                switch(data.Type)
+                {
+                    case AssetType.Texture:
+                    case AssetType.Sound:
+                    case AssetType.ImageJPEG:
+                        /* these are well-compressed no need for further compression */
+                        compressionEnabled = false;
+                        break;
+
+                    default:
+                        break;
+                }
+                Stream st = res.GetOutputStream(compressionEnabled);
                 st.Write(data.Data, 0, data.Data.Length);
                 res.Close();
             }
