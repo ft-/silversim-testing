@@ -46,20 +46,20 @@ namespace SilverSim.LL.Core
 
             if(httpreq.Method != "GET")
             {
-                httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method Not Allowed").Close();
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method Not Allowed");
                 return;
             }
 
             if (parts.Length < 4)
             {
-                httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
 
             UUID meshID;
             if (parts[3].Substring(0, 1) != "?")
             {
-                httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
 
@@ -81,7 +81,7 @@ namespace SilverSim.LL.Core
             }
             catch
             {
-                httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
 
@@ -108,14 +108,14 @@ namespace SilverSim.LL.Core
                 }
                 catch
                 {
-                    httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
+                    httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                     return;
                 }
             }
 
             if (asset.Type != AssetType.Mesh)
             {
-                httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
 
@@ -131,13 +131,13 @@ namespace SilverSim.LL.Core
                     string[] p = range.Split('=');
                     if (p.Length != 2)
                     {
-                        httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                        httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                         return;
                     }
                     string[] v = p[1].Split('-');
                     if (v.Length != 2)
                     {
-                        httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                        httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                         return;
                     }
 
@@ -156,19 +156,19 @@ namespace SilverSim.LL.Core
                         int end = int.Parse(v[1]);
                         if (start > end)
                         {
-                            httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                            httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                             return;
                         }
                         if (start >= asset.Data.Length || end >= asset.Data.Length)
                         {
-                            httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                            httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                             return;
                         }
                         contentranges.Add(new KeyValuePair<int, int>(start, end));
                     }
                     catch
                     {
-                        httpreq.BeginResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable").Close();
+                        httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                         return;
                     }
                 }

@@ -69,7 +69,7 @@ namespace SilverSim.LL.Core
         {
             if (httpreq.Method != "GET")
             {
-                httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed").Close();
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
             }
 
@@ -77,7 +77,7 @@ namespace SilverSim.LL.Core
             if(parts.Length < 2)
             {
                 m_Log.WarnFormat("Invalid GetDisplayNames request: {0}", httpreq.RawUrl);
-                httpreq.BeginResponse(HttpStatusCode.BadRequest, "Bad Request").Close();
+                httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
 

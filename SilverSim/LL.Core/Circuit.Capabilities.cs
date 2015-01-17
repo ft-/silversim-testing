@@ -210,7 +210,7 @@ namespace SilverSim.LL.Core
             IValue o;
             if (httpreq.Method != "POST")
             {
-                httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed").Close();
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
             }
 
@@ -221,12 +221,12 @@ namespace SilverSim.LL.Core
             catch (Exception e)
             {
                 m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace.ToString());
-                httpreq.BeginResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML").Close();
+                httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
             if (!(o is AnArray))
             {
-                httpreq.BeginResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML").Close();
+                httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
 

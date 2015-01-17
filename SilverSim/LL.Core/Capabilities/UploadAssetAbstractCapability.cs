@@ -80,7 +80,7 @@ namespace SilverSim.LL.Core.Capabilities
             UUID transactionID;
             if (httpreq.Method != "POST")
             {
-                httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed").Close();
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
             }
 
@@ -95,12 +95,12 @@ namespace SilverSim.LL.Core.Capabilities
                 }
                 catch
                 {
-                    httpreq.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type").Close();
+                    httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                     return;
                 }
                 if (!(o is Map))
                 {
-                    httpreq.BeginResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML").Close();
+                    httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                     return;
                 }
                 Map reqmap = (Map)o;
@@ -134,7 +134,7 @@ namespace SilverSim.LL.Core.Capabilities
                 }
                 catch
                 {
-                    httpreq.BeginResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML").Close();
+                    httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                     return;
                 }
                 /* Upload start */
@@ -149,11 +149,11 @@ namespace SilverSim.LL.Core.Capabilities
             }
             else if(parts[3] != "Upload" || parts.Length < 4)
             {
-                httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
             }
             else if(!UUID.TryParse(parts[4], out transactionID))
             {
-                httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
             }
             else
             {
@@ -163,7 +163,7 @@ namespace SilverSim.LL.Core.Capabilities
                 asset.Data = new byte[body.Length];
                 if (body.Length != body.Read(asset.Data, 0, (int)body.Length))
                 {
-                    httpreq.BeginResponse(HttpStatusCode.BadRequest, "Bad Request").Close();
+                    httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                     return;
                 }
 
@@ -181,7 +181,7 @@ namespace SilverSim.LL.Core.Capabilities
                 }
                 catch(UrlNotFoundException)
                 {
-                    httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found").Close();
+                    httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                     return;
                 }
                 catch (UploadErrorException e)
@@ -211,7 +211,7 @@ namespace SilverSim.LL.Core.Capabilities
                 }
                 catch
                 {
-                    httpreq.BeginResponse(HttpStatusCode.InternalServerError, "Internal Server Error").Close();
+                    httpreq.ErrorResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
                     return;
                 }
 

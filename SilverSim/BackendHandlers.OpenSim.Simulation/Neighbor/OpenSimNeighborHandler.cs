@@ -95,15 +95,20 @@ namespace SilverSim.BackendHandlers.OpenSim.Simulation.Neighbor
                 throw new InvalidDataException();
             }
 
+            if(req.Method == "DELETE" || req.Method == "PUT")
+            {
+                req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
             if (req.Method != "POST")
             {
-                req.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed").Close();
+                req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
             }
 
             if (req.ContentType != "application/json")
             {
-                req.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported media type").Close();
+                req.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported media type");
                 return;
             }
 
@@ -114,20 +119,20 @@ namespace SilverSim.BackendHandlers.OpenSim.Simulation.Neighbor
             }
             catch
             {
-                req.BeginResponse(HttpStatusCode.BadRequest, "Bad Request").Close();
+                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
 
             if (!(v is Map))
             {
-                req.BeginResponse(HttpStatusCode.BadRequest, "Bad Request").Close();
+                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
 
             Map m = (Map)v;
             if (!m.ContainsKey("destination_handle"))
             {
-                req.BeginResponse(HttpStatusCode.BadRequest, "Bad Request").Close();
+                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
 
@@ -155,7 +160,7 @@ namespace SilverSim.BackendHandlers.OpenSim.Simulation.Neighbor
             }
             catch
             {
-                req.BeginResponse(HttpStatusCode.BadRequest, "Bad Request").Close();
+                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
 

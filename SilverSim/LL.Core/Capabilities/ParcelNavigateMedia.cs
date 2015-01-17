@@ -63,7 +63,7 @@ namespace SilverSim.LL.Core.Capabilities
         {
             if (httpreq.Method != "POST")
             {
-                httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed").Close();
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
             }
 
@@ -74,19 +74,19 @@ namespace SilverSim.LL.Core.Capabilities
             }
             catch
             {
-                httpreq.BeginResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type").Close();
+                httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
             if (!(o is Map))
             {
-                httpreq.BeginResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML").Close();
+                httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
             Map reqmap = (Map)o;
 
             if(reqmap["agent-id"].AsUUID != m_Agent.ID)
             {
-                httpreq.BeginResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML").Close();
+                httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
 
