@@ -71,6 +71,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
             {
                 m_TemporaryAssetService = loader.GetService<AssetServiceInterface>(m_TemporaryAssetServiceName);
             }
+            m_ResourceAssetService = loader.GetService<AssetServiceInterface>("ResourceAssetService");
         }
 
         public void AssetHandler(HttpRequest req)
@@ -212,7 +213,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                 HttpResponse res = req.BeginResponse();
                 res.ContentType = "text/xml";
                 Stream st = res.GetOutputStream();
-                st.Write(header, 0, footer.Length);
+                st.Write(header, 0, header.Length);
                 int pos = 0;
                 while (data.Data.Length - pos >= MAX_ASSET_BASE64_CONVERSION_SIZE)
                 {

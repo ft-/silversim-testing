@@ -30,6 +30,7 @@ using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using System;
@@ -45,6 +46,19 @@ namespace SilverSim.Main.Common
 {
     public class ConfigurationLoader
     {
+        class ResourceAssetPlugin : SceneInterface.ResourceAssetService, IPlugin
+        {
+            public ResourceAssetPlugin()
+            {
+
+            }
+
+            public void Startup(ConfigurationLoader loader)
+            {
+
+            }
+        }
+
         public class ConfigurationError : Exception
         {
             public ConfigurationError()
@@ -638,6 +652,8 @@ namespace SilverSim.Main.Common
             string mainConfig = startup.GetString("config", defaultConfigName);
 
             m_Sources.Enqueue(new CFG_IniResourceSource(defaultsIniName));
+            /* make the resource assets available for all users not just scene */
+            PluginInstances.Add("ResourceAssetService", new ResourceAssetPlugin());
             AddSource(mainConfig);
 
             CmdIO.CommandRegistry.Commands.Add("shutdown", ShutdownCommand);

@@ -112,7 +112,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private class ResourceAssetService : AssetServiceInterface
+        public class ResourceAssetService : AssetServiceInterface
         {
             ResourceAssetAccessor m_ResourceAssets;
             ResourceAssetMetadataService m_MetadataService;

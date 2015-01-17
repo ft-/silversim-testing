@@ -360,7 +360,7 @@ namespace SilverSim.BackendConnectors.Robust.Asset
                 null, "text/xml", 4 * base64_codegroups + header.Length + footer.Length, delegate(Stream st)
             {
                 /* Stream based asset conversion method here */
-                st.Write(header, 0, footer.Length);
+                st.Write(header, 0, header.Length);
                 int pos = 0;
                 while (asset.Data.Length - pos >= MAX_ASSET_BASE64_CONVERSION_SIZE)
                 {
