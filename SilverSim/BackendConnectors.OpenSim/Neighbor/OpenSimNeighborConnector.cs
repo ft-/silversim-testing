@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using HttpClasses;
+using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Neighbor;
@@ -31,7 +32,6 @@ using SilverSim.StructuredData.JSON;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System;
-using log4net;
 
 namespace SilverSim.BackendConnectors.OpenSim.Neighbor
 {

@@ -23,14 +23,12 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
-using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
+using System;
+using System.Collections.Generic;
 
 namespace SilverSim.Scene.Physics.Common
 {

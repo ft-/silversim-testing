@@ -309,6 +309,14 @@ namespace SilverSim.BackendConnectors.Robust.Asset
             }
             string assetbase_header = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<AssetBase>";
             string flags = "";
+            if(asset.Data.Length != 0)
+            {
+                assetbase_header += "<Data>";
+            }
+            else
+            {
+                assetbase_header += "<Data/>";
+            }
 
             if(0 != (asset.Flags & (uint)AssetFlags.Maptile))
             {
@@ -338,7 +346,7 @@ namespace SilverSim.BackendConnectors.Robust.Asset
                 flags = "Normal";
             }
             string assetbase_footer = String.Format(
-                "<FullID><Guid>{0}</Guid></FullID><ID>{0}</ID><Name>{1}</Name><Description>{2}</Description><Type>{3}</Type><Local>{4}</Local><Temporary>{5}</Temporary><CreatorID>{6}</CreatorID><Flags>{7}</Flags></AssetBase>",
+                "</Data><FullID><Guid>{0}</Guid></FullID><ID>{0}</ID><Name>{1}</Name><Description>{2}</Description><Type>{3}</Type><Local>{4}</Local><Temporary>{5}</Temporary><CreatorID>{6}</CreatorID><Flags>{7}</Flags></AssetBase>",
                 asset.ID.ToString(),
                 System.Xml.XmlConvert.EncodeName(asset.Name),
                 System.Xml.XmlConvert.EncodeName(asset.Description),
@@ -347,6 +355,10 @@ namespace SilverSim.BackendConnectors.Robust.Asset
                 asset.Temporary.ToString(),
                 asset.Creator.ToString(),
                 flags);
+            if (asset.Data.Length != 0)
+            {
+                assetbase_footer = "</Data>" + assetbase_footer;
+            }
             byte[] header = Encoding.UTF8.GetBytes(assetbase_header);
             byte[] footer = Encoding.UTF8.GetBytes(assetbase_footer);
             int base64_codegroups = (asset.Data.Length + 2) / 3;

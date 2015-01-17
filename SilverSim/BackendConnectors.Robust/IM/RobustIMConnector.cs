@@ -23,11 +23,11 @@ exception statement from your version.
 
 */
 
+using HttpClasses;
+using Nwc.XmlRpc;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
 using SilverSim.Types.IM;
-using HttpClasses;
-using Nwc.XmlRpc;
 using System;
 using System.Collections;
 using System.Collections.Generic;

@@ -23,19 +23,15 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.ServiceInterfaces.ServerParam;
 using log4net;
+using MySql.Data.MySqlClient;
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Groups;
-using MySql.Data.MySqlClient;
 using SilverSim.Types;
-using ThreadedClasses;
-using Nini.Config;
+using System;
+using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Groups
 {

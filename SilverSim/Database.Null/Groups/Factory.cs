@@ -23,8 +23,8 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common;
 using Nini.Config;
+using SilverSim.Main.Common;
 
 namespace SilverSim.Database.Null.Groups
 {

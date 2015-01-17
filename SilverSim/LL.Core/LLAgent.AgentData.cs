@@ -23,30 +23,9 @@ exception statement from your version.
 
 */
 
-using log4net;
 using SilverSim.LL.Messages;
-using SilverSim.Main.Common;
-using SilverSim.Scene.Types.Agent;
-using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Scene;
-using SilverSim.Scene.Types.Script.Events;
-using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Economy;
-using SilverSim.ServiceInterfaces.Friends;
-using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
-using SilverSim.ServiceInterfaces.Groups;
-using SilverSim.ServiceInterfaces.Inventory;
-using SilverSim.ServiceInterfaces.Presence;
-using SilverSim.ServiceInterfaces.Profile;
-using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
-using SilverSim.Types.Grid;
-using SilverSim.Types.IM;
 using SilverSim.Types.Groups;
-using System;
-using System.Collections.Generic;
-using ThreadedClasses;
 
 namespace SilverSim.LL.Core
 {

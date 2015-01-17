@@ -23,13 +23,13 @@ exception statement from your version.
 
 */
 
+using Nini.Config;
+using Nwc.XmlRpc;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
 using SilverSim.Types.IM;
-using Nini.Config;
-using Nwc.XmlRpc;
 using System;
 using System.Collections;
 using System.Collections.Generic;

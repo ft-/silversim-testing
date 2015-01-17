@@ -29,10 +29,10 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Grid;
+using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
-using SilverSim.ServiceInterfaces.ServerParam;
 
 namespace SilverSim.Database.MySQL.Grid
 {

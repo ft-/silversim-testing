@@ -23,9 +23,8 @@ exception statement from your version.
 
 */
 
+using SilverSim.LL.Messages;
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Script;
-using SilverSim.Types.Script;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
@@ -39,9 +38,7 @@ using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.IM;
-using SilverSim.LL.Messages;
-using System;
-using ThreadedClasses;
+using SilverSim.Types.Script;
 
 namespace SilverSim.Scene.Types.Agent
 {

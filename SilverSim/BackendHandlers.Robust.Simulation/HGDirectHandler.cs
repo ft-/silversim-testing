@@ -23,41 +23,15 @@ exception statement from your version.
 
 */
 
-using log4net;
 using Nini.Config;
-using SilverSim.BackendConnectors.Robust.Asset;
-using SilverSim.BackendConnectors.Robust.Inventory;
-using SilverSim.LL.Core;
-using SilverSim.LL.Messages.Agent;
+using Nwc.XmlRpc;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Economy;
-using SilverSim.ServiceInterfaces.Friends;
-using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
-using SilverSim.ServiceInterfaces.Groups;
-using SilverSim.ServiceInterfaces.Inventory;
-using SilverSim.ServiceInterfaces.Presence;
-using SilverSim.ServiceInterfaces.Profile;
-using SilverSim.ServiceInterfaces.UserAgents;
-using SilverSim.StructuredData.Agent;
-using SilverSim.StructuredData.JSON;
 using SilverSim.Types;
-using SilverSim.Types.Agent;
-using SilverSim.Types.Asset.Format;
-using SilverSim.Types.Groups;
 using System;
-using System.Collections.Generic;
 using System.Collections;
-using System.IO;
-using System.IO.Compression;
-using System.Net;
-using System.Text;
-using ThreadedClasses;
-using Nwc.XmlRpc;
+using System.Collections.Generic;
 
 namespace SilverSim.BackendHandlers.Robust.Simulation
 {

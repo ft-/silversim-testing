@@ -26,8 +26,9 @@ exception statement from your version.
 using log4net;
 using log4net.Config;
 using Nini.Config;
-using SilverSim.Main.Common.HttpServer;
 using SilverSim.Main.Common.Caps;
+using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
@@ -39,7 +40,6 @@ using System.Reflection;
 using System.Threading;
 using System.Xml;
 using ThreadedClasses;
-using SilverSim.Scene.Management.Scene;
 
 namespace SilverSim.Main.Common
 {
