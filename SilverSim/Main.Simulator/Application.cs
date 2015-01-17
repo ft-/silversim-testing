@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Main.Common;
 using System;
+using System.Reflection;
 using System.Threading;
 
 namespace SilverSim.Main.Simulator
@@ -35,10 +36,18 @@ namespace SilverSim.Main.Simulator
 
         public static ConfigurationLoader m_ConfigLoader;
         public static ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
+        static object m_WinSupport;
 
         public static void Main(string[] args)
         {
             Console.TreatControlCAsInput = true;
+
+            if (Environment.OSVersion.Platform == PlatformID.Win32NT)
+            {
+                Assembly assembly = Assembly.LoadFrom("SilverSim.Main.Simulator.Win.dll");
+                m_WinSupport = assembly.CreateInstance("SilverSim.Main.Simulator.Win.WinSupport");
+            }
+
             Thread.CurrentThread.Name = "SilverSim:Main";
             try
             {

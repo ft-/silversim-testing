@@ -58,6 +58,29 @@
       </Files>
     </Project>
 
+    <Project frameworkVersion="v4_0" name="SilverSim.Main.Simulator.Win" path="SilverSim/Main.Simulator.Win" type="Library">
+      <Configuration name="Release">
+        <Options>
+          <OutputPath>../../bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug">
+        <Options>
+          <OutputPath>../../bin/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="System"/>
+      <Reference name="System.Xml"/>
+      <Reference name="SilverSim.Types" localCopy="false"/>
+      <Reference name="SilverSim.Main.Simulator" localCopy="false"/>
+      <Files>
+        <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
+      </Files>
+    </Project>
+
     <Project frameworkVersion="v4_0" name="SilverSim.Main.Common" path="SilverSim/Main.Common" type="Library">
       <Configuration name="Release">
         <Options>
