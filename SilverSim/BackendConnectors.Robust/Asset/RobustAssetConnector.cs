@@ -66,9 +66,11 @@ namespace SilverSim.BackendConnectors.Robust.Asset
         private DefaultAssetReferencesService m_ReferencesService;
         private RobustAssetDataConnector m_DataService;
         private bool m_EnableCompression = false;
+        private bool m_EnableLocalStorage = false;
+        private bool m_EnableTempStorage = false;
 
         #region Constructor
-        public RobustAssetConnector(string uri)
+        public RobustAssetConnector(string uri, bool enableCompression = false, bool enableLocalStorage = false, bool enableTempStorage = false)
         {
             if(!uri.EndsWith("/"))
             {
@@ -81,22 +83,9 @@ namespace SilverSim.BackendConnectors.Robust.Asset
             m_MetadataService = new RobustAssetMetadataConnector(uri);
             m_ReferencesService = new DefaultAssetReferencesService(this);
             m_MetadataService.TimeoutMs = m_TimeoutMs;
-        }
-
-        public RobustAssetConnector(string uri, bool enableCompression)
-        {
-            if (!uri.EndsWith("/"))
-            {
-                uri += "/";
-            }
-            uri += "";
-
-            m_AssetURI = uri;
-            m_DataService = new RobustAssetDataConnector(uri);
-            m_MetadataService = new RobustAssetMetadataConnector(uri);
-            m_ReferencesService = new DefaultAssetReferencesService(this);
-            m_MetadataService.TimeoutMs = m_TimeoutMs;
             m_EnableCompression = enableCompression;
+            m_EnableLocalStorage = enableLocalStorage;
+            m_EnableTempStorage = enableTempStorage;
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -298,9 +287,10 @@ namespace SilverSim.BackendConnectors.Robust.Asset
 
         public override void Store(AssetData asset)
         {
-            if(asset.Temporary || asset.Local)
+            if((asset.Temporary && !m_EnableTempStorage) ||
+                (asset.Local && !m_EnableLocalStorage))
             {
-                /* Do not store temporary or local assets on grid */
+                /* Do not store temporary or local assets on specified server unless explicitly wanted */
                 return;
             }
             string assetbase_header = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<AssetBase>";
@@ -415,7 +405,11 @@ namespace SilverSim.BackendConnectors.Robust.Asset
                 m_Log.FatalFormat("Missing 'URI' in section {0}", ownSection.Name);
                 throw new ConfigurationLoader.ConfigurationError();
             }
-            return new RobustAssetConnector(ownSection.GetString("URI"), ownSection.GetBoolean("EnableCompressedStoreRequest", false));
+            return new RobustAssetConnector(
+                ownSection.GetString("URI"), 
+                ownSection.GetBoolean("EnableCompressedStoreRequest", false),
+                ownSection.GetBoolean("EnableLocalAssetStorage", false),
+                ownSection.GetBoolean("EnableTempAssetStorage", false));
         }
     }
     #endregion
