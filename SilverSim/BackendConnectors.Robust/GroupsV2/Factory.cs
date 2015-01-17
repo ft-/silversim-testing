@@ -32,6 +32,7 @@ using Nini.Config;
 
 namespace SilverSim.BackendConnectors.Robust.GroupsV2
 {
+    [PluginName("GroupsV2")]
     public class Factory : IPluginFactory
     {
         public Factory()

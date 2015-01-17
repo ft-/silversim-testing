@@ -349,5 +349,14 @@ namespace SilverSim.StructuredData.JSON
                 SerializeData(tw, val);
             }
         }
+
+        public static string Serialize(IValue val)
+        {
+            using(MemoryStream m = new MemoryStream())
+            {
+                Serialize(val, m);
+                return System.Text.Encoding.UTF8.GetString(m.GetBuffer());
+            }
+        }
     }
 }

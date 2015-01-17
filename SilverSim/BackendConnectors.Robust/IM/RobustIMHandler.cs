@@ -119,6 +119,7 @@ namespace SilverSim.BackendConnectors.Robust.IM
     #endregion
 
     #region Factory
+    [PluginName("IMHandler")]
     public class RobustIMHandlerFactory : IPluginFactory
     {
         public RobustIMHandlerFactory()

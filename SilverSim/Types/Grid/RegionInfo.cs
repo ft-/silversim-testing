@@ -49,6 +49,13 @@ namespace SilverSim.Types.Grid
         public string RegionSecret = string.Empty;
         public UUI Owner = UUI.Unknown;
         public RegionFlags Flags = 0;
+        public string ProtocolVariant = ProtocolVariantId.Local;
+        public string GridURI = string.Empty; /* empty when addressing local grid */
+        public static class ProtocolVariantId
+        {
+            public const string Local = "";
+            public const string OpenSim = "OpenSim";
+        }
         #endregion
 
         #region Authentication Info

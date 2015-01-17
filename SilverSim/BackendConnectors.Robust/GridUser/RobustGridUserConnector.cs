@@ -169,6 +169,7 @@ namespace SilverSim.BackendConnectors.Robust.GridUser
     #endregion
 
     #region Factory
+    [PluginName("GridUser")]
     public class RobustGridUserConnectorFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ROBUST GRIDUSER CONNECTOR");

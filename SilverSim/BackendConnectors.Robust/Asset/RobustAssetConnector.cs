@@ -391,6 +391,7 @@ namespace SilverSim.BackendConnectors.Robust.Asset
     #endregion
 
     #region Factory
+    [PluginName("Assets")]
     public class RobustAssetConnectorFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ROBUST ASSET CONNECTOR");

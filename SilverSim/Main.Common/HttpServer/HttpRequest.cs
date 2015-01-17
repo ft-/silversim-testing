@@ -373,6 +373,18 @@ namespace SilverSim.Main.Common.HttpServer
             return Response = new HttpResponse(m_HttpStream, this, HttpStatusCode.OK, "OK");
         }
 
+        public HttpResponse BeginResponse(string contentType)
+        {
+            HttpResponse res = BeginResponse();
+            res.ContentType = contentType;
+            return res;
+        }
+
+        public void ErrorResponse(HttpStatusCode statuscode, string statusDescription)
+        {
+            BeginResponse(statuscode, statusDescription).Close();
+        }
+
         public HttpResponse BeginResponse(HttpStatusCode statuscode, string statusDescription)
         {
             if (Body != null)

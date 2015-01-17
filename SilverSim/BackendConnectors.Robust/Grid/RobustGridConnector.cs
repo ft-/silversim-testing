@@ -334,6 +334,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
             r.Access = (byte)map["access"].AsUInt;
             r.RegionSecret = map["regionSecret"].ToString();
             r.Owner.ID = map["owner_uuid"].AsUUID;
+            r.ProtocolVariant = RegionInfo.ProtocolVariantId.OpenSim;
             if(!Uri.IsWellFormedUriString(r.ServerURI, UriKind.Absolute) ||
                 r.ServerPort == 0 ||
                 r.ServerHttpPort == 0)
@@ -347,6 +348,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
     #endregion
 
     #region Factory
+    [PluginName("Grid")]
     public class RobustGridConnectorFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ROBUST GRID CONNECTOR");

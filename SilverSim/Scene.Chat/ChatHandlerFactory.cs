@@ -56,6 +56,7 @@ namespace SilverSim.Scene.Chat
     #endregion
 
     #region Factory Implementation
+    [PluginName("Chat")]
     public class HandlerFactory : IPluginFactory
     {
         public HandlerFactory()

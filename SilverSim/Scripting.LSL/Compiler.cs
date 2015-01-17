@@ -156,7 +156,15 @@ namespace SilverSim.Scripting.LSL
                         {
                             if ((f.Attributes & FieldAttributes.InitOnly) != 0 || (f.Attributes & FieldAttributes.Literal) != 0)
                             {
-                                m_Constants.Add(f.Name, f);
+                                try
+                                {
+                                    m_Constants.Add(f.Name, f);
+                                }
+                                catch
+                                {
+                                    m_Log.DebugFormat("Field {0} triggered exception", f.Name);
+                                    throw;
+                                }
                             }
                             else
                             {

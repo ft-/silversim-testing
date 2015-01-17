@@ -103,6 +103,7 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
     #endregion
 
     #region Factory
+    [PluginName("GridUserAvatarNames")]
     public class RobustGridUserAvatarNameConnectorFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ROBUST GRIDUSER AVATAR NAME CONNECTOR");

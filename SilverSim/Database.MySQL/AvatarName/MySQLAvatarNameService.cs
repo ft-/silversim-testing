@@ -176,6 +176,7 @@ namespace SilverSim.Database.MySQL.AvatarName
     #endregion
 
     #region Factory
+    [PluginName("AvatarNames")]
     public class MySQLAvatarNameServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR NAMES SERVICE");

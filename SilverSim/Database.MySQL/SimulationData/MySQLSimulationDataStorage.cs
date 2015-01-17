@@ -101,6 +101,7 @@ namespace SilverSim.Database.MySQL.SimulationData
     #endregion
 
     #region Factory
+    [PluginName("SimulationData")]
     public class MySQLSimulationDataServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");

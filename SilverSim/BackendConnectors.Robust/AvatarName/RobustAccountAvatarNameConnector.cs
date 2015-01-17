@@ -121,6 +121,7 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
     #endregion
 
     #region Factory
+    [PluginName("UserAccountAvatarNames")]
     public class RobustAccountAvatarNameConnectorFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ROBUST ACCOUNT AVATAR NAME CONNECTOR");

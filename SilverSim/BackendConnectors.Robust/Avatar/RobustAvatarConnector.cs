@@ -199,6 +199,7 @@ namespace SilverSim.BackendConnectors.Robust.Avatar
     #endregion
 
     #region Factory
+    [PluginName("Avatar")]
     public class RobustAvatarConnectorFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ROBUST AVATAR CONNECTOR");

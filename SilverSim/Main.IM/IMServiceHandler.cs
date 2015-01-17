@@ -97,6 +97,7 @@ namespace SilverSim.Main.IM
     #endregion
 
     #region Factory
+    [PluginName("IMService")]
     public class IMServiceHandlerFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("IM SERVICE");

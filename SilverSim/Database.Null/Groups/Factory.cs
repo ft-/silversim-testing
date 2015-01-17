@@ -28,6 +28,7 @@ using Nini.Config;
 
 namespace SilverSim.Database.Null.Groups
 {
+    [PluginName("Groups")]
     public class Factory : IPluginFactory
     {
         public Factory()

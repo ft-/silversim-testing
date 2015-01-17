@@ -26,7 +26,9 @@ exception statement from your version.
 using log4net;
 using Nini.Config;
 using SilverSim.BackendConnectors.Robust.Asset;
+using SilverSim.BackendConnectors.Robust.GridUser;
 using SilverSim.BackendConnectors.Robust.Inventory;
+using SilverSim.BackendConnectors.Robust.Presence;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages.Agent;
 using SilverSim.Main.Common;
@@ -34,7 +36,6 @@ using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
@@ -42,6 +43,7 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
+using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.StructuredData.Agent;
 using SilverSim.StructuredData.JSON;
@@ -56,9 +58,6 @@ using System.IO.Compression;
 using System.Net;
 using System.Text;
 using ThreadedClasses;
-using SilverSim.ServiceInterfaces.ServerParam;
-using SilverSim.BackendConnectors.Robust.GridUser;
-using SilverSim.BackendConnectors.Robust.Presence;
 
 namespace SilverSim.BackendHandlers.Robust.Simulation
 {
@@ -858,6 +857,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
     #endregion
 
     #region Service Factory
+    [PluginName("RobustAgentHandler")]
     public class PostAgentHandlerFactory : IPluginFactory
     {
         public PostAgentHandlerFactory()

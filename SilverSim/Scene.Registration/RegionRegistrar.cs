@@ -110,6 +110,7 @@ namespace SilverSim.Scene.Registration
     #endregion
 
     #region Factory
+    [PluginName("SceneRegistrar")]
     public class SceneRegistrarFactory : IPluginFactory
     {
         public SceneRegistrarFactory()

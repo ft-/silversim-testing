@@ -357,6 +357,7 @@ id, name, description, assetType, local, temporary, create_time, access_time, as
     #endregion
 
     #region Factory
+    [PluginName("Assets")]
     public class MySQLAssetServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");

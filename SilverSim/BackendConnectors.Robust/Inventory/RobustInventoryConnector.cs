@@ -202,6 +202,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
 
 
     #region Factory
+    [PluginName("Inventory")]
     public class RobustInventoryConnectorFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ROBUST INVENTORY CONNECTOR");

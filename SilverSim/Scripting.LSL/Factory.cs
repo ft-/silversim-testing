@@ -34,6 +34,7 @@ using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scripting.LSL
 {
+    [PluginName("ScriptEngine")]
     public class Factory : IPluginFactory
     {
         public Factory()

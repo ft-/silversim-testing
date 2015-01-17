@@ -144,6 +144,7 @@ namespace SilverSim.Database.MySQL.Groups
     #endregion
 
     #region Factory
+    [PluginName("GroupNames")]
     public class MySQLGroupsNameServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUP NAMES SERVICE");

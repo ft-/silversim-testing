@@ -374,6 +374,7 @@ namespace SilverSim.Database.Null.Grid
     #endregion
 
     #region Factory
+    [PluginName("Grid")]
     class NullGridServiceFactory : IPluginFactory
     {
         public NullGridServiceFactory()

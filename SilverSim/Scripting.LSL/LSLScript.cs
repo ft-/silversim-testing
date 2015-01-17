@@ -446,7 +446,7 @@ namespace SilverSim.Scripting.LSL
                 startticks = Environment.TickCount;
                 InvokeStateEvent("state_entry");
             }
-            catch(System.Threading.ThreadAbortException e)
+            catch(System.Threading.ThreadAbortException)
             {
                 throw;
             }

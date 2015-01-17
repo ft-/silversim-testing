@@ -194,6 +194,7 @@ namespace SilverSim.Database.MySQL.ServerParam
     #endregion
 
     #region Factory
+    [PluginName("ServerParams")]
     class MySQLServerParamServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SERVER PARAM SERVICE");

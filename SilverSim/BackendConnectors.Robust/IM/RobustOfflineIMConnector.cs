@@ -142,6 +142,7 @@ namespace SilverSim.BackendConnectors.Robust.IM
     #endregion
 
     #region Factory
+    [PluginName("OfflineIM")]
     public class RobustOfflineIMConnectorFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ROBUST OFFLINE IM CONNECTOR");

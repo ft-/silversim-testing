@@ -27,25 +27,26 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SilverSim.Main.Common;
 using SilverSim.Types;
-using Nini.Config;
+using SilverSim.Types.Grid;
 
-namespace SilverSim.Scene.RegionLoader.Basic
+namespace SilverSim.ServiceInterfaces.Neighbor
 {
-    [PluginName("RegionLoader")]
-    public class Factory : IPluginFactory
+    public abstract class NeighborServiceInterface
     {
-        public Factory()
+        public NeighborServiceInterface()
         {
 
         }
 
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig)
-        {
-            string regionCfgName = ownConfig.GetString("region_config_source", "");
+        public abstract void notifyNeighborStatus(RegionInfo fromRegion, RegionInfo toRegion);
 
-            return new RegionLoaderService(ownConfig.GetString("RegionStorage"), regionCfgName);
+        public enum ServiceTypeEnum
+        {
+            Local,
+            Remote
         }
+
+        public abstract ServiceTypeEnum ServiceType { get; }
     }
 }

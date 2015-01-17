@@ -169,6 +169,7 @@ namespace SilverSim.BackendConnectors.Robust.Account
     #endregion
 
     #region Factory
+    [PluginName("UserAccounts")]
     public class RobustAccountConnectorFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ROBUST ACCOUNT CONNECTOR");

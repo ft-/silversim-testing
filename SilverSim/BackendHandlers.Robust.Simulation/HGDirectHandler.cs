@@ -171,6 +171,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
     #endregion
 
     #region Service Factory
+    [PluginName("RobustDirectHGHandler")]
     public class PostAgentDirectHGHandlerFactory : IPluginFactory
     {
         public PostAgentDirectHGHandlerFactory()

@@ -412,6 +412,21 @@ namespace SilverSim.Main.Common
             throw new ConfigurationError();
         }
  
+        private Type FindPluginInAssembly(Assembly assembly, string pluginName)
+        {
+            foreach(Type t in assembly.GetTypes())
+            {
+                foreach(object o in t.GetCustomAttributes(typeof(PluginName), false))
+                {
+                    if(((PluginName)o).Name == pluginName)
+                    {
+                        return t;
+                    }
+                }
+            }
+            throw new KeyNotFoundException();
+        }
+
         private void LoadModules()
         {
             SilverSim.Types.Assembly.InterfaceVersion ownVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
@@ -452,32 +467,31 @@ namespace SilverSim.Main.Common
                         }
 
                         /* try to load class from assembly */
-                        string typename = modulenameparts[0] + "." + modulenameparts[1];
                         Type t;
                         try
                         {
-                            t = assembly.GetType(modulenameparts[0] + "." + modulenameparts[1]);
+                            t = FindPluginInAssembly(assembly, modulenameparts[1]);
                         }
-                        catch
+                        catch(Exception e)
                         {
-                            m_Log.FatalFormat("Failed to load factory {1} in module {0}", assemblyname, typename);
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}", assemblyname, modulenameparts[1], e.Message);
                             throw new ConfigurationError();
                         }
 
                         if(t == null)
                         {
-                            m_Log.FatalFormat("Failed to load factory {1} in module {0}", assemblyname, typename);
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: factory not found", assemblyname, modulenameparts[1]);
                             throw new ConfigurationError();
                         }
 
                         /* check type inheritance first */
                         if (!t.GetInterfaces().Contains(typeof(IPluginFactory)))
                         {
-                            m_Log.FatalFormat("Failed to load factory {1} in module {0}", assemblyname, typename);
+                            m_Log.FatalFormat("Failed to load factory for {1} in module {0}: not a factory", assemblyname, modulenameparts[1]);
                             throw new ConfigurationError();
                         }
 
-                        IPluginFactory module = (IPluginFactory)assembly.CreateInstance(typename);
+                        IPluginFactory module = (IPluginFactory)assembly.CreateInstance(t.FullName);
                         PluginInstances.Add(config.Name, module.Initialize(this, config));
                     }
                 }

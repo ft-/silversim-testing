@@ -187,6 +187,7 @@ namespace SilverSim.BackendConnectors.Robust.Presence
     #endregion
 
     #region Factory
+    [PluginName("Presence")]
     public class RobustPresenceConnectorFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ROBUST PRESENCE CONNECTOR");

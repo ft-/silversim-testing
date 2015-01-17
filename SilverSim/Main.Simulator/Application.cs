@@ -38,6 +38,7 @@ namespace SilverSim.Main.Simulator
 
         public static void Main(string[] args)
         {
+            Console.TreatControlCAsInput = true;
             Thread.CurrentThread.Name = "SilverSim:Main";
             try
             {

@@ -27,25 +27,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SilverSim.Main.Common;
-using SilverSim.Types;
-using Nini.Config;
+using System.Runtime.InteropServices;
 
-namespace SilverSim.Scene.RegionLoader.Basic
+namespace SilverSim.Main.Common
 {
-    [PluginName("RegionLoader")]
-    public class Factory : IPluginFactory
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    [ComVisible(true)]
+    public class PluginName : Attribute
     {
-        public Factory()
+        public PluginName(string pluginName)
         {
-
+            Name = pluginName;
         }
 
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig)
-        {
-            string regionCfgName = ownConfig.GetString("region_config_source", "");
-
-            return new RegionLoaderService(ownConfig.GetString("RegionStorage"), regionCfgName);
-        }
+        public string Name { get; private set; }
     }
 }

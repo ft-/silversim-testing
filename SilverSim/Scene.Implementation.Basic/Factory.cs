@@ -122,6 +122,7 @@ namespace SilverSim.Scene.Implementation.Basic
         }
     }
 
+    [PluginName("Scene")]
     public class Factory : IPluginFactory
     {
         public Factory()
