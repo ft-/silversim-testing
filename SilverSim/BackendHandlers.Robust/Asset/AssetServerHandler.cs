@@ -48,6 +48,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
         private BaseHttpServer m_HttpServer;
         AssetServiceInterface m_TemporaryAssetService = null;
         AssetServiceInterface m_PersistentAssetService = null;
+        AssetServiceInterface m_ResourceAssetService = null;
         string m_TemporaryAssetServiceName;
         string m_PersistentAssetServiceName;
         bool m_EnableGet;
@@ -140,8 +141,15 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     }
                     catch
                     {
-                        req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
-                        return;
+                        try
+                        {
+                            data = m_ResourceAssetService[id];
+                        }
+                        catch
+                        {
+                            req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                            return;
+                        }
                     }
                 }
 
@@ -239,8 +247,15 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     }
                     catch
                     {
-                        req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
-                        return;
+                        try
+                        {
+                            data = m_ResourceAssetService.Metadata[id];
+                        }
+                        catch
+                        {
+                            req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                            return;
+                        }
                     }
                 }
 
@@ -310,8 +325,15 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     }
                     catch
                     {
-                        req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
-                        return;
+                        try
+                        {
+                            data = m_ResourceAssetService[id];
+                        }
+                        catch
+                        {
+                            req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                            return;
+                        }
                     }
                 }
 
@@ -409,6 +431,62 @@ namespace SilverSim.BackendHandlers.Robust.Asset
             }
         }
 
+        private static UUID parseUUID(XmlTextReader reader)
+        {
+            while (true)
+            {
+                if (!reader.Read())
+                {
+                    throw new Exception();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.Name != "string")
+                        {
+                            throw new Exception();
+                        }
+                        break;
+
+                    case XmlNodeType.Text:
+                        return new UUID(reader.ReadContentAsString());
+
+                    case XmlNodeType.EndElement:
+                        throw new Exception();
+                }
+            }
+        }
+        private static List<UUID> parseArrayOfUUIDs(XmlTextReader reader)
+        {
+            List<UUID> result = new List<UUID>();
+            while (true)
+            {
+                if (!reader.Read())
+                {
+                    throw new Exception();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.Name != "string")
+                        {
+                            throw new Exception();
+                        }
+                        result.Add(parseUUID(reader));
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "ArrayOfString")
+                        {
+                            throw new Exception();
+                        }
+                        return result;
+                }
+            }
+        }
+
         public void GetAssetsExistHandler(HttpRequest req)
         {
             if (req.Method != "POST")
@@ -416,6 +494,76 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                 req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
             }
+
+            List<UUID> ids;
+            try
+            {
+                using (XmlTextReader reader = new XmlTextReader(req.Body))
+                {
+                    ids = parseArrayOfUUIDs(reader);
+                }
+            }
+            catch
+            {
+                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                return;
+            }
+
+            Dictionary<UUID, bool> asset1;
+            if (m_TemporaryAssetService != null)
+            {
+                asset1 = m_TemporaryAssetService.exists(ids);
+                foreach (KeyValuePair<UUID, bool> kvp in m_PersistentAssetService.exists(ids))
+                {
+                    if (kvp.Value)
+                    {
+                        asset1[kvp.Key] = true;
+                    }
+                }
+            }
+            else
+            {
+                asset1 = m_PersistentAssetService.exists(ids);
+            }
+
+            foreach (KeyValuePair<UUID, bool> kvp in m_ResourceAssetService.exists(ids))
+            {
+                if (kvp.Value)
+                {
+                    asset1[kvp.Key] = true;
+                }
+            }
+
+            HttpResponse res = req.BeginResponse();
+            res.ContentType = "text/xml";
+            using(XmlTextWriter writer = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM))
+            {
+                writer.WriteStartElement("ArrayOfBoolean");
+                foreach(UUID id in ids)
+                {
+                    bool found = false;
+                    try
+                    {
+                        found = asset1[id];
+                    }
+                    catch
+                    {
+
+                    }
+                    writer.WriteStartElement("boolean");
+                    if (found)
+                    {
+                        writer.WriteValue("true");
+                    }
+                    else
+                    {
+                        writer.WriteValue("false");
+                    }
+                    writer.WriteEndElement();
+                }
+                writer.WriteEndElement();
+            }
+            res.Close();
         }
     }
     #endregion

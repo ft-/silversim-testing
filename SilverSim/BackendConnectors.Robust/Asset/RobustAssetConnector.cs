@@ -120,7 +120,6 @@ namespace SilverSim.BackendConnectors.Robust.Asset
 
         private static bool parseBoolean(XmlTextReader reader)
         {
-            bool result = false;
             while(true)
             {
                 if(!reader.Read())
@@ -138,15 +137,10 @@ namespace SilverSim.BackendConnectors.Robust.Asset
                         break;
 
                     case XmlNodeType.Text:
-                        result = reader.ReadContentAsBoolean();
-                        break;
+                        return reader.ReadContentAsBoolean();
 
                     case XmlNodeType.EndElement:
-                        if(reader.Name != "boolean")
-                        {
-                            throw new Exception();
-                        }
-                        return result;
+                        throw new Exception();
                 }
             }
         }
