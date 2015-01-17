@@ -206,8 +206,8 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     assetbase_footer = "</Data>" + assetbase_footer;
                 }
 
-                byte[] header = Encoding.UTF8.GetBytes(assetbase_header);
-                byte[] footer = Encoding.UTF8.GetBytes(assetbase_footer);
+                byte[] header = UTF8NoBOM.GetBytes(assetbase_header);
+                byte[] footer = UTF8NoBOM.GetBytes(assetbase_footer);
                 int base64_codegroups = (data.Data.Length + 2) / 3;
 
                 HttpResponse res = req.BeginResponse();
@@ -299,13 +299,13 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     data.Temporary.ToString(),
                     data.Creator.ToString(),
                     flags);
-                byte[] header = Encoding.UTF8.GetBytes(assetbase_header);
-                byte[] footer = Encoding.UTF8.GetBytes(assetbase_footer);
+                byte[] header = UTF8NoBOM.GetBytes(assetbase_header);
+                byte[] footer = UTF8NoBOM.GetBytes(assetbase_footer);
 
                 HttpResponse res = req.BeginResponse();
                 res.ContentType = "text/xml";
                 Stream st = res.GetOutputStream(header.Length + footer.Length);
-                st.Write(header, 0, footer.Length);
+                st.Write(header, 0, header.Length);
                 st.Write(footer, 0, footer.Length);
 
                 res.Close();
