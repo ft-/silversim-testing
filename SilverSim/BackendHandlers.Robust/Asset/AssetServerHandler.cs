@@ -204,7 +204,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
 
                 HttpResponse res = req.BeginResponse();
                 res.ContentType = "text/xml";
-                Stream st = res.GetOutputStream(4 * base64_codegroups + header.Length + footer.Length);
+                Stream st = res.GetOutputStream();
                 st.Write(header, 0, footer.Length);
                 int pos = 0;
                 while (data.Data.Length - pos >= MAX_ASSET_BASE64_CONVERSION_SIZE)
@@ -317,7 +317,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
 
                 HttpResponse res = req.BeginResponse();
                 res.ContentType = data.ContentType;
-                Stream st = res.GetOutputStream(data.Data.Length);
+                Stream st = res.GetOutputStream();
                 st.Write(data.Data, 0, data.Data.Length);
                 res.Close();
             }
