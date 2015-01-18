@@ -247,7 +247,7 @@ namespace SilverSim.Database.MySQL.Asset
 
                 using (MySqlCommand cmd =
                     new MySqlCommand(
-                        "replace INTO assets(id, name, description, assetType, local, temporary, create_time, access_time, asset_flags, CreatorID, data)" +
+                        "INSERT INTO assets(id, name, description, assetType, local, temporary, create_time, access_time, asset_flags, CreatorID, data)" +
                         "VALUES(?id, ?name, ?description, ?assetType, ?local, ?temporary, ?create_time, ?access_time, ?asset_flags, ?CreatorID, ?data)",
                         conn))
                 {
@@ -276,7 +276,7 @@ namespace SilverSim.Database.MySQL.Asset
                             cmd.Parameters.AddWithValue("?id", asset.ID);
                             cmd.Parameters.AddWithValue("?name", assetName);
                             cmd.Parameters.AddWithValue("?description", assetDescription);
-                            cmd.Parameters.AddWithValue("?assetType", asset.Type);
+                            cmd.Parameters.AddWithValue("?assetType", (int)asset.Type);
                             cmd.Parameters.AddWithValue("?local", asset.Local);
                             cmd.Parameters.AddWithValue("?temporary", asset.Temporary);
                             cmd.Parameters.AddWithValue("?create_time", now);
