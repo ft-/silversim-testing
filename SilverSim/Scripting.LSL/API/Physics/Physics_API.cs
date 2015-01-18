@@ -193,14 +193,77 @@ namespace SilverSim.Scripting.LSL.API.Physics
         [APILevel(APIFlags.LSL)]
         public AnArray llGetPhysicsMaterial(ScriptInstance Instance)
         {
+            AnArray array = new AnArray();
+            lock (this)
+            {
+                array.Add(Instance.Part.ObjectGroup.RootPart.PhysicsGravityMultiplier);
+                array.Add(Instance.Part.ObjectGroup.RootPart.PhysicsRestitution);
+                array.Add(Instance.Part.ObjectGroup.RootPart.PhysicsFriction);
+                array.Add(Instance.Part.ObjectGroup.RootPart.PhysicsDensity);
+                return array;
+            }
 #warning Implement llGetPhysicsMaterial
-            return new AnArray();
         }
+
+        const int DENSITY = 1;
+        const int FRICTION = 2;
+        const int RESTITUTION = 4;
+        const int GRAVITY_MULTIPLIER = 8;
 
         [APILevel(APIFlags.LSL)]
         public void llSetPhysicsMaterial(ScriptInstance Instance, int mask, double gravity_multiplier, double restitution, double friction, double density)
         {
-#warning Implement llSetPhysicsMaterial
+            lock (Instance)
+            {
+                if (0 != (mask & DENSITY))
+                {
+                    if (density < 1)
+                    {
+                        density = 1;
+                    }
+                    else if (density > 22587f)
+                    {
+                        density = 22587f;
+                    }
+                    Instance.Part.ObjectGroup.RootPart.PhysicsDensity = density;
+                }
+                if (0 != (mask & FRICTION))
+                {
+                    if (friction < 0)
+                    {
+                        friction = 0f;
+                    }
+                    else if (friction > 255f)
+                    {
+                        friction = 255f;
+                    }
+                    Instance.Part.ObjectGroup.RootPart.PhysicsFriction = friction;
+                }
+                if (0 != (mask & RESTITUTION))
+                {
+                    if (restitution < 0f)
+                    {
+                        restitution = 0f;
+                    }
+                    else if (restitution > 1f)
+                    {
+                        restitution = 1f;
+                    }
+                    Instance.Part.ObjectGroup.RootPart.PhysicsRestitution = restitution;
+                }
+                if (0 != (mask & GRAVITY_MULTIPLIER))
+                {
+                    if (gravity_multiplier < -1f)
+                    {
+                        gravity_multiplier = -1f;
+                    }
+                    else if (gravity_multiplier > 28f)
+                    {
+                        gravity_multiplier = 28f;
+                    }
+                    Instance.Part.ObjectGroup.RootPart.PhysicsGravityMultiplier = gravity_multiplier;
+                }
+            }
         }
 
         [APILevel(APIFlags.LSL)]

@@ -33,6 +33,7 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Xml;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
@@ -656,6 +657,49 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_Material = value;
+                switch(value)
+                {
+                    case PrimitiveMaterial.Stone:
+                        m_PhysicsFriction = 0.8;
+                        m_PhysicsRestitution = 0.4;
+                        break;
+
+                    case PrimitiveMaterial.Metal:
+                        m_PhysicsFriction = 0.3;
+                        m_PhysicsRestitution = 0.4;
+                        break;
+
+                    case PrimitiveMaterial.Glass:
+                        m_PhysicsFriction = 0.2;
+                        m_PhysicsRestitution = 0.7;
+                        break;
+
+                    case PrimitiveMaterial.Wood:
+                        m_PhysicsFriction = 0.6;
+                        m_PhysicsRestitution = 0.5;
+                        break;
+
+                    case PrimitiveMaterial.Flesh:
+                        m_PhysicsFriction = 0.9;
+                        m_PhysicsRestitution = 0.3;
+                        break;
+
+                    case PrimitiveMaterial.Plastic:
+                        m_PhysicsFriction = 0.4;
+                        m_PhysicsRestitution = 0.7;
+                        break;
+
+                    case PrimitiveMaterial.Rubber:
+                        m_PhysicsFriction = 0.9;
+                        m_PhysicsRestitution = 0.9;
+                        break;
+
+                    case PrimitiveMaterial.Light:
+                        break;
+
+                    default:
+                        break;
+                }
                 IsChanged = true;
                 TriggerOnUpdate(0);
             }
@@ -769,6 +813,95 @@ namespace SilverSim.Scene.Types.Object
         {
             return true;
         }
+
+        #region Physics Properties
+
+        double m_PhysicsDensity = 1000f;
+        double m_PhysicsFriction = 0.6f;
+        double m_PhysicsRestitution = 0.5f;
+        double m_PhysicsGravityMultiplier = 1f;
+
+        public double PhysicsDensity
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_PhysicsDensity;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_PhysicsDensity = value;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public double PhysicsFriction
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_PhysicsFriction;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_PhysicsFriction = value;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public double PhysicsRestitution
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_PhysicsRestitution;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_PhysicsRestitution = value;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+
+        public double PhysicsGravityMultiplier
+        {
+            get
+            {
+                lock (this)
+                {
+                    return m_PhysicsGravityMultiplier;
+                }
+            }
+            set
+            {
+                lock (this)
+                {
+                    m_PhysicsGravityMultiplier = value;
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+        #endregion
 
         #region Position Properties
         public Vector3 Position
@@ -1128,5 +1261,156 @@ namespace SilverSim.Scene.Types.Object
                 return data;
             }
         }
+
+        #region XML Serialization
+        public void ToXml(XmlTextWriter writer)
+        {
+            lock (this)
+            {
+                writer.WriteStartElement("SceneObjectPart");
+                {
+                    writer.WriteNamedValue("AllowedDrop", IsAllowedDrop);
+                    writer.WriteUUID("CreatorID", Creator.ID);
+                    if (!string.IsNullOrEmpty(Creator.CreatorData))
+                    {
+                        writer.WriteNamedValue("CreatorData", Creator.CreatorData);
+                    }
+
+                    writer.WriteUUID("FolderID", UUID.Zero);
+
+                    Inventory.ToXml(writer);
+
+                    writer.WriteUUID("UUID", ID);
+                    writer.WriteNamedValue("LocalId", LocalID);
+                    writer.WriteNamedValue("Name", Name);
+                    writer.WriteNamedValue("Material", (int)Material);
+                    writer.WriteNamedValue("PassTouches", IsPassTouches);
+                    writer.WriteNamedValue("PassCollisions", IsPassCollisions);
+                    writer.WriteNamedValue("RegionHandle", 0);
+                    writer.WriteNamedValue("ScriptAccessPin", ScriptAccessPin);
+                    writer.WriteNamedValue("GroupPosition", LocalPosition);
+                    writer.WriteNamedValue("OffsetPosition", LocalPosition);
+                    writer.WriteNamedValue("RotationOffset", LocalRotation);
+                    writer.WriteNamedValue("Velocity", Velocity);
+                    writer.WriteNamedValue("AngularVelocity", AngularVelocity);
+                    writer.WriteNamedValue("Acceleration", Acceleration);
+                    writer.WriteNamedValue("Description", Description);
+                    TextParam tp = Text;
+                    writer.WriteNamedValue("Color", tp.TextColor);
+                    writer.WriteNamedValue("Text", tp.Text);
+                    writer.WriteNamedValue("SitName", SitText);
+                    writer.WriteNamedValue("TouchName", TouchText);
+                    writer.WriteNamedValue("LinkNum", LinkNumber);
+                    writer.WriteNamedValue("ClickAction", (int)ClickAction);
+
+                    writer.WriteStartElement("Shape");
+                    {
+                        PrimitiveShape shape = Shape;
+
+                        writer.WriteNamedValue("ProfileCurve", shape.ProfileCurve);
+                        writer.WriteNamedValue("TextureEntry", TextureEntryBytes);
+                        writer.WriteNamedValue("ExtraParams", ExtraParamsBytes);
+                        writer.WriteNamedValue("PathBegin", shape.PathBegin);
+                        writer.WriteNamedValue("PathCurve", shape.PathCurve);
+                        writer.WriteNamedValue("PathEnd", shape.PathEnd);
+                        writer.WriteNamedValue("PathRadiusOffset", shape.PathRadiusOffset);
+                        writer.WriteNamedValue("PathRevolutions", shape.PathRevolutions);
+                        writer.WriteNamedValue("PathScaleX", shape.PathScaleX);
+                        writer.WriteNamedValue("PathScaleY", shape.PathScaleY);
+                        writer.WriteNamedValue("PathShearX", shape.PathShearX);
+                        writer.WriteNamedValue("PathShearY", shape.PathShearY);
+                        writer.WriteNamedValue("PathSkew", shape.PathSkew);
+                        writer.WriteNamedValue("PathTaperX", shape.PathTaperX);
+                        writer.WriteNamedValue("PathTaperY", shape.PathTaperY);
+                        writer.WriteNamedValue("PathTwist", shape.PathTwist);
+                        writer.WriteNamedValue("PathTwistBegin", shape.PathTwistBegin);
+                        writer.WriteNamedValue("PCode", (int)shape.PCode);
+                        writer.WriteNamedValue("ProfileBegin", shape.ProfileBegin);
+                        writer.WriteNamedValue("ProfileEnd", shape.ProfileEnd);
+                        writer.WriteNamedValue("ProfileHollow", shape.ProfileHollow);
+                        writer.WriteNamedValue("State", (int)shape.State);
+                        writer.WriteNamedValue("LastAttachPoint", (int)ObjectGroup.AttachPoint);
+                        writer.WriteNamedValue("ProfileShape", (int)shape.Type);
+                        writer.WriteNamedValue("HollowShape", (int)shape.ProfileHollow);
+                        writer.WriteUUID("SculptTexture", shape.SculptMap);
+                        writer.WriteNamedValue("SculptType", (int)shape.SculptType);
+
+                        FlexibleParam fp = Flexible;
+                        PointLightParam plp = PointLight;
+                        ProjectionParam pp = Projection;
+
+                        writer.WriteNamedValue("FlexiSoftness", fp.Softness);
+                        writer.WriteNamedValue("FlexiTension", fp.Tension);
+                        writer.WriteNamedValue("FlexiDrag", fp.Friction);
+                        writer.WriteNamedValue("FlexiGravity", fp.Gravity);
+                        writer.WriteNamedValue("FlexiWind", fp.Wind);
+                        writer.WriteNamedValue("FlexiForce", fp.Force);
+
+                        writer.WriteNamedValue("LightColor", plp.LightColor);
+                        writer.WriteNamedValue("LightRadius", plp.Radius);
+                        writer.WriteNamedValue("LightCutoff", plp.Cutoff);
+                        writer.WriteNamedValue("LightFalloff", plp.Falloff);
+                        writer.WriteNamedValue("LightIntensity", plp.Intensity);
+
+                        writer.WriteNamedValue("FlexiEntry", fp.IsFlexible);
+                        writer.WriteNamedValue("LightEntry", plp.IsLight);
+                        writer.WriteNamedValue("SculptEntry", shape.Type == PrimitiveShapeType.Sculpt);
+                        //Media
+                    }
+                    writer.WriteEndElement();
+
+                    writer.WriteNamedValue("Scale", Size);
+                    writer.WriteNamedValue("SitTargetOrientation", SitTargetOrientation);
+                    writer.WriteNamedValue("SitTargetPosition", SitTargetOffset);
+                    writer.WriteNamedValue("SitTargetPositionLL", SitTargetOffset);
+                    writer.WriteNamedValue("SitTargetOrientationLL", SitTargetOrientation);
+                    writer.WriteNamedValue("ParentID", ObjectGroup.RootPart.ID);
+                    writer.WriteNamedValue("CreationDate", CreationDate.AsUInt);
+                    //writer.WriteNamedValue("Category");
+                    //writer.WriteNamedValue("SalePrice", );
+                    //writer.WriteNamedValue("ObjectSaleType", );
+                    //writer.WriteNamedValue("OwnershipCost", );
+                    writer.WriteUUID("GroupID", ObjectGroup.Group.ID);
+                    writer.WriteUUID("OwnerID", ObjectGroup.Owner.ID);
+                    writer.WriteUUID("LastOwnerID", ObjectGroup.LastOwner.ID);
+                    writer.WriteNamedValue("BaseMask", (uint)BaseMask);
+                    writer.WriteNamedValue("OwnerMask", (uint)OwnerMask);
+                    writer.WriteNamedValue("GroupMask", (uint)GroupMask);
+                    writer.WriteNamedValue("EveryoneMask", (uint)EveryoneMask);
+                    writer.WriteNamedValue("NextOwnerMask", (uint)NextOwnerMask);
+                    writer.WriteNamedValue("Flags", "None");
+                    CollisionSoundParam sp = CollisionSound;
+                    writer.WriteUUID("CollisionSound", sp.ImpactSound);
+                    writer.WriteNamedValue("CollisionSoundVolume", sp.ImpactVolume);
+                    if (!string.IsNullOrEmpty(MediaURL))
+                    {
+                        writer.WriteNamedValue("MediaUrl", MediaURL);
+                    }
+                    writer.WriteNamedValue("AttachedPos", ObjectGroup.AttachedPos);
+                    //DynAttrs
+                    writer.WriteNamedValue("TextureAnimation", TextureAnimationBytes);
+                    writer.WriteNamedValue("ParticleSystem", ParticleSystemBytes);
+                    writer.WriteNamedValue("PayPrice0", 0);
+                    writer.WriteNamedValue("PayPrice1", 0);
+                    writer.WriteNamedValue("PayPrice2", 0);
+                    writer.WriteNamedValue("PayPrice3", 0);
+                    writer.WriteNamedValue("PayPrice4", 0);
+                    writer.WriteNamedValue("PhysicsShapeType", (int)PhysicsShapeType);
+                    writer.WriteNamedValue("Density", (float)PhysicsDensity);
+                    writer.WriteNamedValue("Friction", (float)PhysicsFriction);
+                    writer.WriteNamedValue("Bounce", (float)PhysicsRestitution);
+                    writer.WriteNamedValue("GravityModifier", (float)PhysicsGravityMultiplier);
+                }
+                writer.WriteEndElement();
+            }
+        }
+        #endregion
+
+        #region XML Deserialization
+        public static ObjectPart FromXml(XmlTextReader reader)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
     }
 }

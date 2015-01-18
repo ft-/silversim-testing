@@ -38,7 +38,7 @@ namespace SilverSim.LL.Core
         void WriteAvatarNameData(XmlTextWriter writer, AvatarNameServiceInterface.NameData nd)
         {
             writer.WriteStartElement("map");
-            WriteKeyValuePair(writer, "key", "username");
+            writer.WriteKeyValuePair("key", "username");
             string username;
             if(string.IsNullOrEmpty(nd.ID.LastName))
             {
@@ -49,19 +49,19 @@ namespace SilverSim.LL.Core
                 username = nd.ID.FirstName + "." + nd.ID.LastName;
             }
             string utcstring = DateTime.Now.AddDays(1).ToUniversalTime().ToString("yyyy\\-MM\\-dd\\THH\\-mm\\-ss\\Z");
-            WriteKeyValuePair(writer, "string", username);
-            WriteKeyValuePair(writer, "key", "display_name");
-            WriteKeyValuePair(writer, "string", username);
-            WriteKeyValuePair(writer, "key", "display_name_next_update");
-            WriteKeyValuePair(writer, "string", utcstring);
-            WriteKeyValuePair(writer, "key", "legacy_first_name");
-            WriteKeyValuePair(writer, "string", nd.ID.FirstName);
-            WriteKeyValuePair(writer, "key", "legacy_last_name");
-            WriteKeyValuePair(writer, "string", nd.ID.LastName);
-            WriteKeyValuePair(writer, "key", "id");
-            WriteKeyValuePair(writer, "uuid", nd.ID.ID);
-            WriteKeyValuePair(writer, "key", "is_display_name_default");
-            WriteKeyValuePair(writer, "boolean", false);
+            writer.WriteKeyValuePair("string", username);
+            writer.WriteKeyValuePair("key", "display_name");
+            writer.WriteKeyValuePair("string", username);
+            writer.WriteKeyValuePair("key", "display_name_next_update");
+            writer.WriteKeyValuePair("string", utcstring);
+            writer.WriteKeyValuePair("key", "legacy_first_name");
+            writer.WriteKeyValuePair("string", nd.ID.FirstName);
+            writer.WriteKeyValuePair("key", "legacy_last_name");
+            writer.WriteKeyValuePair("string", nd.ID.LastName);
+            writer.WriteKeyValuePair("key", "id");
+            writer.WriteKeyValuePair("uuid", nd.ID.ID);
+            writer.WriteKeyValuePair("key", "is_display_name_default");
+            writer.WriteKeyValuePair("boolean", false);
             writer.WriteEndElement();
         }
 
@@ -134,7 +134,7 @@ namespace SilverSim.LL.Core
                 }
                 if (!haveAgents)
                 {
-                    WriteKeyValuePair(text, "key", "haveAgents");
+                    text.WriteKeyValuePair("key", "haveAgents");
                     text.WriteStartElement("array");
                     haveAgents = true;
                 }
@@ -161,7 +161,7 @@ namespace SilverSim.LL.Core
                 }
                 if (!haveAgents)
                 {
-                    WriteKeyValuePair(text, "key", "haveAgents");
+                    text.WriteKeyValuePair("key", "haveAgents");
                     text.WriteStartElement("array");
                     haveAgents = true;
                 }
@@ -176,22 +176,22 @@ namespace SilverSim.LL.Core
 
             if(baduuids.Count != 0)
             {
-                WriteKeyValuePair(text, "key", "bad_ids");
+                text.WriteKeyValuePair("key", "bad_ids");
                 text.WriteStartElement("array");
                 foreach(UUID id in baduuids)
                 {
-                    WriteKeyValuePair(text, "uuid", id);
+                    text.WriteKeyValuePair("uuid", id);
                 }
                 text.WriteEndElement();
             }
 
             if (badnames.Count != 0)
             {
-                WriteKeyValuePair(text, "key", "bad_names");
+                text.WriteKeyValuePair("key", "bad_names");
                 text.WriteStartElement("array");
                 foreach (string name in badnames)
                 {
-                    WriteKeyValuePair(text, "string", name);
+                    text.WriteKeyValuePair("string", name);
                 }
                 text.WriteEndElement();
             }

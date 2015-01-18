@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SilverSim.Types.Primitive
 {
-    public enum PrimitiveMaterial
+    public enum PrimitiveMaterial : int
     {
         Stone = 0,
         Metal = 1,

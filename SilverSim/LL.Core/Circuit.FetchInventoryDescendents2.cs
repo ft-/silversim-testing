@@ -41,9 +41,9 @@ namespace SilverSim.LL.Core
             bool fetch_items, List<InventoryItem> items, List<InventoryItem> linkeditems)
         {
             writer.WriteStartElement("map");
-            WriteKeyValuePair(writer, "agent_id", folder.Owner.ID);
-            WriteKeyValuePair(writer, "descendents", folders.Count + items.Count);
-            WriteKeyValuePair(writer, "folder_id", folder.ID);
+            writer.WriteKeyValuePair("agent_id", folder.Owner.ID);
+            writer.WriteKeyValuePair("descendents", folders.Count + items.Count);
+            writer.WriteKeyValuePair("folder_id", folder.ID);
             if(fetch_folders)
             {
                 writer.WriteStartElement("key");
@@ -53,18 +53,18 @@ namespace SilverSim.LL.Core
                 foreach(InventoryFolder childfolder in folders)
                 {
                     writer.WriteStartElement("map");
-                    WriteKeyValuePair(writer, "folder_id", childfolder.ID);
-                    WriteKeyValuePair(writer, "parent_id", childfolder.ParentFolderID);
-                    WriteKeyValuePair(writer, "name", childfolder.Name);
+                    writer.WriteKeyValuePair("folder_id", childfolder.ID);
+                    writer.WriteKeyValuePair("parent_id", childfolder.ParentFolderID);
+                    writer.WriteKeyValuePair("name", childfolder.Name);
                     if (childfolder.InventoryType != InventoryType.Folder)
                     {
-                        WriteKeyValuePair(writer, "type", (byte)childfolder.InventoryType);
+                        writer.WriteKeyValuePair("type", (byte)childfolder.InventoryType);
                     }
                     else
                     {
-                        WriteKeyValuePair(writer, "type", -1);
+                        writer.WriteKeyValuePair("type", -1);
                     }
-                    WriteKeyValuePair(writer, "preferred_type", -1);
+                    writer.WriteKeyValuePair("preferred_type", -1);
                     writer.WriteEndElement();
                 }
                 writer.WriteEndElement();
@@ -92,8 +92,8 @@ namespace SilverSim.LL.Core
                 }
                 writer.WriteEndElement();
             }
-            WriteKeyValuePair(writer, "owner_id", folder.Owner.ID);
-            WriteKeyValuePair(writer, "version", folder.Version);
+            writer.WriteKeyValuePair("owner_id", folder.Owner.ID);
+            writer.WriteKeyValuePair("version", folder.Version);
             writer.WriteEndElement();
         }
 

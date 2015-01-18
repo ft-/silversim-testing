@@ -23,12 +23,14 @@ exception statement from your version.
 
 */
 
+using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Threading;
+using System.Xml;
 using ThreadedClasses;
-using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -36,6 +38,8 @@ namespace SilverSim.Scene.Types.Object
     {
         public delegate void OnChangeDelegate();
         public event OnChangeDelegate OnChange;
+
+        public int InventorySerial = 1;
 
         public ObjectPartInventory()
         {
@@ -160,6 +164,7 @@ namespace SilverSim.Scene.Types.Object
         public new void Add(UUID key1, string key2, ObjectPartInventoryItem item)
         {
             base.Add(key1, key2, item);
+            Interlocked.Increment(ref InventorySerial);
             
             var addDelegate = OnChange;
             if(addDelegate != null)
@@ -174,6 +179,7 @@ namespace SilverSim.Scene.Types.Object
         public new void ChangeKey(string newKey, string oldKey)
         {
             base.ChangeKey(newKey, oldKey);
+            Interlocked.Increment(ref InventorySerial);
 
             var updateDelegate = OnChange;
             if(updateDelegate != null)
@@ -189,6 +195,7 @@ namespace SilverSim.Scene.Types.Object
         {
             if (base.Remove(key1))
             {
+                Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
@@ -206,6 +213,7 @@ namespace SilverSim.Scene.Types.Object
         {
             if (base.Remove(key2))
             {
+                Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
@@ -223,6 +231,7 @@ namespace SilverSim.Scene.Types.Object
         {
             if (base.Remove(key1, key2))
             {
+                Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
@@ -234,6 +243,51 @@ namespace SilverSim.Scene.Types.Object
                 return true;
             }
             return false;
+        }
+        #endregion
+
+        #region XML Serialization
+        public void ToXml(XmlTextWriter writer)
+        {
+            writer.WriteNamedValue("InventorySerial", InventorySerial);
+            writer.WriteStartElement("TaskInventory");
+            {
+                ForEach(delegate(ObjectPartInventoryItem item)
+                {
+                    writer.WriteStartElement("TaskInventoryItem");
+                    {
+                        writer.WriteUUID("AssetID", item.AssetID);
+                        writer.WriteNamedValue("BasePermissions", (uint)item.Permissions.Base);
+                        writer.WriteNamedValue("CreationDate", item.CreationDate.AsUInt);
+                        writer.WriteUUID("CreatorID", item.Creator.ID);
+                        if (!string.IsNullOrEmpty(item.Creator.CreatorData))
+                        {
+                            writer.WriteNamedValue("CreatorData", item.Creator.CreatorData);
+                        }
+                        writer.WriteNamedValue("Description", item.Description);
+                        writer.WriteNamedValue("EveryonePermissions", (uint)item.Permissions.EveryOne);
+                        writer.WriteNamedValue("Flags", (uint)item.Flags);
+                        writer.WriteNamedValue("GroupID", item.Group.ID);
+                        writer.WriteNamedValue("GroupPermissions", (uint)item.Permissions.Group);
+                        writer.WriteNamedValue("InvType", (uint)item.InventoryType);
+                        writer.WriteUUID("ItemID", item.ID);
+                        writer.WriteUUID("OldItemID", UUID.Zero);
+                        writer.WriteUUID("LastOwnerID", item.LastOwner.ID);
+                        writer.WriteNamedValue("Name", item.Name);
+                        writer.WriteNamedValue("NextPermissions", (uint)item.Permissions.NextOwner);
+                        writer.WriteUUID("OwnerID", item.Owner.ID);
+                        writer.WriteNamedValue("CurrentPermissions", (uint)item.Permissions.Current);
+                        writer.WriteUUID("ParentID", item.ParentFolderID);
+                        writer.WriteUUID("ParentPartID", item.ParentFolderID);
+                        //writer.WriteUUID("PermsGranter", item.ScriptInstanc);
+                        //PermsMask
+                        writer.WriteNamedValue("Type", (int)item.AssetType);
+                        //writer.WriteNamedValue("OwnerChanged", false);
+                    }
+                    writer.WriteEndElement();
+                });
+            }
+            writer.WriteEndElement();
         }
         #endregion
     }

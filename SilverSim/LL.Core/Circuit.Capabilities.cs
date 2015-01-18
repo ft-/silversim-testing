@@ -61,76 +61,6 @@ namespace SilverSim.LL.Core
             return false;
         }
 
-        void WriteKeyValuePair(XmlTextWriter writer, string key, string value)
-        {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("string");
-            writer.WriteValue(value);
-            writer.WriteEndElement();
-        }
-
-        void WriteKeyValuePair(XmlTextWriter writer, string key, uint value)
-        {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("integer");
-            writer.WriteValue(value);
-            writer.WriteEndElement();
-        }
-
-        void WriteKeyValuePair(XmlTextWriter writer, string key, int value)
-        {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("integer");
-            writer.WriteValue(value);
-            writer.WriteEndElement();
-        }
-
-        void WriteKeyValuePair(XmlTextWriter writer, string key, float value)
-        {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("real");
-            writer.WriteValue(value);
-            writer.WriteEndElement();
-        }
-
-        void WriteKeyValuePair(XmlTextWriter writer, string key, bool value)
-        {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("boolean");
-            writer.WriteValue(value ? "1" : "0");
-            writer.WriteEndElement();
-        }
-
-        void WriteKeyValuePair(XmlTextWriter writer, string key, double value)
-        {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("real");
-            writer.WriteValue((float)value);
-            writer.WriteEndElement();
-        }
-
-        void WriteKeyValuePair(XmlTextWriter writer, string key, UUID value)
-        {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("uuid");
-            writer.WriteValue(value);
-            writer.WriteEndElement();
-        }
-
         Dictionary<string, string> m_ServiceURLCapabilities = new Dictionary<string, string>();
 
 
@@ -259,7 +189,7 @@ namespace SilverSim.LL.Core
             text.WriteStartElement("map");
             foreach (KeyValuePair<string, string> kvp in capsUri)
             {
-                WriteKeyValuePair(text, kvp.Key, kvp.Value);
+                text.WriteKeyValuePair(kvp.Key, kvp.Value);
             }
             text.WriteEndElement();
             text.WriteEndElement();

@@ -34,6 +34,7 @@ using SilverSim.Types.Agent;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Xml;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
@@ -69,6 +70,8 @@ namespace SilverSim.Scene.Types.Object
         private bool m_IsTempOnRez = false;
         private bool m_IsTemporary = false;
         private bool m_IsGroupOwned = false;
+        private AttachmentPoint m_AttachPoint = AttachmentPoint.NotAttached;
+        private Vector3 m_AttachedPos = Vector3.Zero;
         private Vector3 m_Velocity = Vector3.Zero;
         private UGI m_Group = UGI.Unknown;
         private UUI m_Owner = UUI.Unknown;
@@ -102,7 +105,6 @@ namespace SilverSim.Scene.Types.Object
         }
         private Vector3 m_Acceleration = Vector3.Zero;
         private Vector3 m_AngularAcceleration = Vector3.Zero;
-        public AttachmentPoint AttachPoint = AttachmentPoint.NotAttached;
 
         #region Constructor
         public ObjectGroup()
@@ -135,6 +137,7 @@ namespace SilverSim.Scene.Types.Object
                 throw new InvalidOperationException();
             }
         }
+
         #endregion
 
         public UUID OriginalAssetID /* will be set to UUID.Zero when anything has been changed */
@@ -175,8 +178,11 @@ namespace SilverSim.Scene.Types.Object
 
         private void TriggerOnUpdate(ChangedEvent.ChangedFlags flags)
         {
-            OriginalAssetID = UUID.Zero;
-            NextOwnerAssetID = UUID.Zero;
+            lock (this)
+            {
+                OriginalAssetID = UUID.Zero;
+                NextOwnerAssetID = UUID.Zero;
+            }
 
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
@@ -200,6 +206,20 @@ namespace SilverSim.Scene.Types.Object
         #region Properties
         public bool IsChanged { get; private set; }
 
+        public AttachmentPoint AttachPoint
+        {
+            get
+            {
+                return m_AttachPoint;
+            }
+            set
+            {
+                m_AttachPoint = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
         public Vector3 Acceleration
         {
             get
@@ -209,6 +229,20 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_Acceleration = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public Vector3 AttachedPos
+        {
+            get
+            {
+                return m_AttachedPos;
+            }
+            set
+            {
+                m_AttachedPos = value;
                 IsChanged = true;
                 TriggerOnUpdate(0);
             }
@@ -895,5 +929,150 @@ namespace SilverSim.Scene.Types.Object
                 throw new NotImplementedException();
             }
         }
+
+        #region XML Serialization
+        public void ToXml(XmlTextWriter writer)
+        {
+            List<ObjectPart> parts = Values;
+            writer.WriteStartElement("SceneObjectGroup");
+            RootPart.ToXml(writer);
+            writer.WriteEndElement();
+            writer.WriteStartElement("OtherParts");
+            foreach (ObjectPart p in parts)
+            {
+                if(p.ID != RootPart.ID)
+                {
+                    p.ToXml(writer);
+                }
+            }
+            writer.WriteEndElement();
+            
+#warning KeyframeMotion Base64
+        }
+        #endregion
+
+        #region XML Deserialization
+        static void fromXmlOtherParts(XmlTextReader reader, ObjectGroup group)
+        {
+            ObjectPart part = null;
+            if (reader.IsEmptyElement)
+            {
+                throw new InvalidObjectXmlException();
+            }
+
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        switch (reader.Name)
+                        {
+                            case "SceneObjectPart":
+                                if (reader.IsEmptyElement)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                part = ObjectPart.FromXml(reader);
+                                group.Add(part.LinkNumber, part.ID, part);
+                                break;
+
+                            default:
+                                if (reader.IsEmptyElement)
+                                {
+                                    reader.Skip();
+                                }
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "OtherParts")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public static ObjectGroup FromXml(XmlTextReader reader)
+        {
+            ObjectGroup group = new ObjectGroup();
+            ObjectPart rootPart = null;
+            if(reader.IsEmptyElement)
+            {
+                throw new InvalidObjectXmlException();
+            }
+
+            for(;;)
+            {
+                if(!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        switch (reader.Name)
+                        {
+                            case "SceneObjectPart":
+                                if (reader.IsEmptyElement)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                if (rootPart != null)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                rootPart = ObjectPart.FromXml(reader);
+                                group.Add(rootPart.LinkNumber, rootPart.ID, rootPart);
+                                break;
+
+                            case "OtherParts":
+                                if (reader.IsEmptyElement)
+                                {
+                                    break;
+                                }
+                                fromXmlOtherParts(reader, group);
+                                break;
+
+                            case "KeyframeMotion":
+                                if (reader.IsEmptyElement)
+                                {
+                                    reader.Skip();
+                                }
+                                break;
+
+                            default:
+                                if (reader.IsEmptyElement)
+                                {
+                                    reader.Skip();
+                                }
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if(reader.Name != "SceneObjectGroup")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return group;
+
+                    default:
+                        break;
+                }
+            }
+        }
+        #endregion
     }
 }
