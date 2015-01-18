@@ -1263,7 +1263,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
         #region XML Serialization
-        public void ToXml(XmlTextWriter writer)
+        public void ToXml(XmlTextWriter writer, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
             lock (this)
             {
@@ -1370,11 +1370,33 @@ namespace SilverSim.Scene.Types.Object
                     //writer.WriteNamedValue("SalePrice", );
                     //writer.WriteNamedValue("ObjectSaleType", );
                     //writer.WriteNamedValue("OwnershipCost", );
-                    writer.WriteUUID("GroupID", ObjectGroup.Group.ID);
-                    writer.WriteUUID("OwnerID", ObjectGroup.Owner.ID);
-                    writer.WriteUUID("LastOwnerID", ObjectGroup.LastOwner.ID);
+                    if (XmlSerializationOptions.None != (options & XmlSerializationOptions.WriteOwnerInfo))
+                    {
+                        writer.WriteUUID("GroupID", ObjectGroup.Group.ID);
+                        writer.WriteUUID("OwnerID", ObjectGroup.Owner.ID);
+                        writer.WriteUUID("LastOwnerID", ObjectGroup.LastOwner.ID);
+                    }
+                    else if(XmlSerializationOptions.None != (options & XmlSerializationOptions.AdjustForNextOwner))
+                    {
+                        writer.WriteUUID("GroupID", UUID.Zero);
+                        writer.WriteUUID("OwnerID", UUID.Zero);
+                        writer.WriteUUID("LastOwnerID", ObjectGroup.Owner.ID);
+                    }
+                    else
+                    {
+                        writer.WriteUUID("GroupID", UUID.Zero);
+                        writer.WriteUUID("OwnerID", UUID.Zero);
+                        writer.WriteUUID("LastOwnerID", ObjectGroup.LastOwner.ID);
+                    }
                     writer.WriteNamedValue("BaseMask", (uint)BaseMask);
-                    writer.WriteNamedValue("OwnerMask", (uint)OwnerMask);
+                    if(XmlSerializationOptions.None != (options & XmlSerializationOptions.AdjustForNextOwner))
+                    {
+                        writer.WriteNamedValue("OwnerMask", (uint)OwnerMask);
+                    }
+                    else
+                    {
+                        writer.WriteNamedValue("OwnerMask", (uint)NextOwnerMask);
+                    }
                     writer.WriteNamedValue("GroupMask", (uint)GroupMask);
                     writer.WriteNamedValue("EveryoneMask", (uint)EveryoneMask);
                     writer.WriteNamedValue("NextOwnerMask", (uint)NextOwnerMask);
