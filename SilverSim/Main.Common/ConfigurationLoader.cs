@@ -654,6 +654,7 @@ namespace SilverSim.Main.Common
             m_Sources.Enqueue(new CFG_IniResourceSource(defaultsIniName));
             /* make the resource assets available for all users not just scene */
             PluginInstances.Add("ResourceAssetService", new ResourceAssetPlugin());
+            PluginInstances.Add("LocalNeighborConnector", new Neighbor.LocalNeighborConnector());
             AddSource(mainConfig);
 
             CmdIO.CommandRegistry.Commands.Add("shutdown", ShutdownCommand);

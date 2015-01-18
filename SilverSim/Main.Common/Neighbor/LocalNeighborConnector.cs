@@ -23,13 +23,46 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scene.Types.Scene;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SilverSim.ServiceInterfaces.Neighbor;
+using SilverSim.Types.Grid;
+using SilverSim.Scene.Management.Scene;
 
-namespace SilverSim.Scene.Management.Scene
+namespace SilverSim.Main.Common.Neighbor
 {
-    public static class SceneManager
+    public class LocalNeighborConnector : NeighborServiceInterface, IPlugin
     {
-        public static readonly SceneList Scenes = new SceneList();
-        public static readonly NeighborList Neighbors = new NeighborList();
+        public LocalNeighborConnector()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+
+        }
+
+        public override void notifyNeighborStatus(RegionInfo fromRegion, RegionInfo toRegion)
+        {
+            if ((fromRegion.Flags & RegionFlags.RegionOnline) == RegionFlags.RegionOnline)
+            {
+                SceneManager.Neighbors.Add(fromRegion);
+            }
+            else
+            {
+                SceneManager.Neighbors.Remove(fromRegion);
+            }
+        }
+
+        public override ServiceTypeEnum ServiceType
+        {
+            get
+            {
+                return ServiceTypeEnum.Local;
+            }
+        }
     }
 }
