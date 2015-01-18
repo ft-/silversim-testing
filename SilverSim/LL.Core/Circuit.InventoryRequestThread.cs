@@ -118,6 +118,7 @@ namespace SilverSim.LL.Core
                     case MessageType.TransferRequest:
                         {
                             UUID assetID;
+                            bool denyLSLTextViaDirect = false;
                             Messages.Transfer.TransferRequest req = (Messages.Transfer.TransferRequest)m;
                             if (req.SourceType == Messages.Transfer.SourceType.SimInventoryItem)
                             {
@@ -153,6 +154,7 @@ namespace SilverSim.LL.Core
                             else if(req.SourceType == Messages.Transfer.SourceType.Asset)
                             {
                                 assetID = new UUID(req.Params, 0);
+                                denyLSLTextViaDirect = true;
                             }
                             else
                             {
@@ -199,12 +201,16 @@ namespace SilverSim.LL.Core
                             {
                                 m_Log.DebugFormat("Starting to download asset {0} (TransferPacket)", assetID);
                             }
+                            else if(denyLSLTextViaDirect && asset.Type == AssetType.LSLText)
+                            {
+                                return;
+                            }
 
                             Messages.Transfer.TransferInfo ti = new Messages.Transfer.TransferInfo();
                             ti.Params = req.Params;
                             ti.ChannelType = 2;
                             ti.Status = 0;
-                            ti.TargetType = (int)req.SourceType;
+                            ti.TargetType = 0;
                             ti.TransferID = req.TransferID;
                             ti.Size = asset.Data.Length;
                             if(req.SourceType == Messages.Transfer.SourceType.Asset)
