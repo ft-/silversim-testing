@@ -194,7 +194,7 @@ namespace SilverSim.Scripting.LSL.API.Physics
         public AnArray llGetPhysicsMaterial(ScriptInstance Instance)
         {
             AnArray array = new AnArray();
-            lock (this)
+            lock (Instance)
             {
                 array.Add(Instance.Part.ObjectGroup.RootPart.PhysicsGravityMultiplier);
                 array.Add(Instance.Part.ObjectGroup.RootPart.PhysicsRestitution);
@@ -202,7 +202,6 @@ namespace SilverSim.Scripting.LSL.API.Physics
                 array.Add(Instance.Part.ObjectGroup.RootPart.PhysicsDensity);
                 return array;
             }
-#warning Implement llGetPhysicsMaterial
         }
 
         const int DENSITY = 1;
