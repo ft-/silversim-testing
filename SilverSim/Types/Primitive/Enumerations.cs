@@ -185,4 +185,19 @@ namespace SilverSim.Types.Primitive
         Triangle = 0x30
     }
 
+    [Flags]
+    public enum PrimitiveMediaPermission : int
+    {
+        None = 0,
+        Owner = 1,
+        Group = 2,
+        Anyone = 4,
+        All = 7
+    }
+
+    public enum PrimitiveMediaControls : int
+    {
+        Standard = 0,
+        Mini = 1
+    }
 }

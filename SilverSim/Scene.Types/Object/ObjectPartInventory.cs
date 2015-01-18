@@ -247,7 +247,12 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Serialization
-        public void ToXml(XmlTextWriter writer)
+        public void ToXml(XmlTextWriter writer, XmlSerializationOptions options)
+        {
+            ToXml(writer, UUID.Zero, options);
+        }
+
+        public void ToXml(XmlTextWriter writer, UUID nextOwner, XmlSerializationOptions options)
         {
             writer.WriteNamedValue("InventorySerial", InventorySerial);
             writer.WriteStartElement("TaskInventory");
@@ -267,7 +272,14 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteNamedValue("Description", item.Description);
                         writer.WriteNamedValue("EveryonePermissions", (uint)item.Permissions.EveryOne);
                         writer.WriteNamedValue("Flags", (uint)item.Flags);
-                        writer.WriteNamedValue("GroupID", item.Group.ID);
+                        if ((options & XmlSerializationOptions.WriteOwnerInfo) != XmlSerializationOptions.None)
+                        {
+                            writer.WriteNamedValue("GroupID", item.Group.ID);
+                        }
+                        else
+                        {
+                            writer.WriteNamedValue("GroupID", UUID.Zero);
+                        }
                         writer.WriteNamedValue("GroupPermissions", (uint)item.Permissions.Group);
                         writer.WriteNamedValue("InvType", (uint)item.InventoryType);
                         writer.WriteUUID("ItemID", item.ID);
@@ -275,8 +287,21 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteUUID("LastOwnerID", item.LastOwner.ID);
                         writer.WriteNamedValue("Name", item.Name);
                         writer.WriteNamedValue("NextPermissions", (uint)item.Permissions.NextOwner);
-                        writer.WriteUUID("OwnerID", item.Owner.ID);
-                        writer.WriteNamedValue("CurrentPermissions", (uint)item.Permissions.Current);
+                        if((options & XmlSerializationOptions.WriteOwnerInfo) != XmlSerializationOptions.None)
+                        {
+                            writer.WriteUUID("OwnerID", item.Owner.ID);
+                            writer.WriteNamedValue("CurrentPermissions", (uint)item.Permissions.Current);
+                        }
+                        else if((options & XmlSerializationOptions.AdjustForNextOwner) != XmlSerializationOptions.None)
+                        {
+                            writer.WriteUUID("OwnerID", nextOwner);
+                            writer.WriteNamedValue("CurrentPermissions", (uint)item.Permissions.NextOwner);
+                        }
+                        else
+                        {
+                            writer.WriteUUID("OwnerID", UUID.Zero);
+                            writer.WriteNamedValue("CurrentPermissions", (uint)item.Permissions.Current);
+                        }
                         writer.WriteUUID("ParentID", item.ParentFolderID);
                         writer.WriteUUID("ParentPartID", item.ParentFolderID);
                         //writer.WriteUUID("PermsGranter", item.ScriptInstanc);

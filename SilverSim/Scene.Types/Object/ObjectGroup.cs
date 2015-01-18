@@ -933,6 +933,10 @@ namespace SilverSim.Scene.Types.Object
         #region XML Serialization
         public void ToXml(XmlTextWriter writer, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
+            ToXml(writer, UUID.Zero, options);
+        }
+        public void ToXml(XmlTextWriter writer, UUID nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
+        {
             List<ObjectPart> parts = Values;
             writer.WriteStartElement("SceneObjectGroup");
             RootPart.ToXml(writer, options);
@@ -942,7 +946,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 if(p.ID != RootPart.ID)
                 {
-                    p.ToXml(writer, options);
+                    p.ToXml(writer, nextOwner, options);
                 }
             }
             writer.WriteEndElement();

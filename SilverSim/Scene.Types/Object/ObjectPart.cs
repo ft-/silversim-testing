@@ -814,6 +814,10 @@ namespace SilverSim.Scene.Types.Object
             return true;
         }
 
+        #region Media Properties
+        public PrimitiveMedia Media = null;
+        #endregion
+
         #region Physics Properties
 
         double m_PhysicsDensity = 1000f;
@@ -1263,7 +1267,12 @@ namespace SilverSim.Scene.Types.Object
         }
 
         #region XML Serialization
-        public void ToXml(XmlTextWriter writer, XmlSerializationOptions options = XmlSerializationOptions.None)
+        public void ToXml(XmlTextWriter writer,XmlSerializationOptions options = XmlSerializationOptions.None)
+        {
+            ToXml(writer, UUID.Zero, options);
+        }
+
+        public void ToXml(XmlTextWriter writer, UUID nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
             lock (this)
             {
@@ -1278,7 +1287,7 @@ namespace SilverSim.Scene.Types.Object
 
                     writer.WriteUUID("FolderID", UUID.Zero);
 
-                    Inventory.ToXml(writer);
+                    Inventory.ToXml(writer, nextOwner, options);
 
                     writer.WriteUUID("UUID", ID);
                     writer.WriteNamedValue("LocalId", LocalID);
@@ -1286,7 +1295,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("Material", (int)Material);
                     writer.WriteNamedValue("PassTouches", IsPassTouches);
                     writer.WriteNamedValue("PassCollisions", IsPassCollisions);
-                    writer.WriteNamedValue("RegionHandle", 0);
+                    writer.WriteNamedValue("RegionHandle", ObjectGroup.Scene.RegionData.Location.RegionHandle);
                     writer.WriteNamedValue("ScriptAccessPin", ScriptAccessPin);
                     writer.WriteNamedValue("GroupPosition", LocalPosition);
                     writer.WriteNamedValue("OffsetPosition", LocalPosition);
@@ -1355,7 +1364,11 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteNamedValue("FlexiEntry", fp.IsFlexible);
                         writer.WriteNamedValue("LightEntry", plp.IsLight);
                         writer.WriteNamedValue("SculptEntry", shape.Type == PrimitiveShapeType.Sculpt);
-                        //Media
+                        PrimitiveMedia media = Media;
+                        if (null != media)
+                        {
+                            Media.ToXml(writer);
+                        }
                     }
                     writer.WriteEndElement();
 
@@ -1379,7 +1392,7 @@ namespace SilverSim.Scene.Types.Object
                     else if(XmlSerializationOptions.None != (options & XmlSerializationOptions.AdjustForNextOwner))
                     {
                         writer.WriteUUID("GroupID", UUID.Zero);
-                        writer.WriteUUID("OwnerID", UUID.Zero);
+                        writer.WriteUUID("OwnerID", nextOwner);
                         writer.WriteUUID("LastOwnerID", ObjectGroup.Owner.ID);
                     }
                     else
@@ -1431,7 +1444,40 @@ namespace SilverSim.Scene.Types.Object
         #region XML Deserialization
         public static ObjectPart FromXml(XmlTextReader reader)
         {
-            throw new NotImplementedException();
+            ObjectGroup group = new ObjectGroup();
+            ObjectPart rootPart = null;
+            if(reader.IsEmptyElement)
+            {
+                throw new InvalidObjectXmlException();
+            }
+
+            for(;;)
+            {
+                if(!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.IsEmptyElement)
+                        {
+                            break;
+                        }
+                        reader.Skip();
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if(reader.Name != "SceneObjectPart")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return null;
+
+                    default:
+                        break;
+                }
         }
         #endregion
     }
