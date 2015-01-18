@@ -143,6 +143,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
+                    UUID originalAssetID;
+                    UUID nextOwnerAssetID;
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE ?regionid AND ID LIKE ?id", connection))
                     {
                         cmd.Parameters.AddWithValue("?regionid", regionID);
@@ -155,7 +157,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                             }
 
                             objgroup = new ObjectGroup();
-
                             objgroup.IsVolumeDetect = MySQLUtilities.GetBoolean(dbReader, "IsVolumeDetect");
                             objgroup.IsPhantom = MySQLUtilities.GetBoolean(dbReader, "IsPhantom");
                             objgroup.IsPhysics = MySQLUtilities.GetBoolean(dbReader, "IsPhysics");
@@ -163,6 +164,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                             objgroup.Owner = new UUI((string)dbReader["Owner"]);
                             objgroup.LastOwner = new UUI((string)dbReader["LastOwner"]);
                             objgroup.Group = new UGI((string)dbReader["Group"]);
+                            originalAssetID = new UUID((string)dbReader["OriginalAssetID"]);
+                            nextOwnerAssetID = new UUID((string)dbReader["NextOwnerAssetID"]);
                         }
                     }
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RootPartID LIKE ?id ORDER BY LinkNumber", connection))
@@ -264,6 +267,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                             }
                         }
                     }
+                    objgroup.OriginalAssetID = originalAssetID;
+                    objgroup.NextOwnerAssetID = nextOwnerAssetID;
                 }
                 return objgroup;
             }
@@ -378,6 +383,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["Owner"] = objgroup.Owner.ToString();
             p["LastOwner"] = objgroup.LastOwner.ToString();
             p["Group"] = objgroup.Group.ToString();
+            p["OriginalAssetID"] = objgroup.OriginalAssetID.ToString();
+            p["NextOwnerAssetID"] = objgroup.NextOwnerAssetID.ToString();
 
             MySQLUtilities.ReplaceInsertInto(connection, "objects", p);
         }
@@ -505,6 +512,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "`Group` VARCHAR(255) NOT NULL DEFAULT ''," +
                 "PRIMARY KEY(ID)" +
             ")",
+            "ALTER TABLE %tablename% ADD COLUMN (OriginalAssetID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                        "NextOwnerAssetID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'),"
         };
 
         private static readonly string[] PrimItemsMigrations = new string[]{
