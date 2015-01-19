@@ -5,7 +5,7 @@ using System.Text;
 
 namespace SilverSim.Types
 {
-    public sealed class UGI
+    public sealed class UGI : IEquatable<UGI>
     {
         public UUID ID = UUID.Zero;
         public string GroupName = string.Empty;
@@ -75,6 +75,35 @@ namespace SilverSim.Types
         public UGI()
         {
         }
+
+        public override bool Equals(object obj)
+        {
+            return (obj is UUI) ? this == (UUI)obj : false;
+        }
+
+        public bool Equals(UGI ugi)
+        {
+            if (ugi.ID == ID && ID == UUID.Zero)
+            {
+                return true;
+            }
+
+            return ugi.ID == ID && ugi.GroupName == GroupName && ugi.HomeURI.Equals(HomeURI);
+        }
+
+        public override int GetHashCode()
+        {
+            Uri h = HomeURI;
+            if (h != null)
+            {
+                return ID.GetHashCode() ^ GroupName.GetHashCode() ^ h.GetHashCode();
+            }
+            else
+            {
+                return ID.GetHashCode() ^ GroupName.GetHashCode();
+            }
+        }
+
 
         public UGI(UUID ID, string GroupName, Uri HomeURI)
         {
