@@ -27,7 +27,6 @@ using log4net;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System;
-using System.Reflection;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Management.Scene

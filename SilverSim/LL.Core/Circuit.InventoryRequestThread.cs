@@ -23,18 +23,15 @@ exception statement from your version.
 
 */
 
+using SilverSim.LL.Messages;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
-using SilverSim.Types;
-using SilverSim.ServiceInterfaces.Inventory;
 using System;
-using System.Threading;
 using System.Collections.Generic;
-using SilverSim.LL.Messages;
-using System.IO;
-using SilverSim.Scene.Types.Scene;
-using System.Text;
+using System.Threading;
 
 namespace SilverSim.LL.Core
 {

@@ -24,16 +24,16 @@ exception statement from your version.
 */
 
 using SilverSim.Scene.ServiceInterfaces.Chat;
-using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Types.Script;
 using System;
-using System.Timers;
-using System.Reflection;
 using System.Collections.Generic;
+using System.Reflection;
+using System.Timers;
 using ThreadedClasses;
 
 namespace SilverSim.Scripting.LSL

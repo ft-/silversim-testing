@@ -23,13 +23,9 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using SilverSim.Scene.Management.Scene;
 using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.Types.Grid;
-using SilverSim.Scene.Management.Scene;
 
 namespace SilverSim.Main.Common.Neighbor
 {

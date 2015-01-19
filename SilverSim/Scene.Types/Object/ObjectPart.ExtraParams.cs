@@ -23,16 +23,11 @@ exception statement from your version.
 
 */
 
-using log4net;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
-using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
-using System.Collections.Generic;
 using System.Threading;
-using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
 {

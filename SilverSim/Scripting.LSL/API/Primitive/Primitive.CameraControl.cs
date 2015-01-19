@@ -23,15 +23,10 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using SilverSim.Types.Script;
-using SilverSim.Scene.Types.Script.Events;
-using SilverSim.Scene.Types.Script;
-using SilverSim.Scene.Types.Object;
 
 namespace SilverSim.Scripting.LSL.API.Primitive
 {
