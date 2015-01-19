@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using SilverSim.Types.Script;
@@ -52,47 +53,53 @@ namespace SilverSim.Scripting.LSL.API.Animation
         [APILevel(APIFlags.LSL)]
         public void llStartAnimation(ScriptInstance instance, string anim)
         {
-            IAgent agent;
-            Script script = (Script)instance;
-            if ((script.m_ScriptPermissions & ScriptPermissions.TriggerAnimation) == 0 ||
-                script.m_ScriptPermissionsKey == UUID.Zero)
+            lock (instance)
             {
-                return;
-            }
-            try
-            {
-                agent = instance.Part.ObjectGroup.Scene.Agents[script.m_ScriptPermissionsKey];
-            }
-            catch
-            {
-                instance.ShoutError("llStartAnimation: permission granter not in region");
-                return;
-            }
+                IAgent agent;
+                ObjectPartInventoryItem.PermsGranterInfo grantinfo = instance.Item.PermsGranter;
+                if ((grantinfo.PermsMask & ScriptPermissions.TriggerAnimation) == 0 ||
+                    grantinfo.PermsGranter == UUI.Unknown)
+                {
+                    return;
+                }
+                try
+                {
+                    agent = instance.Part.ObjectGroup.Scene.Agents[grantinfo.PermsGranter.ID];
+                }
+                catch
+                {
+                    instance.ShoutError("llStartAnimation: permission granter not in region");
+                    return;
+                }
 
-            agent.PlayAnimation(anim, instance.Part.ID);
+                agent.PlayAnimation(anim, instance.Part.ID);
+            }
         }
 
         [APILevel(APIFlags.LSL)]
         public void llStopAnimation(ScriptInstance instance, string anim)
         {
-            IAgent agent;
-            Script script = (Script)instance;
-            if ((script.m_ScriptPermissions & ScriptPermissions.TriggerAnimation) == 0 ||
-                script.m_ScriptPermissionsKey == UUID.Zero)
+            lock (instance)
             {
-                return;
-            }
-            try
-            {
-                agent = instance.Part.ObjectGroup.Scene.Agents[script.m_ScriptPermissionsKey];
-            }
-            catch
-            {
-                instance.ShoutError("llStopAnimation: permission granter not in region");
-                return;
-            }
+                IAgent agent;
+                ObjectPartInventoryItem.PermsGranterInfo grantinfo = instance.Item.PermsGranter;
+                if ((grantinfo.PermsMask & ScriptPermissions.TriggerAnimation) == 0 ||
+                    grantinfo.PermsGranter == UUI.Unknown)
+                {
+                    return;
+                }
+                try
+                {
+                    agent = instance.Part.ObjectGroup.Scene.Agents[grantinfo.PermsGranter.ID];
+                }
+                catch
+                {
+                    instance.ShoutError("llStopAnimation: permission granter not in region");
+                    return;
+                }
 
-            agent.StopAnimation(anim, instance.Part.ID);
+                agent.StopAnimation(anim, instance.Part.ID);
+            }
         }
     }
 }

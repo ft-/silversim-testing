@@ -57,42 +57,48 @@ namespace SilverSim.Scripting.LSL.API.Controls
         [APILevel(APIFlags.LSL)]
         public void llTakeControls(ScriptInstance instance, int controls, int accept, int pass_on)
         {
-            Script script = (Script)instance;
-            if((script.m_ScriptPermissions & ScriptPermissions.TakeControls) == 0 ||
-                script.m_ScriptPermissionsKey == UUID.Zero)
+            lock (instance)
             {
-                return;
-            }
+                ObjectPartInventoryItem.PermsGranterInfo grantinfo = instance.Item.PermsGranter;
+                if ((grantinfo.PermsMask & ScriptPermissions.TakeControls) == 0 ||
+                    grantinfo.PermsGranter == UUI.Unknown)
+                {
+                    return;
+                }
 #if NOT_IMPLEMENTED
-            IAgent agent;
-            try
-            {
-                agent = instance.Part.ObjectGroup.Scene.Agents[script.m_ScriptPermissionsKey];
-            }
-            catch
-            {
-                instance.ShoutError("llTakeControls: permission granter not in region");
-                return;
-            }
+                IAgent agent;
+                try
+                {
+                    agent = instance.Part.ObjectGroup.Scene.Agents[grantinfo.PermsGranter.ID];
+                }
+                catch
+                {
+                    instance.ShoutError("llTakeControls: permission granter not in region");
+                    return;
+                }
 #endif
+            }
         }
 
         [APILevel(APIFlags.LSL)]
         public void llReleaseControls(ScriptInstance instance)
         {
-            IAgent agent;
-            Script script = (Script)instance;
-            script.m_ScriptPermissions &= (~ScriptPermissions.TakeControls);
-            try
+            lock (instance)
             {
-                agent = instance.Part.ObjectGroup.Scene.Agents[script.m_ScriptPermissionsKey];
+                IAgent agent;
+                ObjectPartInventoryItem.PermsGranterInfo grantinfo = instance.Item.PermsGranter;
+                grantinfo.PermsMask &= (~ScriptPermissions.TakeControls);
+                try
+                {
+                    agent = instance.Part.ObjectGroup.Scene.Agents[grantinfo.PermsGranter.ID];
+                }
+                catch
+                {
+                    instance.ShoutError("llTakeControls: permission granter not in region");
+                    return;
+                }
+                agent.RevokePermissions(instance.Part.ID, instance.Item.ID, ScriptPermissions.TakeControls);
             }
-            catch
-            {
-                instance.ShoutError("llTakeControls: permission granter not in region");
-                return;
-            }
-            agent.RevokePermissions(script.Part.ID, script.Item.ID, ScriptPermissions.TakeControls);
         }
     }
 }

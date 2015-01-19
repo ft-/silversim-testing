@@ -27,7 +27,7 @@ using System;
 
 namespace SilverSim.Types
 {
-    public sealed class UUI
+    public sealed class UUI : IEquatable<UUI>
     {
         public UUID ID = UUID.Zero;
         public string FirstName = string.Empty;
@@ -38,6 +38,36 @@ namespace SilverSim.Types
         {
             return string.Format("{0};{1};{2} {3}", v.ID.ToString(), v.HomeURI.ToString(), v.FirstName, v.LastName);
         }
+
+        public override bool Equals(object obj)
+        {
+            return (obj is UUI) ? this == (UUI)obj : false;
+        }
+
+        public bool Equals(UUI uui)
+        {
+            if(uui.ID == ID && ID == UUID.Zero)
+            {
+                return true;
+            }
+
+            return uui.ID == ID && uui.FirstName == FirstName && uui.LastName == LastName && uui.HomeURI.Equals(HomeURI);
+        }
+
+        public override int GetHashCode()
+        {
+            Uri h = HomeURI;
+            if (h != null)
+            {
+                return ID.GetHashCode() ^ FirstName.GetHashCode() ^ LastName.GetHashCode() ^ h.GetHashCode();
+            }
+            else
+            {
+                return ID.GetHashCode() ^ FirstName.GetHashCode() ^ LastName.GetHashCode();
+            }
+        }
+
+
 
         public string CreatorData
         {

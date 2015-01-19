@@ -31,6 +31,7 @@ using SilverSim.Types;
 using SilverSim.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Object;
 
 namespace SilverSim.Scripting.LSL.API.Primitive
 {
@@ -105,8 +106,8 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         {
             lock (Instance)
             {
-                Script script = (Script)Instance;
-                if (script.m_ScriptPermissionsKey != UUID.Zero && (script.m_ScriptPermissions & ScriptPermissions.ControlCamera) != 0)
+                ObjectPartInventoryItem.PermsGranterInfo grantinfo = Instance.Item.PermsGranter;
+                if (grantinfo.PermsGranter != UUI.Unknown && (grantinfo.PermsMask & ScriptPermissions.ControlCamera) != 0)
                 {
 
                 }
@@ -119,8 +120,8 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         {
             lock (Instance)
             {
-                Script script = (Script)Instance;
-                if (script.m_ScriptPermissionsKey != UUID.Zero && (script.m_ScriptPermissions & ScriptPermissions.ControlCamera) != 0)
+                ObjectPartInventoryItem.PermsGranterInfo grantinfo = Instance.Item.PermsGranter;
+                if (grantinfo.PermsGranter != UUI.Unknown && (grantinfo.PermsMask & ScriptPermissions.ControlCamera) != 0)
                 {
 
                 }
@@ -131,8 +132,8 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         [APILevel(APIFlags.LSL)]
         public Vector3 llGetCameraPos(ScriptInstance Instance)
         {
-            Script script = (Script)Instance;
-            if (script.m_ScriptPermissionsKey != UUID.Zero && (script.m_ScriptPermissions & ScriptPermissions.TrackCamera) != 0)
+            ObjectPartInventoryItem.PermsGranterInfo grantinfo = Instance.Item.PermsGranter;
+            if (grantinfo.PermsGranter != UUI.Unknown && (grantinfo.PermsMask & ScriptPermissions.TrackCamera) != 0)
             {
 
             }
@@ -142,8 +143,8 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         [APILevel(APIFlags.LSL)]
         public Quaternion llGetCameraRot(ScriptInstance Instance)
         {
-            Script script = (Script)Instance;
-            if (script.m_ScriptPermissionsKey != UUID.Zero && (script.m_ScriptPermissions & ScriptPermissions.TrackCamera) != 0)
+            ObjectPartInventoryItem.PermsGranterInfo grantinfo = Instance.Item.PermsGranter;
+            if (grantinfo.PermsGranter != UUI.Unknown && (grantinfo.PermsMask & ScriptPermissions.TrackCamera) != 0)
             {
 
             }

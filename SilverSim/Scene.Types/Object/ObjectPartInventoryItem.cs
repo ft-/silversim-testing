@@ -128,7 +128,7 @@ namespace SilverSim.Scene.Types.Object
                     }
                     else
                     {
-                        return null;
+                        return new PermsGranterInfo();
                     }
                 }
             }

@@ -31,6 +31,6 @@ namespace SilverSim.Scene.Types.Script.Events
     public struct RuntimePermissionsEvent : IScriptEvent
     {
         public ScriptPermissions Permissions;
-        public UUID PermissionsKey;
+        public UUI PermissionsKey;
     }
 }

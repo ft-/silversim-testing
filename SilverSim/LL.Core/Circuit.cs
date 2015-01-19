@@ -436,6 +436,7 @@ namespace SilverSim.LL.Core
                         /* we got a decoder, so we can make use of it */
                         m.ReceivedOnCircuitCode = CircuitCode;
                         m.CircuitAgentID = new UUID(AgentID);
+                        m.CircuitAgentOwner = Agent.Owner;
                         m.CircuitSessionID = new UUID(SessionID);
                         m.CircuitSceneID = new UUID(Scene.ID);
 

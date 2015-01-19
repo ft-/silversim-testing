@@ -50,9 +50,6 @@ namespace SilverSim.Scripting.LSL
         internal RwLockedDictionary<int, ChatServiceInterface.Listener> m_Listeners = new RwLockedDictionary<int, ChatServiceInterface.Listener>();
         private double m_ExecutionTime = 0;
         protected bool UseMessageObjectEvent = false;
-        internal UUID m_ScriptPermissionsKey = UUID.Zero;
-
-        internal ScriptPermissions m_ScriptPermissions = ScriptPermissions.None;
 
         public readonly Timer Timer = new Timer();
 
@@ -173,22 +170,27 @@ namespace SilverSim.Scripting.LSL
 
         public override void RevokePermissions(UUID permissionsKey, ScriptPermissions permissions)
         {
-            if(permissionsKey == m_ScriptPermissionsKey && m_ScriptPermissionsKey != UUID.Zero)
+            ObjectPartInventoryItem.PermsGranterInfo grantinfo = Item.PermsGranter;
+            if (permissionsKey == grantinfo.PermsGranter.ID && grantinfo.PermsGranter != UUI.Unknown)
             {
                 IAgent agent;
                 try
                 {
-                    agent = Part.ObjectGroup.Scene.Agents[m_ScriptPermissionsKey];
+                    agent = Part.ObjectGroup.Scene.Agents[grantinfo.PermsGranter.ID];
                 }
                 catch
                 {
                    return;
                 }
-                agent.RevokePermissions(Part.ID, Item.ID, (~permissions) & (m_ScriptPermissions));
-                m_ScriptPermissions &= (~permissions);
-                if (ScriptPermissions.None == m_ScriptPermissions)
+                agent.RevokePermissions(Part.ID, Item.ID, (~permissions) & (grantinfo.PermsMask));
+                grantinfo.PermsMask &= (~permissions);
+                if (ScriptPermissions.None == grantinfo.PermsMask)
                 {
-                    m_ScriptPermissionsKey = UUID.Zero;
+                    Item.PermsGranter = null;
+                }
+                else
+                {
+                    Item.PermsGranter = grantinfo;
                 }
             }
         }
@@ -398,9 +400,12 @@ namespace SilverSim.Scripting.LSL
                     {
                         e.Permissions &= ~ScriptPermissions.Debit;
                     }
-                    m_ScriptPermissions = (ScriptPermissions)e.Permissions;
-                    m_ScriptPermissionsKey = e.PermissionsKey;
-                    InvokeStateEvent("run_time_permissions", m_ScriptPermissions);
+
+                    ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
+                    grantinfo.PermsGranter = e.PermissionsKey;
+                    grantinfo.PermsMask = (ScriptPermissions)e.Permissions;
+                    Item.PermsGranter = grantinfo;
+                    InvokeStateEvent("run_time_permissions", (ScriptPermissions)e.Permissions);
                 }
                 else if (ev is SensorEvent)
                 {

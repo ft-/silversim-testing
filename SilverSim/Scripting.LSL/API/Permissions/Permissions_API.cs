@@ -54,27 +54,24 @@ namespace SilverSim.Scripting.LSL.API.Permissions
         [APILevel(APIFlags.LSL)]
         public int llGetPermissions(ScriptInstance Instance)
         {
-            Script script = (Script)Instance;
-            lock (script)
+            lock (Instance)
             {
-                return (int)script.m_ScriptPermissions;
+                return (int)Instance.Item.PermsGranter.PermsMask;
             }
         }
 
         [APILevel(APIFlags.LSL)]
         public UUID llGetPermissionsKey(ScriptInstance Instance)
         {
-            Script script = (Script)Instance;
-            lock (script)
+            lock (Instance)
             {
-                return script.m_ScriptPermissionsKey;
+                return Instance.Item.PermsGranter.PermsGranter.ID;
             }
         }
 
         [APILevel(APIFlags.LSL)]
         public void llRequestPermissions(ScriptInstance Instance, UUID agentID, int permissions)
         {
-            Script script = (Script)Instance;
             lock(Instance)
             {
                 if (agentID == UUID.Zero || permissions == 0)
@@ -90,8 +87,7 @@ namespace SilverSim.Scripting.LSL.API.Permissions
                     }
                     catch
                     {
-                        script.m_ScriptPermissionsKey = UUID.Zero;
-                        script.m_ScriptPermissions = 0;
+                        Instance.Item.PermsGranter = null;
                         return;
                     }
                     ScriptPermissions perms = a.RequestPermissions(Instance.Part, Instance.Item.ID, (ScriptPermissions)permissions);
@@ -99,8 +95,8 @@ namespace SilverSim.Scripting.LSL.API.Permissions
                     {
                         RuntimePermissionsEvent e = new RuntimePermissionsEvent();
                         e.Permissions = perms;
-                        e.PermissionsKey = agentID;
-                        script.PostEvent(e);
+                        e.PermissionsKey = a.Owner;
+                        Instance.PostEvent(e);
                     }
                 }
             }
@@ -109,11 +105,9 @@ namespace SilverSim.Scripting.LSL.API.Permissions
         [ExecutedOnScriptReset]
         public static void ResetPermissions(ScriptInstance Instance)
         {
-            Script script = (Script)Instance;
-            lock (script)
+            lock (Instance)
             {
-                script.m_ScriptPermissions = 0;
-                script.m_ScriptPermissionsKey = UUID.Zero;
+                Instance.Item.PermsGranter = null;
             }
         }
     }

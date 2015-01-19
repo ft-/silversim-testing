@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Main.Common;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Economy;
@@ -115,9 +116,9 @@ namespace SilverSim.Scripting.LSL.API.Money
         [APILevel(APIFlags.LSL)]
         public void llGiveMoney(ScriptInstance instance, UUID destination, int amount)
         {
-            Script script = (Script)instance;
-            if((script.m_ScriptPermissions & ScriptPermissions.Debit) == 0 ||
-                script.m_ScriptPermissionsKey != script.Part.Owner.ID ||
+            ObjectPartInventoryItem.PermsGranterInfo grantinfo = instance.Item.PermsGranter;
+            if ((grantinfo.PermsMask & ScriptPermissions.Debit) == 0 ||
+                grantinfo.PermsGranter != instance.Part.Owner ||
                 amount < 0)
             {
                 return;
@@ -127,9 +128,9 @@ namespace SilverSim.Scripting.LSL.API.Money
         [APILevel(APIFlags.LSL)]
         public UUID llTransferLindenDollars(ScriptInstance instance, UUID destination, int amount)
         {
-            Script script = (Script)instance;
-            if ((script.m_ScriptPermissions & ScriptPermissions.Debit) == 0 ||
-                script.m_ScriptPermissionsKey != script.Part.Owner.ID ||
+            ObjectPartInventoryItem.PermsGranterInfo grantinfo = instance.Item.PermsGranter;
+            if ((grantinfo.PermsMask & ScriptPermissions.Debit) == 0 ||
+                grantinfo.PermsGranter != instance.Part.Owner ||
                 amount < 0)
             {
                 return UUID.Zero;

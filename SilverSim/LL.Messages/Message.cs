@@ -43,6 +43,7 @@ namespace SilverSim.LL.Messages
         public UUID CircuitSessionID = UUID.Zero;
         public UUID CircuitAgentID = UUID.Zero;
         public UUID CircuitSceneID = UUID.Zero;
+        public UUI CircuitAgentOwner = UUI.Unknown;
 
         public MessagePriority Type
         {
