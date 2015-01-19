@@ -981,12 +981,12 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                part = ObjectPart.FromXml(reader);
+                                part = ObjectPart.FromXml(reader, null);
                                 group.Add(part.LinkNumber, part.ID, part);
                                 break;
 
                             default:
-                                if (reader.IsEmptyElement)
+                                if (!reader.IsEmptyElement)
                                 {
                                     reader.Skip();
                                 }
@@ -1037,7 +1037,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                rootPart = ObjectPart.FromXml(reader);
+                                rootPart = ObjectPart.FromXml(reader, group);
                                 group.Add(rootPart.LinkNumber, rootPart.ID, rootPart);
                                 break;
 
@@ -1057,7 +1057,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             default:
-                                if (reader.IsEmptyElement)
+                                if (!reader.IsEmptyElement)
                                 {
                                     reader.Skip();
                                 }

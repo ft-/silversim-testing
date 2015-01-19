@@ -29,6 +29,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
@@ -83,7 +84,6 @@ namespace SilverSim.Scene.Types.Object
         private ClickActionType m_ClickAction = ClickActionType.None;
         private bool m_IsPassCollisions = false;
         private bool m_IsPassTouches = false;
-        private Vector3 m_LastAttachedPos = Vector3.Zero;
         private Vector3 m_AngularVelocity = Vector3.Zero;
         private Vector3 m_Velocity = Vector3.Zero;
         private UUI m_Creator = UUI.Unknown;
@@ -1442,18 +1442,13 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
-        public static ObjectPart FromXml(XmlTextReader reader)
+        static void ShapeFromXml(ObjectPart part, ObjectGroup rootGroup, XmlTextReader reader)
         {
-            ObjectGroup group = new ObjectGroup();
-            ObjectPart rootPart = null;
-            if(reader.IsEmptyElement)
-            {
-                throw new InvalidObjectXmlException();
-            }
+            PrimitiveShape shape = new PrimitiveShape();
 
-            for(;;)
+            for (; ; )
             {
-                if(!reader.Read())
+                if (!reader.Read())
                 {
                     throw new InvalidObjectXmlException();
                 }
@@ -1465,19 +1460,839 @@ namespace SilverSim.Scene.Types.Object
                         {
                             break;
                         }
-                        reader.Skip();
+                        switch (reader.Name)
+                        {
+                            case "ProfileCurve":
+                                shape.ProfileCurve = (byte)reader.ReadContentAsInt();
+                                break;
+
+                            case "TextureEntry":
+                                part.TextureEntryBytes = reader.ReadContentAsBase64();
+                                break;
+
+                            case "ExtraParams":
+                                part.ExtraParamsBytes = reader.ReadContentAsBase64();
+                                break;
+
+                            case "PathBegin":
+                                shape.PathBegin = (ushort)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathCurve":
+                                shape.PathCurve = (byte)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathEnd":
+                                shape.PathEnd = (ushort)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathRadiusOffset":
+                                shape.PathRadiusOffset = (sbyte)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathRevolutions":
+                                shape.PathRevolutions = (byte)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathScaleX":
+                                shape.PathScaleX = (byte)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathScaleY":
+                                shape.PathScaleY = (byte)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathShearX":
+                                shape.PathShearX = (byte)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathShearY":
+                                shape.PathShearY = (byte)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathSkew":
+                                shape.PathSkew = (sbyte)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathTaperX":
+                                shape.PathTaperX = (sbyte)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathTaperY":
+                                shape.PathTaperY = (sbyte)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathTwist":
+                                shape.PathTwist = (sbyte)reader.ReadContentAsInt();
+                                break;
+
+                            case "PathTwistBegin":
+                                shape.PathTwistBegin = (sbyte)reader.ReadContentAsInt();
+                                break;
+
+                            case "PCode":
+                                shape.PCode = (PrimitiveCode)reader.ReadContentAsInt();
+                                break;
+
+                            case "ProfileBegin":
+                                shape.ProfileBegin = (ushort)reader.ReadContentAsInt();
+                                break;
+
+                            case "ProfileEnd":
+                                shape.ProfileEnd = (ushort)reader.ReadContentAsInt();
+                                break;
+
+                            case "ProfileHollow":
+                                shape.ProfileHollow = (ushort)reader.ReadContentAsInt();
+                                break;
+
+                            case "State":
+                                shape.State = (byte)reader.ReadContentAsInt();
+                                break;
+
+                            case "LastAttachPoint":
+                                if(null != rootGroup)
+                                {
+                                    rootGroup.AttachPoint = (AttachmentPoint)reader.ReadContentAsInt();
+                                }
+                                break;
+
+                            case "ProfileShape":
+                                shape.Type = (PrimitiveShapeType)reader.ReadContentAsInt();
+                                break;
+
+                            case "HollowShape":
+                                shape.ProfileHollow = (ushort)reader.ReadContentAsInt();
+                                break;
+
+                            case "SculptTexture":
+                                shape.SculptMap = reader.ReadContentAsUUID();
+                                break;
+
+                            case "FlexiSoftness":
+                                {
+                                    FlexibleParam flexparam = part.Flexible;
+                                    flexparam.Softness = reader.ReadContentAsInt();
+                                    part.Flexible = flexparam;
+                                }
+                                break;
+
+                            case "FlexiTension":
+                                {
+                                    FlexibleParam flexparam = part.Flexible;
+                                    flexparam.Tension = reader.ReadContentAsDouble();
+                                    part.Flexible = flexparam;
+                                }
+                                break;
+
+                            case "FlexiDrag":
+                                {
+                                    FlexibleParam flexparam = part.Flexible;
+                                    flexparam.Friction = reader.ReadContentAsDouble();
+                                    part.Flexible = flexparam;
+                                }
+                                break;
+
+                            case "FlexiGravity":
+                                {
+                                    FlexibleParam flexparam = part.Flexible;
+                                    flexparam.Gravity = reader.ReadContentAsDouble();
+                                    part.Flexible = flexparam;
+                                }
+                                break;
+
+                            case "FlexiWind":
+                                {
+                                    FlexibleParam flexparam = part.Flexible;
+                                    flexparam.Wind = reader.ReadContentAsDouble();
+                                    part.Flexible = flexparam;
+                                }
+                                break;
+
+                            case "FlexiForceX":
+                                {
+                                    FlexibleParam flexparam = part.Flexible;
+                                    Vector3 v = flexparam.Force;
+                                    v.X = reader.ReadContentAsDouble();
+                                    flexparam.Force = v;
+                                    part.Flexible = flexparam;
+                                }
+                                break;
+
+                            case "FlexiForceY":
+                                {
+                                    FlexibleParam flexparam = part.Flexible;
+                                    Vector3 v = flexparam.Force;
+                                    v.Y = reader.ReadContentAsDouble();
+                                    flexparam.Force = v;
+                                    part.Flexible = flexparam;
+                                }
+                                break;
+
+                            case "FlexiForceZ":
+                                {
+                                    FlexibleParam flexparam = part.Flexible;
+                                    Vector3 v = flexparam.Force;
+                                    v.Z = reader.ReadContentAsDouble();
+                                    flexparam.Force = v;
+                                    part.Flexible = flexparam;
+                                }
+                                break;
+
+                            case "LightColorR":
+                                {
+                                    PointLightParam lightparam = part.PointLight;
+                                    Color c = lightparam.LightColor;
+                                    c.R_AsByte = (byte)reader.ReadContentAsInt();
+                                    lightparam.LightColor = c;
+                                    part.PointLight = lightparam;
+                                }
+                                break;
+
+                            case "LightColorG":
+                                {
+                                    PointLightParam lightparam = part.PointLight;
+                                    Color c = lightparam.LightColor;
+                                    c.G_AsByte = (byte)reader.ReadContentAsInt();
+                                    lightparam.LightColor = c;
+                                    part.PointLight = lightparam;
+                                }
+                                break;
+
+                            case "LightColorB":
+                                {
+                                    PointLightParam lightparam = part.PointLight;
+                                    Color c = lightparam.LightColor;
+                                    c.B_AsByte = (byte)reader.ReadContentAsInt();
+                                    lightparam.LightColor = c;
+                                    part.PointLight = lightparam;
+                                }
+                                break;
+
+                            case "LightRadius":
+                                {
+                                    PointLightParam lightparam = part.PointLight;
+                                    lightparam.Radius = reader.ReadContentAsDouble();
+                                    part.PointLight = lightparam;
+                                }
+                                break;
+
+                            case "LightCutoff":
+                                {
+                                    PointLightParam lightparam = part.PointLight;
+                                    lightparam.Cutoff = reader.ReadContentAsDouble();
+                                    part.PointLight = lightparam;
+                                }
+                                break;
+
+                            case "LightFalloff":
+                                {
+                                    PointLightParam lightparam = part.PointLight;
+                                    lightparam.Falloff = reader.ReadContentAsDouble();
+                                    part.PointLight = lightparam;
+                                }
+                                break;
+
+                            case "LightIntensity":
+                                {
+                                    PointLightParam lightparam = part.PointLight;
+                                    lightparam.Intensity = reader.ReadContentAsDouble();
+                                    part.PointLight = lightparam;
+                                }
+                                break;
+
+                            case "FlexiEntry":
+                                {
+                                    FlexibleParam flexparam = part.Flexible;
+                                    flexparam.IsFlexible = reader.ReadContentAsBoolean();
+                                    part.Flexible = flexparam;
+                                }
+                                break;
+
+                            case "LightEntry":
+                                {
+                                    PointLightParam lightparam = part.PointLight;
+                                    lightparam.IsLight = reader.ReadContentAsBoolean();
+                                    part.PointLight = lightparam;
+                                }
+                                break;
+
+                            case "Media":
+                                part.Media = PrimitiveMedia.fromXml(reader);
+                                break;
+
+                            default:
+                                reader.Skip();
+                                break;
+                        }
                         break;
 
                     case XmlNodeType.EndElement:
-                        if(reader.Name != "SceneObjectPart")
+                        if (reader.Name != "Shape")
                         {
                             throw new InvalidObjectXmlException();
                         }
-                        return null;
+                        part.Shape = shape;
+                        return;
 
                     default:
                         break;
                 }
+            }
+        }
+
+        public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup)
+        {
+            ObjectPart part = new ObjectPart();
+            int InventorySerial = 1;
+            if(reader.IsEmptyElement)
+            {
+                throw new InvalidObjectXmlException();
+            }
+
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.IsEmptyElement)
+                        {
+                            break;
+                        }
+                        switch (reader.Name)
+                        {
+                            case "AllowedDrop":
+                                part.IsAllowedDrop = reader.ReadContentAsBoolean();
+                                break;
+
+                            case "CreatorID":
+                                part.Creator.ID = reader.ReadContentAsUUID();
+                                break;
+
+                            case "CreatorData":
+                                part.Creator.CreatorData = reader.ReadContentAsString();
+                                break;
+
+                            case "FolderID":
+                                reader.Skip();
+                                break;
+
+                            case "InventorySerial":
+                                InventorySerial = reader.ReadContentAsInt();
+                                break;
+
+                            case "TaskInventory":
+                                part.Inventory.FillFromXml(reader);
+                                break;
+
+                            case "UUID":
+                                part.ID = reader.ReadContentAsUUID();
+                                break;
+
+                            case "LocalId":
+                                part.LocalID = (uint)reader.ReadContentAsInt();
+                                break;
+
+                            case "Name":
+                                part.Name = reader.ReadContentAsString();
+                                break;
+
+                            case "Material":
+                                part.Material = (PrimitiveMaterial)reader.ReadContentAsInt();
+                                break;
+
+                            case "PassTouches":
+                                part.IsPassTouches = reader.ReadContentAsBoolean();
+                                break;
+
+                            case "PassCollisions":
+                                part.IsPassCollisions = reader.ReadContentAsBoolean();
+                                break;
+
+                            case "RegionHandle":
+                                reader.Skip();
+                                break;
+
+                            case "ScriptAccessPin":
+                                part.ScriptAccessPin = reader.ReadContentAsInt();
+                                break;
+
+                            case "GroupPositionX":
+                                reader.Skip();
+                                break;
+
+                            case "GroupPositionY":
+                                reader.Skip();
+                                break;
+
+                            case "GroupPositionZ":
+                                reader.Skip();
+                                break;
+
+                            case "OffsetPositionX":
+                                {
+                                    Vector3 v = part.LocalPosition;
+                                    v.X = reader.ReadContentAsDouble();
+                                    part.LocalPosition = v;
+                                }
+                                break;
+
+                            case "OffsetPositionY":
+                                {
+                                    Vector3 v = part.LocalPosition;
+                                    v.Y = reader.ReadContentAsDouble();
+                                    part.LocalPosition = v;
+                                }
+                                break;
+
+                            case "OffsetPositionZ":
+                                {
+                                    Vector3 v = part.LocalPosition;
+                                    v.Z = reader.ReadContentAsDouble();
+                                    part.LocalPosition = v;
+                                }
+                                break;
+
+                            case "RotationOffsetX":
+                                {
+                                    Quaternion q = part.LocalRotation;
+                                    q.X = reader.ReadContentAsDouble();
+                                    part.LocalRotation = q;
+                                }
+                                break;
+
+                            case "RotationOffsetY":
+                                {
+                                    Quaternion q = part.LocalRotation;
+                                    q.Y = reader.ReadContentAsDouble();
+                                    part.LocalRotation = q;
+                                }
+                                break;
+
+                            case "RotationOffsetZ":
+                                {
+                                    Quaternion q = part.LocalRotation;
+                                    q.Z = reader.ReadContentAsDouble();
+                                    part.LocalRotation = q;
+                                }
+                                break;
+
+                            case "RotationOffsetW":
+                                {
+                                    Quaternion q = part.LocalRotation;
+                                    q.W = reader.ReadContentAsDouble();
+                                    part.LocalRotation = q;
+                                }
+                                break;
+
+                            case "VelocityX":
+                                {
+                                    Vector3 v = part.Velocity;
+                                    v.X = reader.ReadContentAsDouble();
+                                    part.Velocity = v;
+                                }
+                                break;
+
+                            case "VelocityY":
+                                {
+                                    Vector3 v = part.Velocity;
+                                    v.Y = reader.ReadContentAsDouble();
+                                    part.Velocity = v;
+                                }
+                                break;
+
+                            case "VelocityZ":
+                                {
+                                    Vector3 v = part.Velocity;
+                                    v.Z = reader.ReadContentAsDouble();
+                                    part.Velocity = v;
+                                }
+                                break;
+
+                            case "AngularVelocityX":
+                                {
+                                    Vector3 v = part.AngularVelocity;
+                                    v.X = reader.ReadContentAsDouble();
+                                    part.AngularVelocity = v;
+                                }
+                                break;
+
+                            case "AngularVelocityY":
+                                {
+                                    Vector3 v = part.AngularVelocity;
+                                    v.Y = reader.ReadContentAsDouble();
+                                    part.AngularVelocity = v;
+                                }
+                                break;
+
+                            case "AngularVelocityZ":
+                                {
+                                    Vector3 v = part.AngularVelocity;
+                                    v.Z = reader.ReadContentAsDouble();
+                                    part.AngularVelocity = v;
+                                }
+                                break;
+
+                            case "AccelerationX":
+                                {
+                                    Vector3 v = part.Acceleration;
+                                    v.X = reader.ReadContentAsDouble();
+                                    part.Acceleration = v;
+                                }
+                                break;
+
+                            case "AccelerationY":
+                                {
+                                    Vector3 v = part.Acceleration;
+                                    v.Y = reader.ReadContentAsDouble();
+                                    part.Acceleration = v;
+                                }
+                                break;
+
+                            case "AccelerationZ":
+                                {
+                                    Vector3 v = part.Acceleration;
+                                    v.Z = reader.ReadContentAsDouble();
+                                    part.Acceleration = v;
+                                }
+                                break;
+
+                            case "Description":
+                                part.Description = reader.ReadContentAsString();
+                                break;
+
+                            case "ColorR":
+                                {
+                                    TextParam tp = part.Text;
+                                    tp.TextColor.R_AsByte = (byte)reader.ReadContentAsInt();
+                                    part.Text = tp;
+                                }
+                                break;
+
+                            case "ColorG":
+                                {
+                                    TextParam tp = part.Text;
+                                    tp.TextColor.G_AsByte = (byte)reader.ReadContentAsInt();
+                                    part.Text = tp;
+                                }
+                                break;
+
+                            case "ColorB":
+                                {
+                                    TextParam tp = part.Text;
+                                    tp.TextColor.B_AsByte = (byte)reader.ReadContentAsInt();
+                                    part.Text = tp;
+                                }
+                                break;
+
+                            case "ColorA":
+                                {
+                                    TextParam tp = part.Text;
+                                    tp.TextColor.A_AsByte = (byte)reader.ReadContentAsInt();
+                                    part.Text = tp;
+                                }
+                                break;
+
+                            case "Text":
+                                {
+                                    TextParam tp = part.Text;
+                                    tp.Text = reader.ReadContentAsString();
+                                    part.Text = tp;
+                                }
+                                break;
+
+                            case "SitName":
+                                part.SitText = reader.ReadContentAsString();
+                                break;
+
+                            case "TouchName":
+                                part.TouchText = reader.ReadContentAsString();
+                                break;
+
+                            case "LinkNum":
+                                reader.Skip();
+                                break;
+
+                            case "ClickAction":
+                                part.ClickAction = (ClickActionType)reader.ReadContentAsInt();
+                                break;
+
+                            case "Shape":
+                                ShapeFromXml(part, rootGroup, reader);
+                                break;
+
+                            case "ScaleX":
+                                {
+                                    Vector3 v = part.Size;
+                                    v.X = reader.ReadContentAsDouble();
+                                    part.Size = v;
+                                }
+                                break;
+
+                            case "ScaleY":
+                                {
+                                    Vector3 v = part.Size;
+                                    v.Y = reader.ReadContentAsDouble();
+                                    part.Size = v;
+                                }
+                                break;
+
+                            case "ScaleZ":
+                                {
+                                    Vector3 v = part.Size;
+                                    v.Z = reader.ReadContentAsDouble();
+                                    part.Size = v;
+                                }
+                                break;
+
+                            case "SitTargetOrientatonX":
+                                {
+                                    Quaternion q = part.SitTargetOrientation;
+                                    q.X = reader.ReadContentAsDouble();
+                                    part.SitTargetOrientation = q;
+                                }
+                                break;
+
+                            case "SitTargetOrientatonY":
+                                {
+                                    Quaternion q = part.SitTargetOrientation;
+                                    q.Y = reader.ReadContentAsDouble();
+                                    part.SitTargetOrientation = q;
+                                }
+                                break;
+
+                            case "SitTargetOrientatonZ":
+                                {
+                                    Quaternion q = part.SitTargetOrientation;
+                                    q.Z = reader.ReadContentAsDouble();
+                                    part.SitTargetOrientation = q;
+                                }
+                                break;
+
+                            case "SitTargetOrientatonW":
+                                {
+                                    Quaternion q = part.SitTargetOrientation;
+                                    q.W = reader.ReadContentAsDouble();
+                                    part.SitTargetOrientation = q;
+                                }
+                                break;
+
+                            case "SitTargetPositionX":
+                                {
+                                    Vector3 v = part.SitTargetOffset;
+                                    v.X = reader.ReadContentAsDouble();
+                                    part.SitTargetOffset = v;
+                                }
+                                break;
+
+                            case "SitTargetPositionY":
+                                {
+                                    Vector3 v = part.SitTargetOffset;
+                                    v.Y = reader.ReadContentAsDouble();
+                                    part.SitTargetOffset = v;
+                                }
+                                break;
+
+                            case "SitTargetPositionZ":
+                                {
+                                    Vector3 v = part.SitTargetOffset;
+                                    v.Z = reader.ReadContentAsDouble();
+                                    part.SitTargetOffset = v;
+                                }
+                                break;
+
+                            case "ParentID":
+                                reader.Skip();
+                                break;
+
+                            case "CreationDate":
+                                part.CreationDate = Date.UnixTimeToDateTime((ulong)reader.ReadContentAsLong());
+                                break;
+
+                            case "Category":
+                                reader.Skip();
+                                break;
+
+                            case "SalePrice":
+                                reader.Skip();
+                                break;
+
+                            case "ObjectSaleType":
+                                reader.Skip();
+                                break;
+
+                            case "OwnershipCost":
+                                reader.Skip();
+                                break;
+
+                            case "GroupID":
+                                if (rootGroup != null)
+                                {
+                                    rootGroup.Group.ID = reader.ReadContentAsUUID();
+                                }
+                                else
+                                {
+                                    reader.Skip();
+                                }
+                                break;
+
+                            case "OwnerID":
+                                part.Owner.ID = reader.ReadContentAsUUID();
+                                break;
+
+                            case "LastOwnerID":
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.LastOwner.ID = reader.ReadContentAsUUID();
+                                }
+                                break;
+
+                            case "BaseMask":
+                                part.BaseMask = (InventoryPermissionsMask)reader.ReadContentAsLong();
+                                break;
+
+                            case "OwnerMask":
+                                part.OwnerMask = (InventoryPermissionsMask)reader.ReadContentAsLong();
+                                break;
+
+                            case "GroupMask":
+                                part.GroupMask = (InventoryPermissionsMask)reader.ReadContentAsLong();
+                                break;
+
+                            case "EveryoneMask":
+                                part.EveryoneMask = (InventoryPermissionsMask)reader.ReadContentAsLong();
+                                break;
+
+                            case "NextOwnerMask":
+                                part.NextOwnerMask = (InventoryPermissionsMask)reader.ReadContentAsLong();
+                                break;
+
+                            case "Flags":
+                                reader.Skip();
+                                break;
+
+                            case "CollisionSound":
+                                {
+                                    CollisionSoundParam sp = part.CollisionSound;
+                                    sp.ImpactSound = reader.ReadContentAsUUID();
+                                    part.CollisionSound = sp;
+                                }
+                                break;
+
+                            case "CollisionSoundVolume":
+                                {
+                                    CollisionSoundParam sp = part.CollisionSound;
+                                    sp.ImpactVolume = reader.ReadContentAsDouble();
+                                    part.CollisionSound = sp;
+                                }
+                                break;
+
+                            case "MediaUrl":
+                                part.MediaURL = reader.ReadContentAsString();
+                                break;
+
+                            case "AttachedPosX":
+                                if (null != rootGroup)
+                                {
+                                    Vector3 v = rootGroup.AttachedPos;
+                                    v.X = reader.ReadContentAsDouble();
+                                    rootGroup.AttachedPos = v;
+                                }
+                                break;
+
+                            case "AttachedPosY":
+                                if (null != rootGroup)
+                                {
+                                    Vector3 v = rootGroup.AttachedPos;
+                                    v.Y = reader.ReadContentAsDouble();
+                                    rootGroup.AttachedPos = v;
+                                }
+                                break;
+
+                            case "AttachedPosZ":
+                                if (null != rootGroup)
+                                {
+                                    Vector3 v = rootGroup.AttachedPos;
+                                    v.Z = reader.ReadContentAsDouble();
+                                    rootGroup.AttachedPos = v;
+                                }
+                                break;
+
+                            case "TextureAnimation":
+                                part.TextureAnimationBytes = reader.ReadContentAsBase64();
+                                break;
+
+                            case "ParticleSystem":
+                                part.ParticleSystemBytes = reader.ReadContentAsBase64();
+                                break;
+
+                            case "PayPrice0":
+                                reader.Skip();
+                                break;
+
+                            case "PayPrice1":
+                                reader.Skip();
+                                break;
+
+                            case "PayPrice2":
+                                reader.Skip();
+                                break;
+
+                            case "PayPrice3":
+                                reader.Skip();
+                                break;
+
+                            case "PayPrice4":
+                                reader.Skip();
+                                break;
+
+                            case "PhysicsShapeType":
+                                part.PhysicsShapeType = (PrimitivePhysicsShapeType)reader.ReadContentAsInt();
+                                break;
+
+                            case "Density":
+                                part.PhysicsDensity = reader.ReadContentAsDouble();
+                                break;
+
+                            case "Friction":
+                                part.PhysicsFriction = reader.ReadContentAsDouble();
+                                break;
+
+                            case "Bounce":
+                                part.PhysicsRestitution = reader.ReadContentAsDouble();
+                                break;
+
+                            case "GravityModifier":
+                                part.PhysicsGravityMultiplier = reader.ReadContentAsDouble();
+                                break;
+
+                            case "DynAttrs":
+                                reader.Skip();
+                                break;
+
+                            default:
+                                reader.Skip();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "SceneObjectPart")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        part.Inventory.InventorySerial = InventorySerial;
+                        return part;
+
+                    default:
+                        break;
+                }
+            }
         }
         #endregion
     }

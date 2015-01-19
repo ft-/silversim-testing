@@ -27,6 +27,7 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Script;
 using System;
 
 namespace SilverSim.Scene.Types.Object
@@ -93,6 +94,58 @@ namespace SilverSim.Scene.Types.Object
             ParentFolderID = new UUID(item.ParentFolderID);
             Permissions = item.Permissions;
             SaleInfo = item.SaleInfo;
+        }
+        #endregion
+
+        #region Perms Granting
+        public class PermsGranterInfo
+        {
+            public UUI PermsGranter = UUI.Unknown;
+            public ScriptPermissions PermsMask = ScriptPermissions.None;
+
+            public PermsGranterInfo()
+            {
+
+            }
+
+            public PermsGranterInfo(PermsGranterInfo i)
+            {
+                PermsGranter = i.PermsGranter;
+                PermsMask = i.PermsMask;
+            }
+        }
+
+        private PermsGranterInfo m_PermsGranter = null;
+        public PermsGranterInfo PermsGranter 
+        { 
+            get
+            {
+                lock(this)
+                {
+                    if(null != m_PermsGranter)
+                    {
+                        return new PermsGranterInfo(m_PermsGranter);
+                    }
+                    else
+                    {
+                        return null;
+                    }
+                }
+            }
+            set
+            {
+                lock(this)
+                {
+                    if(value == null)
+                    {
+                        m_PermsGranter = null;
+                    }
+                    else
+                    {
+                        m_PermsGranter = new PermsGranterInfo(value);
+                    }
+                }
+            }
         }
         #endregion
 

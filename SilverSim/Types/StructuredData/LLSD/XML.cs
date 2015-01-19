@@ -229,7 +229,7 @@ namespace SilverSim.StructuredData.LLSD
             }
         }
 
-        private static IValue DeserializeLLSDNode(XmlTextReader input)
+        public static IValue DeserializeLLSDNode(XmlTextReader input)
         {
             IValue value = null;
 

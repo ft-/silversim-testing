@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ThreadedClasses;
-using SilverSim.Types;
+﻿using SilverSim.StructuredData.LLSD;
 using System.Xml;
+using ThreadedClasses;
 
 namespace SilverSim.Types.Primitive
 {
@@ -133,6 +129,135 @@ namespace SilverSim.Types.Primitive
             }
         }
 
+        static void fromXmlOSData(PrimitiveMedia media, XmlTextReader reader)
+        {
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new XmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.IsEmptyElement)
+                        {
+                            break;
+                        }
+                        switch (reader.Name)
+                        {
+                            case "llsd":
+                                IValue v = LLSD_XML.DeserializeLLSDNode(reader);
+                                if (v is AnArray)
+                                {
+                                    AnArray a = (AnArray)v;
+                                    foreach (IValue iv in a)
+                                    {
+                                        if (iv is Map)
+                                        {
+                                            Map m = (Map)iv;
+                                            media.Add(new Entry(m));
+                                        }
+                                    }
+                                }
+                                break;
+
+                            default:
+                                reader.Skip();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "OSData")
+                        {
+                            throw new XmlException();
+                        }
+                        return;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        static void fromXmlOSMedia(PrimitiveMedia media, XmlTextReader reader)
+        {
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new XmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.IsEmptyElement)
+                        {
+                            break;
+                        }
+
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "OSMedia")
+                        {
+                            throw new XmlException();
+                        }
+                        return;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        public static PrimitiveMedia fromXml(XmlTextReader reader)
+        {
+            if (reader.IsEmptyElement)
+            {
+                return null;
+            }
+
+            PrimitiveMedia media = new PrimitiveMedia();
+
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new XmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.IsEmptyElement)
+                        {
+                            break;
+                        }
+                        switch(reader.Name)
+                        {
+                            case "OSMedia":
+                                fromXmlOSMedia(media, reader);
+                                break;
+
+                            default:
+                                reader.Skip();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "Media")
+                        {
+                            throw new XmlException();
+                        }
+                        return media;
+                }
+            }
+        }
         public void ToXml(XmlTextWriter writer)
         {
             writer.WriteStartElement("OSMedia");

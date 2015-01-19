@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
+using SilverSim.Types.Script;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -246,6 +247,179 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
+        #region XML Deserialization
+        ObjectPartInventoryItem fromXML(XmlTextReader reader)
+        {
+            ObjectPartInventoryItem item = new ObjectPartInventoryItem();
+            ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
+            bool ownerChanged = false;
+
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.IsEmptyElement)
+                        {
+                            break;
+                        }
+                        
+                        switch (reader.Name)
+                        {
+                            case "AssetID":
+                                item.AssetID = reader.ReadContentAsUUID();
+                                break;
+
+                            case "BasePermissions":
+                                item.Permissions.Base = (InventoryPermissionsMask)reader.ReadContentAsInt();
+                                break;
+
+                            case "CreationDate":
+                                item.CreationDate = Date.UnixTimeToDateTime((ulong)reader.ReadContentAsLong());
+                                break;
+
+                            case "CreatorID":
+                                item.Creator.ID = reader.ReadContentAsUUID();
+                                break;
+
+                            case "CreatorData":
+                                item.Creator.CreatorData = reader.ReadContentAsString();
+                                break;
+
+                            case "Description":
+                                item.Description = reader.ReadContentAsString();
+                                break;
+
+                            case "EveryonePermissions":
+                                item.Permissions.EveryOne = (InventoryPermissionsMask)reader.ReadContentAsInt();
+                                break;
+
+                            case "Flags":
+                                reader.Skip();
+                                break;
+
+                            case "GroupID":
+                                item.Group.ID = reader.ReadContentAsUUID();
+                                break;
+
+                            case "GroupPermissions":
+                                item.Permissions.Group = (InventoryPermissionsMask)reader.ReadContentAsInt();
+                                break;
+
+                            case "InvType":
+                                item.InventoryType = (InventoryType)reader.ReadContentAsInt();
+                                break;
+
+                            case "ItemID":
+                                item.ID = reader.ReadContentAsUUID();
+                                break;
+
+                            case "LastOwnerID":
+                                item.LastOwner.ID = reader.ReadContentAsUUID();
+                                break;
+
+                            case "Name":
+                                item.Name = reader.ReadContentAsString();
+                                break;
+
+                            case "NextPermissions":
+                                item.Permissions.NextOwner = (InventoryPermissionsMask)reader.ReadContentAsInt();
+                                break;
+
+                            case "OwnerID":
+                                item.Owner.ID = reader.ReadContentAsUUID();
+                                break;
+
+                            case "CurrentPermissions":
+                                item.Permissions.Current = (InventoryPermissionsMask)reader.ReadContentAsInt();
+                                break;
+
+                            case "PermsGranter":
+                                grantinfo.PermsGranter.ID = reader.ReadContentAsUUID();
+                                break;
+
+                            case "PermsMask":
+                                grantinfo.PermsMask = (ScriptPermissions)reader.ReadContentAsInt();
+                                break;
+
+                            case "Type":
+                                item.InventoryType = (InventoryType)reader.ReadContentAsInt();
+                                break;
+
+                            case "OwnerChanged":
+                                ownerChanged = reader.ReadContentAsBoolean();
+                                break;
+
+                            default:
+                                reader.Skip();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "TaskInventoryItem")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        if(ownerChanged)
+                        {
+                            item.Owner = UUI.Unknown;
+                        }
+                        return item;
+                }
+            }
+        }
+
+        public void FillFromXml(XmlTextReader reader)
+        {
+            ObjectPart part = new ObjectPart();
+            if(reader.IsEmptyElement)
+            {
+                throw new InvalidObjectXmlException();
+            }
+
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.IsEmptyElement)
+                        {
+                            break;
+                        }
+                        switch(reader.Name)
+                        {
+                            case "TaskInventoryItem":
+                                Add(fromXML(reader), false);
+                                break;
+
+                            default:
+                                reader.Skip();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "TaskInventory")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        break;
+                }
+            }
+        }
+        #endregion
+
         #region XML Serialization
         public void ToXml(XmlTextWriter writer, XmlSerializationOptions options)
         {
@@ -304,10 +478,11 @@ namespace SilverSim.Scene.Types.Object
                         }
                         writer.WriteUUID("ParentID", item.ParentFolderID);
                         writer.WriteUUID("ParentPartID", item.ParentFolderID);
-                        //writer.WriteUUID("PermsGranter", item.ScriptInstanc);
-                        //PermsMask
+                        ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
+                        writer.WriteUUID("PermsGranter", grantinfo.PermsGranter.ID);
+                        writer.WriteNamedValue("PermsMask", (uint)grantinfo.PermsMask);
                         writer.WriteNamedValue("Type", (int)item.AssetType);
-                        //writer.WriteNamedValue("OwnerChanged", false);
+                        writer.WriteNamedValue("OwnerChanged", (options & XmlSerializationOptions.AdjustForNextOwner) != XmlSerializationOptions.None);
                     }
                     writer.WriteEndElement();
                 });

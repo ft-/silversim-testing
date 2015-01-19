@@ -28,7 +28,6 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Types.Script;
 using System;
-using System.Threading;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Script

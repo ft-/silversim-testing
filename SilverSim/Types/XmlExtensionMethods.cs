@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using System;
 using System.Globalization;
 using System.Xml;
 
@@ -191,6 +192,53 @@ namespace SilverSim.Types
             writer.WriteStartElement(name);
             writer.WriteNamedValue("UUID", uuid);
             writer.WriteEndElement();
+        }
+
+        public static UUID ReadContentAsUUID(this XmlTextReader reader)
+        {
+            string name = reader.Name;
+            if(reader.IsEmptyElement)
+            {
+                return UUID.Zero;
+            }
+
+            do
+            {
+                if (!reader.Read())
+                {
+                    throw new XmlException();
+                }
+            } while (reader.NodeType == XmlNodeType.Text || reader.NodeType == XmlNodeType.Attribute);
+            
+            if(reader.NodeType != XmlNodeType.Element)
+            {
+                throw new XmlException();
+            }
+
+            UUID res = new UUID(reader.ReadContentAsString());
+            do
+            {
+                if (!reader.Read())
+                {
+                    throw new XmlException();
+                }
+            } while (reader.NodeType == XmlNodeType.Text || reader.NodeType == XmlNodeType.Attribute);
+
+            if (reader.NodeType != XmlNodeType.EndElement)
+            {
+                throw new XmlException();
+            }
+            if(reader.Name != name)
+            {
+                throw new XmlException();
+            }
+            return res;
+
+        }
+
+        public static byte[] ReadContentAsBase64(this XmlTextReader reader)
+        {
+            return Convert.FromBase64String(reader.ReadContentAsString());
         }
 
         private readonly static CultureInfo EnUsCulture = new CultureInfo("en-us");
