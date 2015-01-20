@@ -933,12 +933,29 @@ namespace SilverSim.Scene.Types.Object
         #region XML Serialization
         public void ToXml(XmlTextWriter writer, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
-            ToXml(writer, UUID.Zero, options);
+            ToXml(writer, UUID.Zero, null, options);
         }
         public void ToXml(XmlTextWriter writer, UUID nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
+            ToXml(writer, nextOwner, null, options);
+        }
+        public void ToXml(XmlTextWriter writer, UUID nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None)
+        {
             List<ObjectPart> parts = Values;
             writer.WriteStartElement("SceneObjectGroup");
+            if(offsetpos != null)
+            {
+                Vector3 opos = Position - offsetpos;
+                writer.WriteStartAttribute("x");
+                writer.WriteValue(opos.X);
+                writer.WriteEndAttribute();
+                writer.WriteStartAttribute("y");
+                writer.WriteValue(opos.Y);
+                writer.WriteEndAttribute();
+                writer.WriteStartAttribute("z");
+                writer.WriteValue(opos.Z);
+                writer.WriteEndAttribute();
+            }
             RootPart.ToXml(writer, options);
             writer.WriteEndElement();
             writer.WriteStartElement("OtherParts");

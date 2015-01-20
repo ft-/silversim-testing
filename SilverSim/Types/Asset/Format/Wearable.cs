@@ -296,6 +296,11 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
+        public AssetData Asset()
+        {
+            return (AssetData)this;
+        }
+
         public static implicit operator AssetData(Wearable v)
         {
             AssetData asset = new AssetData();

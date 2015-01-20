@@ -23,12 +23,12 @@ exception statement from your version.
 
 */
 
+using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Text;
-using SilverSim.Types.Inventory;
 
 namespace SilverSim.Types.Asset.Format
 {
@@ -494,6 +494,11 @@ namespace SilverSim.Types.Asset.Format
                 item.Description,
                 item.CreationDate.AsULong
                 );
+        }
+
+        public AssetData Asset()
+        {
+            return (AssetData)this;
         }
 
         public static implicit operator AssetData(Notecard v)

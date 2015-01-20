@@ -364,6 +364,12 @@ namespace SilverSim.Types.Asset.Format
         #endregion
 
         #region Operators
+
+        public AssetData Asset()
+        {
+            return (AssetData)this;
+        }
+
         public static implicit operator AssetData(Gesture v)
         {
             AssetData asset = new AssetData();

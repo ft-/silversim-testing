@@ -79,6 +79,12 @@ namespace SilverSim.Types.Asset.Format
         #endregion
 
         #region Operators
+
+        public AssetData Asset()
+        {
+            return (AssetData)this;
+        }
+
         public static implicit operator AssetData(Landmark v)
         {
             AssetData asset = new AssetData();

@@ -298,6 +298,10 @@ namespace SilverSim.Types
             {
                 return string.Format(EnUsCulture, "{0}", X);
             }
+            set
+            {
+                X = double.Parse(value, EnUsCulture);
+            }
         }
 
         public string Y_String
@@ -306,6 +310,10 @@ namespace SilverSim.Types
             {
                 return string.Format(EnUsCulture, "{0}", Y);
             }
+            set
+            {
+                Y = double.Parse(value, EnUsCulture);
+            }
         }
 
         public string Z_String
@@ -313,6 +321,10 @@ namespace SilverSim.Types
             get
             {
                 return string.Format(EnUsCulture, "{0}", Z);
+            }
+            set
+            {
+                Z = double.Parse(value, EnUsCulture);
             }
         }
 

@@ -23,13 +23,11 @@ exception statement from your version.
 
 */
 
-using System;
+using SilverSim.StructuredData.LLSD;
 using System.Collections.Generic;
-using System.Linq;
 using System.IO;
 using System.Text;
 using System.Xml;
-using SilverSim.StructuredData.LLSD;
 
 namespace SilverSim.Types.Asset.Format
 {
@@ -139,6 +137,11 @@ namespace SilverSim.Types.Asset.Format
             w.WriteStartElement("uuid");
             w.WriteValue(val.ToString());
             w.WriteEndElement();
+        }
+
+        public AssetData Asset()
+        {
+            return (AssetData)this;
         }
 
         public static implicit operator AssetData(Material v)
