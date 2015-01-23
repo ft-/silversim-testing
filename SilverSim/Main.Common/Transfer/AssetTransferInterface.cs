@@ -34,7 +34,7 @@ namespace SilverSim.Main.Common.Transfer
     {
         AssetServiceInterface m_DestinationAssetService;
         AssetServiceInterface m_SourceAssetService;
-        UUID m_AssetID;
+        protected UUID m_AssetID { get; private set; }
 
         public enum ReferenceSource
         {

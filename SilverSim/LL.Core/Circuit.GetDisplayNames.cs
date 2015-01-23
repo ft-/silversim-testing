@@ -38,6 +38,7 @@ namespace SilverSim.LL.Core
         void WriteAvatarNameData(XmlTextWriter writer, AvatarNameServiceInterface.NameData nd)
         {
             writer.WriteStartElement("map");
+#warning verify expected username handling with viewer source code (GetDisplayNames capability)
             writer.WriteKeyValuePair("key", "username");
             string username;
             if(string.IsNullOrEmpty(nd.ID.LastName))
