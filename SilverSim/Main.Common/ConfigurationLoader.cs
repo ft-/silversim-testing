@@ -30,7 +30,9 @@ using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scripting.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using System;
@@ -78,6 +80,12 @@ namespace SilverSim.Main.Common
         private Queue<CFG_ISource> m_Sources = new Queue<CFG_ISource>();
         private RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
         private ManualResetEvent m_ShutdownEvent;
+
+        static ConfigurationLoader()
+        {
+            /* prevent circular dependencies by assigning relevant parts here */
+            ObjectGroup.CompilerRegistry = CompilerRegistry.ScriptCompilers;
+        }
 
         public IConfigSource Config
         {

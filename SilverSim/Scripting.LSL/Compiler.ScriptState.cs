@@ -23,22 +23,20 @@ exception statement from your version.
 
 */
 
-using Nini.Config;
-using SilverSim.Main.Common;
+using SilverSim.Scene.Types.Script;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Xml;
 
 namespace SilverSim.Scripting.LSL
 {
-    [PluginName("ScriptEngine")]
-    public class Factory : IPluginFactory
+    public partial class LSLCompiler 
     {
-        public Factory()
+        public IScriptState StateFromXml(XmlTextReader reader, Dictionary<string, string> attrs)
         {
-
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new LSLCompiler();
+            throw new NotImplementedException();
         }
     }
 }

@@ -42,7 +42,7 @@ using System.Text;
 
 namespace SilverSim.Scripting.LSL
 {
-    public class LSLCompiler : IScriptCompiler, IPlugin, IPluginSubFactory
+    public partial class LSLCompiler : IScriptCompiler, IPlugin, IPluginSubFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LSL COMPILER");
         List<IScriptApi> m_Apis = new List<IScriptApi>();

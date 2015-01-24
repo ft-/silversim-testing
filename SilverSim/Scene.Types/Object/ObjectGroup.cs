@@ -27,6 +27,7 @@ using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
@@ -41,6 +42,26 @@ namespace SilverSim.Scene.Types.Object
 {
     public class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject, IDisposable
     {
+        static IScriptCompilerRegistry m_CompilerRegistry = null;
+        public static IScriptCompilerRegistry CompilerRegistry
+        {
+            get
+            {
+                return m_CompilerRegistry;
+            }
+            set
+            {
+                if(m_CompilerRegistry == null)
+                {
+                    m_CompilerRegistry = value;
+                }
+                else
+                {
+                    throw new InvalidOperationException();
+                }
+            }
+        }
+
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT GROUP");
 
         #region Events
@@ -1067,10 +1088,19 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "KeyframeMotion":
-                                if (reader.IsEmptyElement)
+                                if (!reader.IsEmptyElement)
                                 {
                                     reader.Skip();
                                 }
+                                break;
+
+                            case "GroupScriptStates":
+                                if(reader.IsEmptyElement)
+                                {
+                                    break;
+                                }
+
+                                
                                 break;
 
                             default:
