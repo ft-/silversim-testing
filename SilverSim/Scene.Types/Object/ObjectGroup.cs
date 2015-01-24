@@ -990,6 +990,36 @@ namespace SilverSim.Scene.Types.Object
             writer.WriteEndElement();
             
 #warning KeyframeMotion Base64
+
+            bool haveScriptState = false;
+            foreach(ObjectPart p in parts)
+            {
+                foreach(ObjectPartInventoryItem i in p.Inventory.Values)
+                {
+                    IScriptState scriptState = i.ScriptState;
+                    if(scriptState != null)
+                    {
+                        if(!haveScriptState)
+                        {
+                            writer.WriteStartElement("GroupScriptStates");
+                            haveScriptState = true;
+                        }
+
+                        writer.WriteStartElement("SavedScriptState");
+                        writer.WriteStartAttribute("UUID");
+                        writer.WriteValue(i.ID);
+                        writer.WriteEndAttribute();
+
+                        scriptState.ToXml(writer);
+
+                        writer.WriteEndElement();
+                    }
+                }
+            }
+            if(haveScriptState)
+            {
+                writer.WriteEndElement();
+            }
         }
         #endregion
 
@@ -1099,8 +1129,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     break;
                                 }
-
-                                
+                                fromXmlGroupScriptStates(reader, group);
                                 break;
 
                             default:
@@ -1118,6 +1147,184 @@ namespace SilverSim.Scene.Types.Object
                             throw new InvalidObjectXmlException();
                         }
                         return group;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        static void fromXmlGroupScriptStates(XmlTextReader reader, ObjectGroup group)
+        {
+            UUID itemID = UUID.Zero;
+
+            for(;;)
+            {
+                if(!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch(reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.IsEmptyElement)
+                        {
+                            break;
+                        }
+                        switch(reader.Name)
+                        {
+                            case "SavedScriptState":
+                                string attrname = "";
+                                while (reader.ReadAttributeValue())
+                                {
+                                    switch(reader.NodeType)
+                                    {
+                                        case XmlNodeType.Attribute:
+                                            attrname = reader.Value;
+                                            break;
+
+                                        case XmlNodeType.Text:
+                                            switch(attrname)
+                                            {
+                                                case "UUID":
+                                                    itemID = UUID.Parse(reader.Value);
+                                                    break;
+
+                                                default:
+                                                    break;
+                                            }
+                                            break;
+
+                                        default:
+                                            break;
+                                    }
+                                }
+
+                                fromXmlSavedScriptState(reader, group, itemID);
+                                break;
+
+                            default:
+                                reader.Skip();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if(reader.Name != "GroupScriptStates")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        static void fromXmlSavedScriptState(XmlTextReader reader, ObjectGroup group, UUID itemID)
+        {
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        if (reader.IsEmptyElement)
+                        {
+                            break;
+                        }
+                        switch (reader.Name)
+                        {
+                            case "State":
+                                string attrname = "";
+                                Dictionary<string, string> attrs = new Dictionary<string, string>();
+                                while (reader.ReadAttributeValue())
+                                {
+                                    switch (reader.NodeType)
+                                    {
+                                        case XmlNodeType.Attribute:
+                                            attrname = reader.Value;
+                                            break;
+
+                                        case XmlNodeType.Text:
+                                            attrs[attrname] = reader.Value;
+                                            break;
+
+                                        default:
+                                            break;
+                                    }
+                                }
+                                ObjectPartInventoryItem item = null;
+
+                                if(!attrs.ContainsKey("Asset") || !attrs.ContainsKey("Engine"))
+                                {
+                                    reader.Skip();
+                                    return;
+                                }
+
+                                foreach(ObjectPart part in group.Values)
+                                {
+                                    if(part.Inventory.ContainsKey(itemID))
+                                    {
+                                        item = part.Inventory[itemID];
+                                        UUID assetid;
+
+                                        /* validate inventory item */
+                                        if(!UUID.TryParse(attrs["Asset"], out assetid))
+                                        {
+                                            item = null;
+                                        }
+                                        else if(item.AssetType != SilverSim.Types.Asset.AssetType.LSLText ||
+                                            item.InventoryType != SilverSim.Types.Inventory.InventoryType.LSLText)
+                                        {
+                                            item = null;
+                                        }
+                                        else if(assetid != item.AssetID)
+                                        {
+                                            item = null;
+                                        }
+                                    }
+                                }
+
+                                if (null == item)
+                                {
+                                    reader.Skip();
+                                }
+                                else
+                                {
+                                    IScriptCompiler compiler;
+                                    try
+                                    {
+                                        compiler = CompilerRegistry[attrs["Engine"]];
+                                    }
+                                    catch
+                                    {
+                                        reader.Skip();
+                                        return;
+                                    }
+
+                                    item.ScriptState = compiler.StateFromXml(reader, attrs, item);
+                                }
+                                break;
+
+                            default:
+                                reader.Skip();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "GroupScriptStates")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return;
 
                     default:
                         break;

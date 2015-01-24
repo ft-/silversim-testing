@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
@@ -64,6 +65,6 @@ namespace SilverSim.Scene.Types.Script
     {
         IScriptAssembly Compile(AppDomain appDom, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1);
         void SyntaxCheck(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1);
-        IScriptState StateFromXml(XmlTextReader reader, Dictionary<string, string> attrs);
+        IScriptState StateFromXml(XmlTextReader reader, Dictionary<string, string> attrs, ObjectPartInventoryItem item);
     }
 }

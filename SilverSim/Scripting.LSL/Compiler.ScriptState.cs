@@ -23,18 +23,17 @@ exception statement from your version.
 
 */
 
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Xml;
 
 namespace SilverSim.Scripting.LSL
 {
     public partial class LSLCompiler 
     {
-        public IScriptState StateFromXml(XmlTextReader reader, Dictionary<string, string> attrs)
+        public IScriptState StateFromXml(XmlTextReader reader, Dictionary<string, string> attrs, ObjectPartInventoryItem item)
         {
             throw new NotImplementedException();
         }
