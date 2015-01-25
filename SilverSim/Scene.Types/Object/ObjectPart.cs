@@ -121,6 +121,7 @@ namespace SilverSim.Scene.Types.Object
             ObjectGroup = null;
             IsChanged = false;
             Inventory = new ObjectPartInventory();
+            Inventory.OnChange += OnInventoryChange;
             m_ObjectUpdateInfo = new ObjectUpdateInfo(this);
         }
         #endregion
@@ -186,6 +187,12 @@ namespace SilverSim.Scene.Types.Object
         public void SendObjectUpdate()
         {
             ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+        }
+
+        void OnInventoryChange()
+        {
+            IsChanged = true;
+            TriggerOnUpdate(ChangedEvent.ChangedFlags.Inventory);
         }
 
         internal void TriggerOnUpdate(ChangedEvent.ChangedFlags flags)
@@ -1823,7 +1830,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "RegionHandle":
-                                reader.Skip();
+                                reader.Skip(); /* why was this ever serialized, it breaks any deserialization attempt */
                                 break;
 
                             case "ScriptAccessPin":
@@ -2123,20 +2130,6 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "Category":
-                                /*
-                    writer.WriteNamedValue("Category", ObjectGroup.Category);
-                    if (this == ObjectGroup.RootPart)
-                    {
-                        writer.WriteNamedValue("SalePrice", ObjectGroup.SalePrice);
-                        writer.WriteNamedValue("ObjectSaleType", (int)ObjectGroup.SaleType);
-                    }
-                    else
-                    {
-                        writer.WriteNamedValue("SalePrice", 10);
-                        writer.WriteNamedValue("ObjectSaleType", (int)ObjectPartInventoryItem.SaleInfoData.SaleType.NoSale);
-                    }
-                    writer.WriteNamedValue("OwnershipCost", ObjectGroup.OwnershipCost);
-                                 */
                                 if (null != rootGroup)
                                 {
                                     rootGroup.Category = (UInt32)reader.ReadContentAsInt();
@@ -2223,7 +2216,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "Flags":
-                                reader.Skip();
+                                reader.Skip(); /* why should these ever be serialized? */
                                 break;
 
                             case "CollisionSound":
