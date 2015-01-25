@@ -129,6 +129,7 @@ namespace SilverSim.Scene.Types.Object
         #region Dispose
         public void Dispose()
         {
+            Inventory.OnChange -= OnInventoryChange;
             m_ObjectUpdateInfo.KillObject();
             ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
         }
