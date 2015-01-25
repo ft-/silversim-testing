@@ -35,7 +35,7 @@ namespace SilverSim.Scripting.LSL
     {
         public IScriptState StateFromXml(XmlTextReader reader, Dictionary<string, string> attrs, ObjectPartInventoryItem item)
         {
-            throw new NotImplementedException();
+            return LSLScript.SavedScriptState.FromXML(reader, attrs, item);
         }
     }
 }

@@ -1297,7 +1297,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("PassCollisions", IsPassCollisions);
                     writer.WriteNamedValue("RegionHandle", ObjectGroup.Scene.RegionData.Location.RegionHandle);
                     writer.WriteNamedValue("ScriptAccessPin", ScriptAccessPin);
-                    writer.WriteNamedValue("GroupPosition", LocalPosition);
+                    writer.WriteNamedValue("GroupPosition", ObjectGroup.RootPart.GlobalPosition);
                     writer.WriteNamedValue("OffsetPosition", LocalPosition);
                     writer.WriteNamedValue("RotationOffset", LocalRotation);
                     writer.WriteNamedValue("Velocity", Velocity);
@@ -1379,10 +1379,18 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("SitTargetOrientationLL", SitTargetOrientation);
                     writer.WriteNamedValue("ParentID", ObjectGroup.RootPart.ID);
                     writer.WriteNamedValue("CreationDate", CreationDate.AsUInt);
-                    //writer.WriteNamedValue("Category");
-                    //writer.WriteNamedValue("SalePrice", );
-                    //writer.WriteNamedValue("ObjectSaleType", );
-                    //writer.WriteNamedValue("OwnershipCost", );
+                    writer.WriteNamedValue("Category", ObjectGroup.Category);
+                    if (this == ObjectGroup.RootPart)
+                    {
+                        writer.WriteNamedValue("SalePrice", ObjectGroup.SalePrice);
+                        writer.WriteNamedValue("ObjectSaleType", (int)ObjectGroup.SaleType);
+                    }
+                    else
+                    {
+                        writer.WriteNamedValue("SalePrice", 10);
+                        writer.WriteNamedValue("ObjectSaleType", (int)ObjectPartInventoryItem.SaleInfoData.SaleType.NoSale);
+                    }
+                    writer.WriteNamedValue("OwnershipCost", ObjectGroup.OwnershipCost);
                     if (XmlSerializationOptions.None != (options & XmlSerializationOptions.WriteOwnerInfo))
                     {
                         writer.WriteUUID("GroupID", ObjectGroup.Group.ID);
@@ -1823,15 +1831,15 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "GroupPositionX":
-                                reader.Skip();
+                                reader.Skip(); /* not needed redundant information */
                                 break;
 
                             case "GroupPositionY":
-                                reader.Skip();
+                                reader.Skip(); /* not needed redundant information */
                                 break;
 
                             case "GroupPositionZ":
-                                reader.Skip();
+                                reader.Skip(); /* not needed redundant information */
                                 break;
 
                             case "OffsetPositionX":
@@ -2115,19 +2123,61 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "Category":
-                                reader.Skip();
+                                /*
+                    writer.WriteNamedValue("Category", ObjectGroup.Category);
+                    if (this == ObjectGroup.RootPart)
+                    {
+                        writer.WriteNamedValue("SalePrice", ObjectGroup.SalePrice);
+                        writer.WriteNamedValue("ObjectSaleType", (int)ObjectGroup.SaleType);
+                    }
+                    else
+                    {
+                        writer.WriteNamedValue("SalePrice", 10);
+                        writer.WriteNamedValue("ObjectSaleType", (int)ObjectPartInventoryItem.SaleInfoData.SaleType.NoSale);
+                    }
+                    writer.WriteNamedValue("OwnershipCost", ObjectGroup.OwnershipCost);
+                                 */
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.Category = (UInt32)reader.ReadContentAsInt();
+                                }
+                                else
+                                {
+                                    reader.Skip();
+                                }
                                 break;
 
                             case "SalePrice":
-                                reader.Skip();
+                                if(null != rootGroup)
+                                {
+                                    rootGroup.SalePrice = reader.ReadContentAsInt();
+                                }
+                                else
+                                {
+                                    reader.Skip();
+                                }
                                 break;
 
                             case "ObjectSaleType":
-                                reader.Skip();
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.SaleType = (InventoryItem.SaleInfoData.SaleType)reader.ReadContentAsInt();
+                                }
+                                else
+                                {
+                                    reader.Skip();
+                                }
                                 break;
 
                             case "OwnershipCost":
-                                reader.Skip();
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.OwnershipCost = reader.ReadContentAsInt();
+                                }
+                                else
+                                {
+                                    reader.Skip();
+                                }
                                 break;
 
                             case "GroupID":
@@ -2232,23 +2282,58 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "PayPrice0":
-                                reader.Skip();
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.PayPrice0 = reader.ReadContentAsInt();
+                                }
+                                else
+                                {
+                                    reader.Skip();
+                                }
                                 break;
 
                             case "PayPrice1":
-                                reader.Skip();
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.PayPrice1 = reader.ReadContentAsInt();
+                                }
+                                else
+                                {
+                                    reader.Skip();
+                                }
                                 break;
 
                             case "PayPrice2":
-                                reader.Skip();
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.PayPrice2 = reader.ReadContentAsInt();
+                                }
+                                else
+                                {
+                                    reader.Skip();
+                                }
                                 break;
 
                             case "PayPrice3":
-                                reader.Skip();
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.PayPrice3 = reader.ReadContentAsInt();
+                                }
+                                else
+                                {
+                                    reader.Skip();
+                                }
                                 break;
 
                             case "PayPrice4":
-                                reader.Skip();
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.PayPrice4 = reader.ReadContentAsInt();
+                                }
+                                else
+                                {
+                                    reader.Skip();
+                                }
                                 break;
 
                             case "PhysicsShapeType":

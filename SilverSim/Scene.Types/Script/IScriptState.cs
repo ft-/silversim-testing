@@ -23,13 +23,22 @@ exception statement from your version.
 
 */
 
+using System;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.Script
 {
+    public class ScriptStateLoaderNotImplementedException : Exception
+    {
+        /* do not throw this exception after calling any XmlTextReader function */
+        public ScriptStateLoaderNotImplementedException()
+        {
+
+        }
+    }
+
     public interface IScriptState
     {
-        string EngineName { get; }
         void ToXml(XmlTextWriter writer);
     }
 }

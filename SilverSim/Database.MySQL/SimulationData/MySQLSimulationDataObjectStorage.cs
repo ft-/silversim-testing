@@ -128,6 +128,20 @@ namespace SilverSim.Database.MySQL.SimulationData
                             item.SaleInfo.Type = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
                             item.SaleInfo.Price = (int)dbReader["SalePrice"];
                             item.SaleInfo.PermMask = (InventoryPermissionsMask)(uint)dbReader["SalePermMask"];
+                            ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
+                            if ((string)dbReader["PermsGranter"] != "")
+                            {
+                                try
+                                {
+                                    grantinfo.PermsGranter = new UUI((string)dbReader["PermsGranter"]);
+                                }
+                                catch
+                                {
+
+                                }
+                            }
+                            grantinfo.PermsMask = (Types.Script.ScriptPermissions)(uint)dbReader["PermsMask"];
+
                             objpart.Inventory.Add(item.ID, item.Name, item);
                         }
                     }
@@ -166,6 +180,13 @@ namespace SilverSim.Database.MySQL.SimulationData
                             objgroup.Group = new UGI((string)dbReader["Group"]);
                             originalAssetID = new UUID((string)dbReader["OriginalAssetID"]);
                             nextOwnerAssetID = new UUID((string)dbReader["NextOwnerAssetID"]);
+                            objgroup.SaleType = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
+                            objgroup.SalePrice = (int)dbReader["SalePrice"];
+                            objgroup.PayPrice0 = (int)dbReader["PayPrice0"];
+                            objgroup.PayPrice1 = (int)dbReader["PayPrice1"];
+                            objgroup.PayPrice2 = (int)dbReader["PayPrice2"];
+                            objgroup.PayPrice3 = (int)dbReader["PayPrice3"];
+                            objgroup.PayPrice4 = (int)dbReader["PayPrice4"];
                         }
                     }
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RootPartID LIKE ?id ORDER BY LinkNumber", connection))
@@ -364,6 +385,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["SaleType"] = item.SaleInfo.Type;
             p["SalePrice"] = item.SaleInfo.Price;
             p["SalePermMask"] = item.SaleInfo.PermMask;
+            ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
+            p["PermsGranter"] = grantinfo.PermsGranter.FullName;
+            p["PermsMask"] = (uint)grantinfo.PermsMask;
 
             MySQLUtilities.ReplaceInsertInto(connection, "primitems", p);
         }
@@ -385,6 +409,13 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["Group"] = objgroup.Group.ToString();
             p["OriginalAssetID"] = objgroup.OriginalAssetID.ToString();
             p["NextOwnerAssetID"] = objgroup.NextOwnerAssetID.ToString();
+            p["SaleType"] = (int)objgroup.SaleType;
+            p["SalePrice"] = objgroup.SalePrice;
+            p["PayPrice0"] = objgroup.PayPrice0;
+            p["PayPrice1"] = objgroup.PayPrice1;
+            p["PayPrice2"] = objgroup.PayPrice2;
+            p["PayPrice3"] = objgroup.PayPrice3;
+            p["PayPrice4"] = objgroup.PayPrice4;
 
             MySQLUtilities.ReplaceInsertInto(connection, "objects", p);
         }
@@ -513,7 +544,16 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "PRIMARY KEY(ID)" +
             ")",
             "ALTER TABLE %tablename% ADD COLUMN (OriginalAssetID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                        "NextOwnerAssetID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'),"
+                        "NextOwnerAssetID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'),",
+            "ALTER TABLE %tablename% ADD COLUMN (Category INT(11) NOT NULL DEFAULT '0'," +
+                        "SaleType INT(11) NOT NULL DEFAULT '0'," + 
+                        "SalePrice INT(11) NOT NULL DEFAULT '0'," +
+                        "PayPrice0 INT(11) NOT NULL DEFAULT '0'," +
+                        "PayPrice1 INT(11) NOT NULL DEFAULT '0'," + 
+                        "PayPrice2 INT(11) NOT NULL DEFAULT '0'," + 
+                        "PayPrice3 INT(11) NOT NULL DEFAULT '0'," + 
+                        "PayPrice4 INT(11) NOT NULL DEFAULT '0'" + 
+        "),"
         };
 
         private static readonly string[] PrimItemsMigrations = new string[]{
@@ -542,7 +582,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "SalePrice INT(11) NOT NULL DEFAULT '0'," +
                 "SalePermMask INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
                 "PRIMARY KEY(PrimID, InventoryID)," +
-                "KEY primID (PrimID))"
+                "KEY primID (PrimID))",
+            "ALTER TABLE %tablename% ADD COLUMN (PermsGranter VARCHAR(255) NOT NULL DEFAULT ''," +
+                        "PermsMask INT(11) UNSIGNED NOT NULL DEFAULT '0'),"
         };
 
         private static readonly string[] PrimsMigrations = new string[] {

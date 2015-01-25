@@ -34,11 +34,12 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 using System.Timers;
+using System.Xml;
 using ThreadedClasses;
 
 namespace SilverSim.Scripting.LSL
 {
-    public class Script : ScriptInstance
+    public partial class Script : ScriptInstance, IScriptState
     {
         private ObjectPart m_Part;
         private ObjectPartInventoryItem m_Item;
@@ -79,10 +80,66 @@ namespace SilverSim.Scripting.LSL
             m_States.Add(name, state);
         }
 
+        public void ToXml(XmlTextWriter writer)
+        {
+            writer.WriteStartElement("State");
+            writer.WriteStartAttribute("UUID");
+            writer.WriteValue(Item.ID);
+            writer.WriteEndAttribute();
+            writer.WriteStartAttribute("Asset");
+            writer.WriteValue(Item.AssetID);
+            writer.WriteEndAttribute();
+            writer.WriteStartAttribute("Engine");
+            writer.WriteValue("XEngine");
+            writer.WriteEndAttribute();
+            {
+                writer.WriteStartElement("ScriptState");
+                {
+                    string current_state = "default";
+                    foreach (KeyValuePair<string, LSLState> kvp in m_States)
+                    {
+                        if (kvp.Value == m_CurrentState)
+                        {
+                            current_state = kvp.Key;
+                        }
+                    }
+                    writer.WriteStartElement("State");
+                    {
+                        writer.WriteValue(current_state);
+                    }
+                    writer.WriteEndElement();
+                    writer.WriteStartElement("Running");
+                    {
+                        writer.WriteValue(IsRunning);
+                    }
+                    writer.WriteEndElement();
+                    writer.WriteStartElement("Variables");
+                    {
+
+                    }
+                    writer.WriteEndElement();
+                    writer.WriteStartElement("Queue");
+                    {
+
+                    }
+                    writer.WriteEndElement();
+                    writer.WriteStartElement("Plugins");
+                    {
+
+                    }
+                    writer.WriteEndElement();
+                }
+                writer.WriteEndElement();
+            }
+            writer.WriteEndElement();
+        }
+
         public Script(ObjectPart part, ObjectPartInventoryItem item, List<Delegate> stateChangeDelegates)
         {
             m_Part = part;
             m_Item = item;
+            /* we replace the loaded script state with ours */
+            m_Item.ScriptState = this;
             m_Part.OnUpdate += OnPrimUpdate;
             m_Part.OnPositionChange += OnPrimPositionUpdate;
             m_Part.ObjectGroup.OnUpdate += OnGroupUpdate;

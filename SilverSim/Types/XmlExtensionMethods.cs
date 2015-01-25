@@ -194,6 +194,15 @@ namespace SilverSim.Types
             writer.WriteEndElement();
         }
 
+        public static T ReadContentAsEnum<T>(this XmlTextReader reader)
+        {
+            string value = reader.ReadElementContentAsString();
+            if (value.Contains(" ") && !value.Contains(","))
+                value = value.Replace(" ", ", ");
+
+            return (T)Enum.Parse(typeof(T), value);
+        }
+
         public static UUID ReadContentAsUUID(this XmlTextReader reader)
         {
             string name = reader.Name;
@@ -212,7 +221,7 @@ namespace SilverSim.Types
             
             if(reader.NodeType != XmlNodeType.Element)
             {
-                throw new XmlException();
+                return new UUID(reader.ReadContentAsString()); /* they did three types of serialization for this and this is the third without inner element */
             }
 
             UUID res = new UUID(reader.ReadContentAsString());

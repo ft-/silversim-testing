@@ -227,6 +227,142 @@ namespace SilverSim.Scene.Types.Object
         #region Properties
         public bool IsChanged { get; private set; }
 
+        public SilverSim.Types.Inventory.InventoryItem.SaleInfoData.SaleType m_SaleType;
+        public int m_SalePrice;
+        public int m_OwnershipCost;
+        public UInt32 m_Category;
+        public int m_PayPrice0;
+        public int m_PayPrice1;
+        public int m_PayPrice2;
+        public int m_PayPrice3;
+        public int m_PayPrice4;
+
+        public int PayPrice0
+        {
+            get
+            {
+                return m_PayPrice0;
+            }
+            set
+            {
+                m_PayPrice0 = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public int PayPrice1
+        {
+            get
+            {
+                return m_PayPrice1;
+            }
+            set
+            {
+                m_PayPrice1 = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public int PayPrice2
+        {
+            get
+            {
+                return m_PayPrice2;
+            }
+            set
+            {
+                m_PayPrice2 = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public int PayPrice3
+        {
+            get
+            {
+                return m_PayPrice3;
+            }
+            set
+            {
+                m_PayPrice3 = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public int PayPrice4
+        {
+            get
+            {
+                return m_PayPrice4;
+            }
+            set
+            {
+                m_PayPrice4 = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public SilverSim.Types.Inventory.InventoryItem.SaleInfoData.SaleType SaleType
+        {
+            get
+            {
+                return m_SaleType;
+            }
+            set
+            {
+                m_SaleType = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public int SalePrice
+        {
+            get
+            {
+                return m_SalePrice;
+            }
+            set
+            {
+                m_SalePrice = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public int OwnershipCost
+        {
+            get
+            {
+                return m_OwnershipCost;
+            }
+            set
+            {
+                m_OwnershipCost = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public UInt32 Category
+        {
+            get
+            {
+                return m_Category;
+            }
+            set
+            {
+                m_Category = value;
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
         public AttachmentPoint AttachPoint
         {
             get
@@ -1306,10 +1442,18 @@ namespace SilverSim.Scene.Types.Object
                                     catch
                                     {
                                         reader.Skip();
-                                        return;
+                                        break;
                                     }
 
-                                    item.ScriptState = compiler.StateFromXml(reader, attrs, item);
+                                    try
+                                    {
+                                        item.ScriptState = compiler.StateFromXml(reader, attrs, item);
+                                    }
+                                    catch(ScriptStateLoaderNotImplementedException e)
+                                    {
+                                        reader.Skip();
+                                        break;
+                                    }
                                 }
                                 break;
 

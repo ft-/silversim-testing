@@ -333,6 +333,7 @@ namespace SilverSim.Scripting.LSL
             #endregion
 #endif
             SilverSim.Scripting.Common.CompilerRegistry.ScriptCompilers["lsl"] = this;
+            SilverSim.Scripting.Common.CompilerRegistry.ScriptCompilers["XEngine"] = this; /* we won't be supporting anything beyond LSL compatibility */
         }
 
         class LSLScriptAssembly : IScriptAssembly
