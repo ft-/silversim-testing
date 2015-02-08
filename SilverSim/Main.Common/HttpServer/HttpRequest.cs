@@ -380,6 +380,13 @@ namespace SilverSim.Main.Common.HttpServer
             return res;
         }
 
+        public HttpResponse BeginResponse(HttpStatusCode statuscode, string statusDescription, string contentType)
+        {
+            HttpResponse res = BeginResponse(statuscode, statusDescription);
+            res.ContentType = contentType;
+            return res;
+        }
+
         public void ErrorResponse(HttpStatusCode statuscode, string statusDescription)
         {
             BeginResponse(statuscode, statusDescription).Close();

@@ -196,7 +196,7 @@ namespace SilverSim.LL.Core
                     }
                 }
 
-                httpres = httpreq.BeginResponse();
+                httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "image/x-j2c");
                 o = httpres.GetOutputStream(asset.Data.LongLength);
                 foreach(KeyValuePair<int, int> range in contentranges)
                 {
@@ -206,7 +206,7 @@ namespace SilverSim.LL.Core
             }
             else
             {
-                HttpResponse httpres = httpreq.BeginResponse();
+                HttpResponse httpres = httpreq.BeginResponse("image/x-j2c");
                 Stream o = httpres.GetOutputStream(asset.Data.LongLength);
                 o.Write(asset.Data, 0, asset.Data.Length);
                 httpres.Close();
