@@ -23,18 +23,12 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
-using System.Net;
-using System.Xml;
-using System.IO;
-using SilverSim.StructuredData.LLSD;
-using SilverSim.Types.Inventory;
 using SilverSim.Types.Asset;
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
 
 namespace SilverSim.LL.Core
 {
