@@ -70,6 +70,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
         private Main.Common.Caps.CapsHttpRedirector m_CapsRedirector;
         private string m_DefaultGridUserServerURI = string.Empty;
         private string m_DefaultPresenceServerURI = string.Empty;
+        private Dictionary<string, IAssetServicePlugin> m_AssetServicePlugins = new Dictionary<string,IAssetServicePlugin>();
+        private Dictionary<string, IInventoryServicePlugin> m_InventoryServicePlugins = new Dictionary<string,IInventoryServicePlugin>();
 
         private class GridParameterMap : ICloneable
         {
@@ -119,12 +121,54 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             m_AgentBaseURL = agentBaseURL;
         }
 
+        protected string HeloRequester(string uri)
+        {
+            if (!uri.EndsWith("="))
+            {
+                uri = uri.TrimEnd('/') + "/helo/";
+            }
+            else
+            {
+                /* simian special */
+                if(uri.Contains("?"))
+                {
+                    uri = uri.Substring(0, uri.IndexOf('?'));
+                }
+                uri = uri.TrimEnd('/') + "/helo/";
+            }
+
+            try
+            {
+                WebRequest req = HttpWebRequest.Create(uri);
+                using(WebResponse response = req.GetResponse())
+                {
+                    if(response.Headers.Get("X-Handlers-Provided") == null)
+                    {
+                        return "opensim-robust"; /* let us assume Robust API */
+                    }
+                    return response.Headers.Get("X-Handlers-Provided");
+                }
+            }
+            catch
+            {
+                return "opensim-robust"; /* let us assume Robust API */
+            }
+        }
+
         public virtual void Startup(ConfigurationLoader loader)
         {
             m_Log.Info("Initializing agent post handler for " + m_AgentBaseURL);
             m_ServerParams = loader.GetService<ServerParamServiceInterface>("ServerParamStorage");
             m_HttpServer = loader.HttpServer;
             m_HttpServer.StartsWithUriHandlers.Add(m_AgentBaseURL, AgentPostHandler);
+            foreach(IAssetServicePlugin plugin in loader.GetServicesByValue<IAssetServicePlugin>())
+            {
+                m_AssetServicePlugins.Add(plugin.Name, plugin);
+            }
+            foreach(IInventoryServicePlugin plugin in loader.GetServicesByValue<IInventoryServicePlugin>())
+            {
+                m_InventoryServicePlugins.Add(plugin.Name, plugin);
+            }
 
             foreach(IConfig section in loader.Config.Configs)
             {
@@ -408,8 +452,26 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 }
 
                 GroupsServiceInterface groupsService = null;
-                AssetServiceInterface assetService = new RobustAssetConnector(assetServerURI);
-                InventoryServiceInterface inventoryService = new RobustInventoryConnector(inventoryServerURI, groupsService);
+                AssetServiceInterface assetService;
+                InventoryServiceInterface inventoryService;
+                string inventoryType = HeloRequester(inventoryServerURI);
+                string assetType = HeloRequester(assetServerURI);
+                if (string.IsNullOrEmpty(assetType) || assetType == "opensim-robust")
+                {
+                    assetService = new RobustAssetConnector(assetServerURI);
+                }
+                else
+                {
+                    assetService = m_AssetServicePlugins[assetType].Instantiate(assetServerURI);
+                }
+                if (string.IsNullOrEmpty(inventoryType) || inventoryType == "opensim-robust")
+                {
+                    inventoryService = new RobustInventoryConnector(inventoryServerURI, groupsService);
+                }
+                else
+                {
+                    inventoryService = m_InventoryServicePlugins[assetType].Instantiate(inventoryServerURI);
+                }
                 GridServiceInterface gridService = scene.GridService;
 
                 AgentServiceList serviceList = new AgentServiceList();
