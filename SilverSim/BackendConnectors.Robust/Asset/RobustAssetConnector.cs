@@ -76,7 +76,6 @@ namespace SilverSim.BackendConnectors.Robust.Asset
             {
                 uri += "/";
             }
-            uri += "";
 
             m_AssetURI = uri;
             m_DataService = new RobustAssetDataConnector(uri);
