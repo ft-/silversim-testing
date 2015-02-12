@@ -31,81 +31,77 @@ using SilverSim.Types;
 
 namespace SilverSim.BackendConnectors.Robust
 {
-
-    namespace SilverSim.BackendConnectors.Robust
+    public class RobustInventoryPlugin : IInventoryServicePlugin, IPlugin
     {
-        public class RobustInventoryPlugin : IInventoryServicePlugin, IPlugin
+        public RobustInventoryPlugin()
         {
-            public RobustInventoryPlugin()
-            {
 
-            }
-
-            public void Startup(ConfigurationLoader loader)
-            {
-
-            }
-
-            public InventoryServiceInterface Instantiate(string url)
-            {
-                return new Inventory.RobustInventoryConnector(url);
-            }
-
-            public string Name
-            {
-                get
-                {
-                    return "opensim-robust";
-                }
-            }
-        }
-        [PluginName("InventoryPlugin")]
-        public class RobustInventoryPluginFactory : IPluginFactory
-        {
-            public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-            {
-                return new RobustInventoryPlugin();
-            }
         }
 
-        public class RobustAssetPlugin : IAssetServicePlugin, IPlugin
+        public void Startup(ConfigurationLoader loader)
         {
-            public RobustAssetPlugin()
-            {
 
-            }
-
-            public void Startup(ConfigurationLoader loader)
-            {
-
-            }
-
-            public AssetServiceInterface Instantiate(string url)
-            {
-                return new Asset.RobustAssetConnector(url);
-            }
-
-            public string Name
-            {
-                get
-                {
-                    return "opensim-robust";
-                }
-            }
         }
 
-        [PluginName("AssetPlugin")]
-        public class RobustAssetPluginFactory : IPluginFactory
+        public InventoryServiceInterface Instantiate(string url)
         {
-            public RobustAssetPluginFactory()
-            {
+            return new Inventory.RobustInventoryConnector(url);
+        }
 
-            }
-
-            public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        public string Name
+        {
+            get
             {
-                return new RobustAssetPlugin();
+                return "opensim-robust";
             }
+        }
+    }
+    [PluginName("InventoryPlugin")]
+    public class RobustInventoryPluginFactory : IPluginFactory
+    {
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            return new RobustInventoryPlugin();
+        }
+    }
+
+    public class RobustAssetPlugin : IAssetServicePlugin, IPlugin
+    {
+        public RobustAssetPlugin()
+        {
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+
+        }
+
+        public AssetServiceInterface Instantiate(string url)
+        {
+            return new Asset.RobustAssetConnector(url);
+        }
+
+        public string Name
+        {
+            get
+            {
+                return "opensim-robust";
+            }
+        }
+    }
+
+    [PluginName("AssetPlugin")]
+    public class RobustAssetPluginFactory : IPluginFactory
+    {
+        public RobustAssetPluginFactory()
+        {
+
+        }
+
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            return new RobustAssetPlugin();
         }
     }
 }
