@@ -23,7 +23,6 @@ exception statement from your version.
 
 */
 
-using HttpClasses;
 using log4net;
 using Nini.Config;
 using SilverSim.BackendConnectors.Simian.Common;
@@ -33,7 +32,6 @@ using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
-using System;
 using System.Collections.Generic;
 
 namespace SilverSim.BackendConnectors.Simian.Inventory
@@ -119,31 +117,71 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
 
         public override List<InventoryItem> getActiveGestures(UUID PrincipalID)
         {
-                throw new NotImplementedException();
-#if NOT_IMPLEMENTED
-            Dictionary<string, string> post = new Dictionary<string,string>();
-            post["PRINCIPAL"] = PrincipalID;
-            post["METHOD"] = "GETACTIVEGESTURES";
-            Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
-            if (!(map["ITEMS"] is Map))
-            {
-                throw new InventoryInaccessible();
-            }
+            List<InventoryItem> item = new List<InventoryItem>();
+            Dictionary<string, string> post = new Dictionary<string, string>();
+            post["RequestMethod"] = "GetUser";
+            post["UserID"] = PrincipalID;
 
-            List<InventoryItem> items = new List<InventoryItem>();
-            foreach(KeyValuePair<string, IValue> i in (Map)map["ITEMS"])
+            Map res = SimianGrid.PostToService(m_InventoryURI, m_InventoryCapability, post, TimeoutMs);
+            if (res["Success"].AsBoolean && res.ContainsKey("Gestures") && res["Gestures"] is AnArray)
             {
-                if(i.Value is Map)
+                AnArray gestures = (AnArray)res["Gestures"];
+                foreach(IValue v in gestures)
                 {
-                    items.Add(ItemFromMap((Map)i.Value, m_GroupsService));
+                    try
+                    {
+                        item.Add(Item[PrincipalID, v.AsUUID]);
+                    }
+                    catch
+                    {
+
+                    }
                 }
             }
-            return items;
-#endif
+            throw new InventoryInaccessible();
         }
         #endregion
 
         #region Map converson
+        internal static string ContentTypeFromAssetType(AssetType type)
+        {
+            switch(type)
+            {
+                case AssetType.Unknown: return "application/octet-stream";
+                case AssetType.Texture: return "image/x-j2c";
+                case AssetType.TextureTGA: return "image/tga";
+                case AssetType.ImageJPEG: return "image/jpeg";
+                case AssetType.ImageTGA: return "image/tga";
+                case AssetType.Sound: return "audio/ogg";
+                case AssetType.SoundWAV: return "audio/x-wav";
+                case AssetType.CallingCard: return "application/vnd.ll.callingcard";
+                case AssetType.Landmark: return "application/vnd.ll.landmark";
+                case AssetType.Clothing: return "application/vnd.ll.clothing";
+                case AssetType.Object: return "application/vnd.ll.primitive";
+                case AssetType.Notecard: return "application/vnd.ll.notecard";
+                case AssetType.Folder: return "application/vnd.ll.folder";
+                case AssetType.RootFolder: return "application/vnd.ll.rootfolder";
+                case AssetType.LSLText: return "application/vnd.ll.lsltext";
+                case AssetType.LSLBytecode: return "application/vnd.ll.lslbyte";
+                case AssetType.Bodypart: return "application/vnd.ll.bodypart";
+                case AssetType.TrashFolder: return "application/vnd.ll.trashfolder";
+                case AssetType.SnapshotFolder: return "application/vnd.ll.snapshotfolder";
+                case AssetType.LostAndFoundFolder: return "application/vnd.ll.lostandfoundfolder";
+                case AssetType.Animation: return "application/vnd.ll.animation";
+                case AssetType.Gesture: return "application/vnd.ll.gesture";
+                case AssetType.Simstate: return "application/x-metaverse-simstate";
+                case AssetType.FavoriteFolder: return "application/vnd.ll.favoritefolder";
+                case AssetType.Link: return "application/vnd.ll.link";
+                case AssetType.LinkFolder: return "application/vnd.ll.linkfolder";
+                case AssetType.CurrentOutfitFolder: return "application/vnd.ll.currentoutfitfolder";
+                case AssetType.OutfitFolder: return "application/vnd.ll.outfitfolder";
+                case AssetType.MyOutfitsFolder: return "application/vnd.ll.myoutfitsfolder";
+                case AssetType.Mesh: return "application/vnd.ll.mesh";
+                case AssetType.Material: return "application/llsd+xml";
+                default: return "application/octet-stream";
+            }
+        }
+
         internal static AssetType AssetTypeFromContentType(string contenttype)
         {
             switch(contenttype)
@@ -212,6 +250,39 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
                 case "application/llsd+xml": return AssetType.Material;
 
                 default: return AssetType.Unknown;
+            }
+        }
+
+        internal static string ContentTypeFromInventoryType(InventoryType type)
+        {
+            switch(type)
+            {
+                case InventoryType.Unknown: return "application/octet-stream";
+                case InventoryType.Texture: return "image/x-j2c";
+                case InventoryType.TextureTGA: return "image/tga";
+                case InventoryType.Sound: return "audio/ogg";
+                case InventoryType.CallingCard: return "application/vnd.ll.callingcard";
+                case InventoryType.Landmark: return "application/vnd.ll.landmark";
+                case InventoryType.Clothing: return "application/vnd.ll.clothing";
+                case InventoryType.Object: return "application/vnd.ll.primitive";
+                case InventoryType.Notecard: return "application/vnd.ll.notecard";
+                case InventoryType.Folder: return "application/vnd.ll.folder";
+                case InventoryType.RootFolder: return "application/vnd.ll.rootfolder";
+                case InventoryType.LSLText: return "application/vnd.ll.lsltext";
+                case InventoryType.LSLBytecode: return "application/vnd.ll.lslbyte";
+                case InventoryType.Bodypart: return "application/vnd.ll.bodypart";
+                case InventoryType.TrashFolder: return "application/vnd.ll.trashfolder";
+                case InventoryType.SnapshotFolder: return "application/vnd.ll.snapshotfolder";
+                case InventoryType.LostAndFoundFolder: return "application/vnd.ll.lostandfoundfolder";
+                case InventoryType.Animation: return "application/vnd.ll.animation";
+                case InventoryType.Gesture: return "application/vnd.ll.gesture";
+                case InventoryType.Simstate: return "application/x-metaverse-simstate";
+                case InventoryType.FavoriteFolder: return "application/vnd.ll.favoritefolder";
+                case InventoryType.CurrentOutfitFolder: return "application/vnd.ll.currentoutfitfolder";
+                case InventoryType.OutfitFolder: return "application/vnd.ll.outfitfolder";
+                case InventoryType.MyOutfitsFolder: return "application/vnd.ll.myoutfitsfolder";
+                case InventoryType.Mesh: return "application/vnd.ll.mesh";
+                default: return "application/octet-stream";
             }
         }
 
@@ -291,6 +362,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
             folder.ParentFolderID = map["ParentID"].AsUUID;
             return folder;
         }
+
         internal static InventoryItem ItemFromMap(Map map, GroupsServiceInterface groupsService)
         {
             InventoryItem item = new InventoryItem();

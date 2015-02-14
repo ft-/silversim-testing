@@ -23,14 +23,14 @@ exception statement from your version.
 
 */
 
+using SilverSim.BackendConnectors.Simian.Common;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.StructuredData.JSON;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
-using HttpClasses;
 using System.Collections.Generic;
-using SilverSim.BackendConnectors.Simian.Common;
-using System;
 
 namespace SilverSim.BackendConnectors.Simian.Inventory
 {
@@ -55,78 +55,142 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
         {
             get
             {
-                throw new NotImplementedException();
-#if NOT_IMPLEMENTED
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["PRINCIPAL"] = PrincipalID;
-                post["ID"] = key;
-                post["METHOD"] = "GETITEM";
-                Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
-                if (!(map["item"] is Map))
-                {
-                    throw new InventoryInaccessible();
-                }
+                post["RequestMethod"] = "GetInventoryNode";
+                post["ItemID"] = key;
+                post["OwnerID"] = PrincipalID;
+                post["IncludeFolders"] = "1";
+                post["IncludeItems"] = "1";
+                post["ChildrenOnly"] = "1";
 
-                return SimianInventoryConnector.ItemFromMap((Map)map["item"], m_GroupsService);
-#endif
+                Map res = SimianGrid.PostToService(m_InventoryURI, m_InventoryCapability, post, TimeoutMs);
+                if (res["Success"].AsBoolean && res.ContainsKey("Items") && res["Items"] is AnArray)
+                {
+                    foreach (IValue iv in (AnArray)res["Items"])
+                    {
+                        if(iv is Map)
+                        {
+                            Map m = (Map)iv;
+                            if(m["Type"].ToString() == "Item")
+                            {
+                                return SimianInventoryConnector.ItemFromMap(m, m_GroupsService);
+                            }
+                        }
+                    }
+                }
+                throw new InventoryItemNotFound(key);
             }
         }
         #endregion
 
-        private Dictionary<string, string> SerializeItem(InventoryItem item)
-        {
-            Dictionary<string, string> post = new Dictionary<string,string>();
-            post["ID"] = item.ID;
-            post["AssetID"] = item.AssetID;
-            post["CreatorId"] = item.Creator.ID;
-            post["GroupID"] = item.Group.ID;
-            post["GroupOwned"] = item.GroupOwned.ToString();
-            post["Folder"] = item.ParentFolderID;
-            post["Owner"] = item.Owner.ID;
-            post["Name"] = item.Name;
-            post["InvType"] = ((int)item.InventoryType).ToString();
-            post["AssetType"] = ((uint)item.AssetType).ToString();
-            post["BasePermissions"] = ((uint)item.Permissions.Base).ToString();
-            post["CreationDate"] = ((uint)item.CreationDate.DateTimeToUnixTime()).ToString();
-            post["CreatorData"] = item.Creator.CreatorData;
-            post["CurrentPermissions"] = ((uint)item.Permissions.Current).ToString();
-            post["GroupPermissions"] = ((uint)item.Permissions.Group).ToString();
-            post["Description"] = item.Description;
-            post["EveryOnePermissions"] = ((uint)item.Permissions.EveryOne).ToString();
-            post["Flags"] = item.Flags.ToString();
-            post["NextPermissions"] = ((uint)item.Permissions.NextOwner).ToString();
-            post["SalePrice"] = ((uint)item.SaleInfo.Price).ToString();
-            post["SaleType"] = ((uint)item.SaleInfo.Type).ToString();
-
-            return post;
-        }
-
         public override void Add(InventoryItem item)
         {
-                throw new NotImplementedException();
-#if NOT_IMPLEMENTED
-            Dictionary<string, string> post = SerializeItem(item);
-            post["METHOD"] = "ADDITEM";
-            Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
-            if(!((AString)map["RESULT"]))
+            Map perms = new Map();
+            perms.Add("BaseMask", (uint)item.Permissions.Base);
+            perms.Add("EveryoneMask", (uint)item.Permissions.EveryOne);
+            perms.Add("GroupMask", (uint)item.Permissions.Group);
+            perms.Add("NextOwnerMask", (uint)item.Permissions.NextOwner);
+            perms.Add("OwnerMask", (uint)item.Permissions.Current);
+
+            Map extraData = new Map();
+            extraData.Add("Flags", item.Flags);
+            extraData["GroupID"] = item.Group.ID;
+            extraData.Add("GroupOwned", item.GroupOwned);
+            extraData.Add("SalePrice", item.SaleInfo.Price);
+            extraData.Add("SaleType", (int)item.SaleInfo.Type);
+            extraData.Add("Permissions", perms);
+
+            string invContentType = SimianInventoryConnector.ContentTypeFromInventoryType(item.InventoryType);
+            string assetContentType = SimianInventoryConnector.ContentTypeFromAssetType(item.AssetType);
+            if (invContentType != assetContentType)
+            {
+                extraData.Add("LinkedItemType", assetContentType);
+            }
+
+            Dictionary<string, string> post = new Dictionary<string, string>();
+            post["RequestMethod"] = "AddInventoryItem";
+            post["ItemID"] = item.ID;
+            post["AssetID"] = item.AssetID;
+            post["ParentID"] = item.ParentFolderID;
+            post["OwnerID"] = item.Owner;
+            post["Name"] = item.Name;
+            post["Description"] = item.Description;
+            post["CreatorID"] = item.Creator.ID;
+            post["CreatorData"] = item.Creator.CreatorData;
+            post["ContentType"] = invContentType;
+            post["ExtraData"] = JSON.Serialize(extraData);
+
+            Map m = SimianGrid.PostToService(m_InventoryURI, m_InventoryCapability, post, TimeoutMs);
+            if (!m["Success"].AsBoolean)
             {
                 throw new InventoryItemNotStored(item.ID);
             }
-#endif
+
+            if(item.AssetType == AssetType.Gesture)
+            {
+                try
+                {
+                    post.Clear();
+                    post["RequestMethod"] = "GetUser";
+                    post["UserID"] = item.Owner.ID;
+                    m = SimianGrid.PostToService(m_InventoryURI, m_InventoryCapability, post, TimeoutMs);
+                    if (!m["Success"].AsBoolean || !m.ContainsKey("Gestures") || !(m["Gestures"] is AnArray))
+                    {
+                        return;
+                    }
+                    List<UUID> gestures = new List<UUID>();
+                    if (item.Flags == 1)
+                    {
+                        gestures.Add(item.ID);
+                    }
+
+                    bool updateNeeded = false;
+                    foreach (IValue v in (AnArray)m["Gestures"])
+                    {
+                        if(v.AsUUID == item.ID && item.Flags != 1)
+                        {
+                            updateNeeded = true;
+                        }
+                        else if (!gestures.Contains(v.AsUUID))
+                        {
+                            gestures.Add(v.AsUUID);
+                            if(v.AsUUID == item.ID)
+                            {
+                                updateNeeded = true;
+                            }
+                        }
+                        else if(v.AsUUID == item.ID)
+                        {
+                            /* no update needed */
+                            return;
+                        }
+                    }
+                    if(!updateNeeded)
+                    {
+                        return;
+                    }
+                    AnArray json_gestures = new AnArray();
+                    foreach(UUID u in gestures)
+                    {
+                        json_gestures.Add(u);
+                    }
+
+                    post.Clear();
+                    post["RequestMethod"] = "AddUserData";
+                    post["UserID"] = item.Owner.ID;
+                    post["Gestures"] = JSON.Serialize(json_gestures);
+                    m = SimianGrid.PostToService(m_InventoryURI, m_InventoryCapability, post, TimeoutMs);
+                }
+                catch
+                {
+
+                }
+            }
         }
 
         public override void Update(InventoryItem item)
         {
-                throw new NotImplementedException();
-#if NOT_IMPLEMENTED
-            Dictionary<string, string> post = SerializeItem(item);
-            post["METHOD"] = "UPDATEITEM";
-            Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
-            if (!((AString)map["RESULT"]))
-            {
-                throw new InventoryItemNotStored(item.ID);
-            }
-#endif
+            Add(item);
         }
 
         public override void Delete(UUID PrincipalID, UUID ID)

@@ -64,6 +64,14 @@ namespace SilverSim.Types
         {
         }
 
+        public Map(Dictionary<string, IValue> ival)
+        {
+            foreach(KeyValuePair<string, IValue> kvp in ival)
+            {
+                Add(kvp.Key, kvp.Value);
+            }
+        }
+
         #endregion Constructors
         #region Add methods
         public void Add(string key, bool val)

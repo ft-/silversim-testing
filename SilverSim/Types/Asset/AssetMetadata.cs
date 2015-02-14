@@ -69,6 +69,7 @@ namespace SilverSim.Types.Asset
                     case AssetType.Gesture: return "application/vnd.ll.gesture";
                     case AssetType.Simstate: return "application/x-metaverse-simstate";
                     case AssetType.Mesh: return "application/vnd.ll.mesh";
+                    case AssetType.Material: return "application/llsd+xml";
                     default: return "application/octet-stream";
                 }
             }
@@ -93,6 +94,7 @@ namespace SilverSim.Types.Asset
                     case "application/vnd.ll.gesture": Type = AssetType.Gesture; break;
                     case "application/x-metaverse-simstate": Type = AssetType.Simstate; break;
                     case "application/vnd.ll.mesh": Type = AssetType.Mesh; break;
+                    case "application/llsd+xml": Type = AssetType.Material; break;
                     default: throw new InvalidOperationException();
                 }
             }
