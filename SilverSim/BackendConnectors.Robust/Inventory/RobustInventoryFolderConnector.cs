@@ -141,28 +141,6 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             return items;
         }
 
-        public override List<InventoryFolder> getSkeleton(UUID PrincipalID)
-        {
-            Dictionary<string, string> post = new Dictionary<string, string>();
-            post["PRINCIPAL"] = PrincipalID;
-            post["METHOD"] = "GETINVENTORYSKELETON";
-            Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
-            if (!(map["FOLDERS"] is Map))
-            {
-                throw new InventoryInaccessible();
-            }
-
-            List<InventoryFolder> items = new List<InventoryFolder>();
-            foreach (KeyValuePair<string, IValue> i in (Map)map["FOLDERS"])
-            {
-                if (i.Value is Map)
-                {
-                    items.Add(RobustInventoryConnector.FolderFromMap((Map)i.Value));
-                }
-            }
-            return items;
-        }
-
         #endregion
 
         #region Methods

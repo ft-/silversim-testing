@@ -155,36 +155,6 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
             throw new InventoryInaccessible();
         }
 
-        public override List<InventoryFolder> getSkeleton(UUID PrincipalID)
-        {
-            List<InventoryFolder> folders = new List<InventoryFolder>();
-            Dictionary<string, string> post = new Dictionary<string, string>();
-            post["RequestMethod"] = "GetInventoryNode";
-            post["ItemID"] = PrincipalID;
-            post["OwnerID"] = PrincipalID;
-            post["IncludeFolders"] = "1";
-            post["IncludeItems"] = "0";
-            post["ChildrenOnly"] = "0";
-
-            Map res = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
-            if (res["Success"].AsBoolean && res.ContainsKey("Items") && res["Items"] is AnArray)
-            {
-                foreach (IValue iv in (AnArray)res["Items"])
-                {
-                    if (iv is Map)
-                    {
-                        Map m = (Map)iv;
-                        if (m["Type"].ToString() == "Folder")
-                        {
-                            folders.Add(SimianInventoryConnector.FolderFromMap(m));
-                        }
-                    }
-                }
-                return folders;
-            }
-            throw new InventoryInaccessible();
-        }
-
         #endregion
 
         #region Methods

@@ -44,7 +44,6 @@ namespace SilverSim.ServiceInterfaces.Inventory
 
         public abstract List<InventoryFolder> getFolders(UUID PrincipalID, UUID key);
         public abstract List<InventoryItem> getItems(UUID PrincipalID, UUID key);
-        public abstract List<InventoryFolder> getSkeleton(UUID PrincipalID);
         #endregion
 
         #region Methods

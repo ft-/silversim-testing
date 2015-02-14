@@ -38,15 +38,15 @@ namespace SilverSim.Scene.Types.Object
 
         public static AssetData Asset(this ObjectGroup grp, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
-            return grp.Asset(UUID.Zero, null, options);
+            return grp.Asset(UUI.Unknown, null, options);
         }
 
-        public static AssetData Asset(this ObjectGroup grp, UUID nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
+        public static AssetData Asset(this ObjectGroup grp, UUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
             return grp.Asset(nextOwner, null, options);
         }
 
-        public static AssetData Asset(this ObjectGroup grp, UUID nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None)
+        public static AssetData Asset(this ObjectGroup grp, UUI nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
             using (MemoryStream ms = new MemoryStream())
             {
@@ -65,10 +65,10 @@ namespace SilverSim.Scene.Types.Object
 
         public static AssetData Asset(this List<ObjectGroup> objlist, XmlSerializationOptions options)
         {
-            return objlist.Asset(UUID.Zero, options);
+            return objlist.Asset(UUI.Unknown, options);
         }
 
-        public static AssetData Asset(this List<ObjectGroup> objlist, UUID nextOwner, XmlSerializationOptions options)
+        public static AssetData Asset(this List<ObjectGroup> objlist, UUI nextOwner, XmlSerializationOptions options)
         {
             if (objlist.Count == 1)
             {
@@ -97,7 +97,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public static List<ObjectGroup> fromAsset(AssetData data)
+        public static List<ObjectGroup> fromAsset(AssetData data, UUI currentOwner)
         {
             if(data.Type != AssetType.Object)
             {
@@ -106,11 +106,11 @@ namespace SilverSim.Scene.Types.Object
 
             using(XmlTextReader reader = new XmlTextReader(data.InputStream))
             {
-                return fromXml(reader);
+                return fromXml(reader, currentOwner);
             }
         }
 
-        public static List<ObjectGroup> fromXml(XmlTextReader reader)
+        public static List<ObjectGroup> fromXml(XmlTextReader reader, UUI currentOwner)
         {
             for(;;)
             {
@@ -124,10 +124,10 @@ namespace SilverSim.Scene.Types.Object
                     switch(reader.Name)
                     {
                         case "SceneObjectGroup":
-                            return fromXmlSingleObject(reader);
+                            return fromXmlSingleObject(reader, currentOwner);
 
                         case "CoalescedObject":
-                            return fromXmlCoalescedObject(reader);
+                            return fromXmlCoalescedObject(reader, currentOwner);
 
                         default:
                             throw new InvalidObjectXmlException();
@@ -136,15 +136,15 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        static List<ObjectGroup> fromXmlSingleObject(XmlTextReader reader)
+        static List<ObjectGroup> fromXmlSingleObject(XmlTextReader reader, UUI currentOwner)
         {
             List<ObjectGroup> list = new List<ObjectGroup>();
 
-            list.Add(ObjectGroup.FromXml(reader));
+            list.Add(ObjectGroup.FromXml(reader, currentOwner));
             return list;
         }
 
-        static List<ObjectGroup> fromXmlCoalescedObject(XmlTextReader reader)
+        static List<ObjectGroup> fromXmlCoalescedObject(XmlTextReader reader, UUI currentOwner)
         {
             List<ObjectGroup> list = new List<ObjectGroup>();
             for(;;)
@@ -198,7 +198,7 @@ namespace SilverSim.Scene.Types.Object
                                             break;
                                     }
                                 }
-                                ObjectGroup grp = ObjectGroup.FromXml(reader);
+                                ObjectGroup grp = ObjectGroup.FromXml(reader, currentOwner);
                                 grp.Position = sogpos;
                                 list.Add(grp);
                                 break;

@@ -27,7 +27,9 @@ using SilverSim.BackendConnectors.IWC.Common;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.BackendConnectors.IWC.Inventory
@@ -70,132 +72,102 @@ namespace SilverSim.BackendConnectors.IWC.Inventory
             }
         }
 
-        public override InventoryFolder this[UUID PrincipalID, InventoryType type]
+        public override InventoryFolder this[UUID PrincipalID, InventoryType invtype]
         {
             get
             {
-#if NOT_IMPLEMENTED
-                Dictionary<string, string> post = new Dictionary<string, string>();
-                if (type == InventoryType.RootFolder)
+                AssetType type;
+                switch(invtype)
                 {
-                    post["RequestMethod"] = "GetInventoryNode";
-                    post["ItemID"] = PrincipalID;
-                    post["OwnerID"] = PrincipalID;
-                    post["IncludeFolders"] = "1";
-                    post["IncludeItems"] = "0";
-                    post["ChildrenOnly"] = "1";
+                    case InventoryType.Animation: type = AssetType.Animation; break;
+                    case InventoryType.Attachable: type = AssetType.Object; break;
+                    case InventoryType.Bodypart: type = AssetType.Bodypart; break;
+                    case InventoryType.CallingCard: type = AssetType.CallingCard; break;
+                    case InventoryType.Clothing: type = AssetType.Clothing; break;
+                    case InventoryType.CurrentOutfitFolder: type = AssetType.CurrentOutfitFolder; break;
+                    case InventoryType.FavoriteFolder: type = AssetType.FavoriteFolder; break;
+                    case InventoryType.Folder: type = AssetType.Folder; break;
+                    case InventoryType.Gesture: type = AssetType.Gesture; break;
+                    case InventoryType.Inbox: type = AssetType.Inbox; break;
+                    case InventoryType.Landmark: type = AssetType.Landmark; break;
+                    case InventoryType.LostAndFoundFolder: type = AssetType.LostAndFoundFolder; break;
+                    case InventoryType.LSLBytecode: type = AssetType.LSLBytecode; break;
+                    case InventoryType.LSLText: type = AssetType.LSLText; break;
+                    case InventoryType.Mesh: type = AssetType.Mesh; break;
+                    case InventoryType.MyOutfitsFolder: type = AssetType.MyOutfitsFolder; break;
+                    case InventoryType.Notecard: type = AssetType.Notecard; break;
+                    case InventoryType.Object: type = AssetType.Object; break;
+                    case InventoryType.Outbox: type = AssetType.Outbox; break;
+                    case InventoryType.OutfitFolder: type = AssetType.OutfitFolder; break;
+                    case InventoryType.RootFolder: type = AssetType.RootFolder; break;
+                    case InventoryType.Simstate: type = AssetType.Simstate; break;
+                    case InventoryType.Snapshot: type = AssetType.SnapshotFolder; break;
+                    case InventoryType.Sound: type = AssetType.Sound; break;
+                    case InventoryType.Texture: type = AssetType.Texture; break;
+                    case InventoryType.TextureTGA: type = AssetType.TextureTGA; break;
+                    case InventoryType.TrashFolder: type = AssetType.TrashFolder; break;
+                    case InventoryType.Wearable: type = AssetType.Unknown; break;
+                    default: type = AssetType.Unknown; break;
                 }
-                else
+
+                Map param = new Map
                 {
-                    post["RequestMethod"] = "GetFolderForType";
-                    post["OwnerID"] = PrincipalID;
-                    post["ContentType"] = SimianInventoryConnector.ContentTypeFromInventoryType(type);
-                }
-                Map res = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
-                if (res["Success"].AsBoolean && res.ContainsKey("Items") && res["Items"] is AnArray)
+                    {"userID", PrincipalID},
+                    {"invType", (int)invtype},
+                    {"type", (int)type}
+                };
+
+                Map m = IWCGrid.PostToService(m_InventoryURI, "GetFolderForType", param, TimeoutMs);
+                if (m.ContainsKey("Value"))
                 {
-                    Map m = (Map)((AnArray)res["Items"])[0];
-                    return SimianInventoryConnector.FolderFromMap(m);
+                    return m.IWCtoFolder();
                 }
-#endif
+
                 throw new InventoryInaccessible();
             }
         }
 
         public override List<InventoryFolder> getFolders(UUID PrincipalID, UUID key)
         {
-#if NOT_IMPLEMENTED
-            List<InventoryFolder> folders = new List<InventoryFolder>();
-            Dictionary<string, string> post = new Dictionary<string, string>();
-            post["RequestMethod"] = "GetInventoryNode";
-            post["ItemID"] = key;
-            post["OwnerID"] = PrincipalID;
-            post["IncludeFolders"] = "1";
-            post["IncludeItems"] = "0";
-            post["ChildrenOnly"] = "1";
-
-            Map res = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
-            if (res["Success"].AsBoolean && res.ContainsKey("Items") && res["Items"] is AnArray)
-            {
-                foreach (IValue iv in (AnArray)res["Items"])
+            Map param = new Map
                 {
-                    if (iv is Map)
-                    {
-                        Map m = (Map)iv;
-                        if (m["Type"].ToString() == "Folder")
-                        {
-                            folders.Add(SimianInventoryConnector.FolderFromMap(m));
-                        }
-                    }
+                    {"userID", PrincipalID},
+                    {"folderID", key}
+                };
+
+            Map m = IWCGrid.PostToService(m_InventoryURI, "GetFolderFolders", param, TimeoutMs);
+            if (m.ContainsKey("Value"))
+            {
+                List<InventoryFolder> folders = new List<InventoryFolder>();
+                foreach (IValue v in (AnArray)m["Value"])
+                {
+                    folders.Add(((Map)v).IWCtoFolder());
                 }
                 return folders;
             }
-#endif
+
             throw new InventoryInaccessible();
         }
 
         public override List<InventoryItem> getItems(UUID PrincipalID, UUID key)
         {
-#if NOT_IMPLEMENTED
-
-            List<InventoryItem> items = new List<InventoryItem>();
-            Dictionary<string, string> post = new Dictionary<string, string>();
-            post["RequestMethod"] = "GetInventoryNode";
-            post["ItemID"] = key;
-            post["OwnerID"] = PrincipalID;
-            post["IncludeFolders"] = "0";
-            post["IncludeItems"] = "1";
-            post["ChildrenOnly"] = "1";
-
-            Map res = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
-            if (res["Success"].AsBoolean && res.ContainsKey("Items") && res["Items"] is AnArray)
-            {
-                foreach (IValue iv in (AnArray)res["Items"])
+            Map param = new Map
                 {
-                    if (iv is Map)
-                    {
-                        Map m = (Map)iv;
-                        if (m["Type"].ToString() == "Item")
-                        {
-                            items.Add(SimianInventoryConnector.ItemFromMap(m, m_GroupsService));
-                        }
-                    }
+                    {"userID", PrincipalID},
+                    {"folderID", key}
+                };
+
+            Map m = IWCGrid.PostToService(m_InventoryURI, "GetFolderItems", param, TimeoutMs);
+            if (m.ContainsKey("Value"))
+            {
+                List<InventoryItem> items = new List<InventoryItem>();
+                foreach (IValue v in (AnArray)m["Value"])
+                {
+                    items.Add(((Map)v).IWCtoItem());
                 }
                 return items;
             }
-#endif
-            throw new InventoryInaccessible();
-        }
 
-        public override List<InventoryFolder> getSkeleton(UUID PrincipalID)
-        {
-#if NOT_IMPLEMENTED
-            List<InventoryFolder> folders = new List<InventoryFolder>();
-            Dictionary<string, string> post = new Dictionary<string, string>();
-            post["RequestMethod"] = "GetInventoryNode";
-            post["ItemID"] = PrincipalID;
-            post["OwnerID"] = PrincipalID;
-            post["IncludeFolders"] = "1";
-            post["IncludeItems"] = "0";
-            post["ChildrenOnly"] = "0";
-
-            Map res = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
-            if (res["Success"].AsBoolean && res.ContainsKey("Items") && res["Items"] is AnArray)
-            {
-                foreach (IValue iv in (AnArray)res["Items"])
-                {
-                    if (iv is Map)
-                    {
-                        Map m = (Map)iv;
-                        if (m["Type"].ToString() == "Folder")
-                        {
-                            folders.Add(SimianInventoryConnector.FolderFromMap(m));
-                        }
-                    }
-                }
-                return folders;
-            }
-#endif
             throw new InventoryInaccessible();
         }
 

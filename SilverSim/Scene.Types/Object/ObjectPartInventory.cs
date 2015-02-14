@@ -248,9 +248,10 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
-        ObjectPartInventoryItem fromXML(XmlTextReader reader)
+        ObjectPartInventoryItem fromXML(XmlTextReader reader, UUI currentOwner)
         {
             ObjectPartInventoryItem item = new ObjectPartInventoryItem();
+            item.Owner = currentOwner;
             ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
             bool ownerChanged = false;
 
@@ -332,7 +333,8 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "OwnerID":
-                                item.Owner.ID = reader.ReadContentAsUUID();
+                                /* Do not trust this ever! */
+                                reader.Skip();
                                 break;
 
                             case "CurrentPermissions":
@@ -375,9 +377,10 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public void FillFromXml(XmlTextReader reader)
+        public void FillFromXml(XmlTextReader reader, UUI currentOwner)
         {
             ObjectPart part = new ObjectPart();
+            part.Owner = currentOwner;
             if(reader.IsEmptyElement)
             {
                 throw new InvalidObjectXmlException();
@@ -400,7 +403,7 @@ namespace SilverSim.Scene.Types.Object
                         switch(reader.Name)
                         {
                             case "TaskInventoryItem":
-                                Add(fromXML(reader), false);
+                                Add(fromXML(reader, currentOwner), false);
                                 break;
 
                             default:
@@ -423,10 +426,10 @@ namespace SilverSim.Scene.Types.Object
         #region XML Serialization
         public void ToXml(XmlTextWriter writer, XmlSerializationOptions options)
         {
-            ToXml(writer, UUID.Zero, options);
+            ToXml(writer, UUI.Unknown, options);
         }
 
-        public void ToXml(XmlTextWriter writer, UUID nextOwner, XmlSerializationOptions options)
+        public void ToXml(XmlTextWriter writer, UUI nextOwner, XmlSerializationOptions options)
         {
             writer.WriteNamedValue("InventorySerial", InventorySerial);
             writer.WriteStartElement("TaskInventory");
@@ -468,7 +471,7 @@ namespace SilverSim.Scene.Types.Object
                         }
                         else if((options & XmlSerializationOptions.AdjustForNextOwner) != XmlSerializationOptions.None)
                         {
-                            writer.WriteUUID("OwnerID", nextOwner);
+                            writer.WriteUUID("OwnerID", nextOwner.ID);
                             writer.WriteNamedValue("CurrentPermissions", (uint)item.Permissions.NextOwner);
                         }
                         else

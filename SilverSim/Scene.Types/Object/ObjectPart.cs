@@ -1277,10 +1277,10 @@ namespace SilverSim.Scene.Types.Object
         #region XML Serialization
         public void ToXml(XmlTextWriter writer,XmlSerializationOptions options = XmlSerializationOptions.None)
         {
-            ToXml(writer, UUID.Zero, options);
+            ToXml(writer, UUI.Unknown, options);
         }
 
-        public void ToXml(XmlTextWriter writer, UUID nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
+        public void ToXml(XmlTextWriter writer, UUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
             lock (this)
             {
@@ -1408,7 +1408,7 @@ namespace SilverSim.Scene.Types.Object
                     else if(XmlSerializationOptions.None != (options & XmlSerializationOptions.AdjustForNextOwner))
                     {
                         writer.WriteUUID("GroupID", UUID.Zero);
-                        writer.WriteUUID("OwnerID", nextOwner);
+                        writer.WriteUUID("OwnerID", nextOwner.ID);
                         writer.WriteUUID("LastOwnerID", ObjectGroup.Owner.ID);
                     }
                     else
@@ -1757,9 +1757,10 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup)
+        public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner)
         {
             ObjectPart part = new ObjectPart();
+            part.Owner = currentOwner;
             int InventorySerial = 1;
             if(reader.IsEmptyElement)
             {
@@ -1803,7 +1804,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "TaskInventory":
-                                part.Inventory.FillFromXml(reader);
+                                part.Inventory.FillFromXml(reader, currentOwner);
                                 break;
 
                             case "UUID":
@@ -2186,7 +2187,8 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "OwnerID":
-                                part.Owner.ID = reader.ReadContentAsUUID();
+                                /* do not trust this thing ever! */
+                                reader.Skip();
                                 break;
 
                             case "LastOwnerID":

@@ -1090,13 +1090,13 @@ namespace SilverSim.Scene.Types.Object
         #region XML Serialization
         public void ToXml(XmlTextWriter writer, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
-            ToXml(writer, UUID.Zero, null, options);
+            ToXml(writer, UUI.Unknown, null, options);
         }
-        public void ToXml(XmlTextWriter writer, UUID nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
+        public void ToXml(XmlTextWriter writer, UUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
             ToXml(writer, nextOwner, null, options);
         }
-        public void ToXml(XmlTextWriter writer, UUID nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None)
+        public void ToXml(XmlTextWriter writer, UUI nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
             List<ObjectPart> parts = Values;
             writer.WriteStartElement("SceneObjectGroup");
@@ -1160,7 +1160,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
-        static void fromXmlOtherParts(XmlTextReader reader, ObjectGroup group)
+        static void fromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
             ObjectPart part = null;
             if (reader.IsEmptyElement)
@@ -1185,7 +1185,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                part = ObjectPart.FromXml(reader, null);
+                                part = ObjectPart.FromXml(reader, null, currentOwner);
                                 group.Add(part.LinkNumber, part.ID, part);
                                 break;
 
@@ -1211,7 +1211,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public static ObjectGroup FromXml(XmlTextReader reader)
+        public static ObjectGroup FromXml(XmlTextReader reader, UUI currentOwner)
         {
             ObjectGroup group = new ObjectGroup();
             ObjectPart rootPart = null;
@@ -1241,7 +1241,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                rootPart = ObjectPart.FromXml(reader, group);
+                                rootPart = ObjectPart.FromXml(reader, group, currentOwner);
                                 group.Add(rootPart.LinkNumber, rootPart.ID, rootPart);
                                 break;
 
@@ -1250,7 +1250,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     break;
                                 }
-                                fromXmlOtherParts(reader, group);
+                                fromXmlOtherParts(reader, group, currentOwner);
                                 break;
 
                             case "KeyframeMotion":

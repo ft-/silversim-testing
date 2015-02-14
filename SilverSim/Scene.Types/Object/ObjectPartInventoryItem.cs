@@ -25,8 +25,8 @@ exception statement from your version.
 
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
-using SilverSim.Types.Inventory;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Inventory;
 using SilverSim.Types.Script;
 using System;
 

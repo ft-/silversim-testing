@@ -29,6 +29,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 
@@ -38,23 +39,25 @@ namespace SilverSim.Main.Common.Transfer
     {
         SceneInterface m_Scene;
         Vector3 m_TargetPos;
-        UUID m_RezzingAgentID;
+        UUI m_RezzingAgent;
+        InventoryPermissionsMask m_ItemOwnerPermissions;
 
         public abstract void PostProcessObjectGroups(List<ObjectGroup> grp);
 
-        public RezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UUID rezzingagent)
+        public RezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UUI rezzingagent, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
             : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
         {
             m_Scene = scene;
             m_TargetPos = targetpos;
-            m_RezzingAgentID = rezzingagent;
+            m_RezzingAgent = rezzingagent;
+            m_ItemOwnerPermissions = itemOwnerPermissions;
         }
 
         protected void SendAlertMessage(string msg)
         {
             try
             {
-                IAgent agent = m_Scene.Agents[m_RezzingAgentID];
+                IAgent agent = m_Scene.Agents[m_RezzingAgent.ID];
                 agent.SendAlertMessage(msg, m_Scene.ID);
             }
             catch
@@ -80,7 +83,7 @@ namespace SilverSim.Main.Common.Transfer
 
             try
             {
-                objgroups = ObjectXML.fromAsset(data);
+                objgroups = ObjectXML.fromAsset(data, m_RezzingAgent);
             }
             catch
             {
@@ -104,6 +107,7 @@ namespace SilverSim.Main.Common.Transfer
                 foreach(ObjectPart part in group.Values)
                 {
                     part.ID = UUID.Random;
+                    part.OwnerMask &= m_ItemOwnerPermissions;
                 }
                 m_Scene.Add(group);
             }
@@ -113,7 +117,7 @@ namespace SilverSim.Main.Common.Transfer
         {
             try
             {
-                IAgent agent = m_Scene.Agents[m_RezzingAgentID];
+                IAgent agent = m_Scene.Agents[m_RezzingAgent.ID];
                 agent.SendAlertMessage("ALERT: CantFindObject", m_Scene.ID);
             }
             catch

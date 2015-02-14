@@ -23,50 +23,41 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
-using SilverSim.Types.Profile;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SilverSim.Types.Experience;
+using SilverSim.Types;
 
-namespace SilverSim.ServiceInterfaces.Profile
+namespace SilverSim.ServiceInterfaces.Experience
 {
-    public abstract class ProfileServiceInterface
+    public abstract class ExperienceServiceInterface
     {
-        public interface IClassifiedsInterface
-        {
-            List<UUID> getClassifieds(UUI user);
-            ProfileClassified this[UUI user, UUID id] { get; }
-        }
-
-        public interface IPicksInterface
-        {
-            List<UUID> getPicks(UUI user);
-            ProfilePick this[UUI user, UUID id] { get; }
-        }
-
-        public interface INotesInterface
-        {
-            ProfileNotes this[UUI user, UUI target] { get; set; }
-        }
-
-        public interface IUserPreferencesInterface
-        {
-            ProfilePreferences this[UUI user] { get; set; }
-        }
-
-        public interface IPropertiesInterface
-        {
-            ProfileProperties this[UUI user] { get; set; }
-        }
-
-        public ProfileServiceInterface()
+        public ExperienceServiceInterface()
         {
 
         }
 
-        public abstract IClassifiedsInterface Classifieds { get; }
-        public abstract IPicksInterface Picks { get; }
-        public abstract INotesInterface Notes { get; }
-        public abstract IUserPreferencesInterface Preferences { get; }
-        public abstract IPropertiesInterface Properties { get; }
+        public interface ExperienceInterface
+        {
+            ExperienceInfo this[UUID experienceID] { get; set; }
+        }
+
+        public abstract ExperienceInterface Experiences { get; }
+
+        public interface ExperiencePermissionsInterface
+        {
+            ExperiencePermissionsInfo this[UUID experienceID, UUI agent] { get; set; }
+        }
+
+        public abstract ExperiencePermissionsInterface ExperiencePermissions { get; }
+
+        public interface ExperienceKeyInterface
+        {
+            string this[UUID experienceID, string key] { get; set; }
+        }
+
+        public abstract ExperienceKeyInterface Keys { get; }
     }
 }
