@@ -105,12 +105,10 @@ namespace SilverSim.BackendConnectors.IWC.Inventory
 
         public override void Delete(UUID PrincipalID, UUID ID)
         {
-            AnArray items = new AnArray();
-            items.Add(ID);
             Map param = new Map
             {
                 {"userID", PrincipalID},
-                {"itemIDs", items}
+                {"itemIDs", new AnArray { ID } }
             };
             Map m = IWCGrid.PostToService(m_InventoryURI, "DeleteItems", param, TimeoutMs);
             if (m.ContainsKey("Value"))
@@ -125,18 +123,23 @@ namespace SilverSim.BackendConnectors.IWC.Inventory
 
         public override void Move(UUID PrincipalID, UUID ID, UUID newFolder)
         {
-#if NOT_IMPLEMENTED
-            Dictionary<string, string> post = new Dictionary<string, string>();
-            post["RequestMethod"] = "MoveInventoryNodes";
-            post["OwnerID"] = PrincipalID;
-            post["FolderID"] = newFolder;
-            post["Items"] = ID;
-            Map m = SimianGrid.PostToService(m_InventoryURI, m_InventoryCapability, post, TimeoutMs);
-            if(!m["Success"].AsBoolean)
-#endif
+            InventoryItem item = this[PrincipalID, ID];
+            item.ParentFolderID = newFolder;
+
+            Map param = new Map
             {
-                throw new InventoryItemNotFound(ID);
+                {"ownerID", PrincipalID},
+                {"items", new AnArray { item.ItemToIWC() } }
+            };
+            Map m = IWCGrid.PostToService(m_InventoryURI, "MoveItems", param, TimeoutMs);
+            if (m.ContainsKey("Value"))
+            {
+                if (m["Value"].AsBoolean)
+                {
+                    return;
+                }
             }
+            throw new InventoryItemNotStored(ID);
         }
     }
 }

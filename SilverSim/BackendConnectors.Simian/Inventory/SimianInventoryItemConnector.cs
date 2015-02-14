@@ -216,7 +216,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
             Map m = SimianGrid.PostToService(m_InventoryURI, m_InventoryCapability, post, TimeoutMs);
             if(!m["Success"].AsBoolean)
             {
-                throw new InventoryItemNotFound(ID);
+                throw new InventoryItemNotStored(ID);
             }
         }
     }

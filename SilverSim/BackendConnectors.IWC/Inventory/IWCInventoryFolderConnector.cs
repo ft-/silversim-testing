@@ -205,65 +205,90 @@ namespace SilverSim.BackendConnectors.IWC.Inventory
 
         public override void Add(UUID PrincipalID, InventoryFolder folder)
         {
-#if NOT_IMPLEMENTED
-
-            Dictionary<string, string> post = new Dictionary<string, string>();
-            post["RequestMethod"] = "AddInventoryFolder";
-            post["FolderID"] = folder.ID;
-            post["ParentID"] = folder.ParentFolderID;
-            post["ContentType"] = ((int)folder.InventoryType).ToString();
-            post["Name"] = folder.Name;
-            post["OwnerID"] = folder.Owner.ID;
-
-            Map m = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
-            if (!m["Success"].AsBoolean)
-#endif
+            Map param = new Map
             {
-                throw new InventoryFolderNotStored(folder.ID);
+                {"folder", folder.FolderToIWC()}
+            };
+            Map m = IWCGrid.PostToService(m_InventoryURI, "AddFolder", param, TimeoutMs);
+            if (m.ContainsKey("Value"))
+            {
+                if (m["Value"].AsBoolean)
+                {
+                    return;
+                }
             }
+            throw new InventoryFolderNotStored(folder.ID);
         }
         public override void Update(UUID PrincipalID, InventoryFolder folder)
         {
-            Add(PrincipalID, folder);
+            Map param = new Map
+            {
+                {"folder", folder.FolderToIWC()}
+            };
+            Map m = IWCGrid.PostToService(m_InventoryURI, "UpdateFolder", param, TimeoutMs);
+            if (m.ContainsKey("Value"))
+            {
+                if (m["Value"].AsBoolean)
+                {
+                    return;
+                }
+            }
+            throw new InventoryFolderNotStored(folder.ID);
         }
 
         public override void Move(UUID PrincipalID, UUID folderID, UUID toFolderID)
         {
             InventoryFolder folder = this[PrincipalID, folderID];
             folder.ParentFolderID = toFolderID;
-            Add(PrincipalID, folder);
+            Map param = new Map
+            {
+                {"folder", folder.FolderToIWC()}
+            };
+            Map m = IWCGrid.PostToService(m_InventoryURI, "MoveFolder", param, TimeoutMs);
+            if (m.ContainsKey("Value"))
+            {
+                if (m["Value"].AsBoolean)
+                {
+                    return;
+                }
+            }
+            throw new InventoryFolderNotStored(folder.ID);
         }
 
         public override void Delete(UUID PrincipalID, UUID folderID)
         {
-#if NOT_IMPLEMENTED
-            Dictionary<string, string> post = new Dictionary<string, string>();
-            post["RequestMethod"] = "RemoveInventoryNode";
-            post["OwnerID"] = PrincipalID;
-            post["ItemID"] = folderID;
-
-            Map m = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
-            if(!m["Success"].AsBoolean)
-#endif
+            Map param = new Map
             {
-                throw new InventoryFolderNotStored(folderID);
+                {"userID", PrincipalID},
+                {"folderIDs", new AnArray { folderID } }
+            };
+            Map m = IWCGrid.PostToService(m_InventoryURI, "DeleteFolders", param, TimeoutMs);
+            if (m.ContainsKey("Value"))
+            {
+                if (m["Value"].AsBoolean)
+                {
+                    return;
+                }
             }
+            throw new InventoryFolderNotStored(folderID);
         }
 
         public override void Purge(UUID PrincipalID, UUID folderID)
         {
-#if NOT_IMPLEMENTED
-            Dictionary<string, string> post = new Dictionary<string, string>();
-            post["RequestMethod"] = "PurgeInventoryFolder";
-            post["OwnerID"] = PrincipalID;
-            post["FolderID"] = folderID;
-
-            Map m = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
-            if(!m["Success"].AsBoolean)
-#endif
+            InventoryFolder folder = this[PrincipalID, folderID];
+            Map param = new Map
             {
-                throw new InventoryFolderNotStored(folderID);
+                {"folder", folder.FolderToIWC()}
+            };
+            Map m = IWCGrid.PostToService(m_InventoryURI, "PurgeFolder", param, TimeoutMs);
+            if (m.ContainsKey("Value"))
+            {
+                if (m["Value"].AsBoolean)
+                {
+                    return;
+                }
             }
+            throw new InventoryFolderNotStored(folder.ID);
         }
         #endregion
     }

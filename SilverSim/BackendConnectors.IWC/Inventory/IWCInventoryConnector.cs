@@ -107,6 +107,7 @@ namespace SilverSim.BackendConnectors.IWC.Inventory
 
         public override List<InventoryItem> getActiveGestures(UUID PrincipalID)
         {
+            /* List<InventoryItemBase> GetActiveGestures(UUID userId); */
             throw new NotImplementedException();
 #if NOT_IMPLEMENTED
             List<InventoryItem> item = new List<InventoryItem>();

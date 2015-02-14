@@ -43,6 +43,14 @@ namespace SilverSim.Types
         {
 
         }
+
+        public AnArray(List<IValue> ival)
+        {
+            foreach(IValue v in ival)
+            {
+                Add(v);
+            }
+        }
         #endregion Constructors
 
         #region Properties

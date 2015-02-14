@@ -31,7 +31,6 @@ using SilverSim.Types;
 
 namespace SilverSim.BackendConnectors.IWC
 {
-#if IWC_INVENTORY
     public class IWCInventoryPlugin : IInventoryServicePlugin, IPlugin
     {
         public IWCInventoryPlugin()
@@ -65,7 +64,6 @@ namespace SilverSim.BackendConnectors.IWC
             return new IWCInventoryPlugin();
         }
     }
-#endif
 
     public class IWCAssetPlugin : IAssetServicePlugin, IPlugin
     {
