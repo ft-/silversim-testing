@@ -46,7 +46,7 @@ namespace SilverSim.Scripting.LSL
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LSL COMPILER");
         List<IScriptApi> m_Apis = new List<IScriptApi>();
-        Dictionary<string, FieldInfo> m_Constants = new Dictionary<string, FieldInfo>();
+        Dictionary<string, APIFlags> m_Constants = new Dictionary<string, APIFlags>();
         List<KeyValuePair<IScriptApi, MethodInfo>> m_Methods = new List<KeyValuePair<IScriptApi,MethodInfo>>();
         Dictionary<string, MethodInfo> m_EventDelegates = new Dictionary<string, MethodInfo>();
         List<Script.StateChangeEventDelegate> m_StateChangeDelegates = new List<ScriptInstance.StateChangeEventDelegate>();
@@ -149,7 +149,7 @@ namespace SilverSim.Scripting.LSL
             {
                 foreach (FieldInfo f in api.GetType().GetFields())
                 {
-                    System.Attribute attr = System.Attribute.GetCustomAttribute(f, typeof(APILevel));
+                    APILevel attr = (APILevel) System.Attribute.GetCustomAttribute(f, typeof(APILevel));
                     if(attr != null)
                     {
                         if ((f.Attributes & FieldAttributes.Static) != 0)
@@ -158,12 +158,11 @@ namespace SilverSim.Scripting.LSL
                             {
                                 try
                                 {
-                                    m_Constants.Add(f.Name, f);
+                                    m_Constants.Add(f.Name, attr.Flags);
                                 }
                                 catch
                                 {
-                                    m_Log.DebugFormat("Field {0} triggered exception", f.Name);
-                                    throw;
+                                    m_Constants[f.Name] |= attr.Flags;
                                 }
                             }
                             else
@@ -390,7 +389,7 @@ namespace SilverSim.Scripting.LSL
             {
                 throwParserException(p, string.Format("{1} cannot be declared as '{0}'. '{0}' is an already defined function name.", name, type));
             }
-            else if(m_Constants.ContainsKey(name))
+            else if(m_Constants.ContainsKey(name) && (m_Constants[name] & cs.AcceptedFlags) != 0)
             {
                 throwParserException(p, string.Format("{1} cannot be declared as '{0}'. '{0}' is an already defined constant.", name, type));
             }
@@ -1687,31 +1686,30 @@ namespace SilverSim.Scripting.LSL
                 {
                     foreach (FieldInfo f in api.GetType().GetFields())
                     {
-                        foreach (System.Attribute attr in System.Attribute.GetCustomAttributes(f))
+                        System.Attribute attr = System.Attribute.GetCustomAttribute(f, typeof(APILevel));
+
+                        if (attr != null && (f.Attributes & FieldAttributes.Static) != 0)
                         {
-                            if (attr is APILevel && (f.Attributes & FieldAttributes.Static) != 0)
+                            if ((f.Attributes & FieldAttributes.InitOnly) != 0 || (f.Attributes & FieldAttributes.Literal) != 0)
                             {
-                                if ((f.Attributes & FieldAttributes.InitOnly) != 0 || (f.Attributes & FieldAttributes.Literal) != 0)
+                                APILevel apilevel = (APILevel)attr;
+                                if ((apilevel.Flags & compileState.AcceptedFlags) != 0)
                                 {
-                                    APILevel apilevel = (APILevel)attr;
-                                    if ((apilevel.Flags & compileState.AcceptedFlags) != 0)
+                                    fb = state.DefineField(f.Name, f.FieldType, f.Attributes);
+                                    if ((f.Attributes & FieldAttributes.Literal) != 0)
                                     {
-                                        fb = state.DefineField(f.Name, f.FieldType, f.Attributes);
-                                        if ((f.Attributes & FieldAttributes.Literal) != 0)
-                                        {
-                                            fb.SetConstant(f.GetValue(null));
-                                        }
-                                        else
-                                        {
-                                            state_ilgen.Emit(OpCodes.Ldfld, f);
-                                            state_ilgen.Emit(OpCodes.Stfld, fb);
-                                        }
+                                        fb.SetConstant(f.GetValue(null));
+                                    }
+                                    else
+                                    {
+                                        state_ilgen.Emit(OpCodes.Ldfld, f);
+                                        state_ilgen.Emit(OpCodes.Stfld, fb);
                                     }
                                 }
-                                else
-                                {
-                                    m_Log.DebugFormat("Field {0} has unsupported attribute flags {1}", f.Name, f.Attributes.ToString());
-                                }
+                            }
+                            else
+                            {
+                                m_Log.DebugFormat("Field {0} has unsupported attribute flags {1}", f.Name, f.Attributes.ToString());
                             }
                         }
                     }

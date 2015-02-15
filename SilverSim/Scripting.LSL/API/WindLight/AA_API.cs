@@ -46,7 +46,6 @@ namespace SilverSim.Scripting.LSL.API.WindLight
 
         }
 
-#if NEEDS_SOLUTION_TO_SOLVE_THESE_NAMING_ISSUES
         [APILevel(APIFlags.WindLight_Aurora)]
         public const int WL_OK = -1;
         [APILevel(APIFlags.WindLight_Aurora)]
@@ -131,7 +130,6 @@ namespace SilverSim.Scripting.LSL.API.WindLight
         public const int WL_WATER_BIG_WAVE_DIRECTION = 32;
         [APILevel(APIFlags.WindLight_Aurora)]
         public const int WL_WATER_LITTLE_WAVE_DIRECTION = 33;
-#endif
 
         [APILevel(APIFlags.WindLight_Aurora)]
         public AnArray aaWindlightGetScene(ScriptInstance Instance, AnArray rules)
