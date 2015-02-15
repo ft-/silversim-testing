@@ -176,16 +176,31 @@ namespace SilverSim.Main.Common.HttpServer
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if(count > m_RemainingLength)
+            int rescount = 0;
+            while (count > 0)
             {
-                count = (int)m_RemainingLength;
+                if (count > m_RemainingLength)
+                {
+                    count = (int)m_RemainingLength;
+                }
+                int result;
+                if (count > 10240)
+                {
+                    result = m_Input.Read(buffer, offset, 10240);
+                }
+                else
+                {
+                    result = m_Input.Read(buffer, offset, count);
+                }
+                if (result > 0)
+                {
+                    m_RemainingLength -= result;
+                    offset += result;
+                    count -= result;
+                    rescount += result;
+                }
             }
-            int result = m_Input.Read(buffer, offset, count);
-            if(result > 0)
-            {
-                m_RemainingLength -= result;
-            }
-            return result;
+            return rescount;
         }
 
         public override long Seek(long offset, SeekOrigin origin)

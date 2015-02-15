@@ -79,6 +79,9 @@ namespace SilverSim.LL.Core
         private BlockingQueue<Message> m_InventoryRequestQueue = new BlockingQueue<Message>();
         public string GatekeeperURI { get; protected set; }
 
+        int m_PacketsReceived = 0;
+        int m_PacketsSent = 0;
+
         private uint NextSequenceNumber
         {
             get
@@ -221,6 +224,8 @@ namespace SilverSim.LL.Core
             MessageType mType = pck.ReadMessageType();
 
             m_LastReceivedPacketAtTime = Environment.TickCount;
+            
+            Interlocked.Increment(ref m_PacketsReceived);
 
             /* do we have some acks from the packet's end? */
             if(null != acknumbers)
@@ -284,7 +289,6 @@ namespace SilverSim.LL.Core
                     newpck.WriteMessageType(MessageType.CompletePingCheck);
                     newpck.WriteUInt8(pingID);
                     newpck.SequenceNumber = NextSequenceNumber;
-                    m_Server.SendPacketTo(newpck, ep);
                     /* check for unacks */
                     foreach(KeyValuePair<uint,UDPPacket> keyval in m_UnackedPackets)
                     {
@@ -297,6 +301,7 @@ namespace SilverSim.LL.Core
                             }
                         }
                     }
+                    m_Server.SendPacketTo(newpck, ep);
                     break;
 
                 case MessageType.CompletePingCheck:

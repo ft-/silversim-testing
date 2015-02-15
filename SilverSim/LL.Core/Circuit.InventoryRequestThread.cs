@@ -198,7 +198,7 @@ namespace SilverSim.LL.Core
                             {
                                 m_Log.DebugFormat("Starting to download asset {0} (TransferPacket)", assetID);
                             }
-                            else if(denyLSLTextViaDirect && asset.Type == AssetType.LSLText)
+                            if(denyLSLTextViaDirect && asset.Type == AssetType.LSLText)
                             {
                                 return;
                             }
@@ -252,6 +252,10 @@ namespace SilverSim.LL.Core
                                     assetOffset = asset.Data.Length;
                                 }
                                 SendMessage(tp);
+                            }
+                            if (m_Server.LogTransferPacket)
+                            {
+                                m_Log.DebugFormat("Completed download of asset {0} (TransferPacket)", assetID);
                             }
                         }
                         break;

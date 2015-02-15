@@ -91,7 +91,7 @@ namespace SilverSim.LL.Messages.Simulator
         public UInt32 RegionFlags = 0;
         public UInt32 ObjectCapacity = 0;
 
-        public List<Data> Stat = new List<Data>();
+        public Data[] Stat = new Data[0];
         public Int32 PID = 0;
         public UInt64[] RegionFlagsExtended = new UInt64[0];
 
@@ -116,11 +116,11 @@ namespace SilverSim.LL.Messages.Simulator
             p.WriteUInt32(RegionFlags);
             p.WriteUInt32(ObjectCapacity);
 
-            p.WriteUInt8((byte)Stat.Count);
-            foreach(Data d in Stat)
+            p.WriteUInt8((byte)Stat.Length);
+            for (int i = 0; i < Stat.Length; ++i)
             {
-                p.WriteUInt32((uint)d.StatID);
-                p.WriteFloat((float)d.StatValue);
+                p.WriteUInt32((uint)Stat[i].StatID);
+                p.WriteFloat((float)Stat[i].StatValue);
             }
             p.WriteInt32(PID);
             p.WriteUInt8((byte)RegionFlagsExtended.Length);

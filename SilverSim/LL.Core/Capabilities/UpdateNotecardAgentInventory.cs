@@ -48,8 +48,8 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        public UpdateNotecardAgentInventory(LLAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
-            : base(agent.Owner)
+        public UpdateNotecardAgentInventory(LLAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI)
+            : base(agent.Owner, serverURI)
         {
             m_Agent = agent;
             m_InventoryService = inventoryService;

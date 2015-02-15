@@ -48,8 +48,8 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        public UpdateGestureAgentInventory(LLAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
-            : base(agent.Owner)
+        public UpdateGestureAgentInventory(LLAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI)
+            : base(agent.Owner, serverURI)
         {
             m_InventoryService = inventoryService;
             m_AssetService = assetService;

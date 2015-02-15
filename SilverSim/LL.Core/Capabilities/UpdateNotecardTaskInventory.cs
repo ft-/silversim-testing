@@ -61,8 +61,8 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        public UpdateNotecardTaskInventory(LLAgent agent, SceneInterface scene)
-            : base(agent.Owner)
+        public UpdateNotecardTaskInventory(LLAgent agent, SceneInterface scene, string serverURI)
+            : base(agent.Owner, serverURI)
         {
             m_Agent = agent;
             m_Scene = scene;

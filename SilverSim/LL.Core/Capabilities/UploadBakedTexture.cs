@@ -33,11 +33,13 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types;
 using ThreadedClasses;
+using log4net;
 
 namespace SilverSim.LL.Core.Capabilities
 {
     public class UploadBakedTexture : UploadAssetAbstractCapability
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("UPLOAD BAKED TEXTURE");
         private AssetServiceInterface m_AssetService;
         private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
 
@@ -49,8 +51,8 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        public UploadBakedTexture(UUI creator, AssetServiceInterface assetService)
-            : base(creator)
+        public UploadBakedTexture(UUI creator, AssetServiceInterface assetService, string serverURI)
+            : base(creator, serverURI)
         {
             m_AssetService = assetService;
         }
@@ -74,10 +76,11 @@ namespace SilverSim.LL.Core.Capabilities
                     throw new UrlNotFoundException();
                 }
 
-                data.Name = "Baked Texture for Agent " + m_Creator.ToString();
+                data.Name = "Baked Texture for Agent " + m_Creator.ID.ToString();
                 try
                 {
                     m_AssetService.Store(data);
+                    m_Log.InfoFormat("Uploaded baked texture {1} for {0}", m_Creator.FullName, data.ID);
                 }
                 catch
                 {

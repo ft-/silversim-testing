@@ -145,6 +145,10 @@ namespace SilverSim.StructuredData.LLSD
                     return new Integer(Int32.Parse(GetTextNode(input)));
 
                 case "map":
+                    if(input.IsEmptyElement)
+                    {
+                        return new Map();
+                    }
                     Map map = new Map();
                     bool in_entity = false;
                     string key = string.Empty;
@@ -373,13 +377,13 @@ namespace SilverSim.StructuredData.LLSD
             else if (input is Real)
             {
                 output.WriteStartElement("real");
-                output.WriteValue((Real)input);
+                output.WriteValue(input.AsReal);
                 output.WriteEndElement();
             }
             else if (input is AString)
             {
                 output.WriteStartElement("string");
-                output.WriteValue((AString)input);
+                output.WriteValue(input.ToString());
                 output.WriteEndElement();
             }
             else if (input is Undef)
@@ -390,7 +394,7 @@ namespace SilverSim.StructuredData.LLSD
             else if (input is URI)
             {
                 output.WriteStartElement("uri");
-                output.WriteValue((URI)input);
+                output.WriteValue(input.ToString());
                 output.WriteEndElement();
             }
             else if (input is UUID)

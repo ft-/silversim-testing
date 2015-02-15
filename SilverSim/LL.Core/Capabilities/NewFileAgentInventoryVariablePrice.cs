@@ -51,8 +51,8 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        public NewFileAgentInventory(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService)
-            : base(creator)
+        public NewFileAgentInventory(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI)
+            : base(creator, serverURI)
         {
             m_InventoryService = inventoryService;
             m_AssetService = assetService;

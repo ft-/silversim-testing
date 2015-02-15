@@ -37,10 +37,12 @@ namespace SilverSim.LL.Core.Capabilities
     {
         public abstract string CapabilityName { get; }
         protected UUI m_Creator { get; private set; }
+        protected string m_ServerURI;
 
-        public UploadAssetAbstractCapability(UUI creator)
+        public UploadAssetAbstractCapability(UUI creator, string serverURI)
         {
             m_Creator = creator;
+            m_ServerURI = serverURI;
         }
 
         public abstract UUID GetUploaderID(Map reqmap);
@@ -89,13 +91,18 @@ namespace SilverSim.LL.Core.Capabilities
             {
                 UUID uploadID;
                 IValue o;
+                if(httpreq.ContentType != "application/llsd+xml")
+                {
+                    httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
+                    return;
+                }
                 try
                 {
                     o = LLSD_XML.Deserialize(httpreq.Body);
                 }
                 catch
                 {
-                    httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
+                    httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                     return;
                 }
                 if (!(o is Map))
@@ -139,8 +146,8 @@ namespace SilverSim.LL.Core.Capabilities
                 }
                 /* Upload start */
                 Map llsdreply = new Map();
-                llsdreply.Add("state", new AString("upload"));
-                llsdreply.Add("uploader", httpreq.RawUrl + "/Upload/" + uploadID);
+                llsdreply.Add("state", "upload");
+                llsdreply.Add("uploader", m_ServerURI + httpreq.RawUrl + "/Upload/" + uploadID.ToString());
 
                 HttpResponse httpres = httpreq.BeginResponse();
                 Stream outStream = httpres.GetOutputStream();
@@ -161,7 +168,8 @@ namespace SilverSim.LL.Core.Capabilities
                 AssetData asset = new AssetData();
                 Stream body = httpreq.Body;
                 asset.Data = new byte[body.Length];
-                if (body.Length != body.Read(asset.Data, 0, (int)body.Length))
+                int readBytes = body.Read(asset.Data, 0, (int)body.Length);
+                if (body.Length != readBytes)
                 {
                     httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                     return;

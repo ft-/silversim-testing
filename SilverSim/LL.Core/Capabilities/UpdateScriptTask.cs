@@ -69,8 +69,8 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        public UpdateScriptTask(LLAgent agent, SceneInterface scene)
-            : base(agent.Owner)
+        public UpdateScriptTask(LLAgent agent, SceneInterface scene, string serverURI)
+            : base(agent.Owner, serverURI)
         {
             m_Agent = agent;
             m_Scene = scene;

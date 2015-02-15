@@ -27,6 +27,7 @@ using SilverSim.LL.Messages;
 using System;
 using System.Threading;
 using System.Collections.Generic;
+using SilverSim.Scene.Types.Scene;
 
 namespace SilverSim.LL.Core
 {
@@ -141,11 +142,17 @@ namespace SilverSim.LL.Core
 
                 }
             }
-            LLUDPServer server = (LLUDPServer)Scene.UDPServer;
-            if (server != null)
+
+            SceneInterface scene = Scene;
+            if (null != scene)
             {
-                server.RemoveCircuit(this);
+                LLUDPServer server = (LLUDPServer)scene.UDPServer;
+                if (server != null)
+                {
+                    server.RemoveCircuit(this);
+                }
             }
+
             Stop();
             Agent = null;
             Scene = null;
@@ -289,6 +296,7 @@ namespace SilverSim.LL.Core
                             p.IsReliable = m.IsReliable;
                             p.SequenceNumber = NextSequenceNumber;
                             RateBucket[(int)ThrottleMap[queueidx]] += m_Server.SendPacketTo(p, RemoteEndPoint);
+                            Interlocked.Increment(ref m_PacketsSent);
                             p.EnqueuedAtTime = Environment.TickCount;
                             p.TransferredAtTime = Environment.TickCount;
                             if (m.IsReliable)
@@ -329,8 +337,9 @@ namespace SilverSim.LL.Core
 
                 if(Environment.TickCount - lastSimStatsTick >= 1000)
                 {
+                    int deltatime = Environment.TickCount - lastSimStatsTick;
                     lastSimStatsTick = Environment.TickCount;
-                    SendSimStats();
+                    SendSimStats(deltatime);
                 }
 
                 int bucketCheckTime = Environment.TickCount;
@@ -365,6 +374,7 @@ namespace SilverSim.LL.Core
                         m_PingSendTicks[pingID] = Environment.TickCount;
                         p.WriteUInt32(0);
                         m_Server.SendPacketTo(p, RemoteEndPoint);
+                        Interlocked.Increment(ref m_PacketsSent);
                     }
                 }
                 if (Environment.TickCount - lastAckTick >= 1000)
@@ -396,6 +406,7 @@ namespace SilverSim.LL.Core
                         }
                         p.SequenceNumber = NextSequenceNumber;
                         m_Server.SendPacketTo(p, RemoteEndPoint);
+                        Interlocked.Increment(ref m_PacketsSent);
                     }
                 }
             }
