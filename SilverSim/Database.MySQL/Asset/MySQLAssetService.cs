@@ -165,7 +165,7 @@ namespace SilverSim.Database.MySQL.Asset
                                 AssetData asset = new AssetData();
                                 asset.ID = new UUID(dbReader["id"].ToString());
                                 asset.Data = (byte[])dbReader["data"];
-                                asset.Type = (AssetType)dbReader["assetType"];
+                                asset.Type = (AssetType)(int)dbReader["assetType"];
                                 asset.Name = (string)dbReader["name"];
                                 asset.Description = (string)dbReader["description"];
                                 asset.CreateTime = Date.UnixTimeToDateTime(ulong.Parse(dbReader["create_time"].ToString()));
@@ -182,7 +182,7 @@ namespace SilverSim.Database.MySQL.Asset
                                 Boolean.TryParse(dbReader["temporary"].ToString(), out asset.Temporary);
                                 Boolean.TryParse(dbReader["local"].ToString(), out asset.Local);
 
-                                DateTime d = Date.UnixTimeToDateTime((ulong)dbReader["access_time"]);
+                                DateTime d = Date.UnixTimeToDateTime(ulong.Parse(dbReader["access_time"].ToString()));
                                 if (d - DateTime.UtcNow > TimeSpan.FromHours(1))
                                 {
                                     /* update access_time */

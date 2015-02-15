@@ -32,8 +32,58 @@ namespace SilverSim.LL.Messages.Simulator
     {
         public struct Data
         {
-            public UInt32 StatID;
+            public enum StatType : uint
+            {
+                TimeDilation = 0,
+                SimFPS = 1,
+                PhysicsFPS = 2,
+                AgentUpdates = 3,
+                FrameMS = 4,
+                NetMS = 5,
+                OtherMS = 6,
+                PhysicsMS = 7,
+                AgentMS = 8,
+                ImageMS = 9,
+                ScriptMS = 10,
+                TotalPrim = 11,
+                ActivePrim = 12,
+                Agents = 13,
+                ChildAgents = 14,
+                ActiveScripts = 15,
+                ScriptLinesPerSecond = 16,
+                InPacketsPerSecond = 17,
+                OutPacketsPerSecond = 18,
+                PendingDownloads = 19,
+                PendingUploads = 20,
+                VirtualSizeKb = 21,
+                ResidentSizeKb = 22,
+                PendingLocalUploads = 23,
+                UnAckedBytes = 24,
+                PhysicsPinnedTasks = 25,
+                PhysicsLodTasks = 26,
+                SimPhysicsStepMs = 27,
+                SimPhysicsShapeMs = 28,
+                SimPhysicsOtherMs = 29,
+                SimPhysicsMemory = 30,
+                ScriptEps = 31,
+                SimSpareMs = 32,
+                SimSleepMs = 33,
+                SimIoPumpTime = 34
+            }
+
+            public StatType StatID;
             public double StatValue;
+
+            public Data(StatType type)
+            {
+                StatID = type;
+                StatValue = 0;
+            }
+            public Data(StatType type, double val)
+            {
+                StatID = type;
+                StatValue = val;
+            }
         }
 
         public UInt32 RegionX = 0;
@@ -43,6 +93,7 @@ namespace SilverSim.LL.Messages.Simulator
 
         public List<Data> Stat = new List<Data>();
         public Int32 PID = 0;
+        public UInt64[] RegionFlagsExtended = new UInt64[0];
 
         public SimStats()
         {
@@ -68,10 +119,15 @@ namespace SilverSim.LL.Messages.Simulator
             p.WriteUInt8((byte)Stat.Count);
             foreach(Data d in Stat)
             {
-                p.WriteUInt32(d.StatID);
+                p.WriteUInt32((uint)d.StatID);
                 p.WriteFloat((float)d.StatValue);
             }
             p.WriteInt32(PID);
+            p.WriteUInt8((byte)RegionFlagsExtended.Length);
+            for(int i = 0; i < RegionFlagsExtended.Length; ++i)
+            {
+                p.WriteUInt64(RegionFlagsExtended[i]);
+            }
         }
     }
 }

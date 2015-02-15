@@ -180,8 +180,12 @@ namespace SilverSim.LL.Core
         #endregion
 
         public RwLockedDictionary<UInt32, UDPPacket> m_UnackedPackets = new RwLockedDictionary<uint, UDPPacket>();
-        public Circuit(LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector, UUID regionSeedID, Dictionary<string, string> serviceURLs, string gatekeeperURI)
+        public Circuit(LLAgent agent, LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector, UUID regionSeedID, Dictionary<string, string> serviceURLs, string gatekeeperURI)
         {
+            InitializeTransmitQueueing();
+            InitSimStats();
+
+            Agent = agent;
             m_Server = server;
             CircuitCode = circuitcode;
             m_CapsRedirector = capsredirector;
@@ -305,7 +309,7 @@ namespace SilverSim.LL.Core
                     break;
 
                 case MessageType.AgentThrottle:
-                    /* TODO: decode here */
+                    HandleThrottlePacket(Messages.Agent.AgentThrottle.Decode(pck));
                     break;
 
                 case MessageType.ScriptDialogReply:
