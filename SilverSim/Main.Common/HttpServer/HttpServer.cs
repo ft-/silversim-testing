@@ -27,6 +27,7 @@ using log4net;
 using Nini.Config;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -194,6 +195,10 @@ namespace SilverSim.Main.Common.HttpServer
             }
             catch (HttpResponse.ConnectionCloseException)
             {
+            }
+            catch (IOException)
+            {
+                /* commonly a broken pipe */
             }
             catch (Exception e)
             {
