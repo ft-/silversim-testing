@@ -23,12 +23,22 @@ exception statement from your version.
 
 */
 
-namespace SilverSim.ServiceInterfaces.Asset
+using SilverSim.Types;
+using SilverSim.Types.Script;
+
+namespace SilverSim.Types.Experience
 {
-    public interface IAssetServicePlugin
+    public struct ExperiencePermissionsInfo
     {
-        AssetServiceInterface Instantiate(string url);
-        string Name { get; }
-        bool IsProtocolSupported(string url);
+        public UUID ID;
+        public UUI Agent;
+
+        public ScriptPermissions Permissions;
+    }
+
+    public struct ExperienceInfo
+    {
+        public UUID ID;
+        public string Name;
     }
 }

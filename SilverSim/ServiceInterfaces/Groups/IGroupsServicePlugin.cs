@@ -29,5 +29,6 @@ namespace SilverSim.ServiceInterfaces.Groups
     {
         GroupsServiceInterface Instantiate(string url);
         string Name { get; }
+        bool IsProtocolSupported(string url);
     }
 }

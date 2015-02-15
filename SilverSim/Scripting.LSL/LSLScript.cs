@@ -80,6 +80,16 @@ namespace SilverSim.Scripting.LSL
             m_States.Add(name, state);
         }
 
+        void WriteListItem(XmlTextWriter writer, object o)
+        {
+            writer.WriteStartElement("ListItem");
+            writer.WriteStartAttribute("type");
+            writer.WriteValue(o.GetType().FullName);
+            writer.WriteEndAttribute();
+            writer.WriteValue(o.ToString());
+            writer.WriteEndElement();
+        }
+
         public void ToXml(XmlTextWriter writer)
         {
             writer.WriteStartElement("State");
@@ -125,6 +135,49 @@ namespace SilverSim.Scripting.LSL
                     writer.WriteEndElement();
                     writer.WriteStartElement("Plugins");
                     {
+                        /*
+                        List<object> listeners = new List<object>();
+                        m_Listeners.ForEach(delegate(KeyValuePair<int, ChatServiceInterface.Listener> kvp)
+                        {
+                            listeners.Add(kvp.Value.IsActive);
+                            listeners.Add(kvp.Key);
+                            listeners.Add(kvp.Value.Channel);
+                            listeners.Add(kvp.Value.Name);
+                            listeners.Add(kvp.Value.ID);
+                            listeners.Add(kvp.Value.Message);
+                            listeners.Add(kvp.Value.RegexBitfield);
+                        });
+                         * if(listeners.Count != 0)
+                         * {
+                         * WriteListitem(writer, "listener");
+                         * WriteListItem(writer, listeners.Count);
+                         * foreach(object o in listeners)
+                         * {
+                         * WriteListItem(writer, o);
+                         * }
+                         * }
+                        */
+
+                        if(Timer.Enabled)
+                        {
+                            WriteListItem(writer, "timer");
+                            WriteListItem(writer, 2);
+                            WriteListItem(writer, Timer.Interval);
+                            WriteListItem(writer, 0);
+                        }
+
+                        /* sensor, <element count> 
+                         * foreach(sensor)
+                         * {
+                        data.Add(ts.interval);
+                        data.Add(ts.name);
+                        data.Add(ts.keyID);
+                        data.Add(ts.type);
+                        data.Add(ts.range);
+                        data.Add(ts.arc);
+                         * }
+                         
+                         */
 
                     }
                     writer.WriteEndElement();
@@ -134,7 +187,7 @@ namespace SilverSim.Scripting.LSL
             writer.WriteEndElement();
         }
 
-        public Script(ObjectPart part, ObjectPartInventoryItem item, List<Delegate> stateChangeDelegates)
+        public Script(ObjectPart part, ObjectPartInventoryItem item)
         {
             m_Part = part;
             m_Item = item;

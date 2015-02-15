@@ -51,6 +51,19 @@ namespace SilverSim.Scene.Types.Scene
                 public double Y;
                 public double Z;
                 public double W;
+
+                public WLVector4(Quaternion q)
+                {
+                    X = q.X;
+                    Y = q.Y;
+                    Z = q.Z;
+                    W = q.Z;
+                }
+
+                public static implicit operator Quaternion(WLVector4 v)
+                {
+                    return new Quaternion(v.X, v.Y, v.Z, v.W);
+                }
             }
 
             public struct WindlightSkyData

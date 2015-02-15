@@ -336,20 +336,6 @@ namespace SilverSim.Scripting.LSL
             SilverSim.Scripting.Common.CompilerRegistry.ScriptCompilers["XEngine"] = this; /* we won't be supporting anything beyond LSL compatibility */
         }
 
-        class LSLScriptAssembly : IScriptAssembly
-        {
-            Dictionary<string, Type> m_States;
-            public LSLScriptAssembly(Assembly assembly, Dictionary<string, Type> states)
-            {
-                m_States = states;
-            }
-
-            public ScriptInstance Instantiate(ObjectPart objpart, ObjectPartInventoryItem item)
-            {
-                throw new NotImplementedException();
-            }
-        }
-
         class CompileState
         {
             public APIFlags AcceptedFlags;
@@ -1384,7 +1370,11 @@ namespace SilverSim.Scripting.LSL
                     }
                     else if (mode == "ASSL")
                     {
-                        compileState.AcceptedFlags = APIFlags.ASSL;
+                        compileState.AcceptedFlags = APIFlags.ASSL | APIFlags.OSSL | APIFlags.LightShare | APIFlags.LSL;
+                    }
+                    else if(mode == "AURORA" || mode == "WHITECORE")
+                    {
+                        compileState.AcceptedFlags = APIFlags.OSSL | APIFlags.WindLight_Aurora | APIFlags.LSL;
                     }
                 }
                 else if (shbang.Value.StartsWith("//#!Enable:"))
@@ -1519,7 +1509,301 @@ namespace SilverSim.Scripting.LSL
         public IScriptAssembly Compile(AppDomain appDom, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int lineNumber = 1)
         {
             CompileState compileState = Preprocess(user, shbangs, reader, lineNumber);
-            throw new NotImplementedException();
+            return PostProcess(compileState, appDom, assetID);
+        }
+
+        IScriptAssembly PostProcess(CompileState compileState, AppDomain appDom, UUID assetID)
+        {
+            string assetAssemblyName = "Script." + assetID.ToString().Replace("-", "_");
+            AssemblyName aName = new AssemblyName(assetAssemblyName);
+            AssemblyBuilder ab = appDom.DefineDynamicAssembly(aName, System.Reflection.Emit.AssemblyBuilderAccess.Run);
+            ModuleBuilder mb = ab.DefineDynamicModule(aName.Name);
+
+            #region Create Script Container
+            TypeBuilder scriptTypeBuilder = mb.DefineType(assetAssemblyName + ".Script", TypeAttributes.Public, typeof(Script));
+            foreach (IScriptApi api in m_Apis)
+            {
+                ScriptApiName apiAttr = (ScriptApiName)api.GetType().GetCustomAttributes(typeof(ScriptApiName), false)[0];
+                scriptTypeBuilder.DefineField(apiAttr.Name, api.GetType(), FieldAttributes.Static | FieldAttributes.Public);
+            }
+
+            Type[] script_cb_params = new Type[2] { typeof(ObjectPart), typeof(ObjectPartInventoryItem) };
+            ConstructorBuilder script_cb = scriptTypeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, script_cb_params);
+            ILGenerator script_ilgen = script_cb.GetILGenerator();
+            {
+                ConstructorInfo typeConstructor = typeof(Script).GetConstructor(script_cb_params);
+                script_ilgen.Emit(OpCodes.Ldarg_1);
+                script_ilgen.Emit(OpCodes.Ldarg_1);
+                script_ilgen.Emit(OpCodes.Ldarg_2);
+                script_ilgen.Emit(OpCodes.Call, typeConstructor);
+            }
+            #endregion
+
+            Dictionary<string, Type> stateTypes = new Dictionary<string, Type>();
+
+            foreach(KeyValuePair<string, List<List<string>>> functionKvp in compileState.m_Functions)
+            {
+                MethodBuilder method;
+                Type returnType = typeof(void);
+                List<string> functionDeclaration = functionKvp.Value[0];
+                string functionName = functionDeclaration[1];
+                int functionStart = 2;
+
+                switch(functionDeclaration[0])
+                {
+                    case "integer":
+                        returnType = typeof(int);
+                        break;
+
+                    case "vector":
+                        returnType = typeof(Vector3);
+                        break;
+
+                    case "list":
+                        returnType = typeof(AnArray);
+                        break;
+
+                    case "float":
+                        returnType = typeof(double);
+                        break;
+
+                    case "string":
+                        returnType = typeof(string);
+                        break;
+
+                    case "key":
+                        returnType = typeof(string);
+                        break;
+
+                    case "rotation":
+                        returnType = typeof(Quaternion);
+                        break;
+
+                    default:
+                        functionName = functionDeclaration[0];
+                        functionStart = 1;
+                        break;
+                }
+                List<Type> paramTypes = new List<Type>();
+                while(functionDeclaration[++functionStart] != ")")
+                {
+                    switch(functionDeclaration[++functionStart])
+                    {
+                        case "integer":
+                            paramTypes.Add(typeof(int));
+                            break;
+
+                        case "vector":
+                            paramTypes.Add(typeof(Vector3));
+                            break;
+
+                        case "list":
+                            paramTypes.Add(typeof(AnArray));
+                            break;
+
+                        case "float":
+                            paramTypes.Add(typeof(double));
+                            break;
+
+                        case "string":
+                            paramTypes.Add(typeof(string));
+                            break;
+
+                        case "key":
+                            paramTypes.Add(typeof(string));
+                            break;
+
+                        case "rotation":
+                            paramTypes.Add(typeof(Quaternion));
+                            break;
+
+                        default:
+                            throw new CompilerException(0, "Internal Error");
+                    }
+                    ++functionStart; /* skip parameter */
+                }
+
+                method = scriptTypeBuilder.DefineMethod("fn_" + functionName, MethodAttributes.Public, returnType, paramTypes.ToArray());
+                ILGenerator method_ilgen = method.GetILGenerator();
+
+                method_ilgen.Emit(OpCodes.Ret);
+            }
+
+            foreach (List<string> localVar in compileState.m_LocalVariables)
+            {
+                FieldBuilder fb;
+                switch(localVar[0])
+                {
+                    case "key":
+                        fb = scriptTypeBuilder.DefineField("var_" + localVar[1], typeof(string), FieldAttributes.Public);
+                        break;
+
+                    case "string":
+                        fb = scriptTypeBuilder.DefineField("var_" + localVar[1], typeof(string), FieldAttributes.Public);
+                        break;
+
+                    case "integer":
+                        fb = scriptTypeBuilder.DefineField("var_" + localVar[1], typeof(int), FieldAttributes.Public);
+                        break;
+
+                    case "float":
+                        fb = scriptTypeBuilder.DefineField("var_" + localVar[1], typeof(double), FieldAttributes.Public);
+                        break;
+
+                    case "vector":
+                        fb = scriptTypeBuilder.DefineField("var_" + localVar[1], typeof(Vector3), FieldAttributes.Public);
+                        break;
+
+                    case "rotation":
+                        fb = scriptTypeBuilder.DefineField("var_" + localVar[1], typeof(Quaternion), FieldAttributes.Public);
+                        break;
+
+                    case "list":
+                        fb = scriptTypeBuilder.DefineField("var_" + localVar[1], typeof(AnArray), FieldAttributes.Public);
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            foreach (KeyValuePair<string, Dictionary<string, List<List<string>>>> stateKvp in compileState.m_States)
+            {
+                FieldBuilder fb;
+                TypeBuilder state = mb.DefineType(aName.Name + ".State." + stateKvp.Key, TypeAttributes.Public, typeof(object));
+                state.AddInterfaceImplementation(typeof(LSLState));
+                fb = state.DefineField("Instance", scriptTypeBuilder, FieldAttributes.Private | FieldAttributes.InitOnly);
+
+                ConstructorBuilder state_cb = state.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new Type[1] { scriptTypeBuilder });
+                ILGenerator state_ilgen = state_cb.GetILGenerator();
+                ConstructorInfo typeConstructor = typeof(Script).GetConstructor(new Type[0]);
+                state_ilgen.Emit(OpCodes.Ldarg_0);
+                state_ilgen.Emit(OpCodes.Call, typeConstructor);
+                state_ilgen.Emit(OpCodes.Ldarg_1);
+                state_ilgen.Emit(OpCodes.Stfld, fb);
+
+                #region Fill constants and objects
+                foreach (IScriptApi api in m_Apis)
+                {
+                    foreach (FieldInfo f in api.GetType().GetFields())
+                    {
+                        foreach (System.Attribute attr in System.Attribute.GetCustomAttributes(f))
+                        {
+                            if (attr is APILevel && (f.Attributes & FieldAttributes.Static) != 0)
+                            {
+                                if ((f.Attributes & FieldAttributes.InitOnly) != 0 || (f.Attributes & FieldAttributes.Literal) != 0)
+                                {
+                                    APILevel apilevel = (APILevel)attr;
+                                    if ((apilevel.Flags & compileState.AcceptedFlags) != 0)
+                                    {
+                                        fb = state.DefineField(f.Name, f.FieldType, f.Attributes);
+                                        if ((f.Attributes & FieldAttributes.Literal) != 0)
+                                        {
+                                            fb.SetConstant(f.GetValue(null));
+                                        }
+                                        else
+                                        {
+                                            state_ilgen.Emit(OpCodes.Ldfld, f);
+                                            state_ilgen.Emit(OpCodes.Stfld, fb);
+                                        }
+                                    }
+                                }
+                                else
+                                {
+                                    m_Log.DebugFormat("Field {0} has unsupported attribute flags {1}", f.Name, f.Attributes.ToString());
+                                }
+                            }
+                        }
+                    }
+                }
+                #endregion
+
+                state_ilgen.Emit(OpCodes.Ret);
+
+                /* add the type initializers */
+                state_cb = state.DefineTypeInitializer();
+
+                state_ilgen = state_cb.GetILGenerator();
+
+                typeConstructor = typeof(Object).GetConstructor(new Type[0]);
+
+                state_ilgen.Emit(OpCodes.Ldarg_0);
+                state_ilgen.Emit(OpCodes.Call, typeConstructor);
+                state_ilgen.Emit(OpCodes.Ret);
+
+                foreach (KeyValuePair<string, List<List<string>>> eventKvp in stateKvp.Value)
+                {
+                    MethodInfo d = m_EventDelegates[eventKvp.Key];
+                    ParameterInfo[] pinfo = d.GetParameters();
+                    Type[] paramtypes = new Type[pinfo.Length];
+                    for(int pi = 0; pi < pinfo.Length; ++pi)
+                    {
+                        paramtypes[pi] = pinfo[pi].ParameterType;
+                    }
+                    MethodBuilder eventbuilder = state.DefineMethod(eventKvp.Key, MethodAttributes.Public, typeof(void), paramtypes);
+                    ILGenerator event_ilgen = eventbuilder.GetILGenerator();
+
+                    event_ilgen.Emit(OpCodes.Ret);
+                }
+
+                stateTypes.Add(stateKvp.Key, state.CreateType());
+            }
+
+            script_ilgen.Emit(OpCodes.Ret);
+
+            #region Call type initializer
+            {
+                script_cb = scriptTypeBuilder.DefineTypeInitializer();
+                script_ilgen = script_cb.GetILGenerator();
+                ConstructorInfo typeConstructor = typeof(Object).GetConstructor(new Type[0]);
+
+                script_ilgen.Emit(OpCodes.Ldarg_0);
+                script_ilgen.Emit(OpCodes.Call, typeConstructor);
+                script_ilgen.Emit(OpCodes.Ret);
+            }
+            #endregion
+
+            #region Initialize static fields
+            Type t = scriptTypeBuilder.CreateType();
+            foreach (IScriptApi api in m_Apis)
+            {
+                ScriptApiName apiAttr = (ScriptApiName)api.GetType().GetCustomAttributes(typeof(ScriptApiName), false)[0];
+                FieldInfo info = t.GetField(apiAttr.Name);
+                info.SetValue(t, api);
+            }
+            #endregion
+
+            mb.CreateGlobalFunctions();
+
+            return new LSLScriptAssembly(ab, t, stateTypes);
+        }
+
+        class LSLScriptAssembly : IScriptAssembly
+        {
+            Assembly m_Assembly;
+            Type m_Script;
+            Dictionary<string, Type> m_StateTypes;
+
+            public LSLScriptAssembly(Assembly assembly, Type script, Dictionary<string, Type> stateTypes)
+            {
+                m_Assembly = assembly;
+                m_Script = script;
+                m_StateTypes = stateTypes;
+            }
+
+            public ScriptInstance Instantiate(ObjectPart objpart, ObjectPartInventoryItem item)
+            {
+                Script m_Script = new Script(objpart, item);
+                foreach(KeyValuePair<string, Type> t in m_StateTypes)
+                {
+                    ConstructorInfo info = t.Value.GetConstructor(new Type[1] { typeof(Script) });
+                    object[] param = new object[1];
+                    param[0] = m_Script;
+                    m_Script.AddState(t.Key, (LSLState)info.Invoke(param));
+                }
+
+                return m_Script;
+            }
         }
     }
 }

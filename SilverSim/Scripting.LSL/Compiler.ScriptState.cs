@@ -35,7 +35,7 @@ namespace SilverSim.Scripting.LSL
     {
         public IScriptState StateFromXml(XmlTextReader reader, Dictionary<string, string> attrs, ObjectPartInventoryItem item)
         {
-            return LSLScript.SavedScriptState.FromXML(reader, attrs, item);
+            return Script.SavedScriptState.FromXML(reader, attrs, item);
         }
     }
 }

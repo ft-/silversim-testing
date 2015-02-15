@@ -35,7 +35,7 @@ using System.Xml;
 
 namespace SilverSim.Scripting.LSL
 {
-    public partial class LSLScript
+    public partial class Script
     {
         public class SavedScriptState : IScriptState
         {

@@ -29,5 +29,6 @@ namespace SilverSim.ServiceInterfaces.Inventory
     {
         InventoryServiceInterface Instantiate(string url);
         string Name { get; }
+        bool IsProtocolSupported(string url);
     }
 }

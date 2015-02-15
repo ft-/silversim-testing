@@ -29,5 +29,6 @@ namespace SilverSim.ServiceInterfaces.Profile
     {
         ProfileServiceInterface Instantiate(string url);
         string Name { get; }
+        bool IsProtocolSupported(string url);
     }
 }
