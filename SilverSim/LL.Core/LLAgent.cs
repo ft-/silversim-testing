@@ -945,14 +945,14 @@ namespace SilverSim.LL.Core
             {
                 lock(this)
                 {
-                    return PhysicsActor;
+                    return m_PhysicsActor;
                 }
             }
             set
             {
                 lock(this)
                 {
-                    PhysicsActor = value;
+                    m_PhysicsActor = value;
                 }
             }
         }

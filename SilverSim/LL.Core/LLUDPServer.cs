@@ -73,7 +73,7 @@ namespace SilverSim.LL.Core
         private object m_UseCircuitCodeProcessingLock = new object();
         
         public SceneInterface Scene { get; private set; }
-        public bool LogAssetFailures = true;
+        public bool LogAssetFailures = false;
         public bool LogTransferPacket = true;
 
         public LLUDPServer(IPAddress bindAddress, int port, IMServiceInterface imService, ChatServiceInterface chatService, SceneInterface scene)
@@ -387,9 +387,10 @@ namespace SilverSim.LL.Core
         }
         #endregion
 
-        protected internal void SendPacketTo(UDPPacket p, EndPoint ep)
+        protected internal int SendPacketTo(UDPPacket p, EndPoint ep)
         {
             m_UdpSocket.SendTo(p.Data, 0, p.DataLength, SocketFlags.None, ep);
+            return p.DataLength;
         }
 
         void HandleAgentUpdateMessage(Message m)

@@ -39,6 +39,7 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.AgentUpdate, Agent.AgentUpdate.Decode);
             PacketTypes.Add(MessageType.AgentDataUpdateRequest, Agent.AgentDataUpdateRequest.Decode);
             PacketTypes.Add(MessageType.AgentAnimation, Agent.AgentAnimation.Decode);
+            PacketTypes.Add(MessageType.AgentThrottle, Agent.AgentThrottle.Decode);
 
             /* Appearance */
             PacketTypes.Add(MessageType.AgentWearablesRequest, Appearance.AgentWearablesRequest.Decode);

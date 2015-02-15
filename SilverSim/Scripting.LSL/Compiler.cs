@@ -1511,6 +1511,11 @@ namespace SilverSim.Scripting.LSL
             return PostProcess(compileState, appDom, assetID);
         }
 
+        void ProcessFunction(CompileState compileState, TypeBuilder scriptTypeBuilder, TypeBuilder stateTypeBuilder, MethodBuilder mb, ILGenerator ilgen, List<List<string>> functionBody)
+        {
+
+        }
+
         IScriptAssembly PostProcess(CompileState compileState, AppDomain appDom, UUID assetID)
         {
             string assetAssemblyName = "Script." + assetID.ToString().Replace("-", "_");
@@ -1624,7 +1629,7 @@ namespace SilverSim.Scripting.LSL
 
                 method = scriptTypeBuilder.DefineMethod("fn_" + functionName, MethodAttributes.Public, returnType, paramTypes.ToArray());
                 ILGenerator method_ilgen = method.GetILGenerator();
-
+                ProcessFunction(compileState, scriptTypeBuilder, null, method, method_ilgen, functionKvp.Value);
                 method_ilgen.Emit(OpCodes.Ret);
             }
 
@@ -1740,7 +1745,7 @@ namespace SilverSim.Scripting.LSL
                     }
                     MethodBuilder eventbuilder = state.DefineMethod(eventKvp.Key, MethodAttributes.Public, typeof(void), paramtypes);
                     ILGenerator event_ilgen = eventbuilder.GetILGenerator();
-
+                    ProcessFunction(compileState, scriptTypeBuilder, state, eventbuilder, event_ilgen, eventKvp.Value);
                     event_ilgen.Emit(OpCodes.Ret);
                 }
 
