@@ -25,13 +25,15 @@ exception statement from your version.
 
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
+using System.Net;
 
 namespace SilverSim.BackendConnectors.Robust
 {
-    public class RobustInventoryPlugin : IInventoryServicePlugin, IPlugin
+    public class RobustInventoryPlugin : ServicePluginHelo, IInventoryServicePlugin, IPlugin
     {
         public RobustInventoryPlugin()
         {
@@ -48,7 +50,7 @@ namespace SilverSim.BackendConnectors.Robust
             return new Inventory.RobustInventoryConnector(url);
         }
 
-        public string Name
+        public override string Name
         {
             get
             {
@@ -65,7 +67,7 @@ namespace SilverSim.BackendConnectors.Robust
         }
     }
 
-    public class RobustAssetPlugin : IAssetServicePlugin, IPlugin
+    public class RobustAssetPlugin : ServicePluginHelo, IAssetServicePlugin, IPlugin
     {
         public RobustAssetPlugin()
         {
@@ -82,7 +84,7 @@ namespace SilverSim.BackendConnectors.Robust
             return new Asset.RobustAssetConnector(url);
         }
 
-        public string Name
+        public override string Name
         {
             get
             {

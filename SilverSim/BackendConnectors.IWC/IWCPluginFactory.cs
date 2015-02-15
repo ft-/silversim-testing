@@ -25,6 +25,7 @@ exception statement from your version.
 
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
@@ -46,6 +47,12 @@ namespace SilverSim.BackendConnectors.IWC
         public InventoryServiceInterface Instantiate(string url)
         {
             return new Inventory.IWCInventoryConnector(url);
+        }
+
+        public bool IsProtocolSupported(string url)
+        {
+#warning Determine how to do the IsProtocolSupported on IWC
+            return false;
         }
 
         public string Name
@@ -80,6 +87,12 @@ namespace SilverSim.BackendConnectors.IWC
         public AssetServiceInterface Instantiate(string url)
         {
             return new Asset.IWCAssetConnector(url);
+        }
+
+        public bool IsProtocolSupported(string url)
+        {
+#warning Determine how to do the IsProtocolSupported on IWC
+            return false;
         }
 
         public string Name
