@@ -537,7 +537,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 {
 
                 }
-                m_Log.DebugFormat("Agent post request {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Caps {6} Circuit {7}",
+                m_Log.InfoFormat("Agent post request {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Caps {6} Circuit {7}",
                     agentPost.Account.Principal.FirstName,
                     agentPost.Account.Principal.LastName,
                     agentPost.Account.Principal.HomeURI,
