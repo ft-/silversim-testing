@@ -37,6 +37,7 @@ namespace SilverSim.LL.Core
         enum QueueOutType : uint
         {
             High,
+            Resend,
             LandLayerData,
             WindLayerData,
             GenericLayerData,
@@ -173,6 +174,7 @@ namespace SilverSim.LL.Core
             Queue<Message>[] QueueList = new Queue<Message>[(int)QueueOutType.NumQueues];
             ThrottleOutType[] ThrottleMap = new ThrottleOutType[(int)QueueOutType.NumQueues];
             ThrottleMap[(int)QueueOutType.High] = ThrottleOutType.Task;
+            ThrottleMap[(int)QueueOutType.Resend] = ThrottleOutType.Resend;
             ThrottleMap[(int)QueueOutType.LandLayerData] = ThrottleOutType.LandLayerData;
             ThrottleMap[(int)QueueOutType.WindLayerData] = ThrottleOutType.WindLayerData;
             ThrottleMap[(int)QueueOutType.GenericLayerData] = ThrottleOutType.CloudLayerData;

@@ -158,6 +158,37 @@ namespace SilverSim.LL.Messages
             }
         }
 
+        private void DecodeZLE()
+        {
+            if(!IsZeroEncoded)
+            {
+                return;
+            }
+            byte[] oldData = new byte[DataLength];
+            int extralen = (int)(uint)Data[5];
+            int srcpos = 6 + extralen;
+            int dstpos = 6 + extralen;
+            Buffer.BlockCopy(Data, 0, oldData, 0, DataLength);
+
+            for(;srcpos < DataLength; ++srcpos)
+            {
+                if(oldData[srcpos] == 0)
+                {
+                    uint cnt = oldData[++srcpos];
+                    for (uint i = 0; i < cnt; ++i)
+                    {
+                        Data[dstpos++] = 0;
+                    }
+                }
+                else
+                {
+                    Data[dstpos++] = oldData[srcpos];
+                }
+            }
+            DataLength = dstpos;
+            IsZeroEncoded = false;
+        }
+
         public List<UInt32> Acks
         {
             get
@@ -166,51 +197,13 @@ namespace SilverSim.LL.Messages
                 /* singleton method, it will adjust the data length afterwards */
                 if(HasAckFlag)
                 {
-                    numacks = Data[DataLength - 1];
-                    byte[] ackbuf = new byte[numacks * 4];
-
                     if(IsZeroEncoded)
                     {
-                        int dstpos = (int)numacks * 4;
+                        DecodeZLE();
+                    }
 
-                        int len = (int)numacks * 4;
-                        while (len > 0)
-                        {
-                            if (Data[DataLength - 1] == 0)
-                            {
-                                /* we got a ZLE group */
-                                int zlelen = Data[DataLength - 1];
-                                if (zlelen > len)
-                                {
-                                    /* we did not fully satisfy it so let us adjust that */
-                                    Data[DataLength - 1] -= (byte)len;
-                                    while(len-- != 0)
-                                    {
-                                        ackbuf[--dstpos] = 0;
-                                    }
-                                }
-                                else
-                                {
-                                    /* we fully satisfied it, so move DataLength */
-                                    len -= zlelen;
-                                    DataLength -= 2;
-                                    while(zlelen-- != 0)
-                                    {
-                                        ackbuf[--dstpos] = 0;
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                ackbuf[--dstpos] = Data[--DataLength];
-                            }
-                        }
-                    }
-                    else
-                    {
-                        Buffer.BlockCopy(Data, (int)(DataLength - 1 - numacks * 4), ackbuf, 0, (int)numacks * 4);
-                        DataLength -= (int)(1 + numacks * 4);
-                    }
+                    numacks = Data[DataLength - 1];
+                    int AckStartPos = DataLength - 1 - 4 * (int)numacks;
 
                     List<UInt32> acknumbers = new List<uint>();
 
@@ -218,10 +211,12 @@ namespace SilverSim.LL.Messages
                     {
                         if(BitConverter.IsLittleEndian)
                         {
-                            Array.Reverse(ackbuf, (int)ackidx * 4, 4);
+                            Array.Reverse(Data, AckStartPos + (int)ackidx * 4, 4);
                         }
-                        acknumbers.Add(BitConverter.ToUInt32(ackbuf, (int)ackidx * 4));
+                        acknumbers.Add(BitConverter.ToUInt32(Data, AckStartPos + (int)ackidx * 4));
                     }
+
+                    DataLength = AckStartPos;
 
                     /* we consumed those appended acks, so remove that flag */
                     HasAckFlag = false;
@@ -300,6 +295,20 @@ namespace SilverSim.LL.Messages
             Data = new byte[bufferSize];
             Data[0] = zeroencoded ? (byte)0x80 : (byte)0;
             Data[5] = 0;
+        }
+
+        public override string ToString()
+        {
+            string dmp = "";
+            for(int i = 0; i < DataLength; ++i)
+            {
+                if(i != 0)
+                {
+                    dmp += " ";
+                }
+                dmp += string.Format("{0:x2}", (uint)Data[i]);
+            }
+            return dmp;
         }
 
         public void Reset()

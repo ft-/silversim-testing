@@ -238,7 +238,7 @@ namespace SilverSim.LL.Core
                 foreach(UInt32 ackno in acknumbers)
                 {
                     UDPPacket p_acked;
-                    if(m_UnackedPackets.Remove(ackno, out p_acked))
+                    if (m_UnackedPackets.Remove(ackno, out p_acked))
                     {
                         unackedReleasedCount += p_acked.DataLength;
                     }
@@ -274,7 +274,8 @@ namespace SilverSim.LL.Core
                 case MessageType.PacketAck:
                     /* we decode it here, no need to pass it anywhere else */
                     int unackedReleasedCount = 0;
-                    for(uint i = 0; i < pck.ReadUInt8(); ++i)
+                    uint cnt = pck.ReadUInt8();
+                    for(uint i = 0; i < cnt; ++i)
                     {
                         uint ackno = pck.ReadUInt32();
                         UDPPacket p_acked;
