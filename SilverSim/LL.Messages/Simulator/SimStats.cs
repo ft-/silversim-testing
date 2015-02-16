@@ -38,12 +38,12 @@ namespace SilverSim.LL.Messages.Simulator
                 SimFPS = 1,
                 PhysicsFPS = 2,
                 AgentUpdates = 3,
-                FrameMS = 4,
-                NetMS = 5,
-                OtherMS = 6,
-                PhysicsMS = 7,
-                AgentMS = 8,
-                ImageMS = 9,
+                FrameTimeMs = 4,
+                NetTimeMs = 5,
+                OtherTimeMs = 6,
+                PhysicsTimeMs = 7,
+                AgentTimeMs = 8,
+                ImageTimeMs = 9,
                 ScriptMS = 10,
                 TotalPrim = 11,
                 ActivePrim = 12,
@@ -66,9 +66,10 @@ namespace SilverSim.LL.Messages.Simulator
                 SimPhysicsOtherMs = 29,
                 SimPhysicsMemory = 30,
                 ScriptEps = 31,
-                SimSpareMs = 32,
-                SimSleepMs = 33,
-                SimIoPumpTime = 34
+                SimSpareTimeMs = 32,
+                SimSleepTimeMs = 33,
+                SimIoPumpTimeMs = 34,
+                PercentScriptsRun = 35,
             }
 
             public StatType StatID;

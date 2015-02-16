@@ -166,8 +166,8 @@ namespace SilverSim.LL.Messages
                 /* singleton method, it will adjust the data length afterwards */
                 if(HasAckFlag)
                 {
-                    byte[] ackbuf = new byte[numacks * 4];
                     numacks = Data[DataLength - 1];
+                    byte[] ackbuf = new byte[numacks * 4];
 
                     if(IsZeroEncoded)
                     {
@@ -216,7 +216,7 @@ namespace SilverSim.LL.Messages
 
                     for (uint ackidx = 0; ackidx < numacks; ++ackidx)
                     {
-                        if(!BitConverter.IsLittleEndian)
+                        if(BitConverter.IsLittleEndian)
                         {
                             Array.Reverse(ackbuf, (int)ackidx * 4, 4);
                         }

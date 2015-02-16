@@ -303,6 +303,10 @@ namespace SilverSim.LL.Core
                             {
                                 p.IsResent = true;
                                 m_UnackedPackets[p.SequenceNumber] = p;
+                                lock (m_UnackedBytesLock)
+                                {
+                                    m_UnackedBytes += p.DataLength;
+                                }
                             }
                             if (m.Number == MessageType.LogoutReply)
                             {

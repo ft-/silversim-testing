@@ -81,6 +81,9 @@ namespace SilverSim.LL.Core
 
         int m_PacketsReceived = 0;
         int m_PacketsSent = 0;
+        int m_AgentUpdatesReceived = 0;
+        int m_UnackedBytes = 0;
+        object m_UnackedBytesLock = new object();
 
         private uint NextSequenceNumber
         {
@@ -205,6 +208,7 @@ namespace SilverSim.LL.Core
 
         ~Circuit()
         {
+            m_UploadCapabilities.Clear();
             Agent = null;
             Scene = null;
             Dispose();
@@ -230,9 +234,14 @@ namespace SilverSim.LL.Core
             /* do we have some acks from the packet's end? */
             if(null != acknumbers)
             {
+                int unackedReleasedCount = 0;
                 foreach(UInt32 ackno in acknumbers)
                 {
-                    m_UnackedPackets.Remove(ackno);
+                    UDPPacket p_acked;
+                    if(m_UnackedPackets.Remove(ackno, out p_acked))
+                    {
+                        unackedReleasedCount += p_acked.DataLength;
+                    }
 
                     lock (m_LogoutReplyLock)
                     {
@@ -247,6 +256,10 @@ namespace SilverSim.LL.Core
                         }
                     }
                 }
+                lock (m_UnackedBytesLock)
+                {
+                    m_UnackedBytes -= unackedReleasedCount;
+                }
             }
 
             if(pck.IsReliable)
@@ -260,11 +273,15 @@ namespace SilverSim.LL.Core
             { 
                 case MessageType.PacketAck:
                     /* we decode it here, no need to pass it anywhere else */
-
+                    int unackedReleasedCount = 0;
                     for(uint i = 0; i < pck.ReadUInt8(); ++i)
                     {
                         uint ackno = pck.ReadUInt32();
-                        m_UnackedPackets.Remove(ackno);
+                        UDPPacket p_acked;
+                        if (m_UnackedPackets.Remove(ackno, out p_acked))
+                        {
+                            unackedReleasedCount += p_acked.DataLength;
+                        }
 
                         lock (m_LogoutReplyLock)
                         {
@@ -278,6 +295,10 @@ namespace SilverSim.LL.Core
                                 return;
                             }
                         }
+                    }
+                    lock (m_UnackedBytesLock)
+                    {
+                        m_UnackedBytes -= unackedReleasedCount;
                     }
                     break;
 
@@ -439,6 +460,10 @@ namespace SilverSim.LL.Core
 
                 default:
                     UDPPacketDecoder.PacketDecoderDelegate del;
+                    if(mType == MessageType.AgentUpdate)
+                    {
+                        Interlocked.Increment(ref m_AgentUpdatesReceived);
+                    }
                     if(m_PacketDecoder.PacketTypes.TryGetValue(mType, out del))
                     {
                         Message m = del(pck);

@@ -69,6 +69,14 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
+        public override int ActiveUploads
+        {
+            get
+            {
+                return m_Transactions.Count;
+            }
+        }
+
         public UpdateScriptTask(LLAgent agent, SceneInterface scene, string serverURI)
             : base(agent.Owner, serverURI)
         {

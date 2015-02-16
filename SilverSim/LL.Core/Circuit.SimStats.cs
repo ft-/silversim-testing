@@ -30,6 +30,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.LL.Messages.Simulator;
+using SilverSim.LL.Core.Capabilities;
 
 namespace SilverSim.LL.Core
 {
@@ -45,20 +46,20 @@ namespace SilverSim.LL.Core
             ChildAgents,
             TotalPrim,
             ActivePrim,
-            FrameMS,
-            NetMS,
-            PhysicsMS,
-            ImageMS,
-            OtherMS,
+            FrameTimeMs,
+            NetTimeMs,
+            PhysicsTimeMs,
+            ImageTimeMs,
+            OtherTimeMs,
             InPacketsPerSecond,
             OutPacketsPerSecond,
             UnAckedBytes,
-            AgentMS,
+            AgentTimeMs,
             PendingDownloads,
             PendingUploads,
             ActiveScripts,
             ScriptLinesPerSecond,
-            SimSpareMs,
+            SimSpareTimeMs,
 
             NumStatIndex
         }
@@ -75,34 +76,46 @@ namespace SilverSim.LL.Core
             m_SimStatsData[(int)SimStatIndex.ChildAgents] = new SimStats.Data(SimStats.Data.StatType.ChildAgents, 0);
             m_SimStatsData[(int)SimStatIndex.TotalPrim] = new SimStats.Data(SimStats.Data.StatType.TotalPrim, 0);
             m_SimStatsData[(int)SimStatIndex.ActivePrim] = new SimStats.Data(SimStats.Data.StatType.ActivePrim, 0);
-            m_SimStatsData[(int)SimStatIndex.FrameMS] = new SimStats.Data(SimStats.Data.StatType.FrameMS, 0);
-            m_SimStatsData[(int)SimStatIndex.NetMS] = new SimStats.Data(SimStats.Data.StatType.NetMS, 0);
-            m_SimStatsData[(int)SimStatIndex.PhysicsMS] = new SimStats.Data(SimStats.Data.StatType.PhysicsMS, 0);
-            m_SimStatsData[(int)SimStatIndex.ImageMS] = new SimStats.Data(SimStats.Data.StatType.ImageMS, 0);
-            m_SimStatsData[(int)SimStatIndex.OtherMS] = new SimStats.Data(SimStats.Data.StatType.OtherMS, 0);
+            m_SimStatsData[(int)SimStatIndex.FrameTimeMs] = new SimStats.Data(SimStats.Data.StatType.FrameTimeMs, 0);
+            m_SimStatsData[(int)SimStatIndex.NetTimeMs] = new SimStats.Data(SimStats.Data.StatType.NetTimeMs, 0);
+            m_SimStatsData[(int)SimStatIndex.PhysicsTimeMs] = new SimStats.Data(SimStats.Data.StatType.PhysicsTimeMs, 0);
+            m_SimStatsData[(int)SimStatIndex.ImageTimeMs] = new SimStats.Data(SimStats.Data.StatType.ImageTimeMs, 0);
+            m_SimStatsData[(int)SimStatIndex.OtherTimeMs] = new SimStats.Data(SimStats.Data.StatType.OtherTimeMs, 0);
             m_SimStatsData[(int)SimStatIndex.InPacketsPerSecond] = new SimStats.Data(SimStats.Data.StatType.InPacketsPerSecond, 1);
             m_SimStatsData[(int)SimStatIndex.OutPacketsPerSecond] = new SimStats.Data(SimStats.Data.StatType.OutPacketsPerSecond, 1);
             m_SimStatsData[(int)SimStatIndex.UnAckedBytes] = new SimStats.Data(SimStats.Data.StatType.UnAckedBytes, 0);
-            m_SimStatsData[(int)SimStatIndex.AgentMS] = new SimStats.Data(SimStats.Data.StatType.AgentMS, 0);
+            m_SimStatsData[(int)SimStatIndex.AgentTimeMs] = new SimStats.Data(SimStats.Data.StatType.AgentTimeMs, 0);
             m_SimStatsData[(int)SimStatIndex.PendingDownloads] = new SimStats.Data(SimStats.Data.StatType.PendingDownloads, 0);
             m_SimStatsData[(int)SimStatIndex.PendingUploads] = new SimStats.Data(SimStats.Data.StatType.PendingUploads, 0);
             m_SimStatsData[(int)SimStatIndex.ActiveScripts] = new SimStats.Data(SimStats.Data.StatType.ActiveScripts, 0);
             m_SimStatsData[(int)SimStatIndex.ScriptLinesPerSecond] = new SimStats.Data(SimStats.Data.StatType.ScriptLinesPerSecond, 0);
-            m_SimStatsData[(int)SimStatIndex.SimSpareMs] = new SimStats.Data(SimStats.Data.StatType.SimSpareMs, 0);
+            m_SimStatsData[(int)SimStatIndex.SimSpareTimeMs] = new SimStats.Data(SimStats.Data.StatType.SimSpareTimeMs, 0);
         }
 
         int m_LastPacketsReceived = 0;
         int m_LastPacketsSent = 0;
+        int m_LastAgentUpdatesReceived = 0;
+
         void SendSimStats(int deltatime)
         {
             int packetsReceived = m_PacketsReceived - m_LastPacketsReceived;
             int packetsSent = m_PacketsSent - m_LastPacketsSent;
+            int agentUpdatesReceived = m_AgentUpdatesReceived - m_LastAgentUpdatesReceived;
+            int activeUploads = 0;
+            foreach(UploadAssetAbstractCapability cap in m_UploadCapabilities)
+            {
+                activeUploads += cap.ActiveUploads;
+            }
             m_LastPacketsSent = m_PacketsSent;
             m_LastPacketsReceived = m_PacketsReceived;
+            m_LastAgentUpdatesReceived = m_AgentUpdatesReceived;
 
-            m_SimStatsData[(int)SimStatIndex.InPacketsPerSecond].StatValue = packetsReceived * deltatime / 1000f;
-            m_SimStatsData[(int)SimStatIndex.OutPacketsPerSecond].StatValue = packetsSent * deltatime / 1000f;
+            m_SimStatsData[(int)SimStatIndex.InPacketsPerSecond].StatValue = packetsReceived * 1000f / deltatime;
+            m_SimStatsData[(int)SimStatIndex.OutPacketsPerSecond].StatValue = packetsSent * 1000f / deltatime;
             m_SimStatsData[(int)SimStatIndex.PendingDownloads].StatValue = m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count;
+            m_SimStatsData[(int)SimStatIndex.PendingUploads].StatValue = activeUploads;
+            m_SimStatsData[(int)SimStatIndex.AgentUpdates].StatValue = agentUpdatesReceived * 1000f / deltatime;
+            m_SimStatsData[(int)SimStatIndex.UnAckedBytes].StatValue = m_UnackedBytes;
 
             SimStats stats = new SimStats();
             stats.RegionX = Scene.RegionData.Location.X;

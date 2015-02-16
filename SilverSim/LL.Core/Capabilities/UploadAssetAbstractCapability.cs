@@ -51,6 +51,7 @@ namespace SilverSim.LL.Core.Capabilities
         protected abstract bool AssetIsLocal { get; }
         protected abstract bool AssetIsTemporary { get; }
         protected abstract AssetType NewAssetType { get; }
+        public abstract int ActiveUploads { get; }
 
         protected class UrlNotFoundException : Exception
         {

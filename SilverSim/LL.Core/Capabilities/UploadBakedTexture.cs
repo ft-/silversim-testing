@@ -51,6 +51,14 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
+        public override int ActiveUploads
+        {
+            get
+            {
+                return m_Transactions.Count;
+            }
+        }
+
         public UploadBakedTexture(UUI creator, AssetServiceInterface assetService, string serverURI)
             : base(creator, serverURI)
         {
