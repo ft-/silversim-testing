@@ -265,7 +265,17 @@ namespace SilverSim.LL.Core
             if(pck.IsReliable)
             {
                 /* we have to ack */
-                m_AckList.Enqueue(pck.SequenceNumber);
+                switch(mType)
+                {
+                    case MessageType.CompleteAgentMovement:
+                        /* Immediate ack */
+                        m_Server.SendPacketTo(UDPPacket.PacketAckImmediate(pck.SequenceNumber), RemoteEndPoint);
+                        break;
+
+                    default:
+                        m_AckList.Enqueue(pck.SequenceNumber);
+                        break;
+                }
             }
 
             /* we know the message type now, so we have to decode it when possible */

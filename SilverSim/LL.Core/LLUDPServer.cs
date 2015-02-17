@@ -321,6 +321,8 @@ namespace SilverSim.LL.Core
                                         entry.RegionProtocols = 0; /* 0 => no SSB, 1 => SSB */
                                         rh.RegionExtData.Add(entry);
 
+                                        /* Immediate Ack */
+                                        SendPacketTo(UDPPacket.PacketAckImmediate(pck.SequenceNumber), ep);
                                         
                                         circuit.SendMessage(rh);
                                     }

@@ -283,6 +283,15 @@ namespace SilverSim.LL.Messages
 
         private byte zleCount = 0;
 
+        public static UDPPacket PacketAckImmediate(UInt32 seqno)
+        {
+            UDPPacket p = new UDPPacket();
+            p.WriteMessageType(MessageType.PacketAck);
+            p.WriteUInt8(1);
+            p.WriteUInt32(seqno);
+            return p;
+        }
+
         public UDPPacket()
         {
             Data = new byte[DEFAULT_BUFFER_SIZE];
@@ -562,6 +571,31 @@ namespace SilverSim.LL.Messages
             UInt32 val = BitConverter.ToUInt32(Data, DataPos);
             DataPos += 4;
             return val;
+        }
+        #endregion
+
+        #region UInt32BE
+        public void WriteUInt32BE(UInt32 val)
+        {
+            if (IsZeroEncoded)
+            {
+                byte[] buf = BitConverter.GetBytes(val);
+                if (BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(buf);
+                }
+                WriteZeroEncoded(buf);
+            }
+            else
+            {
+                byte[] buf = BitConverter.GetBytes(val);
+                if (BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(buf);
+                }
+                Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
+                DataLength = DataPos += 4;
+            }
         }
         #endregion
 

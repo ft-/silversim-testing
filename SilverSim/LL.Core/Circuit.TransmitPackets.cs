@@ -297,7 +297,29 @@ namespace SilverSim.LL.Core
                             p.Flush();
                             p.IsReliable = m.IsReliable;
                             p.SequenceNumber = NextSequenceNumber;
+                            int savedDataLength = p.DataLength;
+                            if (!p.IsZeroEncoded)
+                            {
+                                uint appendableAcks = (1399 - (uint)savedDataLength) / 4;
+                                uint curacks = (uint)m_AckList.Count;
+                                if (appendableAcks != 0 && curacks != 0)
+                                {
+                                    p.HasAckFlag = true;
+                                    uint cnt = 0;
+                                    while (cnt < appendableAcks && cnt < curacks && cnt < 255)
+                                    {
+                                        p.WriteUInt32BE(m_AckList.Dequeue());
+                                        ++cnt;
+                                    }
+                                    p.WriteUInt8((byte)cnt);
+                                }
+                            }
+
                             RateBucket[(int)ThrottleMap[queueidx]] += m_Server.SendPacketTo(p, RemoteEndPoint);
+
+                            p.HasAckFlag = false;
+                            p.DataLength = savedDataLength;
+
                             Interlocked.Increment(ref m_PacketsSent);
                             p.EnqueuedAtTime = Environment.TickCount;
                             p.TransferredAtTime = Environment.TickCount;
