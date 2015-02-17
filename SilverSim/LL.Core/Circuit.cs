@@ -593,14 +593,6 @@ namespace SilverSim.LL.Core
                     case MessageType.CrossedRegion:
                     case MessageType.TeleportFinish:
                     case 0: /* only Event Queue support */
-                        if(m is Messages.Console.SimConsoleResponse)
-                        {
-                            if(!Scene.IsSimConsoleAllowed(Agent.Owner))
-                            {
-                                /* no messages when not allowed */
-                                break;
-                            }
-                        }
                         m_EventQueue.Enqueue(m);
                         break;
 

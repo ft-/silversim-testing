@@ -38,7 +38,7 @@ namespace SilverSim.LL.Core
     {
         BlockingQueue<Message> m_EventQueue = new BlockingQueue<Message>();
         bool m_EventQueueEnabled = true;
-        int m_EventQueueEventId = 0;
+        int m_EventQueueEventId = 1;
 
         void Cap_EventQueueGet(HttpRequest httpreq)
         {
@@ -135,8 +135,8 @@ namespace SilverSim.LL.Core
             } while (m != null);
 
             Map result = new Map();
-            result.Add("id", m_EventQueueEventId);
             result.Add("events", eventarr);
+            result.Add("id", m_EventQueueEventId++);
 
             res = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
             res.ContentType = "application/llsd+xml";

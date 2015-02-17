@@ -243,6 +243,7 @@ namespace SilverSim.LL.Core
                     m_ServiceURLCapabilities.Add(kvp.Key.Substring(4), kvp.Value);
                 }
             }
+            AddDefCapability("SimConsoleAsync", regionSeedID, Cap_SimConsoleAsync, capConfig);
             AddDefCapability("FetchInventory2", regionSeedID, Cap_FetchInventory2, capConfig);
             AddDefCapability("FetchLib2", regionSeedID, Cap_FetchInventory2, capConfig);
             AddDefCapability("FetchInventoryDescendents2", regionSeedID, Cap_FetchInventoryDescendents2, capConfig);
