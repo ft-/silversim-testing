@@ -81,6 +81,7 @@ namespace SilverSim.LL.Core
         }
 
         const int TRANSMIT_THROTTLE_MTU = 1500;
+        const int MAX_DATA_MTU = 1400;
 
         void HandleThrottlePacket(Message msg)
         {
@@ -300,7 +301,7 @@ namespace SilverSim.LL.Core
                             int savedDataLength = p.DataLength;
                             if (!p.IsZeroEncoded)
                             {
-                                uint appendableAcks = (1399 - (uint)savedDataLength) / 4;
+                                uint appendableAcks = (MAX_DATA_MTU - 1 - (uint)savedDataLength) / 4;
                                 uint curacks = (uint)m_AckList.Count;
                                 if (appendableAcks != 0 && curacks != 0)
                                 {
