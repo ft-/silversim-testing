@@ -556,6 +556,9 @@ namespace SilverSim.LL.Core
             m_Routing[MessageType.ParcelMediaCommandMessage] = Scene.HandleSimulatorMessage;
             m_Routing[MessageType.ParcelMediaUpdate] = Scene.HandleSimulatorMessage;
 
+            /* Sound */
+            m_Routing[MessageType.SoundTrigger] = Scene.HandleSimulatorMessage;
+
         }
 
         public void RouteReceivedMessage(Message m)

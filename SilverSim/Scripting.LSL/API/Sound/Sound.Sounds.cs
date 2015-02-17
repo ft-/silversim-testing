@@ -80,7 +80,20 @@ namespace SilverSim.Scripting.LSL.API.Sound
         [APILevel(APIFlags.LSL)]
         public void llPreloadSound(ScriptInstance Instance, string sound)
         {
-#warning Implement llPreloadSound(string)
+            lock(Instance)
+            {
+                UUID soundID;
+                try
+                {
+                    soundID = getSoundAssetID(Instance, sound);
+                }
+                catch
+                {
+                    Instance.ShoutError(string.Format("Inventory item {0} does not reference a sound", sound));
+                    return;
+                }
+                Instance.Part.ObjectGroup.Scene.SendPreloadSound(Instance.Part, soundID);
+            }
         }
 
         [APILevel(APIFlags.LSL)]
@@ -104,13 +117,39 @@ namespace SilverSim.Scripting.LSL.API.Sound
         [APILevel(APIFlags.LSL)]
         public void llTriggerSound(ScriptInstance Instance, string sound, double volume)
         {
-#warning Implement llTriggerSound(string, double)
+            lock (Instance)
+            {
+                UUID soundID;
+                try
+                {
+                    soundID = getSoundAssetID(Instance, sound);
+                }
+                catch
+                {
+                    Instance.ShoutError(string.Format("Inventory item {0} does not reference a sound", sound));
+                    return;
+                }
+                Instance.Part.ObjectGroup.Scene.SendTriggerSound(Instance.Part, soundID, volume, 20);
+            }
         }
 
         [APILevel(APIFlags.LSL)]
         public void llTriggerSoundLimited(ScriptInstance Instance, string sound, double volume, Vector3 top_north_east, Vector3 bottom_south_west)
         {
-#warning Implement llTriggerSoundLimited(string, double, Vector3, Vector3)
+            lock (Instance)
+            {
+                UUID soundID;
+                try
+                {
+                    soundID = getSoundAssetID(Instance, sound);
+                }
+                catch
+                {
+                    Instance.ShoutError(string.Format("Inventory item {0} does not reference a sound", sound));
+                    return;
+                }
+                Instance.Part.ObjectGroup.Scene.SendTriggerSound(Instance.Part, soundID, volume, 20, top_north_east, bottom_south_west);
+            }
         }
 
         [APILevel(APIFlags.LSL)]
