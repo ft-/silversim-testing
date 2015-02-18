@@ -120,19 +120,24 @@ namespace SilverSim.LL.Core
                     Messages.Image.ImageData res = new Messages.Image.ImageData();
                     res.Codec = codec;
                     res.ID = imageRequest.ImageID;
+                    res.Size = (uint)asset.Data.Length;
+
                     if (asset.Data.Length > IMAGE_FIRST_PACKET_SIZE)
                     {
-                        res.Data = new byte[IMAGE_FIRST_PACKET_SIZE];
-                        int numpackets = 1 + (asset.Data.Length - 1) / IMAGE_PACKET_SIZE;
-                        res.Packets = (ushort)numpackets;
-                        res.Size = (uint)asset.Data.Length;
+                        if (imageRequest.Packet == 0)
+                        {
+                            res.Data = new byte[IMAGE_FIRST_PACKET_SIZE];
+                            uint numpackets = 1 + ((uint)asset.Data.Length - 1) / IMAGE_PACKET_SIZE;
+                            res.Packets = (ushort)numpackets;
 
-                        Buffer.BlockCopy(asset.Data, 0, res.Data, 0, IMAGE_FIRST_PACKET_SIZE);
-                        SendMessage(res);
+                            Buffer.BlockCopy(asset.Data, 0, res.Data, 0, IMAGE_FIRST_PACKET_SIZE);
+                            SendMessage(res);
+                        } 
                         res = null;
 
+
                         int offset = IMAGE_FIRST_PACKET_SIZE;
-                        ushort packetno = 1;
+                        ushort packetno = 0;
                         while(offset < asset.Data.Length)
                         {
                             Messages.Image.ImagePacket ip = new Messages.Image.ImagePacket();
@@ -155,7 +160,6 @@ namespace SilverSim.LL.Core
                     else
                     {
                         res.Data = asset.Data;
-                        res.Size = (uint)asset.Data.Length;
                         res.Packets = 1;
                         SendMessage(res);
                     }
