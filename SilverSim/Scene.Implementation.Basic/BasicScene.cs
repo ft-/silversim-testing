@@ -264,6 +264,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }
             ID = ri.ID;
             Name = ri.Name;
+            Owner = ri.Owner;
             GridPosition = ri.Location;
             Terrain = new TerrainController(this);
             Environment = new EnvironmentController(this);

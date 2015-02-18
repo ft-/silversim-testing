@@ -99,7 +99,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
                     r.Size.X = ((uint)regionEntry.GetInt("SizeX", 256) + 255) & (~(uint)255);
                     r.Size.Y = ((uint)regionEntry.GetInt("SizeY", 256) + 255) & (~(uint)255);
                     r.Flags = RegionFlags.RegionOnline;
-                    r.Owner.ID = regionEntry.GetString("OwnerID");
+                    r.Owner = new UUI(regionEntry.GetString("Owner"));
                     r.ScopeID = regionEntry.GetString("ScopeID", "00000000-0000-0000-0000-000000000000");
                     r.ServerHttpPort = m_HttpPort;
                     r.RegionMapTexture = regionEntry.GetString("MaptileStaticUUID", "00000000-0000-0000-0000-000000000000");
