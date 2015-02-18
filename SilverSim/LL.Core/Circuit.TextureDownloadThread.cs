@@ -123,7 +123,7 @@ namespace SilverSim.LL.Core
                     if (asset.Data.Length > IMAGE_FIRST_PACKET_SIZE)
                     {
                         res.Data = new byte[IMAGE_FIRST_PACKET_SIZE];
-                        int numpackets = 1 + (asset.Data.Length - IMAGE_FIRST_PACKET_SIZE + IMAGE_PACKET_SIZE - 1) / IMAGE_PACKET_SIZE;
+                        int numpackets = 1 + (asset.Data.Length - 1) / IMAGE_PACKET_SIZE;
                         res.Packets = (ushort)numpackets;
                         res.Size = (uint)asset.Data.Length;
 
