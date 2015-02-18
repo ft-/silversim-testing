@@ -39,6 +39,8 @@ namespace SilverSim.LL.Core
         {
             Thread.CurrentThread.Name = string.Format("LLUDP:Texture Downloader for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
 
+#warning Implement Priority handling
+
             while(true)
             {
                 Messages.Image.RequestImage req;
