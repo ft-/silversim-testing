@@ -34,13 +34,20 @@ namespace SilverSim.LL.Messages.Image
         public UUID AgentID;
         public UUID SessionID;
 
+        public enum ImageType : byte
+        {
+            Normal = 0,
+            Baked = 1,
+            ServerBaked = 2
+        }
+
         public struct RequestImageEntry
         {
             public UUID ImageID;
             public sbyte DiscardLevel;
             public double DownloadPriority;
             public UInt32 Packet;
-            public byte Type;
+            public ImageType Type;
         }
 
         public readonly List<RequestImageEntry> RequestImageList = new List<RequestImageEntry>();
@@ -72,7 +79,7 @@ namespace SilverSim.LL.Messages.Image
                 e.DiscardLevel = p.ReadInt8();
                 e.DownloadPriority = p.ReadFloat();
                 e.Packet = p.ReadUInt32();
-                e.Type = p.ReadUInt8();
+                e.Type = (ImageType)p.ReadUInt8();
                 m.RequestImageList.Add(e);
             }
 

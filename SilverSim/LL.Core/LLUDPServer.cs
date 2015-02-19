@@ -74,7 +74,7 @@ namespace SilverSim.LL.Core
         
         public SceneInterface Scene { get; private set; }
         public bool LogAssetFailures = false;
-        public bool LogTransferPacket = true;
+        public bool LogTransferPacket = false;
 
         public LLUDPServer(IPAddress bindAddress, int port, IMServiceInterface imService, ChatServiceInterface chatService, SceneInterface scene)
         {

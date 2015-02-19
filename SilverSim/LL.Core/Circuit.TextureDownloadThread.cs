@@ -23,8 +23,10 @@ exception statement from your version.
 
 */
 
+using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 
 namespace SilverSim.LL.Core
@@ -38,27 +40,72 @@ namespace SilverSim.LL.Core
         private void TextureDownloadThread(object param)
         {
             Thread.CurrentThread.Name = string.Format("LLUDP:Texture Downloader for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
-
+            Queue<Messages.Image.RequestImage.RequestImageEntry> bakedReqs = new Queue<Messages.Image.RequestImage.RequestImageEntry>();
+            Queue<Messages.Image.RequestImage.RequestImageEntry> normalReqs = new Queue<Messages.Image.RequestImage.RequestImageEntry>();
+            HashSet<UUID> activeRequestImages = new HashSet<UUID>();
 #warning Implement Priority handling
 
             while(true)
             {
-                Messages.Image.RequestImage req;
                 if(!m_TextureDownloadThreadRunning)
                 {
                     return;
                 }
                 try
                 {
-                    req = m_TextureDownloadQueue.Dequeue(1000);
+                    Messages.Image.RequestImage req;
+                    if (bakedReqs.Count != 0 || normalReqs.Count != 0)
+                    {
+                        req = m_TextureDownloadQueue.Dequeue(0);
+                    }
+                    else
+                    {
+                        req = m_TextureDownloadQueue.Dequeue(1000);
+                    }
+                    foreach(Messages.Image.RequestImage.RequestImageEntry imageRequest in req.RequestImageList)
+                    {
+                        if (!activeRequestImages.Contains(imageRequest.ImageID))
+                        {
+                            activeRequestImages.Add(imageRequest.ImageID);
+                            if (imageRequest.Type == Messages.Image.RequestImage.ImageType.Baked ||
+                                imageRequest.Type == Messages.Image.RequestImage.ImageType.ServerBaked)
+                            {
+                                bakedReqs.Enqueue(imageRequest);
+                            }
+                            else
+                            {
+                                normalReqs.Enqueue(imageRequest);
+                            }
+                        }
+                    }
                 }
                 catch
                 {
-                    continue;
+                    if (bakedReqs.Count != 0 || normalReqs.Count != 0)
+                    {
+                        continue;
+                    }
                 }
 
-                foreach (Messages.Image.RequestImage.RequestImageEntry imageRequest in req.RequestImageList)
+                if (bakedReqs.Count != 0 || normalReqs.Count != 0)
                 {
+                    Messages.Image.RequestImage.RequestImageEntry imageRequest;
+                    try
+                    {
+                        imageRequest = bakedReqs.Dequeue();
+                    }
+                    catch
+                    {
+                        try
+                        {
+                            imageRequest = normalReqs.Dequeue();
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+                    }
+
                     /* let us prefer the scene's asset service */
                     AssetData asset;
                     try
@@ -91,6 +138,7 @@ namespace SilverSim.LL.Core
                             Messages.Image.ImageNotInDatabase failres = new Messages.Image.ImageNotInDatabase();
                             failres.ID = imageRequest.ImageID;
                             SendMessage(failres);
+                            activeRequestImages.Remove(imageRequest.ImageID);
                             continue;
                         }
                     }
@@ -116,6 +164,7 @@ namespace SilverSim.LL.Core
                             Messages.Image.ImageNotInDatabase failres = new Messages.Image.ImageNotInDatabase();
                             failres.ID = imageRequest.ImageID;
                             SendMessage(failres);
+                            activeRequestImages.Remove(imageRequest.ImageID);
                             continue;
                     }
 
@@ -129,14 +178,12 @@ namespace SilverSim.LL.Core
                         if (imageRequest.Packet == 0)
                         {
                             res.Data = new byte[IMAGE_FIRST_PACKET_SIZE];
-                            uint numpackets = 1 + ((uint)asset.Data.Length - 1) / IMAGE_PACKET_SIZE;
+                            uint numpackets = 1 + ((uint)asset.Data.Length - IMAGE_FIRST_PACKET_SIZE + IMAGE_PACKET_SIZE - 1) / IMAGE_PACKET_SIZE;
                             res.Packets = (ushort)numpackets;
 
                             Buffer.BlockCopy(asset.Data, 0, res.Data, 0, IMAGE_FIRST_PACKET_SIZE);
                             SendMessage(res);
                         } 
-                        res = null;
-
 
                         int offset = IMAGE_FIRST_PACKET_SIZE;
                         ushort packetno = 0;
@@ -159,12 +206,13 @@ namespace SilverSim.LL.Core
                             offset += IMAGE_PACKET_SIZE;
                         }
                     }
-                    else
+                    else if (imageRequest.Packet == 0)
                     {
                         res.Data = asset.Data;
                         res.Packets = 1;
                         SendMessage(res);
                     }
+                    activeRequestImages.Remove(imageRequest.ImageID);
                 }
             }
         }

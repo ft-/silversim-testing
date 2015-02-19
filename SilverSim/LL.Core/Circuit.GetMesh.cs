@@ -135,9 +135,9 @@ namespace SilverSim.LL.Core
                         return;
                     }
 
-                    if (v[0] != "bytes")
+                    if (p[0] != "bytes")
                     {
-                        httpres = httpreq.BeginResponse();
+                        httpres = httpreq.BeginResponse("application/vnd.ll.mesh");
                         o = httpres.GetOutputStream(asset.Data.LongLength);
                         o.Write(asset.Data, 0, asset.Data.Length);
                         httpres.Close();
@@ -147,7 +147,15 @@ namespace SilverSim.LL.Core
                     try
                     {
                         int start = int.Parse(v[0]);
-                        int end = int.Parse(v[1]);
+                        int end;
+                        if (string.IsNullOrEmpty(v[1]))
+                        {
+                            end = asset.Data.Length - 1;
+                        }
+                        else
+                        {
+                            end = int.Parse(v[1]);
+                        }
                         if (start > end)
                         {
                             httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
