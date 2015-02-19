@@ -37,6 +37,7 @@ namespace SilverSim.LL.Core
         private const int IMAGE_FIRST_PACKET_SIZE = 600;
 
         #region Texture Download Thread
+        public bool LogUDPTextureDownloads = true;
         private void TextureDownloadThread(object param)
         {
             Thread.CurrentThread.Name = string.Format("LLUDP:Texture Downloader for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
@@ -81,7 +82,7 @@ namespace SilverSim.LL.Core
                 }
                 catch
                 {
-                    if (bakedReqs.Count != 0 || normalReqs.Count != 0)
+                    if (bakedReqs.Count == 0 && normalReqs.Count == 0)
                     {
                         continue;
                     }
@@ -106,6 +107,10 @@ namespace SilverSim.LL.Core
                         }
                     }
 
+                    if(LogUDPTextureDownloads)
+                    {
+                        m_Log.InfoFormat("Processing texture {0}", imageRequest.ImageID);
+                    }
                     /* let us prefer the scene's asset service */
                     AssetData asset;
                     try
@@ -138,6 +143,10 @@ namespace SilverSim.LL.Core
                             Messages.Image.ImageNotInDatabase failres = new Messages.Image.ImageNotInDatabase();
                             failres.ID = imageRequest.ImageID;
                             SendMessage(failres);
+                            if (LogUDPTextureDownloads)
+                            {
+                                m_Log.InfoFormat("texture {0} not found", imageRequest.ImageID);
+                            }
                             activeRequestImages.Remove(imageRequest.ImageID);
                             continue;
                         }
@@ -165,6 +174,10 @@ namespace SilverSim.LL.Core
                             failres.ID = imageRequest.ImageID;
                             SendMessage(failres);
                             activeRequestImages.Remove(imageRequest.ImageID);
+                            if(LogUDPTextureDownloads)
+                            {
+                                m_Log.InfoFormat("Asset {0} is not a texture", imageRequest.ImageID);
+                            }
                             continue;
                     }
 
@@ -213,6 +226,10 @@ namespace SilverSim.LL.Core
                         SendMessage(res);
                     }
                     activeRequestImages.Remove(imageRequest.ImageID);
+                    if (LogUDPTextureDownloads)
+                    {
+                        m_Log.InfoFormat("Download of texture {0} finished", imageRequest.ImageID);
+                    }
                 }
             }
         }

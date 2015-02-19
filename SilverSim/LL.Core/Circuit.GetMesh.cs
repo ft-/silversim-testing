@@ -120,22 +120,68 @@ namespace SilverSim.LL.Core
                 List<KeyValuePair<int, int>> contentranges = new List<KeyValuePair<int, int>>();
 
                 string[] ranges = httpreq["Range"].Split(' ');
-                foreach (string range in ranges)
-                {
-                    string[] p = range.Split('=');
-                    if (p.Length != 2)
-                    {
-                        httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
-                        return;
-                    }
-                    string[] v = p[1].Split('-');
-                    if (v.Length != 2)
-                    {
-                        httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
-                        return;
-                    }
 
-                    if (p[0] != "bytes")
+                if(ranges.Length > 1)
+                {
+                    httpres = httpreq.BeginResponse("application/vnd.ll.mesh");
+                    o = httpres.GetOutputStream(asset.Data.LongLength);
+                    o.Write(asset.Data, 0, asset.Data.Length);
+                    httpres.Close();
+                    return;
+                }
+
+                int start;
+                int end;
+
+                string[] p = ranges[0].Split('=');
+                if (p.Length != 2)
+                {
+                    httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
+                    return;
+                }
+                string[] v = p[1].Split('-');
+                if (v.Length != 2)
+                {
+                    httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
+                    return;
+                }
+
+                if (p[0] != "bytes")
+                {
+                    httpres = httpreq.BeginResponse("application/vnd.ll.mesh");
+                    o = httpres.GetOutputStream(asset.Data.LongLength);
+                    o.Write(asset.Data, 0, asset.Data.Length);
+                    httpres.Close();
+                    return;
+                }
+
+                try
+                {
+                    start = int.Parse(v[0]);
+                    if (string.IsNullOrEmpty(v[1]))
+                    {
+                        end = asset.Data.Length - 1;
+                    }
+                    else
+                    {
+                        end = int.Parse(v[1]);
+                    }
+                    if (start > end)
+                    {
+                        httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "image/x-j2c").Close();
+                        return;
+                    }
+                    if (start >= asset.Data.Length)
+                    {
+                        httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh").Close();
+                        return;
+                    }
+                    if (end >= asset.Data.Length)
+                    {
+                        httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
+                        return;
+                    }
+                    if (start == 0 && end == asset.Data.Length - 1)
                     {
                         httpres = httpreq.BeginResponse("application/vnd.ll.mesh");
                         o = httpres.GetOutputStream(asset.Data.LongLength);
@@ -143,44 +189,18 @@ namespace SilverSim.LL.Core
                         httpres.Close();
                         return;
                     }
-
-                    try
-                    {
-                        int start = int.Parse(v[0]);
-                        int end;
-                        if (string.IsNullOrEmpty(v[1]))
-                        {
-                            end = asset.Data.Length - 1;
-                        }
-                        else
-                        {
-                            end = int.Parse(v[1]);
-                        }
-                        if (start > end)
-                        {
-                            httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
-                            return;
-                        }
-                        if (start >= asset.Data.Length || end >= asset.Data.Length)
-                        {
-                            httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
-                            return;
-                        }
-                        contentranges.Add(new KeyValuePair<int, int>(start, end));
-                    }
-                    catch
-                    {
-                        httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
-                        return;
-                    }
+                    contentranges.Add(new KeyValuePair<int, int>(start, end));
+                }
+                catch
+                {
+                    httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
+                    return;
                 }
 
                 httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh");
-                o = httpres.GetOutputStream(asset.Data.LongLength);
-                foreach (KeyValuePair<int, int> range in contentranges)
-                {
-                    o.Write(asset.Data, range.Key, range.Value - range.Key + 1);
-                }
+                httpres.Headers["Content-Range"] = string.Format("bytes {0}-{1}/{2}", start, end, asset.Data.Length);
+                o = httpres.GetOutputStream(end - start + 1);
+                o.Write(asset.Data, start, end - start + 1);
                 httpres.Close();
             }
             else

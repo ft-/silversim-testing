@@ -91,7 +91,8 @@ namespace SilverSim.Main.Common.CmdIO
         public List<string> GetCmdLine(string cmdline)
         {
             List<string> cmdargs = new List<string>();
-            if (cmdline.Trim() == string.Empty)
+            cmdline = cmdline.Trim();
+            if (cmdline == string.Empty)
             {
                 return cmdargs;
             }

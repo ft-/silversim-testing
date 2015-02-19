@@ -49,21 +49,9 @@ namespace SilverSim.LL.Core
             NumQueues, /* must be last */
         }
 
-        enum ThrottleOutType : int
-        {
-            Resend,
-            LandLayerData,
-            WindLayerData,
-            CloudLayerData,
-            Task,
-            Texture,
-            Asset,
-
-            NumThrottles
-        }
-
-        int[] ThrottleRates = new int[(int)ThrottleOutType.NumThrottles];
-        int[] RateBucket = new int[(int)ThrottleOutType.NumThrottles];
+        int ThrottleRate = 60125;
+        int RateBucket;
+        bool m_UseThrottle = false;
 
         private readonly Dictionary<MessageType, QueueOutType> m_QueueOutTable = new Dictionary<MessageType, QueueOutType>();
         static void InitializeTransmitQueueRouting()
@@ -72,12 +60,6 @@ namespace SilverSim.LL.Core
 
         void InitializeTransmitQueueing()
         {
-            ThrottleRates[(int)ThrottleOutType.LandLayerData] = 9125;
-            ThrottleRates[(int)ThrottleOutType.WindLayerData] = 1750;
-            ThrottleRates[(int)ThrottleOutType.CloudLayerData] = 1750;
-            ThrottleRates[(int)ThrottleOutType.Task] = 18500;
-            ThrottleRates[(int)ThrottleOutType.Texture] = 18500;
-            ThrottleRates[(int)ThrottleOutType.Asset] = 10500;
         }
 
         const int TRANSMIT_THROTTLE_MTU = 1500;
@@ -105,22 +87,10 @@ namespace SilverSim.LL.Core
             int texture = (int)(BitConverter.ToSingle(m.Throttles, 20) * 0.125f);
             int asset = (int)(BitConverter.ToSingle(m.Throttles, 24) * 0.125f);
 
-            ThrottleRates[(int)ThrottleOutType.Resend] = Math.Max(resend, TRANSMIT_THROTTLE_MTU);
-            ThrottleRates[(int)ThrottleOutType.LandLayerData] = Math.Max(land, TRANSMIT_THROTTLE_MTU);
-            ThrottleRates[(int)ThrottleOutType.WindLayerData] = Math.Max(wind, TRANSMIT_THROTTLE_MTU);
-            ThrottleRates[(int)ThrottleOutType.CloudLayerData] = Math.Max(cloud, TRANSMIT_THROTTLE_MTU);
-            ThrottleRates[(int)ThrottleOutType.Task] = Math.Max(task, TRANSMIT_THROTTLE_MTU);
-            ThrottleRates[(int)ThrottleOutType.Texture] = Math.Max(texture, TRANSMIT_THROTTLE_MTU);
-            ThrottleRates[(int)ThrottleOutType.Asset] = Math.Max(asset, TRANSMIT_THROTTLE_MTU);
-            m_Log.DebugFormat("Reconfigured throttles for {0} to: Resend {1} Kbs, Land {2} Kbs, Wind {3} Kbs, Cloud {4} Kbs, Task {5} Kbs, Texture {6} Kbs, Asset {7} Kbs",
+            ThrottleRate = resend + land + wind + cloud + task + texture + asset;
+            m_Log.DebugFormat("Reconfigured throttle for {0} to: Total {1} Kbs",
                 Agent.Owner.FullName,
-                ThrottleRates[(int)ThrottleOutType.Resend],
-                ThrottleRates[(int)ThrottleOutType.LandLayerData],
-                ThrottleRates[(int)ThrottleOutType.WindLayerData],
-                ThrottleRates[(int)ThrottleOutType.CloudLayerData],
-                ThrottleRates[(int)ThrottleOutType.Task],
-                ThrottleRates[(int)ThrottleOutType.Texture],
-                ThrottleRates[(int)ThrottleOutType.Asset]);
+                ThrottleRate);
         }
 
         private void TerminateCircuit()
@@ -173,16 +143,6 @@ namespace SilverSim.LL.Core
             Queue<Message> HighPriorityQueue;
             Queue<Message> MediumPriorityQueue;
             Queue<Message>[] QueueList = new Queue<Message>[(int)QueueOutType.NumQueues];
-            ThrottleOutType[] ThrottleMap = new ThrottleOutType[(int)QueueOutType.NumQueues];
-            ThrottleMap[(int)QueueOutType.High] = ThrottleOutType.Task;
-            ThrottleMap[(int)QueueOutType.Resend] = ThrottleOutType.Resend;
-            ThrottleMap[(int)QueueOutType.LandLayerData] = ThrottleOutType.LandLayerData;
-            ThrottleMap[(int)QueueOutType.WindLayerData] = ThrottleOutType.WindLayerData;
-            ThrottleMap[(int)QueueOutType.GenericLayerData] = ThrottleOutType.CloudLayerData;
-            ThrottleMap[(int)QueueOutType.Medium] = ThrottleOutType.Task;
-            ThrottleMap[(int)QueueOutType.Low] = ThrottleOutType.Task;
-            ThrottleMap[(int)QueueOutType.Asset] = ThrottleOutType.Asset;
-            ThrottleMap[(int)QueueOutType.Texture] = ThrottleOutType.Texture;
             QueueOutType qroutidx;
 
             for (uint qidx = 0; qidx < (uint)QueueOutType.NumQueues; ++qidx)
@@ -268,6 +228,24 @@ namespace SilverSim.LL.Core
 
                 }
 
+                int bucketCheckTime = Environment.TickCount;
+                if (bucketCheckTime != lastBucketTick)
+                {
+                    int deltatime = bucketCheckTime - lastBucketTick;
+                    int decreaseVal = (ThrottleRate * deltatime) / 1000;
+                    /* make a min bucket decrease here, prevent stalls */
+                    if (decreaseVal < 60 * deltatime)
+                    { /* this is roughly around 60kByte/s */
+                        decreaseVal = 60 * deltatime;
+                    }
+                    if (decreaseVal > RateBucket)
+                    {
+                        decreaseVal = RateBucket;
+                    }
+                    RateBucket -= decreaseVal;
+                    lastBucketTick = bucketCheckTime;
+                }
+
                 /* make high packets pass low priority packets */
                 for(int queueidx = 0; queueidx < QueueList.Length; ++queueidx)
                 {
@@ -276,7 +254,7 @@ namespace SilverSim.LL.Core
                     {
                         continue;
                     }
-                    if(RateBucket[(int)ThrottleMap[queueidx]] >= ThrottleRates[(int)ThrottleMap[queueidx]])
+                    if(RateBucket >= ThrottleRate && m_UseThrottle)
                     {
                         continue;
                     }
@@ -316,7 +294,7 @@ namespace SilverSim.LL.Core
                                 }
                             }
 
-                            RateBucket[(int)ThrottleMap[queueidx]] += m_Server.SendPacketTo(p, RemoteEndPoint);
+                            RateBucket += m_Server.SendPacketTo(p, RemoteEndPoint);
 
                             p.HasAckFlag = false;
                             p.DataLength = savedDataLength;
@@ -369,27 +347,6 @@ namespace SilverSim.LL.Core
                     int deltatime = Environment.TickCount - lastSimStatsTick;
                     lastSimStatsTick = Environment.TickCount;
                     SendSimStats(deltatime);
-                }
-
-                int bucketCheckTime = Environment.TickCount;
-                if (bucketCheckTime != lastBucketTick)
-                {
-                    int deltatime = bucketCheckTime - lastBucketTick;
-                    for(int rateidx = 0; rateidx < RateBucket.Length; ++rateidx)
-                    {
-                        int decreaseVal = (ThrottleRates[rateidx] * deltatime) / 1000;
-                        /* make a min bucket decrease here, prevent stalls */
-                        if(decreaseVal < 1 * deltatime)
-                        { /* this is roughly around 1kByte/s */
-                            decreaseVal = 1 * deltatime;
-                        }
-                        if(decreaseVal > RateBucket[rateidx])
-                        {
-                            decreaseVal = RateBucket[rateidx];
-                        }
-                        RateBucket[rateidx] -= decreaseVal;
-                    }
-                    lastBucketTick = bucketCheckTime;
                 }
 
                 if (Environment.TickCount - lastPingTick >= 5000)

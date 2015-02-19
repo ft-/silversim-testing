@@ -797,6 +797,10 @@ namespace SilverSim.Main.Common
             {
                 io.WriteFormatted("shutdown not allowed from restricted console");
             }
+            else if(args[0] == "help")
+            {
+                io.Write("shutdown simulator");
+            }
             else
             {
                 m_ShutdownEvent.Set();
@@ -805,8 +809,15 @@ namespace SilverSim.Main.Common
 
         public void MemoryCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
-            io.WriteFormatted(  "Heap allocated to simulator : {0} MB\n" +
-                                "Process Memory              : {0} MB", Math.Round(GC.GetTotalMemory(false) / 1048576.0), Math.Round(Process.GetCurrentProcess().WorkingSet64 / 1048576.0));
+            if (args[0] == "help")
+            {
+                io.Write("Shows current memory usage by simulator");
+            }
+            else
+            {
+                io.WriteFormatted("Heap allocated to simulator : {0} MB\n" +
+                                    "Process Memory              : {0} MB", Math.Round(GC.GetTotalMemory(false) / 1048576.0), Math.Round(Process.GetCurrentProcess().WorkingSet64 / 1048576.0));
+            }
         }
 
         public void Shutdown()

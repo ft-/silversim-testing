@@ -35,139 +35,122 @@ namespace SilverSim.Main.Common.CmdIO
         public delegate void CommandDelegate(List<string> args, TTY io, UUID limitedToScene /* is UUID.Zero for all allowed */);
 
         public static RwLockedDictionary<string, CommandDelegate> Commands = new RwLockedDictionary<string, CommandDelegate>();
+        public static RwLockedDictionary<string, CommandDelegate> CreateCommands = new RwLockedDictionary<string, CommandDelegate>();
+        public static RwLockedDictionary<string, CommandDelegate> DeleteCommands = new RwLockedDictionary<string, CommandDelegate>();
         public static RwLockedDictionary<string, CommandDelegate> LoadCommands = new RwLockedDictionary<string, CommandDelegate>();
         public static RwLockedDictionary<string, CommandDelegate> SaveCommands = new RwLockedDictionary<string, CommandDelegate>();
         public static RwLockedDictionary<string, CommandDelegate> ShowCommands = new RwLockedDictionary<string, CommandDelegate>();
 
         static CommandRegistry()
         {
-            Commands.Add("load", LoadCommand_Handler);
-            Commands.Add("save", SaveCommand_Handler);
-            Commands.Add("show", ShowCommand_Handler);
+            Commands.Add("load", new CommandType("load", LoadCommands).Command_Handler);
+            Commands.Add("save", new CommandType("save", SaveCommands).Command_Handler);
+            Commands.Add("show", new CommandType("show", ShowCommands).Command_Handler);
+            Commands.Add("create", new CommandType("create", CreateCommands).Command_Handler);
+            Commands.Add("delete", new CommandType("delete", DeleteCommands).Command_Handler);
         }
 
-        static void LoadCommand_Handler(List<string> args, TTY io, UUID limitedToScene)
+        class CommandType
         {
-            CommandDelegate del;
-            if(args.Count < 2)
+            string m_Command;
+            RwLockedDictionary<string, CommandDelegate> m_Dict;
+            public CommandType(string command, RwLockedDictionary<string, CommandDelegate> dict)
             {
-                io.Write("Invalid load command");
-                return;
-            }
-            try
-            {
-                del = LoadCommands[args[1]];
-            }
-            catch (Exception)
-            {
-                io.WriteFormatted("Unsupported load command '{0}'", args[1]);
-                return;
+                m_Command = command;
+                m_Dict = dict;
             }
 
-            try
+            public void Command_Handler(List<string> args, TTY io, UUID limitedToScene)
             {
-                del(args, io, limitedToScene);
-            }
-            catch (Exception e)
-            {
-                io.WriteFormatted("Command execution error {0}: {1}", e.GetType().ToString(), e.ToString());
-            }
+                CommandDelegate del;
+                if (args.Count < 2)
+                {
+                    if (args[0] == "help")
+                    {
+                        string commands = m_Command + " command list:\n";
+                        foreach(string cmd in m_Dict.Keys)
+                        {
+                            commands += string.Format("{0} {1}\n", m_Command, cmd);
+                        }
+                        io.Write(commands);
+                    }
+                    else
+                    {
+                        io.Write("Invalid " + m_Command + " command");
+                    }
+                    return;
+                }
+                try
+                {
+                    del = m_Dict[args[1]];
+                }
+                catch (Exception)
+                {
+                    io.WriteFormatted("Unsupported {1} command '{0}'", args[1], m_Command);
+                    return;
+                }
 
-        }
+                try
+                {
+                    del(args, io, limitedToScene);
+                }
+                catch (Exception e)
+                {
+                    io.WriteFormatted("Command execution error {0}: {1}", e.GetType().ToString(), e.ToString());
+                }
 
-
-        static void ShowCommand_Handler(List<string> args, TTY io, UUID limitedToScene)
-        {
-            CommandDelegate del;
-            if (args.Count < 2)
-            {
-                io.Write("Invalid show command");
-                return;
             }
-            try
-            {
-                del = ShowCommands[args[1]];
-            }
-            catch (Exception)
-            {
-                io.WriteFormatted("Unsupported show command '{0}'", args[1]);
-                return;
-            }
-
-            try
-            {
-                del(args, io, limitedToScene);
-            }
-            catch (Exception e)
-            {
-                io.WriteFormatted("Command execution error {0}: {1}", e.GetType().ToString(), e.ToString());
-            }
-
-        }
-
-        static void SaveCommand_Handler(List<string> args, TTY io, UUID limitedToScene)
-        {
-            CommandDelegate del;
-            if (args.Count < 2)
-            {
-                io.Write("Invalid save command");
-                return;
-            }
-            try
-            {
-                del = SaveCommands[args[1]];
-            }
-            catch (Exception)
-            {
-                io.WriteFormatted("Unsupported save command '{0}'", args[1]);
-                return;
-            }
-
-            try
-            {
-                del(args, io, limitedToScene);
-            }
-            catch (Exception e)
-            {
-                io.WriteFormatted("Command execution error {0}: {1}", e.GetType().ToString(), e.ToString());
-            }
-
         }
 
         public static void ExecuteCommand(List<string> args, TTY io)
         {
-            CommandDelegate del;
-            try
-            {
-                del = Commands[args[0]];
-            }
-            catch(Exception)
-            {
-                io.WriteFormatted("Invalid command '{0}'", args[0]);
-                return;
-            }
-
-            try
-            {
-                del(args, io, UUID.Zero);
-            }
-            catch(Exception e)
-            {
-                io.WriteFormatted("Command execution error {0}: {1}", e.GetType().ToString(), e.ToString());
-            }
+            ExecuteCommand(args, io, UUID.Zero);
         }
 
         public static void ExecuteCommand(List<string> args, TTY io, UUID limitedToScene)
         {
             CommandDelegate del;
-            try
+            if(args.Count == 0)
             {
-                del = Commands[args[0]];
-            }
-            catch (Exception)
-            {
-                io.WriteFormatted("Invalid command '{0}'", args[0]);
                 return;
+            }
+            else if (args[0] == "help")
+            {
+                if (args.Count == 1)
+                {
+                    string commands = "Command list:\n";
+                    foreach (string cmd in Commands.Keys)
+                    {
+                        commands += string.Format("{0}\n", cmd);
+                    }
+                    io.Write(commands);
+                    return;
+                }
+                else
+                {
+                    try
+                    {
+                        del = Commands[args[1]];
+                        args.RemoveAt(1);
+                    }
+                    catch (Exception)
+                    {
+                        io.WriteFormatted("Invalid command '{0}' for help", args[1]);
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                try
+                {
+                    del = Commands[args[0]];
+                }
+                catch (Exception)
+                {
+                    io.WriteFormatted("Invalid command '{0}'", args[0]);
+                    return;
+                }
             }
 
             try
