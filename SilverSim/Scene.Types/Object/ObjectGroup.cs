@@ -1449,7 +1449,7 @@ namespace SilverSim.Scene.Types.Object
                                     {
                                         item.ScriptState = compiler.StateFromXml(reader, attrs, item);
                                     }
-                                    catch(ScriptStateLoaderNotImplementedException e)
+                                    catch(ScriptStateLoaderNotImplementedException)
                                     {
                                         reader.Skip();
                                         break;

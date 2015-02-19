@@ -155,6 +155,7 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.RezObjectFromNotecard, Object.RezObjectFromNotecard.Decode);
             PacketTypes.Add(MessageType.ObjectIncludeInSearch, Object.ObjectIncludeInSearch.Decode);
             PacketTypes.Add(MessageType.RezRestoreToWorld, Object.RezRestoreToWorld.Decode);
+            PacketTypes.Add(MessageType.ObjectAdd, Object.ObjectAdd.Decode);
 
             /* Task Inventory */
             PacketTypes.Add(MessageType.UpdateTaskInventory, TaskInventory.UpdateTaskInventory.Decode);

@@ -275,9 +275,12 @@ namespace SilverSim.Scene.Types.Scene
             m_PacketHandlers[MessageType.ObjectGrabUpdate] = HandleObjectGrabUpdate;
             m_PacketHandlers[MessageType.ObjectDeGrab] = HandleObjectDeGrab;
             m_PacketHandlers[MessageType.RequestObjectPropertiesFamily] = HandleRequestObjectPropertiesFamily;
+            m_PacketHandlers[MessageType.ObjectAdd] = HandleObjectAdd;
 
             /* sound */
             m_PacketHandlers[MessageType.SoundTrigger] = HandleSoundTrigger;
+
+            /* basic capabilities */
 
             InitializeParcelLayer();
         }
