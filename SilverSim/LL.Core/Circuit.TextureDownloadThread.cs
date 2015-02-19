@@ -37,7 +37,7 @@ namespace SilverSim.LL.Core
         private const int IMAGE_FIRST_PACKET_SIZE = 600;
 
         #region Texture Download Thread
-        public bool LogUDPTextureDownloads = true;
+        public bool LogUDPTextureDownloads = false;
         private void TextureDownloadThread(object param)
         {
             Thread.CurrentThread.Name = string.Format("LLUDP:Texture Downloader for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());

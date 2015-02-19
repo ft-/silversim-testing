@@ -195,17 +195,20 @@ namespace SilverSim.LL.Core
                         end = int.Parse(v[1]);
                     }
 
-                    if(start > end)
-                    {
-                        httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "image/x-j2c").Close();
-                        return;
-                    }
+                    /* The following check is regarding some weirdness of some viewers trying to retrieve data past the file size.
+                     * Yet, RFC2616 requires a RequestedRangeNotSatisfiable here but those viewers would not accept it.
+                     */
                     if(start >= asset.Data.Length)
                     {
                         httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "image/x-j2c").Close();
                         return;
                     }
-                    if(end >= asset.Data.Length)
+                    if (start > end)
+                    {
+                        httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
+                        return;
+                    }
+                    if (end >= asset.Data.Length)
                     {
                         httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                         return;
