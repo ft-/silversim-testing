@@ -37,11 +37,13 @@ namespace SilverSim.Main.Common.CmdIO
         public static RwLockedDictionary<string, CommandDelegate> Commands = new RwLockedDictionary<string, CommandDelegate>();
         public static RwLockedDictionary<string, CommandDelegate> LoadCommands = new RwLockedDictionary<string, CommandDelegate>();
         public static RwLockedDictionary<string, CommandDelegate> SaveCommands = new RwLockedDictionary<string, CommandDelegate>();
+        public static RwLockedDictionary<string, CommandDelegate> ShowCommands = new RwLockedDictionary<string, CommandDelegate>();
 
         static CommandRegistry()
         {
             Commands.Add("load", LoadCommand_Handler);
             Commands.Add("save", SaveCommand_Handler);
+            Commands.Add("show", ShowCommand_Handler);
         }
 
         static void LoadCommand_Handler(List<string> args, TTY io, UUID limitedToScene)
@@ -59,6 +61,36 @@ namespace SilverSim.Main.Common.CmdIO
             catch (Exception)
             {
                 io.WriteFormatted("Unsupported load command '{0}'", args[1]);
+                return;
+            }
+
+            try
+            {
+                del(args, io, limitedToScene);
+            }
+            catch (Exception e)
+            {
+                io.WriteFormatted("Command execution error {0}: {1}", e.GetType().ToString(), e.ToString());
+            }
+
+        }
+
+
+        static void ShowCommand_Handler(List<string> args, TTY io, UUID limitedToScene)
+        {
+            CommandDelegate del;
+            if (args.Count < 2)
+            {
+                io.Write("Invalid show command");
+                return;
+            }
+            try
+            {
+                del = ShowCommands[args[1]];
+            }
+            catch (Exception)
+            {
+                io.WriteFormatted("Unsupported show command '{0}'", args[1]);
                 return;
             }
 

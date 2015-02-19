@@ -37,6 +37,7 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -666,6 +667,7 @@ namespace SilverSim.Main.Common
             AddSource(mainConfig);
 
             CmdIO.CommandRegistry.Commands.Add("shutdown", ShutdownCommand);
+            CmdIO.CommandRegistry.ShowCommands.Add("memory", MemoryCommand);
 
             while(m_Sources.Count != 0)
             {
@@ -799,6 +801,12 @@ namespace SilverSim.Main.Common
             {
                 m_ShutdownEvent.Set();
             }
+        }
+
+        public void MemoryCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            io.WriteFormatted(  "Heap allocated to simulator : {0} MB\n" +
+                                "Process Memory              : {0} MB", Math.Round(GC.GetTotalMemory(false) / 1048576.0), Math.Round(Process.GetCurrentProcess().WorkingSet64 / 1048576.0));
         }
 
         public void Shutdown()
