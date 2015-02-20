@@ -26,9 +26,6 @@ exception statement from your version.
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Object;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -37,6 +34,16 @@ namespace SilverSim.Scene.Types.Scene
         void HandleObjectAdd(Message m)
         {
             ObjectAdd p = (ObjectAdd)m;
+            if(p.CircuitAgentID != p.AgentID ||
+                p.CircuitSessionID != p.SessionID)
+            {
+                return;
+            }
+        }
+
+        public UInt32 ObjectAdd(ObjectAdd p)
+        {
+            throw new NotImplementedException();
         }
     }
 }

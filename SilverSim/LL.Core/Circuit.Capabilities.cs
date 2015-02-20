@@ -254,6 +254,10 @@ namespace SilverSim.LL.Core
             AddDefCapability("CreateInventoryCategory", regionSeedID, Cap_CreateInventoryCategory, capConfig);
             AddDefCapability("GetDisplayNames", regionSeedID, Cap_GetDisplayNames, capConfig);
             string localHostName = string.Format("http://{0}:{1}", m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port);
+            AddDefCapabilityFactory("ObjectAdd", regionSeedID, delegate(LLAgent agent)
+            {
+                return new Capabilities.ObjectAdd(Scene, agent.Owner);
+            }, capConfig);
             AddDefCapabilityFactory("UploadBakedTexture", regionSeedID, delegate(LLAgent agent) 
             {
                 UploadAssetAbstractCapability capability = new Capabilities.UploadBakedTexture(agent.Owner, m_Server.Scene.AssetService, localHostName);

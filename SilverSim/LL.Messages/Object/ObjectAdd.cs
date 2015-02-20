@@ -1,4 +1,6 @@
 ﻿using SilverSim.Types;
+using SilverSim.Types.Agent;
+using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
@@ -19,35 +21,43 @@ namespace SilverSim.LL.Messages.Object
         public UUID SessionID = UUID.Zero;
         public UUID GroupID = UUID.Zero;
 
-        public PrimitiveCode PCode;
-        public PrimitiveMaterial Material;
-        public UInt32 AddFlags;
-        public byte PathCurve;
-        public byte ProfileCurve;
-        public UInt16 PathBegin;
-        public UInt16 PathEnd;
-        public byte PathScaleX;
-        public byte PathScaleY;
-        public byte PathShearX;
-        public byte PathShearY;
-        public sbyte PathTwist;
-        public sbyte PathTwistBegin;
-        public sbyte PathRadiusOffset;
-        public sbyte PathTaperX;
-        public sbyte PathTaperY;
-        public byte PathRevolutions;
-        public sbyte PathSkew;
-        public UInt16 ProfileBegin;
-        public UInt16 ProfileEnd;
-        public UInt16 ProfileHollow;
-        public bool BypassRaycast;
-        public Vector3 RayStart;
-        public Vector3 RayEnd;
-        public UUID RayTargetID;
-        public bool RayEndIsIntersection;
-        public Vector3 Scale;
-        public Quaternion Rotation;
-        public byte State;
+        public PrimitiveCode PCode = PrimitiveCode.None;
+        public PrimitiveMaterial Material = PrimitiveMaterial.Wood;
+        public UInt32 AddFlags = 0;
+        public byte PathCurve = 0;
+        public byte ProfileCurve = 0;
+        public UInt16 PathBegin = 0;
+        public UInt16 PathEnd = 0;
+        public byte PathScaleX = 0;
+        public byte PathScaleY = 0;
+        public byte PathShearX = 0;
+        public byte PathShearY = 0;
+        public sbyte PathTwist = 0;
+        public sbyte PathTwistBegin = 0;
+        public sbyte PathRadiusOffset = 0;
+        public sbyte PathTaperX = 0;
+        public sbyte PathTaperY = 0;
+        public byte PathRevolutions = 0;
+        public sbyte PathSkew = 0;
+        public UInt16 ProfileBegin = 0;
+        public UInt16 ProfileEnd = 0;
+        public UInt16 ProfileHollow = 0;
+        public bool BypassRaycast = false;
+        public Vector3 RayStart = Vector3.Zero;
+        public Vector3 RayEnd = Vector3.Zero;
+        public UUID RayTargetID = UUID.Zero;
+        public bool RayEndIsIntersection = false;
+        public Vector3 Scale = Vector3.One;
+        public Quaternion Rotation = Quaternion.Identity;
+        public byte State = 0;
+        public AttachmentPoint LastAttachPoint = AttachmentPoint.NotAttached;
+
+        /* Extension for internal handling */
+        public InventoryPermissionsMask BasePermissions = InventoryPermissionsMask.All; 
+        public InventoryPermissionsMask EveryOnePermissions = InventoryPermissionsMask.None;
+        public InventoryPermissionsMask CurrentPermissions = InventoryPermissionsMask.Every;
+        public InventoryPermissionsMask NextOwnerPermissions = InventoryPermissionsMask.None;
+        public InventoryPermissionsMask GroupPermissions = InventoryPermissionsMask.None; 
 
         public ObjectAdd()
         {
