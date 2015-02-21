@@ -112,7 +112,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             foreach (IAgent a in Agents)
             {
-                if (ID == areq.Sender)
+                if (a.Owner.ID == areq.Sender)
                 {
                     a.SendMessageIfRootAgent(areq, ID);
                 }
