@@ -70,6 +70,7 @@ namespace SilverSim.LL.Messages.Agent
                 AnimationEntry e = new AnimationEntry();
                 e.AnimID = p.ReadUUID();
                 e.StartAnim = p.ReadBoolean();
+                m.AnimationEntryList.Add(e);
             }
 
             n = p.ReadUInt8();

@@ -967,6 +967,11 @@ namespace SilverSim.LL.Core
             m_AgentMessageRouting.Add(MessageType.AgentDataUpdateRequest, HandleAgentDataUpdateRequest);
             m_AgentMessageRouting.Add(MessageType.AgentAnimation, HandleAgentAnimation);
             m_AgentMessageRouting.Add(MessageType.RezScript, HandleRezScript);
+            m_AgentMessageRouting.Add(MessageType.RezObject, HandleRezObject);
+            m_AgentMessageRouting.Add(MessageType.RezObjectFromNotecard, HandleRezObjectFromNotecard);
+            m_AgentMessageRouting.Add(MessageType.RezMultipleAttachmentFromInv, HandleRezAttachment);
+            m_AgentMessageRouting.Add(MessageType.RezSingleAttachmentFromInv, HandleRezAttachment);
+            m_AgentMessageRouting.Add(MessageType.DetachAttachmentIntoInv, HandleDetachAttachment);
         }
 
         public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)

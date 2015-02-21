@@ -199,6 +199,11 @@ namespace SilverSim.Scene.Types.Agent
 
         public void PlayAnimation(UUID animid, UUID objectid)
         {
+            if(objectid == UUID.Zero)
+            {
+                objectid = m_AgentID;
+            }
+
             lock (this)
             {
                 for (int i = 0; i < m_ActiveAnimations.Count; ++i)

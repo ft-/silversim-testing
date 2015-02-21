@@ -25,6 +25,9 @@ exception statement from your version.
 
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Object;
+using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
+using SilverSim.Types;
 using System;
 
 namespace SilverSim.Scene.Types.Scene
@@ -43,7 +46,57 @@ namespace SilverSim.Scene.Types.Scene
 
         public UInt32 ObjectAdd(ObjectAdd p)
         {
-            throw new NotImplementedException();
+            RezObjectParams rezparams = new RezObjectParams();
+            SilverSim.Scene.Types.Object.ObjectGroup group = new SilverSim.Scene.Types.Object.ObjectGroup();
+            ObjectPart part = new ObjectPart();
+            part.ID = UUID.Random;
+            group.Add(1, part.ID, part);
+            group.Name = "Primitive";
+            IAgent agent;
+            agent = Agents[p.AgentID];
+            group.Owner = agent.Owner;
+            group.LastOwner = agent.Owner;
+            part.Creator = agent.Owner;
+            SilverSim.Scene.Types.Object.ObjectPart.PrimitiveShape pshape;
+            pshape = part.Shape;
+            pshape.PCode = p.PCode;
+            part.Material = p.Material;
+            pshape.PathCurve = p.PathCurve;
+            pshape.ProfileCurve = p.ProfileCurve;
+            pshape.PathBegin = p.PathBegin;
+            pshape.PathEnd = p.PathEnd;
+            pshape.PathScaleX = p.PathScaleX;
+            pshape.PathScaleY = p.PathScaleY;
+            pshape.PathShearX = p.PathShearX;
+            pshape.PathShearY = p.PathShearY;
+            pshape.PathTwist = p.PathTwist;
+            pshape.PathTwistBegin = p.PathTwistBegin;
+            pshape.PathRadiusOffset = p.PathRadiusOffset;
+            pshape.PathTaperX = p.PathTaperX;
+            pshape.PathTaperY = p.PathTaperY;
+            pshape.PathRevolutions = p.PathRevolutions;
+            pshape.PathSkew = p.PathSkew;
+            pshape.ProfileBegin = p.ProfileBegin;
+            pshape.ProfileEnd = p.ProfileEnd;
+            pshape.ProfileHollow = p.ProfileHollow;
+
+            rezparams.RayStart = p.RayStart;
+            rezparams.RayEnd = p.RayEnd;
+            rezparams.RayTargetID = p.RayTargetID;
+            rezparams.RayEndIsIntersection = p.RayEndIsIntersection;
+            rezparams.Scale = p.Scale;
+            rezparams.Rotation = p.Rotation;
+            pshape.State = p.State;
+            group.AttachPoint = p.LastAttachPoint;
+
+            part.BaseMask = p.BasePermissions;
+            part.EveryoneMask = p.EveryOnePermissions;
+            part.OwnerMask = p.CurrentPermissions;
+            part.NextOwnerMask = p.NextOwnerPermissions;
+            part.GroupMask = p.GroupPermissions;
+            group.Group.ID = p.GroupID;
+            
+            return RezObject(group, rezparams);
         }
     }
 }

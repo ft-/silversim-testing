@@ -41,16 +41,18 @@ namespace SilverSim.Main.Common.Transfer
         Vector3 m_TargetPos;
         UUI m_RezzingAgent;
         InventoryPermissionsMask m_ItemOwnerPermissions;
+        SceneInterface.RezObjectParams m_RezParams;
 
         public abstract void PostProcessObjectGroups(List<ObjectGroup> grp);
 
-        public RezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UUI rezzingagent, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+        public RezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
             : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
         {
             m_Scene = scene;
             m_TargetPos = targetpos;
             m_RezzingAgent = rezzingagent;
             m_ItemOwnerPermissions = itemOwnerPermissions;
+            m_RezParams = rezparams;
         }
 
         protected void SendAlertMessage(string msg)
@@ -101,15 +103,14 @@ namespace SilverSim.Main.Common.Transfer
                 return;
             }
 
-            foreach(ObjectGroup group in objgroups)
+            try
             {
-                group.GlobalPosition += m_TargetPos;
-                foreach(ObjectPart part in group.Values)
-                {
-                    part.ID = UUID.Random;
-                    part.OwnerMask &= m_ItemOwnerPermissions;
-                }
-                m_Scene.Add(group);
+                m_Scene.RezObjects(objgroups, m_RezParams);
+            }
+            catch
+            {
+                SendAlertMessage("ALERT: RezAttemptFailed");
+                return;
             }
         }
 
