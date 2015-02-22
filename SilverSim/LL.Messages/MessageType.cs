@@ -472,7 +472,7 @@ namespace SilverSim.LL.Messages
         DenyTrustedCircuit = Low | 393,
         RequestTrustedCircuit = Low | 394,
         RezSingleAttachmentFromInv = Low | 395,
-        RezMultipleAttachmentFromInv = Low | 396,
+        RezMultipleAttachmentsFromInv = Low | 396,
         DetachAttachmentIntoInv = Low | 397,
         CreateNewOutfitAttachments = Low | 398,
         UserInfoRequest = Low | 399,

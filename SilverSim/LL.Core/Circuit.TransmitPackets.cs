@@ -114,6 +114,7 @@ namespace SilverSim.LL.Core
 
                 }
             }
+            Agent.CheckCircuits();
 
             SceneInterface scene = Scene;
             if (null != scene)

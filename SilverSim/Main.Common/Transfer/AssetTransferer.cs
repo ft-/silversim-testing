@@ -84,6 +84,11 @@ namespace SilverSim.Main.Common.Transfer
             m_WorkQueue.Enqueue(wi);
         }
 
+        public void Stop()
+        {
+            Enqueue(new AbortTransfererThread());
+        }
+
         private void ThreadMain()
         {
             for(;;)

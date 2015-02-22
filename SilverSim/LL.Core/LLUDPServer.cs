@@ -490,7 +490,7 @@ namespace SilverSim.LL.Core
             m_Routing[MessageType.AgentCachedTexture] = HandleAgentMessage;
             m_Routing[MessageType.ViewerEffect] = HandleAgentMessage;
             m_Routing[MessageType.RezSingleAttachmentFromInv] = HandleAgentMessage;
-            m_Routing[MessageType.RezMultipleAttachmentFromInv] = HandleAgentMessage;
+            m_Routing[MessageType.RezMultipleAttachmentsFromInv] = HandleAgentMessage;
             m_Routing[MessageType.DetachAttachmentIntoInv] = HandleAgentMessage;
             m_Routing[MessageType.CreateNewOutfitAttachments] = HandleAgentMessage;
 

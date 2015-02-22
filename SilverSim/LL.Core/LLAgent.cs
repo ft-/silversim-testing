@@ -27,6 +27,7 @@ using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Script;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.Transfer;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
@@ -71,6 +72,8 @@ namespace SilverSim.LL.Core
         public UUID SessionID { get; private set; }
 
         public TeleportFlags TeleportFlags = TeleportFlags.None;
+
+        private AssetTransferer m_AssetTransferer = new AssetTransferer();
         #endregion
 
         /* Circuits: UUID is SceneID */
@@ -898,6 +901,7 @@ namespace SilverSim.LL.Core
         {
             lock (this)
             {
+                m_AssetTransferer.Stop();
                 if (m_EconomyService != null)
                 {
                     m_EconomyService.Logout(Owner, SessionID, m_SecureSessionID);
@@ -919,6 +923,7 @@ namespace SilverSim.LL.Core
         {
             lock (this)
             {
+                m_AssetTransferer.Stop();
                 if (m_EconomyService != null)
                 {
                     m_EconomyService.Logout(Owner, SessionID, m_SecureSessionID);
@@ -961,6 +966,14 @@ namespace SilverSim.LL.Core
         private delegate void HandleAgentMessageDelegate(Message m);
         private readonly Dictionary<MessageType, HandleAgentMessageDelegate> m_AgentMessageRouting = new Dictionary<MessageType, HandleAgentMessageDelegate>();
 
+        public void CheckCircuits()
+        {
+            if(Circuits.Count == 0)
+            {
+                m_AssetTransferer.Stop();
+            }
+        }
+
         void InitRouting()
         {
             m_AgentMessageRouting.Add(MessageType.MoneyBalanceRequest, HandleMoneyBalanceRequest);
@@ -969,7 +982,7 @@ namespace SilverSim.LL.Core
             m_AgentMessageRouting.Add(MessageType.RezScript, HandleRezScript);
             m_AgentMessageRouting.Add(MessageType.RezObject, HandleRezObject);
             m_AgentMessageRouting.Add(MessageType.RezObjectFromNotecard, HandleRezObjectFromNotecard);
-            m_AgentMessageRouting.Add(MessageType.RezMultipleAttachmentFromInv, HandleRezAttachment);
+            m_AgentMessageRouting.Add(MessageType.RezMultipleAttachmentsFromInv, HandleRezAttachment);
             m_AgentMessageRouting.Add(MessageType.RezSingleAttachmentFromInv, HandleRezAttachment);
             m_AgentMessageRouting.Add(MessageType.DetachAttachmentIntoInv, HandleDetachAttachment);
         }

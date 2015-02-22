@@ -70,6 +70,56 @@ namespace SilverSim.LL.Core
             {
                 return;
             }
+
+            InventoryItem item;
+            try
+            {
+                item = InventoryService.Item[Owner.ID, req.InventoryData.ItemID];
+            }
+            catch
+            {
+                SendAlertMessage("ALERT: ", m.CircuitSceneID);
+                return;
+            }
+            if(item.AssetType == Types.Asset.AssetType.Link)
+            {
+                try
+                {
+                    item = InventoryService.Item[Owner.ID, req.InventoryData.ItemID];
+                }
+                catch
+                {
+                    SendAlertMessage("ALERT: ", m.CircuitSceneID);
+                    return;
+                }
+            }
+            if(item.AssetType != Types.Asset.AssetType.Object)
+            {
+                SendAlertMessage("ALERT: InvalidObjectParams", m.CircuitSceneID);
+                return;
+            }
+            SceneInterface.RezObjectParams rezparams = new SceneInterface.RezObjectParams();
+            rezparams.RayStart = req.RezData.RayStart;
+            rezparams.RayEnd = req.RezData.RayEnd;
+            rezparams.RayTargetID = req.RezData.RayTargetID;
+            rezparams.RayEndIsIntersection = req.RezData.RayEndIsIntersection;
+            rezparams.RezSelected = req.RezData.RezSelected;
+            rezparams.RemoveItem = req.RezData.RemoveItem;
+            rezparams.Scale = Vector3.One;
+            rezparams.Rotation = Quaternion.Identity;
+            rezparams.ItemFlags = req.RezData.ItemFlags;
+            rezparams.GroupMask = req.RezData.GroupMask;
+            rezparams.EveryoneMask = req.RezData.EveryoneMask;
+            rezparams.NextOwnerMask = req.RezData.NextOwnerMask;
+
+            AgentRezObjectHandler rezHandler = new AgentRezObjectHandler(
+                Circuits[m.ReceivedOnCircuitCode].Scene, 
+                rezparams.RayEnd, 
+                item.AssetID, 
+                AssetService, 
+                Owner, 
+                rezparams);
+            m_AssetTransferer.Enqueue(rezHandler);
         }
 
         void HandleRezObjectFromNotecard(Message m)

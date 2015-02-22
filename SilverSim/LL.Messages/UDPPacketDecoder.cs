@@ -156,6 +156,8 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.ObjectIncludeInSearch, Object.ObjectIncludeInSearch.Decode);
             PacketTypes.Add(MessageType.RezRestoreToWorld, Object.RezRestoreToWorld.Decode);
             PacketTypes.Add(MessageType.ObjectAdd, Object.ObjectAdd.Decode);
+            PacketTypes.Add(MessageType.RezSingleAttachmentFromInv, Object.RezSingleAttachmentFromInv.Decode);
+            PacketTypes.Add(MessageType.RezMultipleAttachmentsFromInv, Object.RezMultipleAttachmentsFromInv.Decode);
 
             /* Task Inventory */
             PacketTypes.Add(MessageType.UpdateTaskInventory, TaskInventory.UpdateTaskInventory.Decode);
