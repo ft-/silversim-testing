@@ -29,9 +29,45 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Region
 {
+    [Flags]
+    public enum RegionOptionFlags : uint
+    {
+        None = 0,
+        AllowDamage = 1 << 0,
+        AllowLandmark = 1 << 1,
+        AllowSetHome = 1 << 2,
+        ResetHomeOnTeleport = 1 << 3,
+        SunFixed = 1 << 4,
+        TaxFree = 1 << 5,
+        BlockTerraform = 1 << 6,
+        BlockLandResell = 1 << 7,
+        Sandbox = 1 << 8,
+        NullLayer = 1 << 9,
+        SkipAgentAction = 1 << 10,
+        SkipUpdateInterestList = 1 << 1,
+        DisableAgentCollisions = 1 << 12,
+        DisableScripts = 1 << 13,
+        DisablePhysics = 1 << 14,
+        ExternallyVisible = 1 << 15,
+        MainlandVisible = 1 << 16,
+        PublicAllowed = 1 << 17,
+        BlockDwell = 1 << 18,
+        NoFly = 1 << 19,
+        AllowDirectTeleport = 1 << 20,
+        EstateDisableScripts = 1 << 21,
+        RestrictPushObject = 1 << 22,
+        DenyAnonymous = 1 << 23,
+        DenyIdentified = 1 << 24,
+        DenyTransacted = 1 << 25,
+        AllowParcelChanges = 1 << 26,
+        AbuseEmailToEstateOwner = 1 << 27,
+        AllowVoice = 1 << 28,
+        BlockParcelSearch = 1 << 29,
+        DenyAgeUnverified = 1 << 30
+    }
     public class RegionHandshake : Message
     {
-        public UInt32 RegionFlags = 0;
+        public RegionOptionFlags RegionFlags = RegionOptionFlags.None;
         public byte SimAccess = 0;
         public string SimName = string.Empty;
         public UUID SimOwner = UUID.Zero;
@@ -96,7 +132,7 @@ namespace SilverSim.LL.Messages.Region
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
-            p.WriteUInt32(RegionFlags);
+            p.WriteUInt32((uint)RegionFlags);
             p.WriteUInt8(SimAccess);
             p.WriteStringLen8(SimName);
             p.WriteUUID(SimOwner);
