@@ -37,7 +37,7 @@ namespace SilverSim.Main.Simulator
         public static ConfigurationLoader m_ConfigLoader;
         public static ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
 
-        public static void Main(string[] args)
+        static void Main(string[] args)
         {
             Console.TreatControlCAsInput = true;
 

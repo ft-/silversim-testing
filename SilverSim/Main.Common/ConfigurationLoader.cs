@@ -652,7 +652,13 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Constructor and Main
-        public ConfigurationLoader(string[] args, string defaultConfigName, string defaultsIniName, ManualResetEvent shutdownEvent)
+        public enum LocalConsole
+        {
+            Disallowed,
+            Allowed
+        }
+
+        public ConfigurationLoader(string[] args, string defaultConfigName, string defaultsIniName, ManualResetEvent shutdownEvent, LocalConsole localConsoleControl = LocalConsole.Allowed)
         {
             m_ShutdownEvent = shutdownEvent;
             ArgvConfigSource configSource = new ArgvConfigSource(args);
@@ -713,7 +719,7 @@ namespace SilverSim.Main.Common
             }
 
             IConfig consoleConfig = m_Config.Configs["Console"];
-            if (null == consoleConfig || consoleConfig.GetBoolean("EnableLocalConsole", true))
+            if (null == consoleConfig || consoleConfig.GetBoolean("EnableLocalConsole", true) && localConsoleControl == LocalConsole.Allowed)
             {
                 PluginInstances.Add("LocalConsole", new Console.LocalConsole());
             }
