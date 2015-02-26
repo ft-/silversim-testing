@@ -165,13 +165,16 @@ namespace SilverSim.LL.Messages.LayerData
 
             wbits += 1;
 
-            header.QuantWBits &= 0xf0;
-
-            if (wbits > 17 || wbits < 2)
+            if(wbits > 17)
             {
-                //Logger.Log("Bits needed per word in EncodePatchHeader() are outside the allowed range",
-                //    Helpers.LogLevel.Error);
+                wbits = 17;
             }
+            else if(wbits < 2)
+            {
+                wbits = 2;
+            }
+
+            header.QuantWBits &= 0xf0;
 
             header.QuantWBits |= (wbits - 2);
 
