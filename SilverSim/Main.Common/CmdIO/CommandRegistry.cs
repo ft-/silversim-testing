@@ -34,17 +34,21 @@ namespace SilverSim.Main.Common.CmdIO
     {
         public delegate void CommandDelegate(List<string> args, TTY io, UUID limitedToScene /* is UUID.Zero for all allowed */);
 
-        public static RwLockedDictionary<string, CommandDelegate> Commands = new RwLockedDictionary<string, CommandDelegate>();
-        public static RwLockedDictionary<string, CommandDelegate> CreateCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static RwLockedDictionary<string, CommandDelegate> DeleteCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static RwLockedDictionary<string, CommandDelegate> LoadCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static RwLockedDictionary<string, CommandDelegate> SaveCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static RwLockedDictionary<string, CommandDelegate> ShowCommands = new RwLockedDictionary<string, CommandDelegate>();
+        public static readonly RwLockedDictionary<string, CommandDelegate> Commands = new RwLockedDictionary<string, CommandDelegate>();
+        public static readonly RwLockedDictionary<string, CommandDelegate> CreateCommands = new RwLockedDictionary<string, CommandDelegate>();
+        public static readonly RwLockedDictionary<string, CommandDelegate> DeleteCommands = new RwLockedDictionary<string, CommandDelegate>();
+        public static readonly RwLockedDictionary<string, CommandDelegate> LoadCommands = new RwLockedDictionary<string, CommandDelegate>();
+        public static readonly RwLockedDictionary<string, CommandDelegate> SaveCommands = new RwLockedDictionary<string, CommandDelegate>();
+        public static readonly RwLockedDictionary<string, CommandDelegate> ShowCommands = new RwLockedDictionary<string, CommandDelegate>();
+        public static readonly RwLockedDictionary<string, CommandDelegate> SetCommands = new RwLockedDictionary<string, CommandDelegate>();
+        public static readonly RwLockedDictionary<string, CommandDelegate> GetCommands = new RwLockedDictionary<string, CommandDelegate>();
 
         static CommandRegistry()
         {
             Commands.Add("load", new CommandType("load", LoadCommands).Command_Handler);
             Commands.Add("save", new CommandType("save", SaveCommands).Command_Handler);
+            Commands.Add("get", new CommandType("get", GetCommands).Command_Handler);
+            Commands.Add("set", new CommandType("set", SetCommands).Command_Handler);
             Commands.Add("show", new CommandType("show", ShowCommands).Command_Handler);
             Commands.Add("create", new CommandType("create", CreateCommands).Command_Handler);
             Commands.Add("delete", new CommandType("delete", DeleteCommands).Command_Handler);
