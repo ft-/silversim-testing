@@ -23,10 +23,10 @@ exception statement from your version.
 
 */
 
+using MySql.Data.MySqlClient;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
-using MySql.Data.MySqlClient;
 using System;
 
 namespace SilverSim.Database.MySQL.Asset.Deduplication

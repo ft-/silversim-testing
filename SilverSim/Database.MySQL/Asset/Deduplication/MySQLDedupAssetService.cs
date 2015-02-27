@@ -34,9 +34,6 @@ using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
 using System.Security.Cryptography;
-using System.Collections;
-using System.Text;
-using System.Linq;
 
 namespace SilverSim.Database.MySQL.Asset.Deduplication
 {
