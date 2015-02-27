@@ -48,7 +48,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT data FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id=?id", conn))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT data FROM assetrefs INNER JOIN assetdata ON assetrefs.hash LIKE assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id=?id", conn))
                     {
                         cmd.Parameters.AddWithValue("?id", key);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
