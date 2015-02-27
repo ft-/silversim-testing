@@ -828,7 +828,6 @@ namespace SilverSim.Main.Common
 
         public void Shutdown()
         {
-            CommandManager.ClearCommands();
             List<IPluginShutdown> shutdownLogoutAgentsList = new List<IPluginShutdown>();
             List<IPluginShutdown> shutdownLogoutRegionsList = new List<IPluginShutdown>();
             List<IPluginShutdown> shutdownAnyList = new List<IPluginShutdown>();
