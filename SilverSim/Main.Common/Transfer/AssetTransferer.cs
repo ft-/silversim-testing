@@ -103,7 +103,15 @@ namespace SilverSim.Main.Common.Transfer
 
             for(;;)
             {
-                AssetTransferWorkItem wi = m_WorkQueue.Dequeue(1);
+                AssetTransferWorkItem wi;
+                try
+                {
+                    wi = m_WorkQueue.Dequeue(1);
+                }
+                catch
+                {
+                    break;
+                }
                 if (!(wi is AbortTransfererThread))
                 {
                     wi.AssetTransferFailed(new AssetTransfererStoppedException());

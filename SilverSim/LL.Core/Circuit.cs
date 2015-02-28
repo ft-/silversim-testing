@@ -248,10 +248,7 @@ namespace SilverSim.LL.Core
                         if (ackno == m_LogoutReplySeqNo && m_LogoutReplySent)
                         {
                             m_Log.InfoFormat("Logout of agent {0} completed", Agent.ID);
-                            Stop();
-                            ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
-                            Agent = null;
-                            Scene = null;
+                            TerminateCircuit();
                             return;
                         }
                     }
@@ -299,10 +296,7 @@ namespace SilverSim.LL.Core
                             if (ackno == m_LogoutReplySeqNo && m_LogoutReplySent)
                             {
                                 m_Log.InfoFormat("Logout of agent {0} completed", Agent.ID);
-                                Stop();
-                                ((LLUDPServer)Scene.UDPServer).RemoveCircuit(this);
-                                Agent = null;
-                                Scene = null;
+                                TerminateCircuit();
                                 return;
                             }
                         }
