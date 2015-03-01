@@ -35,6 +35,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace SilverSim.LL.Core
 {
@@ -119,7 +120,14 @@ namespace SilverSim.LL.Core
                 AssetService, 
                 Owner, 
                 rezparams);
-            m_AssetTransferer.Enqueue(rezHandler);
+
+            ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, rezHandler);
+        }
+
+        void HandleAssetTransferWorkItem(object o)
+        {
+            AssetTransferWorkItem wi = (AssetTransferWorkItem)o;
+            wi.ProcessAssetTransfer();
         }
 
         void HandleRezObjectFromNotecard(Message m)

@@ -72,13 +72,21 @@ namespace SilverSim.LL.Core
         public UUID SessionID { get; private set; }
 
         public TeleportFlags TeleportFlags = TeleportFlags.None;
-
-        private AssetTransferer m_AssetTransferer = new AssetTransferer();
         #endregion
 
         /* Circuits: UUID is SceneID */
         public readonly RwLockedDoubleDictionary<UInt32, UUID, Circuit> Circuits = new RwLockedDoubleDictionary<UInt32, UUID, Circuit>();
         public readonly RwLockedDictionary<GridVector, string> KnownChildAgentURIs = new RwLockedDictionary<GridVector, string>();
+
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<int, int>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<int, int>>(delegate() { return new RwLockedDictionary<int, int>(); });
+
+        public RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<int, int>> TransmittedTerrainSerials
+        {
+            get
+            {
+                return m_TransmittedTerrainSerials;
+            }
+        }
 
         #region IObject Calls
         public void InvokeOnPositionUpdate(IObject obj)
@@ -901,7 +909,6 @@ namespace SilverSim.LL.Core
         {
             lock (this)
             {
-                m_AssetTransferer.Stop();
                 if (m_EconomyService != null)
                 {
                     m_EconomyService.Logout(Owner, SessionID, m_SecureSessionID);
@@ -923,7 +930,6 @@ namespace SilverSim.LL.Core
         {
             lock (this)
             {
-                m_AssetTransferer.Stop();
                 if (m_EconomyService != null)
                 {
                     m_EconomyService.Logout(Owner, SessionID, m_SecureSessionID);
@@ -965,14 +971,6 @@ namespace SilverSim.LL.Core
 
         private delegate void HandleAgentMessageDelegate(Message m);
         private readonly Dictionary<MessageType, HandleAgentMessageDelegate> m_AgentMessageRouting = new Dictionary<MessageType, HandleAgentMessageDelegate>();
-
-        public void CheckCircuits()
-        {
-            if(Circuits.Count == 0)
-            {
-                m_AssetTransferer.Stop();
-            }
-        }
 
         void InitRouting()
         {

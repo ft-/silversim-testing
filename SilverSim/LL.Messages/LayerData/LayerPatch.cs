@@ -43,7 +43,25 @@ namespace SilverSim.LL.Messages.LayerData
             {
                 lock(this)
                 {
-                    m_Serial = value;
+                    if (value == 0)
+                    {
+                        m_Serial = 1;
+                    }
+                    else
+                    {
+                        m_Serial = value;
+                    }
+                }
+            }
+        }
+
+        public void IncrementSerial()
+        {
+            lock(this)
+            {
+                if(++m_Serial == 0)
+                {
+                    m_Serial = 1;
                 }
             }
         }
@@ -53,6 +71,14 @@ namespace SilverSim.LL.Messages.LayerData
         internal uint PackedSerial = 0;
         private byte[] PackedDataBytes = new byte[647]; /* maximum length of a single 16 by 16 patch when packed perfectly bad */
         internal BitPacker PackedData;
+
+        public int ExtendedPatchID
+        {
+            get
+            {
+                return (X << 16) | Y;
+            }
+        }
 
         public LayerPatch()
         {

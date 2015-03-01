@@ -50,6 +50,14 @@ namespace SilverSim.Types
             m_BitPos = 0;
         }
 
+        public int BitLength
+        {
+            get
+            {
+                return m_BitPos;
+            }
+        }
+
         public int BitPos
         {
             get

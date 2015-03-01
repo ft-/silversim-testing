@@ -25,18 +25,19 @@ exception statement from your version.
 
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.LayerData
 {
     public static partial class LayerCompressor
     {
-        public static LayerData ToLayerMessage(LayerPatch[] patches, Messages.LayerData.LayerData.LayerDataType type)
+        public static LayerData ToLayerMessage(List<LayerPatch> patches, Messages.LayerData.LayerData.LayerDataType type)
         {
             int outlength;
-            return ToLayerMessage(patches, type, 0, patches.Length, out outlength);
+            return ToLayerMessage(patches, type, 0, patches.Count, out outlength);
         }
 
-        public static LayerData ToLayerMessage(LayerPatch[] patches, Messages.LayerData.LayerData.LayerDataType type, int offset, int length, out int outlength)
+        public static LayerData ToLayerMessage(List<LayerPatch> patches, Messages.LayerData.LayerData.LayerDataType type, int offset, int length, out int outlength)
         {
             outlength = 0;
             Messages.LayerData.LayerData layer = new Messages.LayerData.LayerData();
@@ -61,7 +62,7 @@ namespace SilverSim.LL.Messages.LayerData
             header.PatchSize = LAYER_PATCH_NUM_XY_ENTRIES;
             header.Type = type;
 
-            byte[] data = new byte[patches.Length * LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES * 2];
+            byte[] data = new byte[1500];
             BitPacker bitpack = new BitPacker(data, 0);
             bitpack.PackBits(header.Stride, 16);
             bitpack.PackBits(header.PatchSize, 8);
@@ -126,9 +127,9 @@ namespace SilverSim.LL.Messages.LayerData
                     layerpatch.PackedSerial = layerpatch.Serial;
                 }
 
-                if(layerpatch.PackedData.BitPos <= remainingbits)
+                if (layerpatch.PackedData.BitLength <= remainingbits)
                 {
-                    remainingbits -= layerpatch.PackedData.BitPos;
+                    remainingbits -= layerpatch.PackedData.BitLength;
                     pack.PackBits(layerpatch.PackedData);
                     return true;
                 }

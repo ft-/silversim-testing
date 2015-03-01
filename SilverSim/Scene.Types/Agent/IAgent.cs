@@ -39,6 +39,7 @@ using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.IM;
 using SilverSim.Types.Script;
+using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Agent
 {
@@ -50,6 +51,8 @@ namespace SilverSim.Scene.Types.Agent
         UUID SceneID { get; set; }
 
         bool IMSend(GridInstantMessage im);
+
+        RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<int, int>> TransmittedTerrainSerials { get; }
 
         int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
         {

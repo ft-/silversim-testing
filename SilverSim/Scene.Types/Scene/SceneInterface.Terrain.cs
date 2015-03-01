@@ -34,6 +34,7 @@ using SilverSim.LL.Messages.LayerData;
 using SilverSim.LL.Messages.Region;
 using SilverSim.LL.Messages;
 using System.Threading;
+using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -80,53 +81,53 @@ namespace SilverSim.Scene.Types.Scene
 
             #region Update of Terrain Data
             /*
-        public IList<TerrainPatch> GetTerrainDistanceSorted(Vector3 v)
-        {
-            SortedList<int, TerrainPatch> sorted = new SortedList<int, TerrainPatch>();
-            uint x;
-            uint y;
+            public IList<TerrainPatch> GetTerrainDistanceSorted(Vector3 v)
+            {
+                SortedList<int, TerrainPatch> sorted = new SortedList<int, TerrainPatch>();
+                uint x;
+                uint y;
 
-            if(v.X < 0)
-            {
-                x = 0;
-            }
-            else if(v.X >= SizeX)
-            {
-                x = SizeX - 1;
-            }
-            else
-            {
-                x = (uint)v.X / TERRAIN_PATCH_SIZE;
-            }
-
-            if (v.Y < 0)
-            {
-                y = 0;
-            }
-            else if(v.Y >= SizeY)
-            {
-                y = SizeY - 1;
-            }
-            else
-            {
-                y = (uint)v.Y / TERRAIN_PATCH_SIZE;
-            }
-
-            int distance;
-
-            for(uint py = 0; py < SizeY / TERRAIN_PATCH_SIZE; ++py)
-            {
-                for(uint px = 0; px < SizeX / TERRAIN_PATCH_SIZE; ++px)
+                if(v.X < 0)
                 {
-                    distance = ((int)px - (int)x) * ((int)px - (int)x) + ((int)py - (int)y) * ((int)py - (int)y);
-                    sorted.Add(distance, new TerrainPatch(px, py, m_Map[py * m_PatchCountX + px]));
+                    x = 0;
                 }
-            }
+                else if(v.X >= SizeX)
+                {
+                    x = SizeX - 1;
+                }
+                else
+                {
+                    x = (uint)v.X / TERRAIN_PATCH_SIZE;
+                }
 
-            return sorted.Values;
-        }
+                if (v.Y < 0)
+                {
+                    y = 0;
+                }
+                else if(v.Y >= SizeY)
+                {
+                    y = SizeY - 1;
+                }
+                else
+                {
+                    y = (uint)v.Y / TERRAIN_PATCH_SIZE;
+                }
+
+                int distance;
+
+                for(uint py = 0; py < SizeY / TERRAIN_PATCH_SIZE; ++py)
+                {
+                    for(uint px = 0; px < SizeX / TERRAIN_PATCH_SIZE; ++px)
+                    {
+                        distance = ((int)px - (int)x) * ((int)px - (int)x) + ((int)py - (int)y) * ((int)py - (int)y);
+                        sorted.Add(distance, new TerrainPatch(px, py, m_Map[py * m_PatchCountX + px]));
+                    }
+                }
+
+                return sorted.Values;
+            }
  */
-            private List<LayerData> CompileTerrainData(bool force)
+            private List<LayerData> CompileTerrainData(IAgent agent, bool force)
             {
                 m_TerrainRwLock.AcquireReaderLock(-1);
                 try
@@ -135,16 +136,28 @@ namespace SilverSim.Scene.Types.Scene
                     int x;
                     List<LayerData> mlist = new List<LayerData>();
                     List<LayerPatch> dirtyPatches = new List<LayerPatch>();
-
+                    RwLockedDictionary<int, int> agentSceneSerials = agent.TransmittedTerrainSerials[m_Scene.ID];
+                    
                     for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
                     {
                         for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                         {
-                            dirtyPatches.Add(new LayerPatch(m_TerrainPatches[y, x]));
+                            LayerPatch patch = m_TerrainPatches[y, x];
+                            try
+                            {
+                                int serial = agentSceneSerials[patch.ExtendedPatchID];
+                                if (serial != patch.Serial)
+                                {
+                                    agentSceneSerials[patch.ExtendedPatchID] = serial;
+                                    dirtyPatches.Add(m_TerrainPatches[y, x]);
+                                }
+                            }
+                            catch
+                            {
+                                dirtyPatches.Add(m_TerrainPatches[y, x]);
+                            }
                         }
                     }
-                    LayerPatch[] patches = new LayerPatch[dirtyPatches.Count];
-                    dirtyPatches.CopyTo(patches);
                     LayerData.LayerDataType layerType = LayerData.LayerDataType.Land;
 
                     if (BASE_REGION_SIZE < m_Scene.RegionData.Size.X || BASE_REGION_SIZE < m_Scene.RegionData.Size.Y)
@@ -152,11 +165,11 @@ namespace SilverSim.Scene.Types.Scene
                         layerType = LayerData.LayerDataType.LandExtended;
                     }
                     int offset = 0;
-                    while (offset < patches.Length)
+                    while (offset < dirtyPatches.Count)
                     {
-                        int remaining = patches.Length - offset;
+                        int remaining = dirtyPatches.Count - offset;
                         int actualused = 0;
-                        mlist.Add(LayerCompressor.ToLayerMessage(patches, layerType, offset, remaining, out actualused));
+                        mlist.Add(LayerCompressor.ToLayerMessage(dirtyPatches, layerType, offset, remaining, out actualused));
                         offset += actualused;
                     }
                     return mlist;
@@ -169,7 +182,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public void UpdateTerrainDataToSingleClient(IAgent agent, bool forceUpdate)
             {
-                List<LayerData> mlist = CompileTerrainData(forceUpdate);
+                List<LayerData> mlist = CompileTerrainData(agent, forceUpdate);
                 foreach (LayerData m in mlist)
                 {
                     agent.SendMessageAlways(m, m_Scene.ID);
@@ -178,21 +191,16 @@ namespace SilverSim.Scene.Types.Scene
 
             private void UpdateTerrainDataToClients()
             {
-                List<LayerData> mlist = CompileTerrainData(false);
-                foreach (LayerData m in mlist)
+                foreach (IAgent agent in m_Scene.Agents)
                 {
-                    SendToAllClients(m);
+                    List<LayerData> mlist = CompileTerrainData(agent, false);
+                    foreach (LayerData m in mlist)
+                    {
+                        agent.SendMessageAlways(m, m_Scene.ID);
+                    }
                 }
             }
             #endregion
-
-            private void SendToAllClients(Message m)
-            {
-                foreach (IAgent agent in m_Scene.Agents)
-                {
-                    agent.SendMessageAlways(m, m_Scene.ID);
-                }
-            }
 
             #region Properties
             public double this[uint x, uint y]

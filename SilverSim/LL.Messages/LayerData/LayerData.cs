@@ -95,6 +95,7 @@ namespace SilverSim.LL.Messages.LayerData
                             zercnt = 0;
                         }
                         ++zercnt;
+                        zerflag = true;
                     }
                     else
                     {

@@ -93,7 +93,6 @@ namespace SilverSim.LL.Core
                 }
             }
             Agent.Circuits.Remove(CircuitCode);
-            Agent.CheckCircuits();
 
             SceneInterface scene = Scene;
             if (null != scene)
