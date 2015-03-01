@@ -77,7 +77,34 @@ namespace SilverSim.LL.Messages.LayerData
         {
             get
             {
-                return true;
+                /* determine zero flag efficiency */
+                bool zerflag = false;
+                int zercnt = 0;
+                int bytecnt = 0;
+                for (int idx = 0; idx < Data.Length; ++idx)
+                {
+                    if(Data[idx] == 0)
+                    {
+                        if(!zerflag)
+                        {
+                            bytecnt += 2;
+                        }
+                        else if(zercnt == 255)
+                        {
+                            bytecnt += 2;
+                            zercnt = 0;
+                        }
+                        ++zercnt;
+                    }
+                    else
+                    {
+                        zercnt = 0;
+                        zerflag = false;
+                        ++bytecnt;
+                    }
+                }
+
+                return (bytecnt < Data.Length);
             }
         }
 

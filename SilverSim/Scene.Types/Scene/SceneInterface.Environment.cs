@@ -245,8 +245,9 @@ namespace SilverSim.Scene.Types.Scene
                     while (offset < patches.Length)
                     {
                         int remaining = Math.Min(patches.Length - offset, LayerCompressor.MESSAGES_PER_WIND_LAYER_PACKET);
-                        mlist.Add(LayerCompressor.ToLayerMessage(patches, layerType, offset, remaining));
-                        offset += remaining;
+                        int actualused;
+                        mlist.Add(LayerCompressor.ToLayerMessage(patches, layerType, offset, remaining, out actualused));
+                        offset += actualused;
                     }
                     return mlist;
                 }

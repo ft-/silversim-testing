@@ -32,11 +32,13 @@ namespace SilverSim.LL.Messages.LayerData
     {
         public static LayerData ToLayerMessage(LayerPatch[] patches, Messages.LayerData.LayerData.LayerDataType type)
         {
-            return ToLayerMessage(patches, type, 0, patches.Length);
+            int outlength;
+            return ToLayerMessage(patches, type, 0, patches.Length, out outlength);
         }
 
-        public static LayerData ToLayerMessage(LayerPatch[] patches, Messages.LayerData.LayerData.LayerDataType type, int offset, int length)
+        public static LayerData ToLayerMessage(LayerPatch[] patches, Messages.LayerData.LayerData.LayerDataType type, int offset, int length, out int outlength)
         {
+            outlength = 0;
             Messages.LayerData.LayerData layer = new Messages.LayerData.LayerData();
             layer.LayerType = type;
 
@@ -59,12 +61,12 @@ namespace SilverSim.LL.Messages.LayerData
             header.PatchSize = LAYER_PATCH_NUM_XY_ENTRIES;
             header.Type = type;
 
-            // Should be enough to fit even the most poorly packed data
             byte[] data = new byte[patches.Length * LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES * 2];
             BitPacker bitpack = new BitPacker(data, 0);
             bitpack.PackBits(header.Stride, 16);
             bitpack.PackBits(header.PatchSize, 8);
             bitpack.PackBits((uint)header.Type, 8);
+            int remainingbits = 1300 * 8; /* 1300 is a bit more than 2 perfectly bad compressed layer patches, wind needs two per packet */
 
             for (int i = 0; i < length; i++)
             {
@@ -74,23 +76,14 @@ namespace SilverSim.LL.Messages.LayerData
                     throw new ArgumentException("Patch data must be a 16x16 array");
                 }
 
-                PatchHeader pheader = PrescanPatch(patches[patchno]);
-                pheader.QuantWBits = 136;
-                if (extended)
+                if(CompressPatch(bitpack, patches[patchno], extended, ref remainingbits))
                 {
-                    pheader.PatchIDs = (patches[patchno].Y & 0xFFFF);
-                    pheader.PatchIDs += (patches[patchno].X << 16);
+                    ++outlength;
                 }
                 else
                 {
-                    pheader.PatchIDs = (patches[patchno].Y & 0x1F);
-                    pheader.PatchIDs += (patches[patchno].X << 5);
+                    break;
                 }
-
-                // NOTE: No idea what prequant and postquant should be or what they do
-                int[] patch = CompressPatch(patches[patchno], pheader, 10);
-                int wbits = EncodePatchHeader(bitpack, pheader, patch, extended);
-                EncodePatch(bitpack, patch, 0, wbits);
             }
 
             bitpack.PackBits(END_OF_PATCHES, 8);
@@ -101,6 +94,49 @@ namespace SilverSim.LL.Messages.LayerData
             return layer;
         }
 
+        private static bool CompressPatch(BitPacker pack, LayerPatch layerpatch, bool extended, ref int remainingbits)
+        {
+            lock (layerpatch)
+            {
+                /* check whether we have to run terrain compression */
+                if(layerpatch.Serial != layerpatch.PackedSerial)
+                {
+                    layerpatch.PackedData.Reset();
+                    if (layerpatch.Data.Length != LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES)
+                    {
+                        throw new ArgumentException("Patch data must be a 16x16 array");
+                    }
+
+                    PatchHeader pheader = PrescanPatch(layerpatch);
+                    pheader.QuantWBits = 136;
+                    if (extended)
+                    {
+                        pheader.PatchIDs = (layerpatch.Y & 0xFFFF);
+                        pheader.PatchIDs += (layerpatch.X << 16);
+                    }
+                    else
+                    {
+                        pheader.PatchIDs = (layerpatch.Y & 0x1F);
+                        pheader.PatchIDs += (layerpatch.X << 5);
+                    }
+
+                    int[] patch = CompressPatch(layerpatch, pheader, 10);
+                    int wbits = EncodePatchHeader(layerpatch.PackedData, pheader, patch, extended);
+                    EncodePatch(layerpatch.PackedData, patch, 0, wbits);
+                    layerpatch.PackedSerial = layerpatch.Serial;
+                }
+
+                if(layerpatch.PackedData.BitPos <= remainingbits)
+                {
+                    remainingbits -= layerpatch.PackedData.BitPos;
+                    pack.PackBits(layerpatch.PackedData);
+                    return true;
+                }
+                return false;
+            }
+        }
+
+        #region Layer Bit Packing Processing
         private static PatchHeader PrescanPatch(LayerPatch patch)
         {
             PatchHeader header = new PatchHeader();
@@ -192,11 +228,14 @@ namespace SilverSim.LL.Messages.LayerData
                 output.PackBits(header.PatchIDs, 10);
             }
 
+            /* Bit Length of Header in VarRegion format: 56 bits => 7 Bytes */
+
             return wbits;
         }
 
         private static void EncodePatch(BitPacker output, int[] patch, int postquant, int wbits)
         {
+            /* maximum possible length of patch data 640 Bytes */
             int temp;
             bool eob;
 
@@ -266,6 +305,7 @@ namespace SilverSim.LL.Messages.LayerData
                 }
             }
         }
+        #endregion
 
         #region Actual compression
         private static int[] CompressPatch(LayerPatch patchData, PatchHeader header, int prequant)

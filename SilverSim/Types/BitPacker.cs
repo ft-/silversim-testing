@@ -39,6 +39,17 @@ namespace SilverSim.Types
             Data = data;
         }
 
+        public BitPacker(byte[] data)
+        {
+            m_BitPos = 0;
+            Data = data;
+        }
+
+        public void Reset()
+        {
+            m_BitPos = 0;
+        }
+
         public int BitPos
         {
             get
@@ -393,11 +404,11 @@ namespace SilverSim.Types
                     count = 8;
                 }
 
-                while(count > 0)
+                while(count-- > 0)
                 {
                     byte curBitMask = (byte)(0x80 >> (m_BitPos % 8));
 
-                    if((data[curBytePos] & (0x01 << (count - 1))) != 0)
+                    if((data[curBytePos] & (0x01 << count)) != 0)
                     {
                         Data[m_BitPos / 8] |= curBitMask;
                     }
@@ -406,7 +417,6 @@ namespace SilverSim.Types
                         Data[m_BitPos / 8] &= (byte)~curBitMask;
                     }
 
-                    --count;
                     ++m_BitPos;
                 }
                 ++curBytePos;
@@ -462,6 +472,52 @@ namespace SilverSim.Types
             }
 
             return output;
+        }
+        #endregion
+
+        #region Pack BitPacker Data
+        public void PackBits(BitPacker src)
+        {
+            int count = 0;
+            int curBytePos = 0;
+            int bitCount = src.m_BitPos;
+
+            while (bitCount > 0)
+            {
+                count = bitCount;
+                if (count > 8)
+                {
+                    count = 8;
+                }
+
+                byte srcBits = src.Data[curBytePos];
+                while (count-- > 0)
+                {
+                    byte curBitMask = (byte)(0x80 >> (m_BitPos % 8));
+
+                    if ((srcBits & 0x80) != 0)
+                    {
+                        Data[m_BitPos / 8] |= curBitMask;
+                    }
+                    else
+                    {
+                        Data[m_BitPos / 8] &= (byte)~curBitMask;
+                    }
+
+                    ++m_BitPos;
+                    srcBits <<= 1;
+                }
+                ++curBytePos;
+
+                if (bitCount > 8)
+                {
+                    bitCount -= 8;
+                }
+                else
+                {
+                    bitCount = 0;
+                }
+            }
         }
         #endregion
     }

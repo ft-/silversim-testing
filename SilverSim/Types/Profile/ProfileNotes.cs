@@ -27,8 +27,8 @@ namespace SilverSim.Types.Profile
 {
     public struct ProfileNotes
     {
-        UUI User;
-        UUI Target;
-        string Notes;
+        public UUI User;
+        public UUI Target;
+        public string Notes;
     }
 }
