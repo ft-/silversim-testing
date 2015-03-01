@@ -34,32 +34,29 @@ namespace SilverSim.LL.Core
     public partial class Circuit
     {
         #region LLUDP Packet transmitter
-        enum QueueOutType : uint
-        {
-            High,
-            Resend,
-            LandLayerData,
-            WindLayerData,
-            GenericLayerData,
-            Medium,
-            Low,
-            Asset,
-            Texture,
 
-            NumQueues, /* must be last */
-        }
+        /* we limit by amount of acks here (concept from TCP, more or less as window approach) */
+        int[] m_AckThrottlingCount = new int[(int)Message.QueueOutType.NumQueues];
 
-        int ThrottleRate = 60125;
-        int RateBucket;
-        bool m_UseThrottle = false;
-
-        private readonly Dictionary<MessageType, QueueOutType> m_QueueOutTable = new Dictionary<MessageType, QueueOutType>();
+        private static readonly Dictionary<MessageType, Message.QueueOutType> m_QueueOutTable = new Dictionary<MessageType, Message.QueueOutType>();
         static void InitializeTransmitQueueRouting()
         {
+            /* viewers do not wait long for this, so we give them higher priority */
+            m_QueueOutTable.Add(MessageType.ImageData, Message.QueueOutType.TextureStart);
+            m_QueueOutTable.Add(MessageType.ImageNotInDatabase, Message.QueueOutType.TextureStart);
+
+            m_QueueOutTable.Add(MessageType.ImagePacket, Message.QueueOutType.Texture);
+            m_QueueOutTable.Add(MessageType.TransferPacket, Message.QueueOutType.Asset);
+            m_QueueOutTable.Add(MessageType.TransferInfo, Message.QueueOutType.Asset);
         }
 
         void InitializeTransmitQueueing()
         {
+            int i;
+            for(i = 0; i < m_AckThrottlingCount.Length; ++i)
+            {
+                m_AckThrottlingCount[i] = 0;
+            }
         }
 
         const int TRANSMIT_THROTTLE_MTU = 1500;
@@ -72,25 +69,6 @@ namespace SilverSim.LL.Core
             {
                 return;
             }
-            if (!BitConverter.IsLittleEndian)
-            {
-                for (int i = 0; i < 7; i++)
-                {
-                    Array.Reverse(m.Throttles, i * 4, 4);
-                }
-            }
-            int resend = (int)(BitConverter.ToSingle(m.Throttles, 0) * 0.125f);
-            int land = (int)(BitConverter.ToSingle(m.Throttles, 4) * 0.125f);
-            int wind = (int)(BitConverter.ToSingle(m.Throttles, 8) * 0.125f);
-            int cloud = (int)(BitConverter.ToSingle(m.Throttles, 12) * 0.125f);
-            int task = (int)(BitConverter.ToSingle(m.Throttles, 16) * 0.125f);
-            int texture = (int)(BitConverter.ToSingle(m.Throttles, 20) * 0.125f);
-            int asset = (int)(BitConverter.ToSingle(m.Throttles, 24) * 0.125f);
-
-            ThrottleRate = resend + land + wind + cloud + task + texture + asset;
-            m_Log.DebugFormat("Reconfigured throttle for {0} to: Total {1} Kbs",
-                Agent.Owner.FullName,
-                ThrottleRate);
         }
 
         private void TerminateCircuit()
@@ -137,24 +115,23 @@ namespace SilverSim.LL.Core
         {
             int lastAckTick = Environment.TickCount;
             int lastPingTick = Environment.TickCount;
-            int lastBucketTick = Environment.TickCount;
             int lastSimStatsTick = Environment.TickCount;
             byte pingID = 0;
             Thread.CurrentThread.Name = string.Format("LLUDP:Transmitter for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
             Queue<Message> LowPriorityQueue;
             Queue<Message> HighPriorityQueue;
             Queue<Message> MediumPriorityQueue;
-            Queue<Message>[] QueueList = new Queue<Message>[(int)QueueOutType.NumQueues];
-            QueueOutType qroutidx;
+            Queue<Message>[] QueueList = new Queue<Message>[(int)Message.QueueOutType.NumQueues];
+            Message.QueueOutType qroutidx;
 
-            for (uint qidx = 0; qidx < (uint)QueueOutType.NumQueues; ++qidx)
+            for (uint qidx = 0; qidx < (uint)Message.QueueOutType.NumQueues; ++qidx)
             {
                 QueueList[qidx] = new Queue<Message>();
             }
 
-            HighPriorityQueue = QueueList[(uint)QueueOutType.High];
-            MediumPriorityQueue = QueueList[(uint)QueueOutType.Medium];
-            LowPriorityQueue = QueueList[(uint)QueueOutType.Low];
+            HighPriorityQueue = QueueList[(uint)Message.QueueOutType.High];
+            MediumPriorityQueue = QueueList[(uint)Message.QueueOutType.Medium];
+            LowPriorityQueue = QueueList[(uint)Message.QueueOutType.Low];
 
             while (true)
             {
@@ -182,7 +159,8 @@ namespace SilverSim.LL.Core
 
                     if(m_QueueOutTable.TryGetValue(m.Number, out qroutidx))
                     {
-                        QueueList[(uint)qroutidx].Enqueue(m);
+                        m.OutQueue = qroutidx;
+                        QueueList[(uint)m.OutQueue].Enqueue(m);
                     }
                     else if (m.Number == MessageType.LayerData)
                     {
@@ -191,61 +169,41 @@ namespace SilverSim.LL.Core
                         {
                             case Messages.LayerData.LayerData.LayerDataType.Land:
                             case Messages.LayerData.LayerData.LayerDataType.LandExtended:
-                                QueueList[(uint)QueueOutType.LandLayerData].Enqueue(m);
+                                m.OutQueue = Message.QueueOutType.LandLayerData;
+                                QueueList[(uint)m.OutQueue].Enqueue(m);
                                 break;
 
                             case Messages.LayerData.LayerData.LayerDataType.Wind:
                             case Messages.LayerData.LayerData.LayerDataType.WindExtended:
-                                QueueList[(uint)QueueOutType.WindLayerData].Enqueue(m);
+                                m.OutQueue = Message.QueueOutType.WindLayerData;
+                                QueueList[(uint)m.OutQueue].Enqueue(m);
                                 break;
 
                             default:
-                                QueueList[(uint)QueueOutType.GenericLayerData].Enqueue(m);
+                                m.OutQueue = Message.QueueOutType.GenericLayerData;
+                                QueueList[(uint)m.OutQueue].Enqueue(m);
                                 break;
                         }
                     }
-                    else if(m.Number == MessageType.ImageData || m.Number == MessageType.ImagePacket)
-                    {
-                        QueueList[(uint)QueueOutType.Texture].Enqueue(m);
-                    }
-                    else if (m.Number == MessageType.TransferPacket || m.Number == MessageType.TransferInfo)
-                    {
-                        QueueList[(uint)QueueOutType.Asset].Enqueue(m);
-                    }
                     else if (m.Number < MessageType.Medium)
                     {
+                        m.OutQueue = Message.QueueOutType.High;
                         HighPriorityQueue.Enqueue(m);
                     }
                     else if(m.Number < MessageType.Low)
                     {
+                        m.OutQueue = Message.QueueOutType.Medium;
                         MediumPriorityQueue.Enqueue(m);
                     }
                     else
                     {
+                        m.OutQueue = Message.QueueOutType.Low;
                         LowPriorityQueue.Enqueue(m);
                     }
                 }
                 catch
                 {
 
-                }
-
-                int bucketCheckTime = Environment.TickCount;
-                if (bucketCheckTime != lastBucketTick)
-                {
-                    int deltatime = bucketCheckTime - lastBucketTick;
-                    int decreaseVal = (ThrottleRate * deltatime) / 1000;
-                    /* make a min bucket decrease here, prevent stalls */
-                    if (decreaseVal < 60 * deltatime)
-                    { /* this is roughly around 60kByte/s */
-                        decreaseVal = 60 * deltatime;
-                    }
-                    if (decreaseVal > RateBucket)
-                    {
-                        decreaseVal = RateBucket;
-                    }
-                    RateBucket -= decreaseVal;
-                    lastBucketTick = bucketCheckTime;
                 }
 
                 /* make high packets pass low priority packets */
@@ -256,7 +214,7 @@ namespace SilverSim.LL.Core
                     {
                         continue;
                     }
-                    if(RateBucket >= ThrottleRate && m_UseThrottle)
+                    if (m_AckThrottlingCount[queueidx] > 100)
                     {
                         continue;
                     }
@@ -273,6 +231,7 @@ namespace SilverSim.LL.Core
                         try
                         {
                             UDPPacket p = new UDPPacket();
+                            p.OutQueue = m.OutQueue;
                             p.IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag;
                             m.Serialize(p);
                             p.Flush();
@@ -296,7 +255,8 @@ namespace SilverSim.LL.Core
                                 }
                             }
 
-                            RateBucket += m_Server.SendPacketTo(p, RemoteEndPoint);
+                            m_Server.SendPacketTo(p, RemoteEndPoint);
+                            Interlocked.Increment(ref m_AckThrottlingCount[queueidx]);
 
                             p.HasAckFlag = false;
                             p.DataLength = savedDataLength;

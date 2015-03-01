@@ -241,6 +241,7 @@ namespace SilverSim.LL.Core
                     if (m_UnackedPackets.Remove(ackno, out p_acked))
                     {
                         unackedReleasedCount += p_acked.DataLength;
+                        Interlocked.Decrement(ref m_AckThrottlingCount[(int)p_acked.OutQueue]);
                     }
 
                     lock (m_LogoutReplyLock)
@@ -289,6 +290,7 @@ namespace SilverSim.LL.Core
                         if (m_UnackedPackets.Remove(ackno, out p_acked))
                         {
                             unackedReleasedCount += p_acked.DataLength;
+                            Interlocked.Decrement(ref m_AckThrottlingCount[(int)p_acked.OutQueue]);
                         }
 
                         lock (m_LogoutReplyLock)
@@ -355,7 +357,7 @@ namespace SilverSim.LL.Core
                     }
                     else
                     {
-                        /* TODO: specific decoder for ListenEvent */
+                        /* specific decoder for ListenEvent */
                         ListenEvent ev = new ListenEvent();
                         ev.TargetID = pck.ReadUUID();
                         ev.Channel = pck.ReadInt32();

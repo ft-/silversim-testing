@@ -46,6 +46,8 @@ namespace SilverSim.LL.Messages
         public int EnqueuedAtTime = 0;
         public uint ResentCount = 0;
 
+        public Message.QueueOutType OutQueue = Message.QueueOutType.Low;
+
         public UInt32 SequenceNumber
         {
             get

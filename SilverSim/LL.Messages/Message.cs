@@ -38,6 +38,24 @@ namespace SilverSim.LL.Messages
             Low
         }
 
+        public enum QueueOutType : uint
+        {
+            High,
+            Resend,
+            LandLayerData,
+            WindLayerData,
+            GenericLayerData,
+            Medium,
+            Low,
+            Asset,
+            TextureStart,
+            Texture,
+
+            NumQueues, /* must be last */
+        }
+
+        public QueueOutType OutQueue = QueueOutType.Low;
+
         public UInt32 ReceivedOnCircuitCode;
         public delegate void Send(UInt32 circuitCode, Message m);
         public UUID CircuitSessionID = UUID.Zero;
