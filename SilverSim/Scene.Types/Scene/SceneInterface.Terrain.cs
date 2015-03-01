@@ -72,6 +72,7 @@ namespace SilverSim.Scene.Types.Scene
                         m_TerrainPatches[y, x].Y = y;
                     }
                 }
+                Patch = new PatchesAccessor(m_TerrainPatches, xPatches, yPatches);
             }
 
             public void Dispose()
@@ -136,7 +137,7 @@ namespace SilverSim.Scene.Types.Scene
                     int x;
                     List<LayerData> mlist = new List<LayerData>();
                     List<LayerPatch> dirtyPatches = new List<LayerPatch>();
-                    RwLockedDictionary<int, int> agentSceneSerials = agent.TransmittedTerrainSerials[m_Scene.ID];
+                    RwLockedDictionary<uint, uint> agentSceneSerials = agent.TransmittedTerrainSerials[m_Scene.ID];
                     
                     for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
                     {
@@ -145,7 +146,7 @@ namespace SilverSim.Scene.Types.Scene
                             LayerPatch patch = m_TerrainPatches[y, x];
                             try
                             {
-                                int serial = agentSceneSerials[patch.ExtendedPatchID];
+                                uint serial = agentSceneSerials[patch.ExtendedPatchID];
                                 if (serial != patch.Serial)
                                 {
                                     agentSceneSerials[patch.ExtendedPatchID] = serial;
@@ -256,6 +257,80 @@ namespace SilverSim.Scene.Types.Scene
                     uint x = (uint)pos.X;
                     uint y = (uint)pos.Y;
                     this[x, y] = (float)value;
+                }
+            }
+            #endregion
+
+            #region Access Terrain Data
+            public readonly PatchesAccessor Patch;
+
+            public List<LayerPatch> AllPatches
+            {
+                get
+                {
+                    int xPatches = (int)m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                    int yPatches = (int)m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+
+                    List<LayerPatch> patches = new List<LayerPatch>();
+                    for (int y = 0; y < yPatches; ++y)
+                    {
+                        for (int x = 0; x < xPatches; ++x)
+                        {
+                            patches.Add(new LayerPatch(m_TerrainPatches[y, x]));
+                        }
+                    }
+                    return patches;
+                }
+
+                set
+                {
+                    foreach(LayerPatch p in value)
+                    {
+                        Patch.Update(p);
+                    }
+                }
+            }
+
+            public class PatchesAccessor
+            {
+                LayerPatch[,] m_TerrainPatches;
+                int m_NumXPatches;
+                int m_NumYPatches;
+                public PatchesAccessor(LayerPatch[,] terrainPatches, int xPatches, int yPatches)
+                {
+                    m_TerrainPatches = terrainPatches;
+                    m_NumXPatches = xPatches;
+                    m_NumYPatches = yPatches;
+                }
+
+                public LayerPatch this[int x, int y]
+                {
+                    get
+                    {
+                        if(x >= m_NumXPatches || y >= m_NumYPatches)
+                        {
+                            throw new KeyNotFoundException();
+                        }
+                        return new LayerPatch(m_TerrainPatches[y, x]);
+                    }
+                }
+
+                public void Update(LayerPatch p)
+                {
+                    if (p.X >= m_NumXPatches || p.Y >= m_NumYPatches)
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    m_TerrainPatches[p.Y, p.X].Update(p);
+                }
+
+                public void UpdateWithSerial(LayerPatch p)
+                {
+                    if (p.X >= m_NumXPatches || p.Y >= m_NumYPatches)
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    m_TerrainPatches[p.Y, p.X].UpdateWithSerial(p);
                 }
             }
             #endregion

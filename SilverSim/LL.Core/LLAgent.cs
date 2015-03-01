@@ -78,9 +78,9 @@ namespace SilverSim.LL.Core
         public readonly RwLockedDoubleDictionary<UInt32, UUID, Circuit> Circuits = new RwLockedDoubleDictionary<UInt32, UUID, Circuit>();
         public readonly RwLockedDictionary<GridVector, string> KnownChildAgentURIs = new RwLockedDictionary<GridVector, string>();
 
-        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<int, int>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<int, int>>(delegate() { return new RwLockedDictionary<int, int>(); });
+        private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(delegate() { return new RwLockedDictionary<uint, uint>(); });
 
-        public RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<int, int>> TransmittedTerrainSerials
+        public RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials
         {
             get
             {

@@ -42,6 +42,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Scene
@@ -84,6 +85,11 @@ namespace SilverSim.Scene.Types.Scene
 
         public readonly RegionSettings RegionSettings = new RegionSettings();
 
+        #region Scene Loading fields (do not use for anything else)
+        public Thread m_LoaderThread = null;
+        public object m_LoaderThreadLock = new object();
+        #endregion
+
         public UUID ID { get; protected set; }
         public UUID RegionSecret { get; private set; }
         public uint RegionPort { get; protected set; }
@@ -115,7 +121,7 @@ namespace SilverSim.Scene.Types.Scene
         private NotecardCache m_NotecardCache;
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }
         public string GatekeeperURI { get; protected set; }
-        public bool IsSceneEnabled { get; protected set; }
+        public bool IsSceneEnabled { get; set; }
 
         public abstract void LoadSceneAsync();
 

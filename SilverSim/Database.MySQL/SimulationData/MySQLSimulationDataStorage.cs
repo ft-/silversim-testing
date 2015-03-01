@@ -40,6 +40,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         private MySQLSimulationDataObjectStorage m_ObjectStorage;
         private MySQLSimulationDataParcelStorage m_ParcelStorage;
         private MySQLSimulationDataScriptStateStorage m_ScriptStateStorage;
+        private MySQLSimulationDataTerrainStorage m_TerrainStorage;
 
         #region Constructor
         public MySQLSimulationDataStorage(string connectionString)
@@ -47,6 +48,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_ConnectionString = connectionString;
             m_ObjectStorage = new MySQLSimulationDataObjectStorage(connectionString);
             m_ParcelStorage = new MySQLSimulationDataParcelStorage(connectionString);
+            m_TerrainStorage = new MySQLSimulationDataTerrainStorage(connectionString);
             m_ScriptStateStorage = new MySQLSimulationDataScriptStateStorage(connectionString);
         }
 
@@ -79,6 +81,14 @@ namespace SilverSim.Database.MySQL.SimulationData
                 return m_ScriptStateStorage;
             }
         }
+
+        public override SimulationDataTerrainStorageInterface Terrains
+        {
+            get 
+            {
+                return m_TerrainStorage;
+            }
+        }
         #endregion
 
         #region IDBServiceInterface
@@ -95,6 +105,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_ObjectStorage.ProcessMigrations();
             m_ScriptStateStorage.ProcessMigrations();
             m_ParcelStorage.ProcessMigrations();
+            m_TerrainStorage.ProcessMigrations();
         }
         #endregion
     }

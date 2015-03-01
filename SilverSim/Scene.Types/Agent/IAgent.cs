@@ -52,7 +52,7 @@ namespace SilverSim.Scene.Types.Agent
 
         bool IMSend(GridInstantMessage im);
 
-        RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<int, int>> TransmittedTerrainSerials { get; }
+        RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials { get; }
 
         int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
         {

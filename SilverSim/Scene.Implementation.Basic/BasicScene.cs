@@ -54,6 +54,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using ThreadedClasses;
+using SilverSim.LL.Messages.LayerData;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -66,8 +67,6 @@ namespace SilverSim.Scene.Implementation.Basic
         protected internal RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
         protected internal RwLockedDoubleDictionary<UUID, int, ParcelInfo> m_Parcels = new RwLockedDoubleDictionary<UUID, int, ParcelInfo>();
         private LLUDPServer m_UDPServer;
-        private Thread m_LoaderThread = null;
-        private object m_LoaderThreadLock = new object();
         #endregion
 
         #region Interface wrappers
@@ -280,18 +279,6 @@ namespace SilverSim.Scene.Implementation.Basic
         }
         #endregion
 
-        public override void LoadSceneAsync()
-        {
-            lock(m_LoaderThreadLock)
-            {
-                if (m_LoaderThread == null && !IsSceneEnabled)
-                {
-                    m_LoaderThread = new Thread(LoadScene);
-                    m_LoaderThread.Start();
-                }
-            }
-        }
-
         #region Internal Delegates
         private bool IMSend(GridInstantMessage im)
         {
@@ -481,123 +468,9 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Scene Loading
-        private void LoadScene()
+        public override void LoadSceneAsync()
         {
-            List<UUID> parcels;
-            try
-            {
-                lock (m_LoaderThreadLock)
-                {
-                    parcels = m_SimulationDataStorage.Parcels.ParcelsInRegion(ID);
-                }
-                if (parcels.Count == 1)
-                {
-                    m_Log.InfoFormat("Loading {0} parcel for {1} ({2})", parcels.Count, RegionData.Name, ID);
-                }
-                else
-                {
-                    m_Log.InfoFormat("Loading {0} parcels for {1} ({2})", parcels.Count, RegionData.Name, ID);
-                }
-                if (parcels.Count != 0)
-                {
-                    foreach (UUID parcelid in parcels)
-                    {
-                        try
-                        {
-                            lock (m_LoaderThreadLock)
-                            {
-                                ParcelInfo pi = m_SimulationDataStorage.Parcels[ID, parcelid];
-                                m_Parcels.Add(pi.ID, pi.LocalID, pi);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            m_Log.WarnFormat("Loading parcel {0} for {3} ({4}) failed: {2}: {1}", parcelid, e.Message, e.GetType().FullName, RegionData.Name, ID);
-                        }
-
-                    }
-                }
-
-                if(parcels.Count == 0)
-                {
-                    ParcelInfo pi = new ParcelInfo((int)RegionData.Size.X, (int)RegionData.Size.Y);
-                    pi.AABBMin = new Vector3(0, 0, 0);
-                    pi.AABBMax = new Vector3(RegionData.Size.X-1, RegionData.Size.Y-1, 0);
-                    pi.ActualArea = (int)(RegionData.Size.X * RegionData.Size.Y);
-                    pi.Area = (int)(RegionData.Size.X * RegionData.Size.Y);
-                    pi.AuctionID = 0;
-                    pi.LocalID = 1;
-                    pi.ID = UUID.Random;
-                    pi.Name = "Your Parcel";
-                    pi.Owner = RegionData.Owner;
-                    pi.Flags = ParcelFlags.None; /* we keep all flags disabled initially */
-                    pi.BillableArea = (int)(RegionData.Size.X * RegionData.Size.Y);
-                    pi.LandBitmap.SetAllBits();
-                    pi.LandingPosition = new Vector3(128, 128, 23);
-                    pi.LandingLookAt = new Vector3(1, 0, 0);
-                    pi.ClaimDate = new Date();
-                    pi.Status = ParcelStatus.Leased;
-                    m_SimulationDataStorage.Parcels.Store(ID, pi);
-                    m_Parcels.Add(pi.ID, pi.LocalID, pi);
-                    m_Log.InfoFormat("Auto-generated default parcel for {1} ({2})", parcels.Count, RegionData.Name, ID);
-                }
-                else if (parcels.Count == 1)
-                {
-                    m_Log.InfoFormat("Loaded {0} parcel for {1} ({2})", parcels.Count, RegionData.Name, ID);
-                }
-                else
-                {
-                    m_Log.InfoFormat("Loaded {0} parcels for {1} ({2})", parcels.Count, RegionData.Name, ID);
-                }
-
-                List<UUID> objects;
-                lock (m_LoaderThreadLock)
-                {
-                    objects = m_SimulationDataStorage.Objects.ObjectsInRegion(ID);
-                }
-                if (objects.Count == 1)
-                {
-                    m_Log.InfoFormat("Loading {0} object for {1} ({2})", objects.Count, RegionData.Name, ID);
-                }
-                else
-                {
-                    m_Log.InfoFormat("Loading {0} objects for {1} ({2})", objects.Count, RegionData.Name, ID);
-                }
-                if (objects.Count != 0)
-                {
-                    foreach (UUID objectid in objects)
-                    {
-                        try
-                        {
-                            lock (m_LoaderThreadLock)
-                            {
-                                Add(m_SimulationDataStorage.Objects[ID, objectid]);
-                            }
-                        }
-                        catch (Exception e)
-                        {
-                            m_Log.WarnFormat("Loading object {0} for {3} ({4}) failed: {2}: {1}", objectid, e.Message, e.GetType().FullName, RegionData.Name, ID);
-                        }
-                    }
-                }
-                if (objects.Count == 1)
-                {
-                    m_Log.InfoFormat("Loaded {0} object for {1} ({2})", objects.Count, RegionData.Name, ID);
-                }
-                else
-                {
-                    m_Log.InfoFormat("Loaded {0} objects for {1} ({2})", objects.Count, RegionData.Name, ID);
-                }
-
-                IsSceneEnabled = true;
-            }
-            finally
-            {
-                lock (m_LoaderThreadLock)
-                {
-                    m_LoaderThread = null;
-                }
-            }
+            this.LoadSceneAsync(m_SimulationDataStorage);
         }
         #endregion
 
