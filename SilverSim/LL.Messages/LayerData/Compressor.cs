@@ -68,26 +68,27 @@ namespace SilverSim.LL.Messages.LayerData
 
             for (int i = 0; i < length; i++)
             {
-                if (patches[i + offset].Data.Length != LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES)
+                int patchno = i + offset;
+                if (patches[patchno].Data.Length != LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES)
                 {
                     throw new ArgumentException("Patch data must be a 16x16 array");
                 }
 
-                PatchHeader pheader = PrescanPatch(patches[i]);
+                PatchHeader pheader = PrescanPatch(patches[patchno]);
                 pheader.QuantWBits = 136;
                 if (extended)
                 {
-                    pheader.PatchIDs = (patches[i].Y & 0xFFFF);
-                    pheader.PatchIDs += (patches[i].X << 16);
+                    pheader.PatchIDs = (patches[patchno].Y & 0xFFFF);
+                    pheader.PatchIDs += (patches[patchno].X << 16);
                 }
                 else
                 {
-                    pheader.PatchIDs = (patches[i].Y & 0x1F);
-                    pheader.PatchIDs += (patches[i].X << 5);
+                    pheader.PatchIDs = (patches[patchno].Y & 0x1F);
+                    pheader.PatchIDs += (patches[patchno].X << 5);
                 }
 
                 // NOTE: No idea what prequant and postquant should be or what they do
-                int[] patch = CompressPatch(patches[i], pheader, 10);
+                int[] patch = CompressPatch(patches[patchno], pheader, 10);
                 int wbits = EncodePatchHeader(bitpack, pheader, patch, extended);
                 EncodePatch(bitpack, patch, 0, wbits);
             }
@@ -180,6 +181,7 @@ namespace SilverSim.LL.Messages.LayerData
 
             output.PackBits(header.QuantWBits, 8);
             output.FloatValue = header.DCOffset;
+            
             output.PackBits(header.Range, 16);
             if (extended)
             {

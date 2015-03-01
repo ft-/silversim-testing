@@ -154,6 +154,7 @@
       <Reference name="System"/>
       <Reference name="System.Core"/>
       <Reference name="SilverSim.Types" localCopy="false"/>
+      <Reference name="log4net" path="../../bin/" localCopy="false"/>
       <Files>
         <Match pattern="*.cs" recurse="true"/>
 	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>

@@ -39,6 +39,20 @@ namespace SilverSim.LL.Messages.LayerData
 
         }
 
+        public LayerPatch(double defaultHeight)
+        {
+            X = 0;
+            Y = 0;
+            int x, y;
+            for (y = 0; y < 16; ++y)
+            {
+                for (x = 0; x < 16; ++x)
+                {
+                    Data[y, x] = (float)defaultHeight;
+                }
+            }
+        }
+
         public LayerPatch(LayerPatch p)
         {
             X = p.X;

@@ -66,7 +66,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     for (x = 0; x < xPatches; ++x)
                     {
-                        m_TerrainPatches[y, x] = new LayerPatch();
+                        m_TerrainPatches[y, x] = new LayerPatch(22);
                         m_TerrainPatches[y, x].X = x;
                         m_TerrainPatches[y, x].Y = y;
                     }
