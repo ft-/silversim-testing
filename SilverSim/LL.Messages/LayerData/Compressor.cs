@@ -284,9 +284,9 @@ namespace SilverSim.LL.Messages.LayerData
                     {
                         temp *= -1;
 
-                        if (temp > (1 << wbits))
+                        if (temp >= (1 << wbits))
                         {
-                            temp = (1 << wbits);
+                            temp = (1 << wbits) - 1;
                         }
 
                         output.PackBits(NEGATIVE_VALUE, 3);
@@ -294,9 +294,9 @@ namespace SilverSim.LL.Messages.LayerData
                     }
                     else
                     {
-                        if (temp > (1 << wbits))
+                        if (temp >= (1 << wbits))
                         {
-                            temp = (1 << wbits);
+                            temp = (1 << wbits) - 1;
                         }
 
                         output.PackBits(POSITIVE_VALUE, 3);
