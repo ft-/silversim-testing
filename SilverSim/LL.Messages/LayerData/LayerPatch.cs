@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using System;
+
 namespace SilverSim.LL.Messages.LayerData
 {
     public class LayerPatch
