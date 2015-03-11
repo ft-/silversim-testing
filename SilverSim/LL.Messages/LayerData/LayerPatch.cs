@@ -29,8 +29,8 @@ namespace SilverSim.LL.Messages.LayerData
 {
     public class LayerPatch
     {
-        public int X;
-        public int Y;
+        public uint X;
+        public uint Y;
 
         uint m_Serial = 1; /* we use a serial number similar to other places to know what an agent has already got */
 
@@ -70,19 +70,19 @@ namespace SilverSim.LL.Messages.LayerData
         public float[,] Data = new float[16,16];
 
         internal uint PackedSerial = 0;
-        private byte[] PackedDataBytes = new byte[647]; /* maximum length of a single 16 by 16 patch when packed perfectly bad */
+        private byte[] PackedDataBytes = new byte[651]; /* maximum length of a single 16 by 16 patch when packed perfectly bad */
         internal BitPacker PackedData;
 
         public uint ExtendedPatchID
         {
             get
             {
-                return ((uint)X << 16) | (uint)Y;
+                return (X << 16) | Y;
             }
             set
             {
-                X = (int)((value >> 16) & 0xFFFF);
-                Y = (int)(value & 0xFFFF);
+                X = ((value >> 16) & 0xFFFF);
+                Y = (value & 0xFFFF);
             }
         }
 
@@ -183,6 +183,21 @@ namespace SilverSim.LL.Messages.LayerData
                 lock(this)
                 {
                     Data[y, x] = value;
+                }
+            }
+        }
+
+        public float this[uint x, uint y]
+        {
+            get
+            {
+                return Data[(int)y, (int)x];
+            }
+            set
+            {
+                lock (this)
+                {
+                    Data[(int)y, (int)x] = value;
                 }
             }
         }

@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 
@@ -34,6 +35,8 @@ namespace SilverSim.Main.Common.CmdIO
         {
 
         }
+
+        public UUID SelectedScene = UUID.Zero;
 
         public abstract void Write(string text);
         

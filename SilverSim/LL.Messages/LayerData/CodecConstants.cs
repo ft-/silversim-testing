@@ -34,19 +34,7 @@ namespace SilverSim.LL.Messages.LayerData
             public float DCOffset;
             public int Range;
             public int QuantWBits;
-            public int PatchIDs;
-
-            public int X
-            {
-                get { return PatchIDs >> 5; }
-                set { PatchIDs += (value << 5); }
-            }
-
-            public int Y
-            {
-                get { return PatchIDs & 0x1F; }
-                set { PatchIDs |= value & 0x1F; }
-            }
+            public uint PatchIDs;
         }
 
         public struct GroupHeader

@@ -198,7 +198,7 @@ namespace SilverSim.Main.Common
                 }
 
                 {
-                    int px, py;
+                    uint px, py;
                     int count = 0;
                     for (py = 0; py < loadparams.Scene.RegionData.Size.Y / 16; ++py)
                     {

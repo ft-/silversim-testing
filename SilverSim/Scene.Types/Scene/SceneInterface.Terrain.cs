@@ -54,11 +54,11 @@ namespace SilverSim.Scene.Types.Scene
 
             public TerrainController(SceneInterface scene)
             {
-                int x;
-                int y;
+                uint x;
+                uint y;
 
-                int xPatches = (int)scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                int yPatches = (int)scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                uint xPatches = scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                uint yPatches = scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
 
                 m_Scene = scene;
                 m_TerrainPatches = new LayerPatch[yPatches, xPatches];
@@ -294,16 +294,16 @@ namespace SilverSim.Scene.Types.Scene
             public class PatchesAccessor
             {
                 LayerPatch[,] m_TerrainPatches;
-                int m_NumXPatches;
-                int m_NumYPatches;
-                public PatchesAccessor(LayerPatch[,] terrainPatches, int xPatches, int yPatches)
+                uint m_NumXPatches;
+                uint m_NumYPatches;
+                public PatchesAccessor(LayerPatch[,] terrainPatches, uint xPatches, uint yPatches)
                 {
                     m_TerrainPatches = terrainPatches;
                     m_NumXPatches = xPatches;
                     m_NumYPatches = yPatches;
                 }
 
-                public LayerPatch this[int x, int y]
+                public LayerPatch this[uint x, uint y]
                 {
                     get
                     {
