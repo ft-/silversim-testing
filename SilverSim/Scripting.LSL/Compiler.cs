@@ -488,7 +488,7 @@ namespace SilverSim.Scripting.LSL
             return null;
         }
 
-        void parseBlock(CompileState compileState, Parser p, List<List<string>> block, bool addNewLocals = false)
+        void parseBlock(CompileState compileState, Parser p, List<List<string>> block, bool inState, bool addNewLocals = false)
         {
             if(addNewLocals)
             {
@@ -532,6 +532,13 @@ namespace SilverSim.Scripting.LSL
                             }
                             break;
 
+                        case "state":
+                            if(!inState)
+                            {
+                                throwParserException(p, "state change not allowed in global function");
+                            }
+                            break;
+
                         default:
                             break;
                     }
@@ -540,7 +547,7 @@ namespace SilverSim.Scripting.LSL
                 else if (args[args.Count - 1] == "{")
                 {
                     block.Add(args);
-                    parseBlock(compileState, p, block, true);
+                    parseBlock(compileState, p, block, inState, true);
                 }
                 else if (args[0] == "}")
                 {
@@ -604,7 +611,7 @@ namespace SilverSim.Scripting.LSL
                     List<List<string>> stateList = new List<List<string>>();
                     compileState.m_States[stateName].Add(args[0], stateList);
                     stateList.Add(args);
-                    parseBlock(compileState, p, stateList);
+                    parseBlock(compileState, p, stateList, true);
                 }
                 else if (args[0] == "}")
                 {
@@ -1362,16 +1369,16 @@ namespace SilverSim.Scripting.LSL
                 if (shbang.Value.StartsWith("//#!Mode:"))
                 {
                     /* we got a sh-bang here, it is a lot safer than what OpenSimulator uses */
-                    string mode = shbang.Value.Substring(9).Trim().ToUpper();
-                    if (mode == "LSL")
+                    string mode = shbang.Value.Substring(9).Trim().ToLower();
+                    if (mode == "lsl")
                     {
                         compileState.AcceptedFlags = APIFlags.LSL;
                     }
-                    else if (mode == "ASSL")
+                    else if (mode == "assl")
                     {
                         compileState.AcceptedFlags = APIFlags.ASSL | APIFlags.OSSL | APIFlags.LightShare | APIFlags.LSL;
                     }
-                    else if(mode == "AURORA" || mode == "WHITECORE")
+                    else if(mode == "aurora" || mode == "whitecore")
                     {
                         compileState.AcceptedFlags = APIFlags.OSSL | APIFlags.WindLight_Aurora | APIFlags.LSL;
                     }
@@ -1451,6 +1458,10 @@ namespace SilverSim.Scripting.LSL
                         {
                             throwParserException(p, "default state cannot be declared with state");
                         }
+                        else if(compileState.m_States.Count == 0)
+                        {
+                            throwParserException(p, "default state must be first declared state in script");
+                        }
                         checkValidName(p, "State", args[1]);
                         if(compileState.m_States.ContainsKey(args[1]))
                         {
@@ -1480,14 +1491,14 @@ namespace SilverSim.Scripting.LSL
                                 checkUsedName(compileState, p, "Function", args[1]);
                                 fp = checkFunctionParameters(compileState, p, args.GetRange(3, args.Count - 3));
                                 funcList.Add(args);
-                                parseBlock(compileState, p, funcList);
+                                parseBlock(compileState, p, funcList, false);
                                 break;
 
                             default:
                                 fp = checkFunctionParameters(compileState, p, args.GetRange(2, args.Count - 3));
                                 args.Insert(0, "void");
                                 funcList.Add(args);
-                                parseBlock(compileState, p, funcList);
+                                parseBlock(compileState, p, funcList, false);
                                 break;
                         }
                     }
@@ -1511,9 +1522,170 @@ namespace SilverSim.Scripting.LSL
             return PostProcess(compileState, appDom, assetID);
         }
 
-        void ProcessFunction(CompileState compileState, TypeBuilder scriptTypeBuilder, TypeBuilder stateTypeBuilder, MethodBuilder mb, ILGenerator ilgen, List<List<string>> functionBody)
+        void ProcessBlock(
+            CompileState compileState, 
+            TypeBuilder scriptTypeBuilder, 
+            TypeBuilder stateTypeBuilder, 
+            MethodBuilder mb, 
+            ILGenerator ilgen, 
+            List<List<string>> functionBody, 
+            List<KeyValuePair<string, Type>> functionArguments,
+            ref int lineIndex)
         {
+            for (; lineIndex < functionBody.Count; ++lineIndex )
+            {
+                List<string> functionLine = new List<string>();
+                switch (functionLine[0])
+                {
+                    /* type named things are variable declaration */
+                    case "integer":
+                        break;
 
+                    case "vector":
+                        break;
+
+                    case "list":
+                        break;
+
+                    case "float":
+                        break;
+
+                    case "string":
+                        break;
+
+                    case "key":
+                        break;
+
+                    case "rotation":
+                        break;
+
+                    case "for":
+                        break;
+
+                    case "while":
+                        break;
+
+                    case "do":
+                        break;
+
+                    case "jump":
+                        break;
+
+                    case "return":
+                        break;
+
+                    case "state":
+                        break;
+
+                    case "{": /* new unconditional block */
+                        break;
+
+                    default:
+                        if (functionLine[1] == "=")
+                        {
+                            /* variable assignment */
+                        }
+                        else
+                        {
+                            /* function call no return */
+                        }
+                        break;
+                }
+            }
+        }
+
+        void ProcessFunction(
+            CompileState compileState, 
+            TypeBuilder scriptTypeBuilder, 
+            TypeBuilder stateTypeBuilder, 
+            MethodBuilder mb, 
+            ILGenerator ilgen, 
+            List<List<string>> functionBody)
+        {
+            Type returnType = typeof(void);
+            List<string> functionDeclaration = functionBody[0];
+            string functionName = functionDeclaration[1];
+            int functionStart = 2;
+
+            switch (functionDeclaration[0])
+            {
+                case "integer":
+                    returnType = typeof(int);
+                    break;
+
+                case "vector":
+                    returnType = typeof(Vector3);
+                    break;
+
+                case "list":
+                    returnType = typeof(AnArray);
+                    break;
+
+                case "float":
+                    returnType = typeof(double);
+                    break;
+
+                case "string":
+                    returnType = typeof(string);
+                    break;
+
+                case "key":
+                    returnType = typeof(string);
+                    break;
+
+                case "rotation":
+                    returnType = typeof(Quaternion);
+                    break;
+
+                default:
+                    functionName = functionDeclaration[0];
+                    functionStart = 1;
+                    break;
+            }
+
+            List<KeyValuePair<string, Type>> functionParams = new List<KeyValuePair<string, Type>>();
+            while (functionDeclaration[++functionStart] != ")")
+            {
+                Type t;
+                switch (functionDeclaration[++functionStart])
+                {
+                    case "integer":
+                        t = typeof(int);
+                        break;
+
+                    case "vector":
+                        t = typeof(Vector3);
+                        break;
+
+                    case "list":
+                        t = typeof(AnArray);
+                        break;
+
+                    case "float":
+                        t = typeof(double);
+                        break;
+
+                    case "string":
+                        t = typeof(string);
+                        break;
+
+                    case "key":
+                        t = typeof(string);
+                        break;
+
+                    case "rotation":
+                        t = typeof(Quaternion);
+                        break;
+
+                    default:
+                        throw new CompilerException(0, "Internal Error");
+                }
+                /* parameter name and type in order */
+                functionParams.Add(new KeyValuePair<string, Type>(functionDeclaration[functionStart++], t));
+            }
+
+            int lineIndex = 1;
+            ProcessBlock(compileState, scriptTypeBuilder, stateTypeBuilder, mb, ilgen, functionBody, functionParams, ref lineIndex);
         }
 
         IScriptAssembly PostProcess(CompileState compileState, AppDomain appDom, UUID assetID)
