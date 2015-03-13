@@ -37,6 +37,14 @@ namespace SilverSim.Main.Common
             }
         }
 
+        public static string Shard
+        {
+            get
+            {
+                return "Development";
+            }
+        }
+
         public static string Version
         {
             get

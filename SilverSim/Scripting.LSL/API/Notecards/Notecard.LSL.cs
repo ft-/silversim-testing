@@ -40,23 +40,23 @@ namespace SilverSim.Scripting.LSL.API.Notecards
         public const string EOF = "\n\n\n";
 
         #region llGetNotecardLine
-        delegate void getNotecardLineDelegate(ScriptInstance instance, UUID queryID, UUID assetID, int line);
+        delegate void getNotecardLineDelegate(ObjectPart part, UUID queryID, UUID assetID, int line);
 
-        void getNotecardLine(ScriptInstance Instance, UUID queryID, UUID assetID, int line)
+        void getNotecardLine(ObjectPart part, UUID queryID, UUID assetID, int line)
         {
-            Notecard nc = Instance.Part.ObjectGroup.Scene.GetService<NotecardCache>()[assetID];
+            Notecard nc = part.ObjectGroup.Scene.GetService<NotecardCache>()[assetID];
             string[] lines = nc.Text.Split('\n');
             DataserverEvent e = new DataserverEvent();
             if (line >= lines.Length || line < 0)
             {
                 e.Data = EOF;
                 e.QueryID = queryID;
-                Instance.Part.PostEvent(e);
+                part.PostEvent(e);
             }
 
             e.Data = lines[line];
             e.QueryID = queryID;
-            Instance.Part.PostEvent(e);
+            part.PostEvent(e);
         }
 
         void getNotecardLineEnd(IAsyncResult ar)
@@ -69,7 +69,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
         void getNotecardLineAsync(ScriptInstance Instance, UUID queryID, UUID assetID, int line)
         {
             getNotecardLineDelegate del = getNotecardLine;
-            del.BeginInvoke(Instance, queryID, assetID, line, getNotecardLineEnd, this);
+            del.BeginInvoke(Instance.Part, queryID, assetID, line, getNotecardLineEnd, this);
         }
 
         [APILevel(APIFlags.LSL)]
@@ -100,11 +100,11 @@ namespace SilverSim.Scripting.LSL.API.Notecards
         #endregion
 
         #region llGetNumberOfNotecardLines
-        delegate void getNumberOfNotecardLinesDelegate(ScriptInstance instance, UUID queryID, UUID assetID);
+        delegate void getNumberOfNotecardLinesDelegate(ObjectPart part, UUID queryID, UUID assetID);
 
-        void getNumberOfNotecardLines(ScriptInstance Instance, UUID queryID, UUID assetID)
+        void getNumberOfNotecardLines(ObjectPart part, UUID queryID, UUID assetID)
         {
-            Notecard nc = Instance.Part.ObjectGroup.Scene.GetService<NotecardCache>()[assetID];
+            Notecard nc = part.ObjectGroup.Scene.GetService<NotecardCache>()[assetID];
             DataserverEvent e = new DataserverEvent();
             int n = 1;
             foreach (char c in nc.Text)
@@ -116,7 +116,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
             }
             e.Data = n.ToString();
             e.QueryID = queryID;
-            Instance.Part.PostEvent(e);
+            part.PostEvent(e);
         }
 
         void getNumberOfNotecardLinesEnd(IAsyncResult ar)
@@ -129,7 +129,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
         void getNumberOfNotecardLinesAsync(ScriptInstance Instance, UUID queryID, UUID assetID)
         {
             getNumberOfNotecardLinesDelegate del = getNumberOfNotecardLines;
-            del.BeginInvoke(Instance, queryID, assetID, getNumberOfNotecardLinesEnd, this);
+            del.BeginInvoke(Instance.Part, queryID, assetID, getNumberOfNotecardLinesEnd, this);
         }
 
         [APILevel(APIFlags.LSL)]
