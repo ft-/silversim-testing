@@ -29,13 +29,8 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
-using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
-using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.Account;
-using SilverSim.Types.Grid;
-using SilverSim.Types.GridUser;
 using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.UserAccounts

@@ -29,7 +29,6 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.GridUser;
-using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.GridUser;
 
