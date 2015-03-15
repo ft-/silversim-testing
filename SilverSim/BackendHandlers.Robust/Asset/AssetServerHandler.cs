@@ -259,7 +259,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     }
                 }
 
-                string assetbase_header = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<AssetBase>";
+                string assetbase_header = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<AssetMetadata>";
                 string flags = "";
 
                 if (0 != (data.Flags & (uint)AssetFlags.Maptile))
@@ -290,7 +290,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     flags = "Normal";
                 }
                 string assetbase_footer = String.Format(
-                    "<FullID><Guid>{0}</Guid></FullID><ID>{0}</ID><Name>{1}</Name><Description>{2}</Description><Type>{3}</Type><Local>{4}</Local><Temporary>{5}</Temporary><CreatorID>{6}</CreatorID><Flags>{7}</Flags></AssetBase>",
+                    "<FullID><Guid>{0}</Guid></FullID><ID>{0}</ID><Name>{1}</Name><Description>{2}</Description><Type>{3}</Type><Local>{4}</Local><Temporary>{5}</Temporary><CreatorID>{6}</CreatorID><Flags>{7}</Flags></AssetMetadata>",
                     data.ID.ToString(),
                     System.Xml.XmlConvert.EncodeName(data.Name),
                     System.Xml.XmlConvert.EncodeName(data.Description),
@@ -396,12 +396,12 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     {
                         m_TemporaryAssetService.Store(data);
                         HttpResponse res = req.BeginResponse();
-                        using (XmlTextWriter writer = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM))
-                        {
-                            writer.WriteStartElement("string");
-                            writer.WriteValue(data.ID);
-                            writer.WriteEndElement();
-                        }
+                        /* DO NOT USE using here, it will close the underlying stream */
+                        XmlTextWriter writer = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM);
+                        writer.WriteStartElement("string");
+                        writer.WriteValue(data.ID);
+                        writer.WriteEndElement();
+                        writer.Flush();
                         res.Close();
                     }
                     catch
@@ -417,17 +417,29 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                 data.Temporary = false;
                 m_PersistentAssetService.Store(data);
                 HttpResponse res = req.BeginResponse();
-                using (XmlTextWriter writer = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM))
-                {
-                    writer.WriteStartElement("string");
-                    writer.WriteValue(data.ID);
-                    writer.WriteEndElement();
-                }
+                /* DO NOT USE using here, it will close the underlying stream */
+                XmlTextWriter writer = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM);
+                writer.WriteStartElement("string");
+                writer.WriteValue(data.ID);
+                writer.WriteEndElement();
+                writer.Flush();
                 res.Close();
             }
-            catch
+            catch(HttpResponse.ConnectionCloseException)
             {
-                req.ErrorResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
+                /* pass this one down to HttpServer */
+                throw;
+            }
+            catch(Exception)
+            {
+                HttpResponse res = req.BeginResponse();
+                /* DO NOT USE using here, it will close the underlying stream */
+                XmlTextWriter writer = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM);
+                writer.WriteStartElement("string");
+                writer.WriteValue(data.ID);
+                writer.WriteEndElement();
+                writer.Flush();
+                res.Close();
             }
         }
 

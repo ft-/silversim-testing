@@ -335,8 +335,8 @@ id, name, description, assetType, local, temporary, create_time, access_time, as
         {
             "CREATE TABLE %tablename% (" +
                     "id CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                    "name VARCHAR(128) NOT NULL DEFAULT ''," +
-                    "description VARCHAR(255) NOT NULL DEFAULT ''," + 
+                    "name VARCHAR(64) NOT NULL DEFAULT ''," +
+                    "description VARCHAR(128) NOT NULL DEFAULT ''," + 
                     "assetType INT(11) NOT NULL," + 
                     "local INT(1) NOT NULL," + 
                     "temporary INT(1) NOT NULL," + 

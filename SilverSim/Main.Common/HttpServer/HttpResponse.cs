@@ -28,6 +28,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.IO.Compression;
+using System.Text;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -54,6 +55,7 @@ namespace SilverSim.Main.Common.HttpServer
         private Stream ResponseBody = null;
         private bool IsChunkedAccepted = false;
         private List<string> AcceptedEncodings = null;
+        private static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         public string ContentType
         {
@@ -91,10 +93,10 @@ namespace SilverSim.Main.Common.HttpServer
         private void SendHeaders()
         {
             MemoryStream ms = new MemoryStream();
-            using (TextWriter w = new StreamWriter(ms))
+            using (TextWriter w = new StreamWriter(ms, UTF8NoBOM))
             {
                 w.Write(string.Format("HTTP/{0}.{1} {2} {3}\r\n", MajorVersion, MinorVersion, (uint)StatusCode, StatusDescription.Replace("\n", "").Replace("\r", "")));
-                foreach(KeyValuePair<string, string> kvp in Headers)
+                foreach (KeyValuePair<string, string> kvp in Headers)
                 {
                     w.Write(string.Format("{0}: {1}\r\n", kvp.Key.Replace("\r", "").Replace("\n", ""), kvp.Value.Replace("\r", "").Replace("\n", "")));
                 }
@@ -115,6 +117,7 @@ namespace SilverSim.Main.Common.HttpServer
             if (ResponseBody != null)
             {
                 ResponseBody.Close();
+                ResponseBody = null;
             }
 
             if(IsCloseConnection)
@@ -145,7 +148,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 IsCloseConnection = true;
                 Headers["Connection"] = "close";
-                if(!disableCompression && AcceptedEncodings.Contains("gzip"))
+                if(!disableCompression && AcceptedEncodings != null && AcceptedEncodings.Contains("gzip"))
                 {
                     gzipEnable = true;
                     Headers["Content-Encoding"] = "gzip";

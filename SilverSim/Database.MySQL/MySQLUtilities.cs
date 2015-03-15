@@ -414,7 +414,7 @@ namespace SilverSim.Database.MySQL
 
         public static Date GetDate(this MySqlDataReader dbReader, string prefix)
         {
-            return Date.UnixTimeToDateTime((ulong)dbReader[prefix]);
+            return Date.UnixTimeToDateTime(ulong.Parse(dbReader[prefix].ToString()));
         }
 
         public static Vector3 GetVector(this MySqlDataReader dbReader, string prefix)
