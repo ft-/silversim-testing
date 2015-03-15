@@ -725,7 +725,7 @@ namespace SilverSim.Main.Common
                 PluginInstances.Add("LocalConsole", new Console.LocalConsole());
             }
 
-            m_Log.InfoFormat("Simulator: {0}", VersionInfo.ProductName);
+            m_Log.InfoFormat("Product: {0}", VersionInfo.ProductName);
             m_Log.InfoFormat("Version: {0}", VersionInfo.Version);
             m_Log.InfoFormat("Runtime: {0} {1}", VersionInfo.RuntimeInformation, VersionInfo.MachineWidth);
 
@@ -783,12 +783,15 @@ namespace SilverSim.Main.Common
                 instance.Startup(this);
             }
 
-            m_Log.Info("Loading regions");
-            foreach(IRegionLoaderInterface regionLoader in GetServices<IRegionLoaderInterface>().Values)
+            ICollection<IRegionLoaderInterface> regionLoaders = GetServices<IRegionLoaderInterface>().Values;
+            if (regionLoaders.Count != 0)
             {
-                regionLoader.LoadRegions();
+                m_Log.Info("Loading regions");
+                foreach (IRegionLoaderInterface regionLoader in GetServices<IRegionLoaderInterface>().Values)
+                {
+                    regionLoader.LoadRegions();
+                }
             }
-
         }
         #endregion
 

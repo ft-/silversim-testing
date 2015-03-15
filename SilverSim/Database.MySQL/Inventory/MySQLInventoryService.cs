@@ -25,6 +25,7 @@ exception statement from your version.
 
 using log4net;
 using MySql.Data.MySqlClient;
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Inventory;
@@ -36,6 +37,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Inventory
 {
+    #region Service Implementation
     public class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin
     {
         string m_ConnectionString;
@@ -109,7 +111,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 "ID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "ParentFolderID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "OwnerID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "Name VARCHAR(128) NOT NULL DEFAULT ''," +
+                "Name VARCHAR(64) NOT NULL DEFAULT ''," +
                 "InventoryType INT(11) NOT NULL DEFAULT '-1'," +
                 "Version INT(11) NOT NULL DEFAULT '1'," +
                 "PRIMARY KEY(ID)," +
@@ -122,8 +124,8 @@ namespace SilverSim.Database.MySQL.Inventory
             "CREATE TABLE %tablename% (" +
                 "ID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "ParentFolderID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "Name VARCHAR(128) NOT NULL DEFAULT ''," +
-                "Description VARCHAR(255) NOT NULL DEFAULT ''," +
+                "Name VARCHAR(64) NOT NULL DEFAULT ''," +
+                "Description VARCHAR(128) NOT NULL DEFAULT ''," +
                 "InventoryType INT(11) NOT NULL DEFAULT '0'," +
                 "Flags INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
                 "OwnerID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
@@ -142,7 +144,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 "IsGroupOwned TINYINT(1) NOT NULL DEFAULT '0'," + 
                 "AssetID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "AssetType INT(11) NOT NULL DEFAULT '0'," +
-                "PRIMARY KEY(ID, homeURI)," +
+                "PRIMARY KEY(ID)," +
                 "KEY inventoryitems_OwnerID (OwnerID)," +
                 "KEY inventoryitems_OwnerID_ID (OwnerID, ID)," +
                 "KEY inventoryitems_OwnerID_ParentFolderID (OwnerID, ParentFolderID))"
@@ -153,4 +155,22 @@ namespace SilverSim.Database.MySQL.Inventory
         {
         }
     }
+    #endregion
+
+    #region Factory
+    [PluginName("Inventory")]
+    public class MySQLInventoryServiceFactory : IPluginFactory
+    {
+        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
+        public MySQLInventoryServiceFactory()
+        {
+
+        }
+
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            return new MySQLInventoryService(MySQLUtilities.BuildConnectionString(ownSection, m_Log));
+        }
+    }
+    #endregion
 }
