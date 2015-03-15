@@ -48,7 +48,7 @@ namespace SilverSim.Types.Asset.Format
             Description = item.Description;
             Flags = item.Flags;
             Group = new UGI(item.Group);
-            GroupOwned = item.GroupOwned;
+            IsGroupOwned = item.IsGroupOwned;
             ID = new UUID(item.ID);
             InventoryType = item.InventoryType;
             LastOwner = new UUI(item.LastOwner);

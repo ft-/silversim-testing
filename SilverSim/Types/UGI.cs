@@ -10,6 +10,7 @@ namespace SilverSim.Types
         public UUID ID = UUID.Zero;
         public string GroupName = string.Empty;
         public Uri HomeURI = null;
+        public bool IsAuthoritative = false; /* means Group Data has been validated through any available resolving service */
 
         public static implicit operator string(UGI v)
         {

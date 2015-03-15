@@ -59,16 +59,14 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
         }
         #endregion
 
-        private NameData fromResult(Map map)
+        private UUI fromResult(Map map)
         {
-            NameData info = new NameData();
             UUI uui = new UUI(map["UserID"].ToString());
-            info.Authoritative = null != uui.HomeURI;
-            info.ID = uui;
-            return info;
+            uui.IsAuthoritative = null != uui.HomeURI;
+            return uui;
         }
 
-        public override NameData this[string firstName, string lastName] 
+        public override UUI this[string firstName, string lastName] 
         { 
             get
             {
@@ -76,7 +74,7 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
             }
         }
 
-        public override NameData this[UUID userID]
+        public override UUI this[UUID userID]
         {
             get
             {

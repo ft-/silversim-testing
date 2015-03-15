@@ -74,7 +74,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             post["AssetID"] = item.AssetID;
             post["CreatorId"] = item.Creator.ID;
             post["GroupID"] = item.Group.ID;
-            post["GroupOwned"] = item.GroupOwned.ToString();
+            post["GroupOwned"] = item.IsGroupOwned.ToString();
             post["Folder"] = item.ParentFolderID;
             post["Owner"] = item.Owner.ID;
             post["Name"] = item.Name;

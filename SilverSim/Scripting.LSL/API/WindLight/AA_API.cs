@@ -46,6 +46,7 @@ namespace SilverSim.Scripting.LSL.API.WindLight
 
         }
 
+        #region Aurora naming of constants
         [APILevel(APIFlags.WindLight_Aurora)]
         public const int WL_OK = -1;
         [APILevel(APIFlags.WindLight_Aurora)]
@@ -130,7 +131,96 @@ namespace SilverSim.Scripting.LSL.API.WindLight
         public const int WL_WATER_BIG_WAVE_DIRECTION = 32;
         [APILevel(APIFlags.WindLight_Aurora)]
         public const int WL_WATER_LITTLE_WAVE_DIRECTION = 33;
+        #endregion
 
+        #region New naming of constants
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_OK = -1;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_ERROR = -2;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_ERROR_NO_SCENE_SET = -3;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_ERROR_SCENE_MUST_BE_STATIC = -4;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_ERROR_SCENE_MUST_NOT_BE_STATIC = -5;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_ERROR_BAD_SETTING = -6;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_ERROR_NO_PRESET_FOUND = -7;
+
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_AMBIENT = 0;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_SKY_BLUE_DENSITY = 1;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_SKY_BLUR_HORIZON = 2;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_CLOUD_COLOR = 3;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_CLOUD_POS_DENSITY1 = 4;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_CLOUD_POS_DENSITY2 = 5;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_CLOUD_SCALE = 6;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_CLOUD_SCROLL_X = 7;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_CLOUD_SCROLL_Y = 8;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_CLOUD_SCROLL_X_LOCK = 9;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_CLOUD_SCROLL_Y_LOCK = 10;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_CLOUD_SHADOW = 11;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_SKY_DENSITY_MULTIPLIER = 12;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_SKY_DISTANCE_MULTIPLIER = 13;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_SKY_GAMMA = 14;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_SKY_GLOW = 15;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_SKY_HAZE_DENSITY = 16;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_SKY_HAZE_HORIZON = 17;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_SKY_LIGHT_NORMALS = 18;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_SKY_MAX_ALTITUDE = 19;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_SKY_STAR_BRIGHTNESS = 20;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_SKY_SUNLIGHT_COLOR = 21;
+
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_WATER_BLUR_MULTIPLIER = 22;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_WATER_FRESNEL_OFFSET = 23;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_WATER_FRESNEL_SCALE = 24;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_WATER_NORMAL_MAP = 25;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_WATER_NORMAL_SCALE = 26;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_WATER_SCALE_ABOVE = 27;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_WATER_SCALE_BELOW = 28;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_WATER_UNDERWATER_FOG_MODIFIER = 29;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_WATER_FOG_COLOR = 30;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_WATER_FOG_DENSITY = 31;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_WATER_BIG_WAVE_DIRECTION = 32;
+        [APILevel(APIFlags.WindLight_New)]
+        public const int REGION_WL_WATER_LITTLE_WAVE_DIRECTION = 33;
+        #endregion
+
+        #region Aurora Sim API
         [APILevel(APIFlags.WindLight_Aurora)]
         public AnArray aaWindlightGetScene(ScriptInstance Instance, AnArray rules)
         {
@@ -160,14 +250,14 @@ namespace SilverSim.Scripting.LSL.API.WindLight
         }
 
         [APILevel(APIFlags.WindLight_Aurora)]
-        public AnArray aaWindlightGetDayCycle()
+        public AnArray aaWindlightGetDayCycle(ScriptInstance Instance)
         {
 #warning aaWindlightGetDayCycle()
             return new AnArray();
         }
 
         [APILevel(APIFlags.WindLight_Aurora)]
-        public int aaWindlightRemoveDayCycleFrame(int dayCycleFrame)
+        public int aaWindlightRemoveDayCycleFrame(ScriptInstance Instance, int dayCycleFrame)
         {
 #warning Implement aaWindlightRemoveDayCycleFrame(int)
             return 0;
@@ -193,18 +283,62 @@ namespace SilverSim.Scripting.LSL.API.WindLight
 #warning Implement aaWindlightSetScene(AnArray)
             return 0;
         }
+        #endregion
 
-        [APILevel(APIFlags.WindLight_Aurora)]
-        public void lsClearWindlightScene(ScriptInstance Instance)
+        #region New WindLight API
+        [APILevel(APIFlags.WindLight_New)]
+        public AnArray rwlWindlightGetScene(ScriptInstance Instance, AnArray rules)
         {
-#warning Implement lsClearWindlightScene()
+            return aaWindlightGetScene(Instance, rules);
         }
 
-        [APILevel(APIFlags.WindLight_Aurora)]
-        public int lsSetWindlightSceneTargeted(ScriptInstance Instance, AnArray rules, UUID target)
+        [APILevel(APIFlags.WindLight_New)]
+        public AnArray rwlWindlightGetScene(ScriptInstance Instance, int dayCycleIndex, AnArray rules)
         {
-#warning Implement lsSetWindlightSceneTargeted(AnArray, UUID)
-            return 0;
+            return aaWindlightGetScene(Instance, dayCycleIndex, rules);
         }
+
+        [APILevel(APIFlags.WindLight_New)]
+        public int rwlWindlightGetSceneIsStatic(ScriptInstance Instance)
+        {
+            return aaWindlightGetSceneIsStatic(Instance);
+        }
+
+        [APILevel(APIFlags.WindLight_New)]
+        public int rwlWindlightGetSceneDayCycleKeyFrameCount(ScriptInstance Instance)
+        {
+            return aaWindlightGetSceneDayCycleKeyFrameCount(Instance);
+        }
+
+        [APILevel(APIFlags.WindLight_New)]
+        public AnArray rwlWindlightGetDayCycle(ScriptInstance Instance)
+        {
+            return aaWindlightGetDayCycle(Instance);
+        }
+
+        [APILevel(APIFlags.WindLight_New)]
+        public int rwlWindlightRemoveDayCycleFrame(ScriptInstance Instance, int dayCycleFrame)
+        {
+            return aaWindlightRemoveDayCycleFrame(Instance, dayCycleFrame);
+        }
+
+        [APILevel(APIFlags.WindLight_New)]
+        public int rwlWindlightAddDayCycleFrame(ScriptInstance Instance, double dayCyclePosition, int dayCycleFrameToCopy)
+        {
+            return aaWindlightAddDayCycleFrame(Instance, dayCyclePosition, dayCycleFrameToCopy);
+        }
+
+        [APILevel(APIFlags.WindLight_New)]
+        public int rwlWindlightSetScene(ScriptInstance Instance, AnArray rules)
+        {
+            return aaWindlightSetScene(Instance, rules);
+        }
+
+        [APILevel(APIFlags.WindLight_New)]
+        public int rwlWindlightSetScene(ScriptInstance Instance, int dayCycleIndex, AnArray list)
+        {
+            return aaWindlightSetScene(Instance, dayCycleIndex, list);
+        }
+        #endregion
     }
 }

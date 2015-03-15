@@ -51,7 +51,7 @@ namespace SilverSim.Types.Inventory
 
         public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted)
         {
-            if(GroupOwned)
+            if(IsGroupOwned)
             {
                 return Permissions.CheckGroupPermissions(Creator, Group, accessor, accessorgroup, wanted);
             }
@@ -110,7 +110,7 @@ namespace SilverSim.Types.Inventory
 
         #region Group Information
         public UGI Group = UGI.Unknown;
-        public bool GroupOwned = false;
+        public bool IsGroupOwned = false;
         #endregion
 
         #region Asset Information
@@ -138,7 +138,7 @@ namespace SilverSim.Types.Inventory
             Description = item.Description;
             Flags = item.Flags;
             Group = new UGI(item.Group);
-            GroupOwned = item.GroupOwned;
+            IsGroupOwned = item.IsGroupOwned;
             ID = new UUID(item.ID);
             InventoryType = item.InventoryType;
             LastOwner = new UUI(item.LastOwner);
@@ -158,7 +158,7 @@ namespace SilverSim.Types.Inventory
             Description = item.Description;
             Flags = item.Flags;
             Group = new UGI(item.Group);
-            GroupOwned = item.GroupOwned;
+            IsGroupOwned = item.IsGroupOwned;
             ID = id;
             InventoryType = item.InventoryType;
             LastOwner = new UUI(item.LastOwner);

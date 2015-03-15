@@ -33,6 +33,7 @@ namespace SilverSim.Types
         public string FirstName = string.Empty;
         public string LastName = string.Empty;
         public Uri HomeURI = null;
+        public bool IsAuthoritative = false; /* means User Data has been validated through any available resolving service */
 
         public static implicit operator string(UUI v)
         {

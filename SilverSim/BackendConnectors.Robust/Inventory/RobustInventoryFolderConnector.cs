@@ -156,7 +156,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             return post;
         }
 
-        public override void Add(UUID PrincipalID, InventoryFolder folder)
+        public override void Add(InventoryFolder folder)
         {
             Dictionary<string, string> post = SerializeFolder(folder);
             post["METHOD"] = "ADDFOLDER";
@@ -166,7 +166,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
                 throw new InventoryFolderNotStored(folder.ID);
             }
         }
-        public override void Update(UUID PrincipalID, InventoryFolder folder)
+        public override void Update(InventoryFolder folder)
         {
             Dictionary<string, string> post = SerializeFolder(folder);
             post["METHOD"] = "UPDATEFOLDER";
@@ -190,6 +190,15 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
                 throw new InventoryFolderNotStored(folderID);
             }
         }
+
+        public override void IncrementVersion(UUID PrincipalID, UUID folderID)
+        {
+#warning TODO: race condition here with FolderVersion, needs a checkup against Robust HTTP API xinventory
+            InventoryFolder folder = this[PrincipalID, folderID];
+            folder.Version += 1;
+            Update(folder);
+        }
+
 
         public override void Delete(UUID PrincipalID, UUID folderID)
         {

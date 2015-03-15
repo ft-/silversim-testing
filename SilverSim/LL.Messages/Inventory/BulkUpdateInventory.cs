@@ -92,7 +92,7 @@ namespace SilverSim.LL.Messages.Inventory
             e.GroupMask = item.Permissions.Group;
             e.EveryoneMask = item.Permissions.EveryOne;
             e.NextOwnerMask = item.Permissions.NextOwner;
-            e.IsGroupOwned = item.GroupOwned;
+            e.IsGroupOwned = item.IsGroupOwned;
             e.AssetID = item.AssetID;
             e.Type = item.AssetType;
             e.InvType = item.InventoryType;

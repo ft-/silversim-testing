@@ -403,7 +403,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
                 {
                     item.Group.ID = extraData["GroupID"].AsUUID;
                 }
-                item.GroupOwned = extraData["GroupOwned"].AsBoolean;
+                item.IsGroupOwned = extraData["GroupOwned"].AsBoolean;
                 item.SaleInfo.Price = extraData["SalePrice"].AsInt;
                 item.SaleInfo.Type = (InventoryItem.SaleInfoData.SaleType)extraData["SaleType"].AsUInt;
 

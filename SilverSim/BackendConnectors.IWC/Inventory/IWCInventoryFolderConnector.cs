@@ -175,7 +175,7 @@ namespace SilverSim.BackendConnectors.IWC.Inventory
 
         #region Methods
 
-        public override void Add(UUID PrincipalID, InventoryFolder folder)
+        public override void Add(InventoryFolder folder)
         {
             Map param = new Map
             {
@@ -191,7 +191,7 @@ namespace SilverSim.BackendConnectors.IWC.Inventory
             }
             throw new InventoryFolderNotStored(folder.ID);
         }
-        public override void Update(UUID PrincipalID, InventoryFolder folder)
+        public override void Update(InventoryFolder folder)
         {
             Map param = new Map
             {
@@ -225,6 +225,14 @@ namespace SilverSim.BackendConnectors.IWC.Inventory
                 }
             }
             throw new InventoryFolderNotStored(folder.ID);
+        }
+
+        public override void IncrementVersion(UUID PrincipalID, UUID folderID)
+        {
+#warning TODO: Check whether IWC has a IncrementVersion request
+            InventoryFolder folder = this[PrincipalID, folderID];
+            folder.Version += 1;
+            Update(folder);
         }
 
         public override void Delete(UUID PrincipalID, UUID folderID)

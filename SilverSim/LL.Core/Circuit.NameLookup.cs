@@ -69,10 +69,10 @@ namespace SilverSim.LL.Core
                 try
                 {
                     Messages.Names.UUIDNameReply.Data d = new Messages.Names.UUIDNameReply.Data();
-                    AvatarNameServiceInterface.NameData nd = Scene.AvatarNameService[id];
-                    d.ID = nd.ID.ID;
-                    d.FirstName = nd.ID.FirstName;
-                    d.LastName = nd.ID.LastName;
+                    UUI nd = Scene.AvatarNameService[id];
+                    d.ID = nd.ID;
+                    d.FirstName = nd.FirstName;
+                    d.LastName = nd.LastName;
                     rep.UUIDNameBlock.Add(d);
                 }
                 catch

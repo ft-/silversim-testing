@@ -113,7 +113,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             item.Description = (string)dbReader["Description"];
                             item.Flags = (uint)dbReader["Flags"];
                             item.Group = new UGI((string)dbReader["Group"]);
-                            item.GroupOwned = (int)dbReader["GroupOwned"] != 0;
+                            item.IsGroupOwned = (int)dbReader["GroupOwned"] != 0;
                             item.ID = (string)dbReader["InventoryID"];
                             item.InventoryType = (InventoryType)(int)dbReader["InventoryType"];
                             item.LastOwner = new UUI((string)dbReader["LastOwner"]);
@@ -372,7 +372,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["Description"] = item.Description;
             p["Flags"] = item.Flags;
             p["Group"] = item.Group;
-            p["GroupOwned"] = item.GroupOwned;
+            p["GroupOwned"] = item.IsGroupOwned;
             p["ID"] = item.ID;
             p["InventoryType"] = (int)item.InventoryType;
             p["LastOwner"] = item.LastOwner;

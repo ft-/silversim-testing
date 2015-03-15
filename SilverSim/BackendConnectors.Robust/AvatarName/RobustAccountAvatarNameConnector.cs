@@ -63,7 +63,7 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
         }
         #endregion
 
-        public override NameData this[string firstName, string lastName] 
+        public override UUI this[string firstName, string lastName] 
         { 
             get
             {
@@ -79,17 +79,17 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
                 }
 
                 Map m = (Map)(map["result"]);
-                NameData nd = new NameData();
-                nd.ID.FirstName = m["FirstName"].ToString();
-                nd.ID.LastName = m["LastName"].ToString();
-                nd.ID.ID = m["PrincipalID"].ToString();
-                nd.ID.HomeURI = new Uri(m_HomeURI);
-                nd.Authoritative = true;
+                UUI nd = new UUI();
+                nd.FirstName = m["FirstName"].ToString();
+                nd.LastName = m["LastName"].ToString();
+                nd.ID = m["PrincipalID"].ToString();
+                nd.HomeURI = new Uri(m_HomeURI);
+                nd.IsAuthoritative = true;
                 return nd;
             }
         }
 
-        public override NameData this[UUID accountID]
+        public override UUI this[UUID accountID]
         {
             get
             {
@@ -104,12 +104,12 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
                 }
 
                 Map m = (Map)(map["result"]);
-                NameData nd = new NameData();
-                nd.ID.FirstName = m["FirstName"].ToString();
-                nd.ID.LastName = m["LastName"].ToString();
-                nd.ID.ID = m["PrincipalID"].ToString();
-                nd.ID.HomeURI = new Uri(m_HomeURI);
-                nd.Authoritative = true;
+                UUI nd = new UUI();
+                nd.FirstName = m["FirstName"].ToString();
+                nd.LastName = m["LastName"].ToString();
+                nd.ID = m["PrincipalID"].ToString();
+                nd.HomeURI = new Uri(m_HomeURI);
+                nd.IsAuthoritative = true;
                 return nd;
             }
             set

@@ -95,7 +95,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
             Map extraData = new Map();
             extraData.Add("Flags", item.Flags);
             extraData["GroupID"] = item.Group.ID;
-            extraData.Add("GroupOwned", item.GroupOwned);
+            extraData.Add("GroupOwned", item.IsGroupOwned);
             extraData.Add("SalePrice", item.SaleInfo.Price);
             extraData.Add("SaleType", (int)item.SaleInfo.Type);
             extraData.Add("Permissions", perms);

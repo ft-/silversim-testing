@@ -29,24 +29,31 @@ namespace SilverSim.ServiceInterfaces.AvatarName
 {
     public abstract class AvatarNameServiceInterface
     {
-        public class NameData
-        {
-            public UUI ID = UUI.Unknown;
-            public bool Authoritative = false;
-
-            public NameData()
-            {
-
-            }
-        }
-
         public AvatarNameServiceInterface()
         {
 
         }
 
-        public abstract NameData this[UUID key] { get; set; } /* setting to null clears an entry if supported */
+        public abstract UUI this[UUID key] { get; set; } /* setting to null clears an entry if supported */
         /* if setting is not supported, the set access is ignored */
-        public abstract NameData this[string firstName, string lastName] { get; }
+        public abstract UUI this[string firstName, string lastName] { get; }
+
+        public UUI this[UUI input]
+        {
+            get
+            {
+                try
+                {
+                    if (!input.IsAuthoritative)
+                    {
+                        return this[input.ID];
+                    }
+                }
+                catch
+                {
+                }
+                return input;
+            }
+        }
     }
 }

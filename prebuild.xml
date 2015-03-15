@@ -33,7 +33,7 @@
     </Configuration>
     
     <!-- ******************************************************************* -->
-    <!-- Core Logic Code -->
+    <!-- Simulator Executables -->
     <!-- ******************************************************************* -->
     
     <Project frameworkVersion="v4_0" name="SilverSim.Main.Simulator" path="SilverSim/Main.Simulator" type="Exe">
@@ -82,6 +82,61 @@
       </Files>
     </Project>
 
+    <!-- ******************************************************************* -->
+    <!-- Grid Executables -->
+    <!-- ******************************************************************* -->
+    
+    <Project frameworkVersion="v4_0" name="SilverSim.Main.Grid" path="SilverSim/Main.Grid" type="Exe">
+      <Configuration name="Release">
+        <Options>
+          <OutputPath>../../bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug">
+        <Options>
+          <OutputPath>../../bin/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="System"/>
+      <Reference name="SilverSim.Main.Common" localCopy="false"/>
+      <Reference name="SilverSim.Types" localCopy="false"/>
+      <Files>
+        <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
+      </Files>
+    </Project>
+
+<!--
+    <Project frameworkVersion="v4_0" name="SilverSim.Main.Grid.WindowsService" path="SilverSim/Main.Grid.WindowsService" type="Exe">
+      <Configuration name="Release">
+        <Options>
+          <OutputPath>../../bin/</OutputPath>
+        </Options>
+      </Configuration>
+      <Configuration name="Debug">
+        <Options>
+          <OutputPath>../../bin/</OutputPath>
+        </Options>
+      </Configuration>
+
+      <ReferencePath>../../bin/</ReferencePath>
+      <Reference name="System"/>
+      <Reference name="System.ServiceProcess"/>
+      <Reference name="System.Configuration.Install"/>
+      <Reference name="SilverSim.Main.Common" localCopy="false"/>
+      <Reference name="SilverSim.Types" localCopy="false"/>
+      <Files>
+        <Match pattern="*.cs" recurse="true"/>
+	<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
+      </Files>
+    </Project>-->
+    
+    <!-- ******************************************************************* -->
+    <!-- Core Logic Code -->
+    <!-- ******************************************************************* -->
+    
     <Project frameworkVersion="v4_0" name="SilverSim.Main.Common" path="SilverSim/Main.Common" type="Library">
       <Configuration name="Release">
         <Options>

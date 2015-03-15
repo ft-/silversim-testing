@@ -44,18 +44,18 @@ namespace SilverSim.Scene.Types.Scene
                 m_ServiceList = serviceList;
             }
 
-            public override NameData this[string firstName, string lastName]
+            public override UUI this[string firstName, string lastName]
             {
                 get 
                 {
-                    NameData nd = null;
+                    UUI nd = null;
                     bool notFoundFirst = false;
                     foreach (AvatarNameServiceInterface service in m_ServiceList)
                     {
                         try
                         {
                             nd = service[firstName, lastName];
-                            if (!nd.Authoritative)
+                            if (!nd.IsAuthoritative)
                             {
                                 notFoundFirst = true;
                             }
@@ -73,13 +73,13 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         throw new KeyNotFoundException();
                     }
-                    if (notFoundFirst && nd.Authoritative)
+                    if (notFoundFirst && nd.IsAuthoritative)
                     {
                         foreach (AvatarNameServiceInterface service in m_ServiceList)
                         {
                             try
                             {
-                                service[nd.ID.ID] = nd;
+                                service[nd.ID] = nd;
                             }
                             catch
                             {
@@ -90,18 +90,18 @@ namespace SilverSim.Scene.Types.Scene
                     return nd;
                 }
             }
-            public override NameData this[UUID key]
+            public override UUI this[UUID key]
             {
                 get
                 {
-                    NameData nd = null;
+                    UUI nd = null;
                     bool notFoundFirst = false;
                     foreach(AvatarNameServiceInterface service in m_ServiceList)
                     {
                         try
                         {
                             nd = service[key];
-                            if(!nd.Authoritative)
+                            if(!nd.IsAuthoritative)
                             {
                                 notFoundFirst = true;
                             }
@@ -119,7 +119,7 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         throw new KeyNotFoundException();
                     }
-                    if(notFoundFirst && nd.Authoritative)
+                    if(notFoundFirst && nd.IsAuthoritative)
                     {
                         foreach(AvatarNameServiceInterface service in m_ServiceList)
                         {

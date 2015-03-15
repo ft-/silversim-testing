@@ -39,7 +39,8 @@ namespace SilverSim.Scripting.LSL
         OSSL = 1 << 2,
         ASSL = 1 << 3,
         ASSL_Admin = 1 << 4,
-        WindLight_Aurora = 1 << 5
+        WindLight_Aurora = 1 << 5,
+        WindLight_New = 1 << 6
     }
 
     [Serializable]

@@ -73,7 +73,7 @@ namespace SilverSim.LL.Core
 
             try
             {
-                Agent.InventoryService.Folder.Add(AgentID, folder);
+                Agent.InventoryService.Folder.Add(folder);
             }
             catch
             {

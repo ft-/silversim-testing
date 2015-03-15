@@ -159,7 +159,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
 
         #region Methods
 
-        public override void Add(UUID PrincipalID, InventoryFolder folder)
+        public override void Add(InventoryFolder folder)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["RequestMethod"] = "AddInventoryFolder";
@@ -175,16 +175,24 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
                 throw new InventoryFolderNotStored(folder.ID);
             }
         }
-        public override void Update(UUID PrincipalID, InventoryFolder folder)
+        public override void Update(InventoryFolder folder)
         {
-            Add(PrincipalID, folder);
+            Add(folder);
+        }
+
+        public override void IncrementVersion(UUID PrincipalID, UUID folderID)
+        {
+            InventoryFolder folder = this[PrincipalID, folderID];
+#warning TODO: check whether Simian has a IncrementVersion check
+            folder.Version += 1;
+            Update(folder);
         }
 
         public override void Move(UUID PrincipalID, UUID folderID, UUID toFolderID)
         {
             InventoryFolder folder = this[PrincipalID, folderID];
             folder.ParentFolderID = toFolderID;
-            Add(PrincipalID, folder);
+            Add(folder);
         }
 
         public override void Delete(UUID PrincipalID, UUID folderID)

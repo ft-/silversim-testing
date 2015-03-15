@@ -70,7 +70,7 @@ namespace SilverSim.LL.Core
             writer.WriteKeyValuePair("everyone_mask", (uint)item.Permissions.EveryOne);
             writer.WriteKeyValuePair("group_id", item.Group.ID);
             writer.WriteKeyValuePair("group_mask", (uint)item.Permissions.Group);
-            writer.WriteKeyValuePair("is_owner_group", item.GroupOwned);
+            writer.WriteKeyValuePair("is_owner_group", item.IsGroupOwned);
             writer.WriteKeyValuePair("next_owner_mask", (uint)item.Permissions.NextOwner);
             writer.WriteKeyValuePair("owner_id", item.Owner.ID);
             writer.WriteKeyValuePair("owner_mask", (uint)item.Permissions.Current);

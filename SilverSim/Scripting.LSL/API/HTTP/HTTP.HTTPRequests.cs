@@ -33,6 +33,7 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Types.Object;
 using System.Runtime.Remoting.Messaging;
+using System.Text.RegularExpressions;
 
 namespace SilverSim.Scripting.LSL.APIs.HTTP
 {
@@ -84,6 +85,9 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
             HttpRequestDelegate caller = (HttpRequestDelegate)r.AsyncDelegate;
             caller.EndInvoke(ar);
         }
+
+        static readonly Regex m_AuthRegex = new Regex(@"^(https?:\/\/)(\w+):(\w+)@(.*)$");
+        static readonly Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         [APILevel(APIFlags.LSL)]
         public UUID llHTTPRequest(ScriptInstance Instance, string url, AnArray parameters, string body)
@@ -235,12 +239,23 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
             {
                 httpHeaders.Add("X-SecondLife-Object-Name", Instance.Part.ObjectGroup.Name);
                 httpHeaders.Add("X-SecondLife-Object-Key", Instance.Part.ObjectGroup.ID);
-                httpHeaders.Add("X-SecondLife-Region", Instance.Part.ObjectGroup.ID);
-                httpHeaders.Add("X-SecondLife-Local-Position", string.Format("({0},{1},{2})", Instance.Part.ObjectGroup.GlobalPosition.X, Instance.Part.ObjectGroup.GlobalPosition.Y, Instance.Part.ObjectGroup.GlobalPosition.Z));
-                httpHeaders.Add("X-SecondLife-Local-Rotation", string.Format("{0},{1},{2},{3}", Instance.Part.ObjectGroup.GlobalRotation.X, Instance.Part.ObjectGroup.GlobalRotation.Y, Instance.Part.ObjectGroup.GlobalRotation.Z, Instance.Part.ObjectGroup.GlobalRotation.W));
-                httpHeaders.Add("X-SecondLife-Local-Velocity", string.Format("{0},{1},{2}", Instance.Part.ObjectGroup.Velocity.X, Instance.Part.ObjectGroup.Velocity.Y, Instance.Part.ObjectGroup.Velocity.Z));
+                httpHeaders.Add("X-SecondLife-Region", Instance.Part.ObjectGroup.Scene.RegionData.Name);
+                httpHeaders.Add("X-SecondLife-Local-Position", string.Format("({0:0.000000}, {1:0.000000}, {2:0.000000})", Instance.Part.ObjectGroup.GlobalPosition.X, Instance.Part.ObjectGroup.GlobalPosition.Y, Instance.Part.ObjectGroup.GlobalPosition.Z));
+                httpHeaders.Add("X-SecondLife-Local-Velocity", string.Format("({0:0.000000}, {1:0.000000}, {2:0.000000})", Instance.Part.ObjectGroup.Velocity.X, Instance.Part.ObjectGroup.Velocity.Y, Instance.Part.ObjectGroup.Velocity.Z));
+                httpHeaders.Add("X-SecondLife-Local-Rotation", string.Format("({0:0.000000}, {1:0.000000}, {2:0.000000}, {3:0.000000})", Instance.Part.ObjectGroup.GlobalRotation.X, Instance.Part.ObjectGroup.GlobalRotation.Y, Instance.Part.ObjectGroup.GlobalRotation.Z, Instance.Part.ObjectGroup.GlobalRotation.W));
                 httpHeaders.Add("X-SecondLife-Owner-Name", Instance.Part.ObjectGroup.Owner.FullName);
                 httpHeaders.Add("X-SecondLife-Owner-Key", Instance.Part.ObjectGroup.Owner.ID);
+
+                Match authMatch = m_AuthRegex.Match(url);
+                if(authMatch.Success)
+                {
+                    if(authMatch.Groups.Count == 5)
+                    {
+                        string authData = string.Format("{0}:{1}", authMatch.Groups[2].ToString(), authMatch.Groups[3].ToString());
+                        byte[] authDataBinary = UTF8NoBOM.GetBytes(authData);
+                        httpHeaders.Add("Authorization", string.Format("Basic {0}", Convert.ToBase64String(authDataBinary)));
+                    }
+                }
 
                 HttpRequestDelegate del = httpRequest;
                 UUID requestID = UUID.Random;

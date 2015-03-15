@@ -224,7 +224,7 @@ namespace SilverSim.LL.Core
             item.Creator = Owner;
             item.Flags = 0;
             item.Group = Group;
-            item.GroupOwned = false;
+            item.IsGroupOwned = false;
             item.ID = UUID.Random;
             item.InventoryType = InventoryType.LSLText;
             item.LastOwner = Owner;

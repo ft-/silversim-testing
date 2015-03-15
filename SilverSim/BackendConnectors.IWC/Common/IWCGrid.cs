@@ -176,7 +176,7 @@ namespace SilverSim.BackendConnectors.IWC.Common
                 {"Flags", item.Flags},
                 {"Folder", item.ParentFolderID},
                 {"GroupID", item.Group.ID},
-                {"GroupOwned", item.GroupOwned},
+                {"GroupOwned", item.IsGroupOwned},
                 {"GroupPermissions", (uint)item.Permissions.Group},
                 {"ID", item.ID},
                 {"InvType", (int)item.InventoryType},
@@ -202,7 +202,7 @@ namespace SilverSim.BackendConnectors.IWC.Common
             item.Flags = m["Flags"].AsUInt;
             item.ParentFolderID = m["Folder"].AsUUID;
             item.Group.ID = m["GroupID"].AsUUID;
-            item.GroupOwned = m["GroupOwned"].AsBoolean;
+            item.IsGroupOwned = m["GroupOwned"].AsBoolean;
             item.Permissions.Group = (InventoryPermissionsMask)m["GroupPermissions"].AsUInt;
             item.ID = m["ID"].AsUUID;
             item.InventoryType = (InventoryType)m["InvType"].AsInt;

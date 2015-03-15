@@ -53,7 +53,7 @@ namespace SilverSim.Database.MySQL.AvatarName
         #endregion
 
         #region Accessors
-        public override NameData this[string firstName, string lastName]
+        public override UUI this[string firstName, string lastName]
         {
             get
             {
@@ -71,12 +71,12 @@ namespace SilverSim.Database.MySQL.AvatarName
                             {
                                 throw new KeyNotFoundException();
                             }
-                            NameData nd = new NameData();
-                            nd.ID.ID = (string)dbreader["AvatarID"];
-                            nd.ID.HomeURI = new Uri((string)dbreader["HomeURI"]);
-                            nd.ID.FirstName = (string)dbreader["FirstName"];
-                            nd.ID.LastName = (string)dbreader["LastName"];
-                            nd.Authoritative = true;
+                            UUI nd = new UUI();
+                            nd.ID = dbreader.GetUUID("AvatarID");
+                            nd.HomeURI = new Uri((string)dbreader["HomeURI"]);
+                            nd.FirstName = (string)dbreader["FirstName"];
+                            nd.LastName = (string)dbreader["LastName"];
+                            nd.IsAuthoritative = true;
                             return nd;
                         }
                     }
@@ -85,7 +85,7 @@ namespace SilverSim.Database.MySQL.AvatarName
         }
 
 
-        public override NameData this[UUID key]
+        public override UUI this[UUID key]
         {
             get
             {
@@ -102,12 +102,12 @@ namespace SilverSim.Database.MySQL.AvatarName
                             {
                                 throw new KeyNotFoundException();
                             }
-                            NameData nd = new NameData();
-                            nd.ID.ID = (string)dbreader["AvatarID"];
-                            nd.ID.HomeURI = new Uri((string)dbreader["HomeURI"]);
-                            nd.ID.FirstName = (string)dbreader["FirstName"];
-                            nd.ID.LastName = (string)dbreader["LastName"];
-                            nd.Authoritative = true;
+                            UUI nd = new UUI();
+                            nd.ID = dbreader.GetUUID("AvatarID");
+                            nd.HomeURI = new Uri((string)dbreader["HomeURI"]);
+                            nd.FirstName = (string)dbreader["FirstName"];
+                            nd.LastName = (string)dbreader["LastName"];
+                            nd.IsAuthoritative = true;
                             return nd;
                         }
                     }
@@ -124,25 +124,26 @@ namespace SilverSim.Database.MySQL.AvatarName
                         using (MySqlCommand cmd = new MySqlCommand("DELETE FROM avatarnames WHERE AvatarID LIKE ?id", connection))
                         {
                             cmd.Parameters.AddWithValue("?id", key);
-                            cmd.ExecuteNonQuery();
+                            if(cmd.ExecuteNonQuery() < 1)
+                            {
+                                throw new KeyNotFoundException();
+                            }
                         }
                     }
 
                 }
-                else if(value.Authoritative) /* do not store non-authoritative entries */
+                else if(value.IsAuthoritative) /* do not store non-authoritative entries */
                 {
+                    Dictionary<string, object> data = new Dictionary<string, object>();
+                    data["AvatarID"] = value.ID;
+                    data["HomeURI"] = value.HomeURI;
+                    data["FirstName"] = value.FirstName;
+                    data["LastName"] = value.LastName;
                     using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                     {
                         connection.Open();
 
-                        using (MySqlCommand cmd = new MySqlCommand("REPLACE INTO groupnames (AvatarID, HomeURI, FirstName, LastName) VALUES (?avatarID, ?homeURI, ?firstName, ?lastName)"))
-                        {
-                            cmd.Parameters.AddWithValue("?avatarID", value.ID.ID);
-                            cmd.Parameters.AddWithValue("?homeURI", value.ID.HomeURI);
-                            cmd.Parameters.AddWithValue("?firstName", value.ID.FirstName);
-                            cmd.Parameters.AddWithValue("?lastName", value.ID.LastName);
-                            cmd.ExecuteNonQuery();
-                        }
+                        connection.ReplaceInsertInto("avatarnames", data);
                     }
                 }
             }

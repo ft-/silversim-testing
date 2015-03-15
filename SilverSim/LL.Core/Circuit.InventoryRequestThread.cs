@@ -344,7 +344,7 @@ namespace SilverSim.LL.Core
                                 folder.Owner = Agent.Owner;
                                 folder.ParentFolderID = req.ParentFolderID;
                                 folder.Version = 1;
-                                Agent.InventoryService.Folder.Add(AgentID, folder);
+                                Agent.InventoryService.Folder.Add(folder);
                             }
                             catch(Exception e)
                             {
@@ -521,7 +521,7 @@ namespace SilverSim.LL.Core
                                     d.GroupMask = item.Permissions.Group;
                                     d.EveryoneMask = item.Permissions.EveryOne;
                                     d.NextOwnerMask = item.Permissions.NextOwner;
-                                    d.IsGroupOwned = item.GroupOwned;
+                                    d.IsGroupOwned = item.IsGroupOwned;
                                     d.AssetID = item.AssetID;
                                     d.Type = item.AssetType;
                                     d.InvType = item.InventoryType;
@@ -729,7 +729,7 @@ namespace SilverSim.LL.Core
                                     folder.Name = d.Name;
                                     folder.InventoryType = d.Type;
                                     folder.ParentFolderID = d.ParentID;
-                                    Agent.InventoryService.Folder.Update(AgentID, folder);
+                                    Agent.InventoryService.Folder.Update(folder);
                                 }
                                 catch
                                 {
@@ -827,7 +827,7 @@ namespace SilverSim.LL.Core
                                     {
                                         item.Group.ID = d.GroupID;
                                     }
-                                    item.GroupOwned = d.IsGroupOwned;
+                                    item.IsGroupOwned = d.IsGroupOwned;
 
                                     if (d.CreationDate == 0)
                                     {

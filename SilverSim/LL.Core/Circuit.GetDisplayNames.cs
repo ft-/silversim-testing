@@ -35,19 +35,19 @@ namespace SilverSim.LL.Core
 {
     public partial class Circuit
     {
-        void WriteAvatarNameData(XmlTextWriter writer, AvatarNameServiceInterface.NameData nd)
+        void WriteAvatarNameData(XmlTextWriter writer, UUI nd)
         {
             writer.WriteStartElement("map");
 #warning verify expected username handling with viewer source code (GetDisplayNames capability)
             writer.WriteKeyValuePair("key", "username");
             string username;
-            if(string.IsNullOrEmpty(nd.ID.LastName))
+            if(string.IsNullOrEmpty(nd.LastName))
             {
-                username = nd.ID.FirstName;
+                username = nd.FirstName;
             }
             else
             {
-                username = nd.ID.FirstName + "." + nd.ID.LastName;
+                username = nd.FirstName + "." + nd.LastName;
             }
             string utcstring = DateTime.Now.AddDays(1).ToUniversalTime().ToString("yyyy\\-MM\\-dd\\THH\\-mm\\-ss\\Z");
             writer.WriteKeyValuePair("string", username);
@@ -56,11 +56,11 @@ namespace SilverSim.LL.Core
             writer.WriteKeyValuePair("key", "display_name_next_update");
             writer.WriteKeyValuePair("string", utcstring);
             writer.WriteKeyValuePair("key", "legacy_first_name");
-            writer.WriteKeyValuePair("string", nd.ID.FirstName);
+            writer.WriteKeyValuePair("string", nd.FirstName);
             writer.WriteKeyValuePair("key", "legacy_last_name");
-            writer.WriteKeyValuePair("string", nd.ID.LastName);
+            writer.WriteKeyValuePair("string", nd.LastName);
             writer.WriteKeyValuePair("key", "id");
-            writer.WriteKeyValuePair("uuid", nd.ID.ID);
+            writer.WriteKeyValuePair("uuid", nd.ID);
             writer.WriteKeyValuePair("key", "is_display_name_default");
             writer.WriteKeyValuePair("boolean", false);
             writer.WriteEndElement();
@@ -123,7 +123,7 @@ namespace SilverSim.LL.Core
 
             foreach(UUID id in uuids)
             {
-                AvatarNameServiceInterface.NameData nd;
+                UUI nd;
                 try
                 {
                     nd = Scene.AvatarNameService[id];
@@ -145,7 +145,7 @@ namespace SilverSim.LL.Core
 
             foreach(string name in names)
             {
-                AvatarNameServiceInterface.NameData nd;
+                UUI nd;
                 string[] nameparts = name.Split('.');
                 if(nameparts.Length < 2)
                 {

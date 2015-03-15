@@ -47,11 +47,12 @@ namespace SilverSim.ServiceInterfaces.Inventory
         #endregion
 
         #region Methods
-        public abstract void Add(UUID PrincipalID, InventoryFolder folder);
-        public abstract void Update(UUID PrincipalID, InventoryFolder folder);
+        public abstract void Add(InventoryFolder folder);
+        public abstract void Update(InventoryFolder folder);
         public abstract void Move(UUID PrincipalID, UUID folderID, UUID toFolderID);
         public abstract void Delete(UUID PrincipalID, UUID folderID);
         public abstract void Purge(UUID PrincipalID, UUID folderID);
+        public abstract void IncrementVersion(UUID PrincipalID, UUID folderID);
         public virtual List<UUID> Delete(UUID PrincipalID, List<UUID> folderIDs)
         {
             List<UUID> deleted = new List<UUID>();

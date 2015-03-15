@@ -506,7 +506,7 @@ namespace SilverSim.Scripting.LSL
 #warning Add group support here (also allowed are group owners)
                         e.Permissions &= ~ScriptPermissions.ReturnObjects;
                     }
-                    if(Item.GroupOwned)
+                    if(Item.IsGroupOwned)
                     {
                         e.Permissions &= ~ScriptPermissions.Debit;
                     }

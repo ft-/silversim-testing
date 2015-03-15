@@ -169,27 +169,19 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             if (dbReader.Read())
                             {
                                 AssetData asset = new AssetData();
-                                asset.ID = new UUID(dbReader["id"].ToString());
+                                asset.ID = dbReader.GetUUID("id");
                                 asset.Data = (byte[])dbReader["data"];
                                 asset.Type = (AssetType)dbReader["assetType"];
                                 asset.Name = (string)dbReader["name"];
                                 asset.Description = (string)dbReader["description"];
-                                asset.CreateTime = Date.UnixTimeToDateTime(ulong.Parse(dbReader["create_time"].ToString()));
-                                asset.AccessTime = Date.UnixTimeToDateTime(ulong.Parse(dbReader["access_time"].ToString()));
-                                try
-                                {
-                                    asset.Creator = new UUI(dbReader["CreatorID"].ToString());
-                                }
-                                catch
-                                {
-                                    asset.Creator = UUI.Unknown;
-                                }
+                                asset.CreateTime = dbReader.GetDate("create_time");
+                                asset.AccessTime = dbReader.GetDate("access_time");
+                                asset.Creator.ID = dbReader.GetUUID("CreatorID");
                                 uint.TryParse(dbReader["asset_flags"].ToString(), out asset.Flags);
                                 Boolean.TryParse(dbReader["temporary"].ToString(), out asset.Temporary);
                                 Boolean.TryParse(dbReader["local"].ToString(), out asset.Local);
 
-                                DateTime d = Date.UnixTimeToDateTime((ulong)dbReader["access_time"]);
-                                if (d - DateTime.UtcNow > TimeSpan.FromHours(1))
+                                if (asset.AccessTime - DateTime.UtcNow > TimeSpan.FromHours(1))
                                 {
                                     /* update access_time */
                                     using (MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
@@ -337,10 +329,13 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             cmd.Parameters.AddWithValue("?temporary", asset.Temporary);
                             cmd.Parameters.AddWithValue("?create_time", now);
                             cmd.Parameters.AddWithValue("?access_time", now);
-                            cmd.Parameters.AddWithValue("?CreatorID", asset.Creator);
+                            cmd.Parameters.AddWithValue("?CreatorID", asset.Creator.ID);
                             cmd.Parameters.AddWithValue("?asset_flags", (int)asset.Flags);
                             cmd.Parameters.AddWithValue("?hash", sha1);
-                            cmd.ExecuteNonQuery();
+                            if(1 > cmd.ExecuteNonQuery())
+                            {
+                                throw new AssetStoreFailed(asset.ID);
+                            }
                         }
                     }
                     catch (Exception e)
@@ -402,7 +397,7 @@ id, name, description, assetType, local, temporary, create_time, access_time, as
         {
             "CREATE TABLE %tablename% (" +
                     "id CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                    "name VARCHAR(64) NOT NULL DEFAULT ''," +
+                    "name VARCHAR(128) NOT NULL DEFAULT ''," +
                     "description VARCHAR(255) NOT NULL DEFAULT ''," + 
                     "assetType INT(11) NOT NULL," + 
                     "local INT(1) NOT NULL," + 
@@ -410,14 +405,14 @@ id, name, description, assetType, local, temporary, create_time, access_time, as
                     "create_time BIGINT(20) NOT NULL," +
                     "access_time BIGINT(20) NOT NULL," +
                     "asset_flags INT(11) NOT NULL," +
-                    "CreatorID VARCHAR(255) NOT NULL," +
+                    "CreatorID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                     "hash CHAR(26) NOT NULL," + 
                     "PRIMARY KEY(id)" + 
                     ") ROW_FORMAT=DYNAMIC"
         };
         #endregion
 
-        private static readonly int MAX_ASSET_NAME = 64;
+        private static readonly int MAX_ASSET_NAME = 128;
         private static readonly int MAX_ASSET_DESC = 255;
     }
     #endregion
