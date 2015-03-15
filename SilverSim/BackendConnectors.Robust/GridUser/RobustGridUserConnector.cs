@@ -64,14 +64,14 @@ namespace SilverSim.BackendConnectors.Robust.GridUser
         private GridUserInfo fromResult(Map map)
         {
             GridUserInfo info = new GridUserInfo();
-            info.UserID = new UUI(map["UserID"].ToString());
+            info.User = new UUI(map["UserID"].ToString());
             info.HomeRegionID = map["HomeRegionID"].ToString();
             info.HomePosition = new Vector3(map["HomePosition"].ToString());
             info.HomeLookAt = new Vector3(map["HomeLookAt"].ToString());
             info.LastRegionID = map["LastRegionID"].ToString();
             info.LastPosition = new Vector3(map["LastPosition"].ToString());
             info.LastLookAt = new Vector3(map["LastLookAt"].ToString());
-            info.Online = map["Online"].AsBoolean;
+            info.IsOnline = map["Online"].AsBoolean;
             DateTime login;
             DateTime logout;
             DateTime.TryParse(map["Login"].ToString(), out login);

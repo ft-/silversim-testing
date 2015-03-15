@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Inventory
@@ -44,6 +45,11 @@ namespace SilverSim.ServiceInterfaces.Inventory
 
         public abstract List<InventoryFolder> getFolders(UUID PrincipalID, UUID key);
         public abstract List<InventoryItem> getItems(UUID PrincipalID, UUID key);
+
+        public virtual List<InventoryFolder> getInventorySkeleton(UUID PrincipalID)
+        {
+            throw new NotSupportedException(GetType().FullName + ": getInventorySkeleton not supported");
+        }
         #endregion
 
         #region Methods

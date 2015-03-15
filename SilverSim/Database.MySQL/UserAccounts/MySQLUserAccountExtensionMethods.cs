@@ -23,25 +23,37 @@ exception statement from your version.
 
 */
 
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using MySql.Data.MySqlClient;
+using SilverSim.Types.GridUser;
+using SilverSim.Types;
+using SilverSim.Types.Account;
 
-namespace SilverSim.Types.Account
+namespace SilverSim.Database.MySQL.UserAccounts
 {
-    public class UserAccount
+    public static class MySQLUserAccountExtensionMethods
     {
-        public UUI Principal = UUI.Unknown;
-        public UUID ScopeID = UUID.Zero;
-        public string Email = "";
-        public Date Created = new Date();
-        public int UserLevel = -1;
-        public int UserFlags = 0;
-        public string UserTitle = "";
-        public bool IsLocalToGrid = false;
-        public Dictionary<string, string> ServiceURLs = new Dictionary<string,string>(); /* only valid when IsLocalToGrid is set to false */
-
-        public UserAccount()
+        public static UserAccount ToUserAccount(this MySqlDataReader reader)
         {
+            UserAccount info = new UserAccount();
 
+            info.Principal.ID = reader.GetUUID("ID");
+            info.Principal.FirstName = (string)reader["FirstName"];
+            info.Principal.LastName = (string)reader["LastName"];
+            info.Principal.HomeURI = null;
+            info.Principal.IsAuthoritative = true;
+            info.ScopeID = reader.GetUUID("ScopeID");
+            info.Email = (string)reader["Email"];
+            info.Created = reader.GetDate("LastLogin");
+            info.UserLevel = (int)reader["UserLevel"];
+            info.UserFlags = (int)reader["UserFlags"];
+            info.UserTitle = (string)reader["UserTitle"];
+            info.IsLocalToGrid = true;
+
+            return info;
         }
     }
 }

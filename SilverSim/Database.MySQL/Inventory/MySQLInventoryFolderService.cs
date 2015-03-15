@@ -114,6 +114,28 @@ namespace SilverSim.Database.MySQL.Inventory
             return folders;
         }
 
+        public virtual new List<InventoryFolder> getInventorySkeleton(UUID PrincipalID)
+        {
+            List<InventoryFolder> folders = new List<InventoryFolder>();
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?ownerid", PrincipalID);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        while (dbReader.Read())
+                        {
+                            folders.Add(dbReader.ToFolder());
+                        }
+                    }
+                }
+            }
+
+            return folders;
+        }
+
         public override List<InventoryItem> getItems(UUID PrincipalID, UUID key)
         {
             List<InventoryItem> items = new List<InventoryItem>();
@@ -159,7 +181,11 @@ namespace SilverSim.Database.MySQL.Inventory
                     throw new InventoryFolderNotStored(folder.ID);
                 }
             }
-            IncrementVersionNoExcept(folder.Owner.ID, folder.ParentFolderID);
+
+            if (folder.ParentFolderID != UUID.Zero)
+            {
+                IncrementVersionNoExcept(folder.Owner.ID, folder.ParentFolderID);
+            }
         }
 
         public override void Update(InventoryFolder folder)
