@@ -79,8 +79,6 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 "PRIMARY KEY(ID), KEY Email (Email), UNIQUE KEY Name (FirstName, LastName), KEY FirstName (FirstName), KEY LastName (LastName))"
         };
 
-
-
         public override UserAccount this[UUID scopeID, UUID accountID]
         {
             get
