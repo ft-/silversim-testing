@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<Project frameworkVersion="v4_0" name="SilverSim.ServiceInterfaces" path="SilverSim/ServiceInterfaces" type="Library">
+	<Configuration name="Release">
+		<Options>
+			<OutputPath>../../bin/</OutputPath>
+		</Options>
+	</Configuration>
+	<Configuration name="Debug">
+		<Options>
+			<OutputPath>../../bin/</OutputPath>
+		</Options>
+	</Configuration>
+
+	<ReferencePath>../../bin/</ReferencePath>
+	<Reference name="System"/>
+	<Reference name="System.Core"/>
+	<Reference name="SilverSim.Types" localCopy="false"/>
+	<Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
+	<Files>
+		<Match pattern="*.cs" recurse="true"/>
+		<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
+	</Files>
+</Project>
