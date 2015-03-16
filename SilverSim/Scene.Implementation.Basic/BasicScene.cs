@@ -55,6 +55,7 @@ using System.Net;
 using System.Threading;
 using ThreadedClasses;
 using SilverSim.LL.Messages.LayerData;
+using SilverSim.ServiceInterfaces.Estate;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -240,11 +241,13 @@ namespace SilverSim.Scene.Implementation.Basic
             RegionInfo ri,
             List<AvatarNameServiceInterface> avatarNameServices,
             SimulationDataStorageInterface simulationDataStorage,
+            EstateServiceInterface estateService,
             Dictionary<string, string> capabilitiesConfig)
         : base(ri.Size.X, ri.Size.Y)
         {
             m_UDPServer = new LLUDPServer(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
             GroupsNameService = groupsNameService;
+            EstateService = estateService;
             m_SimulationDataStorage = simulationDataStorage;
             PersistentAssetService = persistentAssetService;
             TemporaryAssetService = temporaryAssetService;

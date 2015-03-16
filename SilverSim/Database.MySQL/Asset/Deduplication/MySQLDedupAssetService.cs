@@ -241,7 +241,6 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         {
             SHA1 sha = new SHA1CryptoServiceProvider();
             byte[] sha1data = sha.ComputeHash(asset.Data);
-            string sha1 = Convert.ToBase64String(sha1data);
             
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -267,7 +266,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                         {
                             // create unix epoch time
                             ulong now = Date.GetUnixTime();
-                            cmd.Parameters.AddWithValue("?hash", sha1);
+                            cmd.Parameters.AddWithValue("?hash", sha1data);
                             cmd.Parameters.AddWithValue("?assetType", (int)asset.Type);
                             cmd.Parameters.AddWithValue("?data", asset.Data);
                             if (cmd.ExecuteNonQuery() < 1)
@@ -315,7 +314,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                 cmd.Parameters.AddWithValue("?access_time", now);
                                 cmd.Parameters.AddWithValue("?CreatorID", asset.Creator.ID);
                                 cmd.Parameters.AddWithValue("?asset_flags", (int)asset.Flags);
-                                cmd.Parameters.AddWithValue("?hash", sha1);
+                                cmd.Parameters.AddWithValue("?hash", sha1data);
                                 if (1 > cmd.ExecuteNonQuery())
                                 {
                                     throw new AssetStoreFailed(asset.ID);
@@ -385,7 +384,7 @@ id, name, description, assetType, local, temporary, create_time, access_time, as
         private static readonly string[] Migrations_AssetData = new string[]
         {
             "CREATE TABLE %tablename% (" +
-                    "hash CHAR(28) NOT NULL," +
+                    "hash BINARY(20) NOT NULL," +
                     "assetType INT(11) NOT NULL," + 
                     "data LONGBLOB," + 
                     "PRIMARY KEY(hash, assetType)" +
@@ -405,7 +404,7 @@ id, name, description, assetType, local, temporary, create_time, access_time, as
                     "access_time BIGINT(20) NOT NULL," +
                     "asset_flags INT(11) NOT NULL," +
                     "CreatorID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                    "hash CHAR(28) NOT NULL," + 
+                    "hash BINARY(20) NOT NULL," + 
                     "PRIMARY KEY(id)" + 
                     ") ROW_FORMAT=DYNAMIC"
         };

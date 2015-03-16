@@ -31,6 +31,7 @@ using SilverSim.Scene.Types.Physics;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Economy;
+using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.ServerParam;
@@ -116,6 +117,7 @@ namespace SilverSim.Scene.Types.Scene
         public readonly RwLockedList<AvatarNameServiceInterface> AvatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
         public GridServiceInterface GridService { get; protected set; }
         public EconomyServiceInterface EconomyService { get; protected set; }
+        public EstateServiceInterface EstateService { get; protected set; }
         public ServerParamServiceInterface ServerParamService { get; protected set; }
         public EconomyInfo EconomyData { get; protected set; }
         private NotecardCache m_NotecardCache;
@@ -212,7 +214,11 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return (T)(object)EconomyService;
             }
-            else if(typeof(T).IsAssignableFrom(typeof(EnvironmentController)))
+            else if (typeof(T).IsAssignableFrom(typeof(EstateServiceInterface)))
+            {
+                return (T)(object)EstateService;
+            }
+            else if (typeof(T).IsAssignableFrom(typeof(EnvironmentController)))
             {
                 return (T)(object)Environment;
             }

@@ -37,6 +37,7 @@ using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
+using SilverSim.ServiceInterfaces.Estate;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -49,6 +50,7 @@ namespace SilverSim.Scene.Implementation.Basic
         string m_AssetCacheServiceName;
         string m_GridServiceName;
         string m_IMServiceName;
+        string m_EstateServiceName;
         string m_SimulationDataStorageName;
         List<string> m_AvatarNameServiceNames = new List<string>();
 
@@ -58,6 +60,7 @@ namespace SilverSim.Scene.Implementation.Basic
         GridServiceInterface m_GridService;
         ServerParamServiceInterface m_ServerParamService;
         IMServiceInterface m_IMService;
+        EstateServiceInterface m_EstateService;
         SimulationDataStorageInterface m_SimulationDataStorage;
         Dictionary<string, string> m_CapabilitiesConfig;
         List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
@@ -71,6 +74,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_GridServiceName = ownConfig.GetString("GridService", "GridService");
             m_IMServiceName = ownConfig.GetString("IMService", "IMService");
             m_SimulationDataStorageName = ownConfig.GetString("SimulationDataStorage", "SimulationDataStorage");
+            m_EstateServiceName = ownConfig.GetString("EstateService", "EstateService");
             string avatarNameServices = ownConfig.GetString("AvatarNameServices", "");
             foreach(string p in avatarNameServices.Split(','))
             {
@@ -100,6 +104,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_IMService = loader.GetService<IMServiceInterface>(m_IMServiceName);
             m_ServerParamService = loader.GetService<ServerParamServiceInterface>("ServerParamStorage");
             m_SimulationDataStorage = loader.GetService<SimulationDataStorageInterface>(m_SimulationDataStorageName);
+            m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
             foreach(string servicename in m_AvatarNameServiceNames)
             {
                 m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(servicename));
@@ -118,6 +123,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 ri,
                 m_AvatarNameServices,
                 m_SimulationDataStorage,
+                m_EstateService,
                 m_CapabilitiesConfig);
         }
     }
