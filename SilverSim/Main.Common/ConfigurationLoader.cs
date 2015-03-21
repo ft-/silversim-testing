@@ -667,10 +667,6 @@ namespace SilverSim.Main.Common
             IConfig startup = configSource.Configs["Startup"];
             string mainConfig = startup.GetString("config", defaultConfigName);
 
-
-            /* disable Mono/.NET caching of DNS entries */
-            ServicePointManager.DnsRefreshTimeout = 0;
-
             /* increase service point connection limit */
             if (ServicePointManager.DefaultConnectionLimit < 12)
             {
