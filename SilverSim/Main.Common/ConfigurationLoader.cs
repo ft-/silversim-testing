@@ -40,6 +40,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Threading;
 using System.Xml;
@@ -665,6 +666,16 @@ namespace SilverSim.Main.Common
             configSource.AddSwitch("Startup", "config");
             IConfig startup = configSource.Configs["Startup"];
             string mainConfig = startup.GetString("config", defaultConfigName);
+
+
+            /* disable Mono/.NET caching of DNS entries */
+            ServicePointManager.DnsRefreshTimeout = 0;
+
+            /* increase service point connection limit */
+            if (ServicePointManager.DefaultConnectionLimit < 12)
+            {
+                ServicePointManager.DefaultConnectionLimit = 12;
+            }
 
             m_Sources.Enqueue(new CFG_IniResourceSource(defaultsIniName));
             /* make the resource assets available for all users not just scene */
