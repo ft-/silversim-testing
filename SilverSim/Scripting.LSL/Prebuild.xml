@@ -23,7 +23,7 @@
 	<Reference name="SilverSim.Scripting.Common" localCopy="false"/>
 	<Reference name="SilverSim.Main.Common" localCopy="false"/>
 	<Reference name="SilverSim.LL.Messages" localCopy="false"/>
-	<Reference name="HttpClasses" path="../../bin/" localCopy="false"/>
+	<Reference name="SilverSim.HttpClient" localCopy="false"/>
 	<Reference name="Nini" path="../../bin/" localCopy="false"/>
 	<Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
 	<Files>

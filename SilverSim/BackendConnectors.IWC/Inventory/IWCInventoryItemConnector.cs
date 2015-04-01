@@ -26,11 +26,8 @@ exception statement from your version.
 using SilverSim.BackendConnectors.IWC.Common;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
-using SilverSim.StructuredData.JSON;
 using SilverSim.Types;
-using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
-using System.Collections.Generic;
 
 namespace SilverSim.BackendConnectors.IWC.Inventory
 {

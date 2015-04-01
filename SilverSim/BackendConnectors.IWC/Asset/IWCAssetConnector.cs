@@ -23,20 +23,16 @@ exception statement from your version.
 
 */
 
-using HttpClasses;
 using log4net;
 using Nini.Config;
-using SilverSim.Main.Common;
 using SilverSim.BackendConnectors.IWC.Common;
+using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.StructuredData.AssetXml;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Text;
-using System.Xml;
 
 namespace SilverSim.BackendConnectors.IWC.Asset
 {

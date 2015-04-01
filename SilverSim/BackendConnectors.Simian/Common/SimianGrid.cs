@@ -23,13 +23,10 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
+using SilverSim.HttpClient;
 using SilverSim.StructuredData.LLSD;
-using HttpClasses;
+using SilverSim.Types;
+using System.Collections.Generic;
 
 namespace SilverSim.BackendConnectors.Simian.Common
 {
@@ -38,13 +35,13 @@ namespace SilverSim.BackendConnectors.Simian.Common
         public static Map PostToService(string serverUrl, string capability, Dictionary<string, string> requestargs, bool compressed, int timeoutms = 100000)
         {
             requestargs["cap"] = capability;
-            return (Map)LLSD_XML.Deserialize(HttpClasses.HttpRequestHandler.DoStreamPostRequest(serverUrl, null, requestargs, compressed, timeoutms));
+            return (Map)LLSD_XML.Deserialize(HttpRequestHandler.DoStreamPostRequest(serverUrl, null, requestargs, compressed, timeoutms));
         }
 
         public static Map PostToService(string serverUrl, string capability, Dictionary<string, string> requestargs, int timeoutms = 100000)
         {
             requestargs["cap"] = capability;
-            return (Map)LLSD_XML.Deserialize(HttpClasses.HttpRequestHandler.DoStreamPostRequest(serverUrl, null, requestargs, false, timeoutms));
+            return (Map)LLSD_XML.Deserialize(HttpRequestHandler.DoStreamPostRequest(serverUrl, null, requestargs, false, timeoutms));
         }
     }
 }

@@ -25,12 +25,10 @@ exception statement from your version.
 
 using log4net;
 using Nini.Config;
-using SilverSim.BackendConnectors.IWC.Common;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
-using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;

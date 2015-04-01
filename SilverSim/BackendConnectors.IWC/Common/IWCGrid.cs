@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.HttpClient;
 using SilverSim.StructuredData.JSON;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
@@ -222,7 +223,7 @@ namespace SilverSim.BackendConnectors.IWC.Common
             // param.Add("Password", "");
 
             return (Map)JSON.Deserialize(
-                HttpClasses.HttpRequestHandler.DoStreamRequest(
+                HttpRequestHandler.DoStreamRequest(
                     "POST", 
                     serverUrl, 
                     null, 
@@ -238,7 +239,7 @@ namespace SilverSim.BackendConnectors.IWC.Common
             // param.Add("Password", "");
 
             return (Map)JSON.Deserialize(
-                HttpClasses.HttpRequestHandler.DoStreamRequest(
+                HttpRequestHandler.DoStreamRequest(
                     "POST",
                     serverUrl,
                     null,

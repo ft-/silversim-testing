@@ -23,8 +23,8 @@ exception statement from your version.
 
 */
 
-using HttpClasses;
 using Nwc.XmlRpc;
+using SilverSim.HttpClient;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
 using SilverSim.Types.IM;

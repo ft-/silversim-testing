@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<Project frameworkVersion="v4_0" name="SilverSim.HttpClient" path="SilverSim/HttpClient" type="Library">
+	<Configuration name="Release">
+		<Options>
+			<OutputPath>../../bin/</OutputPath>
+		</Options>
+	</Configuration>
+	<Configuration name="Debug">
+		<Options>
+			<OutputPath>../../bin/</OutputPath>
+		</Options>
+	</Configuration>
+
+	<ReferencePath>../../bin/</ReferencePath>
+	<Reference name="System"/>
+	<Reference name="System.Web"/>
+	<Reference name="System.Xml"/>
+	<Files>
+		<Match pattern="*.cs" recurse="true"/>
+	</Files>
+</Project>

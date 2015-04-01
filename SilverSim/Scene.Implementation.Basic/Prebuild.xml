@@ -25,8 +25,7 @@
 	<Reference name="SilverSim.Scripting.Common" localCopy="false"/>
 	<Reference name="SilverSim.LL.Core" localCopy="false"/>
 	<Reference name="SilverSim.LL.Messages" localCopy="false"/>
-	<Reference name="HttpClasses" path="../../bin/" localCopy="false"/>
-	<Reference name="Nini" path="../../bin/" localCopy="false"/>
+		<Reference name="Nini" path="../../bin/" localCopy="false"/>
 	<Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
 	<Files>
 		<Match pattern="*.cs" recurse="true"/>

@@ -23,18 +23,14 @@ exception statement from your version.
 
 */
 
-using HttpClasses;
-using log4net;
-using Nini.Config;
-using SilverSim.BackendConnectors.Robust.Common;
-using SilverSim.Main.Common;
+using Nwc.XmlRpc;
+using SilverSim.HttpClient;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
 using SilverSim.Types.Presence;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Nwc.XmlRpc;
 
 namespace SilverSim.BackendConnectors.Robust.Presence
 {

@@ -28,8 +28,6 @@ using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
-using SilverSim.Types;
-using System.Net;
 
 namespace SilverSim.BackendConnectors.Robust
 {

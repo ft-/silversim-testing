@@ -23,7 +23,7 @@ exception statement from your version.
 
 */
 
-using HttpClasses;
+using SilverSim.HttpClient;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.StructuredData.AssetXml;
 using SilverSim.Types;

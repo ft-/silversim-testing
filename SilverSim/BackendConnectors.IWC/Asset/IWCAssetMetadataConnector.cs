@@ -23,15 +23,10 @@ exception statement from your version.
 
 */
 
-using HttpClasses;
-using System.Collections.Generic;
 using SilverSim.BackendConnectors.IWC.Common;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.StructuredData.AssetXml;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
-using System.IO;
-using System;
 
 namespace SilverSim.BackendConnectors.IWC.Asset
 {

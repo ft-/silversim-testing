@@ -29,7 +29,6 @@ using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
-using System;
 using System.Collections.Generic;
 
 namespace SilverSim.BackendConnectors.IWC.Inventory

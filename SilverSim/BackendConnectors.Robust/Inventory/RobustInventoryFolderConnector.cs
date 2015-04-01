@@ -24,11 +24,11 @@ exception statement from your version.
 */
 
 using SilverSim.BackendConnectors.Robust.Common;
+using SilverSim.HttpClient;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
-using HttpClasses;
 using System.Collections.Generic;
 
 namespace SilverSim.BackendConnectors.Robust.Inventory
