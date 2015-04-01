@@ -54,5 +54,14 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
 #warning Implement llRequestSecureURL()
             return UUID.Zero;
         }
+
+        [ExecutedOnScriptReset]
+        public static void ResetURLs(ScriptInstance Instance)
+        {
+            Script script = (Script)Instance;
+            lock (script)
+            {
+            }
+        }
     }
 }
