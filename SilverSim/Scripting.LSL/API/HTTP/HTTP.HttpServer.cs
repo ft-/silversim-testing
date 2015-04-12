@@ -29,30 +29,74 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Script.Events;
 
-namespace SilverSim.Scripting.LSL.APIs.HTTP
+namespace SilverSim.Scripting.LSL.API.HTTP
 {
     public partial class HTTP_API
     {
         [APILevel(APIFlags.LSL)]
         public UUID llRequestURL(ScriptInstance Instance)
         {
-#warning Implement llRequestURL()
-            return UUID.Zero;
+            lock(Instance)
+            {
+                UUID reqID = UUID.Random;
+                try
+                {
+                    UUID urlID = m_HTTPHandler.RequestURL(Instance.Part, Instance.Item);
+                    HttpRequestEvent ev = new HttpRequestEvent();
+                    ev.RequestID = reqID;
+                    ev.Method = URL_REQUEST_GRANTED;
+                    ev.Body = "";
+                    Instance.PostEvent(ev);
+                }
+                catch
+                {
+                    HttpRequestEvent ev = new HttpRequestEvent();
+                    ev.RequestID = reqID;
+                    ev.Method = URL_REQUEST_DENIED;
+                    ev.Body = "";
+                    Instance.PostEvent(ev);
+                }
+                return reqID;
+            }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llReleaseURL(ScriptInstance Instance, UUID id)
+        public void llReleaseURL(ScriptInstance Instance, string url)
         {
 #warning Implement llReleaseURL()
-
+            lock (Instance)
+            {
+                m_HTTPHandler.ReleaseURL(url);
+            }
         }
 
         [APILevel(APIFlags.LSL)]
         public UUID llRequestSecureURL(ScriptInstance Instance)
         {
-#warning Implement llRequestSecureURL()
-            return UUID.Zero;
+            lock (Instance)
+            {
+                UUID reqID = UUID.Random;
+                try
+                {
+                    UUID urlID = m_HTTPHandler.RequestSecureURL(Instance.Part, Instance.Item);
+                    HttpRequestEvent ev = new HttpRequestEvent();
+                    ev.RequestID = reqID;
+                    ev.Method = URL_REQUEST_GRANTED;
+                    ev.Body = "https://" + m_HTTPHandler;
+                    Instance.PostEvent(ev);
+                }
+                catch
+                {
+                    HttpRequestEvent ev = new HttpRequestEvent();
+                    ev.RequestID = reqID;
+                    ev.Method = URL_REQUEST_DENIED;
+                    ev.Body = "";
+                    Instance.PostEvent(ev);
+                }
+                return reqID;
+            }
         }
 
         [ExecutedOnScriptReset]

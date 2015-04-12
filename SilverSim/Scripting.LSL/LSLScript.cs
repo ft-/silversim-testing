@@ -47,10 +47,11 @@ namespace SilverSim.Scripting.LSL
         internal List<DetectInfo> m_Detected = new List<DetectInfo>();
         private Dictionary<string, LSLState> m_States = new Dictionary<string, LSLState>();
         private LSLState m_CurrentState = null;
-        public int StartParameter = new Integer();
+        public int StartParameter = 0;
         internal RwLockedDictionary<int, ChatServiceInterface.Listener> m_Listeners = new RwLockedDictionary<int, ChatServiceInterface.Listener>();
         private double m_ExecutionTime = 0;
         protected bool UseMessageObjectEvent = false;
+        internal RwLockedList<UUID> m_RequestedURLs = new RwLockedList<UUID>();
 
         public readonly Timer Timer = new Timer();
 
@@ -191,6 +192,7 @@ namespace SilverSim.Scripting.LSL
         {
             m_Part = part;
             m_Item = item;
+            Timer.Elapsed += OnTimerEvent;
             /* we replace the loaded script state with ours */
             m_Item.ScriptState = this;
             m_Part.OnUpdate += OnPrimUpdate;
@@ -266,6 +268,7 @@ namespace SilverSim.Scripting.LSL
 
         public override void Remove()
         {
+            Timer.Elapsed -= OnTimerEvent;
             m_Part.OnUpdate -= OnPrimUpdate;
             m_Part.OnPositionChange -= OnPrimPositionUpdate;
             m_Part.ObjectGroup.OnUpdate -= OnGroupUpdate;

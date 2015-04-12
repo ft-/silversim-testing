@@ -23,15 +23,40 @@ exception statement from your version.
 
 */
 
-namespace SilverSim.Scene.Types.Script.Events
-{
-    public struct OnRezEvent : IScriptEvent
-    {
-        public int StartParam;
+using log4net;
+using Nini.Config;
+using SilverSim.Main.Common;
 
-        public OnRezEvent(int startParam)
+namespace SilverSim.BackendHandlers.Robust.Groups
+{
+    #region Service Implementation
+    class RobustGroupsServerHandler : IPlugin
+    {
+        public RobustGroupsServerHandler(string groupsServiceName)
         {
-            StartParam = startParam;
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
         }
     }
+    #endregion
+
+    #region Factory
+    [PluginName("GroupsHandler")]
+    public class RobustGroupsServerHandlerFactory : IPluginFactory
+    {
+        private static readonly ILog m_Log = LogManager.GetLogger("ROBUST GROUPS HANDLER");
+        public RobustGroupsServerHandlerFactory()
+        {
+
+        }
+
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            return new RobustGroupsServerHandler(ownSection.GetString("GroupsService", "GroupsService"));
+        }
+    }
+    #endregion
 }

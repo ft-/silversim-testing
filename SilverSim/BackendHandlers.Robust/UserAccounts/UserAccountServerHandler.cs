@@ -23,15 +23,40 @@ exception statement from your version.
 
 */
 
-namespace SilverSim.Scene.Types.Script.Events
-{
-    public struct OnRezEvent : IScriptEvent
-    {
-        public int StartParam;
+using log4net;
+using Nini.Config;
+using SilverSim.Main.Common;
 
-        public OnRezEvent(int startParam)
+namespace SilverSim.BackendHandlers.Robust.UserAccounts
+{
+    #region Service Implementation
+    class RobustUserAccountServerHandler : IPlugin
+    {
+        public RobustUserAccountServerHandler(string userAccountServiceName)
         {
-            StartParam = startParam;
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
         }
     }
+    #endregion
+
+    #region Factory
+    [PluginName("UserAccountHandler")]
+    public class RobustUserAccountServerHandlerFactory : IPluginFactory
+    {
+        private static readonly ILog m_Log = LogManager.GetLogger("ROBUST USERACCOUNT HANDLER");
+        public RobustUserAccountServerHandlerFactory()
+        {
+
+        }
+
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            return new RobustUserAccountServerHandler(ownSection.GetString("UserAccountService", "UserAccountService"));
+        }
+    }
+    #endregion
 }

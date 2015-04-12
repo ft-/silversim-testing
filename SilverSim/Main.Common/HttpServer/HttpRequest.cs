@@ -71,6 +71,10 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 return m_Headers[fieldName];
             }
+            set
+            {
+                m_Headers[fieldName] = value;
+            }
         }
 
         public bool ContainsHeader(string fieldName)
@@ -102,6 +106,11 @@ namespace SilverSim.Main.Common.HttpServer
                 BeginResponse(HttpStatusCode.InternalServerError, "Internal Server Error");
             }
             Response.Close();
+        }
+
+        public void SetConnectionClose()
+        {
+            ConnectionMode = ConnectionModeEnum.Close;
         }
 
         private string ReadHeaderLine()

@@ -141,6 +141,11 @@ namespace SilverSim.Main.Common.HttpServer
                         {
                             return;
                         }
+                        catch(HttpResponse.DisconnectFromThreadException)
+                        {
+                            client = null;
+                            return;
+                        }
                         catch (Exception e)
                         {
                             m_Log.WarnFormat("Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
@@ -155,6 +160,11 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         catch (HttpResponse.ConnectionCloseException)
                         {
+                            return;
+                        }
+                        catch (HttpResponse.DisconnectFromThreadException)
+                        {
+                            client = null;
                             return;
                         }
                         catch (Exception e)
@@ -175,6 +185,11 @@ namespace SilverSim.Main.Common.HttpServer
                                 }
                                 catch (HttpResponse.ConnectionCloseException)
                                 {
+                                    return;
+                                }
+                                catch (HttpResponse.DisconnectFromThreadException)
+                                {
+                                    client = null;
                                     return;
                                 }
                                 catch (Exception e)
@@ -206,7 +221,10 @@ namespace SilverSim.Main.Common.HttpServer
             }
             finally
             {
-                client.Close();
+                if (null != client)
+                {
+                    client.Close();
+                }
             }
         }
 

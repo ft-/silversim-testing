@@ -192,6 +192,35 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public void Replace(string name, ObjectPartInventoryItem newItem)
+        {
+            ObjectPartInventoryItem oldItem;
+            newItem.Name = name;
+            lock(this)
+            {
+                oldItem = this[name];
+                Remove(name);
+                if(ContainsKey(newItem.ID))
+                {
+                    newItem.ID = UUID.Random;
+                }
+                Add(newItem, false);
+            }
+            if(oldItem != null)
+            {
+                oldItem.Dispose();
+            }
+            Interlocked.Increment(ref InventorySerial);
+            var updateDelegate = OnChange;
+            if (updateDelegate != null)
+            {
+                foreach (OnChangeDelegate d in updateDelegate.GetInvocationList())
+                {
+                    d();
+                }
+            }
+        }
+
         public new bool Remove(UUID key1)
         {
             if (base.Remove(key1))

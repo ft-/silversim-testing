@@ -42,6 +42,14 @@ namespace SilverSim.Main.Common.HttpServer
 
             }
         }
+
+        public class DisconnectFromThreadException : Exception
+        {
+            public DisconnectFromThreadException()
+            {
+
+            }
+        }
         #endregion
 
         public readonly Dictionary<string, string> Headers = new Dictionary<string,string>();

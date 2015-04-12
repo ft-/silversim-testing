@@ -23,15 +23,44 @@ exception statement from your version.
 
 */
 
-namespace SilverSim.Scene.Types.Script.Events
-{
-    public struct OnRezEvent : IScriptEvent
-    {
-        public int StartParam;
+using log4net;
+using Nini.Config;
+using SilverSim.Main.Common;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-        public OnRezEvent(int startParam)
+namespace SilverSim.BackendHandlers.Robust.Presence
+{
+    #region Service Implementation
+    class RobustPresenceServerHandler : IPlugin
+    {
+        public RobustPresenceServerHandler(string presenceServiceName)
         {
-            StartParam = startParam;
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
         }
     }
+    #endregion
+
+    #region Factory
+    [PluginName("PresenceHandler")]
+    public class RobustPresenceServerHandlerFactory : IPluginFactory
+    {
+        private static readonly ILog m_Log = LogManager.GetLogger("ROBUST INVENTORY HANDLER");
+        public RobustPresenceServerHandlerFactory()
+        {
+
+        }
+
+        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        {
+            return new RobustPresenceServerHandler(ownSection.GetString("PresenceService", "PresenceService"));
+        }
+    }
+    #endregion
 }

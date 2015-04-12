@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Types;
 using System;
 
 namespace SilverSim.Scripting.LSL.API.HTTP
@@ -34,14 +35,31 @@ namespace SilverSim.Scripting.LSL.API.HTTP
     [LSLImplementation]
     public partial class HTTP_API : MarshalByRefObject, IScriptApi, IPlugin
     {
+        LSLHTTP m_HTTPHandler;
+
         public HTTP_API()
         {
 
         }
 
+        [APILevel(APIFlags.LSL)]
+        public const string URL_REQUEST_GRANTED = "URL_REQUEST_GRANTED";
+
+        [APILevel(APIFlags.LSL)]
+        public const string URL_REQUEST_DENIED = "URL_REQUEST_DENIED";
+
         public void Startup(ConfigurationLoader loader)
         {
+            m_HTTPHandler = loader.GetService<LSLHTTP>("LSLHTTP");
+        }
 
+        [ExecutedOnScriptReset]
+        public void RemoveURLs(ScriptInstance Instance)
+        {
+            foreach(UUID ids in ((Script)Instance).m_RequestedURLs)
+            {
+                m_HTTPHandler.ReleaseURL(ids);
+            }
         }
     }
 }
