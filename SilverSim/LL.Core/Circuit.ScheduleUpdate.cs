@@ -41,12 +41,13 @@ namespace SilverSim.LL.Core
 
         public void ScheduleUpdate(ObjectUpdateInfo info)
         {
-            if(info.IsPhysics)
+            if(info.Part.ObjectGroup.IsAttachedToPrivate && info.Part.ObjectGroup.Owner != Agent.Owner)
             {
-                if(!info.IsKilled)
-                {
-                    m_PhysicalOutQueue.Enqueue(info);
-                }
+                /* do not signal private attachments to anyone else than the owner */
+            }
+            else if(info.IsPhysics && !info.IsKilled && !info.Part.ObjectGroup.IsAttached)
+            {
+                m_PhysicalOutQueue.Enqueue(info);
             }
             else
             {

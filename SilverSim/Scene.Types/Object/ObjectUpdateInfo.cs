@@ -14,12 +14,12 @@ namespace SilverSim.Scene.Types.Object
 
         private bool m_Killed = false;
         public uint LocalID;
-        private ObjectPart m_Part;
+        public ObjectPart Part { get; private set; }
         private int m_SerialNumber;
 
         public ObjectUpdateInfo(ObjectPart part)
         {
-            m_Part = part;
+            Part = part;
             LocalID = part.LocalID;
             m_SerialNumber = 0;
         }
@@ -57,35 +57,34 @@ namespace SilverSim.Scene.Types.Object
                 else
                 {
                     SilverSim.LL.Messages.Object.ObjectUpdate.ObjData m = new LL.Messages.Object.ObjectUpdate.ObjData();
-                    m.ClickAction = m_Part.ClickAction;
+                    m.ClickAction = Part.ClickAction;
                     m.CRC = (uint)m_SerialNumber;
-                    m.ExtraParams = m_Part.ExtraParamsBytes;
-                    m.FullID = m_Part.ID;
+                    m.ExtraParams = Part.ExtraParamsBytes;
+                    m.FullID = Part.ID;
                     m.JointAxisOrAnchor = Vector3.Zero;
                     m.JointPivot = Vector3.Zero;
                     m.JointType = 0;
-                    m.LocalID = m_Part.LocalID;
-                    m.Material = m_Part.Material;
-                    m.MediaURL = m_Part.MediaURL;
-                    if (m_Part.ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.NotAttached)
+                    m.LocalID = Part.LocalID;
+                    m.Material = Part.Material;
+                    m.MediaURL = Part.MediaURL;
+                    if (Part.ObjectGroup.IsAttached)
                     {
-                        m.NameValue = string.Format("AttachItemID STRING RW SV {0}", m_Part.ObjectGroup.FromItemID);
-                        m.State = (byte)(((byte)m_Part.ObjectGroup.AttachPoint % 16) * 16 + (((byte)m_Part.ObjectGroup.AttachPoint / 16)));
+                        m.NameValue = string.Format("AttachItemID STRING RW SV {0}", Part.ObjectGroup.FromItemID);
+                        m.State = (byte)(((byte)Part.ObjectGroup.AttachPoint % 16) * 16 + (((byte)Part.ObjectGroup.AttachPoint / 16)));
                     }
                     else
                     {
-                        m.NameValue = m_Part.Name;
-                        m.State = 0;
-                        //m.State = m_Part.Group.RootPart.Shape.State;
+                        m.NameValue = Part.Name;
+                        m.State = Part.ObjectGroup.RootPart.Shape.State;
                     }
                     m.ObjectData = new byte[60];
-                    m_Part.Position.ToBytes(m.ObjectData, 0);
-                    m_Part.Velocity.ToBytes(m.ObjectData, 12);
-                    m_Part.Acceleration.ToBytes(m.ObjectData, 24);
-                    m_Part.Rotation.ToBytes(m.ObjectData, 36);
-                    m_Part.AngularVelocity.ToBytes(m.ObjectData, 48);
-                    m.ParentID = m_Part.ObjectGroup.RootPart.LocalID;
-                    ObjectPart.PrimitiveShape shape = m_Part.Shape;
+                    Part.Position.ToBytes(m.ObjectData, 0);
+                    Part.Velocity.ToBytes(m.ObjectData, 12);
+                    Part.Acceleration.ToBytes(m.ObjectData, 24);
+                    Part.Rotation.ToBytes(m.ObjectData, 36);
+                    Part.AngularVelocity.ToBytes(m.ObjectData, 48);
+                    m.ParentID = Part.ObjectGroup.RootPart.LocalID;
+                    ObjectPart.PrimitiveShape shape = Part.Shape;
                     m.PathBegin = shape.PathBegin;
                     m.PathEnd = shape.PathEnd;
                     m.PathRadiusOffset = shape.PathRadiusOffset;
@@ -104,37 +103,73 @@ namespace SilverSim.Scene.Types.Object
                     m.ProfileCurve = shape.ProfileCurve;
                     m.ProfileEnd = shape.ProfileEnd;
                     m.ProfileHollow = shape.ProfileHollow;
-                    m.PSBlock = m_Part.ParticleSystemBytes;
-                    m.Scale = m_Part.Size;
-                    ObjectPart.TextParam textparam = m_Part.Text;
+                    m.PSBlock = Part.ParticleSystemBytes;
+                    m.Scale = Part.Size;
+                    ObjectPart.TextParam textparam = Part.Text;
                     m.Text = textparam.Text;
                     m.TextColor = textparam.TextColor;
-                    m.TextureAnim = new byte[0];
-                    m.TextureEntry = m_Part.TextureEntryBytes;
+                    m.TextureAnim = Part.TextureAnimationBytes;
+                    m.TextureEntry = Part.TextureEntryBytes;
                     m.UpdateFlags = 0;
+                    switch(m.PCode)
+                    {
+                        case PrimitiveCode.Grass:
+                        case PrimitiveCode.Tree:
+                        case PrimitiveCode.NewTree:
+                            m.Data = new byte[] { Part.Shape.State };
+                            break;
 
-                    if(m_Part.IsAllowedDrop)
+                        default:
+                            m.Data = new byte[0];
+                            break;
+                    }
+
+                    if(Part.IsAllowedDrop)
                     {
                         m.UpdateFlags |= PrimitiveFlags.AllowInventoryDrop;
                     }
-                    if(m_Part.Inventory.Count == 0)
+                    if(Part.Inventory.Count == 0)
                     {
                         m.UpdateFlags |= PrimitiveFlags.InventoryEmpty;
                     }
-                    if(m_Part.ObjectGroup.IsPhysics)
+                    if(Part.ObjectGroup.IsPhysics)
                     {
                         m.UpdateFlags |= PrimitiveFlags.Physics;
                     }
-                    if(m_Part.Inventory.CountScripts != 0)
+                    if(Part.Inventory.CountScripts != 0)
                     {
                         m.UpdateFlags |= PrimitiveFlags.Scripted;
                     }
+                    if (Part.ObjectGroup.IsGroupOwned)
+                    {
+                        m.UpdateFlags |= PrimitiveFlags.ObjectGroupOwned;
+                    }
+                    if(Part.ObjectGroup.IsTemporary)
+                    {
+                        m.UpdateFlags |= PrimitiveFlags.Temporary;
+                    }
+                    if (Part.ObjectGroup.IsTempOnRez)
+                    {
+                        m.UpdateFlags |= PrimitiveFlags.TemporaryOnRez;
+                    }
 
-                    m.LoopedSound = UUID.Zero;
-                    m.OwnerID = m_Part.Owner.ID;
-                    m.Gain = 0;
-                    m.Radius = 0;
-                    m.Flags = 0;
+                    ObjectPart.SoundParam soundparam = Part.Sound;
+                    if (soundparam.SoundID != UUID.Zero)
+                    {
+                        m.LoopedSound = UUID.Zero;
+                        m.OwnerID = Part.Owner.ID;
+                        m.Gain = soundparam.Gain;
+                        m.Radius = soundparam.Radius;
+                        m.Flags = soundparam.Flags;
+                    }
+                    else
+                    {
+                        m.LoopedSound = UUID.Zero;
+                        m.OwnerID = Part.Owner.ID;
+                        m.Gain = 0;
+                        m.Radius = 0;
+                        m.Flags = 0;
+                    }
 
                     switch (shape.PCode)
                     {
@@ -148,7 +183,7 @@ namespace SilverSim.Scene.Types.Object
                             break;
                     }
 
-                    if(m_Part.Shape.SculptType == SilverSim.Types.Primitive.PrimitiveSculptType.Mesh)
+                    if(Part.Shape.SculptType == SilverSim.Types.Primitive.PrimitiveSculptType.Mesh)
                     {
                         m.ProfileBegin = 12500;
                         m.ProfileEnd = 0;
@@ -171,8 +206,8 @@ namespace SilverSim.Scene.Types.Object
                 else
                 {
                     SilverSim.LL.Messages.Object.ImprovedTerseObjectUpdate.ObjData objdata = new LL.Messages.Object.ImprovedTerseObjectUpdate.ObjData();
-                    objdata.Data = m_Part.TerseData;
-                    objdata.TextureEntry = m_Part.TextureEntryBytes;
+                    objdata.Data = Part.TerseData;
+                    objdata.TextureEntry = Part.TextureEntryBytes;
                     return objdata;
                 }
             }
@@ -192,9 +227,9 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(this)
                 {
-                    if(m_Part != null && !m_Killed)
+                    if(Part != null && !m_Killed)
                     {
-                        return m_Part.ObjectGroup.IsPhysics;
+                        return Part.ObjectGroup.IsPhysics;
                     }
                 }
                 return false;

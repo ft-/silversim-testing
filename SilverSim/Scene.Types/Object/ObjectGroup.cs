@@ -377,6 +377,34 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public bool IsAttached = false;
+
+        public bool IsAttachedToPrivate
+        {
+            get
+            {
+                if(!IsAttached)
+                {
+                    return false;
+                }
+                switch(AttachPoint)
+                {
+                    case AttachmentPoint.HudBottom:
+                    case AttachmentPoint.HudBottomLeft:
+                    case AttachmentPoint.HudBottomRight:
+                    case AttachmentPoint.HudCenter1:
+                    case AttachmentPoint.HudCenter2:
+                    case AttachmentPoint.HudTopCenter:
+                    case AttachmentPoint.HudTopLeft:
+                    case AttachmentPoint.HudTopRight:
+                        return true;
+
+                    default:
+                        return false;
+                }
+            }
+        }
+
         public Vector3 Acceleration
         {
             get

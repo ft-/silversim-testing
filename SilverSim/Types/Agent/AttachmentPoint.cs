@@ -23,11 +23,15 @@ exception statement from your version.
 
 */
 
+using System;
+
 namespace SilverSim.Types.Agent
 {
+    [Flags]
     public enum AttachmentPoint : byte
     {
         NotAttached = 0,
+        Default = 0,
 
         Chest = 1,
         Head = 2,
@@ -68,6 +72,9 @@ namespace SilverSim.Types.Agent
         HudBottom = 37,
         HudBottomRight = 38,
         Neck = 39,
-        AvatarCenter = 40
+        AvatarCenter = 40,
+
+        PositionMask = 0x7F,
+        AppendFlag = 0x80
     }
 }

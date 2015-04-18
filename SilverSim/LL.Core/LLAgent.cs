@@ -983,6 +983,7 @@ namespace SilverSim.LL.Core
             m_AgentMessageRouting.Add(MessageType.RezMultipleAttachmentsFromInv, HandleRezAttachment);
             m_AgentMessageRouting.Add(MessageType.RezSingleAttachmentFromInv, HandleRezAttachment);
             m_AgentMessageRouting.Add(MessageType.DetachAttachmentIntoInv, HandleDetachAttachment);
+            m_AgentMessageRouting.Add(MessageType.ObjectDetach, HandleDetachAttachment);
         }
 
         public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)
