@@ -64,7 +64,16 @@ namespace SilverSim.LL.Core
         private UUID m_CurrentSceneID;
         #endregion
 
-        public Vector4 CollisionPlane { get; set; }
+        public Vector4 CollisionPlane
+        {
+            get
+            {
+                return Vector4.UnitW;
+            }
+            set
+            {
+            }
+        }
 
         #region LLAgent Properties
         public UInt32 LocalID { get; set; }
@@ -158,11 +167,11 @@ namespace SilverSim.LL.Core
             get
             {
                 Vector3 angle = new Vector3(1, 0, 0);
-                return angle * Rotation + Position;
+                return angle * Rotation;
             }
             set
             {
-                Vector3 delta = (value - Position).Normalize();
+                Vector3 delta = value.Normalize();
                 Rotation = Quaternion.CreateFromEulers(new Vector3(0, 0, Math.Atan2(delta.Y, delta.X)));
             }
         }

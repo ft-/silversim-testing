@@ -112,6 +112,11 @@ namespace SilverSim.Main.Common
             return (T)module;
         }
 
+        public T GetPluginService<T>(string serviceName)
+        {
+            return GetService<T>("$" + serviceName);
+        }
+
         public List<T> GetServicesByValue<T>()
         {
             List<T> list = new List<T>();

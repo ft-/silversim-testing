@@ -66,6 +66,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 rot.X = 0;
                 rot.Y = 0;
+                rot.Normalize();
                 d.ParentID = 0;
             }
             else
@@ -79,6 +80,7 @@ namespace SilverSim.Scene.Types.Scene
             d.PathScaleY = 100;
             d.PCode = PrimitiveCode.Avatar;
             d.ProfileCurve = 1;
+            d.Material = PrimitiveMaterial.Flesh;
             d.PSBlock = new byte[0];
             d.Scale = new SilverSim.Types.Vector3(0.45f, 0.6f, 1.9f);
             d.Text = "";

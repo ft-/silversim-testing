@@ -42,56 +42,6 @@ namespace SilverSim.HttpClient
 
     public static class HttpRequestHandler
     {
-        static bool isMonoCached = false;
-        static bool isMono = true; /* be safe initially */
-
-        static bool IsPlatformMono
-        {
-            get
-            {
-                if (!isMonoCached)
-                {
-                    isMono = Type.GetType("Mono.Runtime") != null;
-                    isMonoCached = true;
-                }
-                return isMono;
-            }
-        }
-
-        public static void ResetHosts()
-        {
-            try
-            {
-                if (!IsPlatformMono)
-                {
-                    return;
-                }
-                IDictionary servicePoints = (IDictionary)(typeof(ServicePointManager).GetField("servicePoints",
-                    BindingFlags.Static | BindingFlags.NonPublic |
-                    BindingFlags.GetField).GetValue(null));
-
-                lock (servicePoints)
-                {
-                    foreach (ServicePoint removing in servicePoints.Values)
-                    {
-                        var hostLock = typeof(ServicePoint).GetField("hostE",
-                            BindingFlags.NonPublic | BindingFlags.GetField |
-                            BindingFlags.Instance).GetValue(removing);
-
-                        lock (hostLock)
-                        {
-                            typeof(ServicePoint).GetField("host", BindingFlags.NonPublic |
-                                BindingFlags.SetField | BindingFlags.Instance).SetValue(removing, null);
-                        }
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                /* be neutral outside */
-            }
-        }
-
         private static string BuildQueryString(IDictionary<string, string> parameters)
         {
             List<string> items = new List<string>(parameters.Count);
@@ -138,7 +88,6 @@ namespace SilverSim.HttpClient
                 url += "?" + BuildQueryString(getValues);
             }
 
-            ResetHosts();
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = method;
             request.ContentType = content_type;

@@ -50,7 +50,7 @@ namespace SilverSim.Scripting.LSL.API.HTTP
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_HTTPHandler = loader.GetService<LSLHTTP>("LSLHTTP");
+            m_HTTPHandler = loader.GetPluginService<LSLHTTP>("LSLHTTP");
         }
 
         [ExecutedOnScriptReset]

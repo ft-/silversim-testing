@@ -140,10 +140,10 @@ namespace SilverSim.Types
         /// writing. Must be at least 16 bytes before the end of the array</param>
         public void ToBytes(byte[] dest, int pos)
         {
-            Buffer.BlockCopy(BitConverter.GetBytes(X), 0, dest, pos + 0, 4);
-            Buffer.BlockCopy(BitConverter.GetBytes(Y), 0, dest, pos + 4, 4);
-            Buffer.BlockCopy(BitConverter.GetBytes(Z), 0, dest, pos + 8, 4);
-            Buffer.BlockCopy(BitConverter.GetBytes(W), 0, dest, pos + 12, 4);
+            Buffer.BlockCopy(BitConverter.GetBytes((float)X), 0, dest, pos + 0, 4);
+            Buffer.BlockCopy(BitConverter.GetBytes((float)Y), 0, dest, pos + 4, 4);
+            Buffer.BlockCopy(BitConverter.GetBytes((float)Z), 0, dest, pos + 8, 4);
+            Buffer.BlockCopy(BitConverter.GetBytes((float)W), 0, dest, pos + 12, 4);
 
             if (!BitConverter.IsLittleEndian)
             {
