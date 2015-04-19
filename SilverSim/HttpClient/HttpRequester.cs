@@ -136,7 +136,6 @@ namespace SilverSim.HttpClient
                 url += "?" + BuildQueryString(getValues);
             }
 
-            ResetHosts();
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
             request.Method = method;
             request.ContentType = content_type;
