@@ -27,6 +27,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Text;
 using System.Timers;
@@ -121,7 +122,9 @@ namespace SilverSim.Main.Common.HttpClient
             }
             else if (scheme == Uri.UriSchemeHttps)
             {
-                throw new NotImplementedException();
+                SslStream sslstream = new SslStream(new TcpClient(host, port).GetStream());
+                sslstream.AuthenticateAsClient(host);
+                return sslstream;
             }
             else
             {
