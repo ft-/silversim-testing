@@ -125,6 +125,14 @@ namespace SilverSim.Main.Common.Caps
             }
         }
 
+        public string Scheme
+        {
+            get
+            {
+                return m_HttpServer.Scheme;
+            }
+        }
+
         public string ExternalHostName
         {
             get

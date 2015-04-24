@@ -32,6 +32,7 @@ using System.Net;
 using ThreadedClasses;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types.Grid;
+using System;
 
 namespace SilverSim.Scene.Registration
 {
@@ -71,13 +72,14 @@ namespace SilverSim.Scene.Registration
             {
                 ri.Owner = new UUI();
             }
-            if (m_HttpServer.Port == 80)
+            if ((m_HttpServer.Port == 80 && m_HttpServer.Scheme == Uri.UriSchemeHttp) ||
+                (m_HttpServer.Port == 443 && m_HttpServer.Scheme == Uri.UriSchemeHttps))
             {
-                ri.ServerURI = "http://" + m_HttpServer.ExternalHostName + "/";
+                ri.ServerURI = m_HttpServer.Scheme + "://" + m_HttpServer.ExternalHostName + "/";
             }
             else 
             {
-                ri.ServerURI = "http://" + m_HttpServer.ExternalHostName + ":" + m_HttpServer.Port.ToString() + "/";
+                ri.ServerURI = m_HttpServer.Scheme + "://" + m_HttpServer.ExternalHostName + ":" + m_HttpServer.Port.ToString() + "/";
             }
             ri.ServerHttpPort = m_HttpServer.Port;
             scene.GridService.RegisterRegion(ri);

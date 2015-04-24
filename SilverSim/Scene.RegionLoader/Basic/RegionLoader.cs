@@ -53,6 +53,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
         private SceneFactoryInterface m_SceneFactory;
         private uint m_HttpPort = 0;
         private static readonly ILog m_Log = LogManager.GetLogger("REGION LOADER");
+        private string m_Scheme = Uri.UriSchemeHttp;
 
         #region Constructor
         public RegionLoaderService(string regionStorage, string regionCfg)
@@ -69,6 +70,11 @@ namespace SilverSim.Scene.RegionLoader.Basic
             {
                 m_ExternalHostName = loader.Config.Configs["Network"].GetString("ExternalHostName", "SYSTEMIP");
                 m_HttpPort = (uint)loader.Config.Configs["Network"].GetInt("HttpListenerPort", 9000);
+
+                if(loader.Config.Configs["Network"].Contains("ServerCertificate"))
+                {
+                    m_Scheme = Uri.UriSchemeHttps;
+                }
             }
         }
         #endregion
@@ -95,7 +101,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
                     r.ID = regionEntry.GetString("RegionUUID");
                     r.Location = new GridVector(regionEntry.GetString("Location"), 256);
                     r.ServerPort = (uint)regionEntry.GetInt("InternalPort");
-                    r.ServerURI = string.Format("http://{0}:{1}/", m_ExternalHostName, m_HttpPort);
+                    r.ServerURI = string.Format("{0}://{1}:{2}/", m_Scheme, m_ExternalHostName, m_HttpPort);
                     r.Size.X = ((uint)regionEntry.GetInt("SizeX", 256) + 255) & (~(uint)255);
                     r.Size.Y = ((uint)regionEntry.GetInt("SizeY", 256) + 255) & (~(uint)255);
                     r.Flags = RegionFlags.RegionOnline;

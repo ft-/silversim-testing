@@ -177,7 +177,8 @@ namespace SilverSim.LL.Core
                 }
                 else if (m_RegisteredCapabilities.TryGetValue(v.ToString(), out capsID))
                 {
-                    capsUri[v.ToString()] = string.Format("http://{0}:{1}/CAPS/{2}/{3}", m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port,
+                    capsUri[v.ToString()] = string.Format("{0}://{1}:{2}/CAPS/{3}/{4}",
+                        m_CapsRedirector.Scheme, m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port,
                         v.ToString(), capsID);
                 }
             }
@@ -253,7 +254,7 @@ namespace SilverSim.LL.Core
             AddDefCapability("GetMesh2", regionSeedID, Cap_GetMesh, capConfig);
             AddDefCapability("CreateInventoryCategory", regionSeedID, Cap_CreateInventoryCategory, capConfig);
             AddDefCapability("GetDisplayNames", regionSeedID, Cap_GetDisplayNames, capConfig);
-            string localHostName = string.Format("http://{0}:{1}", m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port);
+            string localHostName = string.Format("{0}://{1}:{2}", m_CapsRedirector.Scheme, m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port);
             AddDefCapabilityFactory("ObjectAdd", regionSeedID, delegate(LLAgent agent)
             {
                 return new Capabilities.ObjectAdd(Scene, agent.Owner);

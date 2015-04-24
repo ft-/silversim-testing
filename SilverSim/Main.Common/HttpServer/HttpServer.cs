@@ -29,7 +29,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using ThreadedClasses;
 
@@ -48,14 +50,28 @@ namespace SilverSim.Main.Common.HttpServer
         private TcpListener m_Listener;
         public uint Port { get; private set; }
         public string ExternalHostName { get; private set; }
+        public string Scheme { get; private set; }
 
         private bool m_IsBehindProxy = false;
+
+        X509Certificate m_ServerCertificate = null;
 
         public BaseHttpServer(IConfig httpConfig)
         {
             Port = (uint)httpConfig.GetInt("HttpListenerPort", 9000);
             m_IsBehindProxy = httpConfig.GetBoolean("HasProxy", false);
             ExternalHostName = httpConfig.GetString("ExternalHostName", "SYSTEMIP");
+
+            if(httpConfig.Contains("ServerCertificate"))
+            {
+                string filename = httpConfig.GetString("ServerCertificate");
+                m_ServerCertificate = X509Certificate.CreateFromCertFile(filename);
+                Scheme = Uri.UriSchemeHttps;
+            }
+            else
+            {
+                Scheme = Uri.UriSchemeHttp;
+            }
 
             m_Listener = new TcpListener(new IPAddress(0), (int)Port);
             m_Listener.Server.Ttl = 128;
@@ -101,13 +117,22 @@ namespace SilverSim.Main.Common.HttpServer
             m_Listener.BeginAcceptTcpClient(AcceptConnectionCallback, null);
             try
             {
+                Stream httpstream = client.GetStream();
+                if (m_ServerCertificate != null)
+                {
+                    /* Start SSL handshake */
+                    SslStream sslstream = new SslStream(httpstream);
+                    sslstream.AuthenticateAsServer(m_ServerCertificate);
+                    httpstream = sslstream;
+                }
+
                 while (true)
                 {
                     HttpRequest req;
                     try
                     {
                         string remoteAddr = IPAddress.Parse(((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString()).ToString();
-                        req = new HttpRequest(client.GetStream(), remoteAddr, m_IsBehindProxy);
+                        req = new HttpRequest(httpstream, remoteAddr, m_IsBehindProxy);
                     }
                     catch (HttpResponse.ConnectionCloseException)
                     {
