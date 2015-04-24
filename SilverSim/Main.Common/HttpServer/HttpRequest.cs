@@ -56,6 +56,7 @@ namespace SilverSim.Main.Common.HttpServer
         public ConnectionModeEnum ConnectionMode { get; private set; }
         public HttpResponse Response { get; private set; }
         public string CallerIP { get; private set; }
+        public bool Expect100Continue { get; private set; }
 
         public bool IsChunkedAccepted
         {
@@ -269,10 +270,19 @@ namespace SilverSim.Main.Common.HttpServer
                 }
             }
 
-            if(ContainsHeader("Content-Length"))
+            Expect100Continue = false;
+            if (ContainsHeader("Expect"))
+            {
+                if(m_Headers["Expect"] == "100-continue")
+                {
+                    Expect100Continue = true;
+                }
+            }
+            
+            if (ContainsHeader("Content-Length"))
             {
                 /* there is a body */
-                RawBody = new HttpRequestBodyStream(m_HttpStream, long.Parse(m_Headers["Content-Length"]));
+                RawBody = new HttpRequestBodyStream(m_HttpStream, long.Parse(m_Headers["Content-Length"]), Expect100Continue);
                 Body = RawBody;
 
                 if(ContainsHeader("Transfer-Encoding"))
