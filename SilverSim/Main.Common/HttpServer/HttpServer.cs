@@ -53,11 +53,6 @@ namespace SilverSim.Main.Common.HttpServer
 
         public BaseHttpServer(IConfig httpConfig)
         {
-            if (!HttpListener.IsSupported)
-            {
-                m_Log.Fatal("HttpListener is not supported on this platform.");
-                return;
-            }
             Port = (uint)httpConfig.GetInt("HttpListenerPort", 9000);
             m_IsBehindProxy = httpConfig.GetBoolean("HasProxy", false);
             ExternalHostName = httpConfig.GetString("ExternalHostName", "SYSTEMIP");
