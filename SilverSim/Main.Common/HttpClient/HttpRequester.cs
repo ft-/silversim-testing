@@ -32,7 +32,7 @@ using System.Net;
 using System.Reflection;
 using System.Web;
 
-namespace SilverSim.HttpClient
+namespace SilverSim.Main.Common
 {
     public interface HttpResponseHandler
     {

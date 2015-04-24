@@ -26,7 +26,6 @@ exception statement from your version.
 using log4net;
 using Nini.Config;
 using SilverSim.BackendConnectors.Robust.Common;
-using SilverSim.HttpClient;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.Types;

@@ -14,6 +14,7 @@
 	<ReferencePath>../../bin/</ReferencePath>
 	<Reference name="System"/>
 	<Reference name="System.Xml"/>
+  <Reference name="System.Web"/>
 	<Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
 	<Reference name="Nini" path="../../bin/" localCopy="false"/>
 	<Reference name="log4net" path="../../bin/" localCopy="false"/>
