@@ -29,18 +29,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
+using System.Net.Sockets;
 using System.Reflection;
+using System.Text;
 using System.Web;
 
-namespace SilverSim.Main.Common
+namespace SilverSim.Main.Common.HttpClient
 {
-    public interface HttpResponseHandler
-    {
-        void OnData(Stream data);
-        void OnException(Exception e);
-    }
-
-    public static class HttpRequestHandler
+    public static partial class HttpRequestHandler
     {
         private static string BuildQueryString(IDictionary<string, string> parameters)
         {
@@ -60,6 +56,7 @@ namespace SilverSim.Main.Common
             return outStr;
         }
 
+        #region Synchronous calls
         /**********************************************************************/
         /* synchronous calls */
         public static Stream DoStreamGetRequest(string url, IDictionary<string, string> getValues, int timeoutms)
@@ -78,83 +75,6 @@ namespace SilverSim.Main.Common
         {
             string post = BuildQueryString(postValues);
             return DoStreamRequest("POST", url, getValues, "application/x-www-form-urlencoded", post, compressed, timeoutms);
-        }
-
-        /*---------------------------------------------------------------------*/
-        public static Stream DoStreamRequest(string method, string url, IDictionary<string, string> getValues, string content_type, string post, bool compressed, int timeoutms)
-        {
-            if (getValues != null)
-            {
-                url += "?" + BuildQueryString(getValues);
-            }
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = method;
-            request.ContentType = content_type;
-            request.Method = method;
-            request.Timeout = timeoutms;
-            request.MaximumAutomaticRedirections = 10;
-            request.ReadWriteTimeout = timeoutms / 4;
-
-            if (compressed && content_type != "application/x-gzip")
-            {
-                request.Headers["X-Content-Encoding"] = "gzip";
-            }
-
-            if (post != string.Empty)
-            {
-                byte[] buffer = System.Text.Encoding.UTF8.GetBytes(post);
-
-                if (compressed || content_type == "application/x-gzip")
-                {
-                    using (MemoryStream ms = new MemoryStream())
-                    {
-                        using (GZipStream comp = new GZipStream(ms, CompressionMode.Compress))
-                        {
-                            comp.Write(buffer, 0, buffer.Length);
-                            /* The GZIP stream has a CRC-32 and a EOF marker, so we close it first to have it completed */
-                        }
-                        buffer = ms.ToArray();
-                    }
-                }
-
-                /* append request POST data */
-                request.ContentLength = buffer.Length;
-                using (Stream requestStream = request.GetRequestStream())
-                    requestStream.Write(buffer, 0, buffer.Length);
-            }
-
-            return request.GetResponse().GetResponseStream();
-        }
-
-        /*---------------------------------------------------------------------*/
-        public delegate void StreamPostDelegate(Stream output);
-        public static Stream DoStreamRequest(string method, string url, IDictionary<string, string> getValues, string content_type, int content_length, StreamPostDelegate postdelegate, bool compressed, int timeoutms)
-        {
-            if (getValues != null)
-            {
-                url += "?" + BuildQueryString(getValues);
-            }
-
-            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-            request.Method = method;
-            request.ContentType = content_type;
-            request.Method = method;
-            request.Timeout = timeoutms;
-            request.MaximumAutomaticRedirections = 10;
-            request.ReadWriteTimeout = timeoutms / 4;
-
-            if (compressed && content_type != "application/x-gzip")
-            {
-                request.Headers["X-Content-Encoding"] = "gzip";
-            }
-
-            /* append request POST data */
-            request.ContentLength = content_length;
-            using (Stream requestStream = request.GetRequestStream())
-                postdelegate(requestStream);
-
-            return request.GetResponse().GetResponseStream();
         }
 
         /**********************************************************************/
@@ -200,5 +120,7 @@ namespace SilverSim.Main.Common
                 }
             }
         }
+
+        #endregion
     }
 }

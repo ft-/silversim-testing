@@ -24,7 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.BackendConnectors.Robust.Common;
-using SilverSim.Main.Common;
+using SilverSim.Main.Common.HttpClient;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;

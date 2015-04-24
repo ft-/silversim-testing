@@ -24,7 +24,7 @@ exception statement from your version.
 */
 
 using Nwc.XmlRpc;
-using SilverSim.Main.Common;
+using SilverSim.Main.Common.HttpClient;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
 using SilverSim.Types.IM;

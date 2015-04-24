@@ -27,6 +27,7 @@ using log4net;
 using Nini.Config;
 using SilverSim.BackendConnectors.Robust.Common;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.HttpClient;
 using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.Types;
 using System;

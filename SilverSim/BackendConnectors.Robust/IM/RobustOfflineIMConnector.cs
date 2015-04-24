@@ -27,6 +27,7 @@ using log4net;
 using Nini.Config;
 using SilverSim.BackendConnectors.Robust.Common;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.HttpClient;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
 using SilverSim.Types.IM;
