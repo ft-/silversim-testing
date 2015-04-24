@@ -271,7 +271,8 @@ namespace SilverSim.Main.Common.HttpClient
             if (headers.TryGetValue("Content-Encoding", out value) || headers.TryGetValue("X-Content-Encoding", out value))
             {
                 /* Content-Encoding */
-                if (value == "gzip")
+                /* x-gzip is deprecated but better feel safe about having that */
+                if (value == "gzip" || value == "x-gzip")
                 {
                     compressedresult = true;
                 }

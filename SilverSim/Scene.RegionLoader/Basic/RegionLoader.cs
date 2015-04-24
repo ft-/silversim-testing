@@ -23,24 +23,18 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+using log4net;
+using Nini.Config;
 using SilverSim.Main.Common;
-using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.Types.Grid;
-using SilverSim.Types;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
 using SilverSim.Scene.ServiceInterfaces.Scene;
-using Nini.Config;
-using System.Web;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Grid;
+using SilverSim.Types;
+using SilverSim.Types.Grid;
+using System;
 using System.Xml;
-using System.Net;
-using log4net;
-using System.Reflection;
 
 namespace SilverSim.Scene.RegionLoader.Basic
 {
