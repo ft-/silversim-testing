@@ -24,7 +24,6 @@ case "$1" in
 
   *)
 
-    mono bin/Prebuild.exe /target nant
     mono bin/Prebuild.exe /target vs2010
 
   ;;

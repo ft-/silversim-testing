@@ -1,6 +1,5 @@
 @echo OFF
 
-bin\Prebuild.exe /target nant
 bin\Prebuild.exe /target vs2010
 
 setlocal ENABLEEXTENSIONS
