@@ -33,7 +33,7 @@ namespace SilverSim.ServiceInterfaces.Asset
 {
     public abstract class AssetReferencesServiceInterface
     {
-        #region Metadata accessors
+        #region References accessors
         public abstract List<UUID> this[UUID key]
         {
             get;
