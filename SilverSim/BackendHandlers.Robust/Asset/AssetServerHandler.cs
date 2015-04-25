@@ -197,20 +197,21 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                 {
                     flags = "Normal";
                 }
-                string assetbase_footer = String.Format(
-                    "<FullID><Guid>{0}</Guid></FullID><ID>{0}</ID><Name>{1}</Name><Description>{2}</Description><Type>{3}</Type><Local>{4}</Local><Temporary>{5}</Temporary><CreatorID>{6}</CreatorID><Flags>{7}</Flags></AssetBase>",
-                    data.ID.ToString(),
-                    System.Xml.XmlConvert.EncodeName(data.Name),
-                    "",
-                    (int)data.Type,
-                    data.Local.ToString(),
-                    data.Temporary.ToString(),
-                    data.Creator.ToString(),
-                    flags);
+                string assetbase_footer = string.Empty;
+
                 if (data.Data.Length != 0)
                 {
                     assetbase_footer = "</Data>" + assetbase_footer;
                 }
+                assetbase_footer += String.Format(
+                     "<FullID><Guid>{0}</Guid></FullID><ID>{0}</ID><Name>{1}</Name><Description/><Type>{2}</Type><Local>{3}</Local><Temporary>{4}</Temporary><CreatorID>{5}</CreatorID><Flags>{6}</Flags></AssetBase>",
+                     data.ID.ToString(),
+                     data.Name.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;"),
+                     (int)data.Type,
+                     data.Local.ToString(),
+                     data.Temporary.ToString(),
+                     data.Creator.ToString(),
+                     flags);
 
                 byte[] header = UTF8NoBOM.GetBytes(assetbase_header);
                 byte[] footer = UTF8NoBOM.GetBytes(assetbase_footer);
@@ -296,10 +297,9 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     flags = "Normal";
                 }
                 string assetbase_footer = String.Format(
-                    "<FullID><Guid>{0}</Guid></FullID><ID>{0}</ID><Name>{1}</Name><Description>{2}</Description><Type>{3}</Type><Local>{4}</Local><Temporary>{5}</Temporary><CreatorID>{6}</CreatorID><Flags>{7}</Flags></AssetMetadata>",
+                    "<FullID><Guid>{0}</Guid></FullID><ID>{0}</ID><Name>{1}</Name><Description/><Type>{2}</Type><Local>{3}</Local><Temporary>{4}</Temporary><CreatorID>{5}</CreatorID><Flags>{6}</Flags></AssetMetadata>",
                     data.ID.ToString(),
-                    System.Xml.XmlConvert.EncodeName(data.Name),
-                    "",
+                    data.Name.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;"),
                     (int)data.Type,
                     data.Local.ToString(),
                     data.Temporary.ToString(),
@@ -387,7 +387,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
             {
                 data = AssetXml.parseAssetData(req.Body);
             }
-            catch(Exception e)
+            catch
             {
                 req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
@@ -395,7 +395,6 @@ namespace SilverSim.BackendHandlers.Robust.Asset
 
             if (data.Temporary || data.Local)
             {
-                data.Local = false;
                 if (null != m_TemporaryAssetService)
                 {
                     try
@@ -419,8 +418,6 @@ namespace SilverSim.BackendHandlers.Robust.Asset
 
             try
             {
-                data.Local = false;
-                data.Temporary = false;
                 m_PersistentAssetService.Store(data);
                 HttpResponse res = req.BeginResponse();
                 /* DO NOT USE using here, it will close the underlying stream */

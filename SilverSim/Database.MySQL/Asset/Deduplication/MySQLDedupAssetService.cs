@@ -80,8 +80,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                     {
                         if(dbReader.Read())
                         {
-                            DateTime d = Date.UnixTimeToDateTime((ulong)dbReader["access_time"]);
-                            if(d - DateTime.UtcNow > TimeSpan.FromHours(1))
+                            if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
                                 /* update access_time */
                                 using(MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
@@ -128,8 +127,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                         {
                             UUID id = new UUID((string)dbReader["id"]);
                             res[id] = true;
-                            DateTime d = Date.UnixTimeToDateTime((ulong)dbReader["access_time"]);
-                            if (d - DateTime.UtcNow > TimeSpan.FromHours(1))
+                            if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
                                 /* update access_time */
                                 using (MySqlConnection uconn = new MySqlConnection(m_ConnectionString))

@@ -26,11 +26,10 @@ exception statement from your version.
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.CmdIO;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
 using System;
 using System.Collections.Generic;
-using SilverSim.Main.Common.CmdIO;
-using SilverSim.Main.Common.Console;
 using System.Threading;
 
 namespace SilverSim.Tests.Extensions
@@ -40,7 +39,7 @@ namespace SilverSim.Tests.Extensions
     {
         private static readonly ILog m_Log = LogManager.GetLogger("TEST RUNNER");
         List<ITest> m_Tests = new List<ITest>();
-        LocalConsole m_Console;
+        TTY m_Console;
 
         public TestRunner()
         {
@@ -49,7 +48,7 @@ namespace SilverSim.Tests.Extensions
 
         public void Startup(ConfigurationLoader loader)
         {
-            m_Console = loader.GetServicesByValue<LocalConsole>()[0];
+            m_Console = loader.GetServicesByValue<TTY>()[0];
             if(loader.GetServicesByValue<TestRunner>().Count != 1)
             {
                 throw new Exception("Too many TestRunner instances");

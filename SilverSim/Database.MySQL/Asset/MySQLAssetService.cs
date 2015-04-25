@@ -74,8 +74,7 @@ namespace SilverSim.Database.MySQL.Asset
                     {
                         if(dbReader.Read())
                         {
-                            DateTime d = Date.UnixTimeToDateTime((ulong)dbReader["access_time"]);
-                            if(d - DateTime.UtcNow > TimeSpan.FromHours(1))
+                            if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
                                 /* update access_time */
                                 using(MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
@@ -122,8 +121,7 @@ namespace SilverSim.Database.MySQL.Asset
                         {
                             UUID id = new UUID((string)dbReader["id"]);
                             res[id] = true;
-                            DateTime d = Date.UnixTimeToDateTime((ulong)dbReader["access_time"]);
-                            if (d - DateTime.UtcNow > TimeSpan.FromHours(1))
+                            if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
                                 /* update access_time */
                                 using (MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
@@ -173,8 +171,7 @@ namespace SilverSim.Database.MySQL.Asset
                                 asset.Flags = dbReader.GetAssetFlags("asset_flags");
                                 asset.Temporary = dbReader.GetBoolean("temporary");
 
-                                DateTime d = Date.UnixTimeToDateTime(ulong.Parse(dbReader["access_time"].ToString()));
-                                if (d - DateTime.UtcNow > TimeSpan.FromHours(1))
+                                if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
                                 {
                                     /* update access_time */
                                     using (MySqlConnection uconn = new MySqlConnection(m_ConnectionString))

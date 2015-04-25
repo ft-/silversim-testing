@@ -771,6 +771,10 @@ namespace SilverSim.Main.Common
             {
                 PluginInstances.Add("LocalConsole", new Console.LocalConsole());
             }
+            else if (null == consoleConfig || consoleConfig.GetBoolean("EnableLogConsole", false) && localConsoleControl == LocalConsole.Allowed)
+            {
+                PluginInstances.Add("LogConsole", new Console.LogConsole());
+            }
 
             m_Log.InfoFormat("Product: {0}", VersionInfo.ProductName);
             m_Log.InfoFormat("Version: {0}", VersionInfo.Version);

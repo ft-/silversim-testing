@@ -34,6 +34,7 @@ using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.IO.Compression;
 using System.Text;
 using System.Xml;
 
@@ -348,28 +349,56 @@ namespace SilverSim.BackendConnectors.Robust.Asset
 
             byte[] header = UTF8NoBOM.GetBytes(assetbase_header);
             byte[] footer = UTF8NoBOM.GetBytes(assetbase_footer);
-            int base64_codegroups = (asset.Data.Length + 2) / 3;
-            HttpRequestHandler.DoRequest("POST", m_AssetURI + "assets", 
-                null, "text/xml", 4 * base64_codegroups + header.Length + footer.Length, delegate(Stream st)
+            if (m_EnableCompression)
             {
-                /* Stream based asset conversion method here */
-                st.Write(header, 0, header.Length);
-                int pos = 0;
-                while (asset.Data.Length - pos >= MAX_ASSET_BASE64_CONVERSION_SIZE)
+                byte[] compressedAsset;
+                using (MemoryStream ms = new MemoryStream())
                 {
-                    string b = Convert.ToBase64String(asset.Data, pos, MAX_ASSET_BASE64_CONVERSION_SIZE);
-                    byte[] block = UTF8NoBOM.GetBytes(b);
-                    st.Write(block, 0, block.Length);
-                    pos += MAX_ASSET_BASE64_CONVERSION_SIZE;
+                    using (GZipStream gz = new GZipStream(ms, CompressionMode.Compress))
+                    {
+                        gz.Write(header, 0, header.Length);
+                        WriteAssetDataAsBase64(gz, asset);
+                        gz.Write(footer, 0, footer.Length);
+                    }
+                    compressedAsset = ms.GetBuffer();
                 }
-                if(asset.Data.Length > pos)
+                HttpRequestHandler.DoRequest("POST", m_AssetURI + "assets",
+                    null, "text/xml", compressedAsset.Length, delegate(Stream st)
+                    {
+                        /* Stream based asset conversion method here */
+                        st.Write(compressedAsset, 0, compressedAsset.Length);
+                    }, m_EnableCompression, TimeoutMs);
+            }
+            else
+            {
+                int base64_codegroups = (asset.Data.Length + 2) / 3;
+                HttpRequestHandler.DoRequest("POST", m_AssetURI + "assets",
+                    null, "text/xml", 4 * base64_codegroups + header.Length + footer.Length, delegate(Stream st)
                 {
-                    string b = Convert.ToBase64String(asset.Data, pos, asset.Data.Length - pos);
-                    byte[] block = UTF8NoBOM.GetBytes(b);
-                    st.Write(block, 0, block.Length);
-                }
-                st.Write(footer, 0, footer.Length);
-            }, m_EnableCompression, TimeoutMs);
+                    /* Stream based asset conversion method here */
+                    st.Write(header, 0, header.Length);
+                    WriteAssetDataAsBase64(st, asset);
+                    st.Write(footer, 0, footer.Length);
+                }, m_EnableCompression, TimeoutMs);
+            }
+        }
+
+        void WriteAssetDataAsBase64(Stream st, AssetData asset)
+        {
+            int pos = 0;
+            while (asset.Data.Length - pos >= MAX_ASSET_BASE64_CONVERSION_SIZE)
+            {
+                string b = Convert.ToBase64String(asset.Data, pos, MAX_ASSET_BASE64_CONVERSION_SIZE);
+                byte[] block = UTF8NoBOM.GetBytes(b);
+                st.Write(block, 0, block.Length);
+                pos += MAX_ASSET_BASE64_CONVERSION_SIZE;
+            }
+            if (asset.Data.Length > pos)
+            {
+                string b = Convert.ToBase64String(asset.Data, pos, asset.Data.Length - pos);
+                byte[] block = UTF8NoBOM.GetBytes(b);
+                st.Write(block, 0, block.Length);
+            }
         }
         #endregion
 

@@ -95,6 +95,30 @@ namespace SilverSim.Tests.Assets
             byte[] nopdata = new byte[1];
             Stream assetstream;
 
+            #region testing exists function
+            m_Log.Info("Testing non-existence of Asset 1");
+            try
+            {
+                m_AssetService.exists(Asset1ID);
+                m_Log.Fatal("Failed to detect non-existence of asset 1");
+                return false;
+            }
+            catch
+            {
+            }
+
+            m_Log.Info("Testing non-existence of Asset 2");
+            try
+            {
+                m_AssetService.exists(Asset2ID);
+                m_Log.Fatal("Failed to detect non-existence of asset 2");
+                return false;
+            }
+            catch
+            {
+            }
+            #endregion
+
             UUI theCreator1 = new UUI();
             theCreator1.ID = UUID.Random;
             theCreator1.HomeURI = new Uri("http://1.example.com/");
@@ -126,6 +150,30 @@ namespace SilverSim.Tests.Assets
             asset.Temporary = true;
             asset.Flags = AssetFlags.Collectable;
             m_AssetService.Store(asset);
+
+            #region testing exists function
+            m_Log.Info("Testing existence of Asset 1");
+            try
+            {
+                m_AssetService.exists(Asset1ID);
+            }
+            catch(Exception e)
+            {
+                m_Log.Fatal("Failed to detect existence of asset 1");
+                return false;
+            }
+
+            m_Log.Info("Testing existence of Asset 2");
+            try
+            {
+                m_AssetService.exists(Asset2ID);
+            }
+            catch
+            {
+                m_Log.Fatal("Failed to detect existence of asset 2");
+                return false;
+            }
+            #endregion
 
             #region Asset1 Access Test
             m_Log.Info("Testing stored asset 1");
