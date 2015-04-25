@@ -438,58 +438,59 @@ namespace SilverSim.Types.Asset.Format
 
         #region Operators
         private static readonly string ItemFormatString =
-                "{\n"+
+                "{{\n"+
                 "ext char index {0}\n" +
                 "\tinv_item\t0\n" +
-                "\t{\n" +
+                "\t{{\n" +
                 "\t\titem_id\t{1}\n" +
                 "\t\tparent_id\t{2}\n" +
                 "\t\tpermissions 0\n" +
-                "\t\t{\n" +
-                "\t\t\tbase_mask\t{3:x08}\n" +
-                "\t\t\towner_mask\t{4:x08}\n" +
-                "\t\t\tgroup_mask\t{5:x08}\n" +
-                "\t\t\teveryone_mask\t{6:x08}\n" +
-                "\t\t\tnext_owner_mask\t{7:x08}\n" +
+                "\t\t{{\n" +
+                "\t\t\tbase_mask\t{3:x8}\n" +
+                "\t\t\towner_mask\t{4:x8}\n" +
+                "\t\t\tgroup_mask\t{5:x8}\n" +
+                "\t\t\teveryone_mask\t{6:x8}\n" +
+                "\t\t\tnext_owner_mask\t{7:x8}\n" +
                 "\t\t\tcreator_id\t{8}\n" +
                 "\t\t\towner_id\t{9}\n" +
                 "\t\t\tlast_owner_id\t{10}\n" +
                 "\t\t\tgroup_id\t{11}\n" +
-                "\t\t}\n" +
+                "\t\t}}\n" +
                 "\t\tasset_id\t{12}\n" +
                 "\t\ttype\t{13}\n" +
                 "\t\tinv_type\t{14}\n" +
-                "\t\tflags\t{15:x08}\n" +
+                "\t\tflags\t{15:x8}\n" +
                 "\t\tsale_info 0\n" +
-                "\t\t{\n" +
+                "\t\t{{\n" +
                 "\t\t\tsale_type\t{16}\n" +
                 "\t\t\tsale_price\t{17}\n" +
-                "\t\t}\n" +
+                "\t\t}}\n" +
                 "\t\tname\t{18}|\n" +
                 "\t\tdesc\t{19}|\n" +
-                "\t\tcreation_date\t{20\\n" +
-                "\t}\n" +
-                "}\n";
+                "\t\tcreation_date\t{20}\n" +
+                "\t}}\n" +
+                "}}\n";
 
         private static string ItemToString(NotecardInventoryItem item)
         {
             return string.Format(ItemFormatString,
                 item.ExtCharIndex,
                 item.ID, item.ParentFolderID,
-                item.Permissions.Base,
-                item.Permissions.Current,
-                item.Permissions.Group,
-                item.Permissions.EveryOne,
-                item.Permissions.NextOwner,
+                (uint)item.Permissions.Base,
+                (uint)item.Permissions.Current,
+                (uint)item.Permissions.Group,
+                (uint)item.Permissions.EveryOne,
+                (uint)item.Permissions.NextOwner,
                 item.Creator.ID,
                 item.Owner.ID,
                 item.LastOwner.ID,
+                item.Group.ID,
                 item.AssetID,
                 item.AssetTypeName,
                 item.InventoryTypeName,
                 item.Flags,
-                item.SaleInfo.Price,
                 item.SaleInfo.TypeName,
+                item.SaleInfo.Price,
                 item.Name,
                 item.Description,
                 item.CreationDate.AsULong
@@ -507,7 +508,7 @@ namespace SilverSim.Types.Asset.Format
             NotecardInventory inventory = v.Inventory;
             if(inventory != null)
             {
-                notecard += String.Format("LLEmbeddedItems\n{\ncount {0}\n", v.Inventory.Count);
+                notecard += String.Format("LLEmbeddedItems\n{{\ncount {0}\n", v.Inventory.Count);
 
                 foreach(NotecardInventoryItem item in inventory.Values)
                 {

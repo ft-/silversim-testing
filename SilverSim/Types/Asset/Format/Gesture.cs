@@ -72,20 +72,11 @@ namespace SilverSim.Types.Asset.Format
 
             }
 
-            public StepAnimation(List<string>.Enumerator e)
+            public StepAnimation(string name, UUID assetID, bool animStart)
             {
-                if (e.MoveNext())
-                {
-                    Name = e.Current;
-                }
-                if(e.MoveNext())
-                {
-                    AssetID = UUID.Parse(e.Current);
-                }
-                if(e.MoveNext())
-                {
-                    AnimationStart = int.Parse(e.Current) != 0;
-                }
+                Name = name;
+                AssetID = assetID;
+                AnimationStart = animStart;
             }
         }
 
@@ -113,17 +104,10 @@ namespace SilverSim.Types.Asset.Format
 
             }
 
-            public StepSound(List<string>.Enumerator e)
+            public StepSound(string name, UUID assetID)
             {
-                if (e.MoveNext())
-                {
-                    Name = e.Current;
-                }
-                if(e.MoveNext())
-                {
-                    AssetID = UUID.Parse(e.Current);
-                }
-                e.MoveNext();
+                Name = name;
+                AssetID = assetID;
             }
         }
 
@@ -150,13 +134,9 @@ namespace SilverSim.Types.Asset.Format
 
             }
 
-            public StepChat(List<string>.Enumerator e)
+            public StepChat(string text)
             {
-                if (e.MoveNext())
-                {
-                    Text = e.Current;
-                }
-                e.MoveNext();
+                Text = text;
             }
         }
 
@@ -186,7 +166,7 @@ namespace SilverSim.Types.Asset.Format
                 {
                     waitFlags |= 0x02;
                 }
-                return string.Format("{0}\n{1:0.000000}\n{2}\n",
+                return string.Format(CultureInfo.InvariantCulture, "{0}\n{1:0.000000}\n{2}\n",
                     (int)Type, WaitTime, waitFlags);
             }
 
@@ -195,18 +175,11 @@ namespace SilverSim.Types.Asset.Format
 
             }
 
-            public StepWait(List<string>.Enumerator e)
+            public StepWait(float waitTime, bool waitForAnim, bool waitForTime)
             {
-                if (e.MoveNext())
-                {
-                    WaitTime = float.Parse(e.Current, CultureInfo.InvariantCulture);
-                }
-                if(e.MoveNext())
-                {
-                    int flags = int.Parse(e.Current);
-                    WaitForTime = (flags & 0x01) != 0;
-                    WaitForAnimation = (flags & 0x02) != 0;
-                }
+                WaitTime = waitTime;
+                WaitForAnimation = waitForAnim;
+                WaitForTime = waitForTime;
             }
         }
 
@@ -249,7 +222,7 @@ namespace SilverSim.Types.Asset.Format
 
         public Gesture(AssetData asset)
         {
-            string input = Encoding.UTF8.GetString(asset.Data);
+            string input = UTF8NoBOM.GetString(asset.Data);
             input = input.Replace('\t', ' ');
             List<string> lines = new List<string>(input.Split('\n'));
             List<string>.Enumerator e = lines.GetEnumerator();
@@ -313,19 +286,66 @@ namespace SilverSim.Types.Asset.Format
                         return;
 
                     case StepType.Animation:
-                        Sequence.Add(new StepAnimation(e));
+                        {
+                            StepAnimation step = new StepAnimation();
+                            if (e.MoveNext())
+                            {
+                                step.Name = e.Current;
+                            }
+                            if (e.MoveNext())
+                            {
+                                step.AssetID = UUID.Parse(e.Current);
+                            }
+                            if (e.MoveNext())
+                            {
+                                step.AnimationStart = int.Parse(e.Current) != 0;
+                            }
+                            Sequence.Add(step);
+                        }
                         break;
 
                     case StepType.Sound:
-                        Sequence.Add(new StepSound(e));
+                        {
+                            StepSound step = new StepSound();
+                            if (e.MoveNext())
+                            {
+                                step.Name = e.Current;
+                            }
+                            if (e.MoveNext())
+                            {
+                                step.AssetID = UUID.Parse(e.Current);
+                            }
+                            Sequence.Add(step);
+                        }
                         break;
 
                     case StepType.Chat:
-                        Sequence.Add(new StepChat(e));
+                        {
+                            StepChat step = new StepChat();
+                            if (e.MoveNext())
+                            {
+                                step.Text = e.Current;
+                            }
+                            e.MoveNext();
+                            Sequence.Add(step);
+                        }
                         break;
 
                     case StepType.Wait:
-                        Sequence.Add(new StepWait(e));
+                        {
+                            StepWait step = new StepWait();
+                            if (e.MoveNext())
+                            {
+                                step.WaitTime = float.Parse(e.Current, CultureInfo.InvariantCulture);
+                            }
+                            if (e.MoveNext())
+                            {
+                                int flags = int.Parse(e.Current);
+                                step.WaitForTime = (flags & 0x01) != 0;
+                                step.WaitForAnimation = (flags & 0x02) != 0;
+                            }
+                            Sequence.Add(step);
+                        }
                         break;
 
                     default:
@@ -385,6 +405,7 @@ namespace SilverSim.Types.Asset.Format
             if(v.Sequence != null)
             {
                 count = v.Sequence.Count;
+                sb.Append(count + "\n");
             }
 
             for (int i = 0; i < count; ++i)
@@ -392,12 +413,14 @@ namespace SilverSim.Types.Asset.Format
                 Step s = v.Sequence[i];
                 sb.Append(s.Serialize());
             }
-            
-            asset.Data = Encoding.UTF8.GetBytes(sb.ToString());
+
+            asset.Data = UTF8NoBOM.GetBytes(sb.ToString());
             asset.Type = AssetType.Gesture;
             asset.Name = "Gesture";
             return asset;
         }
+
+        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
         #endregion
     }
 }
