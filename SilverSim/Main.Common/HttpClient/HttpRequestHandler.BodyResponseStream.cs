@@ -208,6 +208,11 @@ namespace SilverSim.Main.Common.HttpClient
             public override int Read(byte[] buffer, int offset, int count)
             {
                 int rescount = 0;
+                if(m_RemainingLength == 0 || m_Input == null)
+                {
+                    return 0;
+                }
+
                 while (count > 0)
                 {
                     if (count > m_RemainingLength)

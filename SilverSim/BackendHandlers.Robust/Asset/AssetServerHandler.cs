@@ -387,7 +387,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
             {
                 data = AssetXml.parseAssetData(req.Body);
             }
-            catch
+            catch(Exception e)
             {
                 req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;

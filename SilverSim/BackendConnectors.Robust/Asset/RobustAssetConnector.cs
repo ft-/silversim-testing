@@ -330,24 +330,26 @@ namespace SilverSim.BackendConnectors.Robust.Asset
             {
                 flags = "Normal";
             }
-            string assetbase_footer = String.Format(
-                "</Data><FullID><Guid>{0}</Guid></FullID><ID>{0}</ID><Name>{1}</Name><Description>{2}</Description><Type>{3}</Type><Local>{4}</Local><Temporary>{5}</Temporary><CreatorID>{6}</CreatorID><Flags>{7}</Flags></AssetBase>",
+            string assetbase_footer = string.Empty;
+
+            if (asset.Data.Length != 0)
+            {
+                assetbase_footer += "</Data>";
+            }
+            assetbase_footer += String.Format(
+                "<FullID><Guid>{0}</Guid></FullID><ID>{0}</ID><Name>{1}</Name><Description/><Type>{2}</Type><Local>{3}</Local><Temporary>{4}</Temporary><CreatorID>{5}</CreatorID><Flags>{6}</Flags></AssetBase>",
                 asset.ID.ToString(),
-                System.Xml.XmlConvert.EncodeName(asset.Name),
-                "",
+                asset.Name.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;"),
                 (int)asset.Type,
                 asset.Local.ToString(),
                 asset.Temporary.ToString(),
                 asset.Creator.ToString(),
                 flags);
-            if (asset.Data.Length != 0)
-            {
-                assetbase_footer = "</Data>" + assetbase_footer;
-            }
+
             byte[] header = UTF8NoBOM.GetBytes(assetbase_header);
             byte[] footer = UTF8NoBOM.GetBytes(assetbase_footer);
             int base64_codegroups = (asset.Data.Length + 2) / 3;
-            HttpRequestHandler.DoRequest("POST", m_AssetURI, 
+            HttpRequestHandler.DoRequest("POST", m_AssetURI + "assets", 
                 null, "text/xml", 4 * base64_codegroups + header.Length + footer.Length, delegate(Stream st)
             {
                 /* Stream based asset conversion method here */
