@@ -124,7 +124,7 @@ namespace SilverSim.Types.Asset.Format
                         }
                     }
                 }
-                else if(para[0] == "permissions")
+                else if(para.Length == 2 && para[0] == "permissions")
                 {
                     if(lines[++idx].Trim() != "{")
                     {
@@ -183,7 +183,7 @@ namespace SilverSim.Types.Asset.Format
                         }
                     }
                 }
-                else if(para[0] == "sale_info")
+                else if (para.Length == 2 && para[0] == "sale_info")
                 {
                     if (lines[++idx].Trim() != "{")
                     {
@@ -243,22 +243,22 @@ namespace SilverSim.Types.Asset.Format
         #region Operators
         private static readonly string WearableFormat =
                 "permissions 0\n" +
-                "{\n" +
-                "\tbase_mask\t{0:x08}\n" +
-                "\towner_mask\t{1:x08}\n" +
-                "\tgroup_mask\t{2:x08}\n" +
-                "\teveryone_mask\t{3:x08}\n" +
-                "\tnext_owner_mask\t{4:x08}\n" +
+                "{{\n" +
+                "\tbase_mask\t{0:x8}\n" +
+                "\towner_mask\t{1:x8}\n" +
+                "\tgroup_mask\t{2:x8}\n" +
+                "\teveryone_mask\t{3:x8}\n" +
+                "\tnext_owner_mask\t{4:x8}\n" +
                 "\tcreator_id\t{5}\n" +
                 "\towner_id\t{6}\n" +
                 "\tlast_owner_id\t{7}\n" +
                 "\tgroup_id\t{8}\n" +
-                "}\n" +
+                "}}\n" +
                 "sale_info 0\n"+
-                "{\n" +
+                "{{\n" +
                 "\tsale_type\t{9}\n" +
                 "\tsale_price\t{10}\n" +
-                "}\n" +
+                "}}\n" +
                 "type\t{11}\n";
 
         public byte[] WearableData
@@ -269,11 +269,11 @@ namespace SilverSim.Types.Asset.Format
                 fmt += Name + "\n";
                 fmt += Description + "\n";
                 fmt += String.Format(WearableFormat,
-                    Permissions.Base,
-                    Permissions.Current,
-                    Permissions.Group,
-                    Permissions.EveryOne,
-                    Permissions.NextOwner,
+                    (uint)Permissions.Base,
+                    (uint)Permissions.Current,
+                    (uint)Permissions.Group,
+                    (uint)Permissions.EveryOne,
+                    (uint)Permissions.NextOwner,
                     Creator.ID,
                     Owner.ID,
                     LastOwner.ID,
