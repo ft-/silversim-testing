@@ -185,45 +185,46 @@ namespace SilverSim.Types.Asset.Format
                 }
 
                 string[] data = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
-                if(data[0] == "base_mask")
-                {
+                switch(data[0])
+                { 
+                    case "base_mask":
                         item.Permissions.Base = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
-                }
-                else if(data[0] == "owner_mask")
-                {
-                    item.Permissions.Current = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
-                }
-                else if(data[0] == "group_mask")
-                {
-                    item.Permissions.Group = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
-                }
-                else if(data[0] == "everyone_mask")
-                {
-                    item.Permissions.EveryOne = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
-                }
-                else if(data[0] == "next_owner_mask")
-                {
-                    item.Permissions.NextOwner = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
-                }
-                else if(data[0] == "creator_id")
-                {
-                    item.Creator.ID = data[1];
-                }
-                else if(data[0] == "owner_id")
-                {
-                    item.Owner.ID = data[1];
-                }
-                else if(data[0] == "last_owner_id")
-                {
-                    item.LastOwner.ID = data[1];
-                }
-                else if(data[0] == "group_id")
-                {
-                    item.Group.ID = data[1];
-                }
-                else
-                {
-                    throw new NotANotecardFormat();
+                        break;
+                
+                    case "owner_mask":
+                        item.Permissions.Current = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                        break;
+
+                    case "group_mask":
+                        item.Permissions.Group = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                        break;
+
+                    case "everyone_mask":
+                        item.Permissions.EveryOne = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                        break;
+    
+                    case "next_owner_mask":
+                        item.Permissions.NextOwner = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                        break;
+
+                    case "creator_id":
+                        item.Creator.ID = data[1];
+                        break;
+
+                    case "owner_id":
+                        item.Owner.ID = data[1];
+                        break;
+
+                    case "last_owner_id":
+                        item.LastOwner.ID = data[1];
+                        break;
+
+                    case "group_id":
+                        item.Group.ID = data[1];
+                        break;
+
+                    default:
+                        throw new NotANotecardFormat();
                 }
             }
         }
@@ -243,21 +244,22 @@ namespace SilverSim.Types.Asset.Format
                 }
 
                 string[] data = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
-                if(data[0] == "sale_type")
+                switch(data[0])
                 {
-                    item.SaleInfo.TypeName = data[1];
-                }
-                else if(data[0] == "sale_price")
-                {
-                    item.SaleInfo.Price = int.Parse(data[1]);
-                }
-                else if(data[0] == "perm_mask")
-                {
-                    item.SaleInfo.PermMask = (InventoryPermissionsMask)uint.Parse(data[1]);
-                }
-                else
-                {
-                    throw new NotANotecardFormat();
+                    case "sale_type":
+                        item.SaleInfo.TypeName = data[1];
+                        break;
+                
+                    case "sale_price":
+                        item.SaleInfo.Price = int.Parse(data[1]);
+                        break;
+                
+                    case "perm_mask":
+                        item.SaleInfo.PermMask = (InventoryPermissionsMask)uint.Parse(data[1]);
+                        break;
+
+                    default:
+                        throw new NotANotecardFormat();
                 }
             }
         }
