@@ -32,6 +32,7 @@ using Nini.Config;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using SilverSim.Types.Asset;
 
 namespace SilverSim.Database.MySQL
 {
@@ -395,6 +396,16 @@ namespace SilverSim.Database.MySQL
         #endregion
 
         #region Data parsers
+        public static AssetFlags GetAssetFlags(this MySqlDataReader dbreader, string prefix)
+        {
+            uint assetFlags;
+            if(!uint.TryParse(dbreader[prefix].ToString(), out assetFlags))
+            {
+                assetFlags = 0;
+            }
+            return (AssetFlags)assetFlags;
+        }
+
         public static UUID GetUUID(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];

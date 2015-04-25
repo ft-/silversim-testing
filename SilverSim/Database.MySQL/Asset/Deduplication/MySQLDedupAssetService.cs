@@ -173,13 +173,11 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                 asset.Data = (byte[])dbReader["data"];
                                 asset.Type = (AssetType)(int)dbReader["assetType"];
                                 asset.Name = (string)dbReader["name"];
-                                asset.Description = (string)dbReader["description"];
                                 asset.CreateTime = dbReader.GetDate("create_time");
                                 asset.AccessTime = dbReader.GetDate("access_time");
                                 asset.Creator.ID = dbReader.GetUUID("CreatorID");
-                                uint.TryParse(dbReader["asset_flags"].ToString(), out asset.Flags);
-                                Boolean.TryParse(dbReader["temporary"].ToString(), out asset.Temporary);
-                                Boolean.TryParse(dbReader["local"].ToString(), out asset.Local);
+                                asset.Flags = dbReader.GetAssetFlags("asset_flags");
+                                asset.Temporary = dbReader.GetBoolean("temporary");
 
                                 if (asset.AccessTime - DateTime.UtcNow > TimeSpan.FromHours(1))
                                 {
@@ -278,8 +276,8 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 
                     using (MySqlCommand cmd =
                         new MySqlCommand(
-                            "INSERT INTO assetrefs (id, name, description, assetType, local, temporary, create_time, access_time, asset_flags, CreatorID, hash)" +
-                            "VALUES(?id, ?name, ?description, ?assetType, ?local, ?temporary, ?create_time, ?access_time, ?asset_flags, ?CreatorID, ?hash)",
+                            "INSERT INTO assetrefs (id, name, assetType, temporary, create_time, access_time, asset_flags, CreatorID, hash)" +
+                            "VALUES(?id, ?name, ?assetType, ?temporary, ?create_time, ?access_time, ?asset_flags, ?CreatorID, ?hash)",
                             conn))
                     {
                         string assetName = asset.Name;
@@ -290,14 +288,6 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                 asset.Name, asset.ID, asset.Name.Length, assetName.Length);
                         }
 
-                        string assetDescription = asset.Description;
-                        if (asset.Description.Length > MAX_ASSET_DESC)
-                        {
-                            assetDescription = asset.Description.Substring(0, MAX_ASSET_DESC);
-                            m_Log.WarnFormat("Description '{0}' for asset {1} truncated from {2} to {3} characters on add",
-                                asset.Description, asset.ID, asset.Description.Length, assetDescription.Length);
-                        }
-
                         try
                         {
                             using (cmd)
@@ -306,14 +296,12 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                 ulong now = Date.GetUnixTime();
                                 cmd.Parameters.AddWithValue("?id", asset.ID);
                                 cmd.Parameters.AddWithValue("?name", assetName);
-                                cmd.Parameters.AddWithValue("?description", assetDescription);
                                 cmd.Parameters.AddWithValue("?assetType", (int)asset.Type);
-                                cmd.Parameters.AddWithValue("?local", asset.Local);
                                 cmd.Parameters.AddWithValue("?temporary", asset.Temporary);
                                 cmd.Parameters.AddWithValue("?create_time", now);
                                 cmd.Parameters.AddWithValue("?access_time", now);
                                 cmd.Parameters.AddWithValue("?CreatorID", asset.Creator.ID);
-                                cmd.Parameters.AddWithValue("?asset_flags", (int)asset.Flags);
+                                cmd.Parameters.AddWithValue("?asset_flags", (uint)asset.Flags);
                                 cmd.Parameters.AddWithValue("?hash", sha1data);
                                 if (1 > cmd.ExecuteNonQuery())
                                 {
@@ -396,9 +384,7 @@ id, name, description, assetType, local, temporary, create_time, access_time, as
             "CREATE TABLE %tablename% (" +
                     "id CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                     "name VARCHAR(64) NOT NULL DEFAULT ''," +
-                    "description VARCHAR(128) NOT NULL DEFAULT ''," + 
                     "assetType INT(11) NOT NULL," + 
-                    "local INT(1) NOT NULL," + 
                     "temporary INT(1) NOT NULL," + 
                     "create_time BIGINT(20) NOT NULL," +
                     "access_time BIGINT(20) NOT NULL," +
@@ -410,8 +396,7 @@ id, name, description, assetType, local, temporary, create_time, access_time, as
         };
         #endregion
 
-        private static readonly int MAX_ASSET_NAME = 128;
-        private static readonly int MAX_ASSET_DESC = 255;
+        private static readonly int MAX_ASSET_NAME = 64;
     }
     #endregion
 

@@ -38,7 +38,7 @@ namespace SilverSim.BackendConnectors.IWC.Common
         {
             return new Map
             {
-                {"AssetFlags", data.Flags},
+                {"AssetFlags", (uint)data.Flags},
                 {"AssetID", data.ID},
                 {"CreationDate", data.CreateTime},
                 {"CreatorID", data.Creator.ID},
@@ -47,7 +47,7 @@ namespace SilverSim.BackendConnectors.IWC.Common
                 {"Name", data.Name},
                 {"ParentID", data.CreateTime},
                 {"TypeAsset", (int)data.Type},
-                {"Description", data.Description},
+                {"Description", ""},
             };
         }
 
@@ -56,7 +56,7 @@ namespace SilverSim.BackendConnectors.IWC.Common
             AssetData data = new AssetData();
             if (m.ContainsKey("AssetFlags"))
             {
-                data.Flags = m["AssetFlags"].AsUInt;
+                data.Flags = (AssetFlags)m["AssetFlags"].AsUInt;
             }
             if(m.ContainsKey("AssetID"))
             {
@@ -86,10 +86,6 @@ namespace SilverSim.BackendConnectors.IWC.Common
             {
                 data.Type = (AssetType)m["TypeAsset"].AsInt;
             }
-            if(m.ContainsKey("Description"))
-            {
-                data.Description = m["Description"].ToString();
-            }
             return data;
         }
 
@@ -98,7 +94,7 @@ namespace SilverSim.BackendConnectors.IWC.Common
             AssetMetadata data = new AssetMetadata();
             if (m.ContainsKey("AssetFlags"))
             {
-                data.Flags = m["AssetFlags"].AsUInt;
+                data.Flags = (AssetFlags)m["AssetFlags"].AsUInt;
             }
             if (m.ContainsKey("AssetID"))
             {
@@ -123,10 +119,6 @@ namespace SilverSim.BackendConnectors.IWC.Common
             if (m.ContainsKey("TypeAsset"))
             {
                 data.Type = (AssetType)m["TypeAsset"].AsInt;
-            }
-            if (m.ContainsKey("Description"))
-            {
-                data.Description = m["Description"].ToString();
             }
             return data;
         }

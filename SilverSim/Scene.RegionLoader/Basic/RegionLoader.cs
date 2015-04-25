@@ -73,6 +73,11 @@ namespace SilverSim.Scene.RegionLoader.Basic
         }
         #endregion
 
+        public void AllRegionsLoaded()
+        {
+
+        }
+
         public void LoadRegions()
         {
             if (!string.IsNullOrEmpty(m_RegionCfg))

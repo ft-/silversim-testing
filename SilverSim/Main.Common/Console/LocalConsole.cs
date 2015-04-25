@@ -51,6 +51,7 @@ namespace SilverSim.Main.Common.Console
             m_LogThread.Start();
             Log.LogController.Queues.Add(m_LogQueue);
             m_InputThread = new Thread(PromptThread);
+            m_InputThread.IsBackground = true;
             m_InputThread.Start();
         }
 

@@ -159,13 +159,9 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "Description":
-                                if (reader.IsEmptyElement)
+                                if (!reader.IsEmptyElement)
                                 {
-                                    asset.Description = "";
-                                }
-                                else
-                                {
-                                    asset.Description = getValue(reader);
+                                    reader.Skip();
                                 }
                                 break;
 
@@ -207,7 +203,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "Flags":
-                                asset.Flags = 0;
+                                asset.Flags = AssetFlags.Normal;
                                 string flags = getValue(reader);
                                 if (flags != "Normal")
                                 {
@@ -216,15 +212,15 @@ namespace SilverSim.StructuredData.AssetXml
                                     {
                                         if (flag == "Maptile")
                                         {
-                                            asset.Flags |= (uint)AssetFlags.Maptile;
+                                            asset.Flags |= AssetFlags.Maptile;
                                         }
                                         if (flag == "Rewritable")
                                         {
-                                            asset.Flags |= (uint)AssetFlags.Rewritable;
+                                            asset.Flags |= AssetFlags.Rewritable;
                                         }
                                         if (flag == "Collectable")
                                         {
-                                            asset.Flags |= (uint)AssetFlags.Collectable;
+                                            asset.Flags |= AssetFlags.Collectable;
                                         }
                                     }
                                 }
@@ -311,7 +307,10 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "Description":
-                                asset.Description = getValue(reader);
+                                if(!reader.IsEmptyElement)
+                                {
+                                    reader.Skip();
+                                }
                                 break;
 
                             case "Type":
@@ -331,7 +330,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "Flags":
-                                asset.Flags = 0;
+                                asset.Flags = AssetFlags.Normal;
                                 string flags = getValue(reader);
                                 if (flags != "Normal")
                                 {
@@ -340,15 +339,15 @@ namespace SilverSim.StructuredData.AssetXml
                                     {
                                         if (flag == "Maptile")
                                         {
-                                            asset.Flags |= (uint)AssetFlags.Maptile;
+                                            asset.Flags |= AssetFlags.Maptile;
                                         }
                                         if (flag == "Rewritable")
                                         {
-                                            asset.Flags |= (uint)AssetFlags.Rewritable;
+                                            asset.Flags |= AssetFlags.Rewritable;
                                         }
                                         if (flag == "Collectable")
                                         {
-                                            asset.Flags |= (uint)AssetFlags.Collectable;
+                                            asset.Flags |= AssetFlags.Collectable;
                                         }
                                     }
                                 }

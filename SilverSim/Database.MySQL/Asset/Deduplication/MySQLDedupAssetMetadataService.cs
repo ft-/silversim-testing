@@ -58,13 +58,11 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                 asset.ID = dbReader.GetUUID("id");
                                 asset.Type = (AssetType)(int)dbReader["assetType"];
                                 asset.Name = (string)dbReader["name"];
-                                asset.Description = (string)dbReader["description"];
                                 asset.Creator.ID = dbReader.GetUUID("CreatorID");
                                 asset.CreateTime = dbReader.GetDate("create_time");
                                 asset.AccessTime = dbReader.GetDate("access_time");
-                                uint.TryParse(dbReader["asset_flags"].ToString(), out asset.Flags);
-                                Boolean.TryParse(dbReader["temporary"].ToString(), out asset.Temporary);
-                                Boolean.TryParse(dbReader["local"].ToString(), out asset.Local);
+                                asset.Flags = dbReader.GetAssetFlags("asset_flags");
+                                asset.Temporary = dbReader.GetBoolean("temporary");
                                 return asset;
                             }
                         }

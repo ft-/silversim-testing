@@ -28,12 +28,10 @@ using System;
 using System.Reflection;
 using System.Threading;
 
-namespace SilverSim.Main.Grid
+namespace SilverSim.Main
 {
     public static class Application
     {
-        private const string DEFAULT_CONFIG_FILENAME = "../data/SilverSim.Grid.ini";
-
         public static ConfigurationLoader m_ConfigLoader;
         public static ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
 
@@ -44,7 +42,7 @@ namespace SilverSim.Main.Grid
             Thread.CurrentThread.Name = "SilverSim:Main";
             try
             {
-                m_ConfigLoader = new ConfigurationLoader(args, DEFAULT_CONFIG_FILENAME, "Grid.defaults.ini", m_ShutdownEvent);
+                m_ConfigLoader = new ConfigurationLoader(args, m_ShutdownEvent);
             }
             catch(ConfigurationLoader.ConfigurationError e)
             {
@@ -52,6 +50,10 @@ namespace SilverSim.Main.Grid
                 System.Console.Write(e.StackTrace.ToString());
                 System.Console.WriteLine();
 #endif
+                Environment.Exit(1);
+            }
+            catch(ConfigurationLoader.TestingError)
+            {
                 Environment.Exit(1);
             }
             catch(Exception e)

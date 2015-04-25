@@ -63,6 +63,14 @@ namespace SilverSim.Main.Common
             }
         }
 
+        public class TestingError : Exception
+        {
+            public TestingError()
+            {
+
+            }
+        }
+
         public class ConfigurationError : Exception
         {
             public ConfigurationError()
@@ -597,20 +605,24 @@ namespace SilverSim.Main.Common
         private void ProcessResourceMap()
         {
             IConfig resourceMap = m_Config.Configs["ResourceMap"];
+            if (resourceMap == null)
+            {
+                return;
+            }
 
-            foreach(string key in resourceMap.GetKeys())
+            foreach (string key in resourceMap.GetKeys())
             {
                 string[] parts = key.Split(new char[] { '.' }, 2, StringSplitOptions.None);
-                if(parts.Length < 2)
+                if (parts.Length < 2)
                 {
                     continue;
                 }
                 IConfig config = m_Config.Configs[parts[0]];
-                if(config == null)
+                if (config == null)
                 {
                     continue;
                 }
-                if(config.Contains(parts[1]))
+                if (config.Contains(parts[1]))
                 {
                     if (config.Get(parts[1]) != string.Empty)
                     {
@@ -664,21 +676,44 @@ namespace SilverSim.Main.Common
             Allowed
         }
 
-        public ConfigurationLoader(string[] args, string defaultConfigName, string defaultsIniName, ManualResetEvent shutdownEvent, LocalConsole localConsoleControl = LocalConsole.Allowed)
+        public ConfigurationLoader(string[] args, ManualResetEvent shutdownEvent, LocalConsole localConsoleControl = LocalConsole.Allowed)
         {
+            string defaultConfigName;
+            string defaultsIniName;
+            string mode = "Simulator";
+
             m_ShutdownEvent = shutdownEvent;
             ArgvConfigSource configSource = new ArgvConfigSource(args);
-            configSource.AddSwitch("Startup", "config");
+            configSource.AddSwitch("Startup", "mode", "m");
+            configSource.AddSwitch("Startup", "config", "c");
             IConfig startup = configSource.Configs["Startup"];
+            mode = startup.GetString("mode", "simulator");
+            switch(mode)
+            {
+                case "simulator":
+                    defaultConfigName = "../data/SilverSim.ini";
+                    defaultsIniName = "Simulator.defaults.ini";
+                    break;
+
+                case "grid":
+                    defaultConfigName = "../data/SilverSim.Grid.ini";
+                    defaultsIniName = "Grid.defaults.ini";
+                    break;
+
+                case "testing":
+                    defaultConfigName = "";
+                    defaultsIniName = "Testing.defaults.ini";
+                    break;
+
+                default:
+                    throw new Exception("Invalid mode parameter");
+            }
             string mainConfig = startup.GetString("config", defaultConfigName);
 
-            /* increase service point connection limit */
-            if (ServicePointManager.DefaultConnectionLimit < 12)
+            if (defaultsIniName != "")
             {
-                ServicePointManager.DefaultConnectionLimit = 12;
+                m_Sources.Enqueue(new CFG_IniResourceSource(defaultsIniName));
             }
-
-            m_Sources.Enqueue(new CFG_IniResourceSource(defaultsIniName));
             /* make the resource assets available for all users not just scene */
             PluginInstances.Add("ResourceAssetService", new ResourceAssetPlugin());
             PluginInstances.Add("LocalNeighborConnector", new Neighbor.LocalNeighborConnector());
@@ -802,6 +837,10 @@ namespace SilverSim.Main.Common
                 foreach (IRegionLoaderInterface regionLoader in GetServices<IRegionLoaderInterface>().Values)
                 {
                     regionLoader.LoadRegions();
+                }
+                foreach (IRegionLoaderInterface regionLoader in GetServices<IRegionLoaderInterface>().Values)
+                {
+                    regionLoader.AllRegionsLoaded();
                 }
             }
         }

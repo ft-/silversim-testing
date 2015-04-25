@@ -81,7 +81,6 @@ namespace SilverSim.Scene.Types.Scene
                     md.AccessTime = ad.AccessTime;
                     md.CreateTime = ad.CreateTime;
                     md.Creator = ad.Creator;
-                    md.Description = ad.Description;
                     md.Flags = ad.Flags;
                     md.ID = ad.ID;
                     md.Local = ad.Local;

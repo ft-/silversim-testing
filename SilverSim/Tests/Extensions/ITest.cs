@@ -23,12 +23,12 @@ exception statement from your version.
 
 */
 
-namespace SilverSim.Scene.ServiceInterfaces.RegionLoader
-{
-    public interface IRegionLoaderInterface
-    {
-        void LoadRegions();
+using SilverSim.Main.Common;
 
-        void AllRegionsLoaded();
+namespace SilverSim.Tests.Extensions
+{
+    public interface ITest : IPlugin
+    {
+        bool Run();
     }
 }

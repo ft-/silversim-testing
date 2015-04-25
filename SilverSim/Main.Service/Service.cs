@@ -29,15 +29,13 @@ using System.Diagnostics;
 using System.ServiceProcess;
 using System.Threading;
 
-namespace SilverSim.Main.Simulator.WindowsService
+namespace SilverSim.Main.Service
 {
-    class WindowsService : ServiceBase
+    class MainService : ServiceBase
     {
         public const string SERVICE_NAME = "SilverSim";
 
-        private const string DEFAULT_CONFIG_FILENAME = "../data/SilverSim.ini";
-
-        public WindowsService()
+        public MainService()
         {
             ServiceName = SERVICE_NAME;
             EventLog.Source = SERVICE_NAME;
@@ -57,7 +55,7 @@ namespace SilverSim.Main.Simulator.WindowsService
 
         static void Main()
         {
-            ServiceBase.Run(new WindowsService());
+            ServiceBase.Run(new MainService());
         }
 
         protected override void OnStart(string[] args)
@@ -104,7 +102,7 @@ namespace SilverSim.Main.Simulator.WindowsService
             Thread.CurrentThread.Name = "SilverSim:Main";
             try
             {
-                m_ConfigLoader = new ConfigurationLoader(args, DEFAULT_CONFIG_FILENAME, "Simulator.defaults.ini", m_ShutdownEvent, ConfigurationLoader.LocalConsole.Disallowed);
+                m_ConfigLoader = new ConfigurationLoader(args, m_ShutdownEvent, ConfigurationLoader.LocalConsole.Disallowed);
             }
             catch (ConfigurationLoader.ConfigurationError e)
             {

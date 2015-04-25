@@ -170,12 +170,12 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     assetbase_header += "<Data/>";
                 }
 
-                if(0 != (data.Flags & (uint)AssetFlags.Maptile))
+                if(0 != (data.Flags & AssetFlags.Maptile))
                 {
                     flags = "Maptile";
                 }
 
-                if (0 != (data.Flags & (uint)AssetFlags.Rewritable))
+                if (0 != (data.Flags & AssetFlags.Rewritable))
                 {
                     if(flags != string.Empty)
                     {
@@ -184,7 +184,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     flags += "Rewritable";
                 }
 
-                if (0 != (data.Flags & (uint)AssetFlags.Collectable))
+                if (0 != (data.Flags & AssetFlags.Collectable))
                 {
                     if (flags != string.Empty)
                     {
@@ -201,7 +201,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     "<FullID><Guid>{0}</Guid></FullID><ID>{0}</ID><Name>{1}</Name><Description>{2}</Description><Type>{3}</Type><Local>{4}</Local><Temporary>{5}</Temporary><CreatorID>{6}</CreatorID><Flags>{7}</Flags></AssetBase>",
                     data.ID.ToString(),
                     System.Xml.XmlConvert.EncodeName(data.Name),
-                    System.Xml.XmlConvert.EncodeName(data.Description),
+                    "",
                     (int)data.Type,
                     data.Local.ToString(),
                     data.Temporary.ToString(),
@@ -268,12 +268,12 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                 string assetbase_header = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n<AssetMetadata>";
                 string flags = "";
 
-                if (0 != (data.Flags & (uint)AssetFlags.Maptile))
+                if (0 != (data.Flags & AssetFlags.Maptile))
                 {
                     flags = "Maptile";
                 }
 
-                if (0 != (data.Flags & (uint)AssetFlags.Rewritable))
+                if (0 != (data.Flags & AssetFlags.Rewritable))
                 {
                     if (flags != string.Empty)
                     {
@@ -282,7 +282,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     flags += "Rewritable";
                 }
 
-                if (0 != (data.Flags & (uint)AssetFlags.Collectable))
+                if (0 != (data.Flags & AssetFlags.Collectable))
                 {
                     if (flags != string.Empty)
                     {
@@ -299,7 +299,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     "<FullID><Guid>{0}</Guid></FullID><ID>{0}</ID><Name>{1}</Name><Description>{2}</Description><Type>{3}</Type><Local>{4}</Local><Temporary>{5}</Temporary><CreatorID>{6}</CreatorID><Flags>{7}</Flags></AssetMetadata>",
                     data.ID.ToString(),
                     System.Xml.XmlConvert.EncodeName(data.Name),
-                    System.Xml.XmlConvert.EncodeName(data.Description),
+                    "",
                     (int)data.Type,
                     data.Local.ToString(),
                     data.Temporary.ToString(),

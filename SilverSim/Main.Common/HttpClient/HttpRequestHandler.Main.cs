@@ -193,12 +193,21 @@ namespace SilverSim.Main.Common.HttpClient
             {
                 s.Write(outdata, 0, outdata.Length);
             }
+            catch(ObjectDisposedException)
+            {
+                if (retrycnt-- > 0)
+                {
+                    goto retry;
+                }
+                throw;
+            }
             catch(IOException)
             {
                 if(retrycnt-- > 0)
                 {
                     goto retry;
                 }
+                throw;
             }
             s.ReadTimeout = 10000;
             string resline;

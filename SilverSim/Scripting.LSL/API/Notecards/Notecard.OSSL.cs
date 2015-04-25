@@ -64,7 +64,6 @@ namespace SilverSim.Scripting.LSL.API.Notecards
                 asset.ID = UUID.Random;
                 asset.Name = notecardName;
                 asset.Creator = Instance.Part.ObjectGroup.Owner;
-                asset.Description = "osMakeNotecard";
                 Instance.Part.ObjectGroup.Scene.AssetService.Store(asset);
                 ObjectPartInventoryItem item = new ObjectPartInventoryItem(asset);
                 item.ParentFolderID = Instance.Part.ID;

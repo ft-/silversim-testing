@@ -31,13 +31,12 @@ namespace SilverSim.Types.Asset
     public class AssetMetadata
     {
         public UUID ID = UUID.Zero;
-        public bool Local = false;
+        public bool Local = false; /* not for serialization */
         public bool Temporary = false;
         public AssetType Type = AssetType.Unknown;
         public string Name = string.Empty;
-        public string Description = string.Empty;
         public UUI Creator = UUI.Unknown;
-        public uint Flags = 0;
+        public AssetFlags Flags = AssetFlags.Normal;
         public Date CreateTime = new Date();
         public Date AccessTime = new Date();
 

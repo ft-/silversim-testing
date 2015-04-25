@@ -46,7 +46,6 @@ namespace SilverSim.Scene.Types.Object
             AssetType = asset.Type;
             Creator = asset.Creator;
             Name = asset.Name;
-            Description = asset.Description;
             Flags = 0;
             ID = UUID.Random;
             switch(AssetType)

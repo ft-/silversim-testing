@@ -59,8 +59,6 @@ namespace SilverSim.Scene.Types.Scene
                         catch
                         {
                             AssetMetadata md = ResourceAssets.Metadata[key];
-                            md.Description = "Embedded Asset";
-                            md.Local = false;
                             md.Temporary = false;
                             return md;
                         }
@@ -100,7 +98,6 @@ namespace SilverSim.Scene.Types.Scene
                                 /* store these permanently */
                                 ad.Local = false;
                                 ad.Temporary = false;
-                                ad.Description = "Embedded Asset";
                                 m_Scene.PersistentAssetService.Store(ad);
                             }
                             catch
@@ -207,7 +204,6 @@ namespace SilverSim.Scene.Types.Scene
                                 /* store these permanently */
                                 ad.Local = false;
                                 ad.Temporary = false;
-                                ad.Description = "Embedded Asset";
                                 m_Scene.PersistentAssetService.Store(ad);
                             }
                             catch

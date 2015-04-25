@@ -944,7 +944,6 @@ namespace SilverSim.LL.Core
                     lm.Location = curScene.RegionData.Location;
 
                     AssetData asset = lm;
-                    asset.Description = item.Description;
                     asset.Name = item.Name;
                     asset.Creator = Agent.Owner;
                     asset.ID = UUID.Random;

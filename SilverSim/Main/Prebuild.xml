@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Project frameworkVersion="v4_0" name="SilverSim.Main.Simulator.WindowsService" path="SilverSim/Main.Simulator.WindowsService" type="Exe">
+<Project frameworkVersion="v4_0" name="SilverSim.Main" path="SilverSim/Main" type="Exe">
 	<Configuration name="Release">
 		<Options>
 			<OutputPath>../../bin/</OutputPath>
@@ -13,8 +13,6 @@
 
 	<ReferencePath>../../bin/</ReferencePath>
 	<Reference name="System"/>
-	<Reference name="System.ServiceProcess"/>
-	<Reference name="System.Configuration.Install"/>
 	<Reference name="SilverSim.Main.Common" localCopy="false"/>
 	<Reference name="SilverSim.Types" localCopy="false"/>
 	<Files>

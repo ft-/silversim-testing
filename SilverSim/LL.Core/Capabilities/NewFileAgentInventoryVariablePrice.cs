@@ -98,7 +98,6 @@ namespace SilverSim.LL.Core.Capabilities
                 kvp.Value.AssetID = data.ID;
                 data.Type = kvp.Value.AssetType;
                 data.Name = kvp.Value.Name;
-                data.Description = kvp.Value.Description;
 
                 try
                 {

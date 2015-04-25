@@ -58,13 +58,11 @@ namespace SilverSim.Database.MySQL.Asset
                                 asset.ID = dbReader.GetUUID("id");
                                 asset.Type = (AssetType)(int)dbReader["assetType"];
                                 asset.Name = (string)dbReader["name"];
-                                asset.Description = (string)dbReader["description"];
                                 asset.Creator.ID = dbReader.GetUUID("CreatorID");
                                 asset.CreateTime = Date.UnixTimeToDateTime(ulong.Parse(dbReader["create_time"].ToString()));
                                 asset.AccessTime = Date.UnixTimeToDateTime(ulong.Parse(dbReader["access_time"].ToString()));
-                                uint.TryParse(dbReader["asset_flags"].ToString(), out asset.Flags);
-                                Boolean.TryParse(dbReader["temporary"].ToString(), out asset.Temporary);
-                                Boolean.TryParse(dbReader["local"].ToString(), out asset.Local);
+                                asset.Flags = dbReader.GetAssetFlags("asset_flags");
+                                asset.Temporary = dbReader.GetBoolean("temporary");
                                 return asset;
                             }
                         }

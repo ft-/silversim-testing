@@ -27,12 +27,12 @@ using System.ComponentModel;
 using System.Configuration.Install;
 using System.ServiceProcess;
 
-namespace SilverSim.Main.Simulator.WindowsService
+namespace SilverSim.Main.Service
 {
     [RunInstaller(true)]
-    public class WindowsServiceInstaller : Installer
+    public class MainServiceInstaller : Installer
     {
-        public WindowsServiceInstaller()
+        public MainServiceInstaller()
         {
             ServiceProcessInstaller serviceProcessInstaller = new ServiceProcessInstaller();
             ServiceInstaller serviceInstaller = new ServiceInstaller();
@@ -43,9 +43,9 @@ namespace SilverSim.Main.Simulator.WindowsService
             serviceProcessInstaller.Password = null;
 
             // Service Information
-            serviceInstaller.DisplayName = WindowsService.SERVICE_NAME;
+            serviceInstaller.DisplayName = MainService.SERVICE_NAME;
             serviceInstaller.StartType = ServiceStartMode.Automatic;
-            serviceInstaller.ServiceName = WindowsService.SERVICE_NAME;
+            serviceInstaller.ServiceName = MainService.SERVICE_NAME;
 
             this.Installers.Add(serviceProcessInstaller);
             this.Installers.Add(serviceInstaller);
