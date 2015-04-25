@@ -117,6 +117,28 @@ namespace SilverSim.Tests.Assets
             catch
             {
             }
+
+            m_Log.Info("Testing multiple non-existence");
+            try
+            {
+                Dictionary<UUID, bool> assetExists = new Dictionary<UUID, bool>();
+                assetExists = m_AssetService.exists(new List<UUID> { Asset1ID, Asset2ID });
+                if(assetExists[Asset1ID])
+                {
+                    m_Log.Fatal("Failed to detect non-existence of asset 1 via multiple exist");
+                    return false;
+                }
+                if (assetExists[Asset2ID])
+                {
+                    m_Log.Fatal("Failed to detect non-existence of asset 2 via multiple exist");
+                    return false;
+                }
+            }
+            catch
+            {
+                m_Log.Fatal("Failed to detect multiple non-existence of asset 1 and 2");
+                return false;
+            }
             #endregion
 
             UUI theCreator1 = new UUI();
@@ -131,7 +153,7 @@ namespace SilverSim.Tests.Assets
             theCreator2.FirstName = "The";
             theCreator2.LastName = "Creator";
 
-            m_Log.Info("Storing assets");
+            m_Log.Info("Storing asset 1");
             asset.Name = "Asset 1";
             asset.ID = Asset1ID;
             asset.Type = AssetType.CallingCard;
@@ -141,6 +163,50 @@ namespace SilverSim.Tests.Assets
             asset.Flags = AssetFlags.Normal;
             m_AssetService.Store(asset);
 
+            m_Log.Info("Testing multiple exist (1 exists, 2 missing)");
+            m_Log.Info("Testing multiple non-existence");
+            try
+            {
+                Dictionary<UUID, bool> assetExists = new Dictionary<UUID, bool>();
+                assetExists = m_AssetService.exists(new List<UUID> { Asset1ID, Asset2ID });
+                if (!assetExists[Asset1ID])
+                {
+                    m_Log.Fatal("Failed to detect existence of asset 1 via multiple exist");
+                    return false;
+                }
+                if (assetExists[Asset2ID])
+                {
+                    m_Log.Fatal("Failed to detect non-existence of asset 2 via multiple exist");
+                    return false;
+                }
+            }
+            catch
+            {
+                m_Log.Fatal("Failed to detect multiple non-existence of asset 1 and 2");
+                return false;
+            }
+            try
+            {
+                Dictionary<UUID, bool> assetExists = new Dictionary<UUID, bool>();
+                assetExists = m_AssetService.exists(new List<UUID> { Asset2ID, Asset1ID });
+                if (!assetExists[Asset1ID])
+                {
+                    m_Log.Fatal("Failed to detect existence of asset 1 via multiple exist");
+                    return false;
+                }
+                if (assetExists[Asset2ID])
+                {
+                    m_Log.Fatal("Failed to detect non-existence of asset 2 via multiple exist");
+                    return false;
+                }
+            }
+            catch
+            {
+                m_Log.Fatal("Failed to detect multiple non-existence of asset 2");
+                return false;
+            }
+
+            m_Log.Info("Storing asset 2");
             asset.Name = "Asset 2";
             asset.ID = Asset2ID;
             asset.Type = AssetType.Mesh;
@@ -172,6 +238,29 @@ namespace SilverSim.Tests.Assets
                 m_Log.Fatal("Failed to detect existence of asset 2");
                 return false;
             }
+
+            m_Log.Info("Testing multiple existence of Asset 1 and Asset 2");
+            try
+            {
+                Dictionary<UUID, bool> assetExists = new Dictionary<UUID, bool>();
+                assetExists = m_AssetService.exists(new List<UUID> { Asset1ID, Asset2ID });
+                if (!assetExists[Asset1ID])
+                {
+                    m_Log.Fatal("Failed to detect existence of asset 1 via multiple exist");
+                    return false;
+                }
+                if (!assetExists[Asset2ID])
+                {
+                    m_Log.Fatal("Failed to detect existence of asset 2 via multiple exist");
+                    return false;
+                }
+            }
+            catch
+            {
+                m_Log.Fatal("Failed to detect multiple existence of asset 1 and 2");
+                return false;
+            }
+
             #endregion
 
             #region Asset1 Access Test

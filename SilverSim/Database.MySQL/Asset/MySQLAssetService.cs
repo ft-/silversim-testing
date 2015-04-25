@@ -119,7 +119,7 @@ namespace SilverSim.Database.MySQL.Asset
                     {
                         while (dbReader.Read())
                         {
-                            UUID id = new UUID((string)dbReader["id"]);
+                            UUID id = dbReader.GetUUID("id");
                             res[id] = true;
                             if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
                             {
