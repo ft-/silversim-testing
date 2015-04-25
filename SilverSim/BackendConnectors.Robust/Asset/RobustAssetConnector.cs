@@ -218,7 +218,7 @@ namespace SilverSim.BackendConnectors.Robust.Asset
                     {
                         throw new RobustAssetProtocolError("Invalid response for get_assets_exist received");
                     }
-                    for(int i = 0; i < res.Count; ++i)
+                    for(int i = 0; i < assets.Count; ++i)
                     {
                         res.Add(assets[i], response[i]);
                     }

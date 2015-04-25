@@ -475,6 +475,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
         private static List<UUID> parseArrayOfUUIDs(XmlTextReader reader)
         {
             List<UUID> result = new List<UUID>();
+            bool haveroot = false;
             while (true)
             {
                 if (!reader.Read())
@@ -485,17 +486,28 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        if (reader.Name != "string")
+                        if (haveroot)
                         {
-                            throw new Exception();
+                            if (reader.Name != "string")
+                            {
+                                throw new Exception("Invalid ArrayOfString");
+                            }
+                            result.Add(parseUUID(reader));
                         }
-                        result.Add(parseUUID(reader));
+                        else
+                        {
+                            if(reader.Name != "ArrayOfString")
+                            {
+                                throw new Exception("Invalid ArrayOfString");
+                            }
+                            haveroot = true;
+                        }
                         break;
 
                     case XmlNodeType.EndElement:
-                        if (reader.Name != "ArrayOfString")
+                        if (reader.Name != "ArrayOfString" || !haveroot)
                         {
-                            throw new Exception();
+                            throw new Exception("Invalid ArrayOfString");
                         }
                         return result;
                 }
@@ -518,7 +530,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     ids = parseArrayOfUUIDs(reader);
                 }
             }
-            catch
+            catch(Exception e)
             {
                 req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
