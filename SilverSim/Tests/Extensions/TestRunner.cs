@@ -79,7 +79,7 @@ namespace SilverSim.Tests.Extensions
                     else
                     {
                         m_Log.Info("********************************************************************************");
-                        m_Log.InfoFormat("Executed test {0} with FAILURE", test.GetType().FullName);
+                        m_Log.ErrorFormat("Executed test {0} with FAILURE", test.GetType().FullName);
                         m_Log.Info("********************************************************************************");
                         failed = true;
                     }
@@ -88,7 +88,7 @@ namespace SilverSim.Tests.Extensions
                 {
                     m_Log.Info("********************************************************************************");
                     m_Log.InfoFormat("Executed test {0} with FAILURE", test.GetType().FullName);
-                    m_Log.InfoFormat("Excption {0}: {1}\n{2}", e.GetType().FullName, e.ToString(), e.StackTrace.ToString());
+                    m_Log.ErrorFormat("Excption {0}: {1}\n{2}", e.GetType().FullName, e.ToString(), e.StackTrace.ToString());
                     m_Log.Info("********************************************************************************");
                     failed = true;
                 }
