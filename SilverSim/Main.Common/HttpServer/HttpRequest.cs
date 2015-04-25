@@ -149,7 +149,7 @@ namespace SilverSim.Main.Common.HttpServer
             Body = null;
             string headerLine;
             string requestInfo = ReadHeaderLine();
-            
+
             /* Parse request line */
             string[] requestData = requestInfo.Split(new char[]{' ', '\t'}, StringSplitOptions.RemoveEmptyEntries);
             if(requestData.Length != 3)

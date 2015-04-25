@@ -223,6 +223,16 @@ namespace SilverSim.Main.Common.HttpServer
             return rescount;
         }
 
+        public override int ReadByte()
+        {
+            byte[] b = new byte[1];
+            if (0 == Read(b, 0, 1))
+            {
+                return -1;
+            }
+            return (int)b[0];
+        }
+
         public override long Seek(long offset, SeekOrigin origin)
         {
             throw new NotSupportedException();

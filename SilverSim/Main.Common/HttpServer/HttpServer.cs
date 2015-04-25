@@ -25,6 +25,7 @@ exception statement from your version.
 
 using log4net;
 using Nini.Config;
+using SilverSim.Main.Common.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -105,25 +106,29 @@ namespace SilverSim.Main.Common.HttpServer
 
         private void AcceptConnectionCallback(IAsyncResult ar)
         {
-            TcpClient client;
+            Socket socket;
             try
             {
-                client = m_Listener.EndAcceptTcpClient(ar);
+                socket = m_Listener.EndAcceptSocket(ar);
             }
             catch(ObjectDisposedException)
             {
                 return;
             }
-            m_Listener.BeginAcceptTcpClient(AcceptConnectionCallback, null);
+            m_Listener.BeginAcceptSocket(AcceptConnectionCallback, null);
             try
             {
-                Stream httpstream = client.GetStream();
+                Stream httpstream;
                 if (m_ServerCertificate != null)
                 {
                     /* Start SSL handshake */
-                    SslStream sslstream = new SslStream(httpstream);
+                    SslStream sslstream = new SslStream(new NetworkStream(socket));
                     sslstream.AuthenticateAsServer(m_ServerCertificate);
                     httpstream = sslstream;
+                }
+                else
+                {
+                    httpstream = new HttpStream(socket);
                 }
 
                 while (true)
@@ -131,10 +136,14 @@ namespace SilverSim.Main.Common.HttpServer
                     HttpRequest req;
                     try
                     {
-                        string remoteAddr = IPAddress.Parse(((IPEndPoint)client.Client.RemoteEndPoint).Address.ToString()).ToString();
+                        string remoteAddr = IPAddress.Parse(((IPEndPoint)socket.RemoteEndPoint).Address.ToString()).ToString();
                         req = new HttpRequest(httpstream, remoteAddr, m_IsBehindProxy);
                     }
                     catch (HttpResponse.ConnectionCloseException)
+                    {
+                        return;
+                    }
+                    catch(IOException)
                     {
                         return;
                     }
@@ -163,7 +172,7 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         catch(HttpResponse.DisconnectFromThreadException)
                         {
-                            client = null;
+                            socket = null;
                             return;
                         }
                         catch (Exception e)
@@ -184,7 +193,7 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         catch (HttpResponse.DisconnectFromThreadException)
                         {
-                            client = null;
+                            socket = null;
                             return;
                         }
                         catch (Exception e)
@@ -209,7 +218,7 @@ namespace SilverSim.Main.Common.HttpServer
                                 }
                                 catch (HttpResponse.DisconnectFromThreadException)
                                 {
-                                    client = null;
+                                    socket = null;
                                     return;
                                 }
                                 catch (Exception e)
@@ -226,6 +235,7 @@ namespace SilverSim.Main.Common.HttpServer
                         res.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
                         res.Close();
                     }
+                    httpstream.ReadTimeout = 10000;
                 }
             }
             catch (HttpResponse.ConnectionCloseException)
@@ -241,9 +251,9 @@ namespace SilverSim.Main.Common.HttpServer
             }
             finally
             {
-                if (null != client)
+                if (null != socket)
                 {
-                    client.Close();
+                    socket.Close();
                 }
             }
         }

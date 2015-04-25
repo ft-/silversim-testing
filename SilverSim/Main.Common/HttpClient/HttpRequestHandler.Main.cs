@@ -23,11 +23,11 @@ exception statement from your version.
 
 */
 
+using SilverSim.Main.Common.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
 using System.Text;
 using System.Web;
 
@@ -45,33 +45,12 @@ namespace SilverSim.Main.Common.HttpClient
         }
 
         #region HTTP Utility Functions
-        private static string ReadHeaderLine(Stream s)
-        {
-            int c;
-            string headerLine = string.Empty;
-            while ((c = s.ReadByte()) != '\r')
-            {
-                if (c == -1)
-                {
-                    throw new BadHttpResponseException();
-                }
-                headerLine += (char)c;
-            }
-
-            if (s.ReadByte() != '\n')
-            {
-                throw new BadHttpResponseException();
-            }
-
-            return headerLine;
-        }
-
-        static void ReadHeaderLines(Stream s, IDictionary<string, string> headers)
+        static void ReadHeaderLines(AbstractHttpStream s, IDictionary<string, string> headers)
         {
             headers.Clear();
             string lastHeader = "";
             string hdrline;
-            while ((hdrline = ReadHeaderLine(s)) != "")
+            while ((hdrline = s.ReadHeaderLine()) != "")
             {
                 if (hdrline.StartsWith(" "))
                 {
@@ -115,7 +94,7 @@ namespace SilverSim.Main.Common.HttpClient
 
             if (post != string.Empty)
             {
-                buffer = System.Text.Encoding.UTF8.GetBytes(post);
+                buffer = UTF8NoBOM.GetBytes(post);
 
                 if (compressed || content_type == "application/x-gzip")
                 {
@@ -187,11 +166,11 @@ namespace SilverSim.Main.Common.HttpClient
 
             int retrycnt = 1;
         retry:
-            Stream s = OpenStream(uri.Scheme, uri.Host, uri.Port);
-            s.WriteTimeout = timeoutms;
+            AbstractHttpStream s = OpenStream(uri.Scheme, uri.Host, uri.Port);
             try
             {
                 s.Write(outdata, 0, outdata.Length);
+                s.Flush();
             }
             catch(ObjectDisposedException)
             {
@@ -217,7 +196,7 @@ namespace SilverSim.Main.Common.HttpClient
             {
                 try
                 {
-                    resline = ReadHeaderLine(s);
+                    resline = s.ReadHeaderLine();
                     splits = resline.Split(new char[] { ' ' }, 3);
                     if (splits.Length < 3)
                     {
@@ -234,10 +213,11 @@ namespace SilverSim.Main.Common.HttpClient
                         throw new HttpException(int.Parse(splits[1]), splits[2]);
                     }
 
-                    while (ReadHeaderLine(s) != "")
+                    while (s.ReadHeaderLine() != "")
                     {
 
                     }
+                    s.ReadTimeout = timeoutms;
                 }
                 catch (IOException)
                 {
@@ -249,10 +229,11 @@ namespace SilverSim.Main.Common.HttpClient
                 {
                     postdelegate(reqbody);
                 }
+                s.Flush();
             }
 
             s.ReadTimeout = timeoutms;
-            resline = ReadHeaderLine(s);
+            resline = s.ReadHeaderLine();
             splits = resline.Split(new char[] { ' ' }, 3);
             if (splits.Length < 3)
             {
@@ -264,16 +245,19 @@ namespace SilverSim.Main.Common.HttpClient
                 throw new BadHttpResponseException();
             }
 
-            if (splits[1] != "200")
-            {
-                throw new HttpException(int.Parse(splits[1]), splits[2]);
-            }
-
             if (headers == null)
             {
                 headers = new Dictionary<string, string>();
             }
+
+            if (splits[1] != "200")
+            {
+                ReadHeaderLines(s, headers);
+                throw new HttpException(int.Parse(splits[1]), splits[2]);
+            }
+
             ReadHeaderLines(s, headers);
+            s.ReadTimeout = timeoutms;
 
             string value;
             bool compressedresult = false;
@@ -327,5 +311,7 @@ namespace SilverSim.Main.Common.HttpClient
             }
         }
         #endregion
+
+        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }

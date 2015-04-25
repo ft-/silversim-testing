@@ -23,11 +23,9 @@ exception statement from your version.
 
 */
 
+using SilverSim.Main.Common.Http;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Main.Common.HttpClient
 {
@@ -35,7 +33,7 @@ namespace SilverSim.Main.Common.HttpClient
     {
         class ResponseBodyStream : Stream
         {
-            private Stream m_Input;
+            private AbstractHttpStream m_Input;
             private long m_RemainingLength;
             private long m_ContentLength;
             private static readonly byte[] FillBytes = new byte[10240];
@@ -44,7 +42,7 @@ namespace SilverSim.Main.Common.HttpClient
             string m_Host;
             int m_Port;
 
-            public ResponseBodyStream(Stream input, long contentLength, bool keepAlive, string scheme, string host, int port)
+            public ResponseBodyStream(AbstractHttpStream input, long contentLength, bool keepAlive, string scheme, string host, int port)
             {
                 m_RemainingLength = contentLength;
                 m_Input = input;
@@ -250,6 +248,16 @@ namespace SilverSim.Main.Common.HttpClient
                     m_Input = null;
                 }
                 return rescount;
+            }
+
+            public override int ReadByte()
+            {
+                byte[] b = new byte[1];
+                if (0 == Read(b, 0, 1))
+                {
+                    return -1;
+                }
+                return (int)b[0];
             }
 
             public override long Seek(long offset, SeekOrigin origin)

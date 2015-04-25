@@ -32,6 +32,7 @@ namespace SilverSim.Main.Common.HttpServer
     {
         private Stream m_Output;
         private long m_RemainingLength;
+        private bool m_HasLimitedLength;
         private long m_ContentLength;
         private static readonly byte[] FillBytes = new byte[10240];
 
@@ -40,6 +41,15 @@ namespace SilverSim.Main.Common.HttpServer
             m_RemainingLength = contentLength;
             m_Output = output;
             m_ContentLength = contentLength;
+            m_HasLimitedLength = true;
+        }
+
+        public HttpResponseBodyStream(Stream output)
+        {
+            m_RemainingLength = 0;
+            m_Output = output;
+            m_ContentLength = 0;
+            m_HasLimitedLength = false;
         }
 
         public override bool CanRead
@@ -126,6 +136,7 @@ namespace SilverSim.Main.Common.HttpServer
                         Write(FillBytes, 0, (int)m_RemainingLength);
                     }
                 }
+                m_Output.Flush();
                 m_Output = null;
             }
         }
@@ -145,6 +156,7 @@ namespace SilverSim.Main.Common.HttpServer
                         Write(FillBytes, 0, (int)m_RemainingLength);
                     }
                 }
+                m_Output.Flush();
                 m_Output = null;
             }
             base.Dispose(disposing);
@@ -165,17 +177,21 @@ namespace SilverSim.Main.Common.HttpServer
                         Write(FillBytes, 0, (int)m_RemainingLength);
                     }
                 }
+                m_Output.Flush();
             }
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            if(count > m_RemainingLength)
+            if(count > m_RemainingLength && m_HasLimitedLength)
             {
                 count = (int)m_RemainingLength;
             }
             m_Output.Write(buffer, offset, count);
-            m_RemainingLength -= count;
+            if (m_RemainingLength >= count)
+            {
+                m_RemainingLength -= count;
+            }
         }
 
         public override int Read(byte[] buffer, int offset, int count)

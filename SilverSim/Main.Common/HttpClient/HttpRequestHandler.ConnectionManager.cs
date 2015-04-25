@@ -23,6 +23,9 @@ exception statement from your version.
 
 */
 
+//#define SUPPORT_PIPELINING
+
+using SilverSim.Main.Common.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -40,12 +43,12 @@ namespace SilverSim.Main.Common.HttpClient
         struct StreamInfo
         {
             public int ValidUntil;
-            public Stream Stream;
+            public AbstractHttpStream Stream;
             public string Scheme;
             public string Host;
             public int Port;
 
-            public StreamInfo(Stream stream, string scheme, string host, int port)
+            public StreamInfo(AbstractHttpStream stream, string scheme, string host, int port)
             {
                 Stream = stream;
                 Scheme = scheme;
@@ -90,8 +93,9 @@ namespace SilverSim.Main.Common.HttpClient
         }
 
         #region Stream pipeling handling
-        static Stream OpenStream(string scheme, string host, int port)
+        static AbstractHttpStream OpenStream(string scheme, string host, int port)
         {
+#if SUPPORT_PIPELINING
             string key = scheme + "://" + host + ":" + port.ToString();
             RwLockedList<StreamInfo> streaminfo;
             if(m_StreamList.TryGetValue(key, out streaminfo))
@@ -115,16 +119,18 @@ namespace SilverSim.Main.Common.HttpClient
                     return stream;
                 }
             }
+#endif
 
             if (scheme == Uri.UriSchemeHttp)
             {
-                return new TcpClient(host, port).GetStream();
+                return new HttpStream(new TcpClient(host, port).Client);
             }
             else if (scheme == Uri.UriSchemeHttps)
             {
-                SslStream sslstream = new SslStream(new TcpClient(host, port).GetStream());
+/*                SslStream sslstream = new SslStream(new TcpClient(host, port).GetStream());
                 sslstream.AuthenticateAsClient(host);
-                return sslstream;
+                return sslstream;*/
+                throw new NotImplementedException();
             }
             else
             {
@@ -132,11 +138,14 @@ namespace SilverSim.Main.Common.HttpClient
             }
         }
 
-        static void AddStreamForNextRequest(Stream st, string scheme, string host, int port)
+        static void AddStreamForNextRequest(AbstractHttpStream st, string scheme, string host, int port)
         {
+#if SUPPORT_PIPELINING
             string key = scheme + "://" + host + ":" + port.ToString();
             m_StreamList[key].Add(new StreamInfo(st, scheme, host, port));
+#else
             st.Close();
+#endif
         }
         #endregion
     }

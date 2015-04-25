@@ -111,6 +111,7 @@ namespace SilverSim.Main.Common.HttpServer
                 w.Write("\r\n");
                 w.Flush();
                 m_Output.Write(ms.GetBuffer(), 0, (int)ms.Length);
+                m_Output.Flush();
             }
             m_IsHeaderSent = true;
         }
@@ -127,6 +128,7 @@ namespace SilverSim.Main.Common.HttpServer
                 ResponseBody.Close();
                 ResponseBody = null;
             }
+            m_Output.Flush();
 
             if(IsCloseConnection)
             {
@@ -168,11 +170,12 @@ namespace SilverSim.Main.Common.HttpServer
                 throw new InvalidOperationException();
             }
 
+            /* we never give out the original stream because Close is working recursively according to .NET specs */
             if(gzipEnable)
             {
-                return new GZipStream(m_Output, CompressionMode.Compress);
+                return new GZipStream(new HttpResponseBodyStream(m_Output), CompressionMode.Compress);
             }
-            return m_Output;
+            return new HttpResponseBodyStream(m_Output);
         }
 
         public Stream GetChunkedOutputStream()

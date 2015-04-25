@@ -35,7 +35,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Net;
 using System.Text;
+using System.Web;
 using System.Xml;
 
 namespace SilverSim.BackendConnectors.Robust.Asset
@@ -101,9 +103,13 @@ namespace SilverSim.BackendConnectors.Robust.Asset
             {
                 HttpRequestHandler.DoGetRequest(m_AssetURI + "assets/" + key.ToString() + "/metadata", null, TimeoutMs);
             }
-            catch
+            catch(HttpException e)
             {
-                throw new AssetNotFound(key);
+                if (e.WebEventCode == (int)HttpStatusCode.NotFound)
+                {
+                    throw new AssetNotFound(key);
+                }
+                throw;
             }
         }
 
@@ -243,9 +249,13 @@ namespace SilverSim.BackendConnectors.Robust.Asset
                 {
                     stream = HttpRequestHandler.DoStreamGetRequest(m_AssetURI + "assets/" + key.ToString(), null, TimeoutMs);
                 }
-                catch
+                catch(HttpException e)
                 {
-                    throw new AssetNotFound(key);
+                    if (e.WebEventCode == (int)HttpStatusCode.NotFound)
+                    {
+                        throw new AssetNotFound(key);
+                    }
+                    throw;
                 }
                 return AssetXml.parseAssetData(stream);
             }

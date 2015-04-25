@@ -530,7 +530,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
                     ids = parseArrayOfUUIDs(reader);
                 }
             }
-            catch(Exception e)
+            catch
             {
                 req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
