@@ -67,6 +67,7 @@ namespace SilverSim.Tests.Assets.Formats
             wearable.Textures.Add(2, UUID.Random);
             wearable.Textures.Add(3, UUID.Random);
 
+            m_Log.Info("Testing Serialization");
             assetdata = wearable.Asset();
             wearableserialized = new Wearable(assetdata);
 
@@ -134,6 +135,7 @@ namespace SilverSim.Tests.Assets.Formats
                 }
             }
 
+            m_Log.Info("Testing References");
             List<UUID> refs = wearableserialized.References;
             if(refs.Count != 3)
             {
