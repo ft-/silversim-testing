@@ -152,6 +152,7 @@ namespace SilverSim.Scene.Types.Object
                     {
                         m.UpdateFlags |= PrimitiveFlags.TemporaryOnRez;
                     }
+                    m.UpdateFlags |= Part.Flags;
 
                     ObjectPart.SoundParam soundparam = Part.Sound;
                     if (soundparam.SoundID != UUID.Zero)

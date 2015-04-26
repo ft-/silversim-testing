@@ -1245,7 +1245,6 @@ namespace SilverSim.Scene.Types.Object
 
         static void fromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
-            ObjectPart part = null;
             if (reader.IsEmptyElement)
             {
                 throw new InvalidObjectXmlException();

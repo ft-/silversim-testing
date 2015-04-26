@@ -91,6 +91,7 @@ namespace SilverSim.Scene.Types.Object
         private Vector3 m_Velocity = Vector3.Zero;
         private UUI m_Creator = UUI.Unknown;
         private Date m_CreationDate = new Date();
+        private PrimitiveFlags m_PrimitiveFlags = PrimitiveFlags.None;
 
         private SilverSim.Types.Inventory.InventoryPermissionsData m_Permissions = new SilverSim.Types.Inventory.InventoryPermissionsData();
 
@@ -379,6 +380,26 @@ namespace SilverSim.Scene.Types.Object
                 lock (this)
                 {
                     m_CreationDate = new Date(value);
+                }
+                IsChanged = true;
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public PrimitiveFlags Flags
+        {
+            get
+            {
+                lock(this)
+                {
+                    return m_PrimitiveFlags;
+                }
+            }
+            set
+            {
+                lock(this)
+                {
+                    m_PrimitiveFlags = value;
                 }
                 IsChanged = true;
                 TriggerOnUpdate(0);
@@ -1445,7 +1466,12 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("GroupMask", (uint)GroupMask);
                     writer.WriteNamedValue("EveryoneMask", (uint)EveryoneMask);
                     writer.WriteNamedValue("NextOwnerMask", (uint)NextOwnerMask);
-                    writer.WriteNamedValue("Flags", "None");
+                    PrimitiveFlags flags = Flags;
+                    if(Inventory.CountScripts != 0)
+                    {
+                        flags |= PrimitiveFlags.Scripted;
+                    }
+                    writer.WriteNamedValue("Flags", flags.ToString().Replace(",", ""));
                     CollisionSoundParam sp = CollisionSound;
                     writer.WriteUUID("CollisionSound", sp.ImpactSound);
                     writer.WriteNamedValue("CollisionSoundVolume", sp.ImpactVolume);
@@ -2306,11 +2332,11 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "Flags":
-                                reader.ReadToEndElement(); /* TODO: Phantom and other flags are here, this is enum serialization */
+                                part.Flags = reader.ReadContentAsEnum<PrimitiveFlags>();
                                 break;
 
                             case "ObjectFlags":
-                                reader.ReadToEndElement(); /* TODO: Phantom and other flags are here, this is uint */
+                                part.Flags = (PrimitiveFlags)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "CollisionSound":
@@ -2497,7 +2523,8 @@ namespace SilverSim.Scene.Types.Object
                                                         rootGroup.AttachedPos = new Vector3(a[0].AsReal, a[1].AsReal, a[2].AsReal);
                                                     }
                                                 }
-                                                else if (m.ContainsKey("SavedAttachmentPoint") && rootGroup != null)
+                                                
+                                                if (m.ContainsKey("SavedAttachmentPoint") && rootGroup != null)
                                                 {
                                                     rootGroup.AttachPoint = (AttachmentPoint)(m["SavedAttachmentPoint"].AsInt);
                                                 }
@@ -2523,6 +2550,32 @@ namespace SilverSim.Scene.Types.Object
                         {
                             throw new InvalidObjectXmlException();
                         }
+                        /* get rid of every flag, we do create internally */
+                        if (null != rootGroup)
+                        {
+                            if ((part.Flags & PrimitiveFlags.Physics) != 0)
+                            {
+                                rootGroup.IsPhysics = true;
+                            }
+                            if((part.Flags & PrimitiveFlags.Temporary) != 0)
+                            {
+                                rootGroup.IsTemporary = true;
+                            }
+                            if ((part.Flags & PrimitiveFlags.TemporaryOnRez) != 0)
+                            {
+                                rootGroup.IsTempOnRez = true;
+                            }
+                        }
+
+                        if(part.Inventory.CountScripts == 0)
+                        {
+                            part.Flags &= ~(PrimitiveFlags.Touch | PrimitiveFlags.Money);
+                        }
+                        
+                        part.Flags &= ~(
+                            PrimitiveFlags.InventoryEmpty | PrimitiveFlags.Physics | PrimitiveFlags.Temporary | PrimitiveFlags.TemporaryOnRez |
+                            PrimitiveFlags.AllowInventoryDrop | PrimitiveFlags.ZlibCompressed | PrimitiveFlags.Scripted |
+                            PrimitiveFlags.ObjectGroupOwned | PrimitiveFlags.ObjectYouOfficer | PrimitiveFlags.ObjectYouOwner);
                         part.Inventory.InventorySerial = InventorySerial;
                         return part;
 
