@@ -287,13 +287,17 @@ namespace SilverSim.Types
             return Convert.FromBase64String(reader.ReadElementValueAsString());
         }
 
-        public static void ReadToEndElement(this XmlTextReader reader)
+        public static void ReadToEndElement(this XmlTextReader reader, string tagname = null)
         {
-            string tagname = reader.Name;
-            if(reader.NodeType == XmlNodeType.Element && !reader.IsEmptyElement)
+            if (string.IsNullOrEmpty(tagname))
+            {
+                tagname = reader.Name;
+            }
+            if((reader.NodeType == XmlNodeType.Element || reader.NodeType == XmlNodeType.Attribute) && !reader.IsEmptyElement)
             {
                 do
                 {
+                nextelem:
                     if(!reader.Read())
                     {
                         throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
@@ -301,10 +305,7 @@ namespace SilverSim.Types
                     if(reader.NodeType == XmlNodeType.Element)
                     {
                         ReadToEndElement(reader);
-                        if (!reader.Read())
-                        {
-                            throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
-                        }
+                        goto nextelem;
                     }
                 } while (reader.NodeType != XmlNodeType.EndElement);
                 if(tagname != reader.Name)

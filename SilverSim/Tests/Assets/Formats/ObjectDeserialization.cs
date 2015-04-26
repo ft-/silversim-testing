@@ -71,6 +71,14 @@ namespace SilverSim.Tests.Assets.Formats
                     }
 
                 }
+
+                List<UUID> reflist = new List<UUID>();
+                resource = GetType().Assembly.GetManifestResourceStream(manifest);
+                using (XmlTextReader reader = new XmlTextReader(resource))
+                {
+                    ObjectReferenceDecoder.GetReferences(reader, "", reflist);
+                    m_Log.InfoFormat("Found {0} references", reflist.Count);
+                }
             }
 
             return true;

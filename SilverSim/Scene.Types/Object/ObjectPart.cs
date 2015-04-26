@@ -28,12 +28,15 @@ using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.StructuredData.JSON;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Text;
 using System.Xml;
 using ThreadedClasses;
 
@@ -1313,7 +1316,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("LocalId", LocalID);
                     writer.WriteNamedValue("Name", Name);
                     writer.WriteNamedValue("Material", (int)Material);
-                    writer.WriteNamedValue("PassTouches", IsPassTouches);
+                    writer.WriteNamedValue("PassTouch", IsPassTouches);
                     writer.WriteNamedValue("PassCollisions", IsPassCollisions);
                     writer.WriteNamedValue("RegionHandle", ObjectGroup.Scene.RegionData.Location.RegionHandle);
                     writer.WriteNamedValue("ScriptAccessPin", ScriptAccessPin);
@@ -1584,6 +1587,10 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     rootGroup.AttachPoint = (AttachmentPoint)reader.ReadElementValueAsUInt();
                                 }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
                                 break;
 
                             case "ProfileShape":
@@ -1842,6 +1849,11 @@ namespace SilverSim.Scene.Types.Object
                                 part.Material = (PrimitiveMaterial)reader.ReadElementValueAsInt();
                                 break;
 
+                            case "UpdateFlag":
+                                reader.ReadToEndElement();
+                                break;
+
+                            case "PassTouch":
                             case "PassTouches":
                                 part.IsPassTouches = reader.ReadElementValueAsBoolean();
                                 break;
@@ -1966,6 +1978,10 @@ namespace SilverSim.Scene.Types.Object
                                 }
                                 break;
 
+                            case "RotationalVelocity":
+                                part.AngularVelocity = reader.ReadElementChildsAsVector3();
+                                break;
+
                             case "AngularVelocity":
                                 part.AngularVelocity = reader.ReadElementChildsAsVector3();
                                 break;
@@ -1992,6 +2008,10 @@ namespace SilverSim.Scene.Types.Object
                                     v.Z = reader.ReadElementValueAsDouble();
                                     part.AngularVelocity = v;
                                 }
+                                break;
+
+                            case "SitTargetAvatar":
+                                reader.ReadToEndElement();
                                 break;
 
                             case "Acceleration":
@@ -2259,6 +2279,10 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     rootGroup.LastOwner.ID = reader.ReadContentAsUUID();
                                 }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
                                 break;
 
                             case "BaseMask":
@@ -2282,7 +2306,11 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "Flags":
-                                reader.ReadToEndElement(); /* TODO: Phantom and other flags are here */
+                                reader.ReadToEndElement(); /* TODO: Phantom and other flags are here, this is enum serialization */
+                                break;
+
+                            case "ObjectFlags":
+                                reader.ReadToEndElement(); /* TODO: Phantom and other flags are here, this is uint */
                                 break;
 
                             case "CollisionSound":
@@ -2306,7 +2334,14 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "AttachedPos":
-                                rootGroup.AttachedPos = reader.ReadElementChildsAsVector3();
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.AttachedPos = reader.ReadElementChildsAsVector3();
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
                                 break;
 
                             case "AttachedPosX":
@@ -2315,6 +2350,10 @@ namespace SilverSim.Scene.Types.Object
                                     Vector3 v = rootGroup.AttachedPos;
                                     v.X = reader.ReadElementValueAsDouble();
                                     rootGroup.AttachedPos = v;
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
                                 }
                                 break;
 
@@ -2325,6 +2364,10 @@ namespace SilverSim.Scene.Types.Object
                                     v.Y = reader.ReadElementValueAsDouble();
                                     rootGroup.AttachedPos = v;
                                 }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
                                 break;
 
                             case "AttachedPosZ":
@@ -2333,6 +2376,10 @@ namespace SilverSim.Scene.Types.Object
                                     Vector3 v = rootGroup.AttachedPos;
                                     v.Z = reader.ReadElementValueAsDouble();
                                     rootGroup.AttachedPos = v;
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
                                 }
                                 break;
 
@@ -2431,6 +2478,39 @@ namespace SilverSim.Scene.Types.Object
                                 reader.ReadToEndElement();
                                 break;
 
+                            case "Components":
+                                {
+                                    string json = reader.ReadElementValueAsString();
+                                    try
+                                    {
+                                        if (!string.IsNullOrEmpty(json))
+                                        {
+                                            IValue iv = JSON.Deserialize(new MemoryStream(UTF8NoBOM.GetBytes(json)));
+                                            if (iv is Map)
+                                            {
+                                                Map m = (Map)iv;
+                                                if (m.ContainsKey("SavedAttachedPos") && m["SavedAttachedPos"] is AnArray && rootGroup != null)
+                                                {
+                                                    AnArray a = (AnArray)(m["SavedAttachedPos"]);
+                                                    if (a.Count == 3)
+                                                    {
+                                                        rootGroup.AttachedPos = new Vector3(a[0].AsReal, a[1].AsReal, a[2].AsReal);
+                                                    }
+                                                }
+                                                else if (m.ContainsKey("SavedAttachmentPoint") && rootGroup != null)
+                                                {
+                                                    rootGroup.AttachPoint = (AttachmentPoint)(m["SavedAttachmentPoint"].AsInt);
+                                                }
+                                            }
+                                        }
+                                    }
+                                    catch
+                                    {
+
+                                    }
+                                }
+                                break;
+
                             default:
                                 m_Log.DebugFormat("Unknown element {0} encountered in object xml", reader.Name);
                                 reader.ReadToEndElement();
@@ -2452,5 +2532,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
         #endregion
+
+        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }

@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Script;
 using System;
@@ -379,7 +380,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "Type":
-                                item.InventoryType = (InventoryType)reader.ReadElementValueAsInt();
+                                item.AssetType = (AssetType)reader.ReadElementValueAsInt();
                                 break;
 
                             case "OwnerChanged":
@@ -446,7 +447,7 @@ namespace SilverSim.Scene.Types.Object
                         {
                             throw new InvalidObjectXmlException();
                         }
-                        break;
+                        return;
                 }
             }
         }

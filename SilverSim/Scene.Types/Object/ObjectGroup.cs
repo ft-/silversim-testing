@@ -1195,6 +1195,54 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
+        static ObjectPart parseOtherPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
+        {
+            ObjectPart otherPart = null;
+            if (reader.IsEmptyElement)
+            {
+                throw new InvalidObjectXmlException();
+            }
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        switch (reader.Name)
+                        {
+                            case "SceneObjectPart":
+                                if (reader.IsEmptyElement)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                if (otherPart != null)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                otherPart = ObjectPart.FromXml(reader, null, currentOwner);
+                                group.Add(group.Count + 1, otherPart.ID, otherPart);
+                                break;
+
+                            default:
+                                reader.ReadToEndElement();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "Part")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return otherPart;
+                }
+            }
+        }
+
         static void fromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
             ObjectPart part = null;
@@ -1215,13 +1263,12 @@ namespace SilverSim.Scene.Types.Object
                     case XmlNodeType.Element:
                         switch (reader.Name)
                         {
-                            case "SceneObjectPart":
+                            case "Part":
                                 if (reader.IsEmptyElement)
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                part = ObjectPart.FromXml(reader, null, currentOwner);
-                                group.Add(part.LinkNumber, part.ID, part);
+                                parseOtherPart(reader, group, currentOwner);
                                 break;
 
                             default:
@@ -1276,7 +1323,7 @@ namespace SilverSim.Scene.Types.Object
                                     throw new InvalidObjectXmlException();
                                 }
                                 rootPart = ObjectPart.FromXml(reader, group, currentOwner);
-                                group.Add(rootPart.LinkNumber, rootPart.ID, rootPart);
+                                group.Add(LINK_ROOT, rootPart.ID, rootPart);
                                 break;
 
                             default:
@@ -1295,7 +1342,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public static ObjectGroup FromXml(XmlTextReader reader, UUI currentOwner)
+        public static ObjectGroup FromXml(XmlTextReader reader, UUI currentOwner, bool inRootPart = false)
         {
             ObjectGroup group = new ObjectGroup();
             ObjectPart rootPart = null;
@@ -1306,7 +1353,11 @@ namespace SilverSim.Scene.Types.Object
 
             for(;;)
             {
-                if(!reader.Read())
+                if(inRootPart)
+                {
+                    inRootPart = false;
+                }
+                else if(!reader.Read())
                 {
                     throw new InvalidObjectXmlException();
                 }
@@ -1388,30 +1439,22 @@ namespace SilverSim.Scene.Types.Object
                         switch(reader.Name)
                         {
                             case "SavedScriptState":
-                                string attrname = "";
-                                while (reader.ReadAttributeValue())
+                                itemID = UUID.Zero;
+                                if (reader.MoveToFirstAttribute())
                                 {
-                                    switch(reader.NodeType)
+                                    do
                                     {
-                                        case XmlNodeType.Attribute:
-                                            attrname = reader.Value;
-                                            break;
+                                        switch (reader.Name)
+                                        {
+                                            case "UUID":
+                                                itemID = UUID.Parse(reader.Value);
+                                                break;
 
-                                        case XmlNodeType.Text:
-                                            switch(attrname)
-                                            {
-                                                case "UUID":
-                                                    itemID = UUID.Parse(reader.Value);
-                                                    break;
-
-                                                default:
-                                                    break;
-                                            }
-                                            break;
-
-                                        default:
-                                            break;
+                                            default:
+                                                break;
+                                        }
                                     }
+                                    while (reader.MoveToNextAttribute());
                                 }
 
                                 fromXmlSavedScriptState(reader, group, itemID);
@@ -1436,6 +1479,79 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        static void fromXmlSavedScriptStateInner(XmlTextReader reader, ObjectGroup group, UUID itemID)
+        {
+            string tagname = reader.Name;
+            Dictionary<string, string> attrs = new Dictionary<string, string>();
+            if (reader.MoveToFirstAttribute())
+            {
+                do
+                {
+                    attrs[reader.Name] = reader.Value;
+                } while (reader.MoveToNextAttribute());
+            }
+            ObjectPartInventoryItem item = null;
+
+            if (!attrs.ContainsKey("Asset") || !attrs.ContainsKey("Engine"))
+            {
+                reader.ReadToEndElement(tagname);
+                return;
+            }
+
+            foreach (ObjectPart part in group.Values)
+            {
+                if (part.Inventory.ContainsKey(itemID))
+                {
+                    item = part.Inventory[itemID];
+                    UUID assetid;
+
+                    /* validate inventory item */
+                    if (!UUID.TryParse(attrs["Asset"], out assetid))
+                    {
+                        item = null;
+                    }
+                    else if (item.AssetType != SilverSim.Types.Asset.AssetType.LSLText ||
+                        item.InventoryType != SilverSim.Types.Inventory.InventoryType.LSLText)
+                    {
+                        item = null;
+                    }
+                    else if (assetid != item.AssetID)
+                    {
+                        item = null;
+                    }
+                    break;
+                }
+            }
+
+            if (null == item)
+            {
+                reader.ReadToEndElement(tagname);
+            }
+            else
+            {
+                IScriptCompiler compiler;
+                try
+                {
+                    compiler = CompilerRegistry[attrs["Engine"]];
+                }
+                catch
+                {
+                    reader.ReadToEndElement(tagname);
+                    return;
+                }
+
+                try
+                {
+                    item.ScriptState = compiler.StateFromXml(reader, attrs, item);
+                }
+                catch (ScriptStateLoaderNotImplementedException)
+                {
+                    reader.ReadToEndElement(tagname);
+                    return;
+                }
+            }
+        }
+
         static void fromXmlSavedScriptState(XmlTextReader reader, ObjectGroup group, UUID itemID)
         {
             for (; ; )
@@ -1455,83 +1571,7 @@ namespace SilverSim.Scene.Types.Object
                         switch (reader.Name)
                         {
                             case "State":
-                                string attrname = "";
-                                Dictionary<string, string> attrs = new Dictionary<string, string>();
-                                while (reader.ReadAttributeValue())
-                                {
-                                    switch (reader.NodeType)
-                                    {
-                                        case XmlNodeType.Attribute:
-                                            attrname = reader.Value;
-                                            break;
-
-                                        case XmlNodeType.Text:
-                                            attrs[attrname] = reader.Value;
-                                            break;
-
-                                        default:
-                                            break;
-                                    }
-                                }
-                                ObjectPartInventoryItem item = null;
-
-                                if(!attrs.ContainsKey("Asset") || !attrs.ContainsKey("Engine"))
-                                {
-                                    reader.ReadToEndElement();
-                                    return;
-                                }
-
-                                foreach(ObjectPart part in group.Values)
-                                {
-                                    if(part.Inventory.ContainsKey(itemID))
-                                    {
-                                        item = part.Inventory[itemID];
-                                        UUID assetid;
-
-                                        /* validate inventory item */
-                                        if(!UUID.TryParse(attrs["Asset"], out assetid))
-                                        {
-                                            item = null;
-                                        }
-                                        else if(item.AssetType != SilverSim.Types.Asset.AssetType.LSLText ||
-                                            item.InventoryType != SilverSim.Types.Inventory.InventoryType.LSLText)
-                                        {
-                                            item = null;
-                                        }
-                                        else if(assetid != item.AssetID)
-                                        {
-                                            item = null;
-                                        }
-                                    }
-                                }
-
-                                if (null == item)
-                                {
-                                    reader.ReadToEndElement();
-                                }
-                                else
-                                {
-                                    IScriptCompiler compiler;
-                                    try
-                                    {
-                                        compiler = CompilerRegistry[attrs["Engine"]];
-                                    }
-                                    catch
-                                    {
-                                        reader.ReadToEndElement();
-                                        break;
-                                    }
-
-                                    try
-                                    {
-                                        item.ScriptState = compiler.StateFromXml(reader, attrs, item);
-                                    }
-                                    catch(ScriptStateLoaderNotImplementedException)
-                                    {
-                                        reader.ReadToEndElement();
-                                        break;
-                                    }
-                                }
+                                fromXmlSavedScriptStateInner(reader, group, itemID);
                                 break;
 
                             default:
@@ -1541,7 +1581,7 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case XmlNodeType.EndElement:
-                        if (reader.Name != "GroupScriptStates")
+                        if (reader.Name != "SavedScriptState")
                         {
                             throw new InvalidObjectXmlException();
                         }

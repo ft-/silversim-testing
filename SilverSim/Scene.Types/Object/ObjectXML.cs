@@ -165,40 +165,31 @@ namespace SilverSim.Scene.Types.Object
                                     throw new InvalidObjectXmlException();
                                 }
                                 Vector3 sogpos = new Vector3();
-                                string attrname = "";
-                                while (reader.ReadAttributeValue())
+                                if (reader.MoveToFirstAttribute())
                                 {
-                                    switch(reader.NodeType)
+                                    do
                                     {
-                                        case XmlNodeType.Attribute:
-                                            attrname = reader.Value;
-                                            break;
+                                        switch (reader.Name)
+                                        {
+                                            case "x":
+                                                sogpos.X_String = reader.Value;
+                                                break;
 
-                                        case XmlNodeType.Text:
-                                            switch(attrname)
-                                            {
-                                                case "x":
-                                                    sogpos.X_String = reader.Value;
-                                                    break;
+                                            case "y":
+                                                sogpos.Y_String = reader.Value;
+                                                break;
 
-                                                case "y":
-                                                    sogpos.Y_String = reader.Value;
-                                                    break;
+                                            case "z":
+                                                sogpos.Z_String = reader.Value;
+                                                break;
 
-                                                case "z":
-                                                    sogpos.Z_String = reader.Value;
-                                                    break;
-
-                                                default:
-                                                    break;
-                                            }
-                                            break;
-
-                                        default:
-                                            break;
+                                            default:
+                                                break;
+                                        }
                                     }
+                                    while (reader.MoveToNextAttribute());
                                 }
-                                ObjectGroup grp = ObjectGroup.FromXml(reader, currentOwner);
+                                ObjectGroup grp = fromXmlSingleWithinCoalescedObject(reader, currentOwner);
                                 grp.Position = sogpos;
                                 list.Add(grp);
                                 break;
@@ -215,6 +206,52 @@ namespace SilverSim.Scene.Types.Object
                             throw new InvalidObjectXmlException();
                         }
                         return list;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
+        static ObjectGroup fromXmlSingleWithinCoalescedObject(XmlTextReader reader, UUI currentOwner)
+        {
+            ObjectGroup grp = null;
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        switch (reader.Name)
+                        {
+                            case "SceneObjectGroup":
+                                if (reader.IsEmptyElement)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                grp = ObjectGroup.FromXml(reader, currentOwner);
+                                break;
+
+                            case "RootPart":
+                                /* XML format mess, two different serializations just for that */
+                                return ObjectGroup.FromXml(reader, currentOwner, true);
+
+                            default:
+                                reader.ReadToEndElement();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "SceneObjectGroup")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return grp;
 
                     default:
                         break;

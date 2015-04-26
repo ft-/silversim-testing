@@ -46,7 +46,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        private static void GetReferences(XmlTextReader data, string parentNodeName, List<UUID> reflist)
+        public static void GetReferences(XmlTextReader data, string parentNodeName, List<UUID> reflist)
         {
             while(data.Read())
             {
