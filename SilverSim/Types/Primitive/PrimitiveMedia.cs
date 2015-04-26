@@ -189,7 +189,7 @@ namespace SilverSim.Types.Primitive
                                 break;
 
                             default:
-                                reader.Skip();
+                                reader.ReadToEndElement();
                                 break;
                         }
                         break;
@@ -269,7 +269,7 @@ namespace SilverSim.Types.Primitive
                                 break;
 
                             default:
-                                reader.Skip();
+                                reader.ReadToEndElement();
                                 break;
                         }
                         break;

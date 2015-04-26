@@ -35,9 +35,16 @@ namespace SilverSim.Types
         public Uri HomeURI = null;
         public bool IsAuthoritative = false; /* means User Data has been validated through any available resolving service */
 
-        public static implicit operator string(UUI v)
+        public static explicit operator string(UUI v)
         {
-            return string.Format("{0};{1};{2} {3}", v.ID.ToString(), v.HomeURI.ToString(), v.FirstName, v.LastName);
+            if (v.HomeURI != null)
+            {
+                return string.Format("{0}", v.ID.ToString());
+            }
+            else
+            {
+                return string.Format("{0};{1};{2} {3}", v.ID.ToString(), v.HomeURI.ToString(), v.FirstName, v.LastName);
+            }
         }
 
         public override bool Equals(object obj)
@@ -47,12 +54,7 @@ namespace SilverSim.Types
 
         public bool Equals(UUI uui)
         {
-            if(uui.ID == ID && ID == UUID.Zero)
-            {
-                return true;
-            }
-
-            return uui.ID == ID && uui.FirstName == FirstName && uui.LastName == LastName && uui.HomeURI.Equals(HomeURI);
+            return uui.ID == ID;
         }
 
         public override int GetHashCode()
@@ -149,6 +151,14 @@ namespace SilverSim.Types
 
         public UUI()
         {
+        }
+
+        public UUI(UUI uui)
+        {
+            this.ID = uui.ID;
+            this.FirstName = uui.FirstName;
+            this.LastName = uui.LastName;
+            this.HomeURI = uui.HomeURI;
         }
 
         public UUI(UUID ID, string FirstName, string LastName, Uri HomeURI)

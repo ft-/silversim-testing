@@ -61,7 +61,7 @@ namespace SilverSim.Types.Asset.Format
                             (parentNodeName == "CollisionSound" && data.Name == "UUID") ||
                             (parentNodeName == "AssetID" && data.Name == "UUID"))
                         {
-                            UUID id = UUID.Parse(data.ReadContentAsString());
+                            UUID id = UUID.Parse(data.ReadElementValueAsString());
                             if(id != UUID.Zero)
                             {
                                 if(!reflist.Contains(id))

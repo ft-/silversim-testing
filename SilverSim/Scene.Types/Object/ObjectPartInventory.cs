@@ -306,11 +306,11 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "BasePermissions":
-                                item.Permissions.Base = (InventoryPermissionsMask)reader.ReadContentAsInt();
+                                item.Permissions.Base = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "CreationDate":
-                                item.CreationDate = Date.UnixTimeToDateTime((ulong)reader.ReadContentAsLong());
+                                item.CreationDate = Date.UnixTimeToDateTime(reader.ReadElementValueAsULong());
                                 break;
 
                             case "CreatorID":
@@ -318,19 +318,19 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "CreatorData":
-                                item.Creator.CreatorData = reader.ReadContentAsString();
+                                item.Creator.CreatorData = reader.ReadElementValueAsString();
                                 break;
 
                             case "Description":
-                                item.Description = reader.ReadContentAsString();
+                                item.Description = reader.ReadElementValueAsString();
                                 break;
 
                             case "EveryonePermissions":
-                                item.Permissions.EveryOne = (InventoryPermissionsMask)reader.ReadContentAsInt();
+                                item.Permissions.EveryOne = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "Flags":
-                                reader.Skip();
+                                item.Flags = reader.ReadElementValueAsUInt();
                                 break;
 
                             case "GroupID":
@@ -338,11 +338,11 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "GroupPermissions":
-                                item.Permissions.Group = (InventoryPermissionsMask)reader.ReadContentAsInt();
+                                item.Permissions.Group = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "InvType":
-                                item.InventoryType = (InventoryType)reader.ReadContentAsInt();
+                                item.InventoryType = (InventoryType)reader.ReadElementValueAsInt();
                                 break;
 
                             case "ItemID":
@@ -354,20 +354,20 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "Name":
-                                item.Name = reader.ReadContentAsString();
+                                item.Name = reader.ReadElementValueAsString();
                                 break;
 
                             case "NextPermissions":
-                                item.Permissions.NextOwner = (InventoryPermissionsMask)reader.ReadContentAsInt();
+                                item.Permissions.NextOwner = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "OwnerID":
                                 /* Do not trust this ever! */
-                                reader.Skip();
+                                reader.ReadToEndElement();
                                 break;
 
                             case "CurrentPermissions":
-                                item.Permissions.Current = (InventoryPermissionsMask)reader.ReadContentAsInt();
+                                item.Permissions.Current = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "PermsGranter":
@@ -375,19 +375,19 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "PermsMask":
-                                grantinfo.PermsMask = (ScriptPermissions)reader.ReadContentAsInt();
+                                grantinfo.PermsMask = (ScriptPermissions)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "Type":
-                                item.InventoryType = (InventoryType)reader.ReadContentAsInt();
+                                item.InventoryType = (InventoryType)reader.ReadElementValueAsInt();
                                 break;
 
                             case "OwnerChanged":
-                                ownerChanged = reader.ReadContentAsBoolean();
+                                ownerChanged = reader.ReadElementValueAsBoolean();
                                 break;
 
                             default:
-                                reader.Skip();
+                                reader.ReadToEndElement();
                                 break;
                         }
                         break;
@@ -436,7 +436,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             default:
-                                reader.Skip();
+                                reader.ReadToEndElement();
                                 break;
                         }
                         break;

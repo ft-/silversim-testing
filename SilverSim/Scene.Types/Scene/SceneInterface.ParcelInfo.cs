@@ -69,7 +69,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 else if(pi.SalePrice >= 0 &&
                     (pi.AuthBuyer.ID == UUID.Zero ||
-                    pi.AuthBuyer.ID == agentID))
+                    pi.AuthBuyer.ID == agentID.ID))
                 {
                     ov |= ParcelOverlayType.ForSale;
                 }

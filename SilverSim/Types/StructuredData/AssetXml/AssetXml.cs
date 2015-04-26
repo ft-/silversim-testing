@@ -159,10 +159,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "Description":
-                                if (!reader.IsEmptyElement)
-                                {
-                                    reader.Skip();
-                                }
+                                reader.ReadToEndElement();
                                 break;
 
                             case "Type":
@@ -307,10 +304,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "Description":
-                                if(!reader.IsEmptyElement)
-                                {
-                                    reader.Skip();
-                                }
+                                reader.ReadToEndElement();
                                 break;
 
                             case "Type":

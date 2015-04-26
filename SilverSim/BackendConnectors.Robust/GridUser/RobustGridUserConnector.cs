@@ -128,7 +128,7 @@ namespace SilverSim.BackendConnectors.Robust.GridUser
         public override void LoggedIn(UUI userID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["UserID"] = userID;
+            post["UserID"] = (string)userID;
             post["METHOD"] = "loggedin";
             checkResult(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridUserURI, null, post, false, TimeoutMs)));
         }
@@ -136,7 +136,7 @@ namespace SilverSim.BackendConnectors.Robust.GridUser
         public override void LoggedOut(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["UserID"] = userID;
+            post["UserID"] = (string)userID;
             post["RegionID"] = lastRegionID.ToString();
             post["Position"] = lastPosition.ToString();
             post["LookAt"] = lastLookAt.ToString();
@@ -147,7 +147,7 @@ namespace SilverSim.BackendConnectors.Robust.GridUser
         public override void SetHome(UUI userID, UUID homeRegionID, Vector3 homePosition, Vector3 homeLookAt)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["UserID"] = userID;
+            post["UserID"] = (string)userID;
             post["RegionID"] = homeRegionID.ToString();
             post["Position"] = homePosition.ToString();
             post["LookAt"] = homeLookAt.ToString();
@@ -158,7 +158,7 @@ namespace SilverSim.BackendConnectors.Robust.GridUser
         public override void SetPosition(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["UserID"] = userID;
+            post["UserID"] = (string)userID;
             post["RegionID"] = lastRegionID.ToString();
             post["Position"] = lastPosition.ToString();
             post["LookAt"] = lastLookAt.ToString();

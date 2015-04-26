@@ -54,7 +54,7 @@ namespace SilverSim.StructuredData.LLSD
                 switch(input.NodeType)
                 {
                     case XmlNodeType.Element:
-                        input.Skip();
+                        input.ReadToEndElement();
                         break;
 
                     case XmlNodeType.Text:
@@ -208,10 +208,7 @@ namespace SilverSim.StructuredData.LLSD
                     return new AString(GetTextNode(input));
 
                 case "undef":
-                    if (!input.IsEmptyElement)
-                    {
-                        input.Skip();
-                    }
+                    input.ReadToEndElement();
                     return new Undef();
 
                 case "uri":

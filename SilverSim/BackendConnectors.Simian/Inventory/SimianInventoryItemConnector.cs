@@ -112,7 +112,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
             post["ItemID"] = item.ID;
             post["AssetID"] = item.AssetID;
             post["ParentID"] = item.ParentFolderID;
-            post["OwnerID"] = item.Owner;
+            post["OwnerID"] = (string)item.Owner;
             post["Name"] = item.Name;
             post["Description"] = item.Description;
             post["CreatorID"] = item.Creator.ID;

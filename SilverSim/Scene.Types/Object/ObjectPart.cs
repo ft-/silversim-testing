@@ -198,6 +198,12 @@ namespace SilverSim.Scene.Types.Object
 
         internal void TriggerOnUpdate(ChangedEvent.ChangedFlags flags)
         {
+            /* we have to check the ObjectGroup during setup process before using it here */
+            if (null == ObjectGroup)
+            {
+                return;
+            }
+
             ObjectGroup.OriginalAssetID = UUID.Zero;
 
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
@@ -222,6 +228,12 @@ namespace SilverSim.Scene.Types.Object
 
         private void TriggerOnPositionChange()
         {
+            /* we have to check the ObjectGroup during setup process before using it here */
+            if (ObjectGroup == null)
+            {
+                return;
+            }
+
             var ev = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
@@ -1347,8 +1359,9 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteNamedValue("ProfileHollow", shape.ProfileHollow);
                         writer.WriteNamedValue("State", (int)shape.State);
                         writer.WriteNamedValue("LastAttachPoint", (int)ObjectGroup.AttachPoint);
-                        writer.WriteNamedValue("ProfileShape", (int)shape.Type);
-                        writer.WriteNamedValue("HollowShape", (int)shape.ProfileHollow);
+                        byte profilecurve = shape.ProfileCurve;
+                        writer.WriteNamedValue("ProfileShape", ((PrimitiveProfileShape)(profilecurve & 0x0F)).ToString());
+                        writer.WriteNamedValue("HollowShape", ((PrimitiveProfileHollowShape)(profilecurve & 0xF0)).ToString());
                         writer.WriteUUID("SculptTexture", shape.SculptMap);
                         writer.WriteNamedValue("SculptType", (int)shape.SculptType);
 
@@ -1361,9 +1374,9 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteNamedValue("FlexiDrag", fp.Friction);
                         writer.WriteNamedValue("FlexiGravity", fp.Gravity);
                         writer.WriteNamedValue("FlexiWind", fp.Wind);
-                        writer.WriteNamedValue("FlexiForce", fp.Force);
+                        writer.WriteNamedValue("FlexiForce", fp.Force, true);
 
-                        writer.WriteNamedValue("LightColor", plp.LightColor);
+                        writer.WriteNamedValue("LightColor", plp.LightColor, true);
                         writer.WriteNamedValue("LightRadius", plp.Radius);
                         writer.WriteNamedValue("LightCutoff", plp.Cutoff);
                         writer.WriteNamedValue("LightFalloff", plp.Falloff);
@@ -1479,7 +1492,7 @@ namespace SilverSim.Scene.Types.Object
                         switch (reader.Name)
                         {
                             case "ProfileCurve":
-                                shape.ProfileCurve = (byte)reader.ReadContentAsInt();
+                                shape.ProfileCurve = (byte)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "TextureEntry":
@@ -1491,94 +1504,100 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "PathBegin":
-                                shape.PathBegin = (ushort)reader.ReadContentAsInt();
+                                shape.PathBegin = (ushort)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "PathCurve":
-                                shape.PathCurve = (byte)reader.ReadContentAsInt();
+                                shape.PathCurve = (byte)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "PathEnd":
-                                shape.PathEnd = (ushort)reader.ReadContentAsInt();
+                                shape.PathEnd = (ushort)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "PathRadiusOffset":
-                                shape.PathRadiusOffset = (sbyte)reader.ReadContentAsInt();
+                                shape.PathRadiusOffset = (sbyte)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "PathRevolutions":
-                                shape.PathRevolutions = (byte)reader.ReadContentAsInt();
+                                shape.PathRevolutions = (byte)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "PathScaleX":
-                                shape.PathScaleX = (byte)reader.ReadContentAsInt();
+                                shape.PathScaleX = (byte)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "PathScaleY":
-                                shape.PathScaleY = (byte)reader.ReadContentAsInt();
+                                shape.PathScaleY = (byte)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "PathShearX":
-                                shape.PathShearX = (byte)reader.ReadContentAsInt();
+                                shape.PathShearX = (byte)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "PathShearY":
-                                shape.PathShearY = (byte)reader.ReadContentAsInt();
+                                shape.PathShearY = (byte)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "PathSkew":
-                                shape.PathSkew = (sbyte)reader.ReadContentAsInt();
+                                shape.PathSkew = (sbyte)reader.ReadElementValueAsInt();
                                 break;
 
                             case "PathTaperX":
-                                shape.PathTaperX = (sbyte)reader.ReadContentAsInt();
+                                shape.PathTaperX = (sbyte)reader.ReadElementValueAsInt();
                                 break;
 
                             case "PathTaperY":
-                                shape.PathTaperY = (sbyte)reader.ReadContentAsInt();
+                                shape.PathTaperY = (sbyte)reader.ReadElementValueAsInt();
                                 break;
 
                             case "PathTwist":
-                                shape.PathTwist = (sbyte)reader.ReadContentAsInt();
+                                shape.PathTwist = (sbyte)reader.ReadElementValueAsInt();
                                 break;
 
                             case "PathTwistBegin":
-                                shape.PathTwistBegin = (sbyte)reader.ReadContentAsInt();
+                                shape.PathTwistBegin = (sbyte)reader.ReadElementValueAsInt();
                                 break;
 
                             case "PCode":
-                                shape.PCode = (PrimitiveCode)reader.ReadContentAsInt();
+                                shape.PCode = (PrimitiveCode)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "ProfileBegin":
-                                shape.ProfileBegin = (ushort)reader.ReadContentAsInt();
+                                shape.ProfileBegin = (ushort)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "ProfileEnd":
-                                shape.ProfileEnd = (ushort)reader.ReadContentAsInt();
+                                shape.ProfileEnd = (ushort)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "ProfileHollow":
-                                shape.ProfileHollow = (ushort)reader.ReadContentAsInt();
+                                shape.ProfileHollow = (ushort)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "State":
-                                shape.State = (byte)reader.ReadContentAsInt();
+                                shape.State = (byte)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "LastAttachPoint":
                                 if(null != rootGroup)
                                 {
-                                    rootGroup.AttachPoint = (AttachmentPoint)reader.ReadContentAsInt();
+                                    rootGroup.AttachPoint = (AttachmentPoint)reader.ReadElementValueAsUInt();
                                 }
                                 break;
 
                             case "ProfileShape":
-                                shape.Type = (PrimitiveShapeType)reader.ReadContentAsInt();
+                                { 
+                                    byte p =  (byte)reader.ReadContentAsEnumValue<PrimitiveProfileShape>();
+                                    shape.ProfileCurve = (byte)((shape.ProfileCurve & (byte)0xF0) | p);
+                                }
                                 break;
 
                             case "HollowShape":
-                                shape.ProfileHollow = (ushort)reader.ReadContentAsInt();
+                                {
+                                    byte p = (byte)reader.ReadContentAsEnumValue<PrimitiveProfileHollowShape>();
+                                    shape.ProfileCurve = (byte)((shape.ProfileCurve & (byte)0x0F) | p);
+                                }
                                 break;
 
                             case "SculptTexture":
@@ -1588,7 +1607,7 @@ namespace SilverSim.Scene.Types.Object
                             case "FlexiSoftness":
                                 {
                                     FlexibleParam flexparam = part.Flexible;
-                                    flexparam.Softness = reader.ReadContentAsInt();
+                                    flexparam.Softness = reader.ReadElementValueAsInt();
                                     part.Flexible = flexparam;
                                 }
                                 break;
@@ -1596,7 +1615,7 @@ namespace SilverSim.Scene.Types.Object
                             case "FlexiTension":
                                 {
                                     FlexibleParam flexparam = part.Flexible;
-                                    flexparam.Tension = reader.ReadContentAsDouble();
+                                    flexparam.Tension = reader.ReadElementValueAsDouble();
                                     part.Flexible = flexparam;
                                 }
                                 break;
@@ -1604,7 +1623,7 @@ namespace SilverSim.Scene.Types.Object
                             case "FlexiDrag":
                                 {
                                     FlexibleParam flexparam = part.Flexible;
-                                    flexparam.Friction = reader.ReadContentAsDouble();
+                                    flexparam.Friction = reader.ReadElementValueAsDouble();
                                     part.Flexible = flexparam;
                                 }
                                 break;
@@ -1612,7 +1631,7 @@ namespace SilverSim.Scene.Types.Object
                             case "FlexiGravity":
                                 {
                                     FlexibleParam flexparam = part.Flexible;
-                                    flexparam.Gravity = reader.ReadContentAsDouble();
+                                    flexparam.Gravity = reader.ReadElementValueAsDouble();
                                     part.Flexible = flexparam;
                                 }
                                 break;
@@ -1620,7 +1639,7 @@ namespace SilverSim.Scene.Types.Object
                             case "FlexiWind":
                                 {
                                     FlexibleParam flexparam = part.Flexible;
-                                    flexparam.Wind = reader.ReadContentAsDouble();
+                                    flexparam.Wind = reader.ReadElementValueAsDouble();
                                     part.Flexible = flexparam;
                                 }
                                 break;
@@ -1629,7 +1648,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     FlexibleParam flexparam = part.Flexible;
                                     Vector3 v = flexparam.Force;
-                                    v.X = reader.ReadContentAsDouble();
+                                    v.X = reader.ReadElementValueAsDouble();
                                     flexparam.Force = v;
                                     part.Flexible = flexparam;
                                 }
@@ -1639,7 +1658,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     FlexibleParam flexparam = part.Flexible;
                                     Vector3 v = flexparam.Force;
-                                    v.Y = reader.ReadContentAsDouble();
+                                    v.Y = reader.ReadElementValueAsDouble();
                                     flexparam.Force = v;
                                     part.Flexible = flexparam;
                                 }
@@ -1649,7 +1668,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     FlexibleParam flexparam = part.Flexible;
                                     Vector3 v = flexparam.Force;
-                                    v.Z = reader.ReadContentAsDouble();
+                                    v.Z = reader.ReadElementValueAsDouble();
                                     flexparam.Force = v;
                                     part.Flexible = flexparam;
                                 }
@@ -1659,7 +1678,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     PointLightParam lightparam = part.PointLight;
                                     Color c = lightparam.LightColor;
-                                    c.R_AsByte = (byte)reader.ReadContentAsInt();
+                                    c.R_AsByte = (byte)reader.ReadElementValueAsUInt();
                                     lightparam.LightColor = c;
                                     part.PointLight = lightparam;
                                 }
@@ -1669,7 +1688,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     PointLightParam lightparam = part.PointLight;
                                     Color c = lightparam.LightColor;
-                                    c.G_AsByte = (byte)reader.ReadContentAsInt();
+                                    c.G_AsByte = (byte)reader.ReadElementValueAsUInt();
                                     lightparam.LightColor = c;
                                     part.PointLight = lightparam;
                                 }
@@ -1679,7 +1698,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     PointLightParam lightparam = part.PointLight;
                                     Color c = lightparam.LightColor;
-                                    c.B_AsByte = (byte)reader.ReadContentAsInt();
+                                    c.B_AsByte = (byte)reader.ReadElementValueAsUInt();
                                     lightparam.LightColor = c;
                                     part.PointLight = lightparam;
                                 }
@@ -1688,7 +1707,7 @@ namespace SilverSim.Scene.Types.Object
                             case "LightRadius":
                                 {
                                     PointLightParam lightparam = part.PointLight;
-                                    lightparam.Radius = reader.ReadContentAsDouble();
+                                    lightparam.Radius = reader.ReadElementValueAsDouble();
                                     part.PointLight = lightparam;
                                 }
                                 break;
@@ -1696,7 +1715,7 @@ namespace SilverSim.Scene.Types.Object
                             case "LightCutoff":
                                 {
                                     PointLightParam lightparam = part.PointLight;
-                                    lightparam.Cutoff = reader.ReadContentAsDouble();
+                                    lightparam.Cutoff = reader.ReadElementValueAsDouble();
                                     part.PointLight = lightparam;
                                 }
                                 break;
@@ -1704,7 +1723,7 @@ namespace SilverSim.Scene.Types.Object
                             case "LightFalloff":
                                 {
                                     PointLightParam lightparam = part.PointLight;
-                                    lightparam.Falloff = reader.ReadContentAsDouble();
+                                    lightparam.Falloff = reader.ReadElementValueAsDouble();
                                     part.PointLight = lightparam;
                                 }
                                 break;
@@ -1712,7 +1731,7 @@ namespace SilverSim.Scene.Types.Object
                             case "LightIntensity":
                                 {
                                     PointLightParam lightparam = part.PointLight;
-                                    lightparam.Intensity = reader.ReadContentAsDouble();
+                                    lightparam.Intensity = reader.ReadElementValueAsDouble();
                                     part.PointLight = lightparam;
                                 }
                                 break;
@@ -1720,7 +1739,7 @@ namespace SilverSim.Scene.Types.Object
                             case "FlexiEntry":
                                 {
                                     FlexibleParam flexparam = part.Flexible;
-                                    flexparam.IsFlexible = reader.ReadContentAsBoolean();
+                                    flexparam.IsFlexible = reader.ReadElementValueAsBoolean();
                                     part.Flexible = flexparam;
                                 }
                                 break;
@@ -1728,7 +1747,7 @@ namespace SilverSim.Scene.Types.Object
                             case "LightEntry":
                                 {
                                     PointLightParam lightparam = part.PointLight;
-                                    lightparam.IsLight = reader.ReadContentAsBoolean();
+                                    lightparam.IsLight = reader.ReadElementValueAsBoolean();
                                     part.PointLight = lightparam;
                                 }
                                 break;
@@ -1738,7 +1757,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             default:
-                                reader.Skip();
+                                reader.ReadToEndElement();
                                 break;
                         }
                         break;
@@ -1784,7 +1803,7 @@ namespace SilverSim.Scene.Types.Object
                         switch (reader.Name)
                         {
                             case "AllowedDrop":
-                                part.IsAllowedDrop = reader.ReadContentAsBoolean();
+                                part.IsAllowedDrop = reader.ReadElementValueAsBoolean();
                                 break;
 
                             case "CreatorID":
@@ -1792,15 +1811,15 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "CreatorData":
-                                part.Creator.CreatorData = reader.ReadContentAsString();
+                                part.Creator.CreatorData = reader.ReadElementValueAsString();
                                 break;
 
                             case "FolderID":
-                                reader.Skip();
+                                reader.ReadToEndElement();
                                 break;
 
                             case "InventorySerial":
-                                InventorySerial = reader.ReadContentAsInt();
+                                InventorySerial = reader.ReadElementValueAsInt();
                                 break;
 
                             case "TaskInventory":
@@ -1812,49 +1831,57 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "LocalId":
-                                part.LocalID = (uint)reader.ReadContentAsInt();
+                                part.LocalID = reader.ReadElementValueAsUInt();
                                 break;
 
                             case "Name":
-                                part.Name = reader.ReadContentAsString();
+                                part.Name = reader.ReadElementValueAsString();
                                 break;
 
                             case "Material":
-                                part.Material = (PrimitiveMaterial)reader.ReadContentAsInt();
+                                part.Material = (PrimitiveMaterial)reader.ReadElementValueAsInt();
                                 break;
 
                             case "PassTouches":
-                                part.IsPassTouches = reader.ReadContentAsBoolean();
+                                part.IsPassTouches = reader.ReadElementValueAsBoolean();
                                 break;
 
                             case "PassCollisions":
-                                part.IsPassCollisions = reader.ReadContentAsBoolean();
+                                part.IsPassCollisions = reader.ReadElementValueAsBoolean();
                                 break;
 
                             case "RegionHandle":
-                                reader.Skip(); /* why was this ever serialized, it breaks any deserialization attempt */
+                                reader.ReadToEndElement(); /* why was this ever serialized, it breaks partly the deduplication attempt */
                                 break;
 
                             case "ScriptAccessPin":
-                                part.ScriptAccessPin = reader.ReadContentAsInt();
+                                part.ScriptAccessPin = reader.ReadElementValueAsInt();
+                                break;
+
+                            case "GroupPosition":
+                                reader.ReadToEndElement(); /* not needed redundant information */
                                 break;
 
                             case "GroupPositionX":
-                                reader.Skip(); /* not needed redundant information */
+                                reader.ReadToEndElement(); /* not needed redundant information */
                                 break;
 
                             case "GroupPositionY":
-                                reader.Skip(); /* not needed redundant information */
+                                reader.ReadToEndElement(); /* not needed redundant information */
                                 break;
 
                             case "GroupPositionZ":
-                                reader.Skip(); /* not needed redundant information */
+                                reader.ReadToEndElement(); /* not needed redundant information */
+                                break;
+
+                            case "OffsetPosition":
+                                part.LocalPosition = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "OffsetPositionX":
                                 {
                                     Vector3 v = part.LocalPosition;
-                                    v.X = reader.ReadContentAsDouble();
+                                    v.X = reader.ReadElementValueAsDouble();
                                     part.LocalPosition = v;
                                 }
                                 break;
@@ -1862,7 +1889,7 @@ namespace SilverSim.Scene.Types.Object
                             case "OffsetPositionY":
                                 {
                                     Vector3 v = part.LocalPosition;
-                                    v.Y = reader.ReadContentAsDouble();
+                                    v.Y = reader.ReadElementValueAsDouble();
                                     part.LocalPosition = v;
                                 }
                                 break;
@@ -1870,15 +1897,19 @@ namespace SilverSim.Scene.Types.Object
                             case "OffsetPositionZ":
                                 {
                                     Vector3 v = part.LocalPosition;
-                                    v.Z = reader.ReadContentAsDouble();
+                                    v.Z = reader.ReadElementValueAsDouble();
                                     part.LocalPosition = v;
                                 }
+                                break;
+
+                            case "RotationOffset":
+                                part.LocalRotation = reader.ReadElementChildsAsQuaternion();
                                 break;
 
                             case "RotationOffsetX":
                                 {
                                     Quaternion q = part.LocalRotation;
-                                    q.X = reader.ReadContentAsDouble();
+                                    q.X = reader.ReadElementValueAsDouble();
                                     part.LocalRotation = q;
                                 }
                                 break;
@@ -1886,7 +1917,7 @@ namespace SilverSim.Scene.Types.Object
                             case "RotationOffsetY":
                                 {
                                     Quaternion q = part.LocalRotation;
-                                    q.Y = reader.ReadContentAsDouble();
+                                    q.Y = reader.ReadElementValueAsDouble();
                                     part.LocalRotation = q;
                                 }
                                 break;
@@ -1894,7 +1925,7 @@ namespace SilverSim.Scene.Types.Object
                             case "RotationOffsetZ":
                                 {
                                     Quaternion q = part.LocalRotation;
-                                    q.Z = reader.ReadContentAsDouble();
+                                    q.Z = reader.ReadElementValueAsDouble();
                                     part.LocalRotation = q;
                                 }
                                 break;
@@ -1902,15 +1933,19 @@ namespace SilverSim.Scene.Types.Object
                             case "RotationOffsetW":
                                 {
                                     Quaternion q = part.LocalRotation;
-                                    q.W = reader.ReadContentAsDouble();
+                                    q.W = reader.ReadElementValueAsDouble();
                                     part.LocalRotation = q;
                                 }
+                                break;
+
+                            case "Velocity":
+                                part.Velocity = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "VelocityX":
                                 {
                                     Vector3 v = part.Velocity;
-                                    v.X = reader.ReadContentAsDouble();
+                                    v.X = reader.ReadElementValueAsDouble();
                                     part.Velocity = v;
                                 }
                                 break;
@@ -1918,7 +1953,7 @@ namespace SilverSim.Scene.Types.Object
                             case "VelocityY":
                                 {
                                     Vector3 v = part.Velocity;
-                                    v.Y = reader.ReadContentAsDouble();
+                                    v.Y = reader.ReadElementValueAsDouble();
                                     part.Velocity = v;
                                 }
                                 break;
@@ -1926,15 +1961,19 @@ namespace SilverSim.Scene.Types.Object
                             case "VelocityZ":
                                 {
                                     Vector3 v = part.Velocity;
-                                    v.Z = reader.ReadContentAsDouble();
+                                    v.Z = reader.ReadElementValueAsDouble();
                                     part.Velocity = v;
                                 }
+                                break;
+
+                            case "AngularVelocity":
+                                part.AngularVelocity = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "AngularVelocityX":
                                 {
                                     Vector3 v = part.AngularVelocity;
-                                    v.X = reader.ReadContentAsDouble();
+                                    v.X = reader.ReadElementValueAsDouble();
                                     part.AngularVelocity = v;
                                 }
                                 break;
@@ -1942,7 +1981,7 @@ namespace SilverSim.Scene.Types.Object
                             case "AngularVelocityY":
                                 {
                                     Vector3 v = part.AngularVelocity;
-                                    v.Y = reader.ReadContentAsDouble();
+                                    v.Y = reader.ReadElementValueAsDouble();
                                     part.AngularVelocity = v;
                                 }
                                 break;
@@ -1950,15 +1989,19 @@ namespace SilverSim.Scene.Types.Object
                             case "AngularVelocityZ":
                                 {
                                     Vector3 v = part.AngularVelocity;
-                                    v.Z = reader.ReadContentAsDouble();
+                                    v.Z = reader.ReadElementValueAsDouble();
                                     part.AngularVelocity = v;
                                 }
+                                break;
+
+                            case "Acceleration":
+                                part.Acceleration = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "AccelerationX":
                                 {
                                     Vector3 v = part.Acceleration;
-                                    v.X = reader.ReadContentAsDouble();
+                                    v.X = reader.ReadElementValueAsDouble();
                                     part.Acceleration = v;
                                 }
                                 break;
@@ -1966,7 +2009,7 @@ namespace SilverSim.Scene.Types.Object
                             case "AccelerationY":
                                 {
                                     Vector3 v = part.Acceleration;
-                                    v.Y = reader.ReadContentAsDouble();
+                                    v.Y = reader.ReadElementValueAsDouble();
                                     part.Acceleration = v;
                                 }
                                 break;
@@ -1974,19 +2017,27 @@ namespace SilverSim.Scene.Types.Object
                             case "AccelerationZ":
                                 {
                                     Vector3 v = part.Acceleration;
-                                    v.Z = reader.ReadContentAsDouble();
+                                    v.Z = reader.ReadElementValueAsDouble();
                                     part.Acceleration = v;
                                 }
                                 break;
 
                             case "Description":
-                                part.Description = reader.ReadContentAsString();
+                                part.Description = reader.ReadElementValueAsString();
+                                break;
+
+                            case "Color":
+                                {
+                                    TextParam tp = part.Text;
+                                    tp.TextColor = reader.ReadElementChildsAsColorAlpha();
+                                    part.Text = tp;
+                                }
                                 break;
 
                             case "ColorR":
                                 {
                                     TextParam tp = part.Text;
-                                    tp.TextColor.R_AsByte = (byte)reader.ReadContentAsInt();
+                                    tp.TextColor.R_AsByte = (byte)reader.ReadElementValueAsInt();
                                     part.Text = tp;
                                 }
                                 break;
@@ -1994,7 +2045,7 @@ namespace SilverSim.Scene.Types.Object
                             case "ColorG":
                                 {
                                     TextParam tp = part.Text;
-                                    tp.TextColor.G_AsByte = (byte)reader.ReadContentAsInt();
+                                    tp.TextColor.G_AsByte = (byte)reader.ReadElementValueAsInt();
                                     part.Text = tp;
                                 }
                                 break;
@@ -2002,7 +2053,7 @@ namespace SilverSim.Scene.Types.Object
                             case "ColorB":
                                 {
                                     TextParam tp = part.Text;
-                                    tp.TextColor.B_AsByte = (byte)reader.ReadContentAsInt();
+                                    tp.TextColor.B_AsByte = (byte)reader.ReadElementValueAsInt();
                                     part.Text = tp;
                                 }
                                 break;
@@ -2010,7 +2061,7 @@ namespace SilverSim.Scene.Types.Object
                             case "ColorA":
                                 {
                                     TextParam tp = part.Text;
-                                    tp.TextColor.A_AsByte = (byte)reader.ReadContentAsInt();
+                                    tp.TextColor.A_AsByte = (byte)reader.ReadElementValueAsInt();
                                     part.Text = tp;
                                 }
                                 break;
@@ -2018,35 +2069,39 @@ namespace SilverSim.Scene.Types.Object
                             case "Text":
                                 {
                                     TextParam tp = part.Text;
-                                    tp.Text = reader.ReadContentAsString();
+                                    tp.Text = reader.ReadElementValueAsString();
                                     part.Text = tp;
                                 }
                                 break;
 
                             case "SitName":
-                                part.SitText = reader.ReadContentAsString();
+                                part.SitText = reader.ReadElementValueAsString();
                                 break;
 
                             case "TouchName":
-                                part.TouchText = reader.ReadContentAsString();
+                                part.TouchText = reader.ReadElementValueAsString();
                                 break;
 
                             case "LinkNum":
-                                reader.Skip();
+                                reader.ReadToEndElement();
                                 break;
 
                             case "ClickAction":
-                                part.ClickAction = (ClickActionType)reader.ReadContentAsInt();
+                                part.ClickAction = (ClickActionType)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "Shape":
                                 ShapeFromXml(part, rootGroup, reader);
                                 break;
 
+                            case "Scale":
+                                part.Size = reader.ReadElementChildsAsVector3();
+                                break;
+
                             case "ScaleX":
                                 {
                                     Vector3 v = part.Size;
-                                    v.X = reader.ReadContentAsDouble();
+                                    v.X = reader.ReadElementValueAsDouble();
                                     part.Size = v;
                                 }
                                 break;
@@ -2054,7 +2109,7 @@ namespace SilverSim.Scene.Types.Object
                             case "ScaleY":
                                 {
                                     Vector3 v = part.Size;
-                                    v.Y = reader.ReadContentAsDouble();
+                                    v.Y = reader.ReadElementValueAsDouble();
                                     part.Size = v;
                                 }
                                 break;
@@ -2062,15 +2117,19 @@ namespace SilverSim.Scene.Types.Object
                             case "ScaleZ":
                                 {
                                     Vector3 v = part.Size;
-                                    v.Z = reader.ReadContentAsDouble();
+                                    v.Z = reader.ReadElementValueAsDouble();
                                     part.Size = v;
                                 }
+                                break;
+
+                            case "SitTargetOrientation":
+                                part.SitTargetOrientation = reader.ReadElementChildsAsQuaternion();
                                 break;
 
                             case "SitTargetOrientatonX":
                                 {
                                     Quaternion q = part.SitTargetOrientation;
-                                    q.X = reader.ReadContentAsDouble();
+                                    q.X = reader.ReadElementValueAsDouble();
                                     part.SitTargetOrientation = q;
                                 }
                                 break;
@@ -2078,7 +2137,7 @@ namespace SilverSim.Scene.Types.Object
                             case "SitTargetOrientatonY":
                                 {
                                     Quaternion q = part.SitTargetOrientation;
-                                    q.Y = reader.ReadContentAsDouble();
+                                    q.Y = reader.ReadElementValueAsDouble();
                                     part.SitTargetOrientation = q;
                                 }
                                 break;
@@ -2086,7 +2145,7 @@ namespace SilverSim.Scene.Types.Object
                             case "SitTargetOrientatonZ":
                                 {
                                     Quaternion q = part.SitTargetOrientation;
-                                    q.Z = reader.ReadContentAsDouble();
+                                    q.Z = reader.ReadElementValueAsDouble();
                                     part.SitTargetOrientation = q;
                                 }
                                 break;
@@ -2094,15 +2153,19 @@ namespace SilverSim.Scene.Types.Object
                             case "SitTargetOrientatonW":
                                 {
                                     Quaternion q = part.SitTargetOrientation;
-                                    q.W = reader.ReadContentAsDouble();
+                                    q.W = reader.ReadElementValueAsDouble();
                                     part.SitTargetOrientation = q;
                                 }
+                                break;
+
+                            case "SitTargetPosition":
+                                part.SitTargetOffset = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "SitTargetPositionX":
                                 {
                                     Vector3 v = part.SitTargetOffset;
-                                    v.X = reader.ReadContentAsDouble();
+                                    v.X = reader.ReadElementValueAsDouble();
                                     part.SitTargetOffset = v;
                                 }
                                 break;
@@ -2110,7 +2173,7 @@ namespace SilverSim.Scene.Types.Object
                             case "SitTargetPositionY":
                                 {
                                     Vector3 v = part.SitTargetOffset;
-                                    v.Y = reader.ReadContentAsDouble();
+                                    v.Y = reader.ReadElementValueAsDouble();
                                     part.SitTargetOffset = v;
                                 }
                                 break;
@@ -2118,60 +2181,60 @@ namespace SilverSim.Scene.Types.Object
                             case "SitTargetPositionZ":
                                 {
                                     Vector3 v = part.SitTargetOffset;
-                                    v.Z = reader.ReadContentAsDouble();
+                                    v.Z = reader.ReadElementValueAsDouble();
                                     part.SitTargetOffset = v;
                                 }
                                 break;
 
                             case "ParentID":
-                                reader.Skip();
+                                reader.ReadToEndElement();
                                 break;
 
                             case "CreationDate":
-                                part.CreationDate = Date.UnixTimeToDateTime((ulong)reader.ReadContentAsLong());
+                                part.CreationDate = Date.UnixTimeToDateTime(reader.ReadElementValueAsULong());
                                 break;
 
                             case "Category":
                                 if (null != rootGroup)
                                 {
-                                    rootGroup.Category = (UInt32)reader.ReadContentAsInt();
+                                    rootGroup.Category = (UInt32)reader.ReadElementValueAsInt();
                                 }
                                 else
                                 {
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                 }
                                 break;
 
                             case "SalePrice":
                                 if(null != rootGroup)
                                 {
-                                    rootGroup.SalePrice = reader.ReadContentAsInt();
+                                    rootGroup.SalePrice = reader.ReadElementValueAsInt();
                                 }
                                 else
                                 {
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                 }
                                 break;
 
                             case "ObjectSaleType":
                                 if (null != rootGroup)
                                 {
-                                    rootGroup.SaleType = (InventoryItem.SaleInfoData.SaleType)reader.ReadContentAsInt();
+                                    rootGroup.SaleType = (InventoryItem.SaleInfoData.SaleType)reader.ReadElementValueAsUInt();
                                 }
                                 else
                                 {
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                 }
                                 break;
 
                             case "OwnershipCost":
                                 if (null != rootGroup)
                                 {
-                                    rootGroup.OwnershipCost = reader.ReadContentAsInt();
+                                    rootGroup.OwnershipCost = reader.ReadElementValueAsInt();
                                 }
                                 else
                                 {
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                 }
                                 break;
 
@@ -2182,13 +2245,13 @@ namespace SilverSim.Scene.Types.Object
                                 }
                                 else
                                 {
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                 }
                                 break;
 
                             case "OwnerID":
                                 /* do not trust this thing ever! */
-                                reader.Skip();
+                                reader.ReadToEndElement();
                                 break;
 
                             case "LastOwnerID":
@@ -2199,27 +2262,27 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "BaseMask":
-                                part.BaseMask = (InventoryPermissionsMask)reader.ReadContentAsLong();
+                                part.BaseMask = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "OwnerMask":
-                                part.OwnerMask = (InventoryPermissionsMask)reader.ReadContentAsLong();
+                                part.OwnerMask = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "GroupMask":
-                                part.GroupMask = (InventoryPermissionsMask)reader.ReadContentAsLong();
+                                part.GroupMask = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "EveryoneMask":
-                                part.EveryoneMask = (InventoryPermissionsMask)reader.ReadContentAsLong();
+                                part.EveryoneMask = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "NextOwnerMask":
-                                part.NextOwnerMask = (InventoryPermissionsMask)reader.ReadContentAsLong();
+                                part.NextOwnerMask = (InventoryPermissionsMask)reader.ReadElementValueAsUInt();
                                 break;
 
                             case "Flags":
-                                reader.Skip(); /* why should these ever be serialized? */
+                                reader.ReadToEndElement(); /* TODO: Phantom and other flags are here */
                                 break;
 
                             case "CollisionSound":
@@ -2233,20 +2296,24 @@ namespace SilverSim.Scene.Types.Object
                             case "CollisionSoundVolume":
                                 {
                                     CollisionSoundParam sp = part.CollisionSound;
-                                    sp.ImpactVolume = reader.ReadContentAsDouble();
+                                    sp.ImpactVolume = reader.ReadElementValueAsDouble();
                                     part.CollisionSound = sp;
                                 }
                                 break;
 
                             case "MediaUrl":
-                                part.MediaURL = reader.ReadContentAsString();
+                                part.MediaURL = reader.ReadElementValueAsString();
+                                break;
+
+                            case "AttachedPos":
+                                rootGroup.AttachedPos = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "AttachedPosX":
                                 if (null != rootGroup)
                                 {
                                     Vector3 v = rootGroup.AttachedPos;
-                                    v.X = reader.ReadContentAsDouble();
+                                    v.X = reader.ReadElementValueAsDouble();
                                     rootGroup.AttachedPos = v;
                                 }
                                 break;
@@ -2255,7 +2322,7 @@ namespace SilverSim.Scene.Types.Object
                                 if (null != rootGroup)
                                 {
                                     Vector3 v = rootGroup.AttachedPos;
-                                    v.Y = reader.ReadContentAsDouble();
+                                    v.Y = reader.ReadElementValueAsDouble();
                                     rootGroup.AttachedPos = v;
                                 }
                                 break;
@@ -2264,7 +2331,7 @@ namespace SilverSim.Scene.Types.Object
                                 if (null != rootGroup)
                                 {
                                     Vector3 v = rootGroup.AttachedPos;
-                                    v.Z = reader.ReadContentAsDouble();
+                                    v.Z = reader.ReadElementValueAsDouble();
                                     rootGroup.AttachedPos = v;
                                 }
                                 break;
@@ -2280,84 +2347,93 @@ namespace SilverSim.Scene.Types.Object
                             case "PayPrice0":
                                 if (null != rootGroup)
                                 {
-                                    rootGroup.PayPrice0 = reader.ReadContentAsInt();
+                                    rootGroup.PayPrice0 = reader.ReadElementValueAsInt();
                                 }
                                 else
                                 {
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                 }
                                 break;
 
                             case "PayPrice1":
                                 if (null != rootGroup)
                                 {
-                                    rootGroup.PayPrice1 = reader.ReadContentAsInt();
+                                    rootGroup.PayPrice1 = reader.ReadElementValueAsInt();
                                 }
                                 else
                                 {
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                 }
                                 break;
 
                             case "PayPrice2":
                                 if (null != rootGroup)
                                 {
-                                    rootGroup.PayPrice2 = reader.ReadContentAsInt();
+                                    rootGroup.PayPrice2 = reader.ReadElementValueAsInt();
                                 }
                                 else
                                 {
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                 }
                                 break;
 
                             case "PayPrice3":
                                 if (null != rootGroup)
                                 {
-                                    rootGroup.PayPrice3 = reader.ReadContentAsInt();
+                                    rootGroup.PayPrice3 = reader.ReadElementValueAsInt();
                                 }
                                 else
                                 {
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                 }
                                 break;
 
                             case "PayPrice4":
                                 if (null != rootGroup)
                                 {
-                                    rootGroup.PayPrice4 = reader.ReadContentAsInt();
+                                    rootGroup.PayPrice4 = reader.ReadElementValueAsInt();
                                 }
                                 else
                                 {
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                 }
                                 break;
 
                             case "PhysicsShapeType":
-                                part.PhysicsShapeType = (PrimitivePhysicsShapeType)reader.ReadContentAsInt();
+                                part.PhysicsShapeType = (PrimitivePhysicsShapeType)reader.ReadElementValueAsInt();
                                 break;
 
                             case "Density":
-                                part.PhysicsDensity = reader.ReadContentAsDouble();
+                                part.PhysicsDensity = reader.ReadElementValueAsDouble();
                                 break;
 
                             case "Friction":
-                                part.PhysicsFriction = reader.ReadContentAsDouble();
+                                part.PhysicsFriction = reader.ReadElementValueAsDouble();
                                 break;
 
                             case "Bounce":
-                                part.PhysicsRestitution = reader.ReadContentAsDouble();
+                                part.PhysicsRestitution = reader.ReadElementValueAsDouble();
                                 break;
 
                             case "GravityModifier":
-                                part.PhysicsGravityMultiplier = reader.ReadContentAsDouble();
+                                part.PhysicsGravityMultiplier = reader.ReadElementValueAsDouble();
                                 break;
 
                             case "DynAttrs":
-                                reader.Skip();
+                                reader.ReadToEndElement();
+                                break;
+
+                            case "SitTargetOrientationLL":
+                                reader.ReadToEndElement();
+                                break;
+
+                            case "SitTargetPositionLL":
+                                reader.ReadToEndElement();
                                 break;
 
                             default:
-                                reader.Skip();
+                                m_Log.DebugFormat("Unknown element {0} encountered in object xml", reader.Name);
+                                reader.ReadToEndElement();
                                 break;
                         }
                         break;

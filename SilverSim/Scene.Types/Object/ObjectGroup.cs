@@ -150,12 +150,15 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    return RootPart.PhysicsActor;
+                    return m_PhysicsActor;
                 }
             }
             set
             {
-                throw new InvalidOperationException();
+                lock(this)
+                {
+                    m_PhysicsActor = value;
+                }
             }
         }
 
@@ -199,6 +202,10 @@ namespace SilverSim.Scene.Types.Object
 
         private void TriggerOnUpdate(ChangedEvent.ChangedFlags flags)
         {
+            if (Count == 0)
+            {
+                return;
+            }
             lock (this)
             {
                 OriginalAssetID = UUID.Zero;
@@ -1218,10 +1225,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             default:
-                                if (!reader.IsEmptyElement)
-                                {
-                                    reader.Skip();
-                                }
+                                reader.ReadToEndElement();
                                 break;
                         }
                         break;
@@ -1235,6 +1239,58 @@ namespace SilverSim.Scene.Types.Object
 
                     default:
                         break;
+                }
+            }
+        }
+
+        static ObjectPart parseRootPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
+        {
+            ObjectPart rootPart = null;
+            if(reader.IsEmptyElement)
+            {
+                throw new InvalidObjectXmlException();
+            }
+            for(;;)
+            {
+                if(!reader.Read())
+                {
+                    throw new InvalidObjectXmlException();
+                }
+
+                switch(reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        switch (reader.Name)
+                        {
+                            case "SceneObjectPart":
+                                if(rootPart != null)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                if (reader.IsEmptyElement)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                if (rootPart != null)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                rootPart = ObjectPart.FromXml(reader, group, currentOwner);
+                                group.Add(rootPart.LinkNumber, rootPart.ID, rootPart);
+                                break;
+
+                            default:
+                                reader.ReadToEndElement();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if(reader.Name != "RootPart")
+                        {
+                            throw new InvalidObjectXmlException();
+                        }
+                        return rootPart;
                 }
             }
         }
@@ -1260,7 +1316,7 @@ namespace SilverSim.Scene.Types.Object
                     case XmlNodeType.Element:
                         switch (reader.Name)
                         {
-                            case "SceneObjectPart":
+                            case "RootPart":
                                 if (reader.IsEmptyElement)
                                 {
                                     throw new InvalidObjectXmlException();
@@ -1269,8 +1325,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                rootPart = ObjectPart.FromXml(reader, group, currentOwner);
-                                group.Add(rootPart.LinkNumber, rootPart.ID, rootPart);
+                                rootPart = parseRootPart(reader, group, currentOwner);
                                 break;
 
                             case "OtherParts":
@@ -1282,10 +1337,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "KeyframeMotion":
-                                if (!reader.IsEmptyElement)
-                                {
-                                    reader.Skip();
-                                }
+                                reader.ReadToEndElement();
                                 break;
 
                             case "GroupScriptStates":
@@ -1297,10 +1349,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             default:
-                                if (!reader.IsEmptyElement)
-                                {
-                                    reader.Skip();
-                                }
+                                reader.ReadToEndElement();
                                 break;
                         }
                         break;
@@ -1369,7 +1418,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             default:
-                                reader.Skip();
+                                reader.ReadToEndElement();
                                 break;
                         }
                         break;
@@ -1428,7 +1477,7 @@ namespace SilverSim.Scene.Types.Object
 
                                 if(!attrs.ContainsKey("Asset") || !attrs.ContainsKey("Engine"))
                                 {
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                     return;
                                 }
 
@@ -1458,7 +1507,7 @@ namespace SilverSim.Scene.Types.Object
 
                                 if (null == item)
                                 {
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                 }
                                 else
                                 {
@@ -1469,7 +1518,7 @@ namespace SilverSim.Scene.Types.Object
                                     }
                                     catch
                                     {
-                                        reader.Skip();
+                                        reader.ReadToEndElement();
                                         break;
                                     }
 
@@ -1479,14 +1528,14 @@ namespace SilverSim.Scene.Types.Object
                                     }
                                     catch(ScriptStateLoaderNotImplementedException)
                                     {
-                                        reader.Skip();
+                                        reader.ReadToEndElement();
                                         break;
                                     }
                                 }
                                 break;
 
                             default:
-                                reader.Skip();
+                                reader.ReadToEndElement();
                                 break;
                         }
                         break;

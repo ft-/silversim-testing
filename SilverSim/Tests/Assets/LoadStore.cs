@@ -103,7 +103,7 @@ namespace SilverSim.Tests.Assets
                 m_Log.Fatal("Failed to detect non-existence of asset 1");
                 return false;
             }
-            catch(Exception e)
+            catch
             {
             }
 

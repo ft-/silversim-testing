@@ -84,7 +84,7 @@ namespace SilverSim.Main.Common.HttpServer
         {
             m_Log.InfoFormat("Starting HTTP Server");
             m_Listener.Start();
-            m_Listener.BeginAcceptTcpClient(AcceptConnectionCallback, null);
+            m_Listener.BeginAcceptSocket(AcceptConnectionCallback, null);
         }
 
         public ShutdownOrder ShutdownOrder 

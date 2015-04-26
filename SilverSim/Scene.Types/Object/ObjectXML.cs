@@ -204,10 +204,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             default:
-                                if (!reader.IsEmptyElement)
-                                {
-                                    reader.Skip();
-                                }
+                                reader.ReadToEndElement();
                                 break;
                         }
                         break;

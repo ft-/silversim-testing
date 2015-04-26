@@ -214,7 +214,7 @@ namespace SilverSim.BackendHandlers.Robust.GridUser
         void WriteXmlGridUserEntry(XmlTextWriter w, GridUserInfo ui, string outerTagName)
         {
             w.WriteStartElement(outerTagName);
-            w.WriteNamedValue("UserID", ui.User);
+            w.WriteNamedValue("UserID", (string)ui.User);
             w.WriteNamedValue("HomeRegionID", ui.HomeRegionID);
             w.WriteNamedValue("HomePosition", ui.HomePosition.ToString());
             w.WriteNamedValue("HomeLookAt", ui.HomeLookAt.ToString());
@@ -235,7 +235,7 @@ namespace SilverSim.BackendHandlers.Robust.GridUser
         void WriteXmlGridUserEntry(XmlTextWriter w, UUI ui, string outerTagName)
         {
             w.WriteStartElement(outerTagName);
-            w.WriteNamedValue("UserID", ui);
+            w.WriteNamedValue("UserID", (string)ui);
             w.WriteNamedValue("HomeRegionID", UUID.Zero);
             w.WriteNamedValue("HomePosition", Vector3.Zero);
             w.WriteNamedValue("HomeLookAt", Vector3.Zero);

@@ -169,6 +169,14 @@ namespace SilverSim.Types.Primitive
         HalfCircle = 5
     }
 
+    public enum PrimitiveProfileHollowShape : byte
+    {
+        Same = 0,
+        Circle = 16,
+        Square = 32,
+        Triangle = 48
+    }
+
     public enum PrimitiveExtrusion : byte
     {
         Straight = 16,

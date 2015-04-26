@@ -127,25 +127,25 @@ namespace SilverSim.Scripting.LSL
                 switch (type)
                 {
                     case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+Quaternion":
-                        vardata = reader.ReadContentAsString();
+                        vardata = reader.ReadElementValueAsString();
                         array.Add(Quaternion.Parse(vardata));
                         break;
 
                     case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+Vector":
-                        vardata = reader.ReadContentAsString();
+                        vardata = reader.ReadElementValueAsString();
                         array.Add(Vector3.Parse(vardata));
                         break;
 
                     case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+LSLInteger":
-                        array.Add(reader.ReadContentAsInt());
+                        array.Add(reader.ReadElementValueAsInt());
                         break;
 
                     case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+LSLFloat":
-                        array.Add(reader.ReadContentAsFloat());
+                        array.Add(reader.ReadElementValueAsFloat());
                         break;
 
                     case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+LSLString":
-                        array.Add(reader.ReadContentAsString());
+                        array.Add(reader.ReadElementValueAsString());
                         break;
 
                     default:
@@ -178,7 +178,7 @@ namespace SilverSim.Scripting.LSL
                                     break;
 
                                 default:
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                     break;
                             }
                             break;
@@ -239,25 +239,25 @@ namespace SilverSim.Scripting.LSL
                 switch(type)
                 {
                     case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+Quaternion":
-                        vardata = reader.ReadContentAsString();
+                        vardata = reader.ReadElementValueAsString();
                         state.Variables[varname] = Quaternion.Parse(vardata);
                         break;
 
                     case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+Vector":
-                        vardata = reader.ReadContentAsString();
+                        vardata = reader.ReadElementValueAsString();
                         state.Variables[varname] = Vector3.Parse(vardata);
                         break;
 
                     case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+LSLInteger":
-                        state.Variables[varname] = reader.ReadContentAsInt();
+                        state.Variables[varname] = reader.ReadElementValueAsInt();
                         break;
 
                     case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+LSLFloat":
-                        state.Variables[varname] = reader.ReadContentAsFloat();
+                        state.Variables[varname] = reader.ReadElementValueAsFloat();
                         break;
 
                     case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+LSLString":
-                        state.Variables[varname] = reader.ReadContentAsString();
+                        state.Variables[varname] = reader.ReadElementValueAsString();
                         break;
 
                     case "list":
@@ -322,23 +322,23 @@ namespace SilverSim.Scripting.LSL
                             switch(reader.Name)
                             {
                                 case "State":
-                                    state.CurrentState = reader.ReadContentAsString();
+                                    state.CurrentState = reader.ReadElementValueAsString();
                                     break;
 
                                 case "Running":
-                                    state.IsRunning = reader.ReadContentAsBoolean();
+                                    state.IsRunning = reader.ReadElementValueAsBoolean();
                                     break;
 
                                 case "Variables":
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                     break;
 
                                 case "Queue":
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                     break;
 
                                 case "Plugins":
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                     break;
 
                                 case "Permissions":
@@ -346,7 +346,7 @@ namespace SilverSim.Scripting.LSL
                                     break;
 
                                 default:
-                                    reader.Skip();
+                                    reader.ReadToEndElement();
                                     break;
                             }
                             break;

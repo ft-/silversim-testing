@@ -12,7 +12,7 @@ namespace SilverSim.Types
         public Uri HomeURI = null;
         public bool IsAuthoritative = false; /* means Group Data has been validated through any available resolving service */
 
-        public static implicit operator string(UGI v)
+        public static explicit operator string(UGI v)
         {
             return string.Format("{0};{1};{2}", v.ID.ToString(), v.HomeURI.ToString(), v.GroupName);
         }
@@ -75,6 +75,13 @@ namespace SilverSim.Types
 
         public UGI()
         {
+        }
+
+        public UGI(UGI v)
+        {
+            ID = v.ID;
+            GroupName = v.GroupName;
+            HomeURI = v.HomeURI;
         }
 
         public override bool Equals(object obj)

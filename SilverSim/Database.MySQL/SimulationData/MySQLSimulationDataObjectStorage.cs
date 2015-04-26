@@ -117,7 +117,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             item.ID = (string)dbReader["InventoryID"];
                             item.InventoryType = (InventoryType)(int)dbReader["InventoryType"];
                             item.LastOwner = new UUI((string)dbReader["LastOwner"]);
-                            item.Name = new UUI((string)dbReader["Name"]);
+                            item.Name = (string)dbReader["Name"];
                             item.Owner = new UUI((string)dbReader["Owner"]);
                             item.ParentFolderID = (string)dbReader["ParentFolderID"];
                             item.Permissions.Base = (InventoryPermissionsMask)(uint)dbReader["BasePermissions"];

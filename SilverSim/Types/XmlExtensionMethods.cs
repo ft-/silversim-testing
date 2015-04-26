@@ -150,34 +150,61 @@ namespace SilverSim.Types
             writer.WriteEndElement();
         }
 
-        public static void WriteNamedValue(this XmlTextWriter writer, string name, Vector3 value)
+        public static void WriteNamedValue(this XmlTextWriter writer, string name, Vector3 value, bool septags = false)
         {
-            writer.WriteNamedValue(name + "X", value.X_String);
-            writer.WriteNamedValue(name + "Y", value.Y_String);
-            writer.WriteNamedValue(name + "Z", value.Z_String);
+            if (septags)
+            {
+                writer.WriteNamedValue(name + "X", value.X_String);
+                writer.WriteNamedValue(name + "Y", value.Y_String);
+                writer.WriteNamedValue(name + "Z", value.Z_String);
+            }
+            else
+            {
+                writer.WriteStartElement(name);
+                writer.WriteNamedValue("X", value.X_String);
+                writer.WriteNamedValue("Y", value.Y_String);
+                writer.WriteNamedValue("Z", value.Z_String);
+                writer.WriteEndElement();
+            }
         }
 
         public static void WriteNamedValue(this XmlTextWriter writer, string name, Quaternion value)
         {
-            writer.WriteNamedValue(name + "X", value.X_String);
-            writer.WriteNamedValue(name + "Y", value.Y_String);
-            writer.WriteNamedValue(name + "Z", value.Z_String);
-            writer.WriteNamedValue(name + "W", value.W_String);
+            writer.WriteStartElement(name);
+            writer.WriteNamedValue("X", value.X_String);
+            writer.WriteNamedValue("Y", value.Y_String);
+            writer.WriteNamedValue("Z", value.Z_String);
+            writer.WriteNamedValue("W", value.W_String);
+            writer.WriteEndElement();
         }
 
-        public static void WriteNamedValue(this XmlTextWriter writer, string name, ColorAlpha value)
+        public static void WriteNamedValue(this XmlTextWriter writer, string name, ColorAlpha value, bool septags = false)
         {
-            writer.WriteNamedValue(name + "R", value.R_AsByte);
-            writer.WriteNamedValue(name + "G", value.G_AsByte);
-            writer.WriteNamedValue(name + "B", value.B_AsByte);
-            writer.WriteNamedValue(name + "A", value.A_AsByte);
+            if (septags)
+            {
+                writer.WriteNamedValue(name + "R", value.R_AsByte);
+                writer.WriteNamedValue(name + "G", value.G_AsByte);
+                writer.WriteNamedValue(name + "B", value.B_AsByte);
+                writer.WriteNamedValue(name + "A", value.A_AsByte);
+            }
+            else
+            {
+                writer.WriteStartElement(name);
+                writer.WriteNamedValue("R", value.R_AsByte);
+                writer.WriteNamedValue("G", value.G_AsByte);
+                writer.WriteNamedValue("B", value.B_AsByte);
+                writer.WriteNamedValue("A", value.A_AsByte);
+                writer.WriteEndElement();
+            }
         }
 
         public static void WriteNamedValue(this XmlTextWriter writer, string name, Color value)
         {
-            writer.WriteNamedValue(name + "R", value.R_AsByte);
-            writer.WriteNamedValue(name + "G", value.G_AsByte);
-            writer.WriteNamedValue(name + "B", value.B_AsByte);
+            writer.WriteStartElement(name);
+            writer.WriteNamedValue("R", value.R_AsByte);
+            writer.WriteNamedValue("G", value.G_AsByte);
+            writer.WriteNamedValue("B", value.B_AsByte);
+            writer.WriteEndElement();
         }
 
         public static void WriteNamedValue(this XmlTextWriter writer, string name, byte[] value)
@@ -196,10 +223,16 @@ namespace SilverSim.Types
 
         public static T ReadContentAsEnum<T>(this XmlTextReader reader)
         {
-            string value = reader.ReadElementContentAsString();
+            string value = reader.ReadElementValueAsString();
             if (value.Contains(" ") && !value.Contains(","))
                 value = value.Replace(" ", ", ");
 
+            return (T)Enum.Parse(typeof(T), value);
+        }
+
+        public static T ReadContentAsEnumValue<T>(this XmlTextReader reader)
+        {
+            string value = reader.ReadElementValueAsString();
             return (T)Enum.Parse(typeof(T), value);
         }
 
@@ -217,21 +250,21 @@ namespace SilverSim.Types
                 {
                     throw new XmlException();
                 }
-            } while (reader.NodeType == XmlNodeType.Text || reader.NodeType == XmlNodeType.Attribute);
+            } while (reader.NodeType == XmlNodeType.Text || reader.NodeType == XmlNodeType.Attribute || reader.NodeType == XmlNodeType.Whitespace);
             
             if(reader.NodeType != XmlNodeType.Element)
             {
                 return new UUID(reader.ReadContentAsString()); /* they did three types of serialization for this and this is the third without inner element */
             }
 
-            UUID res = new UUID(reader.ReadContentAsString());
+            UUID res = new UUID(reader.ReadElementValueAsString());
             do
             {
                 if (!reader.Read())
                 {
                     throw new XmlException();
                 }
-            } while (reader.NodeType == XmlNodeType.Text || reader.NodeType == XmlNodeType.Attribute);
+            } while (reader.NodeType == XmlNodeType.Text || reader.NodeType == XmlNodeType.Attribute || reader.NodeType == XmlNodeType.Whitespace);
 
             if (reader.NodeType != XmlNodeType.EndElement)
             {
@@ -247,7 +280,313 @@ namespace SilverSim.Types
 
         public static byte[] ReadContentAsBase64(this XmlTextReader reader)
         {
-            return Convert.FromBase64String(reader.ReadContentAsString());
+            if(reader.IsEmptyElement)
+            {
+                return new byte[0];
+            }
+            return Convert.FromBase64String(reader.ReadElementValueAsString());
+        }
+
+        public static void ReadToEndElement(this XmlTextReader reader)
+        {
+            string tagname = reader.Name;
+            if(reader.NodeType == XmlNodeType.Element && !reader.IsEmptyElement)
+            {
+                do
+                {
+                    if(!reader.Read())
+                    {
+                        throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
+                    }
+                    if(reader.NodeType == XmlNodeType.Element)
+                    {
+                        ReadToEndElement(reader);
+                        if (!reader.Read())
+                        {
+                            throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
+                        }
+                    }
+                } while (reader.NodeType != XmlNodeType.EndElement);
+                if(tagname != reader.Name)
+                {
+                    throw new XmlException("Closing tag does not match", null, reader.LineNumber, reader.LinePosition);
+                }
+            }
+        }
+
+        public static int ReadElementValueAsInt(this XmlTextReader reader)
+        {
+            if(reader.IsEmptyElement)
+            {
+                return 0;
+            }
+            return int.Parse(ReadElementValueAsString(reader));
+        }
+
+        public static uint ReadElementValueAsUInt(this XmlTextReader reader)
+        {
+            if (reader.IsEmptyElement)
+            {
+                return 0;
+            }
+            return uint.Parse(ReadElementValueAsString(reader));
+        }
+
+        public static long ReadElementValueAsLong(this XmlTextReader reader)
+        {
+            if(reader.IsEmptyElement)
+            {
+                return 0;
+            }
+            return long.Parse(ReadElementValueAsString(reader));
+        }
+
+        public static ulong ReadElementValueAsULong(this XmlTextReader reader)
+        {
+            if (reader.IsEmptyElement)
+            {
+                return 0;
+            }
+            return ulong.Parse(ReadElementValueAsString(reader));
+        }
+
+        public static double ReadElementValueAsFloat(this XmlTextReader reader)
+        {
+            if (reader.IsEmptyElement)
+            {
+                return 0;
+            }
+            return float.Parse(ReadElementValueAsString(reader), CultureInfo.InvariantCulture);
+        }
+
+        public static double ReadElementValueAsDouble(this XmlTextReader reader)
+        {
+            if (reader.IsEmptyElement)
+            {
+                return 0;
+            }
+            return double.Parse(ReadElementValueAsString(reader), CultureInfo.InvariantCulture);
+        }
+
+        public static ColorAlpha ReadElementChildsAsColorAlpha(this XmlTextReader reader)
+        {
+            string tagname = reader.Name;
+            ColorAlpha v = ColorAlpha.White;
+            if (reader.IsEmptyElement)
+            {
+                return v;
+            }
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        switch (reader.Name)
+                        {
+                            case "R":
+                                v.R_AsByte = (byte)reader.ReadElementValueAsUInt();
+                                break;
+
+                            case "G":
+                                v.G_AsByte = (byte)reader.ReadElementValueAsUInt();
+                                break;
+
+                            case "B":
+                                v.B_AsByte = (byte)reader.ReadElementValueAsUInt();
+                                break;
+
+                            case "A":
+                                v.A_AsByte = (byte)reader.ReadElementValueAsUInt();
+                                break;
+
+                            default:
+                                reader.ReadToEndElement();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != tagname)
+                        {
+                            throw new XmlException("Closing tag does not match", null, reader.LineNumber, reader.LinePosition);
+                        }
+
+                        return v;
+                }
+            }
+        }
+
+        public static Vector3 ReadElementChildsAsVector3(this XmlTextReader reader)
+        {
+            string tagname = reader.Name;
+            Vector3 v = Vector3.Zero;
+            if(reader.IsEmptyElement)
+            {
+                return v;
+            }
+            for(;;)
+            {
+                if(!reader.Read())
+                {
+                    throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
+                }
+
+                switch(reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        switch(reader.Name)
+                        {
+                            case "X":
+                                v.X = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "Y":
+                                v.Y = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "Z":
+                                v.Z = reader.ReadElementValueAsDouble();
+                                break;
+
+                            default:
+                                reader.ReadToEndElement();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if(reader.Name != tagname)
+                        {
+                            throw new XmlException("Closing tag does not match", null, reader.LineNumber, reader.LinePosition);
+                        }
+
+                        return v;
+                }
+            }
+        }
+
+        public static Quaternion ReadElementChildsAsQuaternion(this XmlTextReader reader)
+        {
+            string tagname = reader.Name;
+            Quaternion v = Quaternion.Identity;
+            if (reader.IsEmptyElement)
+            {
+                return v;
+            }
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        switch (reader.Name)
+                        {
+                            case "X":
+                                v.X = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "Y":
+                                v.Y = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "Z":
+                                v.Z = reader.ReadElementValueAsDouble();
+                                break;
+
+                            case "W":
+                                v.W = reader.ReadElementValueAsDouble();
+                                break;
+
+                            default:
+                                reader.ReadToEndElement();
+                                break;
+                        }
+                        break;
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != tagname)
+                        {
+                            throw new XmlException("Closing tag does not match", null, reader.LineNumber, reader.LinePosition);
+                        }
+
+                        return v.Normalize();
+                }
+            }
+        }
+
+        public static string ReadElementValueAsString(this XmlTextReader reader)
+        {
+            string tagname = reader.Name;
+            if(reader.IsEmptyElement)
+            {
+                return string.Empty;
+            }
+
+            for(;;)
+            {
+                if(!reader.Read())
+                {
+                    throw new XmlException("Premature end of XML");
+                }
+
+                switch(reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        throw new XmlException("Unexpected child node");
+
+                    case XmlNodeType.Text:
+                        return reader.ReadContentAsString();
+
+                    case XmlNodeType.EndElement:
+                        if(reader.Name != tagname)
+                        {
+                            throw new XmlException("closing tag does not match");
+                        }
+                        return string.Empty;
+                }
+            }
+        }
+
+        public static bool ReadElementValueAsBoolean(this XmlTextReader reader)
+        {
+            string tagname = reader.Name;
+            if (reader.IsEmptyElement)
+            {
+                return false;
+            }
+
+            for (; ; )
+            {
+                if (!reader.Read())
+                {
+                    throw new XmlException("Premature end of XML");
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        throw new XmlException("Unexpected child node");
+
+                    case XmlNodeType.Text:
+                        return reader.ReadContentAsBoolean();
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != tagname)
+                        {
+                            throw new XmlException("closing tag does not match");
+                        }
+                        return false;
+                }
+            }
         }
 
         private readonly static CultureInfo EnUsCulture = new CultureInfo("en-us");

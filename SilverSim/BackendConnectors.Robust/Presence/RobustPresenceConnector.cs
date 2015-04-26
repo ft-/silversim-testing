@@ -130,7 +130,7 @@ namespace SilverSim.BackendConnectors.Robust.Presence
                 else if(reportType == SetType.Login)
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
-                    post["UserID"] = value.UserID;
+                    post["UserID"] = (string)value.UserID;
                     post["SessionID"] = value.SessionID;
                     post["METHOD"] = "login";
 

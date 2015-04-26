@@ -198,8 +198,10 @@ namespace SilverSim.LL.Core
                 {
                     objgroups = ObjectXML.fromAsset(data, m_RezzingAgent);
                 }
-                catch
+                catch(Exception e)
                 {
+                    m_Log.WarnFormat("Deserialization error for object asset {0} for agent {1} {2} ({3}): {4}: {5}", 
+                        data.ID, m_RezzingAgent.FirstName, m_RezzingAgent.LastName, m_RezzingAgent.ID, e.GetType().FullName, e.ToString());
                     SendAlertMessage("ALERT: InvalidObjectParams");
                     return;
                 }
@@ -291,8 +293,9 @@ namespace SilverSim.LL.Core
             {
                 data = AssetService[item.AssetID];
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.WarnFormat("Attaching item {0} not possible due {1}: {2}", item.AssetID, e.GetType().FullName, e.ToString());
                 SendAlertMessage("ALERT: CantFindInvItem", m_CurrentSceneID);
                 return;
             }

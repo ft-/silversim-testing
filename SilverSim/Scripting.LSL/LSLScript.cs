@@ -500,11 +500,11 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is RuntimePermissionsEvent)
                 {
                     RuntimePermissionsEvent e = (RuntimePermissionsEvent)ev;
-                    if(e.PermissionsKey != Item.Owner.ID)
+                    if(e.PermissionsKey != Item.Owner)
                     {
                         e.Permissions &= ~(ScriptPermissions.Debit | ScriptPermissions.SilentEstateManagement | ScriptPermissions.ChangeLinks);
                     }
-                    if(e.PermissionsKey != Item.Owner.ID)
+                    if(e.PermissionsKey != Item.Owner)
                     {
 #warning Add group support here (also allowed are group owners)
                         e.Permissions &= ~ScriptPermissions.ReturnObjects;
