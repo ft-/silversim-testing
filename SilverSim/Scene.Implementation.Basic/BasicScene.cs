@@ -378,10 +378,15 @@ namespace SilverSim.Scene.Implementation.Basic
                 {
                     foreach (ObjectPart objpart in objgroup.Values)
                     {
+                        objpart.ID = UUID.Random;
+                    }
+                    foreach (ObjectPart objpart in objgroup.Values)
+                    {
                         AddNewLocalID(objpart);
                         m_Primitives.Add(objpart.ID, objpart.LocalID, objpart);
                         removeAgain.Add(objpart);
                     }
+                    objgroup.Scene = this;
                     m_Objects.Add(objgroup.ID, objgroup);
 
                     foreach(ObjectPart objpart in objgroup.Values)
@@ -389,8 +394,10 @@ namespace SilverSim.Scene.Implementation.Basic
                         objpart.SendObjectUpdate();
                     }
                 }
-                catch
+                catch(Exception e)
                 {
+                    m_Log.DebugFormat("Failed to add object: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace.ToString());
+                    m_Objects.Remove(objgroup.ID);
                     foreach (ObjectPart objpart in removeAgain)
                     {
                         m_Primitives.Remove(objpart.ID);

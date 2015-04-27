@@ -126,7 +126,7 @@ namespace SilverSim.Scripting.LSL
                     writer.WriteEndElement();
                     writer.WriteStartElement("Variables");
                     {
-
+                        
                     }
                     writer.WriteEndElement();
                     writer.WriteStartElement("Queue");

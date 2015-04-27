@@ -227,7 +227,10 @@ namespace SilverSim.Scene.Types.Object
             }
 
             m_ObjectUpdateInfo.IncSerialNumber();
-            ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+            if (ObjectGroup.Scene != null)
+            {
+                ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+            }
         }
 
         private void TriggerOnPositionChange()
@@ -253,7 +256,10 @@ namespace SilverSim.Scene.Types.Object
                     }
                 }
             }
-            ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+            if (ObjectGroup.Scene != null)
+            {
+                ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+            }
         }
 
         public AssetServiceInterface AssetService /* specific for attachments usage */
@@ -427,7 +433,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
 
-        public ObjectGroup ObjectGroup { get; private set; }
+        public ObjectGroup ObjectGroup { get; internal set; }
         public ObjectPartInventory Inventory { get; private set; }
 
         public bool IsChanged { get; private set; }

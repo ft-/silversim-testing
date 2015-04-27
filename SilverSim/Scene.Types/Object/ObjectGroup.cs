@@ -1409,6 +1409,11 @@ namespace SilverSim.Scene.Types.Object
                         {
                             throw new InvalidObjectXmlException();
                         }
+
+                        foreach(ObjectPart part in group.Values)
+                        {
+                            part.ObjectGroup = group;
+                        }
                         return group;
 
                     default:

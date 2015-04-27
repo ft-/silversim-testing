@@ -199,35 +199,25 @@ namespace SilverSim.Scripting.LSL
             static void VariableFromXml(XmlTextReader reader, SavedScriptState state)
             {
                 string type = "";
-                string attrname = "";
                 string varname = "";
-                while (reader.ReadAttributeValue())
+                if(reader.MoveToFirstAttribute())
                 {
-                    switch (reader.NodeType)
+                    do
                     {
-                        case XmlNodeType.Attribute:
-                            attrname = reader.Value;
-                            break;
+                        switch (reader.Name)
+                        {
+                            case "type":
+                                type = reader.Value;
+                                break;
 
-                        case XmlNodeType.Text:
-                            switch (attrname)
-                            {
-                                case "type":
-                                    type = reader.Value;
-                                    break;
+                            case "name":
+                                varname = reader.Value;
+                                break;
 
-                                case "name":
-                                    varname = reader.Value;
-                                    break;
-
-                                default:
-                                    break;
-                            }
-                            break;
-
-                        default:
-                            break;
-                    }
+                            default:
+                                break;
+                        }
+                    } while (reader.MoveToNextAttribute());
                 }
 
                 if(varname == "" || type == "")
@@ -241,6 +231,11 @@ namespace SilverSim.Scripting.LSL
                     case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+Quaternion":
                         vardata = reader.ReadElementValueAsString();
                         state.Variables[varname] = Quaternion.Parse(vardata);
+                        break;
+
+                    case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+Vector3":
+                        vardata = reader.ReadElementValueAsString();
+                        state.Variables[varname] = Vector3.Parse(vardata);
                         break;
 
                     case "OpenSim.Region.ScriptEngine.Shared.LSL_Types+Vector":
@@ -301,7 +296,7 @@ namespace SilverSim.Scripting.LSL
                 }
             }
 
-            public static SavedScriptState FromXML(XmlTextReader reader, Dictionary<string, string> attrs, ObjectPartInventoryItem item)
+            static SavedScriptState ScriptStateFromXML(XmlTextReader reader, Dictionary<string, string> attrs, ObjectPartInventoryItem item)
             {
                 SavedScriptState state = new SavedScriptState();
                 for (; ;)
@@ -330,14 +325,16 @@ namespace SilverSim.Scripting.LSL
                                     break;
 
                                 case "Variables":
-                                    reader.ReadToEndElement();
+                                    VariablesFromXml(reader, state);
                                     break;
 
                                 case "Queue":
+#warning TODO: Implement queue deserialization for LSL
                                     reader.ReadToEndElement();
                                     break;
 
                                 case "Plugins":
+#warning TODO: Implement Plugins deserialization for LSL
                                     reader.ReadToEndElement();
                                     break;
 
@@ -352,7 +349,47 @@ namespace SilverSim.Scripting.LSL
                             break;
 
                         case XmlNodeType.EndElement:
-                            if(reader.Name != "State")
+                            if(reader.Name != "ScriptState")
+                            {
+                                throw new InvalidObjectXmlException();
+                            }
+                            return state;
+                    }
+                }
+            }
+
+            public static SavedScriptState FromXML(XmlTextReader reader, Dictionary<string, string> attrs, ObjectPartInventoryItem item)
+            {
+                SavedScriptState state = new SavedScriptState();
+                for (; ; )
+                {
+                    if (!reader.Read())
+                    {
+                        throw new InvalidObjectXmlException();
+                    }
+
+                    switch (reader.NodeType)
+                    {
+                        case XmlNodeType.Element:
+                            if (reader.IsEmptyElement)
+                            {
+                                break;
+                            }
+
+                            switch (reader.Name)
+                            {
+                                case "ScriptState":
+                                    state = ScriptStateFromXML(reader, attrs, item);
+                                    break;
+
+                                default:
+                                    reader.ReadToEndElement();
+                                    break;
+                            }
+                            break;
+
+                        case XmlNodeType.EndElement:
+                            if (reader.Name != "State")
                             {
                                 throw new InvalidObjectXmlException();
                             }

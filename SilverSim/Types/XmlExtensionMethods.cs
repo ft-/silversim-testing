@@ -578,7 +578,26 @@ namespace SilverSim.Types
                         throw new XmlException("Unexpected child node");
 
                     case XmlNodeType.Text:
-                        return reader.ReadContentAsBoolean();
+                        {
+                            string val = reader.ReadContentAsString();
+                            int ival;
+                            if(val.ToLower() == "true")
+                            {
+                                return true;
+                            }
+                            else if(val.ToLower() == "false")
+                            {
+                                return false;
+                            }
+                            else if(int.TryParse(val, out ival))
+                            {
+                                return ival != 0;
+                            }
+                            else
+                            {
+                                return false;
+                            }
+                        }
 
                     case XmlNodeType.EndElement:
                         if (reader.Name != tagname)
