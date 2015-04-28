@@ -1413,6 +1413,7 @@ namespace SilverSim.Scene.Types.Object
                         foreach(ObjectPart part in group.Values)
                         {
                             part.ObjectGroup = group;
+                            part.Owner = currentOwner;
                         }
                         return group;
 

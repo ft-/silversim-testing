@@ -37,7 +37,7 @@ namespace SilverSim.LL.Core
     {
         private ThreadedClasses.NonblockingQueue<ObjectUpdateInfo> m_PhysicalOutQueue = new NonblockingQueue<ObjectUpdateInfo>();
         private ThreadedClasses.NonblockingQueue<ObjectUpdateInfo> m_NonPhysicalOutQueue = new NonblockingQueue<ObjectUpdateInfo>();
-        private object m_ObjectUpdateSignal = new object();
+        private AutoResetEvent m_ObjectUpdateSignal = new AutoResetEvent(false);
 
         public void ScheduleUpdate(ObjectUpdateInfo info)
         {
@@ -53,27 +53,27 @@ namespace SilverSim.LL.Core
             {
                 m_NonPhysicalOutQueue.Enqueue(info);
             }
+            m_ObjectUpdateSignal.Set();
         }
 
-        private void HandleObjectUpdates(object para)
+        private void HandleObjectUpdates()
         {
-            ThreadedClasses.BlockingQueue<ObjectUpdateInfo> queue = (ThreadedClasses.BlockingQueue<ObjectUpdateInfo>)para;
             Dictionary<UInt32, int> LastObjSerialNo = new Dictionary<uint, int>();
             NonblockingQueue<ObjectUpdateInfo>[] queues = new NonblockingQueue<ObjectUpdateInfo>[2];
             queues[0] = m_PhysicalOutQueue;
             queues[1] = m_NonPhysicalOutQueue;
 
-            for(;;)
+            while (m_ObjectUpdateThreadRunning)
             {
-                
-                if(!Monitor.Wait(m_ObjectUpdateSignal, 5000))
+
+                if(!m_ObjectUpdateSignal.WaitOne(1000))
                 {
                     continue;
                 }
 
                 Messages.Object.KillObject ko = null;
 
-                while (m_PhysicalOutQueue.Count != 0 && m_NonPhysicalOutQueue.Count != 0)
+                while (m_PhysicalOutQueue.Count != 0 || m_NonPhysicalOutQueue.Count != 0)
                 {
                     foreach (NonblockingQueue<ObjectUpdateInfo> q in queues)
                     {

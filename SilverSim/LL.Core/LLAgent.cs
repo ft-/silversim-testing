@@ -1218,6 +1218,15 @@ namespace SilverSim.LL.Core
             /* this is for the root agent */
         }
 
+        public void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID)
+        {
+            Circuit circuit;
+            if(Circuits.TryGetValue(fromSceneID, out circuit))
+            {
+                circuit.ScheduleUpdate(info);
+            }
+        }
+
         public void SendMessageIfRootAgent(Message m, UUID fromSceneID)
         {
             if(fromSceneID == m_CurrentSceneID)

@@ -79,6 +79,9 @@ namespace SilverSim.LL.Core
         private BlockingQueue<Message> m_InventoryRequestQueue = new BlockingQueue<Message>();
         public string GatekeeperURI { get; protected set; }
 
+        private Thread m_ObjectUpdateThread;
+        private bool m_ObjectUpdateThreadRunning = false;
+
         int m_PacketsReceived = 0;
         int m_PacketsSent = 0;
         int m_AgentUpdatesReceived = 0;
@@ -551,6 +554,12 @@ namespace SilverSim.LL.Core
                     m_InventoryThreadRunning = true;
                     m_InventoryThread.Start(this);
                 }
+                if (!m_ObjectUpdateThreadRunning)
+                {
+                    m_ObjectUpdateThread = new Thread(HandleObjectUpdates);
+                    m_ObjectUpdateThreadRunning = true;
+                    m_ObjectUpdateThread.Start();
+                }
                 m_EventQueueEnabled = true;
             }
         }
@@ -572,6 +581,12 @@ namespace SilverSim.LL.Core
                 {
                     m_InventoryThreadRunning = false;
                     m_InventoryThread = null;
+                }
+                if (null != m_ObjectUpdateThread)
+                {
+                    m_ObjectUpdateThreadRunning = false;
+                    m_ObjectUpdateThread = null;
+                    m_ObjectUpdateSignal.Set();
                 }
                 m_EventQueueEnabled = false;
             }

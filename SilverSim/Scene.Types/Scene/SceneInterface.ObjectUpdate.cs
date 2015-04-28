@@ -23,16 +23,13 @@ exception statement from your version.
 
 */
 
+using SilverSim.LL.Messages.Avatar;
+using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
+using SilverSim.Types;
+using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Scene.Types.Agent;
-using SilverSim.Types.Primitive;
-using SilverSim.Scene.Types.Object;
-using SilverSim.LL.Messages;
-using SilverSim.LL.Messages.Avatar;
-using SilverSim.Types;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -40,7 +37,10 @@ namespace SilverSim.Scene.Types.Scene
     {
         public void ScheduleUpdate(ObjectUpdateInfo objinfo)
         {
-
+            foreach (IAgent a in Agents)
+            {
+                a.ScheduleUpdate(objinfo, ID);
+            }
         }
 
         private SilverSim.LL.Messages.Object.ObjectUpdate AgentToObjectUpdate(IAgent agent)
