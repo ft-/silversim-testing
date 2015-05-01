@@ -54,6 +54,8 @@ namespace SilverSim.Scripting.LSL
         internal RwLockedList<UUID> m_RequestedURLs = new RwLockedList<UUID>();
 
         public readonly Timer Timer = new Timer();
+        public bool UseForcedSleep = true;
+        public double ForcedSleepFactor = 1;
 
         private void OnTimerEvent(object sender, ElapsedEventArgs e)
         {
@@ -73,6 +75,14 @@ namespace SilverSim.Scripting.LSL
             set
             {
                 lock(this) m_ExecutionTime = value;
+            }
+        }
+
+        public void ForcedSleep(double secs)
+        {
+            if (UseForcedSleep)
+            {
+                Sleep(secs * ForcedSleepFactor);
             }
         }
 

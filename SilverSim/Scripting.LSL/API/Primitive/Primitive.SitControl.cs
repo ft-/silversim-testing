@@ -66,6 +66,40 @@ namespace SilverSim.Scripting.LSL.API.Primitive
                 part.SitTargetOrientation = rot;
             }
         }
+
+        [APILevel(APIFlags.ASSL)]
+        public AnArray asGetSitTarget(ScriptInstance Instance)
+        {
+            AnArray res = new AnArray();
+            lock(Instance)
+            {
+                res.Add(Instance.Part.SitTargetOffset);
+                res.Add(Instance.Part.SitTargetOrientation);
+            }
+            return res;
+        }
+
+        [APILevel(APIFlags.ASSL)]
+        public AnArray asGetLinkSitTarget(ScriptInstance Instance, int link)
+        {
+            ObjectPart part;
+            AnArray res = new AnArray();
+            lock (Instance)
+            {
+                if (link == LINK_THIS)
+                {
+                    part = Instance.Part;
+                }
+                else if (!Instance.Part.ObjectGroup.TryGetValue(link, out part))
+                {
+                    return res;
+                }
+
+                res.Add(part.SitTargetOffset);
+                res.Add(part.SitTargetOrientation);
+            }
+            return res;
+        }
         #endregion
 
         #region Sit control
