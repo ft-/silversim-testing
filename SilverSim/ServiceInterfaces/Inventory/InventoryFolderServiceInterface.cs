@@ -43,6 +43,15 @@ namespace SilverSim.ServiceInterfaces.Inventory
             get;
         }
 
+
+        public virtual InventoryFolderContentServiceInterface Content
+        {
+            get
+            {
+                return new DefaultInventoryFolderContentService(this);
+            }
+        }
+
         public abstract List<InventoryFolder> getFolders(UUID PrincipalID, UUID key);
         public abstract List<InventoryItem> getItems(UUID PrincipalID, UUID key);
 

@@ -116,10 +116,17 @@ namespace SilverSim.LL.Core
 
                             if(dofull)
                             {
+                                Messages.Object.ObjectProperties.ObjData objprop = ui.SerializeObjProperties();
+                                if(objprop != null)
+                                {
+                                    Messages.Object.ObjectProperties p = new Messages.Object.ObjectProperties();
+                                    p.ObjectData.Add(objprop);
+                                    SendMessage(p);
+                                }
                                 Messages.Object.ObjectUpdate.ObjData od = ui.SerializeFull();
                                 if(od != null)
                                 {
-                                    if(od.OwnerID == AgentID)
+                                    if(ui.Part.Owner.ID == AgentID)
                                     {
                                         od.UpdateFlags |= Types.Primitive.PrimitiveFlags.ObjectYouOwner;
                                     }

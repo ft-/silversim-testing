@@ -29,65 +29,47 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
-    public abstract class InventoryItemServiceInterface
+    public class DefaultInventoryFolderContentService : InventoryFolderContentServiceInterface
     {
-        #region Accessors
-        public abstract InventoryItem this[UUID PrincipalID, UUID key]
+        InventoryFolderServiceInterface m_Service;
+
+        public DefaultInventoryFolderContentService(InventoryFolderServiceInterface service)
         {
-            get;
+            m_Service = service;
         }
 
-        public virtual List<InventoryItem> this[UUID principalID, List<UUID> itemids]
+        public override InventoryFolderContent this[UUID principalID, UUID folderID]
         {
-            get
+            get 
             {
-                List<InventoryItem> items = new List<InventoryItem>();
-                foreach(UUID itemid in itemids)
-                {
-                    try
-                    {
-                        items.Add(this[principalID, itemid]);
-                    }
-                    catch
-                    {
+                InventoryFolderContent folderContent = new InventoryFolderContent();
+                InventoryFolder folder;
+                folder = m_Service[principalID, folderID];
 
-                    }
-                }
-                return items;
-            }
-        }
+                folderContent.Version = folder.Version;
+                folderContent.Owner = folder.Owner;
+                folderContent.FolderID = folder.ID;
 
-        #endregion
-
-        public abstract void Add(InventoryItem item);
-        public abstract void Update(InventoryItem item);
-
-        public abstract void Delete(UUID PrincipalID, UUID ID);
-        public abstract void Move(UUID PrincipalID, UUID ID, UUID newFolder);
-
-        public virtual List<UUID> Delete(UUID PrincipalID, List<UUID> IDs)
-        {
-            List<UUID> deleted = new List<UUID>();
-            foreach(UUID id in IDs)
-            {
                 try
                 {
-                    Delete(PrincipalID, id);
-                    deleted.Add(id);
+                    folderContent.Folders = m_Service.getFolders(principalID, folderID);
                 }
                 catch
                 {
-
+                    folderContent.Folders = new List<InventoryFolder>();
                 }
+
+                try
+                {
+                    folderContent.Items = m_Service.getItems(principalID, folderID);
+                }
+                catch
+                {
+                    folderContent.Items = new List<InventoryItem>();
+                }
+
+                return folderContent;
             }
-            return deleted;
         }
-
-        #region Constructor
-        public InventoryItemServiceInterface()
-        {
-
-        }
-        #endregion
     }
 }

@@ -198,8 +198,9 @@ namespace SilverSim.Scripting.LSL
             writer.WriteEndElement();
         }
 
-        public Script(ObjectPart part, ObjectPartInventoryItem item)
+        public Script(ObjectPart part, ObjectPartInventoryItem item, bool forcedSleepDefault)
         {
+            UseForcedSleep = forcedSleepDefault;
             m_Part = part;
             m_Item = item;
             Timer.Elapsed += OnTimerEvent;

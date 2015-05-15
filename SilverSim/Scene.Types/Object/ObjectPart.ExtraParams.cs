@@ -475,7 +475,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Flexible.Wind = value.Wind;
                 }
                 UpdateExtraParams();
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(ChangedEvent.ChangedFlags.Shape);
             }
         }
@@ -506,7 +506,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Projection.ProjectionAmbience = value.ProjectionAmbience;
                 }
                 UpdateExtraParams();
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -537,7 +537,7 @@ namespace SilverSim.Scene.Types.Object
                     m_PointLight.Radius = value.Radius;
                 }
                 UpdateExtraParams();
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }

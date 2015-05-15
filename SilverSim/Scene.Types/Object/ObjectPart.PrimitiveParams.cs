@@ -723,7 +723,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     UpdateExtraParams();
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(ChangedEvent.ChangedFlags.Shape);
             }
         }

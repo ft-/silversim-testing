@@ -196,7 +196,7 @@ namespace SilverSim.Scene.Types.Object
 
         void OnInventoryChange()
         {
-            IsChanged = true;
+            IsChanged = m_IsChangedEnabled;
             TriggerOnUpdate(ChangedEvent.ChangedFlags.Inventory);
         }
 
@@ -287,7 +287,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Permissions.Base = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -307,7 +307,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Permissions.Current = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -327,7 +327,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Permissions.Group = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -347,7 +347,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Permissions.EveryOne = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -367,7 +367,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Permissions.NextOwner = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -387,7 +387,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_CreationDate = new Date(value);
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -407,7 +407,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_PrimitiveFlags = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -427,7 +427,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Creator = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -438,6 +438,20 @@ namespace SilverSim.Scene.Types.Object
 
         public bool IsChanged { get; private set; }
 
+        bool m_IsChangedEnabled = false;
+
+        public bool IsChangedEnabled
+        {
+            get
+            {
+                return m_IsChangedEnabled;
+            }
+            set
+            {
+                m_IsChangedEnabled = m_IsChangedEnabled || value;
+            }
+        }
+
         public ClickActionType ClickAction
         {
             get
@@ -447,7 +461,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_ClickAction = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -461,7 +475,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsPassCollisions = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -475,7 +489,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsPassTouches = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -564,7 +578,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsSoundQueueing = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -604,7 +618,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_IsAllowedDrop = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(ChangedEvent.ChangedFlags.AllowedDrop);
             }
         }
@@ -618,7 +632,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 lock (this) m_SitTargetOffset = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate( 0);
             }
         }
@@ -632,7 +646,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 lock (this) m_SitTargetOrientation = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -646,7 +660,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 lock(this) m_SitText = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -679,7 +693,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 lock (this) m_TouchText = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -693,7 +707,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_PhysicsShapeType = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(ChangedEvent.ChangedFlags.Shape);
             }
         }
@@ -750,7 +764,7 @@ namespace SilverSim.Scene.Types.Object
                     default:
                         break;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -770,7 +784,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Size = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(ChangedEvent.ChangedFlags.Scale);
             }
         }
@@ -790,7 +804,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Slice = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(ChangedEvent.ChangedFlags.Shape);
             }
         }
@@ -810,7 +824,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 AngularVelocity = value.Axis * value.Spinrate;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -839,7 +853,7 @@ namespace SilverSim.Scene.Types.Object
             set 
             { 
                 m_Name = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -853,7 +867,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_Description = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -890,7 +904,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_PhysicsDensity = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -910,7 +924,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_PhysicsFriction = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -930,7 +944,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_PhysicsRestitution = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -951,7 +965,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_PhysicsGravityMultiplier = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -1001,7 +1015,7 @@ namespace SilverSim.Scene.Types.Object
                         m_GlobalPosition = value;
                     }
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
             }
@@ -1022,7 +1036,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_GlobalPosition = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
             }
@@ -1071,7 +1085,7 @@ namespace SilverSim.Scene.Types.Object
                         m_GlobalPosition = value;
                     }
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
             }
@@ -1122,7 +1136,7 @@ namespace SilverSim.Scene.Types.Object
                         m_GlobalRotation = value;
                     }
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
             }
@@ -1143,7 +1157,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_GlobalRotation = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
             }
@@ -1192,7 +1206,7 @@ namespace SilverSim.Scene.Types.Object
                         m_GlobalRotation = value;
                     }
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
             }

@@ -32,7 +32,7 @@ namespace SilverSim.LL.Messages.Object
 {
     public class ObjectProperties : Message
     {
-        public struct ObjData
+        public class ObjData
         {
             public UUID ObjectID;
             public UUID CreatorID;
@@ -61,7 +61,12 @@ namespace SilverSim.LL.Messages.Object
             public string Description;
             public string TouchName;
             public string SitName;
-            public string TextureID;
+            public byte[] TextureID = new byte[0];
+
+            public ObjData()
+            {
+
+            }
         }
 
         public List<ObjData> ObjectData = new List<ObjData>();
@@ -111,7 +116,8 @@ namespace SilverSim.LL.Messages.Object
                 p.WriteStringLen8(d.Description);
                 p.WriteStringLen8(d.TouchName);
                 p.WriteStringLen8(d.SitName);
-                p.WriteStringLen8(d.TextureID);
+                p.WriteUInt8((byte)d.TextureID.Length);
+                p.WriteBytes(d.TextureID);
             }
         }
     }

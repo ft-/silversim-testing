@@ -38,6 +38,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         private string m_InventoryURI;
         public int TimeoutMs = 20000;
         private GroupsServiceInterface m_GroupsService;
+        bool m_isMultipleSupported = true;
 
         #region Constructor
         public RobustInventoryItemConnector(string uri, GroupsServiceInterface groupsService)
@@ -63,6 +64,55 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
                 }
 
                 return RobustInventoryConnector.ItemFromMap((Map)map["item"], m_GroupsService);
+            }
+        }
+
+        public override List<InventoryItem> this[UUID principalID, List<UUID> itemids]
+        {
+            get
+            {
+                if(itemids.Count == 0)
+                {
+                    return new List<InventoryItem>();
+                }
+
+                /* when the service failed for being not supported, we do not even try it again in that case */
+                if(!m_isMultipleSupported)
+                {
+                    return base[principalID, itemids];
+                }
+
+                Dictionary<string, string> post = new Dictionary<string, string>();
+                post["PRINCIPAL"] = principalID;
+                post["ITEMS"] = string.Join(",", itemids);
+                post["COUNT"] = itemids.Count.ToString(); /* <- some redundancy here for whatever unknown reason, it could have been derived from ITEMS anyways */
+                post["METHOD"] = "GETMULTIPLEITEMS";
+                Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
+                List<InventoryItem> items = new List<InventoryItem>();
+                bool anyResponse = false;
+                foreach(KeyValuePair<string, IValue> kvp in map)
+                {
+                    if(kvp.Key.StartsWith("item_"))
+                    {
+                        anyResponse = true;
+                        if(kvp.Value is Map)
+                        {
+                            items.Add(RobustInventoryConnector.ItemFromMap((Map)kvp.Value, m_GroupsService));
+                        }
+                    }
+                }
+
+                /* check for fallback */
+                if(!anyResponse)
+                {
+                    items = base[principalID, itemids];
+                    if(items.Count > 0)
+                    {
+                        m_isMultipleSupported = false;
+                    }
+                }
+                
+                return items;
             }
         }
         #endregion

@@ -38,16 +38,26 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         private string m_InventoryURI;
         public int TimeoutMs = 20000;
         private GroupsServiceInterface m_GroupsService;
+        private RobustInventoryFolderContentConnector m_FolderContentService;
 
         #region Constructor
         public RobustInventoryFolderConnector(string uri, GroupsServiceInterface groupsService)
         {
             m_GroupsService = groupsService;
             m_InventoryURI = uri;
+            m_FolderContentService = new RobustInventoryFolderContentConnector(uri, groupsService);
         }
         #endregion
 
         #region Accessors
+        public override InventoryFolderContentServiceInterface Content
+        {
+            get
+            {
+                return m_FolderContentService;
+            }
+        }
+
         public override InventoryFolder this[UUID PrincipalID, UUID key]
         {
             get

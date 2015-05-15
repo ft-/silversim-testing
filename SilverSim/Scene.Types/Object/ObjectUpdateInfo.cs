@@ -83,7 +83,26 @@ namespace SilverSim.Scene.Types.Object
                     Part.Acceleration.ToBytes(m.ObjectData, 24);
                     Part.Rotation.ToBytes(m.ObjectData, 36);
                     Part.AngularVelocity.ToBytes(m.ObjectData, 48);
-                    m.ParentID = Part.ObjectGroup.RootPart.LocalID;
+                    if(Part.ObjectGroup.RootPart != Part)
+                    {
+                        m.ParentID = Part.ObjectGroup.RootPart.LocalID;
+                    }
+                    else if (Part.ObjectGroup.IsAttached)
+                    {
+                        /* we need the owner localid here */
+                        try
+                        {
+                            m.ParentID = Part.ObjectGroup.Scene.Agents[Part.Owner.ID].LocalID;
+                        }
+                        catch
+                        {
+                            m.ParentID = 0;
+                        }
+                    }
+                    else
+                    {
+                        m.ParentID = 0;
+                    }
                     ObjectPart.PrimitiveShape shape = Part.Shape;
                     m.PathBegin = shape.PathBegin;
                     m.PathEnd = shape.PathEnd;
@@ -209,6 +228,57 @@ namespace SilverSim.Scene.Types.Object
                     SilverSim.LL.Messages.Object.ImprovedTerseObjectUpdate.ObjData objdata = new LL.Messages.Object.ImprovedTerseObjectUpdate.ObjData();
                     objdata.Data = Part.TerseData;
                     objdata.TextureEntry = Part.TextureEntryBytes;
+                    return objdata;
+                }
+            }
+        }
+
+        public SilverSim.LL.Messages.Object.ObjectProperties.ObjData SerializeObjProperties()
+        {
+            lock(this)
+            {
+                if(m_Killed)
+                {
+                    return null;
+                }
+                else
+                {
+                    SilverSim.LL.Messages.Object.ObjectProperties.ObjData objdata = new LL.Messages.Object.ObjectProperties.ObjData();
+
+                    objdata.ObjectID = Part.ID;
+                    objdata.CreatorID = Part.Creator.ID;
+                    if (Part.ObjectGroup.IsGroupOwned)
+                    {
+                        objdata.OwnerID = UUID.Zero;
+                    }
+                    else
+                    {
+                        objdata.OwnerID = Part.Owner.ID;
+                    }
+                    objdata.GroupID = Part.ObjectGroup.Group.ID;
+                    objdata.CreationDate = Part.CreationDate.AsULong * 1000000;
+                    objdata.BaseMask = Part.BaseMask;
+                    objdata.OwnerMask = Part.OwnerMask;
+                    objdata.GroupMask = Part.GroupMask;
+                    objdata.EveryoneMask = Part.EveryoneMask;
+                    objdata.NextOwnerMask = Part.NextOwnerMask;
+                    objdata.OwnershipCost = Part.ObjectGroup.OwnershipCost;
+                    objdata.TaxRate = 0;
+                    objdata.SaleType = Part.ObjectGroup.SaleType;
+                    objdata.SalePrice = Part.ObjectGroup.SalePrice;
+                    objdata.AggregatePerms = 0;
+                    objdata.AggregatePermTextures = 0;
+                    objdata.AggregatePermTexturesOwner = 0;
+                    objdata.Category = Part.ObjectGroup.Category;
+                    objdata.InventorySerial = (Int16)Part.Inventory.InventorySerial;
+                    objdata.ItemID = Part.ObjectGroup.FromItemID;
+                    objdata.FolderID = UUID.Zero;
+                    objdata.FromTaskID = UUID.Zero;
+                    objdata.LastOwnerID = Part.ObjectGroup.LastOwner.ID;
+                    objdata.Name = Part.Name;
+                    objdata.Description = Part.Description;
+                    objdata.TouchName = Part.TouchText;
+                    objdata.SitName = Part.SitText;
                     return objdata;
                 }
             }

@@ -1520,7 +1520,7 @@ namespace SilverSim.Scripting.LSL
         public IScriptAssembly Compile(AppDomain appDom, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int lineNumber = 1)
         {
             CompileState compileState = Preprocess(user, shbangs, reader, lineNumber);
-            return PostProcess(compileState, appDom, assetID);
+            return PostProcess(compileState, appDom, assetID, (compileState.AcceptedFlags & APIFlags.ASSL) == 0);
         }
 
         void ProcessBlock(
@@ -1689,7 +1689,7 @@ namespace SilverSim.Scripting.LSL
             ProcessBlock(compileState, scriptTypeBuilder, stateTypeBuilder, mb, ilgen, functionBody, functionParams, ref lineIndex);
         }
 
-        IScriptAssembly PostProcess(CompileState compileState, AppDomain appDom, UUID assetID)
+        IScriptAssembly PostProcess(CompileState compileState, AppDomain appDom, UUID assetID, bool forcedSleepDefault)
         {
             string assetAssemblyName = "Script." + assetID.ToString().Replace("-", "_");
             AssemblyName aName = new AssemblyName(assetAssemblyName);
@@ -1951,7 +1951,7 @@ namespace SilverSim.Scripting.LSL
 
             mb.CreateGlobalFunctions();
 
-            return new LSLScriptAssembly(ab, t, stateTypes);
+            return new LSLScriptAssembly(ab, t, stateTypes, forcedSleepDefault);
         }
 
         class LSLScriptAssembly : IScriptAssembly
@@ -1959,17 +1959,19 @@ namespace SilverSim.Scripting.LSL
             Assembly m_Assembly;
             Type m_Script;
             Dictionary<string, Type> m_StateTypes;
+            bool m_ForcedSleep;
 
-            public LSLScriptAssembly(Assembly assembly, Type script, Dictionary<string, Type> stateTypes)
+            public LSLScriptAssembly(Assembly assembly, Type script, Dictionary<string, Type> stateTypes, bool forcedSleep)
             {
                 m_Assembly = assembly;
                 m_Script = script;
                 m_StateTypes = stateTypes;
+                m_ForcedSleep = forcedSleep;
             }
 
             public ScriptInstance Instantiate(ObjectPart objpart, ObjectPartInventoryItem item)
             {
-                Script m_Script = new Script(objpart, item);
+                Script m_Script = new Script(objpart, item, m_ForcedSleep);
                 foreach(KeyValuePair<string, Type> t in m_StateTypes)
                 {
                     ConstructorInfo info = t.Value.GetConstructor(new Type[1] { typeof(Script) });

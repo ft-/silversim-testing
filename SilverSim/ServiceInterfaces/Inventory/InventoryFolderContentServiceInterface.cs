@@ -29,65 +29,37 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
-    public abstract class InventoryItemServiceInterface
+    public abstract class InventoryFolderContentServiceInterface
     {
-        #region Accessors
-        public abstract InventoryItem this[UUID PrincipalID, UUID key]
+        public InventoryFolderContentServiceInterface()
+        {
+
+        }
+
+        public abstract InventoryFolderContent this[UUID principalID, UUID folderID]
         {
             get;
         }
 
-        public virtual List<InventoryItem> this[UUID principalID, List<UUID> itemids]
+
+        public virtual List<InventoryFolderContent> this[UUID principalID, UUID[] folderIDs]
         {
             get
             {
-                List<InventoryItem> items = new List<InventoryItem>();
-                foreach(UUID itemid in itemids)
+                List<InventoryFolderContent> contents = new List<InventoryFolderContent>();
+                foreach(UUID folderID in folderIDs)
                 {
                     try
                     {
-                        items.Add(this[principalID, itemid]);
+                        contents.Add(this[principalID, folderID]);
                     }
                     catch
                     {
 
                     }
                 }
-                return items;
+                return contents;
             }
         }
-
-        #endregion
-
-        public abstract void Add(InventoryItem item);
-        public abstract void Update(InventoryItem item);
-
-        public abstract void Delete(UUID PrincipalID, UUID ID);
-        public abstract void Move(UUID PrincipalID, UUID ID, UUID newFolder);
-
-        public virtual List<UUID> Delete(UUID PrincipalID, List<UUID> IDs)
-        {
-            List<UUID> deleted = new List<UUID>();
-            foreach(UUID id in IDs)
-            {
-                try
-                {
-                    Delete(PrincipalID, id);
-                    deleted.Add(id);
-                }
-                catch
-                {
-
-                }
-            }
-            return deleted;
-        }
-
-        #region Constructor
-        public InventoryItemServiceInterface()
-        {
-
-        }
-        #endregion
     }
 }

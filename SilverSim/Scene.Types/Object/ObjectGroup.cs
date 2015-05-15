@@ -127,6 +127,23 @@ namespace SilverSim.Scene.Types.Object
         private Vector3 m_Acceleration = Vector3.Zero;
         private Vector3 m_AngularAcceleration = Vector3.Zero;
 
+        bool m_IsChangedEnabled = false;
+        public bool IsChangedEnabled
+        {
+            get
+            {
+                return m_IsChangedEnabled;
+            }
+            set
+            {
+                m_IsChangedEnabled = m_IsChangedEnabled || value;
+                foreach(ObjectPart p in Values)
+                {
+                    p.IsChangedEnabled = value;
+                }
+            }
+        }
+
         #region Constructor
         public ObjectGroup()
         {
@@ -253,7 +270,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_PayPrice0 = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -267,7 +284,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_PayPrice1 = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -281,7 +298,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_PayPrice2 = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -295,7 +312,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_PayPrice3 = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -309,7 +326,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_PayPrice4 = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -323,7 +340,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_SaleType = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -337,7 +354,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_SalePrice = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -351,7 +368,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_OwnershipCost = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -365,7 +382,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_Category = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -379,7 +396,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_AttachPoint = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -421,7 +438,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_Acceleration = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -435,7 +452,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_AttachedPos = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -449,7 +466,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_AngularAcceleration = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -466,7 +483,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_IsTemporary = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -484,7 +501,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_IsTemporary = m_IsTemporary && m_IsTempOnRez;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -510,7 +527,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 PhysicsActor.IsPhantom = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -534,7 +551,7 @@ namespace SilverSim.Scene.Types.Object
                 }
                 if (changed)
                 {
-                    IsChanged = true;
+                    IsChanged = m_IsChangedEnabled;
                     TriggerOnUpdate(ChangedEvent.ChangedFlags.Owner);
                 }
             }
@@ -549,7 +566,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 PhysicsActor.IsPhysicsActive = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -563,7 +580,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 PhysicsActor.IsVolumeDetect = value;
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -583,7 +600,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Group = new UGI(value);
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -603,7 +620,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_LastOwner = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -623,7 +640,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Owner = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(ChangedEvent.ChangedFlags.Owner);
             }
         }
@@ -651,7 +668,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Velocity = value;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }

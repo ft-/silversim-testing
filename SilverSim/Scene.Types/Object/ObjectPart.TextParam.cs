@@ -75,7 +75,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Text.TextColor = new ColorAlpha(value.TextColor);
                 }
                 UpdateExtraParams();
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }

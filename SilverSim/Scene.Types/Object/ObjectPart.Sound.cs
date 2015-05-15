@@ -79,7 +79,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Sound.Radius = value.Radius;
                     m_Sound.Flags = value.Flags;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }
@@ -121,7 +121,7 @@ namespace SilverSim.Scene.Types.Object
                     m_CollisionSound.ImpactSound = value.ImpactSound;
                     m_CollisionSound.ImpactVolume = value.ImpactVolume;
                 }
-                IsChanged = true;
+                IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
         }

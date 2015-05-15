@@ -112,6 +112,8 @@ namespace SilverSim.Scene.Types.Object
 
         public static List<ObjectGroup> fromXml(XmlTextReader reader, UUI currentOwner)
         {
+            /* OpenSim guys messed up xml declarations, so we have to ignore it */
+            reader.DtdProcessing = DtdProcessing.Ignore;
             for(;;)
             {
                 if(!reader.Read())

@@ -245,6 +245,7 @@ namespace SilverSim.LL.Core
                 grp.FromItemID = m_ItemID;
                 grp.IsAttached = true;
                 grp.Position = grp.AttachedPos;
+                grp.IsChangedEnabled = true;
 
                 try
                 {
