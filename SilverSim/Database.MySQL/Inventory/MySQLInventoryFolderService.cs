@@ -26,6 +26,7 @@ exception statement from your version.
 using MySql.Data.MySqlClient;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
@@ -39,6 +40,30 @@ namespace SilverSim.Database.MySQL.Inventory
         public MySQLInventoryFolderService(string connectionString)
         {
             m_ConnectionString = connectionString;
+        }
+
+        public override InventoryFolder this[UUID key]
+        {
+            get
+            {
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                {
+                    connection.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE ID LIKE ?folderid", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?folderid", key);
+                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        {
+                            if (dbReader.Read())
+                            {
+                                return dbReader.ToFolder();
+                            }
+                        }
+                    }
+                }
+
+                throw new InventoryFolderNotFound(key);
+            }
         }
 
         public override InventoryFolder this[UUID PrincipalID, UUID key]
@@ -66,7 +91,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override InventoryFolder this[UUID PrincipalID, InventoryType type]
+        public override InventoryFolder this[UUID PrincipalID, AssetType type]
         {
             get 
             {
@@ -249,6 +274,12 @@ namespace SilverSim.Database.MySQL.Inventory
                 connection.Open();
                 PurgeOrDelete(PrincipalID, folderID, connection, false);
             }
+        }
+
+        public override void Purge(UUID folderID)
+        {
+            InventoryFolder folder = this[folderID];
+            Purge(folder.Owner.ID, folderID);
         }
 
         void PurgeOrDelete(UUID PrincipalID, UUID folderID, MySqlConnection connection, bool deleteFolder)

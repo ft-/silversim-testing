@@ -49,6 +49,23 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         #endregion
 
         #region Accessors
+        public override InventoryItem this[UUID key]
+        {
+            get
+            {
+                Dictionary<string, string> post = new Dictionary<string, string>();
+                post["ID"] = key;
+                post["METHOD"] = "GETITEM";
+                Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
+                if (!(map["item"] is Map))
+                {
+                    throw new InventoryInaccessible();
+                }
+
+                return RobustInventoryConnector.ItemFromMap((Map)map["item"], m_GroupsService);
+            }
+        }
+
         public override InventoryItem this[UUID PrincipalID, UUID key]
         {
             get

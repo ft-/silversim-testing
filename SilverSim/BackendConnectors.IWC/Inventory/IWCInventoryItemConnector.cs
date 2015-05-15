@@ -28,6 +28,7 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
+using System;
 
 namespace SilverSim.BackendConnectors.IWC.Inventory
 {
@@ -46,6 +47,13 @@ namespace SilverSim.BackendConnectors.IWC.Inventory
         #endregion
 
         #region Accessors
+        public override InventoryItem this[UUID key]
+        {
+            get 
+            { 
+                throw new NotImplementedException(); 
+            }
+        }
         public override InventoryItem this[UUID PrincipalID, UUID key]
         {
             get

@@ -27,7 +27,9 @@ using SilverSim.BackendConnectors.Simian.Common;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.BackendConnectors.Simian.Inventory
@@ -65,12 +67,20 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
             }
         }
 
-        public override InventoryFolder this[UUID PrincipalID, InventoryType type]
+        public override InventoryFolder this[UUID key]
+        {
+            get 
+            { 
+                throw new NotImplementedException();
+            }
+        }
+
+        public override InventoryFolder this[UUID PrincipalID, AssetType type]
         {
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                if (type == InventoryType.RootFolder)
+                if (type == AssetType.RootFolder)
                 {
                     post["RequestMethod"] = "GetInventoryNode";
                     post["ItemID"] = PrincipalID;
@@ -83,7 +93,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
                 {
                     post["RequestMethod"] = "GetFolderForType";
                     post["OwnerID"] = PrincipalID;
-                    post["ContentType"] = SimianInventoryConnector.ContentTypeFromInventoryType(type);
+                    post["ContentType"] = SimianInventoryConnector.ContentTypeFromAssetType(type);
                 }
                 Map res = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
                 if (res["Success"].AsBoolean && res.ContainsKey("Items") && res["Items"] is AnArray)
@@ -207,6 +217,11 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
             {
                 throw new InventoryFolderNotStored(folderID);
             }
+        }
+
+        public override void Purge(UUID folderID)
+        {
+            throw new NotImplementedException();
         }
 
         public override void Purge(UUID PrincipalID, UUID folderID)

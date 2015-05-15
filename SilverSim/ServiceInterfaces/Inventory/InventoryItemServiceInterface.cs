@@ -32,6 +32,14 @@ namespace SilverSim.ServiceInterfaces.Inventory
     public abstract class InventoryItemServiceInterface
     {
         #region Accessors
+        /* DO NOT USE this[UUID key] anywhere else than in a Robust Inventory handler 
+         * Not all connectors / services support this access.
+         */
+        public abstract InventoryItem this[UUID key]
+        {
+            get;
+        }
+
         public abstract InventoryItem this[UUID PrincipalID, UUID key]
         {
             get;

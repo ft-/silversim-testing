@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 
@@ -64,9 +65,9 @@ namespace SilverSim.ServiceInterfaces.Inventory
 
     public class InventoryFolderTypeNotFound : Exception
     {
-        public InventoryType Type { get; private set; }
+        public AssetType Type { get; private set; }
 
-        public InventoryFolderTypeNotFound(InventoryType type)
+        public InventoryFolderTypeNotFound(AssetType type)
             : base(string.Format("InventoryFolder for type {0} not found", type))
         {
             Type = type;

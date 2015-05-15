@@ -40,6 +40,29 @@ namespace SilverSim.Database.MySQL.Inventory
             m_ConnectionString = connectionString;
         }
 
+        public override InventoryItem this[UUID key]
+        {
+            get
+            {
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                {
+                    connection.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE ID LIKE ?itemid", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?itemid", key);
+                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        {
+                            if (dbReader.Read())
+                            {
+                                return dbReader.ToItem();
+                            }
+                        }
+                    }
+                }
+                throw new KeyNotFoundException();
+            }
+        }
+
         public override InventoryItem this[UUID PrincipalID, UUID key]
         {
             get 

@@ -30,6 +30,7 @@ using SilverSim.StructuredData.JSON;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.BackendConnectors.Simian.Inventory
@@ -51,6 +52,13 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
         #endregion
 
         #region Accessors
+        public override InventoryItem this[UUID key]
+        {
+            get 
+            { 
+                throw new NotImplementedException(); 
+            }
+        }
         public override InventoryItem this[UUID PrincipalID, UUID key]
         {
             get

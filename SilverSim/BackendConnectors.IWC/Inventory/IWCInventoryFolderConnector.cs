@@ -29,6 +29,7 @@ using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.BackendConnectors.IWC.Inventory
@@ -71,49 +72,25 @@ namespace SilverSim.BackendConnectors.IWC.Inventory
             }
         }
 
-        public override InventoryFolder this[UUID PrincipalID, InventoryType invtype]
+        public override InventoryFolder this[UUID key]
         {
             get
             {
-                AssetType type;
-                switch(invtype)
-                {
-                    case InventoryType.Animation: type = AssetType.Animation; break;
-                    case InventoryType.Attachable: type = AssetType.Object; break;
-                    case InventoryType.Bodypart: type = AssetType.Bodypart; break;
-                    case InventoryType.CallingCard: type = AssetType.CallingCard; break;
-                    case InventoryType.Clothing: type = AssetType.Clothing; break;
-                    case InventoryType.CurrentOutfitFolder: type = AssetType.CurrentOutfitFolder; break;
-                    case InventoryType.FavoriteFolder: type = AssetType.FavoriteFolder; break;
-                    case InventoryType.Folder: type = AssetType.Folder; break;
-                    case InventoryType.Gesture: type = AssetType.Gesture; break;
-                    case InventoryType.Inbox: type = AssetType.Inbox; break;
-                    case InventoryType.Landmark: type = AssetType.Landmark; break;
-                    case InventoryType.LostAndFoundFolder: type = AssetType.LostAndFoundFolder; break;
-                    case InventoryType.LSLBytecode: type = AssetType.LSLBytecode; break;
-                    case InventoryType.LSLText: type = AssetType.LSLText; break;
-                    case InventoryType.Mesh: type = AssetType.Mesh; break;
-                    case InventoryType.MyOutfitsFolder: type = AssetType.MyOutfitsFolder; break;
-                    case InventoryType.Notecard: type = AssetType.Notecard; break;
-                    case InventoryType.Object: type = AssetType.Object; break;
-                    case InventoryType.Outbox: type = AssetType.Outbox; break;
-                    case InventoryType.OutfitFolder: type = AssetType.OutfitFolder; break;
-                    case InventoryType.RootFolder: type = AssetType.RootFolder; break;
-                    case InventoryType.Simstate: type = AssetType.Simstate; break;
-                    case InventoryType.Snapshot: type = AssetType.SnapshotFolder; break;
-                    case InventoryType.Sound: type = AssetType.Sound; break;
-                    case InventoryType.Texture: type = AssetType.Texture; break;
-                    case InventoryType.TextureTGA: type = AssetType.TextureTGA; break;
-                    case InventoryType.TrashFolder: type = AssetType.TrashFolder; break;
-                    case InventoryType.Wearable: type = AssetType.Unknown; break;
-                    default: type = AssetType.Unknown; break;
-                }
+                throw new NotImplementedException();
+            }
+        }
+
+        public override InventoryFolder this[UUID PrincipalID, AssetType assetType]
+        {
+            get
+            {
+                InventoryType invtype = (InventoryType)assetType;
 
                 Map param = new Map
                 {
                     {"userID", PrincipalID},
                     {"invType", (int)invtype},
-                    {"type", (int)type}
+                    {"type", (int)assetType}
                 };
 
                 Map m = IWCGrid.PostToService(m_InventoryURI, "GetFolderForType", param, TimeoutMs);
@@ -250,6 +227,11 @@ namespace SilverSim.BackendConnectors.IWC.Inventory
                 }
             }
             throw new InventoryFolderNotStored(folderID);
+        }
+
+        public override void Purge(UUID folderID)
+        {
+            throw new NotImplementedException();
         }
 
         public override void Purge(UUID PrincipalID, UUID folderID)
