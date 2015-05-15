@@ -480,7 +480,16 @@ namespace SilverSim.BackendHandlers.Robust.Inventory
 
         void CreateUserInventory(HttpRequest httpreq, Dictionary<string, object> reqdata)
         {
-            throw new FailureResultException();
+            UUID principalID = reqdata.GetUUID("PRINCIPAL");
+            try
+            {
+                m_InventoryService.checkInventory(principalID);
+            }
+            catch
+            {
+                throw new FailureResultException();
+            }
+            SuccessResult(httpreq);
         }
 
         void GetInventorySkeleton(HttpRequest httpreq, Dictionary<string, object> reqdata)
