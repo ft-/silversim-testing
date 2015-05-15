@@ -30,6 +30,8 @@ using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
+using System.Net;
+using System.Web;
 
 namespace SilverSim.BackendConnectors.Robust.Inventory
 {
@@ -135,7 +137,28 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
                 post["FOLDERS"] = string.Join(",", folderIDs);
                 post["COUNT"] = folderIDs.Length.ToString(); /* <- some redundancy here for whatever unknown reason, it could have been derived from FOLDERS anyways */
                 post["METHOD"] = "GETMULTIPLEFOLDERSCONTENT";
-                Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
+                Map map;
+                try
+                {
+                    map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
+                }
+                catch(HttpRequestHandler.BadHttpResponseException)
+                {
+                    m_IsMultipeServiceSupported = false;
+                    return base[principalID, folderIDs];
+                }
+                catch(HttpException e)
+                {
+                    if(e.GetHttpCode() == (int)HttpStatusCode.BadGateway)
+                    {
+                        return base[principalID, folderIDs];
+                    }
+                    else
+                    {
+                        m_IsMultipeServiceSupported = false;
+                        return base[principalID, folderIDs];
+                    }
+                }
 
                 List<InventoryFolderContent> contents = new List<InventoryFolderContent>();
 

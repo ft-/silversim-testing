@@ -13,12 +13,12 @@ namespace SilverSim.Database.MySQL.Inventory
     {
         public static InventoryFolder ToFolder(this MySqlDataReader reader)
         {
-            InventoryFolder folder = new InventoryFolder((string)reader["ID"]);
+            InventoryFolder folder = new InventoryFolder(reader.GetUUID("ID"));
 
-            folder.ParentFolderID = MySQLUtilities.GetUUID(reader, "ParentFolderID");
+            folder.ParentFolderID = reader.GetUUID("ParentFolderID");
             folder.Name = (string)reader["Name"];
             folder.InventoryType = (InventoryType)(int)reader["InventoryType"];
-            folder.Owner.ID = MySQLUtilities.GetUUID(reader, "OwnerID");
+            folder.Owner.ID = reader.GetUUID("OwnerID");
             folder.Version = (int)reader["Version"];
 
             return folder;
@@ -38,19 +38,19 @@ namespace SilverSim.Database.MySQL.Inventory
 
         public static InventoryItem ToItem(this MySqlDataReader reader)
         {
-            InventoryItem item = new InventoryItem((string)reader["ID"]);
+            InventoryItem item = new InventoryItem(reader.GetUUID("ID"));
 
-            item.ParentFolderID = (string)reader["ParentFolderID"];
+            item.ParentFolderID = reader.GetUUID("ParentFolderID");
             item.Name = (string)reader["Name"];
             item.Description = (string)reader["Description"];
             item.InventoryType = (InventoryType)(int)reader["InventoryType"];
             item.Flags = (uint)reader["InventoryFlags"];
-            item.Owner.ID = MySQLUtilities.GetUUID(reader, "OwnerID");
-            item.LastOwner.ID = MySQLUtilities.GetUUID(reader, "LastOwnerID");
+            item.Owner.ID = reader.GetUUID("OwnerID");
+            item.LastOwner.ID = reader.GetUUID("LastOwnerID");
             
-            item.Creator.ID = MySQLUtilities.GetUUID(reader, "CreatorID");
+            item.Creator.ID = reader.GetUUID("CreatorID");
 
-            item.CreationDate = MySQLUtilities.GetDate(reader, "CreationDate");
+            item.CreationDate = reader.GetDate("CreationDate");
             item.Permissions.Base = (InventoryPermissionsMask)(uint)reader["BasePermissionsMask"];
             item.Permissions.Current = (InventoryPermissionsMask)(uint)reader["CurrentPermissionsMask"];
             item.Permissions.EveryOne = (InventoryPermissionsMask)(uint)reader["EveryOnePermissionsMask"];

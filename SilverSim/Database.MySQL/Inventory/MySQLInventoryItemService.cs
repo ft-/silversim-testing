@@ -164,7 +164,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("UDPATE inventoryfolders SET Version = Version + 1 WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("UPDATE inventoryfolders SET Version = Version + 1 WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
                     {
                         cmd.Parameters.AddWithValue("?ownerid", PrincipalID);
                         cmd.Parameters.AddWithValue("?folderid", folderID);

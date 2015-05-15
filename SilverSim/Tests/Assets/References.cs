@@ -26,10 +26,6 @@ exception statement from your version.
 using SilverSim.Main.Common;
 using SilverSim.Tests.Extensions;
 using SilverSim.Types.Asset.Format;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Tests.Assets
 {

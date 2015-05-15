@@ -74,7 +74,7 @@ namespace SilverSim.Scene.Types.Object
                     }
                     else
                     {
-                        m.NameValue = Part.Name;
+                        m.NameValue = string.Empty;
                         m.State = Part.ObjectGroup.RootPart.Shape.State;
                     }
                     m.ObjectData = new byte[60];

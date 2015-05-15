@@ -30,6 +30,8 @@ using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
+using System.Net;
+using System.Web;
 
 namespace SilverSim.BackendConnectors.Robust.Inventory
 {
@@ -104,7 +106,30 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
                 post["ITEMS"] = string.Join(",", itemids);
                 post["COUNT"] = itemids.Count.ToString(); /* <- some redundancy here for whatever unknown reason, it could have been derived from ITEMS anyways */
                 post["METHOD"] = "GETMULTIPLEITEMS";
-                Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
+                Map map;
+
+                try
+                {
+                    map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
+                }
+                catch (HttpRequestHandler.BadHttpResponseException)
+                {
+                    m_isMultipleSupported = false;
+                    return base[principalID, itemids];
+                }
+                catch (HttpException e)
+                {
+                    if (e.GetHttpCode() == (int)HttpStatusCode.BadGateway)
+                    {
+                        return base[principalID, itemids];
+                    }
+                    else
+                    {
+                        m_isMultipleSupported = false;
+                        return base[principalID, itemids];
+                    }
+                }
+
                 List<InventoryItem> items = new List<InventoryItem>();
                 bool anyResponse = false;
                 foreach(KeyValuePair<string, IValue> kvp in map)

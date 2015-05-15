@@ -930,6 +930,20 @@ namespace SilverSim.LL.Messages
             WriteUInt16((UInt16)buf.Length);
             WriteBytes(buf);
         }
+
+        public void WriteStringLen16Nul(string val)
+        {
+            byte[] buf = Encoding.UTF8.GetBytes(val);
+            if (buf.Length > 65534)
+            {
+                byte[] nbuf = new byte[65534];
+                Buffer.BlockCopy(buf, 0, nbuf, 0, 65534);
+                buf = nbuf;
+            }
+            WriteUInt16((UInt16)(buf.Length + 1));
+            WriteBytes(buf);
+            WriteUInt8(0);
+        }
         #endregion
 
         #region UUID
