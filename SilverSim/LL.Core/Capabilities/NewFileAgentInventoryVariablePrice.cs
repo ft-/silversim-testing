@@ -36,7 +36,7 @@ using ThreadedClasses;
 
 namespace SilverSim.LL.Core.Capabilities
 {
-    public class NewFileAgentInventory : UploadAssetAbstractCapability
+    public class NewFileAgentInventoryVariablePrice : UploadAssetAbstractCapability
     {
         private InventoryServiceInterface m_InventoryService;
         private AssetServiceInterface m_AssetService;
@@ -47,7 +47,7 @@ namespace SilverSim.LL.Core.Capabilities
         {
             get
             {
-                return "NewFileAgentInventory";
+                return "NewFileAgentInventoryVariablePrice";
             }
         }
 
@@ -59,7 +59,7 @@ namespace SilverSim.LL.Core.Capabilities
             }
         }
 
-        public NewFileAgentInventory(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI)
+        public NewFileAgentInventoryVariablePrice(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI)
             : base(creator, serverURI)
         {
             m_InventoryService = inventoryService;
@@ -105,16 +105,16 @@ namespace SilverSim.LL.Core.Capabilities
                 }
                 catch
                 {
-                    throw new UploadErrorException("Failed to store asset");
+                    throw new UploadErrorException("Could not store asset");
                 }
 
                 try
                 {
-                    m_InventoryService.Item.Update(kvp.Value);
+                    m_InventoryService.Item.Add(kvp.Value);
                 }
                 catch
                 {
-                    throw new UploadErrorException("Failed to store inventory item");
+                    throw new UploadErrorException("Could not store new inventory item");
                 }
                 return m;
             }
