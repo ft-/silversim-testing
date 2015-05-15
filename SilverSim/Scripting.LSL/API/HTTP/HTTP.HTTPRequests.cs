@@ -76,7 +76,7 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
             HttpResponseEvent e = new HttpResponseEvent();
             e.RequestID = UUID.Random;
             e.Status = 499;
-            part.ObjectGroup.PostEvent(e);
+            part.PostEvent(e);
         }
 
         void httpRequestEnd(IAsyncResult ar)
@@ -107,7 +107,7 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
                     HttpResponseEvent e = new HttpResponseEvent();
                     e.RequestID = UUID.Random;
                     e.Status = 499;
-                    Instance.Part.ObjectGroup.PostEvent(e);
+                    Instance.Part.PostEvent(e);
                     return e.RequestID;
                 }
             }
