@@ -78,7 +78,7 @@ namespace SilverSim.BackendHandlers.Robust.Asset
         {
             if (req.ContainsHeader("X-SecondLife-Shard"))
             {
-                req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Request source not allowed");
+                req.ErrorResponse(HttpStatusCode.BadRequest, "Request source not allowed");
                 return;
             }
 

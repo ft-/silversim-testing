@@ -402,6 +402,12 @@ namespace SilverSim.BackendHandlers.Robust.Inventory
 
         void InventoryHandler(HttpRequest httpreq)
         {
+            if (httpreq.ContainsHeader("X-SecondLife-Shard"))
+            {
+                httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Request source not allowed");
+                return;
+            }
+
             if(httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method Not Allowed");
