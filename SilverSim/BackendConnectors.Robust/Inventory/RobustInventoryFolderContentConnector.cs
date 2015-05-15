@@ -174,7 +174,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
                     }
                 }
 
-                if(contents.Count == 0 && folderIDs.Length > 0)
+                if(contents.Count == 0)
                 {
                     /* try old method */
                     contents = base[principalID, folderIDs];
