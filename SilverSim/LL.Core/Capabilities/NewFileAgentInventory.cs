@@ -114,7 +114,7 @@ namespace SilverSim.LL.Core.Capabilities
                 }
                 catch
                 {
-                    throw new UploadErrorException("Failed to store inventory item");
+                    throw new UploadErrorException("Failed to store new inventory item");
                 }
                 return m;
             }
