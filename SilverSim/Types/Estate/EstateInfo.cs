@@ -41,11 +41,11 @@ namespace SilverSim.Types.Estate
             RegionOptionFlags.AllowSetHome | 
             RegionOptionFlags.AllowVoice | 
             RegionOptionFlags.PublicAllowed;
-        public UUI Owner;
+        public UUI Owner = UUI.Unknown;
         public int PricePerMeter = 0;
         public double BillableFactor = 1;
         public double SunPosition = 1;
-        public string AbuseEmail;
+        public string AbuseEmail = string.Empty;
         public bool UseGlobalTime = true;
 
         public EstateInfo()

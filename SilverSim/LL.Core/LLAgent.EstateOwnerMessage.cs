@@ -3,6 +3,7 @@ using SilverSim.LL.Messages.Generic;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using SilverSim.Types.Estate;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -13,6 +14,11 @@ namespace SilverSim.LL.Core
 {
     public partial class LLAgent
     {
+        byte[] StringToBytes(string s)
+        {
+            return UTF8NoBOM.GetBytes(s + "\0");
+        }
+
         void HandleEstateOwnerMessage(Message m)
         {
             EstateOwnerMessage req = (EstateOwnerMessage)m;
@@ -127,33 +133,137 @@ namespace SilverSim.LL.Core
             }
         }
 
+        enum EstateAccessCodes : uint
+        {
+            AccessOptions = 1,
+            AllowedGroups = 2,
+            EstateBans = 4,
+            EstateManagers = 8
+        }
+
+        void sendEstateList(UUID transactionID, UUID invoice, EstateAccessCodes code, List<UUI> data, uint estateID, UUID fromSceneID)
+        {
+            int i;
+            for(i = 0; i < data.Count;)
+            {
+                int remaining = data.Count - i;
+                if(remaining > 50)
+                {
+                    remaining = 50;
+                }
+
+                EstateOwnerMessage msg = new EstateOwnerMessage();
+                msg.TransactionID = transactionID;
+                msg.Invoice = invoice;
+                msg.AgentID = Owner.ID;
+                msg.SessionID = SessionID;
+                msg.Method = "setaccess";
+
+                msg.ParamList.Add(StringToBytes(estateID.ToString()));
+                msg.ParamList.Add(StringToBytes(((uint)code).ToString()));
+                msg.ParamList.Add(StringToBytes("0"));
+                msg.ParamList.Add(StringToBytes("0"));
+                if (code == EstateAccessCodes.EstateBans)
+                {
+                    msg.ParamList.Add(StringToBytes(remaining.ToString()));
+                }
+                else
+                {
+                    msg.ParamList.Add(StringToBytes("0"));
+                }
+                msg.ParamList.Add(StringToBytes("0"));
+                while(remaining-- != 0)
+                {
+                    msg.ParamList.Add(data[i++].ID.GetBytes());
+                }
+                SendMessageIfRootAgent(msg, fromSceneID);
+            }
+        }
+
+        /* this is groups only, so no code check inside */
+        void sendEstateList(UUID transactionID, UUID invoice, EstateAccessCodes code, List<UGI> data, uint estateID, UUID fromSceneID)
+        {
+            int i;
+            for (i = 0; i < data.Count; )
+            {
+                int remaining = data.Count - i;
+                if (remaining > 50)
+                {
+                    remaining = 50;
+                }
+
+                EstateOwnerMessage msg = new EstateOwnerMessage();
+                msg.TransactionID = transactionID;
+                msg.Invoice = invoice;
+                msg.AgentID = Owner.ID;
+                msg.SessionID = SessionID;
+                msg.Method = "setaccess";
+
+                msg.ParamList.Add(StringToBytes(estateID.ToString()));
+                msg.ParamList.Add(StringToBytes(((uint)code).ToString()));
+                msg.ParamList.Add(StringToBytes("0"));
+                msg.ParamList.Add(StringToBytes("0"));
+                msg.ParamList.Add(StringToBytes("0"));
+                msg.ParamList.Add(StringToBytes("0"));
+                while (remaining-- != 0)
+                {
+                    msg.ParamList.Add(data[i++].ID.GetBytes());
+                }
+                SendMessageIfRootAgent(msg, fromSceneID);
+            }
+        }
+
         void EstateOwner_GetInfo(EstateOwnerMessage req)
         {
-            UUID invoice = req.Invoice;
-#if ESTATEUPDATEINFO
             EstateOwnerMessage msg = new EstateOwnerMessage();
-            msg.Invoice = invoice;
-            msg.TransactionID = UUID.Random;
+            msg.AgentID = Owner.ID;
+            msg.SessionID = SessionID;
+            msg.Invoice = req.Invoice;
+            msg.TransactionID = req.TransactionID;
             msg.Method = "estateupdateinfo";
             Circuit circuit;
             if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
             {
                 SceneInterface scene = circuit.Scene;
 
-                msg.ParamList.Add(UTF8NoBOM.GetBytes("Unknown Estate")); /* estatename */
-                msg.ParamList.Add(UTF8NoBOM.GetBytes("Estate Owner")); /* etstae owner */
-                msg.ParamList.Add(UTF8NoBOM.GetBytes("100")); /* estate id */
-                msg.ParamList.Add(UTF8NoBOM.GetBytes("0")); /* estate flags */
-                msg.ParamList.Add(UTF8NoBOM.GetBytes("0")); /* sun position */
-                msg.ParamList.Add(UTF8NoBOM.GetBytes("1")); /* parent Estate */
-                msg.ParamList.Add(UTF8NoBOM.GetBytes(UUID.Zero)); /* covenant */
-                msg.ParamList.Add(UTF8NoBOM.GetBytes("0")); /* covenant changed */
-                msg.ParamList.Add(UTF8NoBOM.GetBytes("1"));
-                msg.ParamList.Add(UTF8NoBOM.GetBytes("")); /* abuse email */
+                uint estateID = scene.EstateService.RegionMap[scene.ID];
+                EstateInfo estateInfo = scene.EstateService[estateID];
+                msg.ParamList.Add(StringToBytes(estateInfo.Name));
+                msg.ParamList.Add(StringToBytes(estateInfo.Owner.ID));
+                msg.ParamList.Add(StringToBytes(estateID.ToString()));
+                msg.ParamList.Add(StringToBytes(((uint)estateInfo.Flags).ToString()));
+                msg.ParamList.Add(StringToBytes(estateInfo.SunPosition.ToString()));
+                msg.ParamList.Add(StringToBytes(estateInfo.ParentEstateID.ToString()));
+                msg.ParamList.Add(StringToBytes(UUID.Zero)); /* covenant */
+                msg.ParamList.Add(StringToBytes("0")); /* covenant changed */
+                msg.ParamList.Add(StringToBytes("1"));
+                msg.ParamList.Add(StringToBytes(estateInfo.AbuseEmail));
 
                 SendMessageIfRootAgent(msg, req.CircuitSceneID);
+
+                sendEstateList(
+                    req.TransactionID,
+                    req.Invoice,
+                    EstateAccessCodes.EstateManagers,
+                    scene.EstateService.EstateManager.All[estateID], 
+                    estateID, 
+                    req.CircuitSceneID);
+                sendEstateList(
+                    req.TransactionID,
+                    req.Invoice, 
+                    EstateAccessCodes.AccessOptions, 
+                    scene.EstateService.EstateAccess.All[estateID], 
+                    estateID, 
+                    req.CircuitSceneID);
+                sendEstateList(
+                    req.TransactionID,
+                    req.Invoice,
+                    EstateAccessCodes.AllowedGroups,
+                    scene.EstateService.EstateGroup.All[estateID],
+                    estateID, 
+                    req.CircuitSceneID);
+                //sendEstateList(req.TransactionID, req.Invoice, EstateAccessCodes.EstateBans, scene.EstateService.EstateBans.All[estateID], estateID, req.CircuitSceneID);
             }
-#endif
         }
 
         void EstateOwner_SetRegionInfo(EstateOwnerMessage req)
@@ -199,18 +309,49 @@ namespace SilverSim.LL.Core
 
         void EstateOwner_TextureHeights(EstateOwnerMessage req)
         {
-            foreach (byte[] b in req.ParamList)
+            Circuit circuit;
+            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
             {
-                string s = UTF8NoBOM.GetString(b);
-                string[] splitfield = s.Split(' ');
-                if (splitfield.Length != 3)
+                SceneInterface scene = circuit.Scene;
+
+                foreach (byte[] b in req.ParamList)
                 {
-                    continue;
+                    string s = UTF8NoBOM.GetString(b);
+                    string[] splitfield = s.Split(' ');
+                    if (splitfield.Length != 3)
+                    {
+                        continue;
+                    }
+
+                    Int16 corner = Int16.Parse(splitfield[0]);
+                    float lowValue = float.Parse(splitfield[1], CultureInfo.InvariantCulture);
+                    float highValue = float.Parse(splitfield[2], CultureInfo.InvariantCulture);
+
+                    switch (corner)
+                    {
+                        case 0:
+                            scene.RegionSettings.Elevation1SW = lowValue;
+                            scene.RegionSettings.Elevation2SW = highValue;
+                            break;
+
+                        case 1:
+                            scene.RegionSettings.Elevation1NW = lowValue;
+                            scene.RegionSettings.Elevation2NW = highValue;
+                            break;
+
+                        case 2:
+                            scene.RegionSettings.Elevation1SE = lowValue;
+                            scene.RegionSettings.Elevation2SE = highValue;
+                            break;
+
+                        case 3:
+                            scene.RegionSettings.Elevation1NE = lowValue;
+                            scene.RegionSettings.Elevation2NE = highValue;
+                            break;
+                    }
                 }
 
-                Int16 corner = Int16.Parse(splitfield[0]);
-                float lowValue = float.Parse(splitfield[1], CultureInfo.InvariantCulture);
-                float highValue = float.Parse(splitfield[2], CultureInfo.InvariantCulture);
+                scene.TriggerRegionSettingsChanged();
             }
         }
 
@@ -246,6 +387,7 @@ namespace SilverSim.LL.Core
                 bool useGlobal = ParamStringToBool(req.ParamList[6]);
                 bool isEstateFixedSun = ParamStringToBool(req.ParamList[7]);
                 float estateSunHour = float.Parse(UTF8NoBOM.GetString(req.ParamList[8]), CultureInfo.InvariantCulture);
+                scene.TriggerRegionSettingsChanged();
             }
         }
 
@@ -332,10 +474,16 @@ namespace SilverSim.LL.Core
             }
             UUID invoice = req.Invoice;
             UUID SenderID = Owner.ID;
-            bool scripted = ParamStringToBool(req.ParamList[0]);
-            bool collisionEvents = ParamStringToBool(req.ParamList[1]);
-            bool physics = ParamStringToBool(req.ParamList[2]);
+            Circuit circuit;
 
+            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
+            {
+                SceneInterface scene = circuit.Scene;
+                scene.RegionSettings.DisableScripts = !ParamStringToBool(req.ParamList[0]);
+                scene.RegionSettings.DisableCollisions = !ParamStringToBool(req.ParamList[1]);
+                scene.RegionSettings.DisablePhysics = !ParamStringToBool(req.ParamList[2]);
+                scene.TriggerRegionSettingsChanged();
+            }
         }
 
         void EstateOwner_TeleportHomeUser(EstateOwnerMessage req)

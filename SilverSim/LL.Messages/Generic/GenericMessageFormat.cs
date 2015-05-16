@@ -30,25 +30,17 @@ namespace SilverSim.LL.Messages.Generic
 {
     public abstract class GenericMessageFormat : Message
     {
-        public UUID AgentID;
-        public UUID SessionID;
-        public UUID TransactionID;
-        public string Method;
-        public UUID Invoice;
+        public UUID AgentID = UUID.Zero;
+        public UUID SessionID = UUID.Zero;
+        public UUID TransactionID = UUID.Random;
+        public string Method = string.Empty;
+        public UUID Invoice = UUID.Zero;
 
         public List<byte[]> ParamList = new List<byte[]>();
 
         public GenericMessageFormat()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.GenericMessage;
-            }
         }
 
         public override void Serialize(UDPPacket p)

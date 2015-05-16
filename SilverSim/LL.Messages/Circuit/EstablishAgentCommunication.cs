@@ -45,6 +45,14 @@ namespace SilverSim.LL.Messages.Circuit
 
         }
 
+        public override MessageType Number
+        {
+            get 
+            { 
+                return 0; 
+            }
+        }
+
         public override SilverSim.Types.IValue SerializeEQG()
         {
             SilverSim.Types.Map i = new SilverSim.Types.Map();

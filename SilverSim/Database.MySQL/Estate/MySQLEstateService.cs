@@ -141,6 +141,7 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM estates WHERE ID LIKE ?id", conn))
                     {
+                        cmd.Parameters.AddWithValue("?id", EstateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if(reader.Read())

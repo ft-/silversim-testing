@@ -30,6 +30,7 @@ using System.Text;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using SilverSim.LL.Messages;
+using SilverSim.Scene.Types.Agent;
 
 namespace SilverSim.Scene.Types.Scene
 {

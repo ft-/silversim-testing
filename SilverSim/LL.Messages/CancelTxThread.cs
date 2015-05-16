@@ -11,5 +11,13 @@ namespace SilverSim.LL.Messages
         {
 
         }
+
+        public override MessageType Number
+        {
+            get
+            {
+                return 0;
+            }
+        }
     }
 }

@@ -28,7 +28,7 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages
 {
-    public class Message
+    public abstract class Message
     {
         #region Message Type
         public enum MessagePriority
@@ -110,12 +110,9 @@ namespace SilverSim.LL.Messages
             }
         }
 
-        public virtual MessageType Number
+        public abstract MessageType Number
         {
-            get
-            {
-                return 0;
-            }
+            get;
         }
 
         public virtual void Serialize(UDPPacket p)
