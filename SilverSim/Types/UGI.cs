@@ -149,7 +149,6 @@ namespace SilverSim.Types
         }
 
         private static readonly char[] Semicolon = new char[1] { (char)';' };
-        private static readonly char[] Whitespace = new char[1] { (char)' ' };
 
         public static UGI Unknown
         {
