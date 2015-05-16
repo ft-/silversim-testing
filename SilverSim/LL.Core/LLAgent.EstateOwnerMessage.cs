@@ -130,6 +130,30 @@ namespace SilverSim.LL.Core
         void EstateOwner_GetInfo(EstateOwnerMessage req)
         {
             UUID invoice = req.Invoice;
+#if ESTATEUPDATEINFO
+            EstateOwnerMessage msg = new EstateOwnerMessage();
+            msg.Invoice = invoice;
+            msg.TransactionID = UUID.Random;
+            msg.Method = "estateupdateinfo";
+            Circuit circuit;
+            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
+            {
+                SceneInterface scene = circuit.Scene;
+
+                msg.ParamList.Add(UTF8NoBOM.GetBytes("Unknown Estate")); /* estatename */
+                msg.ParamList.Add(UTF8NoBOM.GetBytes("Estate Owner")); /* etstae owner */
+                msg.ParamList.Add(UTF8NoBOM.GetBytes("100")); /* estate id */
+                msg.ParamList.Add(UTF8NoBOM.GetBytes("0")); /* estate flags */
+                msg.ParamList.Add(UTF8NoBOM.GetBytes("0")); /* sun position */
+                msg.ParamList.Add(UTF8NoBOM.GetBytes("1")); /* parent Estate */
+                msg.ParamList.Add(UTF8NoBOM.GetBytes(UUID.Zero)); /* covenant */
+                msg.ParamList.Add(UTF8NoBOM.GetBytes("0")); /* covenant changed */
+                msg.ParamList.Add(UTF8NoBOM.GetBytes("1"));
+                msg.ParamList.Add(UTF8NoBOM.GetBytes("")); /* abuse email */
+
+                SendMessageIfRootAgent(msg, req.CircuitSceneID);
+            }
+#endif
         }
 
         void EstateOwner_SetRegionInfo(EstateOwnerMessage req)
@@ -148,8 +172,8 @@ namespace SilverSim.LL.Core
                 scene.RegionSettings.BlockFly = ParamStringToBool(req.ParamList[1]);
                 scene.RegionSettings.AllowDamage = ParamStringToBool(req.ParamList[2]);
                 scene.RegionSettings.AllowLandResell = ParamStringToBool(req.ParamList[3]);
-                scene.RegionSettings.AgentLimit = int.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[4]));
-                scene.RegionSettings.ObjectBonus = float.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[5]), CultureInfo.InvariantCulture);
+                scene.RegionSettings.AgentLimit = int.Parse(UTF8NoBOM.GetString(req.ParamList[4]));
+                scene.RegionSettings.ObjectBonus = float.Parse(UTF8NoBOM.GetString(req.ParamList[5]), CultureInfo.InvariantCulture);
 #warning TODO: adjust for correct values
                 //scene.RegionSettings.Maturity = int.Parse(req.ParamList[6]);
                 scene.RegionSettings.RestrictPushing = ParamStringToBool(req.ParamList[7]);
@@ -161,7 +185,7 @@ namespace SilverSim.LL.Core
         {
             foreach(byte[] b in req.ParamList)
             {
-                string s = UTF8Encoding.UTF8.GetString(b);
+                string s = UTF8NoBOM.GetString(b);
                 string[] splitfield = s.Split(' ');
                 if(splitfield.Length != 2)
                 {
@@ -177,7 +201,7 @@ namespace SilverSim.LL.Core
         {
             foreach (byte[] b in req.ParamList)
             {
-                string s = UTF8Encoding.UTF8.GetString(b);
+                string s = UTF8NoBOM.GetString(b);
                 string[] splitfield = s.Split(' ');
                 if (splitfield.Length != 3)
                 {
@@ -197,7 +221,7 @@ namespace SilverSim.LL.Core
 
         static bool ParamStringToBool(byte[] b)
         {
-            string s = UTF8Encoding.UTF8.GetString(b);
+            string s = UTF8NoBOM.GetString(b);
             return (s == "1" || s.ToLower() == "y" || s.ToLower() == "yes" || s.ToLower() == "t" || s.ToLower() == "true");
         }
 
@@ -208,15 +232,21 @@ namespace SilverSim.LL.Core
                 return;
             }
 
-            float waterHeight = float.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[0]), CultureInfo.InvariantCulture);
-            float terrainRaiseLimit = float.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[1]), CultureInfo.InvariantCulture);
-            float terrainLowerLimit = float.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[2]), CultureInfo.InvariantCulture);
-            bool useEstateSun = ParamStringToBool(req.ParamList[3]);
-            bool useFixedSun = ParamStringToBool(req.ParamList[4]);
-            float sunHour = float.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[5]), CultureInfo.InvariantCulture);
-            bool useGlobal = ParamStringToBool(req.ParamList[6]);
-            bool isEstateFixedSun = ParamStringToBool(req.ParamList[7]);
-            float estateSunHour = float.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[8]), CultureInfo.InvariantCulture);
+            Circuit circuit;
+            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
+            {
+                SceneInterface scene = circuit.Scene;
+
+                scene.RegionSettings.WaterHeight = float.Parse(UTF8NoBOM.GetString(req.ParamList[0]), CultureInfo.InvariantCulture);
+                scene.RegionSettings.TerrainRaiseLimit = float.Parse(UTF8NoBOM.GetString(req.ParamList[1]), CultureInfo.InvariantCulture);
+                scene.RegionSettings.TerrainLowerLimit = float.Parse(UTF8NoBOM.GetString(req.ParamList[2]), CultureInfo.InvariantCulture);
+                bool useEstateSun = ParamStringToBool(req.ParamList[3]);
+                bool useFixedSun = ParamStringToBool(req.ParamList[4]);
+                float sunHour = float.Parse(UTF8NoBOM.GetString(req.ParamList[5]), CultureInfo.InvariantCulture);
+                bool useGlobal = ParamStringToBool(req.ParamList[6]);
+                bool isEstateFixedSun = ParamStringToBool(req.ParamList[7]);
+                float estateSunHour = float.Parse(UTF8NoBOM.GetString(req.ParamList[8]), CultureInfo.InvariantCulture);
+            }
         }
 
         void EstateOwner_Restart(EstateOwnerMessage req)
@@ -262,7 +292,7 @@ namespace SilverSim.LL.Core
                 return;
             }
             UUID invoice = req.Invoice;
-            string message = UTF8Encoding.UTF8.GetString(req.ParamList[4]);
+            string message = UTF8NoBOM.GetString(req.ParamList[4]);
 
             Circuit circuit;
 
@@ -286,11 +316,11 @@ namespace SilverSim.LL.Core
 
             if(req.ParamList.Count < 5)
             {
-                message = UTF8Encoding.UTF8.GetString(req.ParamList[1]);
+                message = UTF8NoBOM.GetString(req.ParamList[1]);
             }
             else
             {
-                message = UTF8Encoding.UTF8.GetString(req.ParamList[4]);
+                message = UTF8NoBOM.GetString(req.ParamList[4]);
             }
         }
 
@@ -316,7 +346,7 @@ namespace SilverSim.LL.Core
             }
             UUID invoice = req.Invoice;
             UUID senderID = Owner.ID;
-            UUID prey = UUID.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[1]));
+            UUID prey = UUID.Parse(UTF8NoBOM.GetString(req.ParamList[1]));
         }
 
         void EstateOwner_TeleportHomeAllUsers(EstateOwnerMessage req)
@@ -341,7 +371,7 @@ namespace SilverSim.LL.Core
             {
                 return;
             }
-            switch(UTF8Encoding.UTF8.GetString(req.ParamList[0]))
+            switch (UTF8NoBOM.GetString(req.ParamList[0]))
             {
                 case "bake":
                     break;
@@ -353,7 +383,7 @@ namespace SilverSim.LL.Core
                     if(req.ParamList.Count > 1)
                     {
                         TerrainUploadTransaction t = new TerrainUploadTransaction();
-                        t.Filename = UTF8Encoding.UTF8.GetString(req.ParamList[1]);
+                        t.Filename = UTF8NoBOM.GetString(req.ParamList[1]);
                         AddTerrainUploadTransaction(t, req.CircuitSceneID);
                     }
                     break;
@@ -368,8 +398,8 @@ namespace SilverSim.LL.Core
             }
             UUID invoice = req.Invoice;
             UUID senderID = req.AgentID;
-            UInt32 param1 = UInt32.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[1]));
-            UInt32 param2 = UInt32.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[2]));
+            UInt32 param1 = UInt32.Parse(UTF8NoBOM.GetString(req.ParamList[1]));
+            UInt32 param2 = UInt32.Parse(UTF8NoBOM.GetString(req.ParamList[2]));
         }
 
         void EstateOwner_Telehub(EstateOwnerMessage req)
@@ -381,14 +411,14 @@ namespace SilverSim.LL.Core
             {
                 return;
             }
-            string cmd = UTF8Encoding.UTF8.GetString(req.ParamList[0]);
+            string cmd = UTF8NoBOM.GetString(req.ParamList[0]);
             if(cmd != "info ui")
             {
                 if (req.ParamList.Count < 2)
                 {
                     return;
                 }
-                param = UInt32.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[1]));
+                param = UInt32.Parse(UTF8NoBOM.GetString(req.ParamList[1]));
             }
         }
 
@@ -401,7 +431,9 @@ namespace SilverSim.LL.Core
 
             UUID invoice = req.Invoice;
             UUID senderID = Owner.ID;
-            UUID prey = UUID.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[0]));
+            UUID prey = UUID.Parse(UTF8NoBOM.GetString(req.ParamList[0]));
         }
+
+        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }
