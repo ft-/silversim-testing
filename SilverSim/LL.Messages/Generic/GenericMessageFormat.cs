@@ -23,22 +23,22 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Types;
-using SilverSim.Types.Asset;
+using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Transfer
+namespace SilverSim.LL.Messages.Generic
 {
-    public class AssetUploadComplete : Message
+    public abstract class GenericMessageFormat : Message
     {
-        public UUID AssetID;
-        public AssetType AssetType;
-        public bool Success;
+        public UUID AgentID;
+        public UUID SessionID;
+        public UUID TransactionID;
+        public string Method;
+        public UUID Invoice;
 
-        public AssetUploadComplete()
+        public List<byte[]> ParamList = new List<byte[]>();
+
+        public GenericMessageFormat()
         {
 
         }
@@ -47,32 +47,38 @@ namespace SilverSim.LL.Messages.Transfer
         {
             get
             {
-                return MessageType.AssetUploadComplete;
+                return MessageType.GenericMessage;
             }
         }
 
-        public override bool IsReliable
+        public override void Serialize(UDPPacket p)
         {
-            get
+            p.WriteMessageType(Number);
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(TransactionID);
+            p.WriteStringLen8(Method);
+            p.WriteUUID(Invoice);
+            p.WriteUInt8((byte)ParamList.Count);
+            foreach (byte[] b in ParamList)
             {
-                return true;
+                p.WriteUInt8((byte)b.Length);
+                p.WriteBytes(b);
             }
         }
 
-        public override bool ZeroFlag
+        public static Message Decode(UDPPacket p, GenericMessageFormat m)
         {
-            get
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.TransactionID = p.ReadUUID();
+            m.Method = p.ReadStringLen8();
+            m.Invoice = p.ReadUUID();
+            int c = (int)p.ReadUInt8();
+            for (int i = 0; i < c; ++i)
             {
-                return true;
+                m.ParamList.Add(p.ReadBytes((int)p.ReadUInt8()));
             }
-        }
-
-        public static AssetUploadComplete Decode(UDPPacket p)
-        {
-            AssetUploadComplete m = new AssetUploadComplete();
-            m.AssetID = p.ReadUUID();
-            m.AssetType = (AssetType)p.ReadInt8();
-            m.Success = p.ReadBoolean();
 
             return m;
         }

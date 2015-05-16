@@ -243,6 +243,10 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.TransferAbort, Transfer.TransferAbort.Decode);
             PacketTypes.Add(MessageType.AssetUploadRequest, Transfer.AssetUploadRequest.Decode);
             PacketTypes.Add(MessageType.AssetUploadComplete, Transfer.AssetUploadComplete.Decode);
+            PacketTypes.Add(MessageType.RequestXfer, Transfer.RequestXfer.Decode);
+            PacketTypes.Add(MessageType.SendXferPacket, Transfer.SendXferPacket.Decode);
+            PacketTypes.Add(MessageType.ConfirmXferPacket, Transfer.ConfirmXferPacket.Decode);
+            PacketTypes.Add(MessageType.AbortXfer, Transfer.TransferRequest.Decode);
 
             /* Start Location */
             PacketTypes.Add(MessageType.SetStartLocationRequest, StartLocation.SetStartLocationRequest.Decode);

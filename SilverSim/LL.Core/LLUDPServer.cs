@@ -559,6 +559,16 @@ namespace SilverSim.LL.Core
             /* Sound */
             m_Routing[MessageType.SoundTrigger] = Scene.HandleSimulatorMessage;
 
+            /* Transfer */
+            m_Routing[MessageType.AssetUploadRequest] = HandleAgentMessage;
+            m_Routing[MessageType.RequestXfer] = HandleAgentMessage;
+            m_Routing[MessageType.SendXferPacket] = HandleAgentMessage;
+            m_Routing[MessageType.ConfirmXferPacket] = HandleAgentMessage;
+            m_Routing[MessageType.AbortXfer] = HandleAgentMessage;
+
+            /* Estate */
+            m_Routing[MessageType.EstateOwnerMessage] = HandleAgentMessage; /* needed here since transaction module is there */
+
         }
 
         public void RouteReceivedMessage(Message m)

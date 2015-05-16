@@ -993,6 +993,10 @@ namespace SilverSim.LL.Core
             m_AgentMessageRouting.Add(MessageType.RezSingleAttachmentFromInv, HandleRezAttachment);
             m_AgentMessageRouting.Add(MessageType.DetachAttachmentIntoInv, HandleDetachAttachment);
             m_AgentMessageRouting.Add(MessageType.ObjectDetach, HandleDetachAttachment);
+            m_AgentMessageRouting.Add(MessageType.AssetUploadRequest, HandleAssetUploadRequest);
+            m_AgentMessageRouting.Add(MessageType.SendXferPacket, HandleSendXferPacket);
+            m_AgentMessageRouting.Add(MessageType.AbortXfer, HandleAbortXfer);
+            m_AgentMessageRouting.Add(MessageType.EstateOwnerMessage, HandleEstateOwnerMessage);
         }
 
         public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)

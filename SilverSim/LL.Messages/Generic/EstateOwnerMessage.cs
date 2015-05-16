@@ -27,15 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Generic
 {
-    public class EstateOwnerMessage : Message
+    public class EstateOwnerMessage : GenericMessageFormat
     {
-        public UUID AgentID;
-        public UUID SessionID;
-        public UUID TransactionID;
-        public string Method;
-        public UUID Invoice;
-        public byte[] ParamList = new byte[0];
-
         public EstateOwnerMessage()
         {
 
@@ -49,29 +42,9 @@ namespace SilverSim.LL.Messages.Generic
             }
         }
 
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteMessageType(Number);
-            p.WriteUUID(AgentID);
-            p.WriteUUID(SessionID);
-            p.WriteUUID(TransactionID);
-            p.WriteStringLen8(Method);
-            p.WriteUUID(Invoice);
-            p.WriteUInt8((byte)ParamList.Length);
-            p.WriteBytes(ParamList);
-        }
-
         public static Message Decode(UDPPacket p)
         {
-            GenericMessage m = new GenericMessage();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.TransactionID = p.ReadUUID();
-            m.Method = p.ReadStringLen8();
-            m.Invoice = p.ReadUUID();
-            m.ParamList = p.ReadBytes((int)(uint)p.ReadUInt8());
-
-            return m;
+            return Decode(p, new EstateOwnerMessage());
         }
     }
 }

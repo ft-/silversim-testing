@@ -344,7 +344,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 GenericMessage m = new GenericMessage();
                 m.Method = "WindlightReset";
-                m.ParamList = new byte[0];
+                m.ParamList.Add(new byte[0]);
                 return m;
             }
 
@@ -392,7 +392,7 @@ namespace SilverSim.Scene.Types.Scene
                 AddToCompiledWL(skyWindlight.CloudScrollXLock, ref mBlock, ref pos);
                 AddToCompiledWL(skyWindlight.CloudScrollYLock, ref mBlock, ref pos);
                 AddToCompiledWL(skyWindlight.DrawClassicClouds, ref mBlock, ref pos);
-                m.ParamList = mBlock;
+                m.ParamList.Add(mBlock);
                 return m;
             }
 

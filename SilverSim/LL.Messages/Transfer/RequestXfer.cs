@@ -23,22 +23,22 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Types;
-using SilverSim.Types.Asset;
+using System;
 
 namespace SilverSim.LL.Messages.Transfer
 {
-    public class AssetUploadComplete : Message
+    public class RequestXfer : Message
     {
-        public UUID AssetID;
-        public AssetType AssetType;
-        public bool Success;
+        public UInt64 ID;
+        public string Filename;
+        public byte FilePath;
+        public bool DeleteOnCompletion;
+        public bool UseBigPackets;
+        public UUID VFileID;
+        public Int16 VFileType;
 
-        public AssetUploadComplete()
+        public RequestXfer()
         {
 
         }
@@ -47,7 +47,7 @@ namespace SilverSim.LL.Messages.Transfer
         {
             get
             {
-                return MessageType.AssetUploadComplete;
+                return MessageType.RequestXfer;
             }
         }
 
@@ -67,14 +67,29 @@ namespace SilverSim.LL.Messages.Transfer
             }
         }
 
-        public static AssetUploadComplete Decode(UDPPacket p)
+        public static RequestXfer Decode(UDPPacket p)
         {
-            AssetUploadComplete m = new AssetUploadComplete();
-            m.AssetID = p.ReadUUID();
-            m.AssetType = (AssetType)p.ReadInt8();
-            m.Success = p.ReadBoolean();
-
+            RequestXfer m = new RequestXfer();
+            m.ID = p.ReadUInt64();
+            m.Filename = p.ReadStringLen8();
+            m.FilePath = p.ReadUInt8();
+            m.DeleteOnCompletion = p.ReadBoolean();
+            m.UseBigPackets = p.ReadBoolean();
+            m.VFileID = p.ReadUUID();
+            m.VFileType = p.ReadInt16();
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteMessageType(Number);
+            p.WriteUInt64(ID);
+            p.WriteStringLen8(Filename);
+            p.WriteUInt8(FilePath);
+            p.WriteBoolean(DeleteOnCompletion);
+            p.WriteBoolean(UseBigPackets);
+            p.WriteUUID(VFileID);
+            p.WriteInt16(VFileType);
         }
     }
 }

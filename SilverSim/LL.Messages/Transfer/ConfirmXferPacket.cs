@@ -23,22 +23,17 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Types;
-using SilverSim.Types.Asset;
+using System;
 
 namespace SilverSim.LL.Messages.Transfer
 {
-    public class AssetUploadComplete : Message
+    public class ConfirmXferPacket : Message
     {
-        public UUID AssetID;
-        public AssetType AssetType;
-        public bool Success;
+        public UInt64 ID;
+        public UInt32 Packet;
 
-        public AssetUploadComplete()
+        public ConfirmXferPacket()
         {
 
         }
@@ -47,7 +42,7 @@ namespace SilverSim.LL.Messages.Transfer
         {
             get
             {
-                return MessageType.AssetUploadComplete;
+                return MessageType.ConfirmXferPacket;
             }
         }
 
@@ -59,22 +54,19 @@ namespace SilverSim.LL.Messages.Transfer
             }
         }
 
-        public override bool ZeroFlag
+        public static ConfirmXferPacket Decode(UDPPacket p)
         {
-            get
-            {
-                return true;
-            }
+            ConfirmXferPacket m = new ConfirmXferPacket();
+            m.ID = p.ReadUInt64();
+            m.Packet = p.ReadUInt32();
+            return m;
         }
 
-        public static AssetUploadComplete Decode(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
-            AssetUploadComplete m = new AssetUploadComplete();
-            m.AssetID = p.ReadUUID();
-            m.AssetType = (AssetType)p.ReadInt8();
-            m.Success = p.ReadBoolean();
-
-            return m;
+            p.WriteMessageType(Number);
+            p.WriteUInt64(ID);
+            p.WriteUInt32(Packet);
         }
     }
 }
