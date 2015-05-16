@@ -301,8 +301,6 @@ namespace SilverSim.StructuredData.LLSD
         {
             if (input is SilverSim.Types.Map)
             {
-                Map i = (Map)input;
-                
                 output.WriteStartElement("map");
 
                 foreach (KeyValuePair<string, IValue> kvp in (Map)input)

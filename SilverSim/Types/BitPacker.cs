@@ -231,7 +231,6 @@ namespace SilverSim.Types
                 {
                     throw new InvalidOperationException();
                 }
-                byte[] b = new byte[16];
                 value.ToBytes(Data, m_BitPos / 8);
                 m_BitPos += (16 * 8);
             }

@@ -147,7 +147,6 @@ namespace SilverSim.Types.Asset.Format
         public static implicit operator AssetData(Material v)
         {
             AssetData asset = new AssetData();
-            Map m = new Map();
             MemoryStream ms = new MemoryStream();
 
             using(XmlTextWriter w = new XmlTextWriter(ms, UTF8NoBOM))

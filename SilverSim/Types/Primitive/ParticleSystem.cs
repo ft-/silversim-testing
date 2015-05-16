@@ -268,7 +268,7 @@ namespace SilverSim.Types.Primitive
                 int sysSize = pack.UnpackSignedBits(32);
                 if (sysSize != SysDataSize) return; // unkown particle system data size
                 UnpackSystem(ref pack);
-                int dataSize = pack.UnpackSignedBits(32);
+                /*int dataSize = */pack.UnpackSignedBits(32);
                 UnpackLegacyData(ref pack);
 
 
