@@ -1,5 +1,6 @@
 ﻿using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Generic;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System;
@@ -142,6 +143,7 @@ namespace SilverSim.LL.Core
             if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
             {
                 SceneInterface scene = circuit.Scene;
+
                 scene.RegionSettings.BlockTerraform = ParamStringToBool(req.ParamList[0]);
                 scene.RegionSettings.BlockFly = ParamStringToBool(req.ParamList[1]);
                 scene.RegionSettings.AllowDamage = ParamStringToBool(req.ParamList[2]);
@@ -260,9 +262,17 @@ namespace SilverSim.LL.Core
                 return;
             }
             UUID invoice = req.Invoice;
-            UUID senderID = UUID.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[2]));
-            string senderName = UTF8Encoding.UTF8.GetString(req.ParamList[3]);
             string message = UTF8Encoding.UTF8.GetString(req.ParamList[4]);
+
+            Circuit circuit;
+
+            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
+            {
+                foreach (IAgent agent in circuit.Scene.Agents)
+                {
+                    agent.SendRegionNotice(Owner, message, req.CircuitSceneID);
+                }
+            }
         }
 
         void EstateOwner_InstantMessage(EstateOwnerMessage req)
@@ -272,20 +282,14 @@ namespace SilverSim.LL.Core
                 return;
             }
             UUID invoice = req.Invoice;
-            UUID senderID;
-            string senderName;
             string message;
 
             if(req.ParamList.Count < 5)
             {
-                senderID = Owner.ID;
-                senderName = UTF8Encoding.UTF8.GetString(req.ParamList[0]);
                 message = UTF8Encoding.UTF8.GetString(req.ParamList[1]);
             }
             else
             {
-                senderID = UUID.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[2]));
-                senderName = UTF8Encoding.UTF8.GetString(req.ParamList[3]);
                 message = UTF8Encoding.UTF8.GetString(req.ParamList[4]);
             }
         }

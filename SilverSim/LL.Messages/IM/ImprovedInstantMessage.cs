@@ -48,7 +48,7 @@ namespace SilverSim.LL.Messages.IM
         public Date Timestamp;
         public string FromAgentName;
         public string Message;
-        public byte[] BinaryBucket;
+        public byte[] BinaryBucket = new byte[0];
 
         public ImprovedInstantMessage()
         {
@@ -74,10 +74,20 @@ namespace SilverSim.LL.Messages.IM
             }
             IsOffline = gim.IsOffline;
             Position = gim.Position;
-            BinaryBucket = gim.BinaryBucket;
+            if (gim.BinaryBucket != null)
+            {
+                BinaryBucket = gim.BinaryBucket;
+            }
             ParentEstateID = (uint)gim.ParentEstateID;
             RegionID = gim.RegionID;
-            Timestamp = gim.Timestamp;
+            if (null == gim.Timestamp)
+            {
+                Timestamp = new Date();
+            }
+            else
+            {
+                Timestamp = gim.Timestamp;
+            }
         }
 
         public override MessageType Number

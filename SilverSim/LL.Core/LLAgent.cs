@@ -1239,6 +1239,25 @@ namespace SilverSim.LL.Core
             }
         }
 
+        public void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID)
+        {
+            GridInstantMessage im = new GridInstantMessage();
+            im.FromAgent = fromAvatar;
+            im.ToAgent = Owner;
+            im.Dialog = GridInstantMessageDialog.MessageBox;
+            im.IsOffline = false;
+            im.Position = Vector3.Zero;
+            im.Message = message;
+            Circuit circuit;
+            if (Circuits.TryGetValue(fromSceneID, out circuit))
+            {
+                if (IsInScene(circuit.Scene))
+                {
+                    IMSend(im);
+                }
+            }
+        }
+
         public void SendAlertMessage(string msg, UUID fromSceneID)
         {
             SilverSim.LL.Messages.Alert.AlertMessage m = new Messages.Alert.AlertMessage(msg);

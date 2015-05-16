@@ -162,6 +162,7 @@ namespace SilverSim.Scene.Types.Agent
         void SendMessageIfRootAgent(Message m, UUID fromSceneID);
         void SendMessageAlways(Message m, UUID fromSceneID);
         void SendAlertMessage(string msg, UUID fromSceneID);
+        void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID);
         void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID);
 
         UGI Group { get; set; }
