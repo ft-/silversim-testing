@@ -74,7 +74,7 @@ namespace SilverSim.Main.Common.HttpServer
                 Scheme = Uri.UriSchemeHttp;
             }
 
-            m_Listener = new TcpListener(new IPAddress(0), (int)Port);
+            m_Listener = new TcpListener(IPAddress.Any, (int)Port);
             m_Listener.Server.Ttl = 128;
 
             m_Log.InfoFormat("Adding HTTP Server at port {0}", Port);
