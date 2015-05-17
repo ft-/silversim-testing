@@ -71,7 +71,7 @@ namespace SilverSim.Tests.Avatar
             result = m_AvatarService[m_UserID];
             if(result.Count != 2)
             {
-                m_Log.Error("Result set is not containing test data correctly. Count mismatch");
+                m_Log.ErrorFormat("Result set is not containing test data correctly. Count mismatch {0} != {1}", result.Count, 2);
                 return false;
             }
 
@@ -100,7 +100,7 @@ namespace SilverSim.Tests.Avatar
             result = m_AvatarService[m_UserID];
             if (result.Count != 1)
             {
-                m_Log.Error("Result set is not containing test data correctly. Count mismatch");
+                m_Log.ErrorFormat("Result set is not containing test data correctly. Count mismatch {0} != {1}", result.Count, 1);
                 return false;
             }
 
@@ -121,19 +121,19 @@ namespace SilverSim.Tests.Avatar
             m_Log.Info("Replacing complete set of data (Test 1)");
             result.Clear();
             result["AvatarSerial"] = "5";
-            result["AvatarWeight"] = "1";
+            result["Avatar Weight"] = "1";
             m_AvatarService[m_UserID] = result;
 
             m_AvatarService.Remove(m_UserID, "AvatarHeight");
             result = m_AvatarService[m_UserID];
             if (result.Count != 2)
             {
-                m_Log.Error("Result set is not containing test data correctly. Count mismatch");
+                m_Log.ErrorFormat("Result set is not containing test data correctly. Count mismatch {0} != {1}", result.Count, 2);
                 return false;
             }
 
             if (!result.ContainsKey("AvatarSerial") || result.ContainsKey("AvatarHeight") ||
-                !result.ContainsKey("AvatarWeight"))
+                !result.ContainsKey("Avatar Weight"))
             {
                 m_Log.Error("Result set is not containing test data correctly. Key mismatch");
                 return false;
@@ -145,9 +145,9 @@ namespace SilverSim.Tests.Avatar
                 return false;
             }
 
-            if (result["AvatarWeight"] != "1")
+            if (result["Avatar Weight"] != "1")
             {
-                m_Log.Error("Test data value mismatch. AvatarWeight");
+                m_Log.Error("Test data value mismatch. Avatar Weight");
                 return false;
             }
             #endregion
@@ -163,12 +163,12 @@ namespace SilverSim.Tests.Avatar
             result = m_AvatarService[m_UserID];
             if (result.Count != 2)
             {
-                m_Log.Error("Result set is not containing test data correctly. Count mismatch");
+                m_Log.ErrorFormat("Result set is not containing test data correctly. Count mismatch {0} != {1}", result.Count, 2);
                 return false;
             }
 
             if (result.ContainsKey("AvatarSerial") || result.ContainsKey("AvatarHeight") ||
-                 result.ContainsKey("AvatarWeight") ||
+                 result.ContainsKey("Avatar Weight") ||
                 !result.ContainsKey("AvatarValue1") || !result.ContainsKey("AvatarValue2"))
             {
                 m_Log.Error("Result set is not containing test data correctly. Key mismatch");
@@ -197,12 +197,12 @@ namespace SilverSim.Tests.Avatar
             result = m_AvatarService[m_UserID];
             if (result.Count != 4)
             {
-                m_Log.Error("Result set is not containing test data correctly. Count mismatch");
+                m_Log.ErrorFormat("Result set is not containing test data correctly. Count mismatch {0} != {1}", result.Count, 4);
                 return false;
             }
 
             if (result.ContainsKey("AvatarSerial") || result.ContainsKey("AvatarHeight") ||
-                 result.ContainsKey("AvatarWeight") ||
+                 result.ContainsKey("Avatar Weight") ||
                 !result.ContainsKey("AvatarValue1") || !result.ContainsKey("AvatarValue2") ||
                 !result.ContainsKey("AvatarFirst") || !result.ContainsKey("AvatarLast"))
             {
@@ -240,7 +240,7 @@ namespace SilverSim.Tests.Avatar
             List<string> itemresult = m_AvatarService[m_UserID, new List<string>(new string[] { "AvatarFirst", "AvatarLast" })];
             if(itemresult.Count != 2)
             {
-                m_Log.Error("Test data value mismatch. Count != 2");
+                m_Log.ErrorFormat("Test data value mismatch. Count mismatch {0} != {1}", itemresult.Count, 2);
                 return false;
             }
 
@@ -265,12 +265,12 @@ namespace SilverSim.Tests.Avatar
             result = m_AvatarService[m_UserID];
             if (result.Count != 6)
             {
-                m_Log.Error("Result set is not containing test data correctly. Count mismatch");
+                m_Log.ErrorFormat("Result set is not containing test data correctly. Count mismatch {0} != {1}", result.Count, 6);
                 return false;
             }
 
             if (!result.ContainsKey("AvatarSerial") || !result.ContainsKey("AvatarHeight") ||
-                 result.ContainsKey("AvatarWeight") ||
+                 result.ContainsKey("Avatar Weight") ||
                 !result.ContainsKey("AvatarValue1") || !result.ContainsKey("AvatarValue2") ||
                 !result.ContainsKey("AvatarFirst") || !result.ContainsKey("AvatarLast"))
             {
@@ -322,7 +322,7 @@ namespace SilverSim.Tests.Avatar
             result = m_AvatarService[m_UserID];
             if (result.Count != 0)
             {
-                m_Log.Error("Result set is not containing test data correctly. Count mismatch");
+                m_Log.ErrorFormat("Result set is not containing test data correctly. Count mismatch {0} != {1}", result.Count, 0);
                 return false;
             }
 

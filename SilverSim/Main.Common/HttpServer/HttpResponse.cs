@@ -32,7 +32,7 @@ using System.Text;
 
 namespace SilverSim.Main.Common.HttpServer
 {
-    public class HttpResponse
+    public class HttpResponse : IDisposable
     {
         #region Connection Close Signalling
         public class ConnectionCloseException : Exception
@@ -198,6 +198,11 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 return GetOutputStream();
             }
+        }
+
+        public void Dispose()
+        {
+            Close();
         }
     }
 }

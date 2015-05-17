@@ -61,7 +61,9 @@ namespace SilverSim.Types.StructuredData.REST
                     string baseName = name.Substring(0, name.Length - 2);
                     if(!result.ContainsKey(baseName))
                     {
-                        result.Add(baseName, new List<string>());
+                        List<string> newList = new List<string>();
+                        newList.Add(value);
+                        result.Add(baseName, newList);
                     }
                     /* we have to check whether we have a request that has been mixed up with no list and list entries resulting into same name */
                     else if (result[baseName] is List<string>)

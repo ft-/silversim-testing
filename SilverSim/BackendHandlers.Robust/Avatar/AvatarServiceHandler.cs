@@ -62,7 +62,7 @@ namespace SilverSim.BackendHandlers.Robust.Avatar
                         break;
 
                     default:
-                        resdata[reqdata[key].ToString().Replace("_", " ")] = reqdata.GetString(key);
+                        resdata[key.ToString().Replace("_", " ")] = reqdata.GetString(key);
                         break;
                 }
             }
@@ -143,23 +143,23 @@ namespace SilverSim.BackendHandlers.Robust.Avatar
                 switch (data["METHOD"].ToString())
                 {
                     case "getavatar":
-                        getavatar(req, data);
+                        GetAvatar(req, data);
                         break;
 
                     case "resetavatar":
-                        resetavatar(req, data);
+                        ResetAvatar(req, data);
                         break;
 
                     case "removeitems":
-                        removeitems(req, data);
+                        RemoveItems(req, data);
                         break;
 
                     case "setavatar":
-                        setavatar(req, data);
+                        SetAvatar(req, data);
                         break;
 
                     case "setitems":
-                        setitems(req, data);
+                        SetItems(req, data);
                         break;
 
                     default:
@@ -182,22 +182,67 @@ namespace SilverSim.BackendHandlers.Robust.Avatar
             }
         }
 
-        public void getavatar(HttpRequest req, Dictionary<string, object> reqdata)
+        void GetAvatar(HttpRequest req, Dictionary<string, object> reqdata)
         {
-
+            UUID avatarID = reqdata.GetUUID("UserID");
+            Dictionary<string, string> result;
+            try
+            {
+                result = m_AvatarService[avatarID];
+            }
+            catch
+            {
+                throw new FailureResultException();
+            }
+            using (HttpResponse res = req.BeginResponse("text/xml"))
+            {
+                using (XmlTextWriter writer = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM))
+                {
+                    writer.WriteStartElement("ServerResponse");
+                    {
+                        writer.WriteStartElement("result");
+                        writer.WriteAttributeString("type", "List");
+                        foreach (KeyValuePair<string, string> kvp in result)
+                        {
+                            writer.WriteNamedValue(XmlConvert.EncodeLocalName(kvp.Key), kvp.Value);
+                        }
+                        writer.WriteEndElement();
+                    }
+                    writer.WriteEndElement();
+                }
+            }
         }
 
-        public void resetavatar(HttpRequest req, Dictionary<string, object> reqdata)
+        void ResetAvatar(HttpRequest req, Dictionary<string, object> reqdata)
         {
-
+            UUID avatarID = reqdata.GetUUID("UserID");
+            try
+            {
+                m_AvatarService[avatarID] = null;
+            }
+            catch
+            {
+                throw new FailureResultException();
+            }
+            SuccessResult(req);
         }
 
-        public void removeitems(HttpRequest req, Dictionary<string, object> reqdata)
+        void RemoveItems(HttpRequest req, Dictionary<string, object> reqdata)
         {
-
+            UUID avatarID = reqdata.GetUUID("UserID");
+            List<string> names = reqdata.GetList("Names");
+            try
+            {
+                m_AvatarService.Remove(avatarID, names);
+            }
+            catch
+            {
+                throw new FailureResultException();
+            }
+            SuccessResult(req);
         }
 
-        public void setavatar(HttpRequest req, Dictionary<string, object> reqdata)
+        void SetAvatar(HttpRequest req, Dictionary<string, object> reqdata)
         {
             Dictionary<string, string> avatarData = reqdata.ToAvatarData();
             UUID principalID = reqdata.GetUUID("UserID");
@@ -212,13 +257,14 @@ namespace SilverSim.BackendHandlers.Robust.Avatar
             SuccessResult(req);
         }
 
-        public void setitems(HttpRequest req, Dictionary<string, object> reqdata)
+        void SetItems(HttpRequest req, Dictionary<string, object> reqdata)
         {
-            Dictionary<string, string> avatarData = reqdata.ToAvatarData();
+            List<string> names = reqdata.GetList("Names");
+            List<string> values = reqdata.GetList("Values");
             UUID principalID = reqdata.GetUUID("UserID");
             try
             {
-                m_AvatarService[principalID, new List<string>(avatarData.Keys)] = new List<string>(avatarData.Values);
+                m_AvatarService[principalID, names] = values;
             }
             catch
             {

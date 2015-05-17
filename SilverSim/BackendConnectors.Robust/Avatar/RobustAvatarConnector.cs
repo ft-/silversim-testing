@@ -85,7 +85,7 @@ namespace SilverSim.BackendConnectors.Robust.Avatar
                 Map result = (Map)map["result"];
                 if(result.Count == 0)
                 {
-                    throw new AvatarInaccessible();
+                    return new Dictionary<string, string>();
                 }
                 Dictionary<string, string> data = new Dictionary<string, string>();
                 foreach(KeyValuePair<string, IValue> kvp in result)
