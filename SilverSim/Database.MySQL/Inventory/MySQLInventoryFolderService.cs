@@ -241,7 +241,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 connection.Open();
                 try
                 {
-                    connection.UpdateSet("inventoryitems", newVals, string.Format("OwnerID LIKE '{0}' AND ID LIKE '{1}'", folder.Owner.ID, folder.ID));
+                    connection.UpdateSet("inventoryfolders", newVals, string.Format("OwnerID LIKE '{0}' AND ID LIKE '{1}'", folder.Owner.ID, folder.ID));
                 }
                 catch
                 {

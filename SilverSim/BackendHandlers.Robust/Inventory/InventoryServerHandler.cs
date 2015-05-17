@@ -205,19 +205,14 @@ namespace SilverSim.BackendHandlers.Robust.Inventory
         public static void WriteFolder(this XmlTextWriter writer, string name, InventoryFolder folder)
         {
             writer.WriteStartElement(name);
+            writer.WriteAttributeString("type", "List");
             {
-                writer.WriteUUID("ParentID", folder.ParentFolderID);
-                writer.WriteStartElement("Type");
-                writer.WriteValue((int)folder.InventoryType);
-                writer.WriteEndElement();
-                writer.WriteStartElement("Version");
-                writer.WriteValue(folder.Version);
-                writer.WriteEndElement();
-                writer.WriteStartElement("Name");
-                writer.WriteValue(folder.Name);
-                writer.WriteEndElement();
-                writer.WriteUUID("Owner", folder.Owner.ID);
-                writer.WriteUUID("ID", folder.ID);
+                writer.WriteNamedValue("ParentID", folder.ParentFolderID);
+                writer.WriteNamedValue("Type", (int)folder.InventoryType);
+                writer.WriteNamedValue("Version", folder.Version);
+                writer.WriteNamedValue("Name", folder.Name);
+                writer.WriteNamedValue("Owner", folder.Owner.ID);
+                writer.WriteNamedValue("ID", folder.ID);
             }
             writer.WriteEndElement();
         }
@@ -225,74 +220,28 @@ namespace SilverSim.BackendHandlers.Robust.Inventory
         public static void WriteItem(this XmlTextWriter writer, string name, InventoryItem item)
         {
             writer.WriteStartElement(name);
+            writer.WriteAttributeString("type", "List");
             {
-                writer.WriteUUID("AssetID", item.AssetID);
-            
-                writer.WriteStartElement("AssetType");
-                writer.WriteValue((int)item.AssetType);
-                writer.WriteEndElement();
-            
-                writer.WriteStartElement("BasePermissions");
-                writer.WriteValue((uint)item.Permissions.Base);
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("CreationDate");
-                writer.WriteValue((long)item.CreationDate.DateTimeToUnixTime());
-                writer.WriteEndElement();
-
-                writer.WriteUUID("CreatorId", item.Creator.ID);
-                
-                writer.WriteStartElement("CreatorData");
-                writer.WriteValue(item.Creator.CreatorData);
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("CurrentPermissions");
-                writer.WriteValue((uint)item.Permissions.Current);
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("Description");
-                writer.WriteValue(item.Description);
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("EveryOnePermissions");
-                writer.WriteValue((uint)item.Permissions.EveryOne);
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("Flags");
-                writer.WriteValue((uint)item.Flags);
-                writer.WriteEndElement();
-
-                writer.WriteUUID("Folder", item.ParentFolderID);
-
-                writer.WriteUUID("GroupID", item.Group.ID);
-                
-                writer.WriteStartElement("GroupOwned");
-                writer.WriteValue(item.IsGroupOwned);
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("GroupPermissions");
-                writer.WriteValue((uint)item.Permissions.Group);
-                writer.WriteEndElement();
-
-                writer.WriteUUID("ID", item.ID);
-
-                writer.WriteStartElement("InvType");
-                writer.WriteValue((int)item.InventoryType);
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("NextPermissions");
-                writer.WriteValue((uint)item.Permissions.NextOwner);
-                writer.WriteEndElement();
-
-                writer.WriteUUID("Owner", item.Owner.ID);
-                
-                writer.WriteStartElement("SalePrice");
-                writer.WriteValue(item.SaleInfo.Price);
-                writer.WriteEndElement();
-
-                writer.WriteStartElement("SaleType");
-                writer.WriteValue((byte)item.SaleInfo.Type);
-                writer.WriteEndElement();
+                writer.WriteNamedValue("AssetID", item.AssetID);
+                writer.WriteNamedValue("AssetType", (int)item.AssetType);
+                writer.WriteNamedValue("BasePermissions", (uint)item.Permissions.Base);
+                writer.WriteNamedValue("CreationDate", (long)item.CreationDate.DateTimeToUnixTime());
+                writer.WriteNamedValue("CreatorId", item.Creator.ID);
+                writer.WriteNamedValue("CreatorData", item.Creator.CreatorData);
+                writer.WriteNamedValue("CurrentPermissions", (uint)item.Permissions.Current);
+                writer.WriteNamedValue("Description", item.Description);
+                writer.WriteNamedValue("EveryOnePermissions", (uint)item.Permissions.EveryOne);
+                writer.WriteNamedValue("Flags", (uint)item.Flags);
+                writer.WriteNamedValue("Folder", item.ParentFolderID);
+                writer.WriteNamedValue("GroupID", item.Group.ID);
+                writer.WriteNamedValue("GroupOwned", item.IsGroupOwned);
+                writer.WriteNamedValue("GroupPermissions", (uint)item.Permissions.Group);
+                writer.WriteNamedValue("ID", item.ID);
+                writer.WriteNamedValue("InvType", (int)item.InventoryType);
+                writer.WriteNamedValue("NextPermissions", (uint)item.Permissions.NextOwner);
+                writer.WriteNamedValue("Owner", item.Owner.ID);
+                writer.WriteNamedValue("SalePrice", item.SaleInfo.Price);
+                writer.WriteNamedValue("SaleType", (byte)item.SaleInfo.Type);
             }
             writer.WriteEndElement();
         }
@@ -302,23 +251,23 @@ namespace SilverSim.BackendHandlers.Robust.Inventory
             if(!string.IsNullOrEmpty(name))
             {
                 writer.WriteStartElement(name);
+                writer.WriteAttributeString("type", "List");
             }
 
             {
-                writer.WriteUUID("FID", content.FolderID);
+                writer.WriteNamedValue("FID", content.FolderID);
 
-                writer.WriteStartElement("VERSION");
-                writer.WriteValue(content.Version);
-                writer.WriteEndElement();
+                writer.WriteNamedValue("VERSION", content.Version);
 
                 if(serializeOwner)
                 {
-                    writer.WriteUUID("OWNER", content.Owner.ID);
+                    writer.WriteNamedValue("OWNER", content.Owner.ID);
                 }
 
                 int count = 0;
                 writer.WriteStartElement("FOLDERS");
-                foreach(InventoryFolder folder in content.Folders)
+                writer.WriteAttributeString("type", "List");
+                foreach (InventoryFolder folder in content.Folders)
                 {
                     writer.WriteFolder("folder_" + count.ToString(), folder);
                     ++count;
@@ -327,7 +276,8 @@ namespace SilverSim.BackendHandlers.Robust.Inventory
 
                 count = 0;
                 writer.WriteStartElement("ITEMS");
-                foreach(InventoryItem item in content.Items)
+                writer.WriteAttributeString("type", "List");
+                foreach (InventoryItem item in content.Items)
                 {
                     writer.WriteItem("item_" + count.ToString(), item);
                     ++count;
@@ -356,7 +306,7 @@ namespace SilverSim.BackendHandlers.Robust.Inventory
         public RobustInventoryServerHandler(string inventoryServiceName)
         {
             m_InventoryServiceName = inventoryServiceName;
-            //m_Handlers["CREATEUSERINVENTORY"];
+            m_Handlers["CREATEUSERINVENTORY"] = CreateUserInventory;
             m_Handlers["GETINVENTORYSKELETON"] = GetInventorySkeleton;
             m_Handlers["GETROOTFOLDER"] = GetRootFolder;
             m_Handlers["GETFOLDERFORTYPE"] = GetFolderForType;
