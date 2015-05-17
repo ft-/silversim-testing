@@ -57,6 +57,12 @@ namespace SilverSim.ServiceInterfaces.Avatar
             set;
         }
 
+        public abstract List<string> this[UUID avatarID, IList<string> itemKeys]
+        {
+            get;
+            set;
+        }
+
         public abstract void Remove(UUID avatarID, IList<string> nameList);
         public abstract void Remove(UUID avatarID, string name);
     }

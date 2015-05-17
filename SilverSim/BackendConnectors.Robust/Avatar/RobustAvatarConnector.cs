@@ -32,6 +32,7 @@ using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Web;
 using System.Xml;
 
 namespace SilverSim.BackendConnectors.Robust.Avatar
@@ -120,6 +121,64 @@ namespace SilverSim.BackendConnectors.Robust.Avatar
                     throw new AvatarUpdateFailedException();
                 }
                 if(map["result"].ToString() != "Success")
+                {
+                    throw new AvatarUpdateFailedException();
+                }
+            }
+        }
+
+        public override List<string> this[UUID avatarID, IList<string> itemKeys]
+        {
+            get
+            {
+                Dictionary<string, string> res = this[avatarID];
+                List<string> result = new List<string>();
+                foreach (string key in itemKeys)
+                {
+                    string val;
+                    if (res.TryGetValue(key, out val))
+                    {
+                        result.Add(val);
+                    }
+                    else
+                    {
+                        result.Add(string.Empty);
+                    }
+                }
+                return result;
+            }
+            set
+            {
+                if(value == null || itemKeys == null)
+                {
+                    throw new ArgumentNullException();
+                }
+                if(itemKeys.Count != value.Count)
+                {
+                    throw new ArgumentException("value and itemKeys must have identical Count");
+                }
+
+                string outStr = "UserID=" + HttpUtility.UrlEncode(avatarID);
+                outStr += "&METHOD=setitems";
+                int i;
+                for(i = 0; i < itemKeys.Count; ++i)
+                {
+                    outStr += "&";
+                    outStr += HttpUtility.UrlEncode("Names[]") + "=" + HttpUtility.UrlEncode(itemKeys[i]);
+                }
+                for (i = 0; i < itemKeys.Count; ++i)
+                {
+                    outStr += "&";
+                    outStr += HttpUtility.UrlEncode("Values[]") + "=" + HttpUtility.UrlEncode(value[i]);
+                }
+                outStr += "&VERSIONMIN=0&VERSIONMAX=0";
+
+                Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamRequest("POST", m_AvatarURI, null, "application/x-www-form-urlencoded", outStr, false, TimeoutMs));
+                if (!map.ContainsKey("result"))
+                {
+                    throw new AvatarUpdateFailedException();
+                }
+                if (map["result"].ToString() != "Success")
                 {
                     throw new AvatarUpdateFailedException();
                 }

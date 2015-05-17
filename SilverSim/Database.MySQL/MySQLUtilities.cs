@@ -86,6 +86,48 @@ namespace SilverSim.Database.MySQL
             }
         }
 
+        public class MySQLTransactionException : Exception
+        {
+            public MySQLTransactionException(string msg)
+                : base(msg)
+            {
+
+            }
+
+            public MySQLTransactionException(string msg, Exception inner)
+                : base(msg, inner)
+            {
+
+            }
+        }
+
+        #region Transaction Helper
+        public delegate void TransactionDelegate();
+        public static void InsideTransaction(this MySqlConnection connection, TransactionDelegate del)
+        {
+            using (MySqlCommand cmd = new MySqlCommand("BEGIN", connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+            try
+            {
+                del();
+            }
+            catch(Exception e)
+            {
+                using (MySqlCommand cmd = new MySqlCommand("ROLLBACK", connection))
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                throw new MySQLTransactionException("Transaction failed", e);
+            }
+            using (MySqlCommand cmd = new MySqlCommand("COMMIT", connection))
+            {
+                cmd.ExecuteNonQuery();
+            }
+        }
+        #endregion
+
         #region Push parameters
         static void AddParameters(MySqlParameterCollection mysqlparam, Dictionary<string, object> vals)
         {

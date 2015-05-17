@@ -32,9 +32,7 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.StructuredData.REST;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Text;
 using System.Xml;
@@ -43,125 +41,8 @@ namespace SilverSim.BackendHandlers.Robust.Inventory
 {
     #region Internal Extension methods and exceptions
 
-    class FailureResultException : Exception
-    {
-        public FailureResultException()
-        {
-
-        }
-    }
-
     static class ExtensionMethods
     {
-        public static int GetInt(this Dictionary<string, object> dict, string key)
-        {
-            if(!dict.ContainsKey(key))
-            {
-                throw new FailureResultException();
-            }
-            try
-            {
-                return int.Parse(dict[key].ToString());
-            }
-            catch
-            {
-                throw new FailureResultException();
-            }
-        }
-
-        public static uint GetUInt(this Dictionary<string, object> dict, string key)
-        {
-            if (!dict.ContainsKey(key))
-            {
-                throw new FailureResultException();
-            }
-            try
-            {
-                return uint.Parse(dict[key].ToString());
-            }
-            catch
-            {
-                throw new FailureResultException();
-            }
-        }
-
-        public static ulong GetULong(this Dictionary<string, object> dict, string key)
-        {
-            if (!dict.ContainsKey(key))
-            {
-                throw new FailureResultException();
-            }
-            try
-            {
-                return ulong.Parse(dict[key].ToString());
-            }
-            catch
-            {
-                throw new FailureResultException();
-            }
-        }
-
-        public static string GetString(this Dictionary<string, object> dict, string key)
-        {
-            if (!dict.ContainsKey(key))
-            {
-                throw new FailureResultException();
-            }
-            return dict[key].ToString();
-        }
-
-        public static List<string> GetList(this Dictionary<string, object> dict, string key)
-        {
-            if (!dict.ContainsKey(key))
-            {
-                throw new FailureResultException();
-            }
-            if(!(dict[key] is List<string>))
-            {
-                throw new FailureResultException();
-            }
-            return (List<string>)dict[key];
-        }
-
-        public static List<UUID> GetUUIDList(this Dictionary<string, object> dict, string key)
-        {
-            if (!dict.ContainsKey(key))
-            {
-                throw new FailureResultException();
-            }
-            if (!(dict[key] is List<string>))
-            {
-                throw new FailureResultException();
-            }
-            List<UUID> uuids = new List<UUID>();
-            foreach(string s in (List<string>)dict[key])
-            {
-                UUID o;
-                if(!UUID.TryParse(s, out o))
-                {
-                    throw new FailureResultException();
-                }
-                uuids.Add(o);
-            }
-            return uuids;
-        }
-
-        public static UUID GetUUID(this Dictionary<string, object> dict, string key)
-        {
-            if(!dict.ContainsKey(key))
-            {
-                throw new FailureResultException();
-            }
-            try
-            {
-                return new UUID(dict[key].ToString());
-            }
-            catch
-            {
-                throw new FailureResultException();
-            }
-        }
-
         public static InventoryItem ToItem(this Dictionary<string, object> dict)
         {
             InventoryItem item = new InventoryItem();

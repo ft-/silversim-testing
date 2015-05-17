@@ -32,7 +32,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SilverSim.ServiceInterfaces.Avatar
+namespace SilverSim.ServiceInterfaces
 {
     public static class ChildAgentController
     {
