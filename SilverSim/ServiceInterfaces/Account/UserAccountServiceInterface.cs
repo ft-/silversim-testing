@@ -65,7 +65,8 @@ namespace SilverSim.ServiceInterfaces.Account
         public abstract List<UserAccount> GetAccounts(UUID ScopeID, string query);
 
         #region Optionally supported services
-        public abstract void Store(UserAccount userAccount);
+        public abstract void Add(UserAccount userAccount);
+        public abstract void Update(UserAccount userAccount);
 
         public abstract void Remove(UUID scopeID, UUID accountID);
         #endregion

@@ -164,7 +164,12 @@ namespace SilverSim.BackendConnectors.Robust.Account
             return ua;
         }
 
-        public override void Store(UserAccount userAccount)
+        public override void Add(UserAccount userAccount)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void Update(UserAccount userAccount)
         {
             throw new NotSupportedException();
         }

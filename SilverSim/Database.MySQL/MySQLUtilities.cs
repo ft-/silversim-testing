@@ -435,6 +435,87 @@ namespace SilverSim.Database.MySQL
                 }
             }
         }
+
+        public static void UpdateSet(this MySqlConnection connection, string tablename, Dictionary<string, object> vals, Dictionary<string, object> where)
+        {
+            string q1 = "UPDATE " + tablename + " SET ";
+            bool first = true;
+
+            foreach (KeyValuePair<string, object> kvp in vals)
+            {
+                if (kvp.Value != null)
+                {
+                    if (!first)
+                    {
+                        q1 += ",";
+                    }
+                    first = false;
+                }
+
+                if (kvp.Value is Vector3)
+                {
+                    q1 += "`" + kvp.Key.ToString() + "X` = ?v_" + kvp.Key.ToString() + "X,";
+                    q1 += "`" + kvp.Key.ToString() + "Y` = ?v_" + kvp.Key.ToString() + "Y,";
+                    q1 += "`" + kvp.Key.ToString() + "Z` = ?v_" + kvp.Key.ToString() + "Z";
+                }
+                else if (kvp.Value is GridVector)
+                {
+                    q1 += "`" + kvp.Key.ToString() + "X` = ?v_" + kvp.Key.ToString() + "X,";
+                    q1 += "`" + kvp.Key.ToString() + "Y` = ?v_" + kvp.Key.ToString() + "Y";
+                }
+                else if (kvp.Value is Quaternion)
+                {
+                    q1 += "`" + kvp.Key.ToString() + "X` = ?v_" + kvp.Key.ToString() + "X,";
+                    q1 += "`" + kvp.Key.ToString() + "Y` = ?v_" + kvp.Key.ToString() + "Y,";
+                    q1 += "`" + kvp.Key.ToString() + "Z` = ?v_" + kvp.Key.ToString() + "Z,";
+                    q1 += "`" + kvp.Key.ToString() + "W` = ?v_" + kvp.Key.ToString() + "W";
+                }
+                else if (kvp.Value is Color)
+                {
+                    q1 += "`" + kvp.Key.ToString() + "Red` = ?v_" + kvp.Key.ToString() + "Red,";
+                    q1 += "`" + kvp.Key.ToString() + "Green` = ?v_" + kvp.Key.ToString() + "Green,";
+                    q1 += "`" + kvp.Key.ToString() + "Blue` = ?v_" + kvp.Key.ToString() + "Blue";
+                }
+                else if (kvp.Value is ColorAlpha)
+                {
+                    q1 += "`" + kvp.Key.ToString() + "Red` = ?v_" + kvp.Key.ToString() + "Red,";
+                    q1 += "`" + kvp.Key.ToString() + "Green` = ?v_" + kvp.Key.ToString() + "Green,";
+                    q1 += "`" + kvp.Key.ToString() + "Blue` = ?v_" + kvp.Key.ToString() + "Blue,";
+                    q1 += "`" + kvp.Key.ToString() + "Alpha` = ?v_" + kvp.Key.ToString() + "Alpha";
+                }
+                else if (kvp.Value == null)
+                {
+                    /* skip */
+                }
+                else
+                {
+                    q1 += "`" + kvp.Key.ToString() + "` = ?v_" + kvp.Key.ToString();
+                }
+            }
+
+            string wherestr = "";
+            foreach(KeyValuePair<string, object> w in where)
+            {
+                if(wherestr != "")
+                {
+                    wherestr += " AND ";
+                }
+                wherestr += string.Format("{0} LIKE ?w_{0}", w.Key, w.Key);
+            }
+
+            using (MySqlCommand command = new MySqlCommand(q1 + " WHERE " + wherestr, connection))
+            {
+                AddParameters(command.Parameters, vals);
+                foreach(KeyValuePair<string, object> w in where)
+                {
+                    command.Parameters.AddWithValue("?w_" + w.Key, w.Value);
+                }
+                if (command.ExecuteNonQuery() < 1)
+                {
+                    throw new MySQLInsertException();
+                }
+            }
+        }
         #endregion
 
         #region Data parsers

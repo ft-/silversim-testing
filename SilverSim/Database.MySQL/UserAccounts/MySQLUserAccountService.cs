@@ -187,12 +187,43 @@ namespace SilverSim.Database.MySQL.UserAccounts
             }
         }
 
-        public override List<UserAccount> GetAccounts(UUID ScopeID, string query)
+        public override List<UserAccount> GetAccounts(UUID scopeID, string query)
         {
-            throw new System.NotImplementedException();
+            string[] words = query.Split(new char[] {' '}, 2);
+            List<UserAccount> accounts = new List<UserAccount>();
+            if(words.Length == 0)
+            {
+                return accounts;
+            }
+
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                string cmdstr = "select * from useraccounts where (ScopeID LIKE ?ScopeID or ScopeID LIKE '00000000-0000-0000-0000-000000000000') and (FirstName LIKE ?word0 or LastName LIKE ?word0)";
+                if (words.Length == 2)
+                {
+                    cmdstr = "select * from useraccounts where (ScopeID LIKE ?ScopeID or ScopeID LIKE '00000000-0000-0000-0000-000000000000') and (FirstName LIKE ?word0 or LastName LIKE ?word1)";
+                }
+                using (MySqlCommand cmd = new MySqlCommand(cmdstr, connection))
+                {
+                    cmd.Parameters.AddWithValue("?ScopeID", scopeID);
+                    for (int i = 0; i < words.Length; ++i)
+                    {
+                        cmd.Parameters.AddWithValue("?word" + i, words[i]);
+                    }
+                    using (MySqlDataReader dbreader = cmd.ExecuteReader())
+                    {
+                        while (dbreader.Read())
+                        {
+                            accounts.Add(dbreader.ToUserAccount());
+                        }
+                    }
+                }
+            }
+            return accounts;
         }
 
-        public override void Store(UserAccount userAccount)
+        public override void Add(UserAccount userAccount)
         {
             Dictionary<string, object> data = new Dictionary<string, object>();
             data["ID"] = userAccount.Principal.ID;
@@ -208,7 +239,28 @@ namespace SilverSim.Database.MySQL.UserAccounts
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.ReplaceInsertInto("useraccounts", data);
+                connection.InsertInto("useraccounts", data);
+            }
+        }
+
+        public override void Update(UserAccount userAccount)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            data["FirstName"] = userAccount.Principal.FirstName;
+            data["LastName"] = userAccount.Principal.LastName;
+            data["Email"] = userAccount.Email;
+            data["Created"] = userAccount.Created;
+            data["UserLevel"] = userAccount.UserLevel;
+            data["UserFlags"] = userAccount.UserFlags;
+            data["UserTitle"] = userAccount.UserTitle;
+            Dictionary<string, object> w = new Dictionary<string,object>();
+            w["ScopeID"] = userAccount.ScopeID;
+            w["ID"] = userAccount.Principal.ID;
+
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.UpdateSet("useraccounts", data, w);
             }
         }
 
