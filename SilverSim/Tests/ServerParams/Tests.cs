@@ -103,18 +103,6 @@ namespace SilverSim.Tests.ServerParams
                 return false;
             }
 
-            /*
-                    public abstract string this[UUID regionID, string parameter, string defvalue]
-                    {
-                        get;
-                    }
-
-                    public abstract string this[UUID regionID, string parameter]
-                    {
-                        get;
-                        set;
-                    }
-             */
             return true;
         }
     }

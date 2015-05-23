@@ -47,7 +47,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             info.Principal.IsAuthoritative = true;
             info.ScopeID = reader.GetUUID("ScopeID");
             info.Email = (string)reader["Email"];
-            info.Created = reader.GetDate("LastLogin");
+            info.Created = reader.GetDate("Created");
             info.UserLevel = (int)reader["UserLevel"];
             info.UserFlags = (int)reader["UserFlags"];
             info.UserTitle = (string)reader["UserTitle"];

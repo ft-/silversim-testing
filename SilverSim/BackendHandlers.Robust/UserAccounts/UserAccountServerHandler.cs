@@ -28,6 +28,7 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.ServiceInterfaces.Account;
+using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.StructuredData.REST;
@@ -86,6 +87,7 @@ namespace SilverSim.BackendHandlers.Robust.UserAccounts
             m_Log.Info("Initializing handler for UserAccount server");
             m_HttpServer = loader.HttpServer;
             m_HttpServer.StartsWithUriHandlers.Add("/accounts", UserAccountHandler);
+            m_UserAccountService = loader.GetService<UserAccountServiceInterface>(m_UserAccountServiceName);
         }
 
         public void UserAccountHandler(HttpRequest req)
