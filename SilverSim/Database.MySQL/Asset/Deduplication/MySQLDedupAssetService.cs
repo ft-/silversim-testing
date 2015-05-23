@@ -242,15 +242,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
             {
                 conn.Open();
 
-                using (MySqlCommand cmd =
-                    new MySqlCommand(
-                        "BEGIN",
-                        conn))
-                {
-                    cmd.ExecuteNonQuery();
-                }
-
-                try
+                conn.InsideTransaction(delegate()
                 {
                     using (MySqlCommand cmd =
                         new MySqlCommand(
@@ -319,18 +311,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                     {
                         cmd.ExecuteNonQuery();
                     }
-                }
-                catch
-                {
-                    using (MySqlCommand cmd =
-                        new MySqlCommand(
-                            "ROLLBACK",
-                            conn))
-                    {
-                        cmd.ExecuteNonQuery();
-                    }
-                    throw;
-                }
+                });
             }
         }
         #endregion
