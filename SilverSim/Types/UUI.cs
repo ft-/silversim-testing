@@ -47,16 +47,6 @@ namespace SilverSim.Types
             }
         }
 
-        public static bool operator ==(UUI a, UUI b)
-        {
-            return a.Equals(b);
-        }
-
-        public static bool operator !=(UUI a, UUI b)
-        {
-            return !a.Equals(b);
-        }
-
         public override bool Equals(object obj)
         {
             return (obj is UUI) ? this == (UUI)obj : false;

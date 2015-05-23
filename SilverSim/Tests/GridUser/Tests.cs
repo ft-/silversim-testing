@@ -97,7 +97,7 @@ namespace SilverSim.Tests.GridUser
                 result = false;
                 m_Log.WarnFormat("GridUserInfo.LastRegionID is not equal ({0} != {1})", gui1.LastRegionID, gui2.LastRegionID);
             }
-            if (gui1.User != gui2.User)
+            if (!gui1.User.Equals(gui2.User))
             {
                 result = false;
                 m_Log.WarnFormat("GridUserInfo.User is not equal ({0} != {1})", gui1.User, gui2.User);
@@ -283,7 +283,6 @@ namespace SilverSim.Tests.GridUser
             {
                 return false;
             }
-
 
             return true;
         }
