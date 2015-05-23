@@ -14,7 +14,7 @@ using System.Text;
 namespace SilverSim.Database.MySQL.Avatar
 {
     #region Service Implementation
-    class MySQLAvatarService : AvatarServiceInterface, IDBServiceInterface, IPlugin, UserAccountDeleteServiceInterface
+    class MySQLAvatarService : AvatarServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         string m_ConnectionString;
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR SERVICE");

@@ -37,7 +37,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.GridUser
 {
     #region Service Implementation
-    class MySQLGridUserService : GridUserServiceInterface, IDBServiceInterface, IPlugin, UserAccountDeleteServiceInterface
+    class MySQLGridUserService : GridUserServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRIDUSER SERVICE");
