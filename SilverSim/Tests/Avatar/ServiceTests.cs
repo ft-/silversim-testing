@@ -29,11 +29,8 @@ using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.Tests.Extensions;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace SilverSim.Tests.Avatar
 {

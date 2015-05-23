@@ -60,6 +60,8 @@ namespace SilverSim.ServiceInterfaces.GridUser
         {
             get;
         }
+
+        public abstract void LoggedInAdd(UUI userID); /* LoggedInAdd is only supported by DB services */
         public abstract void LoggedIn(UUI userID);
         public abstract void LoggedOut(UUI userID, UUID lastRegionID, Vector3 lastPosition, Vector3 lastLookAt);
         public abstract void SetHome(UUI userID, UUID homeRegionID, Vector3 homePosition, Vector3 homeLookAt);

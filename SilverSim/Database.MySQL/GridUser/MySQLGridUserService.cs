@@ -31,6 +31,7 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.Types;
 using SilverSim.Types.GridUser;
+using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.GridUser
 {
@@ -112,6 +113,30 @@ namespace SilverSim.Database.MySQL.GridUser
             }
         }
 
+        public override void LoggedInAdd(UUI userID)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET IsOnline = 1, LastLogin = ?curtime WHERE ID LIKE ?id", conn))
+                {
+                    cmd.Parameters.AddWithValue("?id", userID.ID);
+                    cmd.Parameters.AddWithValue("?curtime", Date.GetUnixTime());
+                    if (cmd.ExecuteNonQuery() >= 1)
+                    {
+                        return;
+                    }
+                }
+
+                Dictionary<string, object> param = new Dictionary<string,object>();
+                param["ID"] = userID.ID;
+                param["LastLogin"] = Date.GetUnixTime();
+                param["IsOnline"] = 1;
+                conn.ReplaceInsertInto("griduser", param);
+            }
+
+        }
+
         public override void LoggedIn(UUI userID)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
@@ -119,7 +144,7 @@ namespace SilverSim.Database.MySQL.GridUser
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET IsOnline = 1, LastLogin = ?curtime WHERE ID LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", userID);
+                    cmd.Parameters.AddWithValue("?id", userID.ID);
                     cmd.Parameters.AddWithValue("?curtime", Date.GetUnixTime());
                     if (cmd.ExecuteNonQuery() < 1)
                     {
@@ -134,10 +159,13 @@ namespace SilverSim.Database.MySQL.GridUser
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET IsOnline = 0, LastLogout = ?curtime WHERE ID LIKE ?id", conn))
+                using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET IsOnline = 0, LastLogout = ?curtime, LastRegionID = ?regionID, LastPosition = ?position, LastLookAt = ?lookAt WHERE ID LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", userID);
+                    cmd.Parameters.AddWithValue("?id", userID.ID);
                     cmd.Parameters.AddWithValue("?curtime", Date.GetUnixTime());
+                    cmd.Parameters.AddWithValue("?regionID", lastRegionID);
+                    cmd.Parameters.AddWithValue("?position", lastPosition.ToString());
+                    cmd.Parameters.AddWithValue("?lookAt", lastLookAt.ToString());
                     if (cmd.ExecuteNonQuery() < 1)
                     {
                         throw new GridUserUpdateFailedException();
@@ -153,7 +181,7 @@ namespace SilverSim.Database.MySQL.GridUser
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET HomeRegionID = ?regionID, HomePosition = ?position, HomeLookAt = ?lookAt WHERE ID LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", userID);
+                    cmd.Parameters.AddWithValue("?id", userID.ID);
                     cmd.Parameters.AddWithValue("?regionID", homeRegionID);
                     cmd.Parameters.AddWithValue("?position", homePosition.ToString());
                     cmd.Parameters.AddWithValue("?lookAt", homeLookAt.ToString());
@@ -172,7 +200,7 @@ namespace SilverSim.Database.MySQL.GridUser
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET LastRegionID = ?regionID, LastPosition = ?position, LastLookAt = ?lookAt WHERE ID LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", userID);
+                    cmd.Parameters.AddWithValue("?id", userID.ID);
                     cmd.Parameters.AddWithValue("?regionID", lastRegionID);
                     cmd.Parameters.AddWithValue("?position", lastPosition.ToString());
                     cmd.Parameters.AddWithValue("?lookAt", lastLookAt.ToString());

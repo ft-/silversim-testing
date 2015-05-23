@@ -114,18 +114,14 @@ namespace SilverSim.Database.MySQL.ServerParam
         {
             get
             {
-                RwLockedDictionary<string, string> regParams;
-                if (m_Cache.TryGetValue(regionID, out regParams))
+                try
                 {
-                    string val;
-                    if (regParams.TryGetValue(parameter, out val))
-                    {
-                        return val;
-                    }
+                    return this[regionID, parameter];
                 }
-
-                m_Cache[regionID][parameter] = defvalue;
-                return defvalue;
+                catch(KeyNotFoundException)
+                { 
+                    return defvalue;
+                }
             }
         }
         public override string this[UUID regionID, string parameter]
@@ -146,8 +142,10 @@ namespace SilverSim.Database.MySQL.ServerParam
                 {
                     connection.Open();
 
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM serverparams WHERE (regionid LIKE '" + regionID.ToString() + "' OR regionid LIKE '00000000-0000-0000-0000-000000000000') AND parametername LIKE '" + MySqlHelper.EscapeString(parameter) + "'", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
                     {
+                        cmd.Parameters.AddWithValue("?regionid", regionID);
+                        cmd.Parameters.AddWithValue("?parametername", parameter);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if(dbReader.Read())
@@ -159,6 +157,18 @@ namespace SilverSim.Database.MySQL.ServerParam
                     }
                 }
 
+                if(UUID.Zero != regionID)
+                {
+                    try
+                    {
+                        return this[UUID.Zero, parameter];
+                    }
+                    catch(KeyNotFoundException)
+                    {
+
+                    }
+                }
+
                 throw new KeyNotFoundException("Key " + regionID.ToString() + ":" + parameter);
             }
 
@@ -167,18 +177,42 @@ namespace SilverSim.Database.MySQL.ServerParam
                 using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-
-                    using(MySqlCommand cmd = new MySqlCommand("REPLACE INTO serverparams (regionid, parametername, parametervalue) VALUES (?regionid, ?parametername, ?parametervalue)"))
+                    connection.InsideTransaction(delegate()
                     {
-                        cmd.Parameters.AddWithValue("?regionid", regionID);
-                        cmd.Parameters.AddWithValue("?parametername", parameter);
-                        cmd.Parameters.AddWithValue("?parametervalue", value);
-                    }
+                        Dictionary<string, object> param = new Dictionary<string, object>();
+                        param["regionid"] = regionID;
+                        param["parametername"] = parameter;
+                        param["parametervalue"] = value;
+                        connection.ReplaceInsertInto("serverparams", param);
+                        m_Cache[regionID][parameter] = value;
+                    });
                 }
-                m_Cache[regionID][parameter] = value;
             }
         }
 
+        public override bool Remove(UUID regionID, string parameter)
+        {
+            bool result = false;
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.InsideTransaction(delegate()
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?regionid", regionID);
+                        cmd.Parameters.AddWithValue("?parametername", parameter);
+                        if(cmd.ExecuteNonQuery() >= 1)
+                        {
+                            result = true;
+                        }
+                    }
+                    m_Cache[regionID].Remove(parameter);
+                });
+            }
+
+            return result;
+        }
 
         private static readonly string[] Migrations = new string[]{
             "CREATE TABLE %tablename% (" +

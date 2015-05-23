@@ -52,6 +52,8 @@ namespace SilverSim.ServiceInterfaces.ServerParam
             get;
         }
 
+        public abstract bool Remove(UUID regionID, string parameter);
+
         public bool GetBoolean(UUID regionID, string parameter)
         {
             return bool.Parse(this[regionID, parameter]);

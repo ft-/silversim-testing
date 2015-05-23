@@ -125,6 +125,11 @@ namespace SilverSim.BackendConnectors.Robust.GridUser
             }
         }
 
+        public override void LoggedInAdd(UUI userID)
+        {
+            throw new NotSupportedException();
+        }
+
         public override void LoggedIn(UUI userID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
