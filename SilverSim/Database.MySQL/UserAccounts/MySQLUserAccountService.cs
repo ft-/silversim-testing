@@ -191,6 +191,43 @@ namespace SilverSim.Database.MySQL.UserAccounts
         {
             throw new System.NotImplementedException();
         }
+
+        public override void Store(UserAccount userAccount)
+        {
+            Dictionary<string, object> data = new Dictionary<string, object>();
+            data["ID"] = userAccount.Principal.ID;
+            data["ScopeID"] = userAccount.ScopeID;
+            data["FirstName"] = userAccount.Principal.FirstName;
+            data["LastName"] = userAccount.Principal.LastName;
+            data["Email"] = userAccount.Email;
+            data["Created"] = userAccount.Created;
+            data["UserLevel"] = userAccount.UserLevel;
+            data["UserFlags"] = userAccount.UserFlags;
+            data["UserTitle"] = userAccount.UserTitle;
+
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.ReplaceInsertInto("useraccounts", data);
+            }
+        }
+
+        public override void Remove(UUID scopeID, UUID accountID)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM useraccounts WHERE ID LIKE ?id AND ScopeID LIKE ?scopeid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", accountID);
+                    cmd.Parameters.AddWithValue("?scopeid", scopeID);
+                    if (cmd.ExecuteNonQuery() < 1)
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                }
+            }
+        }
     }
     #endregion
 

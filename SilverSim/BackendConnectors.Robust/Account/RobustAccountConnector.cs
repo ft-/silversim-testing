@@ -163,6 +163,16 @@ namespace SilverSim.BackendConnectors.Robust.Account
             }
             return ua;
         }
+
+        public override void Store(UserAccount userAccount)
+        {
+            throw new NotSupportedException();
+        }
+
+        public override void Remove(UUID scopeID, UUID accountID)
+        {
+            throw new NotSupportedException();
+        }
     }
     #endregion
 
