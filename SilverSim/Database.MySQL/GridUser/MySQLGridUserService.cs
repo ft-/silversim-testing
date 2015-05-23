@@ -27,6 +27,7 @@ using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.Types;
@@ -36,7 +37,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.GridUser
 {
     #region Service Implementation
-    class MySQLGridUserService : GridUserServiceInterface, IDBServiceInterface, IPlugin
+    class MySQLGridUserService : GridUserServiceInterface, IDBServiceInterface, IPlugin, UserAccountDeleteServiceInterface
     {
         string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRIDUSER SERVICE");
@@ -212,6 +213,19 @@ namespace SilverSim.Database.MySQL.GridUser
             }
         }
         #endregion
+
+        public void Remove(UUID scopeID, UUID userAccount)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM griduser WHERE ID LIKE ?id", conn))
+                {
+                    cmd.Parameters.AddWithValue("?id", userAccount);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
     #endregion
 

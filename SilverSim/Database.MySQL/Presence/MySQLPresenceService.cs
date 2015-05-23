@@ -27,6 +27,7 @@ using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
@@ -37,7 +38,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.Presence
 {
     #region Service Implementation
-    class MySQLPresenceService : PresenceServiceInterface, IDBServiceInterface, IPlugin
+    class MySQLPresenceService : PresenceServiceInterface, IDBServiceInterface, IPlugin, UserAccountDeleteServiceInterface
     {
         string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PRESENCE SERVICE");
@@ -170,6 +171,19 @@ namespace SilverSim.Database.MySQL.Presence
             }
         }
         #endregion
+
+        public void Remove(UUID scopeID, UUID userAccount)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM presence WHERE UserID LIKE ?userid", conn))
+                {
+                    cmd.Parameters.AddWithValue("?userid", userAccount);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
     }
     #endregion
 

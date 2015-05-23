@@ -36,7 +36,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.UserAccounts
 {
     #region Service Implementation
-    class MySQLUserAccountService :UserAccountServiceInterface, IDBServiceInterface, IPlugin
+    class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin
     {
         string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNT SERVICE");

@@ -38,7 +38,7 @@ namespace SilverSim.ServiceInterfaces.Account
         }
     }
 
-    public abstract class UserAccountServiceInterface
+    public abstract class UserAccountServiceInterface : UserAccountDeleteServiceInterface
     {
         #region Constructor
         public UserAccountServiceInterface()

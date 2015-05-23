@@ -27,6 +27,7 @@ using log4net;
 using MySql.Data.MySqlClient;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
@@ -38,7 +39,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.Inventory
 {
     #region Service Implementation
-    public class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin
+    public class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin, UserAccountDeleteServiceInterface
     {
         string m_ConnectionString;
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
@@ -153,6 +154,27 @@ namespace SilverSim.Database.MySQL.Inventory
 
         public void Startup(ConfigurationLoader loader)
         {
+        }
+
+        public void Remove(UUID scopeID, UUID userAccount)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                connection.InsideTransaction(delegate()
+                {
+                    using(MySqlCommand cmd = new MySqlCommand("DELETE FROM inventoryitems WHERE OwnerID LIKE ?ownerid", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?ownerid", userAccount);
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM inventoryfolders WHERE OwnerID LIKE ?ownerid", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?ownerid", userAccount);
+                        cmd.ExecuteNonQuery();
+                    }
+                });
+            }
         }
     }
     #endregion

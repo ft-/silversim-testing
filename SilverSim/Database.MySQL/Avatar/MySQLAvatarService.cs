@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
@@ -13,7 +14,7 @@ using System.Text;
 namespace SilverSim.Database.MySQL.Avatar
 {
     #region Service Implementation
-    class MySQLAvatarService : AvatarServiceInterface, IDBServiceInterface, IPlugin
+    class MySQLAvatarService : AvatarServiceInterface, IDBServiceInterface, IPlugin, UserAccountDeleteServiceInterface
     {
         string m_ConnectionString;
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR SERVICE");
@@ -247,6 +248,11 @@ namespace SilverSim.Database.MySQL.Avatar
                 "PRIMARY KEY(PrincipalID, Name)," +
                 "KEY avatars_principalid (PrincipalID))"
         };
+
+        public void Remove(UUID scopeID, UUID userAccount)
+        {
+            this[userAccount] = null;
+        }
     }
     #endregion
 
