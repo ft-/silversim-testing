@@ -46,7 +46,7 @@ namespace SilverSim.Types.Asset.Format
 
         public Notecard(AssetData asset)
         {
-            using(MemoryStream assetdata = new MemoryStream(asset.Data))
+            using(Stream assetdata = asset.InputStream)
             {
                 string line = readLine(assetdata);
                 string[] versioninfo = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
@@ -156,7 +156,7 @@ namespace SilverSim.Types.Asset.Format
 
         #region Notecard Parser
 
-        private string readLine(MemoryStream stream)
+        private string readLine(Stream stream)
         {
             int c;
             string data = string.Empty;
@@ -170,7 +170,7 @@ namespace SilverSim.Types.Asset.Format
             return data;
         }
 
-        private void readInventoryPermissions(MemoryStream assetdata, ref NotecardInventoryItem item)
+        private void readInventoryPermissions(Stream assetdata, ref NotecardInventoryItem item)
         {
             if(readLine(assetdata) != "{")
             {
@@ -229,7 +229,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        private void readInventorySaleInfo(MemoryStream assetdata, ref NotecardInventoryItem item)
+        private void readInventorySaleInfo(Stream assetdata, ref NotecardInventoryItem item)
         {
             if(readLine(assetdata) != "{")
             {
@@ -264,7 +264,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        private NotecardInventoryItem readInventoryItem(MemoryStream assetdata)
+        private NotecardInventoryItem readInventoryItem(Stream assetdata)
         {
             NotecardInventoryItem item = new NotecardInventoryItem();
             if(readLine(assetdata) != "{")
@@ -331,7 +331,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        private NotecardInventoryItem readInventoryItems(MemoryStream assetdata)
+        private NotecardInventoryItem readInventoryItems(Stream assetdata)
         {
             NotecardInventoryItem item = null;
             uint extcharindex = 0;
@@ -368,7 +368,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        private void readInventory(MemoryStream assetdata)
+        private void readInventory(Stream assetdata)
         {
             Inventory = new NotecardInventory();
             if(readLine(assetdata) != "{")
@@ -400,7 +400,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        private void readNotecard(MemoryStream assetdata)
+        private void readNotecard(Stream assetdata)
         {
             if(readLine(assetdata) != "{")
             {

@@ -27,6 +27,14 @@ using System;
 
 namespace SilverSim.Types.Asset.Format
 {
+    public class NotAMeshFormat : Exception
+    {
+        public NotAMeshFormat()
+        {
+
+        }
+    }
+
     public class NotAMaterialFormat : Exception
     {
         public NotAMaterialFormat()
