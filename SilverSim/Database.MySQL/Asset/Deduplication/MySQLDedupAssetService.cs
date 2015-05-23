@@ -304,13 +304,6 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             throw new AssetStoreFailed(asset.ID);
                         }
                     }
-                    using (MySqlCommand cmd =
-                        new MySqlCommand(
-                            "COMMIT",
-                            conn))
-                    {
-                        cmd.ExecuteNonQuery();
-                    }
                 });
             }
         }
