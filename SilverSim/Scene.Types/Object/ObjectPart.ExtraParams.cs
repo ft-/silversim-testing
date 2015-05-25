@@ -212,7 +212,7 @@ namespace SilverSim.Scene.Types.Object
                         const ushort ProjectionEP = 0x40;
 
                         int paramCount = value[0];
-                        int pos = 0;
+                        int pos = 1;
                         for (int paramIdx = 0; paramIdx < paramCount; ++paramIdx)
                         {
                             if (pos + 6 > value.Length)

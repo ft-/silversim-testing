@@ -28,13 +28,11 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Tests.Extensions;
 using SilverSim.Types;
-using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Xml;
 
 namespace SilverSim.Tests.Assets.Formats
 {

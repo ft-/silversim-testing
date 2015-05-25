@@ -1805,6 +1805,12 @@ namespace SilverSim.Scene.Types.Object
                                 }
                                 break;
 
+                            case "SculptEntry":
+                                {
+                                    bool sculpted = reader.ReadElementValueAsBoolean();
+                                }
+                                break;
+
                             case "Media":
                                 part.Media = PrimitiveMedia.fromXml(reader);
                                 break;
@@ -1860,11 +1866,19 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "CreatorID":
-                                part.Creator.ID = reader.ReadContentAsUUID();
+                                {
+                                    UUI creator = part.Creator;
+                                    creator.ID = reader.ReadContentAsUUID();
+                                    part.Creator = creator;
+                                }
                                 break;
 
                             case "CreatorData":
-                                part.Creator.CreatorData = reader.ReadElementValueAsString();
+                                {
+                                    UUI creator = part.Creator;
+                                    creator.CreatorData = reader.ReadElementValueAsString();
+                                    part.Creator = creator;
+                                }
                                 break;
 
                             case "FolderID":
