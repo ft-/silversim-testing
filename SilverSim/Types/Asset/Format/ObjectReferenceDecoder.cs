@@ -35,15 +35,20 @@ namespace SilverSim.Types.Asset.Format
     {
         public static List<UUID> GetReferences(AssetData data)
         {
-            using(XmlTextReader reader = new XmlTextReader(data.InputStream))
+            List<UUID> reflist = new List<UUID>();
+            GetReferences(data.InputStream, "", reflist);
+            return reflist;
+        }
+
+        public static void GetReferences(Stream xmlstream, string parentNodeName, List<UUID> reflist)
+        {
+            using (XmlTextReader reader = new XmlTextReader(new ObjectXmlStreamFilter(xmlstream)))
             {
-                List<UUID> reflist = new List<UUID>();
-                GetReferences(reader, "", reflist);
-                return reflist;
+                GetReferences(reader, parentNodeName, reflist);
             }
         }
 
-        public static void GetReferences(XmlTextReader data, string parentNodeName, List<UUID> reflist)
+        static void GetReferences(XmlTextReader data, string parentNodeName, List<UUID> reflist)
         {
             while(data.Read())
             {

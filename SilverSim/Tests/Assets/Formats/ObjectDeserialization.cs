@@ -57,28 +57,21 @@ namespace SilverSim.Tests.Assets.Formats
             {
                 m_Log.InfoFormat("Testing decoder with asset {0}", manifest);
                 Stream resource = GetType().Assembly.GetManifestResourceStream(manifest);
-                using (XmlTextReader reader = new XmlTextReader(resource))
+                List<ObjectGroup> objgroup;
+                try
                 {
-                    List<ObjectGroup> objgroup;
-                    try
-                    {
-                        objgroup = ObjectXML.fromXml(reader, UUI.Unknown);
-                    }
-                    catch (Exception e)
-                    {
-                        m_Log.InfoFormat("Failed to parse asset {0}: {1}\n{2}", e.GetType().FullName, e.StackTrace, e.StackTrace.ToString());
-                        return false;
-                    }
-
+                    objgroup = ObjectXML.fromXml(resource, UUI.Unknown);
+                }
+                catch (Exception e)
+                {
+                    m_Log.InfoFormat("Failed to parse asset {0}: {1}\n{2}", e.GetType().FullName, e.StackTrace, e.StackTrace.ToString());
+                    return false;
                 }
 
                 List<UUID> reflist = new List<UUID>();
                 resource = GetType().Assembly.GetManifestResourceStream(manifest);
-                using (XmlTextReader reader = new XmlTextReader(resource))
-                {
-                    ObjectReferenceDecoder.GetReferences(reader, "", reflist);
-                    m_Log.InfoFormat("Found {0} references", reflist.Count);
-                }
+                ObjectReferenceDecoder.GetReferences(resource, "", reflist);
+                m_Log.InfoFormat("Found {0} references", reflist.Count);
             }
 
             return true;

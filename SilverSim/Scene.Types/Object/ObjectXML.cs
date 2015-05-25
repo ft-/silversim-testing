@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Asset.Format;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
@@ -97,6 +98,12 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        /* OpenSim brain-deadness filter */
+        static string FilterBrokenTags(string xmlin)
+        {
+            return xmlin.Replace("<SceneObjectPart xmlns:xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">", "<SceneObjectPart xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">");
+        }
+
         public static List<ObjectGroup> fromAsset(AssetData data, UUI currentOwner)
         {
             if(data.Type != AssetType.Object)
@@ -104,13 +111,21 @@ namespace SilverSim.Scene.Types.Object
                 throw new InvalidObjectXmlException();
             }
 
-            using(XmlTextReader reader = new XmlTextReader(data.InputStream))
+            using (Stream xmlstream = data.InputStream)
+            {
+                return fromXml(xmlstream, currentOwner);
+            }
+        }
+
+        public static List<ObjectGroup> fromXml(Stream xmlstream, UUI currentOwner)
+        {
+            using (XmlTextReader reader = new XmlTextReader(new ObjectXmlStreamFilter(xmlstream)))
             {
                 return fromXml(reader, currentOwner);
             }
         }
 
-        public static List<ObjectGroup> fromXml(XmlTextReader reader, UUI currentOwner)
+        static List<ObjectGroup> fromXml(XmlTextReader reader, UUI currentOwner)
         {
             /* OpenSim guys messed up xml declarations, so we have to ignore it */
             reader.DtdProcessing = DtdProcessing.Ignore;
