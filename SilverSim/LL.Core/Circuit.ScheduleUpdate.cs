@@ -141,6 +141,7 @@ namespace SilverSim.LL.Core
                                     }
                                 }
 
+#if ONLY_SELECTED
                                 Messages.Object.ObjectProperties.ObjData objprop = ui.SerializeObjProperties();
                                 if (objprop != null)
                                 {
@@ -163,6 +164,7 @@ namespace SilverSim.LL.Core
                                         prop_updatemsg = null;
                                     }
                                 }
+#endif
                             }
                             else
                             {
