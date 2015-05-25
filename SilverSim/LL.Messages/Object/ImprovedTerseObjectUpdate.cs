@@ -8,7 +8,7 @@ namespace SilverSim.LL.Messages.Object
 {
     public class ImprovedTerseObjectUpdate : Message
     {
-        public UInt64 RegionHandle = 0;
+        public GridVector GridPosition;
         public UInt16 TimeDilation = 0;
 
         public class ObjData
@@ -40,7 +40,7 @@ namespace SilverSim.LL.Messages.Object
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
-            p.WriteUInt64(RegionHandle);
+            p.WriteUInt64(GridPosition.RegionHandle);
             p.WriteUInt16(TimeDilation);
             p.WriteUInt8((byte)ObjectData.Count);
             foreach (ObjData d in ObjectData)

@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
@@ -179,6 +180,10 @@ namespace SilverSim.LL.Core
                         httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                         return;
                     }
+                    if (end > asset.Data.Length - 1)
+                    {
+                        end = asset.Data.Length - 1;
+                    }
                     if (end >= asset.Data.Length)
                     {
                         httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
@@ -194,8 +199,9 @@ namespace SilverSim.LL.Core
                     }
                     contentranges.Add(new KeyValuePair<int, int>(start, end));
                 }
-                catch
+                catch(Exception e)
                 {
+                    m_Log.Debug("Exception when parsing requested range (GetTexture)", e);
                     httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                     return;
                 }

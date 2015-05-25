@@ -72,6 +72,9 @@ namespace SilverSim.LL.Core
                 }
 
                 Messages.Object.KillObject ko = null;
+                Messages.Object.ObjectUpdate full_updatemsg = null;
+                Messages.Object.ImprovedTerseObjectUpdate terse_updatemsg = null;
+                Messages.Object.ObjectProperties prop_updatemsg = null;
 
                 while (m_PhysicalOutQueue.Count != 0 || m_NonPhysicalOutQueue.Count != 0)
                 {
@@ -116,13 +119,6 @@ namespace SilverSim.LL.Core
 
                             if(dofull)
                             {
-                                Messages.Object.ObjectProperties.ObjData objprop = ui.SerializeObjProperties();
-                                if(objprop != null)
-                                {
-                                    Messages.Object.ObjectProperties p = new Messages.Object.ObjectProperties();
-                                    p.ObjectData.Add(objprop);
-                                    SendMessage(p);
-                                }
                                 Messages.Object.ObjectUpdate.ObjData od = ui.SerializeFull();
                                 if(od != null)
                                 {
@@ -130,10 +126,42 @@ namespace SilverSim.LL.Core
                                     {
                                         od.UpdateFlags |= Types.Primitive.PrimitiveFlags.ObjectYouOwner;
                                     }
-                                    Messages.Object.ObjectUpdate m = new Messages.Object.ObjectUpdate();
-                                    m.ObjectData.Add(od);
-                                    m.TimeDilation = 65535;
-                                    SendMessage(m);
+                                    if (full_updatemsg == null)
+                                    {
+                                        full_updatemsg = new Messages.Object.ObjectUpdate();
+                                        full_updatemsg.GridPosition = Scene.RegionData.Location;
+                                        full_updatemsg.TimeDilation = 65535;
+                                    }
+
+                                    full_updatemsg.ObjectData.Add(od);
+                                    if (full_updatemsg.ObjectData.Count == 3)
+                                    {
+                                        SendMessage(full_updatemsg);
+                                        full_updatemsg = null;
+                                    }
+                                }
+
+                                Messages.Object.ObjectProperties.ObjData objprop = ui.SerializeObjProperties();
+                                if (objprop != null)
+                                {
+                                    if (prop_updatemsg == null)
+                                    {
+                                        prop_updatemsg = new Messages.Object.ObjectProperties();
+                                    }
+
+                                    prop_updatemsg.ObjectData.Add(objprop);
+                                    if (prop_updatemsg.ObjectData.Count == 3)
+                                    {
+                                        /* ObjectUpdate must be first */
+                                        if (full_updatemsg != null)
+                                        {
+                                            SendMessage(full_updatemsg);
+                                            full_updatemsg = null;
+                                        }
+
+                                        SendMessage(prop_updatemsg);
+                                        prop_updatemsg = null;
+                                    }
                                 }
                             }
                             else
@@ -143,6 +171,7 @@ namespace SilverSim.LL.Core
                                 {
                                     Messages.Object.ImprovedTerseObjectUpdate m = new Messages.Object.ImprovedTerseObjectUpdate();
                                     m.ObjectData.Add(od);
+                                    m.GridPosition = Scene.RegionData.Location;
                                     m.TimeDilation = 65535;
                                     SendMessage(m);
                                 }
@@ -151,9 +180,25 @@ namespace SilverSim.LL.Core
                     }
                 }
 
+                if (prop_updatemsg != null)
+                {
+                    SendMessage(prop_updatemsg);
+                    prop_updatemsg = null;
+                }
+                if(full_updatemsg != null)
+                {
+                    SendMessage(full_updatemsg);
+                    full_updatemsg = null;
+                }
+                if(terse_updatemsg != null)
+                {
+                    SendMessage(terse_updatemsg);
+                    terse_updatemsg = null;
+                }
                 if(ko != null)
                 {
                     SendMessage(ko);
+                    ko = null;
                 }
             }
         }

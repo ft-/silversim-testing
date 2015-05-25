@@ -162,12 +162,14 @@ namespace SilverSim.LL.Core
                 if(p.Length != 2)
                 {
                     httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
+                    m_Log.WarnFormat("Requested range for GetTexture is not decoded. {0}", ranges[0]);
                     return;
                 }
                 string[] v = p[1].Split('-');
                 if(v.Length != 2)
                 {
                     httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
+                    m_Log.WarnFormat("Requested range for GetTexture is not decoded. {0} see {1}", ranges[0], p[1]);
                     return;
                 }
 
@@ -208,12 +210,16 @@ namespace SilverSim.LL.Core
                         httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                         return;
                     }
+                    if(end > asset.Data.Length - 1)
+                    {
+                        end = asset.Data.Length - 1;
+                    }
                     if (end >= asset.Data.Length)
                     {
                         httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                         return;
                     }
-                    if(start == 0 && end == asset.Data.Length - 1)
+                    if (start == 0 && end == asset.Data.Length - 1)
                     {
                         httpres = httpreq.BeginResponse("image/x-j2c");
                         o = httpres.GetOutputStream(asset.Data.LongLength);
@@ -222,8 +228,9 @@ namespace SilverSim.LL.Core
                         return;
                     }
                 }
-                catch
+                catch(Exception e)
                 {
+                    m_Log.Debug("Exception when parsing requested range (GetTexture)", e);
                     httpreq.ErrorResponse(HttpStatusCode.RequestedRangeNotSatisfiable, "Requested range not satisfiable");
                     return;
                 }
