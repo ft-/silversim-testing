@@ -1241,7 +1241,6 @@ namespace SilverSim.Scene.Types.Object
                                     throw new InvalidObjectXmlException();
                                 }
                                 otherPart = ObjectPart.FromXml(reader, null, currentOwner);
-                                group.Add(group.Count + 1, otherPart.ID, otherPart);
                                 break;
 
                             default:
@@ -1262,6 +1261,7 @@ namespace SilverSim.Scene.Types.Object
 
         static void fromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
+            SortedDictionary<int, ObjectPart> links = new SortedDictionary<int, ObjectPart>();
             if (reader.IsEmptyElement)
             {
                 throw new InvalidObjectXmlException();
@@ -1284,7 +1284,8 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                parseOtherPart(reader, group, currentOwner);
+                                ObjectPart part = parseOtherPart(reader, group, currentOwner);
+                                links.Add(part.LoadedLinkNumber, part);
                                 break;
 
                             default:
@@ -1297,6 +1298,10 @@ namespace SilverSim.Scene.Types.Object
                         if (reader.Name != "OtherParts")
                         {
                             throw new InvalidObjectXmlException();
+                        }
+                        foreach(KeyValuePair<int, ObjectPart> kvp in links)
+                        {
+                            group.Add(kvp.Key, kvp.Value.ID, kvp.Value);
                         }
                         return;
 

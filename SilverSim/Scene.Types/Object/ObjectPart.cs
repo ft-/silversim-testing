@@ -97,6 +97,7 @@ namespace SilverSim.Scene.Types.Object
 
         public int ScriptAccessPin = 0;
 
+        public int LoadedLinkNumber; /* not authoritative, just for loading from XML */
 
         public class OmegaParam
         {
@@ -2163,7 +2164,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "LinkNum":
-                                reader.ReadToEndElement();
+                                part.LoadedLinkNumber = reader.ReadElementValueAsInt();
                                 break;
 
                             case "ClickAction":
