@@ -148,6 +148,20 @@ namespace SilverSim.Types.Asset.Format
                             m_BufFill = newstr.Length + newbuf.Length;
                         }
                     }
+                    else if(test.StartsWith("<?xml"))
+                    {
+                        /* OpenSim guys messed up xml declarations, so we have to ignore it */
+                        /* filter every other tag opensim does not use anything else than UTF-8
+                         * but falsely declared some as UTF-16 
+                         */
+                        test = "<?xml version=\"1.0\"?>";
+                        byte[] newbuf = new byte[m_BufFill - tagend - 1];
+                        Buffer.BlockCopy(m_Buffer, tagend + 1, newbuf, 0, m_BufFill - tagend - 1);
+                        byte[] newstr = UTF8NoBOM.GetBytes(test);
+                        Buffer.BlockCopy(newstr, 0, m_Buffer, 0, newstr.Length);
+                        Buffer.BlockCopy(newbuf, 0, m_Buffer, newstr.Length, newbuf.Length);
+                        m_BufFill = newstr.Length + newbuf.Length;
+                    }
                 }
 
                 buffer[offset++] = m_Buffer[m_BufUsed++];
