@@ -29,6 +29,7 @@ using System.IO;
 using System.Net;
 using System.IO.Compression;
 using System.Text;
+using SilverSim.Main.Common.Http;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -192,7 +193,7 @@ namespace SilverSim.Main.Common.HttpServer
                     throw new InvalidOperationException();
                 }
 
-                return ResponseBody = new HttpResponseChunkedBodyStream(m_Output);
+                return ResponseBody = new HttpWriteChunkedBodyStream(m_Output);
             }
             else
             {

@@ -27,16 +27,16 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace SilverSim.Main.Common.HttpServer
+namespace SilverSim.Main.Common.Http
 {
-    public class HttpResponseChunkedBodyStream : Stream
+    public class HttpWriteChunkedBodyStream : Stream
     {
         private Stream m_Output;
         private long m_WrittenLength = 0;
         private byte[] StreamBuffer = new byte[10240];
         private int BufferFill = 0;
 
-        public HttpResponseChunkedBodyStream(Stream output)
+        public HttpWriteChunkedBodyStream(Stream output)
         {
             m_Output = output;
         }

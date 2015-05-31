@@ -161,7 +161,8 @@ namespace SilverSim.Main.Common.HttpClient
                 reqdata += "Expect: 100-continue\r\n";
             }
 
-            reqdata += "Accept-Encoding: gzip\r\n\r\n";
+            reqdata += "Accept-Encoding: gzip\r\n";
+            reqdata += "\r\n";
             outdata = Encoding.ASCII.GetBytes(reqdata);
 
             int retrycnt = 1;
@@ -218,6 +219,10 @@ namespace SilverSim.Main.Common.HttpClient
 
                     }
                     s.ReadTimeout = timeoutms;
+                }
+                catch(SilverSim.Main.Common.Http.HttpStream.TimeoutException)
+                {
+
                 }
                 catch (IOException)
                 {
@@ -296,18 +301,34 @@ namespace SilverSim.Main.Common.HttpClient
             if (headers.TryGetValue("Content-Length", out value))
             {
                 Stream bs = new ResponseBodyStream(s, long.Parse(value), keepalive, uri.Scheme, uri.Host, uri.Port);
+                if(headers.TryGetValue("Transfer-Encoding", out value))
+                {
+                    if(value == "chunked")
+                    {
+                        bs = new HttpReadChunkedBodyStream(bs);
+                    }
+                }
                 if (compressedresult)
                 {
-                    return new GZipStream(bs, CompressionMode.Decompress);
+                    bs = new GZipStream(bs, CompressionMode.Decompress);
                 }
-                else
-                {
-                    return bs;
-                }
+                return bs;
             }
             else
             {
-                return s;
+                Stream bs = s;
+                if (headers.TryGetValue("Transfer-Encoding", out value))
+                {
+                    if (value == "chunked")
+                    {
+                        bs = new HttpReadChunkedBodyStream(bs);
+                    }
+                }
+                if (compressedresult)
+                {
+                    bs = new GZipStream(bs, CompressionMode.Decompress);
+                }
+                return bs;
             }
         }
         #endregion

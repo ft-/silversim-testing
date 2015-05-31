@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.Main.Common.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -296,7 +297,7 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         else if(transferEncoding == "chunked")
                         {
-                            Body = new HttpRequestChunkedBodyStream(Body);
+                            Body = new HttpReadChunkedBodyStream(Body);
                         }
                         else
                         {
@@ -356,7 +357,7 @@ namespace SilverSim.Main.Common.HttpServer
                     else if (transferEncoding == "chunked")
                     {
                         HaveChunkedInFront = true;
-                        Body = new HttpRequestChunkedBodyStream(Body);
+                        Body = new HttpReadChunkedBodyStream(Body);
                     }
                     else
                     {

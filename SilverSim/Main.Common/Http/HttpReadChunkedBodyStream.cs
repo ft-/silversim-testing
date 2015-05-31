@@ -26,9 +26,9 @@ exception statement from your version.
 using System;
 using System.IO;
 
-namespace SilverSim.Main.Common.HttpServer
+namespace SilverSim.Main.Common.Http
 {
-    public class HttpRequestChunkedBodyStream : Stream
+    public class HttpReadChunkedBodyStream : Stream
     {
         private Stream m_Input;
         private int m_RemainingChunkLength = 0;
@@ -55,7 +55,7 @@ namespace SilverSim.Main.Common.HttpServer
             return headerLine;
         }
 
-        public HttpRequestChunkedBodyStream(Stream input)
+        public HttpReadChunkedBodyStream(Stream input)
         {
             m_Input = input;
         }
@@ -191,12 +191,20 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     string chunkHeader = ReadHeaderLine();
                     string[] chunkFields = chunkHeader.Split(';');
-                    m_RemainingChunkLength = int.Parse(chunkFields[0], System.Globalization.NumberStyles.HexNumber);
-                    if(0 == m_RemainingChunkLength)
+                    if (chunkFields[0] == "")
                     {
                         m_EndOfChunked = true;
-                        while ((chunkHeader = ReadHeaderLine()) != string.Empty)
+
+                    }
+                    else
+                    {
+                        m_RemainingChunkLength = int.Parse(chunkFields[0], System.Globalization.NumberStyles.HexNumber);
+                        if (0 == m_RemainingChunkLength)
                         {
+                            m_EndOfChunked = true;
+                            while ((chunkHeader = ReadHeaderLine()) != string.Empty)
+                            {
+                            }
                         }
                     }
                     /* start to read a new chunk */
