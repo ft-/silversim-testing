@@ -106,6 +106,7 @@ namespace SilverSim.Scene.Types.Object
                     ObjectPart.PrimitiveShape shape = Part.Shape;
                     m.PathBegin = shape.PathBegin;
                     m.PathEnd = shape.PathEnd;
+                    m.PathCurve = shape.PathCurve;
                     m.PathRadiusOffset = shape.PathRadiusOffset;
                     m.PathRevolutions = shape.PathRevolutions;
                     m.PathScaleX = shape.PathScaleX;
