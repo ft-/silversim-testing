@@ -35,7 +35,7 @@ using SilverSim.Scene.Types.Object;
 using System.Runtime.Remoting.Messaging;
 using System.Text.RegularExpressions;
 
-namespace SilverSim.Scripting.LSL.APIs.HTTP
+namespace SilverSim.Scripting.LSL.API.HTTP
 {
     public partial class HTTP_API
     {
@@ -92,13 +92,13 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
         [APILevel(APIFlags.LSL)]
         public UUID llHTTPRequest(ScriptInstance Instance, string url, AnArray parameters, string body)
         {
-            Dictionary<string, string> httpHeaders = new Dictionary<string, string>();
-            string httpMethod = "GET";
-            string mimeType = "text/plain;charset=utf-8";
-            bool verifyCert = true;
-            bool verboseThrottle = true;
-            bool sendPragmaNoCache = true;
-            int maxBodyLength = 2048;
+            LSLHTTPClient_RequestQueue.LSLHttpRequest req = new LSLHTTPClient_RequestQueue.LSLHttpRequest();
+            lock (Instance)
+            {
+                req.SceneID = Instance.Part.ObjectGroup.Scene.ID;
+                req.PrimID = Instance.Part.ID;
+                req.ItemID = Instance.Item.ID;
+            }
 
             if (url.Contains(' '))
             {
@@ -126,7 +126,7 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
                             }
                         }
 
-                        httpMethod = parameters[++i].ToString();
+                        req.Method = parameters[++i].ToString();
                         break;
 
                     case HTTP_MIMETYPE:
@@ -139,7 +139,7 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
                             }
                         }
 
-                        mimeType = parameters[++i].ToString();
+                        req.MimeType = parameters[++i].ToString();
                         break;
 
                     case HTTP_BODY_MAXLENGTH:
@@ -152,7 +152,7 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
                             }
                         }
 
-                        maxBodyLength = parameters[++i].AsInt;
+                        req.MaxBodyLength = parameters[++i].AsInt;
                         break;
 
                     case HTTP_VERIFY_CERT:
@@ -165,7 +165,7 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
                             }
                         }
 
-                        verifyCert = parameters[++i].AsBoolean;
+                        req.VerifyCert = parameters[++i].AsBoolean;
                         break;
 
                     case HTTP_VERBOSE_THROTTLE:
@@ -178,7 +178,7 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
                             }
                         }
 
-                        verboseThrottle = parameters[++i].AsBoolean;
+                        req.VerboseThrottle = parameters[++i].AsBoolean;
                         break;
 
                     case HTTP_CUSTOM_HEADER:
@@ -201,7 +201,7 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
                         }
                         try
                         {
-                            httpHeaders.Add(name, value);
+                            req.Headers.Add(name, value);
                         }
                         catch
                         {
@@ -220,7 +220,7 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
                             }
                         }
 
-                        sendPragmaNoCache = parameters[++i].AsBoolean;
+                        req.SendPragmaNoCache = parameters[++i].AsBoolean;
                         break;
 
                     default:
@@ -233,18 +233,16 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
                 
             }
 
-            httpHeaders.Add("User-Agent", string.Format("{0} {1}", VersionInfo.ProductName, VersionInfo.Version));
-            httpHeaders.Add("X-SecondLife-Shard", VersionInfo.Shard);
             lock (Instance)
             {
-                httpHeaders.Add("X-SecondLife-Object-Name", Instance.Part.ObjectGroup.Name);
-                httpHeaders.Add("X-SecondLife-Object-Key", Instance.Part.ObjectGroup.ID);
-                httpHeaders.Add("X-SecondLife-Region", Instance.Part.ObjectGroup.Scene.RegionData.Name);
-                httpHeaders.Add("X-SecondLife-Local-Position", string.Format("({0:0.000000}, {1:0.000000}, {2:0.000000})", Instance.Part.ObjectGroup.GlobalPosition.X, Instance.Part.ObjectGroup.GlobalPosition.Y, Instance.Part.ObjectGroup.GlobalPosition.Z));
-                httpHeaders.Add("X-SecondLife-Local-Velocity", string.Format("({0:0.000000}, {1:0.000000}, {2:0.000000})", Instance.Part.ObjectGroup.Velocity.X, Instance.Part.ObjectGroup.Velocity.Y, Instance.Part.ObjectGroup.Velocity.Z));
-                httpHeaders.Add("X-SecondLife-Local-Rotation", string.Format("({0:0.000000}, {1:0.000000}, {2:0.000000}, {3:0.000000})", Instance.Part.ObjectGroup.GlobalRotation.X, Instance.Part.ObjectGroup.GlobalRotation.Y, Instance.Part.ObjectGroup.GlobalRotation.Z, Instance.Part.ObjectGroup.GlobalRotation.W));
-                httpHeaders.Add("X-SecondLife-Owner-Name", Instance.Part.ObjectGroup.Owner.FullName);
-                httpHeaders.Add("X-SecondLife-Owner-Key", Instance.Part.ObjectGroup.Owner.ID);
+                req.Headers.Add("X-SecondLife-Object-Name", Instance.Part.ObjectGroup.Name);
+                req.Headers.Add("X-SecondLife-Object-Key", Instance.Part.ObjectGroup.ID);
+                req.Headers.Add("X-SecondLife-Region", Instance.Part.ObjectGroup.Scene.RegionData.Name);
+                req.Headers.Add("X-SecondLife-Local-Position", string.Format("({0:0.000000}, {1:0.000000}, {2:0.000000})", Instance.Part.ObjectGroup.GlobalPosition.X, Instance.Part.ObjectGroup.GlobalPosition.Y, Instance.Part.ObjectGroup.GlobalPosition.Z));
+                req.Headers.Add("X-SecondLife-Local-Velocity", string.Format("({0:0.000000}, {1:0.000000}, {2:0.000000})", Instance.Part.ObjectGroup.Velocity.X, Instance.Part.ObjectGroup.Velocity.Y, Instance.Part.ObjectGroup.Velocity.Z));
+                req.Headers.Add("X-SecondLife-Local-Rotation", string.Format("({0:0.000000}, {1:0.000000}, {2:0.000000}, {3:0.000000})", Instance.Part.ObjectGroup.GlobalRotation.X, Instance.Part.ObjectGroup.GlobalRotation.Y, Instance.Part.ObjectGroup.GlobalRotation.Z, Instance.Part.ObjectGroup.GlobalRotation.W));
+                req.Headers.Add("X-SecondLife-Owner-Name", Instance.Part.ObjectGroup.Owner.FullName);
+                req.Headers.Add("X-SecondLife-Owner-Key", Instance.Part.ObjectGroup.Owner.ID);
 
                 Match authMatch = m_AuthRegex.Match(url);
                 if(authMatch.Success)
@@ -253,14 +251,18 @@ namespace SilverSim.Scripting.LSL.APIs.HTTP
                     {
                         string authData = string.Format("{0}:{1}", authMatch.Groups[2].ToString(), authMatch.Groups[3].ToString());
                         byte[] authDataBinary = UTF8NoBOM.GetBytes(authData);
-                        httpHeaders.Add("Authorization", string.Format("Basic {0}", Convert.ToBase64String(authDataBinary)));
+                        req.Headers.Add("Authorization", string.Format("Basic {0}", Convert.ToBase64String(authDataBinary)));
                     }
                 }
 
-                HttpRequestDelegate del = httpRequest;
-                UUID requestID = UUID.Random;
-                del.BeginInvoke(Instance.Part, requestID, httpMethod, url, maxBodyLength, httpHeaders, body, httpRequestEnd, this);
-                return requestID;
+                if(m_LSLHTTPClient.Enqueue(req))
+                {
+                    return req.RequestID;
+                }
+                else
+                {
+                    return UUID.Zero;
+                }
             }
         }
     }

@@ -36,6 +36,7 @@ namespace SilverSim.Scripting.LSL.API.HTTP
     public partial class HTTP_API : MarshalByRefObject, IScriptApi, IPlugin
     {
         LSLHTTP m_HTTPHandler;
+        LSLHTTPClient_RequestQueue m_LSLHTTPClient;
 
         public HTTP_API()
         {
@@ -51,6 +52,7 @@ namespace SilverSim.Scripting.LSL.API.HTTP
         public void Startup(ConfigurationLoader loader)
         {
             m_HTTPHandler = loader.GetPluginService<LSLHTTP>("LSLHTTP");
+            m_LSLHTTPClient = loader.GetPluginService<LSLHTTPClient_RequestQueue>("LSLHttpClient");
         }
 
         [ExecutedOnScriptReset]
