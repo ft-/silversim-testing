@@ -129,7 +129,7 @@ namespace SilverSim.Scripting.LSL
                     if (null != impTagAttr && null != scriptApiAttr)
                     {
                         IPlugin factory = (IPlugin)Activator.CreateInstance(type);
-                        loader.AddPlugin(((ScriptApiName)scriptApiAttr).Name, factory);
+                        loader.AddPlugin("LSL_API_" + ((ScriptApiName)scriptApiAttr).Name, factory);
                     }
                 }
             }

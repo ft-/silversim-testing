@@ -722,6 +722,7 @@ namespace SilverSim.Main.Common
             CmdIO.CommandRegistry.Commands.Add("shutdown", ShutdownCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("memory", ShowMemoryCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("threadcount", ShowThreadCountCommand);
+            CmdIO.CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
 
             while(m_Sources.Count != 0)
             {
@@ -882,6 +883,23 @@ namespace SilverSim.Main.Common
             {
                 io.WriteFormatted("Heap allocated to simulator : {0} MB\n" +
                                     "Process Memory              : {0} MB", Math.Round(GC.GetTotalMemory(false) / 1048576.0), Math.Round(Process.GetCurrentProcess().WorkingSet64 / 1048576.0));
+            }
+        }
+
+        public void ShowModulesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if(args[0] == "help")
+            {
+                io.Write("Show currently loaded modules");
+            }
+            else
+            {
+                string output = "Module List:\n----------------------------------------------";
+                foreach(KeyValuePair<string, IPlugin> moduledesc in PluginInstances)
+                {
+                    output += string.Format("\nModule {0}", moduledesc.Key);
+                }
+                io.Write(output);
             }
         }
 
