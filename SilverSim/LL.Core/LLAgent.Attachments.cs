@@ -296,7 +296,7 @@ namespace SilverSim.LL.Core
             }
             catch(Exception e)
             {
-                m_Log.WarnFormat("Attaching item {0} not possible due {1}: {2}", item.AssetID, e.GetType().FullName, e.ToString());
+                m_Log.WarnFormat("Attaching item {0} / asset {1} not possible due {2}: {3}", item.ID, item.AssetID, e.GetType().FullName, e.ToString());
                 SendAlertMessage("ALERT: CantFindInvItem", m_CurrentSceneID);
                 return;
             }

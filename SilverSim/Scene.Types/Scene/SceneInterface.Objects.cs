@@ -28,6 +28,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.LL.Messages;
+using SilverSim.Scene.Types.Object;
+using SilverSim.LL.Messages.Object;
+using SilverSim.Scene.Types.Agent;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -191,6 +194,31 @@ namespace SilverSim.Scene.Types.Scene
         public void HandleRequestObjectPropertiesFamily(Message m)
         {
             SilverSim.LL.Messages.Object.RequestObjectPropertiesFamily req = (SilverSim.LL.Messages.Object.RequestObjectPropertiesFamily)m;
+            if(req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+            ObjectPart part;
+            try
+            {
+                part = Primitives[req.ObjectID];
+            }
+            catch
+            {
+                return;
+            }
+            ObjectPropertiesFamily res = part.PropertiesFamily;
+            res.RequestFlags = req.RequestFlags;
+            try
+            {
+                IAgent agent = Agents[req.AgentID];
+                agent.SendMessageAlways(res, ID);
+            }
+            catch
+            {
+
+            }
         }
     }
 }

@@ -43,39 +43,6 @@ namespace SilverSim.StructuredData.AssetXml
             }
         }
 
-        private static string getValue(XmlTextReader reader)
-        {
-            string tagname = reader.Name;
-            string res = string.Empty;
-            if(reader.IsEmptyElement)
-            {
-                return res;
-            }
-            while (true)
-            {
-                if (!reader.Read())
-                {
-                    throw new InvalidAssetSerialization();
-                }
-
-                switch (reader.NodeType)
-                {
-                    case XmlNodeType.Element:
-                        throw new InvalidAssetSerialization();
-
-                    case XmlNodeType.Text:
-                        return reader.ReadContentAsString();
-
-                    case XmlNodeType.EndElement:
-                        if (tagname != reader.Name)
-                        {
-                            throw new InvalidAssetSerialization();
-                        }
-                        return res;
-                }
-            }
-        }
-
         private static void parseAssetFullID(XmlTextReader reader)
         {
             while (true)
@@ -92,7 +59,7 @@ namespace SilverSim.StructuredData.AssetXml
                         {
 
                             case "Guid":
-                                getValue(reader);
+                                reader.ReadElementValueAsString();
                                 break;
 
                             default:
@@ -133,7 +100,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 }
                                 else
                                 {
-                                    string base64 = getValue(reader);
+                                    string base64 = reader.ReadElementValueAsString();
 
                                     asset.Data = System.Convert.FromBase64String(base64);
                                 }
@@ -144,7 +111,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "ID":
-                                asset.ID = getValue(reader);
+                                asset.ID = reader.ReadElementValueAsString();
                                 break;
 
                             case "Name":
@@ -154,7 +121,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 }
                                 else
                                 {
-                                    asset.Name = getValue(reader);
+                                    asset.Name = reader.ReadElementValueAsString();
                                 }
                                 break;
 
@@ -163,20 +130,20 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "Type":
-                                asset.Type = (AssetType)int.Parse(getValue(reader));
+                                asset.Type = (AssetType)reader.ReadElementValueAsInt();
                                 break;
 
                             case "Local":
                                 if (!reader.IsEmptyElement)
                                 {
-                                    asset.Local = bool.Parse(getValue(reader));
+                                    asset.Local = reader.ReadElementValueAsBoolean();
                                 }
                                 break;
 
                             case "Temporary":
                                 if (!reader.IsEmptyElement)
                                 {
-                                    asset.Temporary = bool.Parse(getValue(reader));
+                                    asset.Temporary = reader.ReadElementValueAsBoolean();
                                 }
                                 break;
 
@@ -187,7 +154,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 }
                                 else
                                 {
-                                    string creatorID = getValue(reader);
+                                    string creatorID = reader.ReadElementValueAsString();
                                     try
                                     {
                                         asset.Creator = new UUI(creatorID);
@@ -201,7 +168,7 @@ namespace SilverSim.StructuredData.AssetXml
 
                             case "Flags":
                                 asset.Flags = AssetFlags.Normal;
-                                string flags = getValue(reader);
+                                string flags = reader.ReadElementValueAsString();
                                 if (flags != "Normal")
                                 {
                                     string[] flaglist = flags.Split(',');
@@ -296,36 +263,36 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "ID":
-                                asset.ID = getValue(reader);
+                                asset.ID = reader.ReadElementValueAsString();
                                 break;
 
                             case "Name":
-                                asset.Name = getValue(reader);
+                                asset.Name = reader.ReadElementValueAsString();
                                 break;
 
                             case "Description":
-                                reader.ReadToEndElement();
+                                reader.ReadElementValueAsString();
                                 break;
 
                             case "Type":
-                                asset.Type = (AssetType)int.Parse(getValue(reader));
+                                asset.Type = (AssetType)reader.ReadElementValueAsInt();
                                 break;
 
                             case "Local":
-                                asset.Local = bool.Parse(getValue(reader));
+                                asset.Local = reader.ReadElementValueAsBoolean();
                                 break;
 
                             case "Temporary":
-                                asset.Temporary = bool.Parse(getValue(reader));
+                                asset.Temporary = reader.ReadElementValueAsBoolean();
                                 break;
 
                             case "CreatorID":
-                                asset.Creator = new UUI(getValue(reader));
+                                asset.Creator = new UUI(reader.ReadElementValueAsString());
                                 break;
 
                             case "Flags":
                                 asset.Flags = AssetFlags.Normal;
-                                string flags = getValue(reader);
+                                string flags = reader.ReadElementValueAsString();
                                 if (flags != "Normal")
                                 {
                                     string[] flaglist = flags.Split(',');
