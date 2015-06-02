@@ -100,9 +100,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 }
                                 else
                                 {
-                                    string base64 = reader.ReadElementValueAsString();
-
-                                    asset.Data = System.Convert.FromBase64String(base64);
+                                    asset.Data = reader.ReadContentAsBase64();
                                 }
                                 break;
 

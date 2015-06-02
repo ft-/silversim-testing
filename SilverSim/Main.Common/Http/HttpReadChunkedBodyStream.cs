@@ -33,6 +33,7 @@ namespace SilverSim.Main.Common.Http
         private Stream m_Input;
         private int m_RemainingChunkLength = 0;
         private bool m_EndOfChunked = false;
+        private bool m_ChunkEnded = false;
 
         private string ReadHeaderLine()
         {
@@ -185,11 +186,16 @@ namespace SilverSim.Main.Common.Http
         public override int Read(byte[] buffer, int offset, int count)
         {
             int sumResult = 0;
-            while(!m_EndOfChunked)
+            while(!m_EndOfChunked && count > 0)
             {
                 if(m_RemainingChunkLength == 0)
                 {
                     string chunkHeader = ReadHeaderLine();
+                    if(m_ChunkEnded)
+                    {
+                        m_ChunkEnded = false;
+                        chunkHeader = ReadHeaderLine();
+                    }
                     string[] chunkFields = chunkHeader.Split(';');
                     if (chunkFields[0] == "")
                     {
@@ -215,6 +221,10 @@ namespace SilverSim.Main.Common.Http
                     if(result > 0)
                     {
                         m_RemainingChunkLength -= result;
+                        if (0 == m_RemainingChunkLength)
+                        {
+                            m_ChunkEnded = true;
+                        }
                         return sumResult + result;
                     }
                     else
@@ -230,6 +240,11 @@ namespace SilverSim.Main.Common.Http
                         m_RemainingChunkLength -= result;
                         sumResult += result;
                         offset += result;
+                        count -= result;
+                        if (0 == m_RemainingChunkLength)
+                        {
+                            m_ChunkEnded = true;
+                        }
                     }
                     else
                     {
