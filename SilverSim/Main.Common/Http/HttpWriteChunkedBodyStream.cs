@@ -35,6 +35,7 @@ namespace SilverSim.Main.Common.Http
         private long m_WrittenLength = 0;
         private byte[] StreamBuffer = new byte[10240];
         private int BufferFill = 0;
+        private byte[] EOB = new byte[2] { (byte)'\r', (byte)'\n' };
 
         public HttpWriteChunkedBodyStream(Stream output)
         {
@@ -157,6 +158,7 @@ namespace SilverSim.Main.Common.Http
             byte[] chunkHeaderData = Encoding.ASCII.GetBytes(chunkHeader);
             m_Output.Write(chunkHeaderData, 0, chunkHeaderData.Length);
             m_Output.Write(StreamBuffer, 0, BufferFill);
+            m_Output.Write(EOB, 0, EOB.Length);
             BufferFill = 0;
         }
 

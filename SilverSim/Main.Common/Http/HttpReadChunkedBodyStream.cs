@@ -33,7 +33,6 @@ namespace SilverSim.Main.Common.Http
         private Stream m_Input;
         private int m_RemainingChunkLength = 0;
         private bool m_EndOfChunked = false;
-        private bool m_ChunkEnded = false;
 
         private string ReadHeaderLine()
         {
@@ -191,11 +190,6 @@ namespace SilverSim.Main.Common.Http
                 if(m_RemainingChunkLength == 0)
                 {
                     string chunkHeader = ReadHeaderLine();
-                    if(m_ChunkEnded)
-                    {
-                        m_ChunkEnded = false;
-                        chunkHeader = ReadHeaderLine();
-                    }
                     string[] chunkFields = chunkHeader.Split(';');
                     if (chunkFields[0] == "")
                     {
@@ -223,7 +217,7 @@ namespace SilverSim.Main.Common.Http
                         m_RemainingChunkLength -= result;
                         if (0 == m_RemainingChunkLength)
                         {
-                            m_ChunkEnded = true;
+                            ReadHeaderLine();
                         }
                         return sumResult + result;
                     }
@@ -243,7 +237,7 @@ namespace SilverSim.Main.Common.Http
                         count -= result;
                         if (0 == m_RemainingChunkLength)
                         {
-                            m_ChunkEnded = true;
+                            ReadHeaderLine();
                         }
                     }
                     else
