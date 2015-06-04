@@ -537,7 +537,7 @@ namespace SilverSim.Scripting.LSL
                         }
                         else
                         {
-                            ilgen.Emit(OpCodes.Ldstr, "");
+                            ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[0]));
                         }
                         ilgen.Emit(OpCodes.Stloc, lb);
                         break;
