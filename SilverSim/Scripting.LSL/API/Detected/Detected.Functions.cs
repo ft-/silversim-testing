@@ -55,7 +55,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llDetectedKey(ScriptInstance Instance, int number)
+        public LSLKey llDetectedKey(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)
@@ -97,7 +97,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llDetectedOwner(ScriptInstance Instance, int number)
+        public LSLKey llDetectedOwner(ScriptInstance Instance, int number)
         {
             Script script = (Script)Instance;
             lock (script)

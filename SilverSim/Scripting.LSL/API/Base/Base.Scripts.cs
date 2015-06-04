@@ -150,7 +150,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llRemoteLoadScript(ScriptInstance Instance, UUID target, string name, int running, int start_param)
+        public void llRemoteLoadScript(ScriptInstance Instance, LSLKey target, string name, int running, int start_param)
         {
             lock (Instance)
             {
@@ -159,7 +159,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llRemoteLoadScriptPin(ScriptInstance Instance, UUID target, string name, int pin, int running, int start_param)
+        public void llRemoteLoadScriptPin(ScriptInstance Instance, LSLKey target, string name, int pin, int running, int start_param)
         {
             lock(Instance)
             {

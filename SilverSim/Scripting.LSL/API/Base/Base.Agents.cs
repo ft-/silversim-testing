@@ -54,19 +54,19 @@ namespace SilverSim.Scripting.LSL.API.Base
         public const int PAYMENT_INFO_USED = 0x2;
 
         [APILevel(APIFlags.LSL)]
-        public UUID llRequestAgentData(ScriptInstance Instance, UUID id, int data)
+        public LSLKey llRequestAgentData(ScriptInstance Instance, UUID id, int data)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llRequestDisplayName(ScriptInstance Instance, UUID id)
+        public LSLKey llRequestDisplayName(ScriptInstance Instance, UUID id)
         {
             return UUID.Zero;
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llRequestUsername(ScriptInstance Instance, UUID id)
+        public LSLKey llRequestUsername(ScriptInstance Instance, UUID id)
         {
             return UUID.Zero;
         }
@@ -114,7 +114,7 @@ namespace SilverSim.Scripting.LSL.API.Base
                     {
                         continue;
                     }
-                    res.Add(agent.ID);
+                    res.Add(new LSLKey(agent.ID));
                     res.Add(agent.GlobalPosition);
                     res.Add(agent.Name);
                 }

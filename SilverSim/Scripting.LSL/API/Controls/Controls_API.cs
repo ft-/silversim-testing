@@ -52,7 +52,7 @@ namespace SilverSim.Scripting.LSL.API.Controls
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void control(UUID id, int level, int edge);
+        public delegate void control(LSLKey id, int level, int edge);
 
         [APILevel(APIFlags.LSL)]
         public void llTakeControls(ScriptInstance instance, int controls, int accept, int pass_on)

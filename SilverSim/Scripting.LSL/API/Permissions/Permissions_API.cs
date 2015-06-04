@@ -61,7 +61,7 @@ namespace SilverSim.Scripting.LSL.API.Permissions
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetPermissionsKey(ScriptInstance Instance)
+        public LSLKey llGetPermissionsKey(ScriptInstance Instance)
         {
             lock (Instance)
             {
@@ -70,7 +70,7 @@ namespace SilverSim.Scripting.LSL.API.Permissions
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llRequestPermissions(ScriptInstance Instance, UUID agentID, int permissions)
+        public void llRequestPermissions(ScriptInstance Instance, LSLKey agentID, int permissions)
         {
             lock(Instance)
             {

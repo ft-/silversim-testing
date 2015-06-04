@@ -45,7 +45,7 @@ namespace SilverSim.Scripting.LSL.API.Base
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void attach(UUID id);
+        public delegate void attach(LSLKey id);
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
@@ -65,7 +65,7 @@ namespace SilverSim.Scripting.LSL.API.Base
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void dataserver(UUID queryid, string data);
+        public delegate void dataserver(LSLKey queryid, string data);
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
@@ -73,11 +73,11 @@ namespace SilverSim.Scripting.LSL.API.Base
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void http_request(UUID request_id, string method, string body);
+        public delegate void http_request(LSLKey request_id, string method, string body);
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void http_response(UUID request_id, int status, AnArray metadata, string body);
+        public delegate void http_response(LSLKey request_id, int status, AnArray metadata, string body);
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
@@ -93,15 +93,15 @@ namespace SilverSim.Scripting.LSL.API.Base
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void link_message(int sender_num, int num, string str, UUID id);
+        public delegate void link_message(int sender_num, int num, string str, LSLKey id);
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void listen(int channel, string name, UUID id, string message);
+        public delegate void listen(int channel, string name, LSLKey id, string message);
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void money(UUID id, int amount);
+        public delegate void money(LSLKey id, int amount);
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
@@ -125,7 +125,7 @@ namespace SilverSim.Scripting.LSL.API.Base
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void object_rez(UUID id);
+        public delegate void object_rez(LSLKey id);
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
@@ -137,7 +137,7 @@ namespace SilverSim.Scripting.LSL.API.Base
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void remote_data(int event_type, UUID channel, UUID message_id, string sender, int idata, string sdata);
+        public delegate void remote_data(int event_type, LSLKey channel, LSLKey message_id, string sender, int idata, string sdata);
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]

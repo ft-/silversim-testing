@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+#if UNUSED
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -985,3 +986,4 @@ namespace SilverSim.Scripting.LSL
 
     }
 }
+#endif

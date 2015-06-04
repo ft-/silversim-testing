@@ -139,7 +139,7 @@ namespace SilverSim.Scripting.LSL.API.Physics
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llPushObject(ScriptInstance Instance, UUID target, Vector3 impulse, Vector3 ang_impulse, int local)
+        public void llPushObject(ScriptInstance Instance, LSLKey target, Vector3 impulse, Vector3 ang_impulse, int local)
         {
 #warning Implement llPushObject
         }

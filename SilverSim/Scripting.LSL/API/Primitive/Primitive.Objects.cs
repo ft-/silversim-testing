@@ -168,7 +168,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetOwnerKey(ScriptInstance Instance, UUID id)
+        public UUID llGetOwnerKey(ScriptInstance Instance, LSLKey id)
         {
             lock (Instance)
             {
@@ -238,10 +238,10 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         #region osMessageObject
         [APILevel(APIFlags.ASSL)]
         [StateEventDelegate]
-        public delegate void object_message(UUID id, string data);
+        public delegate void object_message(LSLKey id, string data);
 
         [APILevel(APIFlags.OSSL)]
-        public void osMessageObject(ScriptInstance Instance, UUID objectUUID, string message)
+        public void osMessageObject(ScriptInstance Instance, LSLKey objectUUID, string message)
         {
             lock (Instance)
             {

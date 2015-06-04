@@ -73,7 +73,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetNotecardLine(ScriptInstance Instance, string name, int line)
+        public LSLKey llGetNotecardLine(ScriptInstance Instance, string name, int line)
         {
             lock (Instance)
             {
@@ -133,7 +133,7 @@ namespace SilverSim.Scripting.LSL.API.Notecards
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetNumberOfNotecardLines(ScriptInstance Instance, string name)
+        public LSLKey llGetNumberOfNotecardLines(ScriptInstance Instance, string name)
         {
             ObjectPartInventoryItem item;
             lock (Instance)

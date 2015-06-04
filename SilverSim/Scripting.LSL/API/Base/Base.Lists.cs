@@ -179,7 +179,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llList2Key(ScriptInstance Instance, AnArray src, int index)
+        public LSLKey llList2Key(ScriptInstance Instance, AnArray src, int index)
         {
             if (index < 0)
             {
@@ -191,7 +191,7 @@ namespace SilverSim.Scripting.LSL.API.Base
                 return UUID.Zero;
             }
 
-            return src[index].AsUUID;
+            return src[index].ToString();
         }
 
         [APILevel(APIFlags.LSL)]

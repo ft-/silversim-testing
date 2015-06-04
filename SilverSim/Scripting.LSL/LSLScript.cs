@@ -362,7 +362,7 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is AttachEvent)
                 {
                     AttachEvent e = (AttachEvent)ev;
-                    InvokeStateEvent("attach", e.ObjectID);
+                    InvokeStateEvent("attach", new LSLKey(e.ObjectID));
                 }
                 else if (ev is AtTargetEvent)
                 {
@@ -398,18 +398,18 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is DataserverEvent)
                 {
                     DataserverEvent e = (DataserverEvent)ev;
-                    InvokeStateEvent("dataserver", e.QueryID, e.Data);
+                    InvokeStateEvent("dataserver", new LSLKey(e.QueryID), e.Data);
                 }
                 else if(ev is MessageObjectEvent)
                 {
                     MessageObjectEvent e = (MessageObjectEvent)ev;
                     if (UseMessageObjectEvent)
                     {
-                        InvokeStateEvent("object_message", e.ObjectID, e.Data);
+                        InvokeStateEvent("object_message", new LSLKey(e.ObjectID), e.Data);
                     }
                     else
                     {
-                        InvokeStateEvent("dataserver", e.ObjectID, e.Data);
+                        InvokeStateEvent("dataserver", new LSLKey(e.ObjectID), e.Data);
                     }
                 }
                 else if (ev is EmailEvent)
@@ -420,12 +420,12 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is HttpRequestEvent)
                 {
                     HttpRequestEvent e = (HttpRequestEvent)ev;
-                    InvokeStateEvent("http_request", e.RequestID, e.Method, e.Body);
+                    InvokeStateEvent("http_request", new LSLKey(e.RequestID), e.Method, e.Body);
                 }
                 else if (ev is HttpResponseEvent)
                 {
                     HttpResponseEvent e = (HttpResponseEvent)ev;
-                    InvokeStateEvent("http_response", e.RequestID, e.Status, e.Metadata, e.Body);
+                    InvokeStateEvent("http_response", new LSLKey(e.RequestID), e.Status, e.Metadata, e.Body);
                 }
                 else if (ev is LandCollisionEvent)
                 {
@@ -451,12 +451,12 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is LinkMessageEvent)
                 {
                     LinkMessageEvent e = (LinkMessageEvent)ev;
-                    InvokeStateEvent("link_message", e.SenderNumber, e.Number, e.Data, e.Id);
+                    InvokeStateEvent("link_message", e.SenderNumber, e.Number, e.Data, new LSLKey(e.Id));
                 }
                 else if (ev is ListenEvent)
                 {
                     ListenEvent e = (ListenEvent)ev;
-                    InvokeStateEvent("listen", e.Channel, e.Name, e.ID, e.Message);
+                    InvokeStateEvent("listen", e.Channel, e.Name, new LSLKey(e.ID), e.Message);
                 }
                 else if (ev is MoneyEvent)
                 {
@@ -486,7 +486,7 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is ObjectRezEvent)
                 {
                     ObjectRezEvent e = (ObjectRezEvent)ev;
-                    InvokeStateEvent("object_rez", e.ObjectID);
+                    InvokeStateEvent("object_rez", new LSLKey(e.ObjectID));
                 }
                 else if (ev is OnRezEvent)
                 {
@@ -502,7 +502,7 @@ namespace SilverSim.Scripting.LSL
                 else if (ev is RemoteDataEvent)
                 {
                     RemoteDataEvent e =(RemoteDataEvent)ev;
-                    InvokeStateEvent("remote_data", e.Type, e.Channel, e.MessageID, e.Sender, e.IData, e.SData);
+                    InvokeStateEvent("remote_data", e.Type, new LSLKey(e.Channel), new LSLKey(e.MessageID), e.Sender, e.IData, e.SData);
                 }
                 else if (ev is ResetScriptEvent)
                 {

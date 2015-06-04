@@ -1524,6 +1524,7 @@ namespace SilverSim.Scene.Types.Object
         static void ShapeFromXml(ObjectPart part, ObjectGroup rootGroup, XmlTextReader reader)
         {
             PrimitiveShape shape = new PrimitiveShape();
+            bool have_attachpoint = false;
 
             for (; ; )
             {
@@ -1632,6 +1633,7 @@ namespace SilverSim.Scene.Types.Object
                             case "LastAttachPoint":
                                 if(null != rootGroup)
                                 {
+                                    have_attachpoint = true;
                                     rootGroup.AttachPoint = (AttachmentPoint)reader.ReadElementValueAsUInt();
                                 }
                                 else
@@ -1826,6 +1828,10 @@ namespace SilverSim.Scene.Types.Object
                         if (reader.Name != "Shape")
                         {
                             throw new InvalidObjectXmlException();
+                        }
+                        if (!have_attachpoint && null != rootGroup)
+                        {
+                            rootGroup.AttachPoint = (AttachmentPoint)shape.State;
                         }
                         part.Shape = shape;
                         return;

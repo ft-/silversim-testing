@@ -35,7 +35,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         #region Primitives
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetKey(ScriptInstance Instance)
+        public LSLKey llGetKey(ScriptInstance Instance)
         {
             lock (Instance)
             {

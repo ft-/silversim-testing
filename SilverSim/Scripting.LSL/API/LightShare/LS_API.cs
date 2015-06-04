@@ -141,7 +141,7 @@ namespace SilverSim.Scripting.LSL.API.LightShare
         }
 
         [APILevel(APIFlags.LightShare)]
-        public int lsSetWindlightSceneTargeted(ScriptInstance Instance, AnArray rules, UUID target)
+        public int lsSetWindlightSceneTargeted(ScriptInstance Instance, AnArray rules, LSLKey target)
         {
 #warning Implement lsSetWindlightSceneTargeted(AnArray, UUID)
             return 0;

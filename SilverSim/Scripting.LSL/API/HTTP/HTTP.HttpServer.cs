@@ -36,7 +36,7 @@ namespace SilverSim.Scripting.LSL.API.HTTP
     public partial class HTTP_API
     {
         [APILevel(APIFlags.LSL)]
-        public UUID llRequestURL(ScriptInstance Instance)
+        public LSLKey llRequestURL(ScriptInstance Instance)
         {
             lock(Instance)
             {
@@ -73,7 +73,7 @@ namespace SilverSim.Scripting.LSL.API.HTTP
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llRequestSecureURL(ScriptInstance Instance)
+        public LSLKey llRequestSecureURL(ScriptInstance Instance)
         {
             lock (Instance)
             {
@@ -100,7 +100,7 @@ namespace SilverSim.Scripting.LSL.API.HTTP
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llGetHTTPHeader(ScriptInstance Instance, UUID requestID, string header)
+        public string llGetHTTPHeader(ScriptInstance Instance, LSLKey requestID, string header)
         {
             lock (Instance)
             {
@@ -109,7 +109,7 @@ namespace SilverSim.Scripting.LSL.API.HTTP
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llHTTPResponse(ScriptInstance Instance, UUID requestID, int status, string body)
+        public void llHTTPResponse(ScriptInstance Instance, LSLKey requestID, int status, string body)
         {
             lock(Instance)
             {
@@ -137,7 +137,7 @@ namespace SilverSim.Scripting.LSL.API.HTTP
         public const int CONTENT_TYPE_RSS = 8;
 
         [APILevel(APIFlags.LSL)]
-        public void llSetContentType(ScriptInstance Instance, UUID requestID, int contenttype)
+        public void llSetContentType(ScriptInstance Instance, LSLKey requestID, int contenttype)
         {
             lock(Instance)
             {
@@ -158,7 +158,7 @@ namespace SilverSim.Scripting.LSL.API.HTTP
         }
 
         [APILevel(APIFlags.OSSL)]
-        public void osSetContentType(ScriptInstance Instance, UUID id, string type)
+        public void osSetContentType(ScriptInstance Instance, LSLKey id, string type)
         {
             lock(Instance)
             {

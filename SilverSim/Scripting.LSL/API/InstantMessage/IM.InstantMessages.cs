@@ -33,7 +33,7 @@ namespace SilverSim.Scripting.LSL.APIs.IM
     public partial class IM_API
     {
         [APILevel(APIFlags.LSL)]
-        public void llInstantMessage(ScriptInstance Instance, UUID user, string message)
+        public void llInstantMessage(ScriptInstance Instance, LSLKey user, string message)
         {
             lock(Instance)
             {

@@ -69,28 +69,11 @@ namespace SilverSim.Scripting.LSL.API.HTTP
             "Vary", "Via", "Warning", "WWW-Authenticate"
         };
 
-        delegate void HttpRequestDelegate(ObjectPart part, UUID requestID, string method, string url, int maxBodyLength, Dictionary<string, string> httpHeaders, string body);
-        void httpRequest(ObjectPart part, UUID requestID, string method, string url, int maxBodyLength, Dictionary<string, string> httpHeaders, string body)
-        {
-#warning Implement httpRequest
-            HttpResponseEvent e = new HttpResponseEvent();
-            e.RequestID = UUID.Random;
-            e.Status = 499;
-            part.PostEvent(e);
-        }
-
-        void httpRequestEnd(IAsyncResult ar)
-        {
-            AsyncResult r = (AsyncResult)ar;
-            HttpRequestDelegate caller = (HttpRequestDelegate)r.AsyncDelegate;
-            caller.EndInvoke(ar);
-        }
-
         static readonly Regex m_AuthRegex = new Regex(@"^(https?:\/\/)(\w+):(\w+)@(.*)$");
         static readonly Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         [APILevel(APIFlags.LSL)]
-        public UUID llHTTPRequest(ScriptInstance Instance, string url, AnArray parameters, string body)
+        public LSLKey llHTTPRequest(ScriptInstance Instance, string url, AnArray parameters, string body)
         {
             LSLHTTPClient_RequestQueue.LSLHttpRequest req = new LSLHTTPClient_RequestQueue.LSLHttpRequest();
             lock (Instance)

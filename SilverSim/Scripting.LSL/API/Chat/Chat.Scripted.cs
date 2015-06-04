@@ -103,7 +103,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llRegionSayTo(ScriptInstance Instance, UUID target, int channel, string message)
+        public void llRegionSayTo(ScriptInstance Instance, LSLKey target, int channel, string message)
         {
             ListenEvent ev = new ListenEvent();
             ev.Channel = channel;

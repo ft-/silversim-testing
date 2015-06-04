@@ -50,7 +50,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llMessageLinked(ScriptInstance Instance, int link, int num, string str, UUID id)
+        public void llMessageLinked(ScriptInstance Instance, int link, int num, string str, LSLKey id)
         {
             lock (Instance)
             {
@@ -59,7 +59,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
                 ev.TargetNumber = link;
                 ev.Number = num;
                 ev.Data = str;
-                ev.Id = id;
+                ev.Id = id.ToString();
 
                 foreach (ObjectPart part in GetLinkTargets(Instance, link))
                 {

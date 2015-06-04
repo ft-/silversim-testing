@@ -54,7 +54,7 @@ namespace SilverSim.Scripting.LSL.API.Region
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llRequestSimulatorData(ScriptInstance Instance, string region, int data)
+        public LSLKey llRequestSimulatorData(ScriptInstance Instance, string region, int data)
         {
 #warning Implement llRequestSimulatorData()
             return UUID.Zero;

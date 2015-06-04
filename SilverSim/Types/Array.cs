@@ -71,6 +71,16 @@ namespace SilverSim.Types
         }
         #endregion Properties
 
+        public new string ToString()
+        {
+            string s = string.Empty;
+            foreach(IValue iv in this)
+            {
+                s += iv.ToString();
+            }
+            return s;
+        }
+
         #region Add methods
         public void Add(bool val)
         {

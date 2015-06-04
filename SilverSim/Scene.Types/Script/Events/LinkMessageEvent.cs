@@ -34,6 +34,6 @@ namespace SilverSim.Scene.Types.Script.Events
 
         public int Number;
         public string Data;
-        public UUID Id;
+        public string Id; /* LSL does not limit key do UUIDs */
     }
 }

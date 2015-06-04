@@ -41,13 +41,13 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         /// Set parameters for light projection in host prim 
         /// </summary>
         [APILevel(APIFlags.OSSL)]
-        public void osSetProjectionParams(ScriptInstance Instance, bool projection, UUID texture, double fov, double focus, double amb)
+        public void osSetProjectionParams(ScriptInstance Instance, bool projection, LSLKey texture, double fov, double focus, double amb)
         {
             osSetLinkProjectionParams(Instance, LINK_THIS, projection, texture, fov, focus, amb);
         }
 
         [APILevel(APIFlags.OSSL)]
-        public void osSetLinkProjectionParams(ScriptInstance Instance, int link, bool projection, UUID texture, double fov, double focus, double amb)
+        public void osSetLinkProjectionParams(ScriptInstance Instance, int link, bool projection, LSLKey texture, double fov, double focus, double amb)
         {
             ObjectPart.ProjectionParam p = new ObjectPart.ProjectionParam();
             p.IsProjecting = projection;
@@ -66,7 +66,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         /// Set parameters for light projection with uuid of target prim
         /// </summary>
         [APILevel(APIFlags.OSSL)]
-        public void osSetProjectionParams(ScriptInstance Instance, UUID prim, bool projection, UUID texture, double fov, double focus, double amb)
+        public void osSetProjectionParams(ScriptInstance Instance, LSLKey prim, bool projection, LSLKey texture, double fov, double focus, double amb)
         {
             lock (Instance)
             {

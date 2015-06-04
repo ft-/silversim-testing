@@ -99,13 +99,13 @@ namespace SilverSim.Scripting.LSL.API.Inventory
         public const string EOF = "\n\n\n";
 
         [APILevel(APIFlags.LSL)]
-        public void llGiveInventory(ScriptInstance Instance, UUID destination, string inventory)
+        public void llGiveInventory(ScriptInstance Instance, LSLKey destination, string inventory)
         {
 #warning Implement llGiveInventory(UUID, string)
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llGiveInventoryList(ScriptInstance Instance, UUID target, string folder, AnArray inventory)
+        public void llGiveInventoryList(ScriptInstance Instance, LSLKey target, string folder, AnArray inventory)
         {
 #warning Implement llGiveInventory(UUID, string, AnArray)
         }

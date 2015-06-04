@@ -107,7 +107,7 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         }
 
         [APILevel(APIFlags.LSL)]
-        public int llReturnObjectsByOwner(ScriptInstance Instance, UUID owner, int scope)
+        public int llReturnObjectsByOwner(ScriptInstance Instance, LSLKey owner, int scope)
         {
 #warning Implement llReturnObjectsByOwner(UUID, int)
             return 0;
