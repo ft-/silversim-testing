@@ -94,7 +94,7 @@ namespace SilverSim.Types
             return v.m_Value ? 1 : 0;
         }
 
-        public static implicit operator Integer(ABoolean v)
+        public static explicit operator Integer(ABoolean v)
         {
             return new Integer(v.m_Value ? 1 : 0);
         }

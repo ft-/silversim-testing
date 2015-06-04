@@ -402,17 +402,17 @@ namespace SilverSim.Types
                 X * value2.Y - value2.X * Y);
         }
 
-        public static implicit operator Vector3(string val)
+        public static explicit operator Vector3(string val)
         {
             return Vector3.Parse(val);
         }
 
-        public static implicit operator string(Vector3 val)
+        public static explicit operator string(Vector3 val)
         {
             return val.ToString();
         }
 
-        public static implicit operator GridVector(Vector3 v)
+        public static explicit operator GridVector(Vector3 v)
         {
             return new GridVector((uint)(v.X * 256f), (uint)(v.Y * 256f));
         }

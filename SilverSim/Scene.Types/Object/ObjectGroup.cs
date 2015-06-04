@@ -1142,17 +1142,17 @@ namespace SilverSim.Scene.Types.Object
         #region XML Serialization
         public void ToXml(XmlTextWriter writer, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
-            ToXml(writer, UUI.Unknown, null, options);
+            ToXml(writer, UUI.Unknown, Vector3.Zero, options, false);
         }
         public void ToXml(XmlTextWriter writer, UUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
-            ToXml(writer, nextOwner, null, options);
+            ToXml(writer, nextOwner, Vector3.Zero, options, false);
         }
-        public void ToXml(XmlTextWriter writer, UUI nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None)
+        public void ToXml(XmlTextWriter writer, UUI nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None, bool writeOffsetPos = true)
         {
             List<ObjectPart> parts = Values;
             writer.WriteStartElement("SceneObjectGroup");
-            if(offsetpos != null)
+            if (writeOffsetPos)
             {
                 Vector3 opos = Position - offsetpos;
                 writer.WriteStartAttribute("x");

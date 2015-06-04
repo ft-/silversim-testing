@@ -39,21 +39,21 @@ namespace SilverSim.Scene.Types.Object
 
         public static AssetData Asset(this ObjectGroup grp, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
-            return grp.Asset(UUI.Unknown, null, options);
+            return grp.Asset(UUI.Unknown, Vector3.Zero, options, false);
         }
 
         public static AssetData Asset(this ObjectGroup grp, UUI nextOwner, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
-            return grp.Asset(nextOwner, null, options);
+            return grp.Asset(nextOwner, Vector3.Zero, options, false);
         }
 
-        public static AssetData Asset(this ObjectGroup grp, UUI nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None)
+        public static AssetData Asset(this ObjectGroup grp, UUI nextOwner, Vector3 offsetpos, XmlSerializationOptions options = XmlSerializationOptions.None, bool writeOffsetPos = true)
         {
             using (MemoryStream ms = new MemoryStream())
             {
                 using (XmlTextWriter writer = new XmlTextWriter(ms, UTF8NoBOM))
                 {
-                    grp.ToXml(writer, options);
+                    grp.ToXml(writer, nextOwner, offsetpos, options, writeOffsetPos);
                     writer.Flush();
                 }
 

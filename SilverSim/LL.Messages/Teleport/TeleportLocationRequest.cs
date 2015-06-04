@@ -31,7 +31,7 @@ namespace SilverSim.LL.Messages.Teleport
     {
         public UUID AgentID;
         public UUID SessionID;
-        public GridVector GridPosition = Vector3.Zero;
+        public GridVector GridPosition = GridVector.Zero;
         public Vector3 Position;
         public Vector3 LookAt;
 

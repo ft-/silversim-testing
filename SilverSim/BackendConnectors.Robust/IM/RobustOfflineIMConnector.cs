@@ -76,7 +76,7 @@ namespace SilverSim.BackendConnectors.Robust.IM
             post["FromGroup"] = isFromGroup.ToString();
             post["Message"] = im.Message;
             post["EstateID"] = im.ParentEstateID.ToString();
-            post["Position"] = im.Position;
+            post["Position"] = im.Position.ToString();
             post["RegionID"] = im.RegionID;
             post["Timestamp"] = im.Timestamp.DateTimeToUnixTime().ToString();
             post["ToAgentID"] = im.ToAgent.ID;

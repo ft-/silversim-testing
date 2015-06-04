@@ -134,14 +134,14 @@ namespace SilverSim.Types
             return Real.Parse(v.m_Value);
         }
 
-        public static explicit operator float(AString v)
+        public static explicit operator double(AString v)
         {
-            return Single.Parse(v.m_Value.Trim(), EnUsCulture);
+            return Double.Parse(v.m_Value.Trim(), EnUsCulture);
         }
 
         public static explicit operator Vector3(AString v)
         {
-            return new Vector3(v.m_Value);
+            return new Vector3((double)v);
         }
         #endregion Operators
 

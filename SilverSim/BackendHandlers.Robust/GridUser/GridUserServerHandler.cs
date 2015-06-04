@@ -186,8 +186,8 @@ namespace SilverSim.BackendHandlers.Robust.GridUser
         public void LoggedOut(Dictionary<string, object> req)
         {
             UUID region = new UUID(req["RegionID"].ToString());
-            Vector3 position = new Vector3(req["Position"].ToString());
-            Vector3 lookAt = new Vector3(req["LookAt"].ToString());
+            Vector3 position = Vector3.Parse(req["Position"].ToString());
+            Vector3 lookAt = Vector3.Parse(req["LookAt"].ToString());
 
             m_GridUserService.LoggedOut(findUser(req["UserID"].ToString()), region, position, lookAt);
         }
@@ -195,8 +195,8 @@ namespace SilverSim.BackendHandlers.Robust.GridUser
         public void SetHome(Dictionary<string, object> req)
         {
             UUID region = new UUID(req["RegionID"].ToString());
-            Vector3 position = new Vector3(req["Position"].ToString());
-            Vector3 lookAt = new Vector3(req["LookAt"].ToString());
+            Vector3 position = Vector3.Parse(req["Position"].ToString());
+            Vector3 lookAt = Vector3.Parse(req["LookAt"].ToString());
 
             m_GridUserService.SetHome(findUser(req["UserID"].ToString()), region, position, lookAt);
         }
@@ -204,8 +204,8 @@ namespace SilverSim.BackendHandlers.Robust.GridUser
         public void SetPosition(Dictionary<string, object> req)
         {
             UUID region = new UUID(req["RegionID"].ToString());
-            Vector3 position = new Vector3(req["Position"].ToString());
-            Vector3 lookAt = new Vector3(req["LookAt"].ToString());
+            Vector3 position = Vector3.Parse(req["Position"].ToString());
+            Vector3 lookAt = Vector3.Parse(req["LookAt"].ToString());
 
             m_GridUserService.SetPosition(findUser(req["UserID"].ToString()), region, position, lookAt);
         }

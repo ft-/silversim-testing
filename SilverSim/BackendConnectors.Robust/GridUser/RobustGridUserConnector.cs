@@ -66,11 +66,11 @@ namespace SilverSim.BackendConnectors.Robust.GridUser
             GridUserInfo info = new GridUserInfo();
             info.User = new UUI(map["UserID"].ToString());
             info.HomeRegionID = map["HomeRegionID"].ToString();
-            info.HomePosition = new Vector3(map["HomePosition"].ToString());
-            info.HomeLookAt = new Vector3(map["HomeLookAt"].ToString());
+            info.HomePosition = Vector3.Parse(map["HomePosition"].ToString());
+            info.HomeLookAt = Vector3.Parse(map["HomeLookAt"].ToString());
             info.LastRegionID = map["LastRegionID"].ToString();
-            info.LastPosition = new Vector3(map["LastPosition"].ToString());
-            info.LastLookAt = new Vector3(map["LastLookAt"].ToString());
+            info.LastPosition = Vector3.Parse(map["LastPosition"].ToString());
+            info.LastLookAt = Vector3.Parse(map["LastLookAt"].ToString());
             info.IsOnline = map["Online"].AsBoolean;
             DateTime login;
             DateTime logout;
