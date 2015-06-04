@@ -84,6 +84,10 @@ namespace SilverSim.Scripting.LSL
             {
                 ilgen.Emit(OpCodes.Pop);
             }
+            else if(fromType == typeof(void))
+            {
+                throw new NotSupportedException();
+            }
             else if(toType == typeof(string))
             {
                 if(fromType == typeof(int))
@@ -112,7 +116,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    throw new NotSupportedException();
                 }
             }
             else if(toType == typeof(int))
@@ -127,7 +131,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    throw new NotSupportedException();
                 }
             }
             else if(toType == typeof(bool))
@@ -158,11 +162,10 @@ namespace SilverSim.Scripting.LSL
                 {
                     ilgen.Emit(OpCodes.Call, typeof(AnArray).GetProperty("Count").GetGetMethod());
                 }
-                    /*
                 else if (fromType == typeof(Quaternion))
                 {
+                    throw new NotImplementedException();
                 }
-                     */
                 else if (fromType == typeof(Vector3))
                 {
                     ilgen.Emit(OpCodes.Call, typeof(Vector3).GetProperty("Length").GetGetMethod());
@@ -172,7 +175,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    throw new NotSupportedException();
                 }
             }
             else if(toType == typeof(double))
@@ -188,7 +191,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    throw new NotSupportedException();
                 }
             }
             else if(toType == typeof(Vector3))
@@ -199,7 +202,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    throw new NotSupportedException();
                 }
             }
             else if(toType == typeof(Quaternion))
@@ -210,7 +213,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    throw new NotSupportedException();
                 }
             }
             else if(toType == typeof(AnArray))
@@ -246,12 +249,12 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    throw new NotSupportedException();
                 }
             }
             else
             {
-                throw new NotImplementedException();
+                throw new NotSupportedException();
             }
         }
 
