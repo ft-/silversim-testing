@@ -89,7 +89,11 @@ namespace SilverSim.Scripting.LSL
             {
                 throw parserException(p, string.Format("{1} cannot be declared as '{0}'. '{0}' is an already defined as user function.", name, type));
             }
-            if (cs.m_LocalVariables[cs.m_LocalVariables.Count - 1].Contains(name))
+            if(cs.m_LocalVariables.Count == 0)
+            {
+
+            }
+            else if (cs.m_LocalVariables[cs.m_LocalVariables.Count - 1].Contains(name))
             {
                 throw parserException(p, string.Format("{1} cannot be declared as '{0}'. '{0}' is an already defined as local variable in the same block.", name, type));
             }
@@ -487,7 +491,7 @@ namespace SilverSim.Scripting.LSL
                             case "key":
                             case "rotation":
                                 checkUsedName(compileState, p, "Function", args[1]);
-                                fp = checkFunctionParameters(compileState, p, args.GetRange(3, args.Count - 3));
+                                fp = checkFunctionParameters(compileState, p, args.GetRange(3, args.Count - 4));
                                 funcList.Add(new LineInfo(args, lineNumber));
                                 parseBlock(compileState, p, funcList, false);
                                 break;

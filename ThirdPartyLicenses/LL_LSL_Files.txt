@@ -1,0 +1,5 @@
+All LSL test files within tests/LSL_Tests/LL_LSL are taken
+from http://wiki.secondlife.com/
+
+
+The LSL Test Harness is a platform for testing LSL scripts developed for Linden Lab by i3D Inc.. Second Life developers may want to use this to confirm that their scripts function consistently from update to update. The test harness is freely available (under Creative Commons license: Attribution-ShareAlike 2.5) to download and use. 

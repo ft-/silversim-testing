@@ -54,6 +54,10 @@ namespace SilverSim.Scene.Types.Script
                 string o = string.Empty;
                 foreach(KeyValuePair<int, string> m in Messages)
                 {
+                    if(o != "")
+                    {
+                        o += "\n";
+                    }
                     o += string.Format("{0}:{1}", m.Key, m.Value);
                 }
                 return o;

@@ -1,0 +1,30 @@
+
+             put this in linked message listener of report state 
+//
+// ReportComplete - notification from Coordinator_TestUnitReports script that reporting is done
+// format example -> ReportComplete
+    
+              put this in linked message listener of default state 
+              
+//   ActivateRegistration - initate the registration process
+//   format example -> ActivateRegistration
+//
+                put this in linked message listener of setup state 
+
+//   ActivateTest - command to begin testing process
+//   format example -> ActivateTest
+
+                  put this in linked message listener of test state 
+//
+//   ActivateReport - initiate the report process
+//   format example -> ActivateReport
+
+
+                 different depending on what state 
+ 
+//   Registration - response from testUnits to RegisterUnit command
+//   format example -> Registration::unitKey::00000-0000-0000-00000::unitName::TestUnit1::groupName::Group1
+//
+//   UpdateUnitStatus - response from testUnits to request to send out unit status information
+//   format example -> UpdateUnitStatus::unitKey::00000-0000-0000-00000::unitStatus::PASS
+//

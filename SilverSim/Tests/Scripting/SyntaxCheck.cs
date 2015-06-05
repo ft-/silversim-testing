@@ -26,9 +26,11 @@ exception statement from your version.
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
 using SilverSim.Tests.Extensions;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
@@ -52,6 +54,7 @@ namespace SilverSim.Tests.Scripting
                     Files[uuid] = config.GetString(key);
                 }
             }
+            CompilerRegistry.ScriptCompilers.DefaultCompilerName = config.GetString("DefaultCompiler");
         }
 
         public bool Run()
@@ -66,9 +69,18 @@ namespace SilverSim.Tests.Scripting
                     {
                         CompilerRegistry.ScriptCompilers.SyntaxCheck(UUI.Unknown, file.Key, reader);
                     }
+                    m_Log.InfoFormat("Syntax of {1} ({0}) parsed successfully", file.Key, file.Value);
                 }
-                catch
+                catch (CompilerException e)
                 {
+                    m_Log.ErrorFormat("Syntax of {1} ({0}) failed to parse: {2}", file.Key, file.Value, e.Message);
+                    m_Log.WarnFormat("Stack Trace:\n{0}", e.StackTrace.ToString());
+                    success = false;
+                }
+                catch (Exception e)
+                {
+                    m_Log.ErrorFormat("Syntax of {1} ({0}) failed to parse: {2}", file.Key, file.Value, e.Message);
+                    m_Log.WarnFormat("Stack Trace:\n{0}", e.StackTrace.ToString());
                     success = false;
                 }
             }

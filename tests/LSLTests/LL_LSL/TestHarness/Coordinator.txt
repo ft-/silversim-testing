@@ -1,0 +1,7 @@
+BroadcastChannel:[0]
+ControlChannel:[1234]
+RegistrationTimeout:[5]
+TestTimeout:[10]
+ReportTimeout:[20]
+Email:[you@yourdomain.com]
+Http:[www.yourdomain.com/yourpage.php]
