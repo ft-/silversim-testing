@@ -139,7 +139,7 @@ namespace SilverSim.Scripting.Common
                 compiler.SyntaxCheck(user, shbangs, assetID, reader, linenumber);
             }
 
-            internal IScriptAssembly Compile(AppDomain appDom, UUI user, UUID assetID, TextReader reader)
+            public IScriptAssembly Compile(AppDomain appDom, UUI user, UUID assetID, TextReader reader)
             {
                 int linenumber = 1;
                 Dictionary<int, string> shbangs = new Dictionary<int, string>();
@@ -156,7 +156,7 @@ namespace SilverSim.Scripting.Common
                 return Compile(appDom, user, shbangs, assetID, reader, linenumber);
             }
 
-            internal void SyntaxCheck(UUI user, UUID assetID, TextReader reader)
+            public void SyntaxCheck(UUI user, UUID assetID, TextReader reader)
             {
                 int linenumber = 1;
                 Dictionary<int, string> shbangs = new Dictionary<int, string>();

@@ -683,6 +683,14 @@ namespace SilverSim.Types
 
         #endregion Operators
 
+        public bool IsLSLTrue
+        {
+            get
+            {
+                return !Equals(Identity);
+            }
+        }
+
         #region Byte conversion
         public byte[] AsByte
         {

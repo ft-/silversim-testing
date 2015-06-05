@@ -54,6 +54,17 @@ namespace SilverSim.Scripting.LSL
         List<char> m_OpChars = new List<char>();
         Resolver m_Resolver;
 
+        class LineInfo
+        {
+            public readonly List<string> Line;
+            public readonly int LineNumber;
+
+            public LineInfo(List<string> line, int lineNo)
+            {
+                Line = line;
+                LineNumber = lineNo;
+            }
+        }
         class CompileState
         {
             public APIFlags AcceptedFlags;
@@ -61,10 +72,10 @@ namespace SilverSim.Scripting.LSL
             //public ModuleBuilder Module;
             public Dictionary<string, Type> m_VariableDeclarations = new Dictionary<string, Type>();
             public Dictionary<string, FieldBuilder> m_VariableFieldInfo = new Dictionary<string, FieldBuilder>();
-            public Dictionary<string, List<string>> m_VariableInitValues = new Dictionary<string, List<string>>();
+            public Dictionary<string, LineInfo> m_VariableInitValues = new Dictionary<string, LineInfo>();
             public List<List<string>> m_LocalVariables = new List<List<string>>();
-            public Dictionary<string, List<List<string>>> m_Functions = new Dictionary<string, List<List<string>>>();
-            public Dictionary<string, Dictionary<string, List<List<string>>>> m_States = new Dictionary<string, Dictionary<string, List<List<string>>>>();
+            public Dictionary<string, List<LineInfo>> m_Functions = new Dictionary<string, List<LineInfo>>();
+            public Dictionary<string, Dictionary<string, List<LineInfo>>> m_States = new Dictionary<string, Dictionary<string, List<LineInfo>>>();
 
             public CompileState()
             {

@@ -36,6 +36,11 @@ namespace SilverSim.Scripting.LSL
 {
     public partial class LSLCompiler
     {
+        CompilerException compilerException(LineInfo p, string message)
+        {
+            return new CompilerException(p.LineNumber, message);
+        }
+
         void ProcessExpression(
             CompileState compileState,
             TypeBuilder scriptTypeBuilder,
@@ -44,7 +49,7 @@ namespace SilverSim.Scripting.LSL
             Type expectedType,
             int startAt,
             int endAt,
-            List<string> functionLine,
+            LineInfo functionLine,
             Dictionary<string, object> localVars)
         {
             List<string> actFunctionLine = new List<string>();
@@ -52,10 +57,38 @@ namespace SilverSim.Scripting.LSL
             {
                 throw new NotImplementedException();
             }
-            
-            Tree expressionTree = new Tree(functionLine.GetRange(startAt, endAt - startAt + 1), m_OpChars, m_SingleOps, m_NumericChars);
-            solveTree(compileState, expressionTree);
-            ProcessExpression(compileState, scriptTypeBuilder, stateTypeBuilder, ilgen, expectedType, expressionTree, localVars);
+
+            Tree expressionTree;
+            try
+            {
+                expressionTree = new Tree(functionLine.Line.GetRange(startAt, endAt - startAt + 1), m_OpChars, m_SingleOps, m_NumericChars);
+                solveTree(compileState, expressionTree);
+            }
+            catch(Exception e)
+            {
+                throw compilerException(functionLine, e.Message);
+            }
+            ProcessExpression(
+                compileState, 
+                scriptTypeBuilder, 
+                stateTypeBuilder, 
+                ilgen, 
+                expectedType, 
+                expressionTree,
+                functionLine.LineNumber,
+                localVars);
+        }
+
+        string MapType(Type t)
+        {
+            if (t == typeof(string)) return "string";
+            if (t == typeof(int)) return "integer";
+            if (t == typeof(double)) return "float";
+            if (t == typeof(LSLKey)) return "key";
+            if (t == typeof(Quaternion)) return "rotation";
+            if (t == typeof(Vector3)) return "vector";
+            if (t == typeof(AnArray)) return "list";
+            return "???";
         }
 
         void ProcessExpression(
@@ -65,6 +98,7 @@ namespace SilverSim.Scripting.LSL
             ILGenerator ilgen,
             Type expectedType,
             Tree functionTree,
+            int lineNumber,
             Dictionary<string, object> localVars)
         {
             Type retType = ProcessExpressionPart(
@@ -73,6 +107,7 @@ namespace SilverSim.Scripting.LSL
                 stateTypeBuilder,
                 ilgen,
                 functionTree,
+                lineNumber,
                 localVars);
             if(retType == typeof(string) && expectedType == typeof(LSLKey))
             {
@@ -92,12 +127,13 @@ namespace SilverSim.Scripting.LSL
             }
             else
             {
-                throw new NotSupportedException();
+                throw new CompilerException(lineNumber, string.Format("Unsupported implicit typecast from {0} to {1}", MapType(retType), MapType(expectedType)));
             }
             ProcessCasts(
                 ilgen,
                 expectedType,
-                retType);
+                retType,
+                lineNumber);
         }
 
         Type ProcessExpressionPart(
@@ -106,6 +142,7 @@ namespace SilverSim.Scripting.LSL
             TypeBuilder stateTypeBuilder,
             ILGenerator ilgen,
             Tree functionTree,
+            int lineNumber,
             Dictionary<string, object> localVars)
         {
             switch(functionTree.Type)
@@ -117,6 +154,7 @@ namespace SilverSim.Scripting.LSL
                         stateTypeBuilder, 
                         ilgen,
                         functionTree.SubTree[0], 
+                        lineNumber,
                         localVars);
 
                 case Tree.EntryType.Function:
@@ -140,7 +178,14 @@ namespace SilverSim.Scripting.LSL
 
                         for (int i = 0; i < functionTree.SubTree.Count; ++i)
                         {
-                            Type t = ProcessExpressionPart(compileState, scriptTypeBuilder, stateTypeBuilder, ilgen, functionTree, localVars);
+                            Type t = ProcessExpressionPart(
+                                compileState, 
+                                scriptTypeBuilder,
+                                stateTypeBuilder, 
+                                ilgen, 
+                                functionTree, 
+                                lineNumber,
+                                localVars);
                             if(pi[i].ParameterType == t)
                             {
                                 /* fully matching */
@@ -197,6 +242,7 @@ namespace SilverSim.Scripting.LSL
                             stateTypeBuilder,
                             ilgen, 
                             functionTree.SubTree[1],
+                            lineNumber,
                             localVars);
 
                         Type retLeft;
@@ -226,6 +272,7 @@ namespace SilverSim.Scripting.LSL
                                 stateTypeBuilder,
                                 ilgen,
                                 functionTree.SubTree[0],
+                                lineNumber,
                                 localVars);
                         }
 
@@ -321,7 +368,7 @@ namespace SilverSim.Scripting.LSL
                         }
                         else
                         {
-                            throw new NotSupportedException();
+                            throw new CompilerException(lineNumber, string.Format("implicit typecast not supported for {0} and {1} with '{2}'", MapType(retLeft), MapType(retRight), functionTree.Entry));
                         }
 
                         {
@@ -348,7 +395,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '+' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -363,7 +410,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '-' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -378,7 +425,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '*' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -393,7 +440,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '/' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -408,7 +455,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '%' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -419,7 +466,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '<<' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -430,7 +477,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '>>' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -449,7 +496,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '==' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -472,7 +519,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '!=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -489,7 +536,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '<=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -504,7 +551,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '<' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -519,7 +566,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '>' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -536,7 +583,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '>=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -546,13 +593,13 @@ namespace SilverSim.Scripting.LSL
                                     ilgen.BeginScope();
                                     LocalBuilder lb = ilgen.DeclareLocal(retLeft);
                                     ilgen.Emit(OpCodes.Stloc, lb);
-                                    ProcessCasts(ilgen, typeof(bool), retLeft);
+                                    ProcessCasts(ilgen, typeof(bool), retLeft, lineNumber);
                                     ilgen.Emit(OpCodes.Ldloc, lb);
                                     ilgen.EndScope();
                                 }
                                 if(typeof(int) != retRight)
                                 {
-                                    ProcessCasts(ilgen, typeof(bool), retRight);
+                                    ProcessCasts(ilgen, typeof(bool), retRight, lineNumber);
                                 }
                                 ilgen.Emit(OpCodes.And);
                                 return retLeft;
@@ -564,7 +611,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '&' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -575,7 +622,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '|' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -586,7 +633,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '^' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 return retLeft;
 
@@ -596,13 +643,13 @@ namespace SilverSim.Scripting.LSL
                                     ilgen.BeginScope();
                                     LocalBuilder lb = ilgen.DeclareLocal(retLeft);
                                     ilgen.Emit(OpCodes.Stloc, lb);
-                                    ProcessCasts(ilgen, typeof(bool), retLeft);
+                                    ProcessCasts(ilgen, typeof(bool), retLeft, lineNumber);
                                     ilgen.Emit(OpCodes.Ldloc, lb);
                                     ilgen.EndScope();
                                 }
                                 if (typeof(int) != retRight)
                                 {
-                                    ProcessCasts(ilgen, typeof(bool), retRight);
+                                    ProcessCasts(ilgen, typeof(bool), retRight, lineNumber);
                                 }
                                 ilgen.Emit(OpCodes.Or);
                                 return retLeft;
@@ -642,14 +689,14 @@ namespace SilverSim.Scripting.LSL
                                     }
                                     else
                                     {
-                                        throw new NotSupportedException();
+                                        throw new CompilerException(lineNumber, string.Format("operator '=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                     }
                                     ilgen.Emit(OpCodes.Ldloc, lb);
                                     ilgen.EndScope();
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 ilgen.Emit(OpCodes.Dup);
                                 SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
@@ -689,14 +736,14 @@ namespace SilverSim.Scripting.LSL
                                     }
                                     else
                                     {
-                                        throw new NotSupportedException();
+                                        throw new CompilerException(lineNumber, string.Format("operator '+=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                     }
                                     ilgen.Emit(OpCodes.Ldloc, lb);
                                     ilgen.EndScope();
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '+=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
                                 {
@@ -708,7 +755,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '+=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 ilgen.Emit(OpCodes.Dup);
                                 SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
@@ -750,7 +797,7 @@ namespace SilverSim.Scripting.LSL
                                     }
                                     else
                                     {
-                                        throw new NotSupportedException();
+                                        throw new CompilerException(lineNumber, string.Format("operator '-=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                     }
                                     ilgen.Emit(OpCodes.Ldloc, lb);
                                     ilgen.EndScope();
@@ -769,7 +816,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '-=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 ilgen.Emit(OpCodes.Dup);
                                 SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
@@ -811,14 +858,14 @@ namespace SilverSim.Scripting.LSL
                                     }
                                     else
                                     {
-                                        throw new NotSupportedException();
+                                        throw new CompilerException(lineNumber, string.Format("operator '*=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                     }
                                     ilgen.Emit(OpCodes.Ldloc, lb);
                                     ilgen.EndScope();
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '*=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
                                 {
@@ -830,7 +877,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '*=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 ilgen.Emit(OpCodes.Dup);
                                 SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
@@ -872,7 +919,7 @@ namespace SilverSim.Scripting.LSL
                                     }
                                     else
                                     {
-                                        throw new NotSupportedException();
+                                        throw new CompilerException(lineNumber, string.Format("operator '/=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                     }
                                     ilgen.Emit(OpCodes.Ldloc, lb);
                                     ilgen.EndScope();
@@ -891,7 +938,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '/=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 ilgen.Emit(OpCodes.Dup);
                                 SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
@@ -933,14 +980,15 @@ namespace SilverSim.Scripting.LSL
                                     }
                                     else
                                     {
-                                        throw new NotSupportedException();
+                                        throw new CompilerException(lineNumber, string.Format("operator '%=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                     }
                                     ilgen.Emit(OpCodes.Ldloc, lb);
                                     ilgen.EndScope();
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '%=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
+
                                 }
                                 if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
                                 {
@@ -952,7 +1000,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '%=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 ilgen.Emit(OpCodes.Dup);
                                 SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
@@ -960,7 +1008,7 @@ namespace SilverSim.Scripting.LSL
                                 return retLeft;
 
                             default:
-                                throw new NotSupportedException();
+                                throw new CompilerException(lineNumber, string.Format("operator '{0}' not supported", functionTree.Entry));
                         }
                     }
 
@@ -977,6 +1025,7 @@ namespace SilverSim.Scripting.LSL
                                     stateTypeBuilder,
                                     ilgen,
                                     functionTree.SubTree[0],
+                                    lineNumber,
                                     localVars);
                                 if (ret == typeof(int))
                                 {
@@ -985,7 +1034,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '!' not supported for {0}", MapType(ret)));
                                 }
                                 return ret;
 
@@ -996,6 +1045,7 @@ namespace SilverSim.Scripting.LSL
                                     stateTypeBuilder,
                                     ilgen,
                                     functionTree.SubTree[0],
+                                    lineNumber,
                                     localVars);
                                 if (ret == typeof(int))
                                 {
@@ -1003,7 +1053,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '~' not supported for {0}", MapType(ret)));
                                 }
                                 return ret;
 
@@ -1021,12 +1071,12 @@ namespace SilverSim.Scripting.LSL
                                     }
                                     else
                                     {
-                                        throw new NotSupportedException();
+                                        throw new CompilerException(lineNumber, string.Format("operator '++' not supported for {0}", MapType(ret)));
                                     }
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '++' not supported for '{0}'", functionTree.SubTree[0].Entry));
                                 }
                                 return ret;
 
@@ -1044,17 +1094,17 @@ namespace SilverSim.Scripting.LSL
                                     }
                                     else
                                     {
-                                        throw new NotSupportedException();
+                                        throw new CompilerException(lineNumber, string.Format("operator '--' not supported for {0}", MapType(ret)));
                                     }
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '--' not supported for '{0}'", functionTree.SubTree[0].Entry));
                                 }
                                 return ret;
 
                             default:
-                                throw new NotSupportedException();
+                                throw new CompilerException(lineNumber, string.Format("operator '{0}' not supported", functionTree.Entry));
                         }
                     }
 
@@ -1077,12 +1127,12 @@ namespace SilverSim.Scripting.LSL
                                     }
                                     else
                                     {
-                                        throw new NotSupportedException();
+                                        throw new CompilerException(lineNumber, string.Format("operator '++' not supported for {0}", MapType(ret)));
                                     }
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '++' not supported for '{0}'", functionTree.SubTree[0].Entry));
                                 }
                                 return ret;
 
@@ -1100,22 +1150,22 @@ namespace SilverSim.Scripting.LSL
                                     }
                                     else
                                     {
-                                        throw new NotSupportedException();
+                                        throw new CompilerException(lineNumber, string.Format("operator '--' not supported for {0}", MapType(ret)));
                                     }
                                 }
                                 else
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("operator '--' not supported for '{0}'", functionTree.SubTree[0].Entry));
                                 }
                                 return ret;
 
                             default:
-                                throw new NotSupportedException();
+                                throw new CompilerException(lineNumber, string.Format("operator '{0}' not supported", functionTree.Entry));
                         }
                     }
 
                 case Tree.EntryType.ReservedWord:
-                    throw new NotSupportedException();
+                    throw new CompilerException(lineNumber, string.Format("'{0}' is a reserved word", functionTree.Entry));
 
                 case Tree.EntryType.Rotation:
                     /* rotation */
@@ -1142,6 +1192,7 @@ namespace SilverSim.Scripting.LSL
                                     stateTypeBuilder,
                                     ilgen,
                                     functionTree.SubTree[i],
+                                    lineNumber,
                                     localVars);
                                 if (ret == typeof(int))
                                 {
@@ -1149,7 +1200,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else if (ret != typeof(double))
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("implicit typecast from {0} to double not supported", MapType(ret)));
                                 }
                             }
 
@@ -1192,7 +1243,7 @@ namespace SilverSim.Scripting.LSL
                     }
                     else
                     {
-                        throw new NotSupportedException();
+                        throw new CompilerException(lineNumber, string.Format("invalid value"));
                     }
 
                 case Tree.EntryType.Variable:
@@ -1225,6 +1276,7 @@ namespace SilverSim.Scripting.LSL
                                     stateTypeBuilder,
                                     ilgen,
                                     functionTree.SubTree[i],
+                                    lineNumber,
                                     localVars);
                                 if (ret == typeof(int))
                                 {
@@ -1232,7 +1284,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else if (ret != typeof(double))
                                 {
-                                    throw new NotSupportedException();
+                                    throw new CompilerException(lineNumber, string.Format("implicit typecast from {0} to double not supported", MapType(ret)));
                                 }
                             }
 
@@ -1242,11 +1294,11 @@ namespace SilverSim.Scripting.LSL
                     return typeof(Vector3);
 
                 default:
-                    throw new NotSupportedException();
+                    throw new CompilerException(lineNumber, string.Format("unexpected '{0}'", functionTree.Entry));
             }
         }
 
-        void ProcessCasts(ILGenerator ilgen, Type toType, Type fromType)
+        void ProcessCasts(ILGenerator ilgen, Type toType, Type fromType, int lineNumber)
         {
             /* value is on stack before */
             if(toType == fromType)
@@ -1258,7 +1310,7 @@ namespace SilverSim.Scripting.LSL
             }
             else if(fromType == typeof(void))
             {
-                throw new NotSupportedException();
+                throw new CompilerException(lineNumber, string.Format("function does not return anything"));
             }
             else if(toType == typeof(string))
             {
@@ -1288,7 +1340,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    throw new CompilerException(lineNumber, string.Format("unsupported typecast from {0} to {1}", MapType(fromType), MapType(toType)));
                 }
             }
             else if(toType == typeof(int))
@@ -1303,7 +1355,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    throw new CompilerException(lineNumber, string.Format("unsupported typecast from {0} to {1}", MapType(fromType), MapType(toType)));
                 }
             }
             else if(toType == typeof(bool))
@@ -1343,7 +1395,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else if (fromType == typeof(Quaternion))
                 {
-                    throw new NotImplementedException();
+                    ilgen.Emit(OpCodes.Call, typeof(Quaternion).GetProperty("IsLSLTrue").GetGetMethod());
                 }
                 else if (fromType == typeof(Vector3))
                 {
@@ -1359,7 +1411,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    throw new CompilerException(lineNumber, string.Format("unsupported typecast from {0} to {1}", MapType(fromType), MapType(toType)));
                 }
             }
             else if(toType == typeof(double))
@@ -1375,7 +1427,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    throw new CompilerException(lineNumber, string.Format("unsupported typecast from {0} to {1}", MapType(fromType), MapType(toType)));
                 }
             }
             else if(toType == typeof(Vector3))
@@ -1386,7 +1438,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    throw new CompilerException(lineNumber, string.Format("unsupported typecast from {0} to {1}", MapType(fromType), MapType(toType)));
                 }
             }
             else if(toType == typeof(Quaternion))
@@ -1397,7 +1449,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    throw new CompilerException(lineNumber, string.Format("unsupported typecast from {0} to {1}", MapType(fromType), MapType(toType)));
                 }
             }
             else if(toType == typeof(AnArray))
@@ -1426,12 +1478,12 @@ namespace SilverSim.Scripting.LSL
                 }
                 else
                 {
-                    throw new NotSupportedException();
+                    throw new CompilerException(lineNumber, string.Format("unsupported typecast from {0} to {1}", MapType(fromType), MapType(toType)));
                 }
             }
             else
             {
-                throw new NotSupportedException();
+                throw new CompilerException(lineNumber, string.Format("unsupported typecast from {0} to {1}", MapType(fromType), MapType(toType)));
             }
         }
 
@@ -1536,13 +1588,13 @@ namespace SilverSim.Scripting.LSL
             ILGenerator ilgen,
             int startAt,
             int endAt,
-            List<string> functionLine,
+            LineInfo functionLine,
             Dictionary<string, object> localVars)
         {
-            if (functionLine[startAt + 1] == "=")
+            if (functionLine.Line[startAt + 1] == "=")
             {
                 /* variable assignment */
-                string varName = functionLine[startAt + 0];
+                string varName = functionLine.Line[startAt + 0];
                 if (localVars[varName] is LocalBuilder)
                 {
                     LocalBuilder lb = (LocalBuilder)localVars[varName];
@@ -1615,7 +1667,7 @@ namespace SilverSim.Scripting.LSL
             TypeBuilder stateTypeBuilder,
             Type returnType,
             ILGenerator ilgen,
-            List<List<string>> functionBody,
+            List<LineInfo> functionBody,
             Dictionary<string, object> localVars,
             Dictionary<string, Label> labels,
             ref int lineIndex)
@@ -1635,16 +1687,16 @@ namespace SilverSim.Scripting.LSL
 
             for (; lineIndex < functionBody.Count; ++lineIndex)
             {
-                List<string> functionLine = new List<string>();
+                LineInfo functionLine = functionBody[lineIndex];
                 LocalBuilder lb;
-                switch (functionLine[0])
+                switch (functionLine.Line[0])
                 {
                     /* type named things are variable declaration */
                     case "integer":
                         lb = ilgen.DeclareLocal(typeof(int));
-                        lb.SetLocalSymInfo(functionLine[1]);
-                        localVars[functionLine[1]] = lb;
-                        if (functionLine[2] != ";")
+                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        localVars[functionLine.Line[1]] = lb;
+                        if (functionLine.Line[2] != ";")
                         {
                             ProcessExpression(
                                 compileState, 
@@ -1653,7 +1705,7 @@ namespace SilverSim.Scripting.LSL
                                 ilgen, 
                                 typeof(int),
                                 3, 
-                                functionLine.Count - 2, 
+                                functionLine.Line.Count - 2, 
                                 functionLine, 
                                 localVars);
                         }
@@ -1666,9 +1718,9 @@ namespace SilverSim.Scripting.LSL
 
                     case "vector":
                         lb = ilgen.DeclareLocal(typeof(Vector3));
-                        lb.SetLocalSymInfo(functionLine[1]);
-                        localVars[functionLine[1]] = lb;
-                        if (functionLine[2] != ";")
+                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        localVars[functionLine.Line[1]] = lb;
+                        if (functionLine.Line[2] != ";")
                         {
                             ProcessExpression(
                                 compileState, 
@@ -1677,7 +1729,7 @@ namespace SilverSim.Scripting.LSL
                                 ilgen, 
                                 typeof(Vector3), 
                                 3, 
-                                functionLine.Count - 2, 
+                                functionLine.Line.Count - 2, 
                                 functionLine, 
                                 localVars);
                         }
@@ -1690,9 +1742,9 @@ namespace SilverSim.Scripting.LSL
 
                     case "list":
                         lb = ilgen.DeclareLocal(typeof(AnArray));
-                        lb.SetLocalSymInfo(functionLine[1]);
-                        localVars[functionLine[1]] = lb;
-                        if (functionLine[2] != ";")
+                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        localVars[functionLine.Line[1]] = lb;
+                        if (functionLine.Line[2] != ";")
                         {
                             ProcessExpression(
                                 compileState,
@@ -1701,7 +1753,7 @@ namespace SilverSim.Scripting.LSL
                                 ilgen, 
                                 typeof(AnArray), 
                                 3,
-                                functionLine.Count - 2,
+                                functionLine.Line.Count - 2,
                                 functionLine, 
                                 localVars);
                         }
@@ -1714,9 +1766,9 @@ namespace SilverSim.Scripting.LSL
 
                     case "float":
                         lb = ilgen.DeclareLocal(typeof(double));
-                        lb.SetLocalSymInfo(functionLine[1]);
-                        localVars[functionLine[1]] = lb;
-                        if (functionLine[2] != ";")
+                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        localVars[functionLine.Line[1]] = lb;
+                        if (functionLine.Line[2] != ";")
                         {
                             ProcessExpression(
                                 compileState,
@@ -1725,7 +1777,7 @@ namespace SilverSim.Scripting.LSL
                                 ilgen, 
                                 typeof(double), 
                                 3,
-                                functionLine.Count - 2,
+                                functionLine.Line.Count - 2,
                                 functionLine, localVars);
                         }
                         else
@@ -1737,9 +1789,9 @@ namespace SilverSim.Scripting.LSL
 
                     case "string":
                         lb = ilgen.DeclareLocal(typeof(string));
-                        lb.SetLocalSymInfo(functionLine[1]);
-                        localVars[functionLine[1]] = lb;
-                        if (functionLine[2] != ";")
+                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        localVars[functionLine.Line[1]] = lb;
+                        if (functionLine.Line[2] != ";")
                         {
                             ProcessExpression(
                                 compileState,
@@ -1748,7 +1800,7 @@ namespace SilverSim.Scripting.LSL
                                 ilgen,
                                 typeof(string),
                                 3,
-                                functionLine.Count - 2, 
+                                functionLine.Line.Count - 2, 
                                 functionLine, 
                                 localVars);
                         }
@@ -1761,9 +1813,9 @@ namespace SilverSim.Scripting.LSL
 
                     case "key":
                         lb = ilgen.DeclareLocal(typeof(LSLKey));
-                        lb.SetLocalSymInfo(functionLine[1]);
-                        localVars[functionLine[1]] = lb;
-                        if (functionLine[2] != ";")
+                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        localVars[functionLine.Line[1]] = lb;
+                        if (functionLine.Line[2] != ";")
                         {
                             ProcessExpression(
                                 compileState,
@@ -1772,7 +1824,7 @@ namespace SilverSim.Scripting.LSL
                                 ilgen,
                                 typeof(LSLKey),
                                 3,
-                                functionLine.Count - 2,
+                                functionLine.Line.Count - 2,
                                 functionLine,
                                 localVars);
                         }
@@ -1785,9 +1837,9 @@ namespace SilverSim.Scripting.LSL
 
                     case "rotation":
                         lb = ilgen.DeclareLocal(typeof(Quaternion));
-                        lb.SetLocalSymInfo(functionLine[1]);
-                        localVars[functionLine[1]] = lb;
-                        if (functionLine[2] != ";")
+                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        localVars[functionLine.Line[1]] = lb;
+                        if (functionLine.Line[2] != ";")
                         {
                             ProcessExpression(
                                 compileState, 
@@ -1795,8 +1847,8 @@ namespace SilverSim.Scripting.LSL
                                 stateTypeBuilder, 
                                 ilgen, 
                                 typeof(Quaternion),
-                                3, 
-                                functionLine.Count - 2,
+                                3,
+                                functionLine.Line.Count - 2,
                                 functionLine, 
                                 localVars);
                         }
@@ -1812,28 +1864,28 @@ namespace SilverSim.Scripting.LSL
                             int semicolon1, semicolon2;
                             int endoffor;
                             int countparens = 0;
-                            for(endoffor = 0; endoffor <= functionLine.Count; ++endoffor)
+                            for (endoffor = 0; endoffor <= functionLine.Line.Count; ++endoffor)
                             {
-                                if(functionLine[endoffor] == ")")
+                                if (functionLine.Line[endoffor] == ")")
                                 {
                                     if(--countparens == 0)
                                     {
                                         break;
                                     }
                                 }
-                                else if(functionLine[endoffor] == "(")
+                                else if (functionLine.Line[endoffor] == "(")
                                 {
                                     ++countparens;
                                 }
                             }
 
-                            if(endoffor >= functionLine.Count)
+                            if (endoffor >= functionLine.Line.Count)
                             {
                                 throw new Exception();
                             }
 
-                            semicolon1 = functionLine.IndexOf(";");
-                            semicolon2 = functionLine.IndexOf(";", semicolon1 + 1);
+                            semicolon1 = functionLine.Line.IndexOf(";");
+                            semicolon2 = functionLine.Line.IndexOf(";", semicolon1 + 1);
                             if (2 != semicolon1)
                             {
                                 ProcessStatement(
@@ -1854,7 +1906,7 @@ namespace SilverSim.Scripting.LSL
                                 ilgen.Emit(OpCodes.Br, endlabel);
 
                                 ilgen.MarkLabel(beginlabel);
-                                if (functionLine[functionLine.Count - 1] == "{")
+                                if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                                 {
                                     /* block */
                                     ilgen.BeginScope();
@@ -1870,7 +1922,7 @@ namespace SilverSim.Scripting.LSL
                                         labels,
                                         ref lineIndex);
                                 }
-                                else if(endoffor + 1 != functionLine.Count - 1)
+                                else if (endoffor + 1 != functionLine.Line.Count - 1)
                                 {
                                     /* single statement */
                                     ProcessStatement(
@@ -1879,7 +1931,7 @@ namespace SilverSim.Scripting.LSL
                                         stateTypeBuilder,
                                         ilgen, 
                                         endoffor + 1,
-                                        functionLine.Count - 2,
+                                        functionLine.Line.Count - 2,
                                         functionLine, 
                                         localVars);
                                 }
@@ -1915,7 +1967,7 @@ namespace SilverSim.Scripting.LSL
                             else
                             {
                                 ilgen.MarkLabel(beginlabel);
-                                if (functionLine[functionLine.Count - 1] == "{")
+                                if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                                 {
                                     /* block */
                                     ilgen.BeginScope();
@@ -1939,8 +1991,8 @@ namespace SilverSim.Scripting.LSL
                                         scriptTypeBuilder,
                                         stateTypeBuilder,
                                         ilgen, 
-                                        endoffor + 1, 
-                                        functionLine.Count - 2,
+                                        endoffor + 1,
+                                        functionLine.Line.Count - 2,
                                         functionLine,
                                         localVars);
                                 }
@@ -1953,22 +2005,22 @@ namespace SilverSim.Scripting.LSL
                         {
                             int endofwhile;
                             int countparens = 0;
-                            for (endofwhile = 0; endofwhile <= functionLine.Count; ++endofwhile)
+                            for (endofwhile = 0; endofwhile <= functionLine.Line.Count; ++endofwhile)
                             {
-                                if (functionLine[endofwhile] == ")")
+                                if (functionLine.Line[endofwhile] == ")")
                                 {
                                     if(--countparens == 0)
                                     {
                                         break;
                                     }
                                 }
-                                else if (functionLine[endofwhile] == "(")
+                                else if (functionLine.Line[endofwhile] == "(")
                                 {
                                     ++countparens;
                                 }
                             }
 
-                            if (endofwhile >= functionLine.Count)
+                            if (endofwhile >= functionLine.Line.Count)
                             {
                                 throw new Exception();
                             }
@@ -1978,7 +2030,7 @@ namespace SilverSim.Scripting.LSL
                             ilgen.Emit(OpCodes.Br, endlabel);
 
                             ilgen.MarkLabel(beginlabel);
-                            if (functionLine[functionLine.Count - 1] == "{")
+                            if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 /* block */
                                 ilgen.BeginScope();
@@ -1994,7 +2046,7 @@ namespace SilverSim.Scripting.LSL
                                     labels, 
                                     ref lineIndex);
                             }
-                            else if(endofwhile + 1 != functionLine.Count - 1)
+                            else if (endofwhile + 1 != functionLine.Line.Count - 1)
                             {
                                 /* single statement */
                                 ProcessStatement(
@@ -2003,7 +2055,7 @@ namespace SilverSim.Scripting.LSL
                                     stateTypeBuilder, 
                                     ilgen, 
                                     endofwhile + 1,
-                                    functionLine.Count - 2,
+                                    functionLine.Line.Count - 2,
                                     functionLine, 
                                     localVars);
                             }
@@ -2032,45 +2084,45 @@ namespace SilverSim.Scripting.LSL
                             int countparens = 0;
 
                             #region Find end of do
-                            for (endofdo = 0; endofdo <= functionLine.Count; ++endofdo)
+                            for (endofdo = 0; endofdo <= functionLine.Line.Count; ++endofdo)
                             {
-                                if (functionLine[endofdo] == ")")
+                                if (functionLine.Line[endofdo] == ")")
                                 {
                                     if (--countparens == 0)
                                     {
                                         break;
                                     }
                                 }
-                                else if (functionLine[endofdo] == "(")
+                                else if (functionLine.Line[endofdo] == "(")
                                 {
                                     ++countparens;
                                 }
                             }
 
-                            if (endofdo >= functionLine.Count)
+                            if (endofdo >= functionLine.Line.Count)
                             {
                                 throw new Exception();
                             }
                             #endregion
 
                             #region Find while
-                            if (functionLine[functionLine.Count - 1] != "{")
+                            if (functionLine.Line[functionLine.Line.Count - 1] != "{")
                             {
-                                for (beginofwhile = functionLine.Count - 1; beginofwhile >= 0; --beginofwhile)
+                                for (beginofwhile = functionLine.Line.Count - 1; beginofwhile >= 0; --beginofwhile)
                                 {
-                                    if (functionLine[beginofwhile] == "(")
+                                    if (functionLine.Line[beginofwhile] == "(")
                                     {
                                         if (--countparens == 0)
                                         {
                                             break;
                                         }
                                     }
-                                    else if (functionLine[beginofwhile] == ")")
+                                    else if (functionLine.Line[beginofwhile] == ")")
                                     {
                                         ++countparens;
                                     }
                                 }
-                                if (beginofwhile < 0 || beginofwhile < endofdo + 1 || functionLine[beginofwhile - 1] != "while")
+                                if (beginofwhile < 0 || beginofwhile < endofdo + 1 || functionLine.Line[beginofwhile - 1] != "while")
                                 {
                                     throw new Exception();
                                 }
@@ -2080,7 +2132,7 @@ namespace SilverSim.Scripting.LSL
                             Label beginlabel = ilgen.DefineLabel();
 
                             ilgen.MarkLabel(beginlabel);
-                            if (functionLine[functionLine.Count - 1] == "{")
+                            if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 /* block */
                                 ilgen.BeginScope();
@@ -2101,7 +2153,7 @@ namespace SilverSim.Scripting.LSL
                                     throw new Exception();
                                 }
                                 functionLine = functionBody[lineIndex];
-                                if(functionLine[0] != "while")
+                                if (functionLine.Line[0] != "while")
                                 {
                                     throw new Exception();
                                 }
@@ -2126,8 +2178,8 @@ namespace SilverSim.Scripting.LSL
                                 stateTypeBuilder, 
                                 ilgen, 
                                 typeof(bool), 
-                                beginofwhile + 1, 
-                                functionLine.Count - 2,
+                                beginofwhile + 1,
+                                functionLine.Line.Count - 2,
                                 functionLine,
                                 localVars);
                             ilgen.Emit(OpCodes.Ldc_I4_0);
@@ -2137,18 +2189,18 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "jump":
-                        if (!labels.ContainsKey(functionLine[1]))
+                        if (!labels.ContainsKey(functionLine.Line[1]))
                         {
                             Label label = ilgen.DefineLabel();
-                            labels[functionLine[1]] = label;
+                            labels[functionLine.Line[1]] = label;
                         }
-                        ilgen.Emit(OpCodes.Br, labels[functionLine[1]]);
+                        ilgen.Emit(OpCodes.Br, labels[functionLine.Line[1]]);
                         break;
 
                     case "return":
                         if (returnType == typeof(void))
                         {
-                            if (functionLine[1] != ";")
+                            if (functionLine.Line[1] != ";")
                             {
                                 ProcessExpression(
                                     compileState,
@@ -2156,8 +2208,8 @@ namespace SilverSim.Scripting.LSL
                                     stateTypeBuilder,
                                     ilgen,
                                     typeof(void), 
-                                    1, 
-                                    functionLine.Count - 2, 
+                                    1,
+                                    functionLine.Line.Count - 2, 
                                     functionLine,
                                     localVars);
                             }
@@ -2170,8 +2222,8 @@ namespace SilverSim.Scripting.LSL
                                 stateTypeBuilder,
                                 ilgen,
                                 typeof(int),
-                                1, 
-                                functionLine.Count - 2, 
+                                1,
+                                functionLine.Line.Count - 2, 
                                 functionLine, 
                                 localVars);
                         }
@@ -2183,8 +2235,8 @@ namespace SilverSim.Scripting.LSL
                                 stateTypeBuilder,
                                 ilgen,
                                 typeof(string),
-                                1, 
-                                functionLine.Count - 2, 
+                                1,
+                                functionLine.Line.Count - 2, 
                                 functionLine, 
                                 localVars);
                         }
@@ -2196,8 +2248,8 @@ namespace SilverSim.Scripting.LSL
                                 stateTypeBuilder,
                                 ilgen, 
                                 typeof(double),
-                                1, 
-                                functionLine.Count - 2,
+                                1,
+                                functionLine.Line.Count - 2,
                                 functionLine, 
                                 localVars);
                         }
@@ -2209,8 +2261,8 @@ namespace SilverSim.Scripting.LSL
                                 stateTypeBuilder,
                                 ilgen,
                                 typeof(AnArray),
-                                1, 
-                                functionLine.Count - 2,
+                                1,
+                                functionLine.Line.Count - 2,
                                 functionLine,
                                 localVars);
                         }
@@ -2223,7 +2275,7 @@ namespace SilverSim.Scripting.LSL
                                 ilgen,
                                 typeof(Vector3), 
                                 1,
-                                functionLine.Count - 2,
+                                functionLine.Line.Count - 2,
                                 functionLine, 
                                 localVars);
                         }
@@ -2236,7 +2288,7 @@ namespace SilverSim.Scripting.LSL
                                 ilgen, 
                                 typeof(Quaternion), 
                                 1,
-                                functionLine.Count - 2,
+                                functionLine.Line.Count - 2,
                                 functionLine, 
                                 localVars);
                         }
@@ -2276,8 +2328,8 @@ namespace SilverSim.Scripting.LSL
                             scriptTypeBuilder,
                             stateTypeBuilder,
                             ilgen, 
-                            0, 
-                            functionLine.Count - 2, 
+                            0,
+                            functionLine.Line.Count - 2, 
                             functionLine, 
                             localVars);
                         break;
@@ -2291,11 +2343,11 @@ namespace SilverSim.Scripting.LSL
             TypeBuilder stateTypeBuilder,
             MethodBuilder mb,
             ILGenerator ilgen,
-            List<List<string>> functionBody,
+            List<LineInfo> functionBody,
             Dictionary<string, object> localVars)
         {
             Type returnType = typeof(void);
-            List<string> functionDeclaration = functionBody[0];
+            List<string> functionDeclaration = functionBody[0].Line;
             string functionName = functionDeclaration[1];
             int functionStart = 2;
 
@@ -2370,7 +2422,7 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     default:
-                        throw new CompilerException(0, "Internal Error");
+                        throw compilerException(functionBody[0], "Internal Error");
                 }
                 /* parameter name and type in order */
                 localVars[functionDeclaration[functionStart++]] = mb.GetParameters()[paramidx];
@@ -2498,12 +2550,21 @@ namespace SilverSim.Scripting.LSL
                 varsToInit.RemoveAt(0);
 
                 FieldBuilder fb = compileState.m_VariableFieldInfo[varName];
-                List<string> initargs;
+                LineInfo initargs;
 
                 if(compileState.m_VariableInitValues.TryGetValue(varName, out initargs))
                 {
-                    Tree expressionTree = new Tree(initargs, m_OpChars, m_SingleOps, m_NumericChars);
-                    solveTree(compileState, expressionTree);
+                    Tree expressionTree;
+                    try
+                    {
+                        expressionTree = new Tree(initargs.Line, m_OpChars, m_SingleOps, m_NumericChars);
+                        solveTree(compileState, expressionTree);
+                    }
+                    catch (Exception e)
+                    {
+                        throw compilerException(initargs, string.Format("Init value of variable {0} has syntax error. {1}", varName, e.Message));
+                    }
+
                     if (AreAllVarReferencesSatisfied(compileState, varIsInited, expressionTree))
                     {
                         ProcessExpression(
@@ -2513,6 +2574,7 @@ namespace SilverSim.Scripting.LSL
                             script_ilgen,
                             fb.FieldType,
                             expressionTree,
+                            initargs.LineNumber,
                             typeLocals);
                     }
                     else
@@ -2551,11 +2613,11 @@ namespace SilverSim.Scripting.LSL
 
             #region Function compilation
             /* we have to process the function definition first */
-            foreach (KeyValuePair<string, List<List<string>>> functionKvp in compileState.m_Functions)
+            foreach (KeyValuePair<string, List<LineInfo>> functionKvp in compileState.m_Functions)
             {
                 MethodBuilder method;
                 Type returnType = typeof(void);
-                List<string> functionDeclaration = functionKvp.Value[0];
+                List<string> functionDeclaration = functionKvp.Value[0].Line;
                 string functionName = functionDeclaration[1];
                 int functionStart = 2;
 
@@ -2636,7 +2698,7 @@ namespace SilverSim.Scripting.LSL
                             break;
 
                         default:
-                            throw new CompilerException(0, "Internal Error");
+                            throw compilerException(functionKvp.Value[0], "Internal Error");
                     }
                 }
 
@@ -2644,9 +2706,9 @@ namespace SilverSim.Scripting.LSL
                 compileState.m_FunctionInfo[functionName] = method;
             }
 
-            foreach (KeyValuePair<string, List<List<string>>> functionKvp in compileState.m_Functions)
+            foreach (KeyValuePair<string, List<LineInfo>> functionKvp in compileState.m_Functions)
             {
-                List<string> functionDeclaration = functionKvp.Value[0];
+                List<string> functionDeclaration = functionKvp.Value[0].Line;
                 string functionName = functionDeclaration[1];
                 MethodBuilder method = compileState.m_FunctionInfo[functionName];
                 
@@ -2657,7 +2719,7 @@ namespace SilverSim.Scripting.LSL
             #endregion
 
             #region State compilation
-            foreach (KeyValuePair<string, Dictionary<string, List<List<string>>>> stateKvp in compileState.m_States)
+            foreach (KeyValuePair<string, Dictionary<string, List<LineInfo>>> stateKvp in compileState.m_States)
             {
                 FieldBuilder fb;
                 TypeBuilder state = mb.DefineType(aName.Name + ".State." + stateKvp.Key, TypeAttributes.Public, typeof(object));
@@ -2685,7 +2747,7 @@ namespace SilverSim.Scripting.LSL
                 state_ilgen.Emit(OpCodes.Call, typeConstructor);
                 state_ilgen.Emit(OpCodes.Ret);
 
-                foreach (KeyValuePair<string, List<List<string>>> eventKvp in stateKvp.Value)
+                foreach (KeyValuePair<string, List<LineInfo>> eventKvp in stateKvp.Value)
                 {
                     MethodInfo d = m_EventDelegates[eventKvp.Key];
                     ParameterInfo[] pinfo = d.GetParameters();
