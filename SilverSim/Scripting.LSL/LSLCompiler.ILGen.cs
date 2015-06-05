@@ -670,7 +670,7 @@ namespace SilverSim.Scripting.LSL
                                 if(retLeft == retRight)
                                 {
                                     ilgen.Emit(OpCodes.Dup);
-                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
                                 }
                                 else if(retLeft == typeof(double) && retRight == typeof(int))
                                 {
@@ -711,7 +711,7 @@ namespace SilverSim.Scripting.LSL
                                     throw new CompilerException(lineNumber, string.Format("operator '=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 ilgen.Emit(OpCodes.Dup);
-                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
 
                                 return retLeft;
 
@@ -770,7 +770,7 @@ namespace SilverSim.Scripting.LSL
                                     throw new CompilerException(lineNumber, string.Format("operator '+=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 ilgen.Emit(OpCodes.Dup);
-                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
 
                                 return retLeft;
 
@@ -778,7 +778,7 @@ namespace SilverSim.Scripting.LSL
                                 if(retLeft == retRight)
                                 {
                                     ilgen.Emit(OpCodes.Dup);
-                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
                                 }
                                 else if(retLeft == typeof(double) && retRight == typeof(int))
                                 {
@@ -831,7 +831,7 @@ namespace SilverSim.Scripting.LSL
                                     throw new CompilerException(lineNumber, string.Format("operator '-=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 ilgen.Emit(OpCodes.Dup);
-                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
 
                                 return retLeft;
 
@@ -839,7 +839,7 @@ namespace SilverSim.Scripting.LSL
                                 if(retLeft == retRight)
                                 {
                                     ilgen.Emit(OpCodes.Dup);
-                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
                                 }
                                 else if(retLeft == typeof(double) && retRight == typeof(int))
                                 {
@@ -892,7 +892,7 @@ namespace SilverSim.Scripting.LSL
                                     throw new CompilerException(lineNumber, string.Format("operator '*=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 ilgen.Emit(OpCodes.Dup);
-                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
 
                                 return retLeft;
 
@@ -900,7 +900,7 @@ namespace SilverSim.Scripting.LSL
                                 if(retLeft == retRight)
                                 {
                                     ilgen.Emit(OpCodes.Dup);
-                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
                                 }
                                 else if(retLeft == typeof(double) && retRight == typeof(int))
                                 {
@@ -953,7 +953,7 @@ namespace SilverSim.Scripting.LSL
                                     throw new CompilerException(lineNumber, string.Format("operator '/=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 ilgen.Emit(OpCodes.Dup);
-                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
 
                                 return retLeft;
 
@@ -961,7 +961,7 @@ namespace SilverSim.Scripting.LSL
                                 if(retLeft == retRight)
                                 {
                                     ilgen.Emit(OpCodes.Dup);
-                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
                                 }
                                 else if(retLeft == typeof(double) && retRight == typeof(int))
                                 {
@@ -1015,12 +1015,12 @@ namespace SilverSim.Scripting.LSL
                                     throw new CompilerException(lineNumber, string.Format("operator '%=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
                                 ilgen.Emit(OpCodes.Dup);
-                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
 
                                 return retLeft;
 
                             default:
-                                throw new CompilerException(lineNumber, string.Format("operator '{0}' not supported", functionTree.Entry));
+                                throw new CompilerException(lineNumber, string.Format("binary operator '{0}' not supported", functionTree.Entry));
                         }
                     }
 
@@ -1079,7 +1079,7 @@ namespace SilverSim.Scripting.LSL
                                         ilgen.Emit(OpCodes.Ldc_I4_1);
                                         ilgen.Emit(OpCodes.Add);
                                         ilgen.Emit(OpCodes.Dup);
-                                        SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                        SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, lineNumber);
                                     }
                                     else
                                     {
@@ -1102,7 +1102,7 @@ namespace SilverSim.Scripting.LSL
                                         ilgen.Emit(OpCodes.Ldc_I4_1);
                                         ilgen.Emit(OpCodes.Sub);
                                         ilgen.Emit(OpCodes.Dup);
-                                        SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                        SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, lineNumber);
                                     }
                                     else
                                     {
@@ -1116,7 +1116,7 @@ namespace SilverSim.Scripting.LSL
                                 return ret;
 
                             default:
-                                throw new CompilerException(lineNumber, string.Format("operator '{0}' not supported", functionTree.Entry));
+                                throw new CompilerException(lineNumber, string.Format("left unary operator '{0}' not supported", functionTree.Entry));
                         }
                     }
 
@@ -1135,7 +1135,7 @@ namespace SilverSim.Scripting.LSL
                                         ilgen.Emit(OpCodes.Dup);
                                         ilgen.Emit(OpCodes.Ldc_I4_1);
                                         ilgen.Emit(OpCodes.Add);
-                                        SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                        SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, lineNumber);
                                     }
                                     else
                                     {
@@ -1158,7 +1158,7 @@ namespace SilverSim.Scripting.LSL
                                         ilgen.Emit(OpCodes.Dup);
                                         ilgen.Emit(OpCodes.Ldc_I4_1);
                                         ilgen.Emit(OpCodes.Sub);
-                                        SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                        SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, lineNumber);
                                     }
                                     else
                                     {
@@ -1172,7 +1172,7 @@ namespace SilverSim.Scripting.LSL
                                 return ret;
 
                             default:
-                                throw new CompilerException(lineNumber, string.Format("operator '{0}' not supported", functionTree.Entry));
+                                throw new CompilerException(lineNumber, string.Format("right unary operator '{0}' not supported", functionTree.Entry));
                         }
                     }
 
@@ -1304,6 +1304,52 @@ namespace SilverSim.Scripting.LSL
                         }
                     }
                     return typeof(Vector3);
+
+                case Tree.EntryType.Level:
+                    switch(functionTree.Entry)
+                    {
+                        case "[":
+                            /* we got a list */
+                            ilgen.BeginScope();
+                            {
+                                LocalBuilder lb = ilgen.DeclareLocal(typeof(AnArray));
+                                ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                                ilgen.Emit(OpCodes.Stloc, lb);
+
+                                foreach(Tree st in functionTree.SubTree)
+                                {
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    Type ret = ProcessExpressionPart(compileState, scriptTypeBuilder, stateTypeBuilder, ilgen, functionTree, lineNumber, localVars);
+                                    if(ret == typeof(void))
+                                    {
+                                        throw new CompilerException(lineNumber, "Function has no return value");
+                                    }
+                                    else if(ret == typeof(int) || ret == typeof(double) || ret == typeof(string))
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { ret }));
+                                    }
+                                    else if(ret == typeof(LSLKey) || ret == typeof(Vector3) || ret == typeof(Quaternion))
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { typeof(IValue) }));
+                                    }
+                                    else if(ret == typeof(AnArray))
+                                    {
+                                        throw new CompilerException(lineNumber, "Lists cannot be put into lists");
+                                    }
+                                    else
+                                    {
+                                        throw new CompilerException(lineNumber, "Internal error");
+                                    }
+                                }
+                                ilgen.Emit(OpCodes.Ldloc, lb);
+                            }
+                            ilgen.EndScope();
+                            return typeof(AnArray);
+
+                        default:
+                            throw new CompilerException(lineNumber, string.Format("unexpected level entry '{0}'", functionTree.Entry));
+                    }
+                    break;
 
                 default:
                     throw new CompilerException(lineNumber, string.Format("unexpected '{0}'", functionTree.Entry));
@@ -1545,12 +1591,26 @@ namespace SilverSim.Scripting.LSL
             }
             else if(v is FieldBuilder)
             {
-                ilgen.Emit(OpCodes.Ldfld, ((FieldBuilder)v));
+                if ((((FieldBuilder)v).Attributes & FieldAttributes.Static) != 0)
+                {
+                    ilgen.Emit(OpCodes.Ldsfld, ((FieldBuilder)v));
+                }
+                else
+                {
+                    ilgen.Emit(OpCodes.Ldfld, ((FieldBuilder)v));
+                }
                 retType = ((FieldBuilder)v).FieldType;
             }
             else if (v is FieldInfo)
             {
-                ilgen.Emit(OpCodes.Ldfld, ((FieldInfo)v));
+                if ((((FieldInfo)v).Attributes & FieldAttributes.Static) != 0)
+                {
+                    ilgen.Emit(OpCodes.Ldsfld, ((FieldInfo)v));
+                }
+                else
+                {
+                    ilgen.Emit(OpCodes.Ldfld, ((FieldInfo)v));
+                }
                 retType = ((FieldInfo)v).FieldType;
             }
             else
@@ -1569,7 +1629,8 @@ namespace SilverSim.Scripting.LSL
             TypeBuilder scriptTypeBuilder,
             TypeBuilder stateTypeBuilder,
             ILGenerator ilgen,
-            object v)
+            object v,
+            int lineNumber)
         {
             if (v is ILParameterInfo)
             {
@@ -1581,10 +1642,18 @@ namespace SilverSim.Scripting.LSL
             }
             else if (v is FieldBuilder)
             {
+                if ((((FieldInfo)v).Attributes & FieldAttributes.Static) != 0)
+                {
+                    throw new CompilerException(lineNumber, "Setting constants is not allowed");
+                }
                 ilgen.Emit(OpCodes.Stfld, ((FieldBuilder)v));
             }
             else if (v is FieldInfo)
             {
+                if ((((FieldInfo)v).Attributes & FieldAttributes.Static) != 0)
+                {
+                    throw new CompilerException(lineNumber, "Setting constants is not allowed");
+                }
                 ilgen.Emit(OpCodes.Stfld, ((FieldInfo)v));
             }
             else

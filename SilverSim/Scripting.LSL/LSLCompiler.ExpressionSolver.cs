@@ -120,7 +120,7 @@ namespace SilverSim.Scripting.LSL
         {
             foreach (Tree st in tree.SubTree)
             {
-                solveVariables(cs, tree);
+                solveVariables(cs, st);
 
                 if (st.Type == Tree.EntryType.Unknown)
                 {
