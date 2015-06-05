@@ -82,11 +82,11 @@ namespace SilverSim.Scripting.LSL.API.Experience
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void experience_permissions(UUID agent_id);
+        public delegate void experience_permissions(LSLKey agent_id);
 
         [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
-        public delegate void experience_permissions_denied(UUID agent_id, int reason);
+        public delegate void experience_permissions_denied(LSLKey agent_id, int reason);
 
         [APILevel(APIFlags.LSL)]
         public int llAgentInExperience(ScriptInstance Instance, UUID agent)

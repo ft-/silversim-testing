@@ -143,7 +143,7 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "key":
-                        fp.Type = typeof(UUID);
+                        fp.Type = typeof(LSLKey);
                         break;
 
                     case "rotation":
