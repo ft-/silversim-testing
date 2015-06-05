@@ -151,7 +151,7 @@ namespace SilverSim.Scripting.LSL
                             }
                             else if(pi[i].ParameterType == typeof(LSLKey) && t == typeof(string))
                             {
-                                ilgen.Emit(OpCodes.Call, typeof(LSLKey).GetConstructor(new Type[] { t }));
+                                ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { t }));
                             }
                             else if(pi[i].ParameterType == typeof(double) && t == typeof(int))
                             {
@@ -1167,7 +1167,7 @@ namespace SilverSim.Scripting.LSL
                         ilgen.Emit(OpCodes.Ldc_R8, v.Value.Y);
                         ilgen.Emit(OpCodes.Ldc_R8, v.Value.Z);
                         ilgen.Emit(OpCodes.Ldc_R8, v.Value.W);
-                        ilgen.Emit(OpCodes.Call, typeof(Quaternion).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double), typeof(double) }));
+                        ilgen.Emit(OpCodes.Newobj, typeof(Quaternion).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double), typeof(double) }));
                         return typeof(Quaternion);
 
                     }
@@ -1177,7 +1177,7 @@ namespace SilverSim.Scripting.LSL
                         ilgen.Emit(OpCodes.Ldc_R8, v.Value.X);
                         ilgen.Emit(OpCodes.Ldc_R8, v.Value.Y);
                         ilgen.Emit(OpCodes.Ldc_R8, v.Value.Z);
-                        ilgen.Emit(OpCodes.Call, typeof(Vector3).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double) }));
+                        ilgen.Emit(OpCodes.Newobj, typeof(Vector3).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double) }));
                         return typeof(Vector3);
                     }
                     else if(functionTree.Value is Tree.ConstantValueFloat)
@@ -1496,7 +1496,7 @@ namespace SilverSim.Scripting.LSL
             if(retType == typeof(AnArray))
             {
                 /* list has deep copying */
-                ilgen.Emit(OpCodes.Call, typeof(AnArray).GetConstructor( new Type[] { retType }));
+                ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[] { retType }));
             }
             return retType;
         }
