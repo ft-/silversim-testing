@@ -106,6 +106,13 @@ namespace SilverSim.Types
         {
             base.Add(new Integer(val));
         }
+
+        public static AnArray operator +(AnArray a, AnArray b)
+        {
+            AnArray n = new AnArray(a);
+            n.AddRange(b);
+            return n;
+        }
         #endregion Add methods
 
         #region Helper

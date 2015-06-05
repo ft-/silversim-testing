@@ -67,11 +67,1184 @@ namespace SilverSim.Scripting.LSL
             Tree functionTree,
             Dictionary<string, object> localVars)
         {
-            Type actualReturnType = typeof(void);
+            Type retType = ProcessExpressionPart(
+                compileState,
+                scriptTypeBuilder,
+                stateTypeBuilder,
+                ilgen,
+                functionTree,
+                localVars);
+            if(retType == typeof(string) && expectedType == typeof(LSLKey))
+            {
+
+            }
+            else if(retType == typeof(LSLKey) && expectedType == typeof(string))
+            {
+
+            }
+            else if(retType == typeof(int) && expectedType == typeof(double))
+            {
+
+            }
+            else if(retType == typeof(bool))
+            {
+
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
             ProcessCasts(
-                ilgen, 
-                expectedType, 
-                actualReturnType);
+                ilgen,
+                expectedType,
+                retType);
+        }
+
+        Type ProcessExpressionPart(
+            CompileState compileState,
+            TypeBuilder scriptTypeBuilder,
+            TypeBuilder stateTypeBuilder,
+            ILGenerator ilgen,
+            Tree functionTree,
+            Dictionary<string, object> localVars)
+        {
+            switch(functionTree.Type)
+            {
+                case Tree.EntryType.ExpressionTree:
+                    return ProcessExpressionPart(
+                        compileState, 
+                        scriptTypeBuilder, 
+                        stateTypeBuilder, 
+                        ilgen,
+                        functionTree.SubTree[0], 
+                        localVars);
+
+                case Tree.EntryType.Function:
+                    {
+                        MethodBuilder mb = compileState.m_FunctionInfo[functionTree.Entry];
+
+                        ParameterInfo[] pi = mb.GetParameters();
+
+                        if (mb.DeclaringType == stateTypeBuilder)
+                        {
+                            ilgen.Emit(OpCodes.Ldarg_0);
+                        }
+                        else if(mb.DeclaringType == scriptTypeBuilder)
+                        {
+                            ilgen.Emit(OpCodes.Ldfld, stateTypeBuilder.GetField("Instance"));
+                        }
+                        else
+                        {
+                            throw new NotImplementedException();
+                        }
+
+                        for (int i = 0; i < functionTree.SubTree.Count; ++i)
+                        {
+                            Type t = ProcessExpressionPart(compileState, scriptTypeBuilder, stateTypeBuilder, ilgen, functionTree, localVars);
+                            if(pi[i].ParameterType == t)
+                            {
+                                /* fully matching */
+                            }
+                            else if(pi[i].ParameterType == typeof(string) && t == typeof(LSLKey))
+                            {
+                                ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[] { t }));
+                            }
+                            else if(pi[i].ParameterType == typeof(LSLKey) && t == typeof(string))
+                            {
+                                ilgen.Emit(OpCodes.Call, typeof(LSLKey).GetConstructor(new Type[] { t }));
+                            }
+                            else if(pi[i].ParameterType == typeof(double) && t == typeof(int))
+                            {
+                                ilgen.Emit(OpCodes.Conv_R8);
+                            }
+                            else if(pi[i].ParameterType == typeof(AnArray))
+                            {
+                                ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                                if(t == typeof(int) || t == typeof(string) || t == typeof(double))
+                                {
+                                    ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { t }));
+                                }
+                                else
+                                {
+                                    ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { typeof(IValue) }));
+                                }
+                            }
+                            else
+                            {
+                                throw new ArgumentException();
+                            }
+                        }
+
+                        ilgen.Emit(OpCodes.Callvirt, mb);
+                        return mb.ReturnType;
+                    }
+
+                case Tree.EntryType.StringValue:
+                    /* string value */
+                    {
+                        Tree.ConstantValueString val = (Tree.ConstantValueString)functionTree.Value;
+                        ilgen.Emit(OpCodes.Ldstr, val.Value);
+                        return typeof(string);
+                    }
+
+                case Tree.EntryType.OperatorBinary:
+                    /* right first */
+                    /* left then */
+                    {
+                        Type retRight = ProcessExpressionPart(
+                            compileState, 
+                            scriptTypeBuilder,
+                            stateTypeBuilder,
+                            ilgen, 
+                            functionTree.SubTree[1],
+                            localVars);
+
+                        Type retLeft;
+                        object varInfo = null;
+                        if (functionTree.Entry == "=")
+                        {
+                            varInfo = localVars[functionTree.SubTree[0].Entry];
+                            retLeft = GetVarType(scriptTypeBuilder, stateTypeBuilder, varInfo);
+                        }
+                        else if(functionTree.Entry == "+=" || functionTree.Entry == "-=" || functionTree.Entry == "*=" || functionTree.Entry == "/=" || functionTree.Entry == "%=")
+                        {
+                            if (functionTree.SubTree[0].Type != Tree.EntryType.Variable && functionTree.SubTree[0].Type != Tree.EntryType.Unknown)
+                            {
+                                throw new NotSupportedException();
+                            }
+                            else
+                            {
+                                varInfo = localVars[functionTree.SubTree[0].Entry];
+                                retLeft = GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                            }
+                        }
+                        else
+                        {
+                            retLeft = ProcessExpressionPart(
+                                compileState,
+                                scriptTypeBuilder,
+                                stateTypeBuilder,
+                                ilgen,
+                                functionTree.SubTree[0],
+                                localVars);
+                        }
+
+                        if(functionTree.Entry == "=")
+                        {
+                            /* skip conversion here */
+                        }
+                        else if(retLeft == typeof(AnArray) && retRight == typeof(AnArray))
+                        {
+                            /* LSL compares list length */
+                            ilgen.BeginScope();
+                            LocalBuilder lb = ilgen.DeclareLocal(retLeft);
+                            ilgen.Emit(OpCodes.Stloc, lb);
+                            ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetProperty("Length").GetGetMethod());
+                            ilgen.Emit(OpCodes.Ldloc, lb);
+                            ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetProperty("Length").GetGetMethod());
+                            ilgen.EndScope();
+                            retLeft = typeof(int);
+                            retRight = typeof(int);
+                        }
+                        else if(retLeft == retRight)
+                        {
+
+                        }
+                        else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
+                        {
+                            ilgen.BeginScope();
+                            LocalBuilder lb = ilgen.DeclareLocal(retLeft);
+                            ilgen.Emit(OpCodes.Stloc, lb);
+                            ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
+                            ilgen.Emit(OpCodes.Ldloc, lb);
+                            ilgen.EndScope();
+                            retRight = typeof(string);
+                        }
+                        else if(retLeft == typeof(LSLKey) && retRight == typeof(string))
+                        {
+                            ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
+                            retLeft = typeof(string);
+                        }
+                        else if(retLeft == typeof(double) && retRight == typeof(int))
+                        {
+                            ilgen.BeginScope();
+                            LocalBuilder lb = ilgen.DeclareLocal(retLeft);
+                            ilgen.Emit(OpCodes.Stloc, lb);
+                            ilgen.Emit(OpCodes.Conv_R8);
+                            ilgen.Emit(OpCodes.Ldloc, lb);
+                            ilgen.EndScope();
+                            retRight = typeof(double);
+                        }
+                        else if(retLeft == typeof(int) && retRight == typeof(double))
+                        {
+                            ilgen.Emit(OpCodes.Conv_R8);
+                            retLeft = typeof(double);
+                        }
+                        else if(retRight == typeof(AnArray))
+                        {
+                            ilgen.BeginScope();
+                            LocalBuilder lb = ilgen.DeclareLocal(retLeft);
+                            ilgen.Emit(OpCodes.Stloc, lb);
+                            if (retLeft == typeof(LSLKey) || retLeft == typeof(Quaternion) || retLeft == typeof(Vector3))
+                            {
+                                ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                                ilgen.Emit(OpCodes.Dup);
+                                ilgen.Emit(OpCodes.Ldloc, lb);
+                                ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { typeof(IValue) }));
+                            }
+                            else
+                            {
+                                ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                                ilgen.Emit(OpCodes.Dup);
+                                ilgen.Emit(OpCodes.Ldloc, lb);
+                                ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { retLeft }));
+                            }
+                            ilgen.EndScope();
+                        }
+                        else if(retLeft == typeof(AnArray))
+                        {
+                            ilgen.BeginScope();
+                            LocalBuilder lb = ilgen.DeclareLocal(retLeft);
+                            ilgen.Emit(OpCodes.Stloc, lb);
+                            ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                            ilgen.Emit(OpCodes.Dup);
+                            ilgen.Emit(OpCodes.Ldloc, lb);
+                            if (retRight == typeof(LSLKey) || retRight == typeof(Quaternion) || retRight == typeof(Vector3))
+                            {
+                                ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { typeof(IValue) }));
+                            }
+                            else
+                            {
+                                ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { retRight }));
+                            }
+                            ilgen.EndScope();
+                        }
+                        else
+                        {
+                            throw new NotSupportedException();
+                        }
+
+                        {
+                            ilgen.BeginScope();
+                            LocalBuilder lbLeft = ilgen.DeclareLocal(retLeft);
+                            LocalBuilder lbRight = ilgen.DeclareLocal(retRight);
+                            ilgen.Emit(OpCodes.Stloc, lbRight);
+                            ilgen.Emit(OpCodes.Stloc, lbLeft);
+                            ilgen.Emit(OpCodes.Ldloc, lbLeft);
+                            ilgen.Emit(OpCodes.Ldloc, lbRight);
+                            ilgen.EndScope();
+                        }
+
+                        switch(functionTree.Entry)
+                        {
+                            case "+":
+                                if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Add);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Addition", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "-":
+                                if (retLeft == typeof(int) || retLeft == typeof(double))
+                                {
+                                    ilgen.Emit(OpCodes.Sub);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Subtraction", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "*":
+                                if (retLeft == typeof(int) || retLeft == typeof(double))
+                                {
+                                    ilgen.Emit(OpCodes.Mul);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Multiplication", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "/":
+                                if (retLeft == typeof(int) || retLeft == typeof(double))
+                                {
+                                    ilgen.Emit(OpCodes.Div);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Division", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "%":
+                                if (retLeft == typeof(int) || retLeft == typeof(double))
+                                {
+                                    ilgen.Emit(OpCodes.Rem);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Remainder", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "<<":
+                                if (retLeft == typeof(int))
+                                {
+                                    ilgen.Emit(OpCodes.Shl);
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case ">>":
+                                if (retLeft == typeof(int))
+                                {
+                                    ilgen.Emit(OpCodes.Shr);
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "==":
+                                if (retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Ceq);
+                                }
+                                else if(retLeft == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Callvirt, retLeft.GetMethod("Equals", new Type[] { retLeft }));
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Equality", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "!=":
+                                if (retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Ceq);
+                                    ilgen.Emit(OpCodes.Ldc_I4_0);
+                                    ilgen.Emit(OpCodes.Ceq);
+                                }
+                                else if (retLeft == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Callvirt, retLeft.GetMethod("Equals", new Type[] { retLeft }));
+                                    ilgen.Emit(OpCodes.Ldc_I4_0);
+                                    ilgen.Emit(OpCodes.Ceq);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Inequality", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "<=":
+                                if (retLeft == typeof(int) || retLeft == typeof(double))
+                                {
+                                    ilgen.Emit(OpCodes.Cgt);
+                                    ilgen.Emit(OpCodes.Ldc_I4_0);
+                                    ilgen.Emit(OpCodes.Ceq);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_LessThanOrEqual", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "<":
+                                if (retLeft == typeof(int) || retLeft == typeof(double))
+                                {
+                                    ilgen.Emit(OpCodes.Clt);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_LessThan", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case ">":
+                                if (retLeft == typeof(int) || retLeft == typeof(double))
+                                {
+                                    ilgen.Emit(OpCodes.Cgt);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_GreaterThan", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case ">=":
+                                if (retLeft == typeof(int) || retLeft == typeof(double))
+                                {
+                                    ilgen.Emit(OpCodes.Clt);
+                                    ilgen.Emit(OpCodes.Ldc_I4_0);
+                                    ilgen.Emit(OpCodes.Ceq);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_GreaterThanOrEqual", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "&&":
+                                if (typeof(int) != retLeft)
+                                {
+                                    ilgen.BeginScope();
+                                    LocalBuilder lb = ilgen.DeclareLocal(retLeft);
+                                    ilgen.Emit(OpCodes.Stloc, lb);
+                                    ProcessCasts(ilgen, typeof(bool), retLeft);
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    ilgen.EndScope();
+                                }
+                                if(typeof(int) != retRight)
+                                {
+                                    ProcessCasts(ilgen, typeof(bool), retRight);
+                                }
+                                ilgen.Emit(OpCodes.And);
+                                return retLeft;
+
+                            case "&":
+                                if(typeof(int) == retLeft)
+                                {
+                                    ilgen.Emit(OpCodes.And);
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "|":
+                                if(typeof(int) == retLeft)
+                                {
+                                    ilgen.Emit(OpCodes.Or);
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "^":
+                                if(typeof(int) == retLeft)
+                                {
+                                    ilgen.Emit(OpCodes.Xor);
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return retLeft;
+
+                            case "||":
+                                if (typeof(int) != retLeft)
+                                {
+                                    ilgen.BeginScope();
+                                    LocalBuilder lb = ilgen.DeclareLocal(retLeft);
+                                    ilgen.Emit(OpCodes.Stloc, lb);
+                                    ProcessCasts(ilgen, typeof(bool), retLeft);
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    ilgen.EndScope();
+                                }
+                                if (typeof(int) != retRight)
+                                {
+                                    ProcessCasts(ilgen, typeof(bool), retRight);
+                                }
+                                ilgen.Emit(OpCodes.Or);
+                                return retLeft;
+
+                            case "=":
+                                if(retLeft == retRight)
+                                {
+                                    ilgen.Emit(OpCodes.Dup);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                }
+                                else if(retLeft == typeof(double) && retRight == typeof(int))
+                                {
+                                    ilgen.Emit(OpCodes.Conv_R8);
+                                }
+                                else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
+                                }
+                                else if (retLeft == typeof(LSLKey) && retRight == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { typeof(string) }));
+                                }
+                                else if (retLeft == typeof(AnArray))
+                                {
+                                    ilgen.BeginScope();
+                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
+                                    ilgen.Emit(OpCodes.Stloc, lb);
+                                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    if(typeof(int) == retRight || typeof(double) == retRight || typeof(string) == retRight)
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { retRight }));
+                                    }
+                                    else if(typeof(LSLKey) == retRight || typeof(Vector3) == retRight || typeof(Quaternion) == retRight)
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { typeof(IValue) }));
+                                    }
+                                    else
+                                    {
+                                        throw new NotSupportedException();
+                                    }
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    ilgen.EndScope();
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                ilgen.Emit(OpCodes.Dup);
+                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+
+                                return retLeft;
+
+                            case "+=":
+                                if(retLeft == retRight)
+                                {
+                                }
+                                else if(retLeft == typeof(double) && retRight == typeof(int))
+                                {
+                                    ilgen.Emit(OpCodes.Conv_R8);
+                                }
+                                else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
+                                }
+                                else if (retLeft == typeof(LSLKey) && retRight == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { typeof(string) }));
+                                }
+                                else if (retLeft == typeof(AnArray))
+                                {
+                                    ilgen.BeginScope();
+                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
+                                    ilgen.Emit(OpCodes.Stloc, lb);
+                                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    if(typeof(int) == retRight || typeof(double) == retRight || typeof(string) == retRight)
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { retRight }));
+                                    }
+                                    else if(typeof(LSLKey) == retRight || typeof(Vector3) == retRight || typeof(Quaternion) == retRight)
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { typeof(IValue) }));
+                                    }
+                                    else
+                                    {
+                                        throw new NotSupportedException();
+                                    }
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    ilgen.EndScope();
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Add);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Addition", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                ilgen.Emit(OpCodes.Dup);
+                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+
+                                return retLeft;
+
+                            case "-=":
+                                if(retLeft == retRight)
+                                {
+                                    ilgen.Emit(OpCodes.Dup);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                }
+                                else if(retLeft == typeof(double) && retRight == typeof(int))
+                                {
+                                    ilgen.Emit(OpCodes.Conv_R8);
+                                }
+                                else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
+                                }
+                                else if (retLeft == typeof(LSLKey) && retRight == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { typeof(string) }));
+                                }
+                                else if (retLeft == typeof(AnArray))
+                                {
+                                    ilgen.BeginScope();
+                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
+                                    ilgen.Emit(OpCodes.Stloc, lb);
+                                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    if(typeof(int) == retRight || typeof(double) == retRight || typeof(string) == retRight)
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { retRight }));
+                                    }
+                                    else if(typeof(LSLKey) == retRight || typeof(Vector3) == retRight || typeof(Quaternion) == retRight)
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { typeof(IValue) }));
+                                    }
+                                    else
+                                    {
+                                        throw new NotSupportedException();
+                                    }
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    ilgen.EndScope();
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Sub);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Subtraction", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                ilgen.Emit(OpCodes.Dup);
+                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+
+                                return retLeft;
+
+                            case "*=":
+                                if(retLeft == retRight)
+                                {
+                                    ilgen.Emit(OpCodes.Dup);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                }
+                                else if(retLeft == typeof(double) && retRight == typeof(int))
+                                {
+                                    ilgen.Emit(OpCodes.Conv_R8);
+                                }
+                                else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
+                                }
+                                else if (retLeft == typeof(LSLKey) && retRight == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { typeof(string) }));
+                                }
+                                else if (retLeft == typeof(AnArray))
+                                {
+                                    ilgen.BeginScope();
+                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
+                                    ilgen.Emit(OpCodes.Stloc, lb);
+                                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    if(typeof(int) == retRight || typeof(double) == retRight || typeof(string) == retRight)
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { retRight }));
+                                    }
+                                    else if(typeof(LSLKey) == retRight || typeof(Vector3) == retRight || typeof(Quaternion) == retRight)
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { typeof(IValue) }));
+                                    }
+                                    else
+                                    {
+                                        throw new NotSupportedException();
+                                    }
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    ilgen.EndScope();
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Mul);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Multiplication", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                ilgen.Emit(OpCodes.Dup);
+                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+
+                                return retLeft;
+
+                            case "/=":
+                                if(retLeft == retRight)
+                                {
+                                    ilgen.Emit(OpCodes.Dup);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                }
+                                else if(retLeft == typeof(double) && retRight == typeof(int))
+                                {
+                                    ilgen.Emit(OpCodes.Conv_R8);
+                                }
+                                else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
+                                }
+                                else if (retLeft == typeof(LSLKey) && retRight == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { typeof(string) }));
+                                }
+                                else if (retLeft == typeof(AnArray))
+                                {
+                                    ilgen.BeginScope();
+                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
+                                    ilgen.Emit(OpCodes.Stloc, lb);
+                                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    if(typeof(int) == retRight || typeof(double) == retRight || typeof(string) == retRight)
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { retRight }));
+                                    }
+                                    else if(typeof(LSLKey) == retRight || typeof(Vector3) == retRight || typeof(Quaternion) == retRight)
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { typeof(IValue) }));
+                                    }
+                                    else
+                                    {
+                                        throw new NotSupportedException();
+                                    }
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    ilgen.EndScope();
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Div);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Division", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                ilgen.Emit(OpCodes.Dup);
+                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+
+                                return retLeft;
+
+                            case "%=":
+                                if(retLeft == retRight)
+                                {
+                                    ilgen.Emit(OpCodes.Dup);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+                                }
+                                else if(retLeft == typeof(double) && retRight == typeof(int))
+                                {
+                                    ilgen.Emit(OpCodes.Conv_R8);
+                                }
+                                else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
+                                {
+                                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
+                                }
+                                else if (retLeft == typeof(LSLKey) && retRight == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { typeof(string) }));
+                                }
+                                else if (retLeft == typeof(AnArray))
+                                {
+                                    ilgen.BeginScope();
+                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
+                                    ilgen.Emit(OpCodes.Stloc, lb);
+                                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    if(typeof(int) == retRight || typeof(double) == retRight || typeof(string) == retRight)
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { retRight }));
+                                    }
+                                    else if(typeof(LSLKey) == retRight || typeof(Vector3) == retRight || typeof(Quaternion) == retRight)
+                                    {
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { typeof(IValue) }));
+                                    }
+                                    else
+                                    {
+                                        throw new NotSupportedException();
+                                    }
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    ilgen.EndScope();
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Rem);
+                                }
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
+                                {
+                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Remainder", new Type[] { retLeft, retRight }));
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                ilgen.Emit(OpCodes.Dup);
+                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo);
+
+                                return retLeft;
+
+                            default:
+                                throw new NotSupportedException();
+                        }
+                    }
+
+                case Tree.EntryType.OperatorLeftUnary:
+                    {
+                        Type ret;
+
+                        switch (functionTree.Entry)
+                        {
+                            case "!":
+                                ret = ProcessExpressionPart(
+                                    compileState,
+                                    scriptTypeBuilder,
+                                    stateTypeBuilder,
+                                    ilgen,
+                                    functionTree.SubTree[0],
+                                    localVars);
+                                if (ret == typeof(int))
+                                {
+                                    ilgen.Emit(OpCodes.Ldc_I4_0);
+                                    ilgen.Emit(OpCodes.Ceq);
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return ret;
+
+                            case "~":
+                                ret = ProcessExpressionPart(
+                                    compileState,
+                                    scriptTypeBuilder,
+                                    stateTypeBuilder,
+                                    ilgen,
+                                    functionTree.SubTree[0],
+                                    localVars);
+                                if (ret == typeof(int))
+                                {
+                                    ilgen.Emit(OpCodes.Neg);
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return ret;
+
+                            case "++":
+                                if(functionTree.SubTree[0].Type == Tree.EntryType.Variable || functionTree.SubTree[0].Type == Tree.EntryType.Unknown)
+                                {
+                                    object v = localVars[functionTree.SubTree[0].Entry];
+                                    ret = GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    if(ret == typeof(int))
+                                    {
+                                        ilgen.Emit(OpCodes.Ldc_I4_1);
+                                        ilgen.Emit(OpCodes.Add);
+                                        ilgen.Emit(OpCodes.Dup);
+                                        SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    }
+                                    else
+                                    {
+                                        throw new NotSupportedException();
+                                    }
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return ret;
+
+                            case "--":
+                                if(functionTree.SubTree[0].Type == Tree.EntryType.Variable || functionTree.SubTree[0].Type == Tree.EntryType.Unknown)
+                                {
+                                    object v = localVars[functionTree.SubTree[0].Entry];
+                                    ret = GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    if(ret == typeof(int))
+                                    {
+                                        ilgen.Emit(OpCodes.Ldc_I4_1);
+                                        ilgen.Emit(OpCodes.Sub);
+                                        ilgen.Emit(OpCodes.Dup);
+                                        SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    }
+                                    else
+                                    {
+                                        throw new NotSupportedException();
+                                    }
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return ret;
+
+                            default:
+                                throw new NotSupportedException();
+                        }
+                    }
+
+                case Tree.EntryType.OperatorRightUnary:
+                    {
+                        Type ret;
+                        switch (functionTree.Entry)
+                        {
+                            case "++":
+                                if (functionTree.SubTree[0].Type == Tree.EntryType.Variable || functionTree.SubTree[0].Type == Tree.EntryType.Unknown)
+                                {
+                                    object v = localVars[functionTree.SubTree[0].Entry];
+                                    ret = GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    if (ret == typeof(int))
+                                    {
+                                        ilgen.Emit(OpCodes.Dup);
+                                        ilgen.Emit(OpCodes.Ldc_I4_1);
+                                        ilgen.Emit(OpCodes.Add);
+                                        SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    }
+                                    else
+                                    {
+                                        throw new NotSupportedException();
+                                    }
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return ret;
+
+                            case "--":
+                                if (functionTree.SubTree[0].Type == Tree.EntryType.Variable || functionTree.SubTree[0].Type == Tree.EntryType.Unknown)
+                                {
+                                    object v = localVars[functionTree.SubTree[0].Entry];
+                                    ret = GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    if (ret == typeof(int))
+                                    {
+                                        ilgen.Emit(OpCodes.Dup);
+                                        ilgen.Emit(OpCodes.Ldc_I4_1);
+                                        ilgen.Emit(OpCodes.Sub);
+                                        SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    }
+                                    else
+                                    {
+                                        throw new NotSupportedException();
+                                    }
+                                }
+                                else
+                                {
+                                    throw new NotSupportedException();
+                                }
+                                return ret;
+
+                            default:
+                                throw new NotSupportedException();
+                        }
+                    }
+
+                case Tree.EntryType.ReservedWord:
+                    throw new NotSupportedException();
+
+                case Tree.EntryType.Rotation:
+                    /* rotation */
+                    {
+                        if(null != functionTree.Value)
+                        {
+                            /* constants */
+                            ConstantValueRotation val = (ConstantValueRotation)functionTree.Value;
+                            ilgen.Emit(OpCodes.Ldc_R8, val.Value.X);
+                            ilgen.Emit(OpCodes.Ldc_R8, val.Value.Y);
+                            ilgen.Emit(OpCodes.Ldc_R8, val.Value.Z);
+                            ilgen.Emit(OpCodes.Ldc_R8, val.Value.W);
+                            ilgen.Emit(OpCodes.Newobj, typeof(Quaternion).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double), typeof(double) }));
+                        }
+                        else
+                        {
+                            Type ret;
+
+                            for (int i = 0; i < 4; ++i)
+                            {
+                                ret = ProcessExpressionPart(
+                                    compileState,
+                                    scriptTypeBuilder,
+                                    stateTypeBuilder,
+                                    ilgen,
+                                    functionTree.SubTree[i],
+                                    localVars);
+                                if (ret == typeof(int))
+                                {
+                                    ilgen.Emit(OpCodes.Conv_R8);
+                                }
+                                else if (ret != typeof(double))
+                                {
+                                    throw new NotSupportedException();
+                                }
+                            }
+
+                            ilgen.Emit(OpCodes.Newobj, typeof(Vector3).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double) }));
+                        }
+                    }
+                    return typeof(Quaternion);
+
+                case Tree.EntryType.Value:
+                    /* value */
+                    if(functionTree.Value is ConstantValueRotation)
+                    {
+                        ConstantValueRotation v = (ConstantValueRotation)functionTree.Value;
+                        ilgen.Emit(OpCodes.Ldc_R8, v.Value.X);
+                        ilgen.Emit(OpCodes.Ldc_R8, v.Value.Y);
+                        ilgen.Emit(OpCodes.Ldc_R8, v.Value.Z);
+                        ilgen.Emit(OpCodes.Ldc_R8, v.Value.W);
+                        ilgen.Emit(OpCodes.Call, typeof(Quaternion).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double), typeof(double) }));
+                        return typeof(Quaternion);
+
+                    }
+                    else if(functionTree.Value is ConstantValueVector)
+                    {
+                        ConstantValueVector v = (ConstantValueVector)functionTree.Value;
+                        ilgen.Emit(OpCodes.Ldc_R8, v.Value.X);
+                        ilgen.Emit(OpCodes.Ldc_R8, v.Value.Y);
+                        ilgen.Emit(OpCodes.Ldc_R8, v.Value.Z);
+                        ilgen.Emit(OpCodes.Call, typeof(Vector3).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double) }));
+                        return typeof(Vector3);
+                    }
+                    else if(functionTree.Value is Tree.ConstantValueFloat)
+                    {
+                        ilgen.Emit(OpCodes.Ldc_R8, ((Tree.ConstantValueFloat)functionTree.Value).Value);
+                        return typeof(double);
+                    }
+                    else if(functionTree.Value is Tree.ConstantValueInt)
+                    {
+                        ilgen.Emit(OpCodes.Ldc_I4, ((Tree.ConstantValueInt)functionTree.Value).Value);
+                        return typeof(int);
+                    }
+                    else
+                    {
+                        throw new NotSupportedException();
+                    }
+                    break;
+
+                case Tree.EntryType.Variable:
+                    /* variable */
+                    {
+                        object v = localVars[functionTree.SubTree[0].Entry];
+                        return GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                    }
+
+                case Tree.EntryType.Vector:
+                    /* three components */
+                    {
+                        if(null != functionTree.Value)
+                        {
+                            /* constants */
+                            ConstantValueVector val = (ConstantValueVector)functionTree.Value;
+                            ilgen.Emit(OpCodes.Ldc_R8, val.Value.X);
+                            ilgen.Emit(OpCodes.Ldc_R8, val.Value.Y);
+                            ilgen.Emit(OpCodes.Ldc_R8, val.Value.Z);
+                            ilgen.Emit(OpCodes.Newobj, typeof(Vector3).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double) }));
+                        }
+                        else
+                        {
+                            Type ret;
+                            for (int i = 0; i < 3; ++i)
+                            {
+                                ret = ProcessExpressionPart(
+                                    compileState,
+                                    scriptTypeBuilder,
+                                    stateTypeBuilder,
+                                    ilgen,
+                                    functionTree.SubTree[i],
+                                    localVars);
+                                if (ret == typeof(int))
+                                {
+                                    ilgen.Emit(OpCodes.Conv_R8);
+                                }
+                                else if (ret != typeof(double))
+                                {
+                                    throw new NotSupportedException();
+                                }
+                            }
+
+                            ilgen.Emit(OpCodes.Newobj, typeof(Vector3).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double) }));
+                        }
+                    }
+                    return typeof(Vector3);
+
+                default:
+                    throw new NotSupportedException();
+            }
         }
 
         void ProcessCasts(ILGenerator ilgen, Type toType, Type fromType)
@@ -140,12 +1313,16 @@ namespace SilverSim.Scripting.LSL
                 {
                     ilgen.Emit(OpCodes.Callvirt, typeof(string).GetProperty("Length").GetGetMethod());
                     ilgen.Emit(OpCodes.Ldc_I4_0);
-                    ilgen.Emit(OpCodes.Clt);
+                    ilgen.Emit(OpCodes.Ceq);
+                    ilgen.Emit(OpCodes.Ldc_I4_0);
+                    ilgen.Emit(OpCodes.Ceq);
                 }
                 else if (fromType == typeof(int))
                 {
                     ilgen.Emit(OpCodes.Ldc_I4_0);
-                    ilgen.Emit(OpCodes.Clt_Un);
+                    ilgen.Emit(OpCodes.Ceq);
+                    ilgen.Emit(OpCodes.Ldc_I4_0);
+                    ilgen.Emit(OpCodes.Ceq);
                 }
                 else if (fromType == typeof(LSLKey))
                 {
@@ -155,12 +1332,15 @@ namespace SilverSim.Scripting.LSL
                 {
                     ilgen.Emit(OpCodes.Ldc_R8, 0f);
                     ilgen.Emit(OpCodes.Ceq);
-                    ilgen.Emit(OpCodes.Ldc_I4_1);
-                    ilgen.Emit(OpCodes.Xor);
+                    ilgen.Emit(OpCodes.Ldc_I4_0);
+                    ilgen.Emit(OpCodes.Ceq);
                 }
                 else if (fromType == typeof(AnArray))
                 {
                     ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetProperty("Count").GetGetMethod());
+                    ilgen.Emit(OpCodes.Ceq);
+                    ilgen.Emit(OpCodes.Ldc_I4_0);
+                    ilgen.Emit(OpCodes.Ceq);
                 }
                 else if (fromType == typeof(Quaternion))
                 {
@@ -169,9 +1349,10 @@ namespace SilverSim.Scripting.LSL
                 else if (fromType == typeof(Vector3))
                 {
                     ilgen.Emit(OpCodes.Callvirt, typeof(Vector3).GetProperty("Length").GetGetMethod());
+                    ilgen.Emit(OpCodes.Ldc_R8, 0f);
                     ilgen.Emit(OpCodes.Ceq);
-                    ilgen.Emit(OpCodes.Ldc_I4_1);
-                    ilgen.Emit(OpCodes.Xor);
+                    ilgen.Emit(OpCodes.Ldc_I4_0);
+                    ilgen.Emit(OpCodes.Ceq);
                 }
                 else if (fromType == typeof(LSLKey))
                 {
@@ -222,35 +1403,27 @@ namespace SilverSim.Scripting.LSL
             }
             else if(toType == typeof(AnArray))
             {
-                if(fromType == typeof(string))
+                if(fromType == typeof(string) || fromType == typeof(int) || fromType == typeof(double))
                 {
+                    ilgen.BeginScope();
+                    LocalBuilder lb = ilgen.DeclareLocal(fromType);
+                    ilgen.Emit(OpCodes.Stloc, lb);
                     ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                    ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { typeof(string) }));
+                    ilgen.Emit(OpCodes.Ldloc, lb);
+                    ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { fromType }));
+                    ilgen.Emit(OpCodes.Ldloc, lb);
+                    ilgen.EndScope();
                 }
-                else if(fromType == typeof(int))
+                else if(fromType == typeof(Vector3) || fromType == typeof(Quaternion) || fromType == typeof(LSLKey))
                 {
+                    ilgen.BeginScope();
+                    LocalBuilder lb = ilgen.DeclareLocal(fromType);
+                    ilgen.Emit(OpCodes.Stloc, lb);
                     ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                    ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { typeof(int) }));
-                }
-                else if(fromType == typeof(Vector3))
-                {
-                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                    ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { typeof(Vector3) }));
-                }
-                else if(fromType == typeof(Quaternion))
-                {
-                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                    ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { typeof(Quaternion) }));
-                }
-                else if (fromType == typeof(double))
-                {
-                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                    ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { typeof(double) }));
-                }
-                else if (fromType == typeof(LSLKey))
-                {
-                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                    ilgen.Emit(OpCodes.Ldloc, lb);
                     ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { typeof(IValue) }));
+                    ilgen.Emit(OpCodes.Ldloc, lb);
+                    ilgen.EndScope();
                 }
                 else
                 {
@@ -263,31 +1436,93 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
+        Type GetVarType(
+            TypeBuilder scriptTypeBuilder,
+            TypeBuilder stateTypeBuilder,
+            object v)
+        {
+            if (v is ParameterInfo)
+            {
+                return ((ParameterInfo)v).ParameterType;
+            }
+            else if (v is LocalBuilder)
+            {
+                return ((LocalBuilder)v).LocalType;
+            }
+            else if (v is FieldBuilder)
+            {
+                return ((FieldBuilder)v).FieldType;
+            }
+            else if (v is FieldInfo)
+            {
+                return ((FieldInfo)v).FieldType;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         Type GetVarToStack(
             TypeBuilder scriptTypeBuilder,
             TypeBuilder stateTypeBuilder,
             ILGenerator ilgen, 
             object v)
         {
+            Type retType;
             if(v is ParameterInfo)
             {
                 ilgen.Emit(OpCodes.Ldarg, ((ParameterInfo)v).Position);
-                return ((ParameterInfo)v).ParameterType;
+                retType = ((ParameterInfo)v).ParameterType;
             }
             else if(v is LocalBuilder)
             {
                 ilgen.Emit(OpCodes.Ldloc, (LocalBuilder)v);
-                return ((LocalBuilder)v).LocalType;
+                retType = ((LocalBuilder)v).LocalType;
             }
             else if(v is FieldBuilder)
             {
                 ilgen.Emit(OpCodes.Ldfld, ((FieldBuilder)v));
-                return ((FieldBuilder)v).FieldType;
+                retType = ((FieldBuilder)v).FieldType;
             }
             else if (v is FieldInfo)
             {
                 ilgen.Emit(OpCodes.Ldfld, ((FieldInfo)v));
-                return ((FieldInfo)v).FieldType;
+                retType = ((FieldInfo)v).FieldType;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+            if(retType == typeof(AnArray))
+            {
+                /* list has deep copying */
+                ilgen.Emit(OpCodes.Call, typeof(AnArray).GetConstructor( new Type[] { retType }));
+            }
+            return retType;
+        }
+
+        void SetVarFromStack(
+            TypeBuilder scriptTypeBuilder,
+            TypeBuilder stateTypeBuilder,
+            ILGenerator ilgen,
+            object v)
+        {
+            if (v is ParameterInfo)
+            {
+                ilgen.Emit(OpCodes.Starg, ((ParameterInfo)v).Position);
+            }
+            else if (v is LocalBuilder)
+            {
+                ilgen.Emit(OpCodes.Stloc, (LocalBuilder)v);
+            }
+            else if (v is FieldBuilder)
+            {
+                ilgen.Emit(OpCodes.Stfld, ((FieldBuilder)v));
+            }
+            else if (v is FieldInfo)
+            {
+                ilgen.Emit(OpCodes.Stfld, ((FieldInfo)v));
             }
             else
             {
@@ -1298,22 +2533,18 @@ namespace SilverSim.Scripting.LSL
                 else if (fb.FieldType == typeof(string))
                 {
                     script_ilgen.Emit(OpCodes.Ldstr, "");
-                    /* TODO: more to do */
                 }
                 else if (fb.FieldType == typeof(Vector3))
                 {
                     script_ilgen.Emit(OpCodes.Newobj, typeof(Vector3).GetConstructor(new Type[0]));
-                    /* TODO: more to do */
                 }
                 else if (fb.FieldType == typeof(Quaternion))
                 {
                     script_ilgen.Emit(OpCodes.Newobj, typeof(Quaternion).GetConstructor(new Type[0]));
-                    /* TODO: more to do */
                 }
                 else if (fb.FieldType == typeof(AnArray))
                 {
                     script_ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                    /* TODO: more to do */
                 }
                 script_ilgen.Emit(OpCodes.Stfld, fb);
             }
