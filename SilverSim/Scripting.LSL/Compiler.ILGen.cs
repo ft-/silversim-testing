@@ -1194,7 +1194,6 @@ namespace SilverSim.Scripting.LSL
                     {
                         throw new NotSupportedException();
                     }
-                    break;
 
                 case Tree.EntryType.Variable:
                     /* variable */
