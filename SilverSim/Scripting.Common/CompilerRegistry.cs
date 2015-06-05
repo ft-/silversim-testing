@@ -73,7 +73,7 @@ namespace SilverSim.Scripting.Common
                 }
             }
 
-            private IScriptAssembly Compile(AppDomain appDom, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1)
+            private IScriptAssembly Compile(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1)
             {
                 string language = DefaultCompilerName;
                 bool useDefault = true;
@@ -103,7 +103,29 @@ namespace SilverSim.Scripting.Common
                 {
                     throw new CompilerException(lineno, "Unknown engine specified");
                 }
-                return compiler.Compile(appDom, user, shbangs, assetID, reader, linenumber);
+
+                object[] attrs = compiler.GetType().GetCustomAttributes(typeof(CompilerUsesRunAndCollectMode), false);
+                if(attrs.Length != 0)
+                {
+                    return compiler.Compile(AppDomain.CurrentDomain, user, shbangs, assetID, reader, linenumber);
+                }
+                else
+                {
+                    AppDomain appDom = AppDomain.CreateDomain(
+                        "Script Domain " + assetID, 
+                        AppDomain.CurrentDomain.Evidence);
+                    try
+                    {
+                        IScriptAssembly assembly = compiler.Compile(appDom, user, shbangs, assetID, reader, linenumber);
+                        ScriptLoader.RegisterAppDomain(assetID, appDom);
+                        return assembly;
+                    }
+                    catch
+                    {
+                        AppDomain.Unload(appDom);
+                        throw;
+                    }
+                }
             }
 
             private void SyntaxCheck(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1)
@@ -153,7 +175,7 @@ namespace SilverSim.Scripting.Common
                     ++linenumber;
                 }
 
-                return Compile(appDom, user, shbangs, assetID, reader, linenumber);
+                return Compile(user, shbangs, assetID, reader, linenumber);
             }
 
             public void SyntaxCheck(UUI user, UUID assetID, TextReader reader)

@@ -99,12 +99,14 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(0.2)]
         public void llSetTexture(ScriptInstance Instance, string texture, int face)
         {
             llSetLinkTexture(Instance, LINK_THIS, texture, face);
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(0.2)]
         public void llSetLinkTexture(ScriptInstance Instance, int link, string texture, int face)
         {
             UUID textureID = getTextureAssetID(Instance, texture);

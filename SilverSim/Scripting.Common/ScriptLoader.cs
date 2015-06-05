@@ -49,6 +49,11 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        internal static void RegisterAppDomain(UUID assetID, AppDomain appDom)
+        {
+            m_LoadedDomains.Add(assetID, appDom);
+        }
+
         public static ScriptInstance Load(ObjectPart part, ObjectPartInventoryItem item, UUI user, AssetData data)
         {
             ScriptInstance instance;
@@ -60,9 +65,7 @@ namespace SilverSim.Scripting.Common
                 {
                     using (TextReader reader = new StreamReader(data.InputStream))
                     {
-                        AppDomain appDom = AppDomain.CreateDomain("Script Domain " + data.ID.ToString(), AppDomain.CurrentDomain.Evidence);
-                        m_LoadedDomains.Add(data.ID, appDom);
-                        return CompilerRegistry.ScriptCompilers.Compile(appDom, user, data.ID, reader);
+                        return CompilerRegistry.ScriptCompilers.Compile(AppDomain.CurrentDomain, user, data.ID, reader);
                     }
                 });
                 m_LoadedAssemblies[data.ID] = assembly;

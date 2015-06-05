@@ -159,6 +159,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(3)]
         public void llRemoteLoadScriptPin(ScriptInstance Instance, LSLKey target, string name, int pin, int running, int start_param)
         {
             lock(Instance)

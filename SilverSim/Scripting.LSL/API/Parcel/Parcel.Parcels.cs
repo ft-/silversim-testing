@@ -94,6 +94,7 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(2)]
         public void llSetParcelMusicURL(ScriptInstance Instance, string url)
         {
 #warning Implement llSetParcelMusicURL(string)
@@ -128,6 +129,7 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(2)]
         public AnArray llGetParcelPrimOwners(ScriptInstance Instance, Vector3 pos)
         {
 #warning Implement llGetParcelPrimOwners(Vector3)

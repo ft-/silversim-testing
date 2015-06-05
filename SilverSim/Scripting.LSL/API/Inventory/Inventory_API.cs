@@ -105,6 +105,7 @@ namespace SilverSim.Scripting.LSL.API.Inventory
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(3)]
         public void llGiveInventoryList(ScriptInstance Instance, LSLKey target, string folder, AnArray inventory)
         {
 #warning Implement llGiveInventory(UUID, string, AnArray)

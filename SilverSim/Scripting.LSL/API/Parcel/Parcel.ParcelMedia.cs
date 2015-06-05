@@ -60,12 +60,14 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         public const int PARCEL_MEDIA_COMMAND_LOOP_SET = 13;
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(2)]
         public void llParcelMediaCommandList(ScriptInstance Instance, AnArray commandList)
         {
 
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(2)]
         public AnArray llParcelMediaQuery(ScriptInstance Instance, AnArray query)
         {
             return new AnArray();

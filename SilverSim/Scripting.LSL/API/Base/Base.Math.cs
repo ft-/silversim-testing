@@ -145,6 +145,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(1)]
         public int llModPow(ScriptInstance Instance, int a, int b, int c)
         {
             return ((int)Math.Pow(a, b)) % c;

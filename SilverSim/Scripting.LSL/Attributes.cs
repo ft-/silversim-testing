@@ -56,6 +56,17 @@ namespace SilverSim.Scripting.LSL
 
     [Serializable]
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+    public class ForcedSleep : Attribute
+    {
+        public readonly double Seconds;
+        public ForcedSleep(double seconds)
+        {
+            Seconds = seconds;
+        }
+    }
+
+    [Serializable]
+    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     public class ExecutedOnStateChange : Attribute
     {
         public ExecutedOnStateChange()

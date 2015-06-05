@@ -26,6 +26,7 @@ exception statement from your version.
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
 using SilverSim.Tests.Extensions;
 using SilverSim.Types;
@@ -53,6 +54,7 @@ namespace SilverSim.Tests.Scripting
                     Files[uuid] = config.GetString(key);
                 }
             }
+            CompilerRegistry.ScriptCompilers.DefaultCompilerName = config.GetString("DefaultCompiler");
         }
 
         public bool Run()
@@ -60,18 +62,25 @@ namespace SilverSim.Tests.Scripting
             bool success = true;
             foreach (KeyValuePair<UUID, string> file in Files)
             {
-                m_Log.InfoFormat("Testing syntax of {1} ({0})", file.Key, file.Value);
+                m_Log.InfoFormat("Testing compilation of {1} ({0})", file.Key, file.Value);
                 try
                 {
-                    AppDomain appDom = AppDomain.CreateDomain("Script Domain " + file.Key, AppDomain.CurrentDomain.Evidence);
                     using(TextReader reader = new StreamReader(file.Value))
                     {
-                        CompilerRegistry.ScriptCompilers.Compile(appDom, UUI.Unknown, file.Key, reader);
+                        CompilerRegistry.ScriptCompilers.Compile(AppDomain.CurrentDomain, UUI.Unknown, file.Key, reader);
                     }
-                    AppDomain.Unload(appDom);
+                    m_Log.InfoFormat("Compilation of {1} ({0}) successful", file.Key, file.Value);
                 }
-                catch
+                catch (CompilerException e)
                 {
+                    m_Log.ErrorFormat("Compilation of {1} ({0}) failed: {2}", file.Key, file.Value, e.Message);
+                    m_Log.WarnFormat("Stack Trace:\n{0}", e.StackTrace.ToString());
+                    success = false;
+                }
+                catch (Exception e)
+                {
+                    m_Log.ErrorFormat("Compilation of {1} ({0}) failed: {2}", file.Key, file.Value, e.Message);
+                    m_Log.WarnFormat("Stack Trace:\n{0}", e.StackTrace.ToString());
                     success = false;
                 }
             }

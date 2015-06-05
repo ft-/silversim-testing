@@ -26,6 +26,7 @@ exception statement from your version.
 using log4net;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scripting.Common;
 using SilverSim.Scripting.Common.Expression;
 using SilverSim.Types;
 using System;
@@ -37,6 +38,7 @@ using System.Reflection.Emit;
 
 namespace SilverSim.Scripting.LSL
 {
+    [CompilerUsesRunAndCollectMode]
     public partial class LSLCompiler : IScriptCompiler, IPlugin, IPluginSubFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LSL COMPILER");
@@ -67,6 +69,7 @@ namespace SilverSim.Scripting.LSL
         }
         class CompileState
         {
+            public bool EmitDebugSymbols = false;
             public APIFlags AcceptedFlags;
             public Dictionary<string, MethodBuilder> m_FunctionInfo = new Dictionary<string, MethodBuilder>();
             //public ModuleBuilder Module;

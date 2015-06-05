@@ -32,6 +32,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
     public partial class Chat_API
     {
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(1)]
         public void llDialog(ScriptInstance Instance, LSLKey avatar, string message, AnArray buttons, int channel)
         {
             lock (Instance)
@@ -67,6 +68,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(1)]
         public void llTextBox(ScriptInstance Instance, LSLKey avatar, string message, int channel)
         {
             AnArray buttons = new AnArray();
@@ -75,6 +77,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(10)]
         public void llLoadURL(ScriptInstance Instance, LSLKey avatar, string message, string url)
         {
             lock (Instance)

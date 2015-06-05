@@ -64,6 +64,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(0.2)]
         public AnArray llGetPrimitiveParams(ScriptInstance Instance, AnArray param)
         {
             AnArray parout = new AnArray();
@@ -171,6 +172,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(0.2)]
         public void llSetPrimitiveParams(ScriptInstance Instance, AnArray rules)
         {
             lock (Instance)
@@ -180,7 +182,14 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(0.2)]
         public void llSetLinkPrimitiveParams(ScriptInstance Instance, int linkTarget, AnArray rules)
+        {
+            llSetLinkPrimitiveParamsFast(Instance, linkTarget, rules);
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public void llSetLinkPrimitiveParamsFast(ScriptInstance Instance, int linkTarget, AnArray rules)
         {
             lock (Instance)
             {

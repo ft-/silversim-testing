@@ -40,6 +40,7 @@ namespace SilverSim.Scripting.LSL.API.Region
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(10)]
         public string llGetSimulatorHostname(ScriptInstance Instance)
         {
 #warning Implement llGetSimulatorHostname()
@@ -54,6 +55,7 @@ namespace SilverSim.Scripting.LSL.API.Region
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(1)]
         public LSLKey llRequestSimulatorData(ScriptInstance Instance, string region, int data)
         {
 #warning Implement llRequestSimulatorData()

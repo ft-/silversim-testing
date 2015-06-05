@@ -73,6 +73,7 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(0.3)]
         public string llXorBase64(ScriptInstance Instance, string str1, string str2)
         {
             byte[] a = System.Convert.FromBase64String(str1);

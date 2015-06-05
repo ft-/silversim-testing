@@ -581,12 +581,16 @@ namespace SilverSim.Scripting.LSL
             }
             catch(ChangeStateException e)
             {
-                TriggerOnStateChange();
-                m_Events.Clear();
-                InvokeStateEvent("state_exit");
-                m_CurrentState = m_States[e.NewState];
-                m_CurrentStateMethods.Clear();
-                InvokeStateEvent("state_entry");
+                if (m_CurrentState != m_States[e.NewState])
+                {
+                    /* if state is equal, it simply aborts the event execution */
+                    TriggerOnStateChange();
+                    m_Events.Clear();
+                    InvokeStateEvent("state_exit");
+                    m_CurrentState = m_States[e.NewState];
+                    m_CurrentStateMethods.Clear();
+                    InvokeStateEvent("state_entry");
+                }
             }
             catch(Exception e)
             {

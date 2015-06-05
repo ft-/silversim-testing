@@ -41,6 +41,18 @@ namespace SilverSim.Scripting.LSL
             return new CompilerException(p.LineNumber, message);
         }
 
+        class ILParameterInfo
+        {
+            public int Position;
+            public Type ParameterType;
+
+            public ILParameterInfo(Type type, int position)
+            {
+                ParameterType = type;
+                Position = position;
+            }
+        }
+
         void ProcessExpression(
             CompileState compileState,
             TypeBuilder scriptTypeBuilder,
@@ -1492,9 +1504,9 @@ namespace SilverSim.Scripting.LSL
             TypeBuilder stateTypeBuilder,
             object v)
         {
-            if (v is ParameterInfo)
+            if (v is ILParameterInfo)
             {
-                return ((ParameterInfo)v).ParameterType;
+                return ((ILParameterInfo)v).ParameterType;
             }
             else if (v is LocalBuilder)
             {
@@ -1521,10 +1533,10 @@ namespace SilverSim.Scripting.LSL
             object v)
         {
             Type retType;
-            if(v is ParameterInfo)
+            if (v is ILParameterInfo)
             {
-                ilgen.Emit(OpCodes.Ldarg, ((ParameterInfo)v).Position);
-                retType = ((ParameterInfo)v).ParameterType;
+                ilgen.Emit(OpCodes.Ldarg, ((ILParameterInfo)v).Position);
+                retType = ((ILParameterInfo)v).ParameterType;
             }
             else if(v is LocalBuilder)
             {
@@ -1559,9 +1571,9 @@ namespace SilverSim.Scripting.LSL
             ILGenerator ilgen,
             object v)
         {
-            if (v is ParameterInfo)
+            if (v is ILParameterInfo)
             {
-                ilgen.Emit(OpCodes.Starg, ((ParameterInfo)v).Position);
+                ilgen.Emit(OpCodes.Starg, ((ILParameterInfo)v).Position);
             }
             else if (v is LocalBuilder)
             {
@@ -1694,7 +1706,10 @@ namespace SilverSim.Scripting.LSL
                     /* type named things are variable declaration */
                     case "integer":
                         lb = ilgen.DeclareLocal(typeof(int));
-                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        if (compileState.EmitDebugSymbols)
+                        {
+                            lb.SetLocalSymInfo(functionLine.Line[1]);
+                        }
                         localVars[functionLine.Line[1]] = lb;
                         if (functionLine.Line[2] != ";")
                         {
@@ -1718,7 +1733,10 @@ namespace SilverSim.Scripting.LSL
 
                     case "vector":
                         lb = ilgen.DeclareLocal(typeof(Vector3));
-                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        if (compileState.EmitDebugSymbols)
+                        {
+                            lb.SetLocalSymInfo(functionLine.Line[1]);
+                        }
                         localVars[functionLine.Line[1]] = lb;
                         if (functionLine.Line[2] != ";")
                         {
@@ -1742,7 +1760,10 @@ namespace SilverSim.Scripting.LSL
 
                     case "list":
                         lb = ilgen.DeclareLocal(typeof(AnArray));
-                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        if (compileState.EmitDebugSymbols)
+                        {
+                            lb.SetLocalSymInfo(functionLine.Line[1]);
+                        }
                         localVars[functionLine.Line[1]] = lb;
                         if (functionLine.Line[2] != ";")
                         {
@@ -1766,7 +1787,10 @@ namespace SilverSim.Scripting.LSL
 
                     case "float":
                         lb = ilgen.DeclareLocal(typeof(double));
-                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        if (compileState.EmitDebugSymbols)
+                        {
+                            lb.SetLocalSymInfo(functionLine.Line[1]);
+                        }
                         localVars[functionLine.Line[1]] = lb;
                         if (functionLine.Line[2] != ";")
                         {
@@ -1789,7 +1813,10 @@ namespace SilverSim.Scripting.LSL
 
                     case "string":
                         lb = ilgen.DeclareLocal(typeof(string));
-                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        if (compileState.EmitDebugSymbols)
+                        {
+                            lb.SetLocalSymInfo(functionLine.Line[1]);
+                        }
                         localVars[functionLine.Line[1]] = lb;
                         if (functionLine.Line[2] != ";")
                         {
@@ -1813,7 +1840,10 @@ namespace SilverSim.Scripting.LSL
 
                     case "key":
                         lb = ilgen.DeclareLocal(typeof(LSLKey));
-                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        if (compileState.EmitDebugSymbols)
+                        {
+                            lb.SetLocalSymInfo(functionLine.Line[1]);
+                        }
                         localVars[functionLine.Line[1]] = lb;
                         if (functionLine.Line[2] != ";")
                         {
@@ -1837,7 +1867,10 @@ namespace SilverSim.Scripting.LSL
 
                     case "rotation":
                         lb = ilgen.DeclareLocal(typeof(Quaternion));
-                        lb.SetLocalSymInfo(functionLine.Line[1]);
+                        if (compileState.EmitDebugSymbols)
+                        {
+                            lb.SetLocalSymInfo(functionLine.Line[1]);
+                        }
                         localVars[functionLine.Line[1]] = lb;
                         if (functionLine.Line[2] != ";")
                         {
@@ -2292,12 +2325,32 @@ namespace SilverSim.Scripting.LSL
                                 functionLine, 
                                 localVars);
                         }
+                        else if (returnType == typeof(LSLKey))
+                        {
+                            ProcessExpression(
+                                compileState, 
+                                scriptTypeBuilder, 
+                                stateTypeBuilder, 
+                                ilgen,
+                                typeof(LSLKey), 
+                                1,
+                                functionLine.Line.Count - 2,
+                                functionLine, 
+                                localVars);
+                        }
                         ilgen.Emit(OpCodes.Ret);
                         break;
 
                     case "state":
-                        throw new NotImplementedException();
-                        //break;
+                        /* when same state, the state instruction compiles to nop according to wiki */
+                        if(stateTypeBuilder == scriptTypeBuilder)
+                        {
+                            throw compilerException(functionLine, "Global functions cannot change state");
+                        }
+                        ilgen.Emit(OpCodes.Ldstr, functionLine.Line[1]);
+                        ilgen.Emit(OpCodes.Newobj, typeof(ChangeStateException).GetConstructor(new Type[1] { typeof(string) }));
+                        ilgen.Emit(OpCodes.Throw);
+                        break;
 
                     case "{": /* new unconditional block */
                         ilgen.BeginScope();
@@ -2390,8 +2443,12 @@ namespace SilverSim.Scripting.LSL
             int paramidx = 0;
             while (functionDeclaration[++functionStart] != ")")
             {
+                if(functionDeclaration[functionStart] == ",")
+                {
+                    ++functionStart;
+                }
                 Type t;
-                switch (functionDeclaration[++functionStart])
+                switch (functionDeclaration[functionStart++])
                 {
                     case "integer":
                         t = typeof(int);
@@ -2425,7 +2482,7 @@ namespace SilverSim.Scripting.LSL
                         throw compilerException(functionBody[0], "Internal Error");
                 }
                 /* parameter name and type in order */
-                localVars[functionDeclaration[functionStart++]] = mb.GetParameters()[paramidx];
+                localVars[functionDeclaration[functionStart]] = new ILParameterInfo(t, paramidx + 1);
             }
 
             int lineIndex = 1;
@@ -2439,6 +2496,38 @@ namespace SilverSim.Scripting.LSL
                 localVars, 
                 null, 
                 ref lineIndex);
+
+            /* we have no missing return value check right now, so we simply emit default values in that case */
+            if(returnType == typeof(int))
+            {
+                ilgen.Emit(OpCodes.Ldc_I4_0);
+            }
+            else if(returnType == typeof(double))
+            {
+                ilgen.Emit(OpCodes.Ldc_R8, 0f);
+            }
+            else if(returnType == typeof(string))
+            {
+                ilgen.Emit(OpCodes.Ldstr);
+            }
+            else if(returnType == typeof(AnArray))
+            {
+                ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+            }
+            else if (returnType == typeof(Vector3))
+            {
+                ilgen.Emit(OpCodes.Newobj, typeof(Vector3).GetConstructor(new Type[0]));
+            }
+            else if (returnType == typeof(Quaternion))
+            {
+                ilgen.Emit(OpCodes.Newobj, typeof(Quaternion).GetConstructor(new Type[0]));
+            }
+            else if (returnType == typeof(LSLKey))
+            {
+                ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[0]));
+            }
+            ilgen.Emit(OpCodes.Ret);
+
         }
 
         Dictionary<string, object> AddConstants(CompileState compileState, TypeBuilder typeBuilder, ILGenerator ilgen)
@@ -2505,7 +2594,7 @@ namespace SilverSim.Scripting.LSL
         {
             string assetAssemblyName = "Script." + assetID.ToString().Replace("-", "_");
             AssemblyName aName = new AssemblyName(assetAssemblyName);
-            AssemblyBuilder ab = appDom.DefineDynamicAssembly(aName, System.Reflection.Emit.AssemblyBuilderAccess.Run);
+            AssemblyBuilder ab = appDom.DefineDynamicAssembly(aName, AssemblyBuilderAccess.RunAndCollect);
             ModuleBuilder mb = ab.DefineDynamicModule(aName.Name);
 
             #region Create Script Container
@@ -2518,14 +2607,25 @@ namespace SilverSim.Scripting.LSL
             }
 
 
-            Type[] script_cb_params = new Type[2] { typeof(ObjectPart), typeof(ObjectPartInventoryItem) };
-            ConstructorBuilder script_cb = scriptTypeBuilder.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, script_cb_params);
+            Type[] script_cb_params = new Type[3] { typeof(ObjectPart), typeof(ObjectPartInventoryItem), typeof(bool) };
+            ConstructorBuilder script_cb = scriptTypeBuilder.DefineConstructor(
+                MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName,
+                CallingConventions.Standard, 
+                script_cb_params);
             ILGenerator script_ilgen = script_cb.GetILGenerator();
             {
                 ConstructorInfo typeConstructor = typeof(Script).GetConstructor(script_cb_params);
-                script_ilgen.Emit(OpCodes.Ldarg_1);
+                script_ilgen.Emit(OpCodes.Ldarg_0);
                 script_ilgen.Emit(OpCodes.Ldarg_1);
                 script_ilgen.Emit(OpCodes.Ldarg_2);
+                if (forcedSleepDefault)
+                {
+                    script_ilgen.Emit(OpCodes.Ldc_I4_1);
+                }
+                else
+                {
+                    script_ilgen.Emit(OpCodes.Ldc_I4_0);
+                }
                 script_ilgen.Emit(OpCodes.Call, typeConstructor);
             }
             typeLocals = AddConstants(compileState, scriptTypeBuilder, script_ilgen);
@@ -2726,9 +2826,12 @@ namespace SilverSim.Scripting.LSL
                 state.AddInterfaceImplementation(typeof(LSLState));
                 fb = state.DefineField("Instance", scriptTypeBuilder, FieldAttributes.Private | FieldAttributes.InitOnly);
 
-                ConstructorBuilder state_cb = state.DefineConstructor(MethodAttributes.Public, CallingConventions.Standard, new Type[1] { scriptTypeBuilder });
+                ConstructorBuilder state_cb = state.DefineConstructor(
+                    MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, 
+                    CallingConventions.Standard, 
+                    new Type[1] { scriptTypeBuilder });
                 ILGenerator state_ilgen = state_cb.GetILGenerator();
-                ConstructorInfo typeConstructor = typeof(Script).GetConstructor(new Type[0]);
+                ConstructorInfo typeConstructor = typeof(object).GetConstructor(new Type[0]);
                 state_ilgen.Emit(OpCodes.Ldarg_0);
                 state_ilgen.Emit(OpCodes.Call, typeConstructor);
                 state_ilgen.Emit(OpCodes.Ldarg_1);
@@ -2740,11 +2843,6 @@ namespace SilverSim.Scripting.LSL
                 state_cb = state.DefineTypeInitializer();
 
                 state_ilgen = state_cb.GetILGenerator();
-
-                typeConstructor = typeof(Object).GetConstructor(new Type[0]);
-
-                state_ilgen.Emit(OpCodes.Ldarg_0);
-                state_ilgen.Emit(OpCodes.Call, typeConstructor);
                 state_ilgen.Emit(OpCodes.Ret);
 
                 foreach (KeyValuePair<string, List<LineInfo>> eventKvp in stateKvp.Value)
@@ -2756,7 +2854,11 @@ namespace SilverSim.Scripting.LSL
                     {
                         paramtypes[pi] = pinfo[pi].ParameterType;
                     }
-                    MethodBuilder eventbuilder = state.DefineMethod(eventKvp.Key, MethodAttributes.Public, typeof(void), paramtypes);
+                    MethodBuilder eventbuilder = state.DefineMethod(
+                        eventKvp.Key, 
+                        MethodAttributes.Public, 
+                        typeof(void), 
+                        paramtypes);
                     ILGenerator event_ilgen = eventbuilder.GetILGenerator();
                     ProcessFunction(compileState, scriptTypeBuilder, state, eventbuilder, event_ilgen, eventKvp.Value, typeLocals);
                     event_ilgen.Emit(OpCodes.Ret);
@@ -2772,25 +2874,22 @@ namespace SilverSim.Scripting.LSL
             {
                 script_cb = scriptTypeBuilder.DefineTypeInitializer();
                 script_ilgen = script_cb.GetILGenerator();
-                ConstructorInfo typeConstructor = typeof(Object).GetConstructor(new Type[0]);
-
-                script_ilgen.Emit(OpCodes.Ldarg_0);
-                script_ilgen.Emit(OpCodes.Call, typeConstructor);
                 script_ilgen.Emit(OpCodes.Ret);
             }
             #endregion
 
+            mb.CreateGlobalFunctions();
+
             #region Initialize static fields
             Type t = scriptTypeBuilder.CreateType();
+
             foreach (IScriptApi api in m_Apis)
             {
                 ScriptApiName apiAttr = (ScriptApiName)api.GetType().GetCustomAttributes(typeof(ScriptApiName), false)[0];
-                FieldInfo info = t.GetField(apiAttr.Name);
-                info.SetValue(t, api);
+                FieldInfo info = t.GetField(apiAttr.Name, BindingFlags.Static | BindingFlags.Public);
+                info.SetValue(null, api);
             }
             #endregion
-
-            mb.CreateGlobalFunctions();
 
             return new LSLScriptAssembly(ab, t, stateTypes, forcedSleepDefault);
         }

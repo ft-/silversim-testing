@@ -78,6 +78,7 @@ namespace SilverSim.Scripting.LSL.API.Sound
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(1)]
         public void llPreloadSound(ScriptInstance Instance, string sound)
         {
             lock(Instance)
@@ -153,6 +154,7 @@ namespace SilverSim.Scripting.LSL.API.Sound
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(0.1)]
         public void llAdjustSoundVolume(ScriptInstance Instance, double volume)
         {
 #warning Implement llAdjustSoundVolume(double)
