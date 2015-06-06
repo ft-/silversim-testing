@@ -116,7 +116,7 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetLandOwnerAt(ScriptInstance Instance, Vector3 pos)
+        public LSLKey llGetLandOwnerAt(ScriptInstance Instance, Vector3 pos)
         {
 #warning Implement llGetLandOwnerAt(Vector3)
             throw new NotImplementedException();

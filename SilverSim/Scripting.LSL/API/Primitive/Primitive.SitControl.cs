@@ -104,13 +104,13 @@ namespace SilverSim.Scripting.LSL.API.Primitive
 
         #region Sit control
         [APILevel(APIFlags.LSL)]
-        public UUID llAvatarOnSitTarget(ScriptInstance Instance)
+        public LSLKey llAvatarOnSitTarget(ScriptInstance Instance)
         {
             return llAvatarOnLinkSitTarget(Instance, LINK_THIS);
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llAvatarOnLinkSitTarget(ScriptInstance Instance, int link)
+        public LSLKey llAvatarOnLinkSitTarget(ScriptInstance Instance, int link)
         {
 #warning Implement llAvatarOnLinkSitTarget(int)
             return UUID.Zero;
@@ -123,7 +123,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llUnSit(ScriptInstance Instance, UUID id)
+        public void llUnSit(ScriptInstance Instance, LSLKey id)
         {
 #warning Implement llUnSit(UUID)
         }

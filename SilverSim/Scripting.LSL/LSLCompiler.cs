@@ -194,13 +194,23 @@ namespace SilverSim.Scripting.LSL
                         {
                             if ((f.Attributes & FieldAttributes.InitOnly) != 0 || (f.Attributes & FieldAttributes.Literal) != 0)
                             {
-                                try
+                                if (IsValidType(f.FieldType))
                                 {
-                                    m_Constants.Add(f.Name, attr.Flags);
+                                    try
+                                    {
+                                        m_Constants.Add(f.Name, attr.Flags);
+                                    }
+                                    catch
+                                    {
+                                        m_Constants[f.Name] |= attr.Flags;
+                                    }
                                 }
-                                catch
+                                else
                                 {
-                                    m_Constants[f.Name] |= attr.Flags;
+                                    m_Log.DebugFormat("Invalid constant '{0}' in '{1}' has APILevel attribute. It does not have LSL compatible type '{2}'.",
+                                        f.Name,
+                                        f.DeclaringType.FullName,
+                                        f.FieldType.FullName);
                                 }
                             }
                             else
@@ -216,7 +226,35 @@ namespace SilverSim.Scripting.LSL
                     System.Attribute attr = System.Attribute.GetCustomAttribute(t, typeof(APILevel));
                     if(attr != null)
                     {
-                        m_EventDelegates.Add(t.Name, t.GetMethod("Invoke"));
+                        MethodInfo mi = t.GetMethod("Invoke");
+                        ParameterInfo[] pi = mi.GetParameters();
+                        /* validate parameters */
+                        bool eventValid = true;
+                        for (int i = 0; i < pi.Length; ++i)
+                        {
+                            if (!IsValidType(pi[i].ParameterType))
+                            {
+                                eventValid = false;
+                                m_Log.DebugFormat("Invalid delegate '{0}' in '{1}' has APILevel attribute. Parameter '{2}' does not have LSL compatible type '{3}'.",
+                                    mi.Name,
+                                    mi.DeclaringType.FullName,
+                                    pi[i].Name,
+                                    pi[i].ParameterType.FullName);
+                            }
+                        }
+                        if (mi.ReturnType != typeof(void))
+                        {
+                            eventValid = false;
+                            m_Log.DebugFormat("Invalid delegate '{0}' in '{1}' has APILevel attribute. Return value is not void. Found: '{2}'",
+                                mi.Name,
+                                mi.DeclaringType.FullName,
+                                mi.ReturnType.FullName);
+                        }
+
+                        if (eventValid)
+                        {
+                            m_EventDelegates.Add(t.Name, mi);
+                        }
                     }
                 }
 
@@ -230,10 +268,43 @@ namespace SilverSim.Scripting.LSL
                         {
                             if (pi[0].ParameterType.Equals(typeof(ScriptInstance)))
                             {
-                                m_Methods.Add(new KeyValuePair<IScriptApi,MethodInfo>(api, m));
-                                if(!m_MethodNames.Contains(m.Name))
+                                /* validate parameters */
+                                bool methodValid = true;
+                                if((m.Attributes & MethodAttributes.Static) != 0)
                                 {
-                                    m_MethodNames.Add(m.Name);
+                                    methodValid = false;
+                                    m_Log.DebugFormat("Invalid method '{0}' in '{1}' has APILevel attribute. Method is declared static.",
+                                        m.Name,
+                                        m.DeclaringType.FullName);
+                                }
+                                for (int i = 1; i < pi.Length; ++i)
+                                {
+                                    if(!IsValidType(pi[i].ParameterType))
+                                    {
+                                        methodValid = false;
+                                        m_Log.DebugFormat("Invalid method '{0}' in '{1}' has APILevel attribute. Parameter '{2}' does not have LSL compatible type '{3}'.",
+                                            m.Name,
+                                            m.DeclaringType.FullName,
+                                            pi[i].Name,
+                                            pi[i].ParameterType.FullName);
+                                    }
+                                }
+                                if (!IsValidType(m.ReturnType))
+                                {
+                                    methodValid = false;
+                                    m_Log.DebugFormat("Invalid method '{0}' in '{1}' has APILevel attribute. Return value does not have LSL compatible type '{2}'.",
+                                        m.Name,
+                                        m.DeclaringType.FullName,
+                                        m.ReturnType.FullName);
+                                }
+
+                                if (methodValid)
+                                {
+                                    m_Methods.Add(new KeyValuePair<IScriptApi, MethodInfo>(api, m));
+                                    if (!m_MethodNames.Contains(m.Name))
+                                    {
+                                        m_MethodNames.Add(m.Name);
+                                    }
                                 }
                             }
                         }
@@ -248,6 +319,7 @@ namespace SilverSim.Scripting.LSL
                             if(pi[0].ParameterType.Equals(typeof(ScriptInstance)))
                             {
                                 Delegate d = Delegate.CreateDelegate(typeof(Script.StateChangeEventDelegate), null, m);
+
                                 m_StateChangeDelegates.Add((Script.StateChangeEventDelegate)d);
                             }
                         }

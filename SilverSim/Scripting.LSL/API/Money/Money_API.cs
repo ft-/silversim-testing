@@ -126,7 +126,7 @@ namespace SilverSim.Scripting.LSL.API.Money
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llTransferLindenDollars(ScriptInstance instance, LSLKey destination, int amount)
+        public LSLKey llTransferLindenDollars(ScriptInstance instance, LSLKey destination, int amount)
         {
             ObjectPartInventoryItem.PermsGranterInfo grantinfo = instance.Item.PermsGranter;
             if ((grantinfo.PermsMask & ScriptPermissions.Debit) == 0 ||

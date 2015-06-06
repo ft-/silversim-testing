@@ -116,7 +116,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
-        public Integer llListen(ScriptInstance Instance, int channel, string name, UUID id, string msg)
+        public int llListen(ScriptInstance Instance, int channel, string name, LSLKey id, string msg)
         {
             Script script = (Script)Instance;
             lock (script)

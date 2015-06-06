@@ -89,31 +89,31 @@ namespace SilverSim.Scripting.LSL.API.Experience
         public delegate void experience_permissions_denied(LSLKey agent_id, int reason);
 
         [APILevel(APIFlags.LSL)]
-        public int llAgentInExperience(ScriptInstance Instance, UUID agent)
+        public int llAgentInExperience(ScriptInstance Instance, LSLKey agent)
         {
             throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llCreateKeyValue(ScriptInstance Instance, string k, string v)
+        public LSLKey llCreateKeyValue(ScriptInstance Instance, string k, string v)
         {
             throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llDataSizeKeyValue(ScriptInstance Instance)
+        public LSLKey llDataSizeKeyValue(ScriptInstance Instance)
         {
             throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llDeleteKeyValue(ScriptInstance Instance, string k)
+        public LSLKey llDeleteKeyValue(ScriptInstance Instance, string k)
         {
             throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public AnArray llGetExperienceDetails(ScriptInstance Instance, UUID experience_id)
+        public AnArray llGetExperienceDetails(ScriptInstance Instance, LSLKey experience_id)
         {
             throw new NotImplementedException();
         }
@@ -145,31 +145,31 @@ namespace SilverSim.Scripting.LSL.API.Experience
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llKeyCountKeyValue(ScriptInstance Instance)
+        public LSLKey llKeyCountKeyValue(ScriptInstance Instance)
         {
             throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llKeysKeyValue(ScriptInstance Instance, int first, int count)
+        public LSLKey llKeysKeyValue(ScriptInstance Instance, int first, int count)
         {
             throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llReadKeyValue(ScriptInstance Instance, string k)
+        public LSLKey llReadKeyValue(ScriptInstance Instance, string k)
         {
             throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llRequestExperiencePermissions(ScriptInstance Instance, UUID agent, string name /* unused */)
+        public void llRequestExperiencePermissions(ScriptInstance Instance, LSLKey agent, string name /* unused */)
         {
 
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llUpdateKeyValue(ScriptInstance Instance, string k, string v, int checked_orig, string original_value)
+        public LSLKey llUpdateKeyValue(ScriptInstance Instance, string k, string v, int checked_orig, string original_value)
         {
             throw new NotImplementedException();
         }

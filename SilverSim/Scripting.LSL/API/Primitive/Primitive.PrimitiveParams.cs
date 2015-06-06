@@ -216,7 +216,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llSetText(ScriptInstance Instance, string text, Color color, double alpha)
+        public void llSetText(ScriptInstance Instance, string text, Vector3 color, double alpha)
         {
             ObjectPart.TextParam tp = new ObjectPart.TextParam();
             tp.Text = text;

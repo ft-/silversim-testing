@@ -90,7 +90,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetCreator(ScriptInstance Instance)
+        public LSLKey llGetCreator(ScriptInstance Instance)
         {
             lock (Instance)
             {
@@ -159,7 +159,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetOwner(ScriptInstance Instance)
+        public LSLKey llGetOwner(ScriptInstance Instance)
         {
             lock (Instance)
             {
@@ -168,7 +168,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetOwnerKey(ScriptInstance Instance, LSLKey id)
+        public LSLKey llGetOwnerKey(ScriptInstance Instance, LSLKey id)
         {
             lock (Instance)
             {
@@ -195,7 +195,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetLinkKey(ScriptInstance Instance, int link)
+        public LSLKey llGetLinkKey(ScriptInstance Instance, int link)
         {
             lock (Instance)
             {

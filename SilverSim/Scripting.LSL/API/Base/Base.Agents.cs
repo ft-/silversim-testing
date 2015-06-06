@@ -55,31 +55,31 @@ namespace SilverSim.Scripting.LSL.API.Base
         public const int PAYMENT_INFO_USED = 0x2;
 
         [APILevel(APIFlags.LSL)]
-        public LSLKey llRequestAgentData(ScriptInstance Instance, UUID id, int data)
+        public LSLKey llRequestAgentData(ScriptInstance Instance, LSLKey id, int data)
         {
             throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public LSLKey llRequestDisplayName(ScriptInstance Instance, UUID id)
+        public LSLKey llRequestDisplayName(ScriptInstance Instance, LSLKey id)
         {
             throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public LSLKey llRequestUsername(ScriptInstance Instance, UUID id)
+        public LSLKey llRequestUsername(ScriptInstance Instance, LSLKey id)
         {
             throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public string llGetDisplayName(ScriptInstance Instance, UUID id)
+        public string llGetDisplayName(ScriptInstance Instance, LSLKey id)
         {
             throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
-        public Vector3 llGetAgentSize(ScriptInstance Instance, UUID id)
+        public Vector3 llGetAgentSize(ScriptInstance Instance, LSLKey id)
         {
             lock (Instance)
             {
