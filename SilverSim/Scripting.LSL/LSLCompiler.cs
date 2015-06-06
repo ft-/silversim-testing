@@ -35,6 +35,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using System.Text;
 
 namespace SilverSim.Scripting.LSL
 {
@@ -67,6 +68,7 @@ namespace SilverSim.Scripting.LSL
                 LineNumber = lineNo;
             }
         }
+
         class CompileState
         {
             public bool EmitDebugSymbols = false;
@@ -80,11 +82,73 @@ namespace SilverSim.Scripting.LSL
             public Dictionary<string, Dictionary<string, List<LineInfo>>> m_States = new Dictionary<string, Dictionary<string, List<LineInfo>>>();
             public FieldBuilder InstanceField;
             public Dictionary<string, FieldBuilder> m_ApiFieldInfo = new Dictionary<string, FieldBuilder>();
+            private List<string> m_ControlFlowStack = new List<string>(); /* we only push control flow instructions here that have no block */
 
             public CompileState()
             {
 
             }
+
+            public bool HasOpenBlocks
+            {
+                get
+                {
+                    return m_ControlFlowStack.Contains("{");
+                }
+            }
+
+            public void closeControlFlows(Parser p, List<LineInfo> block, string item)
+            {
+                while (m_ControlFlowStack.Count != 0)
+                {
+                    if (m_ControlFlowStack[0] == item)
+                    {
+                        m_ControlFlowStack.RemoveAt(0);
+                        block.Add(new LineInfo(new List<string>(new string[] { "}" }), p.getfileinfo().LineNumber));
+                        break;
+                    }
+                    m_ControlFlowStack.RemoveAt(0);
+                    block.Add(new LineInfo(new List<string>(new string[] { "}" }), p.getfileinfo().LineNumber));
+                }
+            }
+
+            public void closeControlFlow()
+            {
+                if(m_ControlFlowStack.Count > 0)
+                {
+                    m_ControlFlowStack.RemoveAt(0);
+                }
+            }
+
+            public void changeLastControlFlow(string item)
+            {
+                if (m_ControlFlowStack.Count > 0)
+                {
+                    m_ControlFlowStack[0] = item;
+                }
+            }
+
+            public void closeAllForDoWhileControlFlows(Parser p, List<LineInfo> block)
+            {
+                while (m_ControlFlowStack.Count != 0)
+                {
+                    if (m_ControlFlowStack[0] == "for" || m_ControlFlowStack[0] == "do" || m_ControlFlowStack[0] == "while")
+                    {
+                        m_ControlFlowStack.RemoveAt(0);
+                        block.Add(new LineInfo(new List<string>(new string[] { "}" }), p.getfileinfo().LineNumber));
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+            }
+
+            public void openControlFlow(string item)
+            {
+                m_ControlFlowStack.Insert(0, item);
+            }
+
         }
 
         public LSLCompiler()
@@ -184,6 +248,7 @@ namespace SilverSim.Scripting.LSL
 
             foreach (IScriptApi api in apis)
             {
+                #region Collect constants
                 foreach (FieldInfo f in api.GetType().GetFields())
                 {
                     APILevel attr = (APILevel) System.Attribute.GetCustomAttribute(f, typeof(APILevel));
@@ -219,8 +284,10 @@ namespace SilverSim.Scripting.LSL
                         }
                     }
                 }
+                #endregion
 
-                foreach(Type t in api.GetType().GetNestedTypes(BindingFlags.Public).Where(t => t.BaseType == typeof(MulticastDelegate)))
+                #region Collect event definitions
+                foreach (Type t in api.GetType().GetNestedTypes(BindingFlags.Public).Where(t => t.BaseType == typeof(MulticastDelegate)))
                 {
                     System.Attribute attr = System.Attribute.GetCustomAttribute(t, typeof(APILevel));
                     if(attr != null)
@@ -256,7 +323,9 @@ namespace SilverSim.Scripting.LSL
                         }
                     }
                 }
+                #endregion
 
+                #region Collect API functions, reset delegates and state change delegates
                 foreach (MethodInfo m in api.GetType().GetMethods())
                 {
                     System.Attribute attr = System.Attribute.GetCustomAttribute(m, typeof(APILevel));
@@ -313,14 +382,28 @@ namespace SilverSim.Scripting.LSL
                     if (attr != null && (m.Attributes & MethodAttributes.Static) != 0)
                     {
                         ParameterInfo[] pi = m.GetParameters();
-                        if(pi.Length == 1)
+                        if(pi.Length != 1)
                         {
-                            if(pi[0].ParameterType.Equals(typeof(ScriptInstance)))
-                            {
-                                Delegate d = Delegate.CreateDelegate(typeof(Script.StateChangeEventDelegate), null, m);
-
-                                m_StateChangeDelegates.Add((Script.StateChangeEventDelegate)d);
-                            }
+                            m_Log.DebugFormat("Invalid method '{0}' in '{1}' has attribute ExecutedOnStateChange. Parameter count does not match.",
+                                m.Name,
+                                m.DeclaringType.FullName);
+                        }
+                        else if (m.ReturnType != typeof(void))
+                        {
+                            m_Log.DebugFormat("Invalid method '{0}' in '{1}' has attribute ExecutedOnStateChange. Return type is not void.",
+                                m.Name,
+                                m.DeclaringType.FullName);
+                        }
+                        else if(pi[0].ParameterType != typeof(ScriptInstance))
+                        {
+                            m_Log.DebugFormat("Invalid method '{0}' in '{1}' has attribute ExecutedOnStateChange. Parameter type is not ScriptInstance.",
+                                m.Name,
+                                m.DeclaringType.FullName);
+                        }
+                        else
+                        {
+                            Delegate d = Delegate.CreateDelegate(typeof(Script.StateChangeEventDelegate), null, m);
+                            m_StateChangeDelegates.Add((Script.StateChangeEventDelegate)d);
                         }
                     }
 
@@ -328,16 +411,32 @@ namespace SilverSim.Scripting.LSL
                     if (attr != null && (m.Attributes & MethodAttributes.Static) != 0)
                     {
                         ParameterInfo[] pi = m.GetParameters();
-                        if (pi.Length == 1)
+                        if(pi.Length != 1)
                         {
-                            if (pi[0].ParameterType.Equals(typeof(ScriptInstance)))
-                            {
-                                Delegate d = Delegate.CreateDelegate(typeof(Script.ScriptResetEventDelegate), null, m);
-                                m_ScriptResetDelegates.Add((Script.ScriptResetEventDelegate)d);
-                            }
+                            m_Log.DebugFormat("Invalid method '{0}' in '{1}' has attribute ExecutedOnScriptReset. Parameter count does not match.",
+                                m.Name,
+                                m.DeclaringType.FullName);
+                        }
+                        else if (m.ReturnType != typeof(void))
+                        {
+                            m_Log.DebugFormat("Invalid method '{0}' in '{1}' has attribute ExecutedOnScriptReset. Return type is not void.",
+                                m.Name,
+                                m.DeclaringType.FullName);
+                        }
+                        else if(pi[0].ParameterType != typeof(ScriptInstance))
+                        {
+                            m_Log.DebugFormat("Invalid method '{0}' in '{1}' has attribute ExecutedOnScriptReset. Parameter type is not ScriptInstance.",
+                                m.Name,
+                                m.DeclaringType.FullName);
+                        }
+                        else
+                        {
+                            Delegate d = Delegate.CreateDelegate(typeof(Script.ScriptResetEventDelegate), null, m);
+                            m_ScriptResetDelegates.Add((Script.ScriptResetEventDelegate)d);
                         }
                     }
                 }
+                #endregion
             }
 
             List<Dictionary<string, Resolver.OperatorType>> operators = new List<Dictionary<string, Resolver.OperatorType>>();
@@ -417,6 +516,121 @@ namespace SilverSim.Scripting.LSL
         public void SyntaxCheck(UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1)
         {
             Preprocess(user, shbangs, reader, linenumber);
+        }
+
+        void WriteIndent(TextWriter writer, int indent)
+        {
+            while(indent-- > 0)
+            {
+                writer.Write("    ");
+            }
+        }
+
+        void WriteIndented(TextWriter writer, string s, ref int oldIndent)
+        {
+            if(s == "[" || s == "{" || s == "(")
+            {
+                ++oldIndent;
+                writer.WriteLine("\n");
+                WriteIndent(writer, oldIndent);
+                writer.WriteLine(s);
+                WriteIndent(writer, oldIndent);
+            }
+            else if(s == "]" || s == "}" || s == ")")
+            {
+                --oldIndent;
+                writer.WriteLine("\n");
+                WriteIndent(writer, oldIndent);
+                writer.WriteLine(s);
+                WriteIndent(writer, oldIndent);
+            }
+            else if(s == "\n")
+            {
+                writer.WriteLine("\n");
+                WriteIndent(writer, oldIndent);
+            }
+            else if(s == ";")
+            {
+                writer.WriteLine(";");
+                WriteIndent(writer, oldIndent);
+            }
+            else
+            {
+                writer.Write(s + " ");
+            }
+        }
+
+        void WriteIndented(TextWriter writer, List<string> list, ref int oldIndent)
+        {
+            foreach(string s in list)
+            {
+                WriteIndented(writer, s, ref oldIndent);
+            }
+        }
+
+        void WriteIndented(TextWriter writer, string[] strarray, ref int oldIndent)
+        {
+            foreach(string s in strarray)
+            {
+                WriteIndented(writer, s, ref oldIndent);
+            }
+        }
+
+        public void SyntaxCheckAndDump(Stream s, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1)
+        {
+            CompileState cs = Preprocess(user, shbangs, reader, linenumber);
+            /* rewrite script */
+            int indent = 0;
+            using (TextWriter writer = new StreamWriter(s, new UTF8Encoding(false)))
+            {
+                #region Write Variables
+                foreach (KeyValuePair<string, Type> kvp in cs.m_VariableDeclarations)
+                {
+                    LineInfo li;
+                    WriteIndented(writer, MapType(kvp.Value), ref indent);
+                    WriteIndented(writer, kvp.Key, ref indent);
+                    if (cs.m_VariableInitValues.TryGetValue(kvp.Key, out li))
+                    {
+                        WriteIndented(writer, "=", ref indent);
+                        WriteIndented(writer, li.Line, ref indent);
+                    }
+                    WriteIndented(writer, ";", ref indent);
+                }
+                WriteIndented(writer, "\n", ref indent);
+                #endregion
+
+                #region Write functions
+                foreach(KeyValuePair<string, List<LineInfo>> kvp in cs.m_Functions)
+                {
+                    foreach(LineInfo li in kvp.Value)
+                    {
+                        WriteIndented(writer, li.Line, ref indent);
+                    }
+                }
+                #endregion
+
+                #region Write states
+                foreach (KeyValuePair<string, Dictionary<string, List<LineInfo>>> kvp in cs.m_States)
+                {
+                    if (kvp.Key != "default")
+                    {
+                        WriteIndented(writer, "state", ref indent);
+                    }
+                    WriteIndented(writer, kvp.Key, ref indent);
+                    WriteIndented(writer, "{", ref indent);
+
+                    foreach (KeyValuePair<string, List<LineInfo>> eventfn in kvp.Value)
+                    {
+                        foreach (LineInfo li in eventfn.Value)
+                        {
+                            WriteIndented(writer, li.Line, ref indent);
+                        }
+                    }
+                    WriteIndented(writer, "}", ref indent);
+                }
+                #endregion
+                writer.Flush();
+            }
         }
 
         public IScriptAssembly Compile(AppDomain appDom, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int lineNumber = 1)

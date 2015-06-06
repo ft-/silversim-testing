@@ -34,6 +34,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
+using System.Text;
 
 namespace SilverSim.Tests.Scripting
 {
@@ -42,6 +43,7 @@ namespace SilverSim.Tests.Scripting
         private static readonly ILog m_Log = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
         Dictionary<UUID, string> Files = new Dictionary<UUID, string>();
+        bool WriteParserResult = false;
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -55,6 +57,7 @@ namespace SilverSim.Tests.Scripting
                 }
             }
             CompilerRegistry.ScriptCompilers.DefaultCompilerName = config.GetString("DefaultCompiler");
+            WriteParserResult = config.GetBoolean("WriteParserResult", false);
         }
 
         public bool Run()
@@ -67,7 +70,17 @@ namespace SilverSim.Tests.Scripting
                 {
                     using(TextReader reader = new StreamReader(file.Value))
                     {
-                        CompilerRegistry.ScriptCompilers.SyntaxCheck(UUI.Unknown, file.Key, reader);
+                        if (WriteParserResult)
+                        {
+                            using (FileStream st = new FileStream(file.Value + ".dump.txt", FileMode.Create))
+                            {
+                                CompilerRegistry.ScriptCompilers.SyntaxCheckAndDump(st, UUI.Unknown, file.Key, reader);
+                            }
+                        }
+                        else
+                        {
+                            CompilerRegistry.ScriptCompilers.SyntaxCheck(UUI.Unknown, file.Key, reader);
+                        }
                     }
                     m_Log.InfoFormat("Syntax of {1} ({0}) parsed successfully", file.Key, file.Value);
                 }

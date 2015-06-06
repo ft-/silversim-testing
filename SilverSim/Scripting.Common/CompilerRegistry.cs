@@ -161,6 +161,39 @@ namespace SilverSim.Scripting.Common
                 compiler.SyntaxCheck(user, shbangs, assetID, reader, linenumber);
             }
 
+            private void SyntaxCheckAndDump(Stream s, UUI user, Dictionary<int, string> shbangs, UUID assetID, TextReader reader, int linenumber = 1)
+            {
+                string language = DefaultCompilerName;
+                bool useDefault = true;
+                int lineno = 0;
+                foreach (KeyValuePair<int, string> shbang in shbangs)
+                {
+                    if (shbang.Value.StartsWith("//#!Engine:"))
+                    {
+                        /* we got a sh-bang here, it is a lot safer than what OpenSimulator uses */
+                        language = shbang.Value.Substring(11).Trim().ToUpper();
+                        useDefault = false;
+                        lineno = shbang.Key;
+                    }
+                }
+
+                if (useDefault)
+                {
+                    shbangs.Add(-1, string.Format("//#!Engine:{0}", language));
+                }
+
+                IScriptCompiler compiler;
+                try
+                {
+                    compiler = this[language];
+                }
+                catch
+                {
+                    throw new CompilerException(lineno, "Unknown engine specified");
+                }
+                compiler.SyntaxCheckAndDump(s, user, shbangs, assetID, reader, linenumber);
+            }
+
             public IScriptAssembly Compile(AppDomain appDom, UUI user, UUID assetID, TextReader reader)
             {
                 int linenumber = 1;
@@ -193,6 +226,23 @@ namespace SilverSim.Scripting.Common
                 }
                 SyntaxCheck(user, shbangs, assetID, reader, linenumber);
             }
+
+            public void SyntaxCheckAndDump(Stream s, UUI user, UUID assetID, TextReader reader)
+            {
+                int linenumber = 1;
+                Dictionary<int, string> shbangs = new Dictionary<int, string>();
+                while (reader.Peek() == '/')
+                {
+                    string shbang = reader.ReadLine();
+                    if (shbang.StartsWith("//#!"))
+                    {
+                        shbangs.Add(linenumber, shbang);
+                    }
+                    ++linenumber;
+                }
+                SyntaxCheckAndDump(s, user, shbangs, assetID, reader, linenumber);
+            }
+
         }
 
         public static RegistryImpl ScriptCompilers = new RegistryImpl();

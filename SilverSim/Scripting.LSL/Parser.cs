@@ -45,6 +45,7 @@ namespace SilverSim.Scripting.LSL
             begin();
             args.Clear();
             bool is_preprocess = false;
+            int parencount = 0;
 
             for(;;)
             {
@@ -70,7 +71,7 @@ redo:
                         if(0 != token.Length)
                             args.Add(token);
                         args.Add(";");
-                        if(args.Count != 0)
+                        if (args.Count != 0 && parencount == 0)
                             return;
                         break;
 
@@ -143,6 +144,15 @@ redo:
                             args.Add(token);
                         token = "";
                         args.Add(new string(new char[] {c}));
+                        if (c == '(') ++parencount;
+                        if( c == ')')
+                        {
+                            if(parencount == 0)
+                            {
+                                throw new Exception("Mismatching ')'");
+                            }
+                            --parencount;
+                        }
                         break;
                 
                     case '<':

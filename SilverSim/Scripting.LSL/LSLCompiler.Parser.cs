@@ -175,33 +175,140 @@ namespace SilverSim.Scripting.LSL
             throw parserException(p, string.Format("Missing ')' at the end of function declaration"));
         }
 
-        void parseBlock(CompileState compileState, Parser p, List<LineInfo> block, bool inState, bool addNewLocals = false)
+        int findEndOfControlFlow(List<string> line, int lineNumber)
         {
-            if (addNewLocals)
+            int i;
+            List<string> parenstack = new List<string>();
+
+            if(line[1] != "(")
             {
-                compileState.m_LocalVariables.Add(new List<string>());
+                throw new CompilerException(lineNumber, string.Format("'{0}' is not followed by '('", line[0]));
             }
+
+            for (i = 1; i < line.Count; ++i)
+            {
+                switch(line[i])
+                {
+                    case "(":
+                    case "[":
+                        parenstack.Insert(0, line[i]);
+                        break;
+
+                    case ")":
+                        if(parenstack[0] != "(")
+                        {
+                            throw new CompilerException(lineNumber, string.Format("Mismatching '{0}' for '{1}'", line[i], parenstack[parenstack.Count - 1]));
+                        }
+                        parenstack.RemoveAt(0);
+                        if(parenstack.Count == 0)
+                        {
+                            return i;
+                        }
+                        break;
+
+                    case "]":
+                        if (parenstack[0] != "[")
+                        {
+                            throw new CompilerException(lineNumber, string.Format("Mismatching '{0}' for '{1}'", line[i], parenstack[parenstack.Count - 1]));
+                        }
+                        parenstack.RemoveAt(0);
+                        break;
+
+                    case "if":
+                    case "for":
+                    case "else":
+                    case "while":
+                    case "do":
+                    case "return":
+                    case "state":
+                        if(m_ReservedWords.Contains(line[i]))
+                        {
+                            throw new CompilerException(lineNumber, string.Format("'{0}' not allowed in '{1}'", line[i], line[0]));
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+            throw new CompilerException(lineNumber, string.Format("Could not find end of '{0}'", line[0]));
+        }
+
+        void parseBlockLine(CompileState compileState, Parser p, List<LineInfo> block, List<string> args, int lineNumber, bool inState)
+        {
+            bool pushedAlready = false;
             for (; ; )
             {
-                int lineNumber = p.getfileinfo().LineNumber;
-                List<string> args = new List<string>();
-                try
+                if (args[0] == "else")
                 {
-                    p.read(args);
+                    compileState.closeControlFlows(p, block, "if");
+                    compileState.openControlFlow("else");
+
+                    List<string> controlflow = args.GetRange(0, 1);
+                    controlflow.Add("{");
+                    pushedAlready = true;
+                    block.Add(new LineInfo(controlflow, lineNumber));
+
+                    args = args.GetRange(1, args.Count - 1);
                 }
-                catch (ParserBase.EndOfStringException)
+                else if (args[0] == "do")
                 {
-                    throw parserException(p, "Missing '\"' at the end of string");
+                    compileState.openControlFlow("do");
+
+                    List<string> controlflow = args.GetRange(0, 1);
+                    controlflow.Add("{");
+                    pushedAlready = true;
+                    block.Add(new LineInfo(controlflow, lineNumber));
+
+                    args = args.GetRange(1, args.Count - 1);
                 }
-                catch (ParserBase.EndOfFileException)
+                else if (args[0] == "if")
                 {
-                    throw parserException(p, "Premature end of script");
+                    compileState.closeAllForDoWhileControlFlows(p, block);
+                    int eocf = findEndOfControlFlow(args, lineNumber);
+                    /* make it a block */
+                    List<string> controlflow = args.GetRange(0, eocf + 1);
+                    controlflow.Add("{");
+                    pushedAlready = true;
+                    block.Add(new LineInfo(controlflow, lineNumber));
+                    args = args.GetRange(eocf + 1, args.Count - eocf - 1);
                 }
-                if (args.Count == 0)
+                else if (args[0] == "for" || args[0] == "while")
                 {
-                    /* should not happen but better be safe here */
+                    compileState.openControlFlow(args[0]);
+                    int eocf = findEndOfControlFlow(args, lineNumber);
+                    /* make it a block */
+                    List<string> controlflow = args.GetRange(0, eocf + 1);
+                    controlflow.Add("{");
+                    pushedAlready = true;
+                    block.Add(new LineInfo(controlflow, lineNumber));
+                    args = args.GetRange(eocf + 1, args.Count - eocf - 1);
                 }
-                else if (args[args.Count - 1] == ";")
+                else if (args[0] == "{")
+                {
+                    if (pushedAlready)
+                    {
+                        compileState.changeLastControlFlow("{");
+                    }
+                    else
+                    {
+                        compileState.openControlFlow("{");
+                    }
+                    block.Add(new LineInfo(args, lineNumber));
+                    parseBlock(compileState, p, block, inState, true);
+                    return;
+                }
+                else if (args[0] == ";")
+                {
+                    block.Add(new LineInfo(new List<string>(new string[] { "}" }), lineNumber));
+                    compileState.closeControlFlow();
+                    return;
+                }
+                else if(args[args.Count - 1] == "{")
+                {
+                    throw parserException(p, "'{' not allowed at end of line without control flow instruction");
+                }
+                else
                 {
                     switch (args[0])
                     {
@@ -232,16 +339,46 @@ namespace SilverSim.Scripting.LSL
                             break;
                     }
                     block.Add(new LineInfo(args, lineNumber));
+                    return;
                 }
-                else if (args[args.Count - 1] == "{")
+            }
+        }
+
+        void parseBlock(CompileState compileState, Parser p, List<LineInfo> block, bool inState, bool addNewLocals = false)
+        {
+            if (addNewLocals)
+            {
+                compileState.m_LocalVariables.Add(new List<string>());
+            }
+            for (; ; )
+            {
+                int lineNumber = p.getfileinfo().LineNumber;
+                List<string> args = new List<string>();
+                try
                 {
-                    block.Add(new LineInfo(args, lineNumber));
-                    parseBlock(compileState, p, block, inState, true);
+                    p.read(args);
+                }
+                catch (ParserBase.EndOfStringException)
+                {
+                    throw parserException(p, "Missing '\"' at the end of string");
+                }
+                catch (ParserBase.EndOfFileException)
+                {
+                    throw parserException(p, "Premature end of script");
+                }
+                if (args.Count == 0)
+                {
+                    /* should not happen but better be safe here */
                 }
                 else if (args[0] == "}")
                 {
+                    compileState.closeControlFlows(p, block, "}");
                     compileState.m_LocalVariables.RemoveAt(compileState.m_LocalVariables.Count - 1);
                     return;
+                }
+                else
+                {
+                    parseBlockLine(compileState, p, block, args, lineNumber, inState);
                 }
             }
         }
@@ -302,9 +439,18 @@ namespace SilverSim.Scripting.LSL
                     compileState.m_States[stateName].Add(args[0], stateList);
                     stateList.Add(new LineInfo(args, lineNumber));
                     parseBlock(compileState, p, stateList, true);
+                    if(compileState.HasOpenBlocks)
+                    {
+                        throw parserException(p, string.Format("Missing '}' at end of event {0} of state {1}", args[0], stateName));
+                    }
+                    compileState.closeControlFlows(p, stateList, "");
                 }
                 else if (args[0] == "}")
                 {
+                    if(compileState.m_States[stateName].Count == 0)
+                    {
+                        throw parserException(p, string.Format("state '{0}' does not have any events.", stateName));
+                    }
                     return;
                 }
             }
@@ -499,6 +645,11 @@ namespace SilverSim.Scripting.LSL
                                 fp = checkFunctionParameters(compileState, p, args.GetRange(3, args.Count - 4));
                                 funcList.Add(new LineInfo(args, lineNumber));
                                 parseBlock(compileState, p, funcList, false);
+                                if(compileState.HasOpenBlocks)
+                                {
+                                    throw parserException(p, string.Format("Missing '}' at end of '{1}'", args[1]));
+                                }
+                                compileState.closeControlFlows(p, funcList, "");
                                 compileState.m_Functions[args[1]] = funcList;
                                 break;
 
@@ -507,6 +658,11 @@ namespace SilverSim.Scripting.LSL
                                 args.Insert(0, "void");
                                 funcList.Add(new LineInfo(args, lineNumber));
                                 parseBlock(compileState, p, funcList, false);
+                                if(compileState.HasOpenBlocks)
+                                {
+                                    throw parserException(p, string.Format("Missing '}' at end of '{0}'", args[0]));
+                                }
+                                compileState.closeControlFlows(p, funcList, "");
                                 compileState.m_Functions[args[1]] = funcList;
                                 break;
                         }
