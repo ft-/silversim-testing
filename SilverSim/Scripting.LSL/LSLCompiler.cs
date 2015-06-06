@@ -72,7 +72,6 @@ namespace SilverSim.Scripting.LSL
             public bool EmitDebugSymbols = false;
             public APIFlags AcceptedFlags;
             public Dictionary<string, MethodBuilder> m_FunctionInfo = new Dictionary<string, MethodBuilder>();
-            //public ModuleBuilder Module;
             public Dictionary<string, Type> m_VariableDeclarations = new Dictionary<string, Type>();
             public Dictionary<string, FieldBuilder> m_VariableFieldInfo = new Dictionary<string, FieldBuilder>();
             public Dictionary<string, LineInfo> m_VariableInitValues = new Dictionary<string, LineInfo>();
