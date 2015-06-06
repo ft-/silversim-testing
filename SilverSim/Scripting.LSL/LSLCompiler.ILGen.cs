@@ -2749,7 +2749,7 @@ namespace SilverSim.Scripting.LSL
             string assetAssemblyName = "Script." + assetID.ToString().Replace("-", "_");
             AssemblyName aName = new AssemblyName(assetAssemblyName);
             AssemblyBuilder ab = appDom.DefineDynamicAssembly(aName, AssemblyBuilderAccess.RunAndCollect);
-            ModuleBuilder mb = ab.DefineDynamicModule(aName.Name);
+            ModuleBuilder mb = ab.DefineDynamicModule(aName.Name, compileState.EmitDebugSymbols);
 
             #region Create Script Container
             TypeBuilder scriptTypeBuilder = mb.DefineType(assetAssemblyName + ".Script", TypeAttributes.Public, typeof(Script));
