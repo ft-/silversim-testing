@@ -69,6 +69,66 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
+        enum ControlFlowType
+        {
+            Entry,
+            UnconditionalBlock,
+            If,
+            Else,
+            ElseIf,
+            For,
+            DoWhile,
+            While
+        }
+
+        class ControlFlowElement
+        {
+            public bool IsExplicitBlock;
+            public bool PopNextImplicit = false;
+            public ControlFlowType Type;
+            public Label? LoopLabel;
+            public Label? EndOfControlFlowLabel;
+            public Label? EndOfIfFlowLabel;
+
+            public ControlFlowElement(ControlFlowType type, bool isExplicit, Label looplabel, Label eofclabel)
+            {
+                IsExplicitBlock = isExplicit;
+                Type = type;
+                LoopLabel = looplabel;
+                EndOfControlFlowLabel = eofclabel;
+            }
+            public ControlFlowElement(ControlFlowType type, bool isExplicit, Label looplabel, Label eofclabel, bool popOneImplicit)
+            {
+                IsExplicitBlock = isExplicit;
+                Type = type;
+                LoopLabel = looplabel;
+                EndOfControlFlowLabel = eofclabel;
+                PopNextImplicit = popOneImplicit;
+            }
+            public ControlFlowElement(ControlFlowType type, bool isExplicit, Label looplabel, Label eofclabel, Label eoiflabel)
+            {
+                IsExplicitBlock = isExplicit;
+                Type = type;
+                LoopLabel = looplabel;
+                EndOfControlFlowLabel = eofclabel;
+                EndOfIfFlowLabel = eoiflabel;
+            }
+            public ControlFlowElement(ControlFlowType type, bool isExplicit, Label looplabel, Label eofclabel, Label eoiflabel, bool popOneImplicit)
+            {
+                IsExplicitBlock = isExplicit;
+                Type = type;
+                LoopLabel = looplabel;
+                EndOfControlFlowLabel = eofclabel;
+                EndOfIfFlowLabel = eoiflabel;
+                PopNextImplicit = popOneImplicit;
+            }
+            public ControlFlowElement(ControlFlowType type, bool isExplicit)
+            {
+                IsExplicitBlock = isExplicit;
+                Type = type;
+            }
+        }
+
         class CompileState
         {
             public bool EmitDebugSymbols = false;
@@ -82,73 +142,148 @@ namespace SilverSim.Scripting.LSL
             public Dictionary<string, Dictionary<string, List<LineInfo>>> m_States = new Dictionary<string, Dictionary<string, List<LineInfo>>>();
             public FieldBuilder InstanceField;
             public Dictionary<string, FieldBuilder> m_ApiFieldInfo = new Dictionary<string, FieldBuilder>();
-            private List<string> m_ControlFlowStack = new List<string>(); /* we only push control flow instructions here that have no block */
+            List<ControlFlowElement> m_ControlFlowStack = new List<ControlFlowElement>();
+            public ControlFlowElement LastBlock = null;
+
+            public void InitControlFlow()
+            {
+                m_ControlFlowStack.Clear();
+                PushControlFlow(new ControlFlowElement(ControlFlowType.Entry, true));
+            }
+
+            public void PushControlFlow(ControlFlowElement e)
+            {
+                m_ControlFlowStack.Insert(0, e);
+                LastBlock = null;
+            }
+
+            public string GetControlFlowInfo(int lineNumber)
+            {
+                if (m_ControlFlowStack.Count == 0)
+                {
+                    throw new CompilerException(lineNumber, "Mismatched '}'");
+                }
+                switch(m_ControlFlowStack[0].Type)
+                {
+                    case ControlFlowType.Entry: return "function entry";
+                    case ControlFlowType.If: return "if";
+                    case ControlFlowType.Else: return "else";
+                    case ControlFlowType.ElseIf: return "else if";
+                    case ControlFlowType.For: return "for";
+                    case ControlFlowType.DoWhile: return "do ... while";
+                    case ControlFlowType.While: return "while";
+                    default: throw new ArgumentException(m_ControlFlowStack[0].Type.ToString());
+                }
+            }
+
+            public bool IsImplicitControlFlow(int lineNumber)
+            {
+                if (m_ControlFlowStack.Count == 0)
+                {
+                    throw new CompilerException(lineNumber, "Mismatched '}'");
+                }
+                return !m_ControlFlowStack[0].IsExplicitBlock;
+            }
+
+            public void PopControlFlowImplicit(ILGenerator ilgen, int lineNumber)
+            {
+                if(m_ControlFlowStack.Count == 0)
+                {
+                    throw new CompilerException(lineNumber, "Mismatched '}'");
+                }
+                else if(!m_ControlFlowStack[0].IsExplicitBlock)
+                {
+                    ControlFlowElement elem = m_ControlFlowStack[0];
+                    m_ControlFlowStack.RemoveAt(0);
+                    if (elem.Type == ControlFlowType.If || elem.Type == ControlFlowType.ElseIf)
+                    {
+                        LastBlock = elem;
+                    }
+                    if(null != elem.EndOfIfFlowLabel)
+                    {
+                        ilgen.Emit(OpCodes.Br, elem.EndOfIfFlowLabel.Value);
+                    }
+                    if (null != elem.EndOfControlFlowLabel)
+                    {
+                        ilgen.MarkLabel(elem.EndOfControlFlowLabel.Value);
+                    }
+                }
+            }
+
+            public void PopControlFlowImplicits(ILGenerator ilgen, int lineNumber)
+            {
+                if (m_ControlFlowStack.Count == 0)
+                {
+                    throw new CompilerException(lineNumber, "Mismatched '}'");
+                }
+                else while (!m_ControlFlowStack[0].IsExplicitBlock)
+                {
+                    ControlFlowElement elem = m_ControlFlowStack[0];
+                    m_ControlFlowStack.RemoveAt(0);
+                    if (elem.Type == ControlFlowType.If || elem.Type == ControlFlowType.ElseIf)
+                    {
+                        LastBlock = elem;
+                    }
+                    if (null != elem.EndOfIfFlowLabel)
+                    {
+                        ilgen.Emit(OpCodes.Br, elem.EndOfIfFlowLabel.Value);
+                    }
+                    if (null != elem.EndOfControlFlowLabel)
+                    {
+                        ilgen.MarkLabel(elem.EndOfControlFlowLabel.Value);
+                    }
+                }
+            }
+
+            public ControlFlowElement PopControlFlowExplicit(ILGenerator ilgen, int lineNumber)
+            {
+                while (m_ControlFlowStack.Count != 0 && !m_ControlFlowStack[0].IsExplicitBlock)
+                {
+                    ControlFlowElement elem = m_ControlFlowStack[0];
+                    m_ControlFlowStack.RemoveAt(0);
+                    if (elem.Type == ControlFlowType.If || elem.Type == ControlFlowType.ElseIf)
+                    {
+                        LastBlock = elem;
+                    }
+                    if (null != elem.EndOfIfFlowLabel)
+                    {
+                        ilgen.MarkLabel(elem.EndOfIfFlowLabel.Value);
+                    }
+                    if (null != elem.EndOfControlFlowLabel)
+                    {
+                        ilgen.MarkLabel(elem.EndOfControlFlowLabel.Value);
+                    }
+                }
+
+                if (m_ControlFlowStack.Count == 0)
+                {
+                    throw new CompilerException(lineNumber, "Mismatched '}'");
+                }
+                else
+                {
+                    ControlFlowElement elem = m_ControlFlowStack[0];
+                    m_ControlFlowStack.RemoveAt(0);
+                    if (elem.Type == ControlFlowType.If || elem.Type == ControlFlowType.ElseIf)
+                    {
+                        LastBlock = elem;
+                    }
+                    if (null != elem.EndOfIfFlowLabel)
+                    {
+                        ilgen.Emit(OpCodes.Br, elem.EndOfIfFlowLabel.Value);
+                    }
+                    if (null != elem.EndOfControlFlowLabel)
+                    {
+                        ilgen.MarkLabel(elem.EndOfControlFlowLabel.Value);
+                        elem.EndOfControlFlowLabel = null;
+                    }
+                    return elem;
+                }
+            }
 
             public CompileState()
             {
 
             }
-
-            public bool HasOpenBlocks
-            {
-                get
-                {
-                    return m_ControlFlowStack.Contains("{");
-                }
-            }
-
-            public void closeControlFlows(Parser p, List<LineInfo> block, string item)
-            {
-                while (m_ControlFlowStack.Count != 0)
-                {
-                    if (m_ControlFlowStack[0] == item)
-                    {
-                        m_ControlFlowStack.RemoveAt(0);
-                        block.Add(new LineInfo(new List<string>(new string[] { "}" }), p.getfileinfo().LineNumber));
-                        break;
-                    }
-                    m_ControlFlowStack.RemoveAt(0);
-                    block.Add(new LineInfo(new List<string>(new string[] { "}" }), p.getfileinfo().LineNumber));
-                }
-            }
-
-            public void closeControlFlow()
-            {
-                if(m_ControlFlowStack.Count > 0)
-                {
-                    m_ControlFlowStack.RemoveAt(0);
-                }
-            }
-
-            public void changeLastControlFlow(string item)
-            {
-                if (m_ControlFlowStack.Count > 0)
-                {
-                    m_ControlFlowStack[0] = item;
-                }
-            }
-
-            public void closeAllForDoWhileControlFlows(Parser p, List<LineInfo> block)
-            {
-                while (m_ControlFlowStack.Count != 0)
-                {
-                    if (m_ControlFlowStack[0] == "for" || m_ControlFlowStack[0] == "do" || m_ControlFlowStack[0] == "while")
-                    {
-                        m_ControlFlowStack.RemoveAt(0);
-                        block.Add(new LineInfo(new List<string>(new string[] { "}" }), p.getfileinfo().LineNumber));
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-            }
-
-            public void openControlFlow(string item)
-            {
-                m_ControlFlowStack.Insert(0, item);
-            }
-
         }
 
         public LSLCompiler()
@@ -528,15 +663,31 @@ namespace SilverSim.Scripting.LSL
 
         void WriteIndented(TextWriter writer, string s, ref int oldIndent)
         {
-            if(s == "[" || s == "{" || s == "(")
+            if (s == "[")
             {
-                ++oldIndent;
                 writer.WriteLine("\n");
+                ++oldIndent;
                 WriteIndent(writer, oldIndent);
                 writer.WriteLine(s);
                 WriteIndent(writer, oldIndent);
             }
-            else if(s == "]" || s == "}" || s == ")")
+            else if (s == "{")
+            {
+                writer.WriteLine("\n");
+                WriteIndent(writer, oldIndent);
+                writer.WriteLine(s);
+                ++oldIndent;
+                WriteIndent(writer, oldIndent);
+            }
+            else if (s == "]")
+            {
+                writer.WriteLine("\n");
+                WriteIndent(writer, oldIndent);
+                writer.WriteLine(s);
+                --oldIndent;
+                WriteIndent(writer, oldIndent);
+            }
+            else if ( s == "}")
             {
                 --oldIndent;
                 writer.WriteLine("\n");
@@ -605,6 +756,12 @@ namespace SilverSim.Scripting.LSL
                     foreach(LineInfo li in kvp.Value)
                     {
                         WriteIndented(writer, li.Line, ref indent);
+                        if (li.Line[li.Line.Count - 1] != "{" && li.Line[li.Line.Count - 1] != ";" && li.Line[li.Line.Count - 1] != "}")
+                        {
+                            ++indent;
+                            WriteIndented(writer, "\n", ref indent);
+                            --indent;
+                        }
                     }
                 }
                 #endregion
@@ -621,9 +778,21 @@ namespace SilverSim.Scripting.LSL
 
                     foreach (KeyValuePair<string, List<LineInfo>> eventfn in kvp.Value)
                     {
+                        int tempindent = 0;
                         foreach (LineInfo li in eventfn.Value)
                         {
                             WriteIndented(writer, li.Line, ref indent);
+                            if (li.Line[li.Line.Count - 1] != "{" && li.Line[li.Line.Count - 1] != ";" && li.Line[li.Line.Count - 1] != "}")
+                            {
+                                ++tempindent;
+                                indent += tempindent;
+                                WriteIndented(writer, "\n", ref indent);
+                                indent -= tempindent;
+                            }
+                            else
+                            {
+                                tempindent = 0;
+                            }
                         }
                     }
                     WriteIndented(writer, "}", ref indent);

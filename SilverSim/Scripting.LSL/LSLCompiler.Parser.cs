@@ -236,64 +236,90 @@ namespace SilverSim.Scripting.LSL
 
         void parseBlockLine(CompileState compileState, Parser p, List<LineInfo> block, List<string> args, int lineNumber, bool inState)
         {
-            bool pushedAlready = false;
             for (; ; )
             {
-                if (args[0] == "else")
+                if(args[0] == "else" && args[1] == "if")
                 {
-                    compileState.closeControlFlows(p, block, "if");
-                    compileState.openControlFlow("else");
-
-                    List<string> controlflow = args.GetRange(0, 1);
-                    controlflow.Add("{");
-                    pushedAlready = true;
-                    block.Add(new LineInfo(controlflow, lineNumber));
-
-                    args = args.GetRange(1, args.Count - 1);
-                }
-                else if (args[0] == "do")
-                {
-                    compileState.openControlFlow("do");
-
-                    List<string> controlflow = args.GetRange(0, 1);
-                    controlflow.Add("{");
-                    pushedAlready = true;
-                    block.Add(new LineInfo(controlflow, lineNumber));
-
-                    args = args.GetRange(1, args.Count - 1);
-                }
-                else if (args[0] == "if")
-                {
-                    compileState.closeAllForDoWhileControlFlows(p, block);
-                    int eocf = findEndOfControlFlow(args, lineNumber);
+                    int eocf = findEndOfControlFlow(args.GetRange(1, args.Count - 1), lineNumber) + 1;
                     /* make it a block */
-                    List<string> controlflow = args.GetRange(0, eocf + 1);
-                    controlflow.Add("{");
-                    pushedAlready = true;
-                    block.Add(new LineInfo(controlflow, lineNumber));
-                    args = args.GetRange(eocf + 1, args.Count - eocf - 1);
-                }
-                else if (args[0] == "for" || args[0] == "while")
-                {
-                    compileState.openControlFlow(args[0]);
-                    int eocf = findEndOfControlFlow(args, lineNumber);
-                    /* make it a block */
-                    List<string> controlflow = args.GetRange(0, eocf + 1);
-                    controlflow.Add("{");
-                    pushedAlready = true;
-                    block.Add(new LineInfo(controlflow, lineNumber));
-                    args = args.GetRange(eocf + 1, args.Count - eocf - 1);
-                }
-                else if (args[0] == "{")
-                {
-                    if (pushedAlready)
+                    if (args[eocf + 1] == "{")
                     {
-                        compileState.changeLastControlFlow("{");
+                        block.Add(new LineInfo(args, lineNumber));
+                        parseBlock(compileState, p, block, inState, true);
+                        return;
                     }
                     else
                     {
-                        compileState.openControlFlow("{");
+                        List<string> controlflow = args.GetRange(0, eocf + 1);
+                        block.Add(new LineInfo(controlflow, lineNumber));
+                        args = args.GetRange(eocf + 1, args.Count - eocf - 1);
                     }
+                }
+                else if (args[0] == "else")
+                {
+                    if (args[1] == "{")
+                    {
+                        block.Add(new LineInfo(args, lineNumber));
+                        parseBlock(compileState, p, block, inState, true);
+                        return;
+                    }
+                    else
+                    {
+                        List<string> controlflow = args.GetRange(0, 1);
+                        block.Add(new LineInfo(controlflow, lineNumber));
+                        args = args.GetRange(1, args.Count - 1);
+                    }
+                }
+                else if (args[0] == "do")
+                {
+                    if (args[1] == "{")
+                    {
+                        parseBlock(compileState, p, block, inState, true);
+                        return;
+                    }
+                    else
+                    {
+                        List<string> controlflow = args.GetRange(0, 1);
+                        block.Add(new LineInfo(controlflow, lineNumber));
+
+                        args = args.GetRange(1, args.Count - 1);
+                    }
+                }
+                else if (args[0] == "if")
+                {
+                    int eocf = findEndOfControlFlow(args, lineNumber);
+                    /* make it a block */
+                    if (args[eocf + 1] == "{")
+                    {
+                        block.Add(new LineInfo(args, lineNumber));
+                        parseBlock(compileState, p, block, inState, true);
+                        return;
+                    }
+                    else
+                    {
+                        List<string> controlflow = args.GetRange(0, eocf + 1);
+                        block.Add(new LineInfo(controlflow, lineNumber));
+                        args = args.GetRange(eocf + 1, args.Count - eocf - 1);
+                    }
+                }
+                else if (args[0] == "for" || args[0] == "while")
+                {
+                    int eocf = findEndOfControlFlow(args, lineNumber);
+                    /* make it a block */
+                    if(args[eocf + 1] == "{")
+                    {
+                        parseBlock(compileState, p, block, inState, true);
+                        return;
+                    }
+                    else
+                    {
+                        List<string> controlflow = args.GetRange(0, eocf + 1);
+                        block.Add(new LineInfo(controlflow, lineNumber));
+                        args = args.GetRange(eocf + 1, args.Count - eocf - 1);
+                    }
+                }
+                else if (args[0] == "{")
+                {
                     block.Add(new LineInfo(args, lineNumber));
                     parseBlock(compileState, p, block, inState, true);
                     return;
@@ -301,7 +327,6 @@ namespace SilverSim.Scripting.LSL
                 else if (args[0] == ";")
                 {
                     block.Add(new LineInfo(new List<string>(new string[] { "}" }), lineNumber));
-                    compileState.closeControlFlow();
                     return;
                 }
                 else if(args[args.Count - 1] == "{")
@@ -372,8 +397,8 @@ namespace SilverSim.Scripting.LSL
                 }
                 else if (args[0] == "}")
                 {
-                    compileState.closeControlFlows(p, block, "}");
                     compileState.m_LocalVariables.RemoveAt(compileState.m_LocalVariables.Count - 1);
+                    block.Add(new LineInfo(args, lineNumber));
                     return;
                 }
                 else
@@ -439,11 +464,6 @@ namespace SilverSim.Scripting.LSL
                     compileState.m_States[stateName].Add(args[0], stateList);
                     stateList.Add(new LineInfo(args, lineNumber));
                     parseBlock(compileState, p, stateList, true);
-                    if(compileState.HasOpenBlocks)
-                    {
-                        throw parserException(p, string.Format("Missing '}' at end of event {0} of state {1}", args[0], stateName));
-                    }
-                    compileState.closeControlFlows(p, stateList, "");
                 }
                 else if (args[0] == "}")
                 {
@@ -645,11 +665,6 @@ namespace SilverSim.Scripting.LSL
                                 fp = checkFunctionParameters(compileState, p, args.GetRange(3, args.Count - 4));
                                 funcList.Add(new LineInfo(args, lineNumber));
                                 parseBlock(compileState, p, funcList, false);
-                                if(compileState.HasOpenBlocks)
-                                {
-                                    throw parserException(p, string.Format("Missing '}' at end of '{1}'", args[1]));
-                                }
-                                compileState.closeControlFlows(p, funcList, "");
                                 compileState.m_Functions[args[1]] = funcList;
                                 break;
 
@@ -658,11 +673,6 @@ namespace SilverSim.Scripting.LSL
                                 args.Insert(0, "void");
                                 funcList.Add(new LineInfo(args, lineNumber));
                                 parseBlock(compileState, p, funcList, false);
-                                if(compileState.HasOpenBlocks)
-                                {
-                                    throw parserException(p, string.Format("Missing '}' at end of '{0}'", args[0]));
-                                }
-                                compileState.closeControlFlows(p, funcList, "");
                                 compileState.m_Functions[args[1]] = funcList;
                                 break;
                         }

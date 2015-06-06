@@ -1863,6 +1863,12 @@ namespace SilverSim.Scripting.LSL
                 {
                     /* type named things are variable declaration */
                     case "integer":
+                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        {
+                            throw compilerException(functionLine,
+                                string.Format("variable declaration cannot be a single statement within flow control '{0}'",
+                                compileState.GetControlFlowInfo(functionLine.LineNumber)));
+                        }
                         lb = ilgen.DeclareLocal(typeof(int));
                         if (compileState.EmitDebugSymbols)
                         {
@@ -1890,6 +1896,12 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "vector":
+                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        {
+                            throw compilerException(functionLine,
+                                string.Format("variable declaration cannot be a single statement within flow control '{0}'",
+                                compileState.GetControlFlowInfo(functionLine.LineNumber)));
+                        }
                         lb = ilgen.DeclareLocal(typeof(Vector3));
                         if (compileState.EmitDebugSymbols)
                         {
@@ -1917,6 +1929,12 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "list":
+                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        {
+                            throw compilerException(functionLine,
+                                string.Format("variable declaration cannot be a single statement within flow control '{0}'",
+                                compileState.GetControlFlowInfo(functionLine.LineNumber)));
+                        }
                         lb = ilgen.DeclareLocal(typeof(AnArray));
                         if (compileState.EmitDebugSymbols)
                         {
@@ -1944,6 +1962,12 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "float":
+                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        {
+                            throw compilerException(functionLine,
+                                string.Format("variable declaration cannot be a single statement within flow control '{0}'",
+                                compileState.GetControlFlowInfo(functionLine.LineNumber)));
+                        }
                         lb = ilgen.DeclareLocal(typeof(double));
                         if (compileState.EmitDebugSymbols)
                         {
@@ -1970,6 +1994,12 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "string":
+                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        {
+                            throw compilerException(functionLine,
+                                string.Format("variable declaration cannot be a single statement within flow control '{0}'",
+                                compileState.GetControlFlowInfo(functionLine.LineNumber)));
+                        }
                         lb = ilgen.DeclareLocal(typeof(string));
                         if (compileState.EmitDebugSymbols)
                         {
@@ -1997,6 +2027,12 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "key":
+                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        {
+                            throw compilerException(functionLine,
+                                string.Format("variable declaration cannot be a single statement within flow control '{0}'",
+                                compileState.GetControlFlowInfo(functionLine.LineNumber)));
+                        }
                         lb = ilgen.DeclareLocal(typeof(LSLKey));
                         if (compileState.EmitDebugSymbols)
                         {
@@ -2025,6 +2061,12 @@ namespace SilverSim.Scripting.LSL
 
                     case "rotation":
                     case "quaternion":
+                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        {
+                            throw compilerException(functionLine, 
+                                string.Format("variable declaration cannot be a single statement within flow control '{0}'",
+                                compileState.GetControlFlowInfo(functionLine.LineNumber)));
+                        }
                         lb = ilgen.DeclareLocal(typeof(Quaternion));
                         if (compileState.EmitDebugSymbols)
                         {
@@ -2052,7 +2094,7 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "for":
-                        {
+                        {   /* for(a;b;c) */
                             int semicolon1, semicolon2;
                             int endoffor;
                             int countparens = 0;
@@ -2071,9 +2113,9 @@ namespace SilverSim.Scripting.LSL
                                 }
                             }
 
-                            if (endoffor >= functionLine.Line.Count)
+                            if (endoffor != functionLine.Line.Count && endoffor != functionLine.Line.Count - 1)
                             {
-                                throw new Exception();
+                                throw compilerException(functionLine, "Invalid 'for' encountered");
                             }
 
                             semicolon1 = functionLine.Line.IndexOf(";");
@@ -2090,105 +2132,49 @@ namespace SilverSim.Scripting.LSL
                                     functionLine, 
                                     localVars);
                             }
-                            Label beginlabel = ilgen.DefineLabel();
+                            Label endlabel = ilgen.DefineLabel();
+                            Label looplabel = ilgen.DefineLabel();
+                            ControlFlowElement elem = new ControlFlowElement(
+                                ControlFlowType.For, 
+                                functionLine.Line[functionLine.Line.Count - 1] == "{", 
+                                looplabel,
+                                endlabel,
+                                compileState.IsImplicitControlFlow(functionLine.LineNumber));
+                            compileState.PushControlFlow(elem);
+
+                            ilgen.MarkLabel(looplabel);
 
                             if (semicolon1 + 1 != semicolon2)
                             {
-                                Label endlabel = ilgen.DefineLabel();
-                                ilgen.Emit(OpCodes.Br, endlabel);
-
-                                ilgen.MarkLabel(beginlabel);
-                                if (functionLine.Line[functionLine.Line.Count - 1] == "{")
-                                {
-                                    /* block */
-                                    ilgen.BeginScope();
-                                    ++lineIndex;
-                                    ProcessBlock(
-                                        compileState,
-                                        scriptTypeBuilder, 
-                                        stateTypeBuilder,
-                                        returnType,
-                                        ilgen,
-                                        functionBody,
-                                        localVars, 
-                                        labels,
-                                        ref lineIndex);
-                                }
-                                else if (endoffor + 1 != functionLine.Line.Count - 1)
-                                {
-                                    /* single statement */
-                                    ProcessStatement(
-                                        compileState,
-                                        scriptTypeBuilder,
-                                        stateTypeBuilder,
-                                        ilgen, 
-                                        endoffor + 1,
-                                        functionLine.Line.Count - 2,
-                                        functionLine, 
-                                        localVars);
-                                }
-
-                                if (semicolon2 + 1 != endoffor)
-                                {
-                                    ProcessStatement(
-                                        compileState,
-                                        scriptTypeBuilder, 
-                                        stateTypeBuilder, 
-                                        ilgen, 
-                                        semicolon2 + 1,
-                                        endoffor - 1, 
-                                        functionLine, 
-                                        localVars);
-                                }
-
-                                ilgen.MarkLabel(endlabel);
                                 ProcessExpression(
-                                    compileState, 
+                                    compileState,
                                     scriptTypeBuilder,
                                     stateTypeBuilder,
                                     ilgen,
-                                    typeof(int),
-                                    semicolon1 + 1, 
-                                    semicolon2 - 1, 
+                                    typeof(bool),
+                                    semicolon1 + 1,
+                                    semicolon2 - 1,
                                     functionLine,
                                     localVars);
-                                ilgen.Emit(OpCodes.Ldc_I4_0);
-                                ilgen.Emit(OpCodes.Ceq);
-                                ilgen.Emit(OpCodes.Brfalse, beginlabel);
+                                ilgen.Emit(OpCodes.Brfalse, endlabel);
                             }
-                            else
+
+                            if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
-                                ilgen.MarkLabel(beginlabel);
-                                if (functionLine.Line[functionLine.Line.Count - 1] == "{")
-                                {
-                                    /* block */
-                                    ilgen.BeginScope();
-                                    ++lineIndex;
-                                    ProcessBlock(
-                                        compileState, 
-                                        scriptTypeBuilder,
-                                        stateTypeBuilder,
-                                        returnType,
-                                        ilgen,
-                                        functionBody, 
-                                        localVars,
-                                        labels,
-                                        ref lineIndex);
-                                }
-                                else
-                                {
-                                    /* single statement */
-                                    ProcessStatement(
-                                        compileState,
-                                        scriptTypeBuilder,
-                                        stateTypeBuilder,
-                                        ilgen, 
-                                        endoffor + 1,
-                                        functionLine.Line.Count - 2,
-                                        functionLine,
-                                        localVars);
-                                }
-                                ilgen.Emit(OpCodes.Br, beginlabel);
+                                /* block */
+                                ilgen.BeginScope();
+                                ++lineIndex;
+                                ProcessBlock(
+                                    compileState,
+                                    scriptTypeBuilder, 
+                                    stateTypeBuilder,
+                                    returnType,
+                                    ilgen,
+                                    functionBody,
+                                    localVars, 
+                                    labels,
+                                    ref lineIndex);
+                                ilgen.EndScope();
                             }
                         }
                         break;
@@ -2212,171 +2198,169 @@ namespace SilverSim.Scripting.LSL
                                 }
                             }
 
-                            if (endofwhile >= functionLine.Line.Count)
+                            if ((endofwhile != functionLine.Line.Count && endofwhile != functionLine.Line.Count - 1) || endofwhile == 2)
                             {
-                                throw new Exception();
+                                throw compilerException(functionLine, "Invalid 'while' encountered");
                             }
 
-                            Label beginlabel = ilgen.DefineLabel();
+                            Label looplabel = ilgen.DefineLabel();
                             Label endlabel = ilgen.DefineLabel();
+                            ControlFlowElement elem = new ControlFlowElement(
+                                ControlFlowType.While, 
+                                functionLine.Line[functionLine.Line.Count - 1] == "{",
+                                looplabel, 
+                                endlabel,
+                                compileState.IsImplicitControlFlow(functionLine.LineNumber));
+                            compileState.PushControlFlow(elem);
+
                             ilgen.Emit(OpCodes.Br, endlabel);
 
-                            ilgen.MarkLabel(beginlabel);
-                            if (functionLine.Line[functionLine.Line.Count - 1] == "{")
-                            {
-                                /* block */
-                                ilgen.BeginScope();
-                                ++lineIndex;
-                                ProcessBlock(
-                                    compileState, 
-                                    scriptTypeBuilder, 
-                                    stateTypeBuilder,
-                                    returnType,
-                                    ilgen,
-                                    functionBody,
-                                    localVars, 
-                                    labels, 
-                                    ref lineIndex);
-                            }
-                            else if (endofwhile + 1 != functionLine.Line.Count - 1)
-                            {
-                                /* single statement */
-                                ProcessStatement(
-                                    compileState,
-                                    scriptTypeBuilder,
-                                    stateTypeBuilder, 
-                                    ilgen, 
-                                    endofwhile + 1,
-                                    functionLine.Line.Count - 2,
-                                    functionLine, 
-                                    localVars);
-                            }
-
-                            ilgen.MarkLabel(endlabel);
+                            ilgen.MarkLabel(looplabel);
                             ProcessExpression(
-                                compileState, 
-                                scriptTypeBuilder, 
-                                stateTypeBuilder, 
+                                compileState,
+                                scriptTypeBuilder,
+                                stateTypeBuilder,
                                 ilgen,
                                 typeof(bool),
-                                2, 
-                                endofwhile - 1, 
+                                2,
+                                endofwhile - 1,
                                 functionLine,
                                 localVars);
-                            ilgen.Emit(OpCodes.Ldc_I4_0);
-                            ilgen.Emit(OpCodes.Ceq);
-                            ilgen.Emit(OpCodes.Brfalse, beginlabel);
+                            ilgen.Emit(OpCodes.Brfalse, endlabel);
+
+                            if(functionLine.Line[functionLine.Line.Count - 1] == "{")
+                            {
+                                ilgen.BeginScope();
+                            }
                         }
                         break;
 
                     case "do":
                         {
-                            int endofdo;
-                            int beginofwhile = 0;
-                            int countparens = 0;
+                            Label looplabel = ilgen.DefineLabel();
+                            Label endlabel = ilgen.DefineLabel();
+                            Label enterlabel = ilgen.DefineLabel();
+                            ControlFlowElement elem = new ControlFlowElement(
+                                ControlFlowType.DoWhile,
+                                functionLine.Line[functionLine.Line.Count - 1] == "{",
+                                looplabel, 
+                                endlabel, 
+                                compileState.IsImplicitControlFlow(functionLine.LineNumber));
+                            compileState.PushControlFlow(elem);
 
-                            #region Find end of do
-                            for (endofdo = 0; endofdo <= functionLine.Line.Count; ++endofdo)
+                            if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
-                                if (functionLine.Line[endofdo] == ")")
+                                ilgen.BeginScope();
+                            }
+                            ilgen.MarkLabel(looplabel);
+                        }
+                        break;
+
+                    case "if":
+                        {
+                            Label eoiflabel = ilgen.DefineLabel();
+                            Label endlabel = ilgen.DefineLabel();
+
+                            int endofif;
+                            int countparens = 0;
+                            for (endofif = 0; endofif <= functionLine.Line.Count; ++endofif)
+                            {
+                                if (functionLine.Line[endofif] == ")")
                                 {
                                     if (--countparens == 0)
                                     {
                                         break;
                                     }
                                 }
-                                else if (functionLine.Line[endofdo] == "(")
+                                else if (functionLine.Line[endofif] == "(")
                                 {
                                     ++countparens;
                                 }
                             }
 
-                            if (endofdo >= functionLine.Line.Count)
+                            if ((endofif != functionLine.Line.Count && endofif != functionLine.Line.Count - 1) || endofif == 2)
                             {
-                                throw new Exception();
-                            }
-                            #endregion
-
-                            #region Find while
-                            if (functionLine.Line[functionLine.Line.Count - 1] != "{")
-                            {
-                                for (beginofwhile = functionLine.Line.Count - 1; beginofwhile >= 0; --beginofwhile)
-                                {
-                                    if (functionLine.Line[beginofwhile] == "(")
-                                    {
-                                        if (--countparens == 0)
-                                        {
-                                            break;
-                                        }
-                                    }
-                                    else if (functionLine.Line[beginofwhile] == ")")
-                                    {
-                                        ++countparens;
-                                    }
-                                }
-                                if (beginofwhile < 0 || beginofwhile < endofdo + 1 || functionLine.Line[beginofwhile - 1] != "while")
-                                {
-                                    throw new Exception();
-                                }
-                            }
-                            #endregion
-
-                            Label beginlabel = ilgen.DefineLabel();
-
-                            ilgen.MarkLabel(beginlabel);
-                            if (functionLine.Line[functionLine.Line.Count - 1] == "{")
-                            {
-                                /* block */
-                                ilgen.BeginScope();
-                                ++lineIndex;
-                                ProcessBlock(
-                                    compileState, 
-                                    scriptTypeBuilder, 
-                                    stateTypeBuilder,
-                                    returnType,
-                                    ilgen, 
-                                    functionBody, 
-                                    localVars, 
-                                    labels,
-                                    ref lineIndex);
-                                beginofwhile = 0;
-                                if(++lineIndex >= functionBody.Count)
-                                {
-                                    throw new Exception();
-                                }
-                                functionLine = functionBody[lineIndex];
-                                if (functionLine.Line[0] != "while")
-                                {
-                                    throw new Exception();
-                                }
-                            }
-                            else if (endofdo + 1 != beginofwhile - 1)
-                            {
-                                /* single statement */
-                                ProcessStatement(
-                                    compileState,
-                                    scriptTypeBuilder,
-                                    stateTypeBuilder, 
-                                    ilgen, 
-                                    endofdo + 1, 
-                                    beginofwhile - 2,
-                                    functionLine,
-                                    localVars);
+                                throw compilerException(functionLine, "Invalid 'if' encountered");
                             }
 
                             ProcessExpression(
                                 compileState,
-                                scriptTypeBuilder, 
-                                stateTypeBuilder, 
-                                ilgen, 
-                                typeof(bool), 
-                                beginofwhile + 1,
-                                functionLine.Line.Count - 2,
+                                scriptTypeBuilder,
+                                stateTypeBuilder,
+                                ilgen,
+                                typeof(bool),
+                                2,
+                                endofif - 1,
                                 functionLine,
                                 localVars);
-                            ilgen.Emit(OpCodes.Ldc_I4_0);
-                            ilgen.Emit(OpCodes.Ceq);
-                            ilgen.Emit(OpCodes.Brfalse, beginlabel);
+                            ilgen.Emit(OpCodes.Brfalse, endlabel);
+
+                            if (functionLine.Line[functionLine.Line.Count - 1] == "{")
+                            {
+                                ilgen.BeginScope();
+                            }
+                        }
+                        break;
+
+                    case "else":
+                        if(null == compileState.LastBlock)
+                        {
+                            throw compilerException(functionLine, "No matching 'if' found for 'else'");
+                        }
+                        else if(functionLine.Line.Count > 1 && functionLine.Line[1] == "if")
+                        { /* else if */
+                            Label eoiflabel = compileState.LastBlock.EndOfIfFlowLabel.Value;
+                            Label endlabel = ilgen.DefineLabel();
+
+                            int endofif;
+                            int countparens = 0;
+                            for (endofif = 0; endofif <= functionLine.Line.Count; ++endofif)
+                            {
+                                if (functionLine.Line[endofif] == ")")
+                                {
+                                    if (--countparens == 0)
+                                    {
+                                        break;
+                                    }
+                                }
+                                else if (functionLine.Line[endofif] == "(")
+                                {
+                                    ++countparens;
+                                }
+                            }
+
+                            if ((endofif != functionLine.Line.Count && endofif != functionLine.Line.Count - 1) || endofif == 2)
+                            {
+                                throw compilerException(functionLine, "Invalid 'else if' encountered");
+                            }
+
+                            ProcessExpression(
+                                compileState,
+                                scriptTypeBuilder,
+                                stateTypeBuilder,
+                                ilgen,
+                                typeof(bool),
+                                2,
+                                endofif - 1,
+                                functionLine,
+                                localVars);
+                            ilgen.Emit(OpCodes.Brfalse, endlabel);
+
+                            if (functionLine.Line[functionLine.Line.Count - 1] == "{")
+                            {
+                                ilgen.BeginScope();
+                            }
+                        }
+                        else
+                        {
+                            /* else */
+                            Label eoiflabel = compileState.LastBlock.EndOfIfFlowLabel.Value;
+                            Label endlabel = ilgen.DefineLabel();
+
+                            if (functionLine.Line[functionLine.Line.Count - 1] == "{")
+                            {
+                                ilgen.BeginScope();
+                            }
                         }
                         break;
 
@@ -2387,6 +2371,7 @@ namespace SilverSim.Scripting.LSL
                             labels[functionLine.Line[1]] = label;
                         }
                         ilgen.Emit(OpCodes.Br, labels[functionLine.Line[1]]);
+                        compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
                         break;
 
                     case "return":
@@ -2498,6 +2483,7 @@ namespace SilverSim.Scripting.LSL
                                 localVars);
                         }
                         ilgen.Emit(OpCodes.Ret);
+                        compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
                         break;
 
                     case "state":
@@ -2509,32 +2495,44 @@ namespace SilverSim.Scripting.LSL
                         ilgen.Emit(OpCodes.Ldstr, functionLine.Line[1]);
                         ilgen.Emit(OpCodes.Newobj, typeof(ChangeStateException).GetConstructor(new Type[1] { typeof(string) }));
                         ilgen.Emit(OpCodes.Throw);
+                        compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
                         break;
 
                     case "{": /* new unconditional block */
-                        ilgen.BeginScope();
-                        ++lineIndex;
-                        ProcessBlock(
-                            compileState, 
-                            scriptTypeBuilder, 
-                            stateTypeBuilder,
-                            returnType,
-                            ilgen, 
-                            functionBody,
-                            localVars,
-                            labels, 
-                            ref lineIndex);
+                        compileState.PopControlFlowImplicits(ilgen, functionLine.LineNumber);
+                        {
+                            ControlFlowElement elem = new ControlFlowElement(ControlFlowType.UnconditionalBlock, true);
+                            compileState.PushControlFlow(elem);
+                            ilgen.BeginScope();
+                            ++lineIndex;
+                            ProcessBlock(
+                                compileState,
+                                scriptTypeBuilder,
+                                stateTypeBuilder,
+                                returnType,
+                                ilgen,
+                                functionBody,
+                                localVars,
+                                labels,
+                                ref lineIndex);
+                        }
                         break;
 
-                    case "}": /* end unconditional block */
-                        if (outerLabels != null)
+                    case "}": /* end unconditional/conditional block */
                         {
-                            ilgen.EndScope();
+                            ControlFlowElement elem = compileState.PopControlFlowExplicit(ilgen, functionLine.LineNumber);
+                            if (elem.IsExplicitBlock && elem.Type != ControlFlowType.Entry)
+                            {
+                                ilgen.EndScope();
+                            }
                         }
                         /* no increment here, is done outside */
                         return;
 
                     default:
+                        /* drop last block */
+                        compileState.LastBlock = null;
+
                         ProcessStatement(
                             compileState,
                             scriptTypeBuilder,
@@ -2558,6 +2556,7 @@ namespace SilverSim.Scripting.LSL
             List<LineInfo> functionBody,
             Dictionary<string, object> localVars)
         {
+            compileState.InitControlFlow();
             Type returnType = typeof(void);
             List<string> functionDeclaration = functionBody[0].Line;
             string functionName = functionDeclaration[1];
