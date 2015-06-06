@@ -89,6 +89,7 @@ namespace SilverSim.Scripting.LSL
             public Label? LoopLabel;
             public Label? EndOfControlFlowLabel;
             public Label? EndOfIfFlowLabel;
+            public bool EndOfIfLabelDefined = false;
 
             public ControlFlowElement(ControlFlowType type, bool isExplicit, Label looplabel, Label eofclabel)
             {
@@ -113,7 +114,7 @@ namespace SilverSim.Scripting.LSL
                 EndOfControlFlowLabel = eofclabel;
                 EndOfIfFlowLabel = eoiflabel;
             }
-            public ControlFlowElement(ControlFlowType type, bool isExplicit, Label looplabel, Label eofclabel, Label eoiflabel, bool popOneImplicit)
+            public ControlFlowElement(ControlFlowType type, bool isExplicit, Label? looplabel, Label eofclabel, Label eoiflabel, bool popOneImplicit)
             {
                 IsExplicitBlock = isExplicit;
                 Type = type;
@@ -148,6 +149,7 @@ namespace SilverSim.Scripting.LSL
             public void InitControlFlow()
             {
                 m_ControlFlowStack.Clear();
+                LastBlock = null;
                 PushControlFlow(new ControlFlowElement(ControlFlowType.Entry, true));
             }
 
@@ -187,6 +189,12 @@ namespace SilverSim.Scripting.LSL
 
             public void PopControlFlowImplicit(ILGenerator ilgen, int lineNumber)
             {
+                if (LastBlock != null && (LastBlock.Type == ControlFlowType.If || LastBlock.Type == ControlFlowType.ElseIf) && null != LastBlock.EndOfIfFlowLabel)
+                {
+                    ilgen.MarkLabel(LastBlock.EndOfIfFlowLabel.Value);
+                    LastBlock = null;
+                }
+
                 if(m_ControlFlowStack.Count == 0)
                 {
                     throw new CompilerException(lineNumber, "Mismatched '}'");
@@ -201,7 +209,14 @@ namespace SilverSim.Scripting.LSL
                     }
                     if(null != elem.EndOfIfFlowLabel)
                     {
-                        ilgen.Emit(OpCodes.Br, elem.EndOfIfFlowLabel.Value);
+                        if (elem.Type == ControlFlowType.Else)
+                        {
+                            ilgen.MarkLabel(elem.EndOfIfFlowLabel.Value);
+                        }
+                        else
+                        {
+                            ilgen.Emit(OpCodes.Br, elem.EndOfIfFlowLabel.Value);
+                        }
                     }
                     if (null != elem.EndOfControlFlowLabel)
                     {
@@ -212,6 +227,12 @@ namespace SilverSim.Scripting.LSL
 
             public void PopControlFlowImplicits(ILGenerator ilgen, int lineNumber)
             {
+                if (LastBlock != null && (LastBlock.Type == ControlFlowType.If || LastBlock.Type == ControlFlowType.ElseIf) && null != LastBlock.EndOfIfFlowLabel)
+                {
+                    ilgen.MarkLabel(LastBlock.EndOfIfFlowLabel.Value);
+                    LastBlock = null;
+                }
+
                 if (m_ControlFlowStack.Count == 0)
                 {
                     throw new CompilerException(lineNumber, "Mismatched '}'");
@@ -226,7 +247,14 @@ namespace SilverSim.Scripting.LSL
                     }
                     if (null != elem.EndOfIfFlowLabel)
                     {
-                        ilgen.Emit(OpCodes.Br, elem.EndOfIfFlowLabel.Value);
+                        if (elem.Type == ControlFlowType.Else)
+                        {
+                            ilgen.MarkLabel(elem.EndOfIfFlowLabel.Value);
+                        }
+                        else
+                        {
+                            ilgen.Emit(OpCodes.Br, elem.EndOfIfFlowLabel.Value);
+                        }
                     }
                     if (null != elem.EndOfControlFlowLabel)
                     {
@@ -237,6 +265,12 @@ namespace SilverSim.Scripting.LSL
 
             public ControlFlowElement PopControlFlowExplicit(ILGenerator ilgen, int lineNumber)
             {
+                if (LastBlock != null && (LastBlock.Type == ControlFlowType.If || LastBlock.Type == ControlFlowType.ElseIf) && null != LastBlock.EndOfIfFlowLabel)
+                {
+                    ilgen.MarkLabel(LastBlock.EndOfIfFlowLabel.Value);
+                    LastBlock = null;
+                }
+
                 while (m_ControlFlowStack.Count != 0 && !m_ControlFlowStack[0].IsExplicitBlock)
                 {
                     ControlFlowElement elem = m_ControlFlowStack[0];
@@ -269,7 +303,14 @@ namespace SilverSim.Scripting.LSL
                     }
                     if (null != elem.EndOfIfFlowLabel)
                     {
-                        ilgen.Emit(OpCodes.Br, elem.EndOfIfFlowLabel.Value);
+                        if (elem.Type == ControlFlowType.Else)
+                        {
+                            ilgen.MarkLabel(elem.EndOfIfFlowLabel.Value);
+                        }
+                        else
+                        {
+                            ilgen.Emit(OpCodes.Br, elem.EndOfIfFlowLabel.Value);
+                        }
                     }
                     if (null != elem.EndOfControlFlowLabel)
                     {

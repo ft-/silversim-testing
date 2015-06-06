@@ -2113,7 +2113,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                             }
 
-                            if (endoffor != functionLine.Line.Count && endoffor != functionLine.Line.Count - 1)
+                            if (endoffor != functionLine.Line.Count - 1 && endoffor != functionLine.Line.Count - 2)
                             {
                                 throw compilerException(functionLine, "Invalid 'for' encountered");
                             }
@@ -2198,7 +2198,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                             }
 
-                            if ((endofwhile != functionLine.Line.Count && endofwhile != functionLine.Line.Count - 1) || endofwhile == 2)
+                            if ((endofwhile != functionLine.Line.Count - 1 && endofwhile != functionLine.Line.Count - 2) || endofwhile == 2)
                             {
                                 throw compilerException(functionLine, "Invalid 'while' encountered");
                             }
@@ -2231,6 +2231,17 @@ namespace SilverSim.Scripting.LSL
                             if(functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 ilgen.BeginScope();
+                                ++lineIndex;
+                                ProcessBlock(
+                                    compileState,
+                                    scriptTypeBuilder,
+                                    stateTypeBuilder,
+                                    returnType,
+                                    ilgen,
+                                    functionBody,
+                                    localVars,
+                                    labels,
+                                    ref lineIndex);
                             }
                         }
                         break;
@@ -2248,11 +2259,22 @@ namespace SilverSim.Scripting.LSL
                                 compileState.IsImplicitControlFlow(functionLine.LineNumber));
                             compileState.PushControlFlow(elem);
 
+                            ilgen.MarkLabel(looplabel);
                             if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 ilgen.BeginScope();
+                                ++lineIndex;
+                                ProcessBlock(
+                                    compileState,
+                                    scriptTypeBuilder,
+                                    stateTypeBuilder,
+                                    returnType,
+                                    ilgen,
+                                    functionBody,
+                                    localVars,
+                                    labels,
+                                    ref lineIndex);
                             }
-                            ilgen.MarkLabel(looplabel);
                         }
                         break;
 
@@ -2278,7 +2300,16 @@ namespace SilverSim.Scripting.LSL
                                 }
                             }
 
-                            if ((endofif != functionLine.Line.Count && endofif != functionLine.Line.Count - 1) || endofif == 2)
+                            ControlFlowElement elem = new ControlFlowElement(
+                                ControlFlowType.If,
+                                functionLine.Line[functionLine.Line.Count - 1] == "{",
+                                null,
+                                endlabel,
+                                eoiflabel,
+                                compileState.IsImplicitControlFlow(functionLine.LineNumber));
+                            compileState.PushControlFlow(elem);
+
+                            if ((endofif != functionLine.Line.Count - 1 && endofif != functionLine.Line.Count - 2) || endofif == 2)
                             {
                                 throw compilerException(functionLine, "Invalid 'if' encountered");
                             }
@@ -2298,6 +2329,17 @@ namespace SilverSim.Scripting.LSL
                             if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 ilgen.BeginScope();
+                                ++lineIndex;
+                                ProcessBlock(
+                                    compileState,
+                                    scriptTypeBuilder,
+                                    stateTypeBuilder,
+                                    returnType,
+                                    ilgen,
+                                    functionBody,
+                                    localVars,
+                                    labels,
+                                    ref lineIndex);
                             }
                         }
                         break;
@@ -2311,6 +2353,15 @@ namespace SilverSim.Scripting.LSL
                         { /* else if */
                             Label eoiflabel = compileState.LastBlock.EndOfIfFlowLabel.Value;
                             Label endlabel = ilgen.DefineLabel();
+
+                            ControlFlowElement elem = new ControlFlowElement(
+                                ControlFlowType.ElseIf,
+                                functionLine.Line[functionLine.Line.Count - 1] == "{",
+                                null,
+                                endlabel,
+                                eoiflabel,
+                                compileState.IsImplicitControlFlow(functionLine.LineNumber));
+                            compileState.PushControlFlow(elem);
 
                             int endofif;
                             int countparens = 0;
@@ -2329,7 +2380,7 @@ namespace SilverSim.Scripting.LSL
                                 }
                             }
 
-                            if ((endofif != functionLine.Line.Count && endofif != functionLine.Line.Count - 1) || endofif == 2)
+                            if ((endofif != functionLine.Line.Count - 1 && endofif != functionLine.Line.Count - 2) || endofif == 2)
                             {
                                 throw compilerException(functionLine, "Invalid 'else if' encountered");
                             }
@@ -2340,7 +2391,7 @@ namespace SilverSim.Scripting.LSL
                                 stateTypeBuilder,
                                 ilgen,
                                 typeof(bool),
-                                2,
+                                3,
                                 endofif - 1,
                                 functionLine,
                                 localVars);
@@ -2349,6 +2400,17 @@ namespace SilverSim.Scripting.LSL
                             if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 ilgen.BeginScope();
+                                ++lineIndex;
+                                ProcessBlock(
+                                    compileState,
+                                    scriptTypeBuilder,
+                                    stateTypeBuilder,
+                                    returnType,
+                                    ilgen,
+                                    functionBody,
+                                    localVars,
+                                    labels,
+                                    ref lineIndex);
                             }
                         }
                         else
@@ -2357,9 +2419,29 @@ namespace SilverSim.Scripting.LSL
                             Label eoiflabel = compileState.LastBlock.EndOfIfFlowLabel.Value;
                             Label endlabel = ilgen.DefineLabel();
 
+                            ControlFlowElement elem = new ControlFlowElement(
+                                ControlFlowType.Else,
+                                functionLine.Line[functionLine.Line.Count - 1] == "{",
+                                null,
+                                endlabel,
+                                eoiflabel,
+                                compileState.IsImplicitControlFlow(functionLine.LineNumber));
+                            compileState.PushControlFlow(elem);
+
                             if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 ilgen.BeginScope();
+                                ++lineIndex;
+                                ProcessBlock(
+                                    compileState,
+                                    scriptTypeBuilder,
+                                    stateTypeBuilder,
+                                    returnType,
+                                    ilgen,
+                                    functionBody,
+                                    localVars,
+                                    labels,
+                                    ref lineIndex);
                             }
                         }
                         break;
@@ -2530,9 +2612,6 @@ namespace SilverSim.Scripting.LSL
                         return;
 
                     default:
-                        /* drop last block */
-                        compileState.LastBlock = null;
-
                         ProcessStatement(
                             compileState,
                             scriptTypeBuilder,
@@ -2542,6 +2621,7 @@ namespace SilverSim.Scripting.LSL
                             functionLine.Line.Count - 2, 
                             functionLine, 
                             localVars);
+                        compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
                         break;
                 }
             }
