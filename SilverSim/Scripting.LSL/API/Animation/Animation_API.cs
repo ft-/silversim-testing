@@ -47,15 +47,39 @@ namespace SilverSim.Scripting.LSL.API.Animation
 
         }
 
+        public UUID getAnimationAssetID(ScriptInstance Instance, string item)
+        {
+            UUID assetID;
+            if (!UUID.TryParse(item, out assetID))
+            {
+#warning Implement viewer built-in animations
+                /* must be an inventory item */
+                lock (Instance)
+                {
+                    ObjectPartInventoryItem i = Instance.Part.Inventory[item];
+                    if (i.InventoryType != Types.Inventory.InventoryType.Animation)
+                    {
+                        throw new InvalidOperationException(string.Format("Inventory item {0} is not an animation", item));
+                    }
+                    assetID = i.AssetID;
+                }
+            }
+            return assetID;
+        }
+
         [APILevel(APIFlags.LSL)]
         [LSLTooltip("permission to start or stop animations on agent")]
         public const int PERMISSION_TRIGGER_ANIMATION = 0x10;
 
         [APILevel(APIFlags.LSL)]
-        public void llStartAnimation(ScriptInstance instance, string anim)
+        public void llStartAnimation(
+            ScriptInstance instance,
+            [LSLTooltip("animation to be played")]
+            string anim)
         {
             lock (instance)
             {
+                UUID animID = getAnimationAssetID(instance, anim);
                 IAgent agent;
                 ObjectPartInventoryItem.PermsGranterInfo grantinfo = instance.Item.PermsGranter;
                 if ((grantinfo.PermsMask & ScriptPermissions.TriggerAnimation) == 0 ||
@@ -73,15 +97,48 @@ namespace SilverSim.Scripting.LSL.API.Animation
                     return;
                 }
 
-                agent.PlayAnimation(anim, instance.Part.ID);
+                agent.PlayAnimation(animID, instance.Part.ID);
+            }
+        }
+
+        [APILevel(APIFlags.OSSL)]
+        [LSLTooltip("causes an animation to be played on the specified avatar.")]
+        public void osAvatarPlayAnimation(
+            ScriptInstance instance, 
+            [LSLTooltip("UUID of the agent")]
+            LSLKey avatar, 
+            [LSLTooltip("animation to be played")]
+            string animation)
+        {
+            lock (instance)
+            {
+                instance.CheckThreatLevel("osAvatarPlayAnimation", ScriptInstance.ThreatLevelType.VeryHigh);
+                UUID animID = getAnimationAssetID(instance, animation);
+                IAgent agent;
+                ObjectPartInventoryItem.PermsGranterInfo grantinfo = instance.Item.PermsGranter;
+                try
+                {
+                    agent = instance.Part.ObjectGroup.Scene.Agents[avatar];
+                }
+                catch
+                {
+                    instance.ShoutError("osAvatarPlayAnimation: agent not in region");
+                    return;
+                }
+
+                agent.PlayAnimation(animID, instance.Part.ID);
             }
         }
 
         [APILevel(APIFlags.LSL)]
-        public void llStopAnimation(ScriptInstance instance, string anim)
+        public void llStopAnimation(
+            ScriptInstance instance, 
+            [LSLTooltip("animation to be stopped")]
+            string anim)
         {
             lock (instance)
             {
+                UUID animID = getAnimationAssetID(instance, anim);
                 IAgent agent;
                 ObjectPartInventoryItem.PermsGranterInfo grantinfo = instance.Item.PermsGranter;
                 if ((grantinfo.PermsMask & ScriptPermissions.TriggerAnimation) == 0 ||
@@ -99,7 +156,36 @@ namespace SilverSim.Scripting.LSL.API.Animation
                     return;
                 }
 
-                agent.StopAnimation(anim, instance.Part.ID);
+                agent.StopAnimation(animID, instance.Part.ID);
+            }
+        }
+
+        [APILevel(APIFlags.OSSL)]
+        [LSLTooltip("stops the specified animation if it is playing on the avatar given.")]
+        public void osAvatarStopAnimation(
+            ScriptInstance instance,
+            [LSLTooltip("UUID of the agent")]
+            LSLKey avatar,
+            [LSLTooltip("animation to be stopped")]
+            string animation)
+        {
+            lock (instance)
+            {
+                instance.CheckThreatLevel("osAvatarStopAnimation", ScriptInstance.ThreatLevelType.VeryHigh);
+                UUID animID = getAnimationAssetID(instance, animation);
+                IAgent agent;
+                ObjectPartInventoryItem.PermsGranterInfo grantinfo = instance.Item.PermsGranter;
+                try
+                {
+                    agent = instance.Part.ObjectGroup.Scene.Agents[avatar];
+                }
+                catch
+                {
+                    instance.ShoutError("osAvatarStopAnimation: agent not in region");
+                    return;
+                }
+
+                agent.PlayAnimation(animID, instance.Part.ID);
             }
         }
 

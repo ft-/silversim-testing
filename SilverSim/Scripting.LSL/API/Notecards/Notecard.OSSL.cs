@@ -53,7 +53,6 @@ namespace SilverSim.Scripting.LSL.API.Notecards
             osMakeNotecard(Instance, notecardName, nc);
         }
 
-        [APILevel(APIFlags.OSSL)]
         public void osMakeNotecard(ScriptInstance Instance, string notecardName, string contents)
         {
             lock (Instance)
