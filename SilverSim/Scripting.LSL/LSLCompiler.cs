@@ -105,6 +105,7 @@ namespace SilverSim.Scripting.LSL
             m_ReservedWords.Add("return");
             m_ReservedWords.Add("state");
             m_ReservedWords.Add("void");
+            m_ReservedWords.Add("quaternion");
 
             m_MultiOps.Add('+');
             m_MultiOps.Add('-');
@@ -336,25 +337,8 @@ namespace SilverSim.Scripting.LSL
 
             m_Resolver = new Resolver(m_ReservedWords, operators, blockOps);
 
-#if TEST_CODE
-            #region Test Code
-            string test = "test(vector a, float b, string c, integer d, list e, key f) {" +
-                    "{llSay(PUBLIC_CHANNEL, \"Hello\");}" +
-                    "integer f;\n" +
-                    "}\n" +
-                    "default {\n" +
-                    "state_entry()\n{\n" +
-                    "test(\n);\n" +
-                    "}}";
-            using (Stream s = new MemoryStream(Encoding.UTF8.GetBytes(test)))
-            {
-                List<string> shbangs = new List<string>();
-                shbangs.Add("//#!Mode: ASSL");
-                shbangs.Add("//#!Enable: Admin");
-                IScriptAssembly t = Compile(AppDomain.CurrentDomain, UUI.Unknown, shbangs, UUID.Zero, new StreamReader(s));
-            }
-            #endregion
-#endif
+            GenerateLSLSyntaxFile();
+
             SilverSim.Scripting.Common.CompilerRegistry.ScriptCompilers["lsl"] = this;
             SilverSim.Scripting.Common.CompilerRegistry.ScriptCompilers["XEngine"] = this; /* we won't be supporting anything beyond LSL compatibility */
         }

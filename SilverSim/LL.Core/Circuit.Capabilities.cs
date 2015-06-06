@@ -25,12 +25,15 @@ exception statement from your version.
 
 using SilverSim.LL.Core.Capabilities;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Types.Script;
+using SilverSim.Scripting.Common;
 using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Reflection;
 using System.Xml;
 
 namespace SilverSim.LL.Core
@@ -244,6 +247,24 @@ namespace SilverSim.LL.Core
                     m_ServiceURLCapabilities.Add(kvp.Key.Substring(4), kvp.Value);
                 }
             }
+
+            try
+            {
+                /* The LSLCompiler is the only one that has this method */
+                /* there has to be LSLSyntaxId which contains the hash of the file as UUID */
+                IScriptCompiler compiler = CompilerRegistry.ScriptCompilers["lsl"];
+                MethodInfo mi = compiler.GetType().GetMethod("GetLSLSyntaxId", new Type[0]);
+                if(compiler.GetType().GetMethod("WriteLSLSyntaxFile", new Type[] { typeof(Stream)}) != null && mi != null)
+                {
+                    AddDefCapability("LSLSyntax", regionSeedID, Cap_LSLSyntax, capConfig);
+                    m_ServiceURLCapabilities["LSLSyntaxId"] = (string)mi.Invoke(compiler, new object[0]);
+                }
+            }
+            catch
+            {
+
+            }
+
             AddDefCapability("SimConsoleAsync", regionSeedID, Cap_SimConsoleAsync, capConfig);
             AddDefCapability("FetchInventory2", regionSeedID, Cap_FetchInventory2, capConfig);
             AddDefCapability("FetchLib2", regionSeedID, Cap_FetchInventory2, capConfig);

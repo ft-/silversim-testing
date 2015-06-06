@@ -1974,6 +1974,7 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "rotation":
+                    case "quaternion":
                         lb = ilgen.DeclareLocal(typeof(Quaternion));
                         if (compileState.EmitDebugSymbols)
                         {
@@ -2539,6 +2540,7 @@ namespace SilverSim.Scripting.LSL
                     break;
 
                 case "rotation":
+                case "quaternion":
                     returnType = typeof(Quaternion);
                     break;
 
@@ -2587,6 +2589,7 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "rotation":
+                    case "quaternion":
                         t = typeof(Quaternion);
                         break;
 
@@ -2854,6 +2857,7 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "rotation":
+                    case "quaternion":
                         returnType = typeof(Quaternion);
                         break;
 
@@ -2907,6 +2911,7 @@ namespace SilverSim.Scripting.LSL
                             break;
 
                         case "rotation":
+                        case "quaternion":
                             paramTypes.Add(typeof(Quaternion));
                             paramName.Add(functionDeclaration[functionStart++]);
                             break;

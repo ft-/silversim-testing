@@ -147,6 +147,7 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "rotation":
+                    case "quaternion":
                         fp.Type = typeof(Quaternion);
                         break;
 
@@ -211,6 +212,7 @@ namespace SilverSim.Scripting.LSL
                         case "string":
                         case "key":
                         case "rotation":
+                        case "quaternion":
                             checkUsedName(compileState, p, "Local Variable", args[1]);
                             compileState.m_LocalVariables[compileState.m_LocalVariables.Count - 1].Add(args[1]);
                             if (args[2] != ";" && args[2] != "=")
@@ -430,6 +432,7 @@ namespace SilverSim.Scripting.LSL
                             break;
 
                         case "rotation":
+                        case "quaternion":
                             checkUsedName(compileState, p, "Variable", args[1]);
                             compileState.m_VariableDeclarations[args[1]] = typeof(Quaternion);
                             if(args[2] == "=")
@@ -490,6 +493,7 @@ namespace SilverSim.Scripting.LSL
                             case "string":
                             case "key":
                             case "rotation":
+                            case "quaternion":
                             case "void":
                                 checkUsedName(compileState, p, "Function", args[1]);
                                 fp = checkFunctionParameters(compileState, p, args.GetRange(3, args.Count - 4));
