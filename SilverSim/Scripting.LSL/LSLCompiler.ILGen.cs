@@ -311,6 +311,71 @@ namespace SilverSim.Scripting.LSL
                 case Tree.EntryType.OperatorBinary:
                     /* right first */
                     /* left then */
+                    if(functionTree.Entry == ".")
+                    {
+                        Type retLeft = ProcessExpressionPart(
+                            compileState,
+                            scriptTypeBuilder,
+                            stateTypeBuilder,
+                            ilgen,
+                            functionTree.SubTree[0],
+                            lineNumber,
+                            localVars);
+                        if(functionTree.SubTree[1].Type != Tree.EntryType.Unknown &&
+                            functionTree.SubTree[1].Type != Tree.EntryType.Variable)
+                        {
+                            throw new CompilerException(lineNumber, string.Format("'{0}' is not a member of type vector", functionTree.SubTree[1].Entry));
+                        }
+                        else if(typeof(Vector3) == retLeft)
+                        {
+                            switch(functionTree.SubTree[1].Entry)
+                            {
+                                case "x":
+                                    ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("X"));
+                                    return typeof(double);
+
+                                case "y":
+                                    ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("Y"));
+                                    return typeof(double);
+
+                                case "z":
+                                    ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("Z"));
+                                    return typeof(double);
+
+                                default:
+                                    throw new CompilerException(lineNumber, string.Format("'{0}' is not a member of type vector", functionTree.SubTree[1].Entry));
+                            }
+                        }
+                        else if(typeof(Quaternion) == retLeft)
+                        {
+                            switch (functionTree.SubTree[1].Entry)
+                            {
+                                case "x":
+                                    ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("X"));
+                                    return typeof(double);
+
+                                case "y":
+                                    ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("Y"));
+                                    return typeof(double);
+
+                                case "z":
+                                    ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("Z"));
+                                    return typeof(double);
+
+                                case "s":
+                                    ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("W"));
+                                    return typeof(double);
+
+                                default:
+                                    throw new CompilerException(lineNumber, string.Format("'{0}' is not a member of type rotation", functionTree.SubTree[1].Entry));
+                            }
+                        }
+                        else
+                        {
+                            throw new CompilerException(lineNumber, string.Format("Component access with '{0}' not defined", MapType(retLeft)));
+                        }
+                    }
+                    else
                     {
                         Type retRight = ProcessExpressionPart(
                             compileState, 
@@ -322,6 +387,7 @@ namespace SilverSim.Scripting.LSL
                             localVars);
 
                         Type retLeft;
+                        Type lookupType;
                         object varInfo = null;
                         if (functionTree.Entry == "=")
                         {
@@ -352,6 +418,9 @@ namespace SilverSim.Scripting.LSL
                                 localVars);
                         }
 
+
+                        lookupType = retLeft;
+
                         if(functionTree.Entry == "=")
                         {
                             /* skip conversion here */
@@ -362,33 +431,87 @@ namespace SilverSim.Scripting.LSL
                             ilgen.BeginScope();
                             LocalBuilder lb = ilgen.DeclareLocal(retLeft);
                             ilgen.Emit(OpCodes.Stloc, lb);
-                            ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetProperty("Length").GetGetMethod());
+                            ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetProperty("Count").GetGetMethod());
                             ilgen.Emit(OpCodes.Ldloc, lb);
-                            ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetProperty("Length").GetGetMethod());
+                            ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetProperty("Count").GetGetMethod());
                             ilgen.EndScope();
                             retLeft = typeof(int);
                             retRight = typeof(int);
+                            lookupType = retLeft;
                         }
-                        else if(retLeft == retRight)
+                        #region vector * scalar or quaternion * scalar
+                        else if(retLeft == typeof(Vector3) && retRight == typeof(double))
+                        {
+
+                        }
+                        else if (retLeft == typeof(Quaternion) && retRight == typeof(double))
+                        {
+
+                        }
+                        else if (retLeft == typeof(Vector3) && retRight == typeof(int))
+                        {
+                            ilgen.Emit(OpCodes.Conv_R8);
+                            retRight = typeof(double);
+                        }
+                        else if (retLeft == typeof(Quaternion) && retRight == typeof(int))
+                        {
+                            ilgen.Emit(OpCodes.Conv_R8);
+                            retRight = typeof(double);
+                        }
+                        #endregion
+                        #region scalar * vector or scalar * quaternion
+                        else if (retLeft == typeof(double) && retRight == typeof(Vector3))
+                        {
+                            lookupType = retRight;
+                        }
+                        else if (retLeft == typeof(double) && retRight == typeof(Quaternion))
+                        {
+                            lookupType = retRight;
+                        }
+                        else if (retLeft == typeof(int) && (retRight == typeof(Vector3) || retRight == typeof(Quaternion)))
+                        {
+                            ilgen.BeginScope();
+                            LocalBuilder lb = ilgen.DeclareLocal(retRight);
+                            ilgen.Emit(OpCodes.Stloc, lb);
+                            ilgen.Emit(OpCodes.Conv_R8);
+                            ilgen.Emit(OpCodes.Ldloc, lb);
+                            ilgen.EndScope();
+                            lookupType = retRight;
+                            retLeft = typeof(double);
+                        }
+                        #endregion
+                        #region vector * quaternion or vector / quaternion
+                        else if(retLeft == typeof(Vector3) && retRight == typeof(Quaternion))
+                        {
+
+                        }
+                        #endregion
+                        else if (retLeft == retRight)
                         {
 
                         }
                         else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
                         {
-                            ilgen.BeginScope();
-                            LocalBuilder lb = ilgen.DeclareLocal(retLeft);
-                            ilgen.Emit(OpCodes.Stloc, lb);
                             ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
-                            ilgen.Emit(OpCodes.Ldloc, lb);
-                            ilgen.EndScope();
                             retRight = typeof(string);
                         }
                         else if(retLeft == typeof(LSLKey) && retRight == typeof(string))
                         {
+                            ilgen.BeginScope();
+                            LocalBuilder lb = ilgen.DeclareLocal(retLeft);
+                            ilgen.Emit(OpCodes.Stloc, lb);
                             ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
+                            ilgen.Emit(OpCodes.Ldloc, lb);
+                            ilgen.EndScope();
                             retLeft = typeof(string);
+                            lookupType = retLeft;
                         }
                         else if(retLeft == typeof(double) && retRight == typeof(int))
+                        {
+                            ilgen.Emit(OpCodes.Conv_R8);
+                            retRight = typeof(double);
+                        }
+                        else if(retLeft == typeof(int) && retRight == typeof(double))
                         {
                             ilgen.BeginScope();
                             LocalBuilder lb = ilgen.DeclareLocal(retLeft);
@@ -396,12 +519,8 @@ namespace SilverSim.Scripting.LSL
                             ilgen.Emit(OpCodes.Conv_R8);
                             ilgen.Emit(OpCodes.Ldloc, lb);
                             ilgen.EndScope();
-                            retRight = typeof(double);
-                        }
-                        else if(retLeft == typeof(int) && retRight == typeof(double))
-                        {
-                            ilgen.Emit(OpCodes.Conv_R8);
                             retLeft = typeof(double);
+                            lookupType = retLeft;
                         }
                         else if(retRight == typeof(AnArray))
                         {
@@ -467,7 +586,27 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
                                 {
-                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Addition", new Type[] { retLeft, retRight }));
+                                    if (retRight == typeof(LSLKey))
+                                    {
+                                        ilgen.BeginScope();
+                                        LocalBuilder lb = ilgen.DeclareLocal(typeof(LSLKey));
+                                        ilgen.Emit(OpCodes.Stloc, lb);
+                                        ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[] { typeof(AnArray) }));
+                                        ilgen.Emit(OpCodes.Dup);
+                                        ilgen.Emit(OpCodes.Ldloc, lb);
+                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { typeof(IValue) }));
+                                        ilgen.EndScope();
+                                    }
+                                    else
+                                    {
+                                        MethodInfo mi = lookupType.GetMethod("op_Addition", new Type[] { retLeft, retRight });
+                                        if (mi == null)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("internal error. operator '+' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                        }
+                                        ilgen.Emit(OpCodes.Call, mi);
+                                        retLeft = mi.ReturnType;
+                                    }
                                 }
                                 else
                                 {
@@ -482,7 +621,13 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey))
                                 {
-                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Subtraction", new Type[] { retLeft, retRight }));
+                                    MethodInfo mi = lookupType.GetMethod("op_Subtraction", new Type[] { retLeft, retRight });
+                                    if (mi == null)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '-' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Call, mi);
+                                    retLeft = mi.ReturnType;
                                 }
                                 else
                                 {
@@ -493,11 +638,30 @@ namespace SilverSim.Scripting.LSL
                             case "*":
                                 if (retLeft == typeof(int) || retLeft == typeof(double))
                                 {
-                                    ilgen.Emit(OpCodes.Mul);
+                                    if (retRight == typeof(Vector3) || retRight == typeof(Quaternion))
+                                    {
+                                        MethodInfo mi = lookupType.GetMethod("op_Multiply", new Type[] { retLeft, retRight });
+                                        if (mi == null)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("internal error. operator '*' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                        }
+                                        ilgen.Emit(OpCodes.Call, mi);
+                                        retLeft = mi.ReturnType;
+                                    }
+                                    else
+                                    {
+                                        ilgen.Emit(OpCodes.Mul);
+                                    }
                                 }
                                 else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey))
                                 {
-                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Multiplication", new Type[] { retLeft, retRight }));
+                                    MethodInfo mi = lookupType.GetMethod("op_Multiply", new Type[] { retLeft, retRight });
+                                    if (mi == null)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '*' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Call, mi);
+                                    retLeft = mi.ReturnType;
                                 }
                                 else
                                 {
@@ -508,11 +672,30 @@ namespace SilverSim.Scripting.LSL
                             case "/":
                                 if (retLeft == typeof(int) || retLeft == typeof(double))
                                 {
-                                    ilgen.Emit(OpCodes.Div);
+                                    if (retRight == typeof(Vector3) || retRight == typeof(Quaternion))
+                                    {
+                                        MethodInfo mi = lookupType.GetMethod("op_Division", new Type[] { retLeft, retRight });
+                                        if (mi == null)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("internal error. operator '/' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                        }
+                                        ilgen.Emit(OpCodes.Call, mi);
+                                        retLeft = mi.ReturnType;
+                                    }
+                                    else
+                                    {
+                                        ilgen.Emit(OpCodes.Div);
+                                    }
                                 }
                                 else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey))
                                 {
-                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Division", new Type[] { retLeft, retRight }));
+                                    MethodInfo mi = lookupType.GetMethod("op_Division", new Type[] { retLeft, retRight });
+                                    if (mi == null)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '/' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Call, mi);
+                                    retLeft = mi.ReturnType;
                                 }
                                 else
                                 {
@@ -527,7 +710,13 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey))
                                 {
-                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Remainder", new Type[] { retLeft, retRight }));
+                                    MethodInfo mi = lookupType.GetMethod("op_Modulus", new Type[] { retLeft, retRight });
+                                    if (mi == null)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '%' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Call, mi);
+                                    retLeft = mi.ReturnType;
                                 }
                                 else
                                 {
@@ -580,13 +769,12 @@ namespace SilverSim.Scripting.LSL
                                     ilgen.Emit(OpCodes.Callvirt, retLeft.GetProperty("Length").GetGetMethod());
                                     ilgen.EndScope();
                                     ilgen.Emit(OpCodes.Ceq);
-                                    return typeof(int);
                                 }
                                 else
                                 {
                                     throw new CompilerException(lineNumber, string.Format("operator '==' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
-                                return retLeft;
+                                return typeof(int);
 
                             case "!=":
                                 if (retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
@@ -616,13 +804,12 @@ namespace SilverSim.Scripting.LSL
                                     ilgen.EndScope();
                                     /* LSL is really about subtraction with that operator */
                                     ilgen.Emit(OpCodes.Sub);
-                                    return typeof(int);
                                 }
                                 else
                                 {
                                     throw new CompilerException(lineNumber, string.Format("operator '!=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
-                                return retLeft;
+                                return typeof(int);
 
                             case "<=":
                                 if (retLeft == typeof(int) || retLeft == typeof(double))
@@ -639,7 +826,7 @@ namespace SilverSim.Scripting.LSL
                                 {
                                     throw new CompilerException(lineNumber, string.Format("operator '<=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
-                                return retLeft;
+                                return typeof(int);
 
                             case "<":
                                 if (retLeft == typeof(int) || retLeft == typeof(double))
@@ -654,7 +841,7 @@ namespace SilverSim.Scripting.LSL
                                 {
                                     throw new CompilerException(lineNumber, string.Format("operator '<' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
-                                return retLeft;
+                                return typeof(int);
 
                             case ">":
                                 if (retLeft == typeof(int) || retLeft == typeof(double))
@@ -669,7 +856,7 @@ namespace SilverSim.Scripting.LSL
                                 {
                                     throw new CompilerException(lineNumber, string.Format("operator '>' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
-                                return retLeft;
+                                return typeof(int);
 
                             case ">=":
                                 if (retLeft == typeof(int) || retLeft == typeof(double))
@@ -686,7 +873,7 @@ namespace SilverSim.Scripting.LSL
                                 {
                                     throw new CompilerException(lineNumber, string.Format("operator '>=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
                                 }
-                                return retLeft;
+                                return typeof(int);
 
                             case "&&":
                                 if (typeof(int) != retLeft)
@@ -703,7 +890,7 @@ namespace SilverSim.Scripting.LSL
                                     ProcessCasts(ilgen, typeof(bool), retRight, lineNumber);
                                 }
                                 ilgen.Emit(OpCodes.And);
-                                return retLeft;
+                                return typeof(int);
 
                             case "&":
                                 if(typeof(int) == retLeft)
@@ -753,7 +940,7 @@ namespace SilverSim.Scripting.LSL
                                     ProcessCasts(ilgen, typeof(bool), retRight, lineNumber);
                                 }
                                 ilgen.Emit(OpCodes.Or);
-                                return retLeft;
+                                return typeof(int);
 
                             case "=":
                                 ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
@@ -770,7 +957,16 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
                                 {
-                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Addition", new Type[] { retLeft, retRight }));
+                                    MethodInfo mi = retLeft.GetMethod("op_Addition", new Type[] { retLeft, retRight });
+                                    if(null == mi)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '+=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Call, mi);
+                                    if(retLeft != mi.ReturnType)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("'+=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    }
                                 }
                                 else
                                 {
@@ -789,7 +985,16 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
                                 {
-                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Subtraction", new Type[] { retLeft, retRight }));
+                                    MethodInfo mi = retLeft.GetMethod("op_Subtraction", new Type[] { retLeft, retRight });
+                                    if (null == mi)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '-=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Call, mi);
+                                    if (retLeft != mi.ReturnType)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("operator '-=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    }
                                 }
                                 else
                                 {
@@ -811,7 +1016,16 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
                                 {
-                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Multiplication", new Type[] { retLeft, retRight }));
+                                    MethodInfo mi = retLeft.GetMethod("op_Multiply", new Type[] { retLeft, retRight });
+                                    if (null == mi)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '*=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Call, mi);
+                                    if (retLeft != mi.ReturnType)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("operator '*=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    }
                                 }
                                 else
                                 {
@@ -833,7 +1047,16 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
                                 {
-                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Division", new Type[] { retLeft, retRight }));
+                                    MethodInfo mi = retLeft.GetMethod("op_Division", new Type[] { retLeft, retRight });
+                                    if (null == mi)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '/=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Call, mi);
+                                    if (retLeft != mi.ReturnType)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("operator '/=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    }
                                 }
                                 else
                                 {
@@ -852,7 +1075,16 @@ namespace SilverSim.Scripting.LSL
                                 }
                                 else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
                                 {
-                                    ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Remainder", new Type[] { retLeft, retRight }));
+                                    MethodInfo mi = retLeft.GetMethod("op_Division", new Type[] { retLeft, retRight });
+                                    if (null == mi)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '%=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Call, mi);
+                                    if (retLeft != mi.ReturnType)
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("operator '%=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    }
                                 }
                                 else
                                 {
@@ -891,6 +1123,33 @@ namespace SilverSim.Scripting.LSL
                                 else
                                 {
                                     throw new CompilerException(lineNumber, string.Format("operator '!' not supported for {0}", MapType(ret)));
+                                }
+                                return ret;
+
+                            case "-":
+                                ret = ProcessExpressionPart(
+                                    compileState,
+                                    scriptTypeBuilder,
+                                    stateTypeBuilder,
+                                    ilgen,
+                                    functionTree.SubTree[0],
+                                    lineNumber,
+                                    localVars);
+                                if (ret == typeof(int) || ret == typeof(double))
+                                {
+                                    ilgen.Emit(OpCodes.Neg);
+                                }
+                                else if(ret == typeof(Vector3))
+                                {
+                                    ilgen.Emit(OpCodes.Call, typeof(Vector3).GetMethod("op_UnaryNegation"));
+                                }
+                                else if (ret == typeof(Quaternion))
+                                {
+                                    ilgen.Emit(OpCodes.Call, typeof(Quaternion).GetMethod("op_UnaryNegation"));
+                                }
+                                else
+                                {
+                                    throw new CompilerException(lineNumber, string.Format("operator '-' not supported for {0}", MapType(ret)));
                                 }
                                 return ret;
 
@@ -1398,7 +1657,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 else if (fromType == typeof(LSLKey))
                 {
-                    ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetProperty("IsLSLTrue").GetGetMethod());
+                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetProperty("IsLSLTrue").GetGetMethod());
                 }
                 else if (fromType == typeof(double))
                 {
@@ -1751,7 +2010,7 @@ namespace SilverSim.Scripting.LSL
                     }
                     else if (ret == typeof(Vector3) || ret == typeof(Quaternion))
                     {
-                        ilgen.Emit(OpCodes.Callvirt, ret.GetMethod("op_Multiplication", new Type[] { ret, ret }));
+                        ilgen.Emit(OpCodes.Callvirt, ret.GetMethod("op_Multiply", new Type[] { ret, ret }));
                     }
                     else
                     {

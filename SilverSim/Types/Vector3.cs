@@ -346,6 +346,14 @@ namespace SilverSim.Types
             return new Vector3(value1.X + value2.X, value1.Y + value2.Y, value1.Z + value2.Z);
         }
 
+        public static AnArray operator +(Vector3 v, AnArray a)
+        {
+            AnArray b = new AnArray();
+            b.Add(v);
+            b.AddRange(a);
+            return b;
+        }
+
         public static Vector3 operator -(Vector3 value)
         {
             return new Vector3(-value.X, -value.Y, -value.Z);
@@ -357,6 +365,11 @@ namespace SilverSim.Types
         }
 
         public static Vector3 operator *(Vector3 value, double scaleFactor)
+        {
+            return new Vector3(value.X * scaleFactor, value.Y * scaleFactor, value.Z * scaleFactor);
+        }
+
+        public static Vector3 operator *(double scaleFactor, Vector3 value)
         {
             return new Vector3(value.X * scaleFactor, value.Y * scaleFactor, value.Z * scaleFactor);
         }
@@ -383,6 +396,16 @@ namespace SilverSim.Types
         public static Vector3 operator *(Vector3 vector, Matrix4 matrix)
         {
             return Transform(vector, matrix);
+        }
+
+        public static double operator*(Vector3 v1, Vector3 v2)
+        {
+            return v1.Dot(v2);
+        }
+
+        public static Vector3 operator %(Vector3 v1, Vector3 v2)
+        {
+            return v1.Cross(v2);
         }
 
         public static Vector3 operator /(Vector3 value, double divider)

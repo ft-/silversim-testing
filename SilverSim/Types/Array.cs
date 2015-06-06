@@ -69,6 +69,7 @@ namespace SilverSim.Types
                 return LSLValueType.Invalid;
             }
         }
+
         #endregion Properties
 
         public new string ToString()
@@ -111,6 +112,36 @@ namespace SilverSim.Types
         {
             AnArray n = new AnArray(a);
             n.AddRange(b);
+            return n;
+        }
+        public static AnArray operator +(AnArray a, int b)
+        {
+            AnArray n = new AnArray(a);
+            n.Add(b);
+            return n;
+        }
+        public static AnArray operator +(AnArray a, double b)
+        {
+            AnArray n = new AnArray(a);
+            n.Add(b);
+            return n;
+        }
+        public static AnArray operator +(AnArray a, string b)
+        {
+            AnArray n = new AnArray(a);
+            n.Add(b);
+            return n;
+        }
+        public static AnArray operator +(AnArray a, Vector3 b)
+        {
+            AnArray n = new AnArray(a);
+            n.Add(b);
+            return n;
+        }
+        public static AnArray operator +(AnArray a, Quaternion b)
+        {
+            AnArray n = new AnArray(a);
+            n.Add(b);
             return n;
         }
         #endregion Add methods

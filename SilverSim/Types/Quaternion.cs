@@ -621,6 +621,14 @@ namespace SilverSim.Types
                 quaternion1.W + quaternion2.W);
         }
 
+        public static AnArray operator+(Quaternion q, AnArray a)
+        {
+            AnArray b = new AnArray();
+            b.Add(q);
+            b.AddRange(a);
+            return b;
+        }
+
         public static Quaternion operator -(Quaternion quaternion)
         {
             return new Quaternion(-quaternion.X, -quaternion.Y, -quaternion.Z, -quaternion.W);

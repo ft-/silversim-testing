@@ -310,6 +310,12 @@ namespace SilverSim.Scripting.LSL
                                     ((Tree.ConstantValueString)(st.SubTree[0].Value)).Value +
                                     ((Tree.ConstantValueString)(st.SubTree[1].Value)).Value);
                             }
+                            else if (st.SubTree[0].Value is ConstantValueRotation && st.SubTree[1].Value is ConstantValueRotation)
+                            {
+                                st.Value = new ConstantValueRotation(
+                                    ((ConstantValueRotation)(st.SubTree[0].Value)).Value +
+                                    ((ConstantValueRotation)(st.SubTree[1].Value)).Value);
+                            }
                             else
                             {
                                 throw new Resolver.ResolverException(string.Format("Cannot process '{0}' on parameters of mismatching type", st.Entry));
@@ -346,6 +352,12 @@ namespace SilverSim.Scripting.LSL
                                 st.Value = new ConstantValueVector(
                                     ((ConstantValueVector)(st.SubTree[0].Value)).Value -
                                     ((ConstantValueVector)(st.SubTree[1].Value)).Value);
+                            }
+                            else if (st.SubTree[0].Value is ConstantValueRotation && st.SubTree[1].Value is ConstantValueRotation)
+                            {
+                                st.Value = new ConstantValueRotation(
+                                    ((ConstantValueRotation)(st.SubTree[0].Value)).Value -
+                                    ((ConstantValueRotation)(st.SubTree[1].Value)).Value);
                             }
                             else
                             {
@@ -414,6 +426,12 @@ namespace SilverSim.Scripting.LSL
                                     ((ConstantValueRotation)(st.SubTree[0].Value)).Value *
                                     ((ConstantValueRotation)(st.SubTree[1].Value)).Value);
                             }
+                            else if (st.SubTree[0].Value is ConstantValueVector && st.SubTree[1].Value is ConstantValueRotation)
+                            {
+                                st.Value = new ConstantValueVector(
+                                    ((ConstantValueVector)(st.SubTree[0].Value)).Value *
+                                    ((ConstantValueRotation)(st.SubTree[1].Value)).Value);
+                            }
                             else
                             {
                                 throw new Resolver.ResolverException(string.Format("Cannot process '{0}' on parameters of mismatching type", st.Entry));
@@ -463,6 +481,12 @@ namespace SilverSim.Scripting.LSL
                                     ((ConstantValueRotation)(st.SubTree[0].Value)).Value /
                                     ((ConstantValueRotation)(st.SubTree[1].Value)).Value);
                             }
+                            else if (st.SubTree[0].Value is ConstantValueVector && st.SubTree[1].Value is ConstantValueRotation)
+                            {
+                                st.Value = new ConstantValueVector(
+                                    ((ConstantValueVector)(st.SubTree[0].Value)).Value /
+                                    ((ConstantValueRotation)(st.SubTree[1].Value)).Value);
+                            }
                             else
                             {
                                 throw new Resolver.ResolverException(string.Format("Cannot process '{0}' on parameters of mismatching type", st.Entry));
@@ -493,6 +517,12 @@ namespace SilverSim.Scripting.LSL
                                 st.Value = new Tree.ConstantValueInt(
                                     ((Tree.ConstantValueInt)(st.SubTree[0].Value)).Value %
                                     ((Tree.ConstantValueInt)(st.SubTree[1].Value)).Value);
+                            }
+                            else if (st.SubTree[0].Value is ConstantValueVector && st.SubTree[1].Value is ConstantValueVector)
+                            {
+                                st.Value = new ConstantValueVector(
+                                    ((ConstantValueVector)(st.SubTree[0].Value)).Value %
+                                    ((ConstantValueVector)(st.SubTree[1].Value)).Value);
                             }
                             else
                             {

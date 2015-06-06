@@ -152,6 +152,13 @@ namespace SilverSim.Scripting.LSL
             return v.m_Value.Length != 0;
         }
 
+        public static AnArray operator+(LSLKey k, AnArray a)
+        {
+            AnArray b = new AnArray();
+            b.Add(k);
+            b.AddRange(a);
+            return b;
+        }
         #endregion Operators
 
         #region Helpers
