@@ -106,6 +106,7 @@ namespace SilverSim.Scripting.LSL
                     st.Entry = st.SubTree[0].Entry;
                     st.Type = Tree.EntryType.Typecast;
                     st.SubTree.Add(tree.SubTree[pos + 1]);
+                    st.SubTree.RemoveAt(0);
                     tree.SubTree.RemoveAt(pos + 1);
                 }
                 else

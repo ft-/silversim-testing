@@ -1203,6 +1203,56 @@ namespace SilverSim.Scripting.LSL
                     {
                         throw new CompilerException(lineNumber, string.Format("unknown variable '{0}'", functionTree.Entry));
                     }
+
+                case Tree.EntryType.Typecast:
+                    {
+                        Type toType;
+                        switch(functionTree.Entry)
+                        {
+                            case "integer":
+                                toType = typeof(int);
+                                break;
+
+                            case "float":
+                                toType = typeof(double);
+                                break;
+
+                            case "string":
+                                toType = typeof(string);
+                                break;
+
+                            case "key":
+                                toType = typeof(LSLKey);
+                                break;
+
+                            case "list":
+                                toType = typeof(AnArray);
+                                break;
+
+                            case "vector":
+                                toType = typeof(Vector3);
+                                break;
+
+                            case "rotation":
+                            case "quaternion":
+                                toType = typeof(Quaternion);
+                                break;
+
+                            default:
+                                throw new CompilerException(lineNumber, string.Format("{0} is not a type", functionTree.Entry));
+                        }
+
+                        Type fromType = ProcessExpressionPart(
+                            compileState,
+                            scriptTypeBuilder,
+                            stateTypeBuilder,
+                            ilgen,
+                            functionTree.SubTree[0],
+                            lineNumber,
+                            localVars);
+                        ProcessCasts(ilgen, toType, fromType, lineNumber);
+                        return toType;
+                    }
                     
                 default:
                     throw new CompilerException(lineNumber, string.Format("unknown '{0}'", functionTree.Entry));
@@ -1861,7 +1911,7 @@ namespace SilverSim.Scripting.LSL
                         }
                         else
                         {
-                            ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                            ilgen.Emit(OpCodes.Ldsfld, typeof(Vector3).GetField("Zero"));
                         }
                         ilgen.Emit(OpCodes.Stloc, lb);
                         break;
@@ -1996,7 +2046,7 @@ namespace SilverSim.Scripting.LSL
                         }
                         else
                         {
-                            ilgen.Emit(OpCodes.Newobj, typeof(Quaternion).GetConstructor(new Type[0]));
+                            ilgen.Emit(OpCodes.Ldsfld, typeof(Quaternion).GetField("Identity"));
                         }
                         ilgen.Emit(OpCodes.Stloc, lb);
                         break;
