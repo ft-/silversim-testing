@@ -22,6 +22,10 @@ empty_void_rotation(rotation a, rotation b)
 {
 }
 
+empty_void_quaternion(quaternion a, quaternion b)
+{
+}
+
 empty_void_list(list a, list b)
 {
 }
@@ -55,6 +59,14 @@ list empty_list()
 }
 
 key empty_key()
+{
+}
+
+quaternion empty_quaternion()
+{
+}
+
+void voidfn()
 {
 }
 
