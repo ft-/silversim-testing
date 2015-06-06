@@ -310,7 +310,8 @@ namespace SilverSim.Scripting.Common.Expression
                     }
                     else if(nt.SubTree[start - 1].Type == Tree.EntryType.OperatorUnknown ||
                         nt.SubTree[start - 1].Type == Tree.EntryType.OperatorBinary ||
-                        nt.SubTree[start - 1].Type == Tree.EntryType.Separator)
+                        nt.SubTree[start - 1].Type == Tree.EntryType.Separator ||
+                        nt.SubTree[start - 1].Type == Tree.EntryType.Level)
                     {
                         int end;
                         /* a declaration too */

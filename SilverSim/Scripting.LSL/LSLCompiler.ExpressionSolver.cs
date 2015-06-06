@@ -97,21 +97,53 @@ namespace SilverSim.Scripting.LSL
 
         void solveTypecasts(Tree tree)
         {
-            int pos;
-            for (pos = 0; pos < tree.SubTree.Count - 1; ++pos)
+            int i;
+            for (i = 0; i < tree.SubTree.Count; ++i)
             {
-                Tree st = tree.SubTree[pos];
-                if (st.SubTree.Count == 1 && st.SubTree[0].Type == Tree.EntryType.ReservedWord && st.Type == Tree.EntryType.Level)
+                Tree st = tree.SubTree[i];
+                if (st.Type == Tree.EntryType.OperatorLeftUnary)
                 {
-                    st.Entry = st.SubTree[0].Entry;
-                    st.Type = Tree.EntryType.Typecast;
-                    st.SubTree.Add(tree.SubTree[pos + 1]);
-                    st.SubTree.RemoveAt(0);
-                    tree.SubTree.RemoveAt(pos + 1);
+                    switch (st.Entry)
+                    {
+                        case "(integer)":
+                        case "(string)":
+                        case "(float)":
+                        case "(key)":
+                        case "(list)":
+                        case "(rotation)":
+                        case "(quaternion)":
+                        case "(vector)":
+                            st.Type = Tree.EntryType.Typecast;
+                            st.Entry = st.Entry.Substring(1, st.Entry.Length - 2);
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
-                else
+                else if (st.Type == Tree.EntryType.OperatorUnknown && i + 1 < tree.SubTree.Count && 
+                    (tree.SubTree[i + 1].Type == Tree.EntryType.Vector ||
+                    tree.SubTree[i + 1].Type == Tree.EntryType.Rotation))
                 {
-                    ++pos;
+                    switch (st.Entry)
+                    {
+                        case "(integer)":
+                        case "(string)":
+                        case "(float)":
+                        case "(key)":
+                        case "(list)":
+                        case "(rotation)":
+                        case "(quaternion)":
+                        case "(vector)":
+                            st.Type = Tree.EntryType.Typecast;
+                            st.Entry = st.Entry.Substring(1, st.Entry.Length - 2);
+                            st.SubTree.Add(tree.SubTree[i + 1]);
+                            tree.SubTree.RemoveAt(i + 1);
+                            break;
+
+                        default:
+                            break;
+                    }
                 }
                 solveTypecasts(st);
             }
@@ -224,6 +256,9 @@ namespace SilverSim.Scripting.LSL
                             break;
 
                         case "rotation":
+                            break;
+
+                        case "quaternion":
                             break;
 
                         case "key":
@@ -762,8 +797,51 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
+        void combineTypecasts(CompileState cs, Tree resolvetree)
+        {
+            int i;
+
+            for(i = 0; i < resolvetree.SubTree.Count; ++i)
+            {
+                if(resolvetree.SubTree[i].SubTree.Count != 0)
+                {
+                    throw new Resolver.ResolverException("invalid state for combineTypecasts");
+                }
+            }
+
+            for(i = 0; i < resolvetree.SubTree.Count; ++i)
+            {
+                if(i + 2 < resolvetree.SubTree.Count)
+                {
+                    if(resolvetree.SubTree[i].Entry == "(" && resolvetree.SubTree[i + 2].Entry == ")" &&
+                        m_ReservedWords.Contains(resolvetree.SubTree[i + 1].Entry))
+                    {
+                        switch(resolvetree.SubTree[i + 1].Entry)
+                        {
+                            case "integer":
+                            case "float":
+                            case "string":
+                            case "list":
+                            case "rotation":
+                            case "quaternion":
+                            case "vector":
+                            case "key":
+                                resolvetree.SubTree[i].Entry = "(" + resolvetree.SubTree[i + 1].Entry + ")";
+                                resolvetree.SubTree.RemoveAt(i + 1);
+                                resolvetree.SubTree.RemoveAt(i + 1);
+                                break;
+
+                            default:
+                                throw new Resolver.ResolverException(string.Format("invalid typecast {0}", resolvetree.SubTree[i + 1].Entry));
+                        }
+                    }
+                }
+            }
+        }
+
         void solveTree(CompileState cs, Tree resolvetree)
         {
+            combineTypecasts(cs, resolvetree);
             m_Resolver.Process(resolvetree);
             solveDeclarations(resolvetree);
             solveTypecasts(resolvetree);

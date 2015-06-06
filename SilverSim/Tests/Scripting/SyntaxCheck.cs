@@ -63,8 +63,11 @@ namespace SilverSim.Tests.Scripting
         public bool Run()
         {
             bool success = true;
+            int count = 0;
+            int successcnt = 0;
             foreach (KeyValuePair<UUID, string> file in Files)
             {
+                ++count;
                 m_Log.InfoFormat("Testing syntax of {1} ({0})", file.Key, file.Value);
                 try
                 {
@@ -83,6 +86,7 @@ namespace SilverSim.Tests.Scripting
                         }
                     }
                     m_Log.InfoFormat("Syntax of {1} ({0}) parsed successfully", file.Key, file.Value);
+                    ++successcnt;
                 }
                 catch (CompilerException e)
                 {
@@ -98,6 +102,7 @@ namespace SilverSim.Tests.Scripting
                 }
             }
 
+            m_Log.InfoFormat("{0} of {1} compilations successful", successcnt, count);
             return success;
         }
     }

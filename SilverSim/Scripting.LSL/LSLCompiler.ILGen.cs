@@ -205,8 +205,8 @@ namespace SilverSim.Scripting.LSL
                         MethodBuilder mb;
                         if (compileState.m_FunctionInfo.TryGetValue(functionTree.Entry, out mb))
                         {
-
-                            ParameterInfo[] pi = mb.GetParameters();
+                            KeyValuePair<Type, KeyValuePair<string, Type>[]> signatureInfo = compileState.m_FunctionSignature[functionTree.Entry];
+                            KeyValuePair<string, Type>[] pi = signatureInfo.Value;
 
                             if (null == stateTypeBuilder)
                             {
@@ -228,11 +228,23 @@ namespace SilverSim.Scripting.LSL
                                     functionTree.SubTree[i],
                                     lineNumber,
                                     localVars);
-                                ProcessImplicitCasts(ilgen, pi[i].ParameterType, t, lineNumber);
+                                try
+                                {
+                                    ProcessImplicitCasts(ilgen, pi[i].Value, t, lineNumber);
+                                }
+                                catch
+                                {
+                                    throw new CompilerException(lineNumber, 
+                                        string.Format("No implicit cast from {0} to {1} possible for parameter '{2}' of function '{3}'", 
+                                            MapType(t),
+                                            MapType(pi[i].Value),
+                                            pi[i].Key,
+                                            functionTree.Entry));
+                                }
                             }
 
                             ilgen.Emit(OpCodes.Callvirt, mb);
-                            return mb.ReturnType;
+                            return signatureInfo.Key;
                         }
                         else if(m_MethodNames.Contains(functionTree.Entry))
                         {
@@ -283,6 +295,7 @@ namespace SilverSim.Scripting.LSL
                                     }
                                 }
                             }
+                            throw new CompilerException(lineNumber, string.Format("Parameter mismatch at function {0}", functionTree.Entry));
                         }
                         throw new CompilerException(lineNumber, string.Format("No function {0} defined", functionTree.Entry));
                     }
@@ -3051,6 +3064,12 @@ namespace SilverSim.Scripting.LSL
                 }
 
                 method = scriptTypeBuilder.DefineMethod("fn_" + functionName, MethodAttributes.Public, returnType, paramTypes.ToArray());
+                KeyValuePair<string, Type>[] paramSignature = new KeyValuePair<string, Type>[paramTypes.Count];
+                for (int i = 0; i < paramTypes.Count; ++i)
+                {
+                    paramSignature[i] = new KeyValuePair<string, Type>(paramName[i], paramTypes[i]);
+                }
+                compileState.m_FunctionSignature[functionName] = new KeyValuePair<Type, KeyValuePair<string, Type>[]>(returnType, paramSignature);
                 compileState.m_FunctionInfo[functionName] = method;
             }
 

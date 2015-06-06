@@ -135,6 +135,7 @@ namespace SilverSim.Scripting.LSL
             public bool EmitDebugSymbols = false;
             public APIFlags AcceptedFlags;
             public Dictionary<string, MethodBuilder> m_FunctionInfo = new Dictionary<string, MethodBuilder>();
+            public Dictionary<string, KeyValuePair<Type, KeyValuePair<string, Type>[]>> m_FunctionSignature = new Dictionary<string, KeyValuePair<Type, KeyValuePair<string, Type>[]>>();
             public Dictionary<string, Type> m_VariableDeclarations = new Dictionary<string, Type>();
             public Dictionary<string, FieldBuilder> m_VariableFieldInfo = new Dictionary<string, FieldBuilder>();
             public Dictionary<string, LineInfo> m_VariableInitValues = new Dictionary<string, LineInfo>();
@@ -621,6 +622,16 @@ namespace SilverSim.Scripting.LSL
             blockOps.Add("[", "]");
 
             Dictionary<string, Resolver.OperatorType> plist;
+            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
+            plist.Add("(integer)", Resolver.OperatorType.LeftUnary);
+            plist.Add("(float)", Resolver.OperatorType.LeftUnary);
+            plist.Add("(string)", Resolver.OperatorType.LeftUnary);
+            plist.Add("(list)", Resolver.OperatorType.LeftUnary);
+            plist.Add("(key)", Resolver.OperatorType.LeftUnary);
+            plist.Add("(vector)", Resolver.OperatorType.LeftUnary);
+            plist.Add("(rotation)", Resolver.OperatorType.LeftUnary);
+            plist.Add("(quaternion)", Resolver.OperatorType.LeftUnary);
+
             operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
             plist.Add("@", Resolver.OperatorType.LeftUnary);
 

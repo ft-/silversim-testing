@@ -60,8 +60,11 @@ namespace SilverSim.Tests.Scripting
         public bool Run()
         {
             bool success = true;
+            int count = 0;
+            int successcnt = 0;
             foreach (KeyValuePair<UUID, string> file in Files)
             {
+                ++count;
                 m_Log.InfoFormat("Testing compilation of {1} ({0})", file.Key, file.Value);
                 try
                 {
@@ -70,6 +73,7 @@ namespace SilverSim.Tests.Scripting
                         CompilerRegistry.ScriptCompilers.Compile(AppDomain.CurrentDomain, UUI.Unknown, file.Key, reader);
                     }
                     m_Log.InfoFormat("Compilation of {1} ({0}) successful", file.Key, file.Value);
+                    ++successcnt;
                 }
                 catch (CompilerException e)
                 {
@@ -84,7 +88,7 @@ namespace SilverSim.Tests.Scripting
                     success = false;
                 }
             }
-
+            m_Log.InfoFormat("{0} of {1} compilations successful", successcnt, count);
             return success;
         }
     }
