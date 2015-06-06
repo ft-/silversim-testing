@@ -225,63 +225,63 @@ namespace SilverSim.Scripting.LSL.API.WindLight
         public AnArray aaWindlightGetScene(ScriptInstance Instance, AnArray rules)
         {
 #warning Implement aaWindlightGetScene(AnArray)
-            return new AnArray();
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.WindLight_Aurora)]
         public AnArray aaWindlightGetScene(ScriptInstance Instance, int dayCycleIndex, AnArray rules)
         {
 #warning Implement aaWindlightGetScene(int, AnArray)
-            return new AnArray();
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.WindLight_Aurora)]
         public int aaWindlightGetSceneIsStatic(ScriptInstance Instance)
         {
 #warning Implement aaWindlightGetSceneIsStatic()
-            return 0;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.WindLight_Aurora)]
         public int aaWindlightGetSceneDayCycleKeyFrameCount(ScriptInstance Instance)
         {
 #warning aaWindlightGetSceneDayCycleKeyFrameCount()
-            return 0;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.WindLight_Aurora)]
         public AnArray aaWindlightGetDayCycle(ScriptInstance Instance)
         {
 #warning aaWindlightGetDayCycle()
-            return new AnArray();
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.WindLight_Aurora)]
         public int aaWindlightRemoveDayCycleFrame(ScriptInstance Instance, int dayCycleFrame)
         {
 #warning Implement aaWindlightRemoveDayCycleFrame(int)
-            return 0;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.WindLight_Aurora)]
         public int aaWindlightAddDayCycleFrame(ScriptInstance Instance, double dayCyclePosition, int dayCycleFrameToCopy)
         {
-#warning aaWindlightAddDayCycleFrame
-            return 0;
+#warning Implement aaWindlightAddDayCycleFrame
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.WindLight_Aurora)]
         public int aaWindlightSetScene(ScriptInstance Instance, AnArray rules)
         {
 #warning Implement aaWindlightSetScene(AnArray)
-            return 0;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.WindLight_Aurora)]
         public int aaWindlightSetScene(ScriptInstance Instance, int dayCycleIndex, AnArray list)
         {
 #warning Implement aaWindlightSetScene(AnArray)
-            return 0;
+            throw new NotImplementedException();
         }
         #endregion
 

@@ -140,7 +140,7 @@ namespace SilverSim.Scripting.LSL.API.Inventory
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetInventoryCreator(ScriptInstance Instance, string item)
+        public LSLKey llGetInventoryCreator(ScriptInstance Instance, string item)
         {
             lock (Instance)
             {
@@ -156,13 +156,13 @@ namespace SilverSim.Scripting.LSL.API.Inventory
         }
 
         [APILevel(APIFlags.LSL)]
-        public UUID llGetInventoryKey(ScriptInstance Instance, string item)
+        public LSLKey llGetInventoryKey(ScriptInstance Instance, string item)
         {
             lock (Instance)
             {
                 try
                 {
-                    return Instance.Part.Inventory[item].ID;
+                    return Instance.Part.Inventory[item].AssetID;
                 }
                 catch
                 {
@@ -206,6 +206,12 @@ namespace SilverSim.Scripting.LSL.API.Inventory
                 }
                 return Instance.Part.Inventory.CountType((Types.Inventory.InventoryType)type);
             }
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public void llSetInventoryPermMask(ScriptInstance Instance, string name, int category, int mask)
+        {
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
@@ -268,6 +274,14 @@ namespace SilverSim.Scripting.LSL.API.Inventory
             }
         }
 
+        [APILevel(APIFlags.LSL)]
+        [ForcedSleep(1.0)]
+        public LSLKey llRequestInventoryData(ScriptInstance Instance, string name)
+        {
+#warning Implement llRequestInventoryData
+            throw new NotImplementedException();
+        }
+
         #region osGetInventoryDesc
         [APILevel(APIFlags.OSSL)]
         public string osGetInventoryDesc(ScriptInstance Instance, string item)
@@ -283,6 +297,22 @@ namespace SilverSim.Scripting.LSL.API.Inventory
                     return string.Empty;
                 }
             }
+        }
+        #endregion
+
+        #region Rez Inventory
+        [APILevel(APIFlags.LSL)]
+        public void llRezObject(ScriptInstance Instance, string inventory, Vector3 pos, Vector3 vel, Quaternion rot, int param)
+        {
+#warning Implement llRezObject
+            throw new NotImplementedException();
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public void llRezAtRoot(ScriptInstance Instance, string inventory, Vector3 pos, Vector3 vel, Quaternion rot, int param)
+        {
+#warning Implement llRezAtRoot
+            throw new NotImplementedException();
         }
         #endregion
     }

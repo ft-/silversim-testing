@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Scene.Types.Script;
+using System;
 
 namespace SilverSim.Scripting.LSL.API.Region
 {
@@ -44,14 +45,14 @@ namespace SilverSim.Scripting.LSL.API.Region
         public string llGetSimulatorHostname(ScriptInstance Instance)
         {
 #warning Implement llGetSimulatorHostname()
-            return string.Empty;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public Vector3 llGetRegionCorner(ScriptInstance Instance)
         {
 #warning Implement llGetRegionCorner()
-            return Vector3.Zero;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
@@ -59,7 +60,7 @@ namespace SilverSim.Scripting.LSL.API.Region
         public LSLKey llRequestSimulatorData(ScriptInstance Instance, string region, int data)
         {
 #warning Implement llRequestSimulatorData()
-            return UUID.Zero;
+            throw new NotImplementedException();
         }
     }
 }

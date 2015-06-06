@@ -47,7 +47,7 @@ namespace SilverSim.Scripting.LSL.API.LogListen
         [APILevel(APIFlags.ASSL)]
         public void asLogListen(ScriptInstance Instance, int onChannel, int enable)
         {
-
+            throw new NotImplementedException();
         }
     }
 }

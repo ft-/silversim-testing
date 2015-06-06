@@ -79,6 +79,8 @@ namespace SilverSim.Scripting.LSL
             public List<List<string>> m_LocalVariables = new List<List<string>>();
             public Dictionary<string, List<LineInfo>> m_Functions = new Dictionary<string, List<LineInfo>>();
             public Dictionary<string, Dictionary<string, List<LineInfo>>> m_States = new Dictionary<string, Dictionary<string, List<LineInfo>>>();
+            public FieldBuilder InstanceField;
+            public Dictionary<string, FieldBuilder> m_ApiFieldInfo = new Dictionary<string, FieldBuilder>();
 
             public CompileState()
             {
@@ -102,6 +104,7 @@ namespace SilverSim.Scripting.LSL
             m_ReservedWords.Add("do");
             m_ReservedWords.Add("return");
             m_ReservedWords.Add("state");
+            m_ReservedWords.Add("void");
 
             m_MultiOps.Add('+');
             m_MultiOps.Add('-');
@@ -330,19 +333,6 @@ namespace SilverSim.Scripting.LSL
             plist.Add("*=", Resolver.OperatorType.Binary);
             plist.Add("/=", Resolver.OperatorType.Binary);
             plist.Add("%=", Resolver.OperatorType.Binary);
-
-            operators.Add(plist = new Dictionary<string, Resolver.OperatorType>());
-            plist.Add("=", Resolver.OperatorType.Binary);
-            plist.Add("+=", Resolver.OperatorType.Binary);
-            plist.Add("-=", Resolver.OperatorType.Binary);
-            plist.Add("*=", Resolver.OperatorType.Binary);
-            plist.Add("/=", Resolver.OperatorType.Binary);
-            plist.Add("%=", Resolver.OperatorType.Binary);
-            plist.Add("&=", Resolver.OperatorType.Binary);
-            plist.Add("^=", Resolver.OperatorType.Binary);
-            plist.Add("|=", Resolver.OperatorType.Binary);
-            plist.Add("<<=", Resolver.OperatorType.Binary);
-            plist.Add(">>=", Resolver.OperatorType.Binary);
 
             m_Resolver = new Resolver(m_ReservedWords, operators, blockOps);
 

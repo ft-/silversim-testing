@@ -91,31 +91,31 @@ namespace SilverSim.Scripting.LSL.API.Experience
         [APILevel(APIFlags.LSL)]
         public int llAgentInExperience(ScriptInstance Instance, UUID agent)
         {
-            return 0;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public UUID llCreateKeyValue(ScriptInstance Instance, string k, string v)
         {
-            return UUID.Zero;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public UUID llDataSizeKeyValue(ScriptInstance Instance)
         {
-            return UUID.Zero;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public UUID llDeleteKeyValue(ScriptInstance Instance, string k)
         {
-            return UUID.Zero;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public AnArray llGetExperienceDetails(ScriptInstance Instance, UUID experience_id)
         {
-            return new AnArray();
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
@@ -147,19 +147,19 @@ namespace SilverSim.Scripting.LSL.API.Experience
         [APILevel(APIFlags.LSL)]
         public UUID llKeyCountKeyValue(ScriptInstance Instance)
         {
-            return UUID.Zero;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public UUID llKeysKeyValue(ScriptInstance Instance, int first, int count)
         {
-            return UUID.Zero;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public UUID llReadKeyValue(ScriptInstance Instance, string k)
         {
-            return UUID.Zero;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
@@ -171,7 +171,7 @@ namespace SilverSim.Scripting.LSL.API.Experience
         [APILevel(APIFlags.LSL)]
         public UUID llUpdateKeyValue(ScriptInstance Instance, string k, string v, int checked_orig, string original_value)
         {
-            return UUID.Zero;
+            throw new NotImplementedException();
         }
     }
 }

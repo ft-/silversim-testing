@@ -142,18 +142,21 @@ namespace SilverSim.Scripting.LSL.API.Physics
         public void llPushObject(ScriptInstance Instance, LSLKey target, Vector3 impulse, Vector3 ang_impulse, int local)
         {
 #warning Implement llPushObject
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public void llApplyImpulse(ScriptInstance Instance, Vector3 momentum, int local)
         {
 #warning Implement llApplyImpulse
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public void llApplyRotationalImpulse(ScriptInstance Instance, Vector3 ang_impulse, int local)
         {
 #warning Implement llApplyRotationalImpulse
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
@@ -269,12 +272,14 @@ namespace SilverSim.Scripting.LSL.API.Physics
         public void llSetHoverHeight(ScriptInstance Instance, double height, int water, double tau)
         {
 #warning Implement llSetHoverHeight
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public void llStopHover(ScriptInstance Instance)
         {
 #warning Implement llStopHover
+            throw new NotImplementedException();
         }
     }
 }

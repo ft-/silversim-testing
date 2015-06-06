@@ -592,7 +592,11 @@ namespace SilverSim.Scripting.LSL
                     InvokeStateEvent("state_entry");
                 }
             }
-            catch(Exception e)
+            catch (NotImplementedException e)
+            {
+                ShoutError("Script uses not implemented function " + e.StackTrace[0].ToString());
+            }
+            catch (Exception e)
             {
                 ShoutError(e.Message);
             }

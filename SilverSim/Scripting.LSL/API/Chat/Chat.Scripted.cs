@@ -187,7 +187,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
 
         #region osListenRegex
         [APILevel(APIFlags.OSSL)]
-        public int osListenRegex(ScriptInstance Instance, int channel, string name, UUID id, string msg, int regexBitfield)
+        public int osListenRegex(ScriptInstance Instance, int channel, string name, LSLKey id, string msg, int regexBitfield)
         {
             Script script = (Script)Instance;
             lock (script)

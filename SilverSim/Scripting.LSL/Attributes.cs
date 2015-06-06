@@ -104,4 +104,28 @@ namespace SilverSim.Scripting.LSL
 
         }
     }
+
+    [Serializable]
+    [AttributeUsage(AttributeTargets.Delegate | AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Property, Inherited = false)]
+    public class EnergyUsage : Attribute
+    {
+        public readonly double Energy;
+
+        public EnergyUsage(double val)
+        {
+            Energy = val;
+        }
+    }
+
+    [Serializable]
+    [AttributeUsage(AttributeTargets.Delegate | AttributeTargets.Method | AttributeTargets.Field | AttributeTargets.Property | AttributeTargets.Parameter, Inherited = false)]
+    public class LSLTooltip : Attribute
+    {
+        public readonly string Tooltip;
+
+        public LSLTooltip(string tooltip)
+        {
+            Tooltip = tooltip.Replace("\n", "\\n");
+        }
+    }
 }

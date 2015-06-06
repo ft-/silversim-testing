@@ -380,7 +380,7 @@ namespace SilverSim.Scripting.LSL
                             compileState.m_VariableDeclarations[args[1]] = typeof(int);
                             if (args[2] == "=")
                             {
-                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(2, args.Count - 2), lineNumber);
+                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(3, args.Count - 4), lineNumber);
                             }
                             break;
 
@@ -389,7 +389,7 @@ namespace SilverSim.Scripting.LSL
                             compileState.m_VariableDeclarations[args[1]] = typeof(Vector3);
                             if (args[2] == "=")
                             {
-                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(2, args.Count - 2), lineNumber);
+                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(3, args.Count - 4), lineNumber);
                             }
                             break;
 
@@ -398,7 +398,7 @@ namespace SilverSim.Scripting.LSL
                             compileState.m_VariableDeclarations[args[1]] = typeof(AnArray);
                             if (args[2] == "=")
                             {
-                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(2, args.Count - 2), lineNumber);
+                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(3, args.Count - 4), lineNumber);
                             }
                             break;
 
@@ -407,7 +407,7 @@ namespace SilverSim.Scripting.LSL
                             compileState.m_VariableDeclarations[args[1]] = typeof(double);
                             if (args[2] == "=")
                             {
-                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(2, args.Count - 2), lineNumber);
+                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(3, args.Count - 4), lineNumber);
                             }
                             break;
 
@@ -416,7 +416,7 @@ namespace SilverSim.Scripting.LSL
                             compileState.m_VariableDeclarations[args[1]] = typeof(string);
                             if (args[2] == "=")
                             {
-                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(2, args.Count - 2), lineNumber);
+                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(3, args.Count - 4), lineNumber);
                             }
                             break;
 
@@ -425,7 +425,7 @@ namespace SilverSim.Scripting.LSL
                             compileState.m_VariableDeclarations[args[1]] = typeof(string);
                             if (args[2] == "=")
                             {
-                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(2, args.Count - 2), lineNumber);
+                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(3, args.Count - 4), lineNumber);
                             }
                             break;
 
@@ -434,7 +434,7 @@ namespace SilverSim.Scripting.LSL
                             compileState.m_VariableDeclarations[args[1]] = typeof(Quaternion);
                             if(args[2] == "=")
                             {
-                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(2, args.Count - 2), lineNumber);
+                                compileState.m_VariableInitValues[args[1]] = new LineInfo(args.GetRange(3, args.Count - 4), lineNumber);
                             }
                             break;
 
@@ -490,10 +490,12 @@ namespace SilverSim.Scripting.LSL
                             case "string":
                             case "key":
                             case "rotation":
+                            case "void":
                                 checkUsedName(compileState, p, "Function", args[1]);
                                 fp = checkFunctionParameters(compileState, p, args.GetRange(3, args.Count - 4));
                                 funcList.Add(new LineInfo(args, lineNumber));
                                 parseBlock(compileState, p, funcList, false);
+                                compileState.m_Functions[args[1]] = funcList;
                                 break;
 
                             default:
@@ -501,6 +503,7 @@ namespace SilverSim.Scripting.LSL
                                 args.Insert(0, "void");
                                 funcList.Add(new LineInfo(args, lineNumber));
                                 parseBlock(compileState, p, funcList, false);
+                                compileState.m_Functions[args[1]] = funcList;
                                 break;
                         }
                     }

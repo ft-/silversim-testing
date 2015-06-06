@@ -32,6 +32,34 @@ using System.Collections.Generic;
 using System.Reflection;
 using System.Reflection.Emit;
 
+/*
+ * Operator Overloads
+== op_Equality
+!= op_Inequality
+>  op_GreaterThan
+<  op_LessThan
+>= op_GreaterThanOrEqual
+<= op_LessThanOrEqual
+&  op_BitwiseAnd
+|  op_BitwiseOr
++  op_Addition
+-  op_Subtraction
+/  op_Division
+%  op_Modulus
+*  op_Multiply
+<< op_LeftShift
+>> op_RightShift
+^  op_ExclusiveOr
+-  op_UnaryNegation
++  op_UnaryPlus
+!  op_LogicalNot
+~  op_OnesComplement
+   op_False
+   op_True
+++ op_Increment
+-- op_Decrement
+ */
+
 namespace SilverSim.Scripting.LSL
 {
     public partial class LSLCompiler
@@ -91,6 +119,18 @@ namespace SilverSim.Scripting.LSL
                 localVars);
         }
 
+        bool IsValidType(Type t)
+        {
+            if (t == typeof(string)) return true;
+            if (t == typeof(int)) return true;
+            if (t == typeof(double)) return true;
+            if (t == typeof(LSLKey)) return true;
+            if (t == typeof(Quaternion)) return true;
+            if (t == typeof(Vector3)) return true;
+            if (t == typeof(AnArray)) return true;
+            if (t == typeof(void)) return true;
+            return false;
+        }
         string MapType(Type t)
         {
             if (t == typeof(string)) return "string";
@@ -100,6 +140,7 @@ namespace SilverSim.Scripting.LSL
             if (t == typeof(Quaternion)) return "rotation";
             if (t == typeof(Vector3)) return "vector";
             if (t == typeof(AnArray)) return "list";
+            if (t == typeof(void)) return "void";
             return "???";
         }
 
@@ -121,27 +162,7 @@ namespace SilverSim.Scripting.LSL
                 functionTree,
                 lineNumber,
                 localVars);
-            if(retType == typeof(string) && expectedType == typeof(LSLKey))
-            {
-
-            }
-            else if(retType == typeof(LSLKey) && expectedType == typeof(string))
-            {
-
-            }
-            else if(retType == typeof(int) && expectedType == typeof(double))
-            {
-
-            }
-            else if(retType == typeof(bool))
-            {
-
-            }
-            else
-            {
-                throw new CompilerException(lineNumber, string.Format("Unsupported implicit typecast from {0} to {1}", MapType(retType), MapType(expectedType)));
-            }
-            ProcessCasts(
+            ProcessImplicitCasts(
                 ilgen,
                 expectedType,
                 retType,
@@ -169,71 +190,101 @@ namespace SilverSim.Scripting.LSL
                         lineNumber,
                         localVars);
 
+                case Tree.EntryType.FunctionArgument:
+                    return ProcessExpressionPart(
+                        compileState,
+                        scriptTypeBuilder,
+                        stateTypeBuilder,
+                        ilgen,
+                        functionTree.SubTree[0],
+                        lineNumber,
+                        localVars);
+
                 case Tree.EntryType.Function:
                     {
-                        MethodBuilder mb = compileState.m_FunctionInfo[functionTree.Entry];
+                        MethodBuilder mb;
+                        if (compileState.m_FunctionInfo.TryGetValue(functionTree.Entry, out mb))
+                        {
 
-                        ParameterInfo[] pi = mb.GetParameters();
+                            ParameterInfo[] pi = mb.GetParameters();
 
-                        if (mb.DeclaringType == stateTypeBuilder)
-                        {
-                            ilgen.Emit(OpCodes.Ldarg_0);
-                        }
-                        else if(mb.DeclaringType == scriptTypeBuilder)
-                        {
-                            ilgen.Emit(OpCodes.Ldfld, stateTypeBuilder.GetField("Instance"));
-                        }
-                        else
-                        {
-                            throw new NotImplementedException();
-                        }
-
-                        for (int i = 0; i < functionTree.SubTree.Count; ++i)
-                        {
-                            Type t = ProcessExpressionPart(
-                                compileState, 
-                                scriptTypeBuilder,
-                                stateTypeBuilder, 
-                                ilgen, 
-                                functionTree, 
-                                lineNumber,
-                                localVars);
-                            if(pi[i].ParameterType == t)
+                            if (null == stateTypeBuilder)
                             {
-                                /* fully matching */
-                            }
-                            else if(pi[i].ParameterType == typeof(string) && t == typeof(LSLKey))
-                            {
-                                ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[] { t }));
-                            }
-                            else if(pi[i].ParameterType == typeof(LSLKey) && t == typeof(string))
-                            {
-                                ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { t }));
-                            }
-                            else if(pi[i].ParameterType == typeof(double) && t == typeof(int))
-                            {
-                                ilgen.Emit(OpCodes.Conv_R8);
-                            }
-                            else if(pi[i].ParameterType == typeof(AnArray))
-                            {
-                                ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                                if(t == typeof(int) || t == typeof(string) || t == typeof(double))
-                                {
-                                    ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { t }));
-                                }
-                                else
-                                {
-                                    ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[] { typeof(IValue) }));
-                                }
+                                ilgen.Emit(OpCodes.Ldarg_0);
                             }
                             else
                             {
-                                throw new ArgumentException();
+                                ilgen.Emit(OpCodes.Ldarg_0);
+                                ilgen.Emit(OpCodes.Ldfld, compileState.InstanceField);
+                            }
+
+                            for (int i = 0; i < functionTree.SubTree.Count; ++i)
+                            {
+                                Type t = ProcessExpressionPart(
+                                    compileState,
+                                    scriptTypeBuilder,
+                                    stateTypeBuilder,
+                                    ilgen,
+                                    functionTree.SubTree[i],
+                                    lineNumber,
+                                    localVars);
+                                ProcessImplicitCasts(ilgen, pi[i].ParameterType, t, lineNumber);
+                            }
+
+                            ilgen.Emit(OpCodes.Callvirt, mb);
+                            return mb.ReturnType;
+                        }
+                        else if(m_MethodNames.Contains(functionTree.Entry))
+                        {
+                            foreach(KeyValuePair<IScriptApi, MethodInfo> kvp in m_Methods)
+                            {
+                                if(kvp.Value.Name == functionTree.Entry)
+                                {
+                                    ParameterInfo[] pi = kvp.Value.GetParameters();
+                                    if(pi.Length - 1 == functionTree.SubTree.Count)
+                                    {
+                                        ScriptApiName apiAttr = (ScriptApiName)System.Attribute.GetCustomAttribute(kvp.Key.GetType(), typeof(ScriptApiName));
+
+                                        if (!IsValidType(kvp.Value.ReturnType))
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("Internal Error! Return Value (type {1}) of function {0} is not LSL compatible", kvp.Value.Name, kvp.Value.ReturnType.Name));
+                                        }
+                                        if (null == stateTypeBuilder)
+                                        {
+                                            ilgen.Emit(OpCodes.Ldarg_0);
+                                        }
+                                        else
+                                        {
+                                            ilgen.Emit(OpCodes.Ldarg_0);
+                                            ilgen.Emit(OpCodes.Ldfld, compileState.InstanceField);
+                                        }
+
+                                        ilgen.Emit(OpCodes.Ldsfld, compileState.m_ApiFieldInfo[apiAttr.Name]);
+
+                                        for (int i = 0; i < functionTree.SubTree.Count; ++i)
+                                        {
+                                            if (!IsValidType(pi[i + 1].ParameterType))
+                                            {
+                                                throw new CompilerException(lineNumber, string.Format("Internal Error! Parameter {0} (type {1}) of function {2} is not LSL compatible",
+                                                    pi[i + 1].Name, pi[i + 1].ParameterType.FullName, functionTree.Entry));
+                                            }
+                                            Type t = ProcessExpressionPart(
+                                                compileState,
+                                                scriptTypeBuilder,
+                                                stateTypeBuilder,
+                                                ilgen,
+                                                functionTree.SubTree[i],
+                                                lineNumber,
+                                                localVars);
+                                            ProcessImplicitCasts(ilgen, pi[i + 1].ParameterType, t, lineNumber);
+                                        }
+                                        ilgen.Emit(OpCodes.Callvirt, kvp.Value);
+                                        return kvp.Value.ReturnType;
+                                    }
+                                }
                             }
                         }
-
-                        ilgen.Emit(OpCodes.Callvirt, mb);
-                        return mb.ReturnType;
+                        throw new CompilerException(lineNumber, string.Format("No function {0} defined", functionTree.Entry));
                     }
 
                 case Tree.EntryType.StringValue:
@@ -506,6 +557,18 @@ namespace SilverSim.Scripting.LSL
                                 {
                                     ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Equality", new Type[] { retLeft, retRight }));
                                 }
+                                else if(retLeft == typeof(AnArray))
+                                {
+                                    ilgen.BeginScope();
+                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
+                                    ilgen.Emit(OpCodes.Stloc, lb);
+                                    ilgen.Emit(OpCodes.Callvirt, retLeft.GetProperty("Length").GetGetMethod());
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    ilgen.Emit(OpCodes.Callvirt, retLeft.GetProperty("Length").GetGetMethod());
+                                    ilgen.EndScope();
+                                    ilgen.Emit(OpCodes.Ceq);
+                                    return typeof(int);
+                                }
                                 else
                                 {
                                     throw new CompilerException(lineNumber, string.Format("operator '==' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
@@ -528,6 +591,19 @@ namespace SilverSim.Scripting.LSL
                                 else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey))
                                 {
                                     ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Inequality", new Type[] { retLeft, retRight }));
+                                }
+                                else if (retLeft == typeof(AnArray))
+                                {
+                                    ilgen.BeginScope();
+                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
+                                    ilgen.Emit(OpCodes.Stloc, lb);
+                                    ilgen.Emit(OpCodes.Callvirt, retLeft.GetProperty("Length").GetGetMethod());
+                                    ilgen.Emit(OpCodes.Ldloc, lb);
+                                    ilgen.Emit(OpCodes.Callvirt, retLeft.GetProperty("Length").GetGetMethod());
+                                    ilgen.EndScope();
+                                    /* LSL is really about subtraction with that operator */
+                                    ilgen.Emit(OpCodes.Sub);
+                                    return typeof(int);
                                 }
                                 else
                                 {
@@ -667,96 +743,14 @@ namespace SilverSim.Scripting.LSL
                                 return retLeft;
 
                             case "=":
-                                if(retLeft == retRight)
-                                {
-                                    ilgen.Emit(OpCodes.Dup);
-                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
-                                }
-                                else if(retLeft == typeof(double) && retRight == typeof(int))
-                                {
-                                    ilgen.Emit(OpCodes.Conv_R8);
-                                }
-                                else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
-                                {
-                                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
-                                }
-                                else if (retLeft == typeof(LSLKey) && retRight == typeof(string))
-                                {
-                                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { typeof(string) }));
-                                }
-                                else if (retLeft == typeof(AnArray))
-                                {
-                                    ilgen.BeginScope();
-                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
-                                    ilgen.Emit(OpCodes.Stloc, lb);
-                                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                                    ilgen.Emit(OpCodes.Ldloc, lb);
-                                    if(typeof(int) == retRight || typeof(double) == retRight || typeof(string) == retRight)
-                                    {
-                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { retRight }));
-                                    }
-                                    else if(typeof(LSLKey) == retRight || typeof(Vector3) == retRight || typeof(Quaternion) == retRight)
-                                    {
-                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { typeof(IValue) }));
-                                    }
-                                    else
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("operator '=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                    }
-                                    ilgen.Emit(OpCodes.Ldloc, lb);
-                                    ilgen.EndScope();
-                                }
-                                else
-                                {
-                                    throw new CompilerException(lineNumber, string.Format("operator '=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                }
+                                ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
                                 ilgen.Emit(OpCodes.Dup);
                                 SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
 
                                 return retLeft;
 
                             case "+=":
-                                if(retLeft == retRight)
-                                {
-                                }
-                                else if(retLeft == typeof(double) && retRight == typeof(int))
-                                {
-                                    ilgen.Emit(OpCodes.Conv_R8);
-                                }
-                                else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
-                                {
-                                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
-                                }
-                                else if (retLeft == typeof(LSLKey) && retRight == typeof(string))
-                                {
-                                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { typeof(string) }));
-                                }
-                                else if (retLeft == typeof(AnArray))
-                                {
-                                    ilgen.BeginScope();
-                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
-                                    ilgen.Emit(OpCodes.Stloc, lb);
-                                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                                    ilgen.Emit(OpCodes.Ldloc, lb);
-                                    if(typeof(int) == retRight || typeof(double) == retRight || typeof(string) == retRight)
-                                    {
-                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { retRight }));
-                                    }
-                                    else if(typeof(LSLKey) == retRight || typeof(Vector3) == retRight || typeof(Quaternion) == retRight)
-                                    {
-                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { typeof(IValue) }));
-                                    }
-                                    else
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("operator '+=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                    }
-                                    ilgen.Emit(OpCodes.Ldloc, lb);
-                                    ilgen.EndScope();
-                                }
-                                else
-                                {
-                                    throw new CompilerException(lineNumber, string.Format("operator '+=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                }
+                                ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
                                 if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
                                 {
                                     ilgen.Emit(OpCodes.Add);
@@ -775,49 +769,7 @@ namespace SilverSim.Scripting.LSL
                                 return retLeft;
 
                             case "-=":
-                                if(retLeft == retRight)
-                                {
-                                    ilgen.Emit(OpCodes.Dup);
-                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
-                                }
-                                else if(retLeft == typeof(double) && retRight == typeof(int))
-                                {
-                                    ilgen.Emit(OpCodes.Conv_R8);
-                                }
-                                else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
-                                {
-                                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
-                                }
-                                else if (retLeft == typeof(LSLKey) && retRight == typeof(string))
-                                {
-                                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { typeof(string) }));
-                                }
-                                else if (retLeft == typeof(AnArray))
-                                {
-                                    ilgen.BeginScope();
-                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
-                                    ilgen.Emit(OpCodes.Stloc, lb);
-                                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                                    ilgen.Emit(OpCodes.Ldloc, lb);
-                                    if(typeof(int) == retRight || typeof(double) == retRight || typeof(string) == retRight)
-                                    {
-                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { retRight }));
-                                    }
-                                    else if(typeof(LSLKey) == retRight || typeof(Vector3) == retRight || typeof(Quaternion) == retRight)
-                                    {
-                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { typeof(IValue) }));
-                                    }
-                                    else
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("operator '-=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                    }
-                                    ilgen.Emit(OpCodes.Ldloc, lb);
-                                    ilgen.EndScope();
-                                }
-                                else
-                                {
-                                    throw new NotSupportedException();
-                                }
+                                ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
                                 if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
                                 {
                                     ilgen.Emit(OpCodes.Sub);
@@ -836,48 +788,9 @@ namespace SilverSim.Scripting.LSL
                                 return retLeft;
 
                             case "*=":
-                                if(retLeft == retRight)
+                                if(retLeft != typeof(Vector3) || retRight != typeof(double))
                                 {
-                                    ilgen.Emit(OpCodes.Dup);
-                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
-                                }
-                                else if(retLeft == typeof(double) && retRight == typeof(int))
-                                {
-                                    ilgen.Emit(OpCodes.Conv_R8);
-                                }
-                                else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
-                                {
-                                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
-                                }
-                                else if (retLeft == typeof(LSLKey) && retRight == typeof(string))
-                                {
-                                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { typeof(string) }));
-                                }
-                                else if (retLeft == typeof(AnArray))
-                                {
-                                    ilgen.BeginScope();
-                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
-                                    ilgen.Emit(OpCodes.Stloc, lb);
-                                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                                    ilgen.Emit(OpCodes.Ldloc, lb);
-                                    if(typeof(int) == retRight || typeof(double) == retRight || typeof(string) == retRight)
-                                    {
-                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { retRight }));
-                                    }
-                                    else if(typeof(LSLKey) == retRight || typeof(Vector3) == retRight || typeof(Quaternion) == retRight)
-                                    {
-                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { typeof(IValue) }));
-                                    }
-                                    else
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("operator '*=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                    }
-                                    ilgen.Emit(OpCodes.Ldloc, lb);
-                                    ilgen.EndScope();
-                                }
-                                else
-                                {
-                                    throw new CompilerException(lineNumber, string.Format("operator '*=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
                                 }
                                 if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
                                 {
@@ -897,48 +810,9 @@ namespace SilverSim.Scripting.LSL
                                 return retLeft;
 
                             case "/=":
-                                if(retLeft == retRight)
+                                if(retLeft != typeof(Vector3) || retRight != typeof(double))
                                 {
-                                    ilgen.Emit(OpCodes.Dup);
-                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
-                                }
-                                else if(retLeft == typeof(double) && retRight == typeof(int))
-                                {
-                                    ilgen.Emit(OpCodes.Conv_R8);
-                                }
-                                else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
-                                {
-                                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
-                                }
-                                else if (retLeft == typeof(LSLKey) && retRight == typeof(string))
-                                {
-                                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { typeof(string) }));
-                                }
-                                else if (retLeft == typeof(AnArray))
-                                {
-                                    ilgen.BeginScope();
-                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
-                                    ilgen.Emit(OpCodes.Stloc, lb);
-                                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                                    ilgen.Emit(OpCodes.Ldloc, lb);
-                                    if(typeof(int) == retRight || typeof(double) == retRight || typeof(string) == retRight)
-                                    {
-                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { retRight }));
-                                    }
-                                    else if(typeof(LSLKey) == retRight || typeof(Vector3) == retRight || typeof(Quaternion) == retRight)
-                                    {
-                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { typeof(IValue) }));
-                                    }
-                                    else
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("operator '/=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                    }
-                                    ilgen.Emit(OpCodes.Ldloc, lb);
-                                    ilgen.EndScope();
-                                }
-                                else
-                                {
-                                    throw new NotSupportedException();
+                                    ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
                                 }
                                 if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
                                 {
@@ -958,50 +832,7 @@ namespace SilverSim.Scripting.LSL
                                 return retLeft;
 
                             case "%=":
-                                if(retLeft == retRight)
-                                {
-                                    ilgen.Emit(OpCodes.Dup);
-                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
-                                }
-                                else if(retLeft == typeof(double) && retRight == typeof(int))
-                                {
-                                    ilgen.Emit(OpCodes.Conv_R8);
-                                }
-                                else if(retLeft == typeof(string) && retRight == typeof(LSLKey))
-                                {
-                                    ilgen.Emit(OpCodes.Callvirt, typeof(LSLKey).GetMethod("ToString", new Type[0]));
-                                }
-                                else if (retLeft == typeof(LSLKey) && retRight == typeof(string))
-                                {
-                                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { typeof(string) }));
-                                }
-                                else if (retLeft == typeof(AnArray))
-                                {
-                                    ilgen.BeginScope();
-                                    LocalBuilder lb = ilgen.DeclareLocal(retRight);
-                                    ilgen.Emit(OpCodes.Stloc, lb);
-                                    ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
-                                    ilgen.Emit(OpCodes.Ldloc, lb);
-                                    if(typeof(int) == retRight || typeof(double) == retRight || typeof(string) == retRight)
-                                    {
-                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { retRight }));
-                                    }
-                                    else if(typeof(LSLKey) == retRight || typeof(Vector3) == retRight || typeof(Quaternion) == retRight)
-                                    {
-                                        ilgen.Emit(OpCodes.Callvirt, typeof(AnArray).GetMethod("Add", new Type[1] { typeof(IValue) }));
-                                    }
-                                    else
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("operator '%=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                    }
-                                    ilgen.Emit(OpCodes.Ldloc, lb);
-                                    ilgen.EndScope();
-                                }
-                                else
-                                {
-                                    throw new CompilerException(lineNumber, string.Format("operator '%=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
-
-                                }
+                                ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
                                 if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
                                 {
                                     ilgen.Emit(OpCodes.Rem);
@@ -1316,10 +1147,18 @@ namespace SilverSim.Scripting.LSL
                                 ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
                                 ilgen.Emit(OpCodes.Stloc, lb);
 
-                                foreach(Tree st in functionTree.SubTree)
+                                for(int i = 0; i < functionTree.SubTree.Count; ++i)
                                 {
+                                    Tree st = functionTree.SubTree[i++];
+                                    if(i + 1 < functionTree.SubTree.Count)
+                                    {
+                                        if(functionTree.SubTree[i].Entry != ",")
+                                        {
+                                            throw new CompilerException(lineNumber, "Wrong list declaration");
+                                        }
+                                    }
                                     ilgen.Emit(OpCodes.Ldloc, lb);
-                                    Type ret = ProcessExpressionPart(compileState, scriptTypeBuilder, stateTypeBuilder, ilgen, functionTree, lineNumber, localVars);
+                                    Type ret = ProcessExpressionPart(compileState, scriptTypeBuilder, stateTypeBuilder, ilgen, st, lineNumber, localVars);
                                     if(ret == typeof(void))
                                     {
                                         throw new CompilerException(lineNumber, "Function has no return value");
@@ -1346,14 +1185,64 @@ namespace SilverSim.Scripting.LSL
                             ilgen.EndScope();
                             return typeof(AnArray);
 
+                        case "(":
+                            return ProcessExpressionPart(compileState, scriptTypeBuilder, stateTypeBuilder, ilgen, functionTree.SubTree[0], lineNumber, localVars);
+
                         default:
                             throw new CompilerException(lineNumber, string.Format("unexpected level entry '{0}'", functionTree.Entry));
                     }
-                    break;
 
+                case Tree.EntryType.Unknown:
+                    /* variable? */
+                    try
+                    {
+                        object v = localVars[functionTree.Entry];
+                        return GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                    }
+                    catch
+                    {
+                        throw new CompilerException(lineNumber, string.Format("unknown variable '{0}'", functionTree.Entry));
+                    }
+                    
                 default:
-                    throw new CompilerException(lineNumber, string.Format("unexpected '{0}'", functionTree.Entry));
+                    throw new CompilerException(lineNumber, string.Format("unknown '{0}'", functionTree.Entry));
             }
+        }
+
+        void ProcessImplicitCasts(ILGenerator ilgen, Type toType, Type fromType, int lineNumber)
+        {
+            if (fromType == toType)
+            {
+
+            }
+            else if(toType == typeof(void))
+            {
+            }
+            else if (fromType == typeof(string) && toType == typeof(LSLKey))
+            {
+
+            }
+            else if (fromType == typeof(LSLKey) && toType == typeof(string))
+            {
+
+            }
+            else if (fromType == typeof(int) && toType == typeof(double))
+            {
+
+            }
+            else if(toType == typeof(AnArray))
+            {
+
+            }
+            else if (toType == typeof(bool))
+            {
+
+            }
+            else
+            {
+                throw new CompilerException(lineNumber, string.Format("Unsupported implicit typecast from {0} to {1}", MapType(fromType), MapType(toType)));
+            }
+            ProcessCasts(ilgen, toType, fromType, lineNumber);
         }
 
         void ProcessCasts(ILGenerator ilgen, Type toType, Type fromType, int lineNumber)
@@ -1369,6 +1258,17 @@ namespace SilverSim.Scripting.LSL
             else if(fromType == typeof(void))
             {
                 throw new CompilerException(lineNumber, string.Format("function does not return anything"));
+            }
+            else if(toType == typeof(LSLKey))
+            {
+                if(fromType == typeof(string))
+                {
+                    ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[] { fromType }));
+                }
+                else
+                {
+                    throw new CompilerException(lineNumber, string.Format("function does not return anything"));
+                }
             }
             else if(toType == typeof(string))
             {
@@ -1674,56 +1574,195 @@ namespace SilverSim.Scripting.LSL
         {
             if (functionLine.Line[startAt + 1] == "=")
             {
+                string varName = functionLine.Line[startAt];
                 /* variable assignment */
-                string varName = functionLine.Line[startAt + 0];
-                if (localVars[varName] is LocalBuilder)
+                object v = localVars[varName];
+                ProcessExpression(
+                    compileState,
+                    scriptTypeBuilder,
+                    stateTypeBuilder,
+                    ilgen,
+                    GetVarType(scriptTypeBuilder, stateTypeBuilder, v),
+                    startAt + 2,
+                    endAt,
+                    functionLine,
+                    localVars);
+                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, functionLine.LineNumber);
+            }
+            else if(functionLine.Line[startAt + 1] == "+=")
+            {
+                if(startAt != 0)
                 {
-                    LocalBuilder lb = (LocalBuilder)localVars[varName];
-                    ProcessExpression(
-                        compileState,
-                        scriptTypeBuilder,
-                        stateTypeBuilder,
-                        ilgen,
-                        lb.GetType(),
-                        startAt + 2,
-                        endAt,
-                        functionLine,
-                        localVars);
-                    ilgen.Emit(OpCodes.Stloc, lb);
-                }
-                else if (localVars[varName] is FieldInfo)
-                {
-                    FieldInfo fi = (FieldInfo)localVars[varName];
-                    ProcessExpression(
-                        compileState,
-                        scriptTypeBuilder,
-                        stateTypeBuilder,
-                        ilgen,
-                        fi.GetType(),
-                        startAt + 2,
-                        endAt,
-                        functionLine,
-                        localVars);
-                    ilgen.Emit(OpCodes.Stfld, fi);
-                }
-                else if (localVars[varName] is FieldBuilder)
-                {
-                    FieldBuilder fi = (FieldBuilder)localVars[varName];
-                    ProcessExpression(
-                        compileState,
-                        scriptTypeBuilder,
-                        stateTypeBuilder,
-                        ilgen,
-                        fi.GetType(),
-                        startAt + 2,
-                        endAt,
-                        functionLine,
-                        localVars);
-                    ilgen.Emit(OpCodes.Stfld, fi);
+                    throw compilerException(functionLine, "Invalid assignment");
                 }
                 else
                 {
-                    throw new NotImplementedException();
+                    string varName = functionLine.Line[startAt];
+                    object v = localVars[varName];
+                    Type ret = GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                    ProcessExpression(
+                        compileState,
+                        scriptTypeBuilder,
+                        stateTypeBuilder,
+                        ilgen,
+                        GetVarType(scriptTypeBuilder, stateTypeBuilder, v),
+                        startAt + 2,
+                        endAt,
+                        functionLine,
+                        localVars);
+                    if(ret == typeof(int) || ret == typeof(double) || ret == typeof(string))
+                    {
+                        ilgen.Emit(OpCodes.Add);
+                    }
+                    else if(ret == typeof(LSLKey) || ret == typeof(AnArray) || ret == typeof(Vector3) || ret == typeof(Quaternion))
+                    {
+                        ilgen.Emit(OpCodes.Callvirt, ret.GetMethod("op_Addition", new Type[] { ret, ret }));
+                    }
+                    else
+                    {
+                        throw compilerException(functionLine, string.Format("operator '+=' is not supported for {0}", MapType(ret)));
+                    }
+                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, functionLine.LineNumber);
+                }
+            }
+            else if(functionLine.Line[startAt + 1] == "-=")
+            {
+                if (startAt != 0)
+                {
+                    throw compilerException(functionLine, "Invalid assignment");
+                }
+                else
+                {
+                    string varName = functionLine.Line[startAt];
+                    object v = localVars[varName];
+                    Type ret = GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                    ProcessExpression(
+                        compileState,
+                        scriptTypeBuilder,
+                        stateTypeBuilder,
+                        ilgen,
+                        GetVarType(scriptTypeBuilder, stateTypeBuilder, v),
+                        startAt + 2,
+                        endAt,
+                        functionLine,
+                        localVars);
+                    if (ret == typeof(int) || ret == typeof(double))
+                    {
+                        ilgen.Emit(OpCodes.Sub);
+                    }
+                    else if (ret == typeof(Vector3) || ret == typeof(Quaternion))
+                    {
+                        ilgen.Emit(OpCodes.Callvirt, ret.GetMethod("op_Subtraction", new Type[] { ret, ret }));
+                    }
+                    else
+                    {
+                        throw compilerException(functionLine, string.Format("operator '-=' is not supported for {0}", MapType(ret)));
+                    }
+                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, functionLine.LineNumber);
+                }
+            }
+            else if (functionLine.Line[startAt + 1] == "*=")
+            {
+                if (startAt != 0)
+                {
+                    throw compilerException(functionLine, "Invalid assignment");
+                }
+                else
+                {
+                    string varName = functionLine.Line[startAt];
+                    object v = localVars[varName];
+                    Type ret = GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                    ProcessExpression(
+                        compileState,
+                        scriptTypeBuilder,
+                        stateTypeBuilder,
+                        ilgen,
+                        GetVarType(scriptTypeBuilder, stateTypeBuilder, v),
+                        startAt + 2,
+                        endAt,
+                        functionLine,
+                        localVars);
+                    if (ret == typeof(int) || ret == typeof(double))
+                    {
+                        ilgen.Emit(OpCodes.Mul);
+                    }
+                    else if (ret == typeof(Vector3) || ret == typeof(Quaternion))
+                    {
+                        ilgen.Emit(OpCodes.Callvirt, ret.GetMethod("op_Multiplication", new Type[] { ret, ret }));
+                    }
+                    else
+                    {
+                        throw compilerException(functionLine, string.Format("operator '*=' is not supported for {0}", MapType(ret)));
+                    }
+                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, functionLine.LineNumber);
+                }
+            }
+            else if (functionLine.Line[startAt + 1] == "/=")
+            {
+                if (startAt != 0)
+                {
+                    throw compilerException(functionLine, "Invalid assignment");
+                }
+                else
+                {
+                    string varName = functionLine.Line[startAt];
+                    object v = localVars[varName];
+                    Type ret = GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                    ProcessExpression(
+                        compileState,
+                        scriptTypeBuilder,
+                        stateTypeBuilder,
+                        ilgen,
+                        GetVarType(scriptTypeBuilder, stateTypeBuilder, v),
+                        startAt + 2,
+                        endAt,
+                        functionLine,
+                        localVars);
+                    if (ret == typeof(int) || ret == typeof(double))
+                    {
+                        ilgen.Emit(OpCodes.Div);
+                    }
+                    else if (ret == typeof(Vector3) || ret == typeof(Quaternion))
+                    {
+                        ilgen.Emit(OpCodes.Callvirt, ret.GetMethod("op_Division", new Type[] { ret, ret }));
+                    }
+                    else
+                    {
+                        throw compilerException(functionLine, string.Format("operator '/=' is not supported for {0}", MapType(ret)));
+                    }
+                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, functionLine.LineNumber);
+                }
+            }
+            else if (functionLine.Line[startAt + 1] == "%=")
+            {
+                if (startAt != 0)
+                {
+                    throw compilerException(functionLine, "Invalid assignment");
+                }
+                else
+                {
+                    string varName = functionLine.Line[startAt];
+                    object v = localVars[varName];
+                    Type ret = GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                    ProcessExpression(
+                        compileState,
+                        scriptTypeBuilder,
+                        stateTypeBuilder,
+                        ilgen,
+                        GetVarType(scriptTypeBuilder, stateTypeBuilder, v),
+                        startAt + 2,
+                        endAt,
+                        functionLine,
+                        localVars);
+                    if (ret == typeof(int) || ret == typeof(double))
+                    {
+                        ilgen.Emit(OpCodes.Rem);
+                    }
+                    else
+                    {
+                        throw compilerException(functionLine, string.Format("operator '%=' is not supported for {0}", MapType(ret)));
+                    }
+                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, functionLine.LineNumber);
                 }
             }
             else
@@ -2503,6 +2542,10 @@ namespace SilverSim.Scripting.LSL
                     returnType = typeof(Quaternion);
                     break;
 
+                case "void":
+                    returnType = typeof(void);
+                    break;
+
                 default:
                     functionName = functionDeclaration[0];
                     functionStart = 1;
@@ -2585,11 +2628,11 @@ namespace SilverSim.Scripting.LSL
             }
             else if (returnType == typeof(Vector3))
             {
-                ilgen.Emit(OpCodes.Newobj, typeof(Vector3).GetConstructor(new Type[0]));
+                ilgen.Emit(OpCodes.Ldsfld, typeof(Vector3).GetField("Zero"));
             }
             else if (returnType == typeof(Quaternion))
             {
-                ilgen.Emit(OpCodes.Newobj, typeof(Quaternion).GetConstructor(new Type[0]));
+                ilgen.Emit(OpCodes.Ldsfld, typeof(Quaternion).GetField("Identity"));
             }
             else if (returnType == typeof(LSLKey))
             {
@@ -2602,7 +2645,6 @@ namespace SilverSim.Scripting.LSL
         Dictionary<string, object> AddConstants(CompileState compileState, TypeBuilder typeBuilder, ILGenerator ilgen)
         {
             Dictionary<string, object> localVars = new Dictionary<string, object>();
-            FieldBuilder fb;
             foreach (IScriptApi api in m_Apis)
             {
                 foreach (FieldInfo f in api.GetType().GetFields())
@@ -2616,17 +2658,7 @@ namespace SilverSim.Scripting.LSL
                             APILevel apilevel = (APILevel)attr;
                             if ((apilevel.Flags & compileState.AcceptedFlags) != 0)
                             {
-                                fb = typeBuilder.DefineField(f.Name, f.FieldType, f.Attributes);
-                                if ((f.Attributes & FieldAttributes.Literal) != 0)
-                                {
-                                    fb.SetConstant(f.GetValue(null));
-                                }
-                                else
-                                {
-                                    ilgen.Emit(OpCodes.Ldfld, f);
-                                    ilgen.Emit(OpCodes.Stfld, fb);
-                                }
-                                localVars[f.Name] = fb;
+                                localVars[f.Name] = f;
                             }
                         }
                         else
@@ -2671,8 +2703,9 @@ namespace SilverSim.Scripting.LSL
             Dictionary<string, object> typeLocals = new Dictionary<string, object>();
             foreach (IScriptApi api in m_Apis)
             {
-                ScriptApiName apiAttr = (ScriptApiName)api.GetType().GetCustomAttributes(typeof(ScriptApiName), false)[0];
+                ScriptApiName apiAttr = (ScriptApiName)System.Attribute.GetCustomAttribute(api.GetType(), typeof(ScriptApiName));
                 FieldBuilder fb = scriptTypeBuilder.DefineField(apiAttr.Name, api.GetType(), FieldAttributes.Static | FieldAttributes.Public);
+                compileState.m_ApiFieldInfo[apiAttr.Name] = fb;
             }
 
 
@@ -2776,6 +2809,10 @@ namespace SilverSim.Scripting.LSL
                 {
                     script_ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
                 }
+                else if (fb.FieldType == typeof(LSLKey))
+                {
+                    script_ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[0]));
+                }
                 script_ilgen.Emit(OpCodes.Stfld, fb);
             }
             #endregion
@@ -2788,7 +2825,7 @@ namespace SilverSim.Scripting.LSL
                 Type returnType = typeof(void);
                 List<string> functionDeclaration = functionKvp.Value[0].Line;
                 string functionName = functionDeclaration[1];
-                int functionStart = 2;
+                int functionStart = 3;
 
                 switch (functionDeclaration[0])
                 {
@@ -2820,50 +2857,58 @@ namespace SilverSim.Scripting.LSL
                         returnType = typeof(Quaternion);
                         break;
 
+                    case "void":
+                        returnType = typeof(void);
+                        break;
+
                     default:
                         functionName = functionDeclaration[0];
-                        functionStart = 1;
+                        functionStart = 2;
                         break;
                 }
                 List<Type> paramTypes = new List<Type>();
                 List<string> paramName = new List<string>();
-                while (functionDeclaration[++functionStart] != ")")
+                while (functionDeclaration[functionStart] != ")")
                 {
-                    switch (functionDeclaration[++functionStart])
+                    if(functionDeclaration[functionStart] == ",")
+                    {
+                        ++functionStart;
+                    }
+                    switch (functionDeclaration[functionStart++])
                     {
                         case "integer":
                             paramTypes.Add(typeof(int));
-                            paramName.Add(functionDeclaration[++functionStart]);
+                            paramName.Add(functionDeclaration[functionStart++]);
                             break;
 
                         case "vector":
                             paramTypes.Add(typeof(Vector3));
-                            paramName.Add(functionDeclaration[++functionStart]);
+                            paramName.Add(functionDeclaration[functionStart++]);
                             break;
 
                         case "list":
                             paramTypes.Add(typeof(AnArray));
-                            paramName.Add(functionDeclaration[++functionStart]);
+                            paramName.Add(functionDeclaration[functionStart++]);
                             break;
 
                         case "float":
                             paramTypes.Add(typeof(double));
-                            paramName.Add(functionDeclaration[++functionStart]);
+                            paramName.Add(functionDeclaration[functionStart++]);
                             break;
 
                         case "string":
                             paramTypes.Add(typeof(string));
-                            paramName.Add(functionDeclaration[++functionStart]);
+                            paramName.Add(functionDeclaration[functionStart++]);
                             break;
 
                         case "key":
                             paramTypes.Add(typeof(LSLKey));
-                            paramName.Add(functionDeclaration[++functionStart]);
+                            paramName.Add(functionDeclaration[functionStart++]);
                             break;
 
                         case "rotation":
                             paramTypes.Add(typeof(Quaternion));
-                            paramName.Add(functionDeclaration[++functionStart]);
+                            paramName.Add(functionDeclaration[functionStart++]);
                             break;
 
                         default:
@@ -2894,6 +2939,7 @@ namespace SilverSim.Scripting.LSL
                 TypeBuilder state = mb.DefineType(aName.Name + ".State." + stateKvp.Key, TypeAttributes.Public, typeof(object));
                 state.AddInterfaceImplementation(typeof(LSLState));
                 fb = state.DefineField("Instance", scriptTypeBuilder, FieldAttributes.Private | FieldAttributes.InitOnly);
+                compileState.InstanceField = fb;
 
                 ConstructorBuilder state_cb = state.DefineConstructor(
                     MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, 
@@ -2954,7 +3000,7 @@ namespace SilverSim.Scripting.LSL
 
             foreach (IScriptApi api in m_Apis)
             {
-                ScriptApiName apiAttr = (ScriptApiName)api.GetType().GetCustomAttributes(typeof(ScriptApiName), false)[0];
+                ScriptApiName apiAttr = (ScriptApiName)System.Attribute.GetCustomAttribute(api.GetType(), typeof(ScriptApiName));
                 FieldInfo info = t.GetField(apiAttr.Name, BindingFlags.Static | BindingFlags.Public);
                 info.SetValue(null, api);
             }

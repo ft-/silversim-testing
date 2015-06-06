@@ -89,6 +89,117 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
+        public AnArray llList2ListStrided(AnArray src, int start, int end, int stride)
+        {
+
+            AnArray result = new AnArray();
+            int[] si = new int[2];
+            int[] ei = new int[2];
+            bool twopass = false;
+
+            /*
+             * First step is always to deal with negative indices
+             */
+
+            if (start < 0)
+            {
+                start = src.Count + start;
+            }
+            if (end < 0)
+            {
+                end = src.Count + end;
+            }
+
+            /*
+             * Out of bounds indices are OK, just trim them accordingly
+             */
+
+            if (start > src.Count)
+            {
+                start = src.Count;
+            }
+
+            if (end > src.Count)
+            {
+                end = src.Count;
+            }
+
+            if (stride == 0)
+            {
+                stride = 1;
+            }
+
+            /*
+             * There may be one or two ranges to be considered
+             */
+
+            if (start != end)
+            {
+
+                if (start <= end)
+                {
+                    si[0] = start;
+                    ei[0] = end;
+                }
+                else
+                {
+                    si[1] = start;
+                    ei[1] = src.Count;
+                    si[0] = 0;
+                    ei[0] = end;
+                    twopass = true;
+                }
+
+                /*
+                 * The scan always starts from the beginning of the
+                 * source list, but members are only selected if they
+                 * fall within the specified sub-range. The specified
+                 * range values are inclusive.
+                 * A negative stride reverses the direction of the
+                 * scan producing an inverted list as a result.
+                 */
+
+                if (stride > 0)
+                {
+                    for (int i = 0; i < src.Count; i += stride)
+                    {
+                        if (i <= ei[0] && i >= si[0])
+                        {
+                            result.Add(src[i]);
+                        }
+                        if (twopass && i >= si[1] && i <= ei[1])
+                        {
+                            result.Add(src[i]);
+                        }
+                    }
+                }
+                else if (stride < 0)
+                {
+                    for (int i = src.Count - 1; i >= 0; i += stride)
+                    {
+                        if (i <= ei[0] && i >= si[0])
+                        {
+                            result.Add(src[i]);
+                        }
+                        if (twopass && i >= si[1] && i <= ei[1])
+                        {
+                            result.Add(src[i]);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                if (start % stride == 0)
+                {
+                    result.Add(src[start]);
+                }
+            }
+
+            return result;
+        }
+
+        [APILevel(APIFlags.LSL)]
         public AnArray llList2List(ScriptInstance Instance, AnArray src, int start, int end)
         {
             if (start < 0)

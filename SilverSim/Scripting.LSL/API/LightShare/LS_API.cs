@@ -124,27 +124,28 @@ namespace SilverSim.Scripting.LSL.API.LightShare
         public AnArray lsGetWindlightScene(ScriptInstance Instance, AnArray rules)
         {
 #warning Implement lsGetWindlightScene(AnArray)
-            return new AnArray();
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LightShare)]
         public int lsSetWindlightScene(ScriptInstance Instance, AnArray rules)
         {
 #warning Implement lsSetWindlightScene(AnArray)
-            return 0;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LightShare)]
         public void lsClearWindlightScene(ScriptInstance Instance)
         {
 #warning Implement lsClearWindlightScene()
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LightShare)]
         public int lsSetWindlightSceneTargeted(ScriptInstance Instance, AnArray rules, LSLKey target)
         {
 #warning Implement lsSetWindlightSceneTargeted(AnArray, UUID)
-            return 0;
+            throw new NotImplementedException();
         }
     }
 }

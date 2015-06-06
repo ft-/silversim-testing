@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Scene.Types.Script;
+using System;
 
 namespace SilverSim.Scripting.LSL.API.Detected
 {
@@ -51,7 +52,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         public int llDetectedGroup(ScriptInstance Instance, int number)
         {
 #warning Implement llDetectedGroup(int)
-            return 0;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
@@ -226,7 +227,7 @@ namespace SilverSim.Scripting.LSL.API.Detected
         public int llDetectedType(ScriptInstance Instance, int number)
         {
 #warning Implement llDetectedType(int)
-            return 0;
+            throw new NotImplementedException();
         }
 
         public Vector3 llDetectedVel(ScriptInstance Instance, int number)

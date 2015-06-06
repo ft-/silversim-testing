@@ -48,6 +48,7 @@ namespace SilverSim.Scripting.LSL.API.Animation
         }
 
         [APILevel(APIFlags.LSL)]
+        [LSLTooltip("permission to start or stop animations on agent")]
         public const int PERMISSION_TRIGGER_ANIMATION = 0x10;
 
         [APILevel(APIFlags.LSL)]
@@ -100,6 +101,20 @@ namespace SilverSim.Scripting.LSL.API.Animation
 
                 agent.StopAnimation(anim, instance.Part.ID);
             }
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public string llGetAnimation(ScriptInstance Instance, LSLKey agent)
+        {
+#warning Implement llGetAnimation
+            throw new NotImplementedException();
+        }
+
+        [APILevel(APIFlags.LSL)]
+        public string llGetAnimationList(ScriptInstance Instance, LSLKey agent)
+        {
+#warning Implement llGetAnimation
+            throw new NotImplementedException();
         }
     }
 }

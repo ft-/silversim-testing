@@ -69,28 +69,28 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         public AnArray llGetParcelDetails(ScriptInstance Instance, Vector3 pos, AnArray param)
         {
 #warning Implement llGetParcelDetails(Vector3, AnArray)
-            return new AnArray();
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public int llGetParcelFlags(ScriptInstance Instance, Vector3 pos)
         {
 #warning Implement llGetParcelFlags(Vector3)
-            return 0;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public int llGetParcelMaxPrims(ScriptInstance Instance, Vector3 pos, int sim_wide)
         {
 #warning Implement llGetParcelMaxPrims(Vector3, int)
-            return 0;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public string llGetParcelMusicURL(ScriptInstance Instance)
         {
 #warning Implement llGetParcelMusicURL()
-            return string.Empty;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
@@ -98,34 +98,35 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         public void llSetParcelMusicURL(ScriptInstance Instance, string url)
         {
 #warning Implement llSetParcelMusicURL(string)
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public int llReturnObjectsByID(ScriptInstance Instance, AnArray objects)
         {
 #warning Implement llReturnObjectsByID(AnArray)
-            return 0;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public int llReturnObjectsByOwner(ScriptInstance Instance, LSLKey owner, int scope)
         {
 #warning Implement llReturnObjectsByOwner(UUID, int)
-            return 0;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public UUID llGetLandOwnerAt(ScriptInstance Instance, Vector3 pos)
         {
 #warning Implement llGetLandOwnerAt(Vector3)
-            return UUID.Zero;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public int llGetParcelPrimCount(ScriptInstance Instance, Vector3 pos, int category, int sim_wide)
         {
 #warning Implement llGetParcelPrimCount(Vector3, int, int)
-            return 0;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
@@ -133,7 +134,7 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         public AnArray llGetParcelPrimOwners(ScriptInstance Instance, Vector3 pos)
         {
 #warning Implement llGetParcelPrimOwners(Vector3)
-            return new AnArray();
+            throw new NotImplementedException();
         }
     }
 }

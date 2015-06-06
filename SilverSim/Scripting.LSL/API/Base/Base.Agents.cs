@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.Scripting.LSL.API.Base
 {
@@ -56,25 +57,25 @@ namespace SilverSim.Scripting.LSL.API.Base
         [APILevel(APIFlags.LSL)]
         public LSLKey llRequestAgentData(ScriptInstance Instance, UUID id, int data)
         {
-            return UUID.Zero;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public LSLKey llRequestDisplayName(ScriptInstance Instance, UUID id)
         {
-            return UUID.Zero;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public LSLKey llRequestUsername(ScriptInstance Instance, UUID id)
         {
-            return UUID.Zero;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         public string llGetDisplayName(ScriptInstance Instance, UUID id)
         {
-            return string.Empty;
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]

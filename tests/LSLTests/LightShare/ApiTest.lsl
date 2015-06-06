@@ -41,8 +41,11 @@ default
 			WL_CLOUD_SCROLL_Y_LOCK,
 			WL_DRAW_CLASSIC_CLOUDS,
 			WL_SUN_MOON_POSITION]);
+		
 		lsSetWindlightScene([]);
+		
 		lsClearWindlightScene();
+		
 		lsSetWindlightSceneTargeted([], NULL_KEY);
 	}
 }

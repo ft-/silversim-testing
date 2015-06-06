@@ -99,5 +99,12 @@ namespace SilverSim.Scripting.LSL.API.Chat
                 }
             }
         }
+
+        [APILevel(APIFlags.LSL)]
+        public void llMapDestination(ScriptInstance Instance, string simname, Vector3 pos, Vector3 look_at)
+        {
+#warning Implement llMapDestination
+            throw new NotImplementedException();
+        }
     }
 }

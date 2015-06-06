@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.Scripting.LSL.API.Parcel
 {
@@ -63,14 +64,14 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         [ForcedSleep(2)]
         public void llParcelMediaCommandList(ScriptInstance Instance, AnArray commandList)
         {
-
+            throw new NotImplementedException();
         }
 
         [APILevel(APIFlags.LSL)]
         [ForcedSleep(2)]
         public AnArray llParcelMediaQuery(ScriptInstance Instance, AnArray query)
         {
-            return new AnArray();
+            throw new NotImplementedException();
         }
     }
 }

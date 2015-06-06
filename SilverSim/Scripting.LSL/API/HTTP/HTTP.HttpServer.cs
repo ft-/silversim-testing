@@ -65,7 +65,6 @@ namespace SilverSim.Scripting.LSL.API.HTTP
         [APILevel(APIFlags.LSL)]
         public void llReleaseURL(ScriptInstance Instance, string url)
         {
-#warning Implement llReleaseURL()
             lock (Instance)
             {
                 m_HTTPHandler.ReleaseURL(url);
