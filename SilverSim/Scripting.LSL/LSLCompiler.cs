@@ -224,7 +224,7 @@ namespace SilverSim.Scripting.LSL
                     {
                         LastBlock = elem;
                     }
-                    if(null != elem.EndOfIfFlowLabel)
+                    else if(null != elem.EndOfIfFlowLabel) /* if we are putting one to LastBlock, we do not close the label */
                     {
                         if (elem.Type == ControlFlowType.Else)
                         {
@@ -274,7 +274,7 @@ namespace SilverSim.Scripting.LSL
                     {
                         LastBlock = elem;
                     }
-                    if (null != elem.EndOfIfFlowLabel)
+                    else if (null != elem.EndOfIfFlowLabel) /* if we are putting one to LastBlock, we do not close the label */
                     {
                         if (elem.Type == ControlFlowType.Else)
                         {
@@ -317,7 +317,7 @@ namespace SilverSim.Scripting.LSL
                     {
                         LastBlock = elem;
                     }
-                    if (null != elem.EndOfIfFlowLabel)
+                    else if (null != elem.EndOfIfFlowLabel) /* if we are putting one to LastBlock, we do not close the label */
                     {
                         if(!m_UnnamedLabels.Remove(LastBlock.EndOfIfFlowLabel.Value))
                         {
@@ -347,7 +347,7 @@ namespace SilverSim.Scripting.LSL
                     {
                         LastBlock = elem;
                     }
-                    if (null != elem.EndOfIfFlowLabel)
+                    else if (null != elem.EndOfIfFlowLabel) /* if we are putting one to LastBlock, we do not close the label */
                     {
                         if (elem.Type == ControlFlowType.Else)
                         {

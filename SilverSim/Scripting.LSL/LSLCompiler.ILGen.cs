@@ -2754,6 +2754,7 @@ namespace SilverSim.Scripting.LSL
             {
                 throw compilerException(functionLine, "Invalid label declaration");
             }
+            #region Jump to label
             else if(functionLine.Line[startAt] == "jump")
             {
                 if (functionLine.Line.Count <= startAt + 2)
@@ -2771,6 +2772,8 @@ namespace SilverSim.Scripting.LSL
                 compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
                 return;
             }
+            #endregion
+            #region Return from function
             else if(functionLine.Line[startAt] == "return")
             {
                 if (returnType == typeof(void))
@@ -2884,6 +2887,8 @@ namespace SilverSim.Scripting.LSL
                 compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
                 return;
             }
+            #endregion
+            #region State Change
             else if (functionLine.Line[startAt] == "state")
             {
                 /* when same state, the state instruction compiles to nop according to wiki */
@@ -2897,6 +2902,8 @@ namespace SilverSim.Scripting.LSL
                 compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
                 return;
             }
+            #endregion
+            #region Assignment =
             else if (functionLine.Line[startAt + 1] == "=")
             {
                 string varName = functionLine.Line[startAt];
@@ -2914,6 +2921,8 @@ namespace SilverSim.Scripting.LSL
                     localVars);
                 SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, functionLine.LineNumber);
             }
+            #endregion
+            #region Component Access
             else if (functionLine.Line[startAt + 1] == ".")
             {
                 /* component access */
@@ -3037,6 +3046,8 @@ namespace SilverSim.Scripting.LSL
                     ilgen.EndScope();
                 }
             }
+            #endregion
+            #region Assignment Operators += -= *= /= %=
             else if (functionLine.Line[startAt + 1] == "+=")
             {
                 if (startAt != 0)
@@ -3213,6 +3224,7 @@ namespace SilverSim.Scripting.LSL
                     SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, functionLine.LineNumber);
                 }
             }
+            #endregion
             else
             {
                 /* function call no return */
@@ -3259,6 +3271,7 @@ namespace SilverSim.Scripting.LSL
                 LocalBuilder lb;
                 switch (functionLine.Line[0])
                 {
+                    #region Label definition
                     case "@":
                         if (functionLine.Line.Count != 3 || functionLine.Line[2] != ";")
                         {
@@ -3283,6 +3296,7 @@ namespace SilverSim.Scripting.LSL
                             ilgen.MarkLabel(labels[labelName].Label);
                         }
                         break;
+                    #endregion
 
                     #region Variable declarations
                     /* type named things are variable declaration */
@@ -3518,7 +3532,7 @@ namespace SilverSim.Scripting.LSL
                         break;
                     #endregion
 
-                    #region Control Flow
+                    #region Control Flow (Loops)
                     case "for":
                         {   /* for(a;b;c) */
                             int semicolon1, semicolon2;
@@ -3707,7 +3721,9 @@ namespace SilverSim.Scripting.LSL
                             }
                         }
                         break;
+                    #endregion
 
+                    #region Control Flow (Conditions)
                     case "if":
                         {
                             Label eoiflabel = ilgen.DefineLabel();
@@ -3785,6 +3801,7 @@ namespace SilverSim.Scripting.LSL
                         { /* else if */
                             Label eoiflabel = compileState.LastBlock.EndOfIfFlowLabel.Value;
                             Label endlabel = ilgen.DefineLabel();
+                            compileState.m_UnnamedLabels.Add(endlabel, new KeyValuePair<int, string>(functionLine.LineNumber, "ElseIf End Label"));
 
                             ControlFlowElement elem = new ControlFlowElement(
                                 ControlFlowType.ElseIf,
@@ -3850,6 +3867,7 @@ namespace SilverSim.Scripting.LSL
                             /* else */
                             Label eoiflabel = compileState.LastBlock.EndOfIfFlowLabel.Value;
                             Label endlabel = ilgen.DefineLabel();
+                            compileState.m_UnnamedLabels.Add(endlabel, new KeyValuePair<int, string>(functionLine.LineNumber, "Else End Label"));
 
                             ControlFlowElement elem = new ControlFlowElement(
                                 ControlFlowType.Else,
@@ -3879,6 +3897,7 @@ namespace SilverSim.Scripting.LSL
                         break;
                     #endregion
 
+                    #region New unconditional block
                     case "{": /* new unconditional block */
                         compileState.PopControlFlowImplicits(ilgen, functionLine.LineNumber);
                         {
@@ -3898,7 +3917,9 @@ namespace SilverSim.Scripting.LSL
                                 ref lineIndex);
                         }
                         break;
+                    #endregion
 
+                    #region End of unconditional/conditional block
                     case "}": /* end unconditional/conditional block */
                         {
                             Dictionary<int, string> messages = new Dictionary<int, string>();
@@ -3924,6 +3945,7 @@ namespace SilverSim.Scripting.LSL
                         }
                         /* no increment here, is done outside */
                         return;
+                    #endregion
 
                     default:
                         ProcessStatement(
