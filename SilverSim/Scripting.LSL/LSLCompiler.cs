@@ -319,7 +319,7 @@ namespace SilverSim.Scripting.LSL
                     }
                     else if (null != elem.EndOfIfFlowLabel) /* if we are putting one to LastBlock, we do not close the label */
                     {
-                        if(!m_UnnamedLabels.Remove(LastBlock.EndOfIfFlowLabel.Value))
+                        if (!m_UnnamedLabels.Remove(elem.EndOfIfFlowLabel.Value))
                         {
                             throw new CompilerException(lineNumber, "Internal Error! Duplicate End Of If Label");
                         }
