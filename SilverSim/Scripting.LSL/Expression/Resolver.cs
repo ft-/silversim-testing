@@ -28,6 +28,11 @@ exception statement from your version.
 #define SORTUNARYOPS_NON_RECURSIVE
 #define SORTBINARYOPS_NON_RECURSIVE
 #define SOLVEDOTOPERATOR_NON_RECURSIVE
+#define IDENTIFYUNARYOPS_NON_RECURSIVE
+#define IDENTIFYBINARYOPS_NON_RECURSIVE
+#define IDENTIFYSQUAREBRACKETDECLARATIONS_NON_RECURSIVE
+#define IDENTIFYFUNCTIONS_NON_RECURSIVE
+#define IDENTIFYRESERVEDWORDS_NON_RECURSIVE
 
 using System;
 using System.Collections.Generic;
@@ -248,12 +253,13 @@ namespace SilverSim.Scripting.LSL.Expression
 #endif
         }
 
-        void identifyReservedWords(Tree nt)
-        {
 #if IDENTIFYRESERVEDWORDS_NON_RECURSIVE
+        void identifyReservedWords(Tree tree)
+        {
+            List<Tree> processNodes = new List<Tree>();
             List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
-            enumeratorStack.Insert(0, new ListTreeEnumState(nt));
-
+            enumeratorStack.Insert(0, new ListTreeEnumState(tree));
+            processNodes.Add(tree);
             while(enumeratorStack.Count != 0)
             {
                 if(!enumeratorStack[0].MoveNext())
@@ -262,24 +268,30 @@ namespace SilverSim.Scripting.LSL.Expression
                 }
                 else
                 {
-                    nt = enumeratorStack[0].Current;
+                    tree = enumeratorStack[0].Current;
+                    processNodes.Add(tree);
+                    enumeratorStack.Add(new ListTreeEnumState(tree));
+                }
+            }
+
+            foreach (Tree nt in processNodes)
+#else
+        void identifyReservedWords(Tree nt)
+        {
+#endif
+            {
+                if (nt.Type == Tree.EntryType.Unknown)
+                {
                     if (m_ReservedWords.Contains(nt.Entry))
                     {
                         nt.Type = Tree.EntryType.ReservedWord;
                     }
-                    enumeratorStack.Insert(0, new ListTreeEnumState(nt));
-                }
-            }
-#else
-            if(nt.Type == Tree.EntryType.Unknown)
-            {
-                if(m_ReservedWords.Contains(nt.Entry))
-                {
-                    nt.Type = Tree.EntryType.ReservedWord;
                 }
             }
 
-            foreach(Tree st in nt.SubTree)
+#if IDENTIFYRESERVEDWORDS_NON_RECURSIVE
+#else
+            foreach (Tree st in nt.SubTree)
             {
                 identifyReservedWords(st);
             }
@@ -335,55 +347,81 @@ namespace SilverSim.Scripting.LSL.Expression
             }
         }
 
+#if IDENTIFYFUNCTIONS_NON_RECURSIVE
+        void identifyFunctions(Tree tree)
+        {
+            List<Tree> processNodes = new List<Tree>();
+            List<ListTreeEnumReverseState> enumeratorStack = new List<ListTreeEnumReverseState>();
+            enumeratorStack.Insert(0, new ListTreeEnumReverseState(tree));
+            processNodes.Add(tree);
+            while(enumeratorStack.Count != 0)
+            {
+                if(!enumeratorStack[0].MoveNext())
+                {
+                    enumeratorStack.RemoveAt(0);
+                }
+                else
+                {
+                    tree = enumeratorStack[0].Current;
+                    processNodes.Insert(0, tree);
+                    enumeratorStack.Add(new ListTreeEnumReverseState(tree));
+                }
+            }
+
+            foreach (Tree nt in processNodes)
+#else
         void identifyFunctions(Tree nt)
         {
             foreach(Tree sub in nt.SubTree)
             {
                 identifyFunctions(sub);
             }
-            for(int i = 0; i < nt.SubTree.Count - 1;++i)
+#endif
             {
-                if(nt.SubTree[i].Type == Tree.EntryType.Unknown &&
-                    nt.SubTree[i + 1].Type == Tree.EntryType.Level &&
-                    nt.SubTree[i + 1].Entry == "(")
+                for (int i = 0; i < nt.SubTree.Count - 1; ++i)
                 {
-                    Tree st = nt.SubTree[i + 1];
-                    nt.SubTree.RemoveAt(i + 1);
-                    nt.SubTree[i].Type = Tree.EntryType.Function;
-
-                    /* rebuild arguments */
-                    List<Tree> argumentsList = new List<Tree>();
-                    Tree argument = null;
-                    bool lastIsSeparator = false;
-                    for(int j = 0; j < st.SubTree.Count; ++j)
+                    if (nt.SubTree[i].Type == Tree.EntryType.Unknown &&
+                        nt.SubTree[i + 1].Type == Tree.EntryType.Level &&
+                        nt.SubTree[i + 1].Entry == "(")
                     {
-                        if(st.SubTree[j].Type != Tree.EntryType.Separator)
-                        {
-                            if(argument == null)
-                            {
-                                argument = new Tree();
-                                argumentsList.Add(argument);
-                                argument.Type = Tree.EntryType.FunctionArgument;
-                            }
-                            argument.SubTree.Add(st.SubTree[j]);
-                            lastIsSeparator = false;
-                        }
-                        else
-                        {
-                            if(argument == null)
-                            {
-                                throw new ResolverException(string.Format("Missing parameter to function '{0}'", nt.SubTree[i].Entry));
-                            }
-                            argument = null;
-                            lastIsSeparator = true;
-                        }
-                    }
+                        Tree st = nt.SubTree[i + 1];
+                        nt.SubTree.RemoveAt(i + 1);
+                        nt.SubTree[i].Type = Tree.EntryType.Function;
 
-                    if(lastIsSeparator)
-                    {
-                        throw new ResolverException(string.Format("Missing parameter to function '{0}'", nt.SubTree[i].Entry));
+                        /* rebuild arguments */
+                        List<Tree> argumentsList = new List<Tree>();
+                        Tree argument = null;
+                        bool lastIsSeparator = false;
+                        for (int j = 0; j < st.SubTree.Count; ++j)
+                        {
+                            if (st.SubTree[j].Type != Tree.EntryType.Separator)
+                            {
+                                if (argument == null)
+                                {
+                                    argument = new Tree();
+                                    argumentsList.Add(argument);
+                                    argument.Type = Tree.EntryType.FunctionArgument;
+                                }
+                                argument.SubTree.Add(st.SubTree[j]);
+                                lastIsSeparator = false;
+                            }
+                            else
+                            {
+                                if (argument == null)
+                                {
+                                    throw new ResolverException(string.Format("Missing parameter to function '{0}'", nt.SubTree[i].Entry));
+                                }
+                                argument = null;
+                                lastIsSeparator = true;
+                            }
+                        }
+
+                        if (lastIsSeparator)
+                        {
+                            throw new ResolverException(string.Format("Missing parameter to function '{0}'", nt.SubTree[i].Entry));
+                        }
+                        nt.SubTree[i].SubTree = argumentsList;
                     }
-                    nt.SubTree[i].SubTree = argumentsList;
                 }
             }
         }
@@ -429,82 +467,108 @@ namespace SilverSim.Scripting.LSL.Expression
             nt.SubTree[start].SubTree = argumentsList;
         }
 
-        void identifySquareBracketDeclarations(Tree nt)
+#if IDENTIFYSQUAREBRACKETDECLARATIONS_NON_RECURSIVE
+        void identifySquareBracketDeclarations(Tree tree)
         {
             int start ;
-            foreach(Tree st in nt.SubTree)
+            List<Tree> processNodes = new List<Tree>();
+            List<ListTreeEnumReverseState> enumeratorStack = new List<ListTreeEnumReverseState>();
+            enumeratorStack.Insert(0, new ListTreeEnumReverseState(tree));
+            processNodes.Add(tree);
+            while(enumeratorStack.Count != 0)
+            {
+                if(!enumeratorStack[0].MoveNext())
+                {
+                    enumeratorStack.RemoveAt(0);
+                }
+                else
+                {
+                    tree = enumeratorStack[0].Current;
+                    processNodes.Insert(0, tree);
+                    enumeratorStack.Add(new ListTreeEnumReverseState(tree));
+                }
+            }
+
+            foreach (Tree nt in processNodes)
+#else
+        void identifySquareBracketDeclarations(Tree nt)
+        {
+            int start;
+            foreach (Tree st in nt.SubTree)
             {
                 identifySquareBracketDeclarations(st);
             }
-
-            for(start = 0; start < nt.SubTree.Count; ++start)
+#endif
             {
-                Tree startnode = nt.SubTree[start];
-                if(startnode.Entry == "<")
+                for (start = 0; start < nt.SubTree.Count; ++start)
                 {
-                    if(start == 0)
+                    Tree startnode = nt.SubTree[start];
+                    if (startnode.Entry == "<")
                     {
-                        int end;
-                        /* definitely a declaration, search for end */
-                        for(end = start + 1; end < nt.SubTree.Count; ++end)
+                        if (start == 0)
                         {
-                            if(nt.SubTree[end].Entry == ">")
+                            int end;
+                            /* definitely a declaration, search for end */
+                            for (end = start + 1; end < nt.SubTree.Count; ++end)
                             {
-                                if(end == nt.SubTree.Count - 1)
+                                if (nt.SubTree[end].Entry == ">")
                                 {
-                                    /* has to be a declaration */
-                                    break;
-                                }
-                                else if(nt.SubTree[end + 1].Type == Tree.EntryType.OperatorUnknown ||
-                                    nt.SubTree[end + 1].Type == Tree.EntryType.OperatorBinary ||
-                                    nt.SubTree[end + 1].Type == Tree.EntryType.Separator)
-                                {
-                                    /* has to be a declaration */
-                                    break;
+                                    if (end == nt.SubTree.Count - 1)
+                                    {
+                                        /* has to be a declaration */
+                                        break;
+                                    }
+                                    else if (nt.SubTree[end + 1].Type == Tree.EntryType.OperatorUnknown ||
+                                        nt.SubTree[end + 1].Type == Tree.EntryType.OperatorBinary ||
+                                        nt.SubTree[end + 1].Type == Tree.EntryType.Separator)
+                                    {
+                                        /* has to be a declaration */
+                                        break;
+                                    }
                                 }
                             }
-                        }
-                        if(end == nt.SubTree.Count)
-                        {
-                            throw new ResolverException("Missing end of declaration begun by '<'");
-                        }
-                        else
-                        {
-                            reorderDeclarationArguments(nt, start, end);
-                        }
-                    }
-                    else if(nt.SubTree[start - 1].Type == Tree.EntryType.OperatorUnknown ||
-                        nt.SubTree[start - 1].Type == Tree.EntryType.OperatorBinary ||
-                        nt.SubTree[start - 1].Type == Tree.EntryType.Separator ||
-                        nt.SubTree[start - 1].Type == Tree.EntryType.Level)
-                    {
-                        int end;
-                        /* a declaration too */
-                        for (end = start + 1; end < nt.SubTree.Count; ++end)
-                        {
-                            if (nt.SubTree[end].Entry == ">")
+                            if (end == nt.SubTree.Count)
                             {
-                                if (end == nt.SubTree.Count - 1)
-                                {
-                                    /* has to be a declaration */
-                                    break;
-                                }
-                                else if (nt.SubTree[end + 1].Type == Tree.EntryType.OperatorUnknown ||
-                                    nt.SubTree[end + 1].Type == Tree.EntryType.OperatorBinary ||
-                                    nt.SubTree[end + 1].Type == Tree.EntryType.Separator)
-                                {
-                                    /* has to be a declaration */
-                                    break;
-                                }
+                                throw new ResolverException("Missing end of declaration begun by '<'");
+                            }
+                            else
+                            {
+                                reorderDeclarationArguments(nt, start, end);
                             }
                         }
-                        if (end == nt.SubTree.Count)
+                        else if (nt.SubTree[start - 1].Type == Tree.EntryType.OperatorUnknown ||
+                            nt.SubTree[start - 1].Type == Tree.EntryType.OperatorBinary ||
+                            nt.SubTree[start - 1].Type == Tree.EntryType.Separator ||
+                            nt.SubTree[start - 1].Type == Tree.EntryType.Level)
                         {
-                            throw new ResolverException("Missing end of declaration begun by '<'");
-                        }
-                        else
-                        {
-                            reorderDeclarationArguments(nt, start, end);
+                            int end;
+                            /* a declaration too */
+                            for (end = start + 1; end < nt.SubTree.Count; ++end)
+                            {
+                                if (nt.SubTree[end].Entry == ">")
+                                {
+                                    if (end == nt.SubTree.Count - 1)
+                                    {
+                                        /* has to be a declaration */
+                                        break;
+                                    }
+                                    else if (nt.SubTree[end + 1].Type == Tree.EntryType.OperatorUnknown ||
+                                        nt.SubTree[end + 1].Type == Tree.EntryType.OperatorBinary ||
+                                        nt.SubTree[end + 1].Type == Tree.EntryType.Separator)
+                                    {
+                                        /* has to be a declaration */
+                                        break;
+                                    }
+                                }
+                            }
+                            if (end == nt.SubTree.Count)
+                            {
+                                throw new ResolverException("Missing end of declaration begun by '<'");
+                            }
+                            else
+                            {
+                                reorderDeclarationArguments(nt, start, end);
+                            }
                         }
                     }
                 }
@@ -587,10 +651,33 @@ namespace SilverSim.Scripting.LSL.Expression
             }
         }
 
+#if IDENTIFYUNARYOPS_NON_RECURSIVE
+        void identifyUnaryOps(Tree tree)
+        {
+            int pos;
+            List<Tree> processNodes = new List<Tree>();
+            List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
+            enumeratorStack.Insert(0, new ListTreeEnumState(tree));
+            processNodes.Add(tree);
+            while(enumeratorStack.Count != 0)
+            {
+                if(!enumeratorStack[0].MoveNext())
+                {
+                    enumeratorStack.RemoveAt(0);
+                }
+                else
+                {
+                    tree = enumeratorStack[0].Current;
+                    processNodes.Insert(0, tree);
+                    enumeratorStack.Add(new ListTreeEnumState(tree));
+                }
+            }
+
+            foreach (Tree nt in processNodes)
+#else
         void identifyUnaryOps(Tree nt)
         {
             int pos;
-
             if (nt.SubTree.Count == 0)
             {
                 return;
@@ -600,44 +687,46 @@ namespace SilverSim.Scripting.LSL.Expression
             {
                 identifyUnaryOps(st);
             }
-
-            for (pos = nt.SubTree.Count; pos-- > 0 ;)
+#endif
             {
-                Tree st = nt.SubTree[pos];
-                if (st.Type == Tree.EntryType.OperatorUnknown)
+                for (pos = nt.SubTree.Count; pos-- > 0; )
                 {
-                    OperatorType optype;
-                    foreach (Dictionary<string, OperatorType> oilist in m_Operators)
+                    Tree st = nt.SubTree[pos];
+                    if (st.Type == Tree.EntryType.OperatorUnknown)
                     {
-                        if (oilist.TryGetValue(st.Entry, out optype))
+                        OperatorType optype;
+                        foreach (Dictionary<string, OperatorType> oilist in m_Operators)
                         {
-                            if (optype == OperatorType.LeftUnary)
+                            if (oilist.TryGetValue(st.Entry, out optype))
                             {
-                                if (pos == 0 && pos < nt.SubTree.Count - 1)
+                                if (optype == OperatorType.LeftUnary)
                                 {
-                                    if (isValidUnaryLeft(nt.SubTree[pos + 1]))
+                                    if (pos == 0 && pos < nt.SubTree.Count - 1)
+                                    {
+                                        if (isValidUnaryLeft(nt.SubTree[pos + 1]))
+                                        {
+                                            st.Type = Tree.EntryType.OperatorLeftUnary;
+                                            break;
+                                        }
+                                    }
+                                    else if (pos > 0 && pos < nt.SubTree.Count - 1 &&
+                                        (nt.SubTree[pos - 1].Type == Tree.EntryType.OperatorUnknown ||
+                                        nt.SubTree[pos - 1].Type == Tree.EntryType.OperatorBinary) &&
+                                        isValidUnaryRight(nt.SubTree[pos + 1]))
                                     {
                                         st.Type = Tree.EntryType.OperatorLeftUnary;
                                         break;
                                     }
                                 }
-                                else if (pos > 0 && pos < nt.SubTree.Count - 1 &&
-                                    (nt.SubTree[pos - 1].Type == Tree.EntryType.OperatorUnknown ||
-                                    nt.SubTree[pos - 1].Type == Tree.EntryType.OperatorBinary) &&
-                                    isValidUnaryRight(nt.SubTree[pos + 1]))
+                                else if (optype == OperatorType.RightUnary)
                                 {
-                                    st.Type = Tree.EntryType.OperatorLeftUnary;
-                                    break;
-                                }
-                            }
-                            else if(optype == OperatorType.RightUnary)
-                            {
-                                if (pos > 0)
-                                {
-                                    if (isValidUnaryRight(nt.SubTree[pos - 1]))
+                                    if (pos > 0)
                                     {
-                                        st.Type = Tree.EntryType.OperatorRightUnary;
-                                        break;
+                                        if (isValidUnaryRight(nt.SubTree[pos - 1]))
+                                        {
+                                            st.Type = Tree.EntryType.OperatorRightUnary;
+                                            break;
+                                        }
                                     }
                                 }
                             }
@@ -647,6 +736,30 @@ namespace SilverSim.Scripting.LSL.Expression
             }
         }
 
+#if IDENTIFYBINARYOPS_NON_RECURSIVE
+        void identifyBinaryOps(Tree tree)
+        {
+            int pos;
+            List<Tree> processNodes = new List<Tree>();
+            List<ListTreeEnumReverseState> enumeratorStack = new List<ListTreeEnumReverseState>();
+            enumeratorStack.Insert(0, new ListTreeEnumReverseState(tree));
+            processNodes.Add(tree);
+            while(enumeratorStack.Count != 0)
+            {
+                if(!enumeratorStack[0].MoveNext())
+                {
+                    enumeratorStack.RemoveAt(0);
+                }
+                else
+                {
+                    tree = enumeratorStack[0].Current;
+                    processNodes.Insert(0, tree);
+                    enumeratorStack.Add(new ListTreeEnumReverseState(tree));
+                }
+            }
+
+            foreach (Tree nt in processNodes)
+#else
         void identifyBinaryOps(Tree nt)
         {
             int pos;
@@ -660,39 +773,41 @@ namespace SilverSim.Scripting.LSL.Expression
             {
                 identifyBinaryOps(st);
             }
-
-            for (pos = 0; pos < nt.SubTree.Count; ++pos)
+#endif
             {
-                Tree st = nt.SubTree[pos];
-                if (st.Type == Tree.EntryType.OperatorUnknown)
+                for (pos = 0; pos < nt.SubTree.Count; ++pos)
                 {
-                    OperatorType? optype = null;
-                    foreach (Dictionary<string, OperatorType> oilist in m_Operators)
+                    Tree st = nt.SubTree[pos];
+                    if (st.Type == Tree.EntryType.OperatorUnknown)
                     {
-                        OperatorType _optype;
-                        if (oilist.TryGetValue(st.Entry, out _optype))
+                        OperatorType? optype = null;
+                        foreach (Dictionary<string, OperatorType> oilist in m_Operators)
                         {
-                            if (_optype == OperatorType.Binary)
+                            OperatorType _optype;
+                            if (oilist.TryGetValue(st.Entry, out _optype))
                             {
-                                optype = _optype;
-                                break;
+                                if (_optype == OperatorType.Binary)
+                                {
+                                    optype = _optype;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    if(null != optype)
-                    {
-                        switch (optype.Value)
+                        if (null != optype)
                         {
-                            case OperatorType.Binary:
-                                if (pos > 0 && pos < nt.SubTree.Count - 1)
-                                {
-                                    if(isValidLeftHand(nt.SubTree[pos - 1]) &&
-                                        isValidRightHand(nt.SubTree[pos + 1]))
+                            switch (optype.Value)
+                            {
+                                case OperatorType.Binary:
+                                    if (pos > 0 && pos < nt.SubTree.Count - 1)
                                     {
-                                        st.Type = Tree.EntryType.OperatorBinary;
+                                        if (isValidLeftHand(nt.SubTree[pos - 1]) &&
+                                            isValidRightHand(nt.SubTree[pos + 1]))
+                                        {
+                                            st.Type = Tree.EntryType.OperatorBinary;
+                                        }
                                     }
-                                }
-                                break;
+                                    break;
+                            }
                         }
                     }
                 }

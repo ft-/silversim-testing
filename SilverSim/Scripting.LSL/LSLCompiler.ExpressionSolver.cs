@@ -26,6 +26,7 @@ exception statement from your version.
 #define SOLVEDECLARATIONS_NON_RECURSIVE
 //#define SOLVETYPECASTS_NON_RECURSIVE
 #define SOLVEMAXNEGVALUES_NON_RECURSIVE
+#define SOLVECONSTANTOPERATIONS_NON_RECURSIVE
 
 using SilverSim.Scripting.LSL.Expression;
 using SilverSim.Types;
@@ -258,10 +259,32 @@ namespace SilverSim.Scripting.LSL
 
         void solveConstantOperations(Tree tree)
         {
+#if SOLVECONSTANTOPERATIONS_NON_RECURSIVE
+            List<Tree> processNodes = new List<Tree>();
+            List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
+            enumeratorStack.Insert(0, new ListTreeEnumState(tree));
+            processNodes.Add(tree);
+            while(enumeratorStack.Count != 0)
+            {
+                if(!enumeratorStack[0].MoveNext())
+                {
+                    enumeratorStack.RemoveAt(0);
+                }
+                else
+                {
+                    tree = enumeratorStack[0].Current;
+                    processNodes.Insert(0, tree);
+                    enumeratorStack.Add(new ListTreeEnumState(tree));
+                }
+            }
+
+            foreach (Tree st in processNodes)
+            {
+#else
             foreach (Tree st in tree.SubTree)
             {
                 solveConstantOperations(st);
-
+#endif
                 if (st.Entry != "<")
                 {
 

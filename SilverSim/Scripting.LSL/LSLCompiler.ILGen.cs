@@ -232,6 +232,20 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
+        void CollapseStringConstants(List<string> args)
+        {
+            for(int pos = 1; pos < args.Count - 2; ++pos)
+            {
+                if(args[pos] == "+" && args[pos - 1].StartsWith("\"") && args[pos + 1].StartsWith("\""))
+                {
+                    args[pos - 1] = args[pos - 1] + args[pos + 1];
+                    args.RemoveAt(pos);
+                    args.RemoveAt(pos);
+                    --pos;
+                }
+            }
+        }
+
         void ProcessExpression(
             CompileState compileState,
             TypeBuilder scriptTypeBuilder,
@@ -252,7 +266,9 @@ namespace SilverSim.Scripting.LSL
             Tree expressionTree;
             try
             {
-                expressionTree = new Tree(functionLine.Line.GetRange(startAt, endAt - startAt + 1), m_OpChars, m_SingleOps, m_NumericChars);
+                List<string> expressionLine = functionLine.Line.GetRange(startAt, endAt - startAt + 1);
+                CollapseStringConstants(expressionLine);
+                expressionTree = new Tree(expressionLine, m_OpChars, m_SingleOps, m_NumericChars);
                 solveTree(compileState, expressionTree, localVars.Keys);
             }
             catch(Exception e)
