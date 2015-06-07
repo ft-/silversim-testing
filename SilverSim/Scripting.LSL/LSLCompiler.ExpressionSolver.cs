@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Scripting.Common.Expression;
 using SilverSim.Types;
 using System.Collections.Generic;
+using System.Globalization;
 
 namespace SilverSim.Scripting.LSL
 {
@@ -123,7 +124,9 @@ namespace SilverSim.Scripting.LSL
                 }
                 else if (st.Type == Tree.EntryType.OperatorUnknown && i + 1 < tree.SubTree.Count && 
                     (tree.SubTree[i + 1].Type == Tree.EntryType.Vector ||
-                    tree.SubTree[i + 1].Type == Tree.EntryType.Rotation))
+                    tree.SubTree[i + 1].Type == Tree.EntryType.Rotation ||
+                    (tree.SubTree[i + 1].Type == Tree.EntryType.Level && tree.SubTree[i + 1].Entry == "(") ||
+                    (tree.SubTree[i + 1].Type == Tree.EntryType.Level && tree.SubTree[i + 1].Entry == "[")))
                 {
                     switch (st.Entry)
                     {
@@ -269,6 +272,18 @@ namespace SilverSim.Scripting.LSL
                     }
                 }
 
+                #region Binary operators
+                if (st.Type == Tree.EntryType.OperatorBinary)
+                {
+                    foreach (Tree ot in st.SubTree)
+                    {
+                        if (ot.Type == Tree.EntryType.Value && null == ot.Value)
+                        {
+                            ot.Process();
+                        }
+                    }
+                }
+
                 if (st.Type == Tree.EntryType.OperatorBinary && st.SubTree[0].Value != null && st.SubTree[1].Value != null)
                 {
                     switch (st.Entry)
@@ -392,8 +407,8 @@ namespace SilverSim.Scripting.LSL
                             }
                             else if (st.SubTree[0].Value is ConstantValueVector && st.SubTree[1].Value is ConstantValueVector)
                             {
-                                st.Value = new ConstantValueVector(
-                                    ((ConstantValueVector)(st.SubTree[0].Value)).Value.Cross(
+                                st.Value = new Tree.ConstantValueFloat(
+                                    ((ConstantValueVector)(st.SubTree[0].Value)).Value.Dot(
                                     ((ConstantValueVector)(st.SubTree[1].Value)).Value));
                             }
                             else if (st.SubTree[0].Value is Tree.ConstantValueInt && st.SubTree[1].Value is ConstantValueVector)
@@ -783,15 +798,144 @@ namespace SilverSim.Scripting.LSL
                             throw new Resolver.ResolverException("'.' should not be used with constants");
                     }
                 }
-                else if (st.Type == Tree.EntryType.OperatorLeftUnary && st.SubTree[0].Value != null)
+                #endregion
+                else if(st.Type == Tree.EntryType.Typecast && (st.SubTree[0].Value != null))
                 {
+                    switch(st.Entry)
+                    {
+                        case "string":
+                            if(st.SubTree[0].Value is ConstantValueRotation)
+                            {
+                                st.Value = new Tree.ConstantValueString(((ConstantValueRotation)st.SubTree[0].Value).ToString());
+                            }
+                            else if(st.SubTree[0].Value is ConstantValueVector)
+                            {
+                                st.Value = new Tree.ConstantValueString(((ConstantValueVector)st.SubTree[0].Value).ToString());
+                            }
+                            else if(st.SubTree[0].Value is Tree.ConstantValueFloat)
+                            {
+                                st.Value = new Tree.ConstantValueString(((Tree.ConstantValueFloat)st.SubTree[0].Value).ToString());
+                            }
+                            else if (st.SubTree[0].Value is Tree.ConstantValueInt)
+                            {
+                                st.Value = new Tree.ConstantValueString(((Tree.ConstantValueInt)st.SubTree[0].Value).ToString());
+                            }
+                            else if (st.SubTree[0].Value is Tree.ConstantValueString)
+                            {
+                                st.Value = st.SubTree[0].Value;
+                            }
+                            else if(st.SubTree[0].Type == Tree.EntryType.Level && st.SubTree[0].Entry == "[")
+                            {
+                                /* check if all parts are constants */
+                                bool isConstant = true;
+                                foreach(Tree sst in st.SubTree[0].SubTree)
+                                {
+                                    if(sst.Value == null)
+                                    {
+                                        isConstant = false;
+                                    }
+                                }
+
+                                if(isConstant)
+                                {
+                                    string o = string.Empty;
+                                    foreach(Tree sst in st.SubTree[0].SubTree)
+                                    {
+                                        o += sst.Value.ToString();
+                                    }
+                                    st.Value = new Tree.ConstantValueString(o);
+                                }
+                            }
+                            break;
+
+                        case "rotation":
+                        case "quaternion":
+                            if(st.SubTree[0].Value is ConstantValueRotation)
+                            {
+                                st.Value = st.SubTree[0].Value;
+                            }
+                            else if (st.SubTree[0].Value is Tree.ConstantValueString)
+                            {
+                                Quaternion q;
+                                if(Quaternion.TryParse(((Tree.ConstantValueString)st.SubTree[0].Value).Value, out q))
+                                {
+                                    st.Value = new ConstantValueRotation(q);
+                                }
+                                else
+                                {
+                                    st.Value = new ConstantValueRotation(Quaternion.Identity);
+                                }
+                            }
+                            break;
+
+                        case "integer":
+                            if(st.SubTree[0].Value is Tree.ConstantValueInt)
+                            {
+                                st.Value = st.SubTree[0].Value;
+                            }
+                            else if(st.SubTree[0].Value is Tree.ConstantValueFloat)
+                            {
+                                st.Value = new Tree.ConstantValueInt((int)((Tree.ConstantValueFloat)st.SubTree[0].Value).Value);
+                            }
+                            else if (st.SubTree[0].Value is Tree.ConstantValueString)
+                            {
+                                try
+                                {
+                                    st.Value = new Tree.ConstantValueInt(((Tree.ConstantValueString)st.SubTree[0].Value).Value);
+                                }
+                                catch
+                                {
+                                    st.Value = new Tree.ConstantValueInt(0);
+                                }
+                            }
+                            break;
+
+                        case "float":
+                            if(st.SubTree[0].Value is Tree.ConstantValueFloat)
+                            {
+                                st.Value = st.SubTree[0].Value;
+                            }
+                            else if(st.SubTree[0].Value is Tree.ConstantValueInt)
+                            {
+                                st.Value = new Tree.ConstantValueFloat((int)((Tree.ConstantValueInt)st.SubTree[0].Value).Value);
+                            }
+                            else if (st.SubTree[0].Value is Tree.ConstantValueString)
+                            {
+                                try
+                                {
+                                    st.Value = new Tree.ConstantValueFloat(double.Parse(((Tree.ConstantValueString)st.SubTree[0].Value).Value, NumberStyles.Float, CultureInfo.InvariantCulture));
+                                }
+                                catch
+                                {
+                                    st.Value = new Tree.ConstantValueFloat(0);
+                                }
+                            }
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+                else if (st.Type == Tree.EntryType.OperatorLeftUnary && (st.SubTree[0].Value != null || st.SubTree[0].Type == Tree.EntryType.Value))
+                {
+                    if(st.Entry != "-" && st.SubTree[0].Type == Tree.EntryType.Value)
+                    {
+                        st.Process();
+                    }
                     if (st.Entry == "+")
                     {
                         st.Value = st.SubTree[0].Value;
                     }
                     else if (st.Entry == "-")
                     {
-                        st.Value = st.SubTree[0].Value.Negate();
+                        if(st.SubTree[0].Value == null)
+                        {
+                            st.SubTree[0].Process();
+                        }
+                        if (st.Value == null)
+                        {
+                            st.Value = st.SubTree[0].Value.Negate();
+                        }
                     }
                     else if (st.Entry == "~")
                     {
@@ -869,6 +1013,23 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
+        void solveMaxNegValues(CompileState cs, Tree resolvetree)
+        {
+            if (resolvetree.Type == Tree.EntryType.OperatorLeftUnary && resolvetree.Entry == "-" &&
+                resolvetree.SubTree.Count == 1 && resolvetree.SubTree[0].Entry == "2147483648" && resolvetree.SubTree[0].Type == Tree.EntryType.Value)
+            {
+                resolvetree.Value = new Tree.ConstantValueInt(-2147483648);
+            }
+            else if(resolvetree.Entry == "2147483648" && resolvetree.Type == Tree.EntryType.Value)
+            {
+                resolvetree.Value = new Tree.ConstantValueFloat(2147483648f);
+            }
+            else foreach(Tree st in resolvetree.SubTree)
+            {
+                solveMaxNegValues(cs, st);
+            }
+        }
+
         void solveTree(CompileState cs, Tree resolvetree)
         {
             combineTypecasts(cs, resolvetree);
@@ -876,6 +1037,7 @@ namespace SilverSim.Scripting.LSL
             solveDeclarations(resolvetree);
             solveTypecasts(resolvetree);
             solveVariables(cs, resolvetree);
+            solveMaxNegValues(cs, resolvetree);
             solveConstantOperations(resolvetree);
         }
 

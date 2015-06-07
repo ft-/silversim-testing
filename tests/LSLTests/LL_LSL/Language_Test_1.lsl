@@ -471,7 +471,7 @@ tests()
  
     // check overflow behaviour
     i = 0x80000000 / -1;
-    //FT Temporary: ensureIntegerEqual("i = 0x80000000 / -1;", i, -2147483648);
+    ensureIntegerEqual("i = 0x80000000 / -1;", i, -2147483648);
  
     // modulo assignment
     i = 3;
@@ -512,7 +512,7 @@ tests()
     ensureRotationEqual("((quaternion) \"<1,2,3,4>\")", ((quaternion) "<1,2,3,4>"), <1,2,3,4>);
     ensureStringEqual("((string) <1,2,3>)", ((string) <1,2,3>), "<1.00000, 2.00000, 3.00000>");
     ensureStringEqual("((string) <1,2,3,4>)", ((string) <1,2,3,4>), "<1.00000, 2.00000, 3.00000, 4.00000>");
-    //FT Temporary: ensureStringEqual("((string) [1,2.5,<1,2,3>])", ((string) [1,2.5,<1,2,3>]), "12.500000<1.000000, 2.000000, 3.000000>");
+    ensureStringEqual("((string) [1,2.5,<1,2,3>])", ((string) [1,2.5,<1,2,3>]), "12.500000<1.000000, 2.000000, 3.000000>");
  
     // while
     i = 0;

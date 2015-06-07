@@ -178,6 +178,48 @@ namespace SilverSim.Scripting.LSL
             int lineNumber,
             Dictionary<string, object> localVars)
         {
+            if (functionTree.Value != null)
+            {
+                if(functionTree.Value is Tree.ConstantValueFloat)
+                {
+                    ilgen.Emit(OpCodes.Ldc_R8, ((Tree.ConstantValueFloat)functionTree.Value).Value);
+                    return typeof(double);
+                }
+                else if(functionTree.Value is Tree.ConstantValueInt)
+                {
+                    ilgen.Emit(OpCodes.Ldc_I4, ((Tree.ConstantValueInt)functionTree.Value).Value);
+                    return typeof(int);
+                }
+                else if(functionTree.Value is Tree.ConstantValueString)
+                {
+                    ilgen.Emit(OpCodes.Ldstr, ((Tree.ConstantValueString)functionTree.Value).Value);
+                    return typeof(string);
+                }
+                else if(functionTree.Value is ConstantValueRotation)
+                {
+                    ConstantValueRotation val = (ConstantValueRotation)functionTree.Value;
+                    ilgen.Emit(OpCodes.Ldc_R8, val.Value.X);
+                    ilgen.Emit(OpCodes.Ldc_R8, val.Value.Y);
+                    ilgen.Emit(OpCodes.Ldc_R8, val.Value.Z);
+                    ilgen.Emit(OpCodes.Ldc_R8, val.Value.W);
+                    ilgen.Emit(OpCodes.Newobj, typeof(Quaternion).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double), typeof(double) }));
+                    return typeof(Quaternion);
+                }
+                else if(functionTree.Value is ConstantValueVector)
+                {
+                    ConstantValueVector val = (ConstantValueVector)functionTree.Value;
+                    ilgen.Emit(OpCodes.Ldc_R8, val.Value.X);
+                    ilgen.Emit(OpCodes.Ldc_R8, val.Value.Y);
+                    ilgen.Emit(OpCodes.Ldc_R8, val.Value.Z);
+                    ilgen.Emit(OpCodes.Newobj, typeof(Vector3).GetConstructor(new Type[] { typeof(double), typeof(double), typeof(double) }));
+                    return typeof(Vector3);
+                }
+                else
+                {
+                    throw new CompilerException(lineNumber, "Internal Error");
+                }
+            }
+
             switch(functionTree.Type)
             {
                 case Tree.EntryType.ExpressionTree:

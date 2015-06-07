@@ -92,7 +92,7 @@ namespace SilverSim.Scripting.Common.Expression
             {
                 if (str.StartsWith("0x"))
                 {
-                    Value = int.Parse(str, NumberStyles.HexNumber);
+                    Value = (int)uint.Parse(str.Substring(2), NumberStyles.HexNumber);
                 }
                 else if (str.StartsWith("0"))
                 {
@@ -275,7 +275,7 @@ namespace SilverSim.Scripting.Common.Expression
                 float fval;
                 if(int.TryParse(Entry, out val) || Entry.StartsWith("0x"))
                 {
-                    Value = new ConstantValueInt(val);
+                    Value = new ConstantValueInt(Entry);
                 }
                 else if(float.TryParse(Entry, NumberStyles.Float, CultureInfo.InvariantCulture, out fval))
                 {

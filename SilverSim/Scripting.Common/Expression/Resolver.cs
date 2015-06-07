@@ -64,7 +64,11 @@ namespace SilverSim.Scripting.Common.Expression
         {
             if(nt.Type == Tree.EntryType.StringValue || nt.Type == Tree.EntryType.Value)
             {
-                nt.Process();
+                /* delay the 2147483648 */
+                if (nt.Entry != "2147483648")
+                {
+                    nt.Process();
+                }
             }
 
             foreach(Tree st in nt.SubTree)
