@@ -145,13 +145,28 @@ namespace SilverSim.Scripting.LSL
             public FieldBuilder InstanceField;
             public Dictionary<string, FieldBuilder> m_ApiFieldInfo = new Dictionary<string, FieldBuilder>();
             List<ControlFlowElement> m_ControlFlowStack = new List<ControlFlowElement>();
+            public Dictionary<Label, KeyValuePair<int, string>> m_UnnamedLabels = new Dictionary<Label, KeyValuePair<int, string>>();
             public ControlFlowElement LastBlock = null;
 
             public void InitControlFlow()
             {
                 m_ControlFlowStack.Clear();
+                m_UnnamedLabels.Clear();
                 LastBlock = null;
                 PushControlFlow(new ControlFlowElement(ControlFlowType.Entry, true));
+            }
+
+            public void FinishControlFlowChecks()
+            {
+                Dictionary<int, string> messages = new Dictionary<int, string>();
+                foreach(KeyValuePair<int, string> kvp in m_UnnamedLabels.Values)
+                {
+                    messages[kvp.Key] = string.Format("Internal Error! Undefined local label for {0}", kvp.Value);
+                }
+                if (messages.Count != 0)
+                {
+                    throw new CompilerException(messages);
+                }
             }
 
             public void PushControlFlow(ControlFlowElement e)
@@ -192,6 +207,7 @@ namespace SilverSim.Scripting.LSL
             {
                 if (LastBlock != null && (LastBlock.Type == ControlFlowType.If || LastBlock.Type == ControlFlowType.ElseIf) && null != LastBlock.EndOfIfFlowLabel)
                 {
+                    m_UnnamedLabels.Remove(LastBlock.EndOfIfFlowLabel.Value);
                     ilgen.MarkLabel(LastBlock.EndOfIfFlowLabel.Value);
                     LastBlock = null;
                 }
@@ -212,6 +228,10 @@ namespace SilverSim.Scripting.LSL
                     {
                         if (elem.Type == ControlFlowType.Else)
                         {
+                            if(!m_UnnamedLabels.Remove(elem.EndOfIfFlowLabel.Value))
+                            {
+                                throw new CompilerException(lineNumber, "Internal Error! Duplicate End Of If Label");
+                            }
                             ilgen.MarkLabel(elem.EndOfIfFlowLabel.Value);
                         }
                         else
@@ -221,6 +241,10 @@ namespace SilverSim.Scripting.LSL
                     }
                     if (null != elem.EndOfControlFlowLabel)
                     {
+                        if(!m_UnnamedLabels.Remove(elem.EndOfControlFlowLabel.Value))
+                        {
+                            throw new CompilerException(lineNumber, string.Format("Internal Error! Duplicate End Of Flow ('{0}') Label", elem.Type.ToString()));
+                        }
                         ilgen.MarkLabel(elem.EndOfControlFlowLabel.Value);
                     }
                 }
@@ -230,6 +254,10 @@ namespace SilverSim.Scripting.LSL
             {
                 if (LastBlock != null && (LastBlock.Type == ControlFlowType.If || LastBlock.Type == ControlFlowType.ElseIf) && null != LastBlock.EndOfIfFlowLabel)
                 {
+                    if(!m_UnnamedLabels.Remove(LastBlock.EndOfIfFlowLabel.Value))
+                    {
+                        throw new CompilerException(lineNumber, "Internal Error! Duplicate End Of If Label");
+                    }
                     ilgen.MarkLabel(LastBlock.EndOfIfFlowLabel.Value);
                     LastBlock = null;
                 }
@@ -250,6 +278,10 @@ namespace SilverSim.Scripting.LSL
                     {
                         if (elem.Type == ControlFlowType.Else)
                         {
+                            if (!m_UnnamedLabels.Remove(elem.EndOfIfFlowLabel.Value))
+                            {
+                                throw new CompilerException(lineNumber, "Internal Error! Duplicate End Of If Label");
+                            }
                             ilgen.MarkLabel(elem.EndOfIfFlowLabel.Value);
                         }
                         else
@@ -259,6 +291,10 @@ namespace SilverSim.Scripting.LSL
                     }
                     if (null != elem.EndOfControlFlowLabel)
                     {
+                        if(!m_UnnamedLabels.Remove(LastBlock.EndOfControlFlowLabel.Value))
+                        {
+                            throw new CompilerException(lineNumber, string.Format("Internal Error! Duplicate End Of Flow ('{0}') Label", LastBlock.Type.ToString()));
+                        }
                         ilgen.MarkLabel(elem.EndOfControlFlowLabel.Value);
                     }
                 }
@@ -268,6 +304,7 @@ namespace SilverSim.Scripting.LSL
             {
                 if (LastBlock != null && (LastBlock.Type == ControlFlowType.If || LastBlock.Type == ControlFlowType.ElseIf) && null != LastBlock.EndOfIfFlowLabel)
                 {
+                    m_UnnamedLabels.Remove(LastBlock.EndOfIfFlowLabel.Value);
                     ilgen.MarkLabel(LastBlock.EndOfIfFlowLabel.Value);
                     LastBlock = null;
                 }
@@ -282,10 +319,18 @@ namespace SilverSim.Scripting.LSL
                     }
                     if (null != elem.EndOfIfFlowLabel)
                     {
+                        if(!m_UnnamedLabels.Remove(LastBlock.EndOfIfFlowLabel.Value))
+                        {
+                            throw new CompilerException(lineNumber, "Internal Error! Duplicate End Of If Label");
+                        }
                         ilgen.MarkLabel(elem.EndOfIfFlowLabel.Value);
                     }
                     if (null != elem.EndOfControlFlowLabel)
                     {
+                        if(!m_UnnamedLabels.Remove(elem.EndOfControlFlowLabel.Value))
+                        {
+                            throw new CompilerException(lineNumber, string.Format("Internal Error! Duplicate End Of Flow ('{0}') Label", elem.Type.ToString()));
+                        }
                         ilgen.MarkLabel(elem.EndOfControlFlowLabel.Value);
                     }
                 }
@@ -306,6 +351,10 @@ namespace SilverSim.Scripting.LSL
                     {
                         if (elem.Type == ControlFlowType.Else)
                         {
+                            if(!m_UnnamedLabels.Remove(elem.EndOfIfFlowLabel.Value))
+                            {
+                                throw new CompilerException(lineNumber, "Internal Error! Duplicate End Of If Label");
+                            }
                             ilgen.MarkLabel(elem.EndOfIfFlowLabel.Value);
                         }
                         else
@@ -315,6 +364,10 @@ namespace SilverSim.Scripting.LSL
                     }
                     if (null != elem.EndOfControlFlowLabel)
                     {
+                        if(!m_UnnamedLabels.Remove(elem.EndOfControlFlowLabel.Value))
+                        {
+                            throw new CompilerException(lineNumber, string.Format("Internal Error! Duplicate End Of Flow ('{0}') Label", elem.Type.ToString()));
+                        }
                         ilgen.MarkLabel(elem.EndOfControlFlowLabel.Value);
                         elem.EndOfControlFlowLabel = null;
                     }

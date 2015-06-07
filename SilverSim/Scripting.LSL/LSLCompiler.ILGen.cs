@@ -3562,6 +3562,7 @@ namespace SilverSim.Scripting.LSL
                             }
                             Label endlabel = ilgen.DefineLabel();
                             Label looplabel = ilgen.DefineLabel();
+                            compileState.m_UnnamedLabels.Add(endlabel, new KeyValuePair<int, string>(functionLine.LineNumber, "For End Label"));
                             ControlFlowElement elem = new ControlFlowElement(
                                 ControlFlowType.For,
                                 functionLine.Line[functionLine.Line.Count - 1] == "{",
@@ -3633,6 +3634,7 @@ namespace SilverSim.Scripting.LSL
 
                             Label looplabel = ilgen.DefineLabel();
                             Label endlabel = ilgen.DefineLabel();
+                            compileState.m_UnnamedLabels.Add(endlabel, new KeyValuePair<int, string>(functionLine.LineNumber, "While End Label"));
                             ControlFlowElement elem = new ControlFlowElement(
                                 ControlFlowType.While,
                                 functionLine.Line[functionLine.Line.Count - 1] == "{",
@@ -3678,7 +3680,7 @@ namespace SilverSim.Scripting.LSL
                         {
                             Label looplabel = ilgen.DefineLabel();
                             Label endlabel = ilgen.DefineLabel();
-                            Label enterlabel = ilgen.DefineLabel();
+                            compileState.m_UnnamedLabels.Add(endlabel, new KeyValuePair<int, string>(functionLine.LineNumber, "Do While End Label"));
                             ControlFlowElement elem = new ControlFlowElement(
                                 ControlFlowType.DoWhile,
                                 functionLine.Line[functionLine.Line.Count - 1] == "{",
@@ -3710,6 +3712,8 @@ namespace SilverSim.Scripting.LSL
                         {
                             Label eoiflabel = ilgen.DefineLabel();
                             Label endlabel = ilgen.DefineLabel();
+                            compileState.m_UnnamedLabels.Add(eoiflabel, new KeyValuePair<int, string>(functionLine.LineNumber, "IfElse End Of All Label"));
+                            compileState.m_UnnamedLabels.Add(endlabel, new KeyValuePair<int, string>(functionLine.LineNumber, "IfElse End Label"));
 
                             int endofif;
                             int countparens = 0;
@@ -4085,7 +4089,7 @@ namespace SilverSim.Scripting.LSL
                 ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[0]));
             }
             ilgen.Emit(OpCodes.Ret);
-
+            compileState.FinishControlFlowChecks();
         }
 
         Dictionary<string, object> AddConstants(CompileState compileState, TypeBuilder typeBuilder, ILGenerator ilgen)
@@ -4452,7 +4456,6 @@ namespace SilverSim.Scripting.LSL
                         paramtypes);
                     ILGenerator event_ilgen = eventbuilder.GetILGenerator();
                     ProcessFunction(compileState, scriptTypeBuilder, state, eventbuilder, event_ilgen, eventKvp.Value, typeLocals);
-                    event_ilgen.Emit(OpCodes.Ret);
                 }
 
                 stateTypes.Add(stateKvp.Key, state.CreateType());

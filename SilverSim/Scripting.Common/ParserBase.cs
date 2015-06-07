@@ -107,6 +107,8 @@ namespace SilverSim.Scripting.Common
         protected int cur_linenumber;
         protected string cur_filename;
 
+        public int CurrentLineNumber; /* set to start of line */
+
         public void push(TextReader stream, string filename, int lineNumber = 1)
         {
             ParserInput pi = new ParserInput();

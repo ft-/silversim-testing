@@ -377,7 +377,7 @@ namespace SilverSim.Scripting.LSL
             }
             for (; ; )
             {
-                int lineNumber = p.getfileinfo().LineNumber;
+                int lineNumber;
                 List<string> args = new List<string>();
                 try
                 {
@@ -391,6 +391,8 @@ namespace SilverSim.Scripting.LSL
                 {
                     throw parserException(p, "Premature end of script");
                 }
+                lineNumber = p.CurrentLineNumber;
+
                 if (args.Count == 0)
                 {
                     /* should not happen but better be safe here */
@@ -413,7 +415,7 @@ namespace SilverSim.Scripting.LSL
             compileState.m_States.Add(stateName, new Dictionary<string, List<LineInfo>>());
             for (; ; )
             {
-                int lineNumber = p.getfileinfo().LineNumber;
+                int lineNumber;
                 List<string> args = new List<string>();
                 try
                 {
@@ -427,6 +429,8 @@ namespace SilverSim.Scripting.LSL
                 {
                     throw parserException(p, "Missing '}' at end of script");
                 }
+                lineNumber = p.CurrentLineNumber;
+
                 if (args.Count == 0)
                 {
                     /* should not happen but better be safe here */
@@ -516,7 +520,6 @@ namespace SilverSim.Scripting.LSL
 
             for (; ; )
             {
-                lineNumber = p.getfileinfo().LineNumber;
                 List<string> args = new List<string>();
                 try
                 {
@@ -530,6 +533,7 @@ namespace SilverSim.Scripting.LSL
                 {
                     break;
                 }
+                lineNumber = p.CurrentLineNumber;
                 if (args.Count == 0)
                 {
                     /* should not happen but better be safe here */

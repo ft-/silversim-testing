@@ -267,6 +267,9 @@ namespace SilverSim.Scripting.LSL
                         case "key":
                             break;
 
+                        case "list":
+                            break;
+
                         default:
                             throw new Resolver.ResolverException(string.Format("Invalid typecasting with {0}", st.Entry));
                     }

@@ -46,6 +46,7 @@ namespace SilverSim.Scripting.LSL
             args.Clear();
             bool is_preprocess = false;
             int parencount = 0;
+            CurrentLineNumber = -1;
 
             for(;;)
             {
@@ -68,6 +69,10 @@ redo:
                         break;
 
                     case ';':       /* end of statement */
+                        if (CurrentLineNumber < 0)
+                        {
+                            CurrentLineNumber = getfileinfo().LineNumber;
+                        }
                         if(0 != token.Length)
                             args.Add(token);
                         args.Add(";");
@@ -76,18 +81,30 @@ redo:
                         break;
 
                     case '{':       /* opening statement */
+                        if (CurrentLineNumber < 0)
+                        {
+                            CurrentLineNumber = getfileinfo().LineNumber;
+                        }
                         if(0 != token.Length)
                             args.Add(token);
                         args.Add("{");
                         return;
 
                     case '}':       /* closing statement */
+                        if (CurrentLineNumber < 0)
+                        {
+                            CurrentLineNumber = getfileinfo().LineNumber;
+                        }
                         if(0 != token.Length)
                             args.Add(token);
                         args.Add("}");
                         return;
                 
                     case '\"':      /* string literal */
+                        if (CurrentLineNumber < 0)
+                        {
+                            CurrentLineNumber = getfileinfo().LineNumber;
+                        }
                         if(0 != token.Length)
                             args.Add(token);
                         token = "";
@@ -110,6 +127,10 @@ redo:
                         break;
             
                     case '\'':      /* string literal */
+                        if (CurrentLineNumber < 0)
+                        {
+                            CurrentLineNumber = getfileinfo().LineNumber;
+                        }
                         if(0 != token.Length)
                             args.Add(token);
                         token = "";
@@ -140,6 +161,10 @@ redo:
                     case '\\':
                     case '[':
                     case ']':
+                        if (CurrentLineNumber < 0)
+                        {
+                            CurrentLineNumber = getfileinfo().LineNumber;
+                        }
                         if(0 != token.Length)
                             args.Add(token);
                         token = "";
@@ -156,6 +181,10 @@ redo:
                         break;
                 
                     case '<':
+                        if (CurrentLineNumber < 0)
+                        {
+                            CurrentLineNumber = getfileinfo().LineNumber;
+                        }
                         if(is_preprocess)
                         {
                             if(args.Count != 0)
@@ -195,7 +224,11 @@ redo:
                         }
                         else
                         {
-                            if(token == "" && args.Count == 0 && c == '#')
+                            if (CurrentLineNumber < 0)
+                            {
+                                CurrentLineNumber = getfileinfo().LineNumber;
+                            }
+                            if (token == "" && args.Count == 0 && c == '#')
                                 is_preprocess = true;
                             while(!Char.IsWhiteSpace(c) && c != ';' && c != '(' && c != ')' && c != ',' && c != '~' && c != '\\' && c != '?' && c != '@' && c != '{' && c != '}' && c != '[' && c != ']')
                             {
