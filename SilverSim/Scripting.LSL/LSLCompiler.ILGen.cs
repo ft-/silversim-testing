@@ -3725,6 +3725,7 @@ namespace SilverSim.Scripting.LSL
 
                     #region Control Flow (Conditions)
                     case "if":
+                        compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
                         {
                             Label eoiflabel = ilgen.DefineLabel();
                             Label endlabel = ilgen.DefineLabel();
