@@ -68,10 +68,6 @@ namespace SilverSim.Scripting.LSL.API.Animation
         }
 
         [APILevel(APIFlags.LSL)]
-        [LSLTooltip("permission to start or stop animations on agent")]
-        public const int PERMISSION_TRIGGER_ANIMATION = 0x10;
-
-        [APILevel(APIFlags.LSL)]
         public void llStartAnimation(
             ScriptInstance instance,
             [LSLTooltip("animation to be played")]

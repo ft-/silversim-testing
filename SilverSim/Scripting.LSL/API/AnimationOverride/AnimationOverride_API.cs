@@ -48,9 +48,6 @@ namespace SilverSim.Scripting.LSL.API.AnimationOverride
         }
 
         [APILevel(APIFlags.LSL)]
-        public const int PERMISSION_OVERRIDE_ANIMATIONS = 0x8000;
-
-        [APILevel(APIFlags.LSL)]
         public void llSetAnimationOverride(ScriptInstance instance, string anim_state, string anim)
         {
             lock (instance)

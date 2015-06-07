@@ -354,6 +354,7 @@ namespace SilverSim.Scripting.Common.Expression
         {
             switch(nt.Type)
             {
+                case Tree.EntryType.OperatorBinary:
                 case Tree.EntryType.OperatorRightUnary:
                 case Tree.EntryType.StringValue:
                 case Tree.EntryType.Value:
@@ -361,6 +362,7 @@ namespace SilverSim.Scripting.Common.Expression
                 case Tree.EntryType.Declaration:
                 case Tree.EntryType.Unknown:
                 case Tree.EntryType.Level:
+                case Tree.EntryType.Typecast:
                     return true;
 
                 default:
@@ -379,6 +381,7 @@ namespace SilverSim.Scripting.Common.Expression
                 case Tree.EntryType.Declaration:
                 case Tree.EntryType.Unknown:
                 case Tree.EntryType.Level:
+                case Tree.EntryType.Typecast:
                     return true;
 
                 default:
@@ -405,6 +408,7 @@ namespace SilverSim.Scripting.Common.Expression
             switch(nt.Type)
             {
                 case Tree.EntryType.Unknown:
+                case Tree.EntryType.Value:
                     return true;
 
                 default:
@@ -452,8 +456,8 @@ namespace SilverSim.Scripting.Common.Expression
                                         }
                                     }
                                     else if (pos > 0 && pos < nt.SubTree.Count - 1 &&
-                                        (nt.SubTree[pos - 1].Type != Tree.EntryType.OperatorUnknown ||
-                                        nt.SubTree[pos - 1].Type != Tree.EntryType.OperatorBinary) &&
+                                        (nt.SubTree[pos - 1].Type == Tree.EntryType.OperatorUnknown ||
+                                        nt.SubTree[pos - 1].Type == Tree.EntryType.OperatorBinary) &&
                                         isValidUnaryRight(nt.SubTree[pos + 1]))
                                     {
                                         st.Type = Tree.EntryType.OperatorLeftUnary;
@@ -470,40 +474,20 @@ namespace SilverSim.Scripting.Common.Expression
                                     break;
                             }
                         }
-                        if (st.Type != Tree.EntryType.OperatorUnknown)
-                        {
-                            break;
-                        }
                     }
                 }
             }
         }
 
-        void sortOps(Tree tree)
+        void sortUnaryOps(Tree tree)
         {
             int pos;
-            foreach(Dictionary<string, OperatorType> plist in m_Operators)
+            foreach (Dictionary<string, OperatorType> plist in m_Operators)
             {
-                for(pos = 0; pos < tree.SubTree.Count;)
+                for (pos = 0; pos < tree.SubTree.Count; )
                 {
-                    switch(tree.SubTree[pos].Type)
+                    switch (tree.SubTree[pos].Type)
                     {
-                        case Tree.EntryType.OperatorBinary:
-                            if (plist.ContainsKey(tree.SubTree[pos].Entry) &&
-                                !tree.SubTree[pos].ProcessedOpSort)
-                            {
-                                tree.SubTree[pos].SubTree.Add(tree.SubTree[pos - 1]);
-                                tree.SubTree[pos].SubTree.Add(tree.SubTree[pos + 1]);
-                                tree.SubTree[pos].ProcessedOpSort = true;
-                                tree.SubTree.RemoveAt(pos + 1);
-                                tree.SubTree.RemoveAt(pos - 1);
-                            }
-                            else
-                            {
-                                ++pos;
-                            }
-                            break;
-
                         case Tree.EntryType.OperatorLeftUnary:
                             if (plist.ContainsKey(tree.SubTree[pos].Entry) &&
                                 !tree.SubTree[pos].ProcessedOpSort)
@@ -539,6 +523,44 @@ namespace SilverSim.Scripting.Common.Expression
                 }
             }
 
+            foreach (Tree st in tree.SubTree)
+            {
+                sortUnaryOps(st);
+            }
+        }
+
+        void sortOps(Tree tree)
+        {
+            int pos;
+            foreach(Dictionary<string, OperatorType> plist in m_Operators)
+            {
+                for(pos = 0; pos < tree.SubTree.Count;)
+                {
+                    switch(tree.SubTree[pos].Type)
+                    {
+                        case Tree.EntryType.OperatorBinary:
+                            if (plist.ContainsKey(tree.SubTree[pos].Entry) &&
+                                !tree.SubTree[pos].ProcessedOpSort)
+                            {
+                                tree.SubTree[pos].SubTree.Add(tree.SubTree[pos - 1]);
+                                tree.SubTree[pos].SubTree.Add(tree.SubTree[pos + 1]);
+                                tree.SubTree[pos].ProcessedOpSort = true;
+                                tree.SubTree.RemoveAt(pos + 1);
+                                tree.SubTree.RemoveAt(pos - 1);
+                            }
+                            else
+                            {
+                                ++pos;
+                            }
+                            break;
+
+                        default:
+                            ++pos;
+                            break;
+                    }
+                }
+            }
+
             foreach(Tree st in tree.SubTree)
             {
                 sortOps(st);
@@ -555,7 +577,13 @@ namespace SilverSim.Scripting.Common.Expression
             identifySquareBracketDeclarations(tree);
             identifyFunctions(tree);
             identifyOps(tree);
+            sortUnaryOps(tree);
+            identifyOps(tree);
             sortOps(tree);
+            if(tree.SubTree.Count != 1)
+            {
+                throw new ResolverException("Internal Error! Expression tree not solved");
+            }
         }
     }
 }

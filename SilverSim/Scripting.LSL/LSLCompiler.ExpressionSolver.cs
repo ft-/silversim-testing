@@ -441,9 +441,9 @@ namespace SilverSim.Scripting.LSL
                             }
                             else if (st.SubTree[0].Value is Tree.ConstantValueInt && st.SubTree[1].Value is Tree.ConstantValueInt)
                             {
-                                st.Value = new Tree.ConstantValueInt(
-                                    ((Tree.ConstantValueInt)(st.SubTree[0].Value)).Value *
-                                    ((Tree.ConstantValueInt)(st.SubTree[1].Value)).Value);
+                                st.Value = new Tree.ConstantValueInt(LSLCompiler.LSL_IntegerMultiply(
+                                    ((Tree.ConstantValueInt)(st.SubTree[0].Value)).Value,
+                                    ((Tree.ConstantValueInt)(st.SubTree[1].Value)).Value));
                             }
                             else if (st.SubTree[0].Value is ConstantValueVector && st.SubTree[1].Value is ConstantValueVector)
                             {
@@ -514,9 +514,9 @@ namespace SilverSim.Scripting.LSL
                             }
                             else if (st.SubTree[0].Value is Tree.ConstantValueInt && st.SubTree[1].Value is Tree.ConstantValueInt)
                             {
-                                st.Value = new Tree.ConstantValueInt(
-                                    ((Tree.ConstantValueInt)(st.SubTree[0].Value)).Value /
-                                    ((Tree.ConstantValueInt)(st.SubTree[1].Value)).Value);
+                                st.Value = new Tree.ConstantValueInt(LSLCompiler.LSL_IntegerDivision(
+                                    ((Tree.ConstantValueInt)(st.SubTree[0].Value)).Value,
+                                    ((Tree.ConstantValueInt)(st.SubTree[1].Value)).Value));
                             }
                             else if (st.SubTree[0].Value is ConstantValueVector && st.SubTree[1].Value is Tree.ConstantValueInt)
                             {
@@ -569,9 +569,9 @@ namespace SilverSim.Scripting.LSL
                             }
                             else if (st.SubTree[0].Value is Tree.ConstantValueInt && st.SubTree[1].Value is Tree.ConstantValueInt)
                             {
-                                st.Value = new Tree.ConstantValueInt(
-                                    ((Tree.ConstantValueInt)(st.SubTree[0].Value)).Value %
-                                    ((Tree.ConstantValueInt)(st.SubTree[1].Value)).Value);
+                                st.Value = new Tree.ConstantValueInt(LSLCompiler.LSL_IntegerModulus(
+                                    ((Tree.ConstantValueInt)(st.SubTree[0].Value)).Value,
+                                    ((Tree.ConstantValueInt)(st.SubTree[1].Value)).Value));
                             }
                             else if (st.SubTree[0].Value is ConstantValueVector && st.SubTree[1].Value is ConstantValueVector)
                             {
@@ -837,6 +837,7 @@ namespace SilverSim.Scripting.LSL
                     }
                 }
                 #endregion
+                #region Typecasts
                 else if(st.Type == Tree.EntryType.Typecast && (st.SubTree[0].Value != null))
                 {
                     switch(st.Entry)
@@ -913,13 +914,13 @@ namespace SilverSim.Scripting.LSL
                             }
                             else if(st.SubTree[0].Value is Tree.ConstantValueFloat)
                             {
-                                st.Value = new Tree.ConstantValueInt((int)((Tree.ConstantValueFloat)st.SubTree[0].Value).Value);
+                                st.Value = new Tree.ConstantValueInt(LSLCompiler.ConvToInt(((Tree.ConstantValueFloat)st.SubTree[0].Value).Value));
                             }
                             else if (st.SubTree[0].Value is Tree.ConstantValueString)
                             {
                                 try
                                 {
-                                    st.Value = new Tree.ConstantValueInt(((Tree.ConstantValueString)st.SubTree[0].Value).Value);
+                                    st.Value = new Tree.ConstantValueInt(LSLCompiler.ConvToInt(((Tree.ConstantValueString)st.SubTree[0].Value).Value));
                                 }
                                 catch
                                 {
@@ -954,6 +955,8 @@ namespace SilverSim.Scripting.LSL
                             break;
                     }
                 }
+                #endregion
+                #region Left unary operators
                 else if (st.Type == Tree.EntryType.OperatorLeftUnary && (st.SubTree[0].Value != null || st.SubTree[0].Type == Tree.EntryType.Value))
                 {
                     if(st.Entry != "-" && st.SubTree[0].Type == Tree.EntryType.Value)
@@ -1006,6 +1009,13 @@ namespace SilverSim.Scripting.LSL
                         }
                     }
                 }
+                #endregion
+                #region Parenthesis
+                else if(st.Type == Tree.EntryType.Level && st.Entry == "(" && st.SubTree.Count == 1)
+                {
+                    st.Value = st.SubTree[0].Value;
+                }
+                #endregion
             }
         }
 

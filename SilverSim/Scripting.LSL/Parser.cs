@@ -298,7 +298,17 @@ redo:
                         break;
                     else if('\'' == c)
                         break;
-                    else if('+' == c)
+                    else if('e' == c && i + 1 < curlength && args[argi][i + 1] == '-')
+                    {
+                        /* float component */
+                        i += 2;
+                    }
+                    else if ('e' == c && i + 1 < curlength && args[argi][i + 1] == '+')
+                    {
+                        /* float component */
+                        i += 2;
+                    }
+                    else if ('+' == c)
                     {
                         if(i > 0)
                         {

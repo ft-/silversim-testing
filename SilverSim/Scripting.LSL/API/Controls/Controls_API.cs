@@ -48,9 +48,6 @@ namespace SilverSim.Scripting.LSL.API.Controls
         }
 
         [APILevel(APIFlags.LSL)]
-        public const int PERMISSION_TAKE_CONTROLS = 0x4;
-
-        [APILevel(APIFlags.LSL)]
         public const int CONTROL_FWD = 0x00000001;
         [APILevel(APIFlags.LSL)]
         public const int CONTROL_BACK = 0x00000002;

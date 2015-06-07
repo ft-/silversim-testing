@@ -29,6 +29,7 @@ using SilverSim.Scripting.Common.Expression;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Reflection;
 using System.Reflection.Emit;
 
@@ -64,6 +65,143 @@ namespace SilverSim.Scripting.LSL
 {
     public partial class LSLCompiler
     {
+        #region LSL Integer Overflow
+        /* special functions for converts
+         * 
+         * Integer Overflow
+         * The compiler treats integers outside the range -2147483648 to 2147483647 somewhat strangely. No compile time warning or error is generated. (If the following explanation, doesn't make sense to you don't worry -- just know to avoid using numbers outside the valid range in your script.)
+
+         * - For an integer outside the range -2147483648 to 2147483647, the absolute value of the number is reduced to fall in the range 0 to 4294967295 (0xFFFFFFFF).
+         * - This number is then parsed as an unsigned 32 bit integer and cast to the corresponding signed integer.
+         * - If the value in the script had a negative sign, the sign of the internal representation is switched.
+         * - The net effect is that very large positive numbers get mapped to -1 and very large negative numbers get mapped to 1.
+         */
+
+        public static int ConvToInt(double v)
+        {
+            try
+            {
+                return (int)v;
+            }
+            catch
+            {
+                if(v > 0)
+                {
+                    try
+                    {
+                        return (int)((uint)v);
+                    }
+                    catch
+                    {
+                        return -1;
+                    }
+                }
+                else
+                {
+                    try
+                    {
+                        return (int)-((uint)v);
+                    }
+                    catch
+                    {
+                        return 1;
+                    }
+                }
+            }
+        }
+
+        public static int ConvToInt(string v)
+        {
+            if(v.ToLower().StartsWith("0x"))
+            {
+                try
+                {
+                    return (int)uint.Parse(v.Substring(2), NumberStyles.HexNumber);
+                }
+                catch
+                {
+                    return -1;
+                }
+            }
+            else
+            {
+                try
+                {
+                    return int.Parse(v);
+                }
+                catch
+                {
+                    try
+                    {
+                        if(v.StartsWith("-"))
+                        {
+                            try
+                            {
+                                return -((int)uint.Parse(v.Substring(1)));
+                            }
+                            catch
+                            {
+                                return 1;
+                            }
+                        }
+                        else
+                        {
+                            try
+                            {
+                                return (int)uint.Parse(v.Substring(1));
+                            }
+                            catch
+                            {
+                                return -1;
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        if(v.StartsWith("-"))
+                        {
+                            return 1;
+                        }
+                        else
+                        {
+                            return -1;
+                        }
+                    }
+                }
+            }
+        }
+
+        public static int LSL_IntegerMultiply(int a, int b)
+        {
+#warning implement overflow behaviour for integer multiply
+            return a * b;
+        }
+
+        public static int LSL_IntegerDivision(int a, int b)
+        {
+            if (a == -2147483648 && b == -1)
+            {
+                return -2147483648;
+            }
+            else
+            {
+                return a / b;
+            }
+        }
+
+        public static int LSL_IntegerModulus(int a, int b)
+        {
+            if (a == -2147483648 && b == -1)
+            {
+                return 0;
+            }
+            else
+            {
+                return a / b;
+            }
+        }
+        #endregion
+
         CompilerException compilerException(LineInfo p, string message)
         {
             return new CompilerException(p.LineNumber, message);
@@ -78,6 +216,19 @@ namespace SilverSim.Scripting.LSL
             {
                 ParameterType = type;
                 Position = position;
+            }
+        }
+
+        class ILLabelInfo
+        {
+            public Label Label;
+            public bool IsDefined = false;
+            public List<int> UsedInLines = new List<int>();
+
+            public ILLabelInfo(Label label, bool isDefined)
+            {
+                Label = label;
+                IsDefined = isDefined;
             }
         }
 
@@ -807,7 +958,12 @@ namespace SilverSim.Scripting.LSL
                                 return retLeft;
 
                             case "*":
-                                if (retLeft == typeof(int) || retLeft == typeof(double))
+                                if(retLeft == typeof(int) && retRight == typeof(int))
+                                {
+                                    /* special LSL case */
+                                    ilgen.Emit(OpCodes.Call, typeof(LSLCompiler).GetMethod("LSL_IntegerMultiply", new Type[] { retLeft, retRight }));
+                                }
+                                else if (retLeft == typeof(int) || retLeft == typeof(double))
                                 {
                                     if (retRight == typeof(Vector3) || retRight == typeof(Quaternion))
                                     {
@@ -841,7 +997,12 @@ namespace SilverSim.Scripting.LSL
                                 return retLeft;
 
                             case "/":
-                                if (retLeft == typeof(int) || retLeft == typeof(double))
+                                if(retLeft == typeof(int) && retRight == typeof(int))
+                                {
+                                    /* special LSL case */
+                                    ilgen.Emit(OpCodes.Call, typeof(LSLCompiler).GetMethod("LSL_IntegerDivision", new Type[] { retLeft, retRight }));
+                                }
+                                else if (retLeft == typeof(int) || retLeft == typeof(double))
                                 {
                                     if (retRight == typeof(Vector3) || retRight == typeof(Quaternion))
                                     {
@@ -875,7 +1036,12 @@ namespace SilverSim.Scripting.LSL
                                 return retLeft;
 
                             case "%":
-                                if (retLeft == typeof(int) || retLeft == typeof(double))
+                                if(retLeft == typeof(int) && retRight == typeof(int))
+                                {
+                                    /* special LSL case */
+                                    ilgen.Emit(OpCodes.Call, typeof(LSLCompiler).GetMethod("LSL_IntegerModulus", new Type[] { retLeft, retRight }));
+                                }
+                                else if (retLeft == typeof(int) || retLeft == typeof(double))
                                 {
                                     ilgen.Emit(OpCodes.Rem);
                                 }
@@ -2045,9 +2211,14 @@ namespace SilverSim.Scripting.LSL
 
                 case Tree.EntryType.Variable:
                     /* variable */
+                    try
                     {
-                        object v = localVars[functionTree.SubTree[0].Entry];
+                        object v = localVars[functionTree.Entry];
                         return GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                    }
+                    catch(Exception e)
+                    {
+                        throw new CompilerException(lineNumber, string.Format("Variable '{0}' not defined", functionTree.Entry));
                     }
 
                 case Tree.EntryType.Vector:
@@ -2307,13 +2478,14 @@ namespace SilverSim.Scripting.LSL
             }
             else if(toType == typeof(int))
             {
+                /* yes, we need special handling for conversion of string to integer or float to integer. (see section about Integer Overflow) */
                 if(fromType == typeof(string))
                 {
-                    ilgen.Emit(OpCodes.Callvirt, typeof(string).GetProperty("Length").GetGetMethod());
+                    ilgen.Emit(OpCodes.Call, typeof(LSLCompiler).GetMethod("ConvToInt", new Type[] { fromType }));
                 }
                 else if(fromType == typeof(double))
                 {
-                    ilgen.Emit(OpCodes.Conv_I4);
+                    ilgen.Emit(OpCodes.Call, typeof(LSLCompiler).GetMethod("ConvToInt", new Type[] { fromType }));
                 }
                 else
                 {
@@ -2570,13 +2742,162 @@ namespace SilverSim.Scripting.LSL
             CompileState compileState,
             TypeBuilder scriptTypeBuilder,
             TypeBuilder stateTypeBuilder,
+            Type returnType,
             ILGenerator ilgen,
             int startAt,
             int endAt,
             LineInfo functionLine,
-            Dictionary<string, object> localVars)
+            Dictionary<string, object> localVars,
+            Dictionary<string, ILLabelInfo> labels)
         {
-            if (functionLine.Line[startAt + 1] == "=")
+            if(functionLine.Line[startAt] == "@")
+            {
+                throw compilerException(functionLine, "Invalid label declaration");
+            }
+            else if(functionLine.Line[startAt] == "jump")
+            {
+                if (functionLine.Line.Count <= startAt + 2)
+                {
+                    throw compilerException(functionLine, "Invalid jump statement");
+                }
+                if (!labels.ContainsKey(functionLine.Line[1]))
+                {
+                    Label label = ilgen.DefineLabel();
+                    labels[functionLine.Line[1]] = new ILLabelInfo(label, false);
+                }
+                labels[functionLine.Line[1]].UsedInLines.Add(functionLine.LineNumber);
+
+                ilgen.Emit(OpCodes.Br, labels[functionLine.Line[1]].Label);
+                compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
+                return;
+            }
+            else if(functionLine.Line[startAt] == "return")
+            {
+                if (returnType == typeof(void))
+                {
+                    if (functionLine.Line[1] != ";")
+                    {
+                        ProcessExpression(
+                            compileState,
+                            scriptTypeBuilder, 
+                            stateTypeBuilder,
+                            ilgen,
+                            typeof(void), 
+                            1,
+                            functionLine.Line.Count - 2, 
+                            functionLine,
+                            localVars);
+                    }
+                }
+                else if (returnType == typeof(int))
+                {
+                    ProcessExpression(
+                        compileState, 
+                        scriptTypeBuilder, 
+                        stateTypeBuilder,
+                        ilgen,
+                        typeof(int),
+                        1,
+                        functionLine.Line.Count - 2, 
+                        functionLine, 
+                        localVars);
+                }
+                else if (returnType == typeof(string))
+                {
+                    ProcessExpression(
+                        compileState, 
+                        scriptTypeBuilder, 
+                        stateTypeBuilder,
+                        ilgen,
+                        typeof(string),
+                        1,
+                        functionLine.Line.Count - 2, 
+                        functionLine, 
+                        localVars);
+                }
+                else if (returnType == typeof(double))
+                {
+                    ProcessExpression(
+                        compileState,
+                        scriptTypeBuilder, 
+                        stateTypeBuilder,
+                        ilgen, 
+                        typeof(double),
+                        1,
+                        functionLine.Line.Count - 2,
+                        functionLine, 
+                        localVars);
+                }
+                else if (returnType == typeof(AnArray))
+                {
+                    ProcessExpression(
+                        compileState, 
+                        scriptTypeBuilder, 
+                        stateTypeBuilder,
+                        ilgen,
+                        typeof(AnArray),
+                        1,
+                        functionLine.Line.Count - 2,
+                        functionLine,
+                        localVars);
+                }
+                else if (returnType == typeof(Vector3))
+                {
+                    ProcessExpression(
+                        compileState,
+                        scriptTypeBuilder,
+                        stateTypeBuilder, 
+                        ilgen,
+                        typeof(Vector3), 
+                        1,
+                        functionLine.Line.Count - 2,
+                        functionLine, 
+                        localVars);
+                }
+                else if (returnType == typeof(Quaternion))
+                {
+                    ProcessExpression(
+                        compileState, 
+                        scriptTypeBuilder, 
+                        stateTypeBuilder, 
+                        ilgen, 
+                        typeof(Quaternion), 
+                        1,
+                        functionLine.Line.Count - 2,
+                        functionLine, 
+                        localVars);
+                }
+                else if (returnType == typeof(LSLKey))
+                {
+                    ProcessExpression(
+                        compileState, 
+                        scriptTypeBuilder, 
+                        stateTypeBuilder, 
+                        ilgen,
+                        typeof(LSLKey), 
+                        1,
+                        functionLine.Line.Count - 2,
+                        functionLine, 
+                        localVars);
+                }
+                ilgen.Emit(OpCodes.Ret);
+                compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
+                return;
+            }
+            else if (functionLine.Line[startAt] == "state")
+            {
+                /* when same state, the state instruction compiles to nop according to wiki */
+                if (stateTypeBuilder == scriptTypeBuilder)
+                {
+                    throw compilerException(functionLine, "Global functions cannot change state");
+                }
+                ilgen.Emit(OpCodes.Ldstr, functionLine.Line[1]);
+                ilgen.Emit(OpCodes.Newobj, typeof(ChangeStateException).GetConstructor(new Type[1] { typeof(string) }));
+                ilgen.Emit(OpCodes.Throw);
+                compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
+                return;
+            }
+            else if (functionLine.Line[startAt + 1] == "=")
             {
                 string varName = functionLine.Line[startAt];
                 /* variable assignment */
@@ -2593,7 +2914,7 @@ namespace SilverSim.Scripting.LSL
                     localVars);
                 SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, functionLine.LineNumber);
             }
-            else if(functionLine.Line[startAt + 1] == ".")
+            else if (functionLine.Line[startAt + 1] == ".")
             {
                 /* component access */
                 if (startAt != 0)
@@ -2606,7 +2927,7 @@ namespace SilverSim.Scripting.LSL
                     object o = localVars[varName];
                     Type varType = GetVarType(scriptTypeBuilder, stateTypeBuilder, o);
                     ilgen.BeginScope();
-                    LocalBuilder lb_struct  = ilgen.DeclareLocal(varType);
+                    LocalBuilder lb_struct = ilgen.DeclareLocal(varType);
                     GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, o);
                     ilgen.Emit(OpCodes.Stloc, lb_struct);
                     string fieldName;
@@ -2677,7 +2998,7 @@ namespace SilverSim.Scripting.LSL
                         functionLine,
                         localVars);
 
-                    switch(functionLine.Line[startAt + 3])
+                    switch (functionLine.Line[startAt + 3])
                     {
                         case "=":
                             ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
@@ -2716,9 +3037,9 @@ namespace SilverSim.Scripting.LSL
                     ilgen.EndScope();
                 }
             }
-            else if(functionLine.Line[startAt + 1] == "+=")
+            else if (functionLine.Line[startAt + 1] == "+=")
             {
-                if(startAt != 0)
+                if (startAt != 0)
                 {
                     throw compilerException(functionLine, "Invalid assignment");
                 }
@@ -2737,11 +3058,11 @@ namespace SilverSim.Scripting.LSL
                         endAt,
                         functionLine,
                         localVars);
-                    if(ret == typeof(int) || ret == typeof(double) || ret == typeof(string))
+                    if (ret == typeof(int) || ret == typeof(double) || ret == typeof(string))
                     {
                         ilgen.Emit(OpCodes.Add);
                     }
-                    else if(ret == typeof(LSLKey) || ret == typeof(AnArray) || ret == typeof(Vector3) || ret == typeof(Quaternion))
+                    else if (ret == typeof(LSLKey) || ret == typeof(AnArray) || ret == typeof(Vector3) || ret == typeof(Quaternion))
                     {
                         ilgen.Emit(OpCodes.Callvirt, ret.GetMethod("op_Addition", new Type[] { ret, ret }));
                     }
@@ -2752,7 +3073,7 @@ namespace SilverSim.Scripting.LSL
                     SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, functionLine.LineNumber);
                 }
             }
-            else if(functionLine.Line[startAt + 1] == "-=")
+            else if (functionLine.Line[startAt + 1] == "-=")
             {
                 if (startAt != 0)
                 {
@@ -2916,20 +3237,20 @@ namespace SilverSim.Scripting.LSL
             ILGenerator ilgen,
             List<LineInfo> functionBody,
             Dictionary<string, object> localVars,
-            Dictionary<string, Label> labels,
+            Dictionary<string, ILLabelInfo> labels,
             ref int lineIndex)
         {
-            Dictionary<string, Label> outerLabels = labels;
+            Dictionary<string, ILLabelInfo> outerLabels = labels;
             List<string> markedLabels = new List<string>();
             /* we need a copy here */
             localVars = new Dictionary<string, object>(localVars);
             if (null != labels)
             {
-                labels = new Dictionary<string, Label>(labels);
+                labels = new Dictionary<string, ILLabelInfo>(labels);
             }
             else
             {
-                labels = new Dictionary<string, Label>();
+                labels = new Dictionary<string, ILLabelInfo>();
             }
 
             for (; lineIndex < functionBody.Count; ++lineIndex)
@@ -2938,9 +3259,35 @@ namespace SilverSim.Scripting.LSL
                 LocalBuilder lb;
                 switch (functionLine.Line[0])
                 {
+                    case "@":
+                        if (functionLine.Line.Count != 3 || functionLine.Line[2] != ";")
+                        {
+                            throw compilerException(functionLine, "not a valid label definition");
+                        }
+                        else
+                        {
+                            string labelName = functionLine.Line[1];
+                            if (!labels.ContainsKey(labelName))
+                            {
+                                Label label = ilgen.DefineLabel();
+                                labels[functionLine.Line[1]] = new ILLabelInfo(label, true);
+                            }
+                            else if (labels[labelName].IsDefined)
+                            {
+                                throw compilerException(functionLine, "label already defined");
+                            }
+                            else
+                            {
+                                labels[labelName].IsDefined = true;
+                            }
+                            ilgen.MarkLabel(labels[labelName].Label);
+                        }
+                        break;
+
+                    #region Variable declarations
                     /* type named things are variable declaration */
                     case "integer":
-                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        if (compileState.IsImplicitControlFlow(functionLine.LineNumber))
                         {
                             throw compilerException(functionLine,
                                 string.Format("variable declaration cannot be a single statement within flow control '{0}'",
@@ -2955,14 +3302,14 @@ namespace SilverSim.Scripting.LSL
                         if (functionLine.Line[2] != ";")
                         {
                             ProcessExpression(
-                                compileState, 
-                                scriptTypeBuilder, 
-                                stateTypeBuilder, 
-                                ilgen, 
+                                compileState,
+                                scriptTypeBuilder,
+                                stateTypeBuilder,
+                                ilgen,
                                 typeof(int),
-                                3, 
-                                functionLine.Line.Count - 2, 
-                                functionLine, 
+                                3,
+                                functionLine.Line.Count - 2,
+                                functionLine,
                                 localVars);
                         }
                         else
@@ -2973,7 +3320,7 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "vector":
-                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        if (compileState.IsImplicitControlFlow(functionLine.LineNumber))
                         {
                             throw compilerException(functionLine,
                                 string.Format("variable declaration cannot be a single statement within flow control '{0}'",
@@ -2988,14 +3335,14 @@ namespace SilverSim.Scripting.LSL
                         if (functionLine.Line[2] != ";")
                         {
                             ProcessExpression(
-                                compileState, 
+                                compileState,
                                 scriptTypeBuilder,
-                                stateTypeBuilder, 
-                                ilgen, 
-                                typeof(Vector3), 
-                                3, 
-                                functionLine.Line.Count - 2, 
-                                functionLine, 
+                                stateTypeBuilder,
+                                ilgen,
+                                typeof(Vector3),
+                                3,
+                                functionLine.Line.Count - 2,
+                                functionLine,
                                 localVars);
                         }
                         else
@@ -3006,7 +3353,7 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "list":
-                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        if (compileState.IsImplicitControlFlow(functionLine.LineNumber))
                         {
                             throw compilerException(functionLine,
                                 string.Format("variable declaration cannot be a single statement within flow control '{0}'",
@@ -3024,11 +3371,11 @@ namespace SilverSim.Scripting.LSL
                                 compileState,
                                 scriptTypeBuilder,
                                 stateTypeBuilder,
-                                ilgen, 
-                                typeof(AnArray), 
+                                ilgen,
+                                typeof(AnArray),
                                 3,
                                 functionLine.Line.Count - 2,
-                                functionLine, 
+                                functionLine,
                                 localVars);
                         }
                         else
@@ -3039,7 +3386,7 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "float":
-                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        if (compileState.IsImplicitControlFlow(functionLine.LineNumber))
                         {
                             throw compilerException(functionLine,
                                 string.Format("variable declaration cannot be a single statement within flow control '{0}'",
@@ -3055,10 +3402,10 @@ namespace SilverSim.Scripting.LSL
                         {
                             ProcessExpression(
                                 compileState,
-                                scriptTypeBuilder, 
-                                stateTypeBuilder, 
-                                ilgen, 
-                                typeof(double), 
+                                scriptTypeBuilder,
+                                stateTypeBuilder,
+                                ilgen,
+                                typeof(double),
                                 3,
                                 functionLine.Line.Count - 2,
                                 functionLine, localVars);
@@ -3071,7 +3418,7 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "string":
-                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        if (compileState.IsImplicitControlFlow(functionLine.LineNumber))
                         {
                             throw compilerException(functionLine,
                                 string.Format("variable declaration cannot be a single statement within flow control '{0}'",
@@ -3092,8 +3439,8 @@ namespace SilverSim.Scripting.LSL
                                 ilgen,
                                 typeof(string),
                                 3,
-                                functionLine.Line.Count - 2, 
-                                functionLine, 
+                                functionLine.Line.Count - 2,
+                                functionLine,
                                 localVars);
                         }
                         else
@@ -3104,7 +3451,7 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "key":
-                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        if (compileState.IsImplicitControlFlow(functionLine.LineNumber))
                         {
                             throw compilerException(functionLine,
                                 string.Format("variable declaration cannot be a single statement within flow control '{0}'",
@@ -3138,9 +3485,9 @@ namespace SilverSim.Scripting.LSL
 
                     case "rotation":
                     case "quaternion":
-                        if(compileState.IsImplicitControlFlow(functionLine.LineNumber))
+                        if (compileState.IsImplicitControlFlow(functionLine.LineNumber))
                         {
-                            throw compilerException(functionLine, 
+                            throw compilerException(functionLine,
                                 string.Format("variable declaration cannot be a single statement within flow control '{0}'",
                                 compileState.GetControlFlowInfo(functionLine.LineNumber)));
                         }
@@ -3153,14 +3500,14 @@ namespace SilverSim.Scripting.LSL
                         if (functionLine.Line[2] != ";")
                         {
                             ProcessExpression(
-                                compileState, 
-                                scriptTypeBuilder, 
-                                stateTypeBuilder, 
-                                ilgen, 
+                                compileState,
+                                scriptTypeBuilder,
+                                stateTypeBuilder,
+                                ilgen,
                                 typeof(Quaternion),
                                 3,
                                 functionLine.Line.Count - 2,
-                                functionLine, 
+                                functionLine,
                                 localVars);
                         }
                         else
@@ -3169,7 +3516,9 @@ namespace SilverSim.Scripting.LSL
                         }
                         ilgen.Emit(OpCodes.Stloc, lb);
                         break;
+                    #endregion
 
+                    #region Control Flow
                     case "for":
                         {   /* for(a;b;c) */
                             int semicolon1, semicolon2;
@@ -3179,7 +3528,7 @@ namespace SilverSim.Scripting.LSL
                             {
                                 if (functionLine.Line[endoffor] == ")")
                                 {
-                                    if(--countparens == 0)
+                                    if (--countparens == 0)
                                     {
                                         break;
                                     }
@@ -3200,20 +3549,22 @@ namespace SilverSim.Scripting.LSL
                             if (2 != semicolon1)
                             {
                                 ProcessStatement(
-                                    compileState, 
+                                    compileState,
                                     scriptTypeBuilder,
-                                    stateTypeBuilder, 
+                                    stateTypeBuilder,
+                                    returnType,
                                     ilgen,
-                                    2, 
+                                    2,
                                     semicolon1 - 1,
-                                    functionLine, 
-                                    localVars);
+                                    functionLine,
+                                    localVars,
+                                    labels);
                             }
                             Label endlabel = ilgen.DefineLabel();
                             Label looplabel = ilgen.DefineLabel();
                             ControlFlowElement elem = new ControlFlowElement(
-                                ControlFlowType.For, 
-                                functionLine.Line[functionLine.Line.Count - 1] == "{", 
+                                ControlFlowType.For,
+                                functionLine.Line[functionLine.Line.Count - 1] == "{",
                                 looplabel,
                                 endlabel,
                                 compileState.IsImplicitControlFlow(functionLine.LineNumber));
@@ -3243,12 +3594,12 @@ namespace SilverSim.Scripting.LSL
                                 ++lineIndex;
                                 ProcessBlock(
                                     compileState,
-                                    scriptTypeBuilder, 
+                                    scriptTypeBuilder,
                                     stateTypeBuilder,
                                     returnType,
                                     ilgen,
                                     functionBody,
-                                    localVars, 
+                                    localVars,
                                     labels,
                                     ref lineIndex);
                                 ilgen.EndScope();
@@ -3264,7 +3615,7 @@ namespace SilverSim.Scripting.LSL
                             {
                                 if (functionLine.Line[endofwhile] == ")")
                                 {
-                                    if(--countparens == 0)
+                                    if (--countparens == 0)
                                     {
                                         break;
                                     }
@@ -3283,9 +3634,9 @@ namespace SilverSim.Scripting.LSL
                             Label looplabel = ilgen.DefineLabel();
                             Label endlabel = ilgen.DefineLabel();
                             ControlFlowElement elem = new ControlFlowElement(
-                                ControlFlowType.While, 
+                                ControlFlowType.While,
                                 functionLine.Line[functionLine.Line.Count - 1] == "{",
-                                looplabel, 
+                                looplabel,
                                 endlabel,
                                 compileState.IsImplicitControlFlow(functionLine.LineNumber));
                             compileState.PushControlFlow(elem);
@@ -3305,7 +3656,7 @@ namespace SilverSim.Scripting.LSL
                                 localVars);
                             ilgen.Emit(OpCodes.Brfalse, endlabel);
 
-                            if(functionLine.Line[functionLine.Line.Count - 1] == "{")
+                            if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 ilgen.BeginScope();
                                 ++lineIndex;
@@ -3331,8 +3682,8 @@ namespace SilverSim.Scripting.LSL
                             ControlFlowElement elem = new ControlFlowElement(
                                 ControlFlowType.DoWhile,
                                 functionLine.Line[functionLine.Line.Count - 1] == "{",
-                                looplabel, 
-                                endlabel, 
+                                looplabel,
+                                endlabel,
                                 compileState.IsImplicitControlFlow(functionLine.LineNumber));
                             compileState.PushControlFlow(elem);
 
@@ -3422,11 +3773,11 @@ namespace SilverSim.Scripting.LSL
                         break;
 
                     case "else":
-                        if(null == compileState.LastBlock)
+                        if (null == compileState.LastBlock)
                         {
                             throw compilerException(functionLine, "No matching 'if' found for 'else'");
                         }
-                        else if(functionLine.Line.Count > 1 && functionLine.Line[1] == "if")
+                        else if (functionLine.Line.Count > 1 && functionLine.Line[1] == "if")
                         { /* else if */
                             Label eoiflabel = compileState.LastBlock.EndOfIfFlowLabel.Value;
                             Label endlabel = ilgen.DefineLabel();
@@ -3522,140 +3873,7 @@ namespace SilverSim.Scripting.LSL
                             }
                         }
                         break;
-
-                    case "jump":
-                        if (!labels.ContainsKey(functionLine.Line[1]))
-                        {
-                            Label label = ilgen.DefineLabel();
-                            labels[functionLine.Line[1]] = label;
-                        }
-                        ilgen.Emit(OpCodes.Br, labels[functionLine.Line[1]]);
-                        compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
-                        break;
-
-                    case "return":
-                        if (returnType == typeof(void))
-                        {
-                            if (functionLine.Line[1] != ";")
-                            {
-                                ProcessExpression(
-                                    compileState,
-                                    scriptTypeBuilder, 
-                                    stateTypeBuilder,
-                                    ilgen,
-                                    typeof(void), 
-                                    1,
-                                    functionLine.Line.Count - 2, 
-                                    functionLine,
-                                    localVars);
-                            }
-                        }
-                        else if (returnType == typeof(int))
-                        {
-                            ProcessExpression(
-                                compileState, 
-                                scriptTypeBuilder, 
-                                stateTypeBuilder,
-                                ilgen,
-                                typeof(int),
-                                1,
-                                functionLine.Line.Count - 2, 
-                                functionLine, 
-                                localVars);
-                        }
-                        else if (returnType == typeof(string))
-                        {
-                            ProcessExpression(
-                                compileState, 
-                                scriptTypeBuilder, 
-                                stateTypeBuilder,
-                                ilgen,
-                                typeof(string),
-                                1,
-                                functionLine.Line.Count - 2, 
-                                functionLine, 
-                                localVars);
-                        }
-                        else if (returnType == typeof(double))
-                        {
-                            ProcessExpression(
-                                compileState,
-                                scriptTypeBuilder, 
-                                stateTypeBuilder,
-                                ilgen, 
-                                typeof(double),
-                                1,
-                                functionLine.Line.Count - 2,
-                                functionLine, 
-                                localVars);
-                        }
-                        else if (returnType == typeof(AnArray))
-                        {
-                            ProcessExpression(
-                                compileState, 
-                                scriptTypeBuilder, 
-                                stateTypeBuilder,
-                                ilgen,
-                                typeof(AnArray),
-                                1,
-                                functionLine.Line.Count - 2,
-                                functionLine,
-                                localVars);
-                        }
-                        else if (returnType == typeof(Vector3))
-                        {
-                            ProcessExpression(
-                                compileState,
-                                scriptTypeBuilder,
-                                stateTypeBuilder, 
-                                ilgen,
-                                typeof(Vector3), 
-                                1,
-                                functionLine.Line.Count - 2,
-                                functionLine, 
-                                localVars);
-                        }
-                        else if (returnType == typeof(Quaternion))
-                        {
-                            ProcessExpression(
-                                compileState, 
-                                scriptTypeBuilder, 
-                                stateTypeBuilder, 
-                                ilgen, 
-                                typeof(Quaternion), 
-                                1,
-                                functionLine.Line.Count - 2,
-                                functionLine, 
-                                localVars);
-                        }
-                        else if (returnType == typeof(LSLKey))
-                        {
-                            ProcessExpression(
-                                compileState, 
-                                scriptTypeBuilder, 
-                                stateTypeBuilder, 
-                                ilgen,
-                                typeof(LSLKey), 
-                                1,
-                                functionLine.Line.Count - 2,
-                                functionLine, 
-                                localVars);
-                        }
-                        ilgen.Emit(OpCodes.Ret);
-                        compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
-                        break;
-
-                    case "state":
-                        /* when same state, the state instruction compiles to nop according to wiki */
-                        if(stateTypeBuilder == scriptTypeBuilder)
-                        {
-                            throw compilerException(functionLine, "Global functions cannot change state");
-                        }
-                        ilgen.Emit(OpCodes.Ldstr, functionLine.Line[1]);
-                        ilgen.Emit(OpCodes.Newobj, typeof(ChangeStateException).GetConstructor(new Type[1] { typeof(string) }));
-                        ilgen.Emit(OpCodes.Throw);
-                        compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
-                        break;
+                    #endregion
 
                     case "{": /* new unconditional block */
                         compileState.PopControlFlowImplicits(ilgen, functionLine.LineNumber);
@@ -3679,6 +3897,21 @@ namespace SilverSim.Scripting.LSL
 
                     case "}": /* end unconditional/conditional block */
                         {
+                            Dictionary<int, string> messages = new Dictionary<int, string>();
+                            foreach (KeyValuePair<string, ILLabelInfo> kvp in labels)
+                            {
+                                if (!kvp.Value.IsDefined)
+                                {
+                                    foreach (int line in kvp.Value.UsedInLines)
+                                    {
+                                        messages[line] = string.Format("Label '{0}' not defined", kvp.Key);
+                                    }
+                                }
+                            }
+                            if (messages.Count != 0)
+                            {
+                                throw new CompilerException(messages);
+                            }
                             ControlFlowElement elem = compileState.PopControlFlowExplicit(ilgen, functionLine.LineNumber);
                             if (elem.IsExplicitBlock && elem.Type != ControlFlowType.Entry)
                             {
@@ -3693,15 +3926,19 @@ namespace SilverSim.Scripting.LSL
                             compileState,
                             scriptTypeBuilder,
                             stateTypeBuilder,
-                            ilgen, 
+                            returnType,
+                            ilgen,
                             0,
-                            functionLine.Line.Count - 2, 
-                            functionLine, 
-                            localVars);
+                            functionLine.Line.Count - 2,
+                            functionLine,
+                            localVars,
+                            labels);
                         compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
                         break;
                 }
             }
+
+            throw compilerException(functionBody[functionBody.Count - 1], "Missing '}'");
         }
 
         void ProcessFunction(
@@ -3987,6 +4224,8 @@ namespace SilverSim.Scripting.LSL
                             expressionTree,
                             initargs.LineNumber,
                             typeLocals);
+                        script_ilgen.Emit(OpCodes.Stfld, fb);
+                        varIsInited.Add(varName);
                     }
                     else
                     {
@@ -3997,32 +4236,45 @@ namespace SilverSim.Scripting.LSL
                 else if(fb.FieldType == typeof(int))
                 {
                     script_ilgen.Emit(OpCodes.Ldc_I4_0);
+                    script_ilgen.Emit(OpCodes.Stfld, fb);
+                    varIsInited.Add(varName);
                 }
                 else if(fb.FieldType == typeof(double))
                 {
                     script_ilgen.Emit(OpCodes.Ldc_R8, 0f);
+                    script_ilgen.Emit(OpCodes.Stfld, fb);
+                    varIsInited.Add(varName);
                 }
                 else if (fb.FieldType == typeof(string))
                 {
                     script_ilgen.Emit(OpCodes.Ldstr, "");
+                    script_ilgen.Emit(OpCodes.Stfld, fb);
+                    varIsInited.Add(varName);
                 }
                 else if (fb.FieldType == typeof(Vector3))
                 {
                     script_ilgen.Emit(OpCodes.Newobj, typeof(Vector3).GetConstructor(new Type[0]));
+                    script_ilgen.Emit(OpCodes.Stfld, fb);
+                    varIsInited.Add(varName);
                 }
                 else if (fb.FieldType == typeof(Quaternion))
                 {
                     script_ilgen.Emit(OpCodes.Newobj, typeof(Quaternion).GetConstructor(new Type[0]));
+                    script_ilgen.Emit(OpCodes.Stfld, fb);
+                    varIsInited.Add(varName);
                 }
                 else if (fb.FieldType == typeof(AnArray))
                 {
                     script_ilgen.Emit(OpCodes.Newobj, typeof(AnArray).GetConstructor(new Type[0]));
+                    script_ilgen.Emit(OpCodes.Stfld, fb);
+                    varIsInited.Add(varName);
                 }
                 else if (fb.FieldType == typeof(LSLKey))
                 {
                     script_ilgen.Emit(OpCodes.Newobj, typeof(LSLKey).GetConstructor(new Type[0]));
+                    script_ilgen.Emit(OpCodes.Stfld, fb);
+                    varIsInited.Add(varName);
                 }
-                script_ilgen.Emit(OpCodes.Stfld, fb);
             }
             #endregion
 
@@ -4169,6 +4421,13 @@ namespace SilverSim.Scripting.LSL
                 state_ilgen.Emit(OpCodes.Ldarg_1);
                 state_ilgen.Emit(OpCodes.Stfld, fb);
                 typeLocals = AddConstants(compileState, state, state_ilgen);
+                foreach (KeyValuePair<string, Type> variableKvp in compileState.m_VariableDeclarations)
+                {
+                    FieldBuilder cfb = scriptTypeBuilder.DefineField("var_" + variableKvp.Key, variableKvp.Value, FieldAttributes.Public);
+                    compileState.m_VariableFieldInfo[variableKvp.Key] = cfb;
+                    typeLocals[variableKvp.Key] = cfb;
+                }
+
                 state_ilgen.Emit(OpCodes.Ret);
 
                 /* add the type initializers */

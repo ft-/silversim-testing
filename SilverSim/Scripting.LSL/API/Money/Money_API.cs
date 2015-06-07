@@ -50,9 +50,6 @@ namespace SilverSim.Scripting.LSL.API.Money
         }
 
         [APILevel(APIFlags.LSL)]
-        public const int PERMISSION_DEBIT = 0x2;
-
-        [APILevel(APIFlags.LSL)]
         [StateEventDelegate]
         public delegate void transaction_result(LSLKey id, int success, string data);
 

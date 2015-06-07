@@ -65,7 +65,7 @@ namespace SilverSim.Scripting.LSL.API.Parcel
         [APILevel(APIFlags.LSL)]
         public const int PARCEL_FLAG_ALLOW_ALL_OBJECT_ENTRY = 0x8000000;
         [APILevel(APIFlags.LSL)]
-        public const int PARCEL_FLAG_ALLOW_GROUP_OBJECT_ENTRY = 0x10000000;    
+        public const int PARCEL_FLAG_ALLOW_GROUP_OBJECT_ENTRY = 0x10000000;
 
         public Parcel_API()
         {
