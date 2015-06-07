@@ -27,7 +27,7 @@ using log4net;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
-using SilverSim.Scripting.Common.Expression;
+using SilverSim.Scripting.LSL.Expression;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;

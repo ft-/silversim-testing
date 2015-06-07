@@ -29,7 +29,7 @@ using System.Linq;
 using System.Globalization;
 using System.Text;
 
-namespace SilverSim.Scripting.Common.Expression
+namespace SilverSim.Scripting.LSL.Expression
 {
     public class Tree
     {

@@ -25,7 +25,7 @@ exception statement from your version.
 
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
-using SilverSim.Scripting.Common.Expression;
+using SilverSim.Scripting.LSL.Expression;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
@@ -253,7 +253,7 @@ namespace SilverSim.Scripting.LSL
             try
             {
                 expressionTree = new Tree(functionLine.Line.GetRange(startAt, endAt - startAt + 1), m_OpChars, m_SingleOps, m_NumericChars);
-                solveTree(compileState, expressionTree);
+                solveTree(compileState, expressionTree, localVars.Keys);
             }
             catch(Exception e)
             {
@@ -4215,13 +4215,13 @@ namespace SilverSim.Scripting.LSL
                 }
                 script_ilgen.Emit(OpCodes.Call, typeConstructor);
             }
-            typeLocals = AddConstants(compileState, scriptTypeBuilder, script_ilgen);
             #endregion
 
             Dictionary<string, Type> stateTypes = new Dictionary<string, Type>();
 
             #region Globals generation
-            foreach(KeyValuePair<string, Type> variableKvp in compileState.m_VariableDeclarations)
+            typeLocals = AddConstants(compileState, scriptTypeBuilder, script_ilgen);
+            foreach (KeyValuePair<string, Type> variableKvp in compileState.m_VariableDeclarations)
             {
                 FieldBuilder fb = scriptTypeBuilder.DefineField("var_" + variableKvp.Key, variableKvp.Value, FieldAttributes.Public);
                 compileState.m_VariableFieldInfo[variableKvp.Key] = fb;
@@ -4245,7 +4245,7 @@ namespace SilverSim.Scripting.LSL
                     try
                     {
                         expressionTree = new Tree(initargs.Line, m_OpChars, m_SingleOps, m_NumericChars);
-                        solveTree(compileState, expressionTree);
+                        solveTree(compileState, expressionTree, typeLocals.Keys);
                     }
                     catch (Exception e)
                     {

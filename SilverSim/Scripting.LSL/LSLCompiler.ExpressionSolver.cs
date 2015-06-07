@@ -23,7 +23,7 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scripting.Common.Expression;
+using SilverSim.Scripting.LSL.Expression;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.Globalization;
@@ -1081,10 +1081,10 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
-        void solveTree(CompileState cs, Tree resolvetree)
+        void solveTree(CompileState cs, Tree resolvetree, ICollection<string> varNames)
         {
             combineTypecasts(cs, resolvetree);
-            m_Resolver.Process(resolvetree);
+            m_Resolver.Process(resolvetree, varNames);
             solveDeclarations(resolvetree);
             solveTypecasts(resolvetree);
             solveVariables(cs, resolvetree);
