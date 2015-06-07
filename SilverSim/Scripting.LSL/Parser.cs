@@ -237,7 +237,8 @@ redo:
                                 if(token == "//")
                                 {
                                     /* got C++-style comment */
-                                    while(c != '\n')
+                                    CurrentLineNumber = -1;
+                                    while (c != '\n')
                                     {
                                         try
                                         {
@@ -256,6 +257,7 @@ redo:
                                 if(token == "/*")
                                 {
                                     /* got C-style comment */
+                                    CurrentLineNumber = -1;
                                     for(;;)
                                     {
                                         try
