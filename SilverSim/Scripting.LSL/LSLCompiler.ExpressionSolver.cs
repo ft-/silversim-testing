@@ -23,6 +23,10 @@ exception statement from your version.
 
 */
 
+#define SOLVEDECLARATIONS_NON_RECURSIVE
+//#define SOLVETYPECASTS_NON_RECURSIVE
+#define SOLVEMAXNEGVALUES_NON_RECURSIVE
+
 using SilverSim.Scripting.LSL.Expression;
 using SilverSim.Types;
 using System.Collections.Generic;
@@ -34,6 +38,40 @@ namespace SilverSim.Scripting.LSL
     {
         void solveDeclarations(Tree tree)
         {
+#if SOLVEDECLARATIONS_NON_RECURSIVE
+            List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
+            enumeratorStack.Insert(0, new ListTreeEnumState(tree));
+
+            while(enumeratorStack.Count != 0)
+            {
+                if(!enumeratorStack[0].MoveNext())
+                {
+                    enumeratorStack.RemoveAt(0);
+                }
+                else
+                {
+                    tree = enumeratorStack[0].Current;
+                    if (tree.Type == Tree.EntryType.Declaration)
+                    {
+                        if (tree.SubTree.Count == 3)
+                        {
+                            tree.Type = Tree.EntryType.Vector;
+                        }
+                        else if (tree.SubTree.Count == 4)
+                        {
+                            tree.Type = Tree.EntryType.Rotation;
+                        }
+                        else
+                        {
+                            throw new Resolver.ResolverException("argument list for <> has neither 3 nor 4 arguments");
+                        }
+                    }
+                    enumeratorStack.Insert(0, new ListTreeEnumState(tree));
+                }
+            }
+
+#else
+            /* recursive version of the algorithm above */
             foreach (Tree st in tree.SubTree)
             {
                 solveDeclarations(st);
@@ -54,6 +92,7 @@ namespace SilverSim.Scripting.LSL
                     }
                 }
             }
+#endif
         }
 
         class ConstantValueVector : Tree.ConstantValue
@@ -98,6 +137,70 @@ namespace SilverSim.Scripting.LSL
 
         void solveTypecasts(Tree tree)
         {
+#if SOLVETYPECASTS_NON_RECURSIVE
+            List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
+            enumeratorStack.Insert(0, new ListTreeEnumState(tree));
+            while(enumeratorStack.Count != 0)
+            {
+                if(!enumeratorStack[0].MoveNext())
+                {
+                    enumeratorStack.RemoveAt(0);
+                }
+                else
+                {
+                    tree = enumeratorStack[0].Current;
+                    int i = enumeratorStack[0].Position;
+                    if (tree.Type == Tree.EntryType.OperatorLeftUnary)
+                    {
+                        switch (tree.Entry)
+                        {
+                            case "(integer)":
+                            case "(string)":
+                            case "(float)":
+                            case "(key)":
+                            case "(list)":
+                            case "(rotation)":
+                            case "(quaternion)":
+                            case "(vector)":
+                                tree.Type = Tree.EntryType.Typecast;
+                                tree.Entry = tree.Entry.Substring(1, tree.Entry.Length - 2);
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+                    else if (tree.Type == Tree.EntryType.OperatorUnknown && i + 1 < tree.SubTree.Count &&
+                        (tree.SubTree[i + 1].Type == Tree.EntryType.Vector ||
+                        tree.SubTree[i + 1].Type == Tree.EntryType.Rotation ||
+                        (tree.SubTree[i + 1].Type == Tree.EntryType.Level && tree.SubTree[i + 1].Entry == "(") ||
+                        (tree.SubTree[i + 1].Type == Tree.EntryType.Level && tree.SubTree[i + 1].Entry == "[")))
+                    {
+                        switch (tree.Entry)
+                        {
+                            case "(integer)":
+                            case "(string)":
+                            case "(float)":
+                            case "(key)":
+                            case "(list)":
+                            case "(rotation)":
+                            case "(quaternion)":
+                            case "(vector)":
+                                tree.Type = Tree.EntryType.Typecast;
+                                tree.Entry = tree.Entry.Substring(1, tree.Entry.Length - 2);
+                                tree.SubTree.Add(tree.SubTree[i + 1]);
+                                tree.SubTree.RemoveAt(i + 1);
+                                break;
+
+                            default:
+                                break;
+                        }
+                    }
+
+                    enumeratorStack.Insert(0, new ListTreeEnumState(tree));
+                }
+            }
+#else
             int i;
             for (i = 0; i < tree.SubTree.Count; ++i)
             {
@@ -150,29 +253,7 @@ namespace SilverSim.Scripting.LSL
                 }
                 solveTypecasts(st);
             }
-        }
-
-        void solveVariables(CompileState cs, Tree tree)
-        {
-            foreach (Tree st in tree.SubTree)
-            {
-                solveVariables(cs, st);
-
-                if (st.Type == Tree.EntryType.Unknown)
-                {
-                    if (cs.m_VariableDeclarations.ContainsKey(st.Entry))
-                    {
-                        st.Type = Tree.EntryType.Variable;
-                    }
-                    foreach (List<string> vars in cs.m_LocalVariables)
-                    {
-                        if (vars.Contains(st.Entry))
-                        {
-                            st.Type = Tree.EntryType.Variable;
-                        }
-                    }
-                }
-            }
+#endif
         }
 
         void solveConstantOperations(Tree tree)
@@ -1064,8 +1145,66 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
+        class ListTreeEnumState
+        {
+            public int Position = -1;
+            public Tree Tree;
+
+            public ListTreeEnumState(Tree tree)
+            {
+                Tree = tree;
+            }
+
+            public bool MoveNext()
+            {
+                if (Position >= Tree.SubTree.Count)
+                {
+                    return false;
+                }
+                return (++Position < Tree.SubTree.Count);
+            }
+
+            public Tree Current
+            {
+                get
+                {
+                    return Tree.SubTree[Position];
+                }
+            }
+        }
+
         void solveMaxNegValues(CompileState cs, Tree resolvetree)
         {
+#if SOLVEMAXNEGVALUES_NON_RECURSIVE
+            List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
+            enumeratorStack.Insert(0, new ListTreeEnumState(resolvetree));
+            while(enumeratorStack.Count != 0)
+            {
+                if (!enumeratorStack[0].MoveNext())
+                {
+                    enumeratorStack.RemoveAt(0);
+                }
+                else
+                {
+                    resolvetree = enumeratorStack[0].Current;
+                    if (resolvetree.Type == Tree.EntryType.OperatorLeftUnary && resolvetree.Entry == "-" &&
+                        resolvetree.SubTree.Count == 1 && resolvetree.SubTree[0].Entry == "2147483648" && resolvetree.SubTree[0].Type == Tree.EntryType.Value)
+                    {
+                        resolvetree.Value = new Tree.ConstantValueInt(-2147483648);
+                    }
+                    else if (resolvetree.Entry == "2147483648" && resolvetree.Type == Tree.EntryType.Value)
+                    {
+                        resolvetree.Value = new Tree.ConstantValueFloat(2147483648f);
+                    }
+                    else
+                    {
+                        enumeratorStack.Insert(0, new ListTreeEnumState(resolvetree));
+                    }
+                }
+            }
+
+#else
+            /* recursive version of what is done above */
             if (resolvetree.Type == Tree.EntryType.OperatorLeftUnary && resolvetree.Entry == "-" &&
                 resolvetree.SubTree.Count == 1 && resolvetree.SubTree[0].Entry == "2147483648" && resolvetree.SubTree[0].Type == Tree.EntryType.Value)
             {
@@ -1079,6 +1218,7 @@ namespace SilverSim.Scripting.LSL
             {
                 solveMaxNegValues(cs, st);
             }
+#endif
         }
 
         void solveTree(CompileState cs, Tree resolvetree, ICollection<string> varNames)
@@ -1087,7 +1227,6 @@ namespace SilverSim.Scripting.LSL
             m_Resolver.Process(resolvetree, varNames);
             solveDeclarations(resolvetree);
             solveTypecasts(resolvetree);
-            solveVariables(cs, resolvetree);
             solveMaxNegValues(cs, resolvetree);
             solveConstantOperations(resolvetree);
         }
