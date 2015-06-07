@@ -353,6 +353,119 @@ namespace SilverSim.Scripting.LSL
                 case Tree.EntryType.OperatorBinary:
                     /* right first */
                     /* left then */
+                    if(functionTree.Entry == "!=" || functionTree.Entry == "==")
+                    {
+                        bool allLeftHandElementsConstant = false;
+                        bool allRightHandElementsConstant = false;
+                        bool leftIsKnownList = false;
+                        bool rightIsKnownList = false;
+                        /* optimize list compares for constant parameters */
+                        if (functionTree.SubTree[0].Type == Tree.EntryType.Level &&
+                            functionTree.SubTree[0].Entry == "[")
+                        {
+                            leftIsKnownList = true;
+                            allLeftHandElementsConstant = true;
+                            foreach(Tree lt in functionTree.SubTree[0].SubTree)
+                            {
+                                if(lt.Entry == "," && lt.Type == Tree.EntryType.Separator)
+                                {
+
+                                }
+                                else if(lt.Value == null)
+                                {
+                                    allLeftHandElementsConstant = false;
+                                }
+                            }
+                        }
+
+                        if (functionTree.SubTree[1].Type == Tree.EntryType.Level &&
+                            functionTree.SubTree[1].Entry == "[")
+                        {
+                            rightIsKnownList = true;
+                            allRightHandElementsConstant = true;
+                            foreach (Tree lt in functionTree.SubTree[1].SubTree)
+                            {
+                                if (lt.Entry == "," && lt.Type == Tree.EntryType.Separator)
+                                {
+
+                                }
+                                else if (lt.Value == null)
+                                {
+                                    allRightHandElementsConstant = false;
+                                }
+                            }
+                        }
+
+                        if(leftIsKnownList && rightIsKnownList && allLeftHandElementsConstant && allRightHandElementsConstant)
+                        {
+                            if (functionTree.Entry == "==")
+                            {
+                                /* nothing to do actually besides just push the result of the length difference */
+                                ilgen.Emit(OpCodes.Ldc_I4, functionTree.SubTree[0].SubTree.Count == functionTree.SubTree[1].SubTree.Count ? 1 : 0);
+                            }
+                            else
+                            {
+                                /* nothing to do actually besides just push the length difference */
+                                ilgen.Emit(OpCodes.Ldc_I4, (functionTree.SubTree[0].SubTree.Count + 1) / 2 - (functionTree.SubTree[1].SubTree.Count + 1) / 2);
+                            }
+                            return typeof(int);
+                        }
+                        else if(leftIsKnownList && allLeftHandElementsConstant)
+                        {
+                            /* left hand is constant */
+                            ilgen.Emit(OpCodes.Ldc_I4, (functionTree.SubTree[0].SubTree.Count + 1) / 2);
+                            Type t = ProcessExpressionPart(
+                                compileState,
+                                scriptTypeBuilder,
+                                stateTypeBuilder,
+                                ilgen,
+                                functionTree.SubTree[1],
+                                lineNumber,
+                                localVars);
+                            ilgen.Emit(OpCodes.Call, typeof(AnArray).GetProperty("Count").GetGetMethod());
+                            if (t != typeof(AnArray))
+                            {
+                                throw new CompilerException(lineNumber, string.Format("operator '{0}' is not defined for {1} and {2}", functionTree.Entry, "list", MapType(t)));
+                            }
+                            if (functionTree.Entry == "==")
+                            {
+                                ilgen.Emit(OpCodes.Ceq);
+                            }
+                            else
+                            {
+                                ilgen.Emit(OpCodes.Sub);
+                            }
+                            return typeof(int);
+                        }
+                        else if(rightIsKnownList && allRightHandElementsConstant)
+                        {
+                            /* right hand is constant */
+                            Type t = ProcessExpressionPart(
+                                compileState,
+                                scriptTypeBuilder,
+                                stateTypeBuilder,
+                                ilgen,
+                                functionTree.SubTree[1],
+                                lineNumber,
+                                localVars);
+                            if (t != typeof(AnArray))
+                            {
+                                throw new CompilerException(lineNumber, string.Format("operator '{0}' is not defined for {1} and {2}", functionTree.Entry, "list", MapType(t)));
+                            }
+                            ilgen.Emit(OpCodes.Call, typeof(AnArray).GetProperty("Count").GetGetMethod());
+                            ilgen.Emit(OpCodes.Ldc_I4, (functionTree.SubTree[1].SubTree.Count + 1) / 2);
+                            if (functionTree.Entry == "==")
+                            {
+                                ilgen.Emit(OpCodes.Ceq);
+                            }
+                            else
+                            {
+                                ilgen.Emit(OpCodes.Sub);
+                            }
+                            return typeof(int);
+                        }
+                    }
+
                     if(functionTree.Entry == ".")
                     {
                         Type retLeft = ProcessExpressionPart(
@@ -370,47 +483,59 @@ namespace SilverSim.Scripting.LSL
                         }
                         else if(typeof(Vector3) == retLeft)
                         {
-                            switch(functionTree.SubTree[1].Entry)
-                            {
-                                case "x":
-                                    ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("X"));
-                                    return typeof(double);
-
-                                case "y":
-                                    ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("Y"));
-                                    return typeof(double);
-
-                                case "z":
-                                    ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("Z"));
-                                    return typeof(double);
-
-                                default:
-                                    throw new CompilerException(lineNumber, string.Format("'{0}' is not a member of type vector", functionTree.SubTree[1].Entry));
-                            }
-                        }
-                        else if(typeof(Quaternion) == retLeft)
-                        {
+                            ilgen.BeginScope();
+                            LocalBuilder lb = ilgen.DeclareLocal(retLeft);
+                            ilgen.Emit(OpCodes.Stloc, lb);
+                            ilgen.Emit(OpCodes.Ldloca, lb);
                             switch (functionTree.SubTree[1].Entry)
                             {
                                 case "x":
                                     ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("X"));
-                                    return typeof(double);
+                                    break;
 
                                 case "y":
                                     ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("Y"));
-                                    return typeof(double);
+                                    break;
 
                                 case "z":
                                     ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("Z"));
-                                    return typeof(double);
+                                    break;
+
+                                default:
+                                    throw new CompilerException(lineNumber, string.Format("'{0}' is not a member of type vector", functionTree.SubTree[1].Entry));
+                            }
+                            ilgen.EndScope();
+                            return typeof(double);
+                        }
+                        else if(typeof(Quaternion) == retLeft)
+                        {
+                            ilgen.BeginScope();
+                            LocalBuilder lb = ilgen.DeclareLocal(retLeft);
+                            ilgen.Emit(OpCodes.Stloc, lb);
+                            ilgen.Emit(OpCodes.Ldloca, lb);
+                            switch (functionTree.SubTree[1].Entry)
+                            {
+                                case "x":
+                                    ilgen.Emit(OpCodes.Ldfld, typeof(Quaternion).GetField("X"));
+                                    break;
+
+                                case "y":
+                                    ilgen.Emit(OpCodes.Ldfld, typeof(Quaternion).GetField("Y"));
+                                    break;
+
+                                case "z":
+                                    ilgen.Emit(OpCodes.Ldfld, typeof(Quaternion).GetField("Z"));
+                                    break;
 
                                 case "s":
-                                    ilgen.Emit(OpCodes.Ldfld, typeof(Vector3).GetField("W"));
-                                    return typeof(double);
+                                    ilgen.Emit(OpCodes.Ldfld, typeof(Quaternion).GetField("W"));
+                                    break;
 
                                 default:
                                     throw new CompilerException(lineNumber, string.Format("'{0}' is not a member of type rotation", functionTree.SubTree[1].Entry));
                             }
+                            ilgen.EndScope();
+                            return typeof(double);
                         }
                         else
                         {
@@ -622,9 +747,13 @@ namespace SilverSim.Scripting.LSL
                         switch(functionTree.Entry)
                         {
                             case "+":
-                                if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                if(retLeft == typeof(int) || retLeft == typeof(double))
                                 {
                                     ilgen.Emit(OpCodes.Add);
+                                }
+                                else if(retLeft == typeof(string))
+                                {
+                                    ilgen.Emit(OpCodes.Call, typeof(string).GetMethod("Concat", new Type[] { typeof(string), typeof(string) }));
                                 }
                                 else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
                                 {
@@ -789,7 +918,7 @@ namespace SilverSim.Scripting.LSL
                                 return retLeft;
 
                             case "==":
-                                if (retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                if (retLeft == typeof(int) || retLeft == typeof(double))
                                 {
                                     ilgen.Emit(OpCodes.Ceq);
                                 }
@@ -797,7 +926,7 @@ namespace SilverSim.Scripting.LSL
                                 {
                                     ilgen.Emit(OpCodes.Callvirt, retLeft.GetMethod("Equals", new Type[] { retLeft }));
                                 }
-                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion))
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(string))
                                 {
                                     ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Equality", new Type[] { retLeft, retRight }));
                                 }
@@ -819,7 +948,7 @@ namespace SilverSim.Scripting.LSL
                                 return typeof(int);
 
                             case "!=":
-                                if (retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                if (retLeft == typeof(int) || retLeft == typeof(double))
                                 {
                                     ilgen.Emit(OpCodes.Ceq);
                                     ilgen.Emit(OpCodes.Ldc_I4_0);
@@ -831,7 +960,7 @@ namespace SilverSim.Scripting.LSL
                                     ilgen.Emit(OpCodes.Ldc_I4_0);
                                     ilgen.Emit(OpCodes.Ceq);
                                 }
-                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey))
+                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(string))
                                 {
                                     ilgen.Emit(OpCodes.Call, retLeft.GetMethod("op_Inequality", new Type[] { retLeft, retRight }));
                                 }
@@ -985,156 +1114,667 @@ namespace SilverSim.Scripting.LSL
                                 return typeof(int);
 
                             case "=":
-                                ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
-                                ilgen.Emit(OpCodes.Dup);
-                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
+                                if (functionTree.SubTree[0].Type == Tree.EntryType.OperatorBinary && functionTree.SubTree[0].Entry == ".")
+                                {
+                                    if(functionTree.SubTree[0].SubTree[0].Type == Tree.EntryType.Variable)
+                                    {
+                                        throw new CompilerException(lineNumber, "Component of left-hand value cannot be assigned");
+                                    }
+                                    ProcessImplicitCasts(ilgen, typeof(double), retRight, lineNumber);
+                                    ilgen.BeginScope();
+                                    LocalBuilder lbvar = ilgen.DeclareLocal(typeof(double));
+                                    ilgen.Emit(OpCodes.Stloc, lbvar);
+
+                                    string varName = functionTree.SubTree[0].SubTree[0].Entry;
+                                    object v = localVars[varName];
+                                    Type varType = GetVarType(scriptTypeBuilder, stateTypeBuilder, v);
+                                    string fieldName;
+                                    if(typeof(Vector3) == varType)
+                                    {
+                                        switch(functionTree.SubTree[0].SubTree[1].Entry)
+                                        {
+                                            case "x":
+                                                fieldName = "X";
+                                                break;
+
+                                            case "y":
+                                                fieldName = "Y";
+                                                break;
+
+                                            case "z":
+                                                fieldName = "Z";
+                                                break;
+                                                
+                                            default:
+                                                throw new CompilerException(lineNumber, 
+                                                    string.Format("vector does not have component '{0}'", 
+                                                        functionTree.SubTree[0].SubTree[1].Entry));
+                                        }
+                                    }
+                                    else if(typeof(Quaternion) == varType)
+                                    {
+                                        switch (functionTree.SubTree[0].SubTree[1].Entry)
+                                        {
+                                            case "x":
+                                                fieldName = "X";
+                                                break;
+
+                                            case "y":
+                                                fieldName = "Y";
+                                                break;
+
+                                            case "z":
+                                                fieldName = "Z";
+                                                break;
+
+                                            case "s":
+                                                fieldName = "W";
+                                                break;
+
+                                            default:
+                                                throw new CompilerException(lineNumber,
+                                                    string.Format("rotation does not have component '{0}'",
+                                                        functionTree.SubTree[0].SubTree[1].Entry));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new CompilerException(lineNumber, 
+                                            string.Format("Variable '{0}' has no components",
+                                                varName));
+                                    }
+                                    LocalBuilder lbtarget = ilgen.DeclareLocal(varType);
+                                    GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    ilgen.Emit(OpCodes.Stloc, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldloca, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldloc, lbvar);
+                                    ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
+                                    ilgen.Emit(OpCodes.Ldloc, lbtarget);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, lineNumber);
+                                    ilgen.EndScope();
+                                }
+                                else
+                                {
+                                    ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
+                                    ilgen.Emit(OpCodes.Dup);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
+                                }
 
                                 return retLeft;
 
                             case "+=":
-                                ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
-                                if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                if (functionTree.SubTree[0].Type == Tree.EntryType.OperatorBinary && functionTree.SubTree[0].Entry == ".")
                                 {
+                                    if (functionTree.SubTree[0].SubTree[0].Type == Tree.EntryType.Variable)
+                                    {
+                                        throw new CompilerException(lineNumber, "Component of left-hand value cannot be assigned");
+                                    }
+                                    ProcessImplicitCasts(ilgen, typeof(double), retRight, lineNumber);
+                                    ilgen.BeginScope();
+                                    LocalBuilder lbvar = ilgen.DeclareLocal(typeof(double));
+                                    ilgen.Emit(OpCodes.Stloc, lbvar);
+                                    ilgen.Emit(OpCodes.Dup, lbvar);
+
+                                    string varName = functionTree.SubTree[0].SubTree[0].Entry;
+                                    object v = localVars[varName];
+                                    Type varType = GetVarType(scriptTypeBuilder, stateTypeBuilder, v);
+                                    string fieldName;
+                                    if (typeof(Vector3) == varType)
+                                    {
+                                        switch (functionTree.SubTree[0].SubTree[1].Entry)
+                                        {
+                                            case "x":
+                                                fieldName = "X";
+                                                break;
+
+                                            case "y":
+                                                fieldName = "Y";
+                                                break;
+
+                                            case "z":
+                                                fieldName = "Z";
+                                                break;
+
+                                            default:
+                                                throw new CompilerException(lineNumber,
+                                                    string.Format("vector does not have component '{0}'",
+                                                        functionTree.SubTree[0].SubTree[1].Entry));
+                                        }
+                                    }
+                                    else if (typeof(Quaternion) == varType)
+                                    {
+                                        switch (functionTree.SubTree[0].SubTree[1].Entry)
+                                        {
+                                            case "x":
+                                                fieldName = "X";
+                                                break;
+
+                                            case "y":
+                                                fieldName = "Y";
+                                                break;
+
+                                            case "z":
+                                                fieldName = "Z";
+                                                break;
+
+                                            case "s":
+                                                fieldName = "W";
+                                                break;
+
+                                            default:
+                                                throw new CompilerException(lineNumber,
+                                                    string.Format("rotation does not have component '{0}'",
+                                                        functionTree.SubTree[0].SubTree[1].Entry));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new CompilerException(lineNumber,
+                                            string.Format("Variable '{0}' has no components",
+                                                varName));
+                                    }
+                                    LocalBuilder lbtarget = ilgen.DeclareLocal(varType);
+                                    GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    ilgen.Emit(OpCodes.Stloc, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldloca, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldloc, lbvar);
+                                    ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
+                                    ilgen.Emit(OpCodes.Ldloca, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldfld, varType.GetField(fieldName));
+                                    ilgen.Emit(OpCodes.Ldloc, lbtarget);
                                     ilgen.Emit(OpCodes.Add);
-                                }
-                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
-                                {
-                                    MethodInfo mi = retLeft.GetMethod("op_Addition", new Type[] { retLeft, retRight });
-                                    if(null == mi)
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '+=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
-                                    }
-                                    ilgen.Emit(OpCodes.Call, mi);
-                                    if(retLeft != mi.ReturnType)
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("'+=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                    }
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, lineNumber);
+                                    ilgen.EndScope();
                                 }
                                 else
                                 {
-                                    throw new CompilerException(lineNumber, string.Format("operator '+=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
+                                    if (retLeft == typeof(int) || retLeft == typeof(double))
+                                    {
+                                        ilgen.Emit(OpCodes.Add);
+                                    }
+                                    else if(retLeft == typeof(string))
+                                    {
+                                        ilgen.Emit(OpCodes.Call, typeof(string).GetMethod("Concat", new Type[] { typeof(string), typeof(string) }));
+                                    }
+                                    else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
+                                    {
+                                        MethodInfo mi = retLeft.GetMethod("op_Addition", new Type[] { retLeft, retRight });
+                                        if (null == mi)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("internal error. operator '+=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                        }
+                                        ilgen.Emit(OpCodes.Call, mi);
+                                        if (retLeft != mi.ReturnType)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("'+=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("operator '+=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Dup);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
                                 }
-                                ilgen.Emit(OpCodes.Dup);
-                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
-
                                 return retLeft;
 
                             case "-=":
-                                ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
-                                if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                if (functionTree.SubTree[0].Type == Tree.EntryType.OperatorBinary && functionTree.SubTree[0].Entry == ".")
                                 {
+                                    if (functionTree.SubTree[0].SubTree[0].Type == Tree.EntryType.Variable)
+                                    {
+                                        throw new CompilerException(lineNumber, "Component of left-hand value cannot be assigned");
+                                    }
+                                    ProcessImplicitCasts(ilgen, typeof(double), retRight, lineNumber);
+                                    ilgen.BeginScope();
+                                    LocalBuilder lbvar = ilgen.DeclareLocal(typeof(double));
+                                    ilgen.Emit(OpCodes.Stloc, lbvar);
+                                    ilgen.Emit(OpCodes.Dup, lbvar);
+
+                                    string varName = functionTree.SubTree[0].SubTree[0].Entry;
+                                    object v = localVars[varName];
+                                    Type varType = GetVarType(scriptTypeBuilder, stateTypeBuilder, v);
+                                    string fieldName;
+                                    if (typeof(Vector3) == varType)
+                                    {
+                                        switch (functionTree.SubTree[0].SubTree[1].Entry)
+                                        {
+                                            case "x":
+                                                fieldName = "X";
+                                                break;
+
+                                            case "y":
+                                                fieldName = "Y";
+                                                break;
+
+                                            case "z":
+                                                fieldName = "Z";
+                                                break;
+
+                                            default:
+                                                throw new CompilerException(lineNumber,
+                                                    string.Format("vector does not have component '{0}'",
+                                                        functionTree.SubTree[0].SubTree[1].Entry));
+                                        }
+                                    }
+                                    else if (typeof(Quaternion) == varType)
+                                    {
+                                        switch (functionTree.SubTree[0].SubTree[1].Entry)
+                                        {
+                                            case "x":
+                                                fieldName = "X";
+                                                break;
+
+                                            case "y":
+                                                fieldName = "Y";
+                                                break;
+
+                                            case "z":
+                                                fieldName = "Z";
+                                                break;
+
+                                            case "s":
+                                                fieldName = "W";
+                                                break;
+
+                                            default:
+                                                throw new CompilerException(lineNumber,
+                                                    string.Format("rotation does not have component '{0}'",
+                                                        functionTree.SubTree[0].SubTree[1].Entry));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new CompilerException(lineNumber,
+                                            string.Format("Variable '{0}' has no components",
+                                                varName));
+                                    }
+                                    LocalBuilder lbtarget = ilgen.DeclareLocal(varType);
+                                    GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    ilgen.Emit(OpCodes.Stloc, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldloca, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldloc, lbvar);
+                                    ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
+                                    ilgen.Emit(OpCodes.Ldloca, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldfld, varType.GetField(fieldName));
+                                    ilgen.Emit(OpCodes.Ldloc, lbtarget);
                                     ilgen.Emit(OpCodes.Sub);
-                                }
-                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
-                                {
-                                    MethodInfo mi = retLeft.GetMethod("op_Subtraction", new Type[] { retLeft, retRight });
-                                    if (null == mi)
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '-=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
-                                    }
-                                    ilgen.Emit(OpCodes.Call, mi);
-                                    if (retLeft != mi.ReturnType)
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("operator '-=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                    }
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, lineNumber);
+                                    ilgen.EndScope();
                                 }
                                 else
                                 {
-                                    throw new CompilerException(lineNumber, string.Format("operator '-=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
+                                    if (retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                    {
+                                        ilgen.Emit(OpCodes.Sub);
+                                    }
+                                    else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
+                                    {
+                                        MethodInfo mi = retLeft.GetMethod("op_Subtraction", new Type[] { retLeft, retRight });
+                                        if (null == mi)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("internal error. operator '-=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                        }
+                                        ilgen.Emit(OpCodes.Call, mi);
+                                        if (retLeft != mi.ReturnType)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("operator '-=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("operator '-=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Dup);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
                                 }
-                                ilgen.Emit(OpCodes.Dup);
-                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
-
                                 return retLeft;
 
                             case "*=":
-                                if(retLeft != typeof(Vector3) || retRight != typeof(double))
+                                if (functionTree.SubTree[0].Type == Tree.EntryType.OperatorBinary && functionTree.SubTree[0].Entry == ".")
                                 {
-                                    ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
-                                }
-                                if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
-                                {
+                                    if (functionTree.SubTree[0].SubTree[0].Type == Tree.EntryType.Variable)
+                                    {
+                                        throw new CompilerException(lineNumber, "Component of left-hand value cannot be assigned");
+                                    }
+                                    ProcessImplicitCasts(ilgen, typeof(double), retRight, lineNumber);
+                                    ilgen.BeginScope();
+                                    LocalBuilder lbvar = ilgen.DeclareLocal(typeof(double));
+                                    ilgen.Emit(OpCodes.Stloc, lbvar);
+                                    ilgen.Emit(OpCodes.Dup, lbvar);
+
+                                    string varName = functionTree.SubTree[0].SubTree[0].Entry;
+                                    object v = localVars[varName];
+                                    Type varType = GetVarType(scriptTypeBuilder, stateTypeBuilder, v);
+                                    string fieldName;
+                                    if (typeof(Vector3) == varType)
+                                    {
+                                        switch (functionTree.SubTree[0].SubTree[1].Entry)
+                                        {
+                                            case "x":
+                                                fieldName = "X";
+                                                break;
+
+                                            case "y":
+                                                fieldName = "Y";
+                                                break;
+
+                                            case "z":
+                                                fieldName = "Z";
+                                                break;
+
+                                            default:
+                                                throw new CompilerException(lineNumber,
+                                                    string.Format("vector does not have component '{0}'",
+                                                        functionTree.SubTree[0].SubTree[1].Entry));
+                                        }
+                                    }
+                                    else if (typeof(Quaternion) == varType)
+                                    {
+                                        switch (functionTree.SubTree[0].SubTree[1].Entry)
+                                        {
+                                            case "x":
+                                                fieldName = "X";
+                                                break;
+
+                                            case "y":
+                                                fieldName = "Y";
+                                                break;
+
+                                            case "z":
+                                                fieldName = "Z";
+                                                break;
+
+                                            case "s":
+                                                fieldName = "W";
+                                                break;
+
+                                            default:
+                                                throw new CompilerException(lineNumber,
+                                                    string.Format("rotation does not have component '{0}'",
+                                                        functionTree.SubTree[0].SubTree[1].Entry));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new CompilerException(lineNumber,
+                                            string.Format("Variable '{0}' has no components",
+                                                varName));
+                                    }
+                                    LocalBuilder lbtarget = ilgen.DeclareLocal(varType);
+                                    GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    ilgen.Emit(OpCodes.Stloc, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldloca, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldloc, lbvar);
+                                    ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
+                                    ilgen.Emit(OpCodes.Ldloca, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldfld, varType.GetField(fieldName));
+                                    ilgen.Emit(OpCodes.Ldloc, lbtarget);
                                     ilgen.Emit(OpCodes.Mul);
-                                }
-                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
-                                {
-                                    MethodInfo mi = retLeft.GetMethod("op_Multiply", new Type[] { retLeft, retRight });
-                                    if (null == mi)
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '*=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
-                                    }
-                                    ilgen.Emit(OpCodes.Call, mi);
-                                    if (retLeft != mi.ReturnType)
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("operator '*=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                    }
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, lineNumber);
+                                    ilgen.EndScope();
                                 }
                                 else
                                 {
-                                    throw new CompilerException(lineNumber, string.Format("operator '*=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    if (retLeft != typeof(Vector3) || retRight != typeof(double))
+                                    {
+                                        ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
+                                    }
+                                    if (retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                    {
+                                        ilgen.Emit(OpCodes.Mul);
+                                    }
+                                    else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
+                                    {
+                                        MethodInfo mi = retLeft.GetMethod("op_Multiply", new Type[] { retLeft, retRight });
+                                        if (null == mi)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("internal error. operator '*=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                        }
+                                        ilgen.Emit(OpCodes.Call, mi);
+                                        if (retLeft != mi.ReturnType)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("operator '*=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("operator '*=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Dup);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
                                 }
-                                ilgen.Emit(OpCodes.Dup);
-                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
-
                                 return retLeft;
 
                             case "/=":
-                                if(retLeft != typeof(Vector3) || retRight != typeof(double))
+                                if (functionTree.SubTree[0].Type == Tree.EntryType.OperatorBinary && functionTree.SubTree[0].Entry == ".")
                                 {
-                                    ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
-                                }
-                                if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
-                                {
+                                    if (functionTree.SubTree[0].SubTree[0].Type == Tree.EntryType.Variable)
+                                    {
+                                        throw new CompilerException(lineNumber, "Component of left-hand value cannot be assigned");
+                                    }
+                                    ProcessImplicitCasts(ilgen, typeof(double), retRight, lineNumber);
+                                    ilgen.BeginScope();
+                                    LocalBuilder lbvar = ilgen.DeclareLocal(typeof(double));
+                                    ilgen.Emit(OpCodes.Stloc, lbvar);
+                                    ilgen.Emit(OpCodes.Dup, lbvar);
+
+                                    string varName = functionTree.SubTree[0].SubTree[0].Entry;
+                                    object v = localVars[varName];
+                                    Type varType = GetVarType(scriptTypeBuilder, stateTypeBuilder, v);
+                                    string fieldName;
+                                    if (typeof(Vector3) == varType)
+                                    {
+                                        switch (functionTree.SubTree[0].SubTree[1].Entry)
+                                        {
+                                            case "x":
+                                                fieldName = "X";
+                                                break;
+
+                                            case "y":
+                                                fieldName = "Y";
+                                                break;
+
+                                            case "z":
+                                                fieldName = "Z";
+                                                break;
+
+                                            default:
+                                                throw new CompilerException(lineNumber,
+                                                    string.Format("vector does not have component '{0}'",
+                                                        functionTree.SubTree[0].SubTree[1].Entry));
+                                        }
+                                    }
+                                    else if (typeof(Quaternion) == varType)
+                                    {
+                                        switch (functionTree.SubTree[0].SubTree[1].Entry)
+                                        {
+                                            case "x":
+                                                fieldName = "X";
+                                                break;
+
+                                            case "y":
+                                                fieldName = "Y";
+                                                break;
+
+                                            case "z":
+                                                fieldName = "Z";
+                                                break;
+
+                                            case "s":
+                                                fieldName = "W";
+                                                break;
+
+                                            default:
+                                                throw new CompilerException(lineNumber,
+                                                    string.Format("rotation does not have component '{0}'",
+                                                        functionTree.SubTree[0].SubTree[1].Entry));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new CompilerException(lineNumber,
+                                            string.Format("Variable '{0}' has no components",
+                                                varName));
+                                    }
+                                    LocalBuilder lbtarget = ilgen.DeclareLocal(varType);
+                                    GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    ilgen.Emit(OpCodes.Stloc, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldloca, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldloc, lbvar);
+                                    ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
+                                    ilgen.Emit(OpCodes.Ldloca, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldfld, varType.GetField(fieldName));
+                                    ilgen.Emit(OpCodes.Ldloc, lbtarget);
                                     ilgen.Emit(OpCodes.Div);
-                                }
-                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
-                                {
-                                    MethodInfo mi = retLeft.GetMethod("op_Division", new Type[] { retLeft, retRight });
-                                    if (null == mi)
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '/=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
-                                    }
-                                    ilgen.Emit(OpCodes.Call, mi);
-                                    if (retLeft != mi.ReturnType)
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("operator '/=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                    }
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, lineNumber);
+                                    ilgen.EndScope();
                                 }
                                 else
                                 {
-                                    throw new CompilerException(lineNumber, string.Format("operator '/=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    if (retLeft != typeof(Vector3) || retRight != typeof(double))
+                                    {
+                                        ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
+                                    }
+                                    if (retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                    {
+                                        ilgen.Emit(OpCodes.Div);
+                                    }
+                                    else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
+                                    {
+                                        MethodInfo mi = retLeft.GetMethod("op_Division", new Type[] { retLeft, retRight });
+                                        if (null == mi)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("internal error. operator '/=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                        }
+                                        ilgen.Emit(OpCodes.Call, mi);
+                                        if (retLeft != mi.ReturnType)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("operator '/=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("operator '/=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Dup);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
                                 }
-                                ilgen.Emit(OpCodes.Dup);
-                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
-
                                 return retLeft;
 
                             case "%=":
-                                ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
-                                if(retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                if (functionTree.SubTree[0].Type == Tree.EntryType.OperatorBinary && functionTree.SubTree[0].Entry == ".")
                                 {
+                                    if (functionTree.SubTree[0].SubTree[0].Type == Tree.EntryType.Variable)
+                                    {
+                                        throw new CompilerException(lineNumber, "Component of left-hand value cannot be assigned");
+                                    }
+                                    ProcessImplicitCasts(ilgen, typeof(double), retRight, lineNumber);
+                                    ilgen.BeginScope();
+                                    LocalBuilder lbvar = ilgen.DeclareLocal(typeof(double));
+                                    ilgen.Emit(OpCodes.Stloc, lbvar);
+                                    ilgen.Emit(OpCodes.Dup, lbvar);
+
+                                    string varName = functionTree.SubTree[0].SubTree[0].Entry;
+                                    object v = localVars[varName];
+                                    Type varType = GetVarType(scriptTypeBuilder, stateTypeBuilder, v);
+                                    string fieldName;
+                                    if (typeof(Vector3) == varType)
+                                    {
+                                        switch (functionTree.SubTree[0].SubTree[1].Entry)
+                                        {
+                                            case "x":
+                                                fieldName = "X";
+                                                break;
+
+                                            case "y":
+                                                fieldName = "Y";
+                                                break;
+
+                                            case "z":
+                                                fieldName = "Z";
+                                                break;
+
+                                            default:
+                                                throw new CompilerException(lineNumber,
+                                                    string.Format("vector does not have component '{0}'",
+                                                        functionTree.SubTree[0].SubTree[1].Entry));
+                                        }
+                                    }
+                                    else if (typeof(Quaternion) == varType)
+                                    {
+                                        switch (functionTree.SubTree[0].SubTree[1].Entry)
+                                        {
+                                            case "x":
+                                                fieldName = "X";
+                                                break;
+
+                                            case "y":
+                                                fieldName = "Y";
+                                                break;
+
+                                            case "z":
+                                                fieldName = "Z";
+                                                break;
+
+                                            case "s":
+                                                fieldName = "W";
+                                                break;
+
+                                            default:
+                                                throw new CompilerException(lineNumber,
+                                                    string.Format("rotation does not have component '{0}'",
+                                                        functionTree.SubTree[0].SubTree[1].Entry));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new CompilerException(lineNumber,
+                                            string.Format("Variable '{0}' has no components",
+                                                varName));
+                                    }
+                                    LocalBuilder lbtarget = ilgen.DeclareLocal(varType);
+                                    GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                                    ilgen.Emit(OpCodes.Stloc, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldloca, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldloc, lbvar);
+                                    ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
+                                    ilgen.Emit(OpCodes.Ldloca, lbtarget);
+                                    ilgen.Emit(OpCodes.Ldfld, varType.GetField(fieldName));
+                                    ilgen.Emit(OpCodes.Ldloc, lbtarget);
                                     ilgen.Emit(OpCodes.Rem);
-                                }
-                                else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
-                                {
-                                    MethodInfo mi = retLeft.GetMethod("op_Division", new Type[] { retLeft, retRight });
-                                    if (null == mi)
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("internal error. operator '%=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
-                                    }
-                                    ilgen.Emit(OpCodes.Call, mi);
-                                    if (retLeft != mi.ReturnType)
-                                    {
-                                        throw new CompilerException(lineNumber, string.Format("operator '%=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
-                                    }
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, lineNumber);
+                                    ilgen.EndScope();
                                 }
                                 else
                                 {
-                                    throw new CompilerException(lineNumber, string.Format("operator '%=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    ProcessImplicitCasts(ilgen, retLeft, retRight, lineNumber);
+                                    if (retLeft == typeof(int) || retLeft == typeof(double) || retLeft == typeof(string))
+                                    {
+                                        ilgen.Emit(OpCodes.Rem);
+                                    }
+                                    else if (retLeft == typeof(Vector3) || retLeft == typeof(Quaternion) || retLeft == typeof(LSLKey) || retLeft == typeof(AnArray))
+                                    {
+                                        MethodInfo mi = retLeft.GetMethod("op_Division", new Type[] { retLeft, retRight });
+                                        if (null == mi)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("internal error. operator '%=' for {0} and {1} missing.", MapType(retLeft), MapType(retRight)));
+                                        }
+                                        ilgen.Emit(OpCodes.Call, mi);
+                                        if (retLeft != mi.ReturnType)
+                                        {
+                                            throw new CompilerException(lineNumber, string.Format("operator '%=' cannot be processed on {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                        }
+                                    }
+                                    else
+                                    {
+                                        throw new CompilerException(lineNumber, string.Format("operator '%=' not supported for {0} and {1}", MapType(retLeft), MapType(retRight)));
+                                    }
+                                    ilgen.Emit(OpCodes.Dup);
+                                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
                                 }
-                                ilgen.Emit(OpCodes.Dup);
-                                SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, varInfo, lineNumber);
-
                                 return retLeft;
 
                             default:
@@ -1952,6 +2592,129 @@ namespace SilverSim.Scripting.LSL
                     functionLine,
                     localVars);
                 SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v, functionLine.LineNumber);
+            }
+            else if(functionLine.Line[startAt + 1] == ".")
+            {
+                /* component access */
+                if (startAt != 0)
+                {
+                    throw compilerException(functionLine, "Invalid assignment");
+                }
+                else
+                {
+                    string varName = functionLine.Line[startAt];
+                    object o = localVars[varName];
+                    Type varType = GetVarType(scriptTypeBuilder, stateTypeBuilder, o);
+                    ilgen.BeginScope();
+                    LocalBuilder lb_struct  = ilgen.DeclareLocal(varType);
+                    GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, o);
+                    ilgen.Emit(OpCodes.Stloc, lb_struct);
+                    string fieldName;
+                    if (varType == typeof(Vector3))
+                    {
+                        switch (functionLine.Line[startAt + 2])
+                        {
+                            case "x":
+                                fieldName = "X";
+                                break;
+
+                            case "y":
+                                fieldName = "Y";
+                                break;
+
+                            case "z":
+                                fieldName = "Z";
+                                break;
+
+                            default:
+                                throw compilerException(functionLine, "vector does not have member " + functionLine.Line[startAt + 2]);
+                        }
+
+                    }
+                    else if (varType == typeof(Quaternion))
+                    {
+                        switch (functionLine.Line[startAt + 2])
+                        {
+                            case "x":
+                                fieldName = "X";
+                                break;
+
+                            case "y":
+                                fieldName = "Y";
+                                break;
+
+                            case "z":
+                                fieldName = "Z";
+                                break;
+
+                            case "s":
+                                fieldName = "W";
+                                break;
+
+                            default:
+                                throw compilerException(functionLine, "quaternion does not have member " + functionLine.Line[startAt + 2]);
+                        }
+                    }
+                    else
+                    {
+                        throw compilerException(functionLine, "Type " + MapType(varType) + " does not have accessible components");
+                    }
+
+                    ilgen.Emit(OpCodes.Ldloca, lb_struct);
+                    if (functionLine.Line[startAt + 3] != "=")
+                    {
+                        ilgen.Emit(OpCodes.Dup, lb_struct);
+                        ilgen.Emit(OpCodes.Ldfld, varType.GetField(fieldName));
+                    }
+                    ProcessExpression(
+                        compileState,
+                        scriptTypeBuilder,
+                        stateTypeBuilder,
+                        ilgen,
+                        typeof(double),
+                        startAt + 4,
+                        endAt,
+                        functionLine,
+                        localVars);
+
+                    switch(functionLine.Line[startAt + 3])
+                    {
+                        case "=":
+                            ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
+                            break;
+
+                        case "+=":
+                            ilgen.Emit(OpCodes.Add);
+                            ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
+                            break;
+
+                        case "-=":
+                            ilgen.Emit(OpCodes.Sub);
+                            ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
+                            break;
+
+                        case "*=":
+                            ilgen.Emit(OpCodes.Mul);
+                            ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
+                            break;
+
+                        case "/=":
+                            ilgen.Emit(OpCodes.Div);
+                            ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
+                            break;
+
+                        case "%=":
+                            ilgen.Emit(OpCodes.Rem);
+                            ilgen.Emit(OpCodes.Stfld, varType.GetField(fieldName));
+                            break;
+
+                        default:
+                            throw compilerException(functionLine, string.Format("invalid assignment operator '{0}'", functionLine.Line[startAt + 3]));
+                    }
+                    ilgen.Emit(OpCodes.Ldloc, lb_struct);
+                    SetVarFromStack(scriptTypeBuilder, stateTypeBuilder, ilgen, o, functionLine.LineNumber);
+                    ilgen.EndScope();
+                }
             }
             else if(functionLine.Line[startAt + 1] == "+=")
             {

@@ -288,6 +288,46 @@ namespace SilverSim.Scripting.LSL
                 {
                     switch (st.Entry)
                     {
+                        case ".":
+                            if(st.SubTree[0].Value is ConstantValueRotation)
+                            {
+                                switch(st.SubTree[1].Entry)
+                                {
+                                    case "x":
+                                        st.Value = new Tree.ConstantValueFloat(((ConstantValueRotation)st.SubTree[0].Value).Value.X);
+                                        break;
+                                    case "y":
+                                        st.Value = new Tree.ConstantValueFloat(((ConstantValueRotation)st.SubTree[0].Value).Value.Y);
+                                        break;
+                                    case "z":
+                                        st.Value = new Tree.ConstantValueFloat(((ConstantValueRotation)st.SubTree[0].Value).Value.Z);
+                                        break;
+                                    case "s":
+                                        st.Value = new Tree.ConstantValueFloat(((ConstantValueRotation)st.SubTree[0].Value).Value.W);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            else if(st.SubTree[0].Value is ConstantValueVector)
+                            {
+                                switch (st.SubTree[1].Entry)
+                                {
+                                    case "x":
+                                        st.Value = new Tree.ConstantValueFloat(((ConstantValueVector)st.SubTree[0].Value).Value.X);
+                                        break;
+                                    case "y":
+                                        st.Value = new Tree.ConstantValueFloat(((ConstantValueVector)st.SubTree[0].Value).Value.Y);
+                                        break;
+                                    case "z":
+                                        st.Value = new Tree.ConstantValueFloat(((ConstantValueVector)st.SubTree[0].Value).Value.Z);
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            break;
+
                         case "+":
                             if (st.SubTree[0].Value is Tree.ConstantValueFloat && st.SubTree[1].Value is Tree.ConstantValueInt)
                             {
@@ -794,8 +834,6 @@ namespace SilverSim.Scripting.LSL
                             }
                             break;
 
-                        case ".":
-                            throw new Resolver.ResolverException("'.' should not be used with constants");
                     }
                 }
                 #endregion

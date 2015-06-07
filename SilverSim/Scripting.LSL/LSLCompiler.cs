@@ -358,6 +358,7 @@ namespace SilverSim.Scripting.LSL
             m_MultiOps.Add('&');
             m_MultiOps.Add('|');
             m_MultiOps.Add('^');
+            m_MultiOps.Add('!');
 
             m_SingleOps.Add('~');
             m_SingleOps.Add('.');
@@ -365,7 +366,6 @@ namespace SilverSim.Scripting.LSL
             m_SingleOps.Add(')');
             m_SingleOps.Add('[');
             m_SingleOps.Add(']');
-            m_SingleOps.Add('!');
             m_SingleOps.Add(',');
             m_SingleOps.Add('@');
 
