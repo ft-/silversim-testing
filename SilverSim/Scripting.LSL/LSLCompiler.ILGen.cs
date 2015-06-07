@@ -383,6 +383,7 @@ namespace SilverSim.Scripting.LSL
                         lineNumber,
                         localVars);
 
+                #region Function Processing
                 case Tree.EntryType.FunctionArgument:
                     return ProcessExpressionPart(
                         compileState,
@@ -492,15 +493,9 @@ namespace SilverSim.Scripting.LSL
                         }
                         throw new CompilerException(lineNumber, string.Format("No function {0} defined", functionTree.Entry));
                     }
+                #endregion
 
-                case Tree.EntryType.StringValue:
-                    /* string value */
-                    {
-                        Tree.ConstantValueString val = (Tree.ConstantValueString)functionTree.Value;
-                        ilgen.Emit(OpCodes.Ldstr, val.Value);
-                        return typeof(string);
-                    }
-
+                #region Binary operators
                 case Tree.EntryType.OperatorBinary:
                     /* right first */
                     /* left then */
@@ -1947,7 +1942,9 @@ namespace SilverSim.Scripting.LSL
                                 throw new CompilerException(lineNumber, string.Format("binary operator '{0}' not supported", functionTree.Entry));
                         }
                     }
+                #endregion
 
+                #region Left unary operators
                 case Tree.EntryType.OperatorLeftUnary:
                     {
                         Type ret;
@@ -2070,7 +2067,9 @@ namespace SilverSim.Scripting.LSL
                                 throw new CompilerException(lineNumber, string.Format("left unary operator '{0}' not supported", functionTree.Entry));
                         }
                     }
+                #endregion
 
+                #region Right unary operators
                 case Tree.EntryType.OperatorRightUnary:
                     {
                         Type ret;
@@ -2126,9 +2125,19 @@ namespace SilverSim.Scripting.LSL
                                 throw new CompilerException(lineNumber, string.Format("right unary operator '{0}' not supported", functionTree.Entry));
                         }
                     }
+                #endregion
 
                 case Tree.EntryType.ReservedWord:
                     throw new CompilerException(lineNumber, string.Format("'{0}' is a reserved word", functionTree.Entry));
+
+                #region Constants
+                case Tree.EntryType.StringValue:
+                    /* string value */
+                    {
+                        Tree.ConstantValueString val = (Tree.ConstantValueString)functionTree.Value;
+                        ilgen.Emit(OpCodes.Ldstr, val.Value);
+                        return typeof(string);
+                    }
 
                 case Tree.EntryType.Rotation:
                     /* rotation */
@@ -2209,18 +2218,6 @@ namespace SilverSim.Scripting.LSL
                         throw new CompilerException(lineNumber, string.Format("invalid value"));
                     }
 
-                case Tree.EntryType.Variable:
-                    /* variable */
-                    try
-                    {
-                        object v = localVars[functionTree.Entry];
-                        return GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
-                    }
-                    catch(Exception e)
-                    {
-                        throw new CompilerException(lineNumber, string.Format("Variable '{0}' not defined", functionTree.Entry));
-                    }
-
                 case Tree.EntryType.Vector:
                     /* three components */
                     {
@@ -2260,6 +2257,19 @@ namespace SilverSim.Scripting.LSL
                         }
                     }
                     return typeof(Vector3);
+                #endregion
+
+                case Tree.EntryType.Variable:
+                    /* variable */
+                    try
+                    {
+                        object v = localVars[functionTree.Entry];
+                        return GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
+                    }
+                    catch (Exception e)
+                    {
+                        throw new CompilerException(lineNumber, string.Format("Variable '{0}' not defined", functionTree.Entry));
+                    }
 
                 case Tree.EntryType.Level:
                     switch(functionTree.Entry)
@@ -2329,6 +2339,7 @@ namespace SilverSim.Scripting.LSL
                         throw new CompilerException(lineNumber, string.Format("unknown variable '{0}'", functionTree.Entry));
                     }
 
+                #region Typecasts
                 case Tree.EntryType.Typecast:
                     {
                         Type toType;
@@ -2378,7 +2389,8 @@ namespace SilverSim.Scripting.LSL
                         ProcessCasts(ilgen, toType, fromType, lineNumber);
                         return toType;
                     }
-                    
+                #endregion
+
                 default:
                     throw new CompilerException(lineNumber, string.Format("unknown '{0}'", functionTree.Entry));
             }

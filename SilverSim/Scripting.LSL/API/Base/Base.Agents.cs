@@ -79,6 +79,12 @@ namespace SilverSim.Scripting.LSL.API.Base
         }
 
         [APILevel(APIFlags.LSL)]
+        public string llKey2Name(ScriptInstance Instance, LSLKey id)
+        {
+            throw new NotImplementedException();
+        }
+
+        [APILevel(APIFlags.LSL)]
         public Vector3 llGetAgentSize(ScriptInstance Instance, LSLKey id)
         {
             lock (Instance)

@@ -79,7 +79,7 @@ namespace SilverSim.Scripting.Common.Expression
 
         void resolveSeparators(Tree nt)
         {
-            if (nt.Entry == ",")
+            if (nt.Entry == "," && nt.Type != Tree.EntryType.StringValue)
             {
                 nt.Type = Tree.EntryType.Separator;
             }
@@ -409,6 +409,8 @@ namespace SilverSim.Scripting.Common.Expression
             {
                 case Tree.EntryType.Unknown:
                 case Tree.EntryType.Value:
+                case Tree.EntryType.StringValue:
+                case Tree.EntryType.Function:
                     return true;
 
                 default:
