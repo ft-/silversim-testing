@@ -158,7 +158,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
         public virtual void Startup(ConfigurationLoader loader)
         {
             m_Log.Info("Initializing agent post handler for " + m_AgentBaseURL);
-            m_ServerParams = loader.GetService<ServerParamServiceInterface>("ServerParamStorage");
+            m_ServerParams = loader.GetServerParamStorage();
             m_HttpServer = loader.HttpServer;
             m_HttpServer.StartsWithUriHandlers.Add(m_AgentBaseURL, AgentPostHandler);
             foreach(IAssetServicePlugin plugin in loader.GetServicesByValue<IAssetServicePlugin>())

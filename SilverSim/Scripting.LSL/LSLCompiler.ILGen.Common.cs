@@ -512,6 +512,33 @@ namespace SilverSim.Scripting.LSL
         #endregion
 
         #region Variable Access IL Generator
+        Type GetVarType(
+            TypeBuilder scriptTypeBuilder,
+            TypeBuilder stateTypeBuilder,
+            object v)
+        {
+            if (v is ILParameterInfo)
+            {
+                return ((ILParameterInfo)v).ParameterType;
+            }
+            else if (v is LocalBuilder)
+            {
+                return ((LocalBuilder)v).LocalType;
+            }
+            else if (v is FieldBuilder)
+            {
+                return ((FieldBuilder)v).FieldType;
+            }
+            else if (v is FieldInfo)
+            {
+                return ((FieldInfo)v).FieldType;
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
+        }
+
         Type GetVarToStack(
             TypeBuilder scriptTypeBuilder,
             TypeBuilder stateTypeBuilder,

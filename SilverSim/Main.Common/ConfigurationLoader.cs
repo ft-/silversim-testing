@@ -34,6 +34,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scripting.Common;
 using SilverSim.ServiceInterfaces.Database;
+using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
@@ -108,6 +109,11 @@ namespace SilverSim.Main.Common
         public void AddPlugin(string name, IPlugin plugin)
         {
             PluginInstances.Add("$" + name, plugin);
+        }
+
+        public ServerParamServiceInterface GetServerParamStorage()
+        {
+            return GetService<ServerParamServiceInterface>("ServerParamStorage");
         }
 
         public T GetService<T>(string serviceName)
