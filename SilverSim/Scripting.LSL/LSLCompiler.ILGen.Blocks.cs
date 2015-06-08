@@ -37,7 +37,7 @@ namespace SilverSim.Scripting.LSL
 {
     public partial class LSLCompiler
     {
-
+        
         void ProcessBlock(
             CompileState compileState,
             TypeBuilder scriptTypeBuilder,
@@ -49,6 +49,7 @@ namespace SilverSim.Scripting.LSL
             Dictionary<string, ILLabelInfo> labels,
             ref int lineIndex)
         {
+            int blockLevel = 1;
             Dictionary<string, ILLabelInfo> outerLabels = labels;
             List<string> markedLabels = new List<string>();
             /* we need a copy here */
@@ -403,18 +404,7 @@ namespace SilverSim.Scripting.LSL
                             {
                                 /* block */
                                 ilgen.BeginScope();
-                                ++lineIndex;
-                                ProcessBlock(
-                                    compileState,
-                                    scriptTypeBuilder,
-                                    stateTypeBuilder,
-                                    returnType,
-                                    ilgen,
-                                    functionBody,
-                                    localVars,
-                                    labels,
-                                    ref lineIndex);
-                                ilgen.EndScope();
+                                ++blockLevel;
                             }
                         }
                         break;
@@ -472,17 +462,7 @@ namespace SilverSim.Scripting.LSL
                             if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 ilgen.BeginScope();
-                                ++lineIndex;
-                                ProcessBlock(
-                                    compileState,
-                                    scriptTypeBuilder,
-                                    stateTypeBuilder,
-                                    returnType,
-                                    ilgen,
-                                    functionBody,
-                                    localVars,
-                                    labels,
-                                    ref lineIndex);
+                                ++blockLevel;
                             }
                         }
                         break;
@@ -504,17 +484,7 @@ namespace SilverSim.Scripting.LSL
                             if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 ilgen.BeginScope();
-                                ++lineIndex;
-                                ProcessBlock(
-                                    compileState,
-                                    scriptTypeBuilder,
-                                    stateTypeBuilder,
-                                    returnType,
-                                    ilgen,
-                                    functionBody,
-                                    localVars,
-                                    labels,
-                                    ref lineIndex);
+                                ++blockLevel;
                             }
                         }
                         break;
@@ -575,17 +545,7 @@ namespace SilverSim.Scripting.LSL
                             if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 ilgen.BeginScope();
-                                ++lineIndex;
-                                ProcessBlock(
-                                    compileState,
-                                    scriptTypeBuilder,
-                                    stateTypeBuilder,
-                                    returnType,
-                                    ilgen,
-                                    functionBody,
-                                    localVars,
-                                    labels,
-                                    ref lineIndex);
+                                ++blockLevel;
                             }
                         }
                         break;
@@ -647,17 +607,7 @@ namespace SilverSim.Scripting.LSL
                             if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 ilgen.BeginScope();
-                                ++lineIndex;
-                                ProcessBlock(
-                                    compileState,
-                                    scriptTypeBuilder,
-                                    stateTypeBuilder,
-                                    returnType,
-                                    ilgen,
-                                    functionBody,
-                                    localVars,
-                                    labels,
-                                    ref lineIndex);
+                                ++blockLevel;
                             }
                         }
                         else
@@ -679,17 +629,7 @@ namespace SilverSim.Scripting.LSL
                             if (functionLine.Line[functionLine.Line.Count - 1] == "{")
                             {
                                 ilgen.BeginScope();
-                                ++lineIndex;
-                                ProcessBlock(
-                                    compileState,
-                                    scriptTypeBuilder,
-                                    stateTypeBuilder,
-                                    returnType,
-                                    ilgen,
-                                    functionBody,
-                                    localVars,
-                                    labels,
-                                    ref lineIndex);
+                                ++blockLevel;
                             }
                         }
                         break;
@@ -702,17 +642,7 @@ namespace SilverSim.Scripting.LSL
                             ControlFlowElement elem = new ControlFlowElement(ControlFlowType.UnconditionalBlock, true);
                             compileState.PushControlFlow(elem);
                             ilgen.BeginScope();
-                            ++lineIndex;
-                            ProcessBlock(
-                                compileState,
-                                scriptTypeBuilder,
-                                stateTypeBuilder,
-                                returnType,
-                                ilgen,
-                                functionBody,
-                                localVars,
-                                labels,
-                                ref lineIndex);
+                            ++blockLevel;
                         }
                         break;
                     #endregion
@@ -740,9 +670,19 @@ namespace SilverSim.Scripting.LSL
                             {
                                 ilgen.EndScope();
                             }
+                            switch(--blockLevel)
+                            {
+                                case 0:
+                                    return;
+                                    
+                                case -1:
+                                    throw compilerException(functionLine, "Unmatched '}' found");
+
+                                default:
+                                    break;
+                            }
                         }
-                        /* no increment here, is done outside */
-                        return;
+                        break;
                     #endregion
 
                     default:
@@ -762,7 +702,10 @@ namespace SilverSim.Scripting.LSL
                 }
             }
 
-            throw compilerException(functionBody[functionBody.Count - 1], "Missing '}'");
+            if (blockLevel != 0)
+            {
+                throw compilerException(functionBody[functionBody.Count - 1], "Missing '}'");
+            }
         }
 
         void ProcessFunction(
