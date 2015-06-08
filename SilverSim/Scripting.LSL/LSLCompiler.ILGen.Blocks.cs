@@ -46,25 +46,21 @@ namespace SilverSim.Scripting.LSL
             ILGenerator ilgen,
             List<LineInfo> functionBody,
             Dictionary<string, object> localVars,
-            Dictionary<string, ILLabelInfo> labels,
             ref int lineIndex)
         {
+            Dictionary<string, ILLabelInfo> labels;
+
+            List<Dictionary<string, object>> localVarsStack = new List<Dictionary<string, object>>();
+            List<Dictionary<string, ILLabelInfo>> labelsStack = new List<Dictionary<string, ILLabelInfo>>();
+            localVarsStack.Insert(0, localVars);
+            labelsStack.Insert(0, new Dictionary<string,ILLabelInfo>());
             int blockLevel = 1;
-            Dictionary<string, ILLabelInfo> outerLabels = labels;
             List<string> markedLabels = new List<string>();
-            /* we need a copy here */
-            localVars = new Dictionary<string, object>(localVars);
-            if (null != labels)
-            {
-                labels = new Dictionary<string, ILLabelInfo>(labels);
-            }
-            else
-            {
-                labels = new Dictionary<string, ILLabelInfo>();
-            }
 
             for (; lineIndex < functionBody.Count; ++lineIndex)
             {
+                localVars = localVarsStack[0];
+                labels = labelsStack[0];
                 LineInfo functionLine = functionBody[lineIndex];
                 LocalBuilder lb;
                 switch (functionLine.Line[0])
@@ -405,6 +401,8 @@ namespace SilverSim.Scripting.LSL
                                 /* block */
                                 ilgen.BeginScope();
                                 ++blockLevel;
+                                localVarsStack.Insert(0, new Dictionary<string, object>(localVars));
+                                labelsStack.Insert(0, new Dictionary<string, ILLabelInfo>(labels));
                             }
                         }
                         break;
@@ -463,6 +461,8 @@ namespace SilverSim.Scripting.LSL
                             {
                                 ilgen.BeginScope();
                                 ++blockLevel;
+                                localVarsStack.Insert(0, new Dictionary<string, object>(localVars));
+                                labelsStack.Insert(0, new Dictionary<string, ILLabelInfo>(labels));
                             }
                         }
                         break;
@@ -485,6 +485,8 @@ namespace SilverSim.Scripting.LSL
                             {
                                 ilgen.BeginScope();
                                 ++blockLevel;
+                                localVarsStack.Insert(0, new Dictionary<string, object>(localVars));
+                                labelsStack.Insert(0, new Dictionary<string, ILLabelInfo>(labels));
                             }
                         }
                         break;
@@ -546,6 +548,8 @@ namespace SilverSim.Scripting.LSL
                             {
                                 ilgen.BeginScope();
                                 ++blockLevel;
+                                localVarsStack.Insert(0, new Dictionary<string, object>(localVars));
+                                labelsStack.Insert(0, new Dictionary<string, ILLabelInfo>(labels));
                             }
                         }
                         break;
@@ -608,6 +612,8 @@ namespace SilverSim.Scripting.LSL
                             {
                                 ilgen.BeginScope();
                                 ++blockLevel;
+                                localVarsStack.Insert(0, new Dictionary<string, object>(localVars));
+                                labelsStack.Insert(0, new Dictionary<string, ILLabelInfo>(labels));
                             }
                         }
                         else
@@ -630,6 +636,8 @@ namespace SilverSim.Scripting.LSL
                             {
                                 ilgen.BeginScope();
                                 ++blockLevel;
+                                localVarsStack.Insert(0, new Dictionary<string, object>(localVars));
+                                labelsStack.Insert(0, new Dictionary<string, ILLabelInfo>(labels));
                             }
                         }
                         break;
@@ -643,6 +651,8 @@ namespace SilverSim.Scripting.LSL
                             compileState.PushControlFlow(elem);
                             ilgen.BeginScope();
                             ++blockLevel;
+                            localVarsStack.Insert(0, new Dictionary<string, object>(localVars));
+                            labelsStack.Insert(0, new Dictionary<string, ILLabelInfo>(labels));
                         }
                         break;
                     #endregion
@@ -670,6 +680,8 @@ namespace SilverSim.Scripting.LSL
                             {
                                 ilgen.EndScope();
                             }
+                            labelsStack.RemoveAt(0);
+                            localVarsStack.RemoveAt(0);
                             switch(--blockLevel)
                             {
                                 case 0:
@@ -819,7 +831,6 @@ namespace SilverSim.Scripting.LSL
                 ilgen,
                 functionBody,
                 localVars,
-                null,
                 ref lineIndex);
 
             /* we have no missing return value check right now, so we simply emit default values in that case */
