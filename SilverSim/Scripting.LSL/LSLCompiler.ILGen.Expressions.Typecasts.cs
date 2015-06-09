@@ -57,37 +57,37 @@ namespace SilverSim.Scripting.LSL
                 m_TypecastTree = functionTree.SubTree[0];
                 switch (functionTree.Entry)
                 {
-                    case "integer":
+                    case "(integer)":
                         m_TargetType = typeof(int);
                         break;
 
-                    case "float":
+                    case "(float)":
                         m_TargetType = typeof(double);
                         break;
 
-                    case "string":
+                    case "(string)":
                         m_TargetType = typeof(string);
                         break;
 
-                    case "key":
+                    case "(key)":
                         m_TargetType = typeof(LSLKey);
                         break;
 
-                    case "list":
+                    case "(list)":
                         m_TargetType = typeof(AnArray);
                         break;
 
-                    case "vector":
+                    case "(vector)":
                         m_TargetType = typeof(Vector3);
                         break;
 
-                    case "rotation":
-                    case "quaternion":
+                    case "(rotation)":
+                    case "(quaternion)":
                         m_TargetType = typeof(Quaternion);
                         break;
 
                     default:
-                        throw new CompilerException(lineNumber, string.Format("{0} is not a type", functionTree.Entry));
+                        throw new CompilerException(lineNumber, string.Format("Internal Error! {0} is not a valid typecast", functionTree.Entry));
                 }
             }
 

@@ -247,6 +247,26 @@ namespace SilverSim.Scripting.LSL
                                     }
                                     break;
 
+                                case "(string)":
+                                case "(integer)":
+                                case "(float)":
+                                case "(vector)":
+                                case "(list)":
+                                case "(key)":
+                                case "(quaternion)":
+                                case "(rotation)":
+                                    expressionStack.Insert(0, new TypecastExpression(
+                                        this,
+                                        compileState,
+                                        scriptTypeBuilder,
+                                        stateTypeBuilder,
+                                        ilgen,
+                                        functionTree,
+                                        lineNumber,
+                                        localVars));
+                                    innerExpressionReturn = null;
+                                    break;
+
                                 default:
                                     expressionStack.Insert(0, new LeftUnaryOperators(
                                         this,
@@ -455,19 +475,6 @@ namespace SilverSim.Scripting.LSL
                                 default:
                                     throw new CompilerException(lineNumber, string.Format("unexpected level entry '{0}'", functionTree.Entry));
                             }
-                            break;
-
-                        case Tree.EntryType.Typecast:
-                            expressionStack.Insert(0, new TypecastExpression(
-                                this,
-                                compileState,
-                                scriptTypeBuilder,
-                                stateTypeBuilder,
-                                ilgen,
-                                functionTree,
-                                lineNumber,
-                                localVars));
-                            innerExpressionReturn = null;
                             break;
 
                         default:

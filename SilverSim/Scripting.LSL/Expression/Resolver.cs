@@ -486,7 +486,8 @@ namespace SilverSim.Scripting.LSL.Expression
                 case Tree.EntryType.Declaration:
                 case Tree.EntryType.Unknown:
                 case Tree.EntryType.Level:
-                case Tree.EntryType.Typecast:
+                case Tree.EntryType.Vector:
+                case Tree.EntryType.Rotation:
                     return true;
 
                 default:
@@ -507,7 +508,8 @@ namespace SilverSim.Scripting.LSL.Expression
                 case Tree.EntryType.Declaration:
                 case Tree.EntryType.Unknown:
                 case Tree.EntryType.Level:
-                case Tree.EntryType.Typecast:
+                case Tree.EntryType.Vector:
+                case Tree.EntryType.Rotation:
                     return true;
 
                 default:
@@ -524,7 +526,12 @@ namespace SilverSim.Scripting.LSL.Expression
                 case Tree.EntryType.Value:
                 case Tree.EntryType.StringValue:
                 case Tree.EntryType.OperatorLeftUnary:
+                case Tree.EntryType.Vector:
+                case Tree.EntryType.Rotation:
+                case Tree.EntryType.Declaration:
+                case Tree.EntryType.Level:
                     return true;
+
 
                 default:
                     return false;

@@ -44,7 +44,6 @@ namespace SilverSim.Scripting.LSL.Expression
             OperatorBinary,
             ReservedWord,
             Invalid,
-            Typecast,
             Function,
             FunctionArgument,
             Declaration,
