@@ -145,84 +145,41 @@ namespace SilverSim.Scripting.LSL.Expression
 
         void resolveSeparators(Tree nt)
         {
-#if RESOLVESEPARATORS_NON_RECURSIVE
-            List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
-            enumeratorStack.Insert(0, new ListTreeEnumState(nt));
-            while (enumeratorStack.Count != 0)
+            List<Tree> enumTree = new List<Tree>();
+            enumTree.Add(nt);
+            while (enumTree.Count != 0)
             {
-                if (!enumeratorStack[0].MoveNext())
+                nt = enumTree[0];
+                enumTree.RemoveAt(0);
+                enumTree.AddRange(nt.SubTree);
+                if (nt.Entry == "," && nt.Type != Tree.EntryType.StringValue)
                 {
-                    enumeratorStack.RemoveAt(0);
-                }
-                else
-                {
-                    nt = enumeratorStack[0].Current;
-                    if (nt.Entry == "," && nt.Type != Tree.EntryType.StringValue)
-                    {
-                        nt.Type = Tree.EntryType.Separator;
-                    }
-                    enumeratorStack.Insert(0, new ListTreeEnumState(nt));
+                    nt.Type = Tree.EntryType.Separator;
                 }
             }
-#else
-            if (nt.Entry == "," && nt.Type != Tree.EntryType.StringValue)
-            {
-                nt.Type = Tree.EntryType.Separator;
-            }
-
-            foreach (Tree st in nt.SubTree)
-            {
-                resolveSeparators(st);
-            }
-#endif
         }
 
         void resolveBlockOps(Tree nt)
         {
-#if RESOLVEBLOCKOPS_NON_RECURSIVE
-            List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
-            enumeratorStack.Insert(0, new ListTreeEnumState(nt));
-            while (enumeratorStack.Count != 0)
+            List<Tree> enumTree = new List<Tree>();
+            enumTree.Add(nt);
+            while (enumTree.Count != 0)
             {
-                if (!enumeratorStack[0].MoveNext())
+                nt = enumTree[0];
+                enumTree.RemoveAt(0);
+                enumTree.AddRange(nt.SubTree);
+                if (nt.Type == Tree.EntryType.OperatorUnknown || nt.Type == Tree.EntryType.Unknown)
                 {
-                    enumeratorStack.RemoveAt(0);
-                }
-                else
-                {
-                    nt = enumeratorStack[0].Current;
-                    if (nt.Type == Tree.EntryType.OperatorUnknown || nt.Type == Tree.EntryType.Unknown)
+                    if (m_BlockOps.ContainsKey(nt.Entry))
                     {
-                        if (m_BlockOps.ContainsKey(nt.Entry))
-                        {
-                            nt.Type = Tree.EntryType.LevelBegin;
-                        }
-                        if (m_BlockOps.ContainsValue(nt.Entry))
-                        {
-                            nt.Type = Tree.EntryType.LevelEnd;
-                        }
+                        nt.Type = Tree.EntryType.LevelBegin;
                     }
-                    enumeratorStack.Insert(0, new ListTreeEnumState(nt));
+                    if (m_BlockOps.ContainsValue(nt.Entry))
+                    {
+                        nt.Type = Tree.EntryType.LevelEnd;
+                    }
                 }
             }
-
-#else
-            if(nt.Type == Tree.EntryType.OperatorUnknown || nt.Type == Tree.EntryType.Unknown)
-            {
-                if(m_BlockOps.ContainsKey(nt.Entry))
-                {
-                    nt.Type = Tree.EntryType.LevelBegin;
-                }
-                if (m_BlockOps.ContainsValue(nt.Entry))
-                {
-                    nt.Type = Tree.EntryType.LevelEnd;
-                }
-            }
-            foreach (Tree st in nt.SubTree)
-            {
-                resolveBlockOps(st);
-            }
-#endif
         }
 
         void identifyReservedWords(Tree tree)
