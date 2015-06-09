@@ -110,22 +110,20 @@ namespace SilverSim.Scripting.LSL
 
         void solveTypecasts(Tree tree)
         {
-#if SOLVETYPECASTS_NON_RECURSIVE
-            List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
-            enumeratorStack.Insert(0, new ListTreeEnumState(tree));
-            while(enumeratorStack.Count != 0)
+            List<Tree> enumTree = new List<Tree>();
+            enumTree.Add(tree);
+            while (enumTree.Count != 0)
             {
-                if(!enumeratorStack[0].MoveNext())
+                tree = enumTree[0];
+                enumTree.RemoveAt(0);
+
+                int i;
+                for (i = 0; i < tree.SubTree.Count; ++i)
                 {
-                    enumeratorStack.RemoveAt(0);
-                }
-                else
-                {
-                    tree = enumeratorStack[0].Current;
-                    int i = enumeratorStack[0].Position;
-                    if (tree.Type == Tree.EntryType.OperatorLeftUnary)
+                    Tree st = tree.SubTree[i];
+                    if (st.Type == Tree.EntryType.OperatorLeftUnary)
                     {
-                        switch (tree.Entry)
+                        switch (st.Entry)
                         {
                             case "(integer)":
                             case "(string)":
@@ -135,21 +133,21 @@ namespace SilverSim.Scripting.LSL
                             case "(rotation)":
                             case "(quaternion)":
                             case "(vector)":
-                                tree.Type = Tree.EntryType.Typecast;
-                                tree.Entry = tree.Entry.Substring(1, tree.Entry.Length - 2);
+                                st.Type = Tree.EntryType.Typecast;
+                                st.Entry = st.Entry.Substring(1, st.Entry.Length - 2);
                                 break;
 
                             default:
                                 break;
                         }
                     }
-                    else if (tree.Type == Tree.EntryType.OperatorUnknown && i + 1 < tree.SubTree.Count &&
+                    else if (st.Type == Tree.EntryType.OperatorUnknown && i + 1 < tree.SubTree.Count &&
                         (tree.SubTree[i + 1].Type == Tree.EntryType.Vector ||
                         tree.SubTree[i + 1].Type == Tree.EntryType.Rotation ||
                         (tree.SubTree[i + 1].Type == Tree.EntryType.Level && tree.SubTree[i + 1].Entry == "(") ||
                         (tree.SubTree[i + 1].Type == Tree.EntryType.Level && tree.SubTree[i + 1].Entry == "[")))
                     {
-                        switch (tree.Entry)
+                        switch (st.Entry)
                         {
                             case "(integer)":
                             case "(string)":
@@ -159,9 +157,9 @@ namespace SilverSim.Scripting.LSL
                             case "(rotation)":
                             case "(quaternion)":
                             case "(vector)":
-                                tree.Type = Tree.EntryType.Typecast;
-                                tree.Entry = tree.Entry.Substring(1, tree.Entry.Length - 2);
-                                tree.SubTree.Add(tree.SubTree[i + 1]);
+                                st.Type = Tree.EntryType.Typecast;
+                                st.Entry = st.Entry.Substring(1, st.Entry.Length - 2);
+                                st.SubTree.Add(tree.SubTree[i + 1]);
                                 tree.SubTree.RemoveAt(i + 1);
                                 break;
 
@@ -169,64 +167,9 @@ namespace SilverSim.Scripting.LSL
                                 break;
                         }
                     }
-
-                    enumeratorStack.Insert(0, new ListTreeEnumState(tree));
                 }
+                enumTree.AddRange(tree.SubTree);
             }
-#else
-            int i;
-            for (i = 0; i < tree.SubTree.Count; ++i)
-            {
-                Tree st = tree.SubTree[i];
-                if (st.Type == Tree.EntryType.OperatorLeftUnary)
-                {
-                    switch (st.Entry)
-                    {
-                        case "(integer)":
-                        case "(string)":
-                        case "(float)":
-                        case "(key)":
-                        case "(list)":
-                        case "(rotation)":
-                        case "(quaternion)":
-                        case "(vector)":
-                            st.Type = Tree.EntryType.Typecast;
-                            st.Entry = st.Entry.Substring(1, st.Entry.Length - 2);
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-                else if (st.Type == Tree.EntryType.OperatorUnknown && i + 1 < tree.SubTree.Count && 
-                    (tree.SubTree[i + 1].Type == Tree.EntryType.Vector ||
-                    tree.SubTree[i + 1].Type == Tree.EntryType.Rotation ||
-                    (tree.SubTree[i + 1].Type == Tree.EntryType.Level && tree.SubTree[i + 1].Entry == "(") ||
-                    (tree.SubTree[i + 1].Type == Tree.EntryType.Level && tree.SubTree[i + 1].Entry == "[")))
-                {
-                    switch (st.Entry)
-                    {
-                        case "(integer)":
-                        case "(string)":
-                        case "(float)":
-                        case "(key)":
-                        case "(list)":
-                        case "(rotation)":
-                        case "(quaternion)":
-                        case "(vector)":
-                            st.Type = Tree.EntryType.Typecast;
-                            st.Entry = st.Entry.Substring(1, st.Entry.Length - 2);
-                            st.SubTree.Add(tree.SubTree[i + 1]);
-                            tree.SubTree.RemoveAt(i + 1);
-                            break;
-
-                        default:
-                            break;
-                    }
-                }
-                solveTypecasts(st);
-            }
-#endif
         }
 
         void solveConstantOperations(Tree tree)
