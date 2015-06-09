@@ -130,7 +130,6 @@ namespace SilverSim.Scripting.LSL.Expression
 
         void resolveValues(Tree nt)
         {
-#if RESOLVEVARIABLES_NON_RECURSIVE
             List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
             enumeratorStack.Insert(0, new ListTreeEnumState(nt));
             while (enumeratorStack.Count != 0)
@@ -153,22 +152,6 @@ namespace SilverSim.Scripting.LSL.Expression
                     enumeratorStack.Insert(0, new ListTreeEnumState(nt));
                 }
             }
-
-#else
-            if(nt.Type == Tree.EntryType.StringValue || nt.Type == Tree.EntryType.Value)
-            {
-                // delay the 2147483648
-                if (nt.Entry != "2147483648")
-                {
-                    nt.Process();
-                }
-            }
-
-            foreach(Tree st in nt.SubTree)
-            {
-                resolveValues(st);
-            }
-#endif
         }
 
         void resolveSeparators(Tree nt)
@@ -253,7 +236,6 @@ namespace SilverSim.Scripting.LSL.Expression
 #endif
         }
 
-#if IDENTIFYRESERVEDWORDS_NON_RECURSIVE
         void identifyReservedWords(Tree tree)
         {
             List<Tree> processNodes = new List<Tree>();
@@ -275,10 +257,6 @@ namespace SilverSim.Scripting.LSL.Expression
             }
 
             foreach (Tree nt in processNodes)
-#else
-        void identifyReservedWords(Tree nt)
-        {
-#endif
             {
                 if (nt.Type == Tree.EntryType.Unknown)
                 {
@@ -288,14 +266,6 @@ namespace SilverSim.Scripting.LSL.Expression
                     }
                 }
             }
-
-#if IDENTIFYRESERVEDWORDS_NON_RECURSIVE
-#else
-            foreach (Tree st in nt.SubTree)
-            {
-                identifyReservedWords(st);
-            }
-#endif
         }
 
         void sortBlockOps(Tree nt, int i = 0)
@@ -347,7 +317,6 @@ namespace SilverSim.Scripting.LSL.Expression
             }
         }
 
-#if IDENTIFYFUNCTIONS_NON_RECURSIVE
         void identifyFunctions(Tree tree)
         {
             List<Tree> processNodes = new List<Tree>();
@@ -369,14 +338,6 @@ namespace SilverSim.Scripting.LSL.Expression
             }
 
             foreach (Tree nt in processNodes)
-#else
-        void identifyFunctions(Tree nt)
-        {
-            foreach(Tree sub in nt.SubTree)
-            {
-                identifyFunctions(sub);
-            }
-#endif
             {
                 for (int i = 0; i < nt.SubTree.Count - 1; ++i)
                 {
@@ -467,7 +428,6 @@ namespace SilverSim.Scripting.LSL.Expression
             nt.SubTree[start].SubTree = argumentsList;
         }
 
-#if IDENTIFYSQUAREBRACKETDECLARATIONS_NON_RECURSIVE
         void identifySquareBracketDeclarations(Tree tree)
         {
             int start ;
@@ -490,15 +450,6 @@ namespace SilverSim.Scripting.LSL.Expression
             }
 
             foreach (Tree nt in processNodes)
-#else
-        void identifySquareBracketDeclarations(Tree nt)
-        {
-            int start;
-            foreach (Tree st in nt.SubTree)
-            {
-                identifySquareBracketDeclarations(st);
-            }
-#endif
             {
                 for (start = 0; start < nt.SubTree.Count; ++start)
                 {
@@ -651,7 +602,6 @@ namespace SilverSim.Scripting.LSL.Expression
             }
         }
 
-#if IDENTIFYUNARYOPS_NON_RECURSIVE
         void identifyUnaryOps(Tree tree)
         {
             int pos;
@@ -674,20 +624,6 @@ namespace SilverSim.Scripting.LSL.Expression
             }
 
             foreach (Tree nt in processNodes)
-#else
-        void identifyUnaryOps(Tree nt)
-        {
-            int pos;
-            if (nt.SubTree.Count == 0)
-            {
-                return;
-            }
-
-            foreach (Tree st in nt.SubTree)
-            {
-                identifyUnaryOps(st);
-            }
-#endif
             {
                 for (pos = nt.SubTree.Count; pos-- > 0; )
                 {
@@ -736,7 +672,6 @@ namespace SilverSim.Scripting.LSL.Expression
             }
         }
 
-#if IDENTIFYBINARYOPS_NON_RECURSIVE
         void identifyBinaryOps(Tree tree)
         {
             int pos;
@@ -759,21 +694,6 @@ namespace SilverSim.Scripting.LSL.Expression
             }
 
             foreach (Tree nt in processNodes)
-#else
-        void identifyBinaryOps(Tree nt)
-        {
-            int pos;
-
-            if (nt.SubTree.Count == 0)
-            {
-                return;
-            }
-
-            foreach (Tree st in nt.SubTree)
-            {
-                identifyBinaryOps(st);
-            }
-#endif
             {
                 for (pos = 0; pos < nt.SubTree.Count; ++pos)
                 {
@@ -816,7 +736,6 @@ namespace SilverSim.Scripting.LSL.Expression
 
         void sortUnaryOps(Tree tree)
         {
-#if SORTUNARYOPS_NON_RECURSIVE
             List<ListTreeEnumReverseState> enumeratorStack = new List<ListTreeEnumReverseState>();
             enumeratorStack.Insert(0, new ListTreeEnumReverseState(tree));
             while(enumeratorStack.Count != 0)
@@ -855,45 +774,10 @@ namespace SilverSim.Scripting.LSL.Expression
                     enumeratorStack.Insert(0, new ListTreeEnumReverseState(tree));
                 }
             }
-#else
-            int pos;
-            for (pos = tree.SubTree.Count - 1; pos >= 0; --pos)
-            {
-                switch (tree.SubTree[pos].Type)
-                {
-                    case Tree.EntryType.OperatorLeftUnary:
-                        if (!tree.SubTree[pos].ProcessedOpSort)
-                        {
-                            tree.SubTree[pos].ProcessedOpSort = true;
-                            tree.SubTree[pos].SubTree.Add(tree.SubTree[pos + 1]);
-                            tree.SubTree.RemoveAt(pos + 1);
-                        }
-                        break;
-
-                    case Tree.EntryType.OperatorRightUnary:
-                        if (!tree.SubTree[pos].ProcessedOpSort)
-                        {
-                            tree.SubTree[pos].ProcessedOpSort = true;
-                            tree.SubTree[pos].SubTree.Add(tree.SubTree[pos - 1]);
-                            tree.SubTree.RemoveAt(pos - 1);
-                        }
-                        break;
-
-                    default:
-                        break;
-                }
-            }
-
-            foreach (Tree st in tree.SubTree)
-            {
-                sortUnaryOps(st);
-            }
-#endif
         }
 
         void sortBinaryOps(Tree tree)
         {
-#if SORTBINARYOPS_NON_RECURSIVE
             List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
             enumeratorStack.Insert(0, new ListTreeEnumState(tree));
             int pos;
@@ -968,47 +852,10 @@ namespace SilverSim.Scripting.LSL.Expression
                     enumeratorStack.Insert(0, new ListTreeEnumState(tree));
                 }
             }
-#else
-            int pos;
-            foreach(Dictionary<string, OperatorType> plist in m_Operators)
-            {
-                for(pos = 0; pos < tree.SubTree.Count;)
-                {
-                    switch(tree.SubTree[pos].Type)
-                    {
-                        case Tree.EntryType.OperatorBinary:
-                            if (plist.ContainsKey(tree.SubTree[pos].Entry) &&
-                                !tree.SubTree[pos].ProcessedOpSort)
-                            {
-                                tree.SubTree[pos].SubTree.Add(tree.SubTree[pos - 1]);
-                                tree.SubTree[pos].SubTree.Add(tree.SubTree[pos + 1]);
-                                tree.SubTree[pos].ProcessedOpSort = true;
-                                tree.SubTree.RemoveAt(pos + 1);
-                                tree.SubTree.RemoveAt(pos - 1);
-                            }
-                            else
-                            {
-                                ++pos;
-                            }
-                            break;
-
-                        default:
-                            ++pos;
-                            break;
-                    }
-                }
-            }
-
-            foreach(Tree st in tree.SubTree)
-            {
-                sortBinaryOps(st);
-            }
-#endif
         }
 
         void identifyVariables(Tree tree, ICollection<string> variables)
         {
-#if IDENTIFYVARIABLES_NON_RECURSIVE
             List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
             enumeratorStack.Insert(0, new ListTreeEnumState(tree));
 
@@ -1028,25 +875,10 @@ namespace SilverSim.Scripting.LSL.Expression
                     enumeratorStack.Insert(0, new ListTreeEnumState(tree));
                 }
             }
-#else
-            foreach(Tree st in tree.SubTree)
-            {
-                if(st.Type == Tree.EntryType.Unknown && variables.Contains(st.Entry))
-                {
-                    st.Type = Tree.EntryType.Variable;
-                }
-
-                if(st.SubTree.Count != 0)
-                {
-                    identifyVariables(st, variables);
-                }
-            }
-#endif
         }
 
         public void solveDotOperator(Tree tree)
         {
-#if SOLVEDOTOPERATOR_NON_RECURSIVE
             List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
             int pos;
             for (pos = 0; pos < tree.SubTree.Count; ++pos)
@@ -1112,34 +944,6 @@ namespace SilverSim.Scripting.LSL.Expression
                 }
             }
 
-#else
-            int pos;
-            for (pos = 0; pos < tree.SubTree.Count; ++pos)
-            {
-                if (tree.SubTree[pos].Type == Tree.EntryType.OperatorUnknown && tree.SubTree[pos].Entry == "." && pos > 0 && pos + 1 < tree.SubTree.Count)
-                {
-                    if (isValidLeftHand(tree.SubTree[pos - 1]) &&
-                        (tree.SubTree[pos + 1].Type == Tree.EntryType.Variable ||
-                        tree.SubTree[pos + 1].Type == Tree.EntryType.Unknown))
-                    {
-                        tree.SubTree[pos].Type = Tree.EntryType.OperatorBinary;
-                        tree.SubTree[pos].SubTree.Add(tree.SubTree[pos - 1]);
-                        tree.SubTree[pos].SubTree.Add(tree.SubTree[pos + 1]);
-                        tree.SubTree[pos].ProcessedOpSort = true;
-                        tree.SubTree.RemoveAt(pos + 1);
-                        tree.SubTree.RemoveAt(pos - 1);
-                    }
-                    else
-                    {
-                        solveDotOperator(tree.SubTree[pos]);
-                    }
-                }
-                else
-                {
-                    solveDotOperator(tree.SubTree[pos]);
-                }
-            }
-#endif
         }
 
         public void Process(Tree tree, ICollection<string> variables)

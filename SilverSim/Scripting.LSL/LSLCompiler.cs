@@ -43,14 +43,14 @@ namespace SilverSim.Scripting.LSL
     public partial class LSLCompiler : IScriptCompiler, IPlugin, IPluginSubFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LSL COMPILER");
-        List<IScriptApi> m_Apis = new List<IScriptApi>();
+        internal List<IScriptApi> m_Apis = new List<IScriptApi>();
         Dictionary<string, APIFlags> m_Constants = new Dictionary<string, APIFlags>();
-        List<KeyValuePair<IScriptApi, MethodInfo>> m_Methods = new List<KeyValuePair<IScriptApi,MethodInfo>>();
+        internal List<KeyValuePair<IScriptApi, MethodInfo>> m_Methods = new List<KeyValuePair<IScriptApi,MethodInfo>>();
         Dictionary<string, MethodInfo> m_EventDelegates = new Dictionary<string, MethodInfo>();
         List<Script.StateChangeEventDelegate> m_StateChangeDelegates = new List<ScriptInstance.StateChangeEventDelegate>();
         List<Script.ScriptResetEventDelegate> m_ScriptResetDelegates = new List<ScriptInstance.ScriptResetEventDelegate>();
         List<string> m_ReservedWords = new List<string>();
-        List<string> m_MethodNames = new List<string>();
+        internal List<string> m_MethodNames = new List<string>();
         List<char> m_SingleOps = new List<char>();
         List<char> m_MultiOps = new List<char>();
         List<char> m_NumericChars = new List<char>();

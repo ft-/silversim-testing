@@ -67,7 +67,7 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
-        class ILParameterInfo
+        internal class ILParameterInfo
         {
             public int Position;
             public Type ParameterType;
@@ -79,7 +79,7 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
-        class ILLabelInfo
+        internal class ILLabelInfo
         {
             public Label Label;
             public bool IsDefined = false;
@@ -246,7 +246,7 @@ namespace SilverSim.Scripting.LSL
         #endregion
 
         #region Type validation and string representation
-        bool IsValidType(Type t)
+        internal static bool IsValidType(Type t)
         {
             if (t == typeof(string)) return true;
             if (t == typeof(int)) return true;
@@ -258,7 +258,7 @@ namespace SilverSim.Scripting.LSL
             if (t == typeof(void)) return true;
             return false;
         }
-        string MapType(Type t)
+        internal static string MapType(Type t)
         {
             if (t == typeof(string)) return "string";
             if (t == typeof(int)) return "integer";
@@ -273,7 +273,7 @@ namespace SilverSim.Scripting.LSL
         #endregion
 
         #region Typecasting IL Generator
-        void ProcessImplicitCasts(ILGenerator ilgen, Type toType, Type fromType, int lineNumber)
+        internal static void ProcessImplicitCasts(ILGenerator ilgen, Type toType, Type fromType, int lineNumber)
         {
             if (fromType == toType)
             {
@@ -302,6 +302,22 @@ namespace SilverSim.Scripting.LSL
             {
 
             }
+            else if(null == fromType)
+            {
+                throw new CompilerException(lineNumber, "Internal Error! fromType is not set");
+            }
+            else if (null == toType)
+            {
+                throw new CompilerException(lineNumber, "Internal Error! toType is not set");
+            }
+            else if (!IsValidType(fromType))
+            {
+                throw new CompilerException(lineNumber, string.Format("Internal Error! {0} is not a LSL compatible type", fromType.FullName));
+            }
+            else if (!IsValidType(toType))
+            {
+                throw new CompilerException(lineNumber, string.Format("Internal Error! {0} is not a LSL compatible type", toType.FullName));
+            }
             else
             {
                 throw new CompilerException(lineNumber, string.Format("Unsupported implicit typecast from {0} to {1}", MapType(fromType), MapType(toType)));
@@ -309,7 +325,7 @@ namespace SilverSim.Scripting.LSL
             ProcessCasts(ilgen, toType, fromType, lineNumber);
         }
 
-        void ProcessCasts(ILGenerator ilgen, Type toType, Type fromType, int lineNumber)
+        internal static void ProcessCasts(ILGenerator ilgen, Type toType, Type fromType, int lineNumber)
         {
             /* value is on stack before */
             if (toType == fromType)
@@ -512,7 +528,7 @@ namespace SilverSim.Scripting.LSL
         #endregion
 
         #region Variable Access IL Generator
-        Type GetVarType(
+        internal static Type GetVarType(
             TypeBuilder scriptTypeBuilder,
             TypeBuilder stateTypeBuilder,
             object v)
@@ -539,7 +555,7 @@ namespace SilverSim.Scripting.LSL
             }
         }
 
-        Type GetVarToStack(
+        internal static Type GetVarToStack(
             TypeBuilder scriptTypeBuilder,
             TypeBuilder stateTypeBuilder,
             ILGenerator ilgen,
@@ -592,7 +608,7 @@ namespace SilverSim.Scripting.LSL
             return retType;
         }
 
-        void SetVarFromStack(
+        internal static void SetVarFromStack(
             TypeBuilder scriptTypeBuilder,
             TypeBuilder stateTypeBuilder,
             ILGenerator ilgen,

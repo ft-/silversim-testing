@@ -23,10 +23,7 @@ exception statement from your version.
 
 */
 
-#define SOLVEDECLARATIONS_NON_RECURSIVE
 //#define SOLVETYPECASTS_NON_RECURSIVE
-#define SOLVEMAXNEGVALUES_NON_RECURSIVE
-#define SOLVECONSTANTOPERATIONS_NON_RECURSIVE
 
 using SilverSim.Scripting.LSL.Expression;
 using SilverSim.Types;
@@ -39,7 +36,6 @@ namespace SilverSim.Scripting.LSL
     {
         void solveDeclarations(Tree tree)
         {
-#if SOLVEDECLARATIONS_NON_RECURSIVE
             List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
             enumeratorStack.Insert(0, new ListTreeEnumState(tree));
 
@@ -70,30 +66,6 @@ namespace SilverSim.Scripting.LSL
                     enumeratorStack.Insert(0, new ListTreeEnumState(tree));
                 }
             }
-
-#else
-            /* recursive version of the algorithm above */
-            foreach (Tree st in tree.SubTree)
-            {
-                solveDeclarations(st);
-
-                if (st.Type == Tree.EntryType.Declaration)
-                {
-                    if (st.SubTree.Count == 3)
-                    {
-                        st.Type = Tree.EntryType.Vector;
-                    }
-                    else if (st.SubTree.Count == 4)
-                    {
-                        st.Type = Tree.EntryType.Rotation;
-                    }
-                    else
-                    {
-                        throw new Resolver.ResolverException("argument list for <> has neither 3 nor 4 arguments");
-                    }
-                }
-            }
-#endif
         }
 
         class ConstantValueVector : Tree.ConstantValue
@@ -259,7 +231,6 @@ namespace SilverSim.Scripting.LSL
 
         void solveConstantOperations(Tree tree)
         {
-#if SOLVECONSTANTOPERATIONS_NON_RECURSIVE
             List<Tree> processNodes = new List<Tree>();
             List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
             enumeratorStack.Insert(0, new ListTreeEnumState(tree));
@@ -280,11 +251,6 @@ namespace SilverSim.Scripting.LSL
 
             foreach (Tree st in processNodes)
             {
-#else
-            foreach (Tree st in tree.SubTree)
-            {
-                solveConstantOperations(st);
-#endif
                 if (st.Entry != "<")
                 {
 
@@ -1198,7 +1164,6 @@ namespace SilverSim.Scripting.LSL
 
         void solveMaxNegValues(CompileState cs, Tree resolvetree)
         {
-#if SOLVEMAXNEGVALUES_NON_RECURSIVE
             List<ListTreeEnumState> enumeratorStack = new List<ListTreeEnumState>();
             enumeratorStack.Insert(0, new ListTreeEnumState(resolvetree));
             while(enumeratorStack.Count != 0)
@@ -1225,23 +1190,6 @@ namespace SilverSim.Scripting.LSL
                     }
                 }
             }
-
-#else
-            /* recursive version of what is done above */
-            if (resolvetree.Type == Tree.EntryType.OperatorLeftUnary && resolvetree.Entry == "-" &&
-                resolvetree.SubTree.Count == 1 && resolvetree.SubTree[0].Entry == "2147483648" && resolvetree.SubTree[0].Type == Tree.EntryType.Value)
-            {
-                resolvetree.Value = new Tree.ConstantValueInt(-2147483648);
-            }
-            else if(resolvetree.Entry == "2147483648" && resolvetree.Type == Tree.EntryType.Value)
-            {
-                resolvetree.Value = new Tree.ConstantValueFloat(2147483648f);
-            }
-            else foreach(Tree st in resolvetree.SubTree)
-            {
-                solveMaxNegValues(cs, st);
-            }
-#endif
         }
 
         void solveTree(CompileState cs, Tree resolvetree, ICollection<string> varNames)

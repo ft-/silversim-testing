@@ -327,6 +327,7 @@ namespace SilverSim.Scripting.LSL
                     #endregion
 
                     #region Control Flow (Loops)
+                        /* Control Flow Statements are pre-splitted into own lines with same line number, so we do not have to care about here */
                     case "for":
                         {   /* for(a;b;c) */
                             int semicolon1, semicolon2;
@@ -493,6 +494,7 @@ namespace SilverSim.Scripting.LSL
                     #endregion
 
                     #region Control Flow (Conditions)
+                    /* Control Flow Statements are pre-splitted into own lines with same line number, so we do not have to care about here */
                     case "if":
                         compileState.PopControlFlowImplicit(ilgen, functionLine.LineNumber);
                         {
