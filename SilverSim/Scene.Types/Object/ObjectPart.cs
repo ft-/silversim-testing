@@ -1851,7 +1851,15 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "GroupPosition":
-                                reader.ReadToEndElement(); /* not needed redundant information */
+                                /* needed in case of attachments */
+                                if (null != rootGroup)
+                                {
+                                    rootGroup.AttachedPos = reader.ReadElementChildsAsVector3();
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
                                 break;
 
                             case "GroupPositionX":
