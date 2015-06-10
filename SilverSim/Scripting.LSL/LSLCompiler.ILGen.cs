@@ -23,43 +23,11 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.LSL.Expression;
-using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Reflection;
 using System.Reflection.Emit;
-
-/*
- * Operator Overloads
-== op_Equality
-!= op_Inequality
->  op_GreaterThan
-<  op_LessThan
->= op_GreaterThanOrEqual
-<= op_LessThanOrEqual
-&  op_BitwiseAnd
-|  op_BitwiseOr
-+  op_Addition
--  op_Subtraction
-/  op_Division
-%  op_Modulus
-*  op_Multiply
-<< op_LeftShift
->> op_RightShift
-^  op_ExclusiveOr
--  op_UnaryNegation
-+  op_UnaryPlus
-!  op_LogicalNot
-~  op_OnesComplement
-   op_False
-   op_True
-++ op_Increment
--- op_Decrement
- */
 
 namespace SilverSim.Scripting.LSL
 {

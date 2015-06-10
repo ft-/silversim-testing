@@ -73,8 +73,8 @@ namespace SilverSim.Scene.Types.Object
         private UUID m_ID = UUID.Zero;
         private string m_Name = string.Empty;
         private string m_Description = string.Empty;
-        private Vector3 m_GlobalPosition = Vector3.Zero;
-        private Quaternion m_GlobalRotation = Quaternion.Identity;
+        private Vector3 m_LocalPosition = Vector3.Zero;
+        private Quaternion m_LocalRotation = Quaternion.Identity;
         private Vector3 m_Slice = new Vector3(0, 1, 0);
         private PrimitivePhysicsShapeType m_PhysicsShapeType = PrimitivePhysicsShapeType.Prim;
         private PrimitiveMaterial m_Material = PrimitiveMaterial.Wood;
@@ -979,42 +979,14 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(this)
                 {
-                    if(ObjectGroup != null)
-                    {
-                        if(this != ObjectGroup.RootPart)
-                        {
-                            return m_GlobalPosition - ObjectGroup.RootPart.GlobalPosition;
-                        }
-                        else
-                        {
-                            return m_GlobalPosition;
-                        }
-                    }
-                    else
-                    {
-                        return m_GlobalPosition;
-                    }
+                    return m_LocalPosition;
                 }
             }
             set
             {
                 lock(this)
                 {
-                    if (ObjectGroup != null)
-                    {
-                        if (this != ObjectGroup.RootPart)
-                        {
-                            m_GlobalPosition = value + ObjectGroup.RootPart.GlobalPosition;
-                        }
-                        else
-                        {
-                            m_GlobalPosition = value;
-                        }
-                    }
-                    else
-                    {
-                        m_GlobalPosition = value;
-                    }
+                    m_LocalPosition = value;
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
@@ -1028,14 +1000,25 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(this)
                 {
-                    return m_GlobalPosition;
+                    if(null != ObjectGroup && ObjectGroup.RootPart != this)
+                    {
+                        return m_LocalPosition + ObjectGroup.RootPart.GlobalPosition;
+                    }
+                    return m_LocalPosition;
                 }
             }
             set
             {
                 lock(this)
                 {
-                    m_GlobalPosition = value;
+                    if (null != ObjectGroup && ObjectGroup.RootPart != this)
+                    {
+                        m_LocalPosition = value - ObjectGroup.RootPart.GlobalPosition;
+                    }
+                    else
+                    {
+                        m_LocalPosition = value;
+                    }
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
@@ -1049,42 +1032,14 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    if (ObjectGroup != null)
-                    {
-                        if (this != ObjectGroup.RootPart)
-                        {
-                            return m_GlobalPosition - ObjectGroup.RootPart.GlobalPosition;
-                        }
-                        else
-                        {
-                            return m_GlobalPosition;
-                        }
-                    }
-                    else
-                    {
-                        return m_GlobalPosition;
-                    }
+                    return m_LocalPosition;
                 }
             }
             set
             {
                 lock (this)
                 {
-                    if (ObjectGroup != null)
-                    {
-                        if (this != ObjectGroup.RootPart)
-                        {
-                            m_GlobalPosition = value + ObjectGroup.RootPart.GlobalPosition;
-                        }
-                        else
-                        {
-                            m_GlobalPosition = value;
-                        }
-                    }
-                    else
-                    {
-                        m_GlobalPosition = value;
-                    }
+                    m_LocalPosition = value;
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
@@ -1100,42 +1055,14 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    if (ObjectGroup != null)
-                    {
-                        if (this != ObjectGroup.RootPart)
-                        {
-                            return m_GlobalRotation / ObjectGroup.RootPart.GlobalRotation;
-                        }
-                        else
-                        {
-                            return m_GlobalRotation;
-                        }
-                    }
-                    else
-                    {
-                        return m_GlobalRotation;
-                    }
+                    return m_LocalRotation;
                 }
             }
             set
             {
                 lock (this)
                 {
-                    if (ObjectGroup != null)
-                    {
-                        if (this != ObjectGroup.RootPart)
-                        {
-                            m_GlobalRotation = value * ObjectGroup.RootPart.GlobalRotation;
-                        }
-                        else
-                        {
-                            m_GlobalRotation = value;
-                        }
-                    }
-                    else
-                    {
-                        m_GlobalRotation = value;
-                    }
+                    m_LocalRotation = value;
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
@@ -1149,14 +1076,28 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    return m_GlobalRotation;
+                    if (ObjectGroup != null && this != ObjectGroup.RootPart)
+                    {
+                        return m_LocalRotation * ObjectGroup.RootPart.GlobalRotation;
+                    }
+                    else
+                    {
+                        return m_LocalRotation;
+                    }
                 }
             }
             set
             {
                 lock (this)
                 {
-                    m_GlobalRotation = value;
+                    if (ObjectGroup != null && this != ObjectGroup.RootPart)
+                    {
+                        m_LocalRotation = value / ObjectGroup.RootPart.GlobalRotation;
+                    }
+                    else
+                    {
+                        m_LocalRotation = value;
+                    }
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
@@ -1170,42 +1111,14 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    if (ObjectGroup != null)
-                    {
-                        if (this != ObjectGroup.RootPart)
-                        {
-                            return m_GlobalRotation / ObjectGroup.RootPart.GlobalRotation;
-                        }
-                        else
-                        {
-                            return m_GlobalRotation;
-                        }
-                    }
-                    else
-                    {
-                        return m_GlobalRotation;
-                    }
+                    return m_LocalRotation;
                 }
             }
             set
             {
                 lock (this)
                 {
-                    if (ObjectGroup != null)
-                    {
-                        if (this != ObjectGroup.RootPart)
-                        {
-                            m_GlobalRotation = value * ObjectGroup.RootPart.GlobalRotation;
-                        }
-                        else
-                        {
-                            m_GlobalRotation = value;
-                        }
-                    }
-                    else
-                    {
-                        m_GlobalRotation = value;
-                    }
+                    m_LocalRotation = value;
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);

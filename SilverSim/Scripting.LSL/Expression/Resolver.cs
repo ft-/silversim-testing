@@ -530,6 +530,7 @@ namespace SilverSim.Scripting.LSL.Expression
                 case Tree.EntryType.Rotation:
                 case Tree.EntryType.Declaration:
                 case Tree.EntryType.Level:
+                case Tree.EntryType.Function:
                     return true;
 
 
@@ -601,7 +602,7 @@ namespace SilverSim.Scripting.LSL.Expression
                                     else if (pos > 0 && pos < nt.SubTree.Count - 1 &&
                                         (nt.SubTree[pos - 1].Type == Tree.EntryType.OperatorUnknown ||
                                         nt.SubTree[pos - 1].Type == Tree.EntryType.OperatorBinary) &&
-                                        isValidUnaryRight(nt.SubTree[pos + 1]))
+                                        isValidUnaryLeft(nt.SubTree[pos + 1]))
                                     {
                                         st.Type = Tree.EntryType.OperatorLeftUnary;
                                         break;

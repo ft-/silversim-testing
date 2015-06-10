@@ -23,16 +23,15 @@ exception statement from your version.
 
 */
 
+using SilverSim.Scene.Types.Script;
+using SilverSim.Types;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Xml;
-using SilverSim.Types;
-using SilverSim.Scene.Types.Script;
 using System.Reflection;
 using System.Security.Cryptography;
+using System.Text;
+using System.Xml;
 
 namespace SilverSim.Scripting.LSL
 {

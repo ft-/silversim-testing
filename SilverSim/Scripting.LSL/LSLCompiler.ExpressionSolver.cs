@@ -23,8 +23,6 @@ exception statement from your version.
 
 */
 
-//#define SOLVETYPECASTS_NON_RECURSIVE
-
 using SilverSim.Scripting.LSL.Expression;
 using SilverSim.Types;
 using System.Collections.Generic;
