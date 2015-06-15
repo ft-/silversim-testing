@@ -627,7 +627,7 @@ namespace SilverSim.Scripting.LSL
             ListenEvent ev = new ListenEvent();
             ev.Channel = 0x7FFFFFFF; /* DEBUG_CHANNEL */
             ev.Type = ListenEvent.ChatType.Shout;
-            ev.Message = message;
+            ev.Message = "At region " + Part.ObjectGroup.Scene.Name + ":\n" + message;
             ev.SourceType = ListenEvent.ChatSourceType.Object;
             ev.OwnerID = Part.ObjectGroup.Owner.ID;
             lock (this)
