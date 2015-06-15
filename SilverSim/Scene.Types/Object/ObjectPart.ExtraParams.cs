@@ -465,7 +465,7 @@ namespace SilverSim.Scene.Types.Object
                     
                     double intensity = light.Intensity;
                     if (intensity > m_AttachmentLightLimitIntensity && 
-                        ObjectGroup.AttachPoint == SilverSim.Types.Agent.AttachmentPoint.NotAttached)
+                        ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.NotAttached)
                     {
                         intensity = m_AttachmentLightLimitIntensity;
                     }
