@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using SilverSim.Types.Primitive;
 using System;
 using System.Threading;
@@ -371,6 +372,26 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        bool IsPrivateAttachmentOrNone(AttachmentPoint ap)
+        {
+            switch(ap)
+            {
+                case AttachmentPoint.NotAttached:
+                case AttachmentPoint.HudCenter2:
+                case AttachmentPoint.HudTopRight:
+                case AttachmentPoint.HudTopCenter:
+                case AttachmentPoint.HudTopLeft:
+                case AttachmentPoint.HudCenter1:
+                case AttachmentPoint.HudBottomLeft:
+                case AttachmentPoint.HudBottom:
+                case AttachmentPoint.HudBottomRight:
+                    return true;
+
+                default:
+                    return false;
+            }
+        }
+
         private void UpdateExtraParams()
         {
             const ushort FlexiEP = 0x10;
@@ -452,7 +473,7 @@ namespace SilverSim.Scene.Types.Object
                 }
 
                 if (light.IsLight &&
-                    (!m_IsAttachmentLightsDisabled || ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.NotAttached) &&
+                    (!m_IsAttachmentLightsDisabled || !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint)) &&
                     (!m_IsFacelightDisabled || (ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.LeftHand && ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.RightHand)))
                 {
                     updatebytes[i++] = (byte)(LightEP % 256);
@@ -464,8 +485,8 @@ namespace SilverSim.Scene.Types.Object
                     Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebytes, i, 4);
                     
                     double intensity = light.Intensity;
-                    if (intensity > m_AttachmentLightLimitIntensity && 
-                        ObjectGroup.AttachPoint != SilverSim.Types.Agent.AttachmentPoint.NotAttached)
+                    if (intensity > m_AttachmentLightLimitIntensity &&
+                        !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint))
                     {
                         intensity = m_AttachmentLightLimitIntensity;
                     }
