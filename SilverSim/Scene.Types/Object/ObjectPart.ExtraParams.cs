@@ -38,6 +38,58 @@ namespace SilverSim.Scene.Types.Object
 
         private bool m_IsFacelightDisabled = false;
         private bool m_IsAttachmentLightsDisabled = false;
+        private double m_FacelightLimitIntensity = 1;
+        private double m_AttachmentLightLimitIntensity = 1;
+
+        public double FacelightLimitIntensity
+        {
+            get
+            {
+                return m_FacelightLimitIntensity;
+            }
+            set
+            {
+                lock (this)
+                {
+                    if (value > 1)
+                    {
+                        value = 1;
+                    }
+                    else if (value < 0)
+                    {
+                        value = 0;
+                    }
+                    m_FacelightLimitIntensity = value;
+                }
+                UpdateExtraParams();
+                TriggerOnUpdate(0);
+            }
+        }
+
+        public double AttachmentLightLimitIntensity
+        {
+            get
+            {
+                return m_AttachmentLightLimitIntensity;
+            }
+            set
+            {
+                lock(this)
+                {
+                    if (value > 1)
+                    {
+                        value = 1;
+                    }
+                    else if(value < 0)
+                    {
+                        value = 0;
+                    }
+                    m_AttachmentLightLimitIntensity = value;
+                }
+                UpdateExtraParams();
+                TriggerOnUpdate(0);
+            }
+        }
 
         public bool IsFacelightDisabled
         {
@@ -410,7 +462,18 @@ namespace SilverSim.Scene.Types.Object
                     updatebytes[i++] = 0;
                     updatebytes[i++] = 0;
                     Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebytes, i, 4);
-                    updatebytes[i + 3] = (byte)(light.Intensity * 255f);
+                    
+                    double intensity = light.Intensity;
+                    if(intensity > m_AttachmentLightLimitIntensity)
+                    {
+                        intensity = m_AttachmentLightLimitIntensity;
+                    }
+                    if(intensity > m_FacelightLimitIntensity)
+                    {
+                        intensity = m_FacelightLimitIntensity;
+                    }
+
+                    updatebytes[i + 3] = (byte)(intensity * 255f);
                     i += 4;
                     Float2LEBytes((float)light.Radius, updatebytes, i);
                     i += 4;
