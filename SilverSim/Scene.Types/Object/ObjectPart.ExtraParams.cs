@@ -464,11 +464,14 @@ namespace SilverSim.Scene.Types.Object
                     Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebytes, i, 4);
                     
                     double intensity = light.Intensity;
-                    if(intensity > m_AttachmentLightLimitIntensity)
+                    if (intensity > m_AttachmentLightLimitIntensity && 
+                        ObjectGroup.AttachPoint == SilverSim.Types.Agent.AttachmentPoint.NotAttached)
                     {
                         intensity = m_AttachmentLightLimitIntensity;
                     }
-                    if(intensity > m_FacelightLimitIntensity)
+                    if (intensity > m_FacelightLimitIntensity && 
+                        (ObjectGroup.AttachPoint == SilverSim.Types.Agent.AttachmentPoint.LeftHand ||
+                        ObjectGroup.AttachPoint == SilverSim.Types.Agent.AttachmentPoint.RightHand))
                     {
                         intensity = m_FacelightLimitIntensity;
                     }
