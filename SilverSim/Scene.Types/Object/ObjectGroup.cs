@@ -255,11 +255,11 @@ namespace SilverSim.Scene.Types.Object
         public int m_SalePrice;
         public int m_OwnershipCost;
         public UInt32 m_Category;
-        public int m_PayPrice0;
-        public int m_PayPrice1;
-        public int m_PayPrice2;
-        public int m_PayPrice3;
-        public int m_PayPrice4;
+        public int m_PayPrice0 = -1;
+        public int m_PayPrice1 = -1;
+        public int m_PayPrice2 = -1;
+        public int m_PayPrice3 = -1;
+        public int m_PayPrice4 = -1;
 
         public int PayPrice0
         {
