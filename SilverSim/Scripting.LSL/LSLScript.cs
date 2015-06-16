@@ -630,6 +630,7 @@ namespace SilverSim.Scripting.LSL
             ev.Message = "At region " + Part.ObjectGroup.Scene.Name + ":\n" + message;
             ev.SourceType = ListenEvent.ChatSourceType.Object;
             ev.OwnerID = Part.ObjectGroup.Owner.ID;
+            ev.GlobalPosition = Part.ObjectGroup.GlobalPosition;
             lock (this)
             {
                 ev.ID = Part.ObjectGroup.ID;
