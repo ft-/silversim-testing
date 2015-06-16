@@ -69,6 +69,7 @@ namespace SilverSim.LL.Core
         private int m_LastReceivedPacketAtTime;
         private ChatServiceInterface m_ChatService;
         private ChatServiceInterface.Listener m_ChatListener;
+        private ChatServiceInterface.Listener m_DebugChannelListener;
 
         private Thread m_TextureDownloadThread;
         private bool m_TextureDownloadThreadRunning = false;
@@ -113,8 +114,13 @@ namespace SilverSim.LL.Core
                         {
                             m_ChatListener.Remove();
                             m_ChatListener = null;
-                            m_ChatService = null;
                         }
+                        if(m_DebugChannelListener != null)
+                        {
+                            m_DebugChannelListener.Remove();
+                            m_DebugChannelListener = null;
+                        }
+                        m_ChatService = null;
                         
                         foreach (KeyValuePair<string, object> kvp in m_Scene.SceneCapabilities)
                         {
@@ -143,11 +149,19 @@ namespace SilverSim.LL.Core
                         {
                             try
                             {
-                                m_ChatListener = m_ChatService.AddAgentListen(0, "", UUID.Zero, "", ChatGetAgentUUID, ChatGetAgentPosition, ChatListenerAction);
+                                m_ChatListener = m_ChatService.AddAgentListen(PUBLIC_CHANNEL, "", UUID.Zero, "", ChatGetAgentUUID, ChatGetAgentPosition, ChatListenerAction);
                             }
                             catch
                             {
                                 m_ChatService = null;
+                            }
+                            try
+                            {
+                                m_DebugChannelListener = m_ChatService.AddAgentListen(DEBUG_CHANNEL, "", UUID.Zero, "", ChatGetAgentUUID, ChatGetAgentPosition, ChatListenerAction);
+                            }
+                            catch
+                            {
+                                m_DebugChannelListener = null;
                             }
                         }
                     }
@@ -173,6 +187,9 @@ namespace SilverSim.LL.Core
             return AgentID;
         }
 
+        const int PUBLIC_CHANNEL = 0;
+        const int DEBUG_CHANNEL = 0x7FFFFFFF;
+
         private void ChatListenerAction(ListenEvent le)
         {
             Messages.Chat.ChatFromSimulator cfs = new Messages.Chat.ChatFromSimulator();
@@ -184,7 +201,18 @@ namespace SilverSim.LL.Core
             cfs.SourceID = le.ID;
             cfs.SourceType = (Messages.Chat.ChatSourceType)(byte)le.SourceType;
             cfs.OwnerID = le.OwnerID;
-            SendMessage(cfs);
+            if (le.Channel == DEBUG_CHANNEL)
+            {
+                /* limit debug channel to root agents */
+                if(Agent.IsInScene(Scene))
+                {
+                    SendMessage(cfs);
+                }
+            }
+            else
+            {
+                SendMessage(cfs);
+            }
         }
         #endregion
 
