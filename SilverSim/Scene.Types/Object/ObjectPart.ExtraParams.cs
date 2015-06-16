@@ -485,16 +485,16 @@ namespace SilverSim.Scene.Types.Object
                     Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebytes, i, 4);
                     
                     double intensity = light.Intensity;
-                    if (intensity > m_AttachmentLightLimitIntensity &&
-                        !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint))
-                    {
-                        intensity = m_AttachmentLightLimitIntensity;
-                    }
                     if (intensity > m_FacelightLimitIntensity && 
                         (ObjectGroup.AttachPoint == SilverSim.Types.Agent.AttachmentPoint.LeftHand ||
                         ObjectGroup.AttachPoint == SilverSim.Types.Agent.AttachmentPoint.RightHand))
                     {
                         intensity = m_FacelightLimitIntensity;
+                    }
+                    else if (intensity > m_AttachmentLightLimitIntensity &&
+                        !IsPrivateAttachmentOrNone(ObjectGroup.AttachPoint))
+                    {
+                        intensity = m_AttachmentLightLimitIntensity;
                     }
 
                     updatebytes[i + 3] = (byte)(intensity * 255f);
