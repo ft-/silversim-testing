@@ -634,9 +634,10 @@ namespace SilverSim.Scripting.LSL
             {
                 ev.ID = Part.ObjectGroup.ID;
                 ev.Name = Part.ObjectGroup.Name;
+                /* limit DEBUG_CHANNEL to owner only. */
+                ev.TargetID = Part.ObjectGroup.Owner.ID;
                 Part.ObjectGroup.Scene.GetService<ChatServiceInterface>().Send(ev);
             }
         }
-
     }
 }
