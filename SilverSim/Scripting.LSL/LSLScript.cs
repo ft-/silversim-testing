@@ -627,6 +627,7 @@ namespace SilverSim.Scripting.LSL
             ListenEvent ev = new ListenEvent();
             ev.Channel = 0x7FFFFFFF; /* DEBUG_CHANNEL */
             ev.Type = ListenEvent.ChatType.Shout;
+            ChatServiceInterface chatService;
             lock (this)
             {
                 ev.Message = "At region " + Part.ObjectGroup.Scene.Name + ":\n" + message;
@@ -635,8 +636,9 @@ namespace SilverSim.Scripting.LSL
                 ev.GlobalPosition = Part.ObjectGroup.GlobalPosition;
                 ev.ID = Part.ObjectGroup.ID;
                 ev.Name = Part.ObjectGroup.Name;
-                Part.ObjectGroup.Scene.GetService<ChatServiceInterface>().Send(ev);
+                chatService = Part.ObjectGroup.Scene.GetService<ChatServiceInterface>();
             }
+            chatService.Send(ev);
         }
     }
 }
