@@ -62,8 +62,11 @@ namespace SilverSim.Scene.Types.Object
                     }
                     m_FacelightLimitIntensity = value;
                 }
-                UpdateExtraParams();
-                TriggerOnUpdate(0);
+                if (PointLight.IsLight)
+                {
+                    UpdateExtraParams();
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -87,8 +90,11 @@ namespace SilverSim.Scene.Types.Object
                     }
                     m_AttachmentLightLimitIntensity = value;
                 }
-                UpdateExtraParams();
-                TriggerOnUpdate(0);
+                if (PointLight.IsLight)
+                {
+                    UpdateExtraParams();
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -104,8 +110,11 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_IsFacelightDisabled = value;
                 }
-                UpdateExtraParams();
-                TriggerOnUpdate(0);
+                if (PointLight.IsLight)
+                {
+                    UpdateExtraParams();
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
@@ -121,8 +130,11 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_IsAttachmentLightsDisabled = value;
                 }
-                UpdateExtraParams();
-                TriggerOnUpdate(0);
+                if (PointLight.IsLight)
+                {
+                    UpdateExtraParams();
+                    TriggerOnUpdate(0);
+                }
             }
         }
 
