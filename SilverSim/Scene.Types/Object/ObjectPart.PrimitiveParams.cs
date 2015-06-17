@@ -28,6 +28,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
+using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
@@ -1269,6 +1270,8 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region TextureEntryFace functions
+        const int PRIM_ALPHA_MODE_BLEND = 1;
+
         public void GetTexPrimitiveParams(TextureEntryFace face, PrimitiveParamsType type, ref AnArray paramList)
         {
             switch (type)
@@ -1304,15 +1307,84 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.AlphaMode:
                     /* [ PRIM_ALPHA_MODE, integer face, integer alpha_mode, integer mask_cutoff ] */
-                    throw new ArgumentException("PRIM_ALPHAMODE not yet supported for llGetPrimitiveParams");
+                    if (face.MaterialID == UUID.Zero)
+                    {
+                        paramList.Add(PRIM_ALPHA_MODE_BLEND);
+                        paramList.Add(0);
+                    }
+                    else try
+                    {
+                        Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
+                        paramList.Add(mat.DiffuseAlphaMode);
+                        paramList.Add(mat.AlphaMaskCutoff);
+                    }
+                    catch
+                    {
+                        paramList.Add(PRIM_ALPHA_MODE_BLEND);
+                        paramList.Add(0);
+                    }
+                    break;
 
                 case PrimitiveParamsType.Normal:
                     /* [ PRIM_NORMAL, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians ] */
-                    throw new ArgumentException("PRIM_NORMAL not yet supported for llGetPrimitiveParams");
+                    if(face.MaterialID == UUID.Zero)
+                    {
+                        paramList.Add(UUID.Zero);
+                        paramList.Add(new Vector3(1, 1, 0));
+                        paramList.Add(Vector3.Zero);
+                        paramList.Add(0f);
+                    }
+                    else try
+                    {
+                        Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
+                        paramList.Add(mat.NormMap);
+                        paramList.Add(new Vector3(mat.NormRepeatX, mat.NormRepeatY, 0));
+                        paramList.Add(new Vector3(mat.NormOffsetX, mat.NormOffsetY, 0));
+                        paramList.Add(mat.NormRotation);
+                    }
+                    catch 
+                    {
+                        paramList.Add(UUID.Zero);
+                        paramList.Add(new Vector3(1, 1, 0));
+                        paramList.Add(Vector3.Zero);
+                        paramList.Add(0f);
+                    }
+                    break;
 
                 case PrimitiveParamsType.Specular:
                     /* [ PRIM_SPECULAR, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians, vector color, integer glossiness, integer environment ] */
-                    throw new ArgumentException("PRIM_SPECULAR not yet supported for llGetPrimitiveParams");
+                    if (face.MaterialID == UUID.Zero)
+                    {
+                        paramList.Add(UUID.Zero);
+                        paramList.Add(new Vector3(1, 1, 0));
+                        paramList.Add(Vector3.Zero);
+                        paramList.Add(0f);
+                        paramList.Add(Vector3.One);
+                        paramList.Add(0);
+                        paramList.Add(0);
+                    }
+                    else try
+                    {
+                        Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
+                        paramList.Add(mat.SpecMap);
+                        paramList.Add(new Vector3(mat.SpecRepeatX, mat.SpecRepeatY, 0));
+                        paramList.Add(new Vector3(mat.SpecOffsetX, mat.SpecOffsetY, 0));
+                        paramList.Add(mat.SpecRotation);
+                        paramList.Add(mat.SpecColor.AsVector3);
+                        paramList.Add(mat.SpecExp);
+                        paramList.Add(mat.EnvIntensity);
+                    }
+                    catch
+                    {
+                        paramList.Add(UUID.Zero);
+                        paramList.Add(new Vector3(1, 1, 0));
+                        paramList.Add(Vector3.Zero);
+                        paramList.Add(0f);
+                        paramList.Add(Vector3.One);
+                        paramList.Add(0);
+                        paramList.Add(0);
+                    }
+                    break;
 
                 default:
                     throw new ArgumentException(String.Format("Internal error! Primitive parameter type {0} should not be passed to PrimitiveFace", type));
@@ -1364,7 +1436,39 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.AlphaMode:
                     /* [ PRIM_ALPHA_MODE, integer face, integer alpha_mode, integer mask_cutoff ] */
-                    throw new ArgumentException("PRIM_ALPHAMODE not yet supported for llSetPrimitiveParams");
+                    {
+                        Material mat;
+                        try
+                        {
+                            mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
+                        }
+                        catch
+                        {
+                            mat = new Material();
+                        }
+                        mat.DiffuseAlphaMode = ParamsHelper.GetInteger(enumerator, "PRIM_ALPHA_MODE");
+                        mat.AlphaMaskCutoff = ParamsHelper.GetInteger(enumerator, "PRIM_ALPHA_MODE");
+                        if(mat.DiffuseAlphaMode < 0)
+                        {
+                            mat.DiffuseAlphaMode = 0;
+                        }
+                        else if(mat.DiffuseAlphaMode > 3)
+                        {
+                            mat.DiffuseAlphaMode = 3;
+                        }
+                        if(mat.AlphaMaskCutoff < 0)
+                        {
+                            mat.AlphaMaskCutoff = 0;
+                        }
+                        else if(mat.AlphaMaskCutoff > 3)
+                        {
+                            mat.AlphaMaskCutoff = 3;
+                        }
+                        mat.MaterialID = UUID.Random;
+                        ObjectGroup.Scene.StoreMaterial(mat);
+                        face.MaterialID = mat.MaterialID;
+                    }
+                    break;
 
                 case PrimitiveParamsType.Normal:
                     /* [ PRIM_NORMAL, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians ] */

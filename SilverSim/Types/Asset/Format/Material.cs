@@ -35,10 +35,10 @@ namespace SilverSim.Types.Asset.Format
     {
         #region Fields
         public UUID MaterialID;
-        public int AlphaMaskCutoff = 0;
+        public int AlphaMaskCutoff = 1;
         public int DiffuseAlphaMode = 0;
         public int EnvIntensity = 0;
-        public UUID NormMap;
+        public UUID NormMap = UUID.Zero;
         public int NormOffsetX = 0;
         public int NormOffsetY = 0;
         public int NormRepeatX = 0;
@@ -46,7 +46,7 @@ namespace SilverSim.Types.Asset.Format
         public int NormRotation = 0;
         public ColorAlpha SpecColor = new ColorAlpha();
         public int SpecExp = 0;
-        public UUID SpecMap;
+        public UUID SpecMap = UUID.Zero;
         public int SpecOffsetX = 0;
         public int SpecOffsetY = 0;
         public int SpecRepeatX = 0;
@@ -148,41 +148,47 @@ namespace SilverSim.Types.Asset.Format
             return (AssetData)this;
         }
 
+        public void WriteMap(XmlTextWriter w)
+        {
+            w.WriteStartElement("map");
+            WriteKey(w, "AlphaMaskCutoff", AlphaMaskCutoff);
+            WriteKey(w, "DiffuseAlphaMode", DiffuseAlphaMode);
+            WriteKey(w, "EnvIntensity", EnvIntensity);
+            WriteKey(w, "NormMap", NormMap);
+            WriteKey(w, "NormOffsetX", NormOffsetX);
+            WriteKey(w, "NormOffsetY", NormOffsetY);
+            WriteKey(w, "NormRepeatX", NormRepeatX);
+            WriteKey(w, "NormRepeatY", NormRepeatY);
+            WriteKey(w, "NormRotation", NormRotation);
+            w.WriteStartElement("key");
+            w.WriteValue("SpecColor");
+            w.WriteEndElement();
+            w.WriteStartElement("array");
+            WriteValue(w, SpecColor.R_AsByte);
+            WriteValue(w, SpecColor.G_AsByte);
+            WriteValue(w, SpecColor.B_AsByte);
+            WriteValue(w, SpecColor.A_AsByte);
+            w.WriteEndElement();
+            WriteKey(w, "SpecExp", SpecExp);
+            WriteKey(w, "SpecMap", SpecMap);
+            WriteKey(w, "SpecOffsetX", SpecOffsetX);
+            WriteKey(w, "SpecOffsetY", SpecOffsetY);
+            WriteKey(w, "SpecRepeatX", SpecRepeatX);
+            WriteKey(w, "SpecRepeatY", SpecRepeatY);
+            WriteKey(w, "SpecRotation", SpecRotation);
+            w.WriteEndElement();
+        }
+
         public static implicit operator AssetData(Material v)
         {
             AssetData asset = new AssetData();
+            asset.ID = v.MaterialID;
             MemoryStream ms = new MemoryStream();
 
             using(XmlTextWriter w = new XmlTextWriter(ms, UTF8NoBOM))
             {
                 w.WriteStartElement("llsd");
-                w.WriteStartElement("map");
-                WriteKey(w, "AlphaMaskCutoff", v.AlphaMaskCutoff);
-                WriteKey(w, "DiffuseAlphaMode", v.DiffuseAlphaMode);
-                WriteKey(w, "EnvIntensity", v.EnvIntensity);
-                WriteKey(w, "NormMap", v.NormMap);
-                WriteKey(w, "NormOffsetX", v.NormOffsetX);
-                WriteKey(w, "NormOffsetY", v.NormOffsetY);
-                WriteKey(w, "NormRepeatX", v.NormRepeatX);
-                WriteKey(w, "NormRepeatY", v.NormRepeatY);
-                WriteKey(w, "NormRotation", v.NormRotation);
-                w.WriteStartElement("key");
-                w.WriteValue("SpecColor");
-                w.WriteEndElement();
-                w.WriteStartElement("array");
-                WriteValue(w, v.SpecColor.R_AsByte);
-                WriteValue(w, v.SpecColor.G_AsByte);
-                WriteValue(w, v.SpecColor.B_AsByte);
-                WriteValue(w, v.SpecColor.A_AsByte);
-                w.WriteEndElement();
-                WriteKey(w, "SpecExp", v.SpecExp);
-                WriteKey(w, "SpecMap", v.SpecMap);
-                WriteKey(w, "SpecOffsetX", v.SpecOffsetX);
-                WriteKey(w, "SpecOffsetY", v.SpecOffsetY);
-                WriteKey(w, "SpecRepeatX", v.SpecRepeatX);
-                WriteKey(w, "SpecRepeatY", v.SpecRepeatY);
-                WriteKey(w, "SpecRotation", v.SpecRotation);
-                w.WriteEndElement();
+                v.WriteMap(w);
                 w.WriteEndElement();
                 w.Flush();
             }
