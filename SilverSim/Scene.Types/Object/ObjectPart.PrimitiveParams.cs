@@ -1472,10 +1472,25 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.Normal:
                     /* [ PRIM_NORMAL, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians ] */
+                    {
+                        string texture = ParamsHelper.GetString(enumerator, "PRIM_NORMAL");
+                        Vector3 repeats = ParamsHelper.GetVector(enumerator, "PRIM_NORMAL");
+                        Vector3 offsets = ParamsHelper.GetVector(enumerator, "PRIM_NORMAL");
+                        double rotation = ParamsHelper.GetDouble(enumerator, "PRIM_NORMAL");
+                    }
                     throw new ArgumentException("PRIM_NORMAL not yet supported for llSetPrimitiveParams");
 
                 case PrimitiveParamsType.Specular:
                     /* [ PRIM_SPECULAR, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians, vector color, integer glossiness, integer environment ] */
+                    {
+                        string texture = ParamsHelper.GetString(enumerator, "PRIM_NORMAL");
+                        Vector3 repeats = ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR");
+                        Vector3 offsets = ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR");
+                        double rotation = ParamsHelper.GetDouble(enumerator, "PRIM_SPECULAR");
+                        Color color = new Color(ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR"));
+                        int glossiness = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");
+                        int environment = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");
+                    }
                     throw new ArgumentException("PRIM_SPECULAR not yet supported for llSetPrimitiveParams");
 
                 default:

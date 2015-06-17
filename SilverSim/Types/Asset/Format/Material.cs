@@ -60,6 +60,33 @@ namespace SilverSim.Types.Asset.Format
             MaterialID = UUID.Random;
         }
 
+        public Material(UUID id, Map m)
+        {
+            MaterialID = id;
+
+            AlphaMaskCutoff = m["AlphaMaskCutoff"].AsInt;
+            DiffuseAlphaMode = m["DiffuseAlphaMode"].AsInt;
+            EnvIntensity = m["EnvIntensity"].AsInt;
+            NormMap = m["NormMap"].AsUUID;
+            NormOffsetX = m["NormOffsetX"].AsInt;
+            NormOffsetY = m["NormOffsetY"].AsInt;
+            NormRepeatX = m["NormRepeatX"].AsInt;
+            NormRepeatY = m["NormRepeatY"].AsInt;
+            NormRotation = m["NormRotation"].AsInt;
+            AnArray a = (AnArray)m["SpecColor"];
+            SpecColor.R_AsByte = (byte)a[0].AsUInt;
+            SpecColor.G_AsByte = (byte)a[1].AsUInt;
+            SpecColor.B_AsByte = (byte)a[2].AsUInt;
+            SpecColor.A_AsByte = (byte)a[3].AsUInt;
+            SpecExp = m["SpecExp"].AsInt;
+            SpecMap = m["SpecMap"].AsUUID;
+            SpecOffsetX = m["SpecOffsetX"].AsInt;
+            SpecOffsetY = m["SpecOffsetY"].AsInt;
+            SpecRepeatX = m["SpecRepeatX"].AsInt;
+            SpecRepeatY = m["SpecRepeatY"].AsInt;
+            SpecRotation = m["SpecRotation"].AsInt;
+        }
+
         public Material(AssetData asset)
         {
             IValue v = LLSD_XML.Deserialize(asset.InputStream);
