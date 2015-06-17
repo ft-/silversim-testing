@@ -34,6 +34,7 @@ namespace SilverSim.Types.Asset.Format
     public class Material : IReferencesAccessor
     {
         #region Fields
+        public UUID MaterialID;
         public int AlphaMaskCutoff = 0;
         public int DiffuseAlphaMode = 0;
         public int EnvIntensity = 0;
@@ -56,6 +57,7 @@ namespace SilverSim.Types.Asset.Format
         #region Constructors
         public Material()
         {
+            MaterialID = UUID.Random;
         }
 
         public Material(AssetData asset)
@@ -66,6 +68,8 @@ namespace SilverSim.Types.Asset.Format
                 throw new NotAMaterialFormat();
             }
             Map m = (Map)v;
+
+            MaterialID = asset.ID;
 
             AlphaMaskCutoff = m["AlphaMaskCutoff"].AsInt;
             DiffuseAlphaMode = m["DiffuseAlphaMode"].AsInt;
@@ -153,7 +157,6 @@ namespace SilverSim.Types.Asset.Format
             {
                 w.WriteStartElement("llsd");
                 w.WriteStartElement("map");
-                WriteKey(w, "AlphaMaskCutoff", v.AlphaMaskCutoff);
                 WriteKey(w, "AlphaMaskCutoff", v.AlphaMaskCutoff);
                 WriteKey(w, "DiffuseAlphaMode", v.DiffuseAlphaMode);
                 WriteKey(w, "EnvIntensity", v.EnvIntensity);

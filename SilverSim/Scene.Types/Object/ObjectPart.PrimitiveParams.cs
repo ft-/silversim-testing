@@ -1303,12 +1303,15 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.AlphaMode:
+                    /* [ PRIM_ALPHA_MODE, integer face, integer alpha_mode, integer mask_cutoff ] */
                     throw new ArgumentException("PRIM_ALPHAMODE not yet supported for llGetPrimitiveParams");
 
                 case PrimitiveParamsType.Normal:
+                    /* [ PRIM_NORMAL, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians ] */
                     throw new ArgumentException("PRIM_NORMAL not yet supported for llGetPrimitiveParams");
 
                 case PrimitiveParamsType.Specular:
+                    /* [ PRIM_SPECULAR, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians, vector color, integer glossiness, integer environment ] */
                     throw new ArgumentException("PRIM_SPECULAR not yet supported for llGetPrimitiveParams");
 
                 default:
@@ -1360,12 +1363,15 @@ namespace SilverSim.Scene.Types.Object
                     break;
 
                 case PrimitiveParamsType.AlphaMode:
+                    /* [ PRIM_ALPHA_MODE, integer face, integer alpha_mode, integer mask_cutoff ] */
                     throw new ArgumentException("PRIM_ALPHAMODE not yet supported for llSetPrimitiveParams");
 
                 case PrimitiveParamsType.Normal:
+                    /* [ PRIM_NORMAL, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians ] */
                     throw new ArgumentException("PRIM_NORMAL not yet supported for llSetPrimitiveParams");
 
                 case PrimitiveParamsType.Specular:
+                    /* [ PRIM_SPECULAR, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians, vector color, integer glossiness, integer environment ] */
                     throw new ArgumentException("PRIM_SPECULAR not yet supported for llSetPrimitiveParams");
 
                 default:

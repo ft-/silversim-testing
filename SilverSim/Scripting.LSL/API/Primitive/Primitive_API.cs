@@ -128,6 +128,15 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         public const int PRIM_TEXGEN_PLANAR = 1;
 
         [APILevel(APIFlags.LSL)]
+        public const int PRIM_ALPHA_MODE_NONE = 0;
+        [APILevel(APIFlags.LSL)]
+        public const int PRIM_ALPHA_MODE_BLEND = 1;
+        [APILevel(APIFlags.LSL)]
+        public const int PRIM_ALPHA_MODE_MASK = 2;
+        [APILevel(APIFlags.LSL)]
+        public const int PRIM_ALPHA_MODE_EMISSIVE = 3;
+
+        [APILevel(APIFlags.LSL)]
         public const int PRIM_TYPE_BOX = 0;
         [APILevel(APIFlags.LSL)]
         public const int PRIM_TYPE_CYLINDER = 1;
