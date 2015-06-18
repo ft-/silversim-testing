@@ -64,8 +64,13 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     m_EnvironmentSettings = null;
                 }
-                TriggerRegionSettingsChanged();
+                TriggerEnvironmentSettingsChanged();
             }
+        }
+
+        public void TriggerEnvironmentSettingsChanged()
+        {
+
         }
 
         public class EnvironmentController : IDisposable
