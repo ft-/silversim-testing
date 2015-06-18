@@ -265,6 +265,7 @@ namespace SilverSim.LL.Core
 
             }
 
+            AddDefCapability("EnvironmentSettings", regionSeedID, Cap_EnvironmentSettings, capConfig);
             AddDefCapability("RenderMaterials", regionSeedID, Cap_RenderMaterials, capConfig);
             AddDefCapability("SimConsoleAsync", regionSeedID, Cap_SimConsoleAsync, capConfig);
             AddDefCapability("FetchInventory2", regionSeedID, Cap_FetchInventory2, capConfig);

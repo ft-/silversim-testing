@@ -34,12 +34,39 @@ using SilverSim.LL.Messages.LayerData;
 using SilverSim.LL.Messages.Region;
 using SilverSim.LL.Messages;
 using System.Threading;
+using SilverSim.Scene.Types.WindLight;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
         public EnvironmentController Environment;
+
+        EnvironmentSettings m_EnvironmentSettings;
+
+        public EnvironmentSettings EnvironmentSettings
+        {
+            get
+            {
+                if(m_EnvironmentSettings == null)
+                {
+                    return null;
+                }
+                return new EnvironmentSettings(m_EnvironmentSettings);
+            }
+            set
+            {
+                if (null != m_EnvironmentSettings)
+                {
+                    m_EnvironmentSettings = new EnvironmentSettings(m_EnvironmentSettings);
+                }
+                else
+                {
+                    m_EnvironmentSettings = null;
+                }
+                TriggerRegionSettingsChanged();
+            }
+        }
 
         public class EnvironmentController : IDisposable
         {

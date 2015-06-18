@@ -70,6 +70,18 @@ namespace SilverSim.Main.Common
             {
                 lock (loadparams.Scene.m_LoaderThreadLock)
                 {
+                    try
+                    {
+                        loadparams.Scene.EnvironmentSettings = loadparams.SimulationDataStorage.EnvironmentSettings[loadparams.Scene.ID];
+                    }
+                    catch
+                    {
+                        loadparams.Scene.EnvironmentSettings = null;
+                    }
+                }
+
+                lock (loadparams.Scene.m_LoaderThreadLock)
+                {
                     parcels = loadparams.SimulationDataStorage.Parcels.ParcelsInRegion(loadparams.Scene.ID);
                 }
                 if (parcels.Count == 1)
