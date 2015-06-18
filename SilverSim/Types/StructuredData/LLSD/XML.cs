@@ -271,16 +271,19 @@ namespace SilverSim.StructuredData.LLSD
 
         public static IValue Deserialize(Stream input)
         {
-            XmlTextReader inp = new XmlTextReader(input);
+            return Deserialize(new XmlTextReader(input));
+        }
 
-            while(true)
+        public static IValue Deserialize(XmlTextReader inp)
+        {
+            while (true)
             {
-                if(!inp.Read())
+                if (!inp.Read())
                 {
                     throw new InvalidLLSDXmlSerialization();
                 }
 
-                switch(inp.NodeType)
+                switch (inp.NodeType)
                 {
                     case XmlNodeType.Element:
                         if (inp.Name == "llsd")
@@ -433,10 +436,15 @@ namespace SilverSim.StructuredData.LLSD
         public static void Serialize(IValue value, Stream output)
         {
             XmlTextWriter text = new XmlTextWriter(output, UTF8NoBOM);
+            Serialize(value, text);
+            text.Flush();
+        }
+
+        public static void Serialize(IValue value, XmlTextWriter text)
+        {
             text.WriteStartElement("llsd");
             SerializeInternal(value, text);
             text.WriteEndElement();
-            text.Flush();
         }
 
         private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);

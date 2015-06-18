@@ -29,6 +29,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.StructuredData.JSON;
+using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Inventory;
@@ -92,6 +93,15 @@ namespace SilverSim.Scene.Types.Object
         private UUI m_Creator = UUI.Unknown;
         private Date m_CreationDate = new Date();
         private PrimitiveFlags m_PrimitiveFlags = PrimitiveFlags.None;
+        private Map m_DynAttrMap = new Map();
+
+        public Map DynAttrs
+        {
+            get
+            {
+                return m_DynAttrMap;
+            }
+        }
 
         private SilverSim.Types.Inventory.InventoryPermissionsData m_Permissions = new SilverSim.Types.Inventory.InventoryPermissionsData();
 
@@ -1414,7 +1424,11 @@ namespace SilverSim.Scene.Types.Object
                         writer.WriteNamedValue("MediaUrl", MediaURL);
                     }
                     writer.WriteNamedValue("AttachedPos", ObjectGroup.AttachedPos);
-                    //DynAttrs
+
+                    writer.WriteStartElement("DynAttrs");
+                    LLSD_XML.Serialize(DynAttrs, writer);
+                    writer.WriteEndElement();
+
                     writer.WriteNamedValue("TextureAnimation", TextureAnimationBytes);
                     writer.WriteNamedValue("ParticleSystem", ParticleSystemBytes);
                     writer.WriteNamedValue("PayPrice0", 0);
@@ -2455,7 +2469,22 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "DynAttrs":
-                                reader.ReadToEndElement();
+                                {
+                                    IValue da = LLSD_XML.Deserialize(reader);
+                                    if(da is Map)
+                                    {
+                                        Map damap = (Map)da;
+                                        foreach(string key in damap.Keys)
+                                        {
+                                            if(!(damap[key] is Map))
+                                            {
+                                                /* remove everything that is not a map */
+                                                damap.Remove(key);
+                                            }
+                                        }
+                                        part.m_DynAttrMap = damap;
+                                    }
+                                }
                                 break;
 
                             case "SitTargetOrientationLL":

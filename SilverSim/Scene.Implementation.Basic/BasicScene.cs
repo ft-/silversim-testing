@@ -374,6 +374,8 @@ namespace SilverSim.Scene.Implementation.Basic
                 ObjectGroup objgroup = (ObjectGroup)obj;
                 List<ObjectPart> removeAgain = new List<ObjectPart>();
 
+                AddLegacyMaterials(objgroup);
+                
                 try
                 {
                     foreach (ObjectPart objpart in objgroup.Values)

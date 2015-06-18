@@ -1,4 +1,5 @@
-﻿using SilverSim.Types;
+﻿using SilverSim.Scene.Types.Object;
+using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
 using System;
@@ -129,6 +130,70 @@ namespace SilverSim.Scene.Types.Scene
             finally
             {
                 m_MaterialsRwLock.ReleaseWriterLock();
+            }
+        }
+
+        /* Collect legacy materials and push them to materials */
+        protected void AddLegacyMaterials(ObjectGroup sog)
+        {
+            List<Material> mats = new List<Material>();
+            foreach(ObjectPart part in sog.Values)
+            {
+                Map m;
+                if(!part.DynAttrs.ContainsKey("OpenSim"))
+                {
+                    continue;
+                }
+                m = (Map)part.DynAttrs["OpenSim"];
+
+                if(!m.ContainsKey("Materials"))
+                {
+                    continue;
+                }
+                if(!(m["Materials"] is AnArray))
+                {
+                    continue;
+                }
+
+                foreach(IValue iv in (AnArray)m["Materials"])
+                {
+                    if(!(iv is Map))
+                    {
+                        continue;
+                    }
+                    Map mmap = (Map)iv;
+                    if(!mmap.ContainsKey("ID") || !mmap.ContainsKey("Material"))
+                    {
+                        continue;
+                    }
+
+                    if(!(mmap["Material"] is Map))
+                    {
+                        continue;
+                    }
+
+                    try
+                    {
+                        Material mat = new Material(mmap["ID"].AsUUID, (Map)mmap["Material"]);
+                        mats.Add(mat);
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                /* get rid of legacy advanced materials */
+                m.Remove("Materials");
+            }
+
+            try
+            {
+                AddMaterials(mats);
+            }
+            catch
+            {
+
             }
         }
 
