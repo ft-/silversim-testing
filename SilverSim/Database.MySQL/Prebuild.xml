@@ -14,6 +14,7 @@
 	<ReferencePath>../../bin/</ReferencePath>
 	<Reference name="log4net" path="../../bin/" localCopy="false"/>
 	<Reference name="System"/>
+  <Reference name="System.Xml"/>
 	<Reference name="System.Data"/>
 	<Reference name="SilverSim.Types" localCopy="false"/>
 	<Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>

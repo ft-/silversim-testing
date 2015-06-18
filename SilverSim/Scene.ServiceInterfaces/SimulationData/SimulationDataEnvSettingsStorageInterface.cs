@@ -34,6 +34,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         {
         }
 
+        /* setting value to null will delete the entry */
         public abstract EnvironmentSettings this[UUID regionID]
         {
             get;

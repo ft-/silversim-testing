@@ -69,6 +69,16 @@ namespace SilverSim.Scene.Types.WindLight
 
         }
 
+        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
+
+        public void Serialize(Stream s, UUID regionID)
+        {
+            using(XmlTextWriter writer = new XmlTextWriter(s, UTF8NoBOM))
+            {
+                Serialize(writer, regionID);
+            }
+        }
+
         public void Serialize(XmlTextWriter writer, UUID regionID)
         {
             writer.WriteStartElement("llsd");
