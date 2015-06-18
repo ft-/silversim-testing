@@ -28,12 +28,14 @@ using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.ServiceInterfaces.Database;
+using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.IO;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -283,6 +285,14 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                                 objpart.ScriptAccessPin = (int)dbReader["ScriptAccessPin"];
 
+                                using (MemoryStream ms = new MemoryStream((byte[])dbReader["DynAttrs"]))
+                                {
+                                    foreach(KeyValuePair<string, IValue> kvp in (Map)LLSD_Binary.Deserialize(ms))
+                                    {
+                                        objpart.DynAttrs.Add(kvp.Key, kvp.Value);
+                                    }
+                                }
+
                                 LoadInventory(objpart);
                                 objgroup.Add((int)dbReader["LinkNumber"], objpart.ID, objpart);
                             }
@@ -509,6 +519,12 @@ namespace SilverSim.Database.MySQL.SimulationData
 
             p["ScriptAccessPin"] = objpart.ScriptAccessPin;
 
+            using(MemoryStream ms = new MemoryStream())
+            { 
+                LLSD_Binary.Serialize(objpart.DynAttrs, ms);
+                p["DynAttrs"] = ms.GetBuffer();
+            }
+
             MySQLUtilities.ReplaceInsertInto(connection, "prims", p);
         }
 
@@ -584,7 +600,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "PRIMARY KEY(PrimID, InventoryID)," +
                 "KEY primID (PrimID))",
             "ALTER TABLE %tablename% ADD COLUMN (PermsGranter VARCHAR(255) NOT NULL DEFAULT ''," +
-                        "PermsMask INT(11) UNSIGNED NOT NULL DEFAULT '0'),"
+                        "PermsMask INT(11) UNSIGNED NOT NULL DEFAULT '0'),",
+            "ALTER TABLE %tablename% ADD COLUMN (DynAttrs LONGBLOB),"
         };
 
         private static readonly string[] PrimsMigrations = new string[] {
