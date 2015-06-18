@@ -37,7 +37,7 @@ namespace SilverSim.Scene.Types.WindLight
 {
     public class EnvironmentSettings
     {
-        public readonly RwLockedDictionary<double, string> DayCycle = new RwLockedDictionary<double, string>();
+        public readonly RwLockedList<KeyValuePair<double, string>> DayCycle = new RwLockedList<KeyValuePair<double, string>>();
         public readonly RwLockedDictionary<string, SkyEntry> SkySettings = new RwLockedDictionary<string, SkyEntry>();
         WaterEntry m_WaterSettings;
 
@@ -142,7 +142,7 @@ namespace SilverSim.Scene.Types.WindLight
 
             for (int i = 0; i < dayCycleArray.Count - 1; i += 2 )
             {
-                env.DayCycle.Add(dayCycleArray[i + 0].AsReal, dayCycleArray[i + 1].ToString());
+                env.DayCycle.Add(new KeyValuePair<double, string>(dayCycleArray[i + 0].AsReal, dayCycleArray[i + 1].ToString()));
             }
 
             foreach (KeyValuePair<string, IValue> kvp in skyArray)
