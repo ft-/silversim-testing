@@ -61,7 +61,7 @@ namespace SilverSim.LL.Core
 
         void Cap_RenderMaterials_GET(HttpRequest httpreq)
         {
-            HttpResponse httpres = httpreq.BeginResponse("text/llsd+xml");
+            HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml");
             byte[] matdata = Scene.MaterialsData;
             httpres.GetOutputStream().Write(matdata, 0, matdata.Length);
             httpres.Close();
@@ -207,7 +207,7 @@ namespace SilverSim.LL.Core
                 buf = ms.GetBuffer();
             }
 
-            HttpResponse httpres = httpreq.BeginResponse("text/llsd+xml");
+            HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml");
             using (XmlTextWriter writer = new XmlTextWriter(httpres.GetOutputStream(), UTF8NoBOM))
             {
                 writer.WriteStartElement("llsd");
