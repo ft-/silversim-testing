@@ -159,6 +159,22 @@ namespace SilverSim.Types
         public ulong AsULong { get { return 0; } }
         #endregion 
 
+        public Vector4 ElementsToVector4
+        {
+            get
+            {
+                return new Vector4(this[0].AsReal, this[1].AsReal, this[2].AsReal, this[3].AsReal);
+            }
+        }
+
+        public Vector3 ElementsToVector3
+        {
+            get
+            {
+                return new Vector3(this[0].AsReal, this[1].AsReal, this[2].AsReal);
+            }
+        }
+
         #region Stateful Enumerator
         public class MarkEnumerator : IEnumerator<IValue>, IDisposable, IEnumerator
         {
