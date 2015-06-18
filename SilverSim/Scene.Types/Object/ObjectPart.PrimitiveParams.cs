@@ -28,6 +28,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Primitive;
 using System;
@@ -1338,8 +1339,8 @@ namespace SilverSim.Scene.Types.Object
                     {
                         Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
                         paramList.Add(mat.NormMap);
-                        paramList.Add(new Vector3(mat.NormRepeatX, mat.NormRepeatY, 0));
-                        paramList.Add(new Vector3(mat.NormOffsetX, mat.NormOffsetY, 0));
+                        paramList.Add(new Vector3(mat.NormRepeatX, mat.NormRepeatY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
+                        paramList.Add(new Vector3(mat.NormOffsetX, mat.NormOffsetY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
                         paramList.Add(mat.NormRotation);
                     }
                     catch 
@@ -1367,9 +1368,9 @@ namespace SilverSim.Scene.Types.Object
                     {
                         Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
                         paramList.Add(mat.SpecMap);
-                        paramList.Add(new Vector3(mat.SpecRepeatX, mat.SpecRepeatY, 0));
-                        paramList.Add(new Vector3(mat.SpecOffsetX, mat.SpecOffsetY, 0));
-                        paramList.Add(mat.SpecRotation);
+                        paramList.Add(new Vector3(mat.SpecRepeatX, mat.SpecRepeatY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
+                        paramList.Add(new Vector3(mat.SpecOffsetX, mat.SpecOffsetY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
+                        paramList.Add(mat.SpecRotation / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
                         paramList.Add(mat.SpecColor.AsVector3);
                         paramList.Add(mat.SpecExp);
                         paramList.Add(mat.EnvIntensity);
@@ -1391,13 +1392,32 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        UUID GetTextureParam(IEnumerator<IValue> enumerator, string paraName)
+        {
+            string texture = ParamsHelper.GetString(enumerator, paraName);
+            UUID uuid;
+            ObjectPartInventoryItem texitem;
+            if(UUID.TryParse(texture, out uuid))
+            {
+                return uuid;
+            }
+            else if(Inventory.TryGetValue(texture, out texitem))
+            {
+                if(texitem.AssetType == AssetType.Texture)
+                {
+                    return texitem.AssetID;
+                }
+            }
+            throw new Exception("texture does not name either a inventory item or a uuid");
+        }
+
         public void SetTexPrimitiveParams(TextureEntryFace face, PrimitiveParamsType type, AnArray.MarkEnumerator enumerator)
         {
             switch (type)
             {
                 case PrimitiveParamsType.Texture:
                     {
-                        face.TextureID = ParamsHelper.GetString(enumerator, "PRIM_TEXTURE");
+                        face.TextureID = GetTextureParam(enumerator, "PRIM_TEXTURE");
                         Vector3 v;
                         v = ParamsHelper.GetVector(enumerator, "PRIM_TEXTURE");
                         face.RepeatU = (float)v.X;
@@ -1473,30 +1493,98 @@ namespace SilverSim.Scene.Types.Object
                 case PrimitiveParamsType.Normal:
                     /* [ PRIM_NORMAL, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians ] */
                     {
-                        string texture = ParamsHelper.GetString(enumerator, "PRIM_NORMAL");
+                        UUID texture = GetTextureParam(enumerator, "PRIM_NORMAL");
                         Vector3 repeats = ParamsHelper.GetVector(enumerator, "PRIM_NORMAL");
                         Vector3 offsets = ParamsHelper.GetVector(enumerator, "PRIM_NORMAL");
                         double rotation = ParamsHelper.GetDouble(enumerator, "PRIM_NORMAL");
+
+                        repeats.X *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
+                        repeats.Y *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
+                        offsets.X *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
+                        offsets.Y *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
+                        rotation %= (Math.PI * 2);
+                        rotation *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
+
+                        Material mat;
+                        try
+                        {
+                            mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
+                        }
+                        catch
+                        {
+                            mat = new Material();
+                        }
+                        mat.NormMap = texture;
+                        mat.NormOffsetX = (int)Math.Round(offsets.X);
+                        mat.NormOffsetY = (int)Math.Round(offsets.Y);
+                        mat.NormRepeatX = (int)Math.Round(repeats.X);
+                        mat.NormRepeatY = (int)Math.Round(repeats.Y);
+                        mat.NormRotation = (int)Math.Round(rotation);
+                        mat.MaterialID = UUID.Random;
+                        ObjectGroup.Scene.StoreMaterial(mat);
+                        face.MaterialID = mat.MaterialID;
                     }
-                    throw new ArgumentException("PRIM_NORMAL not yet supported for llSetPrimitiveParams");
+                    break;
 
                 case PrimitiveParamsType.Specular:
                     /* [ PRIM_SPECULAR, integer face, string texture, vector repeats, vector offsets, float rotation_in_radians, vector color, integer glossiness, integer environment ] */
                     {
-                        string texture = ParamsHelper.GetString(enumerator, "PRIM_NORMAL");
+                        UUID texture = GetTextureParam(enumerator, "PRIM_NORMAL");
                         Vector3 repeats = ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR");
                         Vector3 offsets = ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR");
+                        repeats = repeats * SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
+                        offsets = offsets * SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
                         double rotation = ParamsHelper.GetDouble(enumerator, "PRIM_SPECULAR");
-                        Color color = new Color(ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR"));
+                        rotation %= (Math.PI * 2);
+                        rotation *= SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER;
+                        ColorAlpha color = new ColorAlpha(ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR"), 1);
                         int glossiness = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");
                         int environment = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");
+                        if(environment < 0)
+                        {
+                            environment = 0;
+                        }
+                        else if(environment > 255)
+                        {
+                            environment = 255;
+                        }
+                        if(glossiness < 0)
+                        {
+                            glossiness = 0;
+                        }
+                        else if(glossiness > 255)
+                        {
+                            glossiness = 255;
+                        }
+                        Material mat;
+                        try
+                        {
+                            mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
+                        }
+                        catch
+                        {
+                            mat = new Material();
+                        }
+                        mat.SpecColor = color;
+                        mat.SpecMap = texture;
+                        mat.SpecOffsetX = (int)Math.Round(offsets.X);
+                        mat.SpecOffsetY = (int)Math.Round(offsets.Y);
+                        mat.SpecRepeatX = (int)Math.Round(repeats.X);
+                        mat.SpecRepeatY = (int)Math.Round(repeats.Y);
+                        mat.SpecRotation = (int)Math.Round(rotation);
+                        mat.EnvIntensity = environment;
+                        mat.SpecExp = glossiness;
+                        mat.MaterialID = UUID.Random;
+                        ObjectGroup.Scene.StoreMaterial(mat);
+                        face.MaterialID = mat.MaterialID;
                     }
-                    throw new ArgumentException("PRIM_SPECULAR not yet supported for llSetPrimitiveParams");
+                    break;
 
                 default:
                     throw new ArgumentException(String.Format("Internal error! Primitive parameter type {0} should not be passed to PrimitiveFace", type));
             }
         }
+
         #endregion
     }
 }

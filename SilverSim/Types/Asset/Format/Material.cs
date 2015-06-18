@@ -41,18 +41,21 @@ namespace SilverSim.Types.Asset.Format
         public UUID NormMap = UUID.Zero;
         public int NormOffsetX = 0;
         public int NormOffsetY = 0;
-        public int NormRepeatX = 0;
-        public int NormRepeatY = 0;
+        public int NormRepeatX = 10000;
+        public int NormRepeatY = 10000;
         public int NormRotation = 0;
-        public ColorAlpha SpecColor = new ColorAlpha();
-        public int SpecExp = 0;
+        public ColorAlpha SpecColor = ColorAlpha.White;
+        public int SpecExp = DEFAULT_SPECULAR_LIGHT_EXPONENT;
         public UUID SpecMap = UUID.Zero;
         public int SpecOffsetX = 0;
         public int SpecOffsetY = 0;
-        public int SpecRepeatX = 0;
-        public int SpecRepeatY = 0;
+        public int SpecRepeatX = 10000;
+        public int SpecRepeatY = 10000;
         public int SpecRotation = 0;
         #endregion
+
+        public const double MATERIALS_MULTIPLIER = 10000f;
+        public const byte DEFAULT_SPECULAR_LIGHT_EXPONENT = (byte)(0.2f * 255);
 
         #region Constructors
         public Material()
