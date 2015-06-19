@@ -80,7 +80,7 @@ namespace SilverSim.Archiver.Tar
             return buf;
         }
 
-        Header ReadHeader()
+        public Header ReadHeader()
         {
             bool haveLongLink = false;
             byte[] buf;
