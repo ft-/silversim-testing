@@ -32,8 +32,8 @@ namespace SilverSim.Archiver.Tar
 {
     public enum TarFileType : byte
     {
-        File = '0',
-        Directory = '5',
-        LongLink = 'L'
+        File = (byte)'0',
+        Directory = (byte)'5',
+        LongLink = (byte)'L'
     }
 }
