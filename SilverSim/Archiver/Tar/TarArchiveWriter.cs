@@ -66,6 +66,17 @@ namespace SilverSim.Archiver.Tar
             }
         }
 
+        public void WriteEndOfTar()
+        {
+            byte[] header = new byte[512];
+            if (m_Position % 512 != 0)
+            {
+                m_Stream.Write(header, 0, 512 - (m_Position % 512));
+                m_Position += (512 - (m_Position % 512));
+            }
+            m_Stream.Write(header, 0, 512);
+        }
+
         void WriteHeader(string filename, TarFileType fileType, int fileSize)
         {
             byte[] bName = Encoding.ASCII.GetBytes(filename);
