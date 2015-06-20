@@ -23,14 +23,13 @@ exception statement from your version.
 
 */
 
+using SilverSim.StructuredData.LLSD;
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
 using System.Text;
 using System.Xml;
-using SilverSim.Types;
-using System.IO;
-using SilverSim.StructuredData.LLSD;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.WindLight

@@ -23,11 +23,6 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace SilverSim.Archiver.Tar
 {
     public enum TarFileType : byte
