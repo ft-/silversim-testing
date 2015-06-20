@@ -47,6 +47,25 @@ namespace SilverSim.Scripting.LSL.API.WindLight
 
         }
 
+        public UUID getTextureAssetID(ScriptInstance Instance, string item)
+        {
+            UUID assetID;
+            if (!UUID.TryParse(item, out assetID))
+            {
+                /* must be an inventory item */
+                lock (Instance)
+                {
+                    ObjectPartInventoryItem i = Instance.Part.Inventory[item];
+                    if (i.InventoryType != Types.Inventory.InventoryType.Texture)
+                    {
+                        throw new InvalidOperationException(string.Format("Inventory item {0} is not a texture", item));
+                    }
+                    assetID = i.AssetID;
+                }
+            }
+            return assetID;
+        }
+
         [APILevel(APIFlags.WindLight_New)]
         public const int REGION_WL_AMBIENT = 0;
         [APILevel(APIFlags.WindLight_New)]
@@ -127,6 +146,11 @@ namespace SilverSim.Scripting.LSL.API.WindLight
                 envsettings = Instance.Part.ObjectGroup.Scene.EnvironmentSettings;
             }
 
+            if(envsettings == null)
+            {
+                return res;
+            }
+
             foreach(IValue iv in rules)
             {
                 if (!(iv is Integer))
@@ -193,11 +217,179 @@ namespace SilverSim.Scripting.LSL.API.WindLight
                         break;
 
                     default:
-                        Instance.ShoutError(string.Format("Invalid parameter type {0}", iv.LSL_Type.ToString()));
+                        Instance.ShoutError(string.Format("Invalid parameter type {0}", iv.AsInt));
                         return res;
                 }
             }
             return res;
+        }
+
+        [APILevel(APIFlags.WindLight_New)]
+        public int rwlWindlightSetWaterSettings(ScriptInstance Instance, AnArray rules)
+        {
+            AnArray res = new AnArray();
+            EnvironmentSettings envsettings;
+            lock (Instance)
+            {
+                envsettings = Instance.Part.ObjectGroup.Scene.EnvironmentSettings;
+                if(null == envsettings)
+                {
+                    envsettings = new EnvironmentSettings();
+                }
+            }
+
+            if(rules.Count % 2 != 0)
+            {
+                return 0;
+            }
+
+            WaterEntry waterSettings = envsettings.WaterSettings;
+
+            for (int paraidx = 0; paraidx < rules.Count; paraidx += 2 )
+            {
+                IValue ivtype = rules[paraidx];
+                IValue ivvalue = rules[paraidx + 1];
+                if (!(ivtype is Integer))
+                {
+                    lock (Instance)
+                    {
+                        Instance.ShoutError(string.Format("Invalid parameter type {0}", ivtype.LSL_Type.ToString()));
+                        return 0;
+                    }
+                }
+
+                switch (ivtype.AsInt)
+                {
+                    case REGION_WL_WATER_BLUR_MULTIPLIER:
+                        if(!(ivvalue is Real))
+                        {
+                            Instance.ShoutError(string.Format("Invalid parameter type {0} for REGION_WL_WATER_BLUR_MODIFIER", ivvalue.LSL_Type.ToString()));
+                            return 0;
+                        }
+                        waterSettings.BlurMultiplier = ivvalue.AsReal;
+                        break;
+
+                    case REGION_WL_WATER_FRESNEL_OFFSET:
+                        if(!(ivvalue is Real))
+                        {
+                            Instance.ShoutError(string.Format("Invalid parameter type {0} for REGION_WL_WATER_FRESNEL_OFFSET", ivvalue.LSL_Type.ToString()));
+                            return 0;
+                        }
+                        waterSettings.FresnelOffset = ivvalue.AsReal;
+                        break;
+
+                    case REGION_WL_WATER_FRESNEL_SCALE:
+                        if(!(ivvalue is Real))
+                        {
+                            Instance.ShoutError(string.Format("Invalid parameter type {0} for REGION_WL_WATER_FRESNEL_SCALE", ivvalue.LSL_Type.ToString()));
+                            return 0;
+                        }
+                        waterSettings.FresnelScale = ivvalue.AsReal;
+                        break;
+
+                    case REGION_WL_WATER_NORMAL_MAP:
+                        lock (Instance)
+                        {
+                            try
+                            {
+                                waterSettings.NormalMap = getTextureAssetID(Instance, ivvalue.ToString());
+                            }
+                            catch(Exception e)
+                            {
+                                Instance.ShoutError(e.Message);
+                                return 0;
+                            }
+                        }
+                        break;
+
+                    case REGION_WL_WATER_UNDERWATER_FOG_MODIFIER:
+                        if(!(ivvalue is Real))
+                        {
+                            Instance.ShoutError(string.Format("Invalid parameter type {0} for REGION_WL_WATER_UNDERWATER_FOG_MODIFIER", ivvalue.LSL_Type.ToString()));
+                            return 0;
+                        }
+                        waterSettings.UnderwaterFogModifier = ivvalue.AsReal;
+                        break;
+
+                    case REGION_WL_WATER_SCALE_ABOVE:
+                        if(!(ivvalue is Real))
+                        {
+                            Instance.ShoutError(string.Format("Invalid parameter type {0} for REGION_WL_WATER_SCALE_ABOVE", ivvalue.LSL_Type.ToString()));
+                            return 0;
+                        }
+                        waterSettings.ScaleAbove = ivvalue.AsReal;
+                        break;
+
+                    case REGION_WL_WATER_SCALE_BELOW:
+                        if(!(ivvalue is Real))
+                        {
+                            Instance.ShoutError(string.Format("Invalid parameter type {0} for REGION_WL_WATER_SCALE_BELOW", ivvalue.LSL_Type.ToString()));
+                            return 0;
+                        }
+                        waterSettings.ScaleBelow = ivvalue.AsReal;
+                        break;
+
+                    case REGION_WL_WATER_FOG_DENSITY:
+                        if(!(ivvalue is Real))
+                        {
+                            Instance.ShoutError(string.Format("Invalid parameter type {0} for REGION_WL_WATER_FOG_DENSITY", ivvalue.LSL_Type.ToString()));
+                            return 0;
+                        }
+                        waterSettings.WaterFogDensity = ivvalue.AsReal;
+                        break;
+
+                    case REGION_WL_WATER_FOG_COLOR:
+                        if(!(ivvalue is Quaternion))
+                        {
+                            Instance.ShoutError(string.Format("Invalid parameter type {0} for REGION_WL_WATER_FOG_COLOR", ivvalue.LSL_Type.ToString()));
+                            return 0;
+                        }
+
+                        {
+                            Quaternion q = ivvalue.AsQuaternion;
+                            waterSettings.WaterFogColor = new Vector4(q.X.Clamp(0, 1), q.Y.Clamp(0, 1), q.Z.Clamp(0,1), q.W.Clamp(0, 1));
+                        }
+                        break;
+
+                    case REGION_WL_WATER_BIG_WAVE_DIRECTION:
+                        if(!(ivvalue is Vector3))
+                        {
+                            Instance.ShoutError(string.Format("Invalid parameter type {0} for REGION_WL_WATER_BIG_WAVE_DIRECTION", ivvalue.LSL_Type.ToString()));
+                            return 0;
+                        }
+                        waterSettings.Wave1Direction = ivvalue.AsVector3;
+                        break;
+
+                    case REGION_WL_WATER_LITTLE_WAVE_DIRECTION:
+                        if(!(ivvalue is Vector3))
+                        {
+                            Instance.ShoutError(string.Format("Invalid parameter type {0} for REGION_WL_WATER_LITTLE_WAVE_DIRECTION", ivvalue.LSL_Type.ToString()));
+                            return 0;
+                        }
+                        waterSettings.Wave2Direction = ivvalue.AsVector3;
+                        break;
+
+                    case REGION_WL_WATER_NORMAL_SCALE:
+                        if(!(ivvalue is Vector3))
+                        {
+                            Instance.ShoutError(string.Format("Invalid parameter type {0} for REGION_WL_WATER_NORMAL_SCALE", ivvalue.LSL_Type.ToString()));
+                            return 0;
+                        }
+                        waterSettings.NormScale = ivvalue.AsVector3;
+                        break;
+
+                    default:
+                        Instance.ShoutError(string.Format("Invalid parameter type {0}", ivtype.AsInt));
+                        return 0;
+                }
+            }
+
+            envsettings.WaterSettings = waterSettings;
+            lock(Instance)
+            {
+                Instance.Part.ObjectGroup.Scene.EnvironmentSettings = envsettings;
+            }
+            return 1;
         }
     }
 }
