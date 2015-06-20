@@ -23,30 +23,36 @@ exception statement from your version.
 
 */
 
-using SilverSim.Archiver.Tar;
 using SilverSim.Archiver.Common;
+using SilverSim.Archiver.Tar;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
+using SilverSim.Types.Asset.Format;
+using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using SilverSim.Types.Asset;
-using SilverSim.Types.Asset.Format;
 using System.Xml;
-using SilverSim.Types.Inventory;
-using SilverSim.ServiceInterfaces.AvatarName;
 
 namespace SilverSim.Archiver.IAR
 {
-    public static class IAR
+    public static partial class IAR
     {
         public class IARFormatException : Exception
         {
             public IARFormatException()
+            {
+
+            }
+        }
+
+        public class InvalidInventoryPathException : Exception
+        {
+            public InvalidInventoryPathException()
             {
 
             }
@@ -65,7 +71,8 @@ namespace SilverSim.Archiver.IAR
             AssetServiceInterface assetService,
             AvatarNameServiceInterface nameService,
             LoadOptions options,
-            string fileName)
+            string fileName,
+            string topath)
         {
             TarArchiveReader reader;
             {
@@ -75,6 +82,35 @@ namespace SilverSim.Archiver.IAR
             }
 
             Dictionary<string, UUID> inventoryPath = new Dictionary<string, UUID>();
+
+            UUID parentFolder;
+            parentFolder = inventoryService.Folder[principal.ID, AssetType.RootFolder].ID;
+
+            if(!topath.StartsWith("/"))
+            {
+                throw new InvalidInventoryPathException();
+            }
+            foreach (string pathcomp in topath.Substring(1).Split('/'))
+            {
+                List<InventoryFolder> childfolders = inventoryService.Folder.getFolders(principal.ID, parentFolder);
+                int idx;
+                for (idx = 0; idx < childfolders.Count; ++idx)
+                {
+                    if (pathcomp.ToLower() == childfolders[idx].Name.ToLower())
+                    {
+                        break;
+                    }
+                }
+
+                if (idx == childfolders.Count)
+                {
+                    throw new InvalidInventoryPathException();
+                }
+
+                parentFolder = childfolders[idx].ID;
+            }
+
+            inventoryPath[""] = parentFolder;
 
             for(;;)
             {
@@ -99,8 +135,59 @@ namespace SilverSim.Archiver.IAR
                 {
                     /* Load inventory */
                     InventoryItem item = LoadInventoryItem(reader, principal, nameService);
+                    item.ParentFolderID = GetPath(principal, inventoryService, inventoryPath, header.FileName, options);
+                    inventoryService.Item.Add(item);
                 }
             }
+        }
+
+        static UUID GetPath(
+            UUI principalID, 
+            InventoryServiceInterface inventoryService, 
+            Dictionary<string, UUID> folders, 
+            string path, 
+            LoadOptions options)
+        {
+            path = path.Substring(10); /* Get Rid of inventory/ */
+            path = path.Substring(0, path.LastIndexOf('/'));
+            string[] pathcomps = path.Split('/');
+            string finalpath = string.Empty;
+            UUID folderID = folders[""];
+
+
+            int pathidx = 0;
+            if ((options & LoadOptions.Merge) != 0)
+            {
+                if (pathcomps[0].StartsWith("MyInventory") && pathcomps[0].Length == 13 + 36)
+                {
+                    pathidx = 1;
+                }
+            }
+
+            for(; pathidx < pathcomps.Length; ++pathidx)
+            {
+                if(finalpath != "")
+                {
+                    finalpath += "/";
+                }
+                string pname = pathcomps[pathidx].Substring(0, pathcomps[pathidx].Length - 38);
+                finalpath += pname;
+                if (folders.TryGetValue(finalpath, out folderID))
+                {
+
+                }
+                else
+                {
+                    InventoryFolder folder = new InventoryFolder();
+                    folder.Owner = principalID;
+                    folder.ParentFolderID = folderID;
+                    folder.Name = pname;
+                    inventoryService.Folder.Add(folder);
+                    folderID = folder.ID;
+                    folders[finalpath] = folderID;
+                }
+            }
+            return folderID;
         }
 
         static InventoryItem LoadInventoryItem(

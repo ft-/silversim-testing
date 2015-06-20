@@ -31,9 +31,9 @@ namespace SilverSim.Types.Inventory
         public UUID ID = UUID.Zero;
         public UUID ParentFolderID = UUID.Zero;
         public string Name = string.Empty;
-        public InventoryType InventoryType;
+        public InventoryType InventoryType = InventoryType.Unknown;
         public UUI Owner = UUI.Unknown;
-        public int Version = 0;
+        public int Version = 1;
         #endregion
 
         #region Constructors
