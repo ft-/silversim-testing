@@ -23,23 +23,43 @@ exception statement from your version.
 
 */
 
-namespace SilverSim.Types.Profile
+using log4net;
+using MySql.Data.MySqlClient;
+using Nini.Config;
+using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces.Account;
+using SilverSim.ServiceInterfaces.Database;
+using SilverSim.ServiceInterfaces.Presence;
+using SilverSim.Types;
+using SilverSim.Types.Presence;
+using SilverSim.Types.Profile;
+using System;
+using System.Collections.Generic;
+
+namespace SilverSim.Database.MySQL.Profile
 {
-    public struct ProfileProperties
+    public partial class MySQLProfileService
     {
-        public UUI User;
-        public UUI Partner;
-        public bool PublishProfile;
-        public bool PublishMature;
-        public string WebUrl;
-        public uint WantToMask;
-        public string WantToText;
-        public uint SkillsMask;
-        public string SkillsText;
-        public string Language;
-        public UUID ImageID;
-        public string AboutText;
-        public UUID FirstLifeImageID;
-        public string FirstLifeText;
+        class MySQLProperties : IPropertiesInterface
+        {
+            string m_ConnectionString;
+
+            public MySQLProperties(string connectionString)
+            {
+                m_ConnectionString = connectionString;
+            }
+
+            public ProfileProperties this[UUI user]
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+                set
+                {
+                    throw new NotImplementedException();
+                }
+            }
+        }
     }
 }

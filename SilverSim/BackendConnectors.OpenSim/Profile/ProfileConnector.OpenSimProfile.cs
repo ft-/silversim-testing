@@ -23,9 +23,12 @@ exception statement from your version.
 
 */
 
+using Nwc.XmlRpc;
+using SilverSim.Main.Common.HttpClient;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -36,9 +39,14 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
     {
         public class OpenSimClassifiedsConnector : IClassifiedsInterface
         {
-            public OpenSimClassifiedsConnector(string uri)
-            {
+            private static readonly XmlRpcDeserializer m_XmlRpcDeserializer = new XmlRpcDeserializer();
+            string m_Uri;
+            ProfileConnector m_Connector;
 
+            public OpenSimClassifiedsConnector(ProfileConnector connector, string uri)
+            {
+                m_Uri = uri;
+                m_Connector = connector;
             }
 
             public List<UUID> getClassifieds(UUI user)
@@ -48,13 +56,27 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 
             public ProfileClassified this[UUI user, UUID id]
             {
-                get { throw new NotImplementedException(); }
+                get
+                {
+                    throw new NotImplementedException(); 
+                }
+            }
+
+
+            public void Update(ProfileClassified classified)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Delete(UUI user, UUID id)
+            {
+                throw new NotImplementedException();
             }
         }
 
         public class OpenSimPicksConnector : IPicksInterface
         {
-            public OpenSimPicksConnector(string uri)
+            public OpenSimPicksConnector(ProfileConnector connector, string uri)
             {
 
             }
@@ -66,13 +88,27 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 
             public ProfilePick this[UUI user, UUID id]
             {
-                get { throw new NotImplementedException(); }
+                get 
+                {
+                    throw new NotImplementedException(); 
+                }
+            }
+
+
+            public void Update(ProfilePick pick)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Delete(UUI user, UUID id)
+            {
+                throw new NotImplementedException();
             }
         }
 
         public class OpenSimNotesConnector : INotesInterface
         {
-            public OpenSimNotesConnector(string uri)
+            public OpenSimNotesConnector(ProfileConnector connector, string uri)
             {
 
             }
@@ -92,7 +128,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 
         public class OpenSimUserPreferencesConnector : IUserPreferencesInterface
         {
-            public OpenSimUserPreferencesConnector(string uri)
+            public OpenSimUserPreferencesConnector(ProfileConnector connector, string uri)
             {
 
             }
@@ -112,7 +148,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 
         public class OpenSimPropertiesConnector : IPropertiesInterface
         {
-            public OpenSimPropertiesConnector(string uri)
+            public OpenSimPropertiesConnector(ProfileConnector connector, string uri)
             {
 
             }

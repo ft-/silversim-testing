@@ -33,35 +33,68 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 {
     public partial class ProfileConnector : ProfileServiceInterface
     {
+        public class RpcFaultException : Exception
+        {
+            public RpcFaultException()
+            {
+
+            }
+        }
+
         internal IClassifiedsInterface m_Classifieds;
         internal IPicksInterface m_Picks;
         internal INotesInterface m_Notes;
         internal IUserPreferencesInterface m_Preferences;
         internal IPropertiesInterface m_Properties;
+        public int TimeoutMs { get; set; }
+
+        public ProfileConnector(string url)
+        {
+            m_Classifieds = new AutoDetectClassifiedsConnector(this, url);
+            m_Picks = new AutoDetectPicksConnector(this, url);
+            m_Notes = new AutoDetectNotesConnector(this, url);
+            m_Preferences = new AutoDetectUserPreferencesConnector(this, url);
+            m_Properties = new AutoDetectPropertiesConnector(this, url);
+        }
 
         public override ProfileServiceInterface.IClassifiedsInterface Classifieds
         {
-            get { throw new NotImplementedException(); }
+            get 
+            {
+                return m_Classifieds; 
+            }
         }
 
         public override ProfileServiceInterface.IPicksInterface Picks
         {
-            get { throw new NotImplementedException(); }
+            get 
+            {
+                return m_Picks;
+            }
         }
 
         public override ProfileServiceInterface.INotesInterface Notes
         {
-            get { throw new NotImplementedException(); }
+            get
+            {
+                return m_Notes;
+            }
         }
 
         public override ProfileServiceInterface.IUserPreferencesInterface Preferences
         {
-            get { throw new NotImplementedException(); }
+            get 
+            {
+                return m_Preferences;
+            }
         }
 
         public override ProfileServiceInterface.IPropertiesInterface Properties
         {
-            get { throw new NotImplementedException(); }
+            get 
+            {
+                return m_Properties;
+            }
         }
     }
 }

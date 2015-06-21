@@ -36,7 +36,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
     {
         public class RobustClassifiedsConnector : IClassifiedsInterface
         {
-            public RobustClassifiedsConnector(string uri)
+            public RobustClassifiedsConnector(ProfileConnector connector, string uri)
             {
 
             }
@@ -48,13 +48,27 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 
             public ProfileClassified this[UUI user, UUID id]
             {
-                get { throw new NotImplementedException(); }
+                get 
+                {
+                    throw new NotImplementedException(); 
+                }
+            }
+
+
+            public void Update(ProfileClassified classified)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Delete(UUI user, UUID id)
+            {
+                throw new NotImplementedException();
             }
         }
 
         public class RobustPicksConnector : IPicksInterface
         {
-            public RobustPicksConnector(string uri)
+            public RobustPicksConnector(ProfileConnector connector, string uri)
             {
 
             }
@@ -66,13 +80,27 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 
             public ProfilePick this[UUI user, UUID id]
             {
-                get { throw new NotImplementedException(); }
+                get
+                {
+                    throw new NotImplementedException(); 
+                }
+            }
+
+
+            public void Update(ProfilePick pick)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Delete(UUI user, UUID id)
+            {
+                throw new NotImplementedException();
             }
         }
 
         public class RobustNotesConnector : INotesInterface
         {
-            public RobustNotesConnector(string uri)
+            public RobustNotesConnector(ProfileConnector connector, string uri)
             {
 
             }
@@ -92,7 +120,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 
         public class RobustUserPreferencesConnector : IUserPreferencesInterface
         {
-            public RobustUserPreferencesConnector(string uri)
+            public RobustUserPreferencesConnector(ProfileConnector connector, string uri)
             {
 
             }
@@ -112,7 +140,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 
         public class RobustPropertiesConnector : IPropertiesInterface
         {
-            public RobustPropertiesConnector(string uri)
+            public RobustPropertiesConnector(ProfileConnector connector, string uri)
             {
 
             }

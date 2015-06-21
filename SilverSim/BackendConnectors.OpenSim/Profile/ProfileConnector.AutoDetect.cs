@@ -41,8 +41,8 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
             public AutoDetectClassifiedsConnector(ProfileConnector connector, string url)
             {
                 m_Connector = connector;
-                m_OpenSim = new OpenSimClassifiedsConnector(url);
-                m_Robust = new RobustClassifiedsConnector(url);
+                m_OpenSim = new OpenSimClassifiedsConnector(connector, url);
+                m_Robust = new RobustClassifiedsConnector(connector, url);
             }
 
             public List<UUID> getClassifieds(UUI user)
@@ -99,6 +99,57 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     throw new NotImplementedException();
                 }
             }
+
+
+            public void Update(ProfileClassified classified)
+            {
+                try
+                {
+                    m_OpenSim.Update(classified);
+                    m_Connector.m_Classifieds = m_OpenSim;
+                    return;
+                }
+                catch
+                {
+
+                }
+                try
+                {
+                    m_Robust.Update(classified);
+                    m_Connector.m_Classifieds = m_Robust;
+                    return;
+                }
+                catch
+                {
+
+                }
+                throw new NotImplementedException();
+            }
+
+            public void Delete(UUI user, UUID id)
+            {
+                try
+                {
+                    m_OpenSim.Delete(user, id);
+                    m_Connector.m_Classifieds = m_OpenSim;
+                    return;
+                }
+                catch
+                {
+
+                }
+                try
+                {
+                    m_Robust.Delete(user, id);
+                    m_Connector.m_Classifieds = m_Robust;
+                    return;
+                }
+                catch
+                {
+
+                }
+                throw new NotImplementedException();
+            }
         }
 
         public class AutoDetectPicksConnector : IPicksInterface
@@ -110,8 +161,8 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
             public AutoDetectPicksConnector(ProfileConnector connector, string url)
             {
                 m_Connector = connector;
-                m_OpenSim = new OpenSimPicksConnector(url);
-                m_Robust = new RobustPicksConnector(url);
+                m_OpenSim = new OpenSimPicksConnector(connector, url);
+                m_Robust = new RobustPicksConnector(connector, url);
             }
 
             public List<UUID> getPicks(UUI user)
@@ -168,6 +219,57 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     throw new NotImplementedException();
                 }
             }
+
+
+            public void Update(ProfilePick pick)
+            {
+                try
+                {
+                    m_OpenSim.Update(pick);
+                    m_Connector.m_Picks = m_OpenSim;
+                    return;
+                }
+                catch
+                {
+
+                }
+                try
+                {
+                    m_Robust.Update(pick);
+                    m_Connector.m_Picks = m_Robust;
+                    return;
+                }
+                catch
+                {
+
+                }
+                throw new NotImplementedException();
+            }
+
+            public void Delete(UUI user, UUID id)
+            {
+                try
+                {
+                    m_OpenSim.Delete(user, id);
+                    m_Connector.m_Picks = m_OpenSim;
+                    return;
+                }
+                catch
+                {
+
+                }
+                try
+                {
+                    m_Robust.Delete(user, id);
+                    m_Connector.m_Picks = m_Robust;
+                    return;
+                }
+                catch
+                {
+
+                }
+                throw new NotImplementedException();
+            }
         }
 
         public class AutoDetectNotesConnector : INotesInterface
@@ -179,8 +281,8 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
             public AutoDetectNotesConnector(ProfileConnector connector, string url)
             {
                 m_Connector = connector;
-                m_OpenSim = new OpenSimNotesConnector(url);
-                m_Robust = new RobustNotesConnector(url);
+                m_OpenSim = new OpenSimNotesConnector(connector, url);
+                m_Robust = new RobustNotesConnector(connector, url);
             }
 
             public ProfileNotes this[UUI user, UUI target]
@@ -246,8 +348,8 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
             public AutoDetectUserPreferencesConnector(ProfileConnector connector, string url)
             {
                 m_Connector = connector;
-                m_OpenSim = new OpenSimUserPreferencesConnector(url);
-                m_Robust = new RobustUserPreferencesConnector(url);
+                m_OpenSim = new OpenSimUserPreferencesConnector(connector, url);
+                m_Robust = new RobustUserPreferencesConnector(connector, url);
             }
 
             public ProfilePreferences this[UUI user]
@@ -313,8 +415,8 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
             public AutoDetectPropertiesConnector(ProfileConnector connector, string url)
             {
                 m_Connector = connector;
-                m_OpenSim = new OpenSimPropertiesConnector(url);
-                m_Robust = new RobustPropertiesConnector(url);
+                m_OpenSim = new OpenSimPropertiesConnector(connector, url);
+                m_Robust = new RobustPropertiesConnector(connector, url);
             }
 
             public ProfileProperties this[UUI user]

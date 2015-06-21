@@ -35,12 +35,16 @@ namespace SilverSim.ServiceInterfaces.Profile
         {
             List<UUID> getClassifieds(UUI user);
             ProfileClassified this[UUI user, UUID id] { get; }
+            void Update(ProfileClassified classified);
+            void Delete(UUI user, UUID id);
         }
 
         public interface IPicksInterface
         {
             List<UUID> getPicks(UUI user);
             ProfilePick this[UUI user, UUID id] { get; }
+            void Update(ProfilePick pick);
+            void Delete(UUI user, UUID id);
         }
 
         public interface INotesInterface
