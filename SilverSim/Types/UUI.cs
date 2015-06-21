@@ -81,7 +81,7 @@ namespace SilverSim.Types
             set
             {
                 string[] parts = value.Split(new char[] { ';' }, 2, StringSplitOptions.None);
-                if(parts.Length < 2)
+                if (parts.Length < 2)
                 {
                     throw new ArgumentException();
                 }
@@ -115,7 +115,7 @@ namespace SilverSim.Types
             set
             {
                 string[] names = value.Split(new char[] { ' ' }, 2, StringSplitOptions.None);
-                if(names.Length < 2)
+                if (names.Length < 2)
                 {
                     FirstName = names[0];
                     LastName = "";
@@ -128,7 +128,7 @@ namespace SilverSim.Types
                         /* HG UUI */
                         HomeURI = new Uri("http://" + names[1]);
                         names = names[0].Split(new char[] { '.' }, 2, StringSplitOptions.None);
-                        if(names.Length < 2)
+                        if (names.Length < 2)
                         {
                             FirstName = names[0];
                             LastName = "";
@@ -180,12 +180,12 @@ namespace SilverSim.Types
         {
             this.ID = ID;
             string[] parts = creatorData.Split(Semicolon, 2);
-            if(parts.Length < 2)
+            if (parts.Length < 2)
             {
                 throw new ArgumentException("Invald UUI");
             }
             string[] names = parts[1].Split(Whitespace, 2);
-            if(names.Length == 2)
+            if (names.Length == 2)
             {
                 LastName = names[1];
             }
@@ -216,7 +216,7 @@ namespace SilverSim.Types
 
         public override string ToString()
         {
-            if(HomeURI != null)
+            if (HomeURI != null)
             {
                 return String.Format("{0};{1};{2} {3}", ID.ToString(), HomeURI, FirstName.Replace(' ', '.'), LastName.Replace(' ', '.'));
             }

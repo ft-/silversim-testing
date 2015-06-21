@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,6 +36,30 @@ namespace SilverSim.ServiceInterfaces.UserAgents
         public UserAgentServiceInterface()
         {
 
+        }
+
+        public abstract void VerifyAgent(UUID sessionID, string token);
+
+        public abstract void VerifyClient(UUID sessionID, string token);
+
+        public abstract void LogoutAgent(UUI user, UUID sessionID);
+
+        public abstract List<UUID> NotifyStatus(List<KeyValuePair<UUI, string>> friends, UUI user, bool online);
+
+        public abstract Dictionary<string, object> GetUserInfo(UUI user);
+
+        public abstract Dictionary<string, string> GetServerURLs(UUI user);
+
+        public abstract string LocateUser(UUI user);
+
+        public abstract UUI GetUUI(UUI user, UUI targetUserID);
+
+        public class RequestFailedException : Exception
+        {
+            public RequestFailedException()
+            {
+
+            }
         }
     }
 }
