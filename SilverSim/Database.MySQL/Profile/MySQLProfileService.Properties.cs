@@ -23,17 +23,9 @@ exception statement from your version.
 
 */
 
-using log4net;
 using MySql.Data.MySqlClient;
-using Nini.Config;
-using SilverSim.Main.Common;
-using SilverSim.ServiceInterfaces.Account;
-using SilverSim.ServiceInterfaces.Database;
-using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
-using SilverSim.Types.Presence;
 using SilverSim.Types.Profile;
-using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Profile
@@ -94,23 +86,6 @@ namespace SilverSim.Database.MySQL.Profile
                 set
                 {
                     Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                    /*
-            "CREATE TABLE %tablename% (useruuid char(36) not null," +
-                                    "profilePartner char(36) not null default '00000000-0000-0000-0000-000000000000'," +
-                                    "profileAllowPublish int(1) not null," +
-                                    "profileMaturePublish int(1) not null," +
-                                    "profileURL varchar(255) not null default ''," +
-                                    "profileWantToMask unsigned int(11) not null",
-                                    "profileWantToText text," +
-                                    "profileSkillsMask unsigned int(11) not null," +
-                                    "profileSkillsText text," +
-                                    "profileLanguages text," +
-                                    "profileImage char(36) not null default '00000000-0000-0000-0000-000000000000'," +
-                                    "profileAboutText text," +
-                                    "profileFirstImage char(36) not null default '00000000-0000-0000-0000-000000000000'," +
-                                    "profilefirstText text," +
-                                    "primary key (useruuid))"
-                     */
                     replaceVals["useruuid"] = user.ID;
                     replaceVals["profileAllowPublish"] = value.PublishProfile ? 1 : 0;
                     replaceVals["profileMaturePublish"] = value.PublishMature ? 1 : 0;
