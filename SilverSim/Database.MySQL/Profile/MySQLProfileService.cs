@@ -222,7 +222,7 @@ namespace SilverSim.Database.MySQL.Profile
                                     "profileImage char(36) not null default '00000000-0000-0000-0000-000000000000'," +
                                     "profileAboutText text," +
                                     "profileFirstImage char(36) not null default '00000000-0000-0000-0000-000000000000'," +
-                                    "profilefirstText text," +
+                                    "profileFirstText text," +
                                     "primary key (useruuid))"
         };
 

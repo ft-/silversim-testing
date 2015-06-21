@@ -53,11 +53,46 @@ namespace SilverSim.Database.MySQL.Profile
             {
                 get
                 {
-                    throw new NotImplementedException();
+                    using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    {
+                        conn.Open();
+                        using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM usersettings where useruuid LIKE ?uuid", conn))
+                        {
+                            cmd.Parameters.AddWithValue("?uuid", user.ID);
+                            using(MySqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                if(reader.Read())
+                                {
+                                    ProfilePreferences prefs = new ProfilePreferences();
+                                    prefs.User = user;
+                                    prefs.IMviaEmail = reader.GetBoolean("imviaemail");
+                                    prefs.Visible = reader.GetBoolean("visible");
+                                    return prefs;
+                                }
+                                else
+                                {
+                                    ProfilePreferences prefs = new ProfilePreferences();
+                                    prefs.User = user;
+                                    prefs.IMviaEmail = false;
+                                    prefs.Visible = false;
+                                    return prefs;
+                                }
+                            }
+                        }
+                    }
+                    throw new KeyNotFoundException();
                 }
                 set
                 {
-                    throw new NotImplementedException();
+                    Dictionary<string, object> replaceVals = new Dictionary<string, object>();
+                    replaceVals["useruuid"] = user.ID;
+                    replaceVals["imviaemail"] = value.IMviaEmail ? 1 : 0;
+                    replaceVals["visible"] = value.Visible ? 1 : 0;
+                    using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    {
+                        conn.Open();
+                        conn.ReplaceInsertInto("usersettings", replaceVals);
+                    }
                 }
             }
         }

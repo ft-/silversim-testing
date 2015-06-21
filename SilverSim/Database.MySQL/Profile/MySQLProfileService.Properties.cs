@@ -53,11 +53,91 @@ namespace SilverSim.Database.MySQL.Profile
             {
                 get
                 {
-                    throw new NotImplementedException();
+                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    {
+                        conn.Open();
+                        using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM userprofile where useruuid LIKE ?uuid", conn))
+                        {
+                            cmd.Parameters.AddWithValue("?uuid", user.ID);
+                            using (MySqlDataReader reader = cmd.ExecuteReader())
+                            {
+                                if (reader.Read())
+                                {
+                                    ProfileProperties props = new ProfileProperties();
+                                    props.User = user;
+                                    props.Partner.ID = reader.GetUUID("profilePartner");
+                                    props.PublishProfile = reader.GetBoolean("profileAllowPublish");
+                                    props.PublishMature = reader.GetBoolean("profileMaturePublish");
+                                    props.WebUrl = reader.GetString("profileURL");
+                                    props.WantToMask = reader.GetUInt32("profileWantToMask");
+                                    props.WantToText = reader.GetString("profileWantToText");
+                                    props.SkillsMask = reader.GetUInt32("profileSkillsMask");
+                                    props.SkillsText = reader.GetString("profileSkillsText");
+                                    props.Language = reader.GetString("profileLanguages");
+                                    props.ImageID = reader.GetUUID("profileImage");
+                                    props.AboutText = reader.GetString("profileAboutText");
+                                    props.FirstLifeImageID = reader.GetString("profileFirstImage");
+                                    props.FirstLifeText = reader.GetString("profileFirstText");
+                                    return props;
+                                }
+                                else
+                                {
+                                    ProfileProperties props = new ProfileProperties();
+                                    props.User = user;
+                                    return props;
+                                }
+                            }
+                        }
+                    }
+                    throw new KeyNotFoundException();
                 }
                 set
                 {
-                    throw new NotImplementedException();
+                    Dictionary<string, object> replaceVals = new Dictionary<string, object>();
+                    /*
+            "CREATE TABLE %tablename% (useruuid char(36) not null," +
+                                    "profilePartner char(36) not null default '00000000-0000-0000-0000-000000000000'," +
+                                    "profileAllowPublish int(1) not null," +
+                                    "profileMaturePublish int(1) not null," +
+                                    "profileURL varchar(255) not null default ''," +
+                                    "profileWantToMask unsigned int(11) not null",
+                                    "profileWantToText text," +
+                                    "profileSkillsMask unsigned int(11) not null," +
+                                    "profileSkillsText text," +
+                                    "profileLanguages text," +
+                                    "profileImage char(36) not null default '00000000-0000-0000-0000-000000000000'," +
+                                    "profileAboutText text," +
+                                    "profileFirstImage char(36) not null default '00000000-0000-0000-0000-000000000000'," +
+                                    "profilefirstText text," +
+                                    "primary key (useruuid))"
+                     */
+                    replaceVals["useruuid"] = user.ID;
+                    replaceVals["profileAllowPublish"] = value.PublishProfile ? 1 : 0;
+                    replaceVals["profileMaturePublish"] = value.PublishMature ? 1 : 0;
+                    replaceVals["profileURL"] = value.WebUrl;
+                    replaceVals["profileWantToMask"] = value.WantToMask;
+                    replaceVals["profileWantToText"] = value.WantToText;
+                    replaceVals["profileSkillsMask"] = value.SkillsMask;
+                    replaceVals["profileSkillsText"] = value.SkillsText;
+                    replaceVals["profileLanguages"] = value.Language;
+                    replaceVals["profileImage"] = value.ImageID;
+                    replaceVals["profileAboutText"] = value.AboutText;
+                    replaceVals["profileFirstImage"] = value.FirstLifeImageID;
+                    replaceVals["profileFirstText"] = value.FirstLifeText;
+
+                    using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    {
+                        conn.Open();
+                        try
+                        {
+                            conn.InsertInto("userprofile", replaceVals);
+                        }
+                        catch
+                        {
+                            replaceVals.Remove("useruuid");
+                            conn.UpdateSet("userprofile", replaceVals, "useruuid LIKE '" + user.ID + "'");
+                        }
+                    }
                 }
             }
         }

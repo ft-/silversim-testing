@@ -30,6 +30,5 @@ namespace SilverSim.Types.Profile
         public UUI User;
         public bool IMviaEmail;
         public bool Visible;
-        public string EMailAddress;
     }
 }
