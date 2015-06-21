@@ -49,7 +49,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 m_Connector = connector;
             }
 
-            public List<UUID> getClassifieds(UUI user)
+            public Dictionary<UUID, string> getClassifieds(UUI user)
             {
                 throw new NotImplementedException();
             }
@@ -81,7 +81,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 
             }
 
-            public List<UUID> getPicks(UUI user)
+            public Dictionary<UUID, string> getPicks(UUI user)
             {
                 throw new NotImplementedException();
             }

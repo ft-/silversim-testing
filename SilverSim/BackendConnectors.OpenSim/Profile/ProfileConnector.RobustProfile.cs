@@ -23,6 +23,8 @@ exception statement from your version.
 
 */
 
+using SilverSim.Main.Common.Rpc;
+using SilverSim.StructuredData.JSON;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System;
@@ -36,14 +38,28 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
     {
         public class RobustClassifiedsConnector : IClassifiedsInterface
         {
+            string m_Uri;
+            ProfileConnector m_Connector;
+
             public RobustClassifiedsConnector(ProfileConnector connector, string uri)
             {
-
+                m_Connector = connector;
+                m_Uri = uri;
             }
 
-            public List<UUID> getClassifieds(UUI user)
+            public Dictionary<UUID, string> getClassifieds(UUI user)
             {
-                throw new NotImplementedException();
+                Dictionary<UUID, string> data = new Dictionary<UUID, string>();
+                Map m = new Map();
+                m["creatorId"] = user.ID;
+                IValue res = RPC.DoJson20RpcRequest(m_Uri, "avatarclassifiedsrequest", UUID.Random, m, m_Connector.TimeoutMs);
+                AnArray reslist = (((Map)res)["result"]) as AnArray;
+                foreach(IValue iv in reslist)
+                {
+                    Map c = (Map)iv;
+                    data[c["classifieduuid"].AsUUID] = c["name"].ToString();
+                }
+                return data;
             }
 
             public ProfileClassified this[UUI user, UUID id]
@@ -73,7 +89,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 
             }
 
-            public List<UUID> getPicks(UUI user)
+            public Dictionary<UUID, string> getPicks(UUI user)
             {
                 throw new NotImplementedException();
             }

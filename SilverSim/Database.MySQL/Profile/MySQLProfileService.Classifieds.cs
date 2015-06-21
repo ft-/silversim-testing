@@ -42,20 +42,20 @@ namespace SilverSim.Database.MySQL.Profile
                 m_ConnectionString = connectionString;
             }
 
-            public List<UUID> getClassifieds(UUI user)
+            public Dictionary<UUID, string> getClassifieds(UUI user)
             {
-                List<UUID> res = new List<UUID>();
+                Dictionary<UUID, string> res = new Dictionary<UUID, string>();
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT classifieduuid FROM classifieds WHERE creatoruuid LIKE ?uuid", conn))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT classifieduuid, `name` FROM classifieds WHERE creatoruuid LIKE ?uuid", conn))
                     {
                         cmd.Parameters.AddWithValue("?uuid", user.ID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                res.Add(reader.GetUUID("classifieduuid"));
+                                res.Add(reader.GetUUID("classifieduuid"), reader.GetString("name"));
                             }
                             return res;
                         }
