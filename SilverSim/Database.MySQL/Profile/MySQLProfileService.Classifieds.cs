@@ -128,15 +128,14 @@ namespace SilverSim.Database.MySQL.Profile
                 }
             }
 
-            public void Delete(UUI user, UUID id)
+            public void Delete(UUID id)
             {
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM classifieds WHERE creatoruuid LIKE ?user AND classifieduuid LIKE ?pickuuid", conn))
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM classifieds WHERE classifieduuid LIKE ?classifieduuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?user", user.ID);
-                        cmd.Parameters.AddWithValue("?pickuuid", id);
+                        cmd.Parameters.AddWithValue("?classifieduuid", id);
                         if (1 > cmd.ExecuteNonQuery())
                         {
                             throw new InvalidOperationException();

@@ -76,7 +76,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 throw new NotImplementedException();
             }
 
-            public void Delete(UUI user, UUID id)
+            public void Delete(UUID id)
             {
                 throw new NotImplementedException();
             }
@@ -108,7 +108,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 throw new NotImplementedException();
             }
 
-            public void Delete(UUI user, UUID id)
+            public void Delete(UUID id)
             {
                 throw new NotImplementedException();
             }

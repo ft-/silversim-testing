@@ -126,11 +126,11 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 throw new NotImplementedException();
             }
 
-            public void Delete(UUI user, UUID id)
+            public void Delete(UUID id)
             {
                 try
                 {
-                    m_OpenSim.Delete(user, id);
+                    m_OpenSim.Delete(id);
                     m_Connector.m_Classifieds = m_OpenSim;
                     return;
                 }
@@ -140,7 +140,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 }
                 try
                 {
-                    m_Robust.Delete(user, id);
+                    m_Robust.Delete(id);
                     m_Connector.m_Classifieds = m_Robust;
                     return;
                 }
@@ -246,11 +246,11 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 throw new NotImplementedException();
             }
 
-            public void Delete(UUI user, UUID id)
+            public void Delete(UUID id)
             {
                 try
                 {
-                    m_OpenSim.Delete(user, id);
+                    m_OpenSim.Delete(id);
                     m_Connector.m_Picks = m_OpenSim;
                     return;
                 }
@@ -260,7 +260,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 }
                 try
                 {
-                    m_Robust.Delete(user, id);
+                    m_Robust.Delete(id);
                     m_Connector.m_Picks = m_Robust;
                     return;
                 }

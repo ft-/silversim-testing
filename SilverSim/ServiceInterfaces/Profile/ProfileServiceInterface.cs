@@ -36,7 +36,7 @@ namespace SilverSim.ServiceInterfaces.Profile
             Dictionary<UUID, string> getClassifieds(UUI user);
             ProfileClassified this[UUI user, UUID id] { get; }
             void Update(ProfileClassified classified);
-            void Delete(UUI user, UUID id);
+            void Delete(UUID id);
         }
 
         public interface IPicksInterface
@@ -44,7 +44,7 @@ namespace SilverSim.ServiceInterfaces.Profile
             Dictionary<UUID, string> getPicks(UUI user);
             ProfilePick this[UUI user, UUID id] { get; }
             void Update(ProfilePick pick);
-            void Delete(UUI user, UUID id);
+            void Delete(UUID id);
         }
 
         public interface INotesInterface
