@@ -42,8 +42,6 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 
         public abstract void VerifyClient(UUID sessionID, string token);
 
-        public abstract void LogoutAgent(UUI user, UUID sessionID);
-
         public abstract List<UUID> NotifyStatus(List<KeyValuePair<UUI, string>> friends, UUI user, bool online);
 
         public abstract Dictionary<string, object> GetUserInfo(UUI user);

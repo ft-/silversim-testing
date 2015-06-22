@@ -36,14 +36,6 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
             DoXmlRpcWithBoolResponse("verify_client", hash);
         }
 
-        public override void LogoutAgent(UUI user, UUID sessionID)
-        {
-            Hashtable hash = new Hashtable();
-            hash["sessionID"] = sessionID.ToString();
-            hash["userID"] = user.ID.ToString();
-            DoXmlRpcWithBoolResponse("logout_agent", hash);
-        }
-
         public override List<UUID> NotifyStatus(List<KeyValuePair<UUI, string>> friends, UUI user, bool online)
         {
             Hashtable hash = new Hashtable();
