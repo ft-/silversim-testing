@@ -30,10 +30,21 @@ using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
+using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Scene.ServiceInterfaces.Terrain;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
+using SilverSim.ServiceInterfaces.Account;
+using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Avatar;
+using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
+using SilverSim.ServiceInterfaces.Grid;
+using SilverSim.ServiceInterfaces.GridUser;
+using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using System;
@@ -91,11 +102,37 @@ namespace SilverSim.Main.Common
         private Queue<CFG_ISource> m_Sources = new Queue<CFG_ISource>();
         private RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
         private ManualResetEvent m_ShutdownEvent;
+        static readonly Dictionary<Type, string> m_FeaturesTable = new Dictionary<Type, string>();
 
         static ConfigurationLoader()
         {
             /* prevent circular dependencies by assigning relevant parts here */
             ObjectGroup.CompilerRegistry = CompilerRegistry.ScriptCompilers;
+            m_FeaturesTable[typeof(IPlugin)] = "Plugin";
+            m_FeaturesTable[typeof(IPluginFactory)] = "Plugin Factory";
+            m_FeaturesTable[typeof(IPluginSubFactory)] = "Plugin Sub Factory";
+
+            m_FeaturesTable[typeof(AssetServiceInterface)] = "Asset Service";
+            m_FeaturesTable[typeof(InventoryServiceInterface)] = "Inventory Service";
+            m_FeaturesTable[typeof(AvatarNameServiceInterface)] = "Avatar Name Lookup Service";
+            m_FeaturesTable[typeof(PresenceServiceInterface)] = "Presence Service";
+            m_FeaturesTable[typeof(GridServiceInterface)] = "Grid Service";
+            m_FeaturesTable[typeof(GridUserServiceInterface)] = "GridUser Service";
+            m_FeaturesTable[typeof(AvatarServiceInterface)] = "Avatar Service";
+            m_FeaturesTable[typeof(UserAccountServiceInterface)] = "UserAccount Service";
+            m_FeaturesTable[typeof(IInventoryServicePlugin)] = "Inventory Service HELO Instantiator";
+            m_FeaturesTable[typeof(IAssetServicePlugin)] = "Asset Service HELO Instantiator";
+            m_FeaturesTable[typeof(SimulationDataStorageInterface)] = "SImulation Data Storage";
+
+            m_FeaturesTable[typeof(IPluginShutdown)] = "Shutdown Handler";
+            m_FeaturesTable[typeof(IDBServiceInterface)] = "DataBase Service";
+            m_FeaturesTable[typeof(BaseHttpServer)] = "HTTP Server";
+            m_FeaturesTable[typeof(IScriptCompiler)] = "Script Compiler";
+            m_FeaturesTable[typeof(IScriptApi)] = "Script Api";
+            m_FeaturesTable[typeof(ITerrainFileStorage)] = "Terrain File Format";
+            m_FeaturesTable[typeof(IRegionLoaderInterface)] = "Region Loader";
+            m_FeaturesTable[typeof(CmdIO.TTY)] = "Console";
+            m_FeaturesTable[typeof(SceneInterface)] = "Scene Implementation";
         }
 
         public IConfigSource Config
@@ -903,7 +940,23 @@ namespace SilverSim.Main.Common
                 string output = "Module List:\n----------------------------------------------";
                 foreach(KeyValuePair<string, IPlugin> moduledesc in PluginInstances)
                 {
-                    output += string.Format("\nModule {0}", moduledesc.Key);
+                    Type[] types = moduledesc.Value.GetType().GetInterfaces();
+                    string features = string.Empty;
+                    foreach(KeyValuePair<Type, string> kvp in m_FeaturesTable)
+                    {
+                        if(kvp.Key.IsInterface)
+                        {
+                            if(moduledesc.Value.GetType().GetInterfaces().Contains(kvp.Key))
+                            {
+                                features += "\n  - " + kvp.Value;
+                            }
+                        }
+                        else if(kvp.Key.IsAssignableFrom(moduledesc.Value.GetType()))
+                        {
+                            features += "\n  - " + kvp.Value;
+                        }
+                    }
+                    output += string.Format("\nModule {0}:{1}\n", moduledesc.Key, features);
                 }
                 io.Write(output);
             }
