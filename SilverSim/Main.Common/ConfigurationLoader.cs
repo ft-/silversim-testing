@@ -41,10 +41,13 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
+using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
+using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
+using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using System;
@@ -108,7 +111,6 @@ namespace SilverSim.Main.Common
         {
             /* prevent circular dependencies by assigning relevant parts here */
             ObjectGroup.CompilerRegistry = CompilerRegistry.ScriptCompilers;
-            m_FeaturesTable[typeof(IPlugin)] = "Plugin";
             m_FeaturesTable[typeof(IPluginFactory)] = "Plugin Factory";
             m_FeaturesTable[typeof(IPluginSubFactory)] = "Plugin Sub Factory";
 
@@ -122,7 +124,10 @@ namespace SilverSim.Main.Common
             m_FeaturesTable[typeof(UserAccountServiceInterface)] = "UserAccount Service";
             m_FeaturesTable[typeof(IInventoryServicePlugin)] = "Inventory Service HELO Instantiator";
             m_FeaturesTable[typeof(IAssetServicePlugin)] = "Asset Service HELO Instantiator";
-            m_FeaturesTable[typeof(SimulationDataStorageInterface)] = "SImulation Data Storage";
+            m_FeaturesTable[typeof(SimulationDataStorageInterface)] = "Simulation Data Storage";
+            m_FeaturesTable[typeof(EstateServiceInterface)] = "Estate Service";
+            m_FeaturesTable[typeof(GroupsServiceInterface)] = "Groups Service";
+            m_FeaturesTable[typeof(ProfileServiceInterface)] = "Profile Service";
 
             m_FeaturesTable[typeof(IPluginShutdown)] = "Shutdown Handler";
             m_FeaturesTable[typeof(IDBServiceInterface)] = "DataBase Service";
