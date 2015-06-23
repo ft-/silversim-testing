@@ -40,59 +40,83 @@ namespace SilverSim.Main.Common.HttpServer
     {
         private static readonly ILog m_Log = LogManager.GetLogger("JSON2.0RPC SERVER");
 
-        public delegate Map Json20RpcDelegate(Map req);
+        public delegate IValue Json20RpcDelegate(string method, IValue req);
 
         public RwLockedDictionary<string, Json20RpcDelegate> Json20RpcMethods = new RwLockedDictionary<string, Json20RpcDelegate>();
 
-        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
-
         void RequestHandler(HttpRequest httpreq)
         {
-            object o;
-            Map req;
+            IValue req;
+            HttpResponse httpres;
             if (httpreq.Method != "POST")
             {
-                HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                httpres = httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 httpres.Close();
                 return;
             }
+            
+            IValue res; 
+            
             try
             {
-                req = (Map)JSON.Deserialize(httpreq.Body);
+                req = JSON.Deserialize(httpreq.Body);
             }
             catch
             {
-                FaultResponse(httpreq.BeginResponse(), -32700, "Invalid JSON20 RPC Request", "");
-                return;
+                req = null;
             }
+            if(req == null)
+            {
+                res = FaultResponse(-32700, "Invalid JSON20 RPC Request", "");
+            }
+            else if(req is Map)
+            {
+                res = ProcessJsonRequest((Map)req);
+            }
+            else if(req is AnArray)
+            {
+                AnArray o = new AnArray();
+                foreach(IValue v in (AnArray)req)
+                {
+                    if (v is Map)
+                    {
+                        o.Add(ProcessJsonRequest((Map)v));
+                    }
+                }
+                res = o;
+            }
+            else
+            {
+                res = FaultResponse(-32700, "Invalid JSON20 RPC Request", "");
+            }
+            httpres = httpreq.BeginResponse("application/json-rpc");
+            JSON.Serialize(res, httpres.GetOutputStream());
+            httpres.Close();
+        }
 
+        Map ProcessJsonRequest(Map req)
+        {
             Json20RpcDelegate del;
-            Map res;
-            if (Json20RpcMethods.TryGetValue(req["method"].ToString(), out del))
+            string method = req["method"].ToString();
+            if (Json20RpcMethods.TryGetValue(method, out del))
             {
                 try
                 {
-                    res = del(req);
+                    Map res = new Map();
+                    res.Add("jsonrpc", "2.0");
+                    res.Add("id", req["id"]);
+                    res.Add("result", del(method, req["params"]));
+                    return res;
                 }
                 catch (Exception e)
                 {
                     m_Log.WarnFormat("Unexpected exception at XMRPC method {0}: {1}\n{2}", req["method"], e.GetType().Name, e.StackTrace.ToString());
-                    FaultResponse(httpreq.BeginResponse(), -32700, "Internal service error", req["id"].ToString());
-                    return;
+                    return FaultResponse(-32700, "Internal service error", req["id"].ToString());
                 }
-
-                HttpResponse response = httpreq.BeginResponse();
-                response.ContentType = "application/json-rpc";
-                using (TextWriter tw = new StreamWriter(response.GetOutputStream(), UTF8NoBOM))
-                {
-                    tw.Write(res.ToString());
-                    tw.Flush();
-                }
-                response.Close();
             }
             else
             {
-                FaultResponse(httpreq.BeginResponse(), -32601, "Unknown Method", req["id"].ToString());
+                return FaultResponse(-32601, "Unknown Method", req["id"].ToString());
             }
         }
 
@@ -117,24 +141,16 @@ namespace SilverSim.Main.Common.HttpServer
             Json20RpcMethods.Clear();
         }
 
-        private void FaultResponse(HttpResponse response, int statusCode, string statusMessage, string id)
+        private Map FaultResponse(int statusCode, string statusMessage, string id)
         {
-            string s = String.Format("{{\"error\":{{" +
-                    "\"jsonrpc\":\"2.0\"," +
-                    "\"error:\":{{," +
-                        "\"code\":{0}," +
-                        "\"message\":{1}" +
-                    "}}," +
-                    "\"id\":\"{2}\"" +
-                    "}}",
-                    statusCode,
-                    statusMessage,
-                    id);
-
-            byte[] buffer = Encoding.UTF8.GetBytes(s);
-            response.ContentType = "application/json-rpc";
-            response.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
-            response.Close();
+            Map error = new Map();
+            error.Add("code", statusCode);
+            error.Add("message", statusMessage);
+            Map res = new Map();
+            res.Add("jsonrpc", "2.0");
+            res.Add("error", error);
+            res.Add("id", id);
+            return res;
         }
     }
 }
