@@ -27,6 +27,7 @@ using log4net;
 using log4net.Config;
 using Nini.Config;
 using SilverSim.Main.Common.Caps;
+using SilverSim.Main.Common.HttpClient;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
@@ -326,7 +327,7 @@ namespace SilverSim.Main.Common
             {
                 get
                 {
-                    XmlReader r = XmlReader.Create(m_Uri);
+                    XmlReader r = new XmlTextReader(HttpRequestHandler.DoStreamGetRequest(m_Uri, null, 20000));
                     return new XmlConfigSource(r);
                 }
             }
