@@ -84,7 +84,14 @@ namespace SilverSim.StructuredData.Agent
             /* Circuit Info */
             agentparams.Circuit.CircuitCode = parms["circuit_code"].AsUInt;
             agentparams.Circuit.CapsPath = parms["caps_path"].ToString();
-            agentparams.Circuit.IsChild = parms["child"].AsBoolean;
+            if (parms.ContainsKey("child"))
+            {
+                agentparams.Circuit.IsChild = parms["child"].AsBoolean;
+            }
+            else
+            {
+                agentparams.Circuit.IsChild = false;
+            }
             if(parms.ContainsKey("children_seeds"))
             {
                 AnArray children_seeds = (AnArray)parms["children_seeds"];
