@@ -115,7 +115,6 @@ namespace SilverSim.Main.Common.HttpServer
                 {
                     Map res = new Map();
                     res.Add("jsonrpc", "2.0");
-                    res.Add("id", req["id"]);
                     try
                     {
                         res.Add("result", del(method, req["params"]));
@@ -124,6 +123,7 @@ namespace SilverSim.Main.Common.HttpServer
                     {
                         return FaultResponse(je.StatusCode, je.Message, req["id"].ToString());
                     }
+                    res.Add("id", req["id"]);
                     return res;
                 }
                 catch (Exception e)
