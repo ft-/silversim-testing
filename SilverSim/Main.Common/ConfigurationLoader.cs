@@ -46,6 +46,7 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.ServerParam;
@@ -128,6 +129,7 @@ namespace SilverSim.Main.Common
             m_FeaturesTable[typeof(EstateServiceInterface)] = "Estate Service";
             m_FeaturesTable[typeof(GroupsServiceInterface)] = "Groups Service";
             m_FeaturesTable[typeof(ProfileServiceInterface)] = "Profile Service";
+            m_FeaturesTable[typeof(NeighborServiceInterface)] = "Neighbor Signaling Service";
 
             m_FeaturesTable[typeof(IPluginShutdown)] = "Shutdown Handler";
             m_FeaturesTable[typeof(IDBServiceInterface)] = "DataBase Service";
@@ -138,6 +140,9 @@ namespace SilverSim.Main.Common
             m_FeaturesTable[typeof(IRegionLoaderInterface)] = "Region Loader";
             m_FeaturesTable[typeof(CmdIO.TTY)] = "Console";
             m_FeaturesTable[typeof(SceneInterface)] = "Scene Implementation";
+            m_FeaturesTable[typeof(HttpXmlRpcHandler)] = "XML RPC Server";
+            m_FeaturesTable[typeof(CapsHttpRedirector)] = "Capability Redirector";
+            m_FeaturesTable[typeof(HttpJson20RpcHandler)] = "JSON2.0RPC Server";
         }
 
         public IConfigSource Config
@@ -865,6 +870,7 @@ namespace SilverSim.Main.Common
 
             PluginInstances.Add("HttpServer", new BaseHttpServer(httpConfig));
             PluginInstances.Add("XmlRpcServer", new HttpXmlRpcHandler());
+            PluginInstances.Add("JSON2.0RpcServer", new HttpJson20RpcHandler());
             PluginInstances.Add("CapsRedirector", new CapsHttpRedirector());
 
             m_Log.Info("Initing extra modules");
