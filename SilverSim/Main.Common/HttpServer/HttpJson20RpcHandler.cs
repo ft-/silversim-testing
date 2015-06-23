@@ -44,6 +44,17 @@ namespace SilverSim.Main.Common.HttpServer
 
         public RwLockedDictionary<string, Json20RpcDelegate> Json20RpcMethods = new RwLockedDictionary<string, Json20RpcDelegate>();
 
+        public class JSON20RpcException : Exception
+        {
+            public int StatusCode;
+
+            public JSON20RpcException(int statusCode, string message)
+                : base(message)
+            {
+                StatusCode = statusCode;
+            }
+        }
+
         void RequestHandler(HttpRequest httpreq)
         {
             IValue req;
@@ -105,7 +116,14 @@ namespace SilverSim.Main.Common.HttpServer
                     Map res = new Map();
                     res.Add("jsonrpc", "2.0");
                     res.Add("id", req["id"]);
-                    res.Add("result", del(method, req["params"]));
+                    try
+                    {
+                        res.Add("result", del(method, req["params"]));
+                    }
+                    catch (JSON20RpcException je)
+                    {
+                        return FaultResponse(je.StatusCode, je.Message, req["id"].ToString());
+                    }
                     return res;
                 }
                 catch (Exception e)
