@@ -23,7 +23,6 @@ exception statement from your version.
 
 */
 
-using Nwc.XmlRpc;
 using SilverSim.Main.Common.HttpClient;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
@@ -39,7 +38,6 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
     {
         public class OpenSimClassifiedsConnector : IClassifiedsInterface
         {
-            private static readonly XmlRpcDeserializer m_XmlRpcDeserializer = new XmlRpcDeserializer();
             string m_Uri;
             ProfileConnector m_Connector;
 

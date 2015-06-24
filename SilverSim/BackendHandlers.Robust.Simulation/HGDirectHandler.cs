@@ -24,11 +24,11 @@ exception statement from your version.
 */
 
 using Nini.Config;
-using Nwc.XmlRpc;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using SilverSim.Types.StructuredData.XMLRPC;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -70,19 +70,18 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             }
         }
 
-        XmlRpcResponse LinkRegion(XmlRpcRequest req)
+        XMLRPC.XmlRpcResponse LinkRegion(XMLRPC.XmlRpcRequest req)
         {
             string region_name = string.Empty;
             try
             {
-                region_name = (string)(((IDictionary)req.Params[0])["region_name"]);
+                region_name = (((Map)req.Params[0])["region_name"]).ToString();
             }
             catch
             {
                 region_name = "";
             }
-            Dictionary<string, object> resdata = new Dictionary<string, object>();
-            resdata["result"] = false;
+            Map resdata = new Map();
             if (string.IsNullOrEmpty(region_name))
             {
                 region_name = m_ServerParams.GetString(UUID.Zero, "DefaultHGRegion", region_name);
@@ -95,50 +94,59 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     SceneInterface s = Scene.Management.Scene.SceneManager.Scenes[region_name];
                     if (m_ServerParams.GetBoolean(s.ID, "HGDirectEnabled"))
                     {
-                        resdata["uuid"] = s.ID;
-                        resdata["handle"] = s.RegionData.Location.RegionHandle;
-                        resdata["region_image"] = "";
-                        resdata["external_name"] = s.RegionData.ServerURI + " " + s.RegionData.Name;
-                        resdata["result"] = true;
+                        resdata.Add("uuid", s.ID);
+                        resdata.Add("handle", s.RegionData.Location.RegionHandle.ToString());
+                        resdata.Add("region_image", "");
+                        resdata.Add("external_name", s.RegionData.ServerURI + " " + s.RegionData.Name);
+                        resdata.Add("result", true);
                     }
                 }
                 catch
                 {
+                    resdata.Add("result", false);
                 }
             }
-            XmlRpcResponse res = new XmlRpcResponse();
-            res.Value = resdata;
+            else 
+            {
+                resdata.Add("result", false);
+            }
+            XMLRPC.XmlRpcResponse res = new XMLRPC.XmlRpcResponse();
+            res.ReturnValue = resdata;
             return res;
         }
 
-        XmlRpcResponse GetRegion(XmlRpcRequest req)
+        XMLRPC.XmlRpcResponse GetRegion(XMLRPC.XmlRpcRequest req)
         {
-            UUID region_uuid = new UUID((string)(((IDictionary)req.Params[0])["region_uuid"]));
-            Dictionary<string, object> resdata = new Dictionary<string, object>();
-            resdata["result"] = false;
+            UUID region_uuid = (((Map)req.Params[0])["region_uuid"]).AsUUID;
+            Map resdata = new Map();
             try
             {
                 SceneInterface s = Scene.Management.Scene.SceneManager.Scenes[region_uuid];
                 if (m_ServerParams.GetBoolean(s.ID, "HGDirectEnabled"))
                 {
-                    resdata["uuid"] = s.ID;
-                    resdata["handle"] = s.RegionData.Location.RegionHandle;
-                    resdata["x"] = s.RegionData.Location.X;
-                    resdata["y"] = s.RegionData.Location.Y;
-                    resdata["region_name"] = s.RegionData.Name;
+                    resdata.Add("uuid", s.ID);
+                    resdata.Add("handle", s.RegionData.Location.RegionHandle.ToString());
+                    resdata.Add("x", s.RegionData.Location.X);
+                    resdata.Add("y", s.RegionData.Location.Y);
+                    resdata.Add("region_name", s.RegionData.Name);
                     Uri serverURI = new Uri(s.RegionData.ServerURI);
-                    resdata["hostname"] = serverURI.Host;
-                    resdata["http_port"] = s.RegionData.ServerHttpPort;
-                    resdata["internal_port"] = s.RegionData.ServerPort;
-                    resdata["server_uri"] = s.RegionData.ServerURI;
-                    resdata["result"] = true;
+                    resdata.Add("hostname", serverURI.Host);
+                    resdata.Add("http_port", s.RegionData.ServerHttpPort);
+                    resdata.Add("internal_port", s.RegionData.ServerPort);
+                    resdata.Add("server_uri", s.RegionData.ServerURI);
+                    resdata.Add("result", true);
+                }
+                else
+                {
+                    resdata.Add("result", false);
                 }
             }
             catch
             {
+                resdata.Add("result", false);
             }
-            XmlRpcResponse res = new XmlRpcResponse();
-            res.Value = resdata;
+            XMLRPC.XmlRpcResponse res = new XMLRPC.XmlRpcResponse();
+            res.ReturnValue = resdata;
             return res;
         }
     }

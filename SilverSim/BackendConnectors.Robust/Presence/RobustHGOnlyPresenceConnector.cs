@@ -23,11 +23,12 @@ exception statement from your version.
 
 */
 
-using Nwc.XmlRpc;
 using SilverSim.Main.Common.HttpClient;
+using SilverSim.Main.Common.Rpc;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
 using SilverSim.Types.Presence;
+using SilverSim.Types.StructuredData.XMLRPC;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -36,8 +37,6 @@ namespace SilverSim.BackendConnectors.Robust.Presence
 {
     public class RobustHGOnlyPresenceConnector : PresenceServiceInterface
     {
-        private static readonly XmlRpcDeserializer m_XmlRpcDeserializer = new XmlRpcDeserializer();
-
         public int TimeoutMs { get; set; }
         string m_HomeURI;
 
@@ -51,22 +50,24 @@ namespace SilverSim.BackendConnectors.Robust.Presence
 
         void HGLogout(UUID sessionID, UUID userId)
         {
-            Dictionary<string, object> p = new Dictionary<string, object>();
-            p["userID"] = userId.ToString();
-            p["sessionID"] = sessionID.ToString();
+            Map p = new Map();
+            p.Add("userID", userId);
+            p.Add("sessionID", sessionID);
 
-            List<object> plist = new List<object>();
-            plist.Add(p);
-            XmlRpcRequest req = new XmlRpcRequest("logout_agent", plist);
-
-            XmlRpcResponse res = (XmlRpcResponse)m_XmlRpcDeserializer.Deserialize(HttpRequestHandler.DoRequest("POST", m_HomeURI, null, "text/xml", req.ToString(), false, TimeoutMs));
-            if (res.IsFault)
+            XMLRPC.XmlRpcRequest req = new XMLRPC.XmlRpcRequest("logout_agent");
+            req.Params.Add(p);
+            XMLRPC.XmlRpcResponse res;
+            try
+            {
+                res = RPC.DoXmlRpcRequest(m_HomeURI, req, TimeoutMs);
+            }
+            catch
             {
                 throw new PresenceUpdateFailedException();
             }
-            if (res.Value is IDictionary)
+            if (res.ReturnValue is Map)
             {
-                IDictionary d = (IDictionary)res.Value;
+                Map d = (Map)res.ReturnValue;
                 if (bool.Parse(d["result"].ToString()))
                 {
                     return;

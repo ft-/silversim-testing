@@ -24,15 +24,13 @@ exception statement from your version.
 */
 
 using Nini.Config;
-using Nwc.XmlRpc;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
 using SilverSim.Types.IM;
+using SilverSim.Types.StructuredData.XMLRPC;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Threading;
 
 namespace SilverSim.BackendConnectors.Robust.IM
@@ -54,47 +52,46 @@ namespace SilverSim.BackendConnectors.Robust.IM
             m_IMService = loader.GetService<IMServiceInterface>("IMService");
         }
 
-        public XmlRpcResponse IMReceived(XmlRpcRequest req)
+        public XMLRPC.XmlRpcResponse IMReceived(XMLRPC.XmlRpcRequest req)
         {
             GridInstantMessage im = new GridInstantMessage();
-            XmlRpcResponse res = new XmlRpcResponse();
+            XMLRPC.XmlRpcResponse res = new XMLRPC.XmlRpcResponse();
             try
             {
                 im.NoOfflineIMStore = m_DisallowOfflineIM;
-                IDictionary d = (IDictionary)req.Params[0];
+                Map d = (Map)req.Params[0];
 
-                im.FromAgent.ID = (string)d["from_agent_id"];
-                im.ToAgent.ID = (string)d["to_agent_id"];
-                im.IMSessionID = (string)d["im_session_id"];
-                im.RegionID = (string)d["region_id"];
-                im.Timestamp = Date.UnixTimeToDateTime(ulong.Parse((string)d["timestamp"]));
-                im.FromAgent.FullName = (string)d["from_agent_name"];
-                if(d.Contains("message"))
+                im.FromAgent.ID = d["from_agent_id"].ToString();
+                im.ToAgent.ID = d["to_agent_id"].ToString();
+                im.IMSessionID = d["im_session_id"].ToString();
+                im.RegionID = d["region_id"].ToString();
+                im.Timestamp = Date.UnixTimeToDateTime(d["timestamp"].AsULong);
+                im.FromAgent.FullName = d["from_agent_name"].ToString();
+                if(d.ContainsKey("message"))
                 {
-                    im.Message = (string)d["message"];
+                    im.Message = d["message"].ToString();
                 }
                 byte[] dialog = Convert.FromBase64String(d["dialog"].ToString());
                 im.Dialog = (GridInstantMessageDialog)dialog[0];
                 im.IsFromGroup = bool.Parse(d["from_group"].ToString());
                 byte[] offline = Convert.FromBase64String(d["offline"].ToString());
                 im.IsOffline = offline[0] != 0;
-                im.ParentEstateID = (uint)d["parent_estate_id"];
+                im.ParentEstateID = d["parent_estate_id"].AsUInt;
                 im.Position.X = float.Parse(d["position_x"].ToString());
                 im.Position.Y = float.Parse(d["position_y"].ToString());
                 im.Position.Z = float.Parse(d["position_z"].ToString());
-                if(d.Contains("binary_bucket"))
+                if(d.ContainsKey("binary_bucket"))
                 {
                     im.BinaryBucket = Convert.FromBase64String(d["binary_bucket"].ToString());
                 }
             }
             catch
             {
-                res.SetFault(-32602, "invalid method parameters");
-                return res;
+                throw new XMLRPC.XmlRpcFaultException(-32602, "invalid method parameters");
             }
 
             ManualResetEvent e = new ManualResetEvent(false);
-            Dictionary<string, string> p;
+            Map p;
             im.OnResult = delegate(GridInstantMessage _im, bool result) { _im.ResultInfo = result;  e.Set(); };
             m_IMService.Send(im);
             try
@@ -103,15 +100,15 @@ namespace SilverSim.BackendConnectors.Robust.IM
             }
             catch
             {
-                p = new Dictionary<string,string>();
-                p["result"] = "FALSE";
-                res.Value = p;
+                p = new Map();
+                p.Add("result", "FALSE");
+                res.ReturnValue = p;
                 return res;
             }
 
-            p = new Dictionary<string, string>();
-            p["result"] = im.ResultInfo ? "TRUE" : "FALSE";
-            res.Value = p;
+            p = new Map();
+            p.Add("result", im.ResultInfo ? "TRUE" : "FALSE");
+            res.ReturnValue = p;
 
             return res;
         }

@@ -23,11 +23,12 @@ exception statement from your version.
 
 */
 
-using Nwc.XmlRpc;
 using SilverSim.Main.Common.HttpClient;
+using SilverSim.Main.Common.Rpc;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
 using SilverSim.Types.IM;
+using SilverSim.Types.StructuredData.XMLRPC;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -37,7 +38,6 @@ namespace SilverSim.BackendConnectors.Robust.IM
     public class RobustIMConnector : IMServiceInterface
     {
         public int TimeoutMs { get; set; }
-        private static readonly XmlRpcDeserializer m_XmlRpcDeserializer = new XmlRpcDeserializer();
 
         string m_IMUri;
 
@@ -49,40 +49,45 @@ namespace SilverSim.BackendConnectors.Robust.IM
 
         public override void Send(GridInstantMessage im)
         {
-            Dictionary<string, object> p = new Dictionary<string, object>();
-            p["from_agent_id"] = im.FromAgent.ID.ToString();
-            p["from_agent_session"] = UUID.Zero.ToString();
-            p["to_agent_id"] = im.ToAgent.ID.ToString();
-            p["im_session_id"] = im.IMSessionID.ToString();
-            p["region_id"] = im.RegionID.ToString();
-            p["timestamp"] = im.Timestamp.AsULong.ToString();
-            p["from_agent_name"] = im.FromAgent.FullName;
-            p["from_group"] = im.IsFromGroup ? "TRUE" : "FALSE";
-            p["message"] = im.Message;
+            XMLRPC.XmlRpcRequest req = new XMLRPC.XmlRpcRequest();
+            
+            Map p = new Map();
+            p.Add("from_agent_id", im.FromAgent.ID);
+            p.Add("from_agent_session", UUID.Zero);
+            p.Add("to_agent_id", im.ToAgent.ID);
+            p.Add("im_session_id", im.IMSessionID);
+            p.Add("region_id", im.RegionID);
+            p.Add("timestamp", im.Timestamp.AsULong.ToString());
+            p.Add("from_agent_name", im.FromAgent.FullName);
+            p.Add("from_group", im.IsFromGroup ? "TRUE" : "FALSE");
+            p.Add("message", im.Message);
             byte[] v = new byte[1];
             v[0] = (byte)(int)im.Dialog;
-            p["dialog"] = Convert.ToBase64String(v, Base64FormattingOptions.None);
+            p.Add("dialog", Convert.ToBase64String(v, Base64FormattingOptions.None));
             v = new byte[1];
             v[0] = (im.IsOffline ? (byte)1 : (byte)0);
-            p["offline"] = Convert.ToBase64String(v, Base64FormattingOptions.None);
-            p["parent_estate_id"] = im.ParentEstateID.ToString();
-            p["position_x"] = im.Position.X.ToString();
-            p["position_y"] = im.Position.Y.ToString();
-            p["position_z"] = im.Position.Z.ToString();
-            p["binary_bucket"] = Convert.ToBase64String(im.BinaryBucket, Base64FormattingOptions.None); ;
+            p.Add("offline", Convert.ToBase64String(v, Base64FormattingOptions.None));
+            p.Add("parent_estate_id", im.ParentEstateID.ToString());
+            p.Add("position_x", im.Position.X.ToString());
+            p.Add("position_y", im.Position.Y.ToString());
+            p.Add("position_z", im.Position.Z.ToString());
+            p.Add("binary_bucket", Convert.ToBase64String(im.BinaryBucket, Base64FormattingOptions.None));
 
-            List<object> plist = new List<object>();
-            plist.Add(p);
-            XmlRpcRequest req = new XmlRpcRequest("grid_instant_message", plist);
+            req.MethodName = "grid_instant_message";
+            req.Params.Add(p);
 
-            XmlRpcResponse res = (XmlRpcResponse)m_XmlRpcDeserializer.Deserialize(HttpRequestHandler.DoRequest("POST", m_IMUri, null, "text/xml", req.ToString(), false, TimeoutMs));
-            if(res.IsFault)
+            XMLRPC.XmlRpcResponse res;
+            try
+            {
+                res = RPC.DoXmlRpcRequest(m_IMUri, req, TimeoutMs);
+            }
+            catch(XMLRPC.XmlRpcFaultException)
             {
                 throw new IMSendFailedException();
             }
-            if(res.Value is IDictionary)
+            if(res.ReturnValue is Map)
             {
-                IDictionary d = (IDictionary) res.Value;
+                Map d = (Map)res.ReturnValue;
                 if(bool.Parse(d["success"].ToString()))
                 {
                     return;

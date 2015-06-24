@@ -34,7 +34,7 @@ namespace SilverSim.StructuredData.LLSD
 {
     public static class LLSD_XML
     {
-        class InvalidLLSDXmlSerialization : Exception { }
+        public class InvalidLLSDXmlSerialization : Exception { }
 
         #region Main LLSD+XML Deserialization
         private static string GetTextNode(XmlTextReader input)

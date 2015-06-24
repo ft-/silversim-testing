@@ -24,7 +24,7 @@ exception statement from your version.
 */
 
 using log4net;
-using Nwc.XmlRpc;
+using SilverSim.Types.StructuredData.XMLRPC;
 using System;
 using System.IO;
 using System.Net;
@@ -38,17 +38,14 @@ namespace SilverSim.Main.Common.HttpServer
     {
         private static readonly ILog m_Log = LogManager.GetLogger("XMLRPC SERVER");
 
-        public delegate XmlRpcResponse XmlRpcDelegate(XmlRpcRequest req);
+        public delegate XMLRPC.XmlRpcResponse XmlRpcDelegate(XMLRPC.XmlRpcRequest req);
 
         public RwLockedDictionary<string, XmlRpcDelegate> XmlRpcMethods = new RwLockedDictionary<string,XmlRpcDelegate>();
-        XmlRpcDeserializer m_XmlRpcDeserializer = new XmlRpcDeserializer();
-
-        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
 
         void RequestHandler(HttpRequest httpreq)
         {
             object o;
-            XmlRpcRequest req;
+            XMLRPC.XmlRpcRequest req;
             if(httpreq.Method != "POST")
             {
                 HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
@@ -57,10 +54,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
             try
             {
-                using (StreamReader s = new StreamReader(httpreq.Body))
-                {
-                    o = m_XmlRpcDeserializer.Deserialize(s);
-                }
+                req = XMLRPC.DeserializeRequest(httpreq.Body);
             }
             catch
             {
@@ -68,20 +62,18 @@ namespace SilverSim.Main.Common.HttpServer
                 return;
             }
 
-            if(!(o is XmlRpcRequest))
-            {
-                FaultResponse(httpreq.BeginResponse(), -32700, "Invalid XML RPC Request");
-                return;
-            }
-
-            req = (XmlRpcRequest) o;
             XmlRpcDelegate del;
-            XmlRpcResponse res;
+            XMLRPC.XmlRpcResponse res;
             if(XmlRpcMethods.TryGetValue(req.MethodName, out del))
             {
                 try
                 {
                     res = del(req);
+                }
+                catch(XMLRPC.XmlRpcFaultException e)
+                {
+                    FaultResponse(httpreq.BeginResponse(), e.FaultCode, e.Message);
+                    return;
                 }
                 catch(Exception e)
                 {
@@ -92,11 +84,7 @@ namespace SilverSim.Main.Common.HttpServer
 
                 HttpResponse response = httpreq.BeginResponse();
                 response.ContentType = "text/xml";
-                using(TextWriter tw = new StreamWriter(response.GetOutputStream(), UTF8NoBOM))
-                {
-                    tw.Write(res.ToString());
-                    tw.Flush();
-                }
+                res.Serialize(response.GetOutputStream());
                 response.Close();
             }
             else

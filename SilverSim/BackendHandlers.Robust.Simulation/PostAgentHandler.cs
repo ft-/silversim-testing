@@ -29,6 +29,7 @@ using SilverSim.BackendConnectors.Robust.Asset;
 using SilverSim.BackendConnectors.Robust.GridUser;
 using SilverSim.BackendConnectors.Robust.Inventory;
 using SilverSim.BackendConnectors.Robust.Presence;
+using SilverSim.BackendConnectors.Robust.UserAgent;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages.Agent;
 using SilverSim.Main.Common;
@@ -449,6 +450,27 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 else
                 {
                     presenceService = new RobustHGPresenceConnector(m_DefaultPresenceServerURI, agentPost.Account.Principal.HomeURI.ToString());
+                }
+
+                UserAgentServiceInterface userAccountConnector = new RobustUserAgentConnector(agentPost.Account.ServiceURLs["HomeURI"]);
+                try
+                {
+                    userAccountConnector.VerifyAgent(agentPost.Session.SessionID, agentPost.Session.ServiceSessionID);
+                }
+                catch
+                {
+                    DoAgentResponse(req, "Failed to verify agent at Home Grid", false);
+                    return;
+                }
+
+                try
+                {
+                    userAccountConnector.VerifyClient(agentPost.Session.SessionID, agentPost.Session.ServiceSessionID);
+                }
+                catch
+                {
+                    DoAgentResponse(req, "Failed to verify client at Home Grid", false);
+                    return;
                 }
 
                 GroupsServiceInterface groupsService = null;

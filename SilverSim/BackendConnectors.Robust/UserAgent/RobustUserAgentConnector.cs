@@ -1,7 +1,32 @@
-﻿using Nwc.XmlRpc;
+﻿/*
+
+SilverSim is distributed under the terms of the
+GNU Affero General Public License v3
+with the following clarification and special exception.
+
+Linking this code statically or dynamically with other modules is
+making a combined work based on this code. Thus, the terms and
+conditions of the GNU Affero General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this code give you
+permission to link this code with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module. An independent module is a module which is not derived from
+or based on this code. If you modify this code, you may extend
+this exception to your version of the code, but you are not
+obligated to do so. If you do not wish to do so, delete this
+exception statement from your version.
+
+*/
+
 using SilverSim.Main.Common.Rpc;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
+using SilverSim.Types.StructuredData.XMLRPC;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -22,39 +47,39 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
 
         public override void VerifyAgent(UUID sessionID, string token)
         {
-            Hashtable hash = new Hashtable();
-            hash["sessionID"] = sessionID.ToString();
-            hash["token"] = token;
+            Map hash = new Map();
+            hash.Add("sessionID", sessionID);
+            hash.Add("token", token);
             DoXmlRpcWithBoolResponse("verify_agent", hash);
         }
 
         public override void VerifyClient(UUID sessionID, string token)
         {
-            Hashtable hash = new Hashtable();
-            hash["sessionID"] = sessionID.ToString();
-            hash["token"] = token;
+            Map hash = new Map();
+            hash.Add("sessionID", sessionID);
+            hash.Add("token", token);
             DoXmlRpcWithBoolResponse("verify_client", hash);
         }
 
         public override List<UUID> NotifyStatus(List<KeyValuePair<UUI, string>> friends, UUI user, bool online)
         {
-            Hashtable hash = new Hashtable();
-            hash["userID"] = user.ID.ToString();
-            hash["online"] = online.ToString();
+            Map hash = new Map();
+            hash.Add("userID", user.ID);
+            hash.Add("online", online.ToString());
             int i = 0;
             foreach(KeyValuePair<UUI, string> s in friends)
             {
-                hash["friend_" + i.ToString()] = s.Key.ToString() + ";" + s.Value;
+                hash.Add("friend_" + i.ToString(), s.Key.ToString() + ";" + s.Value);
                 ++i;
             }
 
-            Hashtable res = DoXmlRpcWithHashResponse("status_notification", hash);
+            Map res = DoXmlRpcWithHashResponse("status_notification", hash);
 
             List<UUID> friendsOnline = new List<UUID>();
 
-            foreach(object key in hash.Keys)
+            foreach(string key in hash.Keys)
             {
-                if(key is string && ((string)key).StartsWith("friend_") && hash[key] != null)
+                if(key.StartsWith("friend_") && hash[key] != null)
                 {
                     UUID friend;
                     if(UUID.TryParse(hash[key].ToString(), out friend))
@@ -69,12 +94,12 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
 
         public override Dictionary<string, object> GetUserInfo(UUI user)
         {
-            Hashtable hash = new Hashtable();
-            hash["userID"] = user.ID.ToString();
-
-            Hashtable res = DoXmlRpcWithHashResponse("get_user_info", hash);
+            Map hash = new Map();
+            hash.Add("userID", user.ID);
+            
+            Map res = DoXmlRpcWithHashResponse("get_user_info", hash);
             Dictionary<string, object> info = new Dictionary<string, object>();
-            foreach(object key in hash.Keys)
+            foreach(string key in hash.Keys)
             {
                 if(hash[key] != null)
                 {
@@ -87,17 +112,17 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
 
         public override Dictionary<string, string> GetServerURLs(UUI user)
         {
-            Hashtable hash = new Hashtable();
-            hash["userID"] = user.ID.ToString();
+            Map hash = new Map();
+            hash.Add("userID", user.ID);
 
-            Hashtable res = DoXmlRpcWithHashResponse("get_server_urls", hash);
+            Map res = DoXmlRpcWithHashResponse("get_server_urls", hash);
             Dictionary<string, string> serverUrls = new Dictionary<string, string>();
-            foreach(object key in hash.Keys)
+            foreach(string key in hash.Keys)
             {
-                if(key is string && ((string)key).StartsWith("SRV_") && hash[key] != null)
+                if(key.StartsWith("SRV_") && res[key] != null)
                 {
                     string serverType = key.ToString().Substring(4);
-                    serverUrls.Add(serverType, hash[key].ToString());
+                    serverUrls.Add(serverType, res[key].ToString());
                 }
             }
 
@@ -106,10 +131,10 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
 
         public override string LocateUser(UUI user)
         {
-            Hashtable hash = new Hashtable();
-            hash["userID"] = user.ID.ToString();
+            Map hash = new Map();
+            hash.Add("userID", user.ID);
 
-            Hashtable res = DoXmlRpcWithHashResponse("locate_user", hash);
+            Map res = DoXmlRpcWithHashResponse("locate_user", hash);
 
             if(hash.ContainsKey("URL"))
             {
@@ -121,11 +146,11 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
 
         public override UUI GetUUI(UUI user, UUI targetUserID)
         {
-            Hashtable hash = new Hashtable();
-            hash["userID"] = user.ID.ToString();
-            hash["targetUserID"] = targetUserID.ID.ToString();
+            Map hash = new Map();
+            hash.Add("userID", user.ID);
+            hash.Add("targetUserID", targetUserID.ID);
 
-            Hashtable res = DoXmlRpcWithHashResponse("get_uui", hash);
+            Map res = DoXmlRpcWithHashResponse("get_uui", hash);
 
             if (hash.ContainsKey("UUI"))
             {
@@ -135,14 +160,13 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
             throw new KeyNotFoundException();
         }
 
-        void DoXmlRpcWithBoolResponse(string method, Hashtable reqparams)
+        void DoXmlRpcWithBoolResponse(string method, Map reqparams)
         {
-            IList paramList = new ArrayList();
-            paramList.Add(reqparams);
-            XmlRpcRequest req = new XmlRpcRequest(method, paramList);
-            XmlRpcResponse res = RPC.DoXmlRpcRequest(m_Uri, req, TimeoutMs);
+            XMLRPC.XmlRpcRequest req = new XMLRPC.XmlRpcRequest(method);
+            req.Params.Add(reqparams);
+            XMLRPC.XmlRpcResponse res = RPC.DoXmlRpcRequest(m_Uri, req, TimeoutMs);
 
-            Hashtable hash = (Hashtable)res.Value;
+            Map hash = (Map)res.ReturnValue;
             if(hash == null)
             {
                 throw new InvalidOperationException();
@@ -151,7 +175,7 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
             bool success = false;
             if (hash.ContainsKey("result"))
             {
-                success = Boolean.Parse((string)hash["result"]);
+                success = Boolean.Parse(hash["result"].ToString());
                 if(!success)
                 {
                     throw new RequestFailedException();
@@ -163,14 +187,13 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
             }
         }
 
-        Hashtable DoXmlRpcWithHashResponse(string method, Hashtable reqparams)
+        Map DoXmlRpcWithHashResponse(string method, Map reqparams)
         {
-            IList paramList = new ArrayList();
-            paramList.Add(reqparams);
-            XmlRpcRequest req = new XmlRpcRequest(method, paramList);
-            XmlRpcResponse res = RPC.DoXmlRpcRequest(m_Uri, req, TimeoutMs);
+            XMLRPC.XmlRpcRequest req = new XMLRPC.XmlRpcRequest(method);
+            req.Params.Add(reqparams);
+            XMLRPC.XmlRpcResponse res = RPC.DoXmlRpcRequest(m_Uri, req, TimeoutMs);
 
-            Hashtable hash = (Hashtable)res.Value;
+            Map hash = (Map)res.ReturnValue;
             if (hash == null)
             {
                 throw new InvalidOperationException();

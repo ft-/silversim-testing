@@ -25,7 +25,6 @@
 	<Reference name="SilverSim.Scene.Types" localCopy="false"/>
 	<Reference name="SilverSim.Scene.Management" localCopy="false"/>
 	<Reference name="SilverSim.LL.Messages" localCopy="false"/>
-	<Reference name="Nwc.XmlRpc" localCopy="false"/>
 	<Files>
 		<Match pattern="*.cs" recurse="true"/>
 		<Match buildAction="EmbeddedResource" path="Resources" pattern="*" recurse="true"/>
