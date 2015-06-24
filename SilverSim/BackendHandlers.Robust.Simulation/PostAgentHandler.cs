@@ -463,6 +463,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     return;
                 }
 
+#if VERIFY_CLIENT
                 try
                 {
                     userAccountConnector.VerifyClient(agentPost.Session.SessionID, agentPost.Session.ServiceSessionID);
@@ -472,7 +473,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     DoAgentResponse(req, "Failed to verify client at Home Grid", false);
                     return;
                 }
-
+#endif
                 GroupsServiceInterface groupsService = null;
                 AssetServiceInterface assetService;
                 InventoryServiceInterface inventoryService;
