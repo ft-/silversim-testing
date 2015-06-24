@@ -197,7 +197,7 @@ namespace SilverSim.LL.Core.Capabilities
                     m.GroupPermissions = (InventoryPermissionsMask)BinToUInt(rm["group_mask"]);
                     m.ProfileHollow = (ushort)rm["hollow"].AsUInt;
                     m.Material = (PrimitiveMaterial)rm["material"].AsUInt;
-                    m.NextOwnerPermissions = (InventoryPermissionsMask)BinToUInt(rm["next_owneer_mask"]);
+                    m.NextOwnerPermissions = (InventoryPermissionsMask)BinToUInt(rm["next_owner_mask"]);
                     m.PCode = (PrimitiveCode)rm["p_code"].AsUInt;
                     m.PathBegin = (ushort)rm["path_begin"].AsUInt;
                     m.PathCurve = (byte)rm["path_curve"].AsUInt;
