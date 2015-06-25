@@ -194,7 +194,6 @@ namespace SilverSim.Archiver.OAR
                     if (header.FileName.StartsWith("objects/"))
                     {
                         /* Load objects */
-#warning TODO: missing is the load back of the group position
                         List<ObjectGroup> sogs = ObjectXML.fromXml(reader, scene.Owner);
                         foreach (ObjectGroup sog in sogs)
                         {
