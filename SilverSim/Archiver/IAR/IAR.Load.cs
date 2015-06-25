@@ -124,19 +124,22 @@ namespace SilverSim.Archiver.IAR
                     return;
                 }
 
-                if(header.FileName.StartsWith("assets/") && (options & LoadOptions.NoAssets) == 0)
+                if (header.FileType == TarFileType.File)
                 {
-                    /* Load asset */
-                    AssetData ad = reader.LoadAsset(header, principal);
-                    assetService.Store(ad);
-                }
+                    if (header.FileName.StartsWith("assets/") && (options & LoadOptions.NoAssets) == 0)
+                    {
+                        /* Load asset */
+                        AssetData ad = reader.LoadAsset(header, principal);
+                        assetService.Store(ad);
+                    }
 
-                if(header.FileName.StartsWith("inventory/"))
-                {
-                    /* Load inventory */
-                    InventoryItem item = LoadInventoryItem(reader, principal, nameService);
-                    item.ParentFolderID = GetPath(principal, inventoryService, inventoryPath, header.FileName, options);
-                    inventoryService.Item.Add(item);
+                    if (header.FileName.StartsWith("inventory/"))
+                    {
+                        /* Load inventory */
+                        InventoryItem item = LoadInventoryItem(reader, principal, nameService);
+                        item.ParentFolderID = GetPath(principal, inventoryService, inventoryPath, header.FileName, options);
+                        inventoryService.Item.Add(item);
+                    }
                 }
             }
         }
