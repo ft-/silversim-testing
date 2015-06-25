@@ -1869,6 +1869,7 @@ namespace SilverSim.Scene.Types.Object
                                 if (null != rootGroup)
                                 {
                                     rootGroup.AttachedPos = reader.ReadElementChildsAsVector3();
+                                    part.LocalPosition = rootGroup.AttachedPos; /* needs to be restored for load oar */
                                 }
                                 else
                                 {
@@ -1876,108 +1877,16 @@ namespace SilverSim.Scene.Types.Object
                                 }
                                 break;
 
-                            case "GroupPositionX":
-                                reader.ReadToEndElement(); /* not needed redundant information */
-                                break;
-
-                            case "GroupPositionY":
-                                reader.ReadToEndElement(); /* not needed redundant information */
-                                break;
-
-                            case "GroupPositionZ":
-                                reader.ReadToEndElement(); /* not needed redundant information */
-                                break;
-
                             case "OffsetPosition":
                                 part.LocalPosition = reader.ReadElementChildsAsVector3();
-                                break;
-
-                            case "OffsetPositionX":
-                                {
-                                    Vector3 v = part.LocalPosition;
-                                    v.X = reader.ReadElementValueAsDouble();
-                                    part.LocalPosition = v;
-                                }
-                                break;
-
-                            case "OffsetPositionY":
-                                {
-                                    Vector3 v = part.LocalPosition;
-                                    v.Y = reader.ReadElementValueAsDouble();
-                                    part.LocalPosition = v;
-                                }
-                                break;
-
-                            case "OffsetPositionZ":
-                                {
-                                    Vector3 v = part.LocalPosition;
-                                    v.Z = reader.ReadElementValueAsDouble();
-                                    part.LocalPosition = v;
-                                }
                                 break;
 
                             case "RotationOffset":
                                 part.LocalRotation = reader.ReadElementChildsAsQuaternion();
                                 break;
 
-                            case "RotationOffsetX":
-                                {
-                                    Quaternion q = part.LocalRotation;
-                                    q.X = reader.ReadElementValueAsDouble();
-                                    part.LocalRotation = q;
-                                }
-                                break;
-
-                            case "RotationOffsetY":
-                                {
-                                    Quaternion q = part.LocalRotation;
-                                    q.Y = reader.ReadElementValueAsDouble();
-                                    part.LocalRotation = q;
-                                }
-                                break;
-
-                            case "RotationOffsetZ":
-                                {
-                                    Quaternion q = part.LocalRotation;
-                                    q.Z = reader.ReadElementValueAsDouble();
-                                    part.LocalRotation = q;
-                                }
-                                break;
-
-                            case "RotationOffsetW":
-                                {
-                                    Quaternion q = part.LocalRotation;
-                                    q.W = reader.ReadElementValueAsDouble();
-                                    part.LocalRotation = q;
-                                }
-                                break;
-
                             case "Velocity":
                                 part.Velocity = reader.ReadElementChildsAsVector3();
-                                break;
-
-                            case "VelocityX":
-                                {
-                                    Vector3 v = part.Velocity;
-                                    v.X = reader.ReadElementValueAsDouble();
-                                    part.Velocity = v;
-                                }
-                                break;
-
-                            case "VelocityY":
-                                {
-                                    Vector3 v = part.Velocity;
-                                    v.Y = reader.ReadElementValueAsDouble();
-                                    part.Velocity = v;
-                                }
-                                break;
-
-                            case "VelocityZ":
-                                {
-                                    Vector3 v = part.Velocity;
-                                    v.Z = reader.ReadElementValueAsDouble();
-                                    part.Velocity = v;
-                                }
                                 break;
 
                             case "RotationalVelocity":
@@ -1988,60 +1897,12 @@ namespace SilverSim.Scene.Types.Object
                                 part.AngularVelocity = reader.ReadElementChildsAsVector3();
                                 break;
 
-                            case "AngularVelocityX":
-                                {
-                                    Vector3 v = part.AngularVelocity;
-                                    v.X = reader.ReadElementValueAsDouble();
-                                    part.AngularVelocity = v;
-                                }
-                                break;
-
-                            case "AngularVelocityY":
-                                {
-                                    Vector3 v = part.AngularVelocity;
-                                    v.Y = reader.ReadElementValueAsDouble();
-                                    part.AngularVelocity = v;
-                                }
-                                break;
-
-                            case "AngularVelocityZ":
-                                {
-                                    Vector3 v = part.AngularVelocity;
-                                    v.Z = reader.ReadElementValueAsDouble();
-                                    part.AngularVelocity = v;
-                                }
-                                break;
-
                             case "SitTargetAvatar":
                                 reader.ReadToEndElement();
                                 break;
 
                             case "Acceleration":
                                 part.Acceleration = reader.ReadElementChildsAsVector3();
-                                break;
-
-                            case "AccelerationX":
-                                {
-                                    Vector3 v = part.Acceleration;
-                                    v.X = reader.ReadElementValueAsDouble();
-                                    part.Acceleration = v;
-                                }
-                                break;
-
-                            case "AccelerationY":
-                                {
-                                    Vector3 v = part.Acceleration;
-                                    v.Y = reader.ReadElementValueAsDouble();
-                                    part.Acceleration = v;
-                                }
-                                break;
-
-                            case "AccelerationZ":
-                                {
-                                    Vector3 v = part.Acceleration;
-                                    v.Z = reader.ReadElementValueAsDouble();
-                                    part.Acceleration = v;
-                                }
                                 break;
 
                             case "Description":
@@ -2052,38 +1913,6 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     TextParam tp = part.Text;
                                     tp.TextColor = reader.ReadElementChildsAsColorAlpha();
-                                    part.Text = tp;
-                                }
-                                break;
-
-                            case "ColorR":
-                                {
-                                    TextParam tp = part.Text;
-                                    tp.TextColor.R_AsByte = (byte)reader.ReadElementValueAsInt();
-                                    part.Text = tp;
-                                }
-                                break;
-
-                            case "ColorG":
-                                {
-                                    TextParam tp = part.Text;
-                                    tp.TextColor.G_AsByte = (byte)reader.ReadElementValueAsInt();
-                                    part.Text = tp;
-                                }
-                                break;
-
-                            case "ColorB":
-                                {
-                                    TextParam tp = part.Text;
-                                    tp.TextColor.B_AsByte = (byte)reader.ReadElementValueAsInt();
-                                    part.Text = tp;
-                                }
-                                break;
-
-                            case "ColorA":
-                                {
-                                    TextParam tp = part.Text;
-                                    tp.TextColor.A_AsByte = (byte)reader.ReadElementValueAsInt();
                                     part.Text = tp;
                                 }
                                 break;
@@ -2120,92 +1949,12 @@ namespace SilverSim.Scene.Types.Object
                                 part.Size = reader.ReadElementChildsAsVector3();
                                 break;
 
-                            case "ScaleX":
-                                {
-                                    Vector3 v = part.Size;
-                                    v.X = reader.ReadElementValueAsDouble();
-                                    part.Size = v;
-                                }
-                                break;
-
-                            case "ScaleY":
-                                {
-                                    Vector3 v = part.Size;
-                                    v.Y = reader.ReadElementValueAsDouble();
-                                    part.Size = v;
-                                }
-                                break;
-
-                            case "ScaleZ":
-                                {
-                                    Vector3 v = part.Size;
-                                    v.Z = reader.ReadElementValueAsDouble();
-                                    part.Size = v;
-                                }
-                                break;
-
                             case "SitTargetOrientation":
                                 part.SitTargetOrientation = reader.ReadElementChildsAsQuaternion();
                                 break;
 
-                            case "SitTargetOrientatonX":
-                                {
-                                    Quaternion q = part.SitTargetOrientation;
-                                    q.X = reader.ReadElementValueAsDouble();
-                                    part.SitTargetOrientation = q;
-                                }
-                                break;
-
-                            case "SitTargetOrientatonY":
-                                {
-                                    Quaternion q = part.SitTargetOrientation;
-                                    q.Y = reader.ReadElementValueAsDouble();
-                                    part.SitTargetOrientation = q;
-                                }
-                                break;
-
-                            case "SitTargetOrientatonZ":
-                                {
-                                    Quaternion q = part.SitTargetOrientation;
-                                    q.Z = reader.ReadElementValueAsDouble();
-                                    part.SitTargetOrientation = q;
-                                }
-                                break;
-
-                            case "SitTargetOrientatonW":
-                                {
-                                    Quaternion q = part.SitTargetOrientation;
-                                    q.W = reader.ReadElementValueAsDouble();
-                                    part.SitTargetOrientation = q;
-                                }
-                                break;
-
                             case "SitTargetPosition":
                                 part.SitTargetOffset = reader.ReadElementChildsAsVector3();
-                                break;
-
-                            case "SitTargetPositionX":
-                                {
-                                    Vector3 v = part.SitTargetOffset;
-                                    v.X = reader.ReadElementValueAsDouble();
-                                    part.SitTargetOffset = v;
-                                }
-                                break;
-
-                            case "SitTargetPositionY":
-                                {
-                                    Vector3 v = part.SitTargetOffset;
-                                    v.Y = reader.ReadElementValueAsDouble();
-                                    part.SitTargetOffset = v;
-                                }
-                                break;
-
-                            case "SitTargetPositionZ":
-                                {
-                                    Vector3 v = part.SitTargetOffset;
-                                    v.Z = reader.ReadElementValueAsDouble();
-                                    part.SitTargetOffset = v;
-                                }
                                 break;
 
                             case "ParentID":
@@ -2339,45 +2088,6 @@ namespace SilverSim.Scene.Types.Object
                                 if (null != rootGroup)
                                 {
                                     rootGroup.AttachedPos = reader.ReadElementChildsAsVector3();
-                                }
-                                else
-                                {
-                                    reader.ReadToEndElement();
-                                }
-                                break;
-
-                            case "AttachedPosX":
-                                if (null != rootGroup)
-                                {
-                                    Vector3 v = rootGroup.AttachedPos;
-                                    v.X = reader.ReadElementValueAsDouble();
-                                    rootGroup.AttachedPos = v;
-                                }
-                                else
-                                {
-                                    reader.ReadToEndElement();
-                                }
-                                break;
-
-                            case "AttachedPosY":
-                                if (null != rootGroup)
-                                {
-                                    Vector3 v = rootGroup.AttachedPos;
-                                    v.Y = reader.ReadElementValueAsDouble();
-                                    rootGroup.AttachedPos = v;
-                                }
-                                else
-                                {
-                                    reader.ReadToEndElement();
-                                }
-                                break;
-
-                            case "AttachedPosZ":
-                                if (null != rootGroup)
-                                {
-                                    Vector3 v = rootGroup.AttachedPos;
-                                    v.Z = reader.ReadElementValueAsDouble();
-                                    rootGroup.AttachedPos = v;
                                 }
                                 else
                                 {
