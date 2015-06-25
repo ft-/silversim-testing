@@ -43,6 +43,7 @@ using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Estate;
+using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
@@ -131,6 +132,7 @@ namespace SilverSim.Main.Common
             m_FeaturesTable[typeof(GroupsServiceInterface)] = "Groups Service";
             m_FeaturesTable[typeof(ProfileServiceInterface)] = "Profile Service";
             m_FeaturesTable[typeof(NeighborServiceInterface)] = "Neighbor Signaling Service";
+            m_FeaturesTable[typeof(FriendsServiceInterface)] = "Friends Service";
 
             m_FeaturesTable[typeof(IPluginShutdown)] = "Shutdown Handler";
             m_FeaturesTable[typeof(IDBServiceInterface)] = "DataBase Service";

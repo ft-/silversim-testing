@@ -25,12 +25,18 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Types.Friends;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Friends
 {
     public abstract class FriendsServiceInterface
     {
+        public class FriendUpdateFailedException : Exception
+        {
+
+        }
+
         public FriendsServiceInterface()
         {
 
@@ -41,14 +47,13 @@ namespace SilverSim.ServiceInterfaces.Friends
             get;
         }
 
-        public abstract FriendInfo this[UUID userID, UUI friendID]
+        public abstract List<FriendInfo> this[UUI user]
         {
             get;
         }
 
-        public abstract List<FriendInfo> this[UUID userID]
-        {
-            get;
-        }
+        public abstract void Store(FriendInfo fi);
+
+        public abstract void Delete(FriendInfo fi);
     }
 }
