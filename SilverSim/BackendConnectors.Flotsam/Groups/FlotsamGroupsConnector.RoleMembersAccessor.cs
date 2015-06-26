@@ -23,30 +23,46 @@ exception statement from your version.
 
 */
 
-using log4net;
-using Nini.Config;
-using SilverSim.Main.Common;
+using SilverSim.Types;
+using SilverSim.Types.Groups;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace SilverSim.BackendConnectors.Flotsam.Groups
 {
-    [PluginName("XmlRpcGroups")]
-    public class Factory : IPluginFactory
+    public partial class FlotsamGroupsConnector
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("FLOTSAM GROUPS CONNECTOR");
-
-        public Factory()
+        class RoleMembersAccessor : IGroupRolemembersInterface
         {
+            public int TimeoutMs = 20000;
+            string m_Uri;
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            if(!ownSection.Contains("URI"))
+            public RoleMembersAccessor(string uri)
             {
-                m_Log.FatalFormat("Missing 'URI' in section {0}", ownSection.Name);
-                throw new ConfigurationLoader.ConfigurationError();
+                m_Uri = uri;
             }
-            return new FlotsamGroupsConnector(ownSection.GetString("URI"));
+
+            public GroupRolemember this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public List<GroupRolemember> this[UUI requestingAgent, UGI group, UUID roleID]
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public void Add(UUI requestingAgent, GroupRolemember rolemember)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Delete(UUI requestingAgent, UGI group, UUID roleID, UUI principal)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

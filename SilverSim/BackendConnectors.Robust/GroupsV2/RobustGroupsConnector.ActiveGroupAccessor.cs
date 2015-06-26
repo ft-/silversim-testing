@@ -23,30 +23,43 @@ exception statement from your version.
 
 */
 
-using log4net;
-using Nini.Config;
-using SilverSim.Main.Common;
+using SilverSim.Types;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace SilverSim.BackendConnectors.Flotsam.Groups
+namespace SilverSim.BackendConnectors.Robust.GroupsV2
 {
-    [PluginName("XmlRpcGroups")]
-    public class Factory : IPluginFactory
+    public partial class RobustGroupsConnector
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("FLOTSAM GROUPS CONNECTOR");
-
-        public Factory()
+        class ActiveGroupAccessor : IGroupSelectInterface
         {
+            public int TimeoutMs = 20000;
+            string m_Uri;
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            if(!ownSection.Contains("URI"))
+            public ActiveGroupAccessor(string uri)
             {
-                m_Log.FatalFormat("Missing 'URI' in section {0}", ownSection.Name);
-                throw new ConfigurationLoader.ConfigurationError();
+                m_Uri = uri;
             }
-            return new FlotsamGroupsConnector(ownSection.GetString("URI"));
+
+            public UUID this[UUI requestingAgent, UUI princialID]
+            {
+                get
+                {
+                    throw new NotImplementedException();
+                }
+                set
+                {
+                    Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["AgentID"] = princialID.ID;
+                    post["GroupID"] = value;
+                    post["RequestingAgentID"] = requestingAgent.ID;
+                    post["OP"] = "GROUP";
+                    post["METHOD"] = "SETACTIVE";
+                    BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
+                }
+            }
         }
     }
 }

@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Types.Groups;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Groups
@@ -197,6 +198,11 @@ namespace SilverSim.ServiceInterfaces.Groups
         public abstract IGroupNoticesInterface Notices
         {
             get;
+        }
+
+        public class AccessFailedException : Exception
+        {
+
         }
     }
 }

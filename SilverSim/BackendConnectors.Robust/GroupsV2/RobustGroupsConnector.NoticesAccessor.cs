@@ -23,30 +23,46 @@ exception statement from your version.
 
 */
 
-using log4net;
-using Nini.Config;
-using SilverSim.Main.Common;
+using SilverSim.Types;
+using SilverSim.Types.Groups;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace SilverSim.BackendConnectors.Flotsam.Groups
+namespace SilverSim.BackendConnectors.Robust.GroupsV2
 {
-    [PluginName("XmlRpcGroups")]
-    public class Factory : IPluginFactory
+    public partial class RobustGroupsConnector
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("FLOTSAM GROUPS CONNECTOR");
-
-        public Factory()
+        class NoticesAccessor : IGroupNoticesInterface
         {
+            public int TimeoutMs = 20000;
+            string m_Uri;
 
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            if(!ownSection.Contains("URI"))
+            public NoticesAccessor(string uri)
             {
-                m_Log.FatalFormat("Missing 'URI' in section {0}", ownSection.Name);
-                throw new ConfigurationLoader.ConfigurationError();
+                m_Uri = uri;
             }
-            return new FlotsamGroupsConnector(ownSection.GetString("URI"));
+
+            public List<GroupNotice> GetNotices(UUI requestingAgent, UGI group)
+            {
+                throw new NotImplementedException();
+            }
+
+            public GroupNotice this[UUI requestingAgent, UUID groupNoticeID]
+            {
+                get { throw new NotImplementedException(); }
+            }
+
+            public void Add(UUI requestingAgent, GroupNotice notice)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Delete(UUI requestingAgent, UUID groupNoticeID)
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }
