@@ -65,12 +65,24 @@ namespace SilverSim.Archiver
             if (limitedToScene != UUID.Zero)
             {
                 selectedScene = limitedToScene;
-                scene = SceneManager.Scenes[selectedScene];
             }
-            else
+
+            if(UUID.Zero == selectedScene)
             {
                 io.Write("Multi-region OARs currently not supported");
                 return;
+            }
+            else
+            {
+                try
+                {
+                    scene = SceneManager.Scenes[selectedScene];
+                }
+                catch
+                {
+                    io.Write("Selected region does not exist");
+                    return;
+                }
             }
 
             string filename = null;

@@ -49,6 +49,10 @@ namespace SilverSim.Archiver.Tar
 
         void WriteDirectory(string dirname)
         {
+            if(dirname.IndexOf('/') < 0)
+            {
+                return;
+            }
             string[] dirparts = dirname.Split('/');
             string dirpath = "";
 
@@ -75,6 +79,7 @@ namespace SilverSim.Archiver.Tar
                 m_Position += (512 - (m_Position % 512));
             }
             m_Stream.Write(header, 0, 512);
+            m_Stream.Flush();
         }
 
         void WriteHeader(string filename, TarFileType fileType, int fileSize)
@@ -104,10 +109,10 @@ namespace SilverSim.Archiver.Tar
             }
             Buffer.BlockCopy(Encoding.ASCII.GetBytes(fileSizeOctal), 0, header, 124, 11);
 
-            string lastModTime = Date.GetUnixTime().ToString();
+            string lastModTime = Convert.ToString((uint)Date.GetUnixTime(), 8);
             while(lastModTime.Length < 11)
             {
-                lastModTime = "0" + lastModTime;
+                lastModTime = " " + lastModTime;
             }
             Buffer.BlockCopy(Encoding.ASCII.GetBytes(lastModTime), 0, header, 136, 11);
 
@@ -132,6 +137,7 @@ namespace SilverSim.Archiver.Tar
             }
             Array.Copy(Encoding.ASCII.GetBytes(checkSumStr), 0, header, 148, 6);
             header[154] = 0;
+            WriteBytes(header);
         }
 
         void WriteBytes(byte[] b)

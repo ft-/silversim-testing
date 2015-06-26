@@ -169,6 +169,25 @@ namespace SilverSim.Main.Common.CmdIO
                         cmdargs.Add(argument);
                         argument = "";
                     }
+                    inargument = false;
+                }
+                else if(c == '\"')
+                {
+                    if(inargument)
+                    {
+                        cmdargs.Add(argument);
+                        argument = "";
+                    }
+                    indoublequotes = true;
+                }
+                else if (c == '\'')
+                {
+                    if (inargument)
+                    {
+                        cmdargs.Add(argument);
+                        argument = "";
+                    }
+                    insinglequotes = true;
                 }
                 else
                 {

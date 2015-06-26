@@ -54,149 +54,154 @@ namespace SilverSim.Archiver.OAR
             SaveOptions options,
             Stream outputFile)
         {
-            TarArchiveWriter writer = new TarArchiveWriter(new GZipStream(outputFile, CompressionMode.Compress));
-
-            bool saveAssets = (options & SaveOptions.NoAssets) == 0;
-            XmlSerializationOptions xmloptions = XmlSerializationOptions.None;
-            if((options & SaveOptions.Publish) == 0)
+            using (GZipStream gzip = new GZipStream(outputFile, CompressionMode.Compress))
             {
-                xmloptions |= XmlSerializationOptions.WriteOwnerInfo;
-            }
+                TarArchiveWriter writer = new TarArchiveWriter(gzip);
 
-            writer.WriteFile("archive.xml", WriteArchiveXml08(scene, saveAssets));
-
-            Dictionary<string, AssetData> objectAssets = new Dictionary<string,AssetData>();
-
-            foreach (ObjectGroup sog in scene.Objects)
-            {
-                if(sog.IsTemporary)
+                bool saveAssets = (options & SaveOptions.NoAssets) == 0;
+                XmlSerializationOptions xmloptions = XmlSerializationOptions.None;
+                if ((options & SaveOptions.Publish) == 0)
                 {
-                    /* skip temporary */
-                    continue;
+                    xmloptions |= XmlSerializationOptions.WriteOwnerInfo;
                 }
-                using(MemoryStream ms = new MemoryStream())
+
+                writer.WriteFile("archive.xml", WriteArchiveXml08(scene, saveAssets));
+
+                Dictionary<string, AssetData> objectAssets = new Dictionary<string, AssetData>();
+
+                foreach (ObjectGroup sog in scene.Objects)
                 {
-                    using(XmlTextWriter objectwriter = new XmlTextWriter(ms, UTF8NoBOM))
+                    if (sog.IsTemporary)
                     {
-                        sog.ToXml(objectwriter, xmloptions);
-                        AssetData data = new AssetData();
-                        data.Data = ms.GetBuffer();
-                        data.Type = AssetType.Object;
-                        objectAssets.Add(sog.Name + "_" + sog.GlobalPosition.X_String + "-" + sog.GlobalPosition.Y_String + "-" + sog.GlobalPosition.Z_String + "__" + sog.ID + ".xml", data);
+                        /* skip temporary */
+                        continue;
+                    }
+                    using (MemoryStream ms = new MemoryStream())
+                    {
+                        using (XmlTextWriter objectwriter = new XmlTextWriter(ms, UTF8NoBOM))
+                        {
+                            sog.ToXml(objectwriter, xmloptions);
+                            AssetData data = new AssetData();
+                            data.Data = ms.GetBuffer();
+                            data.Type = AssetType.Object;
+                            objectAssets.Add(sog.Name + "_" + sog.GlobalPosition.X_String + "-" + sog.GlobalPosition.Y_String + "-" + sog.GlobalPosition.Z_String + "__" + sog.ID + ".xml", data);
+                        }
                     }
                 }
-            }
 
-            if (saveAssets)
-            {
-                /* we only parse sim details when saving assets */
-                List<UUID> assetIDs = new List<UUID>();
-                AssetData data;
-
-                foreach (AssetData objdata in objectAssets.Values)
+                if (saveAssets)
                 {
-                    foreach (UUID id in objdata.References)
+                    /* we only parse sim details when saving assets */
+                    List<UUID> assetIDs = new List<UUID>();
+                    AssetData data;
+
+                    foreach (AssetData objdata in objectAssets.Values)
                     {
-                        if (!assetIDs.Contains(id))
+                        foreach (UUID id in objdata.References)
                         {
-                            assetIDs.Add(id);
+                            if (!assetIDs.Contains(id))
+                            {
+                                assetIDs.Add(id);
+                            }
+                        }
+                    }
+
+                    foreach (ParcelInfo pinfo in scene.Parcels)
+                    {
+                        assetIDs.Add(pinfo.MediaID);
+                        assetIDs.Add(pinfo.SnapshotID);
+                    }
+
+                    int assetidx = 0;
+                    while (assetidx < assetIDs.Count)
+                    {
+                        UUID assetID = assetIDs[assetidx++];
+                        try
+                        {
+                            data = scene.AssetService[assetID];
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+                        writer.WriteAsset(data);
+                        foreach (UUID refid in data.References)
+                        {
+                            if (!assetIDs.Contains(refid))
+                            {
+                                assetIDs.Add(refid);
+                            }
                         }
                     }
                 }
 
                 foreach (ParcelInfo pinfo in scene.Parcels)
                 {
-                    assetIDs.Add(pinfo.MediaID);
-                    assetIDs.Add(pinfo.SnapshotID);
-                }
-
-                int assetidx = 0;
-                while(assetidx < assetIDs.Count)
-                {
-                    UUID assetID = assetIDs[assetidx++];
-                    try
+                    using (MemoryStream ms = new MemoryStream())
                     {
-                        data = scene.AssetService[assetID];
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-                    writer.WriteAsset(data);
-                    foreach(UUID refid in data.References)
-                    {
-                        if(!assetIDs.Contains(refid))
+                        using (XmlTextWriter xmlwriter = new XmlTextWriter(ms, UTF8NoBOM))
                         {
-                            assetIDs.Add(refid);
-                        }
-                    }
-                }
-            }
-
-            foreach(ParcelInfo pinfo in scene.Parcels)
-            {
-                using(MemoryStream ms = new MemoryStream())
-                {
-                    using(XmlTextWriter xmlwriter = new XmlTextWriter(ms, UTF8NoBOM))
-                    {
-                        xmlwriter.WriteStartElement("LandData");
-                        {
-                            xmlwriter.WriteNamedValue("Area", pinfo.Area);
-                            xmlwriter.WriteNamedValue("AuctionID", pinfo.AuctionID);
-                            xmlwriter.WriteNamedValue("AuthBuyerID", pinfo.AuthBuyer.ID);
-                            xmlwriter.WriteNamedValue("Category", (byte)pinfo.Category);
-                            xmlwriter.WriteNamedValue("ClaimDate", pinfo.ClaimDate.DateTimeToUnixTime());
-                            xmlwriter.WriteNamedValue("ClaimPrice", pinfo.ClaimPrice);
-                            xmlwriter.WriteNamedValue("GlobalID", pinfo.ID);
-                            if ((options & SaveOptions.Publish) != 0)
+                            xmlwriter.WriteStartElement("LandData");
                             {
-                                xmlwriter.WriteNamedValue("GroupID", UUID.Zero);
-                                xmlwriter.WriteNamedValue("IsGroupOwned", false);
-                            }
-                            else
-                            {
-                                xmlwriter.WriteNamedValue("GroupID", pinfo.Group.ID);
-                                xmlwriter.WriteNamedValue("IsGroupOwned", pinfo.GroupOwned);
-                            }
-                            xmlwriter.WriteNamedValue("Bitmap", Convert.ToBase64String(pinfo.LandBitmap.Data));
-                            xmlwriter.WriteNamedValue("Description", pinfo.Description);
-                            xmlwriter.WriteNamedValue("Flags", (uint)pinfo.Flags);
-                            xmlwriter.WriteNamedValue("LandingType", (uint)pinfo.LandingType);
-                            xmlwriter.WriteNamedValue("Name", pinfo.Name);
-                            xmlwriter.WriteNamedValue("Status", (uint)pinfo.Status);
-                            xmlwriter.WriteNamedValue("LocalID", pinfo.LocalID);
-                            xmlwriter.WriteNamedValue("MediaAutoScale", pinfo.MediaAutoScale);
-                            xmlwriter.WriteNamedValue("MediaID", pinfo.MediaID);
-                            xmlwriter.WriteNamedValue("MediaURL", pinfo.MediaURI.ToString());
-                            xmlwriter.WriteNamedValue("MusicURL", pinfo.MusicURI.ToString());
-                            xmlwriter.WriteNamedValue("OwnerID", pinfo.Owner.ID);
-                            xmlwriter.WriteStartElement("ParcelAccessList");
-                            {
+                                xmlwriter.WriteNamedValue("Area", pinfo.Area);
+                                xmlwriter.WriteNamedValue("AuctionID", pinfo.AuctionID);
+                                xmlwriter.WriteNamedValue("AuthBuyerID", pinfo.AuthBuyer.ID);
+                                xmlwriter.WriteNamedValue("Category", (byte)pinfo.Category);
+                                xmlwriter.WriteNamedValue("ClaimDate", pinfo.ClaimDate.DateTimeToUnixTime());
+                                xmlwriter.WriteNamedValue("ClaimPrice", pinfo.ClaimPrice);
+                                xmlwriter.WriteNamedValue("GlobalID", pinfo.ID);
+                                if ((options & SaveOptions.Publish) != 0)
+                                {
+                                    xmlwriter.WriteNamedValue("GroupID", UUID.Zero);
+                                    xmlwriter.WriteNamedValue("IsGroupOwned", false);
+                                }
+                                else
+                                {
+                                    xmlwriter.WriteNamedValue("GroupID", pinfo.Group.ID);
+                                    xmlwriter.WriteNamedValue("IsGroupOwned", pinfo.GroupOwned);
+                                }
+                                xmlwriter.WriteNamedValue("Bitmap", Convert.ToBase64String(pinfo.LandBitmap.Data));
+                                xmlwriter.WriteNamedValue("Description", pinfo.Description);
+                                xmlwriter.WriteNamedValue("Flags", (uint)pinfo.Flags);
+                                xmlwriter.WriteNamedValue("LandingType", (uint)pinfo.LandingType);
+                                xmlwriter.WriteNamedValue("Name", pinfo.Name);
+                                xmlwriter.WriteNamedValue("Status", (uint)pinfo.Status);
+                                xmlwriter.WriteNamedValue("LocalID", pinfo.LocalID);
+                                xmlwriter.WriteNamedValue("MediaAutoScale", pinfo.MediaAutoScale);
+                                xmlwriter.WriteNamedValue("MediaID", pinfo.MediaID);
+                                xmlwriter.WriteNamedValue("MediaURL", pinfo.MediaURI.ToString());
+                                xmlwriter.WriteNamedValue("MusicURL", pinfo.MusicURI.ToString());
+                                xmlwriter.WriteNamedValue("OwnerID", pinfo.Owner.ID);
+                                xmlwriter.WriteStartElement("ParcelAccessList");
+                                {
 #warning Implement saving Parcel Access List
+                                }
+                                xmlwriter.WriteEndElement();
+                                xmlwriter.WriteNamedValue("PassHours", pinfo.PassHours);
+                                xmlwriter.WriteNamedValue("PassPrice", pinfo.PassPrice);
+                                xmlwriter.WriteNamedValue("SalePrice", pinfo.SalePrice);
+                                xmlwriter.WriteNamedValue("SnapshotID", pinfo.SnapshotID);
+                                xmlwriter.WriteNamedValue("UserLocation", pinfo.LandingPosition.ToString());
+                                xmlwriter.WriteNamedValue("UserLookAt", pinfo.LandingLookAt.ToString());
+                                xmlwriter.WriteNamedValue("Dwell", pinfo.Dwell);
+                                xmlwriter.WriteNamedValue("OtherCleanTime", pinfo.OtherCleanTime);
                             }
                             xmlwriter.WriteEndElement();
-                            xmlwriter.WriteNamedValue("PassHours", pinfo.PassHours);
-                            xmlwriter.WriteNamedValue("PassPrice", pinfo.PassPrice);
-                            xmlwriter.WriteNamedValue("SalePrice", pinfo.SalePrice);
-                            xmlwriter.WriteNamedValue("SnapshotID", pinfo.SnapshotID);
-                            xmlwriter.WriteNamedValue("UserLocation", pinfo.LandingPosition.ToString());
-                            xmlwriter.WriteNamedValue("UserLookAt", pinfo.LandingLookAt.ToString());
-                            xmlwriter.WriteNamedValue("Dwell", pinfo.Dwell);
-                            xmlwriter.WriteNamedValue("OtherCleanTime", pinfo.OtherCleanTime);
-                        }
-                        xmlwriter.WriteEndElement();
+                            xmlwriter.Flush();
 
-                        writer.WriteFile("landdata/" + pinfo.ID + ".xml", ms.GetBuffer());
+                            writer.WriteFile("landdata/" + pinfo.ID + ".xml", ms.GetBuffer());
+                        }
                     }
                 }
-            }
 
-            foreach(KeyValuePair<string, AssetData> kvp in objectAssets)
-            {
-                writer.WriteFile("objects/" + kvp.Key, kvp.Value.Data);
-            }
+                foreach (KeyValuePair<string, AssetData> kvp in objectAssets)
+                {
+                    writer.WriteFile("objects/" + kvp.Key, kvp.Value.Data);
+                }
 
-            writer.WriteFile("terrains/" + scene.RegionData.Name + ".r32", GenTerrainFile(scene.Terrain.AllPatches));
+                writer.WriteFile("terrains/" + scene.RegionData.Name + ".r32", GenTerrainFile(scene.Terrain.AllPatches));
+                writer.WriteEndOfTar();
+            }
         }
 
         static byte[] WriteArchiveXml08(SceneInterface scene, bool assetsIncluded)
@@ -226,6 +231,7 @@ namespace SilverSim.Archiver.OAR
                         writer.WriteEndElement();
                     }
                     writer.WriteEndElement();
+                    writer.Flush();
 
                     return ms.GetBuffer();
                 }
