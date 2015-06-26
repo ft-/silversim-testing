@@ -78,7 +78,6 @@ namespace SilverSim.Archiver.Tar
                 m_Stream.Write(header, 0, 512 - (m_Position % 512));
                 m_Position += (512 - (m_Position % 512));
             }
-            m_Stream.Write(header, 0, 512);
             m_Stream.Flush();
         }
 

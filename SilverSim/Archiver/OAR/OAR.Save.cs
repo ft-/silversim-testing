@@ -277,6 +277,7 @@ namespace SilverSim.Archiver.OAR
                     {
                         bs.Write(f);
                     }
+                    bs.Flush();
                     return output.GetBuffer();
                 }
             }
