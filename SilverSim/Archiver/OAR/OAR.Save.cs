@@ -44,6 +44,7 @@ namespace SilverSim.Archiver.OAR
         [Flags]
         public enum SaveOptions
         {
+            None = 0,
             NoAssets = 0x00000001,
             Publish = 0x00000002,
         }
@@ -51,9 +52,9 @@ namespace SilverSim.Archiver.OAR
         public static void Save(
             SceneInterface scene,
             SaveOptions options,
-            string fileName)
+            Stream outputFile)
         {
-            TarArchiveWriter writer = new TarArchiveWriter(new GZipStream(new FileStream(fileName, FileMode.Create), CompressionMode.Compress));
+            TarArchiveWriter writer = new TarArchiveWriter(new GZipStream(outputFile, CompressionMode.Compress));
 
             bool saveAssets = (options & SaveOptions.NoAssets) == 0;
             XmlSerializationOptions xmloptions = XmlSerializationOptions.None;
@@ -147,8 +148,16 @@ namespace SilverSim.Archiver.OAR
                             xmlwriter.WriteNamedValue("ClaimDate", pinfo.ClaimDate.DateTimeToUnixTime());
                             xmlwriter.WriteNamedValue("ClaimPrice", pinfo.ClaimPrice);
                             xmlwriter.WriteNamedValue("GlobalID", pinfo.ID);
-                            xmlwriter.WriteNamedValue("GroupID", pinfo.Group.ID);
-                            xmlwriter.WriteNamedValue("IsGroupOwned", pinfo.GroupOwned);
+                            if ((options & SaveOptions.Publish) != 0)
+                            {
+                                xmlwriter.WriteNamedValue("GroupID", UUID.Zero);
+                                xmlwriter.WriteNamedValue("IsGroupOwned", false);
+                            }
+                            else
+                            {
+                                xmlwriter.WriteNamedValue("GroupID", pinfo.Group.ID);
+                                xmlwriter.WriteNamedValue("IsGroupOwned", pinfo.GroupOwned);
+                            }
                             xmlwriter.WriteNamedValue("Bitmap", Convert.ToBase64String(pinfo.LandBitmap.Data));
                             xmlwriter.WriteNamedValue("Description", pinfo.Description);
                             xmlwriter.WriteNamedValue("Flags", (uint)pinfo.Flags);

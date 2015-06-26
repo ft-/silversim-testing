@@ -1,0 +1,27 @@
+[Startup]
+	Mode=RobustHypergrid
+	HomeURI="http://hg.example.com:8002"
+	GridURI="http://grid.example.com:8003"
+
+[DatabaseService]
+	Type=MySQL
+	Server=localhost
+	Database=silversim
+	Username=silversim
+	Password=silversim
+
+[Network]
+	HttpListenerPort = 9000
+	ExternalHostName = "sim.example.com"
+
+[RegionLoader]
+	region_config_source="../data/Regions.ini"
+	
+[RobustGrid-hg.example.com]
+	HomeURI = "http://hg.example.com:8002/"
+	AssetServerURI = "http://grid.example.com:8003"
+	InventoryServerURI = "http://grid.example.com:8003"
+	PresenceServerURI = "http://grid.example.com:8003"
+
+[OptionalModules]
+	Include-OptionalModules = "SilverSim.OptionalModules.ini"

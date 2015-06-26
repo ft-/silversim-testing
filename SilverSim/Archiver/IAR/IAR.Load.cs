@@ -71,12 +71,11 @@ namespace SilverSim.Archiver.IAR
             AssetServiceInterface assetService,
             AvatarNameServiceInterface nameService,
             LoadOptions options,
-            string fileName,
+            Stream inputFile,
             string topath)
         {
             TarArchiveReader reader;
             {
-                FileStream inputFile = new FileStream(fileName, FileMode.Open, FileAccess.Read); 
                 GZipStream gzipStream = new GZipStream(inputFile, CompressionMode.Decompress);
                 reader = new TarArchiveReader(gzipStream);
             }

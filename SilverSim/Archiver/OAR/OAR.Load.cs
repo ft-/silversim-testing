@@ -41,17 +41,18 @@ namespace SilverSim.Archiver.OAR
 {
     public static partial class OAR
     {
+        public class MultiRegionOARLoadingTriedOnRegion : Exception
+        {
+        }
+
         public class OARFormatException : Exception
         {
-            public OARFormatException()
-            {
-
-            }
         }
 
         [Flags]
         public enum LoadOptions
         {
+            None = 0,
             Merge = 0x000000001,
             NoAssets = 0x00000002
         }
@@ -59,11 +60,10 @@ namespace SilverSim.Archiver.OAR
         public static void Load(
             SceneInterface scene,
             LoadOptions options,
-            string fileName)
+            Stream inputFile)
         {
             TarArchiveReader reader;
             {
-                FileStream inputFile = new FileStream(fileName, FileMode.Open, FileAccess.Read);
                 GZipStream gzipStream = new GZipStream(inputFile, CompressionMode.Decompress);
                 reader = new TarArchiveReader(gzipStream);
             }
@@ -98,6 +98,10 @@ namespace SilverSim.Archiver.OAR
                         {
                             regionMapping.Add(reginfo.Path, reginfo);
                         }
+                        if(regionInfos.Count != 0 && scene != null)
+                        {
+                            throw new MultiRegionOARLoadingTriedOnRegion();
+                        }
                     }
                     if (header.FileName.StartsWith("assets/") && (options & LoadOptions.NoAssets) == 0)
                     {
@@ -126,6 +130,10 @@ namespace SilverSim.Archiver.OAR
                         List<ObjectGroup> sogs = ObjectXML.fromXml(reader, scene.Owner);
                         foreach (ObjectGroup sog in sogs)
                         {
+                            if(sog.Owner.ID == UUID.Zero)
+                            {
+                                sog.Owner = scene.Owner;
+                            }
                             scene.Add(sog);
                         }
                     }
@@ -143,6 +151,11 @@ namespace SilverSim.Archiver.OAR
                             parcelsCleared = true;
                         }
                         ParcelInfo pinfo = ParcelLoader.LoadParcel(new ObjectXmlStreamFilter(reader), regionSize);
+                        if(pinfo.Owner.ID == UUID.Zero)
+                        {
+                            pinfo.Owner = scene.Owner;
+                        }
+                        scene.AddParcel(pinfo);
                     }
                     if (header.FileName.StartsWith("settings/") && (options & LoadOptions.Merge) == 0)
                     {
@@ -151,7 +164,6 @@ namespace SilverSim.Archiver.OAR
                     }
                 }
             }
-
         }
     }
 }
