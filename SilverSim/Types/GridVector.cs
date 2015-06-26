@@ -29,8 +29,8 @@ namespace SilverSim.Types
 {
     public struct GridVector
     {
-        public uint X;
-        public uint Y;
+        public uint X; /* in m */
+        public uint Y; /* in m */
 
         #region Constructors
         public GridVector(GridVector v)

@@ -75,8 +75,8 @@ namespace SilverSim.Archiver.OAR
             GridVector baseLoc = scene.RegionData.Location;
 
             GridVector regionSize = new GridVector(256, 256);
-            Dictionary<string, GridVector> regionSizes = new Dictionary<string, GridVector>();
-            Dictionary<string, UUID> regionMapping = new Dictionary<string,UUID>();
+            Dictionary<string, ArchiveXmlLoader.RegionInfo> regionMapping = new Dictionary<string, ArchiveXmlLoader.RegionInfo>();
+            List<ArchiveXmlLoader.RegionInfo> regionInfos = new List<ArchiveXmlLoader.RegionInfo>();
 
             for (; ; )
             {
@@ -94,81 +94,12 @@ namespace SilverSim.Archiver.OAR
                 {
                     if(header.FileName == "archive.xml")
                     {
-                        XmlDocument xmldoc = new XmlDocument();
-                        try
+                        ArchiveXmlLoader.RegionInfo rinfo = ArchiveXmlLoader.LoadArchiveXml(reader, regionInfos);
+
+                        regionSize = rinfo.RegionSize;
+                        foreach (ArchiveXmlLoader.RegionInfo reginfo in regionInfos)
                         {
-                            xmldoc.Load(new ObjectXmlStreamFilter(reader));
-                            XmlNodeList regionList = xmldoc.GetElementsByTagName("region");
-                            if (regionList.Count != 0)
-                            {
-                                foreach(XmlNode node in regionList)
-                                {
-                                    string dir = null;
-                                    UUID id = UUID.Zero;
-                                    GridVector rSize = new GridVector();
-                                    bool have_size = false;
-
-                                    foreach(XmlNode childnode in node.ChildNodes)
-                                    {
-                                        if(childnode.NodeType == XmlNodeType.Element)
-                                        {
-                                            switch(childnode.Name)
-                                            {
-                                                case "is_megaregion":
-                                                    break;
-
-                                                case "size_in_meters":
-                                                    rSize = new GridVector(childnode.InnerText);
-                                                    have_size = true;
-                                                    break;
-
-                                                case "id":
-                                                    id = childnode.InnerText;
-                                                    break;
-
-                                                case "dir":
-                                                    dir = childnode.InnerText;
-                                                    break;
-                                            }
-                                        }
-                                    }
-
-                                    if(string.IsNullOrEmpty(dir) || id == UUID.Zero || !have_size)
-                                    {
-                                        throw new OARFormatException();
-                                    }
-
-                                    regionSizes.Add(dir, rSize);
-                                    regionMapping.Add(dir, id);
-                                }
-                            }
-                            else
-                            {
-                                XmlNodeList regionInfoList = xmldoc.GetElementsByTagName("region_info");
-                                if (regionInfoList.Count != 0)
-                                {
-                                    XmlNode node = regionInfoList[0];
-                                    foreach (XmlNode childnode in node.ChildNodes)
-                                    {
-                                        if (childnode.NodeType == XmlNodeType.Element)
-                                        {
-                                            switch (childnode.Name)
-                                            {
-                                                case "is_megaregion":
-                                                    break;
-
-                                                case "size_in_meters":
-                                                    regionSize = new GridVector(childnode.InnerText);
-                                                    break;
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        catch
-                        {
-                            throw new OARFormatException();
+                            regionMapping.Add(reginfo.Path, reginfo);
                         }
                     }
                     if (header.FileName.StartsWith("assets/") && (options & LoadOptions.NoAssets) == 0)
@@ -187,8 +118,8 @@ namespace SilverSim.Archiver.OAR
                         }
                         string regionname = pcomps[1];
                         header.FileName = pcomps[2];
-                        regionSize = regionSizes[regionname];
-                        scene = SceneManager.Scenes[regionMapping[regionname]];
+                        regionSize = regionMapping[regionname].RegionSize;
+                        scene = SceneManager.Scenes[regionMapping[regionname].ID];
                     }
 
                     if (header.FileName.StartsWith("objects/"))
@@ -211,6 +142,7 @@ namespace SilverSim.Archiver.OAR
                     if (header.FileName.StartsWith("settings/"))
                     {
                         /* Load settings */
+                        RegionSettingsLoader.LoadRegionSettings(reader, scene);
                     }
                 }
             }

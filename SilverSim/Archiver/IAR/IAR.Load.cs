@@ -126,6 +126,11 @@ namespace SilverSim.Archiver.IAR
 
                 if (header.FileType == TarFileType.File)
                 {
+                    if(header.FileName == "archive.xml")
+                    {
+                        ArchiveXmlLoader.LoadArchiveXml(reader);
+                    }
+
                     if (header.FileName.StartsWith("assets/") && (options & LoadOptions.NoAssets) == 0)
                     {
                         /* Load asset */
