@@ -24,13 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Scene.Types.Scene;
-using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.AvatarName;
-using SilverSim.Types;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Archiver.OAR
 {

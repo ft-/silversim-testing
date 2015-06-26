@@ -23,25 +23,19 @@ exception statement from your version.
 
 */
 
+using SilverSim.Archiver.Common;
 using SilverSim.Archiver.Tar;
+using SilverSim.Scene.Management.Scene;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.Types;
+using SilverSim.Types.Asset;
+using SilverSim.Types.Asset.Format;
+using SilverSim.Types.Parcel;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
-using System.Linq;
-using System.Text;
-using SilverSim.Archiver.Common;
-using SilverSim.Types.Asset;
-using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Management.Scene;
-using System.Xml;
-using SilverSim.Types.Asset.Format;
-using SilverSim.Types.Parcel;
-using SilverSim.LL.Messages.LayerData;
 
 namespace SilverSim.Archiver.OAR
 {

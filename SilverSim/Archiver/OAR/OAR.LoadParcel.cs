@@ -26,10 +26,7 @@ exception statement from your version.
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Xml;
 
 namespace SilverSim.Archiver.OAR

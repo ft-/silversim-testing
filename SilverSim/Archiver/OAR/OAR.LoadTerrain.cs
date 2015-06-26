@@ -24,11 +24,8 @@ exception statement from your version.
 */
 
 using SilverSim.LL.Messages.LayerData;
-using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Archiver.OAR
 {
