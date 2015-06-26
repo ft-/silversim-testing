@@ -1285,7 +1285,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("PassCollisions", IsPassCollisions);
                     writer.WriteNamedValue("RegionHandle", ObjectGroup.Scene.RegionData.Location.RegionHandle);
                     writer.WriteNamedValue("ScriptAccessPin", ScriptAccessPin);
-                    writer.WriteNamedValue("GroupPosition", ObjectGroup.RootPart.GlobalPosition);
+                    writer.WriteNamedValue("GroupPosition", GlobalPosition);
                     writer.WriteNamedValue("OffsetPosition", LocalPosition);
                     writer.WriteNamedValue("RotationOffset", LocalRotation);
                     writer.WriteNamedValue("Velocity", Velocity);
