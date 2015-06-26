@@ -147,7 +147,7 @@ namespace SilverSim.Archiver.OAR
                                 xmlwriter.WriteNamedValue("AuctionID", pinfo.AuctionID);
                                 xmlwriter.WriteNamedValue("AuthBuyerID", pinfo.AuthBuyer.ID);
                                 xmlwriter.WriteNamedValue("Category", (byte)pinfo.Category);
-                                xmlwriter.WriteNamedValue("ClaimDate", pinfo.ClaimDate.DateTimeToUnixTime());
+                                xmlwriter.WriteNamedValue("ClaimDate", pinfo.ClaimDate.DateTimeToUnixTime().ToString());
                                 xmlwriter.WriteNamedValue("ClaimPrice", pinfo.ClaimPrice);
                                 xmlwriter.WriteNamedValue("GlobalID", pinfo.ID);
                                 if ((options & SaveOptions.Publish) != 0)
@@ -169,8 +169,24 @@ namespace SilverSim.Archiver.OAR
                                 xmlwriter.WriteNamedValue("LocalID", pinfo.LocalID);
                                 xmlwriter.WriteNamedValue("MediaAutoScale", pinfo.MediaAutoScale);
                                 xmlwriter.WriteNamedValue("MediaID", pinfo.MediaID);
-                                xmlwriter.WriteNamedValue("MediaURL", pinfo.MediaURI.ToString());
-                                xmlwriter.WriteNamedValue("MusicURL", pinfo.MusicURI.ToString());
+                                if (pinfo.MediaURI != null)
+                                {
+                                    xmlwriter.WriteNamedValue("MediaURL", pinfo.MediaURI.ToString());
+                                }
+                                else
+                                {
+                                    xmlwriter.WriteStartElement("MediaURL");
+                                    xmlwriter.WriteEndElement();
+                                }
+                                if (pinfo.MusicURI != null)
+                                {
+                                    xmlwriter.WriteNamedValue("MusicURL", pinfo.MusicURI.ToString());
+                                }
+                                else
+                                {
+                                    xmlwriter.WriteStartElement("MusicURL");
+                                    xmlwriter.WriteEndElement();
+                                }
                                 xmlwriter.WriteNamedValue("OwnerID", pinfo.Owner.ID);
                                 xmlwriter.WriteStartElement("ParcelAccessList");
                                 {
@@ -216,12 +232,12 @@ namespace SilverSim.Archiver.OAR
                     {
                         writer.WriteStartElement("creation_info");
                         {
-                            writer.WriteNamedValue("datetime", Date.GetUnixTime());
+                            writer.WriteNamedValue("datetime", Date.GetUnixTime().ToString());
                             writer.WriteNamedValue("id", scene.ID);
                         }
                         writer.WriteEndElement();
 
-                        writer.WriteNamedValue("assets_includes", assetsIncluded);
+                        writer.WriteNamedValue("assets_included", assetsIncluded);
 
                         writer.WriteStartElement("region_info");
                         {

@@ -38,17 +38,13 @@ namespace SilverSim.Scene.Types.Scene
         private Int32[,] m_ParcelLayer; /* initialized in constructor */
         private bool[] m_ParcelLayerDirty; /* RegionWidth / PARCEL_BLOCK_SIZE * RegionHeight / PARCEL_BLOCK_SIZE / 1024 */
         private ReaderWriterLock m_ParcelLayerRwLock = new ReaderWriterLock();
-        private readonly RwLockedDoubleDictionary<UUID, Int32, ParcelInfo> m_Parcels = new RwLockedDoubleDictionary<UUID, int, ParcelInfo>();
+        protected readonly RwLockedDoubleDictionary<UUID, Int32, ParcelInfo> m_Parcels = new RwLockedDoubleDictionary<UUID, int, ParcelInfo>();
         private object m_ParcelOverlayUpdateLock = new object();
 
         private void InitializeParcelLayer()
         {
             m_ParcelLayer = new Int32[SizeY / PARCEL_BLOCK_SIZE, SizeX / PARCEL_BLOCK_SIZE];
             m_ParcelLayerDirty = new bool[(SizeY / PARCEL_BLOCK_SIZE) * (SizeX / PARCEL_BLOCK_SIZE) / 1024];
-            ParcelInfo pi = new ParcelInfo((int)(SizeX / PARCEL_BLOCK_SIZE), (int)(SizeY / PARCEL_BLOCK_SIZE));
-            pi.Name = "My Parcel";
-            pi.Owner = Owner;
-            m_Parcels.Add(pi.ID, pi.LocalID, pi);
         }
 
         public void AddParcel(ParcelInfo p)
