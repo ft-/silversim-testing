@@ -162,7 +162,7 @@ namespace SilverSim.BackendConnectors.IWC.Common
                 {"CreationDate", item.CreationDate},
                 {"CreatorData", item.Creator.CreatorData},
                 {"CreatorId", item.Creator.ID},
-                {"CreatorIdentification", item.Creator.FullName},
+                {"CreatorIdentification", item.Creator.ToString()},
                 {"CurrentPermissions", (uint)item.Permissions.Current},
                 {"Description", item.Description},
                 {"EveryOnePermissions", (uint)item.Permissions.EveryOne},

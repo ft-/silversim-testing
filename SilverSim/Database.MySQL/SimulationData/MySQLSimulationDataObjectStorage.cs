@@ -396,7 +396,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["SalePrice"] = item.SaleInfo.Price;
             p["SalePermMask"] = item.SaleInfo.PermMask;
             ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
-            p["PermsGranter"] = grantinfo.PermsGranter.FullName;
+            p["PermsGranter"] = grantinfo.PermsGranter.ToString();
             p["PermsMask"] = (uint)grantinfo.PermsMask;
 
             MySQLUtilities.ReplaceInsertInto(connection, "primitems", p);

@@ -779,6 +779,7 @@ namespace SilverSim.Main.Common
             CmdIO.CommandRegistry.ShowCommands.Add("memory", ShowMemoryCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("threadcount", ShowThreadCountCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
+            CmdIO.CommandRegistry.ShowCommands.Add("regions", ShowRegionsCommand);
 
             while(m_Sources.Count != 0)
             {
@@ -940,6 +941,27 @@ namespace SilverSim.Main.Common
             {
                 io.WriteFormatted("Heap allocated to simulator : {0} MB\n" +
                                     "Process Memory              : {0} MB", Math.Round(GC.GetTotalMemory(false) / 1048576.0), Math.Round(Process.GetCurrentProcess().WorkingSet64 / 1048576.0));
+            }
+        }
+
+        public void ShowRegionsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (args[0] == "help")
+            {
+                io.Write("Show currently loaded regions");
+            }
+            else
+            {
+                string output = "Scene List:\n----------------------------------------------";
+                foreach (SceneInterface scene in SceneManager.Scenes.Values)
+                {
+                    if(limitedToScene == UUID.Zero || scene.ID == limitedToScene)
+                    {
+                        Vector3 gridcoord = scene.RegionData.Location;
+                        output += string.Format("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", scene.Name, scene.ID, scene.RegionData.Location.ToString(), scene.RegionData.Size.ToString(), scene.Owner.FullName, gridcoord.X_String + "," + gridcoord.Y_String);
+                    }
+                }
+                io.Write(output);
             }
         }
 

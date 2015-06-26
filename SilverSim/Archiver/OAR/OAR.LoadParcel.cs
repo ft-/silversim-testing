@@ -58,7 +58,7 @@ namespace SilverSim.Archiver.OAR
                                     break;
 
                                 case "AuthBuyerID":
-                                    pinfo.AuthBuyer.FullName = reader.ReadElementValueAsString();
+                                    pinfo.AuthBuyer = new UUI(reader.ReadElementValueAsString());
                                     break;
 
                                 case "Category":

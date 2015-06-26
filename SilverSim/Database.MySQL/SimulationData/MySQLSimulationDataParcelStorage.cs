@@ -87,7 +87,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 pi.MediaURI = new URI((string)dbReader["MediaURI"]);
                             }
                             pi.MediaID = MySQLUtilities.GetUUID(dbReader, "MediaID");
-                            pi.Owner.FullName = (string)dbReader["Owner"];
+                            pi.Owner = new UUI((string)dbReader["Owner"]);
                             pi.SnapshotID = MySQLUtilities.GetUUID(dbReader, "SnapshotID");
                             pi.SalePrice = (int)dbReader["SalePrice"];
                             pi.OtherCleanTime = (int)(int)dbReader["OtherCleanTime"];

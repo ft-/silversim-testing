@@ -127,8 +127,8 @@ namespace SilverSim.BackendConnectors.Robust.Friends
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["METHOD"] = "storefriend";
-            post["PrincipalID"] = fi.User.FullName;
-            post["Friend"] = fi.Friend.FullName;
+            post["PrincipalID"] = fi.User.ToString();
+            post["Friend"] = fi.Friend.ToString();
             if(fi.Friend.HomeURI != null)
             {
                 post["Friend"] += ";" + fi.Secret;
@@ -142,8 +142,8 @@ namespace SilverSim.BackendConnectors.Robust.Friends
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["METHOD"] = "deletefriend_string";
-            post["PRINCIPALID"] = fi.User.FullName;
-            post["FRIEND"] = fi.Friend.FullName;
+            post["PRINCIPALID"] = fi.User.ToString();
+            post["FRIEND"] = fi.Friend.ToString();
             if (fi.Friend.HomeURI != null)
             {
                 post["FRIEND"] += ";" + fi.Secret;
