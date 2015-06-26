@@ -76,7 +76,7 @@ namespace SilverSim.Archiver
             string filename = null;
             SilverSim.Archiver.OAR.OAR.SaveOptions options = OAR.OAR.SaveOptions.None;
 
-            for (int argi = 1; argi < args.Count; ++argi)
+            for (int argi = 2; argi < args.Count; ++argi)
             {
                 string arg = args[argi];
                 if (arg == "--noassets")
@@ -142,7 +142,7 @@ namespace SilverSim.Archiver
             string filename = null;
             SilverSim.Archiver.OAR.OAR.LoadOptions options = OAR.OAR.LoadOptions.None;
 
-            for (int argi = 1; argi < args.Count; ++argi)
+            for (int argi = 2; argi < args.Count; ++argi)
             {
                 string arg = args[argi];
                 if (arg == "--skip-assets")

@@ -780,6 +780,7 @@ namespace SilverSim.Main.Common
             CmdIO.CommandRegistry.ShowCommands.Add("threadcount", ShowThreadCountCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("regions", ShowRegionsCommand);
+            CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCommand);
 
             while(m_Sources.Count != 0)
             {
@@ -941,6 +942,35 @@ namespace SilverSim.Main.Common
             {
                 io.WriteFormatted("Heap allocated to simulator : {0} MB\n" +
                                     "Process Memory              : {0} MB", Math.Round(GC.GetTotalMemory(false) / 1048576.0), Math.Round(Process.GetCurrentProcess().WorkingSet64 / 1048576.0));
+            }
+        }
+
+        public void ChangeRegionCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (args[0] == "help")
+            {
+                io.Write("change region <region name>");
+            }
+            else if(limitedToScene != UUID.Zero)
+            {
+                io.Write("change region is not possible with limited console");
+            }
+            else if(args.Count == 3)
+            {
+                try
+                {
+                    SceneInterface scene = SceneManager.Scenes[args[2]];
+                    io.SelectedScene = scene.ID;
+                    io.WriteFormatted("region {0} selected", args[2]);
+                }
+                catch
+                {
+                    io.WriteFormatted("region {0} does not exist", args[2]);
+                }
+            }
+            else
+            {
+                io.Write("invalid parameters for change region");
             }
         }
 
