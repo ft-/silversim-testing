@@ -94,7 +94,7 @@ namespace SilverSim.Archiver.OAR
                 {
                     if(header.FileName == "archive.xml")
                     {
-                        ArchiveXmlLoader.RegionInfo rinfo = ArchiveXmlLoader.LoadArchiveXml(reader, regionInfos);
+                        ArchiveXmlLoader.RegionInfo rinfo = ArchiveXmlLoader.LoadArchiveXml(new ObjectXmlStreamFilter(reader), regionInfos);
 
                         regionSize = rinfo.RegionSize;
                         foreach (ArchiveXmlLoader.RegionInfo reginfo in regionInfos)
@@ -142,7 +142,7 @@ namespace SilverSim.Archiver.OAR
                     if (header.FileName.StartsWith("settings/"))
                     {
                         /* Load settings */
-                        RegionSettingsLoader.LoadRegionSettings(reader, scene);
+                        RegionSettingsLoader.LoadRegionSettings(new ObjectXmlStreamFilter(reader), scene);
                     }
                 }
             }

@@ -128,7 +128,7 @@ namespace SilverSim.Archiver.IAR
                 {
                     if(header.FileName == "archive.xml")
                     {
-                        ArchiveXmlLoader.LoadArchiveXml(reader);
+                        ArchiveXmlLoader.LoadArchiveXml(new ObjectXmlStreamFilter(reader));
                     }
 
                     if (header.FileName.StartsWith("assets/") && (options & LoadOptions.NoAssets) == 0)
