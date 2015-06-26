@@ -40,6 +40,8 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Management.Scene;
 using System.Xml;
 using SilverSim.Types.Asset.Format;
+using SilverSim.Types.Parcel;
+using SilverSim.LL.Messages.LayerData;
 
 namespace SilverSim.Archiver.OAR
 {
@@ -77,6 +79,7 @@ namespace SilverSim.Archiver.OAR
             GridVector regionSize = new GridVector(256, 256);
             Dictionary<string, ArchiveXmlLoader.RegionInfo> regionMapping = new Dictionary<string, ArchiveXmlLoader.RegionInfo>();
             List<ArchiveXmlLoader.RegionInfo> regionInfos = new List<ArchiveXmlLoader.RegionInfo>();
+            bool parcelsCleared = false;
 
             for (; ; )
             {
@@ -120,6 +123,7 @@ namespace SilverSim.Archiver.OAR
                         header.FileName = pcomps[2];
                         regionSize = regionMapping[regionname].RegionSize;
                         scene = SceneManager.Scenes[regionMapping[regionname].ID];
+                        parcelsCleared = false;
                     }
 
                     if (header.FileName.StartsWith("objects/"))
@@ -131,15 +135,22 @@ namespace SilverSim.Archiver.OAR
                             scene.Add(sog);
                         }
                     }
-                    if (header.FileName.StartsWith("terrains/"))
+                    if (header.FileName.StartsWith("terrains/") && (options & LoadOptions.Merge) == 0)
                     {
                         /* Load terrains */
+                        scene.Terrain.AllPatches = TerrainLoader.LoadStream(reader, (int)regionSize.X, (int)regionSize.Y);
                     }
-                    if (header.FileName.StartsWith("landdata/"))
+                    if (header.FileName.StartsWith("landdata/") && (options & LoadOptions.Merge) == 0)
                     {
                         /* Load landdata */
+                        if ((options & LoadOptions.Merge) == 0 && !parcelsCleared)
+                        {
+                            scene.ClearParcels();
+                            parcelsCleared = true;
+                        }
+                        ParcelInfo pinfo = ParcelLoader.LoadParcel(new ObjectXmlStreamFilter(reader), regionSize);
                     }
-                    if (header.FileName.StartsWith("settings/"))
+                    if (header.FileName.StartsWith("settings/") && (options & LoadOptions.Merge) == 0)
                     {
                         /* Load settings */
                         RegionSettingsLoader.LoadRegionSettings(new ObjectXmlStreamFilter(reader), scene);
