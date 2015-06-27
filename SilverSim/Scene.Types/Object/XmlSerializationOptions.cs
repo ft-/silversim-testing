@@ -10,6 +10,7 @@ namespace SilverSim.Scene.Types.Object
     {
         None = 0,
         WriteOwnerInfo = 1,
-        AdjustForNextOwner = 2
+        AdjustForNextOwner = 2,
+        WriteXml2 = 4
     }
 }

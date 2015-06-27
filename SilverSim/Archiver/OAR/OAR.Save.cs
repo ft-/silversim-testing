@@ -80,7 +80,7 @@ namespace SilverSim.Archiver.OAR
                     {
                         using (XmlTextWriter objectwriter = new XmlTextWriter(ms, UTF8NoBOM))
                         {
-                            sog.ToXml(objectwriter, xmloptions);
+                            sog.ToXml(objectwriter, xmloptions | XmlSerializationOptions.WriteXml2);
                             AssetData data = new AssetData();
                             data.Data = ms.GetBuffer();
                             data.Type = AssetType.Object;

@@ -1165,14 +1165,30 @@ namespace SilverSim.Scene.Types.Object
                 writer.WriteValue(opos.Z);
                 writer.WriteEndAttribute();
             }
+            if ((options & XmlSerializationOptions.WriteXml2) == 0)
+            {
+                writer.WriteStartElement("RootPart");
+            }
             RootPart.ToXml(writer, options);
+            if ((options & XmlSerializationOptions.WriteXml2) == 0)
+            {
+                writer.WriteEndElement();
+            }
             writer.WriteEndElement();
             writer.WriteStartElement("OtherParts");
             foreach (ObjectPart p in parts)
             {
                 if(p.ID != RootPart.ID)
                 {
+                    if ((options & XmlSerializationOptions.WriteXml2) == 0)
+                    {
+                        writer.WriteStartElement("Part");
+                    }
                     p.ToXml(writer, nextOwner, options);
+                    if ((options & XmlSerializationOptions.WriteXml2) == 0)
+                    {
+                        writer.WriteEndElement();
+                    }
                 }
             }
             writer.WriteEndElement();
