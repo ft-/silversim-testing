@@ -129,6 +129,11 @@ namespace SilverSim.LL.Core
                                     if (full_updatemsg == null)
                                     {
                                         full_updatemsg = new Messages.Object.ObjectUpdate();
+                                        if(Scene == null)
+                                        {
+                                            /* skill the schedule thread when Scene has been cleared */
+                                            return;
+                                        }
                                         full_updatemsg.GridPosition = Scene.RegionData.Location;
                                         full_updatemsg.TimeDilation = 65535;
                                     }
@@ -173,6 +178,11 @@ namespace SilverSim.LL.Core
                                 {
                                     Messages.Object.ImprovedTerseObjectUpdate m = new Messages.Object.ImprovedTerseObjectUpdate();
                                     m.ObjectData.Add(od);
+                                    if (Scene == null)
+                                    {
+                                        /* skill the schedule thread when Scene has been cleared */
+                                        return;
+                                    }
                                     m.GridPosition = Scene.RegionData.Location;
                                     m.TimeDilation = 65535;
                                     SendMessage(m);

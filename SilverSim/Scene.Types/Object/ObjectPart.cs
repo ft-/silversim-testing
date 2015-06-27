@@ -205,6 +205,14 @@ namespace SilverSim.Scene.Types.Object
             ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
         }
 
+        public ObjectUpdateInfo UpdateInfo
+        {
+            get
+            {
+                return m_ObjectUpdateInfo;
+            }
+        }
+
         void OnInventoryChange()
         {
             IsChanged = m_IsChangedEnabled;
