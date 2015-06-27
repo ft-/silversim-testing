@@ -1886,7 +1886,14 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "OffsetPosition":
-                                part.LocalPosition = reader.ReadElementChildsAsVector3();
+                                if (null == rootGroup)
+                                {
+                                    part.LocalPosition = reader.ReadElementChildsAsVector3();
+                                }
+                                else
+                                {
+                                    reader.ReadToEndElement();
+                                }
                                 break;
 
                             case "RotationOffset":

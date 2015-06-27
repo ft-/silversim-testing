@@ -131,7 +131,7 @@ namespace SilverSim.LL.Core
                                         full_updatemsg = new Messages.Object.ObjectUpdate();
                                         if(Scene == null)
                                         {
-                                            /* skill the schedule thread when Scene has been cleared */
+                                            /* kill the schedule thread when Scene has been cleared */
                                             return;
                                         }
                                         full_updatemsg.GridPosition = Scene.RegionData.Location;
@@ -180,7 +180,7 @@ namespace SilverSim.LL.Core
                                     m.ObjectData.Add(od);
                                     if (Scene == null)
                                     {
-                                        /* skill the schedule thread when Scene has been cleared */
+                                        /* kill the schedule thread when Scene has been cleared */
                                         return;
                                     }
                                     m.GridPosition = Scene.RegionData.Location;

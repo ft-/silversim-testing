@@ -72,6 +72,57 @@ namespace SilverSim.Archiver.OAR
             PersistUuids = 0x00000004,
         }
 
+        static void AddObjects(
+            SceneInterface scene,
+            List<ObjectGroup> sogs,
+            LoadOptions options)
+        {
+            foreach (ObjectGroup sog in sogs)
+            {
+                if ((options & LoadOptions.PersistUuids) == LoadOptions.PersistUuids)
+                {
+                    foreach (ObjectPart part in sog.ValuesByKey1)
+                    {
+                        UUID oldID;
+                        try
+                        {
+                            ObjectPart check = scene.Primitives[part.ID];
+                            oldID = part.ID;
+                            part.ID = UUID.Random;
+                            sog.ChangeKey(part.ID, oldID);
+                        }
+                        catch
+                        {
+
+                        }
+                        foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
+                        {
+                            oldID = item.ID;
+                            item.ID = UUID.Random;
+                            part.Inventory.ChangeKey(item.ID, oldID);
+                        }
+                    }
+                }
+                else
+                {
+                    foreach (ObjectPart part in sog.ValuesByKey1)
+                    {
+                        UUID oldID = part.ID;
+                        part.ID = UUID.Random;
+                        sog.ChangeKey(part.ID, oldID);
+                        foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
+                        {
+                            oldID = item.ID;
+                            item.ID = UUID.Random;
+                            part.Inventory.ChangeKey(item.ID, oldID);
+                        }
+                    }
+                }
+                scene.Add(sog);
+            }
+            sogs.Clear();
+        }
+
         public static void Load(
             SceneInterface scene,
             LoadOptions options,
@@ -109,53 +160,7 @@ namespace SilverSim.Archiver.OAR
                         scene.ClearObjects();
                     }
 
-                    if (load_sogs.Count != 0)
-                    {
-                        foreach (ObjectGroup sog in load_sogs)
-                        {
-                            if ((options & LoadOptions.PersistUuids) == LoadOptions.PersistUuids)
-                            {
-                                foreach (ObjectPart part in sog.ValuesByKey1)
-                                {
-                                    UUID oldID;
-                                    try
-                                    {
-                                        ObjectPart check = scene.Primitives[part.ID];
-                                        oldID = part.ID;
-                                        part.ID = UUID.Random;
-                                        sog.ChangeKey(part.ID, oldID);
-                                    }
-                                    catch
-                                    {
-
-                                    }
-                                    foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
-                                    {
-                                        oldID = item.ID;
-                                        item.ID = UUID.Random;
-                                        part.Inventory.ChangeKey(item.ID, oldID);
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                foreach (ObjectPart part in sog.ValuesByKey1)
-                                {
-                                    UUID oldID = part.ID;
-                                    part.ID = UUID.Random;
-                                    sog.ChangeKey(part.ID, oldID);
-                                    foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
-                                    {
-                                        oldID = item.ID;
-                                        item.ID = UUID.Random;
-                                        part.Inventory.ChangeKey(item.ID, oldID);
-                                    }
-                                }
-                            }
-                            scene.Add(sog);
-                        }
-                        load_sogs.Clear();
-                    }
+                    AddObjects(scene, load_sogs, options);
                     return;
                 }
 
@@ -204,52 +209,9 @@ namespace SilverSim.Archiver.OAR
                                 scene.ClearObjects();
                             }
 
-                            if (load_sogs.Count != 0)
+                            if (scene != null)
                             {
-                                foreach (ObjectGroup sog in load_sogs)
-                                {
-                                    if ((options & LoadOptions.PersistUuids) == LoadOptions.PersistUuids)
-                                    {
-                                        foreach (ObjectPart part in sog.ValuesByKey1)
-                                        {
-                                            UUID oldID;
-                                            try
-                                            {
-                                                ObjectPart check = scene.Primitives[part.ID];
-                                                oldID = part.ID;
-                                                part.ID = UUID.Random;
-                                                sog.ChangeKey(part.ID, oldID);
-                                            }
-                                            catch
-                                            {
-
-                                            }
-                                            foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
-                                            {
-                                                oldID = item.ID;
-                                                item.ID = UUID.Random;
-                                                part.Inventory.ChangeKey(item.ID, oldID);
-                                            }
-                                        }
-                                    }
-                                    else
-                                    {
-                                        foreach (ObjectPart part in sog.ValuesByKey1)
-                                        {
-                                            UUID oldID = part.ID;
-                                            part.ID = UUID.Random;
-                                            sog.ChangeKey(part.ID, oldID);
-                                            foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
-                                            {
-                                                oldID = item.ID;
-                                                item.ID = UUID.Random;
-                                                part.Inventory.ChangeKey(item.ID, oldID);
-                                            }
-                                        }
-                                    }
-                                    scene.Add(sog);
-                                }
-                                load_sogs.Clear();
+                                AddObjects(scene, load_sogs, options);
                             }
 
                             string[] pcomps = header.FileName.Split(new char[] { '/' }, 3);
