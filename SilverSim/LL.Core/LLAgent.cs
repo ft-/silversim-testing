@@ -1141,9 +1141,16 @@ namespace SilverSim.LL.Core
                                 circuit.SendMessage(clu);
 
                                 circuit.Scene.Environment.UpdateWindlightProfileToClient(this);
-                                foreach(ObjectPart part in circuit.Scene.Primitives)
+                                foreach (ObjectGroup sog in circuit.Scene.ObjectGroups)
                                 {
-                                    circuit.ScheduleUpdate(part.UpdateInfo);
+                                    circuit.ScheduleUpdate(((ObjectGroup)sog).RootPart.UpdateInfo);
+                                }
+                                foreach (ObjectPart part in circuit.Scene.Primitives)
+                                {
+                                    if (part.LinkNumber != 1)
+                                    {
+                                        circuit.ScheduleUpdate(part.UpdateInfo);
+                                    }
                                 }
                             }
                         }
