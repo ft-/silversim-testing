@@ -254,8 +254,11 @@ namespace SilverSim.LL.Core
                                 }
                             }
 
+                            if (p.IsReliable)
+                            {
+                                Interlocked.Increment(ref m_AckThrottlingCount[queueidx]);
+                            }
                             m_Server.SendPacketTo(p, RemoteEndPoint);
-                            Interlocked.Increment(ref m_AckThrottlingCount[queueidx]);
 
                             p.HasAckFlag = false;
                             p.DataLength = savedDataLength;
