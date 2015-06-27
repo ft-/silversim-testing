@@ -134,7 +134,14 @@ namespace SilverSim.Archiver.IAR
                     {
                         /* Load asset */
                         AssetData ad = reader.LoadAsset(header, principal);
-                        assetService.Store(ad);
+                        try
+                        {
+                            assetService.exists(ad.ID);
+                        }
+                        catch
+                        {
+                            assetService.Store(ad);
+                        }
                     }
 
                     if (header.FileName.StartsWith("inventory/"))

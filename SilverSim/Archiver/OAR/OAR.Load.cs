@@ -54,7 +54,8 @@ namespace SilverSim.Archiver.OAR
         {
             None = 0,
             Merge = 0x000000001,
-            NoAssets = 0x00000002
+            NoAssets = 0x00000002,
+            PersistUuids = 0x00000004,
         }
 
         public static void Load(
@@ -107,7 +108,14 @@ namespace SilverSim.Archiver.OAR
                     {
                         /* Load asset */
                         AssetData ad = reader.LoadAsset(header, scene.Owner);
-                        scene.AssetService.Store(ad);
+                        try
+                        {
+                            scene.AssetService.exists(ad.ID);
+                        }
+                        catch
+                        {
+                            scene.AssetService.Store(ad);
+                        }
                     }
 
                     if (header.FileName.StartsWith("regions/"))
@@ -133,6 +141,21 @@ namespace SilverSim.Archiver.OAR
                             if(sog.Owner.ID == UUID.Zero)
                             {
                                 sog.Owner = scene.Owner;
+                            }
+                            if((options & (LoadOptions.PersistUuids | LoadOptions.Merge)) == LoadOptions.PersistUuids)
+                            {
+                                foreach(ObjectPart part in sog.ValuesByKey1)
+                                {
+                                    UUID oldID = part.ID;
+                                    part.ID = UUID.Random;
+                                    sog.ChangeKey(part.ID, oldID);
+                                    foreach(ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
+                                    {
+                                        oldID = item.ID;
+                                        item.ID = UUID.Random;
+                                        part.Inventory.ChangeKey(item.ID, oldID);
+                                    }
+                                }
                             }
                             scene.Add(sog);
                         }

@@ -28,6 +28,7 @@ using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpClient;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
@@ -48,6 +49,99 @@ namespace SilverSim.Archiver
         {
             CommandRegistry.LoadCommands.Add("oar", LoadOarCommand);
             CommandRegistry.SaveCommands.Add("oar", SaveOarCommand);
+            CommandRegistry.LoadCommands.Add("osassets", LoadAssetsCommand);
+        }
+
+        public void LoadAssetsCommand(List<string> args, TTY io, UUID limitedToScene)
+        {
+            if(args[0] == "help")
+            {
+                string outp = "Available commands:\n";
+                outp += "load osassets <filename> - Load assets to scene\n";
+                io.Write(outp);
+                return;
+            }
+
+            UUID selectedScene = io.SelectedScene;
+            if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+
+            AssetServiceInterface assetService;
+            UUI owner;
+
+            if(args.Count == 3)
+            {
+                /* scene */
+                if(selectedScene == UUID.Zero)
+                {
+                    io.Write("No region selected");
+                    return;
+                }
+                else
+                {
+                    try
+                    {
+                        SceneInterface scene = SceneManager.Scenes[selectedScene];
+                        assetService = scene.AssetService;
+                        owner = scene.Owner;
+                    }
+                    catch
+                    {
+                        io.Write("Selected region not found");
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                io.Write("Invalid arguments to load osassets");
+                return;
+            }
+
+            Stream s;
+            if (Uri.IsWellFormedUriString(args[2], UriKind.Absolute))
+            {
+                try
+                {
+                    s = HttpRequestHandler.DoStreamGetRequest(args[2], null, 20000);
+                }
+                catch(Exception e)
+                {
+                    io.Write(e.Message);
+                    return;
+                }
+            }
+            else
+            {
+                try
+                {
+                    s = new FileStream(args[2], FileMode.Open);
+                }
+                catch(Exception e)
+                {
+                    io.Write(e.Message);
+                    return;
+                }
+            }
+            try
+            {
+                Assets.AssetsLoad.Load(assetService, owner, s);
+                io.Write("Assets loaded successfully.");
+            }
+            catch (Exception e)
+            {
+                io.Write(e.Message);
+            }
+            try
+            {
+                s.Close();
+            }
+            catch
+            {
+
+            }
         }
 
         public void SaveOarCommand(List<string> args, TTY io, UUID limitedToScene)
@@ -133,8 +227,9 @@ namespace SilverSim.Archiver
             if (args[0] == "help")
             {
                 string outp = "Available commands:\n";
-                outp += "load oar [--skip-assets] [--merge] <filename>\n";
-                outp += "load oar [--skip-assets] [--merge] <url>\n";
+                outp += "load oar [--skip-assets] [--merge] [--persist-uuids] <filename>\n";
+                outp += "load oar [--skip-assets] [--merge] [--persist-uuids] <url>\n\n";
+                outp += "--persist-uuids cannot be combined with --merge\n";
                 io.Write(outp);
                 return;
             }
