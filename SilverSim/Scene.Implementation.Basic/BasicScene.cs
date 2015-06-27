@@ -438,6 +438,22 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
+        public override void ClearObjects()
+        {
+            List<ObjectGroup> objects = new List<ObjectGroup>();
+            foreach(ObjectGroup obj in Objects)
+            {
+                if(!obj.IsAttached)
+                {
+                    objects.Add(obj);
+                }
+            }
+            foreach(ObjectGroup obj in objects)
+            {
+                Remove(obj);
+            }
+        }
+
         public override bool Remove(IObject obj, ScriptInstance instance = null)
         {
             if(!m_Objects.ContainsValue(obj))

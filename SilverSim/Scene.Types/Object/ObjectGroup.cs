@@ -1295,7 +1295,15 @@ namespace SilverSim.Scene.Types.Object
                                     throw new InvalidObjectXmlException();
                                 }
                                 part = ObjectPart.FromXml(reader, null, currentOwner);
-                                links.Add(part.LoadedLinkNumber, part);
+                                try
+                                {
+                                    part.LoadedLinkNumber = links.Count + 2;
+                                    links.Add(part.LoadedLinkNumber, part);
+                                }
+                                catch
+                                {
+                                    throw new ObjectDeserializationFailedDueKey();
+                                }
                                 break;
 
                             default:

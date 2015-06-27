@@ -93,6 +93,7 @@ namespace SilverSim.Archiver.OAR
             Dictionary<string, ArchiveXmlLoader.RegionInfo> regionMapping = new Dictionary<string, ArchiveXmlLoader.RegionInfo>();
             List<ArchiveXmlLoader.RegionInfo> regionInfos = new List<ArchiveXmlLoader.RegionInfo>();
             bool parcelsCleared = false;
+            List<ObjectGroup> load_sogs = new List<ObjectGroup>();
 
             for (; ; )
             {
@@ -103,6 +104,58 @@ namespace SilverSim.Archiver.OAR
                 }
                 catch (TarArchiveReader.EndOfTarException)
                 {
+                    if((options & LoadOptions.Merge) == 0 && scene != null)
+                    {
+                        scene.ClearObjects();
+                    }
+
+                    if (load_sogs.Count != 0)
+                    {
+                        foreach (ObjectGroup sog in load_sogs)
+                        {
+                            if ((options & LoadOptions.PersistUuids) == LoadOptions.PersistUuids)
+                            {
+                                foreach (ObjectPart part in sog.ValuesByKey1)
+                                {
+                                    UUID oldID;
+                                    try
+                                    {
+                                        ObjectPart check = scene.Primitives[part.ID];
+                                        oldID = part.ID;
+                                        part.ID = UUID.Random;
+                                        sog.ChangeKey(part.ID, oldID);
+                                    }
+                                    catch
+                                    {
+
+                                    }
+                                    foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
+                                    {
+                                        oldID = item.ID;
+                                        item.ID = UUID.Random;
+                                        part.Inventory.ChangeKey(item.ID, oldID);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                foreach (ObjectPart part in sog.ValuesByKey1)
+                                {
+                                    UUID oldID = part.ID;
+                                    part.ID = UUID.Random;
+                                    sog.ChangeKey(part.ID, oldID);
+                                    foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
+                                    {
+                                        oldID = item.ID;
+                                        item.ID = UUID.Random;
+                                        part.Inventory.ChangeKey(item.ID, oldID);
+                                    }
+                                }
+                            }
+                            scene.Add(sog);
+                        }
+                        load_sogs.Clear();
+                    }
                     return;
                 }
 
@@ -146,6 +199,59 @@ namespace SilverSim.Archiver.OAR
                     {
                         if (header.FileName.StartsWith("regions/"))
                         {
+                            if ((options & LoadOptions.Merge) == 0 && scene != null)
+                            {
+                                scene.ClearObjects();
+                            }
+
+                            if (load_sogs.Count != 0)
+                            {
+                                foreach (ObjectGroup sog in load_sogs)
+                                {
+                                    if ((options & LoadOptions.PersistUuids) == LoadOptions.PersistUuids)
+                                    {
+                                        foreach (ObjectPart part in sog.ValuesByKey1)
+                                        {
+                                            UUID oldID;
+                                            try
+                                            {
+                                                ObjectPart check = scene.Primitives[part.ID];
+                                                oldID = part.ID;
+                                                part.ID = UUID.Random;
+                                                sog.ChangeKey(part.ID, oldID);
+                                            }
+                                            catch
+                                            {
+
+                                            }
+                                            foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
+                                            {
+                                                oldID = item.ID;
+                                                item.ID = UUID.Random;
+                                                part.Inventory.ChangeKey(item.ID, oldID);
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        foreach (ObjectPart part in sog.ValuesByKey1)
+                                        {
+                                            UUID oldID = part.ID;
+                                            part.ID = UUID.Random;
+                                            sog.ChangeKey(part.ID, oldID);
+                                            foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
+                                            {
+                                                oldID = item.ID;
+                                                item.ID = UUID.Random;
+                                                part.Inventory.ChangeKey(item.ID, oldID);
+                                            }
+                                        }
+                                    }
+                                    scene.Add(sog);
+                                }
+                                load_sogs.Clear();
+                            }
+
                             string[] pcomps = header.FileName.Split(new char[] { '/' }, 3);
                             if (pcomps.Length < 3)
                             {
@@ -170,53 +276,15 @@ namespace SilverSim.Archiver.OAR
                             {
                                 throw new OARLoadingError("Failed to load sog " + header.FileName, e);
                             }
+
                             foreach (ObjectGroup sog in sogs)
                             {
                                 if (sog.Owner.ID == UUID.Zero)
                                 {
                                     sog.Owner = scene.Owner;
                                 }
-                                if ((options & LoadOptions.PersistUuids) == LoadOptions.PersistUuids)
-                                {
-                                    foreach (ObjectPart part in sog.ValuesByKey1)
-                                    {
-                                        UUID oldID;
-                                        try
-                                        {
-                                            ObjectPart check = scene.Primitives[part.ID];
-                                            oldID = part.ID;
-                                            part.ID = UUID.Random;
-                                            sog.ChangeKey(part.ID, oldID);
-                                        }
-                                        catch
-                                        {
-
-                                        }
-                                        foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
-                                        {
-                                            oldID = item.ID;
-                                            item.ID = UUID.Random;
-                                            part.Inventory.ChangeKey(item.ID, oldID);
-                                        }
-                                    }
-                                }
-                                else
-                                {
-                                    foreach (ObjectPart part in sog.ValuesByKey1)
-                                    {
-                                        UUID oldID = part.ID;
-                                        part.ID = UUID.Random;
-                                        sog.ChangeKey(part.ID, oldID);
-                                        foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
-                                        {
-                                            oldID = item.ID;
-                                            item.ID = UUID.Random;
-                                            part.Inventory.ChangeKey(item.ID, oldID);
-                                        }
-                                    }
-                                }
-                                scene.Add(sog);
                             }
+                            load_sogs.AddRange(sogs);
                         }
                         else if (header.FileName.StartsWith("terrains/"))
                         {

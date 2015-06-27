@@ -88,14 +88,14 @@ namespace SilverSim.Archiver.Tar
             do
             {
                 buf = ReadHeaderBytes();
-                hdr.FileType = (TarFileType)buf[156];
-                hdr.Length = Convert.ToInt32(Encoding.ASCII.GetString(buf, 124, 11), 8);
-                
                 if(buf[0] == 0)
                 {
                     throw new EndOfTarException();
                 }
-                else if(buf[156] == (byte)TarFileType.LongLink)
+                hdr.FileType = (TarFileType)buf[156];
+                hdr.Length = Convert.ToInt32(Encoding.ASCII.GetString(buf, 124, 11), 8);
+                
+                if(buf[156] == (byte)TarFileType.LongLink)
                 {
                     haveLongLink = true;
                     byte[] fnameBytes = new byte[hdr.Length];

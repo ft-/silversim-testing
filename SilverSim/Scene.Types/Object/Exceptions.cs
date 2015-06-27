@@ -34,4 +34,9 @@ namespace SilverSim.Scene.Types.Object
 
         }
     }
+
+    public class ObjectDeserializationFailedDueKey : Exception
+    {
+
+    }
 }
