@@ -161,6 +161,11 @@ namespace SilverSim.Types
             this.HomeURI = uui.HomeURI;
         }
 
+        public UUI(UUID ID)
+        {
+            this.ID = ID;
+        }
+
         public UUI(UUID ID, string FirstName, string LastName, Uri HomeURI)
         {
             this.ID = ID;

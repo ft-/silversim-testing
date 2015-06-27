@@ -126,7 +126,7 @@ namespace SilverSim.BackendConnectors.Simian.Asset
             {
                 Dictionary<string, string> para = new Dictionary<string, string>();
                 para["RequestMethod"] = "xGetAsset";
-                para["ID"] = key;
+                para["ID"] = (string)key;
                 Map m = SimianGrid.PostToService(m_AssetURI, m_AssetCapability, para, TimeoutMs);
                 if (!m["Success"].AsBoolean)
                 {
@@ -198,7 +198,7 @@ namespace SilverSim.BackendConnectors.Simian.Asset
             para["RequestMethod"] = "xAddAsset";
             para["ContentType"] = asset.ContentType;
             para["EncodedData"] = Convert.ToBase64String(asset.Data);
-            para["AssetID"] = asset.ID;
+            para["AssetID"] = (string)asset.ID;
             para["CreatorID"] = asset.Creator.FullName;
             para["Temporary"] = asset.Temporary ? "1" : "0";
             para["Name"] = asset.Name;
@@ -216,7 +216,7 @@ namespace SilverSim.BackendConnectors.Simian.Asset
         {
             Dictionary<string, string> para = new Dictionary<string, string>();
             para["RequestMethod"] = "xRemoveAsset";
-            para["AssetID"] = id;
+            para["AssetID"] = (string)id;
 
             Map m = SimianGrid.PostToService(m_AssetURI, m_AssetCapability, para, TimeoutMs);
             if (!m["Success"].AsBoolean)

@@ -219,13 +219,13 @@ namespace SilverSim.Scripting.LSL.API.HTTP
             lock (Instance)
             {
                 req.Headers.Add("X-SecondLife-Object-Name", Instance.Part.ObjectGroup.Name);
-                req.Headers.Add("X-SecondLife-Object-Key", Instance.Part.ObjectGroup.ID);
+                req.Headers.Add("X-SecondLife-Object-Key", (string)Instance.Part.ObjectGroup.ID);
                 req.Headers.Add("X-SecondLife-Region", Instance.Part.ObjectGroup.Scene.RegionData.Name);
                 req.Headers.Add("X-SecondLife-Local-Position", string.Format("({0:0.000000}, {1:0.000000}, {2:0.000000})", Instance.Part.ObjectGroup.GlobalPosition.X, Instance.Part.ObjectGroup.GlobalPosition.Y, Instance.Part.ObjectGroup.GlobalPosition.Z));
                 req.Headers.Add("X-SecondLife-Local-Velocity", string.Format("({0:0.000000}, {1:0.000000}, {2:0.000000})", Instance.Part.ObjectGroup.Velocity.X, Instance.Part.ObjectGroup.Velocity.Y, Instance.Part.ObjectGroup.Velocity.Z));
                 req.Headers.Add("X-SecondLife-Local-Rotation", string.Format("({0:0.000000}, {1:0.000000}, {2:0.000000}, {3:0.000000})", Instance.Part.ObjectGroup.GlobalRotation.X, Instance.Part.ObjectGroup.GlobalRotation.Y, Instance.Part.ObjectGroup.GlobalRotation.Z, Instance.Part.ObjectGroup.GlobalRotation.W));
                 req.Headers.Add("X-SecondLife-Owner-Name", Instance.Part.ObjectGroup.Owner.FullName);
-                req.Headers.Add("X-SecondLife-Owner-Key", Instance.Part.ObjectGroup.Owner.ID);
+                req.Headers.Add("X-SecondLife-Owner-Key", (string)Instance.Part.ObjectGroup.Owner.ID);
 
                 Match authMatch = m_AuthRegex.Match(url);
                 if(authMatch.Success)

@@ -191,7 +191,7 @@ namespace SilverSim.Scene.Types.Agent
             {
                 lock (this)
                 {
-                    return m_AnimationOverride[anim_state];
+                    return (string)m_AnimationOverride[anim_state];
                 }
             }
             return string.Empty;

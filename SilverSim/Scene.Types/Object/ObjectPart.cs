@@ -1661,7 +1661,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     PointLightParam lightparam = part.PointLight;
                                     Color c = lightparam.LightColor;
-                                    c.R_AsByte = (byte)reader.ReadElementValueAsUInt();
+                                    c.R = reader.ReadElementValueAsDouble().Clamp(0, 1);
                                     lightparam.LightColor = c;
                                     part.PointLight = lightparam;
                                 }
@@ -1671,7 +1671,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     PointLightParam lightparam = part.PointLight;
                                     Color c = lightparam.LightColor;
-                                    c.G_AsByte = (byte)reader.ReadElementValueAsUInt();
+                                    c.G = reader.ReadElementValueAsDouble().Clamp(0, 1);
                                     lightparam.LightColor = c;
                                     part.PointLight = lightparam;
                                 }
@@ -1681,7 +1681,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     PointLightParam lightparam = part.PointLight;
                                     Color c = lightparam.LightColor;
-                                    c.B_AsByte = (byte)reader.ReadElementValueAsUInt();
+                                    c.B = reader.ReadElementValueAsDouble().Clamp(0, 1);
                                     lightparam.LightColor = c;
                                     part.PointLight = lightparam;
                                 }

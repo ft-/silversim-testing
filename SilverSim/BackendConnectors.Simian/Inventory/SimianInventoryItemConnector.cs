@@ -65,8 +65,8 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
                 post["RequestMethod"] = "GetInventoryNode";
-                post["ItemID"] = key;
-                post["OwnerID"] = PrincipalID;
+                post["ItemID"] = (string)key;
+                post["OwnerID"] = (string)PrincipalID;
                 post["IncludeFolders"] = "1";
                 post["IncludeItems"] = "1";
                 post["ChildrenOnly"] = "1";
@@ -117,13 +117,13 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
 
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["RequestMethod"] = "AddInventoryItem";
-            post["ItemID"] = item.ID;
-            post["AssetID"] = item.AssetID;
-            post["ParentID"] = item.ParentFolderID;
+            post["ItemID"] = (string)item.ID;
+            post["AssetID"] = (string)item.AssetID;
+            post["ParentID"] = (string)item.ParentFolderID;
             post["OwnerID"] = (string)item.Owner;
             post["Name"] = item.Name;
             post["Description"] = item.Description;
-            post["CreatorID"] = item.Creator.ID;
+            post["CreatorID"] = (string)item.Creator.ID;
             post["CreatorData"] = item.Creator.CreatorData;
             post["ContentType"] = invContentType;
             post["ExtraData"] = JSON.Serialize(extraData);
@@ -140,7 +140,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
                 {
                     post.Clear();
                     post["RequestMethod"] = "GetUser";
-                    post["UserID"] = item.Owner.ID;
+                    post["UserID"] = (string)item.Owner.ID;
                     m = SimianGrid.PostToService(m_InventoryURI, m_InventoryCapability, post, TimeoutMs);
                     if (!m["Success"].AsBoolean || !m.ContainsKey("Gestures") || !(m["Gestures"] is AnArray))
                     {
@@ -185,7 +185,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
 
                     post.Clear();
                     post["RequestMethod"] = "AddUserData";
-                    post["UserID"] = item.Owner.ID;
+                    post["UserID"] = (string)item.Owner.ID;
                     post["Gestures"] = JSON.Serialize(json_gestures);
                     m = SimianGrid.PostToService(m_InventoryURI, m_InventoryCapability, post, TimeoutMs);
                 }
@@ -205,8 +205,8 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["RequestMethod"] = "RemoveInventoryNode";
-            post["OwnerID"] = PrincipalID;
-            post["ItemID"] = ID;
+            post["OwnerID"] = (string)PrincipalID;
+            post["ItemID"] = (string)ID;
             Map m = SimianGrid.PostToService(m_InventoryURI, m_InventoryCapability, post, TimeoutMs);
             if(!m["Success"].AsBoolean)
             {
@@ -218,9 +218,9 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["RequestMethod"] = "MoveInventoryNodes";
-            post["OwnerID"] = PrincipalID;
-            post["FolderID"] = newFolder;
-            post["Items"] = ID;
+            post["OwnerID"] = (string)PrincipalID;
+            post["FolderID"] = (string)newFolder;
+            post["Items"] = (string)ID;
             Map m = SimianGrid.PostToService(m_InventoryURI, m_InventoryCapability, post, TimeoutMs);
             if(!m["Success"].AsBoolean)
             {

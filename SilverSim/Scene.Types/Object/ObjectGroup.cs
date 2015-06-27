@@ -1261,6 +1261,7 @@ namespace SilverSim.Scene.Types.Object
 
         static void fromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
+            ObjectPart part;
             SortedDictionary<int, ObjectPart> links = new SortedDictionary<int, ObjectPart>();
             if (reader.IsEmptyElement)
             {
@@ -1284,7 +1285,16 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                ObjectPart part = parseOtherPart(reader, group, currentOwner);
+                                part = parseOtherPart(reader, group, currentOwner);
+                                links.Add(part.LoadedLinkNumber, part);
+                                break;
+
+                            case "SceneObjectPart":
+                                if (reader.IsEmptyElement)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                part = ObjectPart.FromXml(reader, null, currentOwner);
                                 links.Add(part.LoadedLinkNumber, part);
                                 break;
 
@@ -1398,6 +1408,23 @@ namespace SilverSim.Scene.Types.Object
                                     throw new InvalidObjectXmlException();
                                 }
                                 rootPart = parseRootPart(reader, group, currentOwner);
+                                break;
+
+                            case "SceneObjectPart":
+                                if(rootPart != null)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                if (reader.IsEmptyElement)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                if (rootPart != null)
+                                {
+                                    throw new InvalidObjectXmlException();
+                                }
+                                rootPart = ObjectPart.FromXml(reader, group, currentOwner);
+                                group.Add(LINK_ROOT, rootPart.ID, rootPart);
                                 break;
 
                             case "OtherParts":

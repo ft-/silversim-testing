@@ -102,14 +102,14 @@ namespace SilverSim.BackendConnectors.Robust.GridUser
         {
             get
             {
-                return GetUserInfo(userID);
+                return GetUserInfo((string)userID);
             }
         }
         public override GridUserInfo this[UUI userID]
         {
             get
             {
-                return GetUserInfo(userID.ID);
+                return GetUserInfo((string)userID.ID);
             }
         }
 

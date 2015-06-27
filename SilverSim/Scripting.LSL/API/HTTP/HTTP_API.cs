@@ -60,7 +60,7 @@ namespace SilverSim.Scripting.LSL.API.HTTP
         {
             foreach(UUID ids in ((Script)Instance).m_RequestedURLs)
             {
-                m_HTTPHandler.ReleaseURL(ids);
+                m_HTTPHandler.ReleaseURL((string)ids);
             }
         }
     }

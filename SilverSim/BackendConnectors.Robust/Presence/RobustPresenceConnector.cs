@@ -66,7 +66,7 @@ namespace SilverSim.BackendConnectors.Robust.Presence
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["SessionID"] = sessionID;
+                post["SessionID"] = (string)sessionID;
                 post["METHOD"] = "getagent";
 
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_PresenceUri, null, post, false, TimeoutMs));
@@ -87,7 +87,7 @@ namespace SilverSim.BackendConnectors.Robust.Presence
                 if(value == null)
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
-                    post["SessionID"] = sessionID;
+                    post["SessionID"] = (string)sessionID;
                     post["METHOD"] = "logout";
 
                     Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_PresenceUri, null, post, false, TimeoutMs));
@@ -114,7 +114,7 @@ namespace SilverSim.BackendConnectors.Robust.Presence
                 if (value == null)
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
-                    post["SessionID"] = sessionID;
+                    post["SessionID"] = (string)sessionID;
                     post["METHOD"] = "logout";
 
                     Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_PresenceUri, null, post, false, TimeoutMs));
@@ -131,7 +131,7 @@ namespace SilverSim.BackendConnectors.Robust.Presence
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
                     post["UserID"] = (string)value.UserID;
-                    post["SessionID"] = value.SessionID;
+                    post["SessionID"] = (string)value.SessionID;
                     post["METHOD"] = "login";
 
                     Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_PresenceUri, null, post, false, TimeoutMs));
@@ -147,8 +147,8 @@ namespace SilverSim.BackendConnectors.Robust.Presence
                 else if(reportType == SetType.Report)
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
-                    post["SessionID"] = value.SessionID;
-                    post["RegionID"] = value.RegionID;
+                    post["SessionID"] = (string)value.SessionID;
+                    post["RegionID"] = (string)value.RegionID;
 
                     Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_PresenceUri, null, post, false, TimeoutMs));
                     if (!map.ContainsKey("result"))
@@ -170,7 +170,7 @@ namespace SilverSim.BackendConnectors.Robust.Presence
         public override void logoutRegion(UUID regionID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["RegionID"] = regionID;
+            post["RegionID"] = (string)regionID;
             post["METHOD"] = "logoutregion";
 
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_PresenceUri, null, post, false, TimeoutMs));

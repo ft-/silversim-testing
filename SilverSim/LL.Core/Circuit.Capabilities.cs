@@ -112,15 +112,15 @@ namespace SilverSim.LL.Core
                                     break;
 
                                 case 'r':
-                                    uri += System.Uri.EscapeUriString(Scene.ID);
+                                    uri += System.Uri.EscapeUriString((string)Scene.ID);
                                     break;
 
                                 case 's':
-                                    uri += System.Uri.EscapeUriString(SessionID);
+                                    uri += System.Uri.EscapeUriString((string)SessionID);
                                     break;
 
                                 case 'u':
-                                    uri += System.Uri.EscapeUriString(AgentID);
+                                    uri += System.Uri.EscapeUriString((string)AgentID);
                                     break;
                             }
                         }

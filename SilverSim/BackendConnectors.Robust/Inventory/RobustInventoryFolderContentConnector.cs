@@ -52,8 +52,8 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         InventoryFolder GetFolder(UUID PrincipalID, UUID key)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["PRINCIPAL"] = PrincipalID;
-            post["ID"] = key;
+            post["PRINCIPAL"] = (string)PrincipalID;
+            post["ID"] = (string)key;
             post["METHOD"] = "GETFOLDER";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
             if (!map.ContainsKey("folder"))
@@ -75,8 +75,8 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             {
                 InventoryFolderContent folderContent = new InventoryFolderContent();
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["PRINCIPAL"] = principalID;
-                post["FOLDER"] = folderID;
+                post["PRINCIPAL"] = (string)principalID;
+                post["FOLDER"] = (string)folderID;
                 post["METHOD"] = "GETFOLDERCONTENT";
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
 
@@ -133,7 +133,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
                 }
 
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["PRINCIPAL"] = principalID;
+                post["PRINCIPAL"] = (string)principalID;
                 post["FOLDERS"] = string.Join(",", folderIDs);
                 post["COUNT"] = folderIDs.Length.ToString(); /* <- some redundancy here for whatever unknown reason, it could have been derived from FOLDERS anyways */
                 post["METHOD"] = "GETMULTIPLEFOLDERSCONTENT";

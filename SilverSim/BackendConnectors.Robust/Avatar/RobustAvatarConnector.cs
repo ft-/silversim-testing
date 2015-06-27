@@ -73,7 +73,7 @@ namespace SilverSim.BackendConnectors.Robust.Avatar
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["UserID"] = avatarID;
+                post["UserID"] = (string)avatarID;
                 post["METHOD"] = "getavatar";
                 post["VERSIONMIN"] = "0";
                 post["VERSIONMAX"] = "0";
@@ -98,7 +98,7 @@ namespace SilverSim.BackendConnectors.Robust.Avatar
             set
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["UserID"] = avatarID;
+                post["UserID"] = (string)avatarID;
                 post["VERSIONMIN"] = "0";
                 post["VERSIONMAX"] = "0";
 
@@ -158,7 +158,7 @@ namespace SilverSim.BackendConnectors.Robust.Avatar
                     throw new ArgumentException("value and itemKeys must have identical Count");
                 }
 
-                string outStr = "UserID=" + HttpUtility.UrlEncode(avatarID);
+                string outStr = "UserID=" + HttpUtility.UrlEncode((string)avatarID);
                 outStr += "&METHOD=setitems";
                 int i;
                 for(i = 0; i < itemKeys.Count; ++i)
@@ -195,7 +195,7 @@ namespace SilverSim.BackendConnectors.Robust.Avatar
             set
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["UserID"] = avatarID;
+                post["UserID"] = (string)avatarID;
                 post["METHOD"] = "setitems";
                 post["Names[]"] = itemKey;
                 post["Values[]"] = value;
@@ -216,7 +216,7 @@ namespace SilverSim.BackendConnectors.Robust.Avatar
         public override void Remove(UUID avatarID, IList<string> nameList)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["UserID"] = avatarID;
+            post["UserID"] = (string)avatarID;
             post["METHOD"] = "removeitems";
             uint index = 0;
             foreach (string name in nameList)
@@ -239,7 +239,7 @@ namespace SilverSim.BackendConnectors.Robust.Avatar
         public override void Remove(UUID avatarID, string name)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["UserID"] = avatarID;
+            post["UserID"] = (string)avatarID;
             post["METHOD"] = "removeitems";
             post["Names[]"] = name.Replace(" ", "_");
             post["VERSIONMIN"] = "0";

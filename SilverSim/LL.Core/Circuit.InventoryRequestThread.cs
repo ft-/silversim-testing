@@ -821,7 +821,7 @@ namespace SilverSim.LL.Core
 
                                     try
                                     {
-                                        item.Group = Agent.GroupsService.Groups[Agent.Owner, d.GroupID].ID;
+                                        item.Group = Agent.GroupsService.Groups[Agent.Owner, new UGI(d.GroupID)].ID;
                                     }
                                     catch
                                     {

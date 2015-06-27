@@ -85,7 +85,7 @@ namespace SilverSim.BackendConnectors.Robust.Friends
                 List<FriendInfo> reslist = new List<FriendInfo>();
                 Dictionary<string, string> post = new Dictionary<string, string>();
                 post["METHOD"] = "getfriends_string";
-                post["PRINCIPALID"] = user.ID;
+                post["PRINCIPALID"] = (string)user.ID;
 
                 Map res = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
                 foreach(KeyValuePair<string, IValue> kvp in res)

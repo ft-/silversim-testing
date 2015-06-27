@@ -83,8 +83,8 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
                 if (type == AssetType.RootFolder)
                 {
                     post["RequestMethod"] = "GetInventoryNode";
-                    post["ItemID"] = PrincipalID;
-                    post["OwnerID"] = PrincipalID;
+                    post["ItemID"] = (string)PrincipalID;
+                    post["OwnerID"] = (string)PrincipalID;
                     post["IncludeFolders"] = "1";
                     post["IncludeItems"] = "0";
                     post["ChildrenOnly"] = "1";
@@ -92,7 +92,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
                 else
                 {
                     post["RequestMethod"] = "GetFolderForType";
-                    post["OwnerID"] = PrincipalID;
+                    post["OwnerID"] = (string)PrincipalID;
                     post["ContentType"] = SimianInventoryConnector.ContentTypeFromAssetType(type);
                 }
                 Map res = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
@@ -110,8 +110,8 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
             List<InventoryFolder> folders = new List<InventoryFolder>();
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["RequestMethod"] = "GetInventoryNode";
-            post["ItemID"] = key;
-            post["OwnerID"] = PrincipalID;
+            post["ItemID"] = (string)key;
+            post["OwnerID"] = (string)PrincipalID;
             post["IncludeFolders"] = "1";
             post["IncludeItems"] = "0";
             post["ChildrenOnly"] = "1";
@@ -140,8 +140,8 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
             List<InventoryItem> items = new List<InventoryItem>();
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["RequestMethod"] = "GetInventoryNode";
-            post["ItemID"] = key;
-            post["OwnerID"] = PrincipalID;
+            post["ItemID"] = (string)key;
+            post["OwnerID"] = (string)PrincipalID;
             post["IncludeFolders"] = "0";
             post["IncludeItems"] = "1";
             post["ChildrenOnly"] = "1";
@@ -173,11 +173,11 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["RequestMethod"] = "AddInventoryFolder";
-            post["FolderID"] = folder.ID;
-            post["ParentID"] = folder.ParentFolderID;
+            post["FolderID"] = (string)folder.ID;
+            post["ParentID"] = (string)folder.ParentFolderID;
             post["ContentType"] = ((int)folder.InventoryType).ToString();
             post["Name"] = folder.Name;
-            post["OwnerID"] = folder.Owner.ID;
+            post["OwnerID"] = (string)folder.Owner.ID;
 
             Map m = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
             if (!m["Success"].AsBoolean)
@@ -209,8 +209,8 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["RequestMethod"] = "RemoveInventoryNode";
-            post["OwnerID"] = PrincipalID;
-            post["ItemID"] = folderID;
+            post["OwnerID"] = (string)PrincipalID;
+            post["ItemID"] = (string)folderID;
 
             Map m = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
             if(!m["Success"].AsBoolean)
@@ -228,8 +228,8 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["RequestMethod"] = "PurgeInventoryFolder";
-            post["OwnerID"] = PrincipalID;
-            post["FolderID"] = folderID;
+            post["OwnerID"] = (string)PrincipalID;
+            post["FolderID"] = (string)folderID;
 
             Map m = SimianGrid.PostToService(m_InventoryURI, m_SimCapability, post, TimeoutMs);
             if(!m["Success"].AsBoolean)

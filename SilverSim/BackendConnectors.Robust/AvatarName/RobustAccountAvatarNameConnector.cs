@@ -70,7 +70,7 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
                 Dictionary<string, string> post = new Dictionary<string, string>();
                 post["FirstName"] = firstName;
                 post["LastName"] = lastName;
-                post["SCOPEID"] = m_ScopeID;
+                post["SCOPEID"] = (string)m_ScopeID;
                 post["METHOD"] = "getaccount";
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_UserAccountURI, null, post, false, TimeoutMs));
                 if (!(map["result"] is Map))
@@ -94,8 +94,8 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["UserID"] = accountID;
-                post["SCOPEID"] = m_ScopeID;
+                post["UserID"] = (string)accountID;
+                post["SCOPEID"] = (string)m_ScopeID;
                 post["METHOD"] = "getaccount";
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_UserAccountURI, null, post, false, TimeoutMs));
                 if (!(map["result"] is Map))
@@ -142,7 +142,7 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
                 m_Log.FatalFormat("Missing 'HomeURI' in section {0}", ownSection.Name);
                 throw new ConfigurationLoader.ConfigurationError();
             }
-            return new RobustAccountAvatarNameConnector(ownSection.GetString("URI"), ownSection.GetString("HomeURI"), ownSection.GetString("ScopeID", UUID.Zero));
+            return new RobustAccountAvatarNameConnector(ownSection.GetString("URI"), ownSection.GetString("HomeURI"), ownSection.GetString("ScopeID", (string)UUID.Zero));
         }
     }
     #endregion

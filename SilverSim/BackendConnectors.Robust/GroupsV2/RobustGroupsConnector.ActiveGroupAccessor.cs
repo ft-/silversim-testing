@@ -52,9 +52,9 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 set
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
-                    post["AgentID"] = princialID.ID;
-                    post["GroupID"] = value;
-                    post["RequestingAgentID"] = requestingAgent.ID;
+                    post["AgentID"] = (string)princialID.ID;
+                    post["GroupID"] = (string)value;
+                    post["RequestingAgentID"] = (string)requestingAgent.ID;
                     post["OP"] = "GROUP";
                     post["METHOD"] = "SETACTIVE";
                     BooleanResponseRequest(m_Uri, post, false, TimeoutMs);

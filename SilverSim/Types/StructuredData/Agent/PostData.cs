@@ -269,6 +269,10 @@ namespace SilverSim.StructuredData.Agent
         {
             w.Write(string.Format("\"{0}\":\"{1}\"", JSON.JSON.SerializeString(name), JSON.JSON.SerializeString(value)));
         }
+        private void WriteJSONString(TextWriter w, string name, UUID value)
+        {
+            w.Write(string.Format("\"{0}\":\"{1}\"", JSON.JSON.SerializeString(name), JSON.JSON.SerializeString((string)value)));
+        }
         private void WriteJSONValue(TextWriter w, string name, uint value)
         {
             w.Write(string.Format("\"{0}\":{1}", JSON.JSON.SerializeString(name), value));

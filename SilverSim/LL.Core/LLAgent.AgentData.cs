@@ -50,7 +50,7 @@ namespace SilverSim.LL.Core
                             adu.ActiveGroupID = circuit.Agent.GroupsService.ActiveGroup[Owner, Owner];
                             if (adu.ActiveGroupID != UUID.Zero)
                             {
-                                gi = circuit.Agent.GroupsService.Groups[Owner, adu.ActiveGroupID];
+                                gi = circuit.Agent.GroupsService.Groups[Owner, new UGI(adu.ActiveGroupID)];
                                 gm = circuit.Agent.GroupsService.Members[Owner, gi.ID, Owner];
                                 gr = circuit.Agent.GroupsService.Roles[Owner, gi.ID, gm.SelectedRoleID];
                                 adu.GroupName = gi.Name;

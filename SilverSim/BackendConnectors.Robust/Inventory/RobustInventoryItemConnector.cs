@@ -56,7 +56,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["ID"] = key;
+                post["ID"] = (string)key;
                 post["METHOD"] = "GETITEM";
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
                 if (!(map["item"] is Map))
@@ -73,8 +73,8 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["PRINCIPAL"] = PrincipalID;
-                post["ID"] = key;
+                post["PRINCIPAL"] = (string)PrincipalID;
+                post["ID"] = (string)key;
                 post["METHOD"] = "GETITEM";
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
                 if (!(map["item"] is Map))
@@ -102,7 +102,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
                 }
 
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["PRINCIPAL"] = principalID;
+                post["PRINCIPAL"] = (string)principalID;
                 post["ITEMS"] = string.Join(",", itemids);
                 post["COUNT"] = itemids.Count.ToString(); /* <- some redundancy here for whatever unknown reason, it could have been derived from ITEMS anyways */
                 post["METHOD"] = "GETMULTIPLEITEMS";
@@ -162,13 +162,13 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         private Dictionary<string, string> SerializeItem(InventoryItem item)
         {
             Dictionary<string, string> post = new Dictionary<string,string>();
-            post["ID"] = item.ID;
-            post["AssetID"] = item.AssetID;
-            post["CreatorId"] = item.Creator.ID;
-            post["GroupID"] = item.Group.ID;
+            post["ID"] = (string)item.ID;
+            post["AssetID"] = (string)item.AssetID;
+            post["CreatorId"] = (string)item.Creator.ID;
+            post["GroupID"] = (string)item.Group.ID;
             post["GroupOwned"] = item.IsGroupOwned.ToString();
-            post["Folder"] = item.ParentFolderID;
-            post["Owner"] = item.Owner.ID;
+            post["Folder"] = (string)item.ParentFolderID;
+            post["Owner"] = (string)item.Owner.ID;
             post["Name"] = item.Name;
             post["InvType"] = ((int)item.InventoryType).ToString();
             post["AssetType"] = ((uint)item.AssetType).ToString();
@@ -212,8 +212,8 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         public override void Delete(UUID PrincipalID, UUID ID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["ITEMS[]"] = ID;
-            post["PRINCIPAL"] = PrincipalID;
+            post["ITEMS[]"] = (string)ID;
+            post["PRINCIPAL"] = (string)PrincipalID;
             post["METHOD"] = "DELETEITEMS";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
             if (!((AString)map["RESULT"]))
@@ -225,9 +225,9 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         public override void Move(UUID PrincipalID, UUID ID, UUID newFolder)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["IDLIST[]"] = ID;
-            post["DESTLIST[]"] = newFolder;
-            post["PRINCIPAL"] = PrincipalID;
+            post["IDLIST[]"] = (string)ID;
+            post["DESTLIST[]"] = (string)newFolder;
+            post["PRINCIPAL"] = (string)PrincipalID;
             post["METHOD"] = "MOVEITEMS";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
             if (!((AString)map["RESULT"]))

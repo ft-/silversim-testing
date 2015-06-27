@@ -53,7 +53,7 @@ namespace SilverSim.BackendConnectors.Simian.Asset
             {
                 Dictionary<string, string> para = new Dictionary<string, string>();
                 para["RequestMethod"] = "xGetAssetMetadata";
-                para["ID"] = key;
+                para["ID"] = (string)key;
                 Map m = SimianGrid.PostToService(m_AssetURI, m_AssetCapability, para, TimeoutMs);
                 if(!m["Success"].AsBoolean)
                 {

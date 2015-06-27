@@ -66,15 +66,6 @@ namespace SilverSim.Scene.Management.Scene
             }
         }
 
-        /* following is needed to prevent the implicit typecasting here */
-        public new SceneInterface this[UUID id]
-        {
-            get
-            {
-                return ((RwLockedDoubleDictionary<UUID, ulong, SceneInterface>)this)[id];
-            }
-        }
-
         public void Add(SceneInterface scene)
         {
             m_RegionNames.Add(scene.ID, scene.Name);

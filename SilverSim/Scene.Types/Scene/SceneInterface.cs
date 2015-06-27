@@ -177,7 +177,7 @@ namespace SilverSim.Scene.Types.Scene
                 reg.Owner = Owner;
                 reg.ParcelMapTexture = UUID.Zero;
                 reg.RegionMapTexture = UUID.Zero;
-                reg.RegionSecret = RegionSecret;
+                reg.RegionSecret = (string)RegionSecret;
                 reg.ScopeID = UUID.Zero;
                 reg.ServerIP = ExternalHostName;
                 reg.ServerPort = RegionPort;

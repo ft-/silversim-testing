@@ -120,7 +120,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
             List<InventoryItem> item = new List<InventoryItem>();
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["RequestMethod"] = "GetUser";
-            post["UserID"] = PrincipalID;
+            post["UserID"] = (string)PrincipalID;
 
             Map res = SimianGrid.PostToService(m_InventoryURI, m_InventoryCapability, post, TimeoutMs);
             if (res["Success"].AsBoolean && res.ContainsKey("Gestures") && res["Gestures"] is AnArray)
@@ -456,7 +456,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
                 m_Log.FatalFormat("Missing 'URI' in section {0}", ownSection.Name);
                 throw new ConfigurationLoader.ConfigurationError();
             }
-            return new SimianInventoryConnector(ownSection.GetString("URI"), ownSection.GetString("SimCapability", UUID.Zero));
+            return new SimianInventoryConnector(ownSection.GetString("URI"), ownSection.GetString("SimCapability", (string)UUID.Zero));
         }
     }
     #endregion

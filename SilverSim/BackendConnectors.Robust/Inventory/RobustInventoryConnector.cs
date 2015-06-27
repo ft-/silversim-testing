@@ -118,7 +118,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         public override void checkInventory(UUID PrincipalID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["PRINCIPAL"] = PrincipalID;
+            post["PRINCIPAL"] = (string)PrincipalID;
             post["METHOD"] = "CREATEUSERINVENTORY";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
             if (!((AString)map["RESULT"]))
@@ -130,7 +130,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         public override List<InventoryItem> getActiveGestures(UUID PrincipalID)
         {
             Dictionary<string, string> post = new Dictionary<string,string>();
-            post["PRINCIPAL"] = PrincipalID;
+            post["PRINCIPAL"] = (string)PrincipalID;
             post["METHOD"] = "GETACTIVEGESTURES";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
             if (!(map["ITEMS"] is Map))

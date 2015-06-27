@@ -130,7 +130,7 @@ namespace SilverSim.LL.Core
                 }
                 catch
                 {
-                    baduuids.Add(id);
+                    baduuids.Add((string)id);
                     continue;
                 }
                 if (!haveAgents)

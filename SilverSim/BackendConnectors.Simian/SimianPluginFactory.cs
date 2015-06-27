@@ -46,7 +46,7 @@ namespace SilverSim.BackendConnectors.Simian
 
         public InventoryServiceInterface Instantiate(string url)
         {
-            return new Inventory.SimianInventoryConnector(url, UUID.Zero);
+            return new Inventory.SimianInventoryConnector(url, (string)UUID.Zero);
         }
 
         public override string Name
@@ -80,7 +80,7 @@ namespace SilverSim.BackendConnectors.Simian
 
         public AssetServiceInterface Instantiate(string url)
         {
-            return new Asset.SimianAssetConnector(url, UUID.Zero);
+            return new Asset.SimianAssetConnector(url, (string)UUID.Zero);
         }
 
         public override string Name

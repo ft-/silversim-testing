@@ -84,6 +84,11 @@ namespace SilverSim.Types
             HomeURI = v.HomeURI;
         }
 
+        public UGI(UUID v)
+        {
+            ID = v;
+        }
+
         public override bool Equals(object obj)
         {
             return (obj is UGI) ? this == (UGI)obj : false;

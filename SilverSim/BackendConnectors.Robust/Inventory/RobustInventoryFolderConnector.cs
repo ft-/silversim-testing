@@ -64,7 +64,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["ID"] = key;
+                post["ID"] = (string)key;
                 post["METHOD"] = "GETFOLDER";
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
                 if (!map.ContainsKey("folder"))
@@ -85,8 +85,8 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["PRINCIPAL"] = PrincipalID;
-                post["ID"] = key;
+                post["PRINCIPAL"] = (string)PrincipalID;
+                post["ID"] = (string)key;
                 post["METHOD"] = "GETFOLDER";
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
                 if (!map.ContainsKey("folder"))
@@ -107,7 +107,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["PRINCIPAL"] = PrincipalID;
+                post["PRINCIPAL"] = (string)PrincipalID;
                 if (type == AssetType.RootFolder)
                 {
                     post["METHOD"] = "GETROOTFOLDER";
@@ -130,8 +130,8 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         public override List<InventoryFolder> getFolders(UUID PrincipalID, UUID key)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["PRINCIPAL"] = PrincipalID;
-            post["FOLDER"] = key;
+            post["PRINCIPAL"] = (string)PrincipalID;
+            post["FOLDER"] = (string)key;
             post["METHOD"] = "GETFOLDERCONTENT";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
             if (!(map["FOLDERS"] is Map))
@@ -153,8 +153,8 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         public override List<InventoryItem> getItems(UUID PrincipalID, UUID key)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["PRINCIPAL"] = PrincipalID;
-            post["FOLDER"] = key;
+            post["PRINCIPAL"] = (string)PrincipalID;
+            post["FOLDER"] = (string)key;
             post["METHOD"] = "GETFOLDERITEMS";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
             if (!(map["ITEMS"] is Map))
@@ -179,12 +179,12 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         private Dictionary<string, string> SerializeFolder(InventoryFolder folder)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["ID"] = folder.ID;
-            post["ParentID"] = folder.ParentFolderID;
+            post["ID"] = (string)folder.ID;
+            post["ParentID"] = (string)folder.ParentFolderID;
             post["Type"] = ((int)folder.InventoryType).ToString();
             post["Version"] = folder.Version.ToString();
             post["Name"] = folder.Name;
-            post["Owner"] = folder.Owner.ID;
+            post["Owner"] = (string)folder.Owner.ID;
             return post;
         }
 
@@ -212,9 +212,9 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         public override void Move(UUID PrincipalID, UUID folderID, UUID toFolderID)
         {
             Dictionary<string, string> post = new Dictionary<string,string>();
-            post["ParentID"] = toFolderID;
-            post["ID"] = folderID;
-            post["PRINCIPAL"] = PrincipalID;
+            post["ParentID"] = (string)toFolderID;
+            post["ID"] = (string)folderID;
+            post["PRINCIPAL"] = (string)PrincipalID;
             post["METHOD"] = "MOVEFOLDER";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
             if (!((AString)map["RESULT"]))
@@ -235,8 +235,8 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         public override void Delete(UUID PrincipalID, UUID folderID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["FOLDERS[]"] = folderID;
-            post["PRINCIPAL"] = PrincipalID;
+            post["FOLDERS[]"] = (string)folderID;
+            post["PRINCIPAL"] = (string)PrincipalID;
             post["METHOD"] = "DELETEFOLDERS";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
             if (!((AString)map["RESULT"]))
@@ -248,7 +248,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         public override void Purge(UUID folderID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["ID"] = folderID;
+            post["ID"] = (string)folderID;
             post["METHOD"] = "PURGEFOLDER";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
             if (!((AString)map["RESULT"]))
@@ -260,8 +260,8 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
         public override void Purge(UUID PrincipalID, UUID folderID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["ID"] = folderID;
-            post["PRINCIPAL"] = PrincipalID;
+            post["ID"] = (string)folderID;
+            post["PRINCIPAL"] = (string)PrincipalID;
             post["METHOD"] = "PURGEFOLDER";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_InventoryURI, null, post, false, TimeoutMs));
             if (!((AString)map["RESULT"]))

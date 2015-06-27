@@ -41,6 +41,15 @@ namespace SilverSim.Archiver.OAR
 {
     public static partial class OAR
     {
+        public class OARLoadingError : Exception
+        {
+            public OARLoadingError(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
+        }
+
         public class OARLoadingTriedWithoutSelectedRegion : Exception
         {
 
@@ -152,7 +161,15 @@ namespace SilverSim.Archiver.OAR
                         if (header.FileName.StartsWith("objects/"))
                         {
                             /* Load objects */
-                            List<ObjectGroup> sogs = ObjectXML.fromXml(reader, scene.Owner);
+                            List<ObjectGroup> sogs;
+                            try
+                            {
+                                sogs = ObjectXML.fromXml(reader, scene.Owner);
+                            }
+                            catch(Exception e)
+                            {
+                                throw new OARLoadingError("Failed to load sog " + header.FileName, e);
+                            }
                             foreach (ObjectGroup sog in sogs)
                             {
                                 if (sog.Owner.ID == UUID.Zero)

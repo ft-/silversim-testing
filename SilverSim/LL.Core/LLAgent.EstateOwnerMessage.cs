@@ -229,12 +229,12 @@ namespace SilverSim.LL.Core
                 uint estateID = scene.EstateService.RegionMap[scene.ID];
                 EstateInfo estateInfo = scene.EstateService[estateID];
                 msg.ParamList.Add(StringToBytes(estateInfo.Name));
-                msg.ParamList.Add(StringToBytes(estateInfo.Owner.ID));
+                msg.ParamList.Add(StringToBytes((string)estateInfo.Owner.ID));
                 msg.ParamList.Add(StringToBytes(estateID.ToString()));
                 msg.ParamList.Add(StringToBytes(((uint)estateInfo.Flags).ToString()));
                 msg.ParamList.Add(StringToBytes(estateInfo.SunPosition.ToString()));
                 msg.ParamList.Add(StringToBytes(estateInfo.ParentEstateID.ToString()));
-                msg.ParamList.Add(StringToBytes(UUID.Zero)); /* covenant */
+                msg.ParamList.Add(StringToBytes((string)UUID.Zero)); /* covenant */
                 msg.ParamList.Add(StringToBytes("0")); /* covenant changed */
                 msg.ParamList.Add(StringToBytes("1"));
                 msg.ParamList.Add(StringToBytes(estateInfo.AbuseEmail));

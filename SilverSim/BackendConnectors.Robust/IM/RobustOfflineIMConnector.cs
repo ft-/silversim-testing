@@ -70,16 +70,16 @@ namespace SilverSim.BackendConnectors.Robust.IM
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["BinaryBucket"] = BitConverter.ToString(im.BinaryBucket).Replace("-", string.Empty);
             post["Dialog"] = ((int)im.Dialog).ToString();
-            post["FromAgentID"] = im.FromAgent.ID;
+            post["FromAgentID"] = (string)im.FromAgent.ID;
             post["FromAgentName"] = im.FromAgent.FullName;
             bool isFromGroup = !im.IsFromGroup.Equals(UUID.Zero);
             post["FromGroup"] = isFromGroup.ToString();
             post["Message"] = im.Message;
             post["EstateID"] = im.ParentEstateID.ToString();
             post["Position"] = im.Position.ToString();
-            post["RegionID"] = im.RegionID;
+            post["RegionID"] = (string)im.RegionID;
             post["Timestamp"] = im.Timestamp.DateTimeToUnixTime().ToString();
-            post["ToAgentID"] = im.ToAgent.ID;
+            post["ToAgentID"] = (string)im.ToAgent.ID;
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_OfflineIMURI, null, post, false, TimeoutMs));
             if (!map.ContainsKey("RESULT"))
             {
@@ -94,7 +94,7 @@ namespace SilverSim.BackendConnectors.Robust.IM
         public override List<GridInstantMessage> getOfflineIMs(UUID principalID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["PrincipalID"] = principalID;
+            post["PrincipalID"] = (string)principalID;
             post["METHOD"] = "GET";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_OfflineIMURI, null, post, false, TimeoutMs));
             if (!map.ContainsKey("RESULT"))

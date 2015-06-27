@@ -494,7 +494,7 @@ namespace SilverSim.Scene.Types.Object
                     updatebytes[i++] = 0;
                     updatebytes[i++] = 0;
                     updatebytes[i++] = 0;
-                    Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebytes, i, 4);
+                    Buffer.BlockCopy(light.LightColor.AsByte, 0, updatebytes, i, 3);
                     
                     double intensity = light.Intensity;
                     if (intensity > m_FacelightLimitIntensity && 

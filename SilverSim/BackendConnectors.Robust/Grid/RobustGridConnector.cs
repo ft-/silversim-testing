@@ -66,7 +66,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["SCOPEID"] = ScopeID;
+                post["SCOPEID"] = (string)ScopeID;
                 post["REGIONID"] = regionID.ToString();
                 post["METHOD"] = "get_region_by_uuid";
                 return DeserializeRegion(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
@@ -78,7 +78,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["SCOPEID"] = ScopeID;
+                post["SCOPEID"] = (string)ScopeID;
                 post["X"] = gridX.ToString();
                 post["Y"] = gridY.ToString();
                 post["METHOD"] = "get_region_by_position";
@@ -91,7 +91,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["SCOPEID"] = ScopeID;
+                post["SCOPEID"] = (string)ScopeID;
                 post["NAME"] = regionName;
                 post["METHOD"] = "get_region_by_name";
                 return DeserializeRegion(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
@@ -103,7 +103,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["SCOPEID"] = UUID.Zero;
+                post["SCOPEID"] = (string)UUID.Zero;
                 post["REGIONID"] = regionID.ToString();
                 post["METHOD"] = "get_region_by_uuid";
                 return DeserializeRegion(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
@@ -129,7 +129,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["METHOD"] = "register";
-            post["uuid"] = regionInfo.ID;
+            post["uuid"] = (string)regionInfo.ID;
             post["locX"] = regionInfo.Location.X.ToString();
             post["locY"] = regionInfo.Location.Y.ToString();
             post["sizeX"] = regionInfo.Size.X.ToString();
@@ -139,13 +139,13 @@ namespace SilverSim.BackendConnectors.Robust.Grid
             post["serverHttpPort"] = regionInfo.ServerHttpPort.ToString();
             post["serverURI"] = regionInfo.ServerURI;
             post["serverPort"] = regionInfo.ServerPort.ToString();
-            post["regionMapTexture"] = regionInfo.RegionMapTexture;
-            post["parcelMapTexture"] = regionInfo.ParcelMapTexture;
+            post["regionMapTexture"] = (string)regionInfo.RegionMapTexture;
+            post["parcelMapTexture"] = (string)regionInfo.ParcelMapTexture;
             post["access"] = regionInfo.Access.ToString();
             post["regionSecret"] = regionInfo.RegionSecret;
-            post["owner_uuid"] = regionInfo.Owner.ID;
+            post["owner_uuid"] = (string)regionInfo.Owner.ID;
             post["Token"] = "";
-            post["SCOPEID"] = UUID.Zero;
+            post["SCOPEID"] = (string)UUID.Zero;
             post["VERSIONMIN"] = "0";
             post["VERSIONMAX"] = "0";
 
@@ -156,8 +156,8 @@ namespace SilverSim.BackendConnectors.Robust.Grid
         public override void UnregisterRegion(UUID ScopeID, UUID RegionID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["SCOPEID"] = ScopeID;
-            post["REGIONID"] = RegionID;
+            post["SCOPEID"] = (string)ScopeID;
+            post["REGIONID"] = (string)RegionID;
             post["METHOD"] = "deregister";
             checkResult(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
         }
@@ -208,7 +208,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
         public override List<RegionInfo> GetDefaultRegions(UUID ScopeID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["SCOPEID"] = ScopeID;
+            post["SCOPEID"] = (string)ScopeID;
             post["METHOD"] = "get_default_regions";
             return DeserializeList(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
         }
@@ -216,7 +216,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
         public override List<RegionInfo> GetFallbackRegions(UUID ScopeID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["SCOPEID"] = ScopeID;
+            post["SCOPEID"] = (string)ScopeID;
             post["METHOD"] = "get_fallback_regions";
             return DeserializeList(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
         }
@@ -224,7 +224,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
         public override List<RegionInfo> GetDefaultHypergridRegions(UUID ScopeID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["SCOPEID"] = ScopeID;
+            post["SCOPEID"] = (string)ScopeID;
             post["METHOD"] = "get_default_hypergrid_regions";
             return DeserializeList(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
         }
@@ -232,7 +232,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
         public override List<RegionInfo> GetRegionsByRange(UUID ScopeID, GridVector min, GridVector max)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["SCOPEID"] = ScopeID;
+            post["SCOPEID"] = (string)ScopeID;
             post["XMIN"] = min.X.ToString();
             post["YMIN"] = min.Y.ToString();
             post["XMAX"] = max.X.ToString();
@@ -244,8 +244,8 @@ namespace SilverSim.BackendConnectors.Robust.Grid
         public override List<RegionInfo> GetNeighbours(UUID ScopeID, UUID RegionID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["SCOPEID"] = ScopeID;
-            post["REGIONID"] = RegionID;
+            post["SCOPEID"] = (string)ScopeID;
+            post["REGIONID"] = (string)RegionID;
             post["METHOD"] = "get_neighbours";
             return DeserializeList(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));
         }
@@ -253,7 +253,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
         public override List<RegionInfo> GetAllRegions(UUID ScopeID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["SCOPEID"] = ScopeID;
+            post["SCOPEID"] = (string)ScopeID;
             post["XMIN"] = "0";
             post["YMIN"] = "0";
             post["XMAX"] = "65535";
@@ -284,7 +284,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
         public override List<RegionInfo> SearchRegionsByName(UUID ScopeID, string searchString)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
-            post["SCOPEID"] = ScopeID;
+            post["SCOPEID"] = (string)ScopeID;
             post["NAME"] = searchString;
             post["METHOD"] = "get_regions_by_name";
             return DeserializeList(OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_GridURI, null, post, false, TimeoutMs)));

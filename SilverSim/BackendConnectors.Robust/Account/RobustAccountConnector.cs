@@ -65,8 +65,8 @@ namespace SilverSim.BackendConnectors.Robust.Account
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
-                post["UserID"] = accountID;
-                post["SCOPEID"] = scopeID;
+                post["UserID"] = (string)accountID;
+                post["SCOPEID"] = (string)scopeID;
                 post["METHOD"] = "getaccount";
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_UserAccountURI, null, post, false, TimeoutMs));
                 if (!(map["result"] is Map))
@@ -83,7 +83,7 @@ namespace SilverSim.BackendConnectors.Robust.Account
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
                 post["Email"] = email;
-                post["SCOPEID"] = scopeID;
+                post["SCOPEID"] = (string)scopeID;
                 post["METHOD"] = "getaccount";
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_UserAccountURI, null, post, false, TimeoutMs));
                 if (!(map["result"] is Map))
@@ -101,7 +101,7 @@ namespace SilverSim.BackendConnectors.Robust.Account
                 Dictionary<string, string> post = new Dictionary<string, string>();
                 post["FirstName"] = firstName;
                 post["LastName"] = lastName;
-                post["SCOPEID"] = scopeID;
+                post["SCOPEID"] = (string)scopeID;
                 post["METHOD"] = "getaccount";
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_UserAccountURI, null, post, false, TimeoutMs));
                 if (!(map["result"] is Map))
@@ -116,7 +116,7 @@ namespace SilverSim.BackendConnectors.Robust.Account
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["query"] = query;
-            post["SCOPEID"] = scopeID;
+            post["SCOPEID"] = (string)scopeID;
             post["METHOD"] = "getaccounts";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_UserAccountURI, null, post, false, TimeoutMs));
             if (!(map["result"] is Map))

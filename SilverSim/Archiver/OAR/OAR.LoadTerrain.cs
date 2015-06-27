@@ -36,7 +36,7 @@ namespace SilverSim.Archiver.OAR
             public static List<LayerPatch> LoadStream(Stream input, int suggested_width, int suggested_height)
             {
                 List<LayerPatch> patches = new List<LayerPatch>();
-                float[,] vals = new float[LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, suggested_width / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+                float[,] vals = new float[LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, suggested_width];
 
                 using (BinaryReader bs = new BinaryReader(input))
                 {
@@ -45,7 +45,7 @@ namespace SilverSim.Archiver.OAR
                         /* we have to load 16 lines at a time */
                         for (uint liney = 0; liney < LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++liney)
                         {
-                            for (uint x = 0; x < suggested_width; ++x)
+                            for (uint x = 0; x < suggested_width / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH; ++x)
                             {
                                 vals[liney, x] = bs.ReadSingle();
                             }

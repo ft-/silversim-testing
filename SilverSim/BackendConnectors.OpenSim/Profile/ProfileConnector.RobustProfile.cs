@@ -52,7 +52,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 Dictionary<UUID, string> data = new Dictionary<UUID, string>();
                 Map m = new Map();
                 m["creatorId"] = user.ID;
-                IValue res = RPC.DoJson20RpcRequest(m_Uri, "avatarclassifiedsrequest", UUID.Random, m, m_Connector.TimeoutMs);
+                IValue res = RPC.DoJson20RpcRequest(m_Uri, "avatarclassifiedsrequest", (string)UUID.Random, m, m_Connector.TimeoutMs);
                 AnArray reslist = (((Map)res)["result"]) as AnArray;
                 foreach(IValue iv in reslist)
                 {
