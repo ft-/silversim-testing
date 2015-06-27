@@ -206,7 +206,7 @@ namespace SilverSim.Archiver.OAR
 
             static ParcelInfo LoadParcel(XmlTextReader reader, GridVector regionSize)
             {
-                ParcelInfo pinfo = new ParcelInfo((int)regionSize.X, (int)regionSize.Y);
+                ParcelInfo pinfo = new ParcelInfo((int)regionSize.X / 4, (int)regionSize.Y / 4);
                 for(;;)
                 {
                     if(!reader.Read())

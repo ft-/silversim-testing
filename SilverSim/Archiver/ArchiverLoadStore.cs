@@ -235,15 +235,23 @@ namespace SilverSim.Archiver
             }
 
             UUID selectedScene = io.SelectedScene;
-            SceneInterface scene;
+            SceneInterface scene = null;
             if (limitedToScene != UUID.Zero)
             {
                 selectedScene = limitedToScene;
-                scene = SceneManager.Scenes[selectedScene];
             }
-            else
+
+            if(UUID.Zero != selectedScene)
             {
-                scene = null;
+                try
+                {
+                    scene = SceneManager.Scenes[selectedScene];
+                }
+                catch
+                {
+                    io.Write("Selected scene does not exist.");
+                    return;
+                }
             }
 
             string filename = null;
@@ -259,6 +267,10 @@ namespace SilverSim.Archiver
                 else if (arg == "--merge")
                 {
                     options |= OAR.OAR.LoadOptions.Merge;
+                }
+                else if(arg == "--persist-uuids")
+                {
+                    options |= OAR.OAR.LoadOptions.PersistUuids;
                 }
                 else
                 {
@@ -302,9 +314,13 @@ namespace SilverSim.Archiver
                 OAR.OAR.Load(scene, options, s);
                 io.Write("OAR loaded successfully.");
             }
+            catch(OAR.OAR.OARLoadingTriedWithoutSelectedRegion)
+            {
+                io.Write("No region selected");
+            }
             catch (OAR.OAR.MultiRegionOARLoadingTriedOnRegion)
             {
-                io.Write("Multi-Region OAR cannot be loaded with a pre-selected region");
+                io.Write("Multi-Region OAR cannot be loaded with a selected region");
             }
             catch (OAR.OAR.OARFormatException)
             {

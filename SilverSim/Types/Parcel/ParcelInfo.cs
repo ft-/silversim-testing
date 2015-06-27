@@ -166,6 +166,7 @@ namespace SilverSim.Types.Parcel
 
         internal byte[,] m_LandBitmap;
         internal ReaderWriterLock m_LandBitmapRwLock = new ReaderWriterLock();
+        /* Bitmap is per 4m * 4m */
         internal int m_BitmapWidth;
         internal int m_BitmapHeight;
 

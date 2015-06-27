@@ -41,6 +41,11 @@ namespace SilverSim.Archiver.OAR
 {
     public static partial class OAR
     {
+        public class OARLoadingTriedWithoutSelectedRegion : Exception
+        {
+
+        }
+
         public class MultiRegionOARLoadingTriedOnRegion : Exception
         {
         }
@@ -69,7 +74,11 @@ namespace SilverSim.Archiver.OAR
                 reader = new TarArchiveReader(gzipStream);
             }
 
-            GridVector baseLoc = scene.RegionData.Location;
+            GridVector baseLoc = new GridVector(0, 0);
+            if (scene != null)
+            {
+                baseLoc = scene.RegionData.Location;
+            }
 
             GridVector regionSize = new GridVector(256, 256);
             Dictionary<string, ArchiveXmlLoader.RegionInfo> regionMapping = new Dictionary<string, ArchiveXmlLoader.RegionInfo>();
@@ -103,87 +112,145 @@ namespace SilverSim.Archiver.OAR
                         {
                             throw new MultiRegionOARLoadingTriedOnRegion();
                         }
-                    }
-                    if (header.FileName.StartsWith("assets/") && (options & LoadOptions.NoAssets) == 0)
-                    {
-                        /* Load asset */
-                        AssetData ad = reader.LoadAsset(header, scene.Owner);
-                        try
+                        else if(regionInfos.Count == 0 && scene == null)
                         {
-                            scene.AssetService.exists(ad.ID);
-                        }
-                        catch
-                        {
-                            scene.AssetService.Store(ad);
+                            throw new OARLoadingTriedWithoutSelectedRegion();
                         }
                     }
-
-                    if (header.FileName.StartsWith("regions/"))
+                    else if (header.FileName.StartsWith("assets/"))
                     {
-                        string[] pcomps = header.FileName.Split(new char[] { '/' }, 3);
-                        if (pcomps.Length < 3)
+                        if ((options & LoadOptions.NoAssets) == 0)
                         {
-                            throw new OARFormatException();
-                        }
-                        string regionname = pcomps[1];
-                        header.FileName = pcomps[2];
-                        regionSize = regionMapping[regionname].RegionSize;
-                        scene = SceneManager.Scenes[regionMapping[regionname].ID];
-                        parcelsCleared = false;
-                    }
-
-                    if (header.FileName.StartsWith("objects/"))
-                    {
-                        /* Load objects */
-                        List<ObjectGroup> sogs = ObjectXML.fromXml(reader, scene.Owner);
-                        foreach (ObjectGroup sog in sogs)
-                        {
-                            if(sog.Owner.ID == UUID.Zero)
+                            /* Load asset */
+                            AssetData ad = reader.LoadAsset(header, scene.Owner);
+                            try
                             {
-                                sog.Owner = scene.Owner;
+                                scene.AssetService.exists(ad.ID);
                             }
-                            if((options & (LoadOptions.PersistUuids | LoadOptions.Merge)) == LoadOptions.PersistUuids)
+                            catch
                             {
-                                foreach(ObjectPart part in sog.ValuesByKey1)
+                                scene.AssetService.Store(ad);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if (header.FileName.StartsWith("regions/"))
+                        {
+                            string[] pcomps = header.FileName.Split(new char[] { '/' }, 3);
+                            if (pcomps.Length < 3)
+                            {
+                                throw new OARFormatException();
+                            }
+                            string regionname = pcomps[1];
+                            header.FileName = pcomps[2];
+                            regionSize = regionMapping[regionname].RegionSize;
+                            scene = SceneManager.Scenes[regionMapping[regionname].ID];
+                            parcelsCleared = false;
+                        }
+
+                        if (header.FileName.StartsWith("objects/"))
+                        {
+                            /* Load objects */
+                            List<ObjectGroup> sogs = ObjectXML.fromXml(reader, scene.Owner);
+                            foreach (ObjectGroup sog in sogs)
+                            {
+                                if (sog.Owner.ID == UUID.Zero)
                                 {
-                                    UUID oldID = part.ID;
-                                    part.ID = UUID.Random;
-                                    sog.ChangeKey(part.ID, oldID);
-                                    foreach(ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
+                                    sog.Owner = scene.Owner;
+                                }
+                                if ((options & LoadOptions.PersistUuids) == LoadOptions.PersistUuids)
+                                {
+                                    foreach (ObjectPart part in sog.ValuesByKey1)
                                     {
-                                        oldID = item.ID;
-                                        item.ID = UUID.Random;
-                                        part.Inventory.ChangeKey(item.ID, oldID);
+                                        UUID oldID;
+                                        try
+                                        {
+                                            ObjectPart check = scene.Primitives[part.ID];
+                                            oldID = part.ID;
+                                            part.ID = UUID.Random;
+                                            sog.ChangeKey(part.ID, oldID);
+                                        }
+                                        catch
+                                        {
+
+                                        }
+                                        foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
+                                        {
+                                            oldID = item.ID;
+                                            item.ID = UUID.Random;
+                                            part.Inventory.ChangeKey(item.ID, oldID);
+                                        }
                                     }
                                 }
+                                else
+                                {
+                                    foreach (ObjectPart part in sog.ValuesByKey1)
+                                    {
+                                        UUID oldID = part.ID;
+                                        part.ID = UUID.Random;
+                                        sog.ChangeKey(part.ID, oldID);
+                                        foreach (ObjectPartInventoryItem item in part.Inventory.ValuesByKey2)
+                                        {
+                                            oldID = item.ID;
+                                            item.ID = UUID.Random;
+                                            part.Inventory.ChangeKey(item.ID, oldID);
+                                        }
+                                    }
+                                }
+                                scene.Add(sog);
                             }
-                            scene.Add(sog);
                         }
-                    }
-                    if (header.FileName.StartsWith("terrains/") && (options & LoadOptions.Merge) == 0)
-                    {
-                        /* Load terrains */
-                        scene.Terrain.AllPatches = TerrainLoader.LoadStream(reader, (int)regionSize.X, (int)regionSize.Y);
-                    }
-                    if (header.FileName.StartsWith("landdata/") && (options & LoadOptions.Merge) == 0)
-                    {
-                        /* Load landdata */
-                        if ((options & LoadOptions.Merge) == 0 && !parcelsCleared)
+                        else if (header.FileName.StartsWith("terrains/"))
                         {
-                            scene.ClearParcels();
-                            parcelsCleared = true;
+                            /* Load terrains */
+                            if ((options & LoadOptions.Merge) == 0)
+                            {
+                                scene.Terrain.AllPatches = TerrainLoader.LoadStream(reader, (int)regionSize.X, (int)regionSize.Y);
+                            }
                         }
-                        ParcelInfo pinfo = ParcelLoader.LoadParcel(new ObjectXmlStreamFilter(reader), regionSize);
-                        if(pinfo.Owner.ID == UUID.Zero)
+                        else if (header.FileName.StartsWith("landdata/"))
                         {
-                            pinfo.Owner = scene.Owner;
+                            /* Load landdata */
+                            if ((options & LoadOptions.Merge) == 0)
+                            {
+                                if (!parcelsCleared)
+                                {
+                                    scene.ClearParcels();
+                                    parcelsCleared = true;
+                                }
+                                ParcelInfo pinfo = ParcelLoader.LoadParcel(new ObjectXmlStreamFilter(reader), regionSize);
+                                if (pinfo.Owner.ID == UUID.Zero)
+                                {
+                                    pinfo.Owner = scene.Owner;
+                                }
+                                if((options & LoadOptions.PersistUuids) == LoadOptions.PersistUuids)
+                                {
+                                    try
+                                    {
+                                        ParcelInfo check = scene.Parcels[pinfo.ID];
+                                        pinfo.ID = UUID.Random;
+                                    }
+                                    catch
+                                    {
+
+                                    }
+                                }
+                                else
+                                {
+                                    pinfo.ID = UUID.Random;
+                                }
+                                scene.AddParcel(pinfo);
+                            }
                         }
-                        scene.AddParcel(pinfo);
-                    }
-                    if (header.FileName.StartsWith("settings/") && (options & LoadOptions.Merge) == 0)
-                    {
-                        /* Load settings */
-                        RegionSettingsLoader.LoadRegionSettings(new ObjectXmlStreamFilter(reader), scene);
+                        else if (header.FileName.StartsWith("settings/"))
+                        {
+                            /* Load settings */
+                            if ((options & LoadOptions.Merge) == 0)
+                            {
+                                RegionSettingsLoader.LoadRegionSettings(new ObjectXmlStreamFilter(reader), scene);
+                            }
+                        }
                     }
                 }
             }

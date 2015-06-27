@@ -114,7 +114,7 @@ namespace SilverSim.Main.Common
 
                 if (parcels.Count == 0)
                 {
-                    ParcelInfo pi = new ParcelInfo((int)loadparams.Scene.RegionData.Size.X, (int)loadparams.Scene.RegionData.Size.Y);
+                    ParcelInfo pi = new ParcelInfo((int)loadparams.Scene.RegionData.Size.X / 4, (int)loadparams.Scene.RegionData.Size.Y / 4);
                     pi.AABBMin = new Vector3(0, 0, 0);
                     pi.AABBMax = new Vector3(loadparams.Scene.RegionData.Size.X - 1, loadparams.Scene.RegionData.Size.Y - 1, 0);
                     pi.ActualArea = (int)(loadparams.Scene.RegionData.Size.X * loadparams.Scene.RegionData.Size.Y);

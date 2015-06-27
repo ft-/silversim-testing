@@ -357,7 +357,7 @@ namespace SilverSim.Archiver.OAR
             {
                 using(XmlTextReader reader = new XmlTextReader(s))
                 {
-                    LoadRegionSettings(s, scene);
+                    LoadRegionSettings(reader, scene);
                 }
             }
         }
