@@ -56,6 +56,27 @@ namespace SilverSim.LL.Core
             m_ObjectUpdateSignal.Set();
         }
 
+        public void PreScheduleUpdate(ObjectUpdateInfo info)
+        {
+            if (info.Part.ObjectGroup.IsAttachedToPrivate && info.Part.ObjectGroup.Owner != Agent.Owner)
+            {
+                /* do not signal private attachments to anyone else than the owner */
+            }
+            else if (info.IsPhysics && !info.IsKilled && !info.Part.ObjectGroup.IsAttached)
+            {
+                m_PhysicalOutQueue.Enqueue(info);
+            }
+            else
+            {
+                m_NonPhysicalOutQueue.Enqueue(info);
+            }
+        }
+
+        public void PostScheduleUpdate()
+        {
+            m_ObjectUpdateSignal.Set();
+        }
+
         private void HandleObjectUpdates()
         {
             Dictionary<UInt32, int> LastObjSerialNo = new Dictionary<uint, int>();
@@ -65,8 +86,10 @@ namespace SilverSim.LL.Core
 
             while (m_ObjectUpdateThreadRunning)
             {
-
-                if(!m_ObjectUpdateSignal.WaitOne(1000))
+                if (m_PhysicalOutQueue.Count != 0 || m_NonPhysicalOutQueue.Count != 0)
+                {
+                }
+                else if(!m_ObjectUpdateSignal.WaitOne(1000))
                 {
                     continue;
                 }
@@ -81,6 +104,10 @@ namespace SilverSim.LL.Core
                     foreach (NonblockingQueue<ObjectUpdateInfo> q in queues)
                     {
                         ObjectUpdateInfo ui;
+                        if(q.Count == 0)
+                        {
+                            continue;
+                        }
                         try
                         {
                             ui = q.Dequeue();

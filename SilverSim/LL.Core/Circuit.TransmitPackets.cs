@@ -122,6 +122,7 @@ namespace SilverSim.LL.Core
             Queue<Message> MediumPriorityQueue;
             Queue<Message>[] QueueList = new Queue<Message>[(int)Message.QueueOutType.NumQueues];
             Message.QueueOutType qroutidx;
+            int[] QueueCount = new int[(int)Message.QueueOutType.NumQueues];
 
             for (uint qidx = 0; qidx < (uint)Message.QueueOutType.NumQueues; ++qidx)
             {
@@ -135,40 +136,49 @@ namespace SilverSim.LL.Core
             while (true)
             {
                 Message m;
-                try
+                int qcount;
+                int timeout = 10;
+                qcount = 0;
+                foreach(Queue<Message> q in QueueList)
                 {
-                    int qcount = 0;
-                    foreach(Queue<Message> q in QueueList)
+                    if(q.Count > 0)
                     {
-                        qcount += q.Count;
+                        timeout = 0;
                     }
+                }
 
-                    if (qcount == 0)
+                qcount = m_TxQueue.Count + 1;
+                m = null;
+                while (qcount > 0)
+                {
+                    try
                     {
-                        m = m_TxQueue.Dequeue(10);
+                        m = m_TxQueue.Dequeue(timeout);
                     }
-                    else
+                    catch
                     {
-                        m = m_TxQueue.Dequeue(0);
+                        break;
                     }
+                    timeout = 0;
+                    --qcount;
                     if (m is CancelTxThread)
                     {
                         break;
                     }
 
-                    if(m is AcksReceived)
+                    if (m is AcksReceived)
                     {
 
                     }
-                    else if(m_QueueOutTable.TryGetValue(m.Number, out qroutidx))
+                    else if (m_QueueOutTable.TryGetValue(m.Number, out qroutidx))
                     {
                         m.OutQueue = qroutidx;
                         QueueList[(uint)m.OutQueue].Enqueue(m);
                     }
                     else if (m.Number == MessageType.LayerData)
                     {
-                        Messages.LayerData.LayerData ld =(Messages.LayerData.LayerData)m;
-                        switch(ld.LayerType)
+                        Messages.LayerData.LayerData ld = (Messages.LayerData.LayerData)m;
+                        switch (ld.LayerType)
                         {
                             case Messages.LayerData.LayerData.LayerDataType.Land:
                             case Messages.LayerData.LayerData.LayerDataType.LandExtended:
@@ -193,7 +203,7 @@ namespace SilverSim.LL.Core
                         m.OutQueue = Message.QueueOutType.High;
                         HighPriorityQueue.Enqueue(m);
                     }
-                    else if(m.Number < MessageType.Low)
+                    else if (m.Number < MessageType.Low)
                     {
                         m.OutQueue = Message.QueueOutType.Medium;
                         MediumPriorityQueue.Enqueue(m);
@@ -204,97 +214,118 @@ namespace SilverSim.LL.Core
                         LowPriorityQueue.Enqueue(m);
                     }
                 }
-                catch
+                if (m is CancelTxThread)
                 {
-
+                    break;
                 }
 
-                /* make high packets pass low priority packets */
-                for(int queueidx = 0; queueidx < QueueList.Length; ++queueidx)
+
+                for (uint qidx = 0; qidx < (uint)Message.QueueOutType.NumQueues; ++qidx)
                 {
-                    Queue<Message> q = QueueList[queueidx];
-                    if(q.Count == 0)
+                    QueueCount[qidx] = QueueList[qidx].Count;
+                }
+
+                do
+                {
+                    /* make high packets pass low priority packets */
+                    for(int queueidx = 0; queueidx < QueueList.Length; ++queueidx)
                     {
-                        continue;
-                    }
-                    if (m_AckThrottlingCount[queueidx] > 100)
-                    {
-                        continue;
-                    }
-                    try
-                    {
-                        m = q.Dequeue();
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-                    if (m != null)
-                    {
+                        Queue<Message> q = QueueList[queueidx];
+                        if(q.Count == 0)
+                        {
+                            continue;
+                        }
+                        if (m_AckThrottlingCount[queueidx] > 100)
+                        {
+                            QueueCount[queueidx] = 0;
+                            continue;
+                        }
                         try
                         {
-                            UDPPacket p = new UDPPacket();
-                            p.OutQueue = m.OutQueue;
-                            p.IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag;
-                            m.Serialize(p);
-                            p.Flush();
-                            p.IsReliable = m.IsReliable;
-                            p.SequenceNumber = NextSequenceNumber;
-                            int savedDataLength = p.DataLength;
-                            if (!p.IsZeroEncoded)
+                            m = q.Dequeue();
+                            if(QueueCount[queueidx] > 0)
                             {
-                                uint appendableAcks = (MAX_DATA_MTU - 1 - (uint)savedDataLength) / 4;
-                                uint curacks = (uint)m_AckList.Count;
-                                if (appendableAcks != 0 && curacks != 0)
-                                {
-                                    p.HasAckFlag = true;
-                                    uint cnt = 0;
-                                    while (cnt < appendableAcks && cnt < curacks && cnt < 255)
-                                    {
-                                        p.WriteUInt32BE(m_AckList.Dequeue());
-                                        ++cnt;
-                                    }
-                                    p.WriteUInt8((byte)cnt);
-                                }
-                            }
-
-                            if (p.IsReliable)
-                            {
-                                Interlocked.Increment(ref m_AckThrottlingCount[queueidx]);
-                            }
-                            m_Server.SendPacketTo(p, RemoteEndPoint);
-
-                            p.HasAckFlag = false;
-                            p.DataLength = savedDataLength;
-
-                            Interlocked.Increment(ref m_PacketsSent);
-                            p.EnqueuedAtTime = Environment.TickCount;
-                            p.TransferredAtTime = Environment.TickCount;
-                            if (m.IsReliable)
-                            {
-                                p.IsResent = true;
-                                m_UnackedPackets[p.SequenceNumber] = p;
-                                lock (m_UnackedBytesLock)
-                                {
-                                    m_UnackedBytes += p.DataLength;
-                                }
-                            }
-                            if (m.Number == MessageType.LogoutReply)
-                            {
-                                lock (m_LogoutReplyLock)
-                                {
-                                    m_LogoutReplySeqNo = p.SequenceNumber;
-                                    m_LogoutReplySentAtTime = Environment.TickCount;
-                                    m_LogoutReplySent = true;
-                                }
+                                --QueueCount[queueidx];
                             }
                         }
-                        catch(Exception e)
+                        catch
                         {
-                            m_Log.DebugFormat("Failed to serialize message of type {0}: {1}\n{2}", m.TypeDescription, e.Message, e.StackTrace.ToString());
+                            QueueCount[queueidx] = 0;
+                            continue;
+                        }
+                        if (m != null)
+                        {
+                            try
+                            {
+                                UDPPacket p = new UDPPacket();
+                                p.OutQueue = m.OutQueue;
+                                p.IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag;
+                                m.Serialize(p);
+                                p.Flush();
+                                p.IsReliable = m.IsReliable;
+                                p.SequenceNumber = NextSequenceNumber;
+                                int savedDataLength = p.DataLength;
+                                if (!p.IsZeroEncoded)
+                                {
+                                    uint appendableAcks = (MAX_DATA_MTU - 1 - (uint)savedDataLength) / 4;
+                                    uint curacks = (uint)m_AckList.Count;
+                                    if (appendableAcks != 0 && curacks != 0)
+                                    {
+                                        p.HasAckFlag = true;
+                                        uint cnt = 0;
+                                        while (cnt < appendableAcks && cnt < curacks && cnt < 255)
+                                        {
+                                            p.WriteUInt32BE(m_AckList.Dequeue());
+                                            ++cnt;
+                                        }
+                                        p.WriteUInt8((byte)cnt);
+                                    }
+                                }
+
+                                if (p.IsReliable)
+                                {
+                                    Interlocked.Increment(ref m_AckThrottlingCount[queueidx]);
+                                }
+                                m_Server.SendPacketTo(p, RemoteEndPoint);
+
+                                p.HasAckFlag = false;
+                                p.DataLength = savedDataLength;
+
+                                Interlocked.Increment(ref m_PacketsSent);
+                                p.EnqueuedAtTime = Environment.TickCount;
+                                p.TransferredAtTime = Environment.TickCount;
+                                if (m.IsReliable)
+                                {
+                                    p.IsResent = true;
+                                    m_UnackedPackets[p.SequenceNumber] = p;
+                                    lock (m_UnackedBytesLock)
+                                    {
+                                        m_UnackedBytes += p.DataLength;
+                                    }
+                                }
+                                if (m.Number == MessageType.LogoutReply)
+                                {
+                                    lock (m_LogoutReplyLock)
+                                    {
+                                        m_LogoutReplySeqNo = p.SequenceNumber;
+                                        m_LogoutReplySentAtTime = Environment.TickCount;
+                                        m_LogoutReplySent = true;
+                                    }
+                                }
+                            }
+                            catch(Exception e)
+                            {
+                                m_Log.DebugFormat("Failed to serialize message of type {0}: {1}\n{2}", m.TypeDescription, e.Message, e.StackTrace.ToString());
+                            }
                         }
                     }
-                }
+
+                    qcount = 0;
+                    for(int queueidx = 0; queueidx < QueueCount.Length; ++queueidx)
+                    {
+                        qcount += QueueCount[queueidx];
+                    }
+                } while(qcount != 0);
 
                 if (Environment.TickCount - m_LastReceivedPacketAtTime >= 60000)
                 {

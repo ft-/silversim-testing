@@ -1088,6 +1088,25 @@ namespace SilverSim.LL.Core
                             circuit.Scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
                             circuit.Scene.Environment.UpdateWindDataToSingleClient(this);
                             circuit.Scene.SendAgentObjectToAllAgents(this);
+                            foreach(IAgent agent in circuit.Scene.RootAgents)
+                            {
+                                if (agent != this)
+                                {
+                                    circuit.Scene.SendAgentObjectToAgent(agent, this);
+                                }
+                            }
+                            foreach (ObjectGroup sog in circuit.Scene.ObjectGroups)
+                            {
+                                circuit.PreScheduleUpdate(((ObjectGroup)sog).RootPart.UpdateInfo);
+                            }
+                            foreach (ObjectPart part in circuit.Scene.Primitives)
+                            {
+                                if (part.LinkNumber != 1)
+                                {
+                                    circuit.PreScheduleUpdate(part.UpdateInfo);
+                                }
+                            }
+                            circuit.PostScheduleUpdate();
                             SendAnimations();
                         }
                     }
@@ -1141,17 +1160,6 @@ namespace SilverSim.LL.Core
                                 circuit.SendMessage(clu);
 
                                 circuit.Scene.Environment.UpdateWindlightProfileToClient(this);
-                                foreach (ObjectGroup sog in circuit.Scene.ObjectGroups)
-                                {
-                                    circuit.ScheduleUpdate(((ObjectGroup)sog).RootPart.UpdateInfo);
-                                }
-                                foreach (ObjectPart part in circuit.Scene.Primitives)
-                                {
-                                    if (part.LinkNumber != 1)
-                                    {
-                                        circuit.ScheduleUpdate(part.UpdateInfo);
-                                    }
-                                }
                             }
                         }
                     }
