@@ -156,7 +156,11 @@ namespace SilverSim.LL.Core
                         break;
                     }
 
-                    if(m_QueueOutTable.TryGetValue(m.Number, out qroutidx))
+                    if(m is AcksReceived)
+                    {
+
+                    }
+                    else if(m_QueueOutTable.TryGetValue(m.Number, out qroutidx))
                     {
                         m.OutQueue = qroutidx;
                         QueueList[(uint)m.OutQueue].Enqueue(m);
