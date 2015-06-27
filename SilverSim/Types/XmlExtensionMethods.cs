@@ -33,72 +33,44 @@ namespace SilverSim.Types
     {
         public static void WriteKeyValuePair(this XmlTextWriter writer, string key, string value)
         {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("string");
-            writer.WriteValue(value);
-            writer.WriteEndElement();
+            writer.WriteNamedValue("key", key);
+            writer.WriteNamedValue("string", value);
         }
 
         public static void WriteKeyValuePair(this XmlTextWriter writer, string key, uint value)
         {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("integer");
-            writer.WriteValue(value);
-            writer.WriteEndElement();
+            writer.WriteNamedValue("key", key);
+            writer.WriteNamedValue("integer", value);
         }
 
         public static void WriteKeyValuePair(this XmlTextWriter writer, string key, int value)
         {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("integer");
-            writer.WriteValue(value);
-            writer.WriteEndElement();
+            writer.WriteNamedValue("key", key);
+            writer.WriteNamedValue("integer", value);
         }
 
         public static void WriteKeyValuePair(this XmlTextWriter writer, string key, float value)
         {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("real");
-            writer.WriteValue(value);
-            writer.WriteEndElement();
+            writer.WriteNamedValue("key", key);
+            writer.WriteNamedValue("real", value);
         }
 
         public static void WriteKeyValuePair(this XmlTextWriter writer, string key, bool value)
         {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("boolean");
-            writer.WriteValue(value ? "1" : "0");
-            writer.WriteEndElement();
+            writer.WriteNamedValue("key", key);
+            writer.WriteNamedValue("boolean", value ? "1" : "0");
         }
 
         public static void WriteKeyValuePair(this XmlTextWriter writer, string key, double value)
         {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("real");
-            writer.WriteValue(((float)value).ToString(EnUsCulture));
-            writer.WriteEndElement();
+            writer.WriteNamedValue("key", key);
+            writer.WriteNamedValue("real", ((float)value).ToString(EnUsCulture));
         }
 
         public static void WriteKeyValuePair(this XmlTextWriter writer, string key, UUID value)
         {
-            writer.WriteStartElement("key");
-            writer.WriteValue(key);
-            writer.WriteEndElement();
-            writer.WriteStartElement("uuid");
-            writer.WriteValue(value);
-            writer.WriteEndElement();
+            writer.WriteNamedValue("key", key);
+            writer.WriteNamedValue("uuid", (string)value);
         }
 
         public static void WriteNamedValue(this XmlTextWriter writer, string name, string value)
@@ -111,7 +83,7 @@ namespace SilverSim.Types
         public static void WriteNamedValue(this XmlTextWriter writer, string name, UUID value)
         {
             writer.WriteStartElement(name);
-            writer.WriteValue(value);
+            writer.WriteValue((string)value);
             writer.WriteEndElement();
         }
 
@@ -217,7 +189,7 @@ namespace SilverSim.Types
         public static void WriteUUID(this XmlTextWriter writer, string name, UUID uuid)
         {
             writer.WriteStartElement(name);
-            writer.WriteNamedValue("UUID", uuid);
+            writer.WriteNamedValue("UUID", (string)uuid);
             writer.WriteEndElement();
         }
 
