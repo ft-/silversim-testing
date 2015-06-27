@@ -45,7 +45,7 @@ namespace SilverSim.Archiver.OAR
                         /* we have to load 16 lines at a time */
                         for (uint liney = 0; liney < LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++liney)
                         {
-                            for (uint x = 0; x < suggested_width / LayerCompressor.LAYER_PATCH_ENTRY_WIDTH; ++x)
+                            for (uint x = 0; x < suggested_width; ++x)
                             {
                                 vals[liney, x] = bs.ReadSingle();
                             }
