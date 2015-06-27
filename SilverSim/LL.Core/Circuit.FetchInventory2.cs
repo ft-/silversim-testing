@@ -117,12 +117,7 @@ namespace SilverSim.LL.Core
             List<UUID> baditems = new List<UUID>();
             text.WriteStartElement("llsd");
             text.WriteStartElement("map");
-            text.WriteStartElement("key");
-            text.WriteValue("agent_id");
-            text.WriteEndElement();
-            text.WriteStartElement("uuid");
-            text.WriteValue(AgentID);
-            text.WriteEndElement();
+            text.WriteKeyValuePair("agent_id", AgentID);
             bool wroteheader = false;
 
             foreach(IValue iv in (AnArray)reqmap["items"])
@@ -139,6 +134,11 @@ namespace SilverSim.LL.Core
                 }
                 UUID itemid = itemmap["item_id"].AsUUID;
                 InventoryItem item;
+                if(itemid == UUID.Zero)
+                {
+                    baditems.Add(itemid);
+                    continue;
+                }
                 try
                 {
                     item = Agent.InventoryService.Item[AgentID, itemid];
@@ -151,9 +151,7 @@ namespace SilverSim.LL.Core
                 if (!wroteheader)
                 {
                     wroteheader = true;
-                    text.WriteStartElement("key");
-                    text.WriteValue("items");
-                    text.WriteEndElement();
+                    text.WriteNamedValue("key", "items");
                     text.WriteStartElement("array");
                 }
                 WriteInventoryItem(item, text);
@@ -170,9 +168,7 @@ namespace SilverSim.LL.Core
                 text.WriteStartElement("array");
                 foreach(UUID id in baditems)
                 {
-                    text.WriteStartElement("uuid");
-                    text.WriteValue(id);
-                    text.WriteEndElement();
+                    text.WriteNamedValue("uuid", id);
                 }
                 text.WriteEndElement();
             }

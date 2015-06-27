@@ -160,7 +160,10 @@ namespace SilverSim.LL.Core
                 List<UUID> list = new List<UUID>();
                 foreach(Map fm in req.Value)
                 {
-                    list.Add(fm["folder_id"].AsUUID);
+                    if (fm["folder_id"].AsUUID != UUID.Zero)
+                    {
+                        list.Add(fm["folder_id"].AsUUID);
+                    }
                 }
                 try
                 {
@@ -232,9 +235,7 @@ namespace SilverSim.LL.Core
                         if (!wroteheader)
                         {
                             wroteheader = true;
-                            text.WriteStartElement("key");
-                            text.WriteValue("folders");
-                            text.WriteEndElement();
+                            text.WriteNamedValue("key", "folders");
                             text.WriteStartElement("array");
                         }
 
@@ -256,15 +257,11 @@ namespace SilverSim.LL.Core
             }
             if (badfolders.Count != 0)
             {
-                text.WriteStartElement("key");
-                text.WriteValue("bad_folders");
-                text.WriteEndElement();
+                text.WriteNamedValue("key", "bad_folders");
                 text.WriteStartElement("array");
                 foreach (UUID id in badfolders)
                 {
-                    text.WriteStartElement("uuid");
-                    text.WriteValue(id);
-                    text.WriteEndElement();
+                    text.WriteNamedValue("uuid", id);
                 }
                 text.WriteEndElement();
             }
