@@ -116,6 +116,7 @@ namespace SilverSim.LL.Core
             m_SimStatsData[(int)SimStatIndex.PendingUploads].StatValue = activeUploads;
             m_SimStatsData[(int)SimStatIndex.AgentUpdates].StatValue = agentUpdatesReceived * 1000f / deltatime;
             m_SimStatsData[(int)SimStatIndex.UnAckedBytes].StatValue = m_UnackedBytes;
+            m_SimStatsData[(int)SimStatIndex.TotalPrim].StatValue = Scene.Primitives.Count;
 
             SimStats stats = new SimStats();
             stats.RegionX = Scene.RegionData.Location.X;
