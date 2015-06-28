@@ -50,6 +50,7 @@ namespace SilverSim.LL.Messages
             Asset,
             TextureStart,
             Texture,
+            Object,
 
             NumQueues, /* must be last */
         }

@@ -401,7 +401,20 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public bool IsAttached = false;
+        bool m_IsAttached = false;
+
+        public bool IsAttached
+        {
+            get
+            {
+                return m_IsAttached;
+            }
+            set
+            {
+                m_IsAttached = value;
+                TriggerOnUpdate(0);
+            }
+        }
 
         public bool IsAttachedToPrivate
         {
@@ -1487,6 +1500,7 @@ namespace SilverSim.Scene.Types.Object
                         {
                             part.ObjectGroup = group;
                             part.Owner = currentOwner;
+                            part.UpdateData(ObjectPart.UpdateDataFlags.All);
                         }
                         return group;
 

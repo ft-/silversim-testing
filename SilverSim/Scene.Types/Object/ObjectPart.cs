@@ -64,9 +64,14 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(this)
                 {
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID] = (byte)(value & 0xFF);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 1] = (byte)((value >> 8) & 0xFF);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 2] = (byte)((value >> 16) & 0xFF);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 3] = (byte)((value >> 24) & 0xFF);
                     m_ObjectUpdateInfo.LocalID = value;
                     m_LocalID = value;
                 }
+                UpdateData(UpdateDataFlags.Full);
             }
         }
 
@@ -132,6 +137,7 @@ namespace SilverSim.Scene.Types.Object
             m_Permissions.Group = SilverSim.Types.Inventory.InventoryPermissionsMask.None;
             m_Permissions.EveryOne = SilverSim.Types.Inventory.InventoryPermissionsMask.None;
             m_Permissions.NextOwner = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
+            m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = (byte)60;
 
             ObjectGroup = null;
             IsChanged = false;
@@ -216,6 +222,12 @@ namespace SilverSim.Scene.Types.Object
         void OnInventoryChange()
         {
             IsChanged = m_IsChangedEnabled;
+            lock (m_UpdateDataLock)
+            {
+                int invSerial = Inventory.InventorySerial;
+                m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial] = (byte)(invSerial % 256);
+                m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial + 1] = (byte)(invSerial / 256);
+            }
             TriggerOnUpdate(ChangedEvent.ChangedFlags.Inventory);
         }
 
@@ -245,7 +257,7 @@ namespace SilverSim.Scene.Types.Object
                 }
             }
 
-            m_ObjectUpdateInfo.IncSerialNumber();
+            UpdateData(UpdateDataFlags.All);
             if (ObjectGroup.Scene != null)
             {
                 ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
@@ -275,6 +287,7 @@ namespace SilverSim.Scene.Types.Object
                     }
                 }
             }
+            UpdateData(UpdateDataFlags.Full | UpdateDataFlags.Terse);
             if (ObjectGroup.Scene != null)
             {
                 ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
@@ -306,6 +319,15 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Permissions.Base = value;
                 }
+                lock(m_UpdateDataLock)
+                {
+                    byte[] b = BitConverter.GetBytes((uint)value);
+                    if(!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(b);
+                    }
+                    Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.BaseMask, b.Length);
+                }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -325,6 +347,15 @@ namespace SilverSim.Scene.Types.Object
                 lock (this)
                 {
                     m_Permissions.Current = value;
+                }
+                lock (m_UpdateDataLock)
+                {
+                    byte[] b = BitConverter.GetBytes((uint)value);
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(b);
+                    }
+                    Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.OwnerMask, b.Length);
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
@@ -346,6 +377,15 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Permissions.Group = value;
                 }
+                lock (m_UpdateDataLock)
+                {
+                    byte[] b = BitConverter.GetBytes((uint)value);
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(b);
+                    }
+                    Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.GroupMask, b.Length);
+                }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -366,6 +406,15 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_Permissions.EveryOne = value;
                 }
+                lock (m_UpdateDataLock)
+                {
+                    byte[] b = BitConverter.GetBytes((uint)value);
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(b);
+                    }
+                    Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.EveryoneMask, b.Length);
+                }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -385,6 +434,15 @@ namespace SilverSim.Scene.Types.Object
                 lock (this)
                 {
                     m_Permissions.NextOwner = value;
+                }
+                lock (m_UpdateDataLock)
+                {
+                    byte[] b = BitConverter.GetBytes((uint)value);
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(b);
+                    }
+                    Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.NextOwnerMask, b.Length);
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
@@ -480,6 +538,7 @@ namespace SilverSim.Scene.Types.Object
             set
             {
                 m_ClickAction = value;
+                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ClickAction] = (byte)value;
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -521,7 +580,15 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_Velocity = value;
+                lock (this)
+                {
+                    m_Velocity = value;
+                }
+                lock (m_UpdateDataLock)
+                {
+                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Velocity);
+                }
+                UpdateData(UpdateDataFlags.Full);
             }
         }
 
@@ -539,6 +606,10 @@ namespace SilverSim.Scene.Types.Object
                 lock (this)
                 {
                     m_AngularVelocity = value;
+                }
+                lock (m_UpdateDataLock)
+                {
+                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_AngularVelocity);
                 }
                 TriggerOnUpdate(0);
             }
@@ -783,6 +854,7 @@ namespace SilverSim.Scene.Types.Object
                     default:
                         break;
                 }
+                m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.Material] = (byte)value;
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -802,6 +874,10 @@ namespace SilverSim.Scene.Types.Object
                 lock(this)
                 {
                     m_Size = value;
+                }
+                lock(m_UpdateDataLock)
+                {
+                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.Scale);
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(ChangedEvent.ChangedFlags.Scale);
@@ -860,6 +936,12 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_ID = value;
                 }
+                lock(m_UpdateDataLock)
+                {
+                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.FullID);
+                    value.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.ObjectID);
+                }
+                UpdateData(UpdateDataFlags.All);
             }
         }
 
@@ -1006,6 +1088,10 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_LocalPosition = value;
                 }
+                lock(m_UpdateDataLock)
+                {
+                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Position);
+                }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
@@ -1031,13 +1117,18 @@ namespace SilverSim.Scene.Types.Object
                 {
                     if (null != ObjectGroup && ObjectGroup.RootPart != this)
                     {
-                        m_LocalPosition = value - ObjectGroup.RootPart.GlobalPosition;
+                        m_LocalPosition = value -= ObjectGroup.RootPart.GlobalPosition;
                     }
                     else
                     {
                         m_LocalPosition = value;
                     }
                 }
+                lock (m_UpdateDataLock)
+                {
+                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Position);
+                }
+
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
@@ -1059,6 +1150,11 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_LocalPosition = value;
                 }
+                lock (m_UpdateDataLock)
+                {
+                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Position);
+                }
+
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
@@ -1082,6 +1178,11 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_LocalRotation = value;
                 }
+                lock (m_UpdateDataLock)
+                {
+                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Rotation);
+                }
+
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
@@ -1110,13 +1211,18 @@ namespace SilverSim.Scene.Types.Object
                 {
                     if (ObjectGroup != null && this != ObjectGroup.RootPart)
                     {
-                        m_LocalRotation = value / ObjectGroup.RootPart.GlobalRotation;
+                        m_LocalRotation = value /= ObjectGroup.RootPart.GlobalRotation;
                     }
                     else
                     {
                         m_LocalRotation = value;
                     }
                 }
+                lock (m_UpdateDataLock)
+                {
+                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Rotation);
+                }
+
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
@@ -1138,6 +1244,11 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_LocalRotation = value;
                 }
+                lock (m_UpdateDataLock)
+                {
+                    value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.ObjectData_Rotation);
+                }
+
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
                 TriggerOnPositionChange();
@@ -1155,6 +1266,7 @@ namespace SilverSim.Scene.Types.Object
                     throw new ArgumentException();
                 }
                 ObjectGroup = group;
+                UpdateData(UpdateDataFlags.All);
             }
         }
 
@@ -1164,6 +1276,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 ObjectGroup = null;
             }
+            UpdateData(UpdateDataFlags.All);
         }
         #endregion
 
@@ -1223,7 +1336,14 @@ namespace SilverSim.Scene.Types.Object
                     pos += 4;
                 }
 
-                data[pos++] = (byte)ObjectGroup.AttachPoint;
+                if (ObjectGroup != null)
+                {
+                    data[pos++] = (byte)ObjectGroup.AttachPoint;
+                }
+                else
+                {
+                    data[pos++] = 0;
+                }
                 data[pos++] = 0;
                 Position.ToBytes(data, pos);
                 pos += 12;

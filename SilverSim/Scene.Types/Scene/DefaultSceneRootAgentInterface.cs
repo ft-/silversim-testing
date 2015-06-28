@@ -41,7 +41,7 @@ namespace SilverSim.Scene.Types.Scene
             m_Scene = scene;
         }
 
-        public int Count
+        public virtual int Count
         {
             get
             {

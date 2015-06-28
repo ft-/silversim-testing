@@ -31,6 +31,7 @@ using SilverSim.Scene.Types.Object;
 using ThreadedClasses;
 using System.Threading;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.LL.Messages;
 
 namespace SilverSim.LL.Core
 {
@@ -69,12 +70,29 @@ namespace SilverSim.LL.Core
             m_ObjectUpdateSignal.Set();
         }
 
+
+        private void SendObjectUpdateMsg(UDPPacket p)
+        {
+            p.OutQueue = Message.QueueOutType.Object;
+            p.Flush();
+            p.SequenceNumber = NextSequenceNumber;
+            int savedDataLength = p.DataLength;
+
+            if (p.IsReliable)
+            {
+                Interlocked.Increment(ref m_AckThrottlingCount[(int)Message.QueueOutType.Object]);
+            }
+            m_Server.SendPacketTo(p, RemoteEndPoint);
+        }
+
         private void HandleObjectUpdates()
         {
+            UInt64 regionHandle;
             Dictionary<UInt32, int> LastObjSerialNo = new Dictionary<uint, int>();
             NonblockingQueue<ObjectUpdateInfo>[] queues = new NonblockingQueue<ObjectUpdateInfo>[2];
             queues[0] = m_PhysicalOutQueue;
             queues[1] = m_NonPhysicalOutQueue;
+            regionHandle = Scene.RegionData.Location.RegionHandle;
 
             while (m_ObjectUpdateThreadRunning)
             {
@@ -103,9 +121,10 @@ namespace SilverSim.LL.Core
                 }
 
                 Messages.Object.KillObject ko = null;
-                Messages.Object.ObjectUpdate full_updatemsg = null;
-                Messages.Object.ImprovedTerseObjectUpdate terse_updatemsg = null;
-                Messages.Object.ObjectProperties prop_updatemsg = null;
+                UDPPacket full_packet = null;
+                UDPPacket terse_packet = null;
+                byte full_packet_count = 0;
+                byte terse_packet_count = 0;
 
                 while (m_PhysicalOutQueue.Count != 0 || m_NonPhysicalOutQueue.Count != 0)
                 {
@@ -154,94 +173,86 @@ namespace SilverSim.LL.Core
 
                             if(dofull)
                             {
-                                Messages.Object.ObjectUpdate.ObjData od = ui.SerializeFull();
-                                if(od != null)
+                                byte[] fullUpdate = ui.FullUpdate;
+
+                                if(null != fullUpdate)
                                 {
-                                    if(ui.Part.Owner.ID == AgentID)
+
+                                    if(full_packet != null && fullUpdate.Length + full_packet.DataLength > 1400)
                                     {
-                                        od.UpdateFlags |= Types.Primitive.PrimitiveFlags.ObjectYouOwner;
-                                    }
-                                    if (full_updatemsg == null)
-                                    {
-                                        full_updatemsg = new Messages.Object.ObjectUpdate();
-                                        if(Scene == null)
-                                        {
-                                            /* kill the schedule thread when Scene has been cleared */
-                                            return;
-                                        }
-                                        full_updatemsg.GridPosition = Scene.RegionData.Location;
-                                        full_updatemsg.TimeDilation = 65535;
+                                        full_packet.Data[17] = full_packet_count;
+                                        SendObjectUpdateMsg(full_packet);
+                                        full_packet = null;
+                                        full_packet_count = 0;
                                     }
 
-                                    full_updatemsg.ObjectData.Add(od);
-                                    if (full_updatemsg.ObjectData.Count == 3)
+                                    if (null == full_packet)
                                     {
-                                        SendMessage(full_updatemsg);
-                                        full_updatemsg = null;
+                                        full_packet = new UDPPacket();
+                                        full_packet.IsReliable = true;
+                                        full_packet.WriteMessageType(MessageType.ObjectUpdate);
+                                        full_packet.WriteUInt64(regionHandle);
+                                        full_packet.WriteUInt16(65535); /* dilation */
+                                        full_packet.WriteUInt8(0);
                                     }
+
+
+                                    int offset = full_packet.DataPos;
+                                    full_packet.WriteBytes(fullUpdate);
+                                    if (ui.Part.Owner.ID == AgentID)
+                                    {
+                                        full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags] |= (byte)Types.Primitive.PrimitiveFlags.ObjectYouOwner;
+                                    }
+                                    ++full_packet_count;
                                 }
-
-#if ONLY_SELECTED
-                                Messages.Object.ObjectProperties.ObjData objprop = ui.SerializeObjProperties();
-                                if (objprop != null)
-                                {
-                                    if (prop_updatemsg == null)
-                                    {
-                                        prop_updatemsg = new Messages.Object.ObjectProperties();
-                                    }
-
-                                    prop_updatemsg.ObjectData.Add(objprop);
-                                    if (prop_updatemsg.ObjectData.Count == 3)
-                                    {
-                                        /* ObjectUpdate must be first */
-                                        if (full_updatemsg != null)
-                                        {
-                                            SendMessage(full_updatemsg);
-                                            full_updatemsg = null;
-                                        }
-
-                                        SendMessage(prop_updatemsg);
-                                        prop_updatemsg = null;
-                                    }
-                                }
-#endif
                             }
                             else
                             {
-                                Messages.Object.ImprovedTerseObjectUpdate.ObjData od = ui.SerializeTerse();
-                                if(od != null)
+                                byte[] terseUpdate = ui.TerseUpdate;
+
+                                if(null != terseUpdate)
                                 {
-                                    Messages.Object.ImprovedTerseObjectUpdate m = new Messages.Object.ImprovedTerseObjectUpdate();
-                                    m.ObjectData.Add(od);
-                                    if (Scene == null)
+                                    if (terse_packet != null && terseUpdate.Length + terse_packet.DataLength > 1400)
                                     {
-                                        /* kill the schedule thread when Scene has been cleared */
-                                        return;
+                                        terse_packet.Data[17] = terse_packet_count;
+                                        SendObjectUpdateMsg(terse_packet);
+                                        terse_packet = null;
+                                        terse_packet_count = 0;
                                     }
-                                    m.GridPosition = Scene.RegionData.Location;
-                                    m.TimeDilation = 65535;
-                                    SendMessage(m);
+
+                                    if (null == terse_packet)
+                                    {
+                                        terse_packet = new UDPPacket();
+                                        terse_packet.IsReliable = true;
+                                        terse_packet.WriteMessageType(MessageType.ImprovedTerseObjectUpdate);
+                                        terse_packet.WriteUInt64(regionHandle);
+                                        terse_packet.WriteUInt16(65535); /* dilation */
+                                        terse_packet.WriteUInt8(0);
+                                    }
+                                    terse_packet.WriteBytes(terseUpdate);
+                                    ++terse_packet_count;
                                 }
                             }
                         }
                     }
                 }
 
-                if (prop_updatemsg != null)
+                if(full_packet != null)
                 {
-                    SendMessage(prop_updatemsg);
-                    prop_updatemsg = null;
+                    full_packet.Data[17] = full_packet_count;
+                    SendObjectUpdateMsg(full_packet);
+                    full_packet = null;
+                    full_packet_count = 0;
                 }
-                if(full_updatemsg != null)
+
+                if (terse_packet != null)
                 {
-                    SendMessage(full_updatemsg);
-                    full_updatemsg = null;
+                    terse_packet.Data[17] = terse_packet_count;
+                    SendObjectUpdateMsg(terse_packet);
+                    terse_packet = null;
+                    terse_packet_count = 0;
                 }
-                if(terse_updatemsg != null)
-                {
-                    SendMessage(terse_updatemsg);
-                    terse_updatemsg = null;
-                }
+
                 if(ko != null)
                 {
                     SendMessage(ko);

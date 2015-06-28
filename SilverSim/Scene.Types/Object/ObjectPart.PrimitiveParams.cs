@@ -721,6 +721,43 @@ namespace SilverSim.Scene.Types.Object
                     }
                     m_Shape.CopyFrom(value);
                 }
+                lock(m_UpdateDataLock)
+                {
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathBegin] = (byte)(value.PathBegin % 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathBegin + 1] = (byte)(value.PathBegin / 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathEnd] = (byte)(value.PathEnd % 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathEnd + 1] = (byte)(value.PathEnd / 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathCurve] = value.PathCurve;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathRadiusOffset] = (byte)value.PathRadiusOffset;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathRevolutions] = value.PathRevolutions;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathScaleX] = value.PathScaleX;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathScaleY] = value.PathScaleY;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathShearX] = value.PathShearX;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathShearY] = value.PathShearY;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathSkew] = (byte)value.PathSkew;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathTaperX] = (byte)value.PathTaperX;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathTaperY] = (byte)value.PathTaperY;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathTwist] = (byte)value.PathTwist;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PathTwistBegin] = (byte)value.PathTwistBegin;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode] = (byte)value.PCode;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin] = (byte)(value.ProfileBegin % 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin + 1] = (byte)(value.ProfileBegin / 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileCurve] = value.ProfileCurve;
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd] = (byte)(value.ProfileEnd % 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd + 1] = (byte)(value.ProfileEnd / 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow] = (byte)(value.ProfileHollow % 256);
+                    m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow + 1] = (byte)(value.ProfileHollow / 256);
+
+                    if (value.SculptType == SilverSim.Types.Primitive.PrimitiveSculptType.Mesh)
+                    {
+                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin] = (byte)(12500 % 256);
+                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileBegin + 1] = (byte)(12500 / 256);
+                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd] = 0;
+                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileEnd + 1] = 0;
+                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow] = (byte)(27500 % 256);
+                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ProfileHollow + 1] = (byte)(27500 / 256);
+                    }
+                }
                 if (sculptChanged)
                 {
                     UpdateExtraParams();

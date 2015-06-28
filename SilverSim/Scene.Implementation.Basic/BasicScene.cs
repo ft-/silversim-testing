@@ -92,7 +92,7 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 get
                 {
-                    return m_Scene.m_Objects.Count;
+                    return m_Scene.m_ObjectCount;
                 }
             }
 
@@ -148,12 +148,7 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 get
                 {
-                    int n = 0;
-                    foreach(ObjectPart i in this)
-                    {
-                        ++n;
-                    }
-                    return n;
+                    return m_Scene.m_PrimitiveCount;
                 }
             }
 
@@ -203,6 +198,25 @@ namespace SilverSim.Scene.Implementation.Basic
                 return GetEnumerator();
             }
         }
+
+        class BasicSceneAgents : DefaultSceneAgentInterface
+        {
+            BasicScene m_BasicScene;
+
+            public BasicSceneAgents(BasicScene scene)
+                : base(scene)
+            {
+                m_BasicScene = scene;
+            }
+
+            public virtual new int Count
+            {
+                get
+                {
+                    return m_BasicScene.m_AgentCount;
+                }
+            }
+        }
         #endregion
 
         #region Services
@@ -211,7 +225,7 @@ namespace SilverSim.Scene.Implementation.Basic
         private BasicSceneParcels m_SceneParcels;
         private BasicSceneObjectParts m_SceneObjectParts;
         private DefaultSceneObjectGroupInterface m_SceneObjectGroups;
-        private DefaultSceneAgentInterface m_SceneAgents;
+        private BasicSceneAgents m_SceneAgents;
         private DefaultSceneRootAgentInterface m_SceneRootAgents;
         private SimulationDataStorageInterface m_SimulationDataStorage;
 
@@ -255,7 +269,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_SceneObjects = new BasicSceneObjects(this);
             m_SceneObjectParts = new BasicSceneObjectParts(this);
             m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
-            m_SceneAgents = new DefaultSceneAgentInterface(this);
+            m_SceneAgents = new BasicSceneAgents(this);
             m_SceneRootAgents = new DefaultSceneRootAgentInterface(this);
             m_SceneParcels = new BasicSceneParcels(this);
             ServerParamService = serverParamService;
@@ -386,6 +400,10 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Add and Remove
+        internal int m_ObjectCount = 0;
+        internal int m_PrimitiveCount = 0;
+        internal int m_AgentCount = 0;
+
         public override void Add(IObject obj)
         {
             if(obj is ObjectGroup)
@@ -408,8 +426,11 @@ namespace SilverSim.Scene.Implementation.Basic
 
                     foreach(ObjectPart objpart in objgroup.Values)
                     {
+                        Interlocked.Increment(ref m_PrimitiveCount);
+                        objpart.UpdateData(ObjectPart.UpdateDataFlags.Full | ObjectPart.UpdateDataFlags.Terse);
                         objpart.SendObjectUpdate();
                     }
+                    Interlocked.Increment(ref m_ObjectCount);
                 }
                 catch(Exception e)
                 {
@@ -428,6 +449,10 @@ namespace SilverSim.Scene.Implementation.Basic
                 try
                 {
                     m_Objects.Add(obj.ID, obj);
+                    if (obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
+                    {
+                        Interlocked.Increment(ref m_AgentCount);
+                    }
                 }
                 catch
                 {
@@ -485,19 +510,22 @@ namespace SilverSim.Scene.Implementation.Basic
 
                 foreach (ObjectPart objpart in objgroup.Values)
                 {
+                    Interlocked.Decrement(ref m_PrimitiveCount);
                     m_Primitives.Remove(objpart.ID);
                     objpart.SendKillObject();
                     RemoveLocalID(objpart);
                 }
+                Interlocked.Decrement(ref m_ObjectCount);
                 m_Objects.Remove(objgroup.ID);
             }
             else if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
             {
                 IAgent agent = (IAgent)obj;
-                /* TODO: add attachments */
+                /* TODO: remove attachments */
                 m_Objects.Remove(agent.ID);
                 SendKillObjectToAgents(agent.LocalID);
                 RemoveLocalID(agent);
+                Interlocked.Decrement(ref m_AgentCount);
             }
             else
             {
