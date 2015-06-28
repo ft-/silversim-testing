@@ -79,6 +79,33 @@ namespace SilverSim.Scene.Types.Object
                     m_Sound.Radius = value.Radius;
                     m_Sound.Flags = value.Flags;
                 }
+                lock(m_UpdateDataLock)
+                {
+                    value.SoundID.ToBytes(m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.LoopedSound);
+                    byte[] val = BitConverter.GetBytes((float)value.Gain);
+                    if(!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(val);
+                    }
+                    Buffer.BlockCopy(val, 0, m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.SoundGain, val.Length);
+
+                    val = BitConverter.GetBytes((float)value.Radius);
+                    if(!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(val);
+                    }
+                    Buffer.BlockCopy(val, 0, m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.SoundRadius, val.Length);
+
+                    m_FullUpdateFixedBlock2[(int)FullFixedBlock2Offset.SoundFlags] = (byte)value.Flags;
+                    if(value.SoundID != UUID.Zero)
+                    {
+                        Owner.ID.ToBytes(m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.SoundOwner);
+                    }
+                    else
+                    {
+                        UUID.Zero.ToBytes(m_FullUpdateFixedBlock2, (int)FullFixedBlock2Offset.SoundOwner);
+                    }
+                }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
