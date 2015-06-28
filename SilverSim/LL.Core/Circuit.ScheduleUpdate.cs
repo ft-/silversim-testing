@@ -37,37 +37,24 @@ namespace SilverSim.LL.Core
 {
     public partial class Circuit
     {
-        private ThreadedClasses.NonblockingQueue<ObjectUpdateInfo> m_PhysicalOutQueue = new NonblockingQueue<ObjectUpdateInfo>();
-        private ThreadedClasses.NonblockingQueue<ObjectUpdateInfo> m_NonPhysicalOutQueue = new NonblockingQueue<ObjectUpdateInfo>();
-        private AutoResetEvent m_ObjectUpdateSignal = new AutoResetEvent(false);
+        private ThreadedClasses.BlockingQueue<UDPPacket> m_TxObjectPool = new BlockingQueue<UDPPacket>();
+        private ThreadedClasses.BlockingQueue<ObjectUpdateInfo> m_TxObjectQueue = new BlockingQueue<ObjectUpdateInfo>();
         private bool m_TriggerFirstUpdate = false;
 
         public void ScheduleUpdate(ObjectUpdateInfo info)
         {
-            AddScheduleUpdate(info);
-            m_ObjectUpdateSignal.Set();
+            m_TxObjectQueue.Enqueue(info);
         }
 
         public void AddScheduleUpdate(ObjectUpdateInfo info)
         {
-            if (info.Part.ObjectGroup.IsAttachedToPrivate && info.Part.ObjectGroup.Owner != Agent.Owner)
-            {
-                /* do not signal private attachments to anyone else than the owner */
-            }
-            else if (info.IsPhysics && !info.IsKilled && !info.Part.ObjectGroup.IsAttached)
-            {
-                m_PhysicalOutQueue.Enqueue(info);
-            }
-            else
-            {
-                m_NonPhysicalOutQueue.Enqueue(info);
-            }
+            m_TxObjectQueue.Enqueue(info);
         }
 
         public void ScheduleFirstUpdate()
         {
             m_TriggerFirstUpdate = true;
-            m_ObjectUpdateSignal.Set();
+            m_TxObjectQueue.Enqueue(null);
         }
 
 
@@ -94,23 +81,97 @@ namespace SilverSim.LL.Core
             m_Server.SendPacketTo(p, RemoteEndPoint);
         }
 
+        private UDPPacket GetTxObjectPoolPacket()
+        {
+            while (m_ObjectUpdateThreadRunning)
+            {
+                try
+                {
+                    UDPPacket p = m_TxObjectPool.Dequeue(1000);
+                    p.Reset();
+                    return p;
+                }
+                catch
+                {
+                    continue;
+                }
+            }
+            return null;
+        }
+
         private void HandleObjectUpdates()
         {
             UInt64 regionHandle;
             Dictionary<UInt32, int> LastObjSerialNo = new Dictionary<uint, int>();
-            NonblockingQueue<ObjectUpdateInfo>[] queues = new NonblockingQueue<ObjectUpdateInfo>[2];
-            queues[0] = m_PhysicalOutQueue;
-            queues[1] = m_NonPhysicalOutQueue;
+            Queue<ObjectUpdateInfo>[] queues = new Queue<ObjectUpdateInfo>[2];
+            Queue<ObjectUpdateInfo> physicalOutQueue = new Queue<ObjectUpdateInfo>();
+            Queue<ObjectUpdateInfo> nonPhysicalOutQueue = new Queue<ObjectUpdateInfo>();
+            queues[0] = physicalOutQueue;
+            queues[1] = nonPhysicalOutQueue;
             regionHandle = Scene.RegionData.Location.RegionHandle;
 
             while (m_ObjectUpdateThreadRunning)
             {
-                if ((m_PhysicalOutQueue.Count != 0 || m_NonPhysicalOutQueue.Count != 0) && m_AckThrottlingCount[(int)Message.QueueOutType.Object] < 100)
+                ObjectUpdateInfo objinfo;
+
+                if ((physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0) && m_AckThrottlingCount[(int)Message.QueueOutType.Object] < 100)
                 {
                 }
-                else if(!m_ObjectUpdateSignal.WaitOne(1000))
+                else
                 {
-                    continue;
+                    try
+                    {
+                        objinfo = m_TxObjectQueue.Dequeue(1000);
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+                    try
+                    {
+                        if (objinfo.Part.ObjectGroup.IsAttachedToPrivate && objinfo.Part.ObjectGroup.Owner != Agent.Owner)
+                        {
+                            /* do not signal private attachments to anyone else than the owner */
+                        }
+                        else if (objinfo.IsPhysics && !objinfo.IsKilled && !objinfo.Part.ObjectGroup.IsAttached)
+                        {
+                            physicalOutQueue.Enqueue(objinfo);
+                        }
+                        else
+                        {
+                            nonPhysicalOutQueue.Enqueue(objinfo);
+                        }
+
+                    }
+                    catch
+                    {
+
+                    }
+                }
+
+                int qcount = m_TxObjectQueue.Count;
+                while(qcount-- > 0)
+                {
+                    objinfo = m_TxObjectQueue.Dequeue(0);
+                    try
+                    {
+                        if (objinfo.Part.ObjectGroup.IsAttachedToPrivate && objinfo.Part.ObjectGroup.Owner != Agent.Owner)
+                        {
+                            /* do not signal private attachments to anyone else than the owner */
+                        }
+                        else if (objinfo.IsPhysics && !objinfo.IsKilled && !objinfo.Part.ObjectGroup.IsAttached)
+                        {
+                            physicalOutQueue.Enqueue(objinfo);
+                        }
+                        else
+                        {
+                            nonPhysicalOutQueue.Enqueue(objinfo);
+                        }
+                    }
+                    catch
+                    {
+
+                    }
                 }
 
                 if(m_TriggerFirstUpdate)
@@ -135,12 +196,18 @@ namespace SilverSim.LL.Core
                 byte full_packet_count = 0;
                 byte terse_packet_count = 0;
 
-                while (m_PhysicalOutQueue.Count != 0 || m_NonPhysicalOutQueue.Count != 0)
+                while (physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0)
                 {
-                    foreach (NonblockingQueue<ObjectUpdateInfo> q in queues)
+                    int queueidx;
+                    if (!m_ObjectUpdateThreadRunning)
                     {
+                        break;
+                    }
+                    for (queueidx = 0; queueidx < queues.Length; ++queueidx)
+                    {
+                        Queue<ObjectUpdateInfo> q = queues[queueidx];
                         ObjectUpdateInfo ui;
-                        if(q.Count == 0)
+                        if (q.Count == 0)
                         {
                             continue;
                         }
@@ -153,15 +220,15 @@ namespace SilverSim.LL.Core
                             continue;
                         }
 
-                        if(ui.IsKilled)
+                        if (ui.IsKilled)
                         {
-                            if(ko == null)
+                            if (ko == null)
                             {
                                 ko = new Messages.Object.KillObject();
                             }
 
                             ko.LocalIDs.Add(ui.LocalID);
-                            if(ko.LocalIDs.Count > 250)
+                            if (ko.LocalIDs.Count > 250)
                             {
                                 SendMessage(ko);
                                 ko = null;
@@ -180,14 +247,14 @@ namespace SilverSim.LL.Core
                                 dofull = true;
                             }
 
-                            if(dofull)
+                            if (dofull)
                             {
                                 byte[] fullUpdate = ui.FullUpdate;
 
-                                if(null != fullUpdate)
+                                if (null != fullUpdate)
                                 {
 
-                                    if(full_packet != null && fullUpdate.Length + full_packet.DataLength > 1400)
+                                    if (full_packet != null && fullUpdate.Length + full_packet.DataLength > 1400)
                                     {
                                         full_packet.Data[17] = full_packet_count;
                                         SendObjectUpdateMsg(full_packet);
@@ -197,7 +264,11 @@ namespace SilverSim.LL.Core
 
                                     if (null == full_packet)
                                     {
-                                        full_packet = new UDPPacket();
+                                        full_packet = GetTxObjectPoolPacket();
+                                        if(full_packet == null)
+                                        {
+                                            break;
+                                        }
                                         full_packet.IsReliable = true;
                                         full_packet.WriteMessageType(MessageType.ObjectUpdate);
                                         full_packet.WriteUInt64(regionHandle);
@@ -219,7 +290,7 @@ namespace SilverSim.LL.Core
                             {
                                 byte[] terseUpdate = ui.TerseUpdate;
 
-                                if(null != terseUpdate)
+                                if (null != terseUpdate)
                                 {
                                     if (terse_packet != null && terseUpdate.Length + terse_packet.DataLength > 1400)
                                     {
@@ -231,7 +302,11 @@ namespace SilverSim.LL.Core
 
                                     if (null == terse_packet)
                                     {
-                                        terse_packet = new UDPPacket();
+                                        terse_packet = GetTxObjectPoolPacket();
+                                        if (terse_packet == null)
+                                        {
+                                            break;
+                                        }
                                         terse_packet.IsReliable = true;
                                         terse_packet.WriteMessageType(MessageType.ImprovedTerseObjectUpdate);
                                         terse_packet.WriteUInt64(regionHandle);

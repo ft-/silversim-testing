@@ -235,6 +235,11 @@ namespace SilverSim.LL.Core
             SetupDefaultCapabilities(regionSeedID, server.Scene.CapabilitiesConfig, serviceURLs);
             Scene = server.Scene;
             m_LastReceivedPacketAtTime = Environment.TickCount;
+            uint pcks;
+            for(pcks = 0; pcks < 200; ++pcks)
+            {
+                m_TxObjectPool.Enqueue(new UDPPacket());
+            }
         }
 
         ~Circuit()
@@ -277,6 +282,7 @@ namespace SilverSim.LL.Core
                         Interlocked.Decrement(ref m_AckThrottlingCount[(int)p_acked.OutQueue]);
                         if(p_acked.OutQueue == Message.QueueOutType.Object)
                         {
+                            m_TxObjectPool.Enqueue(p_acked);
                             ackedObjects = true;
                         }
                         else
@@ -291,7 +297,7 @@ namespace SilverSim.LL.Core
                     }
                     if(ackedObjects)
                     {
-                        m_ObjectUpdateSignal.Set();
+                        m_TxObjectQueue.Enqueue(null);
                     }
 
                     lock (m_LogoutReplyLock)
@@ -345,6 +351,7 @@ namespace SilverSim.LL.Core
                             Interlocked.Decrement(ref m_AckThrottlingCount[(int)p_acked.OutQueue]);
                             if (p_acked.OutQueue == Message.QueueOutType.Object)
                             {
+                                m_TxObjectPool.Enqueue(p_acked);
                                 ackedObjects = true;
                             }
                             else
@@ -370,7 +377,7 @@ namespace SilverSim.LL.Core
                     }
                     if(ackedObjects)
                     {
-                        m_ObjectUpdateSignal.Set();
+                        m_TxObjectQueue.Enqueue(null);
                     }
 
                     lock (m_UnackedBytesLock)
@@ -653,7 +660,7 @@ namespace SilverSim.LL.Core
                 {
                     m_ObjectUpdateThreadRunning = false;
                     m_ObjectUpdateThread = null;
-                    m_ObjectUpdateSignal.Set();
+                    m_TxObjectQueue.Enqueue(null);
                 }
                 m_EventQueueEnabled = false;
             }
