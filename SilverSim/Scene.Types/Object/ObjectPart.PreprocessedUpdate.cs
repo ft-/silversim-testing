@@ -202,11 +202,46 @@ namespace SilverSim.Scene.Types.Object
                             break;
                     }
 
+                    uint primUpdateFlags = 0;
 
                     string name;
 
                     if (ObjectGroup != null)
                     {
+                        if (IsAllowedDrop)
+                        {
+                            primUpdateFlags |= (uint)PrimitiveFlags.AllowInventoryDrop;
+                        }
+                        if (Inventory.Count == 0)
+                        {
+                            primUpdateFlags |= (uint)PrimitiveFlags.InventoryEmpty;
+                        }
+                        if (ObjectGroup.IsPhysics)
+                        {
+                            primUpdateFlags |= (uint)PrimitiveFlags.Physics;
+                        }
+                        if (Inventory.CountScripts != 0)
+                        {
+                            primUpdateFlags |= (uint)PrimitiveFlags.Scripted;
+                        }
+                        if (ObjectGroup.IsGroupOwned)
+                        {
+                            primUpdateFlags |= (uint)PrimitiveFlags.ObjectGroupOwned;
+                        }
+                        if (ObjectGroup.IsTemporary)
+                        {
+                            primUpdateFlags |= (uint)PrimitiveFlags.Temporary;
+                        }
+                        if (ObjectGroup.IsTempOnRez)
+                        {
+                            primUpdateFlags |= (uint)PrimitiveFlags.TemporaryOnRez;
+                        }
+
+                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags] = (byte)(primUpdateFlags & 0xFF);
+                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 1] = (byte)((primUpdateFlags >> 8) & 0xFF);
+                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 2] = (byte)((primUpdateFlags >> 16) & 0xFF);
+                        m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.UpdateFlags + 3] = (byte)((primUpdateFlags >> 24) & 0xFF);
+
                         if (ObjectGroup.RootPart != this)
                         {
                             uint parentID = ObjectGroup.RootPart.LocalID;
