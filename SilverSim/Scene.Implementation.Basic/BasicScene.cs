@@ -308,6 +308,25 @@ namespace SilverSim.Scene.Implementation.Basic
 
         #region Properties
 
+        public override List<ObjectUpdateInfo> UpdateInfos
+        { 
+            get
+            {
+                List<ObjectUpdateInfo> infos = new List<ObjectUpdateInfo>();
+                foreach(IObject obj in m_Objects.Values)
+                {
+                    if(obj is ObjectGroup)
+                    {
+                        foreach(ObjectPart part in ((ObjectGroup)obj).ValuesByKey1)
+                        {
+                            infos.Add(part.UpdateInfo);
+                        }
+                    }
+                }
+                return infos;
+            }
+        }
+
         public override ISceneObjects Objects
         {
             get

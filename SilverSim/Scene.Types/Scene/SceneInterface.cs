@@ -106,6 +106,7 @@ namespace SilverSim.Scene.Types.Scene
         public abstract ISceneAgents Agents { get; }
         public abstract ISceneAgents RootAgents { get; }
         public abstract ISceneParcels Parcels { get; }
+        public abstract List<ObjectUpdateInfo> UpdateInfos { get; }
         public event Action<SceneInterface> OnRemove;
         public delegate void IPChangedDelegate(SceneInterface scene, IPAddress address);
         public event IPChangedDelegate OnIPChanged;

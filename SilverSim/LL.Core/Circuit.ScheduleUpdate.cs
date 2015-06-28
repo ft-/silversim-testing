@@ -30,6 +30,7 @@ using System.Text;
 using SilverSim.Scene.Types.Object;
 using ThreadedClasses;
 using System.Threading;
+using SilverSim.Scene.Types.Agent;
 
 namespace SilverSim.LL.Core
 {
@@ -38,25 +39,15 @@ namespace SilverSim.LL.Core
         private ThreadedClasses.NonblockingQueue<ObjectUpdateInfo> m_PhysicalOutQueue = new NonblockingQueue<ObjectUpdateInfo>();
         private ThreadedClasses.NonblockingQueue<ObjectUpdateInfo> m_NonPhysicalOutQueue = new NonblockingQueue<ObjectUpdateInfo>();
         private AutoResetEvent m_ObjectUpdateSignal = new AutoResetEvent(false);
+        private bool m_TriggerFirstUpdate = false;
 
         public void ScheduleUpdate(ObjectUpdateInfo info)
         {
-            if(info.Part.ObjectGroup.IsAttachedToPrivate && info.Part.ObjectGroup.Owner != Agent.Owner)
-            {
-                /* do not signal private attachments to anyone else than the owner */
-            }
-            else if(info.IsPhysics && !info.IsKilled && !info.Part.ObjectGroup.IsAttached)
-            {
-                m_PhysicalOutQueue.Enqueue(info);
-            }
-            else
-            {
-                m_NonPhysicalOutQueue.Enqueue(info);
-            }
+            AddScheduleUpdate(info);
             m_ObjectUpdateSignal.Set();
         }
 
-        public void PreScheduleUpdate(ObjectUpdateInfo info)
+        public void AddScheduleUpdate(ObjectUpdateInfo info)
         {
             if (info.Part.ObjectGroup.IsAttachedToPrivate && info.Part.ObjectGroup.Owner != Agent.Owner)
             {
@@ -72,8 +63,9 @@ namespace SilverSim.LL.Core
             }
         }
 
-        public void PostScheduleUpdate()
+        public void ScheduleFirstUpdate()
         {
+            m_TriggerFirstUpdate = true;
             m_ObjectUpdateSignal.Set();
         }
 
@@ -92,6 +84,22 @@ namespace SilverSim.LL.Core
                 else if(!m_ObjectUpdateSignal.WaitOne(1000))
                 {
                     continue;
+                }
+
+                if(m_TriggerFirstUpdate)
+                {
+                    foreach (IAgent agent in Scene.RootAgents)
+                    {
+                        if (agent != this)
+                        {
+                            Scene.SendAgentObjectToAgent(agent, Agent);
+                        }
+                    }
+                    foreach (ObjectUpdateInfo ui in Scene.UpdateInfos)
+                    {
+                        AddScheduleUpdate(ui);
+                    }
+                    m_TriggerFirstUpdate = false;
                 }
 
                 Messages.Object.KillObject ko = null;
