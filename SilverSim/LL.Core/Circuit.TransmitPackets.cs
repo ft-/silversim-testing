@@ -297,7 +297,10 @@ namespace SilverSim.LL.Core
                                 if (m.IsReliable)
                                 {
                                     p.IsResent = true;
-                                    m_UnackedPackets[p.SequenceNumber] = p;
+                                    lock (m_UnackedPacketsHash)
+                                    {
+                                        m_UnackedPacketsHash.Add(p.SequenceNumber, p);
+                                    }
                                     lock (m_UnackedBytesLock)
                                     {
                                         m_UnackedBytes += p.DataLength;

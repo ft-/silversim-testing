@@ -32,6 +32,7 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Types.IM;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
@@ -216,7 +217,7 @@ namespace SilverSim.LL.Core
         }
         #endregion
 
-        public RwLockedDictionary<UInt32, UDPPacket> m_UnackedPackets = new RwLockedDictionary<uint, UDPPacket>();
+        public C5.TreeDictionary<uint, UDPPacket> m_UnackedPacketsHash = new C5.TreeDictionary<uint,UDPPacket>();
         public Circuit(LLAgent agent, LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector, UUID regionSeedID, Dictionary<string, string> serviceURLs, string gatekeeperURI)
         {
             InitializeTransmitQueueing();
@@ -275,8 +276,17 @@ namespace SilverSim.LL.Core
                 bool ackedSomethingElse = false;
                 foreach(UInt32 ackno in acknumbers)
                 {
-                    UDPPacket p_acked;
-                    if (m_UnackedPackets.Remove(ackno, out p_acked))
+                    UDPPacket p_acked = null;
+                    lock (m_UnackedPacketsHash)
+                    {
+                        if (m_UnackedPacketsHash.Contains(ackno))
+                        {
+                            p_acked = (UDPPacket)m_UnackedPacketsHash[ackno];
+                            m_UnackedPacketsHash.Remove(ackno);
+                        }
+                    }
+
+                    if (null != p_acked)
                     {
                         unackedReleasedCount += p_acked.DataLength;
                         Interlocked.Decrement(ref m_AckThrottlingCount[(int)p_acked.OutQueue]);
@@ -344,8 +354,16 @@ namespace SilverSim.LL.Core
                     for(uint i = 0; i < cnt; ++i)
                     {
                         uint ackno = pck.ReadUInt32();
-                        UDPPacket p_acked;
-                        if (m_UnackedPackets.Remove(ackno, out p_acked))
+                        UDPPacket p_acked = null;
+                        lock (m_UnackedPacketsHash)
+                        {
+                            if(m_UnackedPacketsHash.Contains(ackno))
+                            {
+                                p_acked = (UDPPacket)m_UnackedPacketsHash[ackno];
+                                m_UnackedPacketsHash.Remove(ackno);
+                            }
+                        }
+                        if (null != p_acked)
                         {
                             unackedReleasedCount += p_acked.DataLength;
                             Interlocked.Decrement(ref m_AckThrottlingCount[(int)p_acked.OutQueue]);
@@ -395,14 +413,23 @@ namespace SilverSim.LL.Core
                     newpck.WriteUInt8(pingID);
                     newpck.SequenceNumber = NextSequenceNumber;
                     /* check for unacks */
-                    foreach(KeyValuePair<uint,UDPPacket> keyval in m_UnackedPackets)
+                    foreach (uint keyval in m_UnackedPacketsHash.Keys)
                     {
-                        if(Environment.TickCount - keyval.Value.TransferredAtTime > 1000)
+                        UDPPacket Value;
+                        lock (m_UnackedPacketsHash)
                         {
-                            if (keyval.Value.ResentCount++ < 5)
+                            if (!m_UnackedPacketsHash.Contains(keyval))
                             {
-                                keyval.Value.TransferredAtTime = Environment.TickCount;
-                                m_Server.SendPacketTo(keyval.Value, RemoteEndPoint);
+                                continue;
+                            }
+                            Value = (UDPPacket)m_UnackedPacketsHash[keyval];
+                        }
+                        if(Environment.TickCount - Value.TransferredAtTime > 1000)
+                        {
+                            if (Value.ResentCount++ < 5)
+                            {
+                                Value.TransferredAtTime = Environment.TickCount;
+                                m_Server.SendPacketTo(Value, RemoteEndPoint);
                             }
                         }
                     }
