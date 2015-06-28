@@ -266,6 +266,8 @@ namespace SilverSim.LL.Core
             if(null != acknumbers)
             {
                 int unackedReleasedCount = 0;
+                bool ackedObjects = false;
+                bool ackedSomethingElse = false;
                 foreach(UInt32 ackno in acknumbers)
                 {
                     UDPPacket p_acked;
@@ -273,6 +275,23 @@ namespace SilverSim.LL.Core
                     {
                         unackedReleasedCount += p_acked.DataLength;
                         Interlocked.Decrement(ref m_AckThrottlingCount[(int)p_acked.OutQueue]);
+                        if(p_acked.OutQueue == Message.QueueOutType.Object)
+                        {
+                            ackedObjects = true;
+                        }
+                        else
+                        {
+                            ackedSomethingElse = true;
+                        }
+                    }
+
+                    if(ackedSomethingElse)
+                    {
+                        m_TxQueue.Enqueue(new AcksReceived());
+                    }
+                    if(ackedObjects)
+                    {
+                        m_ObjectUpdateSignal.Set();
                     }
 
                     lock (m_LogoutReplyLock)
@@ -313,6 +332,8 @@ namespace SilverSim.LL.Core
                 case MessageType.PacketAck:
                     /* we decode it here, no need to pass it anywhere else */
                     int unackedReleasedCount = 0;
+                    bool ackedObjects = false;
+                    bool ackedSomethingElse = false;
                     uint cnt = pck.ReadUInt8();
                     for(uint i = 0; i < cnt; ++i)
                     {
@@ -322,6 +343,14 @@ namespace SilverSim.LL.Core
                         {
                             unackedReleasedCount += p_acked.DataLength;
                             Interlocked.Decrement(ref m_AckThrottlingCount[(int)p_acked.OutQueue]);
+                            if (p_acked.OutQueue == Message.QueueOutType.Object)
+                            {
+                                ackedObjects = true;
+                            }
+                            else
+                            {
+                                ackedSomethingElse = true;
+                            }
                         }
 
                         lock (m_LogoutReplyLock)
@@ -334,6 +363,16 @@ namespace SilverSim.LL.Core
                             }
                         }
                     }
+
+                    if(ackedSomethingElse)
+                    {
+                        m_TxQueue.Enqueue(new AcksReceived());
+                    }
+                    if(ackedObjects)
+                    {
+                        m_ObjectUpdateSignal.Set();
+                    }
+
                     lock (m_UnackedBytesLock)
                     {
                         m_UnackedBytes -= unackedReleasedCount;

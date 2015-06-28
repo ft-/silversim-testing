@@ -78,9 +78,18 @@ namespace SilverSim.LL.Core
             p.SequenceNumber = NextSequenceNumber;
             int savedDataLength = p.DataLength;
 
+            Interlocked.Increment(ref m_PacketsSent);
+            p.EnqueuedAtTime = Environment.TickCount;
+            p.TransferredAtTime = Environment.TickCount;
             if (p.IsReliable)
             {
                 Interlocked.Increment(ref m_AckThrottlingCount[(int)Message.QueueOutType.Object]);
+                p.IsResent = true;
+                m_UnackedPackets[p.SequenceNumber] = p;
+                lock (m_UnackedBytesLock)
+                {
+                    m_UnackedBytes += p.DataLength;
+                }
             }
             m_Server.SendPacketTo(p, RemoteEndPoint);
         }
@@ -96,7 +105,7 @@ namespace SilverSim.LL.Core
 
             while (m_ObjectUpdateThreadRunning)
             {
-                if (m_PhysicalOutQueue.Count != 0 || m_NonPhysicalOutQueue.Count != 0)
+                if ((m_PhysicalOutQueue.Count != 0 || m_NonPhysicalOutQueue.Count != 0) && m_AckThrottlingCount[(int)Message.QueueOutType.Object] < 100)
                 {
                 }
                 else if(!m_ObjectUpdateSignal.WaitOne(1000))
