@@ -412,28 +412,35 @@ namespace SilverSim.LL.Core
                     newpck.WriteMessageType(MessageType.CompletePingCheck);
                     newpck.WriteUInt8(pingID);
                     newpck.SequenceNumber = NextSequenceNumber;
+                    m_Server.SendPacketTo(newpck, ep);
                     /* check for unacks */
-                    foreach (uint keyval in m_UnackedPacketsHash.Keys)
+                    try
                     {
-                        UDPPacket Value;
-                        lock (m_UnackedPacketsHash)
+                        foreach (uint keyval in m_UnackedPacketsHash.Keys)
                         {
-                            if (!m_UnackedPacketsHash.Contains(keyval))
+                            UDPPacket Value;
+                            lock (m_UnackedPacketsHash)
                             {
-                                continue;
+                                if (!m_UnackedPacketsHash.Contains(keyval))
+                                {
+                                    continue;
+                                }
+                                Value = (UDPPacket)m_UnackedPacketsHash[keyval];
                             }
-                            Value = (UDPPacket)m_UnackedPacketsHash[keyval];
-                        }
-                        if(Environment.TickCount - Value.TransferredAtTime > 1000)
-                        {
-                            if (Value.ResentCount++ < 5)
+                            if (Environment.TickCount - Value.TransferredAtTime > 1000)
                             {
-                                Value.TransferredAtTime = Environment.TickCount;
-                                m_Server.SendPacketTo(Value, RemoteEndPoint);
+                                if (Value.ResentCount++ < 5)
+                                {
+                                    Value.TransferredAtTime = Environment.TickCount;
+                                    m_Server.SendPacketTo(Value, RemoteEndPoint);
+                                }
                             }
                         }
                     }
-                    m_Server.SendPacketTo(newpck, ep);
+                    catch
+                    {
+
+                    }
                     break;
 
                 case MessageType.CompletePingCheck:

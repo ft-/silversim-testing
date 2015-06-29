@@ -102,20 +102,59 @@ namespace SilverSim.LL.Core
             return null;
         }
 
+        private void _SendFullUpdateMsg(UDPPacket full_packet, List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data)
+        {
+            UInt64 regionHandle;
+            try
+            {
+                regionHandle = Scene.RegionData.Location.RegionHandle;
+            }
+            catch
+            {
+                return;
+            }
+            full_packet.IsReliable = true;
+            full_packet.WriteMessageType(MessageType.ObjectUpdate);
+            full_packet.WriteUInt64(regionHandle);
+            full_packet.WriteUInt16(65535); /* dilation */
+            full_packet.WriteUInt8((byte)full_packet_data.Count);
+
+            int offset = full_packet.DataPos;
+            foreach (KeyValuePair<ObjectUpdateInfo, byte[]> kvp in full_packet_data)
+            {
+                full_packet.WriteBytes(kvp.Value);
+                if (kvp.Key.Part.Owner.ID == AgentID)
+                {
+                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags] |= (byte)Types.Primitive.PrimitiveFlags.ObjectYouOwner;
+                }
+            }
+
+            SendObjectUpdateMsg(full_packet);
+        }
+
+        delegate void SendFullUpdateMsgDelegate(UDPPacket pck, List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data);
+
+        private void SendFullUpdateMsgComplete(IAsyncResult res)
+        {
+            SendFullUpdateMsgDelegate del = (SendFullUpdateMsgDelegate) res.AsyncState;
+            del.EndInvoke(res);
+        }
+
         private void HandleObjectUpdates()
         {
             UInt64 regionHandle;
-            Dictionary<UInt32, int> LastObjSerialNo = new Dictionary<uint, int>();
+            C5.TreeDictionary<UInt32, int> LastObjSerialNo = new C5.TreeDictionary<uint, int>();
             Queue<ObjectUpdateInfo>[] queues = new Queue<ObjectUpdateInfo>[2];
             Queue<ObjectUpdateInfo> physicalOutQueue = new Queue<ObjectUpdateInfo>();
             Queue<ObjectUpdateInfo> nonPhysicalOutQueue = new Queue<ObjectUpdateInfo>();
             queues[0] = physicalOutQueue;
             queues[1] = nonPhysicalOutQueue;
             regionHandle = Scene.RegionData.Location.RegionHandle;
+            SendFullUpdateMsgDelegate SendFullUpdateMsg = _SendFullUpdateMsg;
+            ObjectUpdateInfo objinfo;
 
             while (m_ObjectUpdateThreadRunning)
             {
-                ObjectUpdateInfo objinfo;
 
                 if ((physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0) && m_AckThrottlingCount[(int)Message.QueueOutType.Object] < 100)
                 {
@@ -194,10 +233,10 @@ namespace SilverSim.LL.Core
                 }
 
                 Messages.Object.KillObject ko = null;
-                UDPPacket full_packet = null;
                 UDPPacket terse_packet = null;
-                byte full_packet_count = 0;
                 byte terse_packet_count = 0;
+                List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data = new List<KeyValuePair<ObjectUpdateInfo, byte[]>>();
+                int full_packet_data_length = 0;
 
                 while (physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0)
                 {
@@ -231,6 +270,7 @@ namespace SilverSim.LL.Core
                             }
 
                             ko.LocalIDs.Add(ui.LocalID);
+                            LastObjSerialNo.Remove(ui.LocalID);
                             if (ko.LocalIDs.Count > 250)
                             {
                                 SendMessage(ko);
@@ -240,12 +280,12 @@ namespace SilverSim.LL.Core
                         else
                         {
                             bool dofull = false;
-                            try
+                            if(LastObjSerialNo.Contains(ui.LocalID))
                             {
                                 int serialno = LastObjSerialNo[ui.LocalID];
                                 dofull = serialno != ui.SerialNumber;
                             }
-                            catch
+                            else
                             {
                                 dofull = true;
                             }
@@ -257,36 +297,26 @@ namespace SilverSim.LL.Core
                                 if (null != fullUpdate)
                                 {
 
-                                    if (full_packet != null && fullUpdate.Length + full_packet.DataLength > 1400)
+                                    if (full_packet_data != null && fullUpdate.Length + full_packet_data_length > 1400)
                                     {
-                                        full_packet.Data[17] = full_packet_count;
-                                        SendObjectUpdateMsg(full_packet);
-                                        full_packet = null;
-                                        full_packet_count = 0;
-                                    }
-
-                                    if (null == full_packet)
-                                    {
-                                        full_packet = GetTxObjectPoolPacket();
-                                        if(full_packet == null)
+                                        UDPPacket full_packet = GetTxObjectPoolPacket();
+                                        if (full_packet == null)
                                         {
                                             break;
                                         }
-                                        full_packet.IsReliable = true;
-                                        full_packet.WriteMessageType(MessageType.ObjectUpdate);
-                                        full_packet.WriteUInt64(regionHandle);
-                                        full_packet.WriteUInt16(65535); /* dilation */
-                                        full_packet.WriteUInt8(0);
+                                        _SendFullUpdateMsg(full_packet, full_packet_data);
+                                        //SendFullUpdateMsg.BeginInvoke(full_packet, full_packet_data, SendFullUpdateMsgComplete, SendFullUpdateMsg);
+                                        full_packet_data = null;
                                     }
 
-
-                                    int offset = full_packet.DataPos;
-                                    full_packet.WriteBytes(fullUpdate);
-                                    if (ui.Part.Owner.ID == AgentID)
+                                    if (null == full_packet_data)
                                     {
-                                        full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags] |= (byte)Types.Primitive.PrimitiveFlags.ObjectYouOwner;
+                                        full_packet_data = new List<KeyValuePair<ObjectUpdateInfo, byte[]>>();
                                     }
-                                    ++full_packet_count;
+
+
+                                    full_packet_data.Add(new KeyValuePair<ObjectUpdateInfo, byte[]>(ui, fullUpdate));
+                                    full_packet_data_length += fullUpdate.Length;
                                 }
                             }
                             else
@@ -324,12 +354,15 @@ namespace SilverSim.LL.Core
                     }
                 }
 
-                if(full_packet != null)
+                if(full_packet_data != null)
                 {
-                    full_packet.Data[17] = full_packet_count;
-                    SendObjectUpdateMsg(full_packet);
-                    full_packet = null;
-                    full_packet_count = 0;
+                    UDPPacket full_packet = GetTxObjectPoolPacket();
+                    if (full_packet == null)
+                    {
+                        break;
+                    }
+                    _SendFullUpdateMsg(full_packet, full_packet_data);
+                    //SendFullUpdateMsg.BeginInvoke(full_packet, full_packet_data, SendFullUpdateMsgComplete, SendFullUpdateMsg);
                 }
 
                 if (terse_packet != null)
