@@ -102,7 +102,7 @@ namespace SilverSim.LL.Core
             return null;
         }
 
-        private void _SendFullUpdateMsg(UDPPacket full_packet, List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data)
+        private void SendFullUpdateMsg(UDPPacket full_packet, List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data)
         {
             UInt64 regionHandle;
             try
@@ -132,14 +132,6 @@ namespace SilverSim.LL.Core
             SendObjectUpdateMsg(full_packet);
         }
 
-        delegate void SendFullUpdateMsgDelegate(UDPPacket pck, List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data);
-
-        private void SendFullUpdateMsgComplete(IAsyncResult res)
-        {
-            SendFullUpdateMsgDelegate del = (SendFullUpdateMsgDelegate) res.AsyncState;
-            del.EndInvoke(res);
-        }
-
         private void HandleObjectUpdates()
         {
             UInt64 regionHandle;
@@ -150,7 +142,6 @@ namespace SilverSim.LL.Core
             queues[0] = physicalOutQueue;
             queues[1] = nonPhysicalOutQueue;
             regionHandle = Scene.RegionData.Location.RegionHandle;
-            SendFullUpdateMsgDelegate SendFullUpdateMsg = _SendFullUpdateMsg;
             ObjectUpdateInfo objinfo;
 
             while (m_ObjectUpdateThreadRunning)
@@ -304,8 +295,7 @@ namespace SilverSim.LL.Core
                                         {
                                             break;
                                         }
-                                        _SendFullUpdateMsg(full_packet, full_packet_data);
-                                        //SendFullUpdateMsg.BeginInvoke(full_packet, full_packet_data, SendFullUpdateMsgComplete, SendFullUpdateMsg);
+                                        SendFullUpdateMsg(full_packet, full_packet_data);
                                         full_packet_data = null;
                                     }
 
@@ -361,8 +351,7 @@ namespace SilverSim.LL.Core
                     {
                         break;
                     }
-                    _SendFullUpdateMsg(full_packet, full_packet_data);
-                    //SendFullUpdateMsg.BeginInvoke(full_packet, full_packet_data, SendFullUpdateMsgComplete, SendFullUpdateMsg);
+                    SendFullUpdateMsg(full_packet, full_packet_data);
                 }
 
                 if (terse_packet != null)
