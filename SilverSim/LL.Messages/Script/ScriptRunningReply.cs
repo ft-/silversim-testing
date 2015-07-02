@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Script
 {
     [UDPMessage(MessageType.ScriptRunningReply)]
     [Reliable]
+    [EventQueueGet("ScriptRunningReply")]
     public class ScriptRunningReply : Message
     {
         public UUID ObjectID;
@@ -61,14 +62,6 @@ namespace SilverSim.LL.Messages.Script
             SilverSim.Types.Map body = new SilverSim.Types.Map();
             body.Add("Script", scriptArr);
             return body;
-        }
-
-        public override string NameEQG
-        {
-            get
-            {
-                return "ScriptRunningReply";
-            }
         }
     }
 }

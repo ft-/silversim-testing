@@ -24,16 +24,21 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using MapType = SilverSim.Types.Map;
 using System;
 using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Agent
 {
+    [UDPMessage(MessageType.AgentGroupDataUpdate)]
+    [Reliable]
+    [EventQueueGet("AgentGroupDataUpdate")]
     public class AgentGroupDataUpdate : Message
     {
         public UUID AgentID;
         public struct GroupDataEntry
         {
+            public bool ListInProfile; /* <- not in UDP message */
             public UUID GroupID;
             public UInt64 GroupPowers;
             public bool AcceptNotices;
@@ -47,14 +52,6 @@ namespace SilverSim.LL.Messages.Agent
         public AgentGroupDataUpdate()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AgentGroupDataUpdate;
-            }
         }
 
         public override void Serialize(UDPPacket p)
@@ -71,6 +68,32 @@ namespace SilverSim.LL.Messages.Agent
                 p.WriteInt32(d.Contribution);
                 p.WriteStringLen8(d.GroupName);
             }
+        }
+
+        public override IValue SerializeEQG()
+        {
+            MapType body = new MapType();
+            AnArray agentDataArray = new AnArray();
+            MapType agentDataMap = new MapType();
+            agentDataMap.Add("AgentID", AgentID);
+            agentDataArray.Add(agentDataMap);
+            body.Add("AgentData", agentDataArray);
+            AnArray groupDataArray = new AnArray();
+            foreach(GroupDataEntry e in GroupData)
+            {
+                MapType groupData = new MapType();
+                groupData.Add("ListInProfile", e.ListInProfile);
+                groupData.Add("GroupID", e.GroupID);
+                groupData.Add("GroupInsigniaID", e.GroupInsigniaID);
+                groupData.Add("Contribution", e.Contribution);
+                groupData.Add("GroupPowers", ((UInt64)e.GroupPowers).ToString());
+                groupData.Add("GroupName", e.GroupName);
+                groupData.Add("AcceptNotices", e.AcceptNotices);
+                groupDataArray.Add(groupData);
+            }
+            body.Add("GroupData", groupDataArray);
+
+            return body;
         }
     }
 }
