@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Region
 {
+    [UDPMessage(MessageType.RegionHandshakeReply)]
+    [Reliable]
     public class RegionHandshakeReply : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -37,14 +39,6 @@ namespace SilverSim.LL.Messages.Region
         public RegionHandshakeReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RegionHandshakeReply;
-            }
         }
 
         public static Message Decode(UDPPacket p)

@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Circuit
 {
+    [UDPMessage(MessageType.CompleteAgentMovement)]
+    [Reliable]
     public class CompleteAgentMovement : Message
     {
         public UUID SessionID = UUID.Zero;
@@ -38,14 +40,6 @@ namespace SilverSim.LL.Messages.Circuit
         {
 
         }
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.CompleteAgentMovement;
-            }
-        }
-
         public static Message Decode(UDPPacket p)
         {
             CompleteAgentMovement m = new CompleteAgentMovement();

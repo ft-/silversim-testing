@@ -27,6 +27,8 @@ using System;
 
 namespace SilverSim.LL.Messages.LayerData
 {
+    [UDPMessage(MessageType.LayerData)]
+    [Reliable]
     public class LayerData : Message
     {
         public enum LayerDataType : byte
@@ -54,22 +56,6 @@ namespace SilverSim.LL.Messages.LayerData
             get
             {
                 return Number.ToString()+ "." + LayerType.ToString();
-            }
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.LayerData;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
             }
         }
 

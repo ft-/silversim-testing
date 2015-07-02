@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Script
 {
+    [UDPMessage(MessageType.ScriptDialog)]
+    [Reliable]
     public class ScriptDialog : Message
     {
         public UUID ObjectID;
@@ -46,22 +48,6 @@ namespace SilverSim.LL.Messages.Script
         public ScriptDialog()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ScriptDialog;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

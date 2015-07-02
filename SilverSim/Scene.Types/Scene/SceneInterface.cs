@@ -78,6 +78,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         ParcelInfo this[UUID id] { get; }
         ParcelInfo this[Vector3 position] { get; }
+        ParcelInfo this[int localID] { get; }
     }
 
     public abstract partial class SceneInterface
@@ -289,6 +290,10 @@ namespace SilverSim.Scene.Types.Scene
             m_PacketHandlers[MessageType.ObjectDeGrab] = HandleObjectDeGrab;
             m_PacketHandlers[MessageType.RequestObjectPropertiesFamily] = HandleRequestObjectPropertiesFamily;
             m_PacketHandlers[MessageType.ObjectAdd] = HandleObjectAdd;
+
+            /* parcels */
+            m_PacketHandlers[MessageType.ParcelInfoRequest] = HandleParcelInfoRequest;
+            m_PacketHandlers[MessageType.ParcelPropertiesRequestByID] = HandleParcelPropertiesRequestByID;
 
             /* sound */
             m_PacketHandlers[MessageType.SoundTrigger] = HandleSoundTrigger;

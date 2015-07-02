@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.CallingCard
 {
+    [UDPMessage(MessageType.OfferCallingCard)]
+    [Reliable]
     public class OfferCallingCard : Message
     {
         public UUID AgentID;
@@ -37,14 +39,6 @@ namespace SilverSim.LL.Messages.CallingCard
         public OfferCallingCard()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.OfferCallingCard;
-            }
         }
 
         public static Message Decode(UDPPacket p)

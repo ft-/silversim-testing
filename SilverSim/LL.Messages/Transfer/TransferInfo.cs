@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Transfer
 {
+    [UDPMessage(MessageType.TransferInfo)]
+    [Reliable]
     public class TransferInfo : Message
     {
         public UUID TransferID;
@@ -40,22 +42,6 @@ namespace SilverSim.LL.Messages.Transfer
         public TransferInfo()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.TransferInfo;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

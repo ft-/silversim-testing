@@ -27,6 +27,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Alert
 {
+    [UDPMessage(MessageType.AlertMessage)]
+    [Reliable]
     public class AlertMessage : Message
     {
         public struct Data
@@ -46,14 +48,6 @@ namespace SilverSim.LL.Messages.Alert
         public AlertMessage(string message)
         {
             Message = message;
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AlertMessage;
-            }
         }
 
         public override void Serialize(UDPPacket p)

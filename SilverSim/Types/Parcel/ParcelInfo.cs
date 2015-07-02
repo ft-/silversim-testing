@@ -153,7 +153,7 @@ namespace SilverSim.Types.Parcel
         public UUID SnapshotID = UUID.Zero;
         public Int32 SalePrice;
         public Int32 OtherCleanTime;
-        public byte MediaAutoScale;
+        public bool MediaAutoScale;
         public Int32 RentPrice = 0;
         public Vector3 AABBMin;
         public Vector3 AABBMax;

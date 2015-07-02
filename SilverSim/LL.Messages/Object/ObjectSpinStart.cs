@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectSpinStart)]
+    [Reliable]
     public class ObjectSpinStart : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -40,14 +42,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectSpinStart()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectSpinStart;
-            }
         }
 
         public static Message Decode(UDPPacket p)

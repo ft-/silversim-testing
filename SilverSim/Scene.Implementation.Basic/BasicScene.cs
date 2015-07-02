@@ -188,6 +188,14 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
             }
 
+            public ParcelInfo this[int localID]
+            {
+                get
+                {
+                    return m_Scene.Parcels[localID];
+                }
+            }
+
             public IEnumerator<ParcelInfo> GetEnumerator()
             {
                 return m_Scene.m_Parcels.Values.GetEnumerator();

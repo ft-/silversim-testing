@@ -31,6 +31,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.TaskInventory
 {
+    [UDPMessage(MessageType.ReplyTaskInventory)]
+    [Reliable]
     public class ReplyTaskInventory : Message
     {
         public UUID TaskID;
@@ -41,22 +43,6 @@ namespace SilverSim.LL.Messages.TaskInventory
         public ReplyTaskInventory()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ReplyTaskInventory;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

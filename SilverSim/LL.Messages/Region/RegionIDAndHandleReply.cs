@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Region
 {
+    [UDPMessage(MessageType.RegionIDAndHandleReply)]
+    [Reliable]
     public class RegionIDAndHandleReply : Message
     {
         public UUID RegionID;
@@ -39,22 +41,6 @@ namespace SilverSim.LL.Messages.Region
         public RegionIDAndHandleReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RegionIDAndHandleReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

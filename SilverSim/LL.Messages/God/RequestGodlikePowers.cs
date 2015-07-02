@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.God
 {
+    [UDPMessage(MessageType.RequestGodlikePowers)]
+    [Reliable]
     public class RequestGodlikePowers : Message
     {
         public UUID AgentID;
@@ -37,14 +39,6 @@ namespace SilverSim.LL.Messages.God
         public RequestGodlikePowers()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RequestGodlikePowers;
-            }
         }
 
         public static Message Decode(UDPPacket p)

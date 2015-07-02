@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ViewerStartAuction)]
+    [Reliable]
     public class ViewerStartAuction : Message
     {
         public UUID AgentID;
@@ -39,14 +41,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ViewerStartAuction()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ViewerStartAuction;
-            }
         }
 
         public static Message Decode(UDPPacket p)

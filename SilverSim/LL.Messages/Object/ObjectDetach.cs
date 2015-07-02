@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectDetach)]
+    [Reliable]
     public class ObjectDetach : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -39,14 +41,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectDetach()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectDetach;
-            }
         }
 
         public static Message Decode(UDPPacket p)

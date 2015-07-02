@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Circuit
 {
+    [UDPMessage(MessageType.AgentMovementComplete)]
+    [Reliable]
     public class AgentMovementComplete : Message
     {
         public UUID AgentID;
@@ -41,22 +43,6 @@ namespace SilverSim.LL.Messages.Circuit
         public AgentMovementComplete()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AgentMovementComplete;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

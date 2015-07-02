@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Land
 {
+    [UDPMessage(MessageType.LandStatRequest)]
+    [Reliable]
     public class LandStatRequest : Message
     {
         public UUID AgentID;
@@ -40,14 +42,6 @@ namespace SilverSim.LL.Messages.Land
         public LandStatRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.LandStatRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

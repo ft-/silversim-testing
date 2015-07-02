@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Economy
 {
+    [UDPMessage(MessageType.MoneyBalanceRequest)]
+    [Reliable]
     public class MoneyBalanceRequest : Message
     {
         public UUID AgentID;
@@ -36,14 +38,6 @@ namespace SilverSim.LL.Messages.Economy
         public MoneyBalanceRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.MoneyBalanceRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

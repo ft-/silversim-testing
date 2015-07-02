@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectUpdateCompressed)]
+    [Reliable]
     public class ObjectUpdateCompressed : Message
     {
         public UInt64 RegionHandle;
@@ -43,22 +45,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectUpdateCompressed()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectUpdateCompressed;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

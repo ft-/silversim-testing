@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Friend
 {
+    [UDPMessage(MessageType.ChangeUserRights)]
+    [Reliable]
     public class ChangeUserRights : Message
     {
         public UUID AgentID;
@@ -45,22 +47,6 @@ namespace SilverSim.LL.Messages.Friend
         public ChangeUserRights()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ChangeUserRights;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

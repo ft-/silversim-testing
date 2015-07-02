@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Teleport
 {
+    [UDPMessage(MessageType.TeleportFailed)]
+    [Reliable]
     public class TeleportFailed : Message
     {
         public UUID AgentID;
@@ -43,14 +45,6 @@ namespace SilverSim.LL.Messages.Teleport
 
         public TeleportFailed()
         {
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.TeleportFailed;
-            }
         }
 
         public override void Serialize(UDPPacket p)

@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.User
 {
+    [UDPMessage(MessageType.FreezeUser)]
+    [Reliable]
     public class FreezeUser : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -38,14 +40,6 @@ namespace SilverSim.LL.Messages.User
         public FreezeUser()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.FreezeUser;
-            }
         }
 
         public static Message Decode(UDPPacket p)

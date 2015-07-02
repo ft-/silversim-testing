@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Transfer
 {
+    [UDPMessage(MessageType.TransferAbort)]
+    [Reliable]
     public class TransferAbort : Message
     {
         public UUID TransferID;
@@ -39,22 +41,6 @@ namespace SilverSim.LL.Messages.Transfer
         public TransferAbort()
         {
             
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.TransferAbort;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

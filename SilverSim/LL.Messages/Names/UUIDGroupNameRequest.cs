@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Names
 {
+    [UDPMessage(MessageType.UUIDGroupNameRequest)]
+    [Reliable]
     public class UUIDGroupNameRequest : Message
     {
         public List<UUID> UUIDNameBlock = new List<UUID>();
@@ -35,14 +37,6 @@ namespace SilverSim.LL.Messages.Names
         public UUIDGroupNameRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.UUIDGroupNameRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

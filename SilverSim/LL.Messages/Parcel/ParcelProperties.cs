@@ -24,11 +24,13 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using MapType = SilverSim.Types.Map;
 using SilverSim.Types.Parcel;
 using System;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [EventQueueGet("ParcelProperties")]
     public class ParcelProperties : Message
     {
         public Int32 RequestResult;
@@ -41,7 +43,7 @@ namespace SilverSim.LL.Messages.Parcel
         public UUID OwnerID;
         public bool IsGroupOwned;
         public UInt32 AuctionID;
-        public Int32 ClaimDate;
+        public Date ClaimDate;
         public Int32 ClaimPrice;
         public Int32 RentPrice;
         public Vector3 AABBMin;
@@ -62,11 +64,11 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelFlags ParcelFlags;
         public Int32 SalePrice;
         public string Name;
-        public string Desc;
+        public string Description;
         public string MusicURL;
         public string MediaURL;
         public UUID MediaID;
-        public byte MediaAutoScale;
+        public bool MediaAutoScale;
         public UUID GroupID;
         public Int32 PassPrice;
         public double PassHours;
@@ -82,6 +84,19 @@ namespace SilverSim.LL.Messages.Parcel
         public bool RegionDenyTransacted;
         public bool RegionDenyAgeUnverified;
 
+        public bool Privacy;
+        public bool SeeAVs;
+        public bool AnyAVSounds;
+        public bool GroupAVSounds;
+
+        public string MediaDesc;
+        public int MediaWidth;
+        public int MediaHeight;
+        public bool MediaLoop;
+        public string MediaType;
+        public bool ObscureMedia;
+        public bool ObscureMusic;
+
         public ParcelProperties()
         {
 
@@ -91,72 +106,87 @@ namespace SilverSim.LL.Messages.Parcel
         {
             get
             {
-                return MessageType.ParcelProperties;
+                return 0;
             }
         }
 
-        public override bool IsReliable
+        public override IValue SerializeEQG()
         {
-            get
-            {
-                return true;
-            }
-        }
+            MapType m = new MapType();
+            AnArray parcelArray = new AnArray();
+            MapType parcelData = new MapType();
+            parcelData.Add("LocalID", LocalID);
+            parcelData.Add("AABBMax", AABBMax);
+            parcelData.Add("AABBMin", AABBMin);
+            parcelData.Add("Area", Area);
+            parcelData.Add("AuctionID", AuctionID);
+            parcelData.Add("AuthBuyerID", AuthBuyerID);
+            parcelData.Add("Bitmap", new BinaryData(Bitmap));
+            parcelData.Add("Category", (int)Category);
+            parcelData.Add("ClaimDate", ClaimDate.AsInt);
+            parcelData.Add("ClaimPrice", ClaimPrice);
+            parcelData.Add("Desc", Description);
+            parcelData.Add("ParcelFlags", (byte)ParcelFlags);
+            parcelData.Add("GroupID", GroupID);
+            parcelData.Add("GroupPrims", GroupPrims);
+            parcelData.Add("IsGroupOwned", IsGroupOwned);
+            parcelData.Add("LandingType", (int)LandingType);
+            parcelData.Add("MaxPrims", MaxPrims);
+            parcelData.Add("MediaID", MediaID);
+            parcelData.Add("MediaURL", MediaURL);
+            parcelData.Add("MediaAutoScale", MediaAutoScale);
+            parcelData.Add("MusicURL", MusicURL);
+            parcelData.Add("Name", Name);
+            parcelData.Add("OtherCleanTime", OtherCleanTime);
+            parcelData.Add("OtherCount", OtherCount);
+            parcelData.Add("OtherPrims", OtherPrims);
+            parcelData.Add("ParcelPrimBonus", ParcelPrimBonus);
+            parcelData.Add("PassHours", PassHours);
+            parcelData.Add("PassPrice", PassPrice);
+            parcelData.Add("PublicCount", PublicCount);
+            parcelData.Add("Privacy", Privacy);
+            parcelData.Add("RegionDenyAnonymous", RegionDenyAnonymous);
+            parcelData.Add("RegionDenyIdentified", RegionDenyIdentified);
+            parcelData.Add("RegionDenyTransacted", RegionDenyTransacted);
+            parcelData.Add("RegionPushOverride", RegionPushOverride);
+            parcelData.Add("RentPrice", RentPrice);
+            parcelData.Add("RequestResult", RequestResult);
+            parcelData.Add("SalePrice", SalePrice);
+            parcelData.Add("SelectedPrims", SelectedPrims);
+            parcelData.Add("SelfCount", SelfCount);
+            parcelData.Add("SequenceID", SequenceID);
+            parcelData.Add("SimWideMaxPrims", SimWideMaxPrims);
+            parcelData.Add("SimWideTotalPrims", SimWideTotalPrims);
+            parcelData.Add("SnapSelection", SnapSelection);
+            parcelData.Add("SnapshotID", SnapshotID);
+            parcelData.Add("Status", (int)Status);
+            parcelData.Add("TotalPrims", TotalPrims);
+            parcelData.Add("UserLocation", UserLocation);
+            parcelData.Add("UserLookAt", UserLookAt);
+            parcelData.Add("SeeAVs", SeeAVs);
+            parcelData.Add("AnyAVSounds", AnyAVSounds);
+            parcelData.Add("GroupAVSounds", GroupAVSounds);
+            parcelArray.Add(parcelData);
+            m.Add("ParcelData", parcelArray);
 
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteMessageType(Number);
-            p.WriteInt32(RequestResult);
-            p.WriteInt32(SequenceID);
-            p.WriteBoolean(SnapSelection);
-            p.WriteInt32(SelfCount);
-            p.WriteInt32(OtherCount);
-            p.WriteInt32(PublicCount);
-            p.WriteInt32(LocalID);
-            p.WriteUUID(OwnerID);
-            p.WriteBoolean(IsGroupOwned);
-            p.WriteUInt32(AuctionID);
-            p.WriteInt32(ClaimDate);
-            p.WriteInt32(ClaimPrice);
-            p.WriteInt32(RentPrice);
-            p.WriteVector3f(AABBMin);
-            p.WriteVector3f(AABBMax);
-            p.WriteUInt16((UInt16)Bitmap.Length);
-            p.WriteBytes(Bitmap);
-            p.WriteInt32(Area);
-            p.WriteUInt8((byte)Status);
-            p.WriteInt32(SimWideMaxPrims);
-            p.WriteInt32(SimWideTotalPrims);
-            p.WriteInt32(MaxPrims);
-            p.WriteInt32(TotalPrims);
-            p.WriteInt32(OwnerPrims);
-            p.WriteInt32(GroupPrims);
-            p.WriteInt32(OtherPrims);
-            p.WriteInt32(SelectedPrims);
-            p.WriteFloat((float)ParcelPrimBonus);
-            p.WriteInt32(OtherCleanTime);
-            p.WriteUInt32((UInt32)ParcelFlags);
-            p.WriteInt32(SalePrice);
-            p.WriteStringLen8(Name);
-            p.WriteStringLen8(Desc);
-            p.WriteStringLen8(MusicURL);
-            p.WriteStringLen8(MediaURL);
-            p.WriteUUID(MediaID);
-            p.WriteUInt8(MediaAutoScale);
-            p.WriteUUID(GroupID);
-            p.WriteInt32(PassPrice);
-            p.WriteFloat((float)PassHours);
-            p.WriteUInt8((byte)Category);
-            p.WriteUUID(AuthBuyerID);
-            p.WriteUUID(SnapshotID);
-            p.WriteVector3f(UserLocation);
-            p.WriteVector3f(UserLookAt);
-            p.WriteUInt8((byte)LandingType);
-            p.WriteBoolean(RegionPushOverride);
-            p.WriteBoolean(RegionDenyAnonymous);
-            p.WriteBoolean(RegionDenyIdentified);
-            p.WriteBoolean(RegionDenyTransacted);
-            p.WriteBoolean(RegionDenyAgeUnverified);
+            AnArray mediaArray = new AnArray();
+            MapType mediaData = new MapType();
+            mediaData.Add("MediaDesc", MediaDesc);
+            mediaData.Add("MediaHeight", MediaHeight);
+            mediaData.Add("MediaWidth", MediaWidth);
+            mediaData.Add("MediaLoop", MediaLoop);
+            mediaData.Add("MediaType", MediaType);
+            mediaData.Add("ObscureMedia", ObscureMedia);
+            mediaData.Add("ObscureMusic", ObscureMusic);
+            mediaArray.Add(mediaData);
+            m.Add("MediaData", mediaArray);
+
+            AnArray ageArray = new AnArray();
+            MapType ageData = new MapType();
+            ageData.Add("RegionDenyAgeUnverified", RegionDenyAgeUnverified);
+            ageArray.Add(ageData);
+            m.Add("AgeVerificationBlock", ageArray);
+            return m;
         }
     }
 }

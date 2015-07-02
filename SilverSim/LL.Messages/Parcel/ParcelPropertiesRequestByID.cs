@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelPropertiesRequestByID)]
+    [Reliable]
     public class ParcelPropertiesRequestByID : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -39,14 +41,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelPropertiesRequestByID()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelPropertiesRequestByID;
-            }
         }
 
         public static Message Decode(UDPPacket p)

@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelDisableObjects)]
+    [Reliable]
     public class ParcelDisableObjects : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -42,14 +44,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelDisableObjects()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelDisableObjects;
-            }
         }
 
         public static Message Decode(UDPPacket p)

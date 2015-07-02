@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Names
 {
+    [UDPMessage(MessageType.UUIDGroupNameReply)]
+    [Reliable]
     public class UUIDGroupNameReply : Message
     {
         public struct Data
@@ -47,14 +49,6 @@ namespace SilverSim.LL.Messages.Names
         public UUIDGroupNameReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.UUIDGroupNameReply;
-            }
         }
 
         public override void Serialize(UDPPacket p)

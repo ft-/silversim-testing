@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Sound
 {
+    [UDPMessage(MessageType.PreloadSound)]
+    [Reliable]
     public class PreloadSound : Message
     {
         public UUID ObjectID;
@@ -36,22 +38,6 @@ namespace SilverSim.LL.Messages.Sound
         public PreloadSound()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.PreloadSound;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

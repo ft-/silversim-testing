@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelDivide)]
+    [Reliable]
     public class ParcelDivide : Message
     {
         public UUID AgentID;
@@ -46,14 +48,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelDivide()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelDivide;
-            }
         }
 
         public static Message Decode(UDPPacket p)

@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.PurgeInventoryDescendents)]
+    [Reliable]
     public class PurgeInventoryDescendents : Message
     {
         public UUID AgentID;
@@ -36,14 +38,6 @@ namespace SilverSim.LL.Messages.Inventory
         public PurgeInventoryDescendents()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.PurgeInventoryDescendents;
-            }
         }
 
         public static Message Decode(UDPPacket p)

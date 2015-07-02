@@ -31,6 +31,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Image
 {
+    [UDPMessage(MessageType.ImageNotInDatabase)]
+    [Reliable]
     public class ImageNotInDatabase : Message
     {
         public UUID ID = UUID.Zero;
@@ -38,22 +40,6 @@ namespace SilverSim.LL.Messages.Image
         public ImageNotInDatabase()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ImageNotInDatabase;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

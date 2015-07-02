@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Avatar
 {
+    [UDPMessage(MessageType.AvatarSitResponse)]
+    [Reliable]
     public class AvatarSitResponse : Message
     {
         public UUID SitObject = UUID.Zero;
@@ -40,14 +42,6 @@ namespace SilverSim.LL.Messages.Avatar
         public AvatarSitResponse()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AvatarSitResponse;
-            }
         }
 
         public override void Serialize(UDPPacket p)

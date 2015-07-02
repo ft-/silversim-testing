@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Region
 {
+    [UDPMessage(MessageType.RequestRegionInfo)]
+    [Reliable]
     public class RequestRegionInfo : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -35,14 +37,6 @@ namespace SilverSim.LL.Messages.Region
         public RequestRegionInfo()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RequestRegionInfo;
-            }
         }
 
         public static Message Decode(UDPPacket p)

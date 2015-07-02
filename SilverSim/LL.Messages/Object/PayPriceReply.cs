@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.PayPriceReply)]
+    [Reliable]
     public class PayPriceReply : Message
     {
         public UUID ObjectID = UUID.Zero;
@@ -40,22 +42,6 @@ namespace SilverSim.LL.Messages.Object
         public PayPriceReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.PayPriceReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

@@ -31,6 +31,7 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Region
 {
+    [UDPMessage(MessageType.SimulatorViewerTimeMessage)]
     public class SimulatorViewerTimeMessage : Message
     {
         public UInt64 UsecSinceStart;
@@ -43,14 +44,6 @@ namespace SilverSim.LL.Messages.Region
         public SimulatorViewerTimeMessage()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.SimulatorViewerTimeMessage;
-            }
         }
 
         public override void Serialize(UDPPacket p)

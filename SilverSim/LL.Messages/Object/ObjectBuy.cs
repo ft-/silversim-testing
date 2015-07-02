@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectBuy)]
+    [Reliable]
     public class ObjectBuy : Message
     {
         public struct Data
@@ -48,14 +50,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectBuy()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectBuy;
-            }
         }
 
         public static Message Decode(UDPPacket p)

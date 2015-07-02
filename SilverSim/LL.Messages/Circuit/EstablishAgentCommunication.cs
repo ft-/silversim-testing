@@ -32,6 +32,7 @@ using System.Net;
 
 namespace SilverSim.LL.Messages.Circuit
 {
+    [EventQueueGet("EstablishAgentCommunication")]
     public class EstablishAgentCommunication : Message
     {
         public UUID AgentID;
@@ -45,14 +46,6 @@ namespace SilverSim.LL.Messages.Circuit
 
         }
 
-        public override MessageType Number
-        {
-            get 
-            { 
-                return 0; 
-            }
-        }
-
         public override SilverSim.Types.IValue SerializeEQG()
         {
             SilverSim.Types.Map i = new SilverSim.Types.Map();
@@ -64,14 +57,6 @@ namespace SilverSim.LL.Messages.Circuit
             i.Add("region-size-y", RegionSize.Y);
 
             return i;
-        }
-
-        public override string NameEQG
-        {
-            get
-            {
-                return "EstablishAgentCommunication";
-            }
         }
     }
 }

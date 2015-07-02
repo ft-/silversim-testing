@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Economy
 {
+    [UDPMessage(MessageType.MoneyTransferRequest)]
+    [Reliable]
     public class MoneyTransferRequest : Message
     {
         public UUID AgentID;
@@ -45,14 +47,6 @@ namespace SilverSim.LL.Messages.Economy
         public MoneyTransferRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.MoneyTransferRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

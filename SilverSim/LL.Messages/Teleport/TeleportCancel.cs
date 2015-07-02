@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Teleport
 {
+    [UDPMessage(MessageType.TeleportCancel)]
+    [Reliable]
     public class TeleportCancel : Message
     {
         public UUID AgentID;
@@ -35,14 +37,6 @@ namespace SilverSim.LL.Messages.Teleport
         public TeleportCancel()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.TeleportCancel;
-            }
         }
 
         public static Message Decode(UDPPacket p)

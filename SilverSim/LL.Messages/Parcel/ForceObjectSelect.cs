@@ -27,6 +27,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ForceObjectSelect)]
+    [Reliable]
     public class ForceObjectSelect : Message
     {
         public bool ResetList;
@@ -35,14 +37,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ForceObjectSelect()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ForceObjectSelect;
-            }
         }
 
         public override void Serialize(UDPPacket p)

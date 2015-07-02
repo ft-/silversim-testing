@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Land
 {
+    [UDPMessage(MessageType.ModifyLand)]
+    [Reliable]
     public class ModifyLand : Message
     {
         public struct Data
@@ -54,14 +56,6 @@ namespace SilverSim.LL.Messages.Land
         public ModifyLand()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ModifyLand;
-            }
         }
 
         public static Message Decode(UDPPacket p)

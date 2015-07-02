@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.DeRezObject)]
+    [Reliable]
     public class DeRezObject : Message
     {
         public enum DeRezAction : byte
@@ -55,14 +57,6 @@ namespace SilverSim.LL.Messages.Object
         public DeRezObject()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.DeRezObject;
-            }
         }
 
         public static Message Decode(UDPPacket p)

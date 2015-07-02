@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectFlagUpdate)]
+    [Reliable]
     public class ObjectFlagUpdate : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -41,14 +43,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectFlagUpdate()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectFlagUpdate;
-            }
         }
 
         public static Message Decode(UDPPacket p)

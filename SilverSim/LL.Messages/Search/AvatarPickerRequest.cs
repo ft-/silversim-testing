@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Search
 {
+    [UDPMessage(MessageType.AvatarPickerRequest)]
+    [Reliable]
     public class AvatarPickerRequest : Message
     {
         public UUID AgentID;
@@ -37,14 +39,6 @@ namespace SilverSim.LL.Messages.Search
         public AvatarPickerRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AvatarPickerRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

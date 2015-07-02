@@ -27,6 +27,7 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Agent
 {
+    [UDPMessage(MessageType.TrackAgent)]
     public class TrackAgent : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -37,14 +38,6 @@ namespace SilverSim.LL.Messages.Agent
         public TrackAgent()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.TrackAgent;
-            }
         }
 
         public static Message Decode(UDPPacket p)

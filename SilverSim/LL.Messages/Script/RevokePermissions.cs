@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Script
 {
+    [UDPMessage(MessageType.RevokePermissions)]
+    [Reliable]
     public class RevokePermissions : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -38,14 +40,6 @@ namespace SilverSim.LL.Messages.Script
         public RevokePermissions()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RevokePermissions;
-            }
         }
 
         public static Message Decode(UDPPacket p)

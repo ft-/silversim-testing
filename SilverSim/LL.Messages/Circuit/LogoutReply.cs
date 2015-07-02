@@ -23,14 +23,13 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Types;
+using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Circuit
 {
+    [UDPMessage(MessageType.LogoutReply)]
+    [Reliable]
     public class LogoutReply : Message
     {
         public UUID AgentID;
@@ -40,22 +39,6 @@ namespace SilverSim.LL.Messages.Circuit
         public LogoutReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.LogoutReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

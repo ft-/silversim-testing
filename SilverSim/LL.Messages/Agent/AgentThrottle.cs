@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Agent
 {
+    [UDPMessage(MessageType.AgentThrottle)]
+    [Reliable]
     public class AgentThrottle : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -40,14 +42,6 @@ namespace SilverSim.LL.Messages.Agent
         public AgentThrottle()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AgentThrottle;
-            }
         }
 
         public static Message Decode(UDPPacket p)

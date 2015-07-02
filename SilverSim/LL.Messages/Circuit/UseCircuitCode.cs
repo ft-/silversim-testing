@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Circuit
 {
+    [UDPMessage(MessageType.UseCircuitCode)]
+    [Reliable]
     class UseCircuitCode : Message
     {
         public UInt32 CircuitCode = 0;
@@ -37,14 +39,6 @@ namespace SilverSim.LL.Messages.Circuit
         public UseCircuitCode()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.UseCircuitCode;
-            }
         }
 
         public static Message Decode(UDPPacket p)

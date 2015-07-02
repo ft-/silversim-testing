@@ -28,6 +28,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Appearance
 {
+    [UDPMessage(MessageType.ViewerEffect)]
     public class ViewerEffect : Message
     {
         public UUID AgentID;
@@ -48,14 +49,6 @@ namespace SilverSim.LL.Messages.Appearance
         public ViewerEffect()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ViewerEffect;
-            }
         }
 
         public static Message Decode(UDPPacket p)

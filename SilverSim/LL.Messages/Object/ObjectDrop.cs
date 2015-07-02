@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectDrop)]
+    [Reliable]
     public class ObjectDrop : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -39,14 +41,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectDrop()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectDrop;
-            }
         }
 
         public static Message Decode(UDPPacket p)

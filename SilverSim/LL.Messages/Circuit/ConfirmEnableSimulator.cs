@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Circuit
 {
+    [UDPMessage(MessageType.ConfirmEnableSimulator)]
+    [Reliable]
     public class ConfirmEnableSimulator : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -36,14 +38,6 @@ namespace SilverSim.LL.Messages.Circuit
         public ConfirmEnableSimulator()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ConfirmEnableSimulator;
-            }
         }
 
         public override void Serialize(UDPPacket p)

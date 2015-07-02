@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Image
 {
+    [UDPMessage(MessageType.ImageData)]
+    [Reliable]
     public class ImageData : Message
     {
         public UUID ID = UUID.Zero;
@@ -39,22 +41,6 @@ namespace SilverSim.LL.Messages.Image
         public ImageData()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ImageData;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

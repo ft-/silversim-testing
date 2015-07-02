@@ -6,6 +6,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ImprovedTerseObjectUpdate)]
+    [Reliable]
     public class ImprovedTerseObjectUpdate : Message
     {
         public GridVector GridPosition;
@@ -27,14 +29,6 @@ namespace SilverSim.LL.Messages.Object
         public ImprovedTerseObjectUpdate()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ImprovedTerseObjectUpdate;
-            }
         }
 
         public override void Serialize(UDPPacket p)

@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Script
 {
+    [UDPMessage(MessageType.SetScriptRunning)]
+    [Reliable]
     public class SetScriptRunning : Message
     {
         public UUID AgentID;
@@ -38,14 +40,6 @@ namespace SilverSim.LL.Messages.Script
         public SetScriptRunning()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.SetScriptRunning;
-            }
         }
 
         public static Message Decode(UDPPacket p)

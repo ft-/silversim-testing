@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Estate
 {
+    [UDPMessage(MessageType.EstateCovenantRequest)]
+    [Reliable]
     public class EstateCovenantRequest : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -35,14 +37,6 @@ namespace SilverSim.LL.Messages.Estate
         public EstateCovenantRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EstateCovenantRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

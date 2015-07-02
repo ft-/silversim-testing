@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.FetchInventory)]
+    [Reliable]
     public class FetchInventory : Message
     {
         public UUID AgentID;
@@ -42,14 +44,6 @@ namespace SilverSim.LL.Messages.Inventory
         public FetchInventory()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.FetchInventory;
-            }
         }
 
         public static Message Decode(UDPPacket p)

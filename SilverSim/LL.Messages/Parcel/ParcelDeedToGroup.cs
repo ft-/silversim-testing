@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelDeedToGroup)]
+    [Reliable]
     public class ParcelDeedToGroup : Message
     {
         public UUID AgentID;
@@ -38,14 +40,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelDeedToGroup()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelDeedToGroup;
-            }
         }
 
         public static Message Decode(UDPPacket p)

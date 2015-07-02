@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Transfer
 {
+    [UDPMessage(MessageType.TransferRequest)]
+    [Reliable]
     public class TransferRequest : Message
     {
         public UUID TransferID;
@@ -39,22 +41,6 @@ namespace SilverSim.LL.Messages.Transfer
         public TransferRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.TransferRequest;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public static TransferRequest Decode(UDPPacket p)

@@ -34,6 +34,8 @@ using SilverSim.Types.Script;
 
 namespace SilverSim.LL.Messages.Script
 {
+    [UDPMessage(MessageType.RezScript)]
+    [Reliable]
     public class RezScript : Message
     {
         public UUID AgentID;
@@ -73,14 +75,6 @@ namespace SilverSim.LL.Messages.Script
         public RezScript()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RezScript;
-            }
         }
 
         public static Message Decode(UDPPacket p)

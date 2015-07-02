@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectDeselect)]
+    [Reliable]
     public class ObjectDeselect : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -39,14 +41,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectDeselect()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectDeselect;
-            }
         }
 
         public static Message Decode(UDPPacket p)

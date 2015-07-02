@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Script
 {
+    [UDPMessage(MessageType.ScriptControlChange)]
+    [Reliable]
     public class ScriptControlChange : Message
     {
         public struct DataEntry
@@ -42,14 +44,6 @@ namespace SilverSim.LL.Messages.Script
         public ScriptControlChange()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ScriptControlChange;
-            }
         }
 
         public override void Serialize(UDPPacket p)

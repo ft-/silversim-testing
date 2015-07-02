@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Image
 {
+    [UDPMessage(MessageType.RequestImage)]
+    [Reliable]
     public class RequestImage : Message
     {
         public UUID AgentID;
@@ -55,14 +57,6 @@ namespace SilverSim.LL.Messages.Image
         public RequestImage()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RequestImage;
-            }
         }
 
         public static RequestImage Decode(UDPPacket p)

@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Map
 {
+    [UDPMessage(MessageType.MapBlockReply)]
+    [Reliable]
     public class MapBlockReply : Message
     {
         public UUID AgentID;
@@ -59,14 +61,6 @@ namespace SilverSim.LL.Messages.Map
         public MapBlockReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.MapBlockReply;
-            }
         }
 
         public override void Serialize(UDPPacket p)

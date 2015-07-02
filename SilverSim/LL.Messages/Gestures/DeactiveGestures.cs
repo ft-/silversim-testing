@@ -23,15 +23,15 @@ exception statement from your version.
 
 */
 
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Gestures
 {
-    public class DeactiveGestures : Message
+    [UDPMessage(MessageType.DeactivateGestures)]
+    [Reliable]
+    public class DeactivateGestures : Message
     {
         public UUID AgentID;
         public UUID SessionID;
@@ -46,22 +46,14 @@ namespace SilverSim.LL.Messages.Gestures
 
         public List<DataEntry> Data = new List<DataEntry>();
 
-        public DeactiveGestures()
+        public DeactivateGestures()
         {
 
         }
 
-        public override MessageType Number
+        public static DeactivateGestures Decode(UDPPacket p)
         {
-            get
-            {
-                return MessageType.DeactivateGestures;
-            }
-        }
-
-        public static DeactiveGestures Decode(UDPPacket p)
-        {
-            DeactiveGestures m = new DeactiveGestures();
+            DeactivateGestures m = new DeactivateGestures();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
             m.Flags = p.ReadUInt32();

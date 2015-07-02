@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Teleport
 {
+    [UDPMessage(MessageType.TeleportLocationRequest)]
+    [Reliable]
     public class TeleportLocationRequest : Message
     {
         public UUID AgentID;
@@ -38,14 +40,6 @@ namespace SilverSim.LL.Messages.Teleport
         public TeleportLocationRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.TeleportLocationRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

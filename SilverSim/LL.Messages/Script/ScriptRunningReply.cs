@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Script
 {
+    [UDPMessage(MessageType.ScriptRunningReply)]
+    [Reliable]
     public class ScriptRunningReply : Message
     {
         public UUID ObjectID;
@@ -36,22 +38,6 @@ namespace SilverSim.LL.Messages.Script
         public ScriptRunningReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ScriptRunningReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

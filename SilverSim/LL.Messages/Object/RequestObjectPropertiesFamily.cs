@@ -6,6 +6,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.RequestObjectPropertiesFamily)]
+    [Reliable]
     public class RequestObjectPropertiesFamily : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -17,14 +19,6 @@ namespace SilverSim.LL.Messages.Object
         public RequestObjectPropertiesFamily()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RequestObjectPropertiesFamily;
-            }
         }
 
         public static Message Decode(UDPPacket p)

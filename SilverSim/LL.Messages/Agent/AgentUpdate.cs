@@ -28,6 +28,7 @@ using SilverSim.Types.Agent;
 
 namespace SilverSim.LL.Messages.Agent
 {
+    [UDPMessage(MessageType.AgentUpdate)]
     public class AgentUpdate : Message
     {
         public UUID AgentID;
@@ -46,14 +47,6 @@ namespace SilverSim.LL.Messages.Agent
         public AgentUpdate()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AgentUpdate;
-            }
         }
 
         public static Message Decode(UDPPacket p)

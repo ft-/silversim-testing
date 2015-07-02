@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.RemoveInventoryFolder)]
+    [Reliable]
     public class RemoveInventoryFolder : Message
     {
         public UUID AgentID;
@@ -37,14 +39,6 @@ namespace SilverSim.LL.Messages.Inventory
         public RemoveInventoryFolder()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RemoveInventoryFolder;
-            }
         }
 
         public static Message Decode(UDPPacket p)

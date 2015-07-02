@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Profile
 {
+    [UDPMessage(MessageType.PickInfoUpdate)]
+    [Reliable]
     public class PickInfoUpdate : Message
     {
         public UUID AgentID;
@@ -46,14 +48,6 @@ namespace SilverSim.LL.Messages.Profile
         public PickInfoUpdate()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.PickInfoUpdate;
-            }
         }
 
         public static Message Decode(UDPPacket p)

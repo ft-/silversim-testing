@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectLink)]
+    [Reliable]
     public class ObjectLink : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -39,14 +41,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectLink()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectLink;
-            }
         }
 
         public static Message Decode(UDPPacket p)

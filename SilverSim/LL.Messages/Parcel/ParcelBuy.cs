@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelBuy)]
+    [Reliable]
     public class ParcelBuy : Message
     {
         public UUID AgentID;
@@ -47,14 +49,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelBuy()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelBuy;
-            }
         }
 
         public static Message Decode(UDPPacket p)

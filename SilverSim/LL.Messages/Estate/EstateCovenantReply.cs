@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Estate
 {
+    [UDPMessage(MessageType.EstateCovenantReply)]
+    [Reliable]
     public class EstateCovenantReply : Message
     {
         public UUID CovenantID = UUID.Zero;
@@ -38,22 +40,6 @@ namespace SilverSim.LL.Messages.Estate
         public EstateCovenantReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EstateCovenantReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

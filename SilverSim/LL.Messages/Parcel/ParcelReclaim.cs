@@ -31,6 +31,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelReclaim)]
+    [Reliable]
     public class ParcelReclaim : Message
     {
         public UUID AgentID;
@@ -52,14 +54,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelReclaim()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelReclaim;
-            }
         }
 
         public static Message Decode(UDPPacket p)

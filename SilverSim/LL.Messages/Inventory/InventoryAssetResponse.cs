@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.InventoryAssetResponse)]
+    [Reliable]
     public class InventoryAssetResponse : Message
     {
         public UUID QueryID;
@@ -36,22 +38,6 @@ namespace SilverSim.LL.Messages.Inventory
         public InventoryAssetResponse()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.InventoryAssetResponse;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

@@ -31,6 +31,7 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Console
 {
+    [EventQueueGet("SimConsoleResponse")]
     public class SimConsoleResponse : Message
     {
         public string Message;
@@ -44,25 +45,9 @@ namespace SilverSim.LL.Messages.Console
             Message = message;
         }
 
-        public override MessageType Number
-        {
-            get
-            {
-                return 0;
-            }
-        }
-
         public override IValue SerializeEQG()
         {
             return new AString(Message);
-        }
-
-        public override string NameEQG
-        {
-            get
-            {
-                return "SimConsoleResponse";
-            }
         }
     }
 }

@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Script
 {
+    [UDPMessage(MessageType.ForceScriptControlRelease)]
+    [Reliable]
     public class ForceScriptControlRelease : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -35,14 +37,6 @@ namespace SilverSim.LL.Messages.Script
         public ForceScriptControlRelease()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ForceScriptControlRelease;
-            }
         }
 
         public static Message Decode(UDPPacket p)

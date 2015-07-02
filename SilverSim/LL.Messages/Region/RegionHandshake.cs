@@ -30,6 +30,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Region
 {
+    [UDPMessage(MessageType.RegionHandshake)]
+    [Reliable]
     public class RegionHandshake : Message
     {
         public RegionOptionFlags RegionFlags = RegionOptionFlags.None;
@@ -76,22 +78,6 @@ namespace SilverSim.LL.Messages.Region
         public RegionHandshake()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RegionHandshake;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

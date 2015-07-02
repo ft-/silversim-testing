@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Search
 {
+    [UDPMessage(MessageType.PlacesReply)]
+    [Reliable]
     public class PlacesReply : Message
     {
         public UUID AgentID;
@@ -54,22 +56,6 @@ namespace SilverSim.LL.Messages.Search
         public PlacesReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.PlacesReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

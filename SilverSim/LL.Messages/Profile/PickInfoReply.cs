@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Profile
 {
+    [UDPMessage(MessageType.PickInfoReply)]
+    [Reliable]
     public class PickInfoReply : Message
     {
         public UUID AgentID;
@@ -47,22 +49,6 @@ namespace SilverSim.LL.Messages.Profile
         public PickInfoReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.PickInfoReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

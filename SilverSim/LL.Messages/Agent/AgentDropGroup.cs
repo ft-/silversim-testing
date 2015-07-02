@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Agent
 {
+    [UDPMessage(MessageType.AgentDropGroup)]
+    [Reliable]
     public class AgentDropGroup : Message
     {
         public UUID AgentID;
@@ -35,14 +37,6 @@ namespace SilverSim.LL.Messages.Agent
         public AgentDropGroup()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AgentDropGroup;
-            }
         }
 
         public override void Serialize(UDPPacket p)

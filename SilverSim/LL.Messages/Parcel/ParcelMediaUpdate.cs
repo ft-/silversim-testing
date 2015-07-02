@@ -28,11 +28,13 @@ using System;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelMediaUpdate)]
+    [Reliable]
     public class ParcelMediaUpdate : Message
     {
         public string MediaURL;
         public UUID MediaID;
-        public byte MediaAutoScale;
+        public bool MediaAutoScale;
         public string MediaType;
         public string MediaDesc;
         public Int32 MediaWidth;
@@ -44,20 +46,12 @@ namespace SilverSim.LL.Messages.Parcel
 
         }
 
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelMediaUpdate;
-            }
-        }
-
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
             p.WriteStringLen8(MediaURL);
             p.WriteUUID(MediaID);
-            p.WriteUInt8(MediaAutoScale);
+            p.WriteBoolean(MediaAutoScale);
             p.WriteStringLen8(MediaType);
             p.WriteStringLen8(MediaDesc);
             p.WriteInt32(MediaWidth);

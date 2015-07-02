@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Profile
 {
+    [UDPMessage(MessageType.AvatarInterestsReply)]
+    [Reliable]
     public class AvatarInterestsReply : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -41,22 +43,6 @@ namespace SilverSim.LL.Messages.Profile
         public AvatarInterestsReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AvatarInterestsReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Appearance
 {
+    [UDPMessage(MessageType.AgentCachedTexture)]
+    [Reliable]
     public class AgentCachedTexture : Message
     {
         public UUID AgentID;
@@ -46,14 +48,6 @@ namespace SilverSim.LL.Messages.Appearance
         public AgentCachedTexture()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AgentCachedTexture;
-            }
         }
 
         public static Message Decode(UDPPacket p)

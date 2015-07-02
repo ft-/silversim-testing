@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Event
 {
+    [UDPMessage(MessageType.EventInfoRequest)]
+    [Reliable]
     public class EventInfoRequest : Message
     {
         public UUID AgentID;
@@ -37,14 +39,6 @@ namespace SilverSim.LL.Messages.Event
         public EventInfoRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EventInfoRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

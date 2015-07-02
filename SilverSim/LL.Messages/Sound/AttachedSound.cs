@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Sound
 {
+    [UDPMessage(MessageType.AttachedSound)]
+    [Reliable]
     public class AttachedSound : Message
     {
         public UUID SoundID;
@@ -38,22 +40,6 @@ namespace SilverSim.LL.Messages.Sound
         public AttachedSound()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AttachedSound;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

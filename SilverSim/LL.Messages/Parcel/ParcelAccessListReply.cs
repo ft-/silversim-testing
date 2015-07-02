@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelAccessListReply)]
+    [Reliable]
     public class ParcelAccessListReply : Message
     {
         public UUID AgentID;
@@ -48,22 +50,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelAccessListReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelAccessListReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

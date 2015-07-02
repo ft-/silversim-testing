@@ -29,6 +29,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelPropertiesUpdate)]
+    [Reliable]
     public class ParcelPropertiesUpdate : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -43,7 +45,7 @@ namespace SilverSim.LL.Messages.Parcel
         public string MusicURL = string.Empty;
         public string MediaURL = string.Empty;
         public UUID MediaID = UUID.Zero;
-        public byte MediaAutoScale = 0;
+        public bool MediaAutoScale = false;
         public UUID GroupID = UUID.Zero;
         public Int32 PassPrice = 0;
         public double PassHours = 0;
@@ -59,14 +61,6 @@ namespace SilverSim.LL.Messages.Parcel
 
         }
 
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelPropertiesUpdate;
-            }
-        }
-
         public static Message Decode(UDPPacket p)
         {
             ParcelPropertiesUpdate m = new ParcelPropertiesUpdate();
@@ -80,7 +74,7 @@ namespace SilverSim.LL.Messages.Parcel
             m.Description = p.ReadStringLen8();
             m.MusicURL = p.ReadStringLen8();
             m.MediaURL = p.ReadStringLen8();
-            m.MediaAutoScale = p.ReadUInt8();
+            m.MediaAutoScale = p.ReadBoolean();
             m.GroupID = p.ReadUUID();
             m.PassPrice = p.ReadInt32();
             m.PassHours = p.ReadFloat();

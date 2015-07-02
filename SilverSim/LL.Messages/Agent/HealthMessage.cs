@@ -26,6 +26,7 @@ exception statement from your version.
 
 namespace SilverSim.LL.Messages.Agent
 {
+    [UDPMessage(MessageType.HealthMessage)]
     public class HealthMessage : Message
     {
         public double Health = 0f;
@@ -33,14 +34,6 @@ namespace SilverSim.LL.Messages.Agent
         public HealthMessage()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.HealthMessage;
-            }
         }
 
         public override void Serialize(UDPPacket p)

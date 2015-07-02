@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Event
 {
+    [UDPMessage(MessageType.EventLocationRequest)]
+    [Reliable]
     public class EventLocationRequest : Message
     {
         public UUID QueryID;
@@ -36,14 +38,6 @@ namespace SilverSim.LL.Messages.Event
         public EventLocationRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EventLocationRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

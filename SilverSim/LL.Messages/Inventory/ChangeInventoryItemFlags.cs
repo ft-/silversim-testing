@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.ChangeInventoryItemFlags)]
+    [Reliable]
     public class ChangeInventoryItemFlags : Message
     {
         public UUID AgentID;
@@ -43,14 +45,6 @@ namespace SilverSim.LL.Messages.Inventory
         public ChangeInventoryItemFlags()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ChangeInventoryItemFlags;
-            }
         }
 
         public static Message Decode(UDPPacket p)

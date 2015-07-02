@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Script
 {
+    [UDPMessage(MessageType.ScriptQuestion)]
+    [Reliable]
     public class ScriptQuestion : Message
     {
         public UUID TaskID = UUID.Zero;
@@ -40,22 +42,6 @@ namespace SilverSim.LL.Messages.Script
         public ScriptQuestion()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ScriptQuestion;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

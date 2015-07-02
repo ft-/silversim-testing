@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Appearance
 {
+    [UDPMessage(MessageType.AgentSetAppearance)]
+    [Reliable]
     public class AgentSetAppearance : Message
     {
         public UUID AgentID;
@@ -53,22 +55,6 @@ namespace SilverSim.LL.Messages.Appearance
         public AgentSetAppearance()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AgentSetAppearance;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public static AgentSetAppearance Decode(UDPPacket p)

@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.DeRezAck)]
+    [Reliable]
     public class DeRezAck : Message
     {
         public UUID TransactionID;
@@ -35,22 +37,6 @@ namespace SilverSim.LL.Messages.Object
         public DeRezAck()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.DeRezAck;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

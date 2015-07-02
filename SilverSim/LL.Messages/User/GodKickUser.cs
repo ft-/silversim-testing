@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.User
 {
+    [UDPMessage(MessageType.GodKickUser)]
+    [Reliable]
     public class GodKickUser : Message
     {
         public UUID GodID = UUID.Zero;
@@ -39,14 +41,6 @@ namespace SilverSim.LL.Messages.User
         public GodKickUser()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RequestPayPrice;
-            }
         }
 
         public static Message Decode(UDPPacket p)

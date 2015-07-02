@@ -32,6 +32,9 @@ using SilverSim.Types.Asset;
 
 namespace SilverSim.LL.Messages.Transfer
 {
+    [UDPMessage(MessageType.AssetUploadComplete)]
+    [Reliable]
+    [Zerocoded]
     public class AssetUploadComplete : Message
     {
         public UUID AssetID;
@@ -41,30 +44,6 @@ namespace SilverSim.LL.Messages.Transfer
         public AssetUploadComplete()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AssetUploadComplete;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override bool ZeroFlag
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public static AssetUploadComplete Decode(UDPPacket p)

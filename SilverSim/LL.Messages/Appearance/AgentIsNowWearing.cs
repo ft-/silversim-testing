@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Appearance
 {
+    [UDPMessage(MessageType.AgentIsNowWearing)]
+    [Reliable]
     public class AgentIsNowWearing : Message
     {
         public UUID AgentID;
@@ -44,14 +46,6 @@ namespace SilverSim.LL.Messages.Appearance
         public AgentIsNowWearing()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AgentIsNowWearing;
-            }
         }
 
         public static Message Decode(UDPPacket p)

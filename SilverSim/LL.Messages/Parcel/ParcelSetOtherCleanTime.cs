@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelSetOtherCleanTime)]
+    [Reliable]
     public class ParcelSetOtherCleanTime : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -39,14 +41,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelSetOtherCleanTime()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelReturnObjects;
-            }
         }
 
         public static Message Decode(UDPPacket p)

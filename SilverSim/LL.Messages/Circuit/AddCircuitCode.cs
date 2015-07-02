@@ -31,18 +31,12 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Circuit
 {
+    [UDPMessage(MessageType.AddCircuitCode)]
+    [Reliable]
     public class AddCircuitCode : Message
     {
         public UInt32 CircuitCode;
         public UUID SessionID;
         public UUID AgentID;
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AddCircuitCode;
-            }
-        }
     }
 }

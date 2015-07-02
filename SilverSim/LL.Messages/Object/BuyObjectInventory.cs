@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.BuyObjectInventory)]
+    [Reliable]
     public class BuyObjectInventory : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -39,14 +41,6 @@ namespace SilverSim.LL.Messages.Object
         public BuyObjectInventory()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.BuyObjectInventory;
-            }
         }
 
         public static Message Decode(UDPPacket p)

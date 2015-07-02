@@ -27,19 +27,13 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Generic
 {
+    [UDPMessage(MessageType.GenericMessage)]
+    [Reliable]
     public class GenericMessage : GenericMessageFormat
     {
         public GenericMessage()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.GenericMessage;
-            }
         }
 
         public static Message Decode(UDPPacket p)

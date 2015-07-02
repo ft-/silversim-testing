@@ -25,27 +25,14 @@ exception statement from your version.
 
 namespace SilverSim.LL.Messages.Circuit
 {
+    [UDPMessage(MessageType.DisableSimulator)]
+    [Reliable]
+    [EventQueueGet("DisableSimulator")]
     public class DisableSimulator : Message
     {
         public DisableSimulator()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.DisableSimulator;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)
@@ -58,14 +45,6 @@ namespace SilverSim.LL.Messages.Circuit
             SilverSim.Types.Map m = new SilverSim.Types.Map();
 
             return m;
-        }
-
-        public override string NameEQG
-        {
-            get
-            {
-                return "DisableSimulator";
-            }
         }
     }
 }

@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Appearance
 {
+    [UDPMessage(MessageType.AvatarAppearance)]
+    [Reliable]
     public class AvatarAppearance : Message
     {
         public UUID Sender = UUID.Zero;
@@ -52,22 +54,6 @@ namespace SilverSim.LL.Messages.Appearance
         public AvatarAppearance()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AvatarAppearance;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

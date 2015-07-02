@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectCategory)]
+    [Reliable]
     public class ObjectCategory : Message
     {
         public struct Data
@@ -45,14 +47,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectCategory()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectCategory;
-            }
         }
 
         public static Message Decode(UDPPacket p)

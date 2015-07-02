@@ -29,6 +29,8 @@ using SilverSim.Types.Inventory;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectPropertiesFamily)]
+    [Reliable]
     public class ObjectPropertiesFamily : Message
     {
         public UInt32 RequestFlags;
@@ -51,14 +53,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectPropertiesFamily()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectPropertiesFamily;
-            }
         }
 
         public override void Serialize(UDPPacket p)

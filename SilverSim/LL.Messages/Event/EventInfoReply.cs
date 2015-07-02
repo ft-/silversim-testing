@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Event
 {
+    [UDPMessage(MessageType.EventInfoReply)]
+    [Reliable]
     public class EventInfoReply : Message
     {
         public UUID AgentID;
@@ -48,22 +50,6 @@ namespace SilverSim.LL.Messages.Event
         public EventInfoReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EventInfoReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

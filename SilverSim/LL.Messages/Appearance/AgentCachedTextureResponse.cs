@@ -31,6 +31,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Appearance
 {
+    [UDPMessage(MessageType.AgentCachedTextureResponse)]
+    [Reliable]
     public class AgentCachedTextureResponse : Message
     {
         public UUID AgentID;
@@ -56,22 +58,6 @@ namespace SilverSim.LL.Messages.Appearance
         public AgentCachedTextureResponse()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AgentCachedTextureResponse;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

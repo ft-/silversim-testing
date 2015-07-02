@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.CopyInventoryItem)]
+    [Reliable]
     public class CopyInventoryItem : Message
     {
         public UUID AgentID;
@@ -46,14 +48,6 @@ namespace SilverSim.LL.Messages.Inventory
         public CopyInventoryItem()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.CopyInventoryItem;
-            }
         }
 
         public static Message Decode(UDPPacket p)

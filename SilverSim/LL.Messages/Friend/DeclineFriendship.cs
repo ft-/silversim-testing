@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Friend
 {
+    [UDPMessage(MessageType.DeclineFriendship)]
+    [Reliable]
     public class DeclineFriendship : Message
     {
         public UUID AgentID;
@@ -36,14 +38,6 @@ namespace SilverSim.LL.Messages.Friend
         public DeclineFriendship()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.DeclineFriendship;
-            }
         }
 
         public static Message Decode(UDPPacket p)

@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Common
 {
+    [UDPMessage(MessageType.FeatureDisabled)]
+    [Reliable]
     public class FeatureDisabled : Message
     {
         public string ErrorMessage;
@@ -36,14 +38,6 @@ namespace SilverSim.LL.Messages.Common
         public FeatureDisabled()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.FeatureDisabled;
-            }
         }
 
         public override void Serialize(UDPPacket p)

@@ -30,6 +30,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectProperties)]
+    [Reliable]
     public class ObjectProperties : Message
     {
         public class ObjData
@@ -74,14 +76,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectProperties()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectProperties;
-            }
         }
 
         public override void Serialize(UDPPacket p)

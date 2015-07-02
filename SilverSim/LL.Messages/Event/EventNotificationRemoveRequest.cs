@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Event
 {
+    [UDPMessage(MessageType.EventNotificationRemoveRequest)]
+    [Reliable]
     public class EventNotificationRemoveRequest : Message
     {
         public UUID AgentID;
@@ -37,14 +39,6 @@ namespace SilverSim.LL.Messages.Event
         public EventNotificationRemoveRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EventNotificationRemoveRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

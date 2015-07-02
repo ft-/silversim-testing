@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Agent
 {
+    [UDPMessage(MessageType.AgentAnimation)]
+    [Reliable]
     public class AgentAnimation : Message
     {
         public UUID AgentID;
@@ -46,14 +48,6 @@ namespace SilverSim.LL.Messages.Agent
         public AgentAnimation()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AgentAnimation;
-            }
         }
 
         public static Message Decode(UDPPacket p)

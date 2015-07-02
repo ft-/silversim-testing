@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Script
 {
+    [UDPMessage(MessageType.ScriptDialogReply)]
+    [Reliable]
     public class ScriptDialogReply : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -42,14 +44,6 @@ namespace SilverSim.LL.Messages.Script
         public ScriptDialogReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ScriptDialogReply;
-            }
         }
 
         public static Message Decode(UDPPacket p)

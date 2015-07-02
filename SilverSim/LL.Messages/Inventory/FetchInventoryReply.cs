@@ -31,6 +31,9 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.FetchInventoryReply)]
+    [Reliable]
+    [Zerocoded]
     public class FetchInventoryReply : Message
     {
         public UUID AgentID;
@@ -64,30 +67,6 @@ namespace SilverSim.LL.Messages.Inventory
         public FetchInventoryReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.FetchInventoryReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override bool ZeroFlag
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

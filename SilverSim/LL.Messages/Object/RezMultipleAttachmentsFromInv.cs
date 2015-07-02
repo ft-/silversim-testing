@@ -33,6 +33,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.RezMultipleAttachmentsFromInv)]
+    [Reliable]
     public class RezMultipleAttachmentsFromInv : Message
     {
         public UUID AgentID;
@@ -60,14 +62,6 @@ namespace SilverSim.LL.Messages.Object
         public RezMultipleAttachmentsFromInv()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RezMultipleAttachmentsFromInv;
-            }
         }
 
         public static Message Decode(UDPPacket p)

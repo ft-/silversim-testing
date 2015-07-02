@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Transfer
 {
+    [UDPMessage(MessageType.SendXferPacket)]
+    [Reliable]
     public class SendXferPacket : Message
     {
         public UInt64 ID;
@@ -37,22 +39,6 @@ namespace SilverSim.LL.Messages.Transfer
         public SendXferPacket()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.SendXferPacket;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public static SendXferPacket Decode(UDPPacket p)

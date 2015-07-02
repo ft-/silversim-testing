@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Friend
 {
+    [UDPMessage(MessageType.OfflineNotification)]
+    [Reliable]
     public class OfflineNotification : Message
     {
         public List<UUID> AgentIDs = new List<UUID>();
@@ -35,22 +37,6 @@ namespace SilverSim.LL.Messages.Friend
         public OfflineNotification()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.OfflineNotification;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

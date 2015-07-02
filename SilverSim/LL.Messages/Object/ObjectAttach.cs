@@ -30,6 +30,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectAttach)]
+    [Reliable]
     public class ObjectAttach : Message
     {
         public struct Data
@@ -47,14 +49,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectAttach()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectAttach;
-            }
         }
 
         public static Message Decode(UDPPacket p)

@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Teleport
 {
+    [UDPMessage(MessageType.TeleportStart)]
+    [Reliable]
     public class TeleportStart : Message
     {
         public TeleportFlags TeleportFlags;
@@ -35,22 +37,6 @@ namespace SilverSim.LL.Messages.Teleport
         public TeleportStart()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.TeleportStart;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

@@ -31,6 +31,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Friend
 {
+    [UDPMessage(MessageType.AcceptFriendship)]
+    [Reliable]
     public class AcceptFriendship : Message
     {
         public UUID AgentID;
@@ -41,14 +43,6 @@ namespace SilverSim.LL.Messages.Friend
         public AcceptFriendship()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AcceptFriendship;
-            }
         }
 
         public static Message Decode(UDPPacket p)

@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Event
 {
+    [UDPMessage(MessageType.EventLocationReply)]
+    [Reliable]
     public class EventLocationReply : Message
     {
         public UUID QueryID;
@@ -37,22 +39,6 @@ namespace SilverSim.LL.Messages.Event
         public EventLocationReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EventLocationReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

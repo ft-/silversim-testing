@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Transfer
 {
+    [UDPMessage(MessageType.AbortXfer)]
+    [Reliable]
     public class AbortXfer : Message
     {
         public UInt64 ID;
@@ -36,22 +38,6 @@ namespace SilverSim.LL.Messages.Transfer
         public AbortXfer()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AbortXfer;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public static AbortXfer Decode(UDPPacket p)

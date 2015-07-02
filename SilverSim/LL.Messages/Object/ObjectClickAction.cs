@@ -30,6 +30,8 @@ using SilverSim.Types.Primitive;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectClickAction)]
+    [Reliable]
     public class ObjectClickAction : Message
     {
         public struct Data
@@ -45,14 +47,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectClickAction()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectClickAction;
-            }
         }
 
         public static Message Decode(UDPPacket p)

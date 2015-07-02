@@ -32,6 +32,8 @@ using SilverSim.Types.Inventory;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.UpdateInventoryFolder)]
+    [Reliable]
     public class UpdateInventoryFolder : Message
     {
         public UUID AgentID;
@@ -48,14 +50,6 @@ namespace SilverSim.LL.Messages.Inventory
         public UpdateInventoryFolder()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.UpdateInventoryFolder;
-            }
         }
 
         public static Message Decode(UDPPacket p)

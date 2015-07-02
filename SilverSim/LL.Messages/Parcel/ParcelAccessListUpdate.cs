@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelAccessListUpdate)]
+    [Reliable]
     public class ParcelAccessListUpdate : Message
     {
         public UUID AgentID;
@@ -51,14 +53,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelAccessListUpdate()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelAccessListUpdate;
-            }
         }
 
         public static Message Decode(UDPPacket p)

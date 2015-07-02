@@ -31,6 +31,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.CancelAuction)]
+    [Reliable]
     public class CancelAuction : Message
     {
         public UUID ParcelID;
@@ -38,14 +40,6 @@ namespace SilverSim.LL.Messages.Parcel
         public CancelAuction()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.CancelAuction;
-            }
         }
 
         public static Message Decode(UDPPacket p)

@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Camera
 {
+    [UDPMessage(MessageType.SetFollowCamProperties)]
+    [Reliable]
     public class SetFollowCamProperties : Message
     {
         public UUID ObjectID = UUID.Zero;
@@ -44,22 +46,6 @@ namespace SilverSim.LL.Messages.Camera
         public SetFollowCamProperties()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.SetFollowCamProperties;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

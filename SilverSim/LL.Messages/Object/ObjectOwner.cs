@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectOwner)]
+    [Reliable]
     public class ObjectOwner : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -44,14 +46,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectOwner()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectOwner;
-            }
         }
 
         public static Message Decode(UDPPacket p)

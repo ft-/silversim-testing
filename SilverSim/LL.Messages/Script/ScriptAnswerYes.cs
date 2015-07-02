@@ -31,6 +31,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Script
 {
+    [UDPMessage(MessageType.ScriptAnswerYes)]
+    [Reliable]
     public class ScriptAnswerYes : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -42,14 +44,6 @@ namespace SilverSim.LL.Messages.Script
         public ScriptAnswerYes()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ScriptAnswerYes;
-            }
         }
 
         public static Message Decode(UDPPacket p)

@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Profile
 {
+    [UDPMessage(MessageType.PickGodDelete)]
+    [Reliable]
     public class PickGodDelete : Message
     {
         public UUID AgentID;
@@ -37,14 +39,6 @@ namespace SilverSim.LL.Messages.Profile
         public PickGodDelete()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.PickGodDelete;
-            }
         }
 
         public static Message Decode(UDPPacket p)

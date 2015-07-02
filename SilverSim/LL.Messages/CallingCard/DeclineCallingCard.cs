@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.CallingCard
 {
+    [UDPMessage(MessageType.DeclineCallingCard)]
+    [Reliable]
     public class DeclineCallingCard : Message
     {
         public UUID AgentID;
@@ -40,14 +42,6 @@ namespace SilverSim.LL.Messages.CallingCard
         public DeclineCallingCard()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.DeclineCallingCard;
-            }
         }
 
         public static Message Decode(UDPPacket p)

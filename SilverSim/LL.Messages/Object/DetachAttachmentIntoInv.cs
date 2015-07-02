@@ -31,6 +31,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.DetachAttachmentIntoInv)]
+    [Reliable]
     public class DetachAttachmentIntoInv : Message
     {
         public UUID AgentID;
@@ -39,14 +41,6 @@ namespace SilverSim.LL.Messages.Object
         public DetachAttachmentIntoInv()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.DetachAttachmentIntoInv;
-            }
         }
 
         public static Message Decode(UDPPacket p)

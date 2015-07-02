@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Region
 {
+    [UDPMessage(MessageType.GodUpdateRegionInfo)]
+    [Reliable]
     public class GodUpdateRegionInfo : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -45,14 +47,6 @@ namespace SilverSim.LL.Messages.Region
         public GodUpdateRegionInfo()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.GodUpdateRegionInfo;
-            }
         }
 
         public static Message Decode(UDPPacket p)

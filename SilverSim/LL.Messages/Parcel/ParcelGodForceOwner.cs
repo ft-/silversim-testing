@@ -31,6 +31,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelGodForceOwner)]
+    [Reliable]
     public class ParcelGodForceOwner : Message
     {
         public UUID AgentID;
@@ -41,14 +43,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelGodForceOwner()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelGodForceOwner;
-            }
         }
 
         public static Message Decode(UDPPacket p)

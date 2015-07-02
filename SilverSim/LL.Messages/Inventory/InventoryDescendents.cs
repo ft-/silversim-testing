@@ -31,6 +31,9 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.InventoryDescendents)]
+    [Reliable]
+    [Zerocoded]
     public class InventoryDescendents : Message
     {
         public UUID AgentID;
@@ -78,30 +81,6 @@ namespace SilverSim.LL.Messages.Inventory
         public InventoryDescendents()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.InventoryDescendents;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override bool ZeroFlag
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

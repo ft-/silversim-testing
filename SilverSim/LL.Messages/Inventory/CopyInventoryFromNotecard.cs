@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.CopyInventoryFromNotecard)]
+    [Reliable]
     public class CopyInventoryFromNotecard : Message
     {
         public UUID AgentID;
@@ -47,14 +49,6 @@ namespace SilverSim.LL.Messages.Inventory
         public CopyInventoryFromNotecard()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.CopyInventoryFromNotecard;
-            }
         }
 
         public static Message Decode(UDPPacket p)

@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Profile
 {
+    [UDPMessage(MessageType.AvatarPropertiesRequest)]
+    [Reliable]
     public class AvatarPropertiesRequest : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -41,14 +43,6 @@ namespace SilverSim.LL.Messages.Profile
         public AvatarPropertiesRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AvatarPropertiesRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

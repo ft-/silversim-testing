@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Teleport
 {
+    [UDPMessage(MessageType.StartLure)]
+    [Reliable]
     public class StartLure : Message
     {
         public UUID AgentID;
@@ -43,14 +45,6 @@ namespace SilverSim.LL.Messages.Teleport
         public StartLure()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.StartLure;
-            }
         }
 
         public static Message Decode(UDPPacket p)

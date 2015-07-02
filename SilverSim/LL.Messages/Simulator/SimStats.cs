@@ -28,6 +28,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Simulator
 {
+    [UDPMessage(MessageType.SimStats)]
     public class SimStats : Message
     {
         public struct Data
@@ -99,14 +100,6 @@ namespace SilverSim.LL.Messages.Simulator
         public SimStats()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.SimStats;
-            }
         }
 
         public override void Serialize(UDPPacket p)

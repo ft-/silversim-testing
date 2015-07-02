@@ -27,19 +27,13 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Generic
 {
+    [UDPMessage(MessageType.EstateOwnerMessage)]
+    [Reliable]
     public class EstateOwnerMessage : GenericMessageFormat
     {
         public EstateOwnerMessage()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EstateOwnerMessage;
-            }
         }
 
         public static Message Decode(UDPPacket p)

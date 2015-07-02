@@ -33,6 +33,8 @@ using SilverSim.Types.Asset;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.RezRestoreToWorld)]
+    [Reliable]
     public class RezRestoreToWorld : Message
     {
         public UUID AgentID;
@@ -63,14 +65,6 @@ namespace SilverSim.LL.Messages.Object
         public RezRestoreToWorld()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RezRestoreToWorld;
-            }
         }
 
         public static Message Decode(UDPPacket p)

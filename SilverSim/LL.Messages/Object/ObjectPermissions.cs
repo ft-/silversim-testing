@@ -30,6 +30,8 @@ using SilverSim.Types.Inventory;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectPermissions)]
+    [Reliable]
     public class ObjectPermissions : Message
     {
         public struct Data
@@ -50,14 +52,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectPermissions()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectPermissions;
-            }
         }
 
         public static Message Decode(UDPPacket p)

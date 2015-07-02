@@ -28,6 +28,46 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages
 {
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    public class Reliable : Attribute
+    {
+        public Reliable()
+        {
+
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    public class Zerocoded : Attribute
+    {
+        public Zerocoded()
+        {
+
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    public class UDPMessage : Attribute
+    {
+        public readonly MessageType Number;
+
+        public UDPMessage(MessageType number)
+        {
+            Number = number;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    public class EventQueueGet : Attribute
+    {
+        public readonly string Name;
+        
+        public EventQueueGet(string name)
+        {
+            Name = name;
+        }
+    }
+
     public abstract class Message
     {
         #region Message Type
@@ -99,7 +139,7 @@ namespace SilverSim.LL.Messages
         {
             get 
             {
-                return false;
+                return GetType().GetCustomAttributes(typeof(Reliable), false).Length != 0;
             }
         }
 
@@ -107,13 +147,21 @@ namespace SilverSim.LL.Messages
         {
             get
             {
-                return false;
+                return GetType().GetCustomAttributes(typeof(Zerocoded), false).Length != 0;
             }
         }
 
-        public abstract MessageType Number
+        public virtual MessageType Number
         {
-            get;
+            get
+            {
+                UDPMessage a = (UDPMessage)Attribute.GetCustomAttribute(GetType(), typeof(UDPMessage));
+                if(a == null)
+                {
+                    return 0;
+                }
+                return a.Number;
+            }
         }
 
         public virtual void Serialize(UDPPacket p)
@@ -130,7 +178,12 @@ namespace SilverSim.LL.Messages
         {
             get
             {
-                throw new NotSupportedException();
+                EventQueueGet a = (EventQueueGet)Attribute.GetCustomAttribute(GetType(), typeof(EventQueueGet));
+                if (a == null)
+                {
+                    throw new NotSupportedException();
+                }
+                return a.Name;
             }
         }
         #endregion

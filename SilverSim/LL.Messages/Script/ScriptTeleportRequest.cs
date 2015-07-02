@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Script
 {
+    [UDPMessage(MessageType.ScriptTeleportRequest)]
+    [Reliable]
     public class ScriptTeleportRequest : Message
     {
         public string ObjectName;
@@ -41,22 +43,6 @@ namespace SilverSim.LL.Messages.Script
         public ScriptTeleportRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ScriptTeleportRequest;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

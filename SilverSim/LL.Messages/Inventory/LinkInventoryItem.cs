@@ -30,6 +30,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.LinkInventoryItem)]
+    [Reliable]
     public class LinkInventoryItem : Message
     {
         public UUID AgentID;
@@ -46,14 +48,6 @@ namespace SilverSim.LL.Messages.Inventory
         public LinkInventoryItem()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.LinkInventoryItem;
-            }
         }
 
         public static Message Decode(UDPPacket p)

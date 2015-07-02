@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Circuit
 {
+    [UDPMessage(MessageType.LogoutRequest)]
+    [Reliable]
     public class LogoutRequest : Message
     {
         public UUID SessionID = UUID.Zero;
@@ -35,14 +37,6 @@ namespace SilverSim.LL.Messages.Circuit
         public LogoutRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.LogoutRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

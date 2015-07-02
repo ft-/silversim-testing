@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.RequestPayPrice)]
+    [Reliable]
     public class RequestPayPrice : Message
     {
         public UUID ObjectID = UUID.Zero;
@@ -34,14 +36,6 @@ namespace SilverSim.LL.Messages.Object
         public RequestPayPrice()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RequestPayPrice;
-            }
         }
 
         public static Message Decode(UDPPacket p)

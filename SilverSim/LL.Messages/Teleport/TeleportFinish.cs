@@ -30,6 +30,9 @@ using System.Net;
 
 namespace SilverSim.LL.Messages.Teleport
 {
+    [UDPMessage(MessageType.TeleportFinish)]
+    [Reliable]
+    [EventQueueGet("TeleportFinish")]
     public class TeleportFinish : Message
     {
         public UUID AgentID;
@@ -47,22 +50,6 @@ namespace SilverSim.LL.Messages.Teleport
         public TeleportFinish()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.TeleportFinish;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)
@@ -92,14 +79,6 @@ namespace SilverSim.LL.Messages.Teleport
             m.Add("RegionSizeX", RegionSize.X);
             m.Add("RegionSizeY", RegionSize.Y);
             return m;
-        }
-
-        public override string NameEQG
-        {
-            get
-            {
-                return "TeleportFinish";
-            }
         }
     }
 }

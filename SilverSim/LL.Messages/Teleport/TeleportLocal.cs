@@ -29,6 +29,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Teleport
 {
+    [UDPMessage(MessageType.TeleportLocal)]
+    [Reliable]
     public class TeleportLocal : Message
     {
         public UUID AgentID;
@@ -40,22 +42,6 @@ namespace SilverSim.LL.Messages.Teleport
         public TeleportLocal()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.TeleportLocal;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Map
 {
+    [UDPMessage(MessageType.MapLayerReply)]
+    [Reliable]
     public class MapLayerReply : Message
     {
         public UUID AgentID;
@@ -50,14 +52,6 @@ namespace SilverSim.LL.Messages.Map
         public MapLayerReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.MapLayerReply;
-            }
         }
 
         public override void Serialize(UDPPacket p)

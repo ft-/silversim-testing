@@ -28,6 +28,9 @@ using System;
 
 namespace SilverSim.LL.Messages.Transfer
 {
+    [UDPMessage(MessageType.RequestXfer)]
+    [Reliable]
+    [Zerocoded]
     public class RequestXfer : Message
     {
         public UInt64 ID;
@@ -41,30 +44,6 @@ namespace SilverSim.LL.Messages.Transfer
         public RequestXfer()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RequestXfer;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override bool ZeroFlag
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public static RequestXfer Decode(UDPPacket p)

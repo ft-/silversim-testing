@@ -27,6 +27,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Economy
 {
+    [UDPMessage(MessageType.EconomyData)]
+    [Reliable]
     public class EconomyData : Message
     {
         public Int32 ObjectCapacity = 0;
@@ -50,22 +52,6 @@ namespace SilverSim.LL.Messages.Economy
         public EconomyData()
         {
 
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EconomyData;
-            }
         }
 
         public override void Serialize(UDPPacket p)

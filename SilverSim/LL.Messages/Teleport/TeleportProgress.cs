@@ -29,6 +29,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Teleport
 {
+    [UDPMessage(MessageType.TeleportProgress)]
+    [Reliable]
     public class TeleportProgress : Message
     {
         public UUID AgentID;
@@ -38,22 +40,6 @@ namespace SilverSim.LL.Messages.Teleport
         public TeleportProgress()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.TeleportProgress;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

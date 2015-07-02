@@ -7,6 +7,8 @@ using SilverSim.Types.Grid;
 
 namespace SilverSim.LL.Messages.Region
 {
+    [UDPMessage(MessageType.RegionInfo)]
+    [Reliable]
     public class RegionInfo : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -38,22 +40,6 @@ namespace SilverSim.LL.Messages.Region
         public RegionInfo()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RegionInfo;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

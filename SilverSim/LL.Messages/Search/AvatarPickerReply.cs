@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Search
 {
+    [UDPMessage(MessageType.AvatarPickerReply)]
+    [Reliable]
     public class AvatarPickerReply : Message
     {
         public struct DataEntry
@@ -44,21 +46,6 @@ namespace SilverSim.LL.Messages.Search
 
         }
 
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AvatarPickerReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
-        }
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);

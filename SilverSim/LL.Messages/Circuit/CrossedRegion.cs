@@ -29,6 +29,9 @@ using System.Net;
 
 namespace SilverSim.LL.Messages.Circuit
 {
+    [UDPMessage(MessageType.CrossedRegion)]
+    [Reliable]
+    [EventQueueGet("CrossedRegion")]
     public class CrossedRegion : Message
     {
         public UUID AgentID;
@@ -46,22 +49,6 @@ namespace SilverSim.LL.Messages.Circuit
         public CrossedRegion()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.CrossedRegion;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)
@@ -101,14 +88,6 @@ namespace SilverSim.LL.Messages.Circuit
             m.Add("RegionData", r);
 
             return m;
-        }
-
-        public override string NameEQG
-        {
-            get
-            {
-                return "CrossedRegion";
-            }
         }
     }
 }

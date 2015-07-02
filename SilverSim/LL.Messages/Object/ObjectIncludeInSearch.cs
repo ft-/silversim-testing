@@ -25,12 +25,11 @@ exception statement from your version.
 
 using SilverSim.Types;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectIncludeInSearch)]
+    [Reliable]
     public class ObjectIncludeInSearch : Message
     {
         public UUID AgentID;
@@ -41,14 +40,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectIncludeInSearch()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectIncludeInSearch;
-            }
         }
 
         public static Message Decode(UDPPacket p)

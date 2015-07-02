@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Search
 {
+    [UDPMessage(MessageType.PlacesQuery)]
+    [Reliable]
     public class PlacesQuery : Message
     {
         public UUID AgentID;
@@ -42,14 +44,6 @@ namespace SilverSim.LL.Messages.Search
         public PlacesQuery()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.PlacesQuery;
-            }
         }
 
         public static Message Decode(UDPPacket p)

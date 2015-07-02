@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Economy
 {
+    [UDPMessage(MessageType.MoneyBalanceReply)]
+    [Reliable]
     public class MoneyBalanceReply : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -48,22 +50,6 @@ namespace SilverSim.LL.Messages.Economy
         public MoneyBalanceReply()
         {
 
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.MoneyBalanceReply;
-            }
         }
 
         public override void Serialize(UDPPacket p)

@@ -33,6 +33,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.RezObjectFromNotecard)]
+    [Reliable]
     public class RezObjectFromNotecard : Message
     {
         public UUID AgentID;
@@ -70,14 +72,6 @@ namespace SilverSim.LL.Messages.Object
         public RezObjectFromNotecard()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RezObjectFromNotecard;
-            }
         }
 
         public static Message Decode(UDPPacket p)

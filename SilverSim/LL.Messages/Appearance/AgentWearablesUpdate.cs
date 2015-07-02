@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Appearance
 {
+    [UDPMessage(MessageType.AgentWearablesUpdate)]
+    [Reliable]
     public class AgentWearablesUpdate : Message
     {
         public UUID AgentID;
@@ -47,22 +49,6 @@ namespace SilverSim.LL.Messages.Appearance
         public AgentWearablesUpdate()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AgentWearablesUpdate;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

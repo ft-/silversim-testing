@@ -27,6 +27,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelMediaCommandMessage)]
+    [Reliable]
     public class ParcelMediaCommandMessage : Message
     {
         public UInt32 Flags;
@@ -36,14 +38,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelMediaCommandMessage()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelMediaCommandMessage;
-            }
         }
 
         public override void Serialize(UDPPacket p)

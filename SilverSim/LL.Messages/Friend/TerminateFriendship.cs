@@ -31,6 +31,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Friend
 {
+    [UDPMessage(MessageType.TerminateFriendship)]
+    [Reliable]
     public class TerminateFriendship : Message
     {
         public UUID AgentID;
@@ -40,14 +42,6 @@ namespace SilverSim.LL.Messages.Friend
         public TerminateFriendship()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.TerminateFriendship;
-            }
         }
 
         public static Message Decode(UDPPacket p)

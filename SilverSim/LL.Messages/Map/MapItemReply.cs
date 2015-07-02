@@ -6,6 +6,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Map
 {
+    [UDPMessage(MessageType.MapItemReply)]
+    [Reliable]
     public class MapItemReply : Message
     {
         public UUID AgentID;
@@ -27,14 +29,6 @@ namespace SilverSim.LL.Messages.Map
         public MapItemReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.MapItemReply;
-            }
         }
 
         public override void Serialize(UDPPacket p)

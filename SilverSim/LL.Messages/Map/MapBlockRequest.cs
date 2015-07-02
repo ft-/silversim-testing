@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Map
 {
+    [UDPMessage(MessageType.MapBlockRequest)]
+    [Reliable]
     public class MapBlockRequest : Message
     {
         public UUID AgentID;
@@ -43,14 +45,6 @@ namespace SilverSim.LL.Messages.Map
         public MapBlockRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.MapBlockRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

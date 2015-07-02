@@ -6,6 +6,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectExportSelected)]
+    [Reliable]
     public class ObjectExportSelected : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -17,14 +19,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectExportSelected()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectExportSelected;
-            }
         }
 
         public static Message Decode(UDPPacket p)

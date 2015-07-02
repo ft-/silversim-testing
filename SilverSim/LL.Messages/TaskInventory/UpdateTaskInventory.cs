@@ -30,6 +30,8 @@ using System;
 
 namespace SilverSim.LL.Messages.TaskInventory
 {
+    [UDPMessage(MessageType.UpdateTaskInventory)]
+    [Reliable]
     public class UpdateTaskInventory : Message
     {
         public UUID AgentID;
@@ -61,14 +63,6 @@ namespace SilverSim.LL.Messages.TaskInventory
         public UpdateTaskInventory()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.UpdateTaskInventory;
-            }
         }
 
         public static Message Decode(UDPPacket p)

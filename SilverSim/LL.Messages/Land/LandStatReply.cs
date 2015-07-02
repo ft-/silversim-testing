@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Land
 {
+    [UDPMessage(MessageType.LandStatReply)]
+    [Reliable]
     public class LandStatReply : Message
     {
         public struct ReportDataEntry
@@ -50,14 +52,6 @@ namespace SilverSim.LL.Messages.Land
         public LandStatReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.LandStatReply;
-            }
         }
 
         public override void Serialize(UDPPacket p)

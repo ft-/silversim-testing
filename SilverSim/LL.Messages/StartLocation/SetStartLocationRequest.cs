@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.StartLocation
 {
+    [UDPMessage(MessageType.SetStartLocationRequest)]
+    [Reliable]
     public class SetStartLocationRequest : Message
     {
         public UUID AgentID;
@@ -44,14 +46,6 @@ namespace SilverSim.LL.Messages.StartLocation
         public SetStartLocationRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.SetStartLocationRequest;
-            }
         }
 
         public static SetStartLocationRequest Decode(UDPPacket p)

@@ -28,6 +28,7 @@ using System;
 
 namespace SilverSim.LL.Messages.Agent
 {
+    [UDPMessage(MessageType.ChildAgentPositionUpdate)]
     public class ChildAgentPositionUpdate : Message
     {
         public UInt64 RegionHandle;
@@ -46,14 +47,6 @@ namespace SilverSim.LL.Messages.Agent
         public ChildAgentPositionUpdate()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ChildAgentPositionUpdate;
-            }
         }
     }
 }

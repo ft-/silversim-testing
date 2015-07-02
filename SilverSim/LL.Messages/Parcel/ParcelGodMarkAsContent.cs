@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelGodMarkAsContent)]
+    [Reliable]
     public class ParcelGodMarkAsContent : Message
     {
         public UUID AgentID;
@@ -37,14 +39,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelGodMarkAsContent()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelGodMarkAsContent;
-            }
         }
 
         public static Message Decode(UDPPacket p)

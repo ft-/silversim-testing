@@ -23,12 +23,17 @@ exception statement from your version.
 
 */
 
+using log4net;
+using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace SilverSim.LL.Messages
 {
     public class UDPPacketDecoder
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("LLUDP PACKET DECODER");
+
         public delegate Message PacketDecoderDelegate(UDPPacket p);
         public readonly Dictionary<MessageType, PacketDecoderDelegate> PacketTypes = new Dictionary<MessageType,PacketDecoderDelegate>();
 
@@ -95,6 +100,7 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.ParcelDwellRequest, Parcel.ParcelDwellRequest.Decode);
             PacketTypes.Add(MessageType.ViewerStartAuction, Parcel.ViewerStartAuction.Decode);
             PacketTypes.Add(MessageType.CancelAuction, Parcel.CancelAuction.Decode);
+            PacketTypes.Add(MessageType.ParcelInfoRequest, Parcel.ParcelInfoRequest.Decode);
 
             /* Land */
             PacketTypes.Add(MessageType.ModifyLand, Land.ModifyLand.Decode);
@@ -116,8 +122,8 @@ namespace SilverSim.LL.Messages
             PacketTypes.Add(MessageType.FetchInventory, Inventory.FetchInventory.Decode);
             PacketTypes.Add(MessageType.RemoveInventoryObjects, Inventory.RemoveInventoryObjects.Decode);
             PacketTypes.Add(MessageType.LinkInventoryItem, Inventory.LinkInventoryItem.Decode);
-            PacketTypes.Add(MessageType.ActivateGestures, Gestures.ActiveGestures.Decode);
-            PacketTypes.Add(MessageType.DeactivateGestures, Gestures.DeactiveGestures.Decode);
+            PacketTypes.Add(MessageType.ActivateGestures, Gestures.ActivateGestures.Decode);
+            PacketTypes.Add(MessageType.DeactivateGestures, Gestures.DeactivateGestures.Decode);
             PacketTypes.Add(MessageType.PurgeInventoryDescendents, Inventory.PurgeInventoryDescendents.Decode);
 
             /* Objects */
@@ -253,6 +259,48 @@ namespace SilverSim.LL.Messages
 
             /* Sound */
             PacketTypes.Add(MessageType.SoundTrigger, Sound.SoundTrigger.Decode);
+
+            /* Groups */
+            PacketTypes.Add(MessageType.CreateGroupRequest, Groups.CreateGroupRequest.Decode);
+            PacketTypes.Add(MessageType.UpdateGroupInfo, Groups.UpdateGroupInfo.Decode);
+            PacketTypes.Add(MessageType.GroupRoleChanges, Groups.GroupRoleChanges.Decode);
+            PacketTypes.Add(MessageType.JoinGroupRequest, Groups.JoinGroupRequest.Decode);
+
+#if DEBUG
+            /* validation of table */
+            int numpackettypes = 0;
+            foreach(Type t in GetType().Assembly.GetTypes())
+            {
+                if(t.IsSubclassOf(typeof(Message)))
+                {
+                    UDPMessage m = (UDPMessage)Attribute.GetCustomAttribute(t, typeof(UDPMessage));
+                    if(m != null)
+                    {
+                        MethodInfo mi = t.GetMethod("Decode", new Type[] { typeof(UDPPacket) });
+                        if(mi == null)
+                        {
+                        }
+                        else if((mi.Attributes & MethodAttributes.Static) == 0)
+                        {
+                            m_Log.WarnFormat("Type {0} does not contain a static Decode method with correct return type", t.FullName);
+                        }
+                        else if(mi.ReturnType != typeof(Message) && !mi.ReturnType.IsSubclassOf(typeof(Message)))
+                        {
+                            m_Log.WarnFormat("Type {0} does not contain a static Decode method with correct return type", t.FullName);
+                        }
+                        else if(!PacketTypes.ContainsKey(m.Number))
+                        {
+                            m_Log.WarnFormat("Type {0} Decode method is not registered", t.FullName);
+                        }
+                        else
+                        {
+                            ++numpackettypes;
+                        }
+                    }
+                }
+            }
+            m_Log.InfoFormat("Initialized {0} packet decoders", numpackettypes);
+#endif
         }
     }
 }

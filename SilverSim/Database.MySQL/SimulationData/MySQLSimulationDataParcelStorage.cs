@@ -91,7 +91,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             pi.SnapshotID = MySQLUtilities.GetUUID(dbReader, "SnapshotID");
                             pi.SalePrice = (int)dbReader["SalePrice"];
                             pi.OtherCleanTime = (int)(int)dbReader["OtherCleanTime"];
-                            pi.MediaAutoScale = (byte)(uint)dbReader["MediaAutoScale"];
+                            pi.MediaAutoScale = (uint)dbReader["MediaAutoScale"] != 0;
                             pi.RentPrice = (int)dbReader["RentPrice"];
                             pi.AABBMin = MySQLUtilities.GetVector(dbReader, "AABBMin");
                             pi.AABBMax = MySQLUtilities.GetVector(dbReader, "AABBMax");
@@ -161,7 +161,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["SnapshotID"] = parcel.SnapshotID;
             p["SalePrice"] = parcel.SalePrice;
             p["OtherCleanTime"] = parcel.OtherCleanTime;
-            p["MediaAutoScale"] = parcel.MediaAutoScale;
+            p["MediaAutoScale"] = parcel.MediaAutoScale ? 1 : 0;
             p["RentPrice"] = parcel.RentPrice;
             p["AABBMin"] = parcel.AABBMin;
             p["AABBMax"] = parcel.AABBMax;

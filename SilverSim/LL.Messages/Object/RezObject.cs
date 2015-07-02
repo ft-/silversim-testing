@@ -30,6 +30,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.RezObject)]
+    [Reliable]
     public class RezObject : Message
     {
         public UUID AgentID;
@@ -84,14 +86,6 @@ namespace SilverSim.LL.Messages.Object
         public RezObject()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.RezObject;
-            }
         }
 
         public static Message Decode(UDPPacket p)

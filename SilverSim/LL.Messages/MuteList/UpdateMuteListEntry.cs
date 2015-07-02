@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.MuteList
 {
+    [UDPMessage(MessageType.UpdateMuteListEntry)]
+    [Reliable]
     public class UpdateMuteListEntry : Message
     {
         public UUID AgentID;
@@ -40,22 +42,6 @@ namespace SilverSim.LL.Messages.MuteList
         public UpdateMuteListEntry()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.UpdateMuteListEntry;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public static UpdateMuteListEntry Decode(UDPPacket p)

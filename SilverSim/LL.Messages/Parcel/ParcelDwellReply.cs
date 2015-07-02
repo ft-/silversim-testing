@@ -31,6 +31,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Parcel
 {
+    [UDPMessage(MessageType.ParcelDwellReply)]
+    [Reliable]
     public class ParcelDwellReply : Message
     {
         public UUID AgentID;
@@ -41,22 +43,6 @@ namespace SilverSim.LL.Messages.Parcel
         public ParcelDwellReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ParcelDwellReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

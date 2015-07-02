@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Profile
 {
+    [UDPMessage(MessageType.AvatarPropertiesReply)]
+    [Reliable]
     public class AvatarPropertiesReply : Message
     {
         public UUID AgentID = UUID.Zero;

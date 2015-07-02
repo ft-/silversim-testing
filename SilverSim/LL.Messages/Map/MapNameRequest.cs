@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.Map
 {
+    [UDPMessage(MessageType.MapNameRequest)]
+    [Reliable]
     public class MapNameRequest : Message
     {
         public UUID AgentID;
@@ -40,14 +42,6 @@ namespace SilverSim.LL.Messages.Map
         public MapNameRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.MapNameRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

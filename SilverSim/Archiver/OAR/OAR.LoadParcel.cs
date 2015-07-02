@@ -114,7 +114,7 @@ namespace SilverSim.Archiver.OAR
                                     break;
 
                                 case "MediaAutoScale":
-                                    pinfo.MediaAutoScale = (byte)reader.ReadElementValueAsUInt();
+                                    pinfo.MediaAutoScale = reader.ReadElementValueAsUInt() != 0;
                                     break;
 
                                 case "MediaID":

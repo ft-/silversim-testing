@@ -31,6 +31,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.BulkUpdateInventory)]
+    [Reliable]
     public class BulkUpdateInventory : Message
     {
         public UUID AgentID;
@@ -127,22 +129,6 @@ namespace SilverSim.LL.Messages.Inventory
             foreach (InventoryItem item in items)
             {
                 AddInventoryItem(item, callbackID);
-            }
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.BulkUpdateInventory;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
             }
         }
 

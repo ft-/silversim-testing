@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Friend
 {
+    [UDPMessage(MessageType.GrantUserRights)]
+    [Reliable]
     public class GrantUserRights : Message
     {
         public UUID AgentID;
@@ -45,14 +47,6 @@ namespace SilverSim.LL.Messages.Friend
         public GrantUserRights()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.GrantUserRights;
-            }
         }
 
         public static GrantUserRights Decode(UDPPacket p)

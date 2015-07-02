@@ -9,6 +9,8 @@ using System.Text;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectAdd)]
+    [Reliable]
     public class ObjectAdd : Message
     {
         public struct Data
@@ -62,14 +64,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectAdd()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectAdd;
-            }
         }
 
         public static Message Decode(UDPPacket p)

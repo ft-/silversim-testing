@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Script
 {
+    [UDPMessage(MessageType.LoadURL)]
+    [Reliable]
     public class LoadURL : Message
     {
         public string ObjectName;
@@ -39,22 +41,6 @@ namespace SilverSim.LL.Messages.Script
         public LoadURL()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.LoadURL;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

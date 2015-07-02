@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.CallingCard
 {
+    [UDPMessage(MessageType.AcceptCallingCard)]
+    [Reliable]
     public class AcceptCallingCard : Message
     {
         public UUID AgentID;
@@ -39,14 +41,6 @@ namespace SilverSim.LL.Messages.CallingCard
         public AcceptCallingCard()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AcceptCallingCard;
-            }
         }
 
         public static Message Decode(UDPPacket p)

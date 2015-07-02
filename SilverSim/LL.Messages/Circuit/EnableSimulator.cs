@@ -29,6 +29,9 @@ using System.Net;
 
 namespace SilverSim.LL.Messages.Circuit
 {
+    [UDPMessage(MessageType.EnableSimulator)]
+    [Reliable]
+    [EventQueueGet("EnableSimulator")]
     public class EnableSimulator : Message
     {
         public GridVector GridPosition;
@@ -41,22 +44,6 @@ namespace SilverSim.LL.Messages.Circuit
         public EnableSimulator()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EnableSimulator;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)
@@ -83,14 +70,6 @@ namespace SilverSim.LL.Messages.Circuit
             m.Add("SimulatorInfo", arr);
 
             return m;
-        }
-
-        public override string NameEQG
-        {
-            get
-            {
-                return "EnableSimulator";
-            }
         }
     }
 }

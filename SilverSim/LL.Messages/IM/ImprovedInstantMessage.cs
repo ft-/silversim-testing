@@ -32,6 +32,8 @@ using SilverSim.Types.IM;
 
 namespace SilverSim.LL.Messages.IM
 {
+    [UDPMessage(MessageType.ImprovedInstantMessage)]
+    [Reliable]
     public class ImprovedInstantMessage : Message
     {
         public UUID AgentID;
@@ -87,22 +89,6 @@ namespace SilverSim.LL.Messages.IM
             else
             {
                 Timestamp = gim.Timestamp;
-            }
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ImprovedInstantMessage;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
             }
         }
 

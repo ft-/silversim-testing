@@ -25,19 +25,13 @@ exception statement from your version.
 
 namespace SilverSim.LL.Messages.Economy
 {
+    [UDPMessage(MessageType.EconomyDataRequest)]
+    [Reliable]
     public class EconomyDataRequest : Message
     {
         public EconomyDataRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EconomyDataRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

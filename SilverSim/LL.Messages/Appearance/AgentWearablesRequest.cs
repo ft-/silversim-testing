@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Appearance
 {
+    [UDPMessage(MessageType.AgentWearablesRequest)]
+    [Reliable]
     public class AgentWearablesRequest : Message
     {
         public UUID AgentID;
@@ -35,14 +37,6 @@ namespace SilverSim.LL.Messages.Appearance
         public AgentWearablesRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AgentWearablesRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

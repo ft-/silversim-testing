@@ -28,6 +28,7 @@ using System;
 
 namespace SilverSim.LL.Messages.Event
 {
+    [UDPMessage(MessageType.EventGodDelete)]
     public class EventGodDelete : Message
     {
         public UUID AgentID;
@@ -41,14 +42,6 @@ namespace SilverSim.LL.Messages.Event
         public EventGodDelete()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EventGodDelete;
-            }
         }
 
         public static Message Decode(UDPPacket p)

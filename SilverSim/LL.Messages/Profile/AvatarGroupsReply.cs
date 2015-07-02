@@ -31,6 +31,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Profile
 {
+    [UDPMessage(MessageType.AvatarGroupsReply)]
+    [Reliable]
     public class AvatarGroupsReply : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -52,22 +54,6 @@ namespace SilverSim.LL.Messages.Profile
         public AvatarGroupsReply()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AvatarGroupsReply;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public override void Serialize(UDPPacket p)

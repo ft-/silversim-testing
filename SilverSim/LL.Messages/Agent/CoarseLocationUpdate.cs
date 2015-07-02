@@ -29,6 +29,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Agent
 {
+    [UDPMessage(MessageType.CoarseLocationUpdate)]
     public class CoarseLocationUpdate : Message
     {
         public Int16 You = 0;
@@ -46,14 +47,6 @@ namespace SilverSim.LL.Messages.Agent
         public CoarseLocationUpdate()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.CoarseLocationUpdate;
-            }
         }
 
         public override void Serialize(UDPPacket p)

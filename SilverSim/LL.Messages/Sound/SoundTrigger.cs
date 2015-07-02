@@ -27,6 +27,7 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Sound
 {
+    [UDPMessage(MessageType.SoundTrigger)]
     public class SoundTrigger : Message
     {
         public UUID SoundID;
@@ -40,14 +41,6 @@ namespace SilverSim.LL.Messages.Sound
         public SoundTrigger()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.SoundTrigger;
-            }
         }
 
         public override void Serialize(UDPPacket p)

@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Avatar
 {
+    [UDPMessage(MessageType.AvatarAnimation)]
+    [Reliable]
     public class AvatarAnimation : Message
     {
         public UUID Sender = UUID.Zero;
@@ -63,14 +65,6 @@ namespace SilverSim.LL.Messages.Avatar
         public AvatarAnimation()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AvatarAnimation;
-            }
         }
 
         public override void Serialize(UDPPacket p)

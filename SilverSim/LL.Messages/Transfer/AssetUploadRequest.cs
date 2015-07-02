@@ -28,6 +28,8 @@ using SilverSim.Types.Asset;
 
 namespace SilverSim.LL.Messages.Transfer
 {
+    [UDPMessage(MessageType.AssetUploadRequest)]
+    [Reliable]
     public class AssetUploadRequest : Message
     {
         public UUID TransactionID;
@@ -39,22 +41,6 @@ namespace SilverSim.LL.Messages.Transfer
         public AssetUploadRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.AssetUploadRequest;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
         }
 
         public static AssetUploadRequest Decode(UDPPacket p)

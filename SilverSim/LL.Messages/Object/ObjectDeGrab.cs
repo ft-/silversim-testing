@@ -29,6 +29,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
+    [UDPMessage(MessageType.ObjectDeGrab)]
+    [Reliable]
     public class ObjectDeGrab : Message
     {
         public struct Data
@@ -50,14 +52,6 @@ namespace SilverSim.LL.Messages.Object
         public ObjectDeGrab()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ObjectDeGrab;
-            }
         }
 
         public static Message Decode(UDPPacket p)

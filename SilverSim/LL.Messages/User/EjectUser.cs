@@ -28,6 +28,8 @@ using System;
 
 namespace SilverSim.LL.Messages.User
 {
+    [UDPMessage(MessageType.EjectUser)]
+    [Reliable]
     public class EjectUser : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -38,14 +40,6 @@ namespace SilverSim.LL.Messages.User
         public EjectUser()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.EjectUser;
-            }
         }
 
         public static Message Decode(UDPPacket p)

@@ -33,6 +33,9 @@ using SilverSim.Types.Asset;
 
 namespace SilverSim.LL.Messages.Inventory
 {
+    [UDPMessage(MessageType.UpdateCreateInventoryItem)]
+    [Reliable]
+    [Zerocoded]
     public class UpdateCreateInventoryItem : Message
     {
         public UUID AgentID;
@@ -115,30 +118,6 @@ namespace SilverSim.LL.Messages.Inventory
             foreach (InventoryItem item in items)
             {
                 AddItem(item, callbackID);
-            }
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.UpdateCreateInventoryItem;
-            }
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override bool ZeroFlag
-        {
-            get
-            {
-                return true;
             }
         }
 

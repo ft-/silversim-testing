@@ -28,6 +28,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Names
 {
+    [UDPMessage(MessageType.UUIDNameRequest)]
+    [Reliable]
     public class UUIDNameRequest : Message
     {
 
@@ -36,14 +38,6 @@ namespace SilverSim.LL.Messages.Names
         public UUIDNameRequest()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.UUIDNameRequest;
-            }
         }
 
         public static Message Decode(UDPPacket p)

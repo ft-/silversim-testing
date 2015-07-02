@@ -27,6 +27,8 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Chat
 {
+    [UDPMessage(MessageType.ChatFromSimulator)]
+    [Reliable]
     public class ChatFromSimulator : Message
     {
         public string FromName = string.Empty;
@@ -41,14 +43,6 @@ namespace SilverSim.LL.Messages.Chat
         public ChatFromSimulator()
         {
 
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.ChatFromSimulator;
-            }
         }
 
         public override void Serialize(UDPPacket p)

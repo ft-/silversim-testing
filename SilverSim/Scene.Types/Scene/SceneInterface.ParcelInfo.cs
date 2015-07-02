@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Parcel;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
@@ -188,6 +189,137 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     m_ParcelLayerRwLock.ReleaseReaderLock();
                 }
+            }
+        }
+
+        void HandleParcelInfoRequest(Message m)
+        {
+            ParcelInfoRequest req = (ParcelInfoRequest)m;
+            if(req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            try
+            {
+                ParcelInfo pinfo = Parcels[req.ParcelID];
+                ParcelInfoReply reply = new ParcelInfoReply();
+                reply.AgentID = req.AgentID;
+                reply.OwnerID = pinfo.Owner.ID;
+                reply.Name = pinfo.Name;
+                reply.Description = pinfo.Description;
+                reply.ActualArea = pinfo.ActualArea;
+                reply.BillableArea = pinfo.BillableArea;
+                reply.Flags = pinfo.Flags;
+                reply.SimName = RegionData.Name;
+                reply.SnapshotID = UUID.Zero;
+                reply.Dwell = pinfo.Dwell;
+                reply.SalePrice = pinfo.SalePrice;
+                reply.AuctionID = pinfo.AuctionID;
+                Agents[req.AgentID].SendMessageAlways(reply, ID);
+            }
+            catch
+            {
+
+            }
+        }
+
+        ParcelProperties ParcelInfo2ParcelProperties(UUID agentID, ParcelInfo pinfo, int sequenceId, int requestResult)
+        {
+            ParcelProperties prop = new ParcelProperties();
+            
+            prop.RequestResult = requestResult;
+            prop.SequenceID = sequenceId;
+            prop.SnapSelection = false;
+#warning Implement user-specific counts
+            prop.SelfCount = 0; /* TODO: */
+            prop.OtherCount = 0;
+            prop.PublicCount = 0;
+            prop.LocalID = pinfo.LocalID;
+            if(prop.IsGroupOwned = pinfo.GroupOwned)
+            {
+                prop.OwnerID = pinfo.Group.ID;
+            }
+            else
+            {
+                prop.OwnerID = pinfo.Owner.ID;
+            }
+            prop.AuctionID = pinfo.AuctionID;
+            prop.ClaimDate = pinfo.ClaimDate;
+            prop.ClaimPrice = pinfo.ClaimPrice;
+            prop.RentPrice = pinfo.RentPrice;
+            prop.AABBMax = pinfo.AABBMax;
+            prop.AABBMin = pinfo.AABBMin;
+            prop.Bitmap = pinfo.LandBitmap.Data;
+            prop.Area = pinfo.Area;
+            prop.Status = pinfo.Status;
+            prop.SimWideMaxPrims = 15000;
+            prop.SimWideTotalPrims = 15000;
+            prop.MaxPrims = 15000;
+            prop.TotalPrims = 15000;
+            prop.OwnerPrims = 0;
+            prop.GroupPrims = 0;
+            prop.OtherPrims = 0;
+            prop.SelectedPrims = 0;
+            prop.ParcelPrimBonus = pinfo.ParcelPrimBonus;
+            prop.OtherCleanTime = pinfo.OtherCleanTime;
+            prop.ParcelFlags = pinfo.Flags;
+            prop.SalePrice = pinfo.SalePrice;
+            prop.Name = pinfo.Name;
+            prop.Description = pinfo.Description;
+            prop.MusicURL = pinfo.MusicURI;
+            prop.MediaURL = pinfo.MediaURI;
+            prop.MediaID = pinfo.MediaID;
+            prop.MediaAutoScale = pinfo.MediaAutoScale;
+            prop.GroupID = pinfo.Group.ID;
+            prop.PassPrice = pinfo.PassPrice;
+            prop.PassHours = pinfo.PassHours;
+            prop.Category = pinfo.Category;
+            prop.AuthBuyerID = pinfo.AuthBuyer.ID;
+            prop.SnapshotID = pinfo.SnapshotID;
+            prop.UserLocation = pinfo.LandingPosition;
+            prop.UserLookAt = pinfo.LandingLookAt;
+            prop.LandingType = pinfo.LandingType;
+            prop.RegionPushOverride = false;
+            prop.RegionDenyAnonymous = false;
+            prop.RegionDenyIdentified = false;
+            prop.RegionDenyTransacted = false;
+            prop.RegionDenyAgeUnverified = false;
+            prop.Privacy = false;
+            prop.SeeAVs = true;
+            prop.AnyAVSounds = true;
+            prop.GroupAVSounds = true;
+            prop.MediaDesc = "";
+            prop.MediaHeight = 0;
+            prop.MediaWidth = 0;
+            prop.MediaLoop = false;
+            prop.MediaType = "";
+            prop.ObscureMedia = false;
+            prop.ObscureMusic = false;
+
+            return prop;
+        }
+
+        void HandleParcelPropertiesRequestByID(Message m)
+        {
+            ParcelPropertiesRequestByID req = (ParcelPropertiesRequestByID)m;
+            if (req.CircuitSessionID != req.SessionID ||
+                req.CircuitAgentID != req.AgentID)
+            {
+                return;
+            }
+            ParcelProperties res = new ParcelProperties();
+            try
+            {
+                ParcelInfo pinfo = Parcels[req.LocalID];
+
+                ParcelProperties props = ParcelInfo2ParcelProperties(req.AgentID, pinfo, req.SequenceID, 0);
+                Agents[req.AgentID].SendMessageAlways(props, ID);
+            }
+            catch
+            {
+
             }
         }
     }
