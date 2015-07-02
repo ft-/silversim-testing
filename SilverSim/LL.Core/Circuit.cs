@@ -707,16 +707,26 @@ namespace SilverSim.LL.Core
             {
                 switch(m.Number)
                 {
-                    case MessageType.EnableSimulator:
-                    case MessageType.DisableSimulator:
-                    case MessageType.CrossedRegion:
-                    case MessageType.TeleportFinish:
                     case 0: /* only Event Queue support */
-                        m_EventQueue.Enqueue(m);
+                        if (Attribute.GetCustomAttribute(m.GetType(), typeof(EventQueueGet)) != null)
+                        {
+                            m_EventQueue.Enqueue(m);
+                        }
+                        else
+                        {
+                            m_Log.ErrorFormat("Type {0} misses EventQueueGet attribute", m.GetType().FullName);
+                        }
                         break;
 
                     default:
-                        m_TxQueue.Enqueue(m);
+                        if (Attribute.GetCustomAttribute(m.GetType(), typeof(EventQueueGet)) != null)
+                        {
+                            m_EventQueue.Enqueue(m);
+                        }
+                        else
+                        {
+                            m_TxQueue.Enqueue(m);
+                        }
                         break;
                 }
             }

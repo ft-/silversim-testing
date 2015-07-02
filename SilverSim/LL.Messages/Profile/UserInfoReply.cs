@@ -24,29 +24,35 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.LL.Messages.Profile
 {
-    [UDPMessage(MessageType.DetachAttachmentIntoInv)]
+    [UDPMessage(MessageType.UserInfoReply)]
     [Reliable]
-    public class DetachAttachmentIntoInv : Message
+    public class UserInfoReply : Message
     {
         public UUID AgentID;
-        public UUID ItemID;
+        public bool IMViaEmail;
+        public byte[] DirectoryVisibility = new byte[0];
+        public string EMail = string.Empty;
 
-        public DetachAttachmentIntoInv()
+        public UserInfoReply()
         {
 
         }
 
-        public static Message Decode(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
-            DetachAttachmentIntoInv m = new DetachAttachmentIntoInv();
-
-            m.AgentID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-
-            return m;
+            p.WriteMessageType(Number);
+            p.WriteUUID(AgentID);
+            p.WriteBoolean(IMViaEmail);
+            p.WriteUInt8((byte)DirectoryVisibility.Length);
+            p.WriteBytes(DirectoryVisibility);
+            p.WriteStringLen8(EMail);
         }
     }
 }

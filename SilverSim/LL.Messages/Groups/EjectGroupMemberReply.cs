@@ -25,28 +25,27 @@ exception statement from your version.
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.LL.Messages.Groups
 {
-    [UDPMessage(MessageType.DetachAttachmentIntoInv)]
+    [UDPMessage(MessageType.EjectGroupMemberReply)]
     [Reliable]
-    public class DetachAttachmentIntoInv : Message
+    public class EjectGroupMemberReply : Message
     {
-        public UUID AgentID;
-        public UUID ItemID;
+        public UUID AgentID = UUID.Zero;
+        public UUID GroupID = UUID.Zero;
+        public bool Success = false;
 
-        public DetachAttachmentIntoInv()
+        public EjectGroupMemberReply()
         {
 
         }
 
-        public static Message Decode(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
-            DetachAttachmentIntoInv m = new DetachAttachmentIntoInv();
-
-            m.AgentID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-
-            return m;
+            p.WriteMessageType(Number);
+            p.WriteUUID(AgentID);
+            p.WriteUUID(GroupID);
+            p.WriteBoolean(Success);
         }
     }
 }

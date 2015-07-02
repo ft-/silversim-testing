@@ -25,28 +25,38 @@ exception statement from your version.
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.LL.Messages.Groups
 {
-    [UDPMessage(MessageType.DetachAttachmentIntoInv)]
+    [UDPMessage(MessageType.GroupAccountDetailsReply)]
     [Reliable]
-    public class DetachAttachmentIntoInv : Message
+    [Zerocoded]
+    public class GroupAccountDetailsReply : Message
     {
-        public UUID AgentID;
-        public UUID ItemID;
+        public UUID AgentID = UUID.Zero;
+        public UUID GroupID = UUID.Zero;
+        public UUID RequestID = UUID.Zero;
+        public int IntervalDays = 0;
+        public int CurrentInterval = 0;
+        public string StartDate = string.Empty;
+        public string Description = string.Empty;
+        public int Amount = 0;
 
-        public DetachAttachmentIntoInv()
+        public GroupAccountDetailsReply()
         {
 
         }
 
-        public static Message Decode(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
-            DetachAttachmentIntoInv m = new DetachAttachmentIntoInv();
-
+            GroupAccountDetailsReply m = new GroupAccountDetailsReply();
             m.AgentID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-
-            return m;
+            m.GroupID = p.ReadUUID();
+            m.RequestID = p.ReadUUID();
+            m.IntervalDays = p.ReadInt32();
+            m.CurrentInterval = p.ReadInt32();
+            m.StartDate = p.ReadStringLen8();
+            m.Description = p.ReadStringLen8();
+            m.Amount = p.ReadInt32();
         }
     }
 }

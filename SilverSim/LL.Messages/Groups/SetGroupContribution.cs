@@ -25,26 +25,29 @@ exception statement from your version.
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.LL.Messages.Groups
 {
-    [UDPMessage(MessageType.DetachAttachmentIntoInv)]
+    [UDPMessage(MessageType.SetGroupContribution)]
     [Reliable]
-    public class DetachAttachmentIntoInv : Message
+    public class SetGroupContribution : Message
     {
-        public UUID AgentID;
-        public UUID ItemID;
+        public UUID AgentID = UUID.Zero;
+        public UUID SessionID = UUID.Zero;
+        public UUID GroupID = UUID.Zero;
+        public int Contribution = 0;
 
-        public DetachAttachmentIntoInv()
+        public SetGroupContribution()
         {
 
         }
 
-        public static Message Decode(UDPPacket p)
+        public static SetGroupContribution Decode(UDPPacket p)
         {
-            DetachAttachmentIntoInv m = new DetachAttachmentIntoInv();
-
+            SetGroupContribution m = new SetGroupContribution();
             m.AgentID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.GroupID = p.ReadUUID();
+            m.Contribution = p.ReadInt32();
 
             return m;
         }

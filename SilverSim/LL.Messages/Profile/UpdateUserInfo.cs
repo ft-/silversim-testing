@@ -25,27 +25,31 @@ exception statement from your version.
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.LL.Messages.Profile
 {
-    [UDPMessage(MessageType.DetachAttachmentIntoInv)]
+    [UDPMessage(MessageType.UpdateUserInfo)]
     [Reliable]
-    public class DetachAttachmentIntoInv : Message
+    public class UpdateUserInfo : Message
     {
         public UUID AgentID;
-        public UUID ItemID;
+        public UUID SessionID;
 
-        public DetachAttachmentIntoInv()
+        public bool IMViaEmail;
+        public byte[] DirectoryVisibility = new byte[0];
+
+        public UpdateUserInfo()
         {
 
         }
 
-        public static Message Decode(UDPPacket p)
+        public static UpdateUserInfo Decode(UDPPacket p)
         {
-            DetachAttachmentIntoInv m = new DetachAttachmentIntoInv();
-
+            UpdateUserInfo m = new UpdateUserInfo();
             m.AgentID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-
+            m.SessionID = p.ReadUUID();
+            m.IMViaEmail = p.ReadBoolean();
+            int len = p.ReadUInt8();
+            m.DirectoryVisibility = p.ReadBytes(len);
             return m;
         }
     }

@@ -24,29 +24,48 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.LL.Messages.Groups
 {
-    [UDPMessage(MessageType.DetachAttachmentIntoInv)]
+    [UDPMessage(MessageType.GroupRoleMembersReply)]
     [Reliable]
-    public class DetachAttachmentIntoInv : Message
+    public class GroupRoleMembersReply : Message
     {
-        public UUID AgentID;
-        public UUID ItemID;
+        public UUID AgentID = UUID.Zero;
+        public UUID GroupID = UUID.Zero;
+        public UUID RequestID = UUID.Zero;
+        public UInt32 TotalPairs = 0;
 
-        public DetachAttachmentIntoInv()
+        public struct MemberDataEntry
+        {
+            public UUID RoleID;
+            public UUID MemberID;
+        }
+
+        public List<MemberDataEntry> MemberData = new List<MemberDataEntry>();
+
+        public GroupRoleMembersReply()
         {
 
         }
 
-        public static Message Decode(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
-            DetachAttachmentIntoInv m = new DetachAttachmentIntoInv();
-
-            m.AgentID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-
-            return m;
+            p.WriteMessageType(Number);
+            p.WriteUUID(AgentID);
+            p.WriteUUID(GroupID);
+            p.WriteUUID(RequestID);
+            p.WriteUInt32(TotalPairs);
+            p.WriteUInt8((byte)MemberData.Count);
+            foreach(MemberDataEntry e in MemberData)
+            {
+                p.WriteUUID(e.RoleID);
+                p.WriteUUID(e.MemberID);
+            }
         }
     }
 }

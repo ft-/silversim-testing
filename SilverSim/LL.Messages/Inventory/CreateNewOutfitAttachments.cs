@@ -24,28 +24,46 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.LL.Messages.Inventory
 {
-    [UDPMessage(MessageType.DetachAttachmentIntoInv)]
+    [UDPMessage(MessageType.CreateNewOutfitAttachments)]
     [Reliable]
-    public class DetachAttachmentIntoInv : Message
+    public class CreateNewOutfitAttachments : Message
     {
         public UUID AgentID;
-        public UUID ItemID;
+        public UUID SessionID;
 
-        public DetachAttachmentIntoInv()
+        public UUID NewFolderID;
+
+        public struct ObjectDataEntry
+        {
+            public UUID OldItemID;
+            public UUID OldFolderID;
+        }
+
+        public List<ObjectDataEntry> ObjectData = new List<ObjectDataEntry>();
+
+        public CreateNewOutfitAttachments()
         {
 
         }
 
-        public static Message Decode(UDPPacket p)
+        public static CreateNewOutfitAttachments Decode(UDPPacket p)
         {
-            DetachAttachmentIntoInv m = new DetachAttachmentIntoInv();
-
+            CreateNewOutfitAttachments m = new CreateNewOutfitAttachments();
             m.AgentID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-
+            m.SessionID = p.ReadUUID();
+            m.NewFolderID = p.ReadUUID();
+            uint cnt = p.ReadUInt8();
+            for(uint i = 0; i < cnt; ++i)
+            {
+                ObjectDataEntry e = new ObjectDataEntry();
+                e.OldItemID = p.ReadUUID();
+                e.OldFolderID = p.ReadUUID();
+                m.ObjectData.Add(e);
+            }
             return m;
         }
     }

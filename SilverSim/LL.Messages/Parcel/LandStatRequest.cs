@@ -24,28 +24,36 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using System;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.LL.Messages.Parcel
 {
-    [UDPMessage(MessageType.DetachAttachmentIntoInv)]
+    [UDPMessage(MessageType.LandStatRequest)]
     [Reliable]
-    public class DetachAttachmentIntoInv : Message
+    public class LandStatRequest : Message
     {
         public UUID AgentID;
-        public UUID ItemID;
+        public UUID SessionID;
+        public UInt32 ReportType;
+        public UInt32 RequestFlags;
+        public byte[] Filter = new byte[0];
+        public int ParcelLocalID;
 
-        public DetachAttachmentIntoInv()
+        public LandStatRequest()
         {
 
         }
 
-        public static Message Decode(UDPPacket p)
+        public static LandStatRequest Decode(UDPPacket p)
         {
-            DetachAttachmentIntoInv m = new DetachAttachmentIntoInv();
-
+            LandStatRequest m = new LandStatRequest();
             m.AgentID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-
+            m.SessionID = p.ReadUUID();
+            m.ReportType = p.ReadUInt32();
+            m.RequestFlags = p.ReadUInt32();
+            int len = p.ReadUInt8();
+            m.Filter = p.ReadBytes(len);
+            m.ParcelLocalID = p.ReadInt32();
             return m;
         }
     }

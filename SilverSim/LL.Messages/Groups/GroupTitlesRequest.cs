@@ -24,28 +24,48 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.LL.Messages.Groups
 {
-    [UDPMessage(MessageType.DetachAttachmentIntoInv)]
+    [UDPMessage(MessageType.GroupTitlesReply)]
     [Reliable]
-    public class DetachAttachmentIntoInv : Message
+    [Zerocoded]
+    public class GroupTitlesRequest : Message
     {
-        public UUID AgentID;
-        public UUID ItemID;
+        public UUID AgentID = UUID.Zero;
+        public UUID GroupID = UUID.Zero;
+        public UUID RequestID = UUID.Zero;
 
-        public DetachAttachmentIntoInv()
+        public struct GroupDataEntry
+        {
+            public string Title;
+            public UUID RoleID;
+            public bool Selected;
+        }
+
+        public List<GroupDataEntry> GroupData = new List<GroupDataEntry>();
+
+        public GroupTitlesRequest()
         {
 
         }
 
-        public static Message Decode(UDPPacket p)
+        public static GroupTitlesRequest Decode(UDPPacket p)
         {
-            DetachAttachmentIntoInv m = new DetachAttachmentIntoInv();
-
+            GroupTitlesRequest m = new GroupTitlesRequest();
             m.AgentID = p.ReadUUID();
-            m.ItemID = p.ReadUUID();
-
+            m.GroupID = p.ReadUUID();
+            m.RequestID = p.ReadUUID();
+            uint cnt = p.ReadUInt8();
+            for (uint i = 0; i < cnt; ++i)
+            {
+                GroupDataEntry e = new GroupDataEntry();
+                e.Title = p.ReadStringLen8();
+                e.RoleID = p.ReadUUID();
+                e.Selected = p.ReadBoolean();
+                m.GroupData.Add(e);
+            }
             return m;
         }
     }
