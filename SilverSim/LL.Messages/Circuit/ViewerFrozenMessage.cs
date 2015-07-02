@@ -23,16 +23,15 @@ exception statement from your version.
 
 */
 
-
-namespace SilverSim.LL.Messages.Agent
+namespace SilverSim.LL.Messages.Circuit
 {
-    [UDPMessage(MessageType.HealthMessage)]
+    [UDPMessage(MessageType.ViewerFrozenMessage)]
     [Reliable]
-    public class HealthMessage : Message
+    public class ViewerFrozenMessage : Message
     {
-        public double Health = 0f;
+        public bool Frozen;
 
-        public HealthMessage()
+        public ViewerFrozenMessage()
         {
 
         }
@@ -40,7 +39,7 @@ namespace SilverSim.LL.Messages.Agent
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
-            p.WriteFloat((float)Health);
+            p.WriteBoolean(Frozen);
         }
     }
 }
