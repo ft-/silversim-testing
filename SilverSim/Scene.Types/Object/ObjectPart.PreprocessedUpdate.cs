@@ -131,8 +131,7 @@ namespace SilverSim.Scene.Types.Object
             EveryoneMask = GroupMask + 4,
             NextOwnerMask = EveryoneMask + 4,
             OwnershipCost = NextOwnerMask + 4,
-            TaxRate = OwnershipCost + 4,
-            SaleType = TaxRate + 4,
+            SaleType = OwnershipCost + 4,
             SalePrice = SaleType + 1,
             AggregatePerms = SalePrice + 4,
             AggregatePermTextures = AggregatePerms + 1,
@@ -392,6 +391,14 @@ namespace SilverSim.Scene.Types.Object
                     byte[] newPropData = new byte[propDataLength];
 
                     int offset = 0;
+
+                    if(ObjectGroup != null)
+                    {
+                        ObjectGroup.Owner.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.OwnerID);
+                        ObjectGroup.Group.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.GroupID);
+                        ObjectGroup.LastOwner.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.LastOwnerID);
+                        m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.SaleType] = (byte)ObjectGroup.SaleType;
+                    }
 
                     Buffer.BlockCopy(m_PropUpdateFixedBlock, 0, newPropData, offset, m_PropUpdateFixedBlock.Length);
                     offset += m_PropUpdateFixedBlock.Length;

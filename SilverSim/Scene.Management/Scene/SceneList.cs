@@ -62,13 +62,13 @@ namespace SilverSim.Scene.Management.Scene
         {
             get
             {
-                return ((RwLockedDoubleDictionary<UUID, ulong, SceneInterface>)this)[m_RegionNames[name]];
+                return ((RwLockedDoubleDictionary<UUID, ulong, SceneInterface>)this)[m_RegionNames[name.ToLower()]];
             }
         }
 
         public void Add(SceneInterface scene)
         {
-            m_RegionNames.Add(scene.ID, scene.Name);
+            m_RegionNames.Add(scene.ID, scene.Name.ToLower());
             try
             {
                 Add(scene.ID, scene.GridPosition.RegionHandle, scene);

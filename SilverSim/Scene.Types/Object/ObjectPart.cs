@@ -464,6 +464,15 @@ namespace SilverSim.Scene.Types.Object
                 {
                     m_CreationDate = new Date(value);
                 }
+                byte[] b = BitConverter.GetBytes(value.DateTimeToUnixTime());
+                if(!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(b);
+                }
+                lock(m_UpdateDataLock)
+                {
+                    Buffer.BlockCopy(b, 0, m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.CreationDate, 8);
+                }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -503,6 +512,10 @@ namespace SilverSim.Scene.Types.Object
                 lock (this)
                 {
                     m_Creator = value;
+                }
+                lock(m_UpdateDataLock)
+                {
+                    value.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.CreatorID);
                 }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);

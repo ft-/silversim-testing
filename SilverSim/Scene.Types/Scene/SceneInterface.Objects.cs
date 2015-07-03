@@ -149,7 +149,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             SilverSim.LL.Messages.Object.ObjectSelect req = (SilverSim.LL.Messages.Object.ObjectSelect)m;
             if(req.CircuitAgentID == req.AgentID &&
-                req.CircuitSceneID == ID)
+                req.CircuitSessionID == req.SessionID)
             {
                 IAgent agent;
                 try
@@ -226,7 +226,7 @@ namespace SilverSim.Scene.Types.Scene
         {
             SilverSim.LL.Messages.Object.ObjectDeselect req = (SilverSim.LL.Messages.Object.ObjectDeselect)m;
             if (req.CircuitAgentID == req.AgentID &&
-                req.CircuitSceneID == ID)
+                req.CircuitSessionID == req.SessionID)
             {
                 IAgent agent;
                 try

@@ -168,6 +168,8 @@ namespace SilverSim.Scene.Types.Agent
 
         RwLockedList<UUID> SelectedObjects(UUID scene);
 
+        ulong AddNewFile(string filename, byte[] data);
+
         UGI Group { get; set; }
 
         bool IsActiveGod

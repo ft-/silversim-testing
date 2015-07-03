@@ -53,7 +53,7 @@ namespace SilverSim.LL.Core
             }
         }
 
-        class UploadTransaction
+        internal class UploadTransaction
         {
             public List<byte[]> DataBlocks = new List<byte[]>();
             public UInt64 XferID;
@@ -65,7 +65,7 @@ namespace SilverSim.LL.Core
             }
         }
 
-        class TerrainUploadTransaction : UploadTransaction
+        internal class TerrainUploadTransaction : UploadTransaction
         {
             public TerrainUploadTransaction()
             {
@@ -83,7 +83,7 @@ namespace SilverSim.LL.Core
             }
         }
 
-        class AssetUploadTransaction : UploadTransaction
+        internal class AssetUploadTransaction : UploadTransaction
         {
             public UUID AssetID;
             public AssetType AssetType;
@@ -107,8 +107,8 @@ namespace SilverSim.LL.Core
             }
         }
 
-        readonly RwLockedDoubleDictionary<UUID, UInt64, AssetUploadTransaction> m_AssetTransactions = new RwLockedDoubleDictionary<UUID, UInt64, AssetUploadTransaction>();
-        readonly RwLockedDoubleDictionary<UUID, UInt64, TerrainUploadTransaction> m_TerrainTransactions = new RwLockedDoubleDictionary<UUID, ulong, TerrainUploadTransaction>();
+        internal RwLockedDoubleDictionary<UUID, UInt64, AssetUploadTransaction> m_AssetTransactions = new RwLockedDoubleDictionary<UUID, UInt64, AssetUploadTransaction>();
+        internal RwLockedDoubleDictionary<UUID, UInt64, TerrainUploadTransaction> m_TerrainTransactions = new RwLockedDoubleDictionary<UUID, ulong, TerrainUploadTransaction>();
 
         #region Data Builder
         byte[] BuildUploadedData(UploadTransaction t)

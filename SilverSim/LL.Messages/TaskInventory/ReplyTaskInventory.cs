@@ -51,4 +51,27 @@ namespace SilverSim.LL.Messages.TaskInventory
             p.WriteStringLen8(Filename);
         }
     }
+
+    [UDPMessage(MessageType.ReplyTaskInventory)]
+    [Reliable]
+    [Trusted]
+    public class ReplyTaskInventoryNone : Message
+    {
+        public UUID TaskID;
+        public Int16 Serial;
+
+
+        public ReplyTaskInventoryNone()
+        {
+
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteMessageType(Number);
+            p.WriteUUID(TaskID);
+            p.WriteInt16(Serial);
+            p.WriteUInt8(0);
+        }
+    }
 }
