@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Teleport
 {
     [UDPMessage(MessageType.TeleportProgress)]
     [Reliable]
+    [Trusted]
     public class TeleportProgress : Message
     {
         public UUID AgentID;

@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Inventory
 {
     [UDPMessage(MessageType.CopyInventoryItem)]
     [Reliable]
+    [NotTrusted]
     public class CopyInventoryItem : Message
     {
         public UUID AgentID;

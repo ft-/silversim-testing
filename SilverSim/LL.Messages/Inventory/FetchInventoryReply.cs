@@ -34,6 +34,7 @@ namespace SilverSim.LL.Messages.Inventory
     [UDPMessage(MessageType.FetchInventoryReply)]
     [Reliable]
     [Zerocoded]
+    [Trusted]
     public class FetchInventoryReply : Message
     {
         public UUID AgentID;

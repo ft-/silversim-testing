@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectRotation)]
     [Reliable]
+    [NotTrusted]
     public class ObjectRotation : Message
     {
         public struct Data

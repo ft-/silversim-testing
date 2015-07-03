@@ -32,6 +32,7 @@ using SilverSim.Types;
 namespace SilverSim.LL.Messages.Console
 {
     [EventQueueGet("SimConsoleResponse")]
+    [Trusted]
     public class SimConsoleResponse : Message
     {
         public string Message;

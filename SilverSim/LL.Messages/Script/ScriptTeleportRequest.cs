@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Script
 {
     [UDPMessage(MessageType.ScriptTeleportRequest)]
     [Reliable]
+    [Trusted]
     public class ScriptTeleportRequest : Message
     {
         public string ObjectName;

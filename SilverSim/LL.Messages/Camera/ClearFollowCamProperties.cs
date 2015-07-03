@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Camera
 {
     [UDPMessage(MessageType.ClearFollowCamProperties)]
     [Reliable]
+    [Trusted]
     public class ClearFollowCamProperties : Message
     {
         public UUID ObjectID = UUID.Zero;

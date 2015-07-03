@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Agent
 {
     [UDPMessage(MessageType.AgentDropGroup)]
     [Reliable]
+    [Trusted]
     public class AgentDropGroup : Message
     {
         public UUID AgentID;

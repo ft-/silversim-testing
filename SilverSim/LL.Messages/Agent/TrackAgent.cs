@@ -28,6 +28,7 @@ using SilverSim.Types;
 namespace SilverSim.LL.Messages.Agent
 {
     [UDPMessage(MessageType.TrackAgent)]
+    [NotTrusted]
     public class TrackAgent : Message
     {
         public UUID AgentID = UUID.Zero;

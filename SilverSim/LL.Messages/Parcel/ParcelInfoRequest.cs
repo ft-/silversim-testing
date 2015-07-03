@@ -29,7 +29,8 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelInfoRequest)]
     [Reliable]
-    public class ParcelInfoRequest: Message
+    [NotTrusted]
+    public class ParcelInfoRequest : Message
     {
         public UUID AgentID;
         public UUID SessionID;

@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Transfer
 {
     [UDPMessage(MessageType.TransferInfo)]
     [Reliable]
+    [Trusted]
     public class TransferInfo : Message
     {
         public UUID TransferID;

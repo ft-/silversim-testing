@@ -23,16 +23,14 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelBuy)]
     [Reliable]
+    [NotTrusted]
     public class ParcelBuy : Message
     {
         public UUID AgentID;

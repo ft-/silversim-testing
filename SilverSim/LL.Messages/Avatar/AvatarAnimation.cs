@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Avatar
 {
     [UDPMessage(MessageType.AvatarAnimation)]
     [Reliable]
+    [Trusted]
     public class AvatarAnimation : Message
     {
         public UUID Sender = UUID.Zero;

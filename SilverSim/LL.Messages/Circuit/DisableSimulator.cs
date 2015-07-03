@@ -28,6 +28,7 @@ namespace SilverSim.LL.Messages.Circuit
     [UDPMessage(MessageType.DisableSimulator)]
     [Reliable]
     [EventQueueGet("DisableSimulator")]
+    [Trusted]
     public class DisableSimulator : Message
     {
         public DisableSimulator()

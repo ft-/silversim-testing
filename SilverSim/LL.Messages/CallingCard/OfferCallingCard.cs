@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.CallingCard
 {
     [UDPMessage(MessageType.OfferCallingCard)]
     [Reliable]
+    [NotTrusted]
     public class OfferCallingCard : Message
     {
         public UUID AgentID;

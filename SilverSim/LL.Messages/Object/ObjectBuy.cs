@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectBuy)]
     [Reliable]
+    [NotTrusted]
     public class ObjectBuy : Message
     {
         public struct Data

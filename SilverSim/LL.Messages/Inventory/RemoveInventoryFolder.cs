@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Inventory
 {
     [UDPMessage(MessageType.RemoveInventoryFolder)]
     [Reliable]
+    [NotTrusted]
     public class RemoveInventoryFolder : Message
     {
         public UUID AgentID;

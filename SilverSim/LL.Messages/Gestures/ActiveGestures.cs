@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Gestures
 {
     [UDPMessage(MessageType.ActivateGestures)]
     [Reliable]
+    [NotTrusted]
     public class ActivateGestures : Message
     {
         public UUID AgentID;

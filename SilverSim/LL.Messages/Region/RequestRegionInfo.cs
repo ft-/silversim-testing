@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Region
 {
     [UDPMessage(MessageType.RequestRegionInfo)]
     [Reliable]
+    [NotTrusted]
     public class RequestRegionInfo : Message
     {
         public UUID AgentID = UUID.Zero;

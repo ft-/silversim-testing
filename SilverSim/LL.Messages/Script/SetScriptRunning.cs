@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Script
 {
     [UDPMessage(MessageType.SetScriptRunning)]
     [Reliable]
+    [NotTrusted]
     public class SetScriptRunning : Message
     {
         public UUID AgentID;

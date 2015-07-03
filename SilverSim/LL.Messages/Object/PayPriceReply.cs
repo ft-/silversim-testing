@@ -23,16 +23,15 @@ exception statement from your version.
 
 */
 
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.PayPriceReply)]
     [Reliable]
+    [Trusted]
     public class PayPriceReply : Message
     {
         public UUID ObjectID = UUID.Zero;

@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.KillObject)]
     [Reliable]
+    [Trusted]
     public class KillObject : Message
     {
         public List<UInt32> LocalIDs = new List<UInt32>();

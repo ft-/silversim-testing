@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Economy
 {
     [UDPMessage(MessageType.MoneyBalanceReply)]
     [Reliable]
+    [Trusted]
     public class MoneyBalanceReply : Message
     {
         public UUID AgentID = UUID.Zero;

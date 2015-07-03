@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Generic
 {
     [UDPMessage(MessageType.EstateOwnerMessage)]
     [Reliable]
+    [NotTrusted]
     public class EstateOwnerMessage : GenericMessageFormat
     {
         public EstateOwnerMessage()

@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.RequestPayPrice)]
     [Reliable]
+    [NotTrusted]
     public class RequestPayPrice : Message
     {
         public UUID ObjectID = UUID.Zero;

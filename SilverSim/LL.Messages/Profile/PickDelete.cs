@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Profile
 {
     [UDPMessage(MessageType.PickDelete)]
     [Reliable]
+    [NotTrusted]
     public class PickDelete : Message
     {
         public UUID AgentID;

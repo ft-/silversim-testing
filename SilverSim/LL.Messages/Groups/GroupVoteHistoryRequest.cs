@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Groups
 {
     [UDPMessage(MessageType.GroupVoteHistoryRequest)]
     [Reliable]
+    [NotTrusted]
     public class GroupVoteHistoryRequest : Message
     {
         public UUID AgentID = UUID.Zero;

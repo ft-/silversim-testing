@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.StartLocation
 {
     [UDPMessage(MessageType.SetStartLocationRequest)]
     [Reliable]
+    [NotTrusted]
     public class SetStartLocationRequest : Message
     {
         public UUID AgentID;

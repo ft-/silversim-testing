@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.User
 {
     [UDPMessage(MessageType.EjectUser)]
     [Reliable]
+    [NotTrusted]
     public class EjectUser : Message
     {
         public UUID AgentID = UUID.Zero;

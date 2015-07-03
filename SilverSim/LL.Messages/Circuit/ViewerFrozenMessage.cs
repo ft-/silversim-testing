@@ -27,6 +27,7 @@ namespace SilverSim.LL.Messages.Circuit
 {
     [UDPMessage(MessageType.ViewerFrozenMessage)]
     [Reliable]
+    [Trusted]
     public class ViewerFrozenMessage : Message
     {
         public bool Frozen;

@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Teleport
 {
     [UDPMessage(MessageType.TeleportStart)]
     [Reliable]
+    [Trusted]
     public class TeleportStart : Message
     {
         public TeleportFlags TeleportFlags;

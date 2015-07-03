@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Transfer
     [UDPMessage(MessageType.RequestXfer)]
     [Reliable]
     [Zerocoded]
+    [NotTrusted]
     public class RequestXfer : Message
     {
         public UInt64 ID;

@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Profile
 {
     [UDPMessage(MessageType.PickInfoUpdate)]
     [Reliable]
+    [NotTrusted]
     public class PickInfoUpdate : Message
     {
         public UUID AgentID;

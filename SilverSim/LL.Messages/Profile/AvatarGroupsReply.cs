@@ -23,16 +23,15 @@ exception statement from your version.
 
 */
 
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Profile
 {
     [UDPMessage(MessageType.AvatarGroupsReply)]
     [Reliable]
+    [Trusted]
     public class AvatarGroupsReply : Message
     {
         public UUID AgentID = UUID.Zero;

@@ -23,18 +23,16 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Types;
-using SilverSim.Types.Inventory;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Inventory;
+using System;
 
 namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.RezRestoreToWorld)]
     [Reliable]
+    [NotTrusted]
     public class RezRestoreToWorld : Message
     {
         public UUID AgentID;

@@ -24,17 +24,15 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.RezObjectFromNotecard)]
     [Reliable]
+    [NotTrusted]
     public class RezObjectFromNotecard : Message
     {
         public UUID AgentID;

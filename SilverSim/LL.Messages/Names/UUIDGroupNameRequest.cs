@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Names
 {
     [UDPMessage(MessageType.UUIDGroupNameRequest)]
     [Reliable]
+    [NotTrusted]
     public class UUIDGroupNameRequest : Message
     {
         public List<UUID> UUIDNameBlock = new List<UUID>();

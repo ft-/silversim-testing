@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Friend
 {
     [UDPMessage(MessageType.OfflineNotification)]
     [Reliable]
+    [Trusted]
     public class OfflineNotification : Message
     {
         public List<UUID> AgentIDs = new List<UUID>();

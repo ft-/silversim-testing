@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Search
 {
     [UDPMessage(MessageType.PlacesQuery)]
     [Reliable]
+    [NotTrusted]
     public class PlacesQuery : Message
     {
         public UUID AgentID;

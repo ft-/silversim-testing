@@ -32,6 +32,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectUpdate)]
     [Reliable]
+    [Trusted]
     public class ObjectUpdate : Message
     {
         public class ObjData

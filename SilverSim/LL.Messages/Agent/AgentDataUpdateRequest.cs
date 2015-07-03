@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Agent
 {
     [UDPMessage(MessageType.AgentDataUpdateRequest)]
     [Reliable]
+    [NotTrusted]
     public class AgentDataUpdateRequest : Message
     {
         public UUID AgentID;

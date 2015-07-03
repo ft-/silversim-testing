@@ -32,6 +32,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectAttach)]
     [Reliable]
+    [NotTrusted]
     public class ObjectAttach : Message
     {
         public struct Data

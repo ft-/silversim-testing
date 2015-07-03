@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelSetOtherCleanTime)]
     [Reliable]
+    [NotTrusted]
     public class ParcelSetOtherCleanTime : Message
     {
         public UUID AgentID = UUID.Zero;

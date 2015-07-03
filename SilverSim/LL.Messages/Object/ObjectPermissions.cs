@@ -24,14 +24,15 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
-using SilverSim.Types.Inventory;
 
 namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectPermissions)]
     [Reliable]
+    [NotTrusted]
     public class ObjectPermissions : Message
     {
         public struct Data

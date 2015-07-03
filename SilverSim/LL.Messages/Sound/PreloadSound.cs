@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Sound
 {
     [UDPMessage(MessageType.PreloadSound)]
     [Reliable]
+    [Trusted]
     public class PreloadSound : Message
     {
         public UUID ObjectID;

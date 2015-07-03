@@ -32,6 +32,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.RezObject)]
     [Reliable]
+    [NotTrusted]
     public class RezObject : Message
     {
         public UUID AgentID;

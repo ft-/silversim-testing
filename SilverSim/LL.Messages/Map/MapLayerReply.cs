@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Map
 {
     [UDPMessage(MessageType.MapLayerReply)]
     [Reliable]
+    [Trusted]
     public class MapLayerReply : Message
     {
         public UUID AgentID;

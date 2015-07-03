@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Sound
 {
     [UDPMessage(MessageType.AttachedSoundGainChange)]
     [Reliable]
+    [Trusted]
     public class AttachedSoundGainChange : Message
     {
         public UUID ObjectID;

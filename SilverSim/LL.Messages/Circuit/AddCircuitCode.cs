@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Circuit
 {
     [UDPMessage(MessageType.AddCircuitCode)]
     [Reliable]
+    [Trusted]
     public class AddCircuitCode : Message
     {
         public UInt32 CircuitCode;

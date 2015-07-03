@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.LayerData
 {
     [UDPMessage(MessageType.LayerData)]
     [Reliable]
+    [Trusted]
     public class LayerData : Message
     {
         public enum LayerDataType : byte

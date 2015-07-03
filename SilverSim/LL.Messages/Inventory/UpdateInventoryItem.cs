@@ -23,18 +23,17 @@ exception statement from your version.
 
 */
 
+using SilverSim.Types;
+using SilverSim.Types.Asset;
+using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
-using SilverSim.Types.Inventory;
-using SilverSim.Types.Asset;
 
 namespace SilverSim.LL.Messages.Inventory
 {
     [UDPMessage(MessageType.UpdateInventoryItem)]
     [Reliable]
+    [NotTrusted]
     public class UpdateInventoryItem : Message
     {
         public UUID AgentID;

@@ -23,16 +23,13 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.MuteList
 {
     [UDPMessage(MessageType.UseCachedMuteList)]
     [Reliable]
+    [Trusted]
     public class UseCachedMuteList : Message
     {
         public UUID AgentID;

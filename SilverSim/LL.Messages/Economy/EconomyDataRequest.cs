@@ -27,6 +27,7 @@ namespace SilverSim.LL.Messages.Economy
 {
     [UDPMessage(MessageType.EconomyDataRequest)]
     [Reliable]
+    [NotTrusted]
     public class EconomyDataRequest : Message
     {
         public EconomyDataRequest()

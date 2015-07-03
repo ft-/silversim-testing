@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Appearance
 {
     [UDPMessage(MessageType.AgentWearablesRequest)]
     [Reliable]
+    [NotTrusted]
     public class AgentWearablesRequest : Message
     {
         public UUID AgentID;

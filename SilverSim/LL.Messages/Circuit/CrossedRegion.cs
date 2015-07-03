@@ -32,6 +32,7 @@ namespace SilverSim.LL.Messages.Circuit
     [UDPMessage(MessageType.CrossedRegion)]
     [Reliable]
     [EventQueueGet("CrossedRegion")]
+    [Trusted]
     public class CrossedRegion : Message
     {
         public UUID AgentID;

@@ -28,13 +28,12 @@ using SilverSim.Types.Agent;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.RezMultipleAttachmentsFromInv)]
     [Reliable]
+    [NotTrusted]
     public class RezMultipleAttachmentsFromInv : Message
     {
         public UUID AgentID;

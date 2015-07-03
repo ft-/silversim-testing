@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Region
 {
     [UDPMessage(MessageType.GodUpdateRegionInfo)]
     [Reliable]
+    [NotTrusted]
     public class GodUpdateRegionInfo : Message
     {
         public UUID AgentID = UUID.Zero;

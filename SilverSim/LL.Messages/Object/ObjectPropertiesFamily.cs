@@ -24,13 +24,14 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using System;
 using SilverSim.Types.Inventory;
+using System;
 
 namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectPropertiesFamily)]
     [Reliable]
+    [Trusted]
     public class ObjectPropertiesFamily : Message
     {
         public UInt32 RequestFlags;

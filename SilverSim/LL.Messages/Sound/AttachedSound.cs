@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Sound
 {
     [UDPMessage(MessageType.AttachedSound)]
     [Reliable]
+    [Trusted]
     public class AttachedSound : Message
     {
         public UUID SoundID;

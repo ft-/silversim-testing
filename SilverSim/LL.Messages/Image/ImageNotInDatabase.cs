@@ -24,15 +24,12 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.LL.Messages.Image
 {
     [UDPMessage(MessageType.ImageNotInDatabase)]
     [Reliable]
+    [Trusted]
     public class ImageNotInDatabase : Message
     {
         public UUID ID = UUID.Zero;

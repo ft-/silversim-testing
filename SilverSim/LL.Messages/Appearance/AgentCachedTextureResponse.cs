@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Appearance
 {
     [UDPMessage(MessageType.AgentCachedTextureResponse)]
     [Reliable]
+    [Trusted]
     public class AgentCachedTextureResponse : Message
     {
         public UUID AgentID;

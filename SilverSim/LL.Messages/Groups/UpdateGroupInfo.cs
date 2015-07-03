@@ -34,6 +34,7 @@ namespace SilverSim.LL.Messages.Groups
     [UDPMessage(MessageType.UpdateGroupInfo)]
     [Reliable]
     [Zerocoded]
+    [NotTrusted]
     class UpdateGroupInfo : Message
     {
         public UUID AgentID;

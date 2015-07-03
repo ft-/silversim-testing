@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.God
 {
     [UDPMessage(MessageType.GrantGodlikePowers)]
     [Reliable]
+    [Trusted]
     public class GrantGodlikePowers : Message
     {
         public UUID AgentID;

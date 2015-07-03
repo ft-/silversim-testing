@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Script
 {
     [UDPMessage(MessageType.LoadURL)]
     [Reliable]
+    [Trusted]
     public class LoadURL : Message
     {
         public string ObjectName;

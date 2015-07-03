@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectDeGrab)]
     [Reliable]
+    [NotTrusted]
     public class ObjectDeGrab : Message
     {
         public struct Data

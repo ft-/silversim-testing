@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Transfer
 {
     [UDPMessage(MessageType.TransferAbort)]
     [Reliable]
+    [NotTrusted]
     public class TransferAbort : Message
     {
         public UUID TransferID;

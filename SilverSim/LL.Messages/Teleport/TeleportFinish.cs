@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Teleport
     [UDPMessage(MessageType.TeleportFinish)]
     [Reliable]
     [EventQueueGet("TeleportFinish")]
+    [Trusted]
     public class TeleportFinish : Message
     {
         public UUID AgentID;

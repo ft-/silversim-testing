@@ -24,15 +24,13 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.LL.Messages.Inventory
 {
     [UDPMessage(MessageType.MoveInventoryFolder)]
     [Reliable]
+    [NotTrusted]
     public class MoveInventoryFolder : Message
     {
         public UUID AgentID;

@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelOverlay)]
     [Reliable]
+    [Trusted]
     public class ParcelOverlay : Message
     {
         public Int32 SequenceID;

@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Agent
     [UDPMessage(MessageType.AgentGroupDataUpdate)]
     [Reliable]
     [EventQueueGet("AgentGroupDataUpdate")]
+    [Trusted]
     public class AgentGroupDataUpdate : Message
     {
         public UUID AgentID;

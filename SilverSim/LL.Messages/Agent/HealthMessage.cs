@@ -28,6 +28,7 @@ namespace SilverSim.LL.Messages.Agent
 {
     [UDPMessage(MessageType.HealthMessage)]
     [Reliable]
+    [Trusted]
     public class HealthMessage : Message
     {
         public double Health = 0f;

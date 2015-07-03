@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Script
 {
     [UDPMessage(MessageType.ScriptControlChange)]
     [Reliable]
+    [Trusted]
     public class ScriptControlChange : Message
     {
         public struct DataEntry

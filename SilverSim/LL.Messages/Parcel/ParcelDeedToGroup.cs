@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelDeedToGroup)]
     [Reliable]
+    [NotTrusted]
     public class ParcelDeedToGroup : Message
     {
         public UUID AgentID;

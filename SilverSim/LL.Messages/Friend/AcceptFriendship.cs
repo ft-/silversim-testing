@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Friend
 {
     [UDPMessage(MessageType.AcceptFriendship)]
     [Reliable]
+    [NotTrusted]
     public class AcceptFriendship : Message
     {
         public UUID AgentID;

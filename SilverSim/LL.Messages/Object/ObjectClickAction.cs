@@ -32,6 +32,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectClickAction)]
     [Reliable]
+    [NotTrusted]
     public class ObjectClickAction : Message
     {
         public struct Data

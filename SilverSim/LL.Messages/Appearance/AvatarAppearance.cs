@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Appearance
 {
     [UDPMessage(MessageType.AvatarAppearance)]
     [Reliable]
+    [Trusted]
     public class AvatarAppearance : Message
     {
         public UUID Sender = UUID.Zero;

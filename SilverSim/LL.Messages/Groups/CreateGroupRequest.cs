@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Groups
     [UDPMessage(MessageType.CreateGroupRequest)]
     [Reliable]
     [Zerocoded]
+    [NotTrusted]
     class CreateGroupRequest : Message
     {
         public UUID AgentID;

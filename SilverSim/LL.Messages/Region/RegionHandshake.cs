@@ -32,6 +32,7 @@ namespace SilverSim.LL.Messages.Region
 {
     [UDPMessage(MessageType.RegionHandshake)]
     [Reliable]
+    [Trusted]
     public class RegionHandshake : Message
     {
         public RegionOptionFlags RegionFlags = RegionOptionFlags.None;

@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Economy
 {
     [UDPMessage(MessageType.MoneyTransferRequest)]
     [Reliable]
+    [NotTrusted]
     public class MoneyTransferRequest : Message
     {
         public UUID AgentID;

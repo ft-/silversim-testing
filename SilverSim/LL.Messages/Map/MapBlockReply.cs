@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Map
 {
     [UDPMessage(MessageType.MapBlockReply)]
     [Reliable]
+    [Trusted]
     public class MapBlockReply : Message
     {
         public UUID AgentID;

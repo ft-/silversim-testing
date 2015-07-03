@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Land
 {
     [UDPMessage(MessageType.LandStatRequest)]
     [Reliable]
+    [NotTrusted]
     public class LandStatRequest : Message
     {
         public UUID AgentID;

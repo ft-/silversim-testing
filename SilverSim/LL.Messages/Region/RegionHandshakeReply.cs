@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Region
 {
     [UDPMessage(MessageType.RegionHandshakeReply)]
     [Reliable]
+    [NotTrusted]
     public class RegionHandshakeReply : Message
     {
         public UUID AgentID = UUID.Zero;

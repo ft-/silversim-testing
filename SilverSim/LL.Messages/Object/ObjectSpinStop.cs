@@ -23,16 +23,13 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Types;
 
 namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectSpinStop)]
     [Reliable]
+    [NotTrusted]
     public class ObjectSpinStop : Message
     {
         public UUID AgentID = UUID.Zero;

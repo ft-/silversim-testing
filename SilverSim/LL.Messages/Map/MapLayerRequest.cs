@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Map
 {
     [UDPMessage(MessageType.MapLayerRequest)]
     [Reliable]
+    [NotTrusted]
     public class MapLayerRequest : Message
     {
         public UUID AgentID;

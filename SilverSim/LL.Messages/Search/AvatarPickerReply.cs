@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Search
 {
     [UDPMessage(MessageType.AvatarPickerReply)]
     [Reliable]
+    [Trusted]
     public class AvatarPickerReply : Message
     {
         public struct DataEntry

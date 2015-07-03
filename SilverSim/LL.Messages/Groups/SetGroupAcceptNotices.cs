@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Groups
 {
     [UDPMessage(MessageType.SetGroupAcceptNotices)]
     [Reliable]
+    [NotTrusted]
     public class SetGroupAcceptNotices : Message
     {
         public UUID AgentID = UUID.Zero;

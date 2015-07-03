@@ -29,6 +29,7 @@ using SilverSim.Types.Agent;
 namespace SilverSim.LL.Messages.Agent
 {
     [UDPMessage(MessageType.AgentUpdate)]
+    [NotTrusted]
     public class AgentUpdate : Message
     {
         public UUID AgentID;

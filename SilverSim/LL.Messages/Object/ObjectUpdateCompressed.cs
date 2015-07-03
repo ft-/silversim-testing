@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectUpdateCompressed)]
     [Reliable]
+    [Trusted]
     public class ObjectUpdateCompressed : Message
     {
         public UInt64 RegionHandle;

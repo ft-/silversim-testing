@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Transfer
 {
     [UDPMessage(MessageType.AbortXfer)]
     [Reliable]
+    [NotTrusted]
     public class AbortXfer : Message
     {
         public UInt64 ID;

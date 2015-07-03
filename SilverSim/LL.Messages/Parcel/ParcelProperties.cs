@@ -31,6 +31,7 @@ using System;
 namespace SilverSim.LL.Messages.Parcel
 {
     [EventQueueGet("ParcelProperties")]
+    [Trusted]
     public class ParcelProperties : Message
     {
         public Int32 RequestResult;

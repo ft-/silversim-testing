@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelMediaUpdate)]
     [Reliable]
+    [Trusted]
     public class ParcelMediaUpdate : Message
     {
         public string MediaURL;

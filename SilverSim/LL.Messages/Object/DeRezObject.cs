@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.DeRezObject)]
     [Reliable]
+    [NotTrusted]
     public class DeRezObject : Message
     {
         public enum DeRezAction : byte

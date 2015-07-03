@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Generic
 {
     [UDPMessage(MessageType.GodlikeMessage)]
     [Reliable]
+    [NotTrusted]
     public class GodlikeMessage : GenericMessageFormat
     {
         public GodlikeMessage()

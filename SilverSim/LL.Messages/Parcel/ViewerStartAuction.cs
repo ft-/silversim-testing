@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ViewerStartAuction)]
     [Reliable]
+    [NotTrusted]
     public class ViewerStartAuction : Message
     {
         public UUID AgentID;

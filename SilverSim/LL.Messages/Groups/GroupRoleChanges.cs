@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Groups
 {
     [UDPMessage(MessageType.GroupRoleChanges)]
     [Reliable]
+    [NotTrusted]
     class GroupRoleChanges : Message
     {
         public UUID AgentID;

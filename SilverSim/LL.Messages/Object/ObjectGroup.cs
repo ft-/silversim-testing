@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectGroup)]
     [Reliable]
+    [NotTrusted]
     public class ObjectGroup : Message
     {
         public UUID AgentID = UUID.Zero;

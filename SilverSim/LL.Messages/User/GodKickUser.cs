@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.User
 {
     [UDPMessage(MessageType.GodKickUser)]
     [Reliable]
+    [NotTrusted]
     public class GodKickUser : Message
     {
         public UUID GodID = UUID.Zero;

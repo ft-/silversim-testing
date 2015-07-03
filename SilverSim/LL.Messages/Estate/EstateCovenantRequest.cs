@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Estate
 {
     [UDPMessage(MessageType.EstateCovenantRequest)]
     [Reliable]
+    [NotTrusted]
     public class EstateCovenantRequest : Message
     {
         public UUID AgentID = UUID.Zero;

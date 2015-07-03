@@ -23,12 +23,14 @@ obligated to do so. If you do not wish to do so, delete this
 exception statement from your version.
 
 */
+
 using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ForceObjectSelect)]
     [Reliable]
+    [NotTrusted]
     public class ForceObjectSelect : Message
     {
         public bool ResetList;

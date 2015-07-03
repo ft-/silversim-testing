@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Groups
 {
     [UDPMessage(MessageType.InviteGroupRequest)]
     [Reliable]
+    [NotTrusted]
     public class InviteGroupRequest : Message
     {
         public UUID AgentID = UUID.Zero;

@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Chat
 {
     [UDPMessage(MessageType.ChatFromSimulator)]
     [Reliable]
+    [Trusted]
     public class ChatFromSimulator : Message
     {
         public string FromName = string.Empty;

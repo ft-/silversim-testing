@@ -31,7 +31,8 @@ namespace SilverSim.LL.Messages.Groups
     [UDPMessage(MessageType.JoinGroupRequest)]
     [Reliable]
     [Zerocoded]
-    class JoinGroupRequest : Message
+    [NotTrusted]
+    public class JoinGroupRequest : Message
     {
         public UUID AgentID;
         public UUID SessionID;

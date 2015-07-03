@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectFlagUpdate)]
     [Reliable]
+    [NotTrusted]
     public class ObjectFlagUpdate : Message
     {
         public UUID AgentID = UUID.Zero;

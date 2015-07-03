@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Profile
 {
     [UDPMessage(MessageType.AvatarInterestsUpdate)]
     [Reliable]
+    [NotTrusted]
     public class AvatarInterestsUpdate : Message
     {
         public UUID AgentID = UUID.Zero;

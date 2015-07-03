@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Circuit
 {
     [UDPMessage(MessageType.AgentMovementComplete)]
     [Reliable]
+    [Trusted]
     public class AgentMovementComplete : Message
     {
         public UUID AgentID;

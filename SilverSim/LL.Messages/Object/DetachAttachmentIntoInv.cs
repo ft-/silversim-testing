@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.DetachAttachmentIntoInv)]
     [Reliable]
+    [NotTrusted]
     public class DetachAttachmentIntoInv : Message
     {
         public UUID AgentID;

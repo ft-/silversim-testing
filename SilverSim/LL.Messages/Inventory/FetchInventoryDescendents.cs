@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Inventory
 {
     [UDPMessage(MessageType.FetchInventoryDescendents)]
     [Reliable]
+    [NotTrusted]
     public class FetchInventoryDescendents : Message
     {
         public UUID AgentID;

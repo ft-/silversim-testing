@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Event
 {
     [UDPMessage(MessageType.EventInfoRequest)]
     [Reliable]
+    [NotTrusted]
     public class EventInfoRequest : Message
     {
         public UUID AgentID;

@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Names
 {
     [UDPMessage(MessageType.UUIDNameReply)]
     [Reliable]
+    [Trusted]
     public class UUIDNameReply : Message
     {
         public struct Data

@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Circuit
 {
     [UDPMessage(MessageType.LogoutRequest)]
     [Reliable]
+    [NotTrusted]
     public class LogoutRequest : Message
     {
         public UUID SessionID = UUID.Zero;

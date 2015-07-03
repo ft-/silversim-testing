@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Land
 {
     [UDPMessage(MessageType.ModifyLand)]
     [Reliable]
+    [NotTrusted]
     public class ModifyLand : Message
     {
         public struct Data

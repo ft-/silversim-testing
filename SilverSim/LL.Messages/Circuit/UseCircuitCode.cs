@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Circuit
 {
     [UDPMessage(MessageType.UseCircuitCode)]
     [Reliable]
+    [NotTrusted]
     class UseCircuitCode : Message
     {
         public UInt32 CircuitCode = 0;

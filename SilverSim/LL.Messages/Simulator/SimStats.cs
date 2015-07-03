@@ -29,6 +29,7 @@ using System.Collections.Generic;
 namespace SilverSim.LL.Messages.Simulator
 {
     [UDPMessage(MessageType.SimStats)]
+    [Trusted]
     public class SimStats : Message
     {
         public struct Data

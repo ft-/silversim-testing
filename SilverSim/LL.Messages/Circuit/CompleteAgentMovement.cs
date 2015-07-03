@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Circuit
 {
     [UDPMessage(MessageType.CompleteAgentMovement)]
     [Reliable]
+    [NotTrusted]
     public class CompleteAgentMovement : Message
     {
         public UUID SessionID = UUID.Zero;

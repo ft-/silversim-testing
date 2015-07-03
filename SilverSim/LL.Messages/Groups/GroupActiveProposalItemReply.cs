@@ -34,6 +34,7 @@ namespace SilverSim.LL.Messages.Groups
     [UDPMessage(MessageType.GroupActiveProposalItemReply)]
     [Reliable]
     [Zerocoded]
+    [Trusted]
     public class GroupActiveProposalItemReply : Message
     {
         public UUID AgentID = UUID.Zero;

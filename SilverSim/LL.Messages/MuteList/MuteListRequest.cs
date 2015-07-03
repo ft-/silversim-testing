@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.MuteList
 {
     [UDPMessage(MessageType.MuteListRequest)]
     [Reliable]
+    [NotTrusted]
     public class MuteListRequest : Message
     {
         public UUID AgentID;

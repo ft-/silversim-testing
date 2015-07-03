@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Camera
 {
     [UDPMessage(MessageType.SetFollowCamProperties)]
     [Reliable]
+    [Trusted]
     public class SetFollowCamProperties : Message
     {
         public UUID ObjectID = UUID.Zero;

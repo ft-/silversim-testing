@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelGodMarkAsContent)]
     [Reliable]
+    [NotTrusted]
     public class ParcelGodMarkAsContent : Message
     {
         public UUID AgentID;

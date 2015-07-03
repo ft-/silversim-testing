@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Image
 {
     [UDPMessage(MessageType.RequestImage)]
     [Reliable]
+    [NotTrusted]
     public class RequestImage : Message
     {
         public UUID AgentID;

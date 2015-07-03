@@ -25,14 +25,12 @@ exception statement from your version.
 
 using SilverSim.Types;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.LL.Messages.Script
 {
     [UDPMessage(MessageType.ScriptAnswerYes)]
     [Reliable]
+    [NotTrusted]
     public class ScriptAnswerYes : Message
     {
         public UUID AgentID = UUID.Zero;

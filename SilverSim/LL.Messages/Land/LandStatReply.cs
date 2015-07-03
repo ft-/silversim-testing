@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Land
 {
     [UDPMessage(MessageType.LandStatReply)]
     [Reliable]
+    [Trusted]
     public class LandStatReply : Message
     {
         public struct ReportDataEntry

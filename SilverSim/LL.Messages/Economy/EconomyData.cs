@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Economy
 {
     [UDPMessage(MessageType.EconomyData)]
     [Reliable]
+    [Trusted]
     public class EconomyData : Message
     {
         public Int32 ObjectCapacity = 0;

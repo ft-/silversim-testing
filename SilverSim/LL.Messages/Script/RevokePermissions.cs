@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Script
 {
     [UDPMessage(MessageType.RevokePermissions)]
     [Reliable]
+    [NotTrusted]
     public class RevokePermissions : Message
     {
         public UUID AgentID = UUID.Zero;

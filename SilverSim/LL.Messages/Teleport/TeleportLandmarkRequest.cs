@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Teleport
 {
     [UDPMessage(MessageType.TeleportLandmarkRequest)]
     [Reliable]
+    [NotTrusted]
     public class TeleportLandmarkRequest : Message
     {
         public UUID AgentID;

@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectUpdateCached)]
     [Reliable]
+    [Trusted]
     public class ObjectUpdateCached : Message
     {
         public UInt64 RegionHandle;

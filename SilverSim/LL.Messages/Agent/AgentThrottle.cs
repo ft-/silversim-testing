@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Agent
 {
     [UDPMessage(MessageType.AgentThrottle)]
     [Reliable]
+    [NotTrusted]
     public class AgentThrottle : Message
     {
         public UUID AgentID = UUID.Zero;

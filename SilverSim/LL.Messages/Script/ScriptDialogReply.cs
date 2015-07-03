@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Script
 {
     [UDPMessage(MessageType.ScriptDialogReply)]
     [Reliable]
+    [NotTrusted]
     public class ScriptDialogReply : Message
     {
         public UUID AgentID = UUID.Zero;

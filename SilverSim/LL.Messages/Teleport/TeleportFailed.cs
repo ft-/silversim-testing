@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Teleport
 {
     [UDPMessage(MessageType.TeleportFailed)]
     [Reliable]
+    [Trusted]
     public class TeleportFailed : Message
     {
         public UUID AgentID;

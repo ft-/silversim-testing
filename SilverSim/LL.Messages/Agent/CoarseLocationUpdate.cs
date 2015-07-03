@@ -30,6 +30,7 @@ using System.Collections.Generic;
 namespace SilverSim.LL.Messages.Agent
 {
     [UDPMessage(MessageType.CoarseLocationUpdate)]
+    [Trusted]
     public class CoarseLocationUpdate : Message
     {
         public Int16 You = 0;

@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Groups
     [UDPMessage(MessageType.GroupAccountSummaryReply)]
     [Reliable]
     [Zerocoded]
+    [Trusted]
     public class GroupAccountSummaryReply : Message
     {
         public UUID AgentID = UUID.Zero;

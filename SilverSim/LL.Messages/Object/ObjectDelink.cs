@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectDelink)]
     [Reliable]
+    [NotTrusted]
     public class ObjectDelink : Message
     {
         public UUID AgentID = UUID.Zero;

@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectSelect)]
     [Reliable]
+    [NotTrusted]
     public class ObjectSelect : Message
     {
         public UUID AgentID = UUID.Zero;

@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectCategory)]
     [Reliable]
+    [NotTrusted]
     public class ObjectCategory : Message
     {
         public struct Data

@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Event
 {
     [UDPMessage(MessageType.EventNotificationRemoveRequest)]
     [Reliable]
+    [NotTrusted]
     public class EventNotificationRemoveRequest : Message
     {
         public UUID AgentID;

@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Image
 {
     [UDPMessage(MessageType.ImageData)]
     [Reliable]
+    [Trusted]
     public class ImageData : Message
     {
         public UUID ID = UUID.Zero;

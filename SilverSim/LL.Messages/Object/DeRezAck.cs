@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.DeRezAck)]
     [Reliable]
+    [Trusted]
     public class DeRezAck : Message
     {
         public UUID TransactionID;

@@ -23,15 +23,13 @@ exception statement from your version.
 
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.LL.Messages.Region
 {
     [UDPMessage(MessageType.SimulatorViewerTimeMessage)]
+    [Trusted]
     public class SimulatorViewerTimeMessage : Message
     {
         public UInt64 UsecSinceStart;

@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Friend
 {
     [UDPMessage(MessageType.GrantUserRights)]
     [Reliable]
+    [NotTrusted]
     public class GrantUserRights : Message
     {
         public UUID AgentID;

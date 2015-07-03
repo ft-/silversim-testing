@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Estate
 {
     [UDPMessage(MessageType.EstateCovenantReply)]
     [Reliable]
+    [Trusted]
     public class EstateCovenantReply : Message
     {
         public UUID CovenantID = UUID.Zero;

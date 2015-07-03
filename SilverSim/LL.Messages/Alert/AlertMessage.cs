@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Alert
 {
     [UDPMessage(MessageType.AlertMessage)]
     [Reliable]
+    [Trusted]
     public class AlertMessage : Message
     {
         public struct Data

@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Circuit
 {
     [UDPMessage(MessageType.ConfirmEnableSimulator)]
     [Reliable]
+    [NotTrusted]
     public class ConfirmEnableSimulator : Message
     {
         public UUID AgentID = UUID.Zero;

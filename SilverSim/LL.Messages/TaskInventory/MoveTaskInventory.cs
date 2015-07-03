@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.TaskInventory
 {
     [UDPMessage(MessageType.MoveTaskInventory)]
     [Reliable]
+    [NotTrusted]
     public class MoveTaskInventory : Message
     {
         public UUID AgentID;

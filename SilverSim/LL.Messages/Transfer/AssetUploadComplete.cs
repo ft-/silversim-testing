@@ -35,6 +35,7 @@ namespace SilverSim.LL.Messages.Transfer
     [UDPMessage(MessageType.AssetUploadComplete)]
     [Reliable]
     [Zerocoded]
+    [NotTrusted]
     public class AssetUploadComplete : Message
     {
         public UUID AssetID;

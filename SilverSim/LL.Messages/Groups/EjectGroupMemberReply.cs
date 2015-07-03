@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Groups
 {
     [UDPMessage(MessageType.EjectGroupMemberReply)]
     [Reliable]
+    [Trusted]
     public class EjectGroupMemberReply : Message
     {
         public UUID AgentID = UUID.Zero;

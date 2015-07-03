@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Circuit
 {
     [UDPMessage(MessageType.LogoutReply)]
     [Reliable]
+    [Trusted]
     public class LogoutReply : Message
     {
         public UUID AgentID;

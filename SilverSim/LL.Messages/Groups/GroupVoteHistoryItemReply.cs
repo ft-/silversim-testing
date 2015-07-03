@@ -26,13 +26,12 @@ exception statement from your version.
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.LL.Messages.Groups
 {
     [UDPMessage(MessageType.GroupVoteHistoryItemReply)]
     [Reliable]
+    [Trusted]
     public class GroupVoteHistoryItemReply : Message
     {
         public UUID AgentID = UUID.Zero;

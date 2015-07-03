@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Common
 {
     [UDPMessage(MessageType.FeatureDisabled)]
     [Reliable]
+    [Trusted]
     public class FeatureDisabled : Message
     {
         public string ErrorMessage;

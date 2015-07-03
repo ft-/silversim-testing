@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelSelectObjects)]
     [Reliable]
+    [NotTrusted]
     public class ParcelSelectObjects : Message
     {
         public UUID AgentID = UUID.Zero;

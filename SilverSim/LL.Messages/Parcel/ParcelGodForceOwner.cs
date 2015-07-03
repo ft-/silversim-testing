@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelGodForceOwner)]
     [Reliable]
+    [NotTrusted]
     public class ParcelGodForceOwner : Message
     {
         public UUID AgentID;

@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Avatar
 {
     [UDPMessage(MessageType.AvatarSitResponse)]
     [Reliable]
+    [Trusted]
     public class AvatarSitResponse : Message
     {
         public UUID SitObject = UUID.Zero;

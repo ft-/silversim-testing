@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectExtraParams)]
     [Reliable]
+    [NotTrusted]
     public class ObjectExtraParams : Message
     {
         public struct Data

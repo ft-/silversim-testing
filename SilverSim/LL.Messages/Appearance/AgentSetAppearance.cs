@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Appearance
 {
     [UDPMessage(MessageType.AgentSetAppearance)]
     [Reliable]
+    [NotTrusted]
     public class AgentSetAppearance : Message
     {
         public UUID AgentID;

@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Inventory
 {
     [UDPMessage(MessageType.RequestInventoryAsset)]
     [Reliable]
+    [NotTrusted]
     public class RequestInventoryAsset : Message
     {
         public UUID QueryID;

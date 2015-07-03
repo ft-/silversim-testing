@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Inventory
 {
     [UDPMessage(MessageType.BulkUpdateInventory)]
     [Reliable]
+    [Trusted]
     public class BulkUpdateInventory : Message
     {
         public UUID AgentID;

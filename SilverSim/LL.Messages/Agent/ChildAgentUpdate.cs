@@ -31,6 +31,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Agent
 {
+    [Trusted]
     public class ChildAgentUpdate : Message
     {
         #region Extra Fields not communicated in LL message

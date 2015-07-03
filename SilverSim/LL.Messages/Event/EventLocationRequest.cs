@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Event
 {
     [UDPMessage(MessageType.EventLocationRequest)]
     [Reliable]
+    [NotTrusted]
     public class EventLocationRequest : Message
     {
         public UUID QueryID;

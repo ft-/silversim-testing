@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Inventory
 {
     [UDPMessage(MessageType.CopyInventoryFromNotecard)]
     [Reliable]
+    [NotTrusted]
     public class CopyInventoryFromNotecard : Message
     {
         public UUID AgentID;

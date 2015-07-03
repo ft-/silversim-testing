@@ -29,6 +29,7 @@ using System.Collections.Generic;
 namespace SilverSim.LL.Messages.Appearance
 {
     [UDPMessage(MessageType.ViewerEffect)]
+    [NotTrusted]
     public class ViewerEffect : Message
     {
         public UUID AgentID;

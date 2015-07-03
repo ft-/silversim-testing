@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.BuyObjectInventory)]
     [Reliable]
+    [NotTrusted]
     public class BuyObjectInventory : Message
     {
         public UUID AgentID = UUID.Zero;

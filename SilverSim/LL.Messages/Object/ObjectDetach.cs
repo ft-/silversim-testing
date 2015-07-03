@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectDetach)]
     [Reliable]
+    [NotTrusted]
     public class ObjectDetach : Message
     {
         public UUID AgentID = UUID.Zero;

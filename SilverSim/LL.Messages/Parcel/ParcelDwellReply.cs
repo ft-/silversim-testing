@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelDwellReply)]
     [Reliable]
+    [Trusted]
     public class ParcelDwellReply : Message
     {
         public UUID AgentID;

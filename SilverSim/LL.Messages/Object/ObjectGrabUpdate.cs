@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectGrabUpdate)]
     [Reliable]
+    [NotTrusted]
     public class ObjectGrabUpdate : Message
     {
         public struct Data

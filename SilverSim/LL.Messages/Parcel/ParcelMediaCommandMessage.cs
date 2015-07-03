@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelMediaCommandMessage)]
     [Reliable]
+    [Trusted]
     public class ParcelMediaCommandMessage : Message
     {
         public UInt32 Flags;

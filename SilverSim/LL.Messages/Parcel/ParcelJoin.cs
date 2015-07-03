@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelJoin)]
     [Reliable]
+    [NotTrusted]
     public class ParcelJoin : Message
     {
         public UUID AgentID;

@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Teleport
 {
     [UDPMessage(MessageType.TeleportCancel)]
     [Reliable]
+    [NotTrusted]
     public class TeleportCancel : Message
     {
         public UUID AgentID;

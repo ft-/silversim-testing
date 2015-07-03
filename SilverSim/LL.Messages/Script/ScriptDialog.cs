@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Script
 {
     [UDPMessage(MessageType.ScriptDialog)]
     [Reliable]
+    [Trusted]
     public class ScriptDialog : Message
     {
         public UUID ObjectID;

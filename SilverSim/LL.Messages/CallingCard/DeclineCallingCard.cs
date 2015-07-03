@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.CallingCard
 {
     [UDPMessage(MessageType.DeclineCallingCard)]
     [Reliable]
+    [NotTrusted]
     public class DeclineCallingCard : Message
     {
         public UUID AgentID;

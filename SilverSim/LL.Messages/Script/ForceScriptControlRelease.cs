@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Script
 {
     [UDPMessage(MessageType.ForceScriptControlRelease)]
     [Reliable]
+    [NotTrusted]
     public class ForceScriptControlRelease : Message
     {
         public UUID AgentID = UUID.Zero;

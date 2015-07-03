@@ -25,14 +25,12 @@ exception statement from your version.
 
 using SilverSim.Types;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.LL.Messages.TaskInventory
 {
     [UDPMessage(MessageType.ReplyTaskInventory)]
     [Reliable]
+    [Trusted]
     public class ReplyTaskInventory : Message
     {
         public UUID TaskID;

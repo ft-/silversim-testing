@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Agent
 {
     [UDPMessage(MessageType.AgentAnimation)]
     [Reliable]
+    [NotTrusted]
     public class AgentAnimation : Message
     {
         public UUID AgentID;

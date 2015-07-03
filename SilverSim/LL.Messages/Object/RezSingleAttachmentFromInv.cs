@@ -32,6 +32,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.RezSingleAttachmentFromInv)]
     [Reliable]
+    [NotTrusted]
     public class RezSingleAttachmentFromInv : Message
     {
         public UUID AgentID;

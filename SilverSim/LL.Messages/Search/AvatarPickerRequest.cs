@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Search
 {
     [UDPMessage(MessageType.AvatarPickerRequest)]
     [Reliable]
+    [NotTrusted]
     public class AvatarPickerRequest : Message
     {
         public UUID AgentID;

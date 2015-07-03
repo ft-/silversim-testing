@@ -29,6 +29,7 @@ using System;
 namespace SilverSim.LL.Messages.Event
 {
     [UDPMessage(MessageType.EventGodDelete)]
+    [NotTrusted]
     public class EventGodDelete : Message
     {
         public UUID AgentID;

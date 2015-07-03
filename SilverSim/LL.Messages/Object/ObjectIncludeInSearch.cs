@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectIncludeInSearch)]
     [Reliable]
+    [NotTrusted]
     public class ObjectIncludeInSearch : Message
     {
         public UUID AgentID;

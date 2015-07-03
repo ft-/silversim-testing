@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Names
 {
     [UDPMessage(MessageType.UUIDNameRequest)]
     [Reliable]
+    [NotTrusted]
     public class UUIDNameRequest : Message
     {
 

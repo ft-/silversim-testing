@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectDrop)]
     [Reliable]
+    [NotTrusted]
     public class ObjectDrop : Message
     {
         public UUID AgentID = UUID.Zero;

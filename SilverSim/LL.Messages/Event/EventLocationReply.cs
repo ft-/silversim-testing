@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Event
 {
     [UDPMessage(MessageType.EventLocationReply)]
     [Reliable]
+    [Trusted]
     public class EventLocationReply : Message
     {
         public UUID QueryID;

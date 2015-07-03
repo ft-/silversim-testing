@@ -28,6 +28,7 @@ using SilverSim.Types;
 namespace SilverSim.LL.Messages.Sound
 {
     [UDPMessage(MessageType.SoundTrigger)]
+    [NotTrusted]
     public class SoundTrigger : Message
     {
         public UUID SoundID;

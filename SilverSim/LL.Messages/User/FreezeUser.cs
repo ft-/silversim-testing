@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.User
 {
     [UDPMessage(MessageType.FreezeUser)]
     [Reliable]
+    [NotTrusted]
     public class FreezeUser : Message
     {
         public UUID AgentID = UUID.Zero;
