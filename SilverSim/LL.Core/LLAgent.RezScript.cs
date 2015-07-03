@@ -61,6 +61,7 @@ namespace SilverSim.LL.Core
 {
     public partial class LLAgent
     {
+        [PacketHandler(MessageType.RezScript)]
         void HandleRezScript(Message m)
         {
             RezScript req = (RezScript)m;

@@ -36,162 +36,194 @@ namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
-        public void HandleRequestPayPrice(Message m)
+        [PacketHandler(MessageType.RequestPayPrice)]
+        void HandleRequestPayPrice(Message m)
         {
             SilverSim.LL.Messages.Object.RequestPayPrice req = (SilverSim.LL.Messages.Object.RequestPayPrice)m;
         }
 
-        public void HandleObjectSpinStart(Message m)
+        [PacketHandler(MessageType.ObjectSpinStart)]
+        void HandleObjectSpinStart(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectSpinStart req = (SilverSim.LL.Messages.Object.ObjectSpinStart)m;
         }
 
-        public void HandleObjectSpinUpdate(Message m)
+        [PacketHandler(MessageType.ObjectSpinUpdate)]
+        void HandleObjectSpinUpdate(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectSpinUpdate req = (SilverSim.LL.Messages.Object.ObjectSpinUpdate)m;
         }
 
-        public void HandleObjectSpinStop(Message m)
+        [PacketHandler(MessageType.ObjectSpinStop)]
+        void HandleObjectSpinStop(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectSpinStop req = (SilverSim.LL.Messages.Object.ObjectSpinStop)m;
         }
 
-        public void HandleObjectShape(Message m)
+        [PacketHandler(MessageType.ObjectShape)]
+        void HandleObjectShape(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectShape req = (SilverSim.LL.Messages.Object.ObjectShape)m;
         }
 
-        public void HandleObjectSaleInfo(Message m)
+        [PacketHandler(MessageType.ObjectSaleInfo)]
+        void HandleObjectSaleInfo(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectSaleInfo req = (SilverSim.LL.Messages.Object.ObjectSaleInfo)m;
         }
 
-        public void HandleObjectRotation(Message m)
+        [PacketHandler(MessageType.ObjectRotation)]
+        void HandleObjectRotation(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectRotation req = (SilverSim.LL.Messages.Object.ObjectRotation)m;
         }
 
-        public void HandleObjectPermissions(Message m)
+        [PacketHandler(MessageType.ObjectPermissions)]
+        void HandleObjectPermissions(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectPermissions req = (SilverSim.LL.Messages.Object.ObjectPermissions)m;
         }
 
-        public void HandleObjectOwner(Message m)
+        [PacketHandler(MessageType.ObjectOwner)]
+        void HandleObjectOwner(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectOwner req = (SilverSim.LL.Messages.Object.ObjectOwner)m;
         }
 
-        public void HandleObjectName(Message m)
+        [PacketHandler(MessageType.ObjectName)]
+        void HandleObjectName(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectName req = (SilverSim.LL.Messages.Object.ObjectName)m;
         }
 
-        public void HandleObjectLink(Message m)
+        [PacketHandler(MessageType.ObjectLink)]
+        void HandleObjectLink(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectLink req = (SilverSim.LL.Messages.Object.ObjectLink)m;
         }
 
-        public void HandleObjectDelink(Message m)
+        [PacketHandler(MessageType.ObjectDelink)]
+        void HandleObjectDelink(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectDelink req = (SilverSim.LL.Messages.Object.ObjectDelink)m;
         }
 
-        public void HandleObjectGroup(Message m)
+        [PacketHandler(MessageType.ObjectGroup)]
+        void HandleObjectGroup(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectGroup req = (SilverSim.LL.Messages.Object.ObjectGroup)m;
         }
 
-        public void HandleObjectIncludeInSearch(Message m)
+        [PacketHandler(MessageType.ObjectIncludeInSearch)]
+        void HandleObjectIncludeInSearch(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectIncludeInSearch req = (SilverSim.LL.Messages.Object.ObjectIncludeInSearch)m;
         }
 
-        public void HandleObjectFlagUpdate(Message m)
+        [PacketHandler(MessageType.ObjectFlagUpdate)]
+        void HandleObjectFlagUpdate(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectFlagUpdate req = (SilverSim.LL.Messages.Object.ObjectFlagUpdate)m;
         }
 
-        public void HandleObjectMaterial(Message m)
+        [PacketHandler(MessageType.ObjectMaterial)]
+        void HandleObjectMaterial(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectMaterial req = (SilverSim.LL.Messages.Object.ObjectMaterial)m;
         }
 
-        public void HandleObjectExtraParams(Message m)
+        [PacketHandler(MessageType.ObjectExtraParams)]
+        void HandleObjectExtraParams(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectExtraParams req = (SilverSim.LL.Messages.Object.ObjectExtraParams)m;
         }
 
-        public void HandleObjectExportSelected(Message m)
+        [PacketHandler(MessageType.ObjectExportSelected)]
+        void HandleObjectExportSelected(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectExportSelected req = (SilverSim.LL.Messages.Object.ObjectExportSelected)m;
         }
 
-        public void HandleObjectSelect(Message m)
+        [PacketHandler(MessageType.ObjectSelect)]
+        void HandleObjectSelect(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectSelect req = (SilverSim.LL.Messages.Object.ObjectSelect)m;
         }
 
-        public void HandleObjectDrop(Message m)
+        [PacketHandler(MessageType.ObjectDrop)]
+        void HandleObjectDrop(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectDrop req = (SilverSim.LL.Messages.Object.ObjectDrop)m;
         }
 
-        public void HandleObjectAttach(Message m)
+        [PacketHandler(MessageType.ObjectAttach)]
+        void HandleObjectAttach(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectAttach req = (SilverSim.LL.Messages.Object.ObjectAttach)m;
         }
 
-        public void HandleObjectDetach(Message m)
+        [PacketHandler(MessageType.ObjectDetach)]
+        void HandleObjectDetach(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectDetach req = (SilverSim.LL.Messages.Object.ObjectDetach)m;
         }
 
-        public void HandleObjectDescription(Message m)
+        [PacketHandler(MessageType.ObjectDescription)]
+        void HandleObjectDescription(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectDescription req = (SilverSim.LL.Messages.Object.ObjectDescription)m;
         }
 
-        public void HandleObjectDeselect(Message m)
+        [PacketHandler(MessageType.ObjectDeselect)]
+        void HandleObjectDeselect(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectDeselect req = (SilverSim.LL.Messages.Object.ObjectDeselect)m;
         }
 
-        public void HandleObjectClickAction(Message m)
+        [PacketHandler(MessageType.ObjectClickAction)]
+        void HandleObjectClickAction(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectClickAction req = (SilverSim.LL.Messages.Object.ObjectClickAction)m;
         }
 
-        public void HandleObjectCategory(Message m)
+        [PacketHandler(MessageType.ObjectCategory)]
+        void HandleObjectCategory(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectCategory req = (SilverSim.LL.Messages.Object.ObjectCategory)m;
         }
 
-        public void HandleObjectBuy(Message m)
+        [PacketHandler(MessageType.ObjectBuy)]
+        void HandleObjectBuy(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectBuy req = (SilverSim.LL.Messages.Object.ObjectBuy)m;
         }
 
-        public void HandleBuyObjectInventory(Message m)
+        [PacketHandler(MessageType.BuyObjectInventory)]
+        void HandleBuyObjectInventory(Message m)
         {
             SilverSim.LL.Messages.Object.BuyObjectInventory req = (SilverSim.LL.Messages.Object.BuyObjectInventory)m;
         }
 
-        public void HandleObjectGrab(Message m)
+        [PacketHandler(MessageType.ObjectGrab)]
+        void HandleObjectGrab(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectGrab req = (SilverSim.LL.Messages.Object.ObjectGrab)m;
         }
 
-        public void HandleObjectGrabUpdate(Message m)
+        [PacketHandler(MessageType.ObjectGrabUpdate)]
+        void HandleObjectGrabUpdate(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectGrabUpdate req = (SilverSim.LL.Messages.Object.ObjectGrabUpdate)m;
         }
 
-        public void HandleObjectDeGrab(Message m)
+        [PacketHandler(MessageType.ObjectDeGrab)]
+        void HandleObjectDeGrab(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectDeGrab req = (SilverSim.LL.Messages.Object.ObjectDeGrab)m;
         }
 
-        public void HandleRequestObjectPropertiesFamily(Message m)
+        [PacketHandler(MessageType.RequestObjectPropertiesFamily)]
+        void HandleRequestObjectPropertiesFamily(Message m)
         {
             SilverSim.LL.Messages.Object.RequestObjectPropertiesFamily req = (SilverSim.LL.Messages.Object.RequestObjectPropertiesFamily)m;
             if(req.AgentID != req.CircuitAgentID ||

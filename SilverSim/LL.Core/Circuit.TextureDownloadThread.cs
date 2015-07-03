@@ -57,11 +57,11 @@ namespace SilverSim.LL.Core
                     Messages.Image.RequestImage req;
                     if (bakedReqs.Count != 0 || normalReqs.Count != 0)
                     {
-                        req = m_TextureDownloadQueue.Dequeue(0);
+                        req = (Messages.Image.RequestImage)m_TextureDownloadQueue.Dequeue(0);
                     }
                     else
                     {
-                        req = m_TextureDownloadQueue.Dequeue(1000);
+                        req = (Messages.Image.RequestImage)m_TextureDownloadQueue.Dequeue(1000);
                     }
                     foreach(Messages.Image.RequestImage.RequestImageEntry imageRequest in req.RequestImageList)
                     {

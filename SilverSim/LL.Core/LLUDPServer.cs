@@ -69,7 +69,6 @@ namespace SilverSim.LL.Core
         BlockingQueue<IScriptEvent> m_ChatQueue = new BlockingQueue<IScriptEvent>();
         RwLockedDictionary<UUID, LLAgent> m_Agents = new RwLockedDictionary<UUID, LLAgent>();
         Thread m_ChatThread;
-        Dictionary<MessageType, Action<Message>> m_Routing = new Dictionary<MessageType, Action<Message>>();
         private object m_UseCircuitCodeProcessingLock = new object();
         
         public SceneInterface Scene { get; private set; }
@@ -117,7 +116,6 @@ namespace SilverSim.LL.Core
 
             m_ChatThread = new Thread(ChatSendHandler);
             m_ChatThread.Start();
-            InitRouting();
             m_UdpSocket.Bind(ep);
             m_Log.InfoFormat("Initialized UDP Server at {0}:{1}", bindAddress.ToString(), port);
         }
@@ -393,191 +391,6 @@ namespace SilverSim.LL.Core
         {
             m_UdpSocket.SendTo(p.Data, 0, p.DataLength, SocketFlags.None, ep);
             return p.DataLength;
-        }
-
-        void HandleAgentUpdateMessage(Message m)
-        {
-            LLAgent agent;
-            if (m_Agents.TryGetValue(m.CircuitAgentID, out agent))
-            {
-                agent.HandleAgentUpdateMessage(m);
-            }
-        }
-
-        void HandleAgentMessage(Message m)
-        {
-            LLAgent agent;
-            if (m_Agents.TryGetValue(m.CircuitAgentID, out agent))
-            {
-                agent.HandleAgentMessage(m);
-            }
-        }
-
-        void InitRouting()
-        {
-            /* Objects */
-            m_Routing[MessageType.ObjectGrab] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectGrabUpdate] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectDeGrab] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectAdd] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectDelete] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectDuplicate] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectDuplicateOnRay] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.MultipleObjectUpdate] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectRotation] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectClickAction] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.RequestMultipleObjects] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectFlagUpdate] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectImage] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectMaterial] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectShape] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectExtraParams] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectOwner] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectGroup] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectBuy] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.BuyObjectInventory] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectPermissions] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectSaleInfo] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectName] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectDescription] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectCategory] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectSelect] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectDeselect] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectAttach] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectDetach] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectDrop] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectLink] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectDelink] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectExportSelected] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.RequestObjectPropertiesFamily] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.RequestPayPrice] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ObjectIncludeInSearch] = Scene.HandleSimulatorMessage;
-
-            /* Regions */
-            m_Routing[MessageType.RegionHandleRequest] = Scene.HandleSimulatorMessage;
-
-            /* Mute List */
-            m_Routing[MessageType.MuteListRequest] = HandleAgentMessage;
-            m_Routing[MessageType.UpdateMuteListEntry] = HandleAgentMessage;
-            m_Routing[MessageType.RemoveMuteListEntry] = HandleAgentMessage;
-
-            /* Scripts */
-            m_Routing[MessageType.GetScriptRunning] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.SetScriptRunning] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ScriptReset] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ScriptAnswerYes] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.RevokePermissions] = Scene.HandleSimulatorMessage;
-
-            /* God */
-            m_Routing[MessageType.RequestGodlikePowers] = HandleAgentMessage;
-
-            /* Agent Update */
-            m_Routing[MessageType.AgentUpdate] = HandleAgentUpdateMessage;
-            m_Routing[MessageType.AgentFOV] = HandleAgentMessage;
-            m_Routing[MessageType.AgentHeightWidth] = HandleAgentMessage;
-            m_Routing[MessageType.AgentSetAppearance] = HandleAgentMessage;
-            m_Routing[MessageType.AgentAnimation] = HandleAgentMessage;
-            m_Routing[MessageType.AgentRequestSit] = HandleAgentMessage;
-            m_Routing[MessageType.AgentDataUpdateRequest] = HandleAgentMessage;
-
-            /* Economy */
-            m_Routing[MessageType.EconomyDataRequest] = HandleSimulatorMessageLocally;
-            m_Routing[MessageType.MoneyBalanceRequest] = HandleAgentMessage;
-
-            /* Appearance */
-            m_Routing[MessageType.AgentWearablesRequest] = HandleAgentMessage;
-            m_Routing[MessageType.AgentIsNowWearing] = HandleAgentMessage;
-            m_Routing[MessageType.AgentCachedTexture] = HandleAgentMessage;
-            m_Routing[MessageType.ViewerEffect] = HandleAgentMessage;
-            m_Routing[MessageType.RezSingleAttachmentFromInv] = HandleAgentMessage;
-            m_Routing[MessageType.RezMultipleAttachmentsFromInv] = HandleAgentMessage;
-            m_Routing[MessageType.DetachAttachmentIntoInv] = HandleAgentMessage;
-            m_Routing[MessageType.CreateNewOutfitAttachments] = HandleAgentMessage;
-
-            /* Agent State */
-            m_Routing[MessageType.AgentPause] = HandleAgentMessage;
-            m_Routing[MessageType.AgentResume] = HandleAgentMessage;
-            m_Routing[MessageType.SetAlwaysRun] = HandleAgentMessage;
-
-            /* Region Handshake */
-            m_Routing[MessageType.RegionHandshakeReply] = HandleAgentMessage;
-            m_Routing[MessageType.CompleteAgentMovement] = HandleAgentMessage;
-
-            /* Logout Request */
-            m_Routing[MessageType.LogoutRequest] = HandleAgentMessage;
-
-            /* Parcel */
-            m_Routing[MessageType.ParcelInfoRequest] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelObjectOwnersRequest] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelPropertiesRequest] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelPropertiesRequestByID] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelPropertiesUpdate] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelReturnObjects] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelSetOtherCleanTime] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelDisableObjects] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelSelectObjects] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelBuyPass] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelDeedToGroup] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelReclaim] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelClaim] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelJoin] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelDivide] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelRelease] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelBuy] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelGodForceOwner] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelAccessListRequest] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelAccessListUpdate] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelDwellRequest] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelGodMarkAsContent] = Scene.HandleSimulatorMessage;
-
-            m_Routing[MessageType.RequestRegionInfo] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.GodUpdateRegionInfo] = Scene.HandleSimulatorMessage;
-
-            /* Undo/Redo logic */
-            m_Routing[MessageType.Undo] = HandleAgentMessage;
-            m_Routing[MessageType.Redo] = HandleAgentMessage;
-
-            /* Land */
-            m_Routing[MessageType.ModifyLand] = HandleAgentMessage;
-            m_Routing[MessageType.UndoLand] = HandleAgentMessage;
-
-            /* Object Inventory */
-            m_Routing[MessageType.UpdateTaskInventory] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.RemoveTaskInventory] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.RequestTaskInventory] = Scene.HandleSimulatorMessage;
-
-            /* Rez and Derez */
-            m_Routing[MessageType.DeRezObject] = HandleAgentMessage;
-            m_Routing[MessageType.RezObject] = HandleAgentMessage;
-            m_Routing[MessageType.RezObjectFromNotecard] = HandleAgentMessage;
-            m_Routing[MessageType.RezScript] = HandleAgentMessage;
-            m_Routing[MessageType.RezRestoreToWorld] = HandleAgentMessage;
-
-            m_Routing[MessageType.ParcelMediaCommandMessage] = Scene.HandleSimulatorMessage;
-            m_Routing[MessageType.ParcelMediaUpdate] = Scene.HandleSimulatorMessage;
-
-            /* Sound */
-            m_Routing[MessageType.SoundTrigger] = Scene.HandleSimulatorMessage;
-
-            /* Transfer */
-            m_Routing[MessageType.AssetUploadRequest] = HandleAgentMessage;
-            m_Routing[MessageType.RequestXfer] = HandleAgentMessage;
-            m_Routing[MessageType.SendXferPacket] = HandleAgentMessage;
-            m_Routing[MessageType.ConfirmXferPacket] = HandleAgentMessage;
-            m_Routing[MessageType.AbortXfer] = HandleAgentMessage;
-
-            /* Estate */
-            m_Routing[MessageType.EstateOwnerMessage] = HandleAgentMessage; /* needed here since transaction module is there */
-
-        }
-
-        public void RouteReceivedMessage(Message m)
-        {
-            Action<Message> action;
-            if(m_Routing.TryGetValue(m.Number, out action))
-            {
-                action(m);
-            }
         }
 
         public void RouteIM(GridInstantMessage im)

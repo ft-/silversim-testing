@@ -23,6 +23,8 @@ exception statement from your version.
 
 */
 
+using SilverSim.LL.Messages;
+using SilverSim.LL.Messages.Names;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.Types;
 
@@ -30,15 +32,17 @@ namespace SilverSim.LL.Core
 {
     public partial class Circuit
     {
-        public void GroupNameLookup(Messages.Names.UUIDGroupNameRequest req)
+        [PacketHandler(MessageType.UUIDGroupNameRequest)]
+        void GroupNameLookup(Message m)
         {
-            Messages.Names.UUIDGroupNameReply rep = new Messages.Names.UUIDGroupNameReply();
+            UUIDGroupNameRequest req = (UUIDGroupNameRequest)m;
+            UUIDGroupNameReply rep = new UUIDGroupNameReply();
 
             foreach(UUID id in req.UUIDNameBlock)
             {
                 try
                 {
-                    rep.UUIDNameBlock.Add(new Messages.Names.UUIDGroupNameReply.Data(Scene.GroupsNameService[id]));
+                    rep.UUIDNameBlock.Add(new UUIDGroupNameReply.Data(Scene.GroupsNameService[id]));
                 }
                 catch
                 {
@@ -46,7 +50,7 @@ namespace SilverSim.LL.Core
                     {
                         if (null != Agent.GroupsService)
                         {
-                            rep.UUIDNameBlock.Add(new Messages.Names.UUIDGroupNameReply.Data(Agent.GroupsService.Groups[id]));
+                            rep.UUIDNameBlock.Add(new UUIDGroupNameReply.Data(Agent.GroupsService.Groups[id]));
                         }
                     }
                     catch
@@ -60,15 +64,17 @@ namespace SilverSim.LL.Core
             }
         }
 
-        public void UserNameLookup(Messages.Names.UUIDNameRequest req)
+        [PacketHandler(MessageType.UUIDNameRequest)]
+        void UserNameLookup(Message m)
         {
-            Messages.Names.UUIDNameReply rep = new Messages.Names.UUIDNameReply();
+            UUIDNameRequest req = (UUIDNameRequest)m;
+            UUIDNameReply rep = new UUIDNameReply();
 
             foreach (UUID id in req.UUIDNameBlock)
             {
                 try
                 {
-                    Messages.Names.UUIDNameReply.Data d = new Messages.Names.UUIDNameReply.Data();
+                    UUIDNameReply.Data d = new UUIDNameReply.Data();
                     UUI nd = Scene.AvatarNameService[id];
                     d.ID = nd.ID;
                     d.FirstName = nd.FirstName;

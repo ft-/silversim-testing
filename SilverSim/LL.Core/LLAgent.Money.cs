@@ -30,7 +30,8 @@ namespace SilverSim.LL.Core
 {
     public partial class LLAgent
     {
-        public void HandleMoneyBalanceRequest(Message m)
+        [PacketHandler(MessageType.MoneyBalanceRequest)]
+        void HandleMoneyBalanceRequest(Message m)
         {
             Messages.Economy.MoneyBalanceRequest mbr = (Messages.Economy.MoneyBalanceRequest)m;
             if (mbr.AgentID == ID && mbr.SessionID == mbr.CircuitSessionID)

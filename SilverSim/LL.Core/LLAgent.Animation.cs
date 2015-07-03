@@ -32,6 +32,7 @@ using SilverSim.Types;
 using SilverSim.LL.Messages.Avatar;
 using SilverSim.LL.Messages.Agent;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.LL.Messages;
 
 namespace SilverSim.LL.Core
 {
@@ -84,7 +85,8 @@ namespace SilverSim.LL.Core
             m_AnimationController.StopAnimation(animid, objectid);
         }
 
-        public void HandleAgentAnimation(Messages.Message m)
+        [PacketHandler(MessageType.AgentAnimation)]
+        void HandleAgentAnimation(Message m)
         {
             AgentAnimation req = (AgentAnimation)m;
 

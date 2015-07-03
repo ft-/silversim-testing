@@ -52,42 +52,5 @@ namespace SilverSim.LL.Core
                 circ.ScheduleUpdate(info);
             });
         }
-
-        void HandleSimulatorMessageLocally(Message m)
-        {
-            Circuit circuit;
-
-            switch (m.Number)
-            {
-                case MessageType.EconomyDataRequest:
-                    if (m_Circuits.TryGetValue(m.ReceivedOnCircuitCode, out circuit))
-                    {
-                        EconomyInfo ei = Scene.EconomyData;
-                        Messages.Economy.EconomyData ed = new Messages.Economy.EconomyData();
-                        if(ei != null)
-                        {
-                            ed.ObjectCapacity = ei.ObjectCapacity;
-                            ed.ObjectCount = ei.ObjectCount;
-                            ed.PriceEnergyUnit = ei.PriceEnergyUnit;
-                            ed.PriceGroupCreate = ei.PriceGroupCreate;
-                            ed.PriceObjectClaim = ei.PriceObjectClaim;
-                            ed.PriceObjectRent = ei.PriceObjectRent;
-                            ed.PriceObjectScaleFactor = ei.PriceObjectScaleFactor;
-                            ed.PriceParcelClaim = ei.PriceParcelClaim;
-                            ed.PriceParcelClaimFactor = ei.PriceParcelClaimFactor;
-                            ed.PriceParcelRent = ei.PriceParcelRent;
-                            ed.PricePublicObjectDecay = ei.PricePublicObjectDecay;
-                            ed.PricePublicObjectDelete = ei.PricePublicObjectDelete;
-                            ed.PriceRentLight = ei.PriceRentLight;
-                            ed.PriceUpload = ei.PriceUpload;
-                            ed.TeleportMinPrice = ei.TeleportMinPrice;
-                            ed.TeleportPriceExponent = ei.TeleportPriceExponent;
-                        }
-                        circuit.SendMessage(ed);
-                    }
-                    break;
-            }
-        }
-
     }
 }

@@ -47,6 +47,33 @@ namespace SilverSim.LL.Messages
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    public class Trusted : Attribute
+    {
+        public Trusted()
+        {
+
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    public class NotTrusted : Attribute
+    {
+        public NotTrusted()
+        {
+
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
+    public class UDPDeprecated : Attribute
+    {
+        public UDPDeprecated()
+        {
+
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class UDPMessage : Attribute
     {
         public readonly MessageType Number;
@@ -65,6 +92,16 @@ namespace SilverSim.LL.Messages
         public EventQueueGet(string name)
         {
             Name = name;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
+    public class PacketHandler : Attribute
+    {
+        public MessageType Number;
+        public PacketHandler(MessageType type)
+        {
+            Number = type;
         }
     }
 

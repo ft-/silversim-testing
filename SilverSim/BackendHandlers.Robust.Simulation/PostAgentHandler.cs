@@ -845,7 +845,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
                         try
                         {
-                            agent.HandleAgentMessage(childAgentData);
+                            agent.HandleMessage(childAgentData);
                             res = req.BeginResponse();
                             res.Close();
                         }
@@ -898,7 +898,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
                         try
                         {
-                            agent.HandleAgentMessage(childAgentPosition);
+                            agent.HandleMessage(childAgentPosition);
                             res = req.BeginResponse();
                             res.Close();
                         }

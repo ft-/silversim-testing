@@ -192,6 +192,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        [PacketHandler(MessageType.ParcelInfoRequest)]
         void HandleParcelInfoRequest(Message m)
         {
             ParcelInfoRequest req = (ParcelInfoRequest)m;
@@ -301,6 +302,7 @@ namespace SilverSim.Scene.Types.Scene
             return prop;
         }
 
+        [PacketHandler(MessageType.ParcelPropertiesRequestByID)]
         void HandleParcelPropertiesRequestByID(Message m)
         {
             ParcelPropertiesRequestByID req = (ParcelPropertiesRequestByID)m;

@@ -25,16 +25,19 @@ exception statement from your version.
 
 using log4net;
 using SilverSim.LL.Messages;
+using SilverSim.LL.Messages.Economy;
 using SilverSim.Main.Common.Caps;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
+using SilverSim.Types.Economy;
 using SilverSim.Types.IM;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Threading;
 using ThreadedClasses;
@@ -74,7 +77,8 @@ namespace SilverSim.LL.Core
 
         private Thread m_TextureDownloadThread;
         private bool m_TextureDownloadThreadRunning = false;
-        private BlockingQueue<Messages.Image.RequestImage> m_TextureDownloadQueue = new BlockingQueue<Messages.Image.RequestImage>();
+        private BlockingQueue<Message> m_TextureDownloadQueue = new BlockingQueue<Message>();
+        private Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
 
         private Thread m_InventoryThread;
         private bool m_InventoryThreadRunning = false;
@@ -218,6 +222,59 @@ namespace SilverSim.LL.Core
         #endregion
 
         public C5.TreeDictionary<uint, UDPPacket> m_UnackedPacketsHash = new C5.TreeDictionary<uint,UDPPacket>();
+
+        void AddMessageRouting(object o)
+        {
+            foreach(MethodInfo mi in o.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
+            {
+                PacketHandler[] pas = (PacketHandler[])Attribute.GetCustomAttributes(mi, typeof(PacketHandler));
+                foreach (PacketHandler pa in pas)
+                {
+                    if (m_MessageRouting.ContainsKey(pa.Number))
+                    {
+                        m_Log.FatalFormat("Method {0} registered duplicate {1}", mi.Name, pa.Number.ToString());
+                    }
+                    else if (mi.ReturnType != typeof(void))
+                    {
+                        m_Log.FatalFormat("Method {0} return type is not void", mi.Name);
+                    }
+                    else if (mi.GetParameters().Length != 1)
+                    {
+                        m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
+                    }
+                    else if (mi.GetParameters()[0].ParameterType != typeof(Message))
+                    {
+                        m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                    }
+                    else
+                    {
+#if DEBUG
+                        m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, o.GetType().Name, pa.Number.ToString());
+#endif
+                        m_MessageRouting.Add(pa.Number, (Action<Message>)Delegate.CreateDelegate(typeof(Action<Message>), o, mi));
+                    }
+                }
+#if DEBUG
+                if(pas.Length == 0)
+                {
+                    if (mi.ReturnType != typeof(void))
+                    {
+                    }
+                    else if (mi.GetParameters().Length != 1)
+                    {
+                    }
+                    else if (mi.GetParameters()[0].ParameterType != typeof(Message))
+                    {
+                    }
+                    else
+                    {
+                        m_Log.InfoFormat("Candidate method {0} of {1} is not registered", mi.Name, o.GetType().Name);
+                    }
+                }
+#endif
+            }
+        }
+
         public Circuit(LLAgent agent, LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector, UUID regionSeedID, Dictionary<string, string> serviceURLs, string gatekeeperURI)
         {
             InitializeTransmitQueueing();
@@ -235,6 +292,28 @@ namespace SilverSim.LL.Core
 
             SetupDefaultCapabilities(regionSeedID, server.Scene.CapabilitiesConfig, serviceURLs);
             Scene = server.Scene;
+
+            m_MessageRouting.Add(MessageType.CopyInventoryItem, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.ChangeInventoryItemFlags, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.CreateInventoryFolder, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.CreateInventoryItem, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.FetchInventory, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.FetchInventoryDescendents, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.MoveInventoryFolder, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.PurgeInventoryDescendents, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.RemoveInventoryFolder, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.RemoveInventoryItem, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.UpdateInventoryFolder, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.UpdateInventoryItem, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.LinkInventoryItem, m_InventoryRequestQueue.Enqueue);
+            m_MessageRouting.Add(MessageType.RemoveInventoryObjects, m_InventoryRequestQueue.Enqueue);
+
+            m_MessageRouting.Add(MessageType.RequestImage, m_TextureDownloadQueue.Enqueue);
+
+            AddMessageRouting(this);
+            AddMessageRouting(Agent);
+            AddMessageRouting(Scene);
+
             m_LastReceivedPacketAtTime = Environment.TickCount;
             uint pcks;
             for(pcks = 0; pcks < 200; ++pcks)
@@ -546,6 +625,7 @@ namespace SilverSim.LL.Core
                 case MessageType.TransferRequest:
                     {
                         /* we need differentiation here of SimInventoryItem */
+                        Action<Message> mdel;
                         Messages.Transfer.TransferRequest m = Messages.Transfer.TransferRequest.Decode(pck);
                         if(m.SourceType == Messages.Transfer.SourceType.SimInventoryItem)
                         {
@@ -556,9 +636,9 @@ namespace SilverSim.LL.Core
                                 {
                                     m_InventoryRequestQueue.Enqueue(m);
                                 }
-                                else
+                                else if (m_MessageRouting.TryGetValue(MessageType.TransferRequest, out mdel))
                                 {
-                                    m_Server.RouteReceivedMessage(m);
+                                    mdel(m);
                                 }
                             }
                         }
@@ -569,9 +649,9 @@ namespace SilverSim.LL.Core
                                 m_InventoryRequestQueue.Enqueue(m);
                             }
                         }
-                        else
+                        else if (m_MessageRouting.TryGetValue(MessageType.TransferRequest, out mdel))
                         {
-                            m_Server.RouteReceivedMessage(m);
+                            mdel(m);
                         }
                     }
                     break;
@@ -592,42 +672,17 @@ namespace SilverSim.LL.Core
                         m.CircuitSessionID = new UUID(SessionID);
                         m.CircuitSceneID = new UUID(Scene.ID);
 
-                        /* we keep the circuit relatively dumb so that we have no other logic than how to send and receive messages to the viewer */
-                        switch(m.Number)
+                        /* we keep the circuit relatively dumb so that we have no other logic than how to send and receive messages to the viewer.
+                         * It merely collects delegates to other objects as well to call specific functions.
+                         */
+                        Action<Message> mdel;
+                        if (m_MessageRouting.TryGetValue(m.Number, out mdel))
                         {
-                            case MessageType.RequestImage:
-                                m_TextureDownloadQueue.Enqueue((Messages.Image.RequestImage)m);
-                                break;
-
-                            case MessageType.CopyInventoryItem:
-                            case MessageType.ChangeInventoryItemFlags:
-                            case MessageType.CreateInventoryFolder:
-                            case MessageType.CreateInventoryItem:
-                            case MessageType.FetchInventory:
-                            case MessageType.FetchInventoryDescendents:
-                            case MessageType.MoveInventoryFolder:
-                            case MessageType.MoveInventoryItem:
-                            case MessageType.PurgeInventoryDescendents:
-                            case MessageType.RemoveInventoryFolder:
-                            case MessageType.RemoveInventoryItem:
-                            case MessageType.UpdateInventoryFolder:
-                            case MessageType.UpdateInventoryItem:
-                            case MessageType.LinkInventoryItem:
-                            case MessageType.RemoveInventoryObjects:
-                                m_InventoryRequestQueue.Enqueue(m);
-                                break;
-
-                            case MessageType.UUIDGroupNameRequest:
-                                GroupNameLookup((Messages.Names.UUIDGroupNameRequest)m);
-                                break;
-
-                            case MessageType.UUIDNameRequest:
-                                UserNameLookup((Messages.Names.UUIDNameRequest)m);
-                                break;
-
-                            default:
-                                m_Server.RouteReceivedMessage(m);
-                                break;
+                            mdel(m);
+                        }
+                        else
+                        {
+                            m_Log.DebugFormat("Unhandled message type {0} received", m.Number.ToString());
                         }
                     }
                     else
@@ -750,6 +805,33 @@ namespace SilverSim.LL.Core
             m_RegisteredCapabilities.Clear();
             Agent = null;
         }
-        
+
+        [PacketHandler(MessageType.EconomyDataRequest)]
+        void HandleEconomyDataRequest(Message m)
+        {
+            EconomyInfo ei = Scene.EconomyData;
+            EconomyData ed = new EconomyData();
+            if (ei != null)
+            {
+                ed.ObjectCapacity = ei.ObjectCapacity;
+                ed.ObjectCount = ei.ObjectCount;
+                ed.PriceEnergyUnit = ei.PriceEnergyUnit;
+                ed.PriceGroupCreate = ei.PriceGroupCreate;
+                ed.PriceObjectClaim = ei.PriceObjectClaim;
+                ed.PriceObjectRent = ei.PriceObjectRent;
+                ed.PriceObjectScaleFactor = ei.PriceObjectScaleFactor;
+                ed.PriceParcelClaim = ei.PriceParcelClaim;
+                ed.PriceParcelClaimFactor = ei.PriceParcelClaimFactor;
+                ed.PriceParcelRent = ei.PriceParcelRent;
+                ed.PricePublicObjectDecay = ei.PricePublicObjectDecay;
+                ed.PricePublicObjectDelete = ei.PricePublicObjectDelete;
+                ed.PriceRentLight = ei.PriceRentLight;
+                ed.PriceUpload = ei.PriceUpload;
+                ed.TeleportMinPrice = ei.TeleportMinPrice;
+                ed.TeleportPriceExponent = ei.TeleportPriceExponent;
+            }
+            SendMessage(ed);
+        }
+
     }
 }

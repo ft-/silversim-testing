@@ -34,6 +34,7 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
+        [PacketHandler(MessageType.ObjectAdd)]
         void HandleObjectAdd(Message m)
         {
             ObjectAdd p = (ObjectAdd)m;

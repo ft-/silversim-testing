@@ -178,6 +178,7 @@ namespace SilverSim.LL.Core
             return asset;
         }
 
+        [PacketHandler(MessageType.AssetUploadRequest)]
         void HandleAssetUploadRequest(Message m)
         {
             AssetUploadRequest req = (AssetUploadRequest)m;
@@ -212,6 +213,7 @@ namespace SilverSim.LL.Core
             }
         }
 
+        [PacketHandler(MessageType.AbortXfer)]
         void HandleAbortXfer(Message m)
         {
             AbortXfer req = (AbortXfer)m;
@@ -278,6 +280,7 @@ namespace SilverSim.LL.Core
         }
         #endregion
 
+        [PacketHandler(MessageType.SendXferPacket)]
         void HandleSendXferPacket(Message m)
         {
             SendXferPacket req = (SendXferPacket)m;

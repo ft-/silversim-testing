@@ -43,6 +43,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Reflection;
 using System.Threading;
 using ThreadedClasses;
 
@@ -164,8 +165,6 @@ namespace SilverSim.Scene.Types.Scene
         /* do not put any other than ICapabilityInterface into this list */
         public readonly RwLockedDictionary<string, object> SceneCapabilities = new RwLockedDictionary<string, object>();
 
-        protected readonly RwLockedDictionary<MessageType, Action<Message>> m_PacketHandlers = new RwLockedDictionary<MessageType, Action<Message>>();
-
         public RegionInfo RegionData
         {
             get
@@ -248,55 +247,6 @@ namespace SilverSim.Scene.Types.Scene
             RegionSecret = UUID.Random;
             LastIPAddress = new IPAddress(0);
             m_NotecardCache = new NotecardCache(this);
-
-            /* region */
-            m_PacketHandlers[MessageType.RegionHandleRequest] = HandleRegionHandleRequest;
-
-            /* scripts */
-            m_PacketHandlers[MessageType.ScriptAnswerYes] = HandleScriptAnswerYes;
-
-            /* objects */
-            m_PacketHandlers[MessageType.DeRezObject] = HandleDeRezObject;
-            m_PacketHandlers[MessageType.RequestPayPrice] = HandleRequestPayPrice;
-            m_PacketHandlers[MessageType.ObjectSpinStart] = HandleObjectSpinStart;
-            m_PacketHandlers[MessageType.ObjectSpinUpdate] = HandleObjectSpinUpdate;
-            m_PacketHandlers[MessageType.ObjectSpinStop] = HandleObjectSpinStop;
-            m_PacketHandlers[MessageType.ObjectShape] = HandleObjectShape;
-            m_PacketHandlers[MessageType.ObjectSaleInfo] = HandleObjectSaleInfo;
-            m_PacketHandlers[MessageType.ObjectRotation] = HandleObjectRotation;
-            m_PacketHandlers[MessageType.ObjectPermissions] = HandleObjectPermissions;
-            m_PacketHandlers[MessageType.ObjectOwner] = HandleObjectOwner;
-            m_PacketHandlers[MessageType.ObjectName] = HandleObjectName;
-            m_PacketHandlers[MessageType.ObjectMaterial] = HandleObjectMaterial;
-            m_PacketHandlers[MessageType.ObjectLink] = HandleObjectLink;
-            m_PacketHandlers[MessageType.ObjectDelink] = HandleObjectDelink;
-            m_PacketHandlers[MessageType.ObjectGroup] = HandleObjectGroup;
-            m_PacketHandlers[MessageType.ObjectIncludeInSearch] = HandleObjectIncludeInSearch;
-            m_PacketHandlers[MessageType.ObjectFlagUpdate] = HandleObjectFlagUpdate;
-            m_PacketHandlers[MessageType.ObjectExtraParams] = HandleObjectExtraParams;
-            m_PacketHandlers[MessageType.ObjectExportSelected] = HandleObjectExportSelected;
-            m_PacketHandlers[MessageType.ObjectSelect] = HandleObjectSelect;
-            m_PacketHandlers[MessageType.ObjectDrop] = HandleObjectDrop;
-            m_PacketHandlers[MessageType.ObjectAttach] = HandleObjectAttach;
-            m_PacketHandlers[MessageType.ObjectDetach] = HandleObjectDetach;
-            m_PacketHandlers[MessageType.ObjectDescription] = HandleObjectDescription;
-            m_PacketHandlers[MessageType.ObjectDeselect] = HandleObjectDeselect;
-            m_PacketHandlers[MessageType.ObjectClickAction] = HandleObjectClickAction;
-            m_PacketHandlers[MessageType.ObjectCategory] = HandleObjectCategory;
-            m_PacketHandlers[MessageType.ObjectBuy] = HandleObjectBuy;
-            m_PacketHandlers[MessageType.BuyObjectInventory] = HandleBuyObjectInventory;
-            m_PacketHandlers[MessageType.ObjectGrab] = HandleObjectGrab;
-            m_PacketHandlers[MessageType.ObjectGrabUpdate] = HandleObjectGrabUpdate;
-            m_PacketHandlers[MessageType.ObjectDeGrab] = HandleObjectDeGrab;
-            m_PacketHandlers[MessageType.RequestObjectPropertiesFamily] = HandleRequestObjectPropertiesFamily;
-            m_PacketHandlers[MessageType.ObjectAdd] = HandleObjectAdd;
-
-            /* parcels */
-            m_PacketHandlers[MessageType.ParcelInfoRequest] = HandleParcelInfoRequest;
-            m_PacketHandlers[MessageType.ParcelPropertiesRequestByID] = HandleParcelPropertiesRequestByID;
-
-            /* sound */
-            m_PacketHandlers[MessageType.SoundTrigger] = HandleSoundTrigger;
 
             /* basic capabilities */
 
@@ -411,17 +361,6 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     return;
                 }
-            }
-        }
-        #endregion
-
-        #region Scene LL Message interface
-        public void HandleSimulatorMessage(Message m)
-        {
-            Action<Message> del;
-            if(m_PacketHandlers.TryGetValue(m.Number, out del))
-            {
-                del(m);
             }
         }
         #endregion

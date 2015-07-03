@@ -63,7 +63,8 @@ namespace SilverSim.Scene.Types.Scene
             throw new NotImplementedException();
         }
 
-        public void HandleDeRezObject(Message m)
+        [PacketHandler(MessageType.DeRezObject)]
+        void HandleDeRezObject(Message m)
         {
             SilverSim.LL.Messages.Object.DeRezAck ackres;
             SilverSim.LL.Messages.Object.DeRezObject req = (SilverSim.LL.Messages.Object.DeRezObject)m;

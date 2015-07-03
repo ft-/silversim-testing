@@ -299,8 +299,6 @@ namespace SilverSim.Scene.Implementation.Basic
             RegionPort = ri.ServerPort;
             m_UDPServer.Start();
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures("", "", "", true));
-
-            m_PacketHandlers[MessageType.RequestRegionInfo] = HandleRequestRegionInfo;
         }
         #endregion
 
@@ -567,6 +565,7 @@ namespace SilverSim.Scene.Implementation.Basic
         }
 #endif
 
+        [PacketHandler(MessageType.RequestRegionInfo)]
         public void HandleRequestRegionInfo(Message m)
         {
             SilverSim.LL.Messages.Region.RequestRegionInfo req = (SilverSim.LL.Messages.Region.RequestRegionInfo)m;

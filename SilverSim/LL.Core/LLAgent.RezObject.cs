@@ -64,6 +64,7 @@ namespace SilverSim.LL.Core
             }
         }
 
+        [PacketHandler(MessageType.RezObject)]
         void HandleRezObject(Message m)
         {
             Messages.Object.RezObject req = (Messages.Object.RezObject)m;
@@ -130,6 +131,7 @@ namespace SilverSim.LL.Core
             wi.ProcessAssetTransfer();
         }
 
+        [PacketHandler(MessageType.RezObjectFromNotecard)]
         void HandleRezObjectFromNotecard(Message m)
         {
             Messages.Object.RezObjectFromNotecard req = (Messages.Object.RezObjectFromNotecard)m;

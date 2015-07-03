@@ -25,6 +25,7 @@ exception statement from your version.
 
 using log4net;
 using SilverSim.LL.Messages;
+using SilverSim.LL.Messages.Agent;
 using SilverSim.LL.Messages.Script;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.Transfer;
@@ -50,6 +51,7 @@ using SilverSim.Types.Primitive;
 using SilverSim.Types.Script;
 using System;
 using System.Collections.Generic;
+using System.Reflection;
 using ThreadedClasses;
 
 namespace SilverSim.LL.Core
@@ -906,7 +908,6 @@ namespace SilverSim.LL.Core
             FirstName = firstName;
             LastName = lastName;
             PhysicsActor = DummyPhysicsObject.SharedInstance;
-            InitRouting();
             InitAnimations();
             if (m_EconomyService != null)
             {
@@ -978,27 +979,6 @@ namespace SilverSim.LL.Core
         }
         #endregion
 
-        private delegate void HandleAgentMessageDelegate(Message m);
-        private readonly Dictionary<MessageType, HandleAgentMessageDelegate> m_AgentMessageRouting = new Dictionary<MessageType, HandleAgentMessageDelegate>();
-
-        void InitRouting()
-        {
-            m_AgentMessageRouting.Add(MessageType.MoneyBalanceRequest, HandleMoneyBalanceRequest);
-            m_AgentMessageRouting.Add(MessageType.AgentDataUpdateRequest, HandleAgentDataUpdateRequest);
-            m_AgentMessageRouting.Add(MessageType.AgentAnimation, HandleAgentAnimation);
-            m_AgentMessageRouting.Add(MessageType.RezScript, HandleRezScript);
-            m_AgentMessageRouting.Add(MessageType.RezObject, HandleRezObject);
-            m_AgentMessageRouting.Add(MessageType.RezObjectFromNotecard, HandleRezObjectFromNotecard);
-            m_AgentMessageRouting.Add(MessageType.RezMultipleAttachmentsFromInv, HandleRezAttachment);
-            m_AgentMessageRouting.Add(MessageType.RezSingleAttachmentFromInv, HandleRezAttachment);
-            m_AgentMessageRouting.Add(MessageType.DetachAttachmentIntoInv, HandleDetachAttachment);
-            m_AgentMessageRouting.Add(MessageType.ObjectDetach, HandleDetachAttachment);
-            m_AgentMessageRouting.Add(MessageType.AssetUploadRequest, HandleAssetUploadRequest);
-            m_AgentMessageRouting.Add(MessageType.SendXferPacket, HandleSendXferPacket);
-            m_AgentMessageRouting.Add(MessageType.AbortXfer, HandleAbortXfer);
-            m_AgentMessageRouting.Add(MessageType.EstateOwnerMessage, HandleEstateOwnerMessage);
-        }
-
         public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)
         {
             return RequestPermissions(part, itemID, permissions, UUID.Zero);
@@ -1038,179 +1018,112 @@ namespace SilverSim.LL.Core
             m_AnimationController.RevokePermissions(sourceID, permissions);
         }
 
-        public void HandleAgentMessage(Message m)
+        [PacketHandler(MessageType.RegionHandshakeReply)]
+        void HandleRegionHandshakeReply(Message m)
         {
-            switch (m.Number)
+            Messages.Region.RegionHandshakeReply rhr = (Messages.Region.RegionHandshakeReply)m;
+            Circuit circuit;
+            if (Circuits.TryGetValue(rhr.ReceivedOnCircuitCode, out circuit))
             {
-                case MessageType.MoneyBalanceRequest:
-                    {
-                        Messages.Economy.MoneyBalanceRequest mbr = (Messages.Economy.MoneyBalanceRequest)m;
-                        if (mbr.AgentID == ID && mbr.SessionID == mbr.CircuitSessionID)
-                        {
-                            Circuit circuit;
-                            if (Circuits.TryGetValue(mbr.ReceivedOnCircuitCode, out circuit))
-                            {
-                                Messages.Economy.MoneyBalanceReply mbrep = new Messages.Economy.MoneyBalanceReply();
-                                mbrep.ForceZeroFlag = true; /* lots of NUL at the end of the message */
-                                mbrep.AgentID = mbr.AgentID;
-                                mbrep.TransactionID = mbr.TransactionID;
-                                try
-                                {
-                                    EconomyServiceInterface economyService = circuit.Scene.EconomyService;
-                                    if(economyService != null)
-                                    {
-                                        mbrep.MoneyBalance = economyService.MoneyBalance[Owner];
-                                    }
-                                    else
-                                    {
-                                        mbrep.MoneyBalance = 0;
-                                    }
-                                    mbrep.TransactionSuccess = true;
-                                }
-                                catch
-                                {
-                                    mbrep.TransactionSuccess = false;
-                                }
-                                circuit.SendMessage(mbrep);
-                            }
-                        }
-                    }
-                    break;
-
-                case MessageType.RegionHandshakeReply:
-                    {
-                        Messages.Region.RegionHandshakeReply rhr = (Messages.Region.RegionHandshakeReply)m;
-                        Circuit circuit;
-                        if (Circuits.TryGetValue(rhr.ReceivedOnCircuitCode, out circuit))
-                        {
-                            /* Add our agent to scene */
-                            circuit.Scene.SendAllParcelOverlaysTo(this);
-                            circuit.Scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
-                            circuit.Scene.Environment.UpdateWindDataToSingleClient(this);
-                            circuit.Scene.SendAgentObjectToAllAgents(this);
-                            circuit.ScheduleFirstUpdate();
-                            SendAnimations();
-                        }
-                    }
-                    break;
-
-                case MessageType.AgentSetAppearance:
-                    HandleSetAgentAppearance((Messages.Appearance.AgentSetAppearance)m);
-                    break;
-
-                case MessageType.CompleteAgentMovement:
-                    {
-                        Messages.Circuit.CompleteAgentMovement cam = (Messages.Circuit.CompleteAgentMovement)m;
-                        Circuit circuit;
-                        if ((this.TeleportFlags & TeleportFlags.ViaLogin) != 0 && (this.TeleportFlags & TeleportFlags.ViaHGLogin) == 0)
-                        {
-                            if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
-                            {
-                                /* switch agent region */
-                                if(m_IsActiveGod && !circuit.Scene.IsPossibleGod(new UUI(ID, FirstName, LastName, HomeURI)))
-                                {
-                                    /* revoke god powers when changing region and new region has a different owner */
-                                    Messages.God.GrantGodlikePowers gm = new Messages.God.GrantGodlikePowers();
-                                    gm.AgentID = ID;
-                                    gm.SessionID = circuit.SessionID;
-                                    gm.GodLevel = 0;
-                                    gm.Token = UUID.Zero;
-                                    SendMessageIfRootAgent(gm, m_CurrentSceneID);
-                                    m_IsActiveGod = false;
-                                }
-                                m_CurrentSceneID = circuit.Scene.ID;
-
-                                Messages.Circuit.AgentMovementComplete amc = new Messages.Circuit.AgentMovementComplete();
-                                amc.AgentID = cam.AgentID;
-                                amc.ChannelVersion = VersionInfo.SimulatorVersion;
-                                amc.LookAt = new Vector3(1, 1, 0); /* TODO: extract from agent */
-                                amc.Position = GlobalPosition;
-                                amc.SessionID = cam.SessionID;
-                                amc.GridPosition = circuit.Scene.GridPosition;
-
-                                circuit.SendMessage(amc);
-
-                                Messages.Agent.CoarseLocationUpdate clu = new Messages.Agent.CoarseLocationUpdate();
-                                clu.You = 0;
-                                clu.Prey = -1;
-                                Messages.Agent.CoarseLocationUpdate.AgentDataEntry ad = new Messages.Agent.CoarseLocationUpdate.AgentDataEntry();
-                                ad.X = (byte)(uint)GlobalPosition.X;
-                                ad.Y = (byte)(uint)GlobalPosition.Y;
-                                ad.Z = (byte)(uint)GlobalPosition.Z;
-                                ad.AgentID = ID;
-                                clu.AgentData.Add(ad);
-                                circuit.SendMessage(clu);
-
-                                circuit.Scene.Environment.UpdateWindlightProfileToClient(this);
-                            }
-                        }
-                    }
-                    break;
-
-                case MessageType.LogoutRequest:
-                    Messages.Circuit.LogoutRequest lr = (Messages.Circuit.LogoutRequest)m;
-                    /* agent wants to logout */
-                    m_Log.InfoFormat("Agent {0} {1} ({0}) wants to logout", FirstName, LastName, ID);
-                    foreach(Circuit c in Circuits.Values)
-                    {
-                        c.Scene.Remove(this);
-                        if (c.Scene.ID != lr.CircuitSceneID)
-                        {
-                            c.Stop();
-                            Circuits.Remove(c.CircuitCode, c.Scene.ID);
-                            ((LLUDPServer)c.Scene.UDPServer).RemoveCircuit(c);
-                        }
-                        else
-                        {
-                            Messages.Circuit.LogoutReply lrep = new Messages.Circuit.LogoutReply();
-                            lrep.AgentID = lr.AgentID;
-                            lrep.SessionID = lr.SessionID;
-                            c.SendMessage(lrep);
-                        }
-                    }
-                    break;
-
-                case MessageType.AgentWearablesRequest:
-                    HandleAgentWearablesRequest((Messages.Appearance.AgentWearablesRequest)m);
-                    break;
-
-                case MessageType.AgentIsNowWearing:
-                    HandleAgentIsNowWearing((Messages.Appearance.AgentIsNowWearing)m);
-                    break;
-
-                case MessageType.AgentCachedTexture:
-                    HandleAgentCachedTexture((Messages.Appearance.AgentCachedTexture)m);
-                    break;
-
-                case MessageType.RequestGodlikePowers:
-                    HandleRequestGodlikePowers((Messages.God.RequestGodlikePowers)m);
-                    break;
-
-                case MessageType.MuteListRequest:
-                    {
-                        Messages.MuteList.MuteListRequest req = (Messages.MuteList.MuteListRequest)m;
-                        if(req.AgentID != ID || req.SessionID != m.CircuitSessionID)
-                        {
-                            return;
-                        }
-                        Messages.MuteList.UseCachedMuteList res = new Messages.MuteList.UseCachedMuteList();
-                        res.AgentID = req.AgentID;
-                        SendMessageAlways(res, m.CircuitSceneID);
-                    }
-                    break;
-
-                default:
-                    /* all others are handled through routing dictionary */
-                    HandleAgentMessageDelegate del;
-                    if(m_AgentMessageRouting.TryGetValue(m.Number, out del))
-                    {
-                        del(m);
-                    }
-                    break;
+                /* Add our agent to scene */
+                circuit.Scene.SendAllParcelOverlaysTo(this);
+                circuit.Scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
+                circuit.Scene.Environment.UpdateWindDataToSingleClient(this);
+                circuit.Scene.SendAgentObjectToAllAgents(this);
+                circuit.ScheduleFirstUpdate();
+                SendAnimations();
             }
         }
 
-        public void HandleAgentUpdateMessage(Message m)
+        [PacketHandler(MessageType.CompleteAgentMovement)]
+        void HandleCompleteAgentMovement(Message m)
+        {
+            Messages.Circuit.CompleteAgentMovement cam = (Messages.Circuit.CompleteAgentMovement)m;
+            Circuit circuit;
+            if ((this.TeleportFlags & TeleportFlags.ViaLogin) != 0 && (this.TeleportFlags & TeleportFlags.ViaHGLogin) == 0)
+            {
+                if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
+                {
+                    /* switch agent region */
+                    if (m_IsActiveGod && !circuit.Scene.IsPossibleGod(new UUI(ID, FirstName, LastName, HomeURI)))
+                    {
+                        /* revoke god powers when changing region and new region has a different owner */
+                        Messages.God.GrantGodlikePowers gm = new Messages.God.GrantGodlikePowers();
+                        gm.AgentID = ID;
+                        gm.SessionID = circuit.SessionID;
+                        gm.GodLevel = 0;
+                        gm.Token = UUID.Zero;
+                        SendMessageIfRootAgent(gm, m_CurrentSceneID);
+                        m_IsActiveGod = false;
+                    }
+                    m_CurrentSceneID = circuit.Scene.ID;
+
+                    Messages.Circuit.AgentMovementComplete amc = new Messages.Circuit.AgentMovementComplete();
+                    amc.AgentID = cam.AgentID;
+                    amc.ChannelVersion = VersionInfo.SimulatorVersion;
+                    amc.LookAt = new Vector3(1, 1, 0); /* TODO: extract from agent */
+                    amc.Position = GlobalPosition;
+                    amc.SessionID = cam.SessionID;
+                    amc.GridPosition = circuit.Scene.GridPosition;
+
+                    circuit.SendMessage(amc);
+
+                    Messages.Agent.CoarseLocationUpdate clu = new Messages.Agent.CoarseLocationUpdate();
+                    clu.You = 0;
+                    clu.Prey = -1;
+                    Messages.Agent.CoarseLocationUpdate.AgentDataEntry ad = new Messages.Agent.CoarseLocationUpdate.AgentDataEntry();
+                    ad.X = (byte)(uint)GlobalPosition.X;
+                    ad.Y = (byte)(uint)GlobalPosition.Y;
+                    ad.Z = (byte)(uint)GlobalPosition.Z;
+                    ad.AgentID = ID;
+                    clu.AgentData.Add(ad);
+                    circuit.SendMessage(clu);
+
+                    circuit.Scene.Environment.UpdateWindlightProfileToClient(this);
+                }
+            }
+        }
+
+        [PacketHandler(MessageType.LogoutRequest)]
+        void HandleLogoutRequest(Message m)
+        {
+            Messages.Circuit.LogoutRequest lr = (Messages.Circuit.LogoutRequest)m;
+            /* agent wants to logout */
+            m_Log.InfoFormat("Agent {0} {1} ({0}) wants to logout", FirstName, LastName, ID);
+            foreach (Circuit c in Circuits.Values)
+            {
+                c.Scene.Remove(this);
+                if (c.Scene.ID != lr.CircuitSceneID)
+                {
+                    c.Stop();
+                    Circuits.Remove(c.CircuitCode, c.Scene.ID);
+                    ((LLUDPServer)c.Scene.UDPServer).RemoveCircuit(c);
+                }
+                else
+                {
+                    Messages.Circuit.LogoutReply lrep = new Messages.Circuit.LogoutReply();
+                    lrep.AgentID = lr.AgentID;
+                    lrep.SessionID = lr.SessionID;
+                    c.SendMessage(lrep);
+                }
+            }
+        }
+
+        [PacketHandler(MessageType.MuteListRequest)]
+        void HandleMuteListRequest(Message m)
+        {
+            Messages.MuteList.MuteListRequest req = (Messages.MuteList.MuteListRequest)m;
+            if (req.AgentID != ID || req.SessionID != m.CircuitSessionID)
+            {
+                return;
+            }
+            Messages.MuteList.UseCachedMuteList res = new Messages.MuteList.UseCachedMuteList();
+            res.AgentID = req.AgentID;
+            SendMessageAlways(res, m.CircuitSceneID);
+        }
+
+        [PacketHandler(MessageType.AgentUpdate)]
+        void HandleAgentUpdateMessage(Message m)
         {
             /* only AgentUpdate is passed here */
             Messages.Agent.AgentUpdate au = (Messages.Agent.AgentUpdate)m;
@@ -1222,6 +1135,17 @@ namespace SilverSim.LL.Core
 
             /* this is for the root agent */
         }
+
+        public void HandleMessage(ChildAgentUpdate m)
+        {
+
+        }
+
+        public void HandleMessage(ChildAgentPositionUpdate m)
+        {
+
+        }
+
 
         public void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID)
         {

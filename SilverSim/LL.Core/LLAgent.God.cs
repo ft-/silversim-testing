@@ -7,13 +7,17 @@ using SilverSim.LL;
 using SilverSim.Scene.Types;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Management.Scene;
+using SilverSim.LL.Messages;
+using SilverSim.LL.Messages.God;
 
 namespace SilverSim.LL.Core
 {
     public partial class LLAgent
     {
-        public void HandleRequestGodlikePowers(Messages.God.RequestGodlikePowers m)
+        [PacketHandler(MessageType.RequestGodlikePowers)]
+        void HandleRequestGodlikePowers(Message p)
         {
+            RequestGodlikePowers m = (RequestGodlikePowers)p;
             if(m.AgentID != ID || m.SessionID != m.CircuitSessionID)
             {
                 return;
@@ -24,7 +28,7 @@ namespace SilverSim.LL.Core
                 /* request god powers */
                 if(CheckForGodPowers(m.CircuitSceneID, ID))
                 {
-                    Messages.God.GrantGodlikePowers r = new Messages.God.GrantGodlikePowers();
+                    GrantGodlikePowers r = new GrantGodlikePowers();
                     r.AgentID = m.AgentID;
                     r.SessionID = m.SessionID;
 
@@ -42,7 +46,7 @@ namespace SilverSim.LL.Core
             }
             else if(!m.IsGodlike && m_IsActiveGod)
             {
-                Messages.God.GrantGodlikePowers r = new Messages.God.GrantGodlikePowers();
+                GrantGodlikePowers r = new GrantGodlikePowers();
                 r.AgentID = m.AgentID;
                 r.SessionID = m.SessionID;
 

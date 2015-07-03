@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.LL.Messages;
+using SilverSim.LL.Messages.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
@@ -157,13 +158,13 @@ namespace SilverSim.Scene.Types.Agent
             get;
         }
 
-        void HandleAgentMessage(Message m);
-
         void SendMessageIfRootAgent(Message m, UUID fromSceneID);
         void SendMessageAlways(Message m, UUID fromSceneID);
         void SendAlertMessage(string msg, UUID fromSceneID);
         void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID);
         void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID);
+        void HandleMessage(ChildAgentUpdate m);
+        void HandleMessage(ChildAgentPositionUpdate m);
 
         UGI Group { get; set; }
 

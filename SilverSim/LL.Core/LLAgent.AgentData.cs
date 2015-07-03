@@ -31,7 +31,8 @@ namespace SilverSim.LL.Core
 {
     public partial class LLAgent
     {
-        public void HandleAgentDataUpdateRequest(Message m)
+        [PacketHandler(MessageType.AgentDataUpdateRequest)]
+        void HandleAgentDataUpdateRequest(Message m)
         {
             Messages.Agent.AgentDataUpdateRequest adur = (Messages.Agent.AgentDataUpdateRequest)m;
             if (adur.AgentID == ID && adur.SessionID == adur.CircuitSessionID)

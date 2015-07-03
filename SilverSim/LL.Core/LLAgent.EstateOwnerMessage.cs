@@ -19,6 +19,7 @@ namespace SilverSim.LL.Core
             return UTF8NoBOM.GetBytes(s + "\0");
         }
 
+        [PacketHandler(MessageType.EstateOwnerMessage)]
         void HandleEstateOwnerMessage(Message m)
         {
             EstateOwnerMessage req = (EstateOwnerMessage)m;

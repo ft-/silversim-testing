@@ -58,6 +58,8 @@ namespace SilverSim.LL.Core
             }
         }
 
+        [PacketHandler(MessageType.RezMultipleAttachmentsFromInv)]
+        [PacketHandler(MessageType.RezSingleAttachmentFromInv)]
         void HandleRezAttachment(Message m)
         {
             switch(m.Number)
@@ -95,6 +97,8 @@ namespace SilverSim.LL.Core
             }
         }
 
+        [PacketHandler(MessageType.DetachAttachmentIntoInv)]
+        [PacketHandler(MessageType.ObjectDetach)]
         void HandleDetachAttachment(Message m)
         {
             List<DetachEntry> detachList = new List<DetachEntry>();
