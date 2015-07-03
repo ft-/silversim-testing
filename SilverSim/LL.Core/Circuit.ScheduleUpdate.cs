@@ -226,7 +226,7 @@ namespace SilverSim.LL.Core
                 Messages.Object.KillObject ko = null;
                 UDPPacket terse_packet = null;
                 byte terse_packet_count = 0;
-                List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data = new List<KeyValuePair<ObjectUpdateInfo, byte[]>>();
+                List<KeyValuePair<ObjectUpdateInfo, byte[]>> full_packet_data = null;
                 int full_packet_data_length = 0;
 
                 while (physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0)
