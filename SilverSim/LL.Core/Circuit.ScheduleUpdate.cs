@@ -302,6 +302,7 @@ namespace SilverSim.LL.Core
                                     if (null == full_packet_data)
                                     {
                                         full_packet_data = new List<KeyValuePair<ObjectUpdateInfo, byte[]>>();
+                                        full_packet_data_length = 0;
                                     }
 
 
@@ -353,7 +354,6 @@ namespace SilverSim.LL.Core
                     }
                     SendFullUpdateMsg(full_packet, full_packet_data);
                     full_packet_data = null;
-                    full_packet_data_length = 0;
                 }
 
                 if (terse_packet != null)
