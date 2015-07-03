@@ -102,6 +102,14 @@ namespace SilverSim.LL.Core
             }
         }
 
+        [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+        class IgnoreMethod : Attribute
+        {
+            public IgnoreMethod()
+            {
+            }
+        }
+
         public SceneInterface Scene
         {
             get
@@ -227,6 +235,10 @@ namespace SilverSim.LL.Core
         {
             foreach(MethodInfo mi in o.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
             {
+                if(null != Attribute.GetCustomAttribute(mi, typeof(IgnoreMethod)))
+                {
+                    continue;
+                }
                 PacketHandler[] pas = (PacketHandler[])Attribute.GetCustomAttributes(mi, typeof(PacketHandler));
                 foreach (PacketHandler pa in pas)
                 {
@@ -531,10 +543,6 @@ namespace SilverSim.LL.Core
                     }
                     break;
 
-                case MessageType.AgentThrottle:
-                    HandleThrottlePacket(Messages.Agent.AgentThrottle.Decode(pck));
-                    break;
-
                 case MessageType.ScriptDialogReply:
                     /* script dialog uses a different internal format, so we decode it specifically */
                     if(!pck.ReadUUID().Equals(AgentID))
@@ -756,6 +764,7 @@ namespace SilverSim.LL.Core
         }
         #endregion
 
+        [IgnoreMethod]
         public void SendMessage(Message m)
         {
             try

@@ -62,6 +62,7 @@ namespace SilverSim.LL.Core
         const int TRANSMIT_THROTTLE_MTU = 1500;
         const int MAX_DATA_MTU = 1400;
 
+        [PacketHandler(MessageType.AgentThrottle)]
         void HandleThrottlePacket(Message msg)
         {
             Messages.Agent.AgentThrottle m = (Messages.Agent.AgentThrottle)msg;
