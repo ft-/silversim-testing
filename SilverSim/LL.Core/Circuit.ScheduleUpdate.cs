@@ -352,6 +352,8 @@ namespace SilverSim.LL.Core
                         break;
                     }
                     SendFullUpdateMsg(full_packet, full_packet_data);
+                    full_packet_data = null;
+                    full_packet_data_length = 0;
                 }
 
                 if (terse_packet != null)
