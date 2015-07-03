@@ -148,6 +148,53 @@ namespace SilverSim.Scene.Types.Scene
         void HandleObjectSelect(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectSelect req = (SilverSim.LL.Messages.Object.ObjectSelect)m;
+            if(req.CircuitAgentID == req.AgentID &&
+                req.CircuitSceneID == ID)
+            {
+                IAgent agent;
+                try
+                {
+                    agent = Agents[req.AgentID];
+                }
+                catch
+                {
+                    return;
+                }
+
+                ObjectPart part;
+                int bytelen = 0;
+                ObjectProperties props = null;
+                foreach(uint primLocalID in req.ObjectData)
+                {
+                    try
+                    {
+                        part = Primitives[primLocalID];
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+                    byte[] propUpdate = part.PropertiesUpdateData;
+                    if(null == propUpdate)
+                    {
+                        continue;
+                    }
+                    if(bytelen + propUpdate.Length > 1400)
+                    {
+                        agent.SendMessageAlways(props, ID);
+                        bytelen = 0;
+                    }
+                    props = new ObjectProperties();
+                    props.ObjectData.Add(propUpdate);
+                    bytelen += propUpdate.Length;
+                }
+
+                if(null != props)
+                {
+                    agent.SendMessageAlways(props, ID);
+                }
+            }
         }
 
         [PacketHandler(MessageType.ObjectDrop)]
@@ -178,6 +225,53 @@ namespace SilverSim.Scene.Types.Scene
         void HandleObjectDeselect(Message m)
         {
             SilverSim.LL.Messages.Object.ObjectDeselect req = (SilverSim.LL.Messages.Object.ObjectDeselect)m;
+            if (req.CircuitAgentID == req.AgentID &&
+                req.CircuitSceneID == ID)
+            {
+                IAgent agent;
+                try
+                {
+                    agent = Agents[req.AgentID];
+                }
+                catch
+                {
+                    return;
+                }
+
+                ObjectPart part;
+                int bytelen = 0;
+                ObjectProperties props = null;
+                foreach (uint primLocalID in req.ObjectData)
+                {
+                    try
+                    {
+                        part = Primitives[primLocalID];
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+                    byte[] propUpdate = part.PropertiesUpdateData;
+                    if (null == propUpdate)
+                    {
+                        continue;
+                    }
+                    if (bytelen + propUpdate.Length > 1400)
+                    {
+                        agent.SendMessageAlways(props, ID);
+                        bytelen = 0;
+                    }
+                    props = new ObjectProperties();
+                    props.ObjectData.Add(propUpdate);
+                    bytelen += propUpdate.Length;
+                }
+
+                if (null != props)
+                {
+                    agent.SendMessageAlways(props, ID);
+                }
+            }
         }
 
         [PacketHandler(MessageType.ObjectClickAction)]

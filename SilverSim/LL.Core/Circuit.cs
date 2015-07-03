@@ -46,6 +46,7 @@ namespace SilverSim.LL.Core
 {
     public partial class Circuit : IDisposable
     {
+        internal readonly RwLockedList<UUID> SelectedObjects = new RwLockedList<UUID>();
         private static readonly ILog m_Log = LogManager.GetLogger("LL CIRCUIT");
         private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
         private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
@@ -233,57 +234,69 @@ namespace SilverSim.LL.Core
 
         void AddMessageRouting(object o)
         {
-            foreach(MethodInfo mi in o.GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
+            List<Type> types = new List<Type>();
+            Type tt;
+            tt = o.GetType();
+            while(tt != typeof(object))
             {
-                if(null != Attribute.GetCustomAttribute(mi, typeof(IgnoreMethod)))
+                types.Add(tt);
+                tt = tt.BaseType;
+            }
+
+            foreach(Type t in types)
+            {
+                foreach (MethodInfo mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
                 {
-                    continue;
-                }
-                PacketHandler[] pas = (PacketHandler[])Attribute.GetCustomAttributes(mi, typeof(PacketHandler));
-                foreach (PacketHandler pa in pas)
-                {
-                    if (m_MessageRouting.ContainsKey(pa.Number))
+                    if (null != Attribute.GetCustomAttribute(mi, typeof(IgnoreMethod)))
                     {
-                        m_Log.FatalFormat("Method {0} registered duplicate {1}", mi.Name, pa.Number.ToString());
+                        continue;
                     }
-                    else if (mi.ReturnType != typeof(void))
+                    PacketHandler[] pas = (PacketHandler[])Attribute.GetCustomAttributes(mi, typeof(PacketHandler));
+                    foreach (PacketHandler pa in pas)
                     {
-                        m_Log.FatalFormat("Method {0} return type is not void", mi.Name);
-                    }
-                    else if (mi.GetParameters().Length != 1)
-                    {
-                        m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
-                    }
-                    else if (mi.GetParameters()[0].ParameterType != typeof(Message))
-                    {
-                        m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
-                    }
-                    else
-                    {
+                        if (m_MessageRouting.ContainsKey(pa.Number))
+                        {
+                            m_Log.FatalFormat("Method {0} registered duplicate {1}", mi.Name, pa.Number.ToString());
+                        }
+                        else if (mi.ReturnType != typeof(void))
+                        {
+                            m_Log.FatalFormat("Method {0} return type is not void", mi.Name);
+                        }
+                        else if (mi.GetParameters().Length != 1)
+                        {
+                            m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
+                        }
+                        else if (mi.GetParameters()[0].ParameterType != typeof(Message))
+                        {
+                            m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                        }
+                        else
+                        {
 #if DEBUG
-                        m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, o.GetType().Name, pa.Number.ToString());
+                            m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, pa.Number.ToString());
 #endif
-                        m_MessageRouting.Add(pa.Number, (Action<Message>)Delegate.CreateDelegate(typeof(Action<Message>), o, mi));
+                            m_MessageRouting.Add(pa.Number, (Action<Message>)Delegate.CreateDelegate(typeof(Action<Message>), o, mi));
+                        }
                     }
-                }
 #if DEBUG
-                if(pas.Length == 0)
-                {
-                    if (mi.ReturnType != typeof(void))
+                    if (pas.Length == 0)
                     {
+                        if (mi.ReturnType != typeof(void))
+                        {
+                        }
+                        else if (mi.GetParameters().Length != 1)
+                        {
+                        }
+                        else if (mi.GetParameters()[0].ParameterType != typeof(Message))
+                        {
+                        }
+                        else
+                        {
+                            m_Log.InfoFormat("Candidate method {0} of {1} is not registered", mi.Name, t.Name);
+                        }
                     }
-                    else if (mi.GetParameters().Length != 1)
-                    {
-                    }
-                    else if (mi.GetParameters()[0].ParameterType != typeof(Message))
-                    {
-                    }
-                    else
-                    {
-                        m_Log.InfoFormat("Candidate method {0} of {1} is not registered", mi.Name, o.GetType().Name);
-                    }
-                }
 #endif
+                }
             }
         }
 

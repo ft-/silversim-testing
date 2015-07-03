@@ -38,7 +38,7 @@ namespace SilverSim.LL.Messages
         public readonly Dictionary<MessageType, PacketDecoderDelegate> PacketTypes = new Dictionary<MessageType,PacketDecoderDelegate>();
 
 
-        public UDPPacketDecoder()
+        public UDPPacketDecoder(bool allowtrusteddecode = false)
         {
             /* validation of table */
             int numpackettypes = 0;

@@ -35,44 +35,7 @@ namespace SilverSim.LL.Messages.Object
     [Trusted]
     public class ObjectProperties : Message
     {
-        public class ObjData
-        {
-            public UUID ObjectID;
-            public UUID CreatorID;
-            public UUID OwnerID;
-            public UUID GroupID;
-            public UInt64 CreationDate;
-            public InventoryPermissionsMask BaseMask;
-            public InventoryPermissionsMask OwnerMask;
-            public InventoryPermissionsMask GroupMask;
-            public InventoryPermissionsMask EveryoneMask;
-            public InventoryPermissionsMask NextOwnerMask;
-            public Int32 OwnershipCost;
-            public double TaxRate;
-            public InventoryItem.SaleInfoData.SaleType SaleType;
-            public Int32 SalePrice;
-            public byte AggregatePerms;
-            public byte AggregatePermTextures;
-            public byte AggregatePermTexturesOwner;
-            public UInt32 Category;
-            public Int16 InventorySerial;
-            public UUID ItemID;
-            public UUID FolderID;
-            public UUID FromTaskID;
-            public UUID LastOwnerID;
-            public string Name;
-            public string Description;
-            public string TouchName;
-            public string SitName;
-            public byte[] TextureID = new byte[0];
-
-            public ObjData()
-            {
-
-            }
-        }
-
-        public List<ObjData> ObjectData = new List<ObjData>();
+        public List<byte[]> ObjectData = new List<byte[]>();
 
         public ObjectProperties()
         {
@@ -83,36 +46,9 @@ namespace SilverSim.LL.Messages.Object
         {
             p.WriteMessageType(Number);
             p.WriteUInt8((byte)ObjectData.Count);
-            foreach(ObjData d in ObjectData)
+            foreach(byte[] d in ObjectData)
             {
-                p.WriteUUID(d.ObjectID);
-                p.WriteUUID(d.CreatorID);
-                p.WriteUUID(d.OwnerID);
-                p.WriteUUID(d.GroupID);
-                p.WriteUInt64(d.CreationDate);
-                p.WriteUInt32((UInt32)d.BaseMask);
-                p.WriteUInt32((UInt32)d.OwnerMask);
-                p.WriteUInt32((UInt32)d.GroupMask);
-                p.WriteUInt32((UInt32)d.EveryoneMask);
-                p.WriteInt32(d.OwnershipCost);
-                p.WriteFloat((float)d.TaxRate);
-                p.WriteUInt8((byte)d.SaleType);
-                p.WriteInt32(d.SalePrice);
-                p.WriteUInt8(d.AggregatePerms);
-                p.WriteUInt8(d.AggregatePermTextures);
-                p.WriteUInt8(d.AggregatePermTexturesOwner);
-                p.WriteUInt32(d.Category);
-                p.WriteInt16(d.InventorySerial);
-                p.WriteUUID(d.ItemID);
-                p.WriteUUID(d.FolderID);
-                p.WriteUUID(d.FromTaskID);
-                p.WriteUUID(d.LastOwnerID);
-                p.WriteStringLen8(d.Name);
-                p.WriteStringLen8(d.Description);
-                p.WriteStringLen8(d.TouchName);
-                p.WriteStringLen8(d.SitName);
-                p.WriteUInt8((byte)d.TextureID.Length);
-                p.WriteBytes(d.TextureID);
+                p.WriteBytes(d);
             }
         }
     }

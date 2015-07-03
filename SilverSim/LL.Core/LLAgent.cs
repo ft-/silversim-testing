@@ -979,6 +979,19 @@ namespace SilverSim.LL.Core
         }
         #endregion
 
+        public RwLockedList<UUID> SelectedObjects(UUID scene)
+        {
+            Circuit circuit;
+            if(Circuits.TryGetValue(scene, out circuit))
+            {
+                return circuit.SelectedObjects;
+            }
+            else
+            {
+                return new RwLockedList<UUID>();
+            }
+        }
+
         public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)
         {
             return RequestPermissions(part, itemID, permissions, UUID.Zero);

@@ -166,6 +166,8 @@ namespace SilverSim.Scene.Types.Agent
         void HandleMessage(ChildAgentUpdate m);
         void HandleMessage(ChildAgentPositionUpdate m);
 
+        RwLockedList<UUID> SelectedObjects(UUID scene);
+
         UGI Group { get; set; }
 
         bool IsActiveGod
