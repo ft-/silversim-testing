@@ -44,7 +44,6 @@ namespace SilverSim.Main.Common.HttpServer
 
         void RequestHandler(HttpRequest httpreq)
         {
-            object o;
             XMLRPC.XmlRpcRequest req;
             if(httpreq.Method != "POST")
             {

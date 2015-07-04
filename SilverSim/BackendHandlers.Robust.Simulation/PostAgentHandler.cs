@@ -73,6 +73,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
         private string m_DefaultPresenceServerURI = string.Empty;
         private Dictionary<string, IAssetServicePlugin> m_AssetServicePlugins = new Dictionary<string,IAssetServicePlugin>();
         private Dictionary<string, IInventoryServicePlugin> m_InventoryServicePlugins = new Dictionary<string,IInventoryServicePlugin>();
+        private List<IPacketHandlerExtender> m_PacketHandlerPlugins = new List<IPacketHandlerExtender>();
 
         private class GridParameterMap : ICloneable
         {
@@ -170,6 +171,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             {
                 m_InventoryServicePlugins.Add(plugin.Name, plugin);
             }
+
+            m_PacketHandlerPlugins = loader.GetServicesByValue<IPacketHandlerExtender>();
 
             foreach(IConfig section in loader.Config.Configs)
             {
@@ -523,7 +526,15 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
                 LLUDPServer udpServer = (LLUDPServer)scene.UDPServer;
 
-                Circuit circuit = new Circuit(agent, udpServer, agentPost.Circuit.CircuitCode, m_CapsRedirector, agentPost.Circuit.CapsPath, agent.ServiceURLs, gatekeeperURI);
+                Circuit circuit = new Circuit(
+                    agent, 
+                    udpServer, 
+                    agentPost.Circuit.CircuitCode, 
+                    m_CapsRedirector, 
+                    agentPost.Circuit.CapsPath, 
+                    agent.ServiceURLs, 
+                    gatekeeperURI,
+                    m_PacketHandlerPlugins);
                 IPEndPoint ep = new IPEndPoint(IPAddress.Parse(agentPost.Client.ClientIP), 0);
                 circuit.RemoteEndPoint = ep;
                 circuit.Agent = agent;

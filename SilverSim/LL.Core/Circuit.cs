@@ -26,6 +26,7 @@ exception statement from your version.
 using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Economy;
+using SilverSim.Main.Common;
 using SilverSim.Main.Common.Caps;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Scene;
@@ -300,7 +301,15 @@ namespace SilverSim.LL.Core
             }
         }
 
-        public Circuit(LLAgent agent, LLUDPServer server, UInt32 circuitcode, CapsHttpRedirector capsredirector, UUID regionSeedID, Dictionary<string, string> serviceURLs, string gatekeeperURI)
+        public Circuit(
+            LLAgent agent, 
+            LLUDPServer server,
+            UInt32 circuitcode,
+            CapsHttpRedirector capsredirector, 
+            UUID regionSeedID, 
+            Dictionary<string, string> serviceURLs,
+            string gatekeeperURI,
+            List<IPacketHandlerExtender> extenders)
         {
             InitializeTransmitQueueing();
             InitSimStats();
@@ -338,6 +347,14 @@ namespace SilverSim.LL.Core
             AddMessageRouting(this);
             AddMessageRouting(Agent);
             AddMessageRouting(Scene);
+
+            if(extenders != null)
+            {
+                foreach(IPacketHandlerExtender o in extenders)
+                {
+                    AddMessageRouting(o);
+                }
+            }
 
             m_LastReceivedPacketAtTime = Environment.TickCount;
             uint pcks;
