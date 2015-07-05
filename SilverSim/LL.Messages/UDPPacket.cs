@@ -465,6 +465,14 @@ namespace SilverSim.LL.Messages
                 }
                 return BitConverter.ToUInt64(buf, 0);
             }
+            else if (!BitConverter.IsLittleEndian)
+            {
+                byte[] buf = new byte[8];
+                Buffer.BlockCopy(Data, DataPos, buf, 0, 8);
+                Array.Reverse(buf);
+                DataPos += 8;
+                return BitConverter.ToUInt64(buf, 0);
+            }
             UInt64 val = BitConverter.ToUInt64(Data, DataPos);
             DataPos += 8;
             return val;
@@ -529,6 +537,14 @@ namespace SilverSim.LL.Messages
                 }
                 return BitConverter.ToInt64(buf, 0);
             }
+            else if (!BitConverter.IsLittleEndian)
+            {
+                byte[] buf = new byte[8];
+                Buffer.BlockCopy(Data, DataPos, buf, 0, 8);
+                Array.Reverse(buf);
+                DataPos += 8;
+                return BitConverter.ToInt64(buf, 0);
+            }
             Int64 val = BitConverter.ToInt64(Data, DataPos);
             DataPos += 8;
             return val;
@@ -568,6 +584,14 @@ namespace SilverSim.LL.Messages
                 {
                     Array.Reverse(buf);
                 }
+                return BitConverter.ToUInt32(buf, 0);
+            }
+            else if (!BitConverter.IsLittleEndian)
+            {
+                byte[] buf = new byte[4];
+                Buffer.BlockCopy(Data, DataPos, buf, 0, 4);
+                Array.Reverse(buf);
+                DataPos += 4;
                 return BitConverter.ToUInt32(buf, 0);
             }
             UInt32 val = BitConverter.ToUInt32(Data, DataPos);
@@ -613,6 +637,14 @@ namespace SilverSim.LL.Messages
                 }
                 return BitConverter.ToInt32(buf, 0);
             }
+            else if (!BitConverter.IsLittleEndian)
+            {
+                byte[] buf = new byte[4];
+                Buffer.BlockCopy(Data, DataPos, buf, 0, 4);
+                Array.Reverse(buf);
+                DataPos += 4;
+                return BitConverter.ToInt32(buf, 0);
+            }
             Int32 val = BitConverter.ToInt32(Data, DataPos);
             DataPos += 4;
             return val;
@@ -654,6 +686,14 @@ namespace SilverSim.LL.Messages
                 }
                 return BitConverter.ToUInt16(buf, 0);
             }
+            else if (!BitConverter.IsLittleEndian)
+            {
+                byte[] buf = new byte[2];
+                Buffer.BlockCopy(Data, DataPos, buf, 0, 2);
+                Array.Reverse(buf);
+                DataPos += 2;
+                return BitConverter.ToUInt16(buf, 0);
+            }
             UInt16 val = BitConverter.ToUInt16(Data, DataPos);
             DataPos += 2;
             return val;
@@ -693,6 +733,14 @@ namespace SilverSim.LL.Messages
                 {
                     Array.Reverse(buf);
                 }
+                return BitConverter.ToInt16(buf, 0);
+            }
+            else if (!BitConverter.IsLittleEndian)
+            {
+                byte[] buf = new byte[2];
+                Buffer.BlockCopy(Data, DataPos, buf, 0, 2);
+                Array.Reverse(buf);
+                DataPos += 2;
                 return BitConverter.ToInt16(buf, 0);
             }
             Int16 val = BitConverter.ToInt16(Data, DataPos);
@@ -796,6 +844,14 @@ namespace SilverSim.LL.Messages
                 }
                 return BitConverter.ToDouble(buf, 0);
             }
+            else if(!BitConverter.IsLittleEndian)
+            {
+                byte[] buf = new byte[8];
+                Buffer.BlockCopy(Data, DataPos, buf, 0, 8);
+                Array.Reverse(buf);
+                DataPos += 8;
+                return BitConverter.ToDouble(buf, 0);
+            }
             double val = BitConverter.ToDouble(Data, DataPos);
             DataPos += 8;
             return val;
@@ -835,6 +891,14 @@ namespace SilverSim.LL.Messages
                 {
                     Array.Reverse(buf);
                 }
+                return BitConverter.ToSingle(buf, 0);
+            }
+            else if!BitConverter.IsLittleEndian)
+            {
+                byte[] buf = new byte[4];
+                Buffer.BlockCopy(Data, DataPos, buf, 0, 4);
+                Array.Reverse(buf);
+                DataPos += 4;
                 return BitConverter.ToSingle(buf, 0);
             }
             float val = BitConverter.ToSingle(Data, DataPos);
