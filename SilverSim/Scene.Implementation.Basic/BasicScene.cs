@@ -184,7 +184,20 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 get
                 {
-                    throw new NotImplementedException();
+                    int x = (int)pos.X;
+                    int y = (int)pos.Y;
+                    if(pos.X < 0 || pos.Y < 0 || x < 0 || y < 0 || x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    foreach(ParcelInfo p in m_Scene.m_Parcels.Values)
+                    {
+                        if(p.LandBitmap[x, y])
+                        {
+                            return p;
+                        }
+                    }
+                    throw new KeyNotFoundException();
                 }
             }
 

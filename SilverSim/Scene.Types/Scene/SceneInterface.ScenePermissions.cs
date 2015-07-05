@@ -547,6 +547,31 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return false;
             }
+
+            ParcelInfo pinfo;
+            try
+            {
+                pinfo = Parcels[location];
+
+                if(0 != (pinfo.Flags & ParcelFlags.AllowTerraform))
+                {
+                    return true;
+                }
+
+                if(pinfo.Owner.EqualsGrid(agent.Owner))
+                {
+                    return true;
+                }
+
+                if(HasGroupPower(agent, pinfo.Group, GroupPowers.AllowEditLand))
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+
+            }
             return false;
         }
     }
