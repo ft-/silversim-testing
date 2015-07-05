@@ -189,9 +189,6 @@ namespace SilverSim.LL.TerrainEdit
             {
                 if (data.South == data.North && data.West == data.East)
                 {
-#if DEBUG
-                    m_Log.DebugFormat("ModifyLand {0} / {1}", data.West, data.South);
-#endif
                     if (m_PaintEffects.TryGetValue((StandardTerrainEffect)req.Action, out modifier))
                     {
                         modifier(agent, scene, req, data);
@@ -213,9 +210,9 @@ namespace SilverSim.LL.TerrainEdit
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
-            int xFrom = (int)(data.West - data.BrushSize - 0.5);
+            int xFrom = (int)(data.West - data.BrushSize + 0.5);
             int xTo = (int)(data.West + data.BrushSize + 0.5);
-            int yFrom = (int)(data.South - data.BrushSize - 0.5);
+            int yFrom = (int)(data.South - data.BrushSize + 0.5);
             int yTo = (int)(data.South + data.BrushSize + 0.5);
 
             if (xFrom < 0)
@@ -237,6 +234,10 @@ namespace SilverSim.LL.TerrainEdit
             {
                 yTo = (int)scene.RegionData.Size.Y - 1;
             }
+
+#if DEBUG
+            m_Log.DebugFormat("ModifyLand {0},{1} RaiseSphere {2}-{3} / {4}-{5}", data.West, data.South, xFrom, xTo, yFrom, yTo);
+#endif
 
             for (int x = xFrom; x <= xTo; x++)
             {
@@ -277,9 +278,9 @@ namespace SilverSim.LL.TerrainEdit
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
-            int xFrom = (int)(data.West - data.BrushSize - 0.5);
+            int xFrom = (int)(data.West - data.BrushSize + 0.5);
             int xTo = (int)(data.West + data.BrushSize + 0.5);
-            int yFrom = (int)(data.South - data.BrushSize - 0.5);
+            int yFrom = (int)(data.South - data.BrushSize + 0.5);
             int yTo = (int)(data.South + data.BrushSize + 0.5);
 
             if (xFrom < 0)
@@ -345,9 +346,9 @@ namespace SilverSim.LL.TerrainEdit
 
             int x, y;
 
-            int xFrom = (int)(data.West - data.BrushSize - 0.5);
+            int xFrom = (int)(data.West - data.BrushSize + 0.5);
             int xTo = (int)(data.West + data.BrushSize + 0.5);
-            int yFrom = (int)(data.South - data.BrushSize - 0.5);
+            int yFrom = (int)(data.South - data.BrushSize + 0.5);
             int yTo = (int)(data.South + data.BrushSize + 0.5);
 
             if (xFrom < 0)
