@@ -49,12 +49,17 @@ namespace SilverSim.Types
 
         public override bool Equals(object obj)
         {
-            return (obj is UUI) ? this == (UUI)obj : false;
+            return (obj is UUI) ? this.ID == ((UUI)obj).ID : false;
         }
 
         public bool Equals(UUI uui)
         {
             return uui.ID == ID;
+        }
+
+        public bool EqualsGrid(UUI uui)
+        {
+            return uui.ID == ID && uui.HomeURI == HomeURI && IsAuthoritative && uui.IsAuthoritative;
         }
 
         public override int GetHashCode()

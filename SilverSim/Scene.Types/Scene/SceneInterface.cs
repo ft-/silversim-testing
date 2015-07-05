@@ -115,6 +115,7 @@ namespace SilverSim.Scene.Types.Scene
         public AssetServiceInterface TemporaryAssetService { get; protected set; }
         public AssetServiceInterface PersistentAssetService { get; protected set; }
         public AssetServiceInterface AssetService { get; private set; }
+        public GroupsServiceInterface GroupsService { get; protected set; }
         public GroupsNameServiceInterface GroupsNameService { get; protected set; }
         public AvatarNameServiceInterface AvatarNameService { get; private set; }
         public readonly RwLockedList<AvatarNameServiceInterface> AvatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
@@ -214,6 +215,10 @@ namespace SilverSim.Scene.Types.Scene
             else if(typeof(T).IsAssignableFrom(typeof(EconomyServiceInterface)))
             {
                 return (T)(object)EconomyService;
+            }
+            else if(typeof(T).IsAssignableFrom(typeof(GroupsServiceInterface)))
+            {
+                return (T)(object)GroupsService;
             }
             else if (typeof(T).IsAssignableFrom(typeof(EstateServiceInterface)))
             {

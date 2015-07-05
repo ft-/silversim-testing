@@ -121,27 +121,14 @@ namespace SilverSim.Scene.Types.Scene
                         {
                             return;
                         }
-#warning Add group support here (also allowed are group owners)
-#warning Add friend modify support here
-                        else if (Owner == agent.Owner)
-                        {
-
-                        }
-                        else if(IsEstateManager(agent.Owner))
-                        {
-
-                        }
-                        else if(grp.Owner == agent.Owner)
-                        {
-
-                        }
-                        else if(grp.RootPart.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.None))
+                        else if(CanDelete(agent, grp, grp.Position))
                         {
 
                         }
                         else
                         {
                             agent.SendAlertMessage("ALERT: ", ID);
+                            return;
                         }
                     }
                     break;
@@ -153,13 +140,7 @@ namespace SilverSim.Scene.Types.Scene
                         {
                             return;
                         }
-#warning Add group support here (also allowed are group owners)
-#warning Add friend modify support here
-                        else if (Owner == agent.Owner)
-                        {
-
-                        }
-                        else if(IsEstateManager(agent.Owner))
+                        else if(CanReturn(agent, grp, grp.Position))
                         {
 
                         }
@@ -170,6 +151,7 @@ namespace SilverSim.Scene.Types.Scene
                             ackres.TransactionID = req.TransactionID;
                             ackres.Success = false;
                             agent.SendMessageAlways(ackres, ID);
+                            return;
                         }
                     }
                     break;
@@ -188,19 +170,7 @@ namespace SilverSim.Scene.Types.Scene
                         {
                             return;
                         }
-                        else if (Owner == agent.Owner)
-                        {
-
-                        }
-                        else if(IsEstateManager(agent.Owner))
-                        {
-
-                        }
-                        else if(grp.Owner == agent.Owner)
-                        {
-
-                        }
-                        else if(grp.RootPart.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.Transfer))
+                        else if(CanTake(agent, grp, grp.Position))
                         {
 
                         }
@@ -219,15 +189,7 @@ namespace SilverSim.Scene.Types.Scene
                 case SilverSim.LL.Messages.Object.DeRezObject.DeRezAction.TakeCopy:
                     foreach(ObjectGroup grp in objectgroups)
                     {
-                        if(Owner == agent.Owner)
-                        {
-
-                        }
-                        else if(IsEstateManager(agent.Owner))
-                        {
-
-                        }
-                        else if(grp.RootPart.CheckPermissions(agent.Owner, agent.Group, SilverSim.Types.Inventory.InventoryPermissionsMask.Copy))
+                        if(CanTakeCopy(agent, grp, grp.Position))
                         {
 
                         }

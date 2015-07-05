@@ -28,6 +28,10 @@ using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.Types;
+using SilverSim.Types.Groups;
+using System.Collections.Generic;
 
 namespace SilverSim.LL.Groups
 {
@@ -66,9 +70,25 @@ namespace SilverSim.LL.Groups
         [PacketHandler(MessageType.GroupTitlesRequest)]
         [PacketHandler(MessageType.GroupTitleUpdate)]
         [PacketHandler(MessageType.GroupRoleUpdate)]
-        public void HandleMessage(Message m)
+        public void HandleMessage(LLAgent agent, Circuit circuit, Message m)
         {
 
+        }
+
+        GroupPowers GetGroupPowers(LLAgent agent, GroupsServiceInterface groupsService, UGI group)
+        {
+            if(null == groupsService)
+            {
+                return GroupPowers.None;
+            }
+            List<GroupRole> roles = groupsService.Roles[agent.Owner, group, agent.Owner];
+            GroupPowers powers = GroupPowers.None;
+            foreach(GroupRole role in roles)
+            {
+                powers |= role.Powers;
+            }
+
+            return GroupPowers.None;
         }
 
         [CapabilityHandler("GroupMemberData")]

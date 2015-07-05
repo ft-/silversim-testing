@@ -157,6 +157,14 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Permissions
+        public bool IsLocked
+        {
+            get
+            {
+                return (m_Permissions.Current & InventoryPermissionsMask.Modify) == 0;
+            }
+        }
+
         public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted)
         {
             if (ObjectGroup.IsGroupOwned)
