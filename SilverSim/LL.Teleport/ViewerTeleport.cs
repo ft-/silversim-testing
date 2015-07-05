@@ -30,7 +30,7 @@ using SilverSim.Main.Common;
 
 namespace SilverSim.LL.Teleport
 {
-    public class ViewerTeleport : IPlugin, IPacketHandlerExtender, ICapabilityExtender
+    public class ViewerTeleport : IPlugin, IPacketHandlerExtender
     {
         public ViewerTeleport()
         {
