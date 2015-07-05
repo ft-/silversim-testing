@@ -242,20 +242,26 @@ namespace SilverSim.LL.Core
 
         class ExtenderCapabilityCaller
         {
-            LLAgent m_Agent;
-            Circuit m_Circuit;
+            /* Weak reference kills the hard referencing */
+            WeakReference m_Agent;
+            WeakReference m_Circuit;
             CapabilityHandler.CapabilityDelegate m_Delegate;
 
             public ExtenderCapabilityCaller(LLAgent agent, Circuit circuit, CapabilityHandler.CapabilityDelegate del)
             {
-                m_Agent = agent;
-                m_Circuit = circuit;
+                m_Agent = new WeakReference(agent, false);
+                m_Circuit = new WeakReference(circuit, false);
                 m_Delegate = del;
             }
 
             public void HttpRequestHandler(HttpRequest req)
             {
-                m_Delegate(m_Agent, m_Circuit, req);
+                LLAgent agent = m_Agent.Target as LLAgent;
+                Circuit circuit = m_Circuit.Target as Circuit;
+                if (agent != null && circuit != null)
+                {
+                    m_Delegate(agent, circuit, req);
+                }
             }
         }
 

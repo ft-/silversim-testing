@@ -30,6 +30,7 @@ using SilverSim.Main.Common;
 using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.ServiceInterfaces.Chat;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
@@ -235,6 +236,53 @@ namespace SilverSim.LL.Core
 
         public C5.TreeDictionary<uint, UDPPacket> m_UnackedPacketsHash = new C5.TreeDictionary<uint,UDPPacket>();
 
+        class MessageHandlerExtenderLLAgent
+        {
+            WeakReference m_Agent;
+            WeakReference m_Circuit;
+            HandlerDelegate m_Delegate;
+
+            public delegate void HandlerDelegate(LLAgent agent, Circuit circuit, Message m);
+
+            public MessageHandlerExtenderLLAgent(LLAgent agent, Circuit circuit, HandlerDelegate del)
+            {
+                m_Agent = new WeakReference(agent, false);
+                m_Circuit = new WeakReference(circuit, false);
+            }
+
+            public void Handler(Message m)
+            {
+                LLAgent agent = m_Agent.Target as LLAgent;
+                Circuit circuit = m_Circuit.Target as Circuit;
+                if (agent != null && circuit != null)
+                {
+                    m_Delegate(agent, circuit, m);
+                }
+            }
+        }
+
+        class MessageHandlerExtenderIAgent
+        {
+            WeakReference m_Agent;
+            HandlerDelegate m_Delegate;
+
+            public delegate void HandlerDelegate(IAgent agent, Message m);
+
+            public MessageHandlerExtenderIAgent(IAgent agent, HandlerDelegate del)
+            {
+                m_Agent = new WeakReference(agent, false);
+            }
+
+            public void Handler(Message m)
+            {
+                IAgent agent = m_Agent.Target as IAgent;
+                if (agent != null)
+                {
+                    m_Delegate(agent, m);
+                }
+            }
+        }
+
         void AddMessageRouting(object o)
         {
             List<Type> types = new List<Type>();
@@ -265,6 +313,39 @@ namespace SilverSim.LL.Core
                         {
                             m_Log.FatalFormat("Method {0} return type is not void", mi.Name);
                         }
+                        else if(mi.GetParameters().Length == 3)
+                        {
+                            if( mi.GetParameters()[0].ParameterType != typeof(LLAgent) ||
+                                mi.GetParameters()[1].ParameterType != typeof(Circuit) ||
+                                mi.GetParameters()[2].ParameterType != typeof(Message))
+                            {
+                                m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                            }
+                            else
+                            {
+#if DEBUG
+                                m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, pa.Number.ToString());
+#endif
+                                m_MessageRouting.Add(pa.Number, new MessageHandlerExtenderLLAgent(Agent, this, 
+                                    (MessageHandlerExtenderLLAgent.HandlerDelegate)Delegate.CreateDelegate(typeof(MessageHandlerExtenderLLAgent.HandlerDelegate), o, mi)).Handler);
+                            }
+                        }
+                        else if(mi.GetParameters().Length == 2)
+                        {
+                            if( mi.GetParameters()[0].ParameterType != typeof(IAgent) ||
+                                mi.GetParameters()[1].ParameterType != typeof(Message))
+                            {
+                                m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                            }
+                            else
+                            {
+#if DEBUG
+                                m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, pa.Number.ToString());
+#endif
+                                m_MessageRouting.Add(pa.Number, new MessageHandlerExtenderIAgent(Agent, 
+                                    (MessageHandlerExtenderIAgent.HandlerDelegate)Delegate.CreateDelegate(typeof(MessageHandlerExtenderIAgent.HandlerDelegate), o, mi)).Handler);
+                            }
+                        }
                         else if (mi.GetParameters().Length != 1)
                         {
                             m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
@@ -287,6 +368,23 @@ namespace SilverSim.LL.Core
                         if (mi.ReturnType != typeof(void))
                         {
                         }
+                        else if(mi.GetParameters().Length == 3)
+                        {
+                            if( mi.GetParameters()[0].ParameterType == typeof(LLAgent) &&
+                                mi.GetParameters()[1].ParameterType == typeof(Circuit) &&
+                                mi.GetParameters()[2].ParameterType == typeof(Message))
+                            {
+                                m_Log.InfoFormat("Candidate method {0} of {1} is not registered", mi.Name, t.Name);
+                            }
+                        }
+                        else if (mi.GetParameters().Length == 2)
+                        {
+                            if (mi.GetParameters()[0].ParameterType == typeof(IAgent) &&
+                                mi.GetParameters()[1].ParameterType == typeof(Message))
+                            {
+                                m_Log.InfoFormat("Candidate method {0} of {1} is not registered", mi.Name, t.Name);
+                            }
+                        }
                         else if (mi.GetParameters().Length != 1)
                         {
                         }
@@ -299,6 +397,69 @@ namespace SilverSim.LL.Core
                         }
                     }
 #endif
+                }
+            }
+        }
+
+        void AddCapabilityExtensions(object o, UUID regionSeedID)
+        {
+            List<Type> types = new List<Type>();
+            Type tt;
+            tt = o.GetType();
+            while (tt != typeof(object))
+            {
+                types.Add(tt);
+                tt = tt.BaseType;
+            }
+
+            foreach (Type t in types)
+            {
+                foreach (MethodInfo mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
+                {
+                    CapabilityHandler ca = (CapabilityHandler)Attribute.GetCustomAttribute(mi, typeof(CapabilityHandler));
+                    if (null == ca)
+                    {
+
+                    }
+                    else if (m_RegisteredCapabilities.ContainsKey(ca.Name))
+                    {
+                        m_Log.FatalFormat("Method {0} of {1} tried to add another instantiation for capability {2}", mi.Name, t.Name, ca.Name);
+                    }
+                    else if (mi.ReturnType != typeof(void))
+                    {
+                        m_Log.FatalFormat("Method {0} return type is not void", mi.Name);
+                    }
+                    else if (mi.GetParameters().Length != 3)
+                    {
+                        m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
+                    }
+                    else if (mi.GetParameters()[0].ParameterType != typeof(LLAgent))
+                    {
+                        m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                    }
+                    else if (mi.GetParameters()[1].ParameterType != typeof(Circuit))
+                    {
+                        m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                    }
+                    else if (mi.GetParameters()[2].ParameterType != typeof(HttpRequest))
+                    {
+                        m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                    }
+                    else
+                    {
+#if DEBUG
+                        m_Log.InfoFormat("Method {0} of {1} used for instantiation of capability {2}", mi.Name, t.Name, ca.Name);
+#endif
+                        try
+                        {
+                            AddExtenderCapability(ca.Name, regionSeedID, (CapabilityHandler.CapabilityDelegate)Delegate.CreateDelegate(typeof(CapabilityHandler.CapabilityDelegate), o, mi), m_Server.Scene.CapabilitiesConfig);
+                        }
+                        catch (Exception e)
+                        {
+                            m_Log.Warn(string.Format("Method {0} of {1} failed to instantiate capability {2}", mi.Name, t.Name, ca.Name), e);
+                        }
+                    }
+
                 }
             }
         }
@@ -349,6 +510,7 @@ namespace SilverSim.LL.Core
             AddMessageRouting(this);
             AddMessageRouting(Agent);
             AddMessageRouting(Scene);
+            AddCapabilityExtensions(Scene, regionSeedID);
 
             if(extenders != null)
             {
@@ -363,65 +525,7 @@ namespace SilverSim.LL.Core
                     
                     if(interfaces.Contains(typeof(ICapabilityExtender)))
                     {
-                        List<Type> types = new List<Type>();
-                        Type tt;
-                        tt = o.GetType();
-                        while(tt != typeof(object))
-                        {
-                            types.Add(tt);
-                            tt = tt.BaseType;
-                        }
-
-                        foreach(Type t in types)
-                        {
-                            foreach(MethodInfo mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
-                            {
-                                CapabilityHandler ca = (CapabilityHandler)Attribute.GetCustomAttribute(mi, typeof(CapabilityHandler));
-                                if(null == ca)
-                                {
-
-                                }
-                                else if(m_RegisteredCapabilities.ContainsKey(ca.Name))
-                                {
-                                    m_Log.FatalFormat("Method {0} of {1} tried to add another instantiation for capability {2}", mi.Name, t.Name, ca.Name);
-                                }
-                                else if (mi.ReturnType != typeof(void))
-                                {
-                                    m_Log.FatalFormat("Method {0} return type is not void", mi.Name);
-                                }
-                                else if (mi.GetParameters().Length != 3)
-                                {
-                                    m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
-                                }
-                                else if (mi.GetParameters()[0].ParameterType != typeof(LLAgent))
-                                {
-                                    m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
-                                }
-                                else if (mi.GetParameters()[1].ParameterType != typeof(Circuit))
-                                {
-                                    m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
-                                }
-                                else if (mi.GetParameters()[2].ParameterType != typeof(HttpRequest))
-                                {
-                                    m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
-                                }
-                                else
-                                {
-#if DEBUG
-                                    m_Log.InfoFormat("Method {0} of {1} used for instantiation of capability {2}", mi.Name, t.Name, ca.Name);
-#endif
-                                    try
-                                    {
-                                        AddExtenderCapability(ca.Name, regionSeedID, (CapabilityHandler.CapabilityDelegate)Delegate.CreateDelegate(typeof(CapabilityHandler.CapabilityDelegate), o, mi), server.Scene.CapabilitiesConfig);
-                                    }
-                                    catch(Exception e)
-                                    {
-                                        m_Log.Warn(string.Format("Method {0} of {1} failed to instantiate capability {2}", mi.Name, t.Name, ca.Name), e);
-                                    }
-                                }
-
-                            }
-                        }
+                        AddCapabilityExtensions(o, regionSeedID);
                     }
                 }
             }
