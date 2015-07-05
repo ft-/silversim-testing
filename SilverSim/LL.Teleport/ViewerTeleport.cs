@@ -24,21 +24,46 @@ exception statement from your version.
 */
 
 using Nini.Config;
+using SilverSim.LL.Core;
+using SilverSim.LL.Messages;
 using SilverSim.Main.Common;
-using System;
 
-namespace SilverSim.LoadStore.Terrain
+namespace SilverSim.LL.Teleport
 {
-    [PluginName("TerrainFileSupport")]
-    public class TerrainLoadStoreFactory : IPluginFactory
+    public class ViewerTeleport : IPlugin, IPacketHandlerExtender, ICapabilityExtender
     {
-        public TerrainLoadStoreFactory()
+        public ViewerTeleport()
         {
 
         }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+        }
+
+        [PacketHandler(MessageType.TeleportRequest)]
+        [PacketHandler(MessageType.TeleportLocationRequest)]
+        [PacketHandler(MessageType.TeleportLandmarkRequest)]
+        [PacketHandler(MessageType.StartLure)]
+        [PacketHandler(MessageType.TeleportLureRequest)]
+        [PacketHandler(MessageType.TeleportCancel)]
+        public void HandleMessage(Message m)
+        {
+
+        }
+    }
+
+    [PluginName("ViewerTeleport")]
+    public class Factory : IPluginFactory
+    {
+        public Factory()
+        {
+
+        }
+
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new TerrainLoadStore(loader);
+            return new ViewerTeleport();
         }
     }
 }

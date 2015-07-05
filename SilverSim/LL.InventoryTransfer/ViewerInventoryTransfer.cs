@@ -24,21 +24,41 @@ exception statement from your version.
 */
 
 using Nini.Config;
+using SilverSim.LL.Core;
+using SilverSim.LL.Messages;
 using SilverSim.Main.Common;
-using System;
 
-namespace SilverSim.LoadStore.Terrain
+namespace SilverSim.LL.InventoryTransfer
 {
-    [PluginName("TerrainFileSupport")]
-    public class TerrainLoadStoreFactory : IPluginFactory
+    public class InventoryTransfer : IPlugin, IPacketHandlerExtender, ICapabilityExtender
     {
-        public TerrainLoadStoreFactory()
+        public InventoryTransfer()
         {
 
         }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+        }
+
+        [PacketHandler(MessageType.TransferInventory)]
+        public void HandleMessage(Message m)
+        {
+
+        }
+    }
+
+    [PluginName("InventoryTransfer")]
+    public class Factory : IPluginFactory
+    {
+        public Factory()
+        {
+
+        }
+
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new TerrainLoadStore(loader);
+            return new InventoryTransfer();
         }
     }
 }

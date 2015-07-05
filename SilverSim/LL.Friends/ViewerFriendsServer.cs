@@ -24,21 +24,44 @@ exception statement from your version.
 */
 
 using Nini.Config;
+using SilverSim.LL.Core;
+using SilverSim.LL.Messages;
 using SilverSim.Main.Common;
-using System;
 
-namespace SilverSim.LoadStore.Terrain
+namespace SilverSim.LL.Friends
 {
-    [PluginName("TerrainFileSupport")]
-    public class TerrainLoadStoreFactory : IPluginFactory
+    public class ViewerFriendsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender
     {
-        public TerrainLoadStoreFactory()
+        public ViewerFriendsServer()
         {
 
         }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+        }
+
+        [PacketHandler(MessageType.AcceptFriendship)]
+        [PacketHandler(MessageType.DeclineFriendship)]
+        [PacketHandler(MessageType.TerminateFriendship)]
+        [PacketHandler(MessageType.GrantUserRights)]
+        public void HandleMessage(Message m)
+        {
+
+        }
+    }
+
+    [PluginName("ViewerFriendsServer")]
+    public class Factory : IPluginFactory
+    {
+        public Factory()
+        {
+
+        }
+
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new TerrainLoadStore(loader);
+            return new ViewerFriendsServer();
         }
     }
 }

@@ -73,7 +73,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
         private string m_DefaultPresenceServerURI = string.Empty;
         private Dictionary<string, IAssetServicePlugin> m_AssetServicePlugins = new Dictionary<string,IAssetServicePlugin>();
         private Dictionary<string, IInventoryServicePlugin> m_InventoryServicePlugins = new Dictionary<string,IInventoryServicePlugin>();
-        private List<IPacketHandlerExtender> m_PacketHandlerPlugins = new List<IPacketHandlerExtender>();
+        private List<IProtocolExtender> m_PacketHandlerPlugins = new List<IProtocolExtender>();
 
         private class GridParameterMap : ICloneable
         {
@@ -172,7 +172,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 m_InventoryServicePlugins.Add(plugin.Name, plugin);
             }
 
-            m_PacketHandlerPlugins = loader.GetServicesByValue<IPacketHandlerExtender>();
+            m_PacketHandlerPlugins = loader.GetServicesByValue<IProtocolExtender>();
 
             foreach(IConfig section in loader.Config.Configs)
             {
