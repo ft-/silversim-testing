@@ -893,7 +893,7 @@ namespace SilverSim.LL.Messages
                 }
                 return BitConverter.ToSingle(buf, 0);
             }
-            else if!BitConverter.IsLittleEndian)
+            else if(!BitConverter.IsLittleEndian)
             {
                 byte[] buf = new byte[4];
                 Buffer.BlockCopy(Data, DataPos, buf, 0, 4);
