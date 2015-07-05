@@ -248,6 +248,7 @@ namespace SilverSim.LL.Core
             {
                 m_Agent = new WeakReference(agent, false);
                 m_Circuit = new WeakReference(circuit, false);
+                m_Delegate = del;
             }
 
             public void Handler(Message m)
@@ -271,6 +272,7 @@ namespace SilverSim.LL.Core
             public MessageHandlerExtenderIAgent(IAgent agent, HandlerDelegate del)
             {
                 m_Agent = new WeakReference(agent, false);
+                m_Delegate = del;
             }
 
             public void Handler(Message m)
