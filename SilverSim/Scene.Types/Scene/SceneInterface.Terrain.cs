@@ -144,9 +144,9 @@ namespace SilverSim.Scene.Types.Scene
                         for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                         {
                             LayerPatch patch = m_TerrainPatches[y, x];
-                            if(agentSceneSerials.ContainsKey(patch.ExtendedPatchID))
+                            uint serial;
+                            if(agentSceneSerials.TryGetValue(patch.ExtendedPatchID, out serial))
                             {
-                                uint serial = agentSceneSerials[patch.ExtendedPatchID];
                                 if (serial != patch.Serial)
                                 {
                                     agentSceneSerials[patch.ExtendedPatchID] = serial;
