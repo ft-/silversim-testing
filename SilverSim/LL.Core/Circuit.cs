@@ -37,6 +37,7 @@ using SilverSim.Types.IM;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 using System.Text;
@@ -309,7 +310,7 @@ namespace SilverSim.LL.Core
             UUID regionSeedID, 
             Dictionary<string, string> serviceURLs,
             string gatekeeperURI,
-            List<IPacketHandlerExtender> extenders)
+            List<IProtocolExtender> extenders)
         {
             InitializeTransmitQueueing();
             InitSimStats();
@@ -350,9 +351,62 @@ namespace SilverSim.LL.Core
 
             if(extenders != null)
             {
-                foreach(IPacketHandlerExtender o in extenders)
+                foreach (IProtocolExtender o in extenders)
                 {
-                    AddMessageRouting(o);
+                    Type extenderType = o.GetType();
+                    Type[] interfaces = extenderType.GetInterfaces();
+                    if (interfaces.Contains(typeof(IPacketHandlerExtender)))
+                    {
+                        AddMessageRouting(o);
+                    }
+                    
+                    if(interfaces.Contains(typeof(ICapabilityExtender)))
+                    {
+                        List<Type> types = new List<Type>();
+                        Type tt;
+                        tt = o.GetType();
+                        while(tt != typeof(object))
+                        {
+                            types.Add(tt);
+                            tt = tt.BaseType;
+                        }
+
+                        foreach(Type t in types)
+                        {
+                            foreach(MethodInfo mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
+                            {
+                                CapabilityHandler ca = (CapabilityHandler)Attribute.GetCustomAttribute(mi, typeof(CapabilityHandler));
+                                if(null == ca)
+                                {
+
+                                }
+                                else if(m_RegisteredCapabilities.ContainsKey(ca.Name))
+                                {
+                                    m_Log.FatalFormat("Method {0} of {1} tried to add another instantiation for capability {2}", mi.Name, t.Name, ca.Name);
+                                }
+                                else if (mi.ReturnType != typeof(ICapabilityInterface))
+                                {
+                                    m_Log.FatalFormat("Method {0} return type is not void", mi.Name);
+                                }
+                                else if (mi.GetParameters().Length != 1)
+                                {
+                                    m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
+                                }
+                                else if (mi.GetParameters()[0].ParameterType != typeof(LLAgent))
+                                {
+                                    m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                                }
+                                else
+                                {
+#if DEBUG
+                                    m_Log.InfoFormat("Method {0} of {1} used for instantiation of capability {2}", mi.Name, t.Name, ca.Name);
+#endif
+                                    AddDefCapabilityFactory(ca.Name, regionSeedID, (DefCapabilityInstantiate)Delegate.CreateDelegate(typeof(DefCapabilityInstantiate), o, mi), server.Scene.CapabilitiesConfig);
+                                }
+
+                            }
+                        }
+                    }
                 }
             }
 

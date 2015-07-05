@@ -232,6 +232,33 @@ namespace SilverSim.LL.Core
             }
         }
 
+        public void AddExtenderCapability(string capabilityType, UUID seedID, CapabilityHandler.CapabilityDelegate del, Dictionary<string, string> capConfig)
+        {
+            if (IsLocalHost(capConfig, capabilityType))
+            {
+                AddCapability(capabilityType, seedID, new ExtenderCapabilityCaller(Agent, this, del).HttpRequestHandler);
+            }
+        }
+
+        class ExtenderCapabilityCaller
+        {
+            LLAgent m_Agent;
+            Circuit m_Circuit;
+            CapabilityHandler.CapabilityDelegate m_Delegate;
+
+            public ExtenderCapabilityCaller(LLAgent agent, Circuit circuit, CapabilityHandler.CapabilityDelegate del)
+            {
+                m_Agent = agent;
+                m_Circuit = circuit;
+                m_Delegate = del;
+            }
+
+            public void HttpRequestHandler(HttpRequest req)
+            {
+                m_Delegate(m_Agent, m_Circuit, req);
+            }
+        }
+
         private List<UploadAssetAbstractCapability> m_UploadCapabilities = new List<UploadAssetAbstractCapability>();
 
         public void SetupDefaultCapabilities(

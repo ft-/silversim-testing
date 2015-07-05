@@ -23,12 +23,10 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scene.Types.Scene;
-
-namespace SilverSim.Main.Common
+namespace SilverSim.LL.Core
 {
     /* Interface for marking interfaces being open extenders for packet decoding in ConfigurationLoader */
-    public interface IPacketHandlerExtender
+    public interface IPacketHandlerExtender : IProtocolExtender
     {
     }
 }
