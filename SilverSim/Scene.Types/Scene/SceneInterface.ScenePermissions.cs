@@ -536,5 +536,18 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
         #endregion
+
+        public bool CanTerraform(IAgent agent, Vector3 location)
+        {
+            if (IsPossibleGod(agent.Owner))
+            {
+                return true;
+            }
+            else if(RegionSettings.BlockTerraform)
+            {
+                return false;
+            }
+            return false;
+        }
     }
 }

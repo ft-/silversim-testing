@@ -190,7 +190,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            private void UpdateTerrainDataToClients()
+            public void UpdateTerrainDataToClients()
             {
                 foreach (IAgent agent in m_Scene.Agents)
                 {
@@ -212,7 +212,7 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         throw new KeyNotFoundException();
                     }
-                    return m_TerrainPatches[y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+                    return m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
                 }
                 set
                 {
@@ -224,14 +224,48 @@ namespace SilverSim.Scene.Types.Scene
                     m_TerrainRwLock.AcquireWriterLock(-1);
                     try
                     {
-                        m_TerrainPatches[y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES].Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = (float)value;
+                        LayerPatch lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES]; 
+                        lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = (float)value;
                     }
+#if DEBUG
+                    catch(Exception e)
+                    {
+                        m_Log.Debug(string.Format("Terrain Change at {0},{1} failed", x, y), e);
+                    }
+#endif
                     finally
                     {
                         m_TerrainRwLock.ReleaseWriterLock();
                     }
                     UpdateTerrainDataToClients();
                 }
+            }
+
+            public LayerPatch AdjustTerrain(uint x, uint y, double change)
+            {
+                if (x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
+                {
+                    throw new KeyNotFoundException();
+                }
+
+                m_TerrainRwLock.AcquireWriterLock(-1);
+                try
+                {
+                    LayerPatch lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+                    lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] += (float)change;
+                    return lp;
+                }
+#if DEBUG
+                catch (Exception e)
+                {
+                    m_Log.Debug(string.Format("Terrain Change at {0},{1} failed", x, y), e);
+                }
+#endif
+                finally
+                {
+                    m_TerrainRwLock.ReleaseWriterLock();
+                }
+                return null;
             }
 
             public double this[Vector3 pos]

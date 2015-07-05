@@ -146,7 +146,7 @@ namespace SilverSim.Scene.Types.Scene
                         }
                         else
                         {
-                            agent.SendAlertMessage("No permission to return object to owners", ID);
+                            agent.SendAlertMessage(string.Format("No permission to return object '{0}' to owners", grp.Name), ID);
                             ackres = new SilverSim.LL.Messages.Object.DeRezAck();
                             ackres.TransactionID = req.TransactionID;
                             ackres.Success = false;
@@ -176,7 +176,7 @@ namespace SilverSim.Scene.Types.Scene
                         }
                         else
                         {
-                            agent.SendAlertMessage("No permission to take object", ID);
+                            agent.SendAlertMessage(string.Format("No permission to take object '{0}'", grp.Name), ID);
                             ackres = new SilverSim.LL.Messages.Object.DeRezAck();
                             ackres.TransactionID = req.TransactionID;
                             ackres.Success = false;
@@ -195,7 +195,7 @@ namespace SilverSim.Scene.Types.Scene
                         }
                         else
                         {
-                            agent.SendAlertMessage("No permission to copy object", ID);
+                            agent.SendAlertMessage(string.Format("No permission to copy object '{0}'", grp.Name), ID);
                             ackres = new SilverSim.LL.Messages.Object.DeRezAck();
                             ackres.TransactionID = req.TransactionID;
                             ackres.Success = false;

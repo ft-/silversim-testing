@@ -59,7 +59,7 @@ namespace SilverSim.Types
 
         public bool EqualsGrid(UUI uui)
         {
-            return uui.ID == ID && uui.HomeURI == HomeURI && IsAuthoritative && uui.IsAuthoritative;
+            return uui.ID == ID && uui.HomeURI.Equals(HomeURI);
         }
 
         public override int GetHashCode()
