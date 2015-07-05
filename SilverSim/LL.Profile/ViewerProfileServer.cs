@@ -41,6 +41,7 @@ namespace SilverSim.LL.Profile
         {
         }
 
+        [PacketHandler(MessageType.DirClassifiedQuery)]
         [PacketHandler(MessageType.ClassifiedInfoRequest)]
         [PacketHandler(MessageType.ClassifiedInfoUpdate)]
         [PacketHandler(MessageType.ClassifiedDelete)]

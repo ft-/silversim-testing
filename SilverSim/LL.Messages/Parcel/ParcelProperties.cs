@@ -34,7 +34,12 @@ namespace SilverSim.LL.Messages.Parcel
     [Trusted]
     public class ParcelProperties : Message
     {
-        public Int32 RequestResult;
+        public enum RequestResultType : uint
+        {
+            Single = 0,
+            Multiple = 1
+        }
+        public RequestResultType RequestResult = RequestResultType.Single;
         public Int32 SequenceID;
         public bool SnapSelection;
         public Int32 SelfCount;
@@ -151,7 +156,7 @@ namespace SilverSim.LL.Messages.Parcel
             parcelData.Add("RegionDenyTransacted", RegionDenyTransacted);
             parcelData.Add("RegionPushOverride", RegionPushOverride);
             parcelData.Add("RentPrice", RentPrice);
-            parcelData.Add("RequestResult", RequestResult);
+            parcelData.Add("RequestResult", (int)RequestResult);
             parcelData.Add("SalePrice", SalePrice);
             parcelData.Add("SelectedPrims", SelectedPrims);
             parcelData.Add("SelfCount", SelfCount);

@@ -26,6 +26,7 @@ exception statement from your version.
 using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Agent;
+using SilverSim.LL.Messages.Parcel;
 using SilverSim.LL.Messages.Script;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.Transfer;
@@ -47,6 +48,7 @@ using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
+using SilverSim.Types.Parcel;
 using SilverSim.Types.Primitive;
 using SilverSim.Types.Script;
 using System;
@@ -992,6 +994,24 @@ namespace SilverSim.LL.Core
             }
         }
 
+        int m_NextParcelSequenceId = 0;
+
+        public int NextParcelSequenceId
+        {
+            get
+            {
+                lock (this)
+                {
+                    int seqid = ++m_NextParcelSequenceId;
+                    if (seqid < 0)
+                    {
+                        seqid = m_NextParcelSequenceId = 1;
+                    }
+                    return seqid;
+                }
+            }
+        }
+
         public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)
         {
             return RequestPermissions(part, itemID, permissions, UUID.Zero);
@@ -1043,6 +1063,17 @@ namespace SilverSim.LL.Core
                 circuit.Scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
                 circuit.Scene.Environment.UpdateWindDataToSingleClient(this);
                 circuit.Scene.SendAgentObjectToAllAgents(this);
+                ParcelInfo pinfo;
+                try
+                {
+                    pinfo = circuit.Scene.Parcels[GlobalPosition];
+                    ParcelProperties props = circuit.Scene.ParcelInfo2ParcelProperties(Owner.ID, pinfo, NextParcelSequenceId, ParcelProperties.RequestResultType.Single);
+                    circuit.SendMessage(props);
+                }
+                catch
+                {
+
+                }
                 circuit.ScheduleFirstUpdate();
                 SendAnimations();
             }

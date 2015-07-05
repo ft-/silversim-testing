@@ -29,6 +29,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
 
@@ -226,7 +227,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        ParcelProperties ParcelInfo2ParcelProperties(UUID agentID, ParcelInfo pinfo, int sequenceId, int requestResult)
+        public ParcelProperties ParcelInfo2ParcelProperties(UUID agentID, ParcelInfo pinfo, int sequenceId, ParcelProperties.RequestResultType requestResult)
         {
             ParcelProperties prop = new ParcelProperties();
             
@@ -269,8 +270,22 @@ namespace SilverSim.Scene.Types.Scene
             prop.SalePrice = pinfo.SalePrice;
             prop.Name = pinfo.Name;
             prop.Description = pinfo.Description;
-            prop.MusicURL = pinfo.MusicURI;
-            prop.MediaURL = pinfo.MediaURI;
+            if (null != pinfo.MusicURI)
+            {
+                prop.MusicURL = pinfo.MusicURI;
+            }
+            else
+            {
+                prop.MusicURL = "";
+            }
+            if (null != pinfo.MediaURI)
+            {
+                prop.MediaURL = pinfo.MediaURI;
+            }
+            else
+            {
+                prop.MediaURL = "";
+            }
             prop.MediaID = pinfo.MediaID;
             prop.MediaAutoScale = pinfo.MediaAutoScale;
             prop.GroupID = pinfo.Group.ID;
@@ -302,6 +317,77 @@ namespace SilverSim.Scene.Types.Scene
             return prop;
         }
 
+        [PacketHandler(MessageType.ParcelPropertiesRequest)]
+        void HandleParcelPropertiesRequest(Message m)
+        {
+            Dictionary<UUID, ParcelInfo> results = new Dictionary<UUID, ParcelInfo>();
+            ParcelPropertiesRequest req = (ParcelPropertiesRequest)m;
+            if(req.CircuitSessionID != req.SessionID ||
+                req.CircuitAgentID != req.AgentID)
+            {
+                return;
+            }
+
+            int start_x = (int)(req.West + 0.5);
+            int start_y = (int)(req.South + 0.5);
+            int end_x = (int)(req.East + 0.5);
+            int end_y = (int)(req.North + 0.5);
+            if(start_x < 0)
+            {
+                start_x = 0;
+            }
+            if(start_y < 0)
+            {
+                start_y = 0;
+            }
+            if(end_x >= RegionData.Size.X)
+            {
+                end_x = (int)RegionData.Size.X - 1;
+            }
+            if (end_y >= RegionData.Size.Y)
+            {
+                end_y = (int)RegionData.Size.Y - 1;
+            }
+            
+            for(int x = start_x; x <= end_x; ++x)
+            {
+                for(int y = start_y; y <= end_y; ++y)
+                {
+                    ParcelInfo pinfo;
+                    try
+                    {
+                        pinfo = Parcels[new Vector3(x, y, 0)];
+                    }
+                    catch
+                    {
+                        continue;
+                    }
+
+                    if(!results.ContainsKey(pinfo.ID))
+                    {
+                        results.Add(pinfo.ID, pinfo);
+                    }
+                }
+            }
+
+            IAgent agent;
+            try
+            {
+                agent = Agents[req.AgentID];
+            }
+            catch
+            {
+                return;
+            }
+            foreach(ParcelInfo pinfo in results.Values)
+            {
+                ParcelProperties props = ParcelInfo2ParcelProperties(req.AgentID, pinfo, req.SequenceID,
+                    (results.Count > 1) ? ParcelProperties.RequestResultType.Multiple : ParcelProperties.RequestResultType.Single);
+                props.SnapSelection = req.SnapSelection;
+                agent.SendMessageAlways(props, ID);
+            }
+        }
+
         [PacketHandler(MessageType.ParcelPropertiesRequestByID)]
         void HandleParcelPropertiesRequestByID(Message m)
         {
@@ -316,7 +402,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 ParcelInfo pinfo = Parcels[req.LocalID];
 
-                ParcelProperties props = ParcelInfo2ParcelProperties(req.AgentID, pinfo, req.SequenceID, 0);
+                ParcelProperties props = ParcelInfo2ParcelProperties(req.AgentID, pinfo, req.SequenceID, ParcelProperties.RequestResultType.Single);
                 Agents[req.AgentID].SendMessageAlways(props, ID);
             }
             catch

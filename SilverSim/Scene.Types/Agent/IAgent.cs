@@ -55,6 +55,11 @@ namespace SilverSim.Scene.Types.Agent
 
         RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials { get; }
 
+        int NextParcelSequenceId
+        {
+            get;
+        }
+
         int LastMeasuredLatencyTickCount /* info from Circuit ping measurement */
         {
             get;

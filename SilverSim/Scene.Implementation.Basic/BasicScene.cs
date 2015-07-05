@@ -192,7 +192,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     }
                     foreach(ParcelInfo p in m_Scene.m_Parcels.Values)
                     {
-                        if(p.LandBitmap[x, y])
+                        if(p.LandBitmap[x / 4, y / 4])
                         {
                             return p;
                         }
