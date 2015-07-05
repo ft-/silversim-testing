@@ -635,10 +635,9 @@ namespace SilverSim.LL.TerrainEdit
             double sum = 0;
             double steps = 0;
 
-            int x, y;
-            for (x = (int)data.West; x < (int)data.East; x++)
+            for (int x = (int)data.West; x < (int)data.East; x++)
             {
-                for (y = (int)data.South; y < (int)data.North; y++)
+                for (int y = (int)data.South; y < (int)data.North; y++)
                 {
                     if (!scene.CanTerraform(agent, new Vector3(x, y, 0)))
                     {
@@ -653,9 +652,9 @@ namespace SilverSim.LL.TerrainEdit
 
             double str = 0.1f * modify.Size; // == 0.2 in the default client
 
-            for (x = (int)data.West; x < (int)data.East; x++)
+            for (int x = (int)data.West; x < (int)data.East; x++)
             {
-                for (y = (int)data.South; y < (int)data.North; y++)
+                for (int y = (int)data.South; y < (int)data.North; y++)
                 {
                     if (scene.CanTerraform(agent, new Vector3(x, y, 0)))
                     {
