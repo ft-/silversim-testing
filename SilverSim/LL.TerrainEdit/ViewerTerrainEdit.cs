@@ -425,7 +425,7 @@ namespace SilverSim.LL.TerrainEdit
             }
         }
 
-        [PaintEffect(StandardTerrainEffect.Flatten)]
+        [PaintEffect(StandardTerrainEffect.Smooth)]
         void SmoothSphere(LLAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
