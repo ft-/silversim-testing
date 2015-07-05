@@ -41,18 +41,19 @@ namespace SilverSim.LL.Messages.Land
             public double South;
             public double East;
             public double North;
+
+            public double BrushSize;
         }
 
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
         
         public byte Action = 0;
-        public byte BrushSize = 0;
+        public byte Size = 0;
         public double Seconds = 0;
         public double Height = 0;
 
         public List<Data> ParcelData = new List<Data>();
-        public List<double> ModifyBlockExtended = new List<double>();
 
         public ModifyLand()
         {
@@ -65,7 +66,8 @@ namespace SilverSim.LL.Messages.Land
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
             m.Action = p.ReadUInt8();
-            m.BrushSize = p.ReadUInt8();
+            m.Size = p.ReadUInt8();
+            double defBrushSize = (1 << (m.Size));
             m.Seconds = p.ReadFloat();
             m.Height = p.ReadFloat();
 
@@ -78,13 +80,16 @@ namespace SilverSim.LL.Messages.Land
                 d.South = p.ReadFloat();
                 d.East = p.ReadFloat();
                 d.North = p.ReadFloat();
+                d.BrushSize = defBrushSize;
                 m.ParcelData.Add(d);
             }
 
             c = p.ReadUInt8();
             for (uint i = 0; i < c; ++i)
             {
-                m.ModifyBlockExtended.Add(p.ReadFloat());
+                Data d = m.ParcelData[(int)i];
+                d.BrushSize = p.ReadFloat();
+                m.ParcelData[(int)i] = d;
             }
             return m;
         }

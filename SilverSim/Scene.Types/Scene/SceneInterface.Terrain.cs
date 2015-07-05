@@ -268,6 +268,35 @@ namespace SilverSim.Scene.Types.Scene
                 return null;
             }
 
+            public LayerPatch BlendTerrain(uint x, uint y, double newval, double mix /* 0. orig only , 1. new only */)
+            {
+                if (x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
+                {
+                    throw new KeyNotFoundException();
+                }
+
+                m_TerrainRwLock.AcquireWriterLock(-1);
+                try
+                {
+                    LayerPatch lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+                    lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] =
+                        (float)(lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] * (1 - mix)) +
+                        (float)(newval * mix);
+                    return lp;
+                }
+#if DEBUG
+                catch (Exception e)
+                {
+                    m_Log.Debug(string.Format("Terrain Change at {0},{1} failed", x, y), e);
+                }
+#endif
+                finally
+                {
+                    m_TerrainRwLock.ReleaseWriterLock();
+                }
+                return null;
+            }
+
             public double this[Vector3 pos]
             {
                 get
