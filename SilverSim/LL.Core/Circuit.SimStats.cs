@@ -101,7 +101,12 @@ namespace SilverSim.LL.Core
             int packetsReceived = m_PacketsReceived - m_LastPacketsReceived;
             int packetsSent = m_PacketsSent - m_LastPacketsSent;
             int agentUpdatesReceived = m_AgentUpdatesReceived - m_LastAgentUpdatesReceived;
-            int activeUploads = Agent.m_TerrainTransactions.Count + Agent.m_AssetTransactions.Count;
+            int activeUploads = 0;
+            LLAgent agent = Agent;
+            if (agent != null)
+            {
+                activeUploads += agent.m_TerrainTransactions.Count + agent.m_AssetTransactions.Count;
+            }
             foreach(UploadAssetAbstractCapability cap in m_UploadCapabilities)
             {
                 activeUploads += cap.ActiveUploads;
@@ -112,10 +117,9 @@ namespace SilverSim.LL.Core
 
             m_SimStatsData[(int)SimStatIndex.InPacketsPerSecond].StatValue = packetsReceived * 1000f / deltatime;
             m_SimStatsData[(int)SimStatIndex.OutPacketsPerSecond].StatValue = packetsSent * 1000f / deltatime;
-            LLAgent agent = Agent;
             if (agent != null)
             {
-                m_SimStatsData[(int)SimStatIndex.PendingDownloads].StatValue = m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count + Agent.m_DownloadTransfers.Count;
+                m_SimStatsData[(int)SimStatIndex.PendingDownloads].StatValue = m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count + agent.m_DownloadTransfers.Count;
             }
             else
             {
