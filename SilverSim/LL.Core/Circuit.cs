@@ -28,6 +28,7 @@ using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Economy;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.Caps;
+using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
@@ -384,15 +385,23 @@ namespace SilverSim.LL.Core
                                 {
                                     m_Log.FatalFormat("Method {0} of {1} tried to add another instantiation for capability {2}", mi.Name, t.Name, ca.Name);
                                 }
-                                else if (mi.ReturnType != typeof(ICapabilityInterface))
+                                else if (mi.ReturnType != typeof(void))
                                 {
                                     m_Log.FatalFormat("Method {0} return type is not void", mi.Name);
                                 }
-                                else if (mi.GetParameters().Length != 1)
+                                else if (mi.GetParameters().Length != 3)
                                 {
                                     m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
                                 }
                                 else if (mi.GetParameters()[0].ParameterType != typeof(LLAgent))
+                                {
+                                    m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                                }
+                                else if (mi.GetParameters()[1].ParameterType != typeof(Circuit))
+                                {
+                                    m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                                }
+                                else if (mi.GetParameters()[2].ParameterType != typeof(HttpRequest))
                                 {
                                     m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
                                 }
@@ -401,7 +410,14 @@ namespace SilverSim.LL.Core
 #if DEBUG
                                     m_Log.InfoFormat("Method {0} of {1} used for instantiation of capability {2}", mi.Name, t.Name, ca.Name);
 #endif
-                                    AddDefCapabilityFactory(ca.Name, regionSeedID, (DefCapabilityInstantiate)Delegate.CreateDelegate(typeof(DefCapabilityInstantiate), o, mi), server.Scene.CapabilitiesConfig);
+                                    try
+                                    {
+                                        AddExtenderCapability(ca.Name, regionSeedID, (CapabilityHandler.CapabilityDelegate)Delegate.CreateDelegate(typeof(CapabilityHandler.CapabilityDelegate), o, mi), server.Scene.CapabilitiesConfig);
+                                    }
+                                    catch(Exception e)
+                                    {
+                                        m_Log.Warn(string.Format("Method {0} of {1} failed to instantiate capability {2}", mi.Name, t.Name, ca.Name), e);
+                                    }
                                 }
 
                             }

@@ -27,6 +27,7 @@ using Nini.Config;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.HttpServer;
 
 namespace SilverSim.LL.Groups
 {
@@ -68,6 +69,12 @@ namespace SilverSim.LL.Groups
         public void HandleMessage(Message m)
         {
 
+        }
+
+        [CapabilityHandler("GroupMemberData")]
+        public void HandleGroupMemberDataCapability(LLAgent agent, Circuit circuit, HttpRequest req)
+        {
+            req.ErrorResponse(System.Net.HttpStatusCode.InternalServerError, "Internal Server Error");
         }
     }
 
