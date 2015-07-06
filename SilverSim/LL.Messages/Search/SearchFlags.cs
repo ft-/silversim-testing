@@ -23,39 +23,35 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
-using System.Collections.Generic;
-
-namespace SilverSim.ServiceInterfaces.AvatarName
+namespace SilverSim.LL.Messages.Search
 {
-    public abstract class AvatarNameServiceInterface
+    public enum SearchFlags : uint
     {
-        public AvatarNameServiceInterface()
-        {
-
-        }
-
-        public abstract UUI this[UUID key] { get; set; } /* setting to null clears an entry if supported */
-        /* if setting is not supported, the set access is ignored */
-        public abstract UUI this[string firstName, string lastName] { get; }
-        public abstract List<UUI> Search(string[] names); /* returns empty list when not supported */
-
-        public UUI this[UUI input]
-        {
-            get
-            {
-                try
-                {
-                    if (!input.IsAuthoritative)
-                    {
-                        return this[input.ID];
-                    }
-                }
-                catch
-                {
-                }
-                return input;
-            }
-        }
+        People = 1,
+        Online = 2,
+        Events = 8,
+        Groups = 16,
+        DateEvents = 32,
+        AgentOwned = 64,
+        ForSale = 128,
+        GroupOwned = 256,
+        DwellSort = 1024,
+        PgSimsOnly = 2048,
+        PicturesOnly = 4096,
+        PgEventsOnly = 8192,
+        MatureSimsOnly = 16384,
+        SortAsc = 32768,
+        PricesSort = 65536,
+        PerMeterSort = 131072,
+        AreaSort = 262144,
+        NameSort = 524288,
+        LimitByPrice = 1048576,
+        LimitByArea = 2097152,
+        FilterMature = 4194304,
+        PGOnly = 8388608,
+        IncludePG = 16777216,
+        IncludeMature = 33554432,
+        IncludeAdult = 67108864,
+        AdultOnly = 134217728,
     }
 }

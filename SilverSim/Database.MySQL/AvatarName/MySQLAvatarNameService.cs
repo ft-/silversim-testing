@@ -150,6 +150,64 @@ namespace SilverSim.Database.MySQL.AvatarName
         }
         #endregion
 
+        public override List<UUI> Search(string[] names)
+        {
+            if(names.Length < 1 || names.Length > 2)
+            {
+                return new List<UUI>();
+            }
+
+            if(names.Length == 1)
+            {
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                {
+                    connection.Open();
+
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE '%' + ?name + '%' OR LastName LIKE '%' + ?name + '%'", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?name", names[0]);
+
+                        return GetSearchResults(cmd);
+                    }
+                }
+            }
+            else
+            {
+                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                {
+                    connection.Open();
+
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE '%' + ?firstname + '%' AND LastName LIKE '%' + ?lastname + '%'", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?firstname", names[0]);
+                        cmd.Parameters.AddWithValue("?lastname", names[1]);
+
+                        return GetSearchResults(cmd);
+                    }
+                }
+            }
+        }
+
+        List<UUI> GetSearchResults(MySqlCommand cmd)
+        {
+            List<UUI> results = new List<UUI>();
+            using(MySqlDataReader dbreader = cmd.ExecuteReader())
+            {
+                while(dbreader.Read())
+                {
+                    UUI nd = new UUI();
+                    nd.ID = dbreader.GetUUID("AvatarID");
+                    nd.HomeURI = new Uri((string)dbreader["HomeURI"]);
+                    nd.FirstName = (string)dbreader["FirstName"];
+                    nd.LastName = (string)dbreader["LastName"];
+                    nd.IsAuthoritative = true;
+                    results.Add(nd);
+                }
+                return results;
+            }
+
+        }
+
         public void VerifyConnection()
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))

@@ -90,6 +90,30 @@ namespace SilverSim.Scene.Types.Scene
                     return nd;
                 }
             }
+
+            public override List<UUI> Search(string[] names)
+            {
+                Dictionary<UUID, UUI> results = new Dictionary<UUID, UUI>();
+                foreach (AvatarNameServiceInterface service in m_ServiceList)
+                {
+                    try
+                    {
+                        foreach(UUI uui in service.Search(names))
+                        {
+                            if(!results.ContainsKey(uui.ID))
+                            {
+                                results.Add(uui.ID, uui);
+                            }
+                        }
+                    }
+                    catch
+                    {
+
+                    }
+                }
+                return new List<UUI>(results.Values);
+            }
+
             public override UUI this[UUID key]
             {
                 get

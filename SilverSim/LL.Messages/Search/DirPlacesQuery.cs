@@ -24,38 +24,41 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using System.Collections.Generic;
 
-namespace SilverSim.ServiceInterfaces.AvatarName
+namespace SilverSim.LL.Messages.Search
 {
-    public abstract class AvatarNameServiceInterface
+    [UDPMessage(MessageType.DirPlacesQuery)]
+    [Reliable]
+    public class DirPlacesQuery : Message
     {
-        public AvatarNameServiceInterface()
+        public UUID AgentID;
+        public UUID SessionID;
+
+        public UUID QueryID;
+        public string QueryText;
+        public SearchFlags QueryFlags;
+        public sbyte Category;
+        public string SimName;
+        public int QueryStart;
+
+        public DirPlacesQuery()
         {
 
         }
 
-        public abstract UUI this[UUID key] { get; set; } /* setting to null clears an entry if supported */
-        /* if setting is not supported, the set access is ignored */
-        public abstract UUI this[string firstName, string lastName] { get; }
-        public abstract List<UUI> Search(string[] names); /* returns empty list when not supported */
-
-        public UUI this[UUI input]
+        public static DirPlacesQuery Decode(UDPPacket p)
         {
-            get
-            {
-                try
-                {
-                    if (!input.IsAuthoritative)
-                    {
-                        return this[input.ID];
-                    }
-                }
-                catch
-                {
-                }
-                return input;
-            }
+            DirPlacesQuery m = new DirPlacesQuery();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.QueryID = p.ReadUUID();
+            m.QueryText = p.ReadStringLen8();
+            m.QueryFlags = (SearchFlags)p.ReadUInt32();
+            m.Category = p.ReadInt8();
+            m.SimName = p.ReadStringLen8();
+            m.QueryStart = p.ReadInt32();
+
+            return m;
         }
     }
 }

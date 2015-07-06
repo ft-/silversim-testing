@@ -89,6 +89,44 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
             }
         }
 
+        public override List<UUI> Search(string[] names)
+        {
+            Dictionary<string, string> post = new Dictionary<string, string>();
+            post["VERSIONMIN"] = "0";
+            post["VERSIONMAX"] = "0";
+            post["query"] = string.Join(" ", names);
+            post["ScopeID"] = (string)m_ScopeID;
+            post["METHOD"] = "getaccounts";
+            Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_UserAccountURI, null, post, false, TimeoutMs));
+            if (!(map["result"] is Map))
+            {
+                return new List<UUI>();
+            }
+
+            List<UUI> results = new List<UUI>();
+
+            foreach(IValue iv in (map["result"] as Map).Values)
+            {
+                try
+                {
+                    Map m = iv as Map;
+                    UUI nd = new UUI();
+                    nd.FirstName = m["FirstName"].ToString();
+                    nd.LastName = m["LastName"].ToString();
+                    nd.ID = m["PrincipalID"].ToString();
+                    nd.HomeURI = new Uri(m_HomeURI);
+                    nd.IsAuthoritative = true;
+                    results.Add(nd);
+                }
+                catch
+                {
+
+                }
+            }
+
+            return results;
+        }
+
         public override UUI this[UUID accountID]
         {
             get

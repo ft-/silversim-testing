@@ -28,24 +28,34 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Search
 {
-    [UDPMessage(MessageType.AvatarPickerReply)]
+    [UDPMessage(MessageType.DirPlacesReply)]
     [Reliable]
+    [Zerocoded]
     [Trusted]
-    public class AvatarPickerReply : Message
+    public class DirPeopleReply : Message
     {
         public UUID AgentID;
+
         public UUID QueryID;
 
-        public struct DataEntry
+        public class QueryReplyData
         {
-            public UUID AvatarID;
-            public string FirstName;
-            public string LastName;
+            public UUID AgentID;
+            public string FirstName = string.Empty;
+            public string LastName = string.Empty;
+            public string Group = string.Empty;
+            public bool Online;
+            public int Reputation;
+
+            public QueryReplyData()
+            {
+
+            }
         }
 
-        public List<DataEntry> Data = new List<DataEntry>();
+        public List<QueryReplyData> QueryReplies = new List<QueryReplyData>();
 
-        public AvatarPickerReply()
+        public DirPeopleReply()
         {
 
         }
@@ -55,12 +65,15 @@ namespace SilverSim.LL.Messages.Search
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(QueryID);
-            p.WriteUInt8((byte)Data.Count);
-            foreach (DataEntry d in Data)
+            p.WriteUInt8((byte)QueryReplies.Count);
+            foreach(QueryReplyData d in QueryReplies)
             {
-                p.WriteUUID(d.AvatarID);
+                p.WriteUUID(d.AgentID);
                 p.WriteStringLen8(d.FirstName);
                 p.WriteStringLen8(d.LastName);
+                p.WriteStringLen8(d.Group);
+                p.WriteBoolean(d.Online);
+                p.WriteInt32(d.Reputation);
             }
         }
     }

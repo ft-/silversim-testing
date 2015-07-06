@@ -24,28 +24,34 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Search
 {
-    [UDPMessage(MessageType.AvatarPickerReply)]
+    [UDPMessage(MessageType.DirEventsReply)]
     [Reliable]
+    [Zerocoded]
     [Trusted]
-    public class AvatarPickerReply : Message
+    public class DirEventsReply : Message
     {
         public UUID AgentID;
         public UUID QueryID;
 
-        public struct DataEntry
+        public struct QueryReplyData
         {
-            public UUID AvatarID;
-            public string FirstName;
-            public string LastName;
+            public UUID OwnerID;
+            public string Name;
+            public UUID EventID;
+            public string Date;
+            public UInt32 UnixTime;
+            public UInt32 EventFlags;
+            public UInt32 Status;
         }
 
-        public List<DataEntry> Data = new List<DataEntry>();
+        public List<QueryReplyData> QueryReplies = new List<QueryReplyData>();
 
-        public AvatarPickerReply()
+        public DirEventsReply()
         {
 
         }
@@ -55,12 +61,21 @@ namespace SilverSim.LL.Messages.Search
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUUID(QueryID);
-            p.WriteUInt8((byte)Data.Count);
-            foreach (DataEntry d in Data)
+            p.WriteUInt8((byte)QueryReplies.Count);
+            foreach(QueryReplyData d in QueryReplies)
             {
-                p.WriteUUID(d.AvatarID);
-                p.WriteStringLen8(d.FirstName);
-                p.WriteStringLen8(d.LastName);
+                p.WriteUUID(d.OwnerID);
+                p.WriteStringLen8(d.Name);
+                p.WriteUUID(d.EventID);
+                p.WriteStringLen8(d.Date);
+                p.WriteUInt32(d.UnixTime);
+                p.WriteUInt32(d.EventFlags);
+            }
+
+            p.WriteUInt8((byte)QueryReplies.Count);
+            foreach (QueryReplyData d in QueryReplies)
+            {
+                p.WriteUInt32(d.Status);
             }
         }
     }

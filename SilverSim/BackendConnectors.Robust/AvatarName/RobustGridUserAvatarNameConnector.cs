@@ -74,6 +74,11 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
             }
         }
 
+        public override List<UUI> Search(string[] names)
+        {
+            return new List<UUI>();
+        }
+
         public override UUI this[UUID userID]
         {
             get

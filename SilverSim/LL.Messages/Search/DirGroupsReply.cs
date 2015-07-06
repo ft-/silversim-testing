@@ -26,35 +26,43 @@ exception statement from your version.
 using SilverSim.Types;
 using System.Collections.Generic;
 
-namespace SilverSim.ServiceInterfaces.AvatarName
+namespace SilverSim.LL.Messages.Search
 {
-    public abstract class AvatarNameServiceInterface
+    [UDPMessage(MessageType.DirGroupsReply)]
+    [Reliable]
+    [Zerocoded]
+    [Trusted]
+    public class DirGroupsReply : Message
     {
-        public AvatarNameServiceInterface()
-        {
+        public UUID AgentID;
+        public UUID QueryID;
 
+        public struct QueryReplyData
+        {
+            public UUID GroupID;
+            public string GroupName;
+            public int Members;
+            public double SearchOrder;
         }
 
-        public abstract UUI this[UUID key] { get; set; } /* setting to null clears an entry if supported */
-        /* if setting is not supported, the set access is ignored */
-        public abstract UUI this[string firstName, string lastName] { get; }
-        public abstract List<UUI> Search(string[] names); /* returns empty list when not supported */
+        public List<QueryReplyData> QueryReplies = new List<QueryReplyData>();
 
-        public UUI this[UUI input]
+        public DirGroupsReply()
         {
-            get
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteMessageType(Number);
+            p.WriteUUID(AgentID);
+            p.WriteUUID(QueryID);
+            p.WriteUInt8((byte)QueryReplies.Count);
+            foreach(QueryReplyData d in QueryReplies)
             {
-                try
-                {
-                    if (!input.IsAuthoritative)
-                    {
-                        return this[input.ID];
-                    }
-                }
-                catch
-                {
-                }
-                return input;
+                p.WriteUUID(d.GroupID);
+                p.WriteStringLen8(d.GroupName);
+                p.WriteInt32(d.Members);
+                p.WriteFloat((float)d.SearchOrder);
             }
         }
     }
