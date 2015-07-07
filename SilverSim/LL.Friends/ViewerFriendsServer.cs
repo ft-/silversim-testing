@@ -27,11 +27,22 @@ using Nini.Config;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
 using SilverSim.Main.Common;
+using System.Collections.Generic;
+using System.Threading;
+using ThreadedClasses;
 
 namespace SilverSim.LL.Friends
 {
-    public class ViewerFriendsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender
+    public class ViewerFriendsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
+        [PacketHandler(MessageType.AcceptFriendship)]
+        [PacketHandler(MessageType.DeclineFriendship)]
+        [PacketHandler(MessageType.TerminateFriendship)]
+        [PacketHandler(MessageType.GrantUserRights)]
+        BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
+
+        bool m_ShutdownFriends = false;
+
         public ViewerFriendsServer()
         {
 
@@ -39,15 +50,40 @@ namespace SilverSim.LL.Friends
 
         public void Startup(ConfigurationLoader loader)
         {
+            new Thread(HandlerThread).Start();
         }
 
-        [PacketHandler(MessageType.AcceptFriendship)]
-        [PacketHandler(MessageType.DeclineFriendship)]
-        [PacketHandler(MessageType.TerminateFriendship)]
-        [PacketHandler(MessageType.GrantUserRights)]
-        public void HandleMessage(Message m)
+        public void HandlerThread()
         {
+            Thread.CurrentThread.Name = "Friends Handler Thread";
 
+            while (!m_ShutdownFriends)
+            {
+                KeyValuePair<Circuit, Message> req;
+                try
+                {
+                    req = RequestQueue.Dequeue(1000);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                Message m = req.Value;
+            }
+        }
+
+        public ShutdownOrder ShutdownOrder
+        {
+            get 
+            {
+                return ShutdownOrder.LogoutRegion;
+            }
+        }
+
+        public void Shutdown()
+        {
+            m_ShutdownFriends = true;
         }
     }
 

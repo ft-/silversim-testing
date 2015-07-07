@@ -95,7 +95,7 @@ namespace SilverSim.LL.Messages
         }
     }
 
-    [AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = true)]
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
     public class PacketHandler : Attribute
     {
         public MessageType Number;

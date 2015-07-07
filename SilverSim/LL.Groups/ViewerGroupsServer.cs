@@ -32,20 +32,13 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System.Collections.Generic;
+using System.Threading;
+using ThreadedClasses;
 
 namespace SilverSim.LL.Groups
 {
-    public class ViewerGroupsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender
+    public class ViewerGroupsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
-        public ViewerGroupsServer()
-        {
-
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-        }
-
         [PacketHandler(MessageType.GroupNoticesListRequest)]
         [PacketHandler(MessageType.CreateGroupRequest)]
         [PacketHandler(MessageType.UpdateGroupInfo)]
@@ -70,9 +63,39 @@ namespace SilverSim.LL.Groups
         [PacketHandler(MessageType.GroupTitlesRequest)]
         [PacketHandler(MessageType.GroupTitleUpdate)]
         [PacketHandler(MessageType.GroupRoleUpdate)]
-        public void HandleMessage(LLAgent agent, Circuit circuit, Message m)
+        BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
+
+        bool m_ShutdownGroups = false;
+
+        public ViewerGroupsServer()
         {
 
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+            new Thread(HandlerThread).Start();
+        }
+
+        public void HandlerThread()
+        {
+            Thread.CurrentThread.Name = "Groups Handler Thread";
+
+            while (!m_ShutdownGroups)
+            {
+                KeyValuePair<Circuit, Message> req;
+                try
+                {
+                    req = RequestQueue.Dequeue(1000);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                Message m = req.Value;
+
+            }
         }
 
         GroupPowers GetGroupPowers(LLAgent agent, GroupsServiceInterface groupsService, UGI group)
@@ -95,6 +118,19 @@ namespace SilverSim.LL.Groups
         public void HandleGroupMemberDataCapability(LLAgent agent, Circuit circuit, HttpRequest req)
         {
             req.ErrorResponse(System.Net.HttpStatusCode.InternalServerError, "Internal Server Error");
+        }
+
+        public ShutdownOrder ShutdownOrder
+        {
+            get
+            {
+                return ShutdownOrder.LogoutRegion;
+            }
+        }
+
+        public void Shutdown()
+        {
+            m_ShutdownGroups = true;
         }
     }
 

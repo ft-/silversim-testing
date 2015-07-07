@@ -108,7 +108,7 @@ namespace SilverSim.LL.Core
         }
 
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-        class IgnoreMethod : Attribute
+        public class IgnoreMethod : Attribute
         {
             public IgnoreMethod()
             {
@@ -236,6 +236,27 @@ namespace SilverSim.LL.Core
 
         public C5.TreeDictionary<uint, UDPPacket> m_UnackedPacketsHash = new C5.TreeDictionary<uint,UDPPacket>();
 
+        class MessageHandlerExtenderKeyValuePairCircuitQueue
+        {
+            WeakReference m_Circuit;
+            Queue<KeyValuePair<Circuit, Message>> m_Queue;
+
+            public MessageHandlerExtenderKeyValuePairCircuitQueue(Circuit circuit, Queue<KeyValuePair<Circuit, Message>> q)
+            {
+                m_Circuit = new WeakReference(circuit, false);
+                m_Queue = q;
+            }
+
+            public void Handler(Message m)
+            {
+                Circuit circuit = m_Circuit.Target as Circuit;
+                if (circuit != null)
+                {
+                    m_Queue.Enqueue(new KeyValuePair<Circuit, Message>(circuit, m));
+                }
+            }
+        }
+
         class MessageHandlerExtenderLLAgent
         {
             WeakReference m_Agent;
@@ -298,6 +319,53 @@ namespace SilverSim.LL.Core
 
             foreach(Type t in types)
             {
+                foreach(FieldInfo fi in t.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
+                {
+                    PacketHandler[] pas = (PacketHandler[])Attribute.GetCustomAttributes(fi, typeof(PacketHandler));
+                    foreach (PacketHandler pa in pas)
+                    {
+                        if (m_MessageRouting.ContainsKey(pa.Number))
+                        {
+                            m_Log.FatalFormat("Field {0} of {1} registered duplicate {1}", fi.Name, t.GetType(), pa.Number.ToString());
+                        }
+                        else if (typeof(Queue<Message>).IsAssignableFrom(fi.FieldType))
+                        {
+                            MethodInfo mi = fi.FieldType.GetMethod("Enqueue", new Type[] { typeof(Message) });
+                            if (null == mi)
+                            {
+                                m_Log.FatalFormat("Field {0} of {1} has no Enqueue method we can use", fi.Name, t.GetType());
+                            }
+                            else
+                            {
+#if DEBUG
+                                m_Log.InfoFormat("Field {0} of {1} registered for {2}", fi.Name, t.Name, pa.Number.ToString());
+#endif
+                                m_MessageRouting.Add(pa.Number, (Action<Message>)Delegate.CreateDelegate(typeof(Action<Message>), fi.GetValue(o), mi));
+
+                            }
+                        }
+                        else if (typeof(Queue<KeyValuePair<Circuit, Message>>).IsAssignableFrom(fi.FieldType))
+                        {
+                            MethodInfo mi = fi.FieldType.GetMethod("Enqueue", new Type[] { typeof(KeyValuePair<Circuit, Message>) });
+                            if (null == mi)
+                            {
+                                m_Log.FatalFormat("Field {0} of {1} has no Enqueue method we can use", fi.Name, t.GetType());
+                            }
+                            else
+                            {
+#if DEBUG
+                                m_Log.InfoFormat("Field {0} of {1} registered for {2}", fi.Name, t.Name, pa.Number.ToString());
+#endif
+                                m_MessageRouting.Add(pa.Number, new MessageHandlerExtenderKeyValuePairCircuitQueue(this, (Queue<KeyValuePair<Circuit, Message>>)fi.GetValue(o)).Handler);
+
+                            }
+                        }
+                        else
+                        {
+                            m_Log.FatalFormat("Field {0} of {1} is not derived from Queue<Message> or Queue<KeyValuePair<Circuit, Message>>", fi.Name, t.GetType());
+                        }
+                    }
+                }
                 foreach (MethodInfo mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
                 {
                     if (null != Attribute.GetCustomAttribute(mi, typeof(IgnoreMethod)))

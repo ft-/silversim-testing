@@ -27,20 +27,14 @@ using Nini.Config;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
 using SilverSim.Main.Common;
+using System.Collections.Generic;
+using System.Threading;
+using ThreadedClasses;
 
 namespace SilverSim.LL.Profile
 {
-    public class ViewerProfileServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender
+    public class ViewerProfileServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
-        public ViewerProfileServer()
-        {
-
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-        }
-
         [PacketHandler(MessageType.DirClassifiedQuery)]
         [PacketHandler(MessageType.ClassifiedInfoRequest)]
         [PacketHandler(MessageType.ClassifiedInfoUpdate)]
@@ -55,9 +49,51 @@ namespace SilverSim.LL.Profile
         [PacketHandler(MessageType.PickGodDelete)]
         [PacketHandler(MessageType.UserInfoRequest)]
         [PacketHandler(MessageType.UpdateUserInfo)]
-        public void HandleMessage(Message m)
+        BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
+        bool m_ShutdownProfile = false;
+
+        public ViewerProfileServer()
         {
 
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+            new Thread(HandlerThread).Start();
+        }
+
+        public void HandlerThread()
+        {
+            Thread.CurrentThread.Name = "Profile Handler Thread";
+
+            while (!m_ShutdownProfile)
+            {
+                KeyValuePair<Circuit, Message> req;
+                try
+                {
+                    req = RequestQueue.Dequeue(1000);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                Message m = req.Value;
+
+            }
+        }
+
+        public ShutdownOrder ShutdownOrder
+        {
+            get 
+            {
+                return ShutdownOrder.LogoutRegion;
+            }
+        }
+
+        public void Shutdown()
+        {
+            m_ShutdownProfile = true;
         }
     }
 

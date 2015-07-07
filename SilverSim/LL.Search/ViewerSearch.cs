@@ -34,42 +34,73 @@ using SilverSim.Types;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Xml;
 using ThreadedClasses;
 
 namespace SilverSim.LL.Search
 {
-    public class ViewerSearch : IPlugin, IPacketHandlerExtender, ICapabilityExtender
+    public class ViewerSearch : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
-        BlockingQueue<Message> RequestQueue = new BlockingQueue<Message>();
-        public ViewerSearch()
-        {
-
-        }
-
-        public void Startup(ConfigurationLoader loader)
-        {
-        }
-
+        [PacketHandler(MessageType.AvatarPickerRequest)]
         [PacketHandler(MessageType.PlacesQuery)]
         [PacketHandler(MessageType.DirPlacesQuery)]
         [PacketHandler(MessageType.DirLandQuery)]
         [PacketHandler(MessageType.DirPopularQuery)]
-        public void HandleMessage(Message m)
-        {
+        [PacketHandler(MessageType.DirFindQuery)]
+        BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
 
+        bool m_ShutdownSearch = false;
+
+        public ViewerSearch()
+        {
         }
 
-        [PacketHandler(MessageType.DirFindQuery)]
+        public void Startup(ConfigurationLoader loader)
+        {
+            new Thread(HandlerThread).Start();
+        }
+
+        public void HandlerThread()
+        {
+            Thread.CurrentThread.Name = "Search Handler Thread";
+
+            while(!m_ShutdownSearch)
+            {
+                KeyValuePair<Circuit, Message> req;
+                try
+                {
+                    req = RequestQueue.Dequeue(1000);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                Message m = req.Value;
+
+                switch(m.Number)
+                {
+                    case MessageType.DirFindQuery:
+                        ProcessDirFindQuery(req.Key.Agent, req.Key, m);
+                        break;
+
+                    case MessageType.AvatarPickerRequest:
+                        ProcessAvatarPickerRequest(req.Key.Agent, req.Key, m);
+                        break;
+                }
+            }
+        }
+
+        [Circuit.IgnoreMethod]
         void ProcessDirFindQuery(LLAgent agent, Circuit circuit, Message m)
         {
 
         }
 
-        [PacketHandler(MessageType.AvatarPickerRequest)]
+        [Circuit.IgnoreMethod]
         void ProcessAvatarPickerRequest(LLAgent agent, Circuit circuit, Message m)
         {
-#warning async this service here
             AvatarPickerRequest req = (AvatarPickerRequest)m;
             AvatarPickerReply res = new AvatarPickerReply();
             SceneInterface scene = circuit.Scene;
@@ -214,6 +245,19 @@ namespace SilverSim.LL.Search
         }
 
         static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
+
+        public ShutdownOrder ShutdownOrder
+        {
+            get 
+            {
+                return ShutdownOrder.LogoutRegion;
+            }
+        }
+
+        public void Shutdown()
+        {
+            m_ShutdownSearch = true;
+        }
     }
 
     [PluginName("ViewerSearch")]

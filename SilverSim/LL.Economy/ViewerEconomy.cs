@@ -30,11 +30,19 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Economy;
+using System.Collections.Generic;
+using System.Threading;
+using ThreadedClasses;
 
 namespace SilverSim.LL.Economy
 {
-    public class ViewerEconomy : IPlugin, IPacketHandlerExtender, ICapabilityExtender
+    public class ViewerEconomy : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
+        [PacketHandler(MessageType.MoneyBalanceRequest)]
+        BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
+
+        bool m_ShutdownEconomy = false;
+
         public ViewerEconomy()
         {
 
@@ -42,22 +50,47 @@ namespace SilverSim.LL.Economy
 
         public void Startup(ConfigurationLoader loader)
         {
+            new Thread(HandlerThread).Start();
         }
 
-        [PacketHandler(MessageType.MoneyBalanceRequest)]
-        void HandleMoneyBalanceRequest(Message m)
+        public void HandlerThread()
+        {
+            Thread.CurrentThread.Name = "Economy Handler Thread";
+
+            while (!m_ShutdownEconomy)
+            {
+                KeyValuePair<Circuit, Message> req;
+                try
+                {
+                    req = RequestQueue.Dequeue(1000);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                Message m = req.Value;
+
+                switch(m.Number)
+                {
+                    case MessageType.MoneyBalanceRequest:
+                        HandleMoneyBalanceRequest(req.Key, req.Value);
+                        break;
+                }
+            }
+        }
+
+        void HandleMoneyBalanceRequest(Circuit circuit, Message m)
         {
             Messages.Economy.MoneyBalanceRequest mbr = (Messages.Economy.MoneyBalanceRequest)m;
             if (mbr.AgentID == mbr.CircuitAgentID && mbr.SessionID == mbr.CircuitSessionID)
             {
                 SceneInterface scene;
                 LLAgent agent;
-                Circuit circuit;
                 try
                 {
                     scene = SceneManager.Scenes[mbr.CircuitSceneID];
-                    agent = (LLAgent)scene.Agents[mbr.AgentID];
-                    circuit = agent.Circuits[mbr.ReceivedOnCircuitCode];
+                    agent = circuit.Agent;
                 }
                 catch
                 {
@@ -86,6 +119,19 @@ namespace SilverSim.LL.Economy
                 }
                 circuit.SendMessage(mbrep);
             }
+        }
+
+        public ShutdownOrder ShutdownOrder
+        {
+            get 
+            {
+                return ShutdownOrder.LogoutRegion;
+            }
+        }
+
+        public void Shutdown()
+        {
+            m_ShutdownEconomy = true;
         }
     }
 
