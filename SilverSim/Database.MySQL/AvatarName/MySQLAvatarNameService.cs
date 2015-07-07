@@ -163,9 +163,9 @@ namespace SilverSim.Database.MySQL.AvatarName
                 {
                     connection.Open();
 
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE '%' + ?name + '%' OR LastName LIKE '%' + ?name + '%'", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?name OR LastName LIKE ?name", connection))
                     {
-                        cmd.Parameters.AddWithValue("?name", names[0]);
+                        cmd.Parameters.AddWithValue("?name", "%" + names[0] + "%");
 
                         return GetSearchResults(cmd);
                     }
@@ -177,10 +177,10 @@ namespace SilverSim.Database.MySQL.AvatarName
                 {
                     connection.Open();
 
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE '%' + ?firstname + '%' AND LastName LIKE '%' + ?lastname + '%'", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
                     {
-                        cmd.Parameters.AddWithValue("?firstname", names[0]);
-                        cmd.Parameters.AddWithValue("?lastname", names[1]);
+                        cmd.Parameters.AddWithValue("?firstname", "%" + names[0] + "%");
+                        cmd.Parameters.AddWithValue("?lastname", "%" + names[1] + "%");
 
                         return GetSearchResults(cmd);
                     }
