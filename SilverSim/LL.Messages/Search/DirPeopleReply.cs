@@ -28,7 +28,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Search
 {
-    [UDPMessage(MessageType.DirPlacesReply)]
+    [UDPMessage(MessageType.DirPeopleReply)]
     [Reliable]
     [Zerocoded]
     [Trusted]
@@ -44,8 +44,8 @@ namespace SilverSim.LL.Messages.Search
             public string FirstName = string.Empty;
             public string LastName = string.Empty;
             public string Group = string.Empty;
-            public bool Online;
-            public int Reputation;
+            public bool Online = false;
+            public int Reputation = 0;
 
             public QueryReplyData()
             {

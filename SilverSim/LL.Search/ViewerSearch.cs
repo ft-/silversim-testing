@@ -95,6 +95,84 @@ namespace SilverSim.LL.Search
         [Circuit.IgnoreMethod]
         void ProcessDirFindQuery(LLAgent agent, Circuit circuit, Message m)
         {
+            DirFindQuery req = (DirFindQuery)m;
+            SceneInterface scene = circuit.Scene;
+            if(null == scene)
+            {
+                return;
+            }
+
+            if(req.CircuitSessionID != req.SessionID ||
+                req.CircuitAgentID != req.AgentID)
+            {
+                return;
+            }
+
+            if((req.QueryFlags & SearchFlags.People) != 0)
+            {
+                ProcessDirFindQuery_People(agent, scene, req);
+            }
+
+            if((req.QueryFlags & SearchFlags.Groups) != 0)
+            {
+                ProcessDirFindQuery_Groups(agent, scene, req);
+            }
+
+            if ((req.QueryFlags & SearchFlags.Events) != 0)
+            {
+                ProcessDirFindQuery_Events(agent, scene, req);
+            }
+        }
+
+        void ProcessDirFindQuery_People(LLAgent agent, SceneInterface scene, DirFindQuery req)
+        {
+            DirPeopleReply res = null;
+            UDPPacket t = new UDPPacket();
+
+            List<UUI> uuis = scene.AvatarNameService.Search(req.QueryText.Split(new char[] {' '}, 2));
+            foreach(UUI uui in uuis)
+            {
+                if(null == res)
+                {
+                    res = new DirPeopleReply();
+                    res.AgentID = req.AgentID;
+                    res.QueryID = req.QueryID;
+                }
+
+                DirPeopleReply.QueryReplyData d = new DirPeopleReply.QueryReplyData();
+                d.AgentID = uui.ID;
+                string[] parts = uui.FullName.Split(' ');
+                d.FirstName = parts[0];
+                if (parts.Length > 1)
+                {
+                    d.LastName = parts[1];
+                }
+                //d.Group
+                //d.Online
+                d.Reputation = 0;
+                res.QueryReplies.Add(d);
+
+                t.Reset();
+                res.Serialize(t);
+                if(t.DataLength >= 1400)
+                {
+                    agent.SendMessageAlways(res, scene.ID);
+                    res = null;
+                }
+            }
+            if(res != null)
+            {
+                agent.SendMessageAlways(res, scene.ID);
+            }
+        }
+
+        void ProcessDirFindQuery_Groups(LLAgent agent, SceneInterface scene, DirFindQuery req)
+        {
+
+        }
+
+        void ProcessDirFindQuery_Events(LLAgent agent, SceneInterface scene, DirFindQuery req)
+        {
 
         }
 
@@ -105,6 +183,12 @@ namespace SilverSim.LL.Search
             AvatarPickerReply res = new AvatarPickerReply();
             SceneInterface scene = circuit.Scene;
             if(scene == null)
+            {
+                return;
+            }
+
+            if (req.CircuitSessionID != req.SessionID ||
+                req.CircuitAgentID != req.AgentID)
             {
                 return;
             }

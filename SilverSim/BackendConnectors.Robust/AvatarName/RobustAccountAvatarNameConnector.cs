@@ -98,14 +98,10 @@ namespace SilverSim.BackendConnectors.Robust.AvatarName
             post["ScopeID"] = (string)m_ScopeID;
             post["METHOD"] = "getaccounts";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_UserAccountURI, null, post, false, TimeoutMs));
-            if (!(map["result"] is Map))
-            {
-                return new List<UUI>();
-            }
 
             List<UUI> results = new List<UUI>();
 
-            foreach(IValue iv in (map["result"] as Map).Values)
+            foreach(IValue iv in map.Values)
             {
                 try
                 {
