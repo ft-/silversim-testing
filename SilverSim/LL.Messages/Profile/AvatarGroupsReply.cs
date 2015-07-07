@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Types.Groups;
 using System;
 using System.Collections.Generic;
 
@@ -39,7 +40,7 @@ namespace SilverSim.LL.Messages.Profile
 
         public struct GroupDataEntry
         {
-            public UInt64 GroupPowers;
+            public GroupPowers GroupPowers;
             public bool AcceptNotices;
             public string GroupTitle;
             public UUID GroupID;
@@ -63,7 +64,7 @@ namespace SilverSim.LL.Messages.Profile
             p.WriteUInt8((byte)GroupData.Count);
             foreach(GroupDataEntry d in GroupData)
             {
-                p.WriteUInt64(d.GroupPowers);
+                p.WriteUInt64((UInt64)d.GroupPowers);
                 p.WriteBoolean(d.AcceptNotices);
                 p.WriteStringLen8(d.GroupTitle);
                 p.WriteUUID(d.GroupID);

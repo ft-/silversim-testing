@@ -73,6 +73,7 @@ namespace SilverSim.LL.Messages.Profile
             p.WriteUUID(AvatarID);
             p.WriteUUID(ImageID);
             p.WriteUUID(FLImageID);
+            p.WriteUUID(PartnerID);
             p.WriteStringLen16(AboutText);
             p.WriteStringLen8(FLAboutText);
             p.WriteStringLen8(BornOn);

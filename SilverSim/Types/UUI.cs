@@ -114,7 +114,16 @@ namespace SilverSim.Types
                 }
                 else
                 {
-                    return string.Format("{0}.{1} @{2}", FirstName.Replace(" ", "."), LastName.Replace(" ", "."), HomeURI.ToString());
+                    string hostName;
+                    if(HomeURI.IsDefaultPort)
+                    {
+                        hostName = HomeURI.Host;
+                    }
+                    else
+                    {
+                        hostName = HomeURI.Host + ":" + HomeURI.Port.ToString();
+                    }
+                    return string.Format("{0}.{1} @{2}", FirstName.Replace(" ", "."), LastName.Replace(" ", "."), hostName);
                 }
             }
             set

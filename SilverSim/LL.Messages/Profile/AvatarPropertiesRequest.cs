@@ -33,9 +33,8 @@ namespace SilverSim.LL.Messages.Profile
     public class AvatarPropertiesRequest : Message
     {
         public UUID AgentID = UUID.Zero;
+        public UUID SessionID = UUID.Zero;
         public UUID AvatarID = UUID.Zero;
-        public byte GodLevel = 0;
-        public bool WebProfilesDisabled = false;
 
         public AvatarPropertiesRequest()
         {
@@ -47,9 +46,8 @@ namespace SilverSim.LL.Messages.Profile
             AvatarPropertiesRequest m = new AvatarPropertiesRequest();
 
             m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
             m.AvatarID = p.ReadUUID();
-            m.GodLevel = p.ReadUInt8();
-            m.WebProfilesDisabled = p.ReadBoolean();
 
             return m;
         }

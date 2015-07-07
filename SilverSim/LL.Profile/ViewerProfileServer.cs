@@ -23,10 +23,15 @@ exception statement from your version.
 
 */
 
+using log4net;
 using Nini.Config;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
+using SilverSim.LL.Messages.Profile;
 using SilverSim.Main.Common;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
@@ -35,6 +40,8 @@ namespace SilverSim.LL.Profile
 {
     public class ViewerProfileServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("LL PROFILE");
+
         [PacketHandler(MessageType.DirClassifiedQuery)]
         [PacketHandler(MessageType.ClassifiedInfoRequest)]
         [PacketHandler(MessageType.ClassifiedInfoUpdate)]
@@ -79,8 +86,71 @@ namespace SilverSim.LL.Profile
                 }
 
                 Message m = req.Value;
-
+                SceneInterface scene = req.Key.Scene;
+                if(scene == null)
+                {
+                    continue;
+                }
+                try
+                {
+                    switch (m.Number)
+                    {
+                        case MessageType.AvatarPropertiesRequest:
+                            HandleAvatarPropertiesRequest(req.Key.Agent, scene, m);
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    m_Log.Debug("Unexpected exception " + e.Message, e);
+                }
             }
+        }
+
+        public void HandleAvatarPropertiesRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            AvatarPropertiesRequest req = (AvatarPropertiesRequest)m;
+            if(req.CircuitSessionID != req.SessionID ||
+                req.CircuitAgentID != req.AgentID)
+            {
+                return;
+            }
+
+            UUI uui;
+            try
+            {
+                uui = scene.AvatarNameService[req.AvatarID];
+            }
+            catch
+            {
+                return;
+            }
+
+            AvatarPropertiesReply res = new AvatarPropertiesReply();
+            res.AgentID = req.AgentID;
+            res.AvatarID = req.AvatarID;
+
+            res.ImageID = "5748decc-f629-461c-9a36-a35a221fe21f";
+            res.FLImageID = "5748decc-f629-461c-9a36-a35a221fe21f";
+            res.PartnerID = UUID.Zero;
+            res.AboutText = "";
+            res.FLAboutText = "";
+            res.BornOn = "01/01/1970";
+            res.ProfileURL = "";
+            res.CharterMember = new byte[] { 0 };
+            res.Flags = 0;
+
+            agent.SendMessageAlways(res, scene.ID);
+
+            AvatarInterestsReply res2 = new AvatarInterestsReply();
+            res2.AgentID = req.AgentID;
+            res2.AvatarID = req.AvatarID;
+            agent.SendMessageAlways(res2, scene.ID);
+
+            AvatarGroupsReply res3 = new AvatarGroupsReply();
+            res3.AgentID = req.AgentID;
+            res3.AvatarID = req.AvatarID;
+            agent.SendMessageAlways(res3, scene.ID);
         }
 
         public ShutdownOrder ShutdownOrder

@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using log4net;
 using Nini.Config;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
@@ -31,6 +32,7 @@ using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Text;
@@ -42,6 +44,8 @@ namespace SilverSim.LL.Search
 {
     public class ViewerSearch : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("LL SEARCH");
+
         [PacketHandler(MessageType.AvatarPickerRequest)]
         [PacketHandler(MessageType.PlacesQuery)]
         [PacketHandler(MessageType.DirPlacesQuery)]
@@ -79,15 +83,22 @@ namespace SilverSim.LL.Search
 
                 Message m = req.Value;
 
-                switch(m.Number)
+                try
                 {
-                    case MessageType.DirFindQuery:
-                        ProcessDirFindQuery(req.Key.Agent, req.Key, m);
-                        break;
+                    switch (m.Number)
+                    {
+                        case MessageType.DirFindQuery:
+                            ProcessDirFindQuery(req.Key.Agent, req.Key, m);
+                            break;
 
-                    case MessageType.AvatarPickerRequest:
-                        ProcessAvatarPickerRequest(req.Key.Agent, req.Key, m);
-                        break;
+                        case MessageType.AvatarPickerRequest:
+                            ProcessAvatarPickerRequest(req.Key.Agent, req.Key, m);
+                            break;
+                    }
+                }
+                catch(Exception e)
+                {
+                    m_Log.Debug("Unexpected exception " + e.Message, e);
                 }
             }
         }

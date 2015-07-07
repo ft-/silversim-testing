@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using log4net;
 using Nini.Config;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
@@ -30,6 +31,7 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Economy;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
@@ -38,6 +40,8 @@ namespace SilverSim.LL.Economy
 {
     public class ViewerEconomy : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("LL ECONOMY");
+
         [PacketHandler(MessageType.MoneyBalanceRequest)]
         BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
 
@@ -71,11 +75,18 @@ namespace SilverSim.LL.Economy
 
                 Message m = req.Value;
 
-                switch(m.Number)
+                try
                 {
-                    case MessageType.MoneyBalanceRequest:
-                        HandleMoneyBalanceRequest(req.Key, req.Value);
-                        break;
+                    switch (m.Number)
+                    {
+                        case MessageType.MoneyBalanceRequest:
+                            HandleMoneyBalanceRequest(req.Key, req.Value);
+                            break;
+                    }
+                }
+                catch(Exception e)
+                {
+                    m_Log.Debug("Exception encountered " + e.Message, e);
                 }
             }
         }
