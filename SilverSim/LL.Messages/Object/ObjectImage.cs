@@ -26,46 +26,47 @@ exception statement from your version.
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using SilverSim.Types.Primitive;
 
 namespace SilverSim.LL.Messages.Object
 {
-    [UDPMessage(MessageType.ObjectClickAction)]
+    [UDPMessage(MessageType.ObjectImage)]
     [Reliable]
     [Zerocoded]
     [NotTrusted]
-    public class ObjectClickAction : Message
+    public class ObjectImage : Message
     {
-        public struct Data
+        public UUID AgentID;
+        public UUID SessionID;
+
+        public struct ObjectDataEntry
         {
             public UInt32 ObjectLocalID;
-            public ClickActionType ClickAction;
+            public string MediaURL;
+            public byte[] TextureEntry;
         }
 
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
-        public List<Data> ObjectData = new List<Data>();
+        public List<ObjectDataEntry> ObjectData = new List<ObjectDataEntry>();
 
-        public ObjectClickAction()
+        public ObjectImage()
         {
 
         }
 
-        public static Message Decode(UDPPacket p)
+        public static ObjectImage Decode(UDPPacket p)
         {
-            ObjectClickAction m = new ObjectClickAction();
+            ObjectImage m = new ObjectImage();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
 
-            uint c = p.ReadUInt8();
-            for (uint i = 0; i < c; ++i)
+            uint entrycnt = p.ReadUInt8();
+            while(entrycnt-- != 0)
             {
-                Data d = new Data();
+                ObjectDataEntry d = new ObjectDataEntry();
                 d.ObjectLocalID = p.ReadUInt32();
-                d.ClickAction = (ClickActionType)p.ReadUInt8();
+                d.MediaURL = p.ReadStringLen8();
+                d.TextureEntry = p.ReadBytes(p.ReadUInt16());
                 m.ObjectData.Add(d);
             }
-
             return m;
         }
     }

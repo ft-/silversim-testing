@@ -26,46 +26,46 @@ exception statement from your version.
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using SilverSim.Types.Primitive;
 
 namespace SilverSim.LL.Messages.Object
 {
-    [UDPMessage(MessageType.ObjectClickAction)]
+    [UDPMessage(MessageType.ObjectScale)]
     [Reliable]
     [Zerocoded]
     [NotTrusted]
-    public class ObjectClickAction : Message
+    [UDPDeprecated]
+    public class ObjectScale : Message
     {
-        public struct Data
+        public UUID AgentID;
+        public UUID SessionID;
+
+        public struct ObjectDataEntry
         {
             public UInt32 ObjectLocalID;
-            public ClickActionType ClickAction;
+            public Vector3 Size;
         }
 
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
-        public List<Data> ObjectData = new List<Data>();
+        public List<ObjectDataEntry> ObjectData = new List<ObjectDataEntry>();
 
-        public ObjectClickAction()
+        public ObjectScale()
         {
 
         }
 
-        public static Message Decode(UDPPacket p)
+        public static ObjectScale Decode(UDPPacket p)
         {
-            ObjectClickAction m = new ObjectClickAction();
+            ObjectScale m = new ObjectScale();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
 
-            uint c = p.ReadUInt8();
-            for (uint i = 0; i < c; ++i)
+            uint cnt = p.ReadUInt8();
+            while(cnt-- != 0)
             {
-                Data d = new Data();
+                ObjectDataEntry d = new ObjectDataEntry();
                 d.ObjectLocalID = p.ReadUInt32();
-                d.ClickAction = (ClickActionType)p.ReadUInt8();
+                d.Size = p.ReadVector3f();
                 m.ObjectData.Add(d);
             }
-
             return m;
         }
     }

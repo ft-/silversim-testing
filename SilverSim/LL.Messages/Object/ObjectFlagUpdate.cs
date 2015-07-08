@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectFlagUpdate)]
     [Reliable]
+    [Zerocoded]
     [NotTrusted]
     public class ObjectFlagUpdate : Message
     {

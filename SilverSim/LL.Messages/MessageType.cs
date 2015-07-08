@@ -135,6 +135,8 @@ namespace SilverSim.LL.Messages
         ObjectDuplicateOnRay = Low | 91,
         MultipleObjectUpdate = Medium | 2,
         RequestMultipleObjects = Medium | 3,
+        ObjectPosition = Medium | 4,
+        ObjectScale = Low | 92,
         ObjectRotation = Low | 93,
         ObjectFlagUpdate = Low | 94,
         ObjectClickAction = Low | 95,

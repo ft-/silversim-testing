@@ -150,11 +150,11 @@ namespace SilverSim.Scene.Types.Scene
                     datapos += 12;
                     if (prim.ObjectGroup.RootPart != prim && CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
                     {
-                        prim.GlobalPosition = pos;
+                        prim.Position = pos;
                     }
                     if (prim.ObjectGroup.RootPart == prim && CanMove(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
                     {
-                        prim.GlobalPosition = pos;
+                        prim.Position = pos;
                     }
                 }
 
@@ -165,11 +165,11 @@ namespace SilverSim.Scene.Types.Scene
                     datapos += 12;
                     if (prim.ObjectGroup.RootPart != prim && CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
                     {
-                        prim.GlobalRotation = rot;
+                        prim.Rotation = rot;
                     }
                     if (prim.ObjectGroup.RootPart == prim && CanMove(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
                     {
-                        prim.GlobalRotation = rot;
+                        prim.Rotation = rot;
                     }
                 }
 
@@ -228,7 +228,97 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     continue;
                 }
-                prim.GlobalRotation = d.Rotation;
+                prim.Rotation = d.Rotation;
+                prim.SendObjectUpdate();
+            }
+        }
+
+        [PacketHandler(MessageType.ObjectPosition)]
+        void HandleObjectPosition(Message m)
+        {
+            SilverSim.LL.Messages.Object.ObjectPosition req = (SilverSim.LL.Messages.Object.ObjectPosition)m;
+            if (req.CircuitSessionID != req.SessionID ||
+                req.CircuitAgentID != req.AgentID)
+            {
+                return;
+            }
+
+            IAgent agent;
+            try
+            {
+                agent = Agents[req.AgentID];
+            }
+            catch
+            {
+                return;
+            }
+
+            foreach (SilverSim.LL.Messages.Object.ObjectPosition.ObjectDataEntry d in req.ObjectData)
+            {
+                ObjectPart prim;
+                try
+                {
+                    prim = Primitives[d.ObjectLocalID];
+                }
+                catch
+                {
+                    continue;
+                }
+
+                if (prim.ObjectGroup.RootPart != prim && !CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                {
+                    continue;
+                }
+                if (prim.ObjectGroup.RootPart == prim && !CanMove(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                {
+                    continue;
+                }
+                prim.Position = d.Position;
+                prim.SendObjectUpdate();
+            }
+        }
+
+        [PacketHandler(MessageType.ObjectScale)]
+        void HandleObjectScale(Message m)
+        {
+            SilverSim.LL.Messages.Object.ObjectScale req = (SilverSim.LL.Messages.Object.ObjectScale)m;
+            if (req.CircuitSessionID != req.SessionID ||
+                req.CircuitAgentID != req.AgentID)
+            {
+                return;
+            }
+
+            IAgent agent;
+            try
+            {
+                agent = Agents[req.AgentID];
+            }
+            catch
+            {
+                return;
+            }
+
+            foreach (SilverSim.LL.Messages.Object.ObjectScale.ObjectDataEntry d in req.ObjectData)
+            {
+                ObjectPart prim;
+                try
+                {
+                    prim = Primitives[d.ObjectLocalID];
+                }
+                catch
+                {
+                    continue;
+                }
+
+                if (prim.ObjectGroup.RootPart != prim && !CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                {
+                    continue;
+                }
+                if (prim.ObjectGroup.RootPart == prim && !CanMove(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                {
+                    continue;
+                }
+                prim.Size = d.Size;
                 prim.SendObjectUpdate();
             }
         }
