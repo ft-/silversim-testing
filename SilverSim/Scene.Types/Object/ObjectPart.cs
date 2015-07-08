@@ -2432,7 +2432,7 @@ namespace SilverSim.Scene.Types.Object
                         part.Flags &= ~(
                             PrimitiveFlags.InventoryEmpty | PrimitiveFlags.Physics | PrimitiveFlags.Temporary | PrimitiveFlags.TemporaryOnRez |
                             PrimitiveFlags.AllowInventoryDrop | PrimitiveFlags.ZlibCompressed | PrimitiveFlags.Scripted |
-                            PrimitiveFlags.ObjectGroupOwned | PrimitiveFlags.ObjectYouOfficer | PrimitiveFlags.ObjectYouOwner);
+                            PrimitiveFlags.ObjectGroupOwned | PrimitiveFlags.ObjectYouOfficer | PrimitiveFlags.ObjectYouOwner | PrimitiveFlags.ObjectOwnerModify);
                         part.Inventory.InventorySerial = InventorySerial;
                         return part;
 

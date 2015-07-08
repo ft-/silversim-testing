@@ -32,6 +32,7 @@ using ThreadedClasses;
 using System.Threading;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.LL.Messages;
+using SilverSim.Types.Inventory;
 
 namespace SilverSim.LL.Core
 {
@@ -123,10 +124,62 @@ namespace SilverSim.LL.Core
             foreach (KeyValuePair<ObjectUpdateInfo, byte[]> kvp in full_packet_data)
             {
                 full_packet.WriteBytes(kvp.Value);
-                if (kvp.Key.Part.Owner.ID == AgentID)
+                byte[] b = new byte[4];
+                Buffer.BlockCopy(full_packet.Data, offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags, b, 0, 4);
+                if(!BitConverter.IsLittleEndian)
                 {
-                    full_packet.Data[offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags] |= (byte)Types.Primitive.PrimitiveFlags.ObjectYouOwner;
+                    Array.Reverse(b);
                 }
+                Types.Primitive.PrimitiveFlags flags = (Types.Primitive.PrimitiveFlags)BitConverter.ToUInt32(b, 0);
+
+                b = BitConverter.GetBytes((UInt32)flags);
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(b);
+                }
+
+                if (kvp.Key.Part.Owner.EqualsGrid(Agent.Owner))
+                {
+                    flags |= Types.Primitive.PrimitiveFlags.ObjectYouOwner;
+                    if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Move) != 0)
+                    {
+                        flags |= Types.Primitive.PrimitiveFlags.ObjectMove;
+                    }
+                    if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Transfer) != 0)
+                    {
+                        flags |= Types.Primitive.PrimitiveFlags.ObjectTransfer;
+                    }
+                    if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Modify) != 0)
+                    {
+                        flags |= Types.Primitive.PrimitiveFlags.ObjectModify;
+                    }
+                    if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Copy) != 0)
+                    {
+                        flags |= Types.Primitive.PrimitiveFlags.ObjectCopy;
+                    }
+                }
+                else
+                {
+                    flags |= Types.Primitive.PrimitiveFlags.ObjectYouOwner;
+                    if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Move) != 0)
+                    {
+                        flags |= Types.Primitive.PrimitiveFlags.ObjectMove;
+                    }
+                    if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Transfer) != 0)
+                    {
+                        flags |= Types.Primitive.PrimitiveFlags.ObjectTransfer;
+                    }
+                    if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Modify) != 0)
+                    {
+                        flags |= Types.Primitive.PrimitiveFlags.ObjectModify;
+                    }
+                    if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Copy) != 0)
+                    {
+                        flags |= Types.Primitive.PrimitiveFlags.ObjectCopy;
+                    }
+                }
+                flags |= Types.Primitive.PrimitiveFlags.ObjectAnyOwner;
+                Buffer.BlockCopy(b, 0, full_packet.Data, offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags, 4);
             }
 
             SendObjectUpdateMsg(full_packet);

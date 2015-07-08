@@ -154,6 +154,41 @@ namespace SilverSim.Scene.Types.Object
             All = 0xFFFFFFFF
         }
 
+        void PutUInt32LEToBytes(byte[] b, int offset, UInt32 v)
+        {
+            b[offset + 0] = (byte)((v >> 0) & 0xFF);
+            b[offset + 1] = (byte)((v >> 8) & 0xFF);
+            b[offset + 2] = (byte)((v >> 16) & 0xFF);
+            b[offset + 3] = (byte)((v >> 24) & 0xFF);
+        }
+
+        void PutUInt64LEToBytes(byte[] b, int offset, UInt64 v)
+        {
+            b[offset + 0] = (byte)((v >> 0) & 0xFF);
+            b[offset + 1] = (byte)((v >> 8) & 0xFF);
+            b[offset + 2] = (byte)((v >> 16) & 0xFF);
+            b[offset + 3] = (byte)((v >> 24) & 0xFF);
+            b[offset + 4] = (byte)((v >> 32) & 0xFF);
+            b[offset + 5] = (byte)((v >> 40) & 0xFF);
+            b[offset + 6] = (byte)((v >> 48) & 0xFF);
+            b[offset + 7] = (byte)((v >> 56) & 0xFF);
+        }
+
+        void PutUInt16LEToBytes(byte[] b, int offset, UInt16 v)
+        {
+            b[offset + 0] = (byte)((v >> 0) & 0xFF);
+            b[offset + 1] = (byte)((v >> 8) & 0xFF);
+        }
+
+        void PutInt32LEToBytes(byte[] b, int offset, Int32 vs)
+        {
+            UInt32 v = (UInt32)vs;
+            b[offset + 0] = (byte)((v >> 0) & 0xFF);
+            b[offset + 1] = (byte)((v >> 8) & 0xFF);
+            b[offset + 2] = (byte)((v >> 16) & 0xFF);
+            b[offset + 3] = (byte)((v >> 24) & 0xFF);
+        }
+
         public void UpdateData(UpdateDataFlags flags)
         {
             lock (m_UpdateDataLock)
@@ -178,6 +213,7 @@ namespace SilverSim.Scene.Types.Object
                     flags |= UpdateDataFlags.Properties;
                 }
 
+                #region ObjectUpdate
                 if((flags & UpdateDataFlags.Full) != 0)
                 {
                     byte[] textureEntry = TextureEntryBytes;
@@ -356,7 +392,9 @@ namespace SilverSim.Scene.Types.Object
 
                     m_FullUpdateData = newFullData;
                 }
+                #endregion
 
+                #region Terse Update
                 if ((flags & UpdateDataFlags.Terse) != 0)
                 {
                     byte[] terseData = TerseData;
@@ -374,8 +412,10 @@ namespace SilverSim.Scene.Types.Object
                     Buffer.BlockCopy(textureEntry, 0, newTerseData, offset, textureEntry.Length);
                     m_TerseUpdateData = newTerseData;
                 }
+                #endregion
 
-                if((flags & UpdateDataFlags.Properties) != 0)
+                #region ObjectProperties
+                if ((flags & UpdateDataFlags.Properties) != 0)
                 {
                     byte[] nameBytes = UTF8NoBOM.GetBytes(Name);
                     byte[] descriptionBytes = UTF8NoBOM.GetBytes(Description);
@@ -392,11 +432,29 @@ namespace SilverSim.Scene.Types.Object
 
                     int offset = 0;
 
-                    if(ObjectGroup != null)
+                    PutUInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.BaseMask, (uint)BaseMask);
+                    PutUInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.OwnerMask, (uint)OwnerMask);
+                    PutUInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.GroupMask, (uint)GroupMask);
+                    PutUInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.EveryoneMask, (uint)EveryoneMask);
+                    PutUInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.NextOwnerMask, (uint)NextOwnerMask);
+                    PutUInt64LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.CreationDate, CreationDate.DateTimeToUnixTime());
+                    PutUInt16LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.InventorySerial, (UInt16)(Inventory.InventorySerial & 0xFFFF));
+                    if (ObjectGroup != null)
                     {
                         ObjectGroup.Owner.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.OwnerID);
                         ObjectGroup.Group.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.GroupID);
                         ObjectGroup.LastOwner.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.LastOwnerID);
+                        m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.SaleType] = (byte)ObjectGroup.SaleType;
+                        PutInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.SalePrice, ObjectGroup.SalePrice);
+                        PutInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.OwnershipCost, ObjectGroup.OwnershipCost);
+                        PutInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.Category, (int)ObjectGroup.Category);
+                        //AggregatePerms = SalePrice + 4,
+                        //AggregatePermTextures = AggregatePerms + 1,
+                        //AggregatePermTexturesOwner = AggregatePermTextures + 1,
+                        //ItemID = InventorySerial + 2,
+                        //FolderID = ItemID + 16,
+                        //FromTaskID = FolderID + 16,
+
                         m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.SaleType] = (byte)ObjectGroup.SaleType;
                     }
 
@@ -427,6 +485,7 @@ namespace SilverSim.Scene.Types.Object
 
                     m_PropUpdateData = newPropData;
                 }
+                #endregion
             }
         }
     }

@@ -62,6 +62,10 @@ namespace SilverSim.Scene.Types.Scene
 
         public bool IsEstateManager(UUI agent)
         {
+            if(agent.EqualsGrid(Owner))
+            {
+                return true;
+            }
             return false;
         }
 
@@ -273,11 +277,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             /* check object owner */
-            if (agent.Owner.EqualsGrid(group.Owner))
-            {
-                return true;
-            }
-            else if (group.IsAttached)
+            if (group.IsAttached)
             {
                 /* others should not be able to edit attachments */
                 return false;
@@ -289,6 +289,49 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return true;
             }
+
+            ParcelInfo pinfo;
+            try
+            {
+                pinfo = Parcels[location];
+                if (pinfo.Owner.EqualsGrid(agent.Owner))
+                {
+                    return true;
+                }
+            }
+            catch
+            {
+            }
+
+            return false;
+        }
+
+        public bool CanChangeGroup(IAgent agent, ObjectGroup group, Vector3 location)
+        {
+            if (IsPossibleGod(agent.Owner))
+            {
+                return true;
+            }
+            /* deny modification of admin objects by non-admins */
+            else if (IsPossibleGod(group.Owner))
+            {
+                return false;
+            }
+
+            /* check locked state */
+            if (group.RootPart.IsLocked)
+            {
+                return false;
+            }
+
+            /* check object owner */
+            if (group.IsAttached)
+            {
+                /* others should not be able to edit attachments */
+                return false;
+            }
+
+#warning Add Friends Rights to CanChangeGroup
 
             ParcelInfo pinfo;
             try

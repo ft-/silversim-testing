@@ -24,45 +24,57 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Object
 {
-    [UDPMessage(MessageType.ObjectMaterial)]
+    [UDPMessage(MessageType.MultipleObjectUpdate)]
     [Reliable]
+    [Zerocoded]
     [NotTrusted]
-    public class ObjectMaterial : Message
+    public class MultipleObjectUpdate : Message
     {
-        public struct Data
+        public UUID AgentID;
+        public UUID SessionID;
+
+        [Flags]
+        public enum UpdateFlags : byte
+        {
+            UpdatePosition = 1,
+            UpdateRotation = 2,
+            UpdateScale = 4,
+            UnknownFlagBit3 = 8,
+            UnknownFlagBit4 = 16,
+        }
+
+        public struct ObjectDataEntry
         {
             public UInt32 ObjectLocalID;
-            public PrimitiveMaterial Material;
+            public UpdateFlags Flags;
+            public byte[] Data;
         }
 
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
-        public List<Data> ObjectData = new List<Data>();
-        
+        public List<ObjectDataEntry> ObjectData = new List<ObjectDataEntry>();
 
-        public ObjectMaterial()
+        public MultipleObjectUpdate()
         {
 
         }
 
-        public static Message Decode(UDPPacket p)
+        public static MultipleObjectUpdate Decode(UDPPacket p)
         {
-            ObjectMaterial m = new ObjectMaterial();
+            MultipleObjectUpdate m = new MultipleObjectUpdate();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
 
-            uint c = p.ReadUInt8();
-            for (uint i = 0; i < c; ++i)
+            uint objcnt = p.ReadUInt8();
+            while(objcnt-- != 0)
             {
-                Data d = new Data();
+                ObjectDataEntry d = new ObjectDataEntry();
                 d.ObjectLocalID = p.ReadUInt32();
-                d.Material = (PrimitiveMaterial)p.ReadUInt8();
+                d.Flags = (UpdateFlags)p.ReadUInt8();
+                d.Data = p.ReadBytes(p.ReadUInt8());
                 m.ObjectData.Add(d);
             }
             return m;
