@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Profile
 {
     [UDPMessage(MessageType.AvatarInterestsReply)]
     [Reliable]
+    [Zerocoded]
     [Trusted]
     public class AvatarInterestsReply : Message
     {

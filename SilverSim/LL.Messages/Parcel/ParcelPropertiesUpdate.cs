@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelPropertiesUpdate)]
     [Reliable]
+    [Zerocoded]
     [NotTrusted]
     public class ParcelPropertiesUpdate : Message
     {

@@ -33,6 +33,7 @@ namespace SilverSim.LL.Messages.Circuit
     [Reliable]
     [EventQueueGet("EnableSimulator")]
     [Trusted]
+    [UDPDeprecated]
     public class EnableSimulator : Message
     {
         public GridVector GridPosition;

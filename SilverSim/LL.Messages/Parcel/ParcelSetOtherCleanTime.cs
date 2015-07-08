@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelSetOtherCleanTime)]
     [Reliable]
+    [Zerocoded]
     [NotTrusted]
     public class ParcelSetOtherCleanTime : Message
     {

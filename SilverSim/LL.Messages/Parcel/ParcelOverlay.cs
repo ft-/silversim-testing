@@ -29,6 +29,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelOverlay)]
     [Reliable]
+    [Zerocoded]
     [Trusted]
     public class ParcelOverlay : Message
     {

@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.IM
 {
     [UDPMessage(MessageType.ImprovedInstantMessage)]
     [Reliable]
+    [Zerocoded]
     [NotTrusted]
     public class ImprovedInstantMessage : Message
     {

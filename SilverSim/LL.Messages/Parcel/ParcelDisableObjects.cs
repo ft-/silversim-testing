@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelDisableObjects)]
     [Reliable]
+    [Zerocoded]
     [NotTrusted]
     public class ParcelDisableObjects : Message
     {

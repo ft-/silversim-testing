@@ -31,6 +31,7 @@ namespace SilverSim.LL.Messages.Script
     [Reliable]
     [EventQueueGet("ScriptRunningReply")]
     [Trusted]
+    [UDPDeprecated]
     public class ScriptRunningReply : Message
     {
         public UUID ObjectID;

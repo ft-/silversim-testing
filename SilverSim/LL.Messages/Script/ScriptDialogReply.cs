@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Script
 {
     [UDPMessage(MessageType.ScriptDialogReply)]
     [Reliable]
+    [Zerocoded]
     [NotTrusted]
     public class ScriptDialogReply : Message
     {

@@ -32,6 +32,7 @@ namespace SilverSim.LL.Messages.Profile
 {
     [UDPMessage(MessageType.AvatarGroupsReply)]
     [Reliable]
+    [Zerocoded]
     [Trusted]
     public class AvatarGroupsReply : Message
     {

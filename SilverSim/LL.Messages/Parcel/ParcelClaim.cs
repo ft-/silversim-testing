@@ -30,6 +30,7 @@ namespace SilverSim.LL.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelClaim)]
     [Reliable]
+    [Zerocoded]
     [NotTrusted]
     public class ParcelClaim : Message
     {

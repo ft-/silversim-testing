@@ -32,6 +32,7 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectProperties)]
     [Reliable]
+    [Zerocoded]
     [Trusted]
     public class ObjectProperties : Message
     {
