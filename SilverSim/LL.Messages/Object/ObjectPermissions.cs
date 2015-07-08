@@ -32,14 +32,31 @@ namespace SilverSim.LL.Messages.Object
 {
     [UDPMessage(MessageType.ObjectPermissions)]
     [Reliable]
+    [Zerocoded]
     [NotTrusted]
     public class ObjectPermissions : Message
     {
+        [Flags]
+        public enum ChangeFieldMask : byte
+        {
+            Base = 0x01,
+            Owner = 0x02,
+            Group = 0x04,
+            Everyone = 0x08,
+            NextOwner = 0x10
+        }
+
+        public enum ChangeType : byte
+        {
+            Clear = 0,
+            Set = 1
+        }
+
         public struct Data
         {
             public UInt32 ObjectLocalID;
-            public byte Field;
-            public byte Set;
+            public ChangeFieldMask Field;
+            public ChangeType ChangeType;
             public InventoryPermissionsMask Mask;
         }
 
@@ -68,8 +85,8 @@ namespace SilverSim.LL.Messages.Object
             {
                 Data d = new Data();
                 d.ObjectLocalID = p.ReadUInt32();
-                d.Field = p.ReadUInt8();
-                d.Set = p.ReadUInt8();
+                d.Field = (ChangeFieldMask)p.ReadUInt8();
+                d.ChangeType = p.ReadUInt8() != 0 ? ChangeType.Set : ChangeType.Clear;
                 d.Mask = (InventoryPermissionsMask)p.ReadUInt32();
                 m.ObjectData.Add(d);
             }

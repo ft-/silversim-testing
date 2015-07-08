@@ -36,7 +36,7 @@ namespace SilverSim.Types.Inventory
         Copy = 1 << 15,
         Export = 1 << 16,
         Move = 1 << 19,
-        Damage = 1 << 20,
+        Damage = 1 << 20, /* deprecated */
         All = Transfer | Modify | Copy | Move,
         Every = 0x7FFFFFFF
     }
