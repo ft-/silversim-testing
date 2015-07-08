@@ -432,13 +432,6 @@ namespace SilverSim.Scene.Types.Object
 
                     int offset = 0;
 
-                    PutUInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.BaseMask, (uint)BaseMask);
-                    PutUInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.OwnerMask, (uint)OwnerMask);
-                    PutUInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.GroupMask, (uint)GroupMask);
-                    PutUInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.EveryoneMask, (uint)EveryoneMask);
-                    PutUInt32LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.NextOwnerMask, (uint)NextOwnerMask);
-                    PutUInt64LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.CreationDate, CreationDate.DateTimeToUnixTime());
-                    PutUInt16LEToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.InventorySerial, (UInt16)(Inventory.InventorySerial & 0xFFFF));
                     if (ObjectGroup != null)
                     {
                         ObjectGroup.Owner.ID.ToBytes(m_PropUpdateFixedBlock, (int)PropertiesFixedBlockOffset.OwnerID);
