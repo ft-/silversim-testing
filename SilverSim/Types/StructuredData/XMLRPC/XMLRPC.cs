@@ -824,7 +824,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                                 {
                                     writer.WriteNamedValue("name", "faultString");
                                     writer.WriteStartElement("value");
-                                    writer.WriteNamedValue("string", FaultCode);
+                                    writer.WriteNamedValue("string", FaultString);
                                     writer.WriteEndElement();
                                 }
                                 writer.WriteEndElement();

@@ -116,27 +116,11 @@ namespace SilverSim.Main.Common.HttpServer
 
         private void FaultResponse(HttpResponse response, int statusCode, string statusMessage)
         {
-            string s = String.Format("<?xml version=\"1.0\" encoding=\"utf-8\"?>" +
-                    "<methodResponse>" +
-                        "<fault>" +
-                            "<value>" +
-                                "<struct>" +
-                                    "<member>" +
-                                        "<name>faultCode</name>" +
-                                        "<value><int>{0}</int></value>" +
-                                    "</member>" +
-                                    "<member>" +
-                                        "<name>faultString</name>" +
-                                        "<value><string>{1}</string></value>" +
-                                    "</member>" +
-                                "</struct>" +
-                            "</value>" +
-                        "</fault>" +
-                    "</methodResponse>",
-                    statusCode,
-                    XmlConvert.EncodeName(statusMessage));
+            XMLRPC.XmlRpcFaultResponse res = new XMLRPC.XmlRpcFaultResponse();
+            res.FaultCode = statusCode;
+            res.FaultString = statusMessage;
 
-            byte[] buffer = Encoding.UTF8.GetBytes(s);
+            byte[] buffer = res.Serialize();
             response.ContentType = "text/xml";
             response.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
             response.Close();
