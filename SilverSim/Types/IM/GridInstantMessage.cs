@@ -25,27 +25,32 @@ exception statement from your version.
 
 namespace SilverSim.Types.IM
 {
-    public struct GridInstantMessage
+    public class GridInstantMessage
     {
         public ulong ID;
-        public UUI FromAgent;
-        public UUI ToAgent;
+        public UUI FromAgent = UUI.Unknown;
+        public UUI ToAgent = UUI.Unknown;
         public GridInstantMessageDialog Dialog;
-        public bool IsFromGroup;
-        public string Message;
-        public UUID IMSessionID;
-        public bool IsOffline;
-        public Vector3 Position;
-        public byte[] BinaryBucket;
-        public uint ParentEstateID;
-        public UUID RegionID;
-        public Date Timestamp;
+        public bool IsFromGroup = false;
+        public string Message = string.Empty;
+        public UUID IMSessionID = UUID.Zero;
+        public bool IsOffline = false;
+        public Vector3 Position = Vector3.Zero;
+        public byte[] BinaryBucket = new byte[0];
+        public uint ParentEstateID = 0;
+        public UUID RegionID = UUID.Zero;
+        public Date Timestamp = new Date();
 
         public delegate void OnResultDelegate(GridInstantMessage im, bool success);
         public OnResultDelegate OnResult;
-        public bool NoOfflineIMStore;
+        public bool NoOfflineIMStore = false;
 
         /* can be used for storing the result */
         public bool ResultInfo;
+
+        public GridInstantMessage()
+        {
+
+        }
     }
 }

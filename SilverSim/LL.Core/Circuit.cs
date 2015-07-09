@@ -26,6 +26,7 @@ exception statement from your version.
 using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Economy;
+using SilverSim.LL.Messages.IM;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
@@ -888,16 +889,15 @@ namespace SilverSim.LL.Core
                         im.ToAgent.ID = pck.ReadUUID();
                         im.ParentEstateID = pck.ReadUInt32();
                         im.RegionID = pck.ReadUUID();
-                        im.Position.X = pck.ReadFloat();
-                        im.Position.Y = pck.ReadFloat();
-                        im.Position.Z = pck.ReadFloat();
-                        im.IsOffline = pck.ReadUInt8() != 0;
+                        im.Position = pck.ReadVector3f();
+                        im.IsOffline = pck.ReadBoolean();
                         im.Dialog = (GridInstantMessageDialog) pck.ReadUInt8();
                         im.IMSessionID = pck.ReadUUID();
                         im.Timestamp = Date.UnixTimeToDateTime(pck.ReadUInt32());
                         im.FromAgent.FullName = pck.ReadStringLen8();
-                        im.Message = pck.ReadStringLen8();
+                        im.Message = pck.ReadStringLen16();
                         im.BinaryBucket = pck.ReadBytes(pck.ReadUInt16());
+                        im.OnResult = OnIMResult;
                         /* TODO: pass on to IMService, add onresult to the im */
                         m_Server.RouteIM(im);
                     }
@@ -972,6 +972,28 @@ namespace SilverSim.LL.Core
                         /* Ignore we have no decoder for that */
                     }
                     break;
+            }
+        }
+
+        void OnIMResult(GridInstantMessage im, bool success)
+        {
+            if (!success)
+            {
+                ImprovedInstantMessage m = new ImprovedInstantMessage();
+                m.AgentID = im.FromAgent.ID;
+                m.SessionID = UUID.Zero;
+                m.FromAgentName = "System";
+                m.FromGroup = false;
+                m.ToAgentID = AgentID;
+                m.ParentEstateID = 0;
+                m.RegionID = UUID.Zero;
+                m.Position = Vector3.Zero;
+                m.IsOffline = false;
+                m.Timestamp = new Date();
+                m.Dialog = GridInstantMessageDialog.MessageFromAgent;
+                m.ID = UUID.Zero;
+                m.Message = "User not logged in. Message not saved.";
+                SendMessage(m);
             }
         }
         #endregion
