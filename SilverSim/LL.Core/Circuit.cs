@@ -979,21 +979,29 @@ namespace SilverSim.LL.Core
         {
             if (!success)
             {
-                ImprovedInstantMessage m = new ImprovedInstantMessage();
-                m.AgentID = im.FromAgent.ID;
-                m.SessionID = UUID.Zero;
-                m.FromAgentName = "System";
-                m.FromGroup = false;
-                m.ToAgentID = AgentID;
-                m.ParentEstateID = 0;
-                m.RegionID = UUID.Zero;
-                m.Position = Vector3.Zero;
-                m.IsOffline = false;
-                m.Timestamp = new Date();
-                m.Dialog = GridInstantMessageDialog.MessageFromAgent;
-                m.ID = UUID.Zero;
-                m.Message = "User not logged in. Message not saved.";
-                SendMessage(m);
+                switch(im.Dialog)
+                {
+                    case GridInstantMessageDialog.MessageFromAgent:
+                        ImprovedInstantMessage m = new ImprovedInstantMessage();
+                        m.AgentID = im.FromAgent.ID;
+                        m.SessionID = UUID.Zero;
+                        m.FromAgentName = "System";
+                        m.FromGroup = false;
+                        m.ToAgentID = AgentID;
+                        m.ParentEstateID = 0;
+                        m.RegionID = UUID.Zero;
+                        m.Position = Vector3.Zero;
+                        m.IsOffline = false;
+                        m.Timestamp = new Date();
+                        m.Dialog = GridInstantMessageDialog.MessageFromAgent;
+                        m.ID = im.IMSessionID;
+                        m.Message = "User not logged in. Message not saved.";
+                        SendMessage(m);
+                        break;
+
+                    default:
+                        break;
+                }
             }
         }
         #endregion
