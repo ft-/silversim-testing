@@ -40,7 +40,7 @@ namespace SilverSim.LL.Messages.Chat
         public UUID OwnerID;
         public string Name;
         public ChatSourceType SourceType;
-        public ChatType Type;
+        public ChatType ChatType;
         public double Radius;
         public byte SimAccess;
         public string Message;
@@ -60,7 +60,7 @@ namespace SilverSim.LL.Messages.Chat
             p.WriteUUID(OwnerID);
             p.WriteStringLen8(Name);
             p.WriteUInt8((byte)SourceType);
-            p.WriteUInt8((byte)Type);
+            p.WriteUInt8((byte)ChatType);
             p.WriteFloat((float)Radius);
             p.WriteUInt8(SimAccess);
             p.WriteStringLen16(Message);
@@ -75,7 +75,7 @@ namespace SilverSim.LL.Messages.Chat
             m.OwnerID = p.ReadUUID();
             m.Name = p.ReadStringLen8();
             m.SourceType = (ChatSourceType)p.ReadUInt8();
-            m.Type = (ChatType)p.ReadUInt8();
+            m.ChatType = (ChatType)p.ReadUInt8();
             m.Radius = p.ReadFloat();
             m.SimAccess = p.ReadUInt8();
             m.Message = p.ReadStringLen16();
