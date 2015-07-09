@@ -241,10 +241,6 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                                 break;
 
                             case "string":
-                                if(reader.IsEmptyElement)
-                                {
-                                    throw new InvalidXmlRpcSerialization();
-                                }
                                 iv = new AString(reader.ReadElementValueAsString());
                                 break;
 

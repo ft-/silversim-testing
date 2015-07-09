@@ -55,7 +55,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 req = XMLRPC.DeserializeRequest(httpreq.Body);
             }
-            catch
+            catch(Exception e)
             {
                 FaultResponse(httpreq.BeginResponse(), -32700, "Invalid XML RPC Request");
                 return;
