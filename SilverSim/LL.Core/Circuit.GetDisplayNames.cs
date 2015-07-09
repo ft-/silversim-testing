@@ -39,30 +39,14 @@ namespace SilverSim.LL.Core
         {
             writer.WriteStartElement("map");
 #warning verify expected username handling with viewer source code (GetDisplayNames capability)
-            writer.WriteKeyValuePair("key", "username");
-            string username;
-            if(string.IsNullOrEmpty(nd.LastName))
-            {
-                username = nd.FirstName;
-            }
-            else
-            {
-                username = nd.FirstName + "." + nd.LastName;
-            }
             string utcstring = DateTime.Now.AddDays(1).ToUniversalTime().ToString("yyyy\\-MM\\-dd\\THH\\-mm\\-ss\\Z");
-            writer.WriteKeyValuePair("string", username);
-            writer.WriteKeyValuePair("key", "display_name");
-            writer.WriteKeyValuePair("string", username);
-            writer.WriteKeyValuePair("key", "display_name_next_update");
-            writer.WriteKeyValuePair("string", utcstring);
-            writer.WriteKeyValuePair("key", "legacy_first_name");
-            writer.WriteKeyValuePair("string", nd.FirstName);
-            writer.WriteKeyValuePair("key", "legacy_last_name");
-            writer.WriteKeyValuePair("string", nd.LastName);
-            writer.WriteKeyValuePair("key", "id");
-            writer.WriteKeyValuePair("uuid", nd.ID);
-            writer.WriteKeyValuePair("key", "is_display_name_default");
-            writer.WriteKeyValuePair("boolean", false);
+            writer.WriteKeyValuePair("username", nd.FullName.Replace(' ', '.'));
+            writer.WriteKeyValuePair("display_name", nd.FullName);
+            writer.WriteKeyValuePair("display_name_next_update", utcstring);
+            writer.WriteKeyValuePair("legacy_first_name", nd.FirstName);
+            writer.WriteKeyValuePair("legacy_last_name", nd.LastName);
+            writer.WriteKeyValuePair("id", nd.ID);
+            writer.WriteKeyValuePair("is_display_name_default", false);
             writer.WriteEndElement();
         }
 
@@ -135,7 +119,7 @@ namespace SilverSim.LL.Core
                 }
                 if (!haveAgents)
                 {
-                    text.WriteKeyValuePair("key", "haveAgents");
+                    text.WriteNamedValue("key", "agents");
                     text.WriteStartElement("array");
                     haveAgents = true;
                 }
@@ -162,7 +146,7 @@ namespace SilverSim.LL.Core
                 }
                 if (!haveAgents)
                 {
-                    text.WriteKeyValuePair("key", "haveAgents");
+                    text.WriteNamedValue("key", "haveAgents");
                     text.WriteStartElement("array");
                     haveAgents = true;
                 }
