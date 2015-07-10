@@ -81,6 +81,32 @@ namespace SilverSim.Database.MySQL.Presence
         };
 
         #region PresenceServiceInterface
+        public override List<PresenceInfo> this[UUID userID]
+        {
+            get
+            {
+                List<PresenceInfo> presences = new List<PresenceInfo>();
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM presence WHERE UserID LIKE ?userID", conn))
+                    {
+                        cmd.Parameters.AddWithValue("?userID", userID);
+                        using(MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            PresenceInfo pi = new PresenceInfo();
+                            pi.UserID.ID = reader.GetUUID("UserID");
+                            pi.RegionID = reader.GetUUID("RegionID");
+                            pi.SessionID = reader.GetUUID("SessionID");
+                            pi.SecureSessionID = reader.GetUUID("SecureSessionID");
+                            presences.Add(pi);
+                        }
+                    }
+                }
+                return presences;
+            }
+        }
+
         public override PresenceInfo this[UUID sessionID, UUID userID]
         {
             get

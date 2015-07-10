@@ -117,7 +117,7 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
 
             Map res = DoXmlRpcWithHashResponse("get_server_urls", hash);
             Dictionary<string, string> serverUrls = new Dictionary<string, string>();
-            foreach(string key in hash.Keys)
+            foreach (string key in res.Keys)
             {
                 if(key.StartsWith("SRV_") && res[key] != null)
                 {

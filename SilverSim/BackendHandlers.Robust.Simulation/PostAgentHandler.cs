@@ -52,6 +52,7 @@ using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Groups;
+using SilverSim.Types.Presence;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -562,13 +563,30 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     DoAgentResponse(req, e.Message, false);
                     return;
                 }
+                if (null != gridUserService)
+                {
+                    try
+                    {
+                        gridUserService.SetPosition(agent.Owner, scene.ID, agent.GlobalPosition, agent.LookAt);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.Warn("Could not contact GridUserService", e);
+                    }
+                }
+
                 try
                 {
-                    gridUserService.SetPosition(agent.Owner, scene.ID, agent.GlobalPosition, agent.LookAt);
+                    PresenceInfo pinfo = new PresenceInfo();
+                    pinfo.UserID = agent.Owner;
+                    pinfo.SessionID = agent.SessionID;
+                    pinfo.SecureSessionID = agentPost.Session.SecureSessionID;
+                    pinfo.RegionID = scene.ID;
+                    presenceService[agent.SessionID, agent.ID, PresenceServiceInterface.SetType.Report] = pinfo;
                 }
-                catch(Exception)
+                catch (Exception e)
                 {
-
+                    m_Log.Warn("Could not contact PresenceService", e);
                 }
                 m_Log.InfoFormat("Agent post request {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Caps {6} Circuit {7}",
                     agentPost.Account.Principal.FirstName,

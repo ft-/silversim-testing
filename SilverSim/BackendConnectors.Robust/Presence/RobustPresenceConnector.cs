@@ -61,12 +61,43 @@ namespace SilverSim.BackendConnectors.Robust.Presence
         }
         #endregion
 
+        public override List<PresenceInfo> this[UUID userID]
+        {
+            get
+            {
+                List<PresenceInfo> presences = new List<PresenceInfo>();
+                Dictionary<string, string> post = new Dictionary<string, string>();
+                post["uuids[]"] = (string)userID;
+                post["VERSIONMIN"] = "0";
+                post["VERSIONMAX"] = "0";
+                post["METHOD"] = "getagents";
+
+                Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_PresenceUri, null, post, false, TimeoutMs));
+                if (!(map["result"] is Map))
+                {
+                    throw new PresenceNotFoundException();
+                }
+                Map m = (Map)(map["result"]);
+                foreach (IValue iv in m.Values)
+                {
+                    PresenceInfo p = new PresenceInfo();
+                    Map pm = (Map)iv;
+                    p.RegionID = pm["RegionID"].ToString();
+                    p.UserID.ID = pm["UserID"].ToString();
+                    presences.Add(p);
+                }
+                return presences;
+            }
+        }
+
         public override PresenceInfo this[UUID sessionID, UUID userID]
         {
             get
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
                 post["SessionID"] = (string)sessionID;
+                post["VERSIONMIN"] = "0";
+                post["VERSIONMAX"] = "0";
                 post["METHOD"] = "getagent";
 
                 Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_PresenceUri, null, post, false, TimeoutMs));
@@ -78,7 +109,6 @@ namespace SilverSim.BackendConnectors.Robust.Presence
                 Map m = (Map)(map["result"]);
                 p.RegionID = m["RegionID"].ToString();
                 p.UserID.ID = m["UserID"].ToString();
-                p.UserID.HomeURI = new Uri(m_HomeURI);
                 p.SessionID = sessionID;
                 return p;
             }
@@ -87,6 +117,8 @@ namespace SilverSim.BackendConnectors.Robust.Presence
                 if(value == null)
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["VERSIONMIN"] = "0";
+                    post["VERSIONMAX"] = "0";
                     post["SessionID"] = (string)sessionID;
                     post["METHOD"] = "logout";
 
@@ -114,6 +146,8 @@ namespace SilverSim.BackendConnectors.Robust.Presence
                 if (value == null)
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["VERSIONMIN"] = "0";
+                    post["VERSIONMAX"] = "0";
                     post["SessionID"] = (string)sessionID;
                     post["METHOD"] = "logout";
 
@@ -130,8 +164,11 @@ namespace SilverSim.BackendConnectors.Robust.Presence
                 else if(reportType == SetType.Login)
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["VERSIONMIN"] = "0";
+                    post["VERSIONMAX"] = "0";
                     post["UserID"] = (string)value.UserID;
                     post["SessionID"] = (string)value.SessionID;
+                    post["SecureSessionID"] = (string)value.SecureSessionID;
                     post["METHOD"] = "login";
 
                     Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_PresenceUri, null, post, false, TimeoutMs));
@@ -147,6 +184,9 @@ namespace SilverSim.BackendConnectors.Robust.Presence
                 else if(reportType == SetType.Report)
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["VERSIONMIN"] = "0";
+                    post["VERSIONMAX"] = "0";
+                    post["METHOD"] = "report";
                     post["SessionID"] = (string)value.SessionID;
                     post["RegionID"] = (string)value.RegionID;
 

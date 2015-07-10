@@ -27,7 +27,9 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.Types;
 
 namespace SilverSim.BackendConnectors.Robust
 {

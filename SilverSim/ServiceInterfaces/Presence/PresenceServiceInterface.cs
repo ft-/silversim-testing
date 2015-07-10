@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Types;
 using SilverSim.Types.Presence;
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Presence
 {
@@ -63,6 +64,11 @@ namespace SilverSim.ServiceInterfaces.Presence
         public PresenceServiceInterface()
         {
 
+        }
+
+        public abstract List<PresenceInfo> this[UUID userID]
+        {
+            get;
         }
 
         public abstract PresenceInfo this[UUID sessionID, UUID userID]

@@ -85,6 +85,14 @@ namespace SilverSim.BackendConnectors.Robust.Presence
             throw new PresenceUpdateFailedException();
         }
 
+        public override List<PresenceInfo> this[UUID userID]
+        {
+            get
+            {
+                return m_LocalConnector[userID];
+            }
+        }
+
         public override PresenceInfo this[UUID sessionID, UUID userID]
         {
             get
@@ -133,6 +141,7 @@ namespace SilverSim.BackendConnectors.Robust.Presence
                 }
                 else if(reportType == SetType.Report)
                 {
+                    m_LocalConnector[sessionID, userID, reportType] = value;
                 }
                 else
                 {

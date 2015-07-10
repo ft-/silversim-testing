@@ -76,6 +76,14 @@ namespace SilverSim.BackendConnectors.Robust.Presence
             throw new PresenceUpdateFailedException();
         }
 
+        public override List<PresenceInfo> this[UUID userID]
+        {
+            get
+            {
+                return new List<PresenceInfo>();
+            }
+        }
+
         public override PresenceInfo this[UUID sessionID, UUID userID]
         {
             get
