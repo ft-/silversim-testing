@@ -105,6 +105,10 @@ namespace SilverSim.LL.Map
             {
                 return;
             }
+
+#if DEBUG
+            m_Log.InfoFormat("MapNameRequest for {0}", req.Name);
+#endif
         }
 
         public ShutdownOrder ShutdownOrder

@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
 
@@ -42,7 +43,7 @@ namespace SilverSim.LL.Messages.Map
             public UInt16 X;
             public UInt16 Y;
             public string Name;
-            public byte Access;
+            public RegionAccess Access;
             public UInt32 RegionFlags;
             public byte WaterHeight;
             public byte Agents;
@@ -75,7 +76,7 @@ namespace SilverSim.LL.Messages.Map
                 p.WriteUInt16(d.X);
                 p.WriteUInt16(d.Y);
                 p.WriteStringLen8(d.Name);
-                p.WriteUInt8(d.Access);
+                p.WriteUInt8((byte)d.Access);
                 p.WriteUInt32(d.RegionFlags);
                 p.WriteUInt8(d.WaterHeight);
                 p.WriteUInt8(d.Agents);
