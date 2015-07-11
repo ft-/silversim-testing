@@ -40,6 +40,7 @@ using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.IM;
 using SilverSim.Types.Script;
+using System.Collections.Generic;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Agent
@@ -50,6 +51,8 @@ namespace SilverSim.Scene.Types.Agent
         string FirstName { get; set; }
         string LastName { get; set; }
         UUID SceneID { get; set; }
+
+        List<GridType> SupportedGridTypes { get; }
 
         bool IMSend(GridInstantMessage im);
 

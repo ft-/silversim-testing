@@ -55,6 +55,8 @@ namespace SilverSim.LL.Map
         [PacketHandler(MessageType.MapItemRequest)]
         BlockingQueue<KeyValuePair<Circuit, Message>> MapDetailsRequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
 
+        List<IForeignGridConnectorPlugin> m_ForeignGridConnectorPlugins;
+
         bool m_ShutdownMap = false;
 
         public ViewerMap()
@@ -64,6 +66,8 @@ namespace SilverSim.LL.Map
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_ForeignGridConnectorPlugins = loader.GetServicesByValue<IForeignGridConnectorPlugin>();
+
             new Thread(HandlerThread).Start(MapBlocksRequestQueue);
             new Thread(HandlerThread).Start(MapDetailsRequestQueue);
         }
@@ -180,7 +184,7 @@ namespace SilverSim.LL.Map
             m_Log.InfoFormat("MapNameRequest for {0}", req.Name);
 #endif
             string[] s;
-            bool isHGTarget = false;
+            bool isForeignGridTarget = false;
             string regionName = req.Name;
             string gatekeeperURI = string.Empty;
             List<MapBlockReply.DataEntry> results = new List<MapBlockReply.DataEntry>();
@@ -188,19 +192,19 @@ namespace SilverSim.LL.Map
             s = req.Name.Split(new char[] { ':' }, 3);
             if(s.Length > 1)
             {
-                /* could be a HG URI, check for number in second place */
+                /* could be a foreign grid URI, check for number in second place */
                 uint val;
                 if(!uint.TryParse(s[1], out val))
                 {
-                    /* not a HG map name */
+                    /* not a foreign grid map name */
                 }
                 else if(val > 65535)
                 {
-                    /* not a HG map name */
+                    /* not a foreign grid map name */
                 }
                 else if(!Uri.IsWellFormedUriString("http://" + s[0] + ":" + s[1] + "/", UriKind.Absolute))
                 {
-                    /* not a HG map name */
+                    /* not a foreign grid map name */
                 }
                 else
                 {
@@ -213,7 +217,7 @@ namespace SilverSim.LL.Map
                     {
                         regionName = ""; /* DefaultHGRegion */
                     }
-                    isHGTarget = true;
+                    isForeignGridTarget = true;
                 }
             }
             s = req.Name.Split(new char[] { ' ' }, 2);
@@ -221,7 +225,7 @@ namespace SilverSim.LL.Map
             {
                 if(Uri.IsWellFormedUriString(s[0],UriKind.Absolute))
                 {
-                    /* this is a HG URI of form <url> <region name> */
+                    /* this is a foreign grid URI of form <url> <region name> */
                     gatekeeperURI = s[0];
                     regionName = s[1];
                 }
@@ -232,7 +236,7 @@ namespace SilverSim.LL.Map
             }
             else if(Uri.IsWellFormedUriString(req.Name, UriKind.Absolute))
             {
-                /* this is a HG URI for the DefaultHGRegion */
+                /* this is a foreign Grid URI for the DefaultHGRegion */
                 gatekeeperURI = req.Name;
                 regionName = "";
             }
@@ -241,9 +245,59 @@ namespace SilverSim.LL.Map
                 /* local Grid URI */
             }
 
-            if(isHGTarget)
+            if(isForeignGridTarget)
             {
-                
+                RegionInfo ri = null;
+                bool foundRegionButWrongProtocol = false;
+                string foundProtocolName = "";
+                foreach(IForeignGridConnectorPlugin foreignGrid in m_ForeignGridConnectorPlugins)
+                {
+                    if(foreignGrid.IsProtocolSupported(gatekeeperURI))
+                    {
+                        try
+                        {
+                            ri = foreignGrid.Instantiate(gatekeeperURI)[regionName];
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+                        if(!foreignGrid.IsAgentSupported(agent.SupportedGridTypes))
+                        {
+                            foundRegionButWrongProtocol = true;
+                            foundProtocolName = agent.DisplayName;
+                            ri = null;
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                if(ri == null && foundRegionButWrongProtocol)
+                {
+                    agent.SendAlertMessage(string.Format("Your home grid does not support the selected target grid (running {0}).", foundProtocolName), scene.ID);
+                }
+                else if(ri != null)
+                {
+                    MapBlockReply.DataEntry d = new MapBlockReply.DataEntry();
+                    d.X = 0;
+                    d.Y = ri.Location.GridY;
+                    /* we map foreign grid locations in specific agent only */
+                    if(ri.Location.GridX > d.Y)
+                    {
+                        d.Y = ri.Location.GridX;
+                    }
+
+                    d.Name = ri.Name;
+                    d.Access = ri.Access;
+                    d.RegionFlags = ri.Flags;
+                    d.WaterHeight = 21;
+                    d.Agents = 0;
+                    d.MapImageID = ri.RegionMapTexture;
+                    results.Add(d);
+                }
             }
             else if(string.IsNullOrEmpty(regionName))
             {

@@ -510,6 +510,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 serviceList.Add(presenceService);
                 serviceList.Add(gridUserService);
                 serviceList.Add(gridService);
+                List<GridType> supportedGridTypes = new List<GridType>();
+                supportedGridTypes.Add(new GridType("opensim-robust"));
 
                 LLAgent agent = new LLAgent(
                     agentPost.Account.Principal.ID,
@@ -518,7 +520,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     agentPost.Account.Principal.HomeURI,
                     agentPost.Session.SessionID,
                     agentPost.Session.SecureSessionID,
-                    serviceList);
+                    serviceList,
+                    supportedGridTypes);
                 agent.ServiceURLs = agentPost.Account.ServiceURLs;
 
                 agent.TeleportFlags = agentPost.Destination.TeleportFlags;

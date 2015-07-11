@@ -66,6 +66,16 @@ namespace SilverSim.LL.Core
         private UUID m_CurrentSceneID;
         #endregion
 
+        List<GridType> m_SupportedGridTypes;
+
+        public List<GridType> SupportedGridTypes 
+        { 
+            get
+            {
+                return m_SupportedGridTypes;
+            }
+        }
+
         public Vector4 CollisionPlane
         {
             get
@@ -895,9 +905,11 @@ namespace SilverSim.LL.Core
             Uri homeURI,
             UUID sessionID,
             UUID secureSessionID,
-            AgentServiceList serviceList
+            AgentServiceList serviceList,
+            List<GridType> supportedGridTypes
             )
         {
+            m_SupportedGridTypes = supportedGridTypes;
             CollisionPlane = Vector4.UnitW;
             m_AgentID = agentID;
             SessionID = sessionID;

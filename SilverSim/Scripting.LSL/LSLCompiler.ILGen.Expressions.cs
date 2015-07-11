@@ -446,7 +446,10 @@ namespace SilverSim.Scripting.LSL
                                 object v = localVars[functionTree.Entry];
                                 innerExpressionReturn = GetVarToStack(scriptTypeBuilder, stateTypeBuilder, ilgen, v);
                             }
-                            catch (Exception e)
+                            catch
+#if DEBUG
+                                (Exception e)
+#endif
                             {
                                 throw new CompilerException(lineNumber, string.Format("Variable '{0}' not defined", functionTree.Entry));
                             }
