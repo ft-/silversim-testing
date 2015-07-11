@@ -34,7 +34,7 @@ namespace SilverSim.ServiceInterfaces.Grid
 
         }
 
-        public abstract RegionInfo this[string name]
+        public abstract RegionInfo this[string name] /* specifying empty string results in DefaultRegion lookup */
         {
             get;
         }

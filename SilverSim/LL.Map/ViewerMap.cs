@@ -215,7 +215,7 @@ namespace SilverSim.LL.Map
                     }
                     else
                     {
-                        regionName = ""; /* DefaultHGRegion */
+                        regionName = ""; /* Default Region */
                     }
                     isForeignGridTarget = true;
                 }
@@ -236,7 +236,7 @@ namespace SilverSim.LL.Map
             }
             else if(Uri.IsWellFormedUriString(req.Name, UriKind.Absolute))
             {
-                /* this is a foreign Grid URI for the DefaultHGRegion */
+                /* this is a foreign Grid URI for the Default Region */
                 gatekeeperURI = req.Name;
                 regionName = "";
             }
