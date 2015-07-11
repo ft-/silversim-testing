@@ -40,7 +40,7 @@ namespace SilverSim.LL.Messages.Map
         public bool IsGodlike;
 
         public MapItemType ItemType;
-        public UInt64 RegionHandle;
+        public GridVector Location;
 
         public MapItemRequest()
         {
@@ -56,7 +56,7 @@ namespace SilverSim.LL.Messages.Map
             m.EstateID = p.ReadUInt32();
             m.IsGodlike = p.ReadBoolean();
             m.ItemType = (MapItemType)p.ReadUInt32();
-            m.RegionHandle = p.ReadUInt64();
+            m.Location.RegionHandle = p.ReadUInt64();
 
             return m;
         }

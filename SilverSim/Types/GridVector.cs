@@ -152,6 +152,10 @@ namespace SilverSim.Types
             {
                 return (ushort)(X / 256);
             }
+            set
+            {
+                X = (uint)value * 256;
+            }
         }
 
         public ushort GridY
@@ -159,6 +163,10 @@ namespace SilverSim.Types
             get
             {
                 return (ushort)(Y / 256);
+            }
+            set
+            {
+                Y = (uint)value * 256;
             }
         }
         #endregion

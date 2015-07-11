@@ -38,10 +38,8 @@ namespace SilverSim.LL.Messages.Map
         public MapAgentFlags Flags;
         public UInt32 EstateID;
         public bool IsGodlike;
-        public UInt16 MinX;
-        public UInt16 MaxX;
-        public UInt16 MinY;
-        public UInt16 MaxY;
+        public GridVector Min;
+        public GridVector Max;
 
         public MapBlockRequest()
         {
@@ -56,10 +54,10 @@ namespace SilverSim.LL.Messages.Map
             m.Flags = (MapAgentFlags)p.ReadUInt32();
             m.EstateID = p.ReadUInt32();
             m.IsGodlike = p.ReadBoolean();
-            m.MinX = p.ReadUInt16();
-            m.MaxX = p.ReadUInt8();
-            m.MinY = p.ReadUInt8();
-            m.MaxY = p.ReadUInt8();
+            m.Min.GridX = p.ReadUInt16();
+            m.Max.GridX = p.ReadUInt16();
+            m.Min.GridY = p.ReadUInt16();
+            m.Max.GridY = p.ReadUInt16();
 
             return m;
         }

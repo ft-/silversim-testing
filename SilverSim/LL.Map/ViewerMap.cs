@@ -29,10 +29,13 @@ using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Map;
 using SilverSim.Main.Common;
+using SilverSim.Scene.Management.Scene;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
+using SilverSim.Types.Parcel;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -125,6 +128,7 @@ namespace SilverSim.LL.Map
         #region MapNameRequest and MapBlockRequest
         void HandleMapBlockRequest(LLAgent agent, SceneInterface scene, Message m)
         {
+            List<MapBlockReply.DataEntry> results = new List<MapBlockReply.DataEntry>();
             MapBlockRequest req = (MapBlockRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
@@ -132,7 +136,35 @@ namespace SilverSim.LL.Map
                 return;
             }
 
-            SendMapBlocks(agent, scene, req.Flags, new List<MapBlockReply.DataEntry>());
+#if DEBUG
+            m_Log.InfoFormat("MapBlockRequest for {0},{1} {2},{3}", req.Min.GridX, req.Min.GridY, req.Max.GridX, req.Max.GridY);
+#endif
+            List<RegionInfo> ris;
+            try
+            {
+                ris = scene.GridService.GetRegionsByRange(scene.RegionData.ScopeID, req.Min, req.Max);
+            }
+            catch
+            {
+                ris = new List<RegionInfo>();
+            }
+
+            foreach(RegionInfo ri in ris)
+            {
+                MapBlockReply.DataEntry d = new MapBlockReply.DataEntry();
+                d.X = ri.Location.GridX;
+                d.Y = ri.Location.GridY;
+
+                d.Name = ri.Name;
+                d.Access = ri.Access;
+                d.RegionFlags = ri.Flags;
+                d.WaterHeight = 21;
+                d.Agents = 0;
+                d.MapImageID = ri.RegionMapTexture;
+                results.Add(d);
+            }
+
+            SendMapBlocks(agent, scene, req.Flags, results);
         }
 
         void HandleMapNameRequest(LLAgent agent, SceneInterface scene, Message m)
@@ -238,7 +270,6 @@ namespace SilverSim.LL.Map
                         d.X = ri.Location.GridX;
                         d.Y = ri.Location.GridY;
 
-                        /* check for the mad V2/V3 viewers */
                         d.Name = ri.Name;
                         d.Access = ri.Access;
                         d.RegionFlags = ri.Flags;
@@ -312,6 +343,95 @@ namespace SilverSim.LL.Map
             reply.Flags = req.Flags;
             reply.ItemType = req.ItemType;
 
+            SceneInterface accessScene = null;
+            if(req.Location.RegionHandle == 0)
+            {
+                accessScene = scene;
+            }
+            else if(req.Location.Equals(scene.RegionData.Location))
+            {
+                accessScene = scene;
+            }
+            else 
+            {
+                try
+                {
+                    accessScene = SceneManager.Scenes[req.Location];
+                }
+                catch
+                {
+                    accessScene = null; /* remote */
+                }
+            }
+
+            switch(req.ItemType)
+            {
+                case MapItemType.AgentLocations:
+                    if(null != accessScene)
+                    {
+                        /* local */
+                        foreach(IAgent sceneagent in accessScene.Agents)
+                        {
+                            if(sceneagent.IsInScene(accessScene) && !sceneagent.Owner.Equals(agent.Owner) && sceneagent is LLAgent)
+                            {
+                                MapItemReply.DataEntry d = new MapItemReply.DataEntry();
+                                d.X = (ushort)sceneagent.GlobalPosition.X;
+                                d.Y = (ushort)sceneagent.GlobalPosition.Y;
+                                d.ID = UUID.Zero;
+                                d.Name = sceneagent.Owner.FullName;
+                                d.Extra = 1;
+                                d.Extra2 = 0;
+                                reply.Data.Add(d);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        /* remote */
+                    }
+                    break;
+
+                case MapItemType.LandForSale:
+                    if(null != accessScene)
+                    {
+                        /* local */
+                        foreach(ParcelInfo parcel in accessScene.Parcels)
+                        {
+                            if((parcel.Flags & ParcelFlags.ForSale) != 0)
+                            {
+                                MapItemReply.DataEntry d = new MapItemReply.DataEntry();
+                                double x = (parcel.AABBMin.X + parcel.AABBMax.X) / 2;
+                                double y = (parcel.AABBMin.Y + parcel.AABBMax.Y) / 2;
+                                d.X = (ushort)x;
+                                d.Y = (ushort)y;
+                                d.ID = parcel.ID;
+                                d.Name = parcel.Name;
+                                d.Extra = parcel.Area;
+                                d.Extra2 = parcel.SalePrice;
+                                reply.Data.Add(d);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        /* remote */
+                    }
+                    break;
+
+                case MapItemType.Telehub:
+                    if(null != accessScene)
+                    {
+                        /* local */
+                    }
+                    else
+                    {
+                        /* remote */
+                    }
+                    break;
+
+                default:
+                    break;
+            }
             agent.SendMessageAlways(reply, scene.ID);
         }
         #endregion
