@@ -36,7 +36,7 @@ namespace SilverSim.LL.Messages.Script
         public UUID SessionID;
         public UUID ObjectID;
         public UUID ItemID;
-        bool IsRunning;
+        public bool IsRunning;
 
         public SetScriptRunning()
         {
