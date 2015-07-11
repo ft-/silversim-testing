@@ -13,7 +13,7 @@ namespace SilverSim.LL.Messages.Map
     {
         public UUID AgentID;
         public MapAgentFlags Flags;
-        public UInt32 ItemType;
+        public MapItemType ItemType;
 
         public struct DataEntry
         {
@@ -37,7 +37,7 @@ namespace SilverSim.LL.Messages.Map
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteUInt32((uint)Flags);
-            p.WriteUInt32(ItemType);
+            p.WriteUInt32((uint)ItemType);
             p.WriteUInt8((byte)Data.Count);
             foreach (DataEntry d in Data)
             {

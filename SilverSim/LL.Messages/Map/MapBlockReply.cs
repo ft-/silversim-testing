@@ -44,7 +44,7 @@ namespace SilverSim.LL.Messages.Map
             public UInt16 Y;
             public string Name;
             public RegionAccess Access;
-            public UInt32 RegionFlags;
+            public RegionFlags RegionFlags;
             public byte WaterHeight;
             public byte Agents;
             public UUID MapImageID;
@@ -77,7 +77,7 @@ namespace SilverSim.LL.Messages.Map
                 p.WriteUInt16(d.Y);
                 p.WriteStringLen8(d.Name);
                 p.WriteUInt8((byte)d.Access);
-                p.WriteUInt32(d.RegionFlags);
+                p.WriteUInt32((uint)d.RegionFlags);
                 p.WriteUInt8(d.WaterHeight);
                 p.WriteUInt8(d.Agents);
                 p.WriteUUID(d.MapImageID);

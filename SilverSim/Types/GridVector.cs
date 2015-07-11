@@ -145,6 +145,22 @@ namespace SilverSim.Types
         {
             return String.Format("{0},{1}", X, Y);
         }
+
+        public ushort GridX
+        {
+            get
+            {
+                return (ushort)(X / 256);
+            }
+        }
+
+        public ushort GridY
+        {
+            get
+            {
+                return (ushort)(Y / 256);
+            }
+        }
         #endregion
     }
 }

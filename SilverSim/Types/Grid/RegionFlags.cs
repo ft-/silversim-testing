@@ -30,6 +30,7 @@ namespace SilverSim.Types.Grid
     [Flags]
     public enum RegionFlags : uint
     {
+        None = 0,
         DefaultRegion = 1,
         FallbackRegion = 2,
         RegionOnline = 4,
