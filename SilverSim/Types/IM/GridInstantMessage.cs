@@ -44,6 +44,7 @@ namespace SilverSim.Types.IM
         public delegate void OnResultDelegate(GridInstantMessage im, bool success);
         public OnResultDelegate OnResult;
         public bool NoOfflineIMStore = false;
+        public bool IsSystemMessage = false;
 
         /* can be used for storing the result */
         public bool ResultInfo;

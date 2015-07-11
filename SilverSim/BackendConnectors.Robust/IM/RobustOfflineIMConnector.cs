@@ -80,6 +80,7 @@ namespace SilverSim.BackendConnectors.Robust.IM
             post["RegionID"] = (string)im.RegionID;
             post["Timestamp"] = im.Timestamp.DateTimeToUnixTime().ToString();
             post["ToAgentID"] = (string)im.ToAgent.ID;
+            post["METHOD"] = "STORE";
             Map map = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_OfflineIMURI, null, post, false, TimeoutMs));
             if (!map.ContainsKey("RESULT"))
             {

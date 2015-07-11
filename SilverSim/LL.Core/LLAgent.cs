@@ -859,6 +859,14 @@ namespace SilverSim.LL.Core
             if(Circuits.TryGetValue(m_CurrentSceneID, out c))
             {
                 Messages.IM.ImprovedInstantMessage im = new Messages.IM.ImprovedInstantMessage(gim);
+                if (gim.IsSystemMessage)
+                {
+                    /* this is a system message, so we change its sender name */
+                    im.FromAgentName = "System";
+                    im.RegionID = UUID.Zero;
+                    im.ParentEstateID = 0;
+                    im.Position = Vector3.Zero;
+                }
                 SendMessageAlways(im, m_CurrentSceneID);
                 return true;
             }
