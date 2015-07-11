@@ -24,24 +24,25 @@ exception statement from your version.
 */
 
 using log4net;
-using SilverSim.LL.Core.Capabilities;
 using SilverSim.LL.Core;
+using SilverSim.LL.Core.Capabilities;
 using SilverSim.LL.Messages;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.ServiceInterfaces.Chat;
+using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
+using SilverSim.Scripting.Common;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
+using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.ServerParam;
-using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using SilverSim.Scene.Types.Script;
-using SilverSim.Scripting.Common;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Grid;
@@ -54,8 +55,6 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using ThreadedClasses;
-using SilverSim.LL.Messages.LayerData;
-using SilverSim.ServiceInterfaces.Estate;
 
 namespace SilverSim.Scene.Implementation.Basic
 {

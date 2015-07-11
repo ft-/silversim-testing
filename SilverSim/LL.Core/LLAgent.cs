@@ -29,7 +29,6 @@ using SilverSim.LL.Messages.Agent;
 using SilverSim.LL.Messages.Parcel;
 using SilverSim.LL.Messages.Script;
 using SilverSim.Main.Common;
-using SilverSim.Main.Common.Transfer;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
@@ -53,7 +52,6 @@ using SilverSim.Types.Primitive;
 using SilverSim.Types.Script;
 using System;
 using System.Collections.Generic;
-using System.Reflection;
 using ThreadedClasses;
 
 namespace SilverSim.LL.Core

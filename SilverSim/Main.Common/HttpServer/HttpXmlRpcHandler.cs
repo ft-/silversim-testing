@@ -26,10 +26,7 @@ exception statement from your version.
 using log4net;
 using SilverSim.Types.StructuredData.XMLRPC;
 using System;
-using System.IO;
 using System.Net;
-using System.Text;
-using System.Xml;
 using ThreadedClasses;
 
 namespace SilverSim.Main.Common.HttpServer

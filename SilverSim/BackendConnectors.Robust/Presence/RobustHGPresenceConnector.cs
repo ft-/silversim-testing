@@ -23,14 +23,12 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common.HttpClient;
 using SilverSim.Main.Common.Rpc;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.Types;
 using SilverSim.Types.Presence;
 using SilverSim.Types.StructuredData.XMLRPC;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace SilverSim.BackendConnectors.Robust.Presence

@@ -27,17 +27,17 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.ServiceInterfaces.Scene;
+using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
+using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.ServerParam;
-using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
-using SilverSim.ServiceInterfaces.Estate;
 
 namespace SilverSim.Scene.Implementation.Basic
 {

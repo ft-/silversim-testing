@@ -28,10 +28,7 @@ using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.XMLRPC;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.BackendConnectors.Robust.UserAgent
 {

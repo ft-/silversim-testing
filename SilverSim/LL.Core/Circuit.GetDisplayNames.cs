@@ -24,7 +24,6 @@ exception statement from your version.
 */
 
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
