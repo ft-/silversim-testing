@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Types.Grid;
 using System;
 
 namespace SilverSim.LL.Messages.Chat
@@ -42,7 +43,7 @@ namespace SilverSim.LL.Messages.Chat
         public ChatSourceType SourceType;
         public ChatType ChatType;
         public double Radius;
-        public byte SimAccess;
+        public RegionAccess SimAccess;
         public string Message;
 
 
@@ -62,7 +63,7 @@ namespace SilverSim.LL.Messages.Chat
             p.WriteUInt8((byte)SourceType);
             p.WriteUInt8((byte)ChatType);
             p.WriteFloat((float)Radius);
-            p.WriteUInt8(SimAccess);
+            p.WriteUInt8((byte)SimAccess);
             p.WriteStringLen16(Message);
         }
 
@@ -77,7 +78,7 @@ namespace SilverSim.LL.Messages.Chat
             m.SourceType = (ChatSourceType)p.ReadUInt8();
             m.ChatType = (ChatType)p.ReadUInt8();
             m.Radius = p.ReadFloat();
-            m.SimAccess = p.ReadUInt8();
+            m.SimAccess = (RegionAccess)p.ReadUInt8();
             m.Message = p.ReadStringLen16();
 
             return m;

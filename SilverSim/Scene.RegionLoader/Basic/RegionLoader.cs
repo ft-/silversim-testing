@@ -108,7 +108,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
                     r.ScopeID = regionEntry.GetString("ScopeID", "00000000-0000-0000-0000-000000000000");
                     r.ServerHttpPort = m_HttpPort;
                     r.RegionMapTexture = regionEntry.GetString("MaptileStaticUUID", "00000000-0000-0000-0000-000000000000");
-                    r.Access = (byte)regionEntry.GetInt("Access", 1);
+                    r.Access = (RegionAccess)(byte)regionEntry.GetInt("Access", 1);
                     r.ServerIP = regionEntry.GetString("ExternalHostName", m_ExternalHostName);
                     m_RegionService.RegisterRegion(r);
                 }

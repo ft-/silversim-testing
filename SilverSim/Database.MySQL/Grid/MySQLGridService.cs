@@ -202,7 +202,7 @@ namespace SilverSim.Database.MySQL.Grid
             ri.RegionMapTexture = dbReader["regionMapTexture"].ToString();
             ri.ServerHttpPort = (uint)dbReader["serverHttpPort"];
             ri.Owner = new UUI(dbReader["owner"].ToString());
-            ri.Access = (byte)(uint)dbReader["access"];
+            ri.Access = (RegionAccess)(uint)dbReader["access"];
             ri.ScopeID = dbReader["ScopeID"].ToString();
             ri.Size.X = (uint)dbReader["sizeX"];
             ri.Size.Y = (uint)dbReader["sizeY"];

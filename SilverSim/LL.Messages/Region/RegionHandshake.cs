@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Types.Estate;
+using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
 
@@ -36,7 +37,7 @@ namespace SilverSim.LL.Messages.Region
     public class RegionHandshake : Message
     {
         public RegionOptionFlags RegionFlags = RegionOptionFlags.None;
-        public byte SimAccess = 0;
+        public RegionAccess SimAccess = 0;
         public string SimName = string.Empty;
         public UUID SimOwner = UUID.Zero;
         public bool IsEstateManager = false;
@@ -85,7 +86,7 @@ namespace SilverSim.LL.Messages.Region
         {
             p.WriteMessageType(Number);
             p.WriteUInt32((uint)RegionFlags);
-            p.WriteUInt8(SimAccess);
+            p.WriteUInt8((byte)SimAccess);
             p.WriteStringLen8(SimName);
             p.WriteUUID(SimOwner);
             p.WriteBoolean(IsEstateManager);

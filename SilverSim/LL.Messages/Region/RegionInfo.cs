@@ -42,7 +42,7 @@ namespace SilverSim.LL.Messages.Region
         public UInt32 EstateID = 0;
         public UInt32 ParentEstateID = 0;
         public RegionFlags RegionFlags = 0;
-        public byte SimAccess = 0;
+        public RegionAccess SimAccess = 0;
         public UInt32 MaxAgents = 0;
         public double BillableFactor = 0;
         public double ObjectBonusFactor = 0;
@@ -75,7 +75,7 @@ namespace SilverSim.LL.Messages.Region
             p.WriteUInt32(EstateID);
             p.WriteUInt32(ParentEstateID);
             p.WriteUInt32((uint)RegionFlags);
-            p.WriteUInt8(SimAccess);
+            p.WriteUInt8((byte)SimAccess);
             if (MaxAgents > 255)
             {
                 p.WriteUInt8(255);
