@@ -35,7 +35,7 @@ namespace SilverSim.LL.Messages.Map
     {
         public UUID AgentID;
         public UUID SessionID;
-        public UInt32 Flags;
+        public MapAgentFlags Flags;
         public UInt32 EstateID;
         public bool IsGodlike;
 
@@ -49,7 +49,7 @@ namespace SilverSim.LL.Messages.Map
             MapLayerRequest m = new MapLayerRequest();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
-            m.Flags = p.ReadUInt32();
+            m.Flags = (MapAgentFlags)p.ReadUInt32();
             m.EstateID = p.ReadUInt32();
             m.IsGodlike = p.ReadBoolean();
 
