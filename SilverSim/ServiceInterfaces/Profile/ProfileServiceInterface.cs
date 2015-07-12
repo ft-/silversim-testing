@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Types.Profile;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Profile
@@ -49,7 +50,7 @@ namespace SilverSim.ServiceInterfaces.Profile
 
         public interface INotesInterface
         {
-            ProfileNotes this[UUI user, UUI target] { get; set; }
+            string this[UUI user, UUI target] { get; set; }
         }
 
         public interface IUserPreferencesInterface
@@ -57,9 +58,17 @@ namespace SilverSim.ServiceInterfaces.Profile
             ProfilePreferences this[UUI user] { get; set; }
         }
 
+        [Flags]
+        public enum PropertiesUpdateFlags
+        {
+            Properties = 1,
+            Interests = 2
+        }
+
         public interface IPropertiesInterface
         {
-            ProfileProperties this[UUI user] { get; set; }
+            ProfileProperties this[UUI user] { get; }
+            ProfileProperties this[UUI user, PropertiesUpdateFlags flags] { set; }
         }
 
         public ProfileServiceInterface()

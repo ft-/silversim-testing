@@ -41,7 +41,7 @@ namespace SilverSim.Database.MySQL.Profile
                 m_ConnectionString = connectionString;
             }
 
-            public ProfileNotes this[UUI user, UUI target]
+            public string this[UUI user, UUI target]
             {
                 get
                 {
@@ -56,11 +56,7 @@ namespace SilverSim.Database.MySQL.Profile
                             {
                                 if(reader.Read())
                                 {
-                                    ProfileNotes notes = new ProfileNotes();
-                                    notes.User = user;
-                                    notes.Target = target;
-                                    notes.Notes = (string)reader["notes"];
-                                    return notes;
+                                    return (string)reader["notes"];
                                 }
                             }
                         }
@@ -72,7 +68,7 @@ namespace SilverSim.Database.MySQL.Profile
                     Dictionary<string, object> replaceVals = new Dictionary<string, object>();
                     replaceVals["user"] = user.ID;
                     replaceVals["target"] = target.ID;
-                    replaceVals["notes"] = value.Notes;
+                    replaceVals["notes"] = value;
                     using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();

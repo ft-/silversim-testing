@@ -83,22 +83,31 @@ namespace SilverSim.Database.MySQL.Profile
                     }
                     throw new KeyNotFoundException();
                 }
+            }
+            public ProfileProperties this[UUI user, PropertiesUpdateFlags flags]
+            {
                 set
                 {
                     Dictionary<string, object> replaceVals = new Dictionary<string, object>();
                     replaceVals["useruuid"] = user.ID;
-                    replaceVals["profileAllowPublish"] = value.PublishProfile ? 1 : 0;
-                    replaceVals["profileMaturePublish"] = value.PublishMature ? 1 : 0;
-                    replaceVals["profileURL"] = value.WebUrl;
-                    replaceVals["profileWantToMask"] = value.WantToMask;
-                    replaceVals["profileWantToText"] = value.WantToText;
-                    replaceVals["profileSkillsMask"] = value.SkillsMask;
-                    replaceVals["profileSkillsText"] = value.SkillsText;
-                    replaceVals["profileLanguages"] = value.Language;
-                    replaceVals["profileImage"] = value.ImageID;
-                    replaceVals["profileAboutText"] = value.AboutText;
-                    replaceVals["profileFirstImage"] = value.FirstLifeImageID;
-                    replaceVals["profileFirstText"] = value.FirstLifeText;
+                    if ((flags & PropertiesUpdateFlags.Properties) != 0)
+                    {
+                        replaceVals["profileAllowPublish"] = value.PublishProfile ? 1 : 0;
+                        replaceVals["profileMaturePublish"] = value.PublishMature ? 1 : 0;
+                        replaceVals["profileURL"] = value.WebUrl;
+                        replaceVals["profileImage"] = value.ImageID;
+                        replaceVals["profileAboutText"] = value.AboutText;
+                        replaceVals["profileFirstImage"] = value.FirstLifeImageID;
+                        replaceVals["profileFirstText"] = value.FirstLifeText;
+                    }
+                    if((flags & PropertiesUpdateFlags.Interests) != 0)
+                    {
+                        replaceVals["profileWantToMask"] = value.WantToMask;
+                        replaceVals["profileWantToText"] = value.WantToText;
+                        replaceVals["profileSkillsMask"] = value.SkillsMask;
+                        replaceVals["profileSkillsText"] = value.SkillsText;
+                        replaceVals["profileLanguages"] = value.Language;
+                    }
 
                     using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {

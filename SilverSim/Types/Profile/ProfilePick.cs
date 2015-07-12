@@ -35,10 +35,11 @@ namespace SilverSim.Types.Profile
         public string Description;
         public UUID ParcelID;
         public UUID SnapshotID;
-        public string User;
+        public string ParcelName;
         public string SimName;
         public Vector3 GlobalPosition;
         public int SortOrder;
         public bool Enabled;
+        public string GatekeeperURI;
     }
 }

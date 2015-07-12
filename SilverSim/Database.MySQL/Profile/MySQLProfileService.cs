@@ -197,7 +197,7 @@ namespace SilverSim.Database.MySQL.Profile
                                     "`name` varchar(255) not null," +
                                     "description text not null," +
                                     "snapshotuuid char(36) not null," +
-                                    "user varchar(255) not null," +
+                                    "parcelname varchar(255) not null," +
                                     "originalname varchar(255) not null," +
                                     "simname varchar(255) not null," +
                                     "posglobal varchar(255) not null," +

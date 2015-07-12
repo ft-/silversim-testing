@@ -285,11 +285,11 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 m_Robust = new RobustNotesConnector(connector, url);
             }
 
-            public ProfileNotes this[UUI user, UUI target]
+            public string this[UUI user, UUI target]
             {
                 get
                 {
-                    ProfileNotes res;
+                    string res;
                     try
                     {
                         res = m_OpenSim[user, target];
@@ -446,11 +446,14 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     }
                     throw new NotImplementedException();
                 }
+            }
+            public ProfileProperties this[UUI user, PropertiesUpdateFlags flags] 
+            { 
                 set
                 {
                     try
                     {
-                        m_OpenSim[user] = value;
+                        m_OpenSim[user, flags] = value;
                         m_Connector.m_Properties = m_OpenSim;
                         return;
                     }
@@ -460,7 +463,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     }
                     try
                     {
-                        m_Robust[user] = value;
+                        m_Robust[user, flags] = value;
                         m_Connector.m_Properties = m_Robust;
                         return;
                     }

@@ -111,7 +111,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 
             }
 
-            public ProfileNotes this[UUI user, UUI target]
+            public string this[UUI user, UUI target]
             {
                 get
                 {
@@ -157,9 +157,12 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 {
                     throw new NotImplementedException();
                 }
+            }
+            public ProfileProperties this[UUI user, PropertiesUpdateFlags flags]
+            {
                 set
                 {
-                    throw new NotImplementedException();
+
                 }
             }
         }

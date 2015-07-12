@@ -91,7 +91,7 @@ namespace SilverSim.Database.MySQL.Profile
                                     pick.SortOrder = reader.GetInt32("sortorder");
                                     pick.TopPick = reader.GetBoolean("toppick");
                                     pick.GlobalPosition = reader.GetVector("posglobal");
-                                    pick.User = reader.GetString("User");
+                                    pick.ParcelName = reader.GetString("parcelname");
                                     return pick;
                                 }
                             }
@@ -111,7 +111,7 @@ namespace SilverSim.Database.MySQL.Profile
                 replaceVals["name"] = value.Name;
                 replaceVals["description"] = value.Description;
                 replaceVals["snapshotuuid"] = value.SnapshotID;
-                replaceVals["user"] = value.User;
+                replaceVals["parcelname"] = value.ParcelName;
                 replaceVals["originalname"] = value.OriginalName;
                 replaceVals["simname"] = value.SimName;
                 replaceVals["posglobal"] = value.GlobalPosition.ToString();
