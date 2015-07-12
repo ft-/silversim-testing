@@ -43,7 +43,7 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
                 m_Uri = uri;
             }
 
-            public UUID this[UUI requestingAgent, UUI princialID]
+            public UGI this[UUI requestingAgent, UUI princialID]
             {
                 get
                 {

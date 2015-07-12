@@ -280,5 +280,75 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             return m;
         }
         #endregion
+
+        #region Group Rolemember
+        public static GroupRolemember ToGroupRolemember(this IValue iv)
+        {
+            Map m = (Map)iv;
+            GroupRolemember member = new GroupRolemember();
+            member.RoleID = m["RoleID"].AsUUID;
+            member.Principal = new UUI(m["MemberID"].ToString());
+            return member;
+        }
+
+        public static Dictionary<string, string> ToPost(this GroupRolemember m)
+        {
+            Dictionary<string, string> post = new Dictionary<string,string>();
+            post["RoleID"] = (string)m.RoleID;
+            post["MemberID"] = m.Principal.ToString();
+
+            return post;
+        }
+        #endregion
+
+        #region Group Notice
+        public static GroupNotice ToGroupNotice(this IValue iv)
+        {
+            Map m = (Map)iv;
+
+            GroupNotice notice = new GroupNotice();
+            notice.ID = m["NoticeID"].AsUUID;
+            notice.Timestamp = Date.UnixTimeToDateTime(m["Timestamp"].AsULong);
+            notice.FromName = m["FromName"].ToString();
+            notice.Subject = m["Subject"].ToString();
+            notice.HasAttachment = bool.Parse(m["HasAttachment"].ToString());
+            if (notice.HasAttachment)
+            {
+                notice.AttachmentItemID = m["AttachmentItemID"].AsUUID;
+                notice.AttachmentName = m["AttachmentName"].ToString();
+                notice.AttachmentType = m["AttachmentType"].AsInt;
+                if ("" != m["AttachmentOwnerID"].ToString())
+                {
+                    notice.AttachmentOwner = new UUI(m["AttachmentOwnerID"].ToString());
+                }
+            }
+            return notice;
+        }
+
+        public static Dictionary<string, string> ToPost(this GroupNotice notice)
+        {
+            Dictionary<string, string> post = new Dictionary<string, string>();
+            post["NoticeID"] = (string)notice.ID;
+            post["Timestamp"] = notice.Timestamp.AsULong.ToString();
+            post["FromName"] = notice.FromName;
+            post["Subject"] = notice.Subject;
+            post["HasAttachment"] = notice.HasAttachment.ToString();
+            if (notice.HasAttachment)
+            {
+                post["AttachmentItemID"] = (string)notice.AttachmentItemID;
+                post["AttachmentName"] = notice.AttachmentName;
+                post["AttachmentType"] = ((int)notice.AttachmentType).ToString();
+                if (notice.AttachmentOwner != null && notice.AttachmentOwner.ID != UUID.Zero)
+                {
+                    post["AttachmentOwnerID"] = notice.AttachmentOwner.ToString();
+                }
+                else
+                {
+                    post["AttachmentOwnerID"] = "";
+                }
+            }
+            return post;
+        }
+        #endregion
     }
 }

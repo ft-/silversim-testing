@@ -52,7 +52,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 { 
                     Dictionary<string, string> post = new Dictionary<string, string>();
                     post["InviteID"] = (string)groupInviteID;
-                    post["RequestingAgentID"] = (string)requestingAgent.ID;
+                    post["RequestingAgentID"] = requestingAgent.ToString();
                     post["OP"] = "GET";
                     post["METHOD"] = "INVITE";
 
@@ -104,8 +104,8 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 post["InviteID"] = (string)invite.ID;
                 post["GroupID"] = (string)invite.Group.ID;
                 post["RoleID"] = (string)invite.RoleID;
-                post["AgentID"] = (string)invite.Principal.ID;
-                post["RequestingAgentID"] = (string)requestingAgent.ID;
+                post["AgentID"] = invite.Principal.ToString();
+                post["RequestingAgentID"] = requestingAgent.ToString();
                 post["OP"] = "ADD";
                 post["METHOD"] = "INVITE";
                 BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
@@ -116,7 +116,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 Dictionary<string, string> post = new Dictionary<string, string>();
                 post["METHOD"] = "INVITE";
                 post["OP"] = "DELETE";
-                post["RequestingAgentID"] = (string)requestingAgent.ID;
+                post["RequestingAgentID"] = requestingAgent.ToString();
                 post["InviteID"] = (string)inviteID;
                 BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
             }

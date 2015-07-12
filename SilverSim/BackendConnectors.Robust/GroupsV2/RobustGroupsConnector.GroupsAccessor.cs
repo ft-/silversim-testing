@@ -52,6 +52,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             {
                 Dictionary<string, string> post = group.ToPost();
                 post.Remove("OwnerRoleID");
+                post["RequestingAgentID"] = requestingAgent.ToString();
                 post["OP"] = op;
                 post["METHOD"] = "PUTGROUP";
                 Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
@@ -88,7 +89,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
                     post["GroupID"] = (string)groupID;
-                    post["RequestingAgentID"] = (string)requestingAgent.ID;
+                    post["RequestingAgentID"] = requestingAgent.ToString();
                     post["METHOD"] = "GETGROUP";
                     Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
                     if (!m.ContainsKey("RESULT"))
@@ -110,7 +111,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
                     post["GroupID"] = (string)group.ID;
-                    post["RequestingAgentID"] = (string)requestingAgent.ID;
+                    post["RequestingAgentID"] = requestingAgent.ToString();
                     post["METHOD"] = "GETGROUP";
                     Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
                     if (!m.ContainsKey("RESULT"))
@@ -132,7 +133,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
                     post["Name"] = groupName;
-                    post["RequestingAgentID"] = (string)requestingAgent.ID;
+                    post["RequestingAgentID"] = requestingAgent.ToString();
                     post["METHOD"] = "GETGROUP";
                     Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
                     if (!m.ContainsKey("RESULT"))
@@ -152,7 +153,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
                 post["Query"] = query;
-                post["RequestingAgentID"] = (string)requestingAgent.ID;
+                post["RequestingAgentID"] = requestingAgent.ToString();
                 post["METHOD"] = "FINDGROUPS";
                 Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
                 if (!m.ContainsKey("RESULT"))

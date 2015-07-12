@@ -45,17 +45,32 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 m_Uri = uri;
             }
 
-            public UUID this[UUI requestingAgent, UUI princialID]
+            public UGI this[UUI requestingAgent, UUI princialID]
             {
                 get
                 {
-                    throw new NotImplementedException();
+                    Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["AgentID"] = princialID.ToString();
+                    post["RequestingAgentID"] = requestingAgent.ToString();
+                    post["METHOD"] = "GETMEMBERSHIP";
+
+                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                    if (!m.ContainsKey("RESULT"))
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    if (m["RESULT"].ToString() == "NULL")
+                    {
+                        throw new KeyNotFoundException();
+                    }
+
+                    return m["RESULT"].ToGroupMemberFromMembership().Group;
                 }
                 set
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
-                    post["AgentID"] = (string)princialID.ID;
-                    post["GroupID"] = (string)value;
+                    post["AgentID"] = princialID.ToString();
+                    post["GroupID"] = (string)value.ID;
                     post["RequestingAgentID"] = (string)requestingAgent.ID;
                     post["OP"] = "GROUP";
                     post["METHOD"] = "SETACTIVE";

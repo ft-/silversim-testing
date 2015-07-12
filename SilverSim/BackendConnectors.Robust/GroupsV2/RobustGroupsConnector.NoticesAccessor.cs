@@ -23,6 +23,8 @@ exception statement from your version.
 
 */
 
+using SilverSim.BackendConnectors.Robust.Common;
+using SilverSim.Main.Common.HttpClient;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System;
@@ -46,17 +48,66 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
 
             public List<GroupNotice> GetNotices(UUI requestingAgent, UGI group)
             {
-                throw new NotImplementedException();
+                Dictionary<string, string> post = new Dictionary<string, string>();
+                post["GroupID"] = (string)group.ID;
+                post["RequestingAgentID"] = requestingAgent.ToString();
+                post["METHOD"] = "GETNOTICES";
+                Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                if (!m.ContainsKey("RESULT"))
+                {
+                    throw new KeyNotFoundException();
+                }
+                if (m["RESULT"].ToString() == "NULL")
+                {
+                    throw new KeyNotFoundException();
+                }
+
+                List<GroupNotice> groupnotices = new List<GroupNotice>();
+                foreach (IValue iv in ((Map)m["RESULT"]).Values)
+                {
+                    if (iv is Map)
+                    {
+                        GroupNotice notice = new GroupNotice();
+                        notice.Group = group;
+                        groupnotices.Add(notice);
+                    }
+                }
+
+                return groupnotices;
             }
 
             public GroupNotice this[UUI requestingAgent, UUID groupNoticeID]
             {
-                get { throw new NotImplementedException(); }
+                get 
+                {
+                    Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["InviteID"] = (string)groupNoticeID;
+                    post["RequestingAgentID"] = requestingAgent.ToString();
+                    post["OP"] = "GET";
+                    post["METHOD"] = "INVITE";
+                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                    if (!m.ContainsKey("RESULT"))
+                    {
+                        throw new AccessFailedException();
+                    }
+                    if (m["RESULT"].ToString() == "NULL")
+                    {
+                        throw new AccessFailedException(m["REASON"].ToString());
+                    }
+
+                    GroupNotice notice = m["RESULT"].ToGroupNotice();
+#warning TODO: GroupNotice service does not deliver any group ID in response
+                    return notice;
+                }
             }
 
             public void Add(UUI requestingAgent, GroupNotice notice)
             {
-                throw new NotImplementedException();
+                Dictionary<string, string> post = notice.ToPost();
+                post["GroupID"] = (string)notice.Group.ID;
+                post["RequestingAgentID"] = requestingAgent.ToString();
+                post["METHOD"] = "ADDNOTICE";
+                BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
             }
 
             public void Delete(UUI requestingAgent, UUID groupNoticeID)

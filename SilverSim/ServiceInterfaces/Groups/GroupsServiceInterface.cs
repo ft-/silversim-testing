@@ -109,13 +109,18 @@ namespace SilverSim.ServiceInterfaces.Groups
                 get;
             }
 
+            List<GroupRolemember> this[UUI requestingAgent, UGI group]
+            {
+                get;
+            }
+
             void Add(UUI requestingAgent, GroupRolemember rolemember);
             void Delete(UUI requestingAgent, UGI group, UUID roleID, UUI principal);
         }
 
         public interface IGroupSelectInterface
         {
-            UUID this[UUI requestingAgent, UUI princialID]
+            UGI this[UUI requestingAgent, UUI princialID]
             {
                 get;
                 set;

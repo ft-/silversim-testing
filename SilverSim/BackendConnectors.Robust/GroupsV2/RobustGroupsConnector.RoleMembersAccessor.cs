@@ -23,6 +23,8 @@ exception statement from your version.
 
 */
 
+using SilverSim.BackendConnectors.Robust.Common;
+using SilverSim.Main.Common.HttpClient;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System;
@@ -46,22 +48,82 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
 
             public GroupRolemember this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
             {
-                get { throw new NotImplementedException(); }
+                get
+                {
+                    foreach(GroupRolemember member in this[requestingAgent, group])
+                    {
+                        if(member.RoleID.Equals(roleID) &&
+                            member.Principal.EqualsGrid(principal))
+                        {
+                            return member;
+                        }
+                    }
+                    throw new KeyNotFoundException();
+                }
             }
 
             public List<GroupRolemember> this[UUI requestingAgent, UGI group, UUID roleID]
             {
-                get { throw new NotImplementedException(); }
+                get
+                {
+                    return new List<GroupRolemember>(this[requestingAgent, group].Where((member) => member.RoleID.Equals(roleID)));
+                }
             }
+
+            public List<GroupRolemember> this[UUI requestingAgent, UGI group]
+            {
+                get
+                {
+                    Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["GroupID"] = (string)group.ID;
+                    post["RequestingAgentID"] = requestingAgent.ToString();
+                    post["METHOD"] = "GETROLEMEMBERS";
+                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                    if (!m.ContainsKey("RESULT"))
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    if (m["RESULT"].ToString() == "NULL")
+                    {
+                        throw new KeyNotFoundException();
+                    }
+
+                    List<GroupRolemember> rolemembers = new List<GroupRolemember>();
+                    foreach (IValue iv in ((Map)m["RESULT"]).Values)
+                    {
+                        if (iv is Map)
+                        {
+                            GroupRolemember member = iv.ToGroupRolemember();
+                            member.Group = group;
+                            rolemembers.Add(member);
+                        }
+                    }
+
+                    return rolemembers;
+                }
+            }
+
 
             public void Add(UUI requestingAgent, GroupRolemember rolemember)
             {
-                throw new NotImplementedException();
+                Dictionary<string, string> post = rolemember.ToPost();
+                post["GroupID"] = (string)rolemember.Group.ID;
+                post["RequestingAgentID"] = requestingAgent.ToString();
+                post["OP"] = "ADD";
+                post["METHOD"] = "AGENTROLE";
+                BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
             }
 
             public void Delete(UUI requestingAgent, UGI group, UUID roleID, UUI principal)
             {
-                throw new NotImplementedException();
+                Dictionary<string, string> post = new Dictionary<string,string>();
+                post["GroupID"] = (string)group.ID;
+                post["RoleID"] = (string)roleID;
+                post["AgentID"] = principal.ToString();
+                post["RequestingAgentID"] = requestingAgent.ToString();
+                post["OP"] = "DELETE";
+                post["METHOD"] = "AGENTROLE";
+                BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
             }
         }
     }
