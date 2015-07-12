@@ -23,16 +23,12 @@ exception statement from your version.
 
 */
 
-using SilverSim.Main.Common.HttpClient;
 using SilverSim.Main.Common.Rpc;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
 using SilverSim.Types.StructuredData.XMLRPC;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.BackendConnectors.OpenSim.Profile
 {
@@ -69,10 +65,17 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 {
                     throw new KeyNotFoundException();
                 }
-                return p["data"];
+                if (p.ContainsKey("data"))
+                {
+                    return p["data"];
+                }
+                else
+                {
+                    return null; /* some calls have no data */
+                }
             }
-
         }
+
         public class OpenSimClassifiedsConnector : OpenSimProfileConnector, IClassifiedsInterface
         {
 

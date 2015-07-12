@@ -25,48 +25,94 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Types.Groups;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace SilverSim.BackendConnectors.Flotsam.Groups
 {
     public partial class FlotsamGroupsConnector
     {
-        class RoleMembersAccessor : IGroupRolemembersInterface
+        class RoleMembersAccessor : FlotsamGroupsCommonConnector, IGroupRolemembersInterface
         {
-            public int TimeoutMs = 20000;
-            string m_Uri;
-
             public RoleMembersAccessor(string uri)
+                : base(uri)
             {
-                m_Uri = uri;
             }
 
             public GroupRolemember this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
             {
-                get { throw new NotImplementedException(); }
+                get 
+                {
+                    Map m = new Map();
+                    m.Add("GroupID", group.ID);
+                    m.Add("AgentID", principal.ID);
+                    IValue iv = FlotsamXmlRpcGetCall(requestingAgent, "groups.getAgentRoles", m);
+                    List<GroupRolemember> rolemems = new List<GroupRolemember>();
+                    if (iv is AnArray)
+                    {
+                        foreach (IValue v in ((AnArray)iv))
+                        {
+                            if (v is Map)
+                            {
+                                GroupRolemember gmem = v.ToGroupRolemember(group);
+                                if(gmem.RoleID.Equals(roleID))
+                                {
+                                    return gmem;
+                                }
+                            }
+                        }
+                    }
+
+                    throw new KeyNotFoundException();
+                }
             }
 
             public List<GroupRolemember> this[UUI requestingAgent, UGI group, UUID roleID]
             {
-                get { throw new NotImplementedException(); }
+                get 
+                {
+                    return new List<GroupRolemember>(this[requestingAgent, group].Where(g => g.RoleID.Equals(roleID)));
+                }
             }
 
             public List<GroupRolemember> this[UUI requestingAgent, UGI group]
             {
-                get { throw new NotImplementedException(); }
+                get
+                {
+                    Map m = new Map();
+                    m.Add("GroupID", group.ID);
+                    IValue iv = FlotsamXmlRpcGetCall(requestingAgent, "groups.getGroupRoleMembers", m);
+                    List<GroupRolemember> rolemems = new List<GroupRolemember>();
+                    if(iv is AnArray)
+                    {
+                        foreach(IValue v in ((AnArray)iv))
+                        {
+                            if(v is Map)
+                            {
+                                rolemems.Add(v.ToGroupRolemember(group));
+                            }
+                        }
+                    }
+                    return rolemems;
+                }
             }
 
             public void Add(UUI requestingAgent, GroupRolemember rolemember)
             {
-                throw new NotImplementedException();
+                Map m = new Map();
+                m.Add("AgentID", rolemember.Principal.ID);
+                m.Add("GroupID", rolemember.Group.ID);
+                m.Add("RoleID", rolemember.RoleID);
+                FlotsamXmlRpcCall(requestingAgent, "groups.addAgentToGroupRole", m);
             }
 
             public void Delete(UUI requestingAgent, UGI group, UUID roleID, UUI principal)
             {
-                throw new NotImplementedException();
+                Map m = new Map();
+                m.Add("AgentID", principal.ID);
+                m.Add("GroupID", group.ID);
+                m.Add("RoleID", roleID);
+                FlotsamXmlRpcCall(requestingAgent, "groups.removeAgentFromGroupRole", m);
             }
         }
     }

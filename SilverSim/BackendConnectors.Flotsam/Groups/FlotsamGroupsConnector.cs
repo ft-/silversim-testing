@@ -23,14 +23,49 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
-using SilverSim.Types.Groups;
+using SilverSim.Main.Common;
+using SilverSim.Main.Common.Rpc;
 using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.Types;
+using SilverSim.Types.StructuredData.XMLRPC;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Main.Common;
+
+/*
+ * RPC method names:
+ * 
+ * "groups.createGroup"
+ * "groups.updateGroup"
+ * "groups.getGroup"
+ * "groups.findGroups"
+ * "groups.getGroupRoles"
+ * "groups.addRoleToGroup"
+ * "groups.removeRoleFromGroup"
+ * "groups.updateGroupRole"
+ * "groups.getGroupRoleMembers"
+ *
+ * "groups.setAgentGroupSelectedRole" 
+ * "groups.addAgentToGroupRole"       
+ * "groups.removeAgentFromGroupRole"  
+ * 
+ * "groups.getGroupMembers"           
+ * "groups.addAgentToGroup"           
+ * "groups.removeAgentFromGroup"      
+ * "groups.setAgentGroupInfo"         
+ * "groups.addAgentToGroupInvite"     
+ * "groups.getAgentToGroupInvite"     
+ * "groups.removeAgentToGroupInvite"  
+ * 
+ * "groups.setAgentActiveGroup"       
+ * "groups.getAgentGroupMembership"   
+ * "groups.getAgentGroupMemberships"  
+ * "groups.getAgentActiveMembership"  
+ * "groups.getAgentRoles"             
+ * 
+ * "groups.getGroupNotices"           
+ * "groups.getGroupNotice"            
+ * "groups.addGroupNotice"            
+ */
 
 namespace SilverSim.BackendConnectors.Flotsam.Groups
 {
@@ -78,6 +113,79 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
         public void Startup(ConfigurationLoader loader)
         {
         }
+
+        public class FlotsamGroupsCommonConnector
+        {
+            protected string m_Uri;
+            public int TimeoutMs = 20000;
+            string m_ReadKey = string.Empty;
+            string m_WriteKey = string.Empty;
+
+            public FlotsamGroupsCommonConnector(string uri)
+            {
+                m_Uri = uri;
+            }
+
+            protected IValue FlotsamXmlRpcCall(UUI requestingAgent, string methodName, Map structparam)
+            {
+                XMLRPC.XmlRpcRequest req = new XMLRPC.XmlRpcRequest();
+                req.MethodName = methodName;
+                structparam.Add("RequestingAgentID", requestingAgent.ID);
+                structparam.Add("RequestingAgentUserService", requestingAgent.HomeURI);
+                structparam.Add("RequestingSessionID", UUID.Zero);
+                structparam.Add("ReadKey", m_ReadKey);
+                structparam.Add("WriteKey", m_WriteKey);
+                req.Params.Add(structparam);
+                XMLRPC.XmlRpcResponse res = RPC.DoXmlRpcRequest(m_Uri, req, TimeoutMs);
+                if (!(res.ReturnValue is Map))
+                {
+                    throw new Exception("Unexpected FlotsamGroups return value");
+                }
+                Map p = (Map)res.ReturnValue;
+                if (!p.ContainsKey("success"))
+                {
+                    throw new Exception("Unexpected FlotsamGroups return value");
+                }
+
+                if (p["success"].ToString().ToLower() != "true")
+                {
+                    throw new KeyNotFoundException();
+                }
+                if (p.ContainsKey("results"))
+                {
+                    return p["results"];
+                }
+                else
+                {
+                    return null; /* some calls have no data */
+                }
+            }
+
+            protected IValue FlotsamXmlRpcGetCall(UUI requestingAgent, string methodName, Map structparam)
+            {
+                XMLRPC.XmlRpcRequest req = new XMLRPC.XmlRpcRequest();
+                req.MethodName = methodName;
+                structparam.Add("RequestingAgentID", requestingAgent.ID);
+                structparam.Add("RequestingAgentUserService", requestingAgent.HomeURI);
+                structparam.Add("RequestingSessionID", UUID.Zero);
+                structparam.Add("ReadKey", m_ReadKey);
+                structparam.Add("WriteKey", m_WriteKey);
+                req.Params.Add(structparam);
+                XMLRPC.XmlRpcResponse res = RPC.DoXmlRpcRequest(m_Uri, req, TimeoutMs);
+                if (res.ReturnValue is Map)
+                {
+                    Map p = (Map)res.ReturnValue;
+                    if (p.ContainsKey("error"))
+                    {
+                        throw new Exception("Unexpected FlotsamGroups return value");
+                    }
+                }
+                
+                return res.ReturnValue;
+            }
+
+        }
+
 
         public override IGroupsInterface Groups
         {

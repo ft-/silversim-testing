@@ -24,13 +24,9 @@ exception statement from your version.
 */
 
 using SilverSim.Main.Common.Rpc;
-using SilverSim.StructuredData.JSON;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.BackendConnectors.OpenSim.Profile
 {

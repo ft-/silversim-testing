@@ -25,9 +25,6 @@ exception statement from your version.
 
 using SilverSim.ServiceInterfaces.Profile;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.BackendConnectors.OpenSim.Profile
 {

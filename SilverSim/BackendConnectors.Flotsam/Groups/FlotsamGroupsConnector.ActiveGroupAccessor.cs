@@ -24,34 +24,51 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.BackendConnectors.Flotsam.Groups
 {
     public partial class FlotsamGroupsConnector
     {
-        class ActiveGroupAccessor : IGroupSelectInterface
+        class ActiveGroupAccessor : FlotsamGroupsCommonConnector, IGroupSelectInterface
         {
-            public int TimeoutMs = 20000;
-            string m_Uri;
-
             public ActiveGroupAccessor(string uri)
+                : base(uri)
             {
-                m_Uri = uri;
             }
 
-            public UGI this[UUI requestingAgent, UUI princialID]
+            public UGI this[UUI requestingAgent, UUI principal]
             {
                 get
                 {
-                    throw new NotImplementedException();
+                    Map m = new Map();
+                    m["AgentID"] = principal.ID;
+                    IValue iv = FlotsamXmlRpcGetCall(requestingAgent, "groups.getAgentActiveMembership", m);
+                    if(!(iv is Map))
+                    {
+                        throw new AccessFailedException();
+                    }
+
+                    m = (Map)iv;
+                    if(m.ContainsKey("error"))
+                    {
+                        if(m["error"].ToString() == "No Active Group Specified")
+                        {
+                            return UGI.Unknown;
+                        }
+                        throw new AccessFailedException();
+                    }
+
+                    UGI res = new UGI();
+                    res.ID = m["GroupID"].AsUUID;
+                    res.GroupName = m["GroupName"].ToString();
+                    return res;
                 }
                 set
                 {
-                    throw new NotImplementedException();
+                    Map m = new Map();
+                    m["AgentID"] = principal.ID;
+                    m["GroupID"] = value.ID;
+                    FlotsamXmlRpcCall(requestingAgent, "groups.setAgentActiveGroup", m);
                 }
             }
         }

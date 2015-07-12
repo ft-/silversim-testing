@@ -28,7 +28,6 @@ namespace SilverSim.Types.Groups
     public class DirGroupInfo
     {
         public UGI ID = UGI.Unknown;
-        public string Name = "";
         public int MemberCount = 0;
         public float SearchOrder = 0;
 
