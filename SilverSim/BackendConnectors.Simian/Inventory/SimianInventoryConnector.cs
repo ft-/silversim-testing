@@ -392,7 +392,7 @@ namespace SilverSim.BackendConnectors.Simian.Inventory
                 {
                     try
                     {
-                        item.Group = groupsService.Groups[extraData["GroupID"].AsUUID];
+                        item.Group = groupsService.Groups[UUI.Unknown, extraData["GroupID"].AsUUID];
                     }
                     catch
                     {

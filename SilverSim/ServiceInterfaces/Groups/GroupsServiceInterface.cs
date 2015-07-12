@@ -34,11 +34,11 @@ namespace SilverSim.ServiceInterfaces.Groups
     {
         public interface IGroupsInterface
         {
-            void Create(UUI requestingAgent, GroupInfo group, ulong EveryonePowers, ulong ownerPowers);
-            void Update(UUI requestingAgent, GroupInfo group);
+            GroupInfo Create(UUI requestingAgent, GroupInfo group);
+            GroupInfo Update(UUI requestingAgent, GroupInfo group);
             void Delete(UUI requestingAgent, GroupInfo group);
 
-            UGI this[UUID groupID]
+            UGI this[UUI requestingAgent, UUID groupID]
             {
                 get;
             }
@@ -53,7 +53,7 @@ namespace SilverSim.ServiceInterfaces.Groups
                 get;
             }
 
-            List<GroupInfo> GetGroupsByName(UUI requestingAgent, string groupName, int limit);
+            List<DirGroupInfo> GetGroupsByName(UUI requestingAgent, string query);
         }
 
         public interface IGroupMembersInterface
@@ -73,14 +73,17 @@ namespace SilverSim.ServiceInterfaces.Groups
                 get;
             }
 
-            void Add(UUI requestingAgent, UGI group, UUI principal);
-            void Update(UUI requestingAgent, UGI group, UUI principal);
+            GroupMember Add(UUI requestingAgent, UGI group, UUI principal, UUID roleID, string accessToken);
             void Delete(UUI requestingAgent, UGI group, UUI principal);
         }
 
         public interface IGroupRolesInterface
         {
             GroupRole this[UUI requestingAgent, UGI group, UUID roleID]
+            {
+                get;
+            }
+            List<GroupRole> this[UUI requestingAgent, UGI group]
             {
                 get;
             }
@@ -139,7 +142,6 @@ namespace SilverSim.ServiceInterfaces.Groups
             List<GroupInvite> GetByGroup(UUI requestingAgent, UGI group);
 
             void Add(UUI requestingAgent, GroupInvite invite);
-            void Update(UUI requestingAgent, GroupInvite invite);
             void Delete(UUI requestingAgent, UUID inviteID);
 
         }
@@ -202,7 +204,16 @@ namespace SilverSim.ServiceInterfaces.Groups
 
         public class AccessFailedException : Exception
         {
+            public AccessFailedException()
+            {
 
+            }
+
+            public AccessFailedException(string message)
+                : base(message)
+            {
+
+            }
         }
     }
 }

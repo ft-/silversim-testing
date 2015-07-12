@@ -23,6 +23,8 @@ exception statement from your version.
 
 */
 
+using SilverSim.BackendConnectors.Robust.Common;
+using SilverSim.Main.Common.HttpClient;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System;
@@ -37,21 +39,42 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
         class GroupsAccessor : IGroupsInterface
         {
             public int TimeoutMs = 20000;
+            string m_GroupServiceURI;
             string m_Uri;
 
-            public GroupsAccessor(string uri)
+            public GroupsAccessor(string uri, string serviceURI)
             {
                 m_Uri = uri;
+                m_GroupServiceURI = serviceURI;
             }
 
-            public void Create(UUI requestingAgent, GroupInfo group, ulong EveryonePowers, ulong ownerPowers)
+            GroupInfo CreateOrUpdate(UUI requestingAgent, GroupInfo group, string op)
             {
-                throw new NotImplementedException();
+                Dictionary<string, string> post = group.ToPost();
+                post.Remove("OwnerRoleID");
+                post["OP"] = op;
+                post["METHOD"] = "PUTGROUP";
+                Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                if (!m.ContainsKey("RESULT"))
+                {
+                    throw new AccessFailedException();
+                }
+                if (m["RESULT"].ToString() == "NULL")
+                {
+                    throw new AccessFailedException(m["REASON"].ToString());
+                }
+
+                return m["RESULT"].ToGroup(m_GroupServiceURI);
             }
 
-            public void Update(UUI requestingAgent, GroupInfo group)
+            public GroupInfo Create(UUI requestingAgent, GroupInfo group)
             {
-                throw new NotImplementedException();
+                return CreateOrUpdate(requestingAgent, group, "ADD");
+            }
+
+            public GroupInfo Update(UUI requestingAgent, GroupInfo group)
+            {
+                return CreateOrUpdate(requestingAgent, group, "UPDATE");
             }
 
             public void Delete(UUI requestingAgent, GroupInfo group)
@@ -59,24 +82,98 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 throw new NotImplementedException();
             }
 
-            public UGI this[UUID groupID]
+            public UGI this[UUI requestingAgent, UUID groupID]
             {
-                get { throw new NotImplementedException(); }
+                get 
+                {
+                    Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["GroupID"] = (string)groupID;
+                    post["RequestingAgentID"] = (string)requestingAgent.ID;
+                    post["METHOD"] = "GETGROUP";
+                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                    if (!m.ContainsKey("RESULT"))
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    if (m["RESULT"].ToString() == "NULL")
+                    {
+                        throw new KeyNotFoundException();
+                    }
+
+                    return m["RESULT"].ToGroup(m_GroupServiceURI).ID;
+                }
             }
 
             public GroupInfo this[UUI requestingAgent, UGI group]
             {
-                get { throw new NotImplementedException(); }
+                get 
+                {
+                    Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["GroupID"] = (string)group.ID;
+                    post["RequestingAgentID"] = (string)requestingAgent.ID;
+                    post["METHOD"] = "GETGROUP";
+                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                    if (!m.ContainsKey("RESULT"))
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    if (m["RESULT"].ToString() == "NULL")
+                    {
+                        throw new KeyNotFoundException();
+                    }
+
+                    return m["RESULT"].ToGroup(m_GroupServiceURI);
+                }
             }
 
             public GroupInfo this[UUI requestingAgent, string groupName]
             {
-                get { throw new NotImplementedException(); }
+                get 
+                {
+                    Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["Name"] = groupName;
+                    post["RequestingAgentID"] = (string)requestingAgent.ID;
+                    post["METHOD"] = "GETGROUP";
+                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                    if (!m.ContainsKey("RESULT"))
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    if (m["RESULT"].ToString() == "NULL")
+                    {
+                        throw new KeyNotFoundException();
+                    }
+
+                    return m["RESULT"].ToGroup(m_GroupServiceURI);
+                }
             }
 
-            public List<GroupInfo> GetGroupsByName(UUI requestingAgent, string groupName, int limit)
+            public List<DirGroupInfo> GetGroupsByName(UUI requestingAgent, string query)
             {
-                throw new NotImplementedException();
+                Dictionary<string, string> post = new Dictionary<string, string>();
+                post["Query"] = query;
+                post["RequestingAgentID"] = (string)requestingAgent.ID;
+                post["METHOD"] = "FINDGROUPS";
+                Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                if (!m.ContainsKey("RESULT"))
+                {
+                    throw new KeyNotFoundException();
+                }
+                if (m["RESULT"].ToString() == "NULL")
+                {
+                    throw new KeyNotFoundException();
+                }
+
+                List<DirGroupInfo> dirgroups = new List<DirGroupInfo>();
+                foreach (IValue iv in ((Map)m["RESULT"]).Values)
+                {
+                    if (iv is Map)
+                    {
+                        dirgroups.Add(iv.ToDirGroupInfo());
+                    }
+                }
+
+                return dirgroups;
             }
         }
     }

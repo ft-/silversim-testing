@@ -59,12 +59,7 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
                 get { throw new NotImplementedException(); }
             }
 
-            public void Add(UUI requestingAgent, UGI group, UUI principal)
-            {
-                throw new NotImplementedException();
-            }
-
-            public void Update(UUI requestingAgent, UGI group, UUI principal)
+            public GroupMember Add(UUI requestingAgent, UGI group, UUI principal, UUID roleID, string accessToken)
             {
                 throw new NotImplementedException();
             }

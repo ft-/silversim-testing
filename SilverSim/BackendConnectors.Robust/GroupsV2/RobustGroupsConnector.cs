@@ -64,14 +64,14 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             }
         }
 
-        public RobustGroupsConnector(string uri)
+        public RobustGroupsConnector(string uri, string serviceUri)
         {
             if(!uri.EndsWith("/"))
             {
                 uri += "/";
             }
             uri += "groups";
-            m_Groups = new GroupsAccessor(uri);
+            m_Groups = new GroupsAccessor(uri, serviceUri);
             m_GroupRoles = new GroupRolesAccessor(uri);
             m_Members = new MembersAccessor(uri);
             m_Rolemembers = new RoleMembersAccessor(uri);

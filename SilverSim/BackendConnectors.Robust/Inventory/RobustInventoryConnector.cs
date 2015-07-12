@@ -187,7 +187,7 @@ namespace SilverSim.BackendConnectors.Robust.Inventory
             {
                 try
                 {
-                    item.Group = groupsService.Groups[map["GroupID"].AsUUID];
+                    item.Group = groupsService.Groups[UUI.Unknown, map["GroupID"].AsUUID];
                 }
                 catch
                 {

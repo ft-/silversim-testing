@@ -49,6 +49,11 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
                 get { throw new NotImplementedException(); }
             }
 
+            public List<GroupRole> this[UUI requestingAgent, UGI group]
+            {
+                get { throw new NotImplementedException(); }
+            }
+
             public List<GroupRole> this[UUI requestingAgent, UGI group, UUI principal]
             {
                 get { throw new NotImplementedException(); }

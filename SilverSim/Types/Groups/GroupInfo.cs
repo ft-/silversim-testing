@@ -25,6 +25,19 @@ exception statement from your version.
 
 namespace SilverSim.Types.Groups
 {
+    public class DirGroupInfo
+    {
+        public UGI ID = UGI.Unknown;
+        public string Name = "";
+        public int MemberCount = 0;
+        public float SearchOrder = 0;
+
+        public DirGroupInfo()
+        {
+
+        }
+    }
+
     public class GroupInfo
     {
         public UGI ID = UGI.Unknown;
@@ -32,7 +45,7 @@ namespace SilverSim.Types.Groups
         public string Charter = "";
         public string Location = "";
         public UUID InsigniaID = UUID.Zero;
-        public UUI FounderID = UUI.Unknown;
+        public UUI Founder = UUI.Unknown;
         public int MembershipFee = 0;
         public bool IsOpenEnrollment = false;
         public bool IsShownInList = false;

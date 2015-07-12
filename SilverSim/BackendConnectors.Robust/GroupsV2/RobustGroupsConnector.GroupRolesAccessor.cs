@@ -23,6 +23,8 @@ exception statement from your version.
 
 */
 
+using SilverSim.BackendConnectors.Robust.Common;
+using SilverSim.Main.Common.HttpClient;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System;
@@ -46,27 +48,109 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
 
             public GroupRole this[UUI requestingAgent, UGI group, UUID roleID]
             {
-                get { throw new NotImplementedException(); }
+                get 
+                {
+                    List<GroupRole> roles = this[requestingAgent, group];
+                    foreach(GroupRole role in roles)
+                    {
+                        if(role.ID.Equals(roleID))
+                        {
+                            return role;
+                        }
+                    }
+                    throw new KeyNotFoundException();
+                }
+            }
+
+            public List<GroupRole> this[UUI requestingAgent, UGI group]
+            {
+                get
+                {
+                    Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["GroupID"] = (string)group.ID;
+                    post["RequestingAgentID"] = (string)requestingAgent.ID;
+                    post["METHOD"] = "GETGROUPROLES";
+                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                    if (!m.ContainsKey("RESULT"))
+                    {
+                        return new List<GroupRole>();
+                    }
+                    if (m["RESULT"].ToString() == "NULL")
+                    {
+                        return new List<GroupRole>();
+                    }
+
+                    List<GroupRole> roles = new List<GroupRole>();
+                    foreach (IValue iv in ((Map)m["RESULT"]).Values)
+                    {
+                        if (iv is Map)
+                        {
+                            roles.Add(iv.ToGroupRole());
+                        }
+                    }
+
+                    return roles;
+                }
             }
 
             public List<GroupRole> this[UUI requestingAgent, UGI group, UUI principal]
             {
-                get { throw new NotImplementedException(); }
+                get
+                {
+                    Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["AgentID"] = (string)principal.ID;
+                    post["GroupID"] = (string)group.ID;
+                    post["RequestingAgentID"] = (string)requestingAgent.ID;
+                    post["METHOD"] = "GETAGENTROLES";
+                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                    if (!m.ContainsKey("RESULT"))
+                    {
+                        return new List<GroupRole>();
+                    }
+                    if (m["RESULT"].ToString() == "NULL")
+                    {
+                        return new List<GroupRole>();
+                    }
+
+                    List<GroupRole> roles = new List<GroupRole>();
+                    foreach(IValue iv in ((Map)m["RESULT"]).Values)
+                    {
+                        if(iv is Map)
+                        {
+                            roles.Add(iv.ToGroupRole());
+                        }
+                    }
+
+                    return roles;
+                }
             }
 
             public void Add(UUI requestingAgent, GroupRole role)
             {
-                throw new NotImplementedException();
+                Dictionary<string, string> post = role.ToPost();
+                post["RequestingAgentID"] = (string)requestingAgent.ID;
+                post["OP"] = "ADD";
+                post["METHOD"] = "PUTROLE";
+                BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
             }
 
             public void Update(UUI requestingAgent, GroupRole role)
             {
-                throw new NotImplementedException();
+                Dictionary<string, string> post = role.ToPost();
+                post["RequestingAgentID"] = (string)requestingAgent.ID;
+                post["OP"] = "UPDATE";
+                post["METHOD"] = "PUTROLE";
+                BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
             }
 
             public void Delete(UUI requestingAgent, UGI group, UUID roleID)
             {
-                throw new NotImplementedException();
+                Dictionary<string, string> post = new Dictionary<string, string>();
+                post["GroupID"] = (string)group.ID;
+                post["RoleID"] = (string)roleID;
+                post["RequestingAgentID"] = (string)requestingAgent.ID;
+                post["METHOD"] = "REMOVEROLE";
+                BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
             }
         }
     }

@@ -44,12 +44,12 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
                 m_Uri = uri;
             }
 
-            public void Create(UUI requestingAgent, GroupInfo group, ulong EveryonePowers, ulong ownerPowers)
+            public GroupInfo Create(UUI requestingAgent, GroupInfo group)
             {
                 throw new NotImplementedException();
             }
 
-            public void Update(UUI requestingAgent, GroupInfo group)
+            public GroupInfo Update(UUI requestingAgent, GroupInfo group)
             {
                 throw new NotImplementedException();
             }
@@ -59,7 +59,7 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
                 throw new NotImplementedException();
             }
 
-            public UGI this[UUID groupID]
+            public UGI this[UUI requestingAgentID, UUID groupID]
             {
                 get { throw new NotImplementedException(); }
             }
@@ -74,7 +74,7 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
                 get { throw new NotImplementedException(); }
             }
 
-            public List<GroupInfo> GetGroupsByName(UUI requestingAgent, string groupName, int limit)
+            public List<DirGroupInfo> GetGroupsByName(UUI requestingAgent, string query)
             {
                 throw new NotImplementedException();
             }

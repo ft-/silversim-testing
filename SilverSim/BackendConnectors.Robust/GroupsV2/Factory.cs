@@ -46,7 +46,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 m_Log.FatalFormat("Missing 'URI' in section {0}", ownSection.Name);
                 throw new ConfigurationLoader.ConfigurationError();
             }
-            return new RobustGroupsConnector(ownSection.GetString("URI"));
+            return new RobustGroupsConnector(ownSection.GetString("URI"), ownSection.GetString("HomeURI", ""));
         }
     }
 }

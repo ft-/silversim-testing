@@ -23,6 +23,8 @@ exception statement from your version.
 
 */
 
+using SilverSim.BackendConnectors.Robust.Common;
+using SilverSim.Main.Common.HttpClient;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
@@ -57,7 +59,16 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                     post["RequestingAgentID"] = (string)requestingAgent.ID;
                     post["OP"] = "GROUP";
                     post["METHOD"] = "SETACTIVE";
-                    BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
+
+                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                    if (!m.ContainsKey("RESULT"))
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    if (m["RESULT"].ToString() == "NULL")
+                    {
+                        throw new KeyNotFoundException();
+                    }
                 }
             }
         }

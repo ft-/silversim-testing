@@ -23,6 +23,8 @@ exception statement from your version.
 
 */
 
+using SilverSim.BackendConnectors.Robust.Common;
+using SilverSim.Main.Common.HttpClient;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System;
@@ -46,37 +48,77 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
 
             public GroupInvite this[UUI requestingAgent, UUID groupInviteID]
             {
-                get { throw new NotImplementedException(); }
+                get 
+                { 
+                    Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["InviteID"] = (string)groupInviteID;
+                    post["RequestingAgentID"] = (string)requestingAgent.ID;
+                    post["OP"] = "GET";
+                    post["METHOD"] = "INVITE";
+
+                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                    if (!m.ContainsKey("RESULT"))
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    if (m["RESULT"].ToString() == "NULL")
+                    {
+                        throw new KeyNotFoundException();
+                    }
+
+                    Map resultMap = m["RESULT"] as Map;
+                    GroupInvite gi = new GroupInvite();
+                    gi.ID = resultMap["InviteID"].AsUUID;
+                    gi.Group.ID = resultMap["GroupID"].AsUUID;
+                    gi.RoleID = resultMap["RoleID"].AsUUID;
+                    gi.Principal.ID = resultMap["AgentID"].AsUUID;
+
+                    return gi;
+                }
             }
 
             public List<GroupInvite> this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
             {
-                get { throw new NotImplementedException(); }
+                get 
+                {
+                    return new List<GroupInvite>();
+                }
             }
 
             public List<GroupInvite> this[UUI requestingAgent, UUI principal]
             {
-                get { throw new NotImplementedException(); }
+                get
+                {
+                    return new List<GroupInvite>();
+                }
             }
 
             public List<GroupInvite> GetByGroup(UUI requestingAgent, UGI group)
             {
-                throw new NotImplementedException();
+                return new List<GroupInvite>();
             }
 
             public void Add(UUI requestingAgent, GroupInvite invite)
             {
-                throw new NotImplementedException();
-            }
-
-            public void Update(UUI requestingAgent, GroupInvite invite)
-            {
-                throw new NotImplementedException();
+                Dictionary<string, string> post = new Dictionary<string, string>();
+                post["InviteID"] = (string)invite.ID;
+                post["GroupID"] = (string)invite.Group.ID;
+                post["RoleID"] = (string)invite.RoleID;
+                post["AgentID"] = (string)invite.Principal.ID;
+                post["RequestingAgentID"] = (string)requestingAgent.ID;
+                post["OP"] = "ADD";
+                post["METHOD"] = "INVITE";
+                BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
             }
 
             public void Delete(UUI requestingAgent, UUID inviteID)
             {
-                throw new NotImplementedException();
+                Dictionary<string, string> post = new Dictionary<string, string>();
+                post["METHOD"] = "INVITE";
+                post["OP"] = "DELETE";
+                post["RequestingAgentID"] = (string)requestingAgent.ID;
+                post["InviteID"] = (string)inviteID;
+                BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
             }
         }
     }

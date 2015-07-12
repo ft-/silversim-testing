@@ -50,7 +50,7 @@ namespace SilverSim.LL.Core
                     {
                         if (null != Agent.GroupsService)
                         {
-                            rep.UUIDNameBlock.Add(new UUIDGroupNameReply.Data(Agent.GroupsService.Groups[id]));
+                            rep.UUIDNameBlock.Add(new UUIDGroupNameReply.Data(Agent.GroupsService.Groups[Agent.Owner, id]));
                         }
                     }
                     catch

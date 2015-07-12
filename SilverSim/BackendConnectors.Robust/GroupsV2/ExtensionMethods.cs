@@ -1,0 +1,284 @@
+﻿/*
+
+SilverSim is distributed under the terms of the
+GNU Affero General Public License v3
+with the following clarification and special exception.
+
+Linking this code statically or dynamically with other modules is
+making a combined work based on this code. Thus, the terms and
+conditions of the GNU Affero General Public License cover the whole
+combination.
+
+As a special exception, the copyright holders of this code give you
+permission to link this code with independent modules to produce an
+executable, regardless of the license terms of these independent
+modules, and to copy and distribute the resulting executable under
+terms of your choice, provided that you also meet, for each linked
+independent module, the terms and conditions of the license of that
+module. An independent module is a module which is not derived from
+or based on this code. If you modify this code, you may extend
+this exception to your version of the code, but you are not
+obligated to do so. If you do not wish to do so, delete this
+exception statement from your version.
+
+*/
+
+using SilverSim.Types;
+using SilverSim.Types.Groups;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+namespace SilverSim.BackendConnectors.Robust.GroupsV2
+{
+    public static class ExtensionMethods
+    {
+        #region Dir Group
+        public static DirGroupInfo ToDirGroupInfo(this IValue iv)
+        {
+            Map m = (Map)iv;
+            DirGroupInfo group = new DirGroupInfo();
+            group.ID.ID = m["GroupID"].AsUUID;
+            group.ID.GroupName = m["Name"].ToString();
+            group.MemberCount = m["NMembers"].AsInt;
+            group.SearchOrder = (float)(double)m["SearchOrder"].AsReal;
+
+            return group;
+        }
+        #endregion
+
+        #region Group
+        public static GroupInfo ToGroup(this IValue iv, string serviceURI)
+        {
+            Map m = (Map)iv;
+            GroupInfo group = new GroupInfo();
+            if(m.ContainsKey("AllowPublish"))
+            {
+                group.IsAllowPublish = bool.Parse(m["AllowPublish"].ToString());
+            }
+
+            if(m.ContainsKey("Charter"))
+            {
+                group.Charter = m["Charter"].ToString();
+            }
+
+            if(m.ContainsKey("FounderUUI"))
+            {
+                group.Founder = new UUI(m["FounderUUI"].ToString());
+            }
+            else if(m.ContainsKey("FounderID"))
+            {
+                group.Founder.ID = m["FounderID"].AsUUID;
+            }
+
+            if(m.ContainsKey("GroupID"))
+            {
+                group.ID.ID = m["GroupID"].AsUUID;
+            }
+
+            if(m.ContainsKey("GroupName"))
+            {
+                group.ID.GroupName = m["GroupName"].ToString();
+            }
+
+            if(m.ContainsKey("InsigniaID"))
+            {
+                group.InsigniaID = m["InsigniaID"].AsUUID;
+            }
+
+            if(m.ContainsKey("MaturePublish"))
+            {
+                group.IsMaturePublish = bool.Parse(m["MaturePublish"].ToString());
+            }
+
+            if(m.ContainsKey("MembershipFee"))
+            {
+                group.MembershipFee = m["MembershipFee"].AsInt;
+            }
+
+            if(m.ContainsKey("OpenEnrollment"))
+            {
+                group.IsOpenEnrollment = bool.Parse(m["OpenEnrollment"].ToString());
+            }
+
+            if(m.ContainsKey("OwnerRoleID"))
+            {
+                group.OwnerRoleID = m["OwnerRoleID"].AsUUID;
+            }
+
+            if(m.ContainsKey("ServiceLocation"))
+            {
+                group.ID.HomeURI = new Uri(m["ServiceLocation"].ToString());
+            }
+            if(group.ID.HomeURI == null)
+            {
+                group.ID.HomeURI = new Uri(serviceURI);
+            }
+
+            if(m.ContainsKey("ShownInList"))
+            {
+                group.IsShownInList = bool.Parse(m["ShownInList"].ToString());
+            }
+
+            if(m.ContainsKey("MemberCount"))
+            {
+                group.MemberCount = m["MemberCount"].AsInt;
+            }
+
+            if(m.ContainsKey("RoleCount"))
+            {
+                group.RoleCount = m["RoleCount"].AsInt;
+            }
+
+            return group;
+        }
+
+        public static Dictionary<string, string> ToPost(this GroupInfo group)
+        {
+            Dictionary<string, string> post = new Dictionary<string, string>();
+
+            post["AllowPublish"] = group.IsAllowPublish.ToString();
+            post["Charter"] = group.Charter;
+            post["FounderID"] = (string)group.Founder.ID;
+            post["FounderUUI"] = group.Founder.ToString();
+            post["GroupID"] = (string)group.ID.ID;
+            post["GroupName"] = group.ID.GroupName;
+            post["InsigniaID"] = (string)group.InsigniaID;
+            post["MaturePublish"] = group.IsMaturePublish.ToString();
+            post["MembershipFee"] = group.MembershipFee.ToString();
+            post["OpenEnrollment"] = group.IsOpenEnrollment.ToString();
+            post["OwnerRoleID"] = group.OwnerRoleID.ToString();
+            post["ServiceLocation"] = group.ID.HomeURI != null ? group.ID.HomeURI.ToString() : "";
+            post["ShownInList"] = group.IsShownInList.ToString();
+            post["MemberCount"] = group.MemberCount.ToString();
+            post["RoleCount"] = group.RoleCount.ToString();
+
+            return post;
+        }
+        #endregion
+
+        #region Group Member
+        public static GroupMember ToGroupMemberFromMembership(this IValue iv)
+        {
+            Map m = (Map)iv;
+            GroupMember member = new GroupMember();
+
+            if(m.ContainsKey("AccessToken"))
+            {
+                member.AccessToken = m["AccessToken"].ToString();
+            }
+
+            if(m.ContainsKey("GroupID"))
+            {
+                member.Group.ID = m["GroupID"].AsUUID;
+            }
+
+            if(m.ContainsKey("GroupName"))
+            {
+                member.Group.GroupName = m["GroupName"].ToString();
+            }
+
+            if(m.ContainsKey("ActiveRole"))
+            {
+                member.SelectedRoleID = m["ActiveRole"].AsUUID;
+            }
+
+            if(m.ContainsKey("Contribution"))
+            {
+                member.Contribution = m["Contribution"].AsInt;
+            }
+            if(m.ContainsKey("ListInProfile"))
+            {
+                member.IsListInProfile = bool.Parse(m["ListInProfile"].ToString());
+            }
+            if(m.ContainsKey("AcceptNotices"))
+            {
+                member.IsAcceptNotices = bool.Parse(m["AcceptNotices"].ToString());
+            }
+
+            return member;
+        }
+
+        public static GroupMember ToGroupMember(this IValue iv, UGI group)
+        {
+            Map m = (Map)iv;
+            GroupMember member = new GroupMember();
+            member.Group = group;
+
+            if(m.ContainsKey("AcceptNotices"))
+            {
+                member.IsAcceptNotices = bool.Parse(m["AcceptNotices"].ToString());
+            }
+
+            if(m.ContainsKey("AccessToken"))
+            {
+                member.AccessToken = m["AccessToken"].ToString();
+            }
+
+            if(m.ContainsKey("AgentID"))
+            {
+                member.Principal = new UUI(m["AgentID"].ToString());
+            }
+
+            if(m.ContainsKey("Contribution"))
+            {
+                member.Contribution = m["Contribution"].AsInt;
+            }
+
+            if(m.ContainsKey("ListInProfile"))
+            {
+                member.IsListInProfile = bool.Parse(m["ListInProfile"].ToString());
+            }
+
+            return member;
+        }
+        #endregion
+
+        #region GroupRole
+        public static GroupRole ToGroupRole(this IValue iv)
+        {
+            Map m = (Map)iv;
+            GroupRole role = new GroupRole();
+            if(m.ContainsKey("Description"))
+            {
+                role.Description = m["Description"].ToString();
+            }
+            if(m.ContainsKey("Members"))
+            {
+                role.Members = m["Members"].AsInt;
+            }
+            if(m.ContainsKey("Name"))
+            {
+                role.Name = m["Name"].ToString();
+            }
+
+            if(m.ContainsKey("Powers"))
+            {
+                role.Powers = (GroupPowers)m["Powers"].AsULong;
+            }
+            
+            if(m.ContainsKey("Title"))
+            {
+                role.Title = m["Title"].ToString();
+            }
+
+            role.ID = m["RoleID"].AsUUID;
+
+            return role;
+        }
+
+        public static Dictionary<string, string> ToPost(this GroupRole role)
+        {
+            Dictionary<string, string> m = new Dictionary<string, string>();
+            m.Add("GroupID", (string)role.Group.ID);
+            m.Add("RoleID", (string)role.ID);
+            m.Add("Name", role.Name);
+            m.Add("Description", role.Description);
+            m.Add("Title", role.Title);
+            m.Add("Powers", ((ulong)role.Powers).ToString());
+            return m;
+        }
+        #endregion
+    }
+}
