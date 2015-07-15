@@ -515,6 +515,33 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     return;
                 }
 
+                try
+                {
+                    IAgent sceneAgent = scene.Agents[agentPost.Account.Principal.ID];
+                    if(sceneAgent.Owner.EqualsGrid(agentPost.Account.Principal))
+                    {
+                        if(agentPost.Circuit.IsChild && !sceneAgent.IsInScene(scene))
+                        {
+                            /* already got an agent here */
+                        }
+                        else if(!agentPost.Circuit.IsChild && !sceneAgent.IsInScene(scene))
+                        {
+                            /* child becomes root */
+                        }
+                    }
+                    else if(sceneAgent.Owner.ID == agentPost.Account.Principal.ID)
+                    {
+                        /* we got an agent already and no grid match? */
+                        DoAgentResponse(req, "Failed to create agent due to duplicate agent id", false);
+                        m_Log.WarnFormat("Failed to create agent due to duplicate agent id. {0} != {1}", sceneAgent.Owner.ToString(), agentPost.Account.Principal.ToString());
+                        return;
+                    }
+                }
+                catch
+                {
+
+                }
+
                 GroupsServiceInterface groupsService = null;
                 AssetServiceInterface assetService;
                 InventoryServiceInterface inventoryService;
@@ -604,8 +631,10 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     DoAgentResponse(req, e.Message, false);
                     return;
                 }
-                if (null != gridUserService)
+                if (null != gridUserService && !agentPost.Circuit.IsChild)
                 {
+                    /* make agent a root agent */
+                    agent.SceneID = scene.ID;
                     try
                     {
                         gridUserService.SetPosition(agent.Owner, scene.ID, agent.GlobalPosition, agent.LookAt);
@@ -629,7 +658,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 {
                     m_Log.Warn("Could not contact PresenceService", e);
                 }
-                m_Log.InfoFormat("Agent post request {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Caps {6} Circuit {7}",
+                m_Log.InfoFormat("Agent post request {0} {1} (Grid {2}, UUID {3}) TeleportFlags ({4}) Client IP {5} Caps {6} Circuit {7} Type {8}",
                     agentPost.Account.Principal.FirstName,
                     agentPost.Account.Principal.LastName,
                     agentPost.Account.Principal.HomeURI,
@@ -637,7 +666,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     agentPost.Destination.TeleportFlags.ToString(),
                     agentPost.Client.ClientIP,
                     agentPost.Circuit.CapsPath,
-                    agentPost.Circuit.CircuitCode);
+                    agentPost.Circuit.CircuitCode,
+                    agentPost.Circuit.IsChild ? "Child" : "Root");
                 DoAgentResponse(req, "authorized", true);
             }
             else if(req.Method == "PUT")
