@@ -39,6 +39,7 @@ using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Authorization;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
@@ -79,6 +80,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
         private Dictionary<string, IAssetServicePlugin> m_AssetServicePlugins = new Dictionary<string,IAssetServicePlugin>();
         private Dictionary<string, IInventoryServicePlugin> m_InventoryServicePlugins = new Dictionary<string,IInventoryServicePlugin>();
         private List<IProtocolExtender> m_PacketHandlerPlugins = new List<IProtocolExtender>();
+        private List<AuthorizationServiceInterface> m_AuthorizationServices;
 
         private class GridParameterMap : ICloneable
         {
@@ -165,6 +167,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
         public virtual void Startup(ConfigurationLoader loader)
         {
             m_Log.Info("Initializing agent post handler for " + m_AgentBaseURL);
+            m_AuthorizationServices = loader.GetServicesByValue<AuthorizationServiceInterface>();
             m_ServerParams = loader.GetServerParamStorage();
             m_HttpServer = loader.HttpServer;
             m_HttpServer.StartsWithUriHandlers.Add(m_AgentBaseURL, AgentPostHandler);
@@ -481,7 +484,36 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     return;
                 }
 
-#warning TODO: Implement access checks here. We have established trust of home grid by verifying its agent. At least agent and grid belong together.
+                /* We have established trust of home grid by verifying its agent. 
+                 * At least agent and grid belong together.
+                 * 
+                 * Now, we can validate the access of the agent.
+                 */
+                AuthorizationServiceInterface.AuthorizationData ad = new AuthorizationServiceInterface.AuthorizationData();
+                ad.ClientInfo = agentPost.Client;
+                ad.SessionInfo = agentPost.Session;
+                ad.AccountInfo = agentPost.Account;
+                ad.DestinationInfo = agentPost.Destination;
+                ad.AppearanceInfo = agentPost.Appearance;
+
+                try
+                {
+                    foreach(AuthorizationServiceInterface authService in m_AuthorizationServices)
+                    {
+                        authService.Authorize(ad);
+                    }
+                }
+                catch(AuthorizationServiceInterface.NotAuthorizedException e)
+                {
+                    DoAgentResponse(req, e.Message, false);
+                    return;
+                }
+                catch(Exception e)
+                {
+                    DoAgentResponse(req, "Failed to verify client's authorization at destination", false);
+                    m_Log.Warn("Failed to verify agent's authorization at destination.", e);
+                    return;
+                }
 
                 GroupsServiceInterface groupsService = null;
                 AssetServiceInterface assetService;
@@ -1057,7 +1089,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 {
                     myVersion = jsonreq["my_version"].ToString();
                 }
-                string agent_home_uri;
+                string agent_home_uri = null;
                 if(jsonreq.ContainsKey("agent_home_uri"))
                 {
                     agent_home_uri = jsonreq["agent_home_uri"].ToString();
@@ -1108,7 +1140,40 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     }
                 }
 
-#warning TODO: Add access checks on an informal basis / The trustworthy check can only be done on POST /agent
+                UUI agentUUI = new UUI();
+                agentUUI.ID = agentID;
+                if (!string.IsNullOrEmpty(agent_home_uri))
+                {
+                    agentUUI.HomeURI = new Uri(agent_home_uri);
+                }
+
+                if (success)
+                {
+                    /* add informational checks only
+                     * These provide messages to the incoming agent.
+                     * But, the agent info here cannot be validated and therefore
+                     * not be trusted.
+                     */
+                    try
+                    {
+                        foreach(AuthorizationServiceInterface authService in m_AuthorizationServices)
+                        {
+                            authService.QueryAccess(agentUUI, regionID);
+                        }
+                    }
+                    catch (AuthorizationServiceInterface.NotAuthorizedException e)
+                    {
+                        success = false;
+                        reason = e.Message;
+                    }
+                    catch(Exception e)
+                    {
+                        /* No one should be able to make any use out of a programming error */
+                        success = false;
+                        reason = "Internal Error";
+                        m_Log.Error("Internal Error", e);
+                    }
+                }
 
                 response.Add("success", success);
                 _result.Add("success", success);
