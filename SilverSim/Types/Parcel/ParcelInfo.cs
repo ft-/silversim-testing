@@ -176,6 +176,7 @@ namespace SilverSim.Types.Parcel
             int m_BitmapWidth;
             int m_BitmapHeight;
             ReaderWriterLock m_LandBitmapRwLock;
+            ParcelInfo m_ParcelInfo;
 
             public int BitmapWidth
             {
@@ -193,12 +194,13 @@ namespace SilverSim.Types.Parcel
                 }
             }
 
-            public ParcelDataLandBitmap(byte[,] landBitmap, int bitmapWidth, int bitmapHeight, ReaderWriterLock landBitmapRwLock)
+            public ParcelDataLandBitmap(byte[,] landBitmap, int bitmapWidth, int bitmapHeight, ReaderWriterLock landBitmapRwLock, ParcelInfo parcelInfo)
             {
                 m_LandBitmap = landBitmap;
                 m_BitmapWidth = bitmapWidth;
                 m_BitmapHeight = bitmapHeight;
                 m_LandBitmapRwLock = landBitmapRwLock;
+                m_ParcelInfo = parcelInfo;
             }
 
             public byte[] Data
@@ -226,6 +228,7 @@ namespace SilverSim.Types.Parcel
                         if (value.Length == m_LandBitmap.Length)
                         {
                             Buffer.BlockCopy(value, 0, m_LandBitmap, 0, m_LandBitmap.Length);
+                            DetermineAABB();
                         }
                         else
                         {
@@ -280,6 +283,7 @@ namespace SilverSim.Types.Parcel
                                 b &= (byte)(~(1 << (x % 8)));
                             }
                             m_LandBitmap[y, x / m_BitmapWidth] = b;
+                            DetermineAABB();
                         }
                         finally
                         {
@@ -292,6 +296,78 @@ namespace SilverSim.Types.Parcel
                     }
                 }
             }
+
+            static const int[] ParcelAreaFromByte = new int[256] 
+            {
+                /*        x0   x1   x2   x3   x4   x5   x6   x7   x8   x9   xA   xB   xC   xD   xE   xF */
+                /* 0x */   0,   1,   1,   2,   1,   2,   2,   3,   1,   2,   2,   3,   2,   3,   3,   4,
+                /* 1x */   1,   2,   2,   3,   2,   3,   3,   4,   2,   3,   3,   4,   3,   4,   4,   5,
+                /* 2x */   1,   2,   2,   3,   2,   3,   3,   4,   2,   3,   3,   4,   3,   4,   4,   5,
+                /* 3x */   2,   3,   3,   4,   3,   4,   4,   5,   3,   4,   4,   5,   4,   5,   5,   6,
+                /* 4x */   1,   2,   2,   3,   2,   3,   3,   4,   2,   3,   3,   4,   3,   4,   4,   5,
+                /* 5x */   2,   3,   3,   4,   3,   4,   4,   5,   3,   4,   4,   5,   4,   5,   5,   6,
+                /* 6x */   2,   3,   3,   4,   3,   4,   4,   5,   3,   4,   4,   5,   4,   5,   5,   6,
+                /* 7x */   3,   4,   4,   5,   4,   5,   5,   6,   4,   5,   5,   6,   5,   6,   6,   7,
+                /* 8x */   1,   2,   2,   3,   2,   3,   3,   4,   2,   3,   3,   4,   3,   4,   4,   5,
+                /* 9x */   2,   3,   3,   4,   3,   4,   4,   5,   3,   4,   4,   5,   4,   5,   5,   6,
+                /* Ax */   2,   3,   3,   4,   3,   4,   4,   5,   3,   4,   4,   5,   4,   5,   5,   6,
+                /* Bx */   3,   4,   4,   5,   4,   5,   5,   6,   4,   5,   5,   6,   5,   6,   6,   7,
+                /* Cx */   2,   3,   3,   4,   3,   4,   4,   5,   3,   4,   4,   5,   4,   5,   5,   6,
+                /* Dx */   3,   4,   4,   5,   4,   5,   5,   6,   4,   5,   5,   6,   5,   6,   6,   7,
+                /* Ex */   3,   4,   4,   5,   4,   5,   5,   6,   4,   5,   5,   6,   5,   6,   6,   7,
+                /* Fx */   4,   5,   5,   6,   5,   6,   6,   7,   5,   6,   6,   7,   6,   7,   7,   8
+            };
+
+            void DetermineAABB()
+            {
+                int aabbminy = m_BitmapHeight - 1;
+                int aabbminx = m_BitmapWidth * 8 - 1;
+                int aabbmaxy = 0;
+                int aabbmaxx = 0;
+                int parcelarea = 0;
+
+                for (int y = 0; y < m_BitmapHeight; ++y)
+                {
+                    for (int x = 0; x < m_BitmapWidth / 8; ++x)
+                    {
+                        if (m_LandBitmap[y, x] != 0)
+                        {
+                            /* we calculate 8 bits at a time */
+                            parcelarea += ParcelAreaFromByte[m_LandBitmap[y, x]];
+
+                            /* AABB only checks a block of 8 X-pixels which has at least one bit set */
+                            if (aabbmaxy < y)
+                            {
+                                aabbmaxy = y;
+                            }
+                            if (aabbminy > y)
+                            {
+                                aabbminy = y;
+                            }
+
+                            int xx = x * 8;
+                            for (int ofx = 0; ofx < 8; ++ofx, ++xx)
+                            {
+                                if ((m_LandBitmap[y, x] & (1 << ofx)) != 0)
+                                {
+                                    if (aabbminx > xx)
+                                    {
+                                        aabbminx = xx;
+                                    }
+                                    if (aabbmaxx < xx)
+                                    {
+                                        aabbmaxx = xx;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+
+                m_ParcelInfo.AABBMin = new Vector3(aabbminx * 4, aabbminy * 4, 0);
+                m_ParcelInfo.AABBMax = new Vector3(aabbmaxx * 4 + 3, aabbmaxy * 4 + 3, 0);
+                m_ParcelInfo.Area = parcelarea;
+            }
         }
 
         public ParcelDataLandBitmap LandBitmap { get; private set; }
@@ -301,7 +377,7 @@ namespace SilverSim.Types.Parcel
             m_LandBitmap = new byte[bitmapHeight, bitmapWidth / 8];
             m_BitmapWidth = bitmapWidth;
             m_BitmapHeight = bitmapHeight;
-            LandBitmap = new ParcelDataLandBitmap(m_LandBitmap, m_BitmapWidth, m_BitmapHeight, m_LandBitmapRwLock);
+            LandBitmap = new ParcelDataLandBitmap(m_LandBitmap, m_BitmapWidth, m_BitmapHeight, m_LandBitmapRwLock, this);
         }
     }
 }
