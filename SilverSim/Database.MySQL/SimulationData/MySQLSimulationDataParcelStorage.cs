@@ -100,7 +100,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             pi.PassHours = (double)dbReader["PassHours"];
                             pi.ActualArea = (int)(ulong)dbReader["ActualArea"];
                             pi.BillableArea = (int)(ulong)dbReader["BillAbleArea"];
-                            pi.LandBitmap.Data = (byte[])dbReader["Bitmap"];
+                            pi.LandBitmap.DataNoAABBUpdate = (byte[])dbReader["Bitmap"];
                             pi.Status = (ParcelStatus)(int)dbReader["Status"];
                             return pi;
                         }

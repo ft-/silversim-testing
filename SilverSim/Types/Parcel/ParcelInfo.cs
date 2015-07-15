@@ -242,6 +242,29 @@ namespace SilverSim.Types.Parcel
                 }
             }
 
+            public byte[] DataNoAABBUpdate
+            {
+                set
+                {
+                    try
+                    {
+                        m_LandBitmapRwLock.AcquireWriterLock(-1);
+                        if (value.Length == m_LandBitmap.Length)
+                        {
+                            Buffer.BlockCopy(value, 0, m_LandBitmap, 0, m_LandBitmap.Length);
+                        }
+                        else
+                        {
+                            throw new ArgumentException("Parcel Bitmap size does not match");
+                        }
+                    }
+                    finally
+                    {
+                        m_LandBitmapRwLock.ReleaseWriterLock();
+                    }
+                }
+            }
+
             public void SetAllBits()
             {
                 for(int x = 0; x < m_BitmapWidth / 8; ++x)
