@@ -47,7 +47,6 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
                     m.Add("GroupID", group.ID);
                     m.Add("AgentID", principal.ID);
                     IValue iv = FlotsamXmlRpcGetCall(requestingAgent, "groups.getAgentRoles", m);
-                    List<GroupRolemember> rolemems = new List<GroupRolemember>();
                     if (iv is AnArray)
                     {
                         foreach (IValue v in ((AnArray)iv))
