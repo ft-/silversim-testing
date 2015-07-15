@@ -55,6 +55,7 @@ using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -1006,8 +1007,14 @@ namespace SilverSim.Main.Common
                 string output = "Module List:\n----------------------------------------------";
                 foreach(KeyValuePair<string, IPlugin> moduledesc in PluginInstances)
                 {
+                    DescriptionAttribute desc = (DescriptionAttribute)Attribute.GetCustomAttribute(moduledesc.Value.GetType(), typeof(DescriptionAttribute));
+
                     Type[] types = moduledesc.Value.GetType().GetInterfaces();
                     string features = string.Empty;
+                    if(null != desc)
+                    {
+                        features += "\n   Description: " + desc.Description;
+                    }
                     foreach(KeyValuePair<Type, string> kvp in m_FeaturesTable)
                     {
                         if(kvp.Key.IsInterface)

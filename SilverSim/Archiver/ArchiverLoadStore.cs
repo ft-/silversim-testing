@@ -32,12 +32,14 @@ using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace SilverSim.Archiver
 {
+    [Description("IAR/OAR Plugin")]
     class ArchiverLoadStore : IPlugin
     {
         public ArchiverLoadStore()
