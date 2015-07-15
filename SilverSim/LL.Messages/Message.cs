@@ -172,9 +172,12 @@ namespace SilverSim.LL.Messages
         public void OnSendComplete(bool flag)
         {
             var ev = OnSendCompletion;
-            foreach(Action<bool> del in ev.GetInvocationList())
+            if (null != ev)
             {
-                del(flag);
+                foreach (Action<bool> del in ev.GetInvocationList())
+                {
+                    del(flag);
+                }
             }
         }
 
