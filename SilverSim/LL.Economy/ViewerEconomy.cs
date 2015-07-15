@@ -27,10 +27,12 @@ using log4net;
 using Nini.Config;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
+using SilverSim.LL.Messages.Economy;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Economy;
+using SilverSim.Types.Economy;
 using System;
 using System.Collections.Generic;
 using System.Threading;
@@ -43,6 +45,7 @@ namespace SilverSim.LL.Economy
         private static readonly ILog m_Log = LogManager.GetLogger("LL ECONOMY");
 
         [PacketHandler(MessageType.MoneyBalanceRequest)]
+        [PacketHandler(MessageType.EconomyDataRequest)]
         BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
 
         bool m_ShutdownEconomy = false;
@@ -82,6 +85,10 @@ namespace SilverSim.LL.Economy
                         case MessageType.MoneyBalanceRequest:
                             HandleMoneyBalanceRequest(req.Key, req.Value);
                             break;
+
+                        case MessageType.EconomyDataRequest:
+                            HandleEconomyDataRequest(req.Key, req.Value);
+                            break;
                     }
                 }
                 catch(Exception e)
@@ -89,6 +96,48 @@ namespace SilverSim.LL.Economy
                     m_Log.Debug("Exception encountered " + e.Message, e);
                 }
             }
+        }
+
+        void HandleEconomyDataRequest(Circuit circuit, Message m)
+        {
+            EconomyDataRequest mbr = (EconomyDataRequest)m;
+            SceneInterface scene;
+            LLAgent agent;
+            try
+            {
+                scene = circuit.Scene;
+                if (scene == null)
+                {
+                    return;
+                }
+                agent = circuit.Agent;
+            }
+            catch
+            {
+                return;
+            }
+            EconomyInfo ei = scene.EconomyData;
+            EconomyData ed = new EconomyData();
+            if (ei != null)
+            {
+                ed.ObjectCapacity = ei.ObjectCapacity;
+                ed.ObjectCount = ei.ObjectCount;
+                ed.PriceEnergyUnit = ei.PriceEnergyUnit;
+                ed.PriceGroupCreate = ei.PriceGroupCreate;
+                ed.PriceObjectClaim = ei.PriceObjectClaim;
+                ed.PriceObjectRent = ei.PriceObjectRent;
+                ed.PriceObjectScaleFactor = ei.PriceObjectScaleFactor;
+                ed.PriceParcelClaim = ei.PriceParcelClaim;
+                ed.PriceParcelClaimFactor = ei.PriceParcelClaimFactor;
+                ed.PriceParcelRent = ei.PriceParcelRent;
+                ed.PricePublicObjectDecay = ei.PricePublicObjectDecay;
+                ed.PricePublicObjectDelete = ei.PricePublicObjectDelete;
+                ed.PriceRentLight = ei.PriceRentLight;
+                ed.PriceUpload = ei.PriceUpload;
+                ed.TeleportMinPrice = ei.TeleportMinPrice;
+                ed.TeleportPriceExponent = ei.TeleportPriceExponent;
+            }
+            agent.SendMessageAlways(ed, scene.ID);
         }
 
         void HandleMoneyBalanceRequest(Circuit circuit, Message m)
@@ -100,7 +149,11 @@ namespace SilverSim.LL.Economy
                 LLAgent agent;
                 try
                 {
-                    scene = SceneManager.Scenes[mbr.CircuitSceneID];
+                    scene = circuit.Scene;
+                    if(scene == null)
+                    {
+                        return;
+                    }
                     agent = circuit.Agent;
                 }
                 catch

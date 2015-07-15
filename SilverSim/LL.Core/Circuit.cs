@@ -1116,33 +1116,5 @@ namespace SilverSim.LL.Core
             m_RegisteredCapabilities.Clear();
             Agent = null;
         }
-
-        [PacketHandler(MessageType.EconomyDataRequest)]
-        void HandleEconomyDataRequest(Message m)
-        {
-            EconomyInfo ei = Scene.EconomyData;
-            EconomyData ed = new EconomyData();
-            if (ei != null)
-            {
-                ed.ObjectCapacity = ei.ObjectCapacity;
-                ed.ObjectCount = ei.ObjectCount;
-                ed.PriceEnergyUnit = ei.PriceEnergyUnit;
-                ed.PriceGroupCreate = ei.PriceGroupCreate;
-                ed.PriceObjectClaim = ei.PriceObjectClaim;
-                ed.PriceObjectRent = ei.PriceObjectRent;
-                ed.PriceObjectScaleFactor = ei.PriceObjectScaleFactor;
-                ed.PriceParcelClaim = ei.PriceParcelClaim;
-                ed.PriceParcelClaimFactor = ei.PriceParcelClaimFactor;
-                ed.PriceParcelRent = ei.PriceParcelRent;
-                ed.PricePublicObjectDecay = ei.PricePublicObjectDecay;
-                ed.PricePublicObjectDelete = ei.PricePublicObjectDelete;
-                ed.PriceRentLight = ei.PriceRentLight;
-                ed.PriceUpload = ei.PriceUpload;
-                ed.TeleportMinPrice = ei.TeleportMinPrice;
-                ed.TeleportPriceExponent = ei.TeleportPriceExponent;
-            }
-            SendMessage(ed);
-        }
-
     }
 }
