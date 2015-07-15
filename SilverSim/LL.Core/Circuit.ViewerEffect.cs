@@ -33,7 +33,7 @@ namespace SilverSim.LL.Core
     public partial class Circuit
     {
         [PacketHandler(MessageType.ViewerEffect)]
-        public void HandleViewerEffect(Message m)
+        void HandleViewerEffect(Message m)
         {
             ViewerEffect ve = (ViewerEffect)m;
             if(ve.AgentID != ve.CircuitAgentID ||
