@@ -66,3 +66,4 @@ namespace SilverSim.ServiceInterfaces.Authorization
         /* throws NotAuthorizedException when not allowed */
         public abstract void QueryAccess(UUI agent, UUID regionID);
     }
+}

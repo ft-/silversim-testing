@@ -344,7 +344,7 @@ namespace SilverSim.Types.Parcel
                 }
             }
 
-            static const int[] ParcelAreaFromByte = new int[256] 
+            static readonly int[] ParcelAreaFromByte = new int[256] 
             {
                 /*        x0   x1   x2   x3   x4   x5   x6   x7   x8   x9   xA   xB   xC   xD   xE   xF */
                 /* 0x */   0,   1,   1,   2,   1,   2,   2,   3,   1,   2,   2,   3,   2,   3,   3,   4,
