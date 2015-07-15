@@ -163,6 +163,21 @@ namespace SilverSim.LL.Messages
 
         public bool ForceZeroFlag = false;
 
+        /* only used rarely for certain things like teleport protocol */
+        /* reliable is triggered when the message is acknowledged by viewer with true */
+        /* unreliable is immediately acknowledged with true */
+        /* reliable not being delivered is acknowledged locally with false */
+        public event Action<bool> OnSendCompletion;
+
+        public void OnSendComplete(bool flag)
+        {
+            var ev = OnSendCompletion;
+            foreach(Action<bool> del in ev.GetInvocationList())
+            {
+                del(flag);
+            }
+        }
+
         #region Overloaded methods
         public virtual string TypeDescription
         {

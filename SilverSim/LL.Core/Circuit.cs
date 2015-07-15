@@ -663,6 +663,17 @@ namespace SilverSim.LL.Core
                         {
                             ackedSomethingElse = true;
                         }
+                        if(null != p_acked.AckMessage)
+                        {
+                            try
+                            {
+                                p_acked.AckMessage.OnSendComplete(true);
+                            }
+                            catch(Exception e)
+                            {
+                                m_Log.WarnFormat("OnSendCompletion: Exception {0} at {1}", e.ToString(), e.StackTrace.ToString());
+                            }
+                        }
                     }
 
                     if(ackedSomethingElse)
@@ -739,6 +750,18 @@ namespace SilverSim.LL.Core
                             else
                             {
                                 ackedSomethingElse = true;
+                            }
+
+                            if (null != p_acked.AckMessage)
+                            {
+                                try
+                                {
+                                    p_acked.AckMessage.OnSendComplete(true);
+                                }
+                                catch (Exception e)
+                                {
+                                    m_Log.WarnFormat("OnSendCompletion: Exception {0} at {1}", e.ToString(), e.StackTrace.ToString());
+                                }
                             }
                         }
 
@@ -1069,6 +1092,12 @@ namespace SilverSim.LL.Core
         [IgnoreMethod]
         public void SendMessage(Message m)
         {
+            if (m.IsReliable && m_CircuitIsClosing)
+            {
+                m.OnSendComplete(false);
+                return;
+            }
+
             try
             {
                 switch(m.Number)
@@ -1103,6 +1132,19 @@ namespace SilverSim.LL.Core
             catch(Exception e)
             {
                 m_Log.ErrorFormat("{0} at {1}", e.ToString(), e.StackTrace.ToString());
+            }
+
+            /* Unreliable message direct acknowledge */
+            if(!m.IsReliable)
+            {
+                try
+                {
+                    m.OnSendComplete(true);
+                }
+                catch(Exception e)
+                {
+                    m_Log.ErrorFormat("OnSendCompletion: {0} at {1}", e.ToString(), e.StackTrace.ToString());
+                }
             }
         }
 

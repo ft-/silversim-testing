@@ -72,8 +72,28 @@ namespace SilverSim.LL.Core
             }
         }
 
+        bool m_CircuitIsClosing = false;
+
         private void TerminateCircuit()
         {
+            m_CircuitIsClosing = true;
+            lock (m_UnackedPacketsHash)
+            {
+                foreach (UDPPacket unacked in m_UnackedPacketsHash.Values)
+                {
+                    if (unacked.AckMessage != null)
+                    {
+                        try
+                        {
+                            unacked.AckMessage.OnSendComplete(false);
+                        }
+                        catch
+                        {
+
+                        }
+                    }
+                }
+            }
             if (Agent.IsInScene(Scene))
             {
                 try
@@ -263,7 +283,14 @@ namespace SilverSim.LL.Core
                                 p.IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag;
                                 m.Serialize(p);
                                 p.Flush();
-                                p.IsReliable = m.IsReliable;
+                                if (p.IsReliable = m.IsReliable)
+                                {
+                                    p.AckMessage = m;
+                                }
+                                else
+                                {
+                                    p.AckMessage = null;
+                                }
                                 p.SequenceNumber = NextSequenceNumber;
                                 int savedDataLength = p.DataLength;
                                 if (!p.IsZeroEncoded)

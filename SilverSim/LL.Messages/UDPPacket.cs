@@ -47,6 +47,7 @@ namespace SilverSim.LL.Messages
         public uint ResentCount = 0;
 
         public Message.QueueOutType OutQueue = Message.QueueOutType.Low;
+        public Message AckMessage = null; /* only used by Circuit */
 
         public UInt32 SequenceNumber
         {

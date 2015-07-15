@@ -1143,7 +1143,8 @@ namespace SilverSim.LL.Core
                     Messages.Circuit.AgentMovementComplete amc = new Messages.Circuit.AgentMovementComplete();
                     amc.AgentID = cam.AgentID;
                     amc.ChannelVersion = VersionInfo.SimulatorVersion;
-                    amc.LookAt = new Vector3(1, 1, 0); /* TODO: extract from agent */
+#warning TODO: extract from agent
+                    amc.LookAt = new Vector3(1, 1, 0);
                     amc.Position = GlobalPosition;
                     amc.SessionID = cam.SessionID;
                     amc.GridPosition = circuit.Scene.GridPosition;
