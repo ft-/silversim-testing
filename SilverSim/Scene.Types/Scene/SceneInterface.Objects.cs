@@ -618,17 +618,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        [PacketHandler(MessageType.ObjectDetach)]
-        void HandleObjectDetach(Message m)
-        {
-            SilverSim.LL.Messages.Object.ObjectDetach req = (SilverSim.LL.Messages.Object.ObjectDetach)m;
-            if (req.CircuitSessionID != req.SessionID ||
-                req.CircuitAgentID != req.AgentID)
-            {
-                return;
-            }
-        }
-
         [PacketHandler(MessageType.ObjectDescription)]
         void HandleObjectDescription(Message m)
         {
