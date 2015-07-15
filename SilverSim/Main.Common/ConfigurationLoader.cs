@@ -1009,7 +1009,6 @@ namespace SilverSim.Main.Common
                 {
                     DescriptionAttribute desc = (DescriptionAttribute)Attribute.GetCustomAttribute(moduledesc.Value.GetType(), typeof(DescriptionAttribute));
 
-                    Type[] types = moduledesc.Value.GetType().GetInterfaces();
                     string features = string.Empty;
                     if(null != desc)
                     {
