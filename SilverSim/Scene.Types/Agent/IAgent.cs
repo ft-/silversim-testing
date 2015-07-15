@@ -58,6 +58,12 @@ namespace SilverSim.Scene.Types.Agent
 
         RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials { get; }
 
+        IAgentTeleportServiceInterface ActiveTeleportService
+        {
+            get;
+            set;
+        }
+
         int NextParcelSequenceId
         {
             get;

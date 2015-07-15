@@ -1073,6 +1073,10 @@ namespace SilverSim.LL.Core
             {
                 switch(m.Number)
                 {
+#if HOWTODEAL
+                    case MessageType.DisableSimulator:
+                        break;
+#endif
                     case 0: /* only Event Queue support */
                         if (Attribute.GetCustomAttribute(m.GetType(), typeof(EventQueueGet)) != null)
                         {

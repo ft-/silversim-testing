@@ -87,6 +87,26 @@ namespace SilverSim.LL.Core
             }
         }
 
+        IAgentTeleportServiceInterface m_ActiveTeleportService = null;
+        public IAgentTeleportServiceInterface ActiveTeleportService
+        {
+            get
+            {
+                return m_ActiveTeleportService;
+            }
+            set
+            {
+                lock(this)
+                {
+                    if(m_ActiveTeleportService != null && value != null)
+                    {
+                        throw new InvalidOperationException();
+                    }
+                    m_ActiveTeleportService = value;
+                }
+            }
+        }
+
         #region LLAgent Properties
         public UInt32 LocalID { get; set; }
         public Uri HomeURI { get; private set; }

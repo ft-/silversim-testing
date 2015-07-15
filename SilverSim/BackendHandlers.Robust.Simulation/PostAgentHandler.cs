@@ -32,8 +32,10 @@ using SilverSim.BackendConnectors.Robust.Presence;
 using SilverSim.BackendConnectors.Robust.UserAgent;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages.Agent;
+using SilverSim.LL.Messages.Circuit;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
@@ -66,6 +68,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
     #region Service Implementation
     public class PostAgentHandler : IPlugin, IPluginShutdown
     {
+        /* CAUTION! Never ever make a protocol version configurable */
+        const string PROTOCOL_VERSION = "SIMULATION/0.3";
         protected static readonly ILog m_Log = LogManager.GetLogger("ROBUST AGENT HANDLER");
         private BaseHttpServer m_HttpServer;
         protected ServerParamServiceInterface m_ServerParams;
@@ -476,6 +480,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     DoAgentResponse(req, "Failed to verify client at Home Grid", false);
                     return;
                 }
+
+#warning TODO: Implement access checks here. We have established trust of home grid by verifying its agent. At least agent and grid belong together.
 
                 GroupsServiceInterface groupsService = null;
                 AssetServiceInterface assetService;
@@ -955,11 +961,162 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             }
             else if(req.Method == "DELETE")
             {
-                HttpResponse res = req.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                HttpResponse res;
+                SceneInterface scene;
+                try
+                {
+                    scene = SceneManager.Scenes[regionID];
+                }
+                catch
+                {
+                    req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                    return;
+                }
+
+                IAgent agent;
+                try
+                {
+                    agent = scene.Agents[agentID];
+                }
+                catch
+                {
+                    req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                    return;
+                }
+
+                if(action == "release")
+                {
+                    /* map this to the teleport protocol */
+                    /* it will make the agent become a child */
+                    IAgentTeleportServiceInterface teleportService = agent.ActiveTeleportService;
+                    if(null != teleportService)
+                    {
+                        teleportService.ReleaseAgent(scene.ID);
+                    }
+                    return;
+                }
+
+                if (agent.IsInScene(scene))
+                {
+                    /* we are not killing any root agent here unconditionally */
+                    /* It is one major design issue within OpenSim not checking that nicely. */
+                    IAgentTeleportServiceInterface teleportService = agent.ActiveTeleportService;
+                    if (null != teleportService)
+                    {
+                        /* we give the teleport handler the chance to do everything required */
+                        teleportService.CloseAgentOnRelease(scene.ID);
+                    }
+                    else
+                    {
+                        req.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                        return;
+                    }
+                }
+                else
+                {
+                    /* let the disconnect be handled by Circuit */
+                    agent.SendMessageAlways(new DisableSimulator(), scene.ID);
+                }
+                res = req.BeginResponse(HttpStatusCode.OK, "OK");
                 res.Close();
             }
             else if(req.Method == "QUERYACCESS")
             {
+                IValue json;
+                SceneInterface scene;
+                try
+                {
+                    scene = SceneManager.Scenes[regionID];
+                }
+                catch
+                {
+                    req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                    return;
+                }
+
+                try
+                {
+                    json = JSON.Deserialize(req.Body);
+                }
+                catch (Exception e)
+                {
+                    m_Log.InfoFormat("Deserialization error for QUERYACCESS message {0}\n{1}", req.RawUrl, e.StackTrace.ToString());
+                    req.ErrorResponse(HttpStatusCode.BadRequest, e.Message);
+                    return;
+                }
+
+                if(!(json is Map))
+                {
+                    m_Log.InfoFormat("Deserialization error for QUERYACCESS message {0}", req.RawUrl);
+                    req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                    return;
+                }
+                Map jsonreq = (Map)json;
+                string myVersion = "SIMULATION/0.1";
+                if (jsonreq.ContainsKey("my_version"))
+                {
+                    myVersion = jsonreq["my_version"].ToString();
+                }
+                string agent_home_uri;
+                if(jsonreq.ContainsKey("agent_home_uri"))
+                {
+                    agent_home_uri = jsonreq["agent_home_uri"].ToString();
+                    /* we can only do informal checks here with it.
+                     * The agent_home_uri cannot be validated itself.
+                     */
+                }
+
+                Map response = new Map();
+                Map _result = new Map();
+                bool success = true;
+                string reason = "";
+                string[] myVersionSplit = myVersion.Split(new char[] { '.', '/' });
+                if(myVersionSplit.Length < 3)
+                {
+                    req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                    return;
+                }
+                if(myVersionSplit[0] != "SIMULATION")
+                {
+                    req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                    return;
+                }
+                int versionMajor = int.Parse(myVersionSplit[1]);
+                int versionMinor = int.Parse(myVersionSplit[2]);
+                /* check version and limit it down to what we actually understand
+                 * weird but the truth of OpenSim protocol versioning
+                 */
+                if(versionMajor > 0)
+                {
+                    versionMajor = 0;
+                    versionMinor = 3;
+                }
+                if(0 == versionMajor && versionMinor > 3)
+                {
+                    versionMinor = 3;
+                }
+
+                if(success && 0 == versionMajor && versionMinor < 3)
+                {
+                    /* check region size 
+                     * check both parameters. It seems rectangular vars are not that impossible to have.
+                     */
+                    if(scene.RegionData.Size.X > 256 || scene.RegionData.Size.Y > 256)
+                    {
+                        success = false;
+                        reason = "Destination is a variable-sized region, and source is an old simulator. Consider upgrading.";
+                    }
+                }
+
+#warning TODO: Add access checks on an informal basis / The trustworthy check can only be done on POST /agent
+
+                response.Add("success", success);
+                _result.Add("success", success);
+                _result.Add("reason", reason);
+                _result.Add("Message", reason);
+                /* CAUTION! never ever make version parameters a configuration parameter */
+                _result.Add("version", PROTOCOL_VERSION);
+                response.Add("_Result", _result);
                 HttpResponse res = req.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 res.Close();
             }
