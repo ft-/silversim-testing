@@ -297,6 +297,53 @@ namespace SilverSim.Types.Parcel
                 }
             }
 
+            public bool this[int x, int y, bool runaabb]
+            {
+                get
+                {
+                    if (x < m_BitmapWidth && y < m_BitmapHeight)
+                    {
+                        return 0 != (m_LandBitmap[y, x / m_BitmapWidth] & (1 << (x % 8)));
+                    }
+                    else
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                }
+                set
+                {
+                    if (x < m_BitmapWidth && y < m_BitmapHeight)
+                    {
+                        m_LandBitmapRwLock.AcquireWriterLock(-1);
+                        try
+                        {
+                            byte b = m_LandBitmap[y, x / m_BitmapWidth];
+                            if (value)
+                            {
+                                b |= (byte)(1 << (x % 8));
+                            }
+                            else
+                            {
+                                b &= (byte)(~(1 << (x % 8)));
+                            }
+                            m_LandBitmap[y, x / m_BitmapWidth] = b;
+                            if (runaabb)
+                            {
+                                DetermineAABB();
+                            }
+                        }
+                        finally
+                        {
+                            m_LandBitmapRwLock.ReleaseWriterLock();
+                        }
+                    }
+                    else
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                }
+            }
+
             static const int[] ParcelAreaFromByte = new int[256] 
             {
                 /*        x0   x1   x2   x3   x4   x5   x6   x7   x8   x9   xA   xB   xC   xD   xE   xF */
