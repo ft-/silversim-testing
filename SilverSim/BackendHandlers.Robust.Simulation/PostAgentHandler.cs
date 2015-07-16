@@ -79,6 +79,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
         private string m_DefaultPresenceServerURI = string.Empty;
         private Dictionary<string, IAssetServicePlugin> m_AssetServicePlugins = new Dictionary<string,IAssetServicePlugin>();
         private Dictionary<string, IInventoryServicePlugin> m_InventoryServicePlugins = new Dictionary<string,IInventoryServicePlugin>();
+        private Dictionary<string, IProfileServicePlugin> m_ProfileServicePlugins = new Dictionary<string, IProfileServicePlugin>();
         private List<IProtocolExtender> m_PacketHandlerPlugins = new List<IProtocolExtender>();
         private List<AuthorizationServiceInterface> m_AuthorizationServices;
 
@@ -92,6 +93,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             public string AvatarServerURI = string.Empty;
             public string FriendsServerURI = string.Empty;
             public string GatekeeperURI = string.Empty;
+            public string ProfileServerURI = string.Empty;
             public readonly List<UUID> ValidForSims = new List<UUID>(); /* if empty, all sims are valid */
 
             public GridParameterMap()
@@ -110,6 +112,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 m.PresenceServerURI = PresenceServerURI;
                 m.AvatarServerURI = AvatarServerURI;
                 m.FriendsServerURI = FriendsServerURI;
+                m.ProfileServerURI = ProfileServerURI;
                 m.ValidForSims.AddRange(ValidForSims);
                 return m;
             }
@@ -178,6 +181,10 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             foreach(IInventoryServicePlugin plugin in loader.GetServicesByValue<IInventoryServicePlugin>())
             {
                 m_InventoryServicePlugins.Add(plugin.Name, plugin);
+            }
+            foreach (IProfileServicePlugin plugin in loader.GetServicesByValue<IProfileServicePlugin>())
+            {
+                m_ProfileServicePlugins.Add(plugin.Name, plugin);
             }
 
             m_PacketHandlerPlugins = loader.GetServicesByValue<IProtocolExtender>();
@@ -435,9 +442,10 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 PresenceServiceInterface presenceService = null;
                 GridUserServiceInterface gridUserService = null;
                 FriendsServiceInterface friendsService = null;
+                string profileServiceURI = string.Empty;
 
                 GridParameterMap gridparams = FindGridParameterMap(agentPost.Account.Principal.HomeURI.ToString(), scene);
-                if(gridparams != null)
+                if (gridparams != null)
                 {
                     assetServerURI = gridparams.AssetServerURI;
                     inventoryServerURI = gridparams.InventoryServerURI;
@@ -445,22 +453,39 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     {
                         gatekeeperURI = gridparams.GatekeeperURI;
                     }
-                    if(!string.IsNullOrEmpty(gridparams.GridUserServerURI))
+                    if (!string.IsNullOrEmpty(gridparams.GridUserServerURI))
                     {
                         gridUserService = new RobustGridUserConnector(gridparams.GridUserServerURI);
                     }
-                    if(!string.IsNullOrEmpty(gridparams.PresenceServerURI))
+                    if (!string.IsNullOrEmpty(gridparams.PresenceServerURI))
                     {
                         presenceService = new RobustPresenceConnector(gridparams.PresenceServerURI, agentPost.Account.Principal.HomeURI.ToString());
                     }
                 }
-                else if(string.IsNullOrEmpty(m_DefaultPresenceServerURI))
-                {
-                    presenceService = new RobustHGOnlyPresenceConnector(agentPost.Account.Principal.HomeURI.ToString());
-                }
                 else
                 {
-                    presenceService = new RobustHGPresenceConnector(m_DefaultPresenceServerURI, agentPost.Account.Principal.HomeURI.ToString());
+                    if (string.IsNullOrEmpty(m_DefaultPresenceServerURI))
+                    {
+                        presenceService = new RobustHGOnlyPresenceConnector(agentPost.Account.Principal.HomeURI.ToString());
+                    }
+                    else
+                    {
+                        presenceService = new RobustHGPresenceConnector(m_DefaultPresenceServerURI, agentPost.Account.Principal.HomeURI.ToString());
+                    }
+                }
+
+                if (agentPost.Account.ServiceURLs.ContainsKey("ProfileServerURI"))
+                {
+                    profileServiceURI = agentPost.Account.ServiceURLs["ProfileServerURI"];
+                }
+
+                if (!string.IsNullOrEmpty(profileServiceURI))
+                {
+                    string profileType = HeloRequester(profileServiceURI);
+                    if(m_ProfileServicePlugins.ContainsKey(profileType))
+                    {
+                        profileService = m_ProfileServicePlugins[profileType].Instantiate(profileServiceURI);
+                    }
                 }
 
                 UserAgentServiceInterface userAccountConnector = new RobustUserAgentConnector(agentPost.Account.ServiceURLs["HomeURI"]);
