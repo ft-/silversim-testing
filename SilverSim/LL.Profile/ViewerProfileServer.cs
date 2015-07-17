@@ -325,10 +325,19 @@ namespace SilverSim.LL.Profile
                 userInfo = serviceData.UserAgentService.GetUserInfo(uui);
             }
             catch
+#if DEBUG
+ (Exception e)
+#endif
             {
+#if DEBUG
+                m_Log.Debug("Exception at userinfo request", e);
+#endif
                 userInfo = new UserAgentServiceInterface.UserInfo();
                 userInfo.FirstName = uui.FirstName;
                 userInfo.LastName = uui.LastName;
+                userInfo.UserFlags = 0;
+                userInfo.UserCreated = new Date();
+                userInfo.UserTitle = string.Empty;
             }
 
             try
@@ -336,11 +345,24 @@ namespace SilverSim.LL.Profile
                 props = serviceData.ProfileService.Properties[uui];
             }
             catch
+#if DEBUG
+                (Exception e)
+#endif
             {
+#if DEBUG
+                m_Log.Debug("Exception at properties request", e);
+#endif
                 props = new ProfileProperties();
                 props.ImageID = "5748decc-f629-461c-9a36-a35a221fe21f";
                 props.FirstLifeImageID = "5748decc-f629-461c-9a36-a35a221fe21f";
                 props.User = uui;
+                props.Partner = UUI.Unknown;
+                props.AboutText = string.Empty;
+                props.FirstLifeText = string.Empty;
+                props.Language = string.Empty;
+                props.WantToText = string.Empty;
+                props.SkillsText = string.Empty;
+                props.WebUrl = string.Empty;
             }
 
             AvatarPropertiesReply res = new AvatarPropertiesReply();
