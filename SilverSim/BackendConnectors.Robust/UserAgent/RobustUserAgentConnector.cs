@@ -89,18 +89,40 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
             return friendsOnline;
         }
 
-        public override Dictionary<string, object> GetUserInfo(UUI user)
+        public override UserAgentServiceInterface.UserInfo GetUserInfo(UUI user)
+        {
+            Dictionary<string, string> info = GetUserInfo_Internal(user);
+            UserInfo userInfo = new UserInfo();
+            userInfo.FirstName = info["user_firstname"];
+            userInfo.LastName = info["user_lastname"];
+            if (info.ContainsKey("user_flags"))
+            {
+                userInfo.UserFlags = uint.Parse(info["user_flags"]);
+            }
+            if(info.ContainsKey("user_created"))
+            {
+                userInfo.UserCreated = Date.UnixTimeToDateTime(ulong.Parse(info["user_created"]));
+            }
+            if(info.ContainsKey("user_title"))
+            {
+                userInfo.UserTitle = info["user_title"];
+            }
+
+            return userInfo;
+        }
+
+        Dictionary<string, string> GetUserInfo_Internal(UUI user)
         {
             Map hash = new Map();
             hash.Add("userID", user.ID);
             
             Map res = DoXmlRpcWithHashResponse("get_user_info", hash);
-            Dictionary<string, object> info = new Dictionary<string, object>();
+            Dictionary<string, string> info = new Dictionary<string, string>();
             foreach(string key in hash.Keys)
             {
                 if(hash[key] != null)
                 {
-                    info.Add(key.ToString(), hash[key]);
+                    info.Add(key.ToString(), hash[key].ToString());
                 }
             }
 

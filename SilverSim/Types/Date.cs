@@ -96,6 +96,11 @@ namespace SilverSim.Types
             return m_Value.ToUniversalTime().ToString(format);
         }
 
+        public string ToString(string format, IFormatProvider culture)
+        {
+            return m_Value.ToString(format, culture);
+        }
+
         public static implicit operator DateTime(Date v)
         {
             return v.m_Value;

@@ -33,6 +33,15 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 {
     public abstract class UserAgentServiceInterface
     {
+        public struct UserInfo
+        {
+            public string FirstName;
+            public string LastName;
+            public uint UserFlags;
+            public Date UserCreated;
+            public string UserTitle;
+        }
+
         public UserAgentServiceInterface()
         {
 
@@ -44,7 +53,7 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 
         public abstract List<UUID> NotifyStatus(List<KeyValuePair<UUI, string>> friends, UUI user, bool online);
 
-        public abstract Dictionary<string, object> GetUserInfo(UUI user);
+        public abstract UserInfo GetUserInfo(UUI user);
 
         public abstract Dictionary<string, string> GetServerURLs(UUI user);
 

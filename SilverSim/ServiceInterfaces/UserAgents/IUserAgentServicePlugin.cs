@@ -23,32 +23,12 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
-
-namespace SilverSim.LL.Messages.Profile
+namespace SilverSim.ServiceInterfaces.UserAgents
 {
-    [UDPMessage(MessageType.UserInfoReply)]
-    [Reliable]
-    [Trusted]
-    public class UserInfoReply : Message
+    public interface IUserAgentServicePlugin
     {
-        public UUID AgentID;
-        public bool IMViaEmail;
-        public string DirectoryVisibility;
-        public string EMail = string.Empty;
-
-        public UserInfoReply()
-        {
-
-        }
-
-        public override void Serialize(UDPPacket p)
-        {
-            p.WriteMessageType(Number);
-            p.WriteUUID(AgentID);
-            p.WriteBoolean(IMViaEmail);
-            p.WriteStringLen8(DirectoryVisibility);
-            p.WriteStringLen8(EMail);
-        }
+        UserAgentServiceInterface Instantiate(string url);
+        string Name { get; }
+        bool IsProtocolSupported(string url);
     }
 }

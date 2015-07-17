@@ -83,6 +83,7 @@ namespace SilverSim.LL.Core
         private bool m_TextureDownloadThreadRunning = false;
         private BlockingQueue<Message> m_TextureDownloadQueue = new BlockingQueue<Message>();
         private Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
+        private Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
 
         private Thread m_InventoryThread;
         private bool m_InventoryThreadRunning = false;
@@ -305,6 +306,106 @@ namespace SilverSim.LL.Core
             }
         }
 
+        Action<Message> DeriveActionDelegateFromFieldInfo(FieldInfo fi, Type t, object o, string info)
+        {
+            if (typeof(Queue<Message>).IsAssignableFrom(fi.FieldType))
+            {
+                MethodInfo mi = fi.FieldType.GetMethod("Enqueue", new Type[] { typeof(Message) });
+                if (null == mi)
+                {
+                    m_Log.FatalFormat("Field {0} of {1} has no Enqueue method we can use", fi.Name, t.GetType());
+                }
+                else
+                {
+#if DEBUG
+                    m_Log.InfoFormat("Field {0} of {1} registered for {2}", fi.Name, t.Name, info);
+#endif
+                    return (Action<Message>)Delegate.CreateDelegate(typeof(Action<Message>), fi.GetValue(o), mi);
+
+                }
+            }
+            else if (typeof(Queue<KeyValuePair<Circuit, Message>>).IsAssignableFrom(fi.FieldType))
+            {
+                MethodInfo mi = fi.FieldType.GetMethod("Enqueue", new Type[] { typeof(KeyValuePair<Circuit, Message>) });
+                if (null == mi)
+                {
+                    m_Log.FatalFormat("Field {0} of {1} has no Enqueue method we can use", fi.Name, t.GetType());
+                }
+                else
+                {
+#if DEBUG
+                    m_Log.InfoFormat("Field {0} of {1} registered for {2}", fi.Name, t.Name, info);
+#endif
+                    return new MessageHandlerExtenderKeyValuePairCircuitQueue(this, (Queue<KeyValuePair<Circuit, Message>>)fi.GetValue(o)).Handler;
+
+                }
+            }
+            else
+            {
+                m_Log.FatalFormat("Field {0} of {1} is not derived from Queue<Message> or Queue<KeyValuePair<Circuit, Message>>", fi.Name, t.GetType());
+            }
+
+            throw new Exception();
+        }
+
+        Action<Message> DeriveActionDelegateFromMethodInfo(MethodInfo mi, Type t, object o, string info)
+        {
+            if (mi.ReturnType != typeof(void))
+            {
+                m_Log.FatalFormat("Method {0} return type is not void", mi.Name);
+            }
+            else if (mi.GetParameters().Length == 3)
+            {
+                if (mi.GetParameters()[0].ParameterType != typeof(LLAgent) ||
+                    mi.GetParameters()[1].ParameterType != typeof(Circuit) ||
+                    mi.GetParameters()[2].ParameterType != typeof(Message))
+                {
+                    m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                }
+                else
+                {
+#if DEBUG
+                    m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, info);
+#endif
+                    return new MessageHandlerExtenderLLAgent(Agent, this,
+                        (MessageHandlerExtenderLLAgent.HandlerDelegate)Delegate.CreateDelegate(typeof(MessageHandlerExtenderLLAgent.HandlerDelegate), o, mi)).Handler;
+                }
+            }
+            else if (mi.GetParameters().Length == 2)
+            {
+                if (mi.GetParameters()[0].ParameterType != typeof(IAgent) ||
+                    mi.GetParameters()[1].ParameterType != typeof(Message))
+                {
+                    m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                }
+                else
+                {
+#if DEBUG
+                    m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, info);
+#endif
+                    return new MessageHandlerExtenderIAgent(Agent,
+                        (MessageHandlerExtenderIAgent.HandlerDelegate)Delegate.CreateDelegate(typeof(MessageHandlerExtenderIAgent.HandlerDelegate), o, mi)).Handler;
+                }
+            }
+            else if (mi.GetParameters().Length != 1)
+            {
+                m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
+            }
+            else if (mi.GetParameters()[0].ParameterType != typeof(Message))
+            {
+                m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+            }
+            else
+            {
+#if DEBUG
+                m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, info);
+#endif
+                return (Action<Message>)Delegate.CreateDelegate(typeof(Action<Message>), o, mi);
+            }
+
+            throw new Exception();
+        }
+
         void AddMessageRouting(object o)
         {
             List<Type> types = new List<Type>();
@@ -325,46 +426,42 @@ namespace SilverSim.LL.Core
                     {
                         if (m_MessageRouting.ContainsKey(pa.Number))
                         {
-                            m_Log.FatalFormat("Field {0} of {1} registered duplicate {1}", fi.Name, t.GetType(), pa.Number.ToString());
-                        }
-                        else if (typeof(Queue<Message>).IsAssignableFrom(fi.FieldType))
-                        {
-                            MethodInfo mi = fi.FieldType.GetMethod("Enqueue", new Type[] { typeof(Message) });
-                            if (null == mi)
-                            {
-                                m_Log.FatalFormat("Field {0} of {1} has no Enqueue method we can use", fi.Name, t.GetType());
-                            }
-                            else
-                            {
-#if DEBUG
-                                m_Log.InfoFormat("Field {0} of {1} registered for {2}", fi.Name, t.Name, pa.Number.ToString());
-#endif
-                                m_MessageRouting.Add(pa.Number, (Action<Message>)Delegate.CreateDelegate(typeof(Action<Message>), fi.GetValue(o), mi));
-
-                            }
-                        }
-                        else if (typeof(Queue<KeyValuePair<Circuit, Message>>).IsAssignableFrom(fi.FieldType))
-                        {
-                            MethodInfo mi = fi.FieldType.GetMethod("Enqueue", new Type[] { typeof(KeyValuePair<Circuit, Message>) });
-                            if (null == mi)
-                            {
-                                m_Log.FatalFormat("Field {0} of {1} has no Enqueue method we can use", fi.Name, t.GetType());
-                            }
-                            else
-                            {
-#if DEBUG
-                                m_Log.InfoFormat("Field {0} of {1} registered for {2}", fi.Name, t.Name, pa.Number.ToString());
-#endif
-                                m_MessageRouting.Add(pa.Number, new MessageHandlerExtenderKeyValuePairCircuitQueue(this, (Queue<KeyValuePair<Circuit, Message>>)fi.GetValue(o)).Handler);
-
-                            }
+                            m_Log.FatalFormat("Field {0} of {1} registered duplicate message {1}", fi.Name, t.GetType(), pa.Number.ToString());
                         }
                         else
                         {
-                            m_Log.FatalFormat("Field {0} of {1} is not derived from Queue<Message> or Queue<KeyValuePair<Circuit, Message>>", fi.Name, t.GetType());
+                            try
+                            {
+                                m_MessageRouting.Add(pa.Number, DeriveActionDelegateFromFieldInfo(fi, t, o, "message " + pa.Number.ToString()));
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                    }
+
+                    GenericMessageHandler[] gms = (GenericMessageHandler[])Attribute.GetCustomAttributes(fi, typeof(GenericMessageHandler));
+                    foreach (GenericMessageHandler gm in gms)
+                    {
+                        if (m_GenericMessageRouting.ContainsKey(gm.Method))
+                        {
+                            m_Log.FatalFormat("Field {0} of {1} registered duplicate generic {1}", fi.Name, t.GetType(), gm.Method);
+                        }
+                        else
+                        {
+                            try
+                            {
+                                m_GenericMessageRouting.Add(gm.Method, DeriveActionDelegateFromFieldInfo(fi, t, o, "generic " + gm.Method));
+                            }
+                            catch
+                            {
+
+                            }
                         }
                     }
                 }
+
                 foreach (MethodInfo mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
                 {
                     if (null != Attribute.GetCustomAttribute(mi, typeof(IgnoreMethod)))
@@ -372,67 +469,47 @@ namespace SilverSim.LL.Core
                         continue;
                     }
                     PacketHandler[] pas = (PacketHandler[])Attribute.GetCustomAttributes(mi, typeof(PacketHandler));
+                    GenericMessageHandler[] gms = (GenericMessageHandler[])Attribute.GetCustomAttributes(mi, typeof(GenericMessageHandler));
+
                     foreach (PacketHandler pa in pas)
                     {
                         if (m_MessageRouting.ContainsKey(pa.Number))
                         {
-                            m_Log.FatalFormat("Method {0} registered duplicate {1}", mi.Name, pa.Number.ToString());
-                        }
-                        else if (mi.ReturnType != typeof(void))
-                        {
-                            m_Log.FatalFormat("Method {0} return type is not void", mi.Name);
-                        }
-                        else if(mi.GetParameters().Length == 3)
-                        {
-                            if( mi.GetParameters()[0].ParameterType != typeof(LLAgent) ||
-                                mi.GetParameters()[1].ParameterType != typeof(Circuit) ||
-                                mi.GetParameters()[2].ParameterType != typeof(Message))
-                            {
-                                m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
-                            }
-                            else
-                            {
-#if DEBUG
-                                m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, pa.Number.ToString());
-#endif
-                                m_MessageRouting.Add(pa.Number, new MessageHandlerExtenderLLAgent(Agent, this, 
-                                    (MessageHandlerExtenderLLAgent.HandlerDelegate)Delegate.CreateDelegate(typeof(MessageHandlerExtenderLLAgent.HandlerDelegate), o, mi)).Handler);
-                            }
-                        }
-                        else if(mi.GetParameters().Length == 2)
-                        {
-                            if( mi.GetParameters()[0].ParameterType != typeof(IAgent) ||
-                                mi.GetParameters()[1].ParameterType != typeof(Message))
-                            {
-                                m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
-                            }
-                            else
-                            {
-#if DEBUG
-                                m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, pa.Number.ToString());
-#endif
-                                m_MessageRouting.Add(pa.Number, new MessageHandlerExtenderIAgent(Agent, 
-                                    (MessageHandlerExtenderIAgent.HandlerDelegate)Delegate.CreateDelegate(typeof(MessageHandlerExtenderIAgent.HandlerDelegate), o, mi)).Handler);
-                            }
-                        }
-                        else if (mi.GetParameters().Length != 1)
-                        {
-                            m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
-                        }
-                        else if (mi.GetParameters()[0].ParameterType != typeof(Message))
-                        {
-                            m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
+                            m_Log.FatalFormat("Method {0} registered duplicate message {1}", mi.Name, pa.Number.ToString());
                         }
                         else
                         {
-#if DEBUG
-                            m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, pa.Number.ToString());
-#endif
-                            m_MessageRouting.Add(pa.Number, (Action<Message>)Delegate.CreateDelegate(typeof(Action<Message>), o, mi));
+                            try
+                            {
+                                m_MessageRouting.Add(pa.Number, DeriveActionDelegateFromMethodInfo(mi, t, o, "message " + pa.Number.ToString()));
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                    }
+
+                    foreach (GenericMessageHandler gm in gms)
+                    {
+                        if (m_GenericMessageRouting.ContainsKey(gm.Method))
+                        {
+                            m_Log.FatalFormat("Method {0} registered duplicate generic {1}", mi.Name, gm.Method);
+                        }
+                        else
+                        {
+                            try
+                            {
+                                m_GenericMessageRouting.Add(gm.Method, DeriveActionDelegateFromMethodInfo(mi, t, o, "message " + gm.Method));
+                            }
+                            catch
+                            {
+
+                            }
                         }
                     }
 #if DEBUG
-                    if (pas.Length == 0)
+                    if (pas.Length == 0 && gms.Length == 0)
                     {
                         if (mi.ReturnType != typeof(void))
                         {
@@ -976,12 +1053,24 @@ namespace SilverSim.LL.Core
                         m.CircuitSceneID = new UUID(Scene.ID);
 
                         /* we keep the circuit relatively dumb so that we have no other logic than how to send and receive messages to the viewer.
-                         * It merely collects delegates to other objects as well to call specific functions.
-                         */
+                            * It merely collects delegates to other objects as well to call specific functions.
+                            */
                         Action<Message> mdel;
                         if (m_MessageRouting.TryGetValue(m.Number, out mdel))
                         {
                             mdel(m);
+                        }
+                        else if (m.Number == MessageType.GenericMessage)
+                        {
+                            SilverSim.LL.Messages.Generic.GenericMessage genMsg = (SilverSim.LL.Messages.Generic.GenericMessage)m;
+                            if (m_GenericMessageRouting.TryGetValue(genMsg.Method, out mdel))
+                            {
+                                mdel(m);
+                            }
+                            else
+                            {
+                                m_Log.DebugFormat("Unhandled generic message {0} received", m.Number.ToString());
+                            }
                         }
                         else
                         {

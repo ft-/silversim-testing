@@ -105,6 +105,16 @@ namespace SilverSim.LL.Messages
         }
     }
 
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
+    public class GenericMessageHandler : Attribute
+    {
+        public string Method;
+        public GenericMessageHandler(string method)
+        {
+            Method = method;
+        }
+    }
+
     public abstract class Message
     {
         #region Message Type
