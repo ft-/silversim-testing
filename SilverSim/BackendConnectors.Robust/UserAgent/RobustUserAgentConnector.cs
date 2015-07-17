@@ -93,16 +93,34 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
         {
             Dictionary<string, string> info = GetUserInfo_Internal(user);
             UserInfo userInfo = new UserInfo();
-            userInfo.FirstName = info["user_firstname"];
-            userInfo.LastName = info["user_lastname"];
+            if (info.ContainsKey("user_firstname"))
+            {
+                userInfo.FirstName = info["user_firstname"];
+            }
+            else
+            {
+                userInfo.FirstName = user.FirstName;
+            }
+            
+            if (info.ContainsKey("user_lastname"))
+            {
+                userInfo.LastName = info["user_lastname"];
+            }
+            else
+            {
+                userInfo.LastName = user.LastName;
+            }
+
             if (info.ContainsKey("user_flags"))
             {
                 userInfo.UserFlags = uint.Parse(info["user_flags"]);
             }
+            
             if(info.ContainsKey("user_created"))
             {
                 userInfo.UserCreated = Date.UnixTimeToDateTime(ulong.Parse(info["user_created"]));
             }
+            
             if(info.ContainsKey("user_title"))
             {
                 userInfo.UserTitle = info["user_title"];
@@ -118,11 +136,11 @@ namespace SilverSim.BackendConnectors.Robust.UserAgent
             
             Map res = DoXmlRpcWithHashResponse("get_user_info", hash);
             Dictionary<string, string> info = new Dictionary<string, string>();
-            foreach(string key in hash.Keys)
+            foreach (string key in res.Keys)
             {
-                if(hash[key] != null)
+                if (res[key] != null)
                 {
-                    info.Add(key.ToString(), hash[key].ToString());
+                    info.Add(key.ToString(), res[key].ToString());
                 }
             }
 

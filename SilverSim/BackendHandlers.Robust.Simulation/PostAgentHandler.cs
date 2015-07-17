@@ -473,6 +473,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                         presenceService = new RobustHGPresenceConnector(m_DefaultPresenceServerURI, agentPost.Account.Principal.HomeURI.ToString());
                     }
                 }
+                userAgentService = new RobustUserAgentConnector(agentPost.Account.Principal.HomeURI.ToString());
 
                 if (agentPost.Account.ServiceURLs.ContainsKey("ProfileServerURI"))
                 {
