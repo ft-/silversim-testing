@@ -56,14 +56,6 @@ namespace SilverSim.BackendConnectors.OpenSim
             }
         }
     }
-    [PluginName("SimianProfilePlugin")]
-    public class SimianProfilePluginFactory : IPluginFactory
-    {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new ProfileInventoryPlugin("opensim-simian");
-        }
-    }
 
     [PluginName("RobustProfilePlugin")]
     public class RobustProfilePluginFactory : IPluginFactory
