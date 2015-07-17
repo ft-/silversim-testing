@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using log4net;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System;
@@ -32,6 +33,10 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 {
     public partial class ProfileConnector
     {
+#if DEBUG
+        static readonly ILog m_Log = LogManager.GetLogger("PROFILE AUTO-DETECT HANDLER");
+#endif
+
         public class AutoDetectClassifiedsConnector : IClassifiedsInterface
         {
             OpenSimClassifiedsConnector m_OpenSim;
@@ -55,8 +60,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     return res;
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
-
+#if DEBUG
+                    m_Log.Debug("Classifieds.getClassifieds: OpenSimProfile", e);
+#endif
                 }
                 try
                 {
@@ -65,8 +75,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     return res;
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
-
+#if DEBUG
+                    m_Log.Debug("Classifieds.getClassifieds: CoreProfile", e);
+#endif
                 }
                 throw new NotImplementedException();
             }
@@ -83,8 +98,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return res;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Classifieds.this[UUI, UUID]: OpenSimProfile", e);
+#endif
                     }
                     try
                     {
@@ -93,8 +113,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return res;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Classifieds.this[UUI, UUID]: CoreProfile", e);
+#endif
                     }
                     throw new NotImplementedException();
                 }
@@ -110,8 +135,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     return;
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
-
+#if DEBUG
+                    m_Log.Debug("Classifieds.Update: OpenSimProfile", e);
+#endif
                 }
                 try
                 {
@@ -120,8 +150,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     return;
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
-
+#if DEBUG
+                    m_Log.Debug("Classifieds.Update: CoreProfile", e);
+#endif
                 }
                 throw new NotImplementedException();
             }
@@ -135,8 +170,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     return;
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
-
+#if DEBUG
+                    m_Log.Debug("Classifieds.Delete: OpenSimProfile", e);
+#endif
                 }
                 try
                 {
@@ -145,8 +185,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     return;
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
-
+#if DEBUG
+                    m_Log.Debug("Classifieds.Delete: CoreProfile", e);
+#endif
                 }
                 throw new NotImplementedException();
             }
@@ -175,8 +220,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     return res;
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
-
+#if DEBUG
+                    m_Log.Debug("Picks.getPicks: OpenSimProfile", e);
+#endif
                 }
                 try
                 {
@@ -185,8 +235,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     return res;
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
-
+#if DEBUG
+                    m_Log.Debug("Picks.getPicks: CoreProfile", e);
+#endif
                 }
                 throw new NotImplementedException();
             }
@@ -203,8 +258,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return res;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Picks.this[UUI, UUID]: OpenSimProfile", e);
+#endif
                     }
                     try
                     {
@@ -213,8 +273,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return res;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Picks.this[UUI, UUID]: CoreProfile", e);
+#endif
                     }
                     throw new NotImplementedException();
                 }
@@ -230,8 +295,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     return;
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
-
+#if DEBUG
+                    m_Log.Debug("Picks.Update: OpenSimProfile", e);
+#endif
                 }
                 try
                 {
@@ -240,8 +310,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     return;
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
-
+#if DEBUG
+                    m_Log.Debug("Picks.Update: CoreProfile", e);
+#endif
                 }
                 throw new NotImplementedException();
             }
@@ -255,8 +330,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     return;
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
-
+#if DEBUG
+                    m_Log.Debug("Picks.Delete: OpenSimProfile", e);
+#endif
                 }
                 try
                 {
@@ -265,8 +345,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     return;
                 }
                 catch
+#if DEBUG
+                    (Exception e)
+#endif
                 {
-
+#if DEBUG
+                    m_Log.Debug("Picks.Delete: CoreProfile", e);
+#endif
                 }
                 throw new NotImplementedException();
             }
@@ -297,8 +382,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return res;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Notes.this[UUI, UUI]: OpenSimProfile", e);
+#endif
                     }
                     try
                     {
@@ -307,8 +397,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return res;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Notes.this[UUI, UUI]: CoreProfile", e);
+#endif
                     }
                     throw new NotImplementedException();
                 }
@@ -321,8 +416,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Notes.this[UUI, UUI]: OpenSimProfile", e);
+#endif
                     }
                     try
                     {
@@ -331,8 +431,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Notes.this[UUI, UUI]: CoreProfile", e);
+#endif
                     }
                     throw new NotImplementedException();
                 }
@@ -364,8 +469,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return res;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Preferences.this[UUI, UUI]: OpenSimProfile", e);
+#endif
                     }
                     try
                     {
@@ -374,8 +484,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return res;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Preferences.this[UUI, UUI]: CoreProfile", e);
+#endif
                     }
                     throw new NotImplementedException();
                 }
@@ -388,8 +503,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Preferences.this[UUI, UUI]: OpenSimProfile", e);
+#endif
                     }
                     try
                     {
@@ -398,8 +518,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Preferences.this[UUI, UUI]: CoreProfile", e);
+#endif
                     }
                     throw new NotImplementedException();
                 }
@@ -431,8 +556,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return res;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Properties.this[UUI, UUI]: OpenSimProfile", e);
+#endif
                     }
                     try
                     {
@@ -441,8 +571,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return res;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Properties.this[UUI, UUI]: CoreProfile", e);
+#endif
                     }
                     throw new NotImplementedException();
                 }
@@ -458,8 +593,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Properties.this[UUI, UUI]: OpenSimProfile", e);
+#endif
                     }
                     try
                     {
@@ -468,8 +608,13 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         return;
                     }
                     catch
+#if DEBUG
+                        (Exception e)
+#endif
                     {
-
+#if DEBUG
+                        m_Log.Debug("Properties.this[UUI, UUI]: CoreProfile", e);
+#endif
                     }
                     throw new NotImplementedException();
                 }
