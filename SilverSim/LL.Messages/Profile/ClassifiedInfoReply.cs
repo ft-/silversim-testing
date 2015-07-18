@@ -39,11 +39,11 @@ namespace SilverSim.LL.Messages.Profile
         public UUID CreatorID = UUID.Zero;
         public Date CreationDate = new Date();
         public Date ExpirationDate = new Date();
-        public UInt32 Category = 0;
+        public int Category = 0;
         public string Name = string.Empty;
         public string Description = string.Empty;
         public UUID ParcelID = UUID.Zero;
-        public UInt32 ParentEstate = 0;
+        public int ParentEstate = 0;
         public UUID SnapshotID = UUID.Zero;
         public string SimName = string.Empty;
         public Vector3 PosGlobal = Vector3.Zero;
@@ -64,11 +64,11 @@ namespace SilverSim.LL.Messages.Profile
             p.WriteUUID(CreatorID);
             p.WriteUInt32((uint)CreationDate.DateTimeToUnixTime());
             p.WriteUInt32((uint)ExpirationDate.DateTimeToUnixTime());
-            p.WriteUInt32(Category);
+            p.WriteInt32(Category);
             p.WriteStringLen8(Name);
             p.WriteStringLen16(Description);
             p.WriteUUID(ParcelID);
-            p.WriteUInt32(ParentEstate);
+            p.WriteInt32(ParentEstate);
             p.WriteUUID(SnapshotID);
             p.WriteStringLen8(SimName);
             p.WriteVector3d(PosGlobal);

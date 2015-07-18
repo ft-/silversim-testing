@@ -29,6 +29,7 @@ using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Generic;
 using SilverSim.LL.Messages.Profile;
+using SilverSim.LL.Messages.Search;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
@@ -183,7 +184,7 @@ namespace SilverSim.LL.Profile
                             break;
 
                         case MessageType.DirClassifiedQuery:
-                            HandleDirClassifiedsQuery(req.Key.Agent, scene, m);
+                            HandleDirClassifiedQuery(req.Key.Agent, scene, m);
                             break;
 
                         case MessageType.ClassifiedInfoRequest:
@@ -325,8 +326,15 @@ namespace SilverSim.LL.Profile
         #endregion
 
         #region Classifieds
-        public void HandleDirClassifiedsQuery(LLAgent agent, SceneInterface scene, Message m)
+        public void HandleDirClassifiedQuery(LLAgent agent, SceneInterface scene, Message m)
         {
+            DirClassifiedQuery req = (DirClassifiedQuery)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
         }
 
         public void HandleAvatarClassifiedsRequest(LLAgent agent, SceneInterface scene, GenericMessage m)
@@ -336,24 +344,152 @@ namespace SilverSim.LL.Profile
             {
                 return;
             }
+
+            if (m.ParamList.Count < 1)
+            {
+                return;
+            }
+            string arg = Encoding.UTF8.GetString(m.ParamList[0]);
+            UUID targetuuid;
+            if (!UUID.TryParse(arg, out targetuuid))
+            {
+                return;
+            }
+
+            ProfileServiceData serviceData;
+            UUI uui;
+            try
+            {
+                serviceData = LookupProfileService(scene, targetuuid, out uui);
+            }
+            catch
+            {
+                return;
+            }
+
+            int messageFill = 0;
+            AvatarClassifiedReply reply = null;
+
+            Dictionary<UUID, string> classifieds;
+            try
+            {
+                classifieds = serviceData.ProfileService.Classifieds.getClassifieds(uui);
+            }
+            catch
+            {
+                reply = new AvatarClassifiedReply();
+                reply.AgentID = m.AgentID;
+                reply.TargetID = targetuuid;
+                agent.SendMessageAlways(reply, scene.ID);
+                return;
+            }
+            foreach (KeyValuePair<UUID, string> classified in classifieds)
+            {
+                int entryLen = classified.Value.Length + 18;
+                if ((entryLen + messageFill > 1400 || reply.Data.Count == 255) && reply != null)
+                {
+                    agent.SendMessageAlways(reply, scene.ID);
+                    reply = null;
+                }
+                if (null == reply)
+                {
+                    reply = new AvatarClassifiedReply();
+                    reply.AgentID = m.AgentID;
+                    reply.TargetID = targetuuid;
+                    messageFill = 0;
+                }
+
+                AvatarClassifiedReply.ClassifiedData d = new AvatarClassifiedReply.ClassifiedData();
+                d.ClassifiedID = classified.Key;
+                d.Name = classified.Value;
+                reply.Data.Add(d);
+                messageFill += entryLen;
+            }
+
+            if (null != reply)
+            {
+                agent.SendMessageAlways(reply, scene.ID);
+            }
         }
 
         public void HandleClassifiedInfoRequest(LLAgent agent, SceneInterface scene, Message m)
         {
+            ClassifiedInfoRequest req = (ClassifiedInfoRequest)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
         }
 
         public void HandleClassifiedInfoUpdate(LLAgent agent, SceneInterface scene, Message m)
         {
+            ClassifiedInfoUpdate req = (ClassifiedInfoUpdate)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
 
+            if(null == agent.ProfileService)
+            {
+                return;
+            }
+
+            try
+            {
+                ProfileClassified classified = agent.ProfileService.Classifieds[agent.Owner, req.ClassifiedID];
+                classified.ClassifiedID = req.ClassifiedID;
+                classified.Category = req.Category;
+                classified.Name = req.Name;
+                classified.Description = req.Description;
+                classified.ParcelID = req.ParcelID;
+                classified.ParentEstate = req.ParentEstate;
+                classified.SnapshotID = req.SnapshotID;
+                classified.GlobalPos = req.PosGlobal;
+                classified.Flags = req.ClassifiedFlags;
+                classified.Price = req.PriceForListing;
+                agent.ProfileService.Classifieds.Update(classified);
+            }
+            catch
+            {
+                agent.SendAlertMessage("Error updating classified", scene.ID);
+            }
         }
 
         public void HandleClassifiedDelete(LLAgent agent, SceneInterface scene, Message m)
         {
+            ClassifiedDelete req = (ClassifiedDelete)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
 
+            if(null == agent.ProfileService)
+            {
+                return;
+            }
+
+            try
+            {
+                agent.ProfileService.Classifieds.Delete(req.ClassifiedID);
+            }
+            catch
+            {
+                agent.SendAlertMessage("Error deleting classified", scene.ID);
+            }
         }
 
         public void HandleClassifiedGodDelete(LLAgent agent, SceneInterface scene, Message m)
         {
+            ClassifiedGodDelete req = (ClassifiedGodDelete)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
 
         }
         #endregion
@@ -378,17 +514,6 @@ namespace SilverSim.LL.Profile
                 return;
             }
 
-            ProfileServiceData serviceData;
-            UUI uui;
-            try
-            {
-                serviceData = LookupProfileService(scene, m.AgentID, out uui);
-            }
-            catch
-            {
-                return;
-            }
-
             UUI targetuui;
             try
             {
@@ -405,9 +530,9 @@ namespace SilverSim.LL.Profile
             reply.TargetID = targetuui.ID;
             try
             {
-                reply.Notes = serviceData.ProfileService.Notes[uui, targetuui];
+                reply.Notes = agent.ProfileService.Notes[agent.Owner, targetuui];
             }
-            catch
+            catch /* yes, we are catching a NullReferenceException here too */
             {
                 reply.Notes = string.Empty;
             }
@@ -423,20 +548,14 @@ namespace SilverSim.LL.Profile
                 return;
             }
 
-            ProfileServiceData serviceData;
-            UUI uui;
-            try
-            {
-                serviceData = LookupProfileService(scene, req.AgentID, out uui);
-            }
-            catch
+            if (null == agent.ProfileService)
             {
                 return;
             }
 
             try
             {
-                serviceData.ProfileService.Notes[uui, new UUI(req.TargetID)] = req.Notes;
+                agent.ProfileService.Notes[agent.Owner, new UUI(req.TargetID)] = req.Notes;
             }
             catch
             {
@@ -452,6 +571,72 @@ namespace SilverSim.LL.Profile
                 m.SessionID != m.CircuitSessionID)
             {
                 return;
+            }
+
+            if (m.ParamList.Count < 1)
+            {
+                return;
+            }
+            string arg = Encoding.UTF8.GetString(m.ParamList[0]);
+            UUID targetuuid;
+            if (!UUID.TryParse(arg, out targetuuid))
+            {
+                return;
+            }
+
+            ProfileServiceData serviceData;
+            UUI uui;
+            try
+            {
+                serviceData = LookupProfileService(scene, targetuuid, out uui);
+            }
+            catch
+            {
+                return;
+            }
+
+            int messageFill = 0;
+            AvatarPicksReply reply = null;
+
+            Dictionary<UUID, string> picks;
+            try
+            {
+                picks = serviceData.ProfileService.Picks.getPicks(uui);
+            }
+            catch
+            {
+                reply = new AvatarPicksReply();
+                reply.AgentID = m.AgentID;
+                reply.TargetID = targetuuid;
+                agent.SendMessageAlways(reply, scene.ID);
+                return;
+            }
+            foreach(KeyValuePair<UUID, string> pick in picks)
+            {
+                int entryLen = pick.Value.Length + 18;
+                if((entryLen + messageFill > 1400 || reply.Data.Count == 255) && reply != null)
+                {
+                    agent.SendMessageAlways(reply, scene.ID);
+                    reply = null;
+                }
+                if(null == reply)
+                {
+                    reply = new AvatarPicksReply();
+                    reply.AgentID = m.AgentID;
+                    reply.TargetID = targetuuid;
+                    messageFill = 0;
+                }
+
+                AvatarPicksReply.PickData d = new AvatarPicksReply.PickData();
+                d.PickID = pick.Key;
+                d.Name = pick.Value;
+                reply.Data.Add(d);
+                messageFill += entryLen;
+            }
+
+            if(null != reply)
+            {
+                agent.SendMessageAlways(reply, scene.ID);
             }
         }
 
@@ -473,6 +658,29 @@ namespace SilverSim.LL.Profile
             {
                 return;
             }
+
+            if(agent.ProfileService == null)
+            {
+                return;
+            }
+
+            try
+            {
+                ProfilePick pick = agent.ProfileService.Picks[agent.Owner, req.PickID];
+                pick.TopPick = req.TopPick;
+                pick.ParcelID = req.ParcelID;
+                pick.Name = req.Name;
+                pick.Description = req.Description;
+                pick.SnapshotID = req.SnapshotID;
+                pick.GlobalPosition = req.PosGlobal;
+                pick.SortOrder = req.SortOrder;
+                pick.Enabled = req.IsEnabled;
+                agent.ProfileService.Picks.Update(pick);
+            }
+            catch
+            {
+                agent.SendAlertMessage("Error updating pick", scene.ID);
+            }
         }
 
         public void HandlePickDelete(LLAgent agent, SceneInterface scene, Message m)
@@ -484,6 +692,19 @@ namespace SilverSim.LL.Profile
                 return;
             }
 
+            if (agent.ProfileService == null)
+            {
+                return;
+            }
+
+            try
+            {
+                agent.ProfileService.Picks.Delete(req.PickID);
+            }
+            catch
+            {
+                agent.SendAlertMessage("Error deleting pick", scene.ID);
+            }
         }
 
         public void HandlePickGodDelete(LLAgent agent, SceneInterface scene, Message m)
@@ -508,23 +729,12 @@ namespace SilverSim.LL.Profile
                 return;
             }
 
-            ProfileServiceData serviceData;
-            UUI uui;
-            try
-            {
-                serviceData = LookupProfileService(scene, req.AgentID, out uui);
-            }
-            catch
-            {
-                return;
-            }
-
             ProfilePreferences prefs;
             try
             {
-                prefs = serviceData.ProfileService.Preferences[agent.Owner];
+                prefs = agent.ProfileService.Preferences[agent.Owner];
             }
-            catch
+            catch /* yes, we are catching a NullReferenceException here too */
             {
                 prefs = new ProfilePreferences();
                 prefs.IMviaEmail = false;
@@ -544,6 +754,7 @@ namespace SilverSim.LL.Profile
             }
             reply.EMail = "";
             reply.IMViaEmail = prefs.IMviaEmail;
+            agent.SendMessageAlways(reply, scene.ID);
         }
 
         public void HandleUpdateUserInfo(LLAgent agent, SceneInterface scene, Message m)
@@ -555,25 +766,19 @@ namespace SilverSim.LL.Profile
                 return;
             }
 
-            ProfileServiceData serviceData;
-            UUI uui;
-            try
-            {
-                serviceData = LookupProfileService(scene, req.AgentID, out uui);
-            }
-            catch
+            if(null == agent.ProfileService)
             {
                 return;
             }
 
             ProfilePreferences prefs = new ProfilePreferences();
-            prefs.User = uui;
+            prefs.User = agent.Owner;
             prefs.IMviaEmail = req.IMViaEmail;
             prefs.Visible = req.DirectoryVisibility != "hidden";
             
             try
             {
-                serviceData.ProfileService.Preferences[uui] = prefs;
+                agent.ProfileService.Preferences[agent.Owner] = prefs;
             }
             catch
             {
@@ -687,13 +892,7 @@ namespace SilverSim.LL.Profile
                 return;
             }
 
-            ProfileServiceData serviceData;
-            UUI uui;
-            try
-            {
-                serviceData = LookupProfileService(scene, req.AgentID, out uui);
-            }
-            catch
+            if(agent.ProfileService == null)
             {
                 return;
             }
@@ -702,7 +901,7 @@ namespace SilverSim.LL.Profile
             props.ImageID = UUID.Zero;
             props.FirstLifeImageID = UUID.Zero;
             props.Partner = UUI.Unknown;
-            props.User = uui;
+            props.User = agent.Owner;
             props.SkillsText = "";
             props.WantToText = "";
             props.Language = "";
@@ -716,7 +915,7 @@ namespace SilverSim.LL.Profile
 
             try
             {
-                serviceData.ProfileService.Properties[uui, ProfileServiceInterface.PropertiesUpdateFlags.Properties] = props;
+                agent.ProfileService.Properties[agent.Owner, ProfileServiceInterface.PropertiesUpdateFlags.Properties] = props;
             }
             catch
             {
@@ -733,13 +932,7 @@ namespace SilverSim.LL.Profile
                 return;
             }
 
-            ProfileServiceData serviceData;
-            UUI uui;
-            try
-            {
-                serviceData = LookupProfileService(scene, req.AgentID, out uui);
-            }
-            catch
+            if(agent.ProfileService == null)
             {
                 return;
             }
@@ -750,7 +943,7 @@ namespace SilverSim.LL.Profile
             props.FirstLifeText = "";
             props.AboutText = "";
             props.Partner = UUI.Unknown;
-            props.User = uui;
+            props.User = agent.Owner;
             props.SkillsMask = req.SkillsMask;
             props.SkillsText = req.SkillsText;
             props.WantToMask = req.WantToMask;
@@ -758,7 +951,7 @@ namespace SilverSim.LL.Profile
             props.Language = req.LanguagesText;
             try
             {
-                serviceData.ProfileService.Properties[uui, ProfileServiceInterface.PropertiesUpdateFlags.Interests] = props;
+                agent.ProfileService.Properties[agent.Owner, ProfileServiceInterface.PropertiesUpdateFlags.Interests] = props;
             }
             catch
             {

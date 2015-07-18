@@ -24,50 +24,42 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using System;
+using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Profile
 {
-    [UDPMessage(MessageType.ClassifiedInfoUpdate)]
+    [UDPMessage(MessageType.AvatarPicksReply)]
     [Reliable]
-    [NotTrusted]
-    public class ClassifiedInfoUpdate : Message
+    [Trusted]
+    public class AvatarPicksReply : Message
     {
         public UUID AgentID;
-        public UUID SessionID;
+        public UUID TargetID;
 
-        public UUID ClassifiedID;
-        public int Category;
-        public string Name;
-        public string Description;
-        public UUID ParcelID;
-        public int ParentEstate;
-        public UUID SnapshotID;
-        public Vector3 PosGlobal;
-        public byte ClassifiedFlags;
-        public int PriceForListing;
+        public struct PickData
+        {
+            public UUID PickID;
+            public string Name;
+        }
 
-        public ClassifiedInfoUpdate()
+        public List<PickData> Data = new List<PickData>();
+
+        public AvatarPicksReply()
         {
 
         }
 
-        public static ClassifiedInfoUpdate Decode(UDPPacket p)
+        public override void Serialize(UDPPacket p)
         {
-            ClassifiedInfoUpdate m = new ClassifiedInfoUpdate();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.ClassifiedID = p.ReadUUID();
-            m.Category = p.ReadInt32();
-            m.Name = p.ReadStringLen8();
-            m.Description = p.ReadStringLen16();
-            m.ParcelID = p.ReadUUID();
-            m.ParentEstate = p.ReadInt32();
-            m.SnapshotID = p.ReadUUID();
-            m.PosGlobal = p.ReadVector3d();
-            m.ClassifiedFlags = p.ReadUInt8();
-            m.PriceForListing = p.ReadInt32();
-            return m;
+            p.WriteMessageType(Number);
+            p.WriteUUID(AgentID);
+            p.WriteUUID(TargetID);
+            p.WriteUInt8((byte)Data.Count);
+            foreach (PickData d in Data)
+            {
+                p.WriteUUID(d.PickID);
+                p.WriteStringLen8(d.Name);
+            }
         }
     }
 }
