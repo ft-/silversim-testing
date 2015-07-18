@@ -27,6 +27,7 @@ using log4net;
 using Nini.Config;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
+using SilverSim.LL.Messages.Generic;
 using SilverSim.LL.Messages.Profile;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
@@ -38,6 +39,7 @@ using SilverSim.Types.Profile;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Text;
 using System.Threading;
 using System.Timers;
 using ThreadedClasses;
@@ -148,8 +150,80 @@ namespace SilverSim.LL.Profile
                             HandleAvatarPropertiesRequest(req.Key.Agent, scene, m);
                             break;
 
+                        case MessageType.AvatarPropertiesUpdate:
+                            HandleAvatarPropertiesUpdate(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.AvatarInterestsUpdate:
+                            HandleAvatarInterestsUpdate(req.Key.Agent, scene, m);
+                            break;
+
                         case MessageType.UserInfoRequest:
                             HandleUserInfoRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.UpdateUserInfo:
+                            HandleUpdateUserInfo(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.PickInfoUpdate:
+                            HandlePickInfoUpdate(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.PickDelete:
+                            HandlePickDelete(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.PickGodDelete:
+                            HandlePickGodDelete(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.AvatarNotesUpdate:
+                            HandleAvatarNotesUpdate(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.DirClassifiedQuery:
+                            HandleDirClassifiedsQuery(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.ClassifiedInfoRequest:
+                            HandleClassifiedInfoRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.ClassifiedInfoUpdate:
+                            HandleClassifiedInfoUpdate(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.ClassifiedDelete:
+                            HandleClassifiedDelete(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.ClassifiedGodDelete:
+                            HandleClassifiedGodDelete(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GenericMessage:
+                            {
+                                GenericMessage gm = (GenericMessage)m;
+                                switch(gm.Method)
+                                {
+                                    case "avatarclassifiedsrequest":
+                                        HandleAvatarClassifiedsRequest(req.Key.Agent, scene, gm);
+                                        break;
+
+                                    case "avatarpicksrequest":
+                                        HandleAvatarPicksRequest(req.Key.Agent, scene, gm);
+                                        break;
+
+                                    case "pickinforequest":
+                                        HandlePickInfoRequest(req.Key.Agent, scene, gm);
+                                        break;
+
+                                    case "avatarnotesrequest":
+                                        HandleAvatarNotesRequest(req.Key.Agent, scene, gm);
+                                        break;
+                                }
+                            }
                             break;
                     }
                 }
@@ -250,6 +324,181 @@ namespace SilverSim.LL.Profile
         }
         #endregion
 
+        #region Classifieds
+        public void HandleDirClassifiedsQuery(LLAgent agent, SceneInterface scene, Message m)
+        {
+        }
+
+        public void HandleAvatarClassifiedsRequest(LLAgent agent, SceneInterface scene, GenericMessage m)
+        {
+            if(m.AgentID != m.CircuitAgentID ||
+                m.SessionID != m.CircuitSessionID)
+            {
+                return;
+            }
+        }
+
+        public void HandleClassifiedInfoRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+        }
+
+        public void HandleClassifiedInfoUpdate(LLAgent agent, SceneInterface scene, Message m)
+        {
+
+        }
+
+        public void HandleClassifiedDelete(LLAgent agent, SceneInterface scene, Message m)
+        {
+
+        }
+
+        public void HandleClassifiedGodDelete(LLAgent agent, SceneInterface scene, Message m)
+        {
+
+        }
+        #endregion
+
+        #region Notes
+        public void HandleAvatarNotesRequest(LLAgent agent, SceneInterface scene, GenericMessage m)
+        {
+            if (m.AgentID != m.CircuitAgentID ||
+                m.SessionID != m.CircuitSessionID)
+            {
+                return;
+            }
+
+            if(m.ParamList.Count < 1)
+            {
+                return;
+            }
+            string arg = Encoding.UTF8.GetString(m.ParamList[0]);
+            UUID targetuuid;
+            if(!UUID.TryParse(arg, out targetuuid))
+            {
+                return;
+            }
+
+            ProfileServiceData serviceData;
+            UUI uui;
+            try
+            {
+                serviceData = LookupProfileService(scene, m.AgentID, out uui);
+            }
+            catch
+            {
+                return;
+            }
+
+            UUI targetuui;
+            try
+            {
+                targetuui = scene.AvatarNameService[targetuuid];
+            }
+            catch
+            {
+                targetuui = new UUI(targetuuid);
+            }
+
+
+            AvatarNotesReply reply = new AvatarNotesReply();
+            reply.AgentID = m.AgentID;
+            reply.TargetID = targetuui.ID;
+            try
+            {
+                reply.Notes = serviceData.ProfileService.Notes[uui, targetuui];
+            }
+            catch
+            {
+                reply.Notes = string.Empty;
+            }
+            agent.SendMessageAlways(reply, scene.ID);
+        }
+
+        public void HandleAvatarNotesUpdate(LLAgent agent, SceneInterface scene, Message m)
+        {
+            AvatarNotesUpdate req = (AvatarNotesUpdate)m;
+            if(req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ProfileServiceData serviceData;
+            UUI uui;
+            try
+            {
+                serviceData = LookupProfileService(scene, req.AgentID, out uui);
+            }
+            catch
+            {
+                return;
+            }
+
+            try
+            {
+                serviceData.ProfileService.Notes[uui, new UUI(req.TargetID)] = req.Notes;
+            }
+            catch
+            {
+                agent.SendAlertMessage("Error updating notes", scene.ID);
+            }
+        }
+        #endregion
+
+        #region Picks
+        public void HandleAvatarPicksRequest(LLAgent agent, SceneInterface scene, GenericMessage m)
+        {
+            if(m.AgentID != m.CircuitAgentID ||
+                m.SessionID != m.CircuitSessionID)
+            {
+                return;
+            }
+        }
+
+        public void HandlePickInfoRequest(LLAgent agent, SceneInterface scene, GenericMessage m)
+        {
+            if (m.AgentID != m.CircuitAgentID ||
+                m.SessionID != m.CircuitSessionID)
+            {
+                return;
+            }
+
+        }
+
+        public void HandlePickInfoUpdate(LLAgent agent, SceneInterface scene, Message m)
+        {
+            PickInfoUpdate req = (PickInfoUpdate)m;
+            if(req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+        }
+
+        public void HandlePickDelete(LLAgent agent, SceneInterface scene, Message m)
+        {
+            PickDelete req = (PickDelete)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+        }
+
+        public void HandlePickGodDelete(LLAgent agent, SceneInterface scene, Message m)
+        {
+            PickGodDelete req = (PickGodDelete)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+        }
+        #endregion
+
+        #region User Info
         public void HandleUserInfoRequest(LLAgent agent, SceneInterface scene, Message m)
         {
             UserInfoRequest req = (UserInfoRequest)m;
@@ -297,6 +546,43 @@ namespace SilverSim.LL.Profile
             reply.IMViaEmail = prefs.IMviaEmail;
         }
 
+        public void HandleUpdateUserInfo(LLAgent agent, SceneInterface scene, Message m)
+        {
+            UpdateUserInfo req = (UpdateUserInfo)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ProfileServiceData serviceData;
+            UUI uui;
+            try
+            {
+                serviceData = LookupProfileService(scene, req.AgentID, out uui);
+            }
+            catch
+            {
+                return;
+            }
+
+            ProfilePreferences prefs = new ProfilePreferences();
+            prefs.User = uui;
+            prefs.IMviaEmail = req.IMViaEmail;
+            prefs.Visible = req.DirectoryVisibility != "hidden";
+            
+            try
+            {
+                serviceData.ProfileService.Preferences[uui] = prefs;
+            }
+            catch
+            {
+                agent.SendAlertMessage("Error updating preferences", scene.ID);
+            }
+        }
+        #endregion
+
+        #region Avatar Properties
         public void HandleAvatarPropertiesRequest(LLAgent agent, SceneInterface scene, Message m)
         {
             AvatarPropertiesRequest req = (AvatarPropertiesRequest)m;
@@ -392,6 +678,95 @@ namespace SilverSim.LL.Profile
             agent.SendMessageAlways(res3, scene.ID);
         }
 
+        public void HandleAvatarPropertiesUpdate(LLAgent agent, SceneInterface scene, Message m)
+        {
+            AvatarPropertiesUpdate req = (AvatarPropertiesUpdate)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ProfileServiceData serviceData;
+            UUI uui;
+            try
+            {
+                serviceData = LookupProfileService(scene, req.AgentID, out uui);
+            }
+            catch
+            {
+                return;
+            }
+
+            ProfileProperties props = new ProfileProperties();
+            props.ImageID = UUID.Zero;
+            props.FirstLifeImageID = UUID.Zero;
+            props.Partner = UUI.Unknown;
+            props.User = uui;
+            props.SkillsText = "";
+            props.WantToText = "";
+            props.Language = "";
+
+            props.AboutText = req.AboutText;
+            props.FirstLifeText = req.FLAboutText;
+            props.ImageID = req.ImageID;
+            props.PublishMature = req.MaturePublish;
+            props.PublishProfile = req.AllowPublish;
+            props.WebUrl = req.ProfileURL;
+
+            try
+            {
+                serviceData.ProfileService.Properties[uui, ProfileServiceInterface.PropertiesUpdateFlags.Properties] = props;
+            }
+            catch
+            {
+                agent.SendAlertMessage("Error updating properties", scene.ID);
+            }
+        }
+
+        public void HandleAvatarInterestsUpdate(LLAgent agent, SceneInterface scene, Message m)
+        {
+            AvatarInterestsUpdate req = (AvatarInterestsUpdate)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ProfileServiceData serviceData;
+            UUI uui;
+            try
+            {
+                serviceData = LookupProfileService(scene, req.AgentID, out uui);
+            }
+            catch
+            {
+                return;
+            }
+
+            ProfileProperties props = new ProfileProperties();
+            props.ImageID = UUID.Zero;
+            props.FirstLifeImageID = UUID.Zero;
+            props.FirstLifeText = "";
+            props.AboutText = "";
+            props.Partner = UUI.Unknown;
+            props.User = uui;
+            props.SkillsMask = req.SkillsMask;
+            props.SkillsText = req.SkillsText;
+            props.WantToMask = req.WantToMask;
+            props.WantToText = req.WantToText;
+            props.Language = req.LanguagesText;
+            try
+            {
+                serviceData.ProfileService.Properties[uui, ProfileServiceInterface.PropertiesUpdateFlags.Interests] = props;
+            }
+            catch
+            {
+                agent.SendAlertMessage("Error updating interests", scene.ID);
+            }
+        }
+        #endregion
+
         public ShutdownOrder ShutdownOrder
         {
             get 
@@ -403,6 +778,7 @@ namespace SilverSim.LL.Profile
         public void Shutdown()
         {
             m_CleanupTimer.Stop();
+            m_CleanupTimer.Elapsed -= CleanupTimer;
             m_ShutdownProfile = true;
         }
     }

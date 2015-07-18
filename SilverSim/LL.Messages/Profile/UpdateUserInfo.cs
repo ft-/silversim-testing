@@ -36,7 +36,7 @@ namespace SilverSim.LL.Messages.Profile
         public UUID SessionID;
 
         public bool IMViaEmail;
-        public byte[] DirectoryVisibility = new byte[0];
+        public string DirectoryVisibility;
 
         public UpdateUserInfo()
         {
@@ -49,8 +49,7 @@ namespace SilverSim.LL.Messages.Profile
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
             m.IMViaEmail = p.ReadBoolean();
-            int len = p.ReadUInt8();
-            m.DirectoryVisibility = p.ReadBytes(len);
+            m.DirectoryVisibility = p.ReadStringLen8();
             return m;
         }
     }
