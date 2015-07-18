@@ -36,6 +36,10 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 #if DEBUG
         static readonly ILog m_Log = LogManager.GetLogger("PROFILE AUTO-DETECT HANDLER");
 #endif
+        public class ProfileAutoDetectFailedException : Exception
+        {
+
+        }
 
         public class AutoDetectClassifiedsConnector : IClassifiedsInterface
         {
@@ -83,7 +87,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     m_Log.Debug("Classifieds.getClassifieds: CoreProfile", e);
 #endif
                 }
-                throw new NotImplementedException();
+                throw new ProfileAutoDetectFailedException();
             }
 
             public ProfileClassified this[UUI user, UUID id]
@@ -121,7 +125,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         m_Log.Debug("Classifieds.this[UUI, UUID]: CoreProfile", e);
 #endif
                     }
-                    throw new NotImplementedException();
+                    throw new ProfileAutoDetectFailedException();
                 }
             }
 
@@ -158,7 +162,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     m_Log.Debug("Classifieds.Update: CoreProfile", e);
 #endif
                 }
-                throw new NotImplementedException();
+                throw new ProfileAutoDetectFailedException();
             }
 
             public void Delete(UUID id)
@@ -193,7 +197,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     m_Log.Debug("Classifieds.Delete: CoreProfile", e);
 #endif
                 }
-                throw new NotImplementedException();
+                throw new ProfileAutoDetectFailedException();
             }
         }
 
@@ -243,7 +247,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     m_Log.Debug("Picks.getPicks: CoreProfile", e);
 #endif
                 }
-                throw new NotImplementedException();
+                throw new ProfileAutoDetectFailedException();
             }
 
             public ProfilePick this[UUI user, UUID id]
@@ -281,7 +285,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         m_Log.Debug("Picks.this[UUI, UUID]: CoreProfile", e);
 #endif
                     }
-                    throw new NotImplementedException();
+                    throw new ProfileAutoDetectFailedException();
                 }
             }
 
@@ -318,7 +322,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     m_Log.Debug("Picks.Update: CoreProfile", e);
 #endif
                 }
-                throw new NotImplementedException();
+                throw new ProfileAutoDetectFailedException();
             }
 
             public void Delete(UUID id)
@@ -353,7 +357,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     m_Log.Debug("Picks.Delete: CoreProfile", e);
 #endif
                 }
-                throw new NotImplementedException();
+                throw new ProfileAutoDetectFailedException();
             }
         }
 
@@ -405,7 +409,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         m_Log.Debug("Notes.this[UUI, UUI]: CoreProfile", e);
 #endif
                     }
-                    throw new NotImplementedException();
+                    throw new ProfileAutoDetectFailedException();
                 }
                 set
                 {
@@ -439,7 +443,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         m_Log.Debug("Notes.this[UUI, UUI]: CoreProfile", e);
 #endif
                     }
-                    throw new NotImplementedException();
+                    throw new ProfileAutoDetectFailedException();
                 }
             }
         }
@@ -492,7 +496,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         m_Log.Debug("Preferences.this[UUI, UUI]: CoreProfile", e);
 #endif
                     }
-                    throw new NotImplementedException();
+                    throw new ProfileAutoDetectFailedException();
                 }
                 set
                 {
@@ -526,7 +530,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         m_Log.Debug("Preferences.this[UUI, UUI]: CoreProfile", e);
 #endif
                     }
-                    throw new NotImplementedException();
+                    throw new ProfileAutoDetectFailedException();
                 }
             }
         }
@@ -579,7 +583,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         m_Log.Debug("Properties.this[UUI, UUI]: CoreProfile", e);
 #endif
                     }
-                    throw new NotImplementedException();
+                    throw new ProfileAutoDetectFailedException();
                 }
             }
             public ProfileProperties this[UUI user, PropertiesUpdateFlags flags] 
@@ -616,7 +620,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                         m_Log.Debug("Properties.this[UUI, UUI]: CoreProfile", e);
 #endif
                     }
-                    throw new NotImplementedException();
+                    throw new ProfileAutoDetectFailedException();
                 }
             }
         }
