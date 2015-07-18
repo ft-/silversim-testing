@@ -90,6 +90,7 @@ namespace SilverSim.LL.Profile
         }
 
         readonly RwLockedDictionary<string, ProfileServiceData> m_LastKnownProfileServices = new RwLockedDictionary<string, ProfileServiceData>();
+        readonly RwLockedDictionary<UUID, KeyValuePair<UUI, int>> m_ClassifiedQueryCache = new RwLockedDictionary<UUID, KeyValuePair<UUI, int>>();
 
         public ViewerProfileServer()
         {
@@ -99,6 +100,7 @@ namespace SilverSim.LL.Profile
         public void CleanupTimer(object sender, ElapsedEventArgs e)
         {
             List<string> removeList = new List<string>();
+            List<UUID> removeClassifiedList = new List<UUID>();
             foreach(KeyValuePair<string, ProfileServiceData> kvp in m_LastKnownProfileServices)
             {
                 if(Environment.TickCount - kvp.Value.TicksAt > 60000)
@@ -109,6 +111,19 @@ namespace SilverSim.LL.Profile
             foreach(string rem in removeList)
             {
                 m_LastKnownProfileServices.Remove(rem);
+            }
+
+            /* remove classifieds query caches after half an hour */
+            foreach (KeyValuePair<UUID, KeyValuePair<UUI, int>> kvp in m_ClassifiedQueryCache)
+            {
+                if(Environment.TickCount - kvp.Value.Value > 1800000)
+                {
+                    removeClassifiedList.Add(kvp.Key);
+                }
+            }
+            foreach(UUID classifiedid in removeClassifiedList)
+            {
+                m_ClassifiedQueryCache.Remove(classifiedid);
             }
         }
 
@@ -403,6 +418,7 @@ namespace SilverSim.LL.Profile
                 d.ClassifiedID = classified.Key;
                 d.Name = classified.Value;
                 reply.Data.Add(d);
+                m_ClassifiedQueryCache[classified.Key] = new KeyValuePair<UUI, int>(uui, Environment.TickCount);
                 messageFill += entryLen;
             }
 
@@ -421,6 +437,51 @@ namespace SilverSim.LL.Profile
                 return;
             }
 
+            KeyValuePair<UUI, int> kvp;
+            if(!m_ClassifiedQueryCache.TryGetValue(req.ClassifiedID, out kvp))
+            {
+                return;
+            }
+
+            ProfileServiceData serviceData;
+            UUI uui;
+            try
+            {
+                serviceData = LookupProfileService(scene, kvp.Key.ID, out uui);
+            }
+            catch
+            {
+                return;
+            }
+
+
+            try
+            {
+                ProfileClassified cls = serviceData.ProfileService.Classifieds[kvp.Key, req.ClassifiedID];
+                ClassifiedInfoReply reply = new ClassifiedInfoReply();
+                reply.AgentID = req.AgentID;
+
+                reply.ClassifiedID = cls.ClassifiedID;
+                reply.CreatorID = cls.Creator.ID;
+                reply.CreationDate = cls.CreationDate;
+                reply.ExpirationDate = cls.ExpirationDate;
+                reply.Category = cls.Category;
+                reply.Name = cls.Name;
+                reply.Description = cls.Description;
+                reply.ParcelID = cls.ParcelID;
+                reply.ParentEstate = cls.ParentEstate;
+                reply.SnapshotID = cls.SnapshotID;
+                reply.SimName = cls.SimName;
+                reply.PosGlobal = cls.GlobalPos;
+                reply.ParcelName = cls.ParcelName;
+                reply.ClassifiedFlags = cls.Flags;
+                reply.PriceForListing = cls.Price;
+                agent.SendMessageAlways(reply, scene.ID);
+            }
+            catch
+            {
+
+            }
         }
 
         public void HandleClassifiedInfoUpdate(LLAgent agent, SceneInterface scene, Message m)
@@ -648,6 +709,58 @@ namespace SilverSim.LL.Profile
                 return;
             }
 
+            if (m.ParamList.Count < 2)
+            {
+                return;
+            }
+            string arg = Encoding.UTF8.GetString(m.ParamList[0]);
+            UUID targetuuid;
+            if (!UUID.TryParse(arg, out targetuuid))
+            {
+                return;
+            }
+
+            arg = Encoding.UTF8.GetString(m.ParamList[1]);
+            UUID pickid;
+            if (!UUID.TryParse(arg, out pickid))
+            {
+                return;
+            }
+
+            ProfileServiceData serviceData;
+            UUI uui;
+            try
+            {
+                serviceData = LookupProfileService(scene, targetuuid, out uui);
+            }
+            catch
+            {
+                return;
+            }
+
+            try
+            {
+                ProfilePick pick = serviceData.ProfileService.Picks[uui, pickid];
+                PickInfoReply reply = new PickInfoReply();
+                reply.AgentID = m.AgentID;
+                reply.CreatorID = pick.Creator.ID;
+                reply.Description = pick.Description;
+                reply.IsEnabled = pick.Enabled;
+                reply.Name = pick.Name;
+                reply.OriginalName = pick.OriginalName;
+                reply.ParcelID = pick.ParcelID;
+                reply.PickID = pick.PickID;
+                reply.PosGlobal = pick.GlobalPosition;
+                reply.SnapshotID = pick.SnapshotID;
+                reply.SortOrder = pick.SortOrder;
+                reply.TopPick = pick.TopPick;
+                reply.User = "";
+                agent.SendMessageAlways(reply, scene.ID);
+            }
+            catch
+            {
+
+            }
         }
 
         public void HandlePickInfoUpdate(LLAgent agent, SceneInterface scene, Message m)
