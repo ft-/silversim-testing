@@ -48,8 +48,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 Dictionary<UUID, string> data = new Dictionary<UUID, string>();
                 Map m = new Map();
                 m["creatorId"] = user.ID;
-                IValue res = RPC.DoJson20RpcRequest(m_Uri, "avatarclassifiedsrequest", (string)UUID.Random, m, m_Connector.TimeoutMs);
-                AnArray reslist = (((Map)res)["result"]) as AnArray;
+                AnArray reslist = (AnArray)RPC.DoJson20RpcRequest(m_Uri, "avatarclassifiedsrequest", (string)UUID.Random, m, m_Connector.TimeoutMs);
                 foreach(IValue iv in reslist)
                 {
                     Map c = (Map)iv;
@@ -65,8 +64,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     ProfileClassified classified = new ProfileClassified();
                     Map m = new Map();
                     m["ClassifiedId"] = id;
-                    IValue res = RPC.DoJson20RpcRequest(m_Uri, "classifieds_info_query", (string)UUID.Random, m, m_Connector.TimeoutMs);
-                    Map reslist = (((Map)res)["result"]) as Map;
+                    Map reslist = (Map)RPC.DoJson20RpcRequest(m_Uri, "classifieds_info_query", (string)UUID.Random, m, m_Connector.TimeoutMs);
                     classified.ClassifiedID = id;
                     classified.Creator.ID = reslist["CreatorId"].AsUUID;
                     classified.CreationDate = Date.UnixTimeToDateTime(reslist["CreationDate"].AsULong);
@@ -134,8 +132,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 Dictionary<UUID, string> data = new Dictionary<UUID, string>();
                 Map m = new Map();
                 m["creatorId"] = user.ID;
-                IValue res = RPC.DoJson20RpcRequest(m_Uri, "avatarpicksrequest", (string)UUID.Random, m, m_Connector.TimeoutMs);
-                AnArray reslist = (((Map)res)["result"]) as AnArray;
+                AnArray reslist = (AnArray)RPC.DoJson20RpcRequest(m_Uri, "avatarpicksrequest", (string)UUID.Random, m, m_Connector.TimeoutMs);
                 foreach (IValue iv in reslist)
                 {
                     Map c = (Map)iv;
@@ -152,8 +149,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     Map m = new Map();
                     m["ClassifiedId"] = id;
                     m["CreatorId"] = user.ID;
-                    IValue res = RPC.DoJson20RpcRequest(m_Uri, "pickinforequest", (string)UUID.Random, m, m_Connector.TimeoutMs);
-                    Map reslist = (((Map)res)["result"]) as Map;
+                    Map reslist = (Map)RPC.DoJson20RpcRequest(m_Uri, "pickinforequest", (string)UUID.Random, m, m_Connector.TimeoutMs);
 
                     pick.PickID = reslist["PickId"].AsUUID;
                     pick.Creator = user;
@@ -224,8 +220,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     Map m = new Map();
                     m["UserId"] = user.ID;
                     m["TargetId"] = target.ID;
-                    IValue res = RPC.DoJson20RpcRequest(m_Uri, "avatarnotesrequest", (string)UUID.Random, m, m_Connector.TimeoutMs);
-                    Map reslist = (((Map)res)["result"]) as Map;
+                    Map reslist = (Map)RPC.DoJson20RpcRequest(m_Uri, "avatarnotesrequest", (string)UUID.Random, m, m_Connector.TimeoutMs);
                     return reslist["Notes"].ToString();
                 }
                 set
@@ -257,8 +252,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     ProfilePreferences prefs = new ProfilePreferences();
                     Map m = new Map();
                     m["UserId"] = user.ID;
-                    IValue res = RPC.DoJson20RpcRequest(m_Uri, "user_preferences_request", (string)UUID.Random, m, m_Connector.TimeoutMs);
-                    Map reslist = (((Map)res)["result"]) as Map;
+                    Map reslist = (Map)RPC.DoJson20RpcRequest(m_Uri, "user_preferences_request", (string)UUID.Random, m, m_Connector.TimeoutMs);
                     prefs.User = user;
                     prefs.IMviaEmail = (ABoolean)reslist["IMViaEmail"];
                     prefs.Visible = (ABoolean)reslist["Visible"];
@@ -292,8 +286,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                 {
                     Map m = new Map();
                     m.Add("UserId", user.ID);
-                    IValue res = RPC.DoJson20RpcRequest(m_Uri, "avatar_properties_request", (string)UUID.Random, m, m_Connector.TimeoutMs);
-                    Map reslist = (((Map)res)["result"]) as Map;
+                    Map reslist = (Map)RPC.DoJson20RpcRequest(m_Uri, "avatar_properties_request", (string)UUID.Random, m, m_Connector.TimeoutMs);
                     ProfileProperties props = new ProfileProperties();
 
                     props.User = user;

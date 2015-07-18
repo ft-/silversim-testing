@@ -161,7 +161,11 @@ namespace SilverSim.Main.Common.HttpClient
                 reqdata += "Expect: 100-continue\r\n";
             }
 
+#if DEBUG
+            /* disable gzip encoding for debugging */
+#else
             reqdata += "Accept-Encoding: gzip\r\n";
+#endif
             reqdata += "\r\n";
             outdata = Encoding.ASCII.GetBytes(reqdata);
 

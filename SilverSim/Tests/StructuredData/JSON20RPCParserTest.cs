@@ -23,27 +23,30 @@ exception statement from your version.
 
 */
 
+using SilverSim.Main.Common;
 using SilverSim.StructuredData.JSON;
+using SilverSim.Tests.Extensions;
 using SilverSim.Types;
-using SilverSim.Types.StructuredData.XMLRPC;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace SilverSim.Main.Common.Rpc
+namespace SilverSim.Tests.StructuredData
 {
-    public static class RPC
+    class JSON20RPCParserTest : ITest
     {
-        public static IValue DoJson20RpcRequest(string url, string method, string jsonId, IValue param, int timeoutms)
+        const string JSONInput = "{\"jsonrpc\":\"2.0\",\"result\":{\"UserId\":\"11111111-2222-3333-4444-fedcba987654\",\"PartnerId\":\"00000000-0000-0000-0000-000000000000\",\"PublishProfile\":false,\"PublishMature\":false,\"WebUrl\":\"\",\"WantToMask\":0,\"WantToText\":\"\",\"SkillsMask\":0,\"SkillsText\":\"\",\"Language\":\"\",\"ImageId\":\"00000000-0000-0000-0000-000000000000\",\"AboutText\":\"\",\"FirstLifeImageId\":\"00000000-0000-0000-0000-000000000000\",\"FirstLifeText\":\"\"},\"id\":\"a96f1bd0-c079-40a4-a012-d43c845d3b99\"}";
+
+        public bool Run()
         {
-            string jsonReq = JSON20RPC.SerializeRequest(method, jsonId, param);
-            return JSON20RPC.DeserializeResponse(HttpClient.HttpRequestHandler.DoStreamRequest("POST", url, null, "application/json-rpc", jsonReq, false, timeoutms));
+            IValue iv = JSON20RPC.DeserializeResponse(new MemoryStream(UTF8NoBOM.GetBytes(JSONInput)));
+            return true;
         }
 
-        public static XMLRPC.XmlRpcResponse DoXmlRpcRequest(string url, XMLRPC.XmlRpcRequest req, int timeoutms)
+        public void Startup(ConfigurationLoader loader)
         {
-            return XMLRPC.DeserializeResponse(HttpClient.HttpRequestHandler.DoStreamRequest("POST", url, null, "text/xml", UTF8NoBOM.GetString(req.Serialize()), false, timeoutms));
         }
 
         static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
