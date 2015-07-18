@@ -24,33 +24,34 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Groups
 {
-    [UDPMessage(MessageType.GroupTitlesReply)]
+    [UDPMessage(MessageType.GroupProposalBallot)]
     [Reliable]
-    [Zerocoded]
     [NotTrusted]
-    public class GroupTitlesRequest : Message
+    [UDPDeprecated]
+    public class GroupProposalBallot : Message
     {
-        public UUID AgentID = UUID.Zero;
-        public UUID SessionID = UUID.Zero;
-        public UUID GroupID = UUID.Zero;
-        public UUID RequestID = UUID.Zero;
+        public UUID AgentID;
+        public UUID SessionID;
+        public UUID ProposalID;
+        public UUID GroupID;
+        public string VoteCast;
 
-        public GroupTitlesRequest()
+        public GroupProposalBallot()
         {
 
         }
 
-        public static GroupTitlesRequest Decode(UDPPacket p)
+        public static GroupProposalBallot Decode(UDPPacket p)
         {
-            GroupTitlesRequest m = new GroupTitlesRequest();
+            GroupProposalBallot m = new GroupProposalBallot();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
+            m.ProposalID = p.ReadUUID();
             m.GroupID = p.ReadUUID();
-            m.RequestID = p.ReadUUID();
+            m.VoteCast = p.ReadStringLen8();
             return m;
         }
     }
