@@ -110,7 +110,7 @@ namespace SilverSim.Backend.Common.OfflineIM
                     response_im.IsOffline = false;
                     response_im.NoOfflineIMStore = true;
                     response_im.IsSystemMessage = true;
-                    IMRouter.SendAsync(response_im);
+                    IMRouter.SendWithResultDelegate(response_im);
                 }
                 catch
                 {

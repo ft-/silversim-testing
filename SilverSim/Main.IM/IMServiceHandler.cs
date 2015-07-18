@@ -55,7 +55,7 @@ namespace SilverSim.Main.IM
                     GridInstantMessage im = m_Queue.Dequeue(1000);
                     try
                     {
-                        IMRouter.SendAsync(im);
+                        IMRouter.SendWithResultDelegate(im);
                     }
                     catch
                     {

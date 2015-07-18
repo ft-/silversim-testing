@@ -39,7 +39,7 @@ namespace SilverSim.Scene.Management.IM
         public delegate bool OnSendDelegate(GridInstantMessage im);
 
         #region Methods
-        public static void SendAsync(GridInstantMessage im)
+        public static void SendWithResultDelegate(GridInstantMessage im)
         {
             im.OnResult(im, SendSync(im));
         }
