@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SilverSim.LL.Messages.Groups
 {
@@ -36,6 +37,8 @@ namespace SilverSim.LL.Messages.Groups
     {
         public UUID AgentID;
         public UUID GroupID;
+
+        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         public struct GroupNoticeData
         {
@@ -50,7 +53,7 @@ namespace SilverSim.LL.Messages.Groups
             {
                 get
                 {
-                    return 24 + FromName.Length + Subject.Length;
+                    return 25 + FromName.Length + UTF8NoBOM.GetByteCount(Subject);
                 }
             }
         }

@@ -79,11 +79,11 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             m_GroupRoles = new GroupRolesAccessor(uri);
             m_Members = new MembersAccessor(uri);
             m_Memberships = new MembershipsAccessor(uri);
-            m_Rolemembers = new RoleMembersAccessor(uri);
             m_ActiveGroup = new ActiveGroupAccessor(uri);
             m_Invites = new InvitesAccessor(uri);
             m_Notices = new NoticesAccessor(uri);
             m_ActiveGroupMembership = new ActiveGroupMembershipAccesor(uri);
+            m_Rolemembers = new RoleMembersAccessor(uri, m_Memberships);
         }
 
         public void Startup(ConfigurationLoader loader)

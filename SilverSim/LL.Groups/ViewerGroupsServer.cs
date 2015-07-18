@@ -619,6 +619,58 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if (null == groupsService)
+            {
+                return;
+            }
+
+            GroupActiveMembership gam;
+            List<GroupRolemembership> grms;
+            GroupTitlesReply reply = null;
+            int messageFill = 0;
+            try
+            {
+                gam = groupsService.ActiveMembership[agent.Owner, agent.Owner];
+                grms = groupsService.Rolemembers[agent.Owner, agent.Owner];
+                foreach(GroupRolemembership grm in grms)
+                {
+                    GroupTitlesReply.GroupDataEntry d = new GroupTitlesReply.GroupDataEntry();
+                    d.RoleID = grm.RoleID;
+                    d.Selected = grm.RoleID == gam.SelectedRoleID;
+                    d.Title = grm.GroupTitle;
+
+                    if(d.SizeInMessage + messageFill > 1400)
+                    {
+                        agent.SendMessageAlways(reply, scene.ID);
+                        reply = null;
+                    }
+                    if(null == reply)
+                    {
+                        reply = new GroupTitlesReply();
+                        reply.AgentID = req.AgentID;
+                        reply.GroupID = req.GroupID;
+                        messageFill = 0;
+                    }
+
+                    messageFill += d.SizeInMessage;
+                    reply.GroupData.Add(d);
+                }
+            }
+            catch
+            {
+                if (null == reply)
+                {
+                    reply = new GroupTitlesReply();
+                    reply.AgentID = req.AgentID;
+                    reply.GroupID = req.GroupID;
+                }
+            }
+            if(null != reply)
+            {
+                agent.SendMessageAlways(reply, scene.ID);
+            }
         }
 
         void HandleGroupTitleUpdate(LLAgent agent, SceneInterface scene, Message m)

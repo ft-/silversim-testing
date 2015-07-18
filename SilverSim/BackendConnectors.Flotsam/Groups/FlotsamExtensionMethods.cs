@@ -111,6 +111,28 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
             return gmem;
         }
 
+        public static GroupRolemembership ToGroupRolemembership(this IValue iv, UGI group)
+        {
+            Map m = (Map)iv;
+            GroupRolemembership gmem = new GroupRolemembership();
+            gmem.RoleID = m["RoleID"].AsUUID;
+            gmem.Principal.ID = m["AgentID"].AsUUID;
+            gmem.GroupTitle = m["Title"].ToString();
+            gmem.Group = group;
+            return gmem;
+        }
+
+        public static GroupRolemembership ToGroupRolemembership(this IValue iv)
+        {
+            Map m = (Map)iv;
+            GroupRolemembership gmem = new GroupRolemembership();
+            gmem.RoleID = m["RoleID"].AsUUID;
+            gmem.Principal.ID = m["AgentID"].AsUUID;
+            gmem.GroupTitle = m["Title"].ToString();
+            gmem.Group.ID = m["GroupID"].AsUUID;
+            return gmem;
+        }
+
         public static GroupRole ToGroupRole(this IValue iv, UGI group)
         {
             Map m = (Map)iv;

@@ -127,6 +127,11 @@ namespace SilverSim.ServiceInterfaces.Groups
                 get;
             }
 
+            List<GroupRolemembership> this[UUI requestingAgent, UUI principal]
+            {
+                get;
+            }
+
             List<GroupRolemember> this[UUI requestingAgent, UGI group]
             {
                 get;

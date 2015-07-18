@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using System.Collections.Generic;
+using System.Text;
 
 namespace SilverSim.LL.Messages.Groups
 {
@@ -42,7 +43,16 @@ namespace SilverSim.LL.Messages.Groups
             public string Title;
             public UUID RoleID;
             public bool Selected;
+            public int SizeInMessage
+            {
+                get
+                {
+                    return 20 + UTF8NoBOM.GetByteCount(Title);
+                }
+            }
         }
+
+        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         public List<GroupDataEntry> GroupData = new List<GroupDataEntry>();
 

@@ -40,10 +40,12 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
         {
             public int TimeoutMs = 20000;
             string m_Uri;
+            IGroupMembershipsInterface m_MembershipsAccessor;
 
-            public RoleMembersAccessor(string uri)
+            public RoleMembersAccessor(string uri, IGroupMembershipsInterface membershipsAccessor)
             {
                 m_Uri = uri;
+                m_MembershipsAccessor = membershipsAccessor;
             }
 
             public GroupRolemember this[UUI requestingAgent, UGI group, UUID roleID, UUI principal]
@@ -103,6 +105,55 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 }
             }
 
+            List<GroupRolemembership> GetRolememberships(UUI requestingAgent, UGI group, UUI principal)
+            {
+                Dictionary<string, string> post = new Dictionary<string, string>();
+                post["AgentID"] = principal.ToString();
+                post["GroupID"] = (string)group.ID;
+                post["RequestingAgentID"] = requestingAgent.ToString();
+                post["METHOD"] = "GETAGENTROLES";
+                Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                if (!m.ContainsKey("RESULT"))
+                {
+                    throw new KeyNotFoundException();
+                }
+                if (m["RESULT"].ToString() == "NULL")
+                {
+                    throw new KeyNotFoundException();
+                }
+
+                List<GroupRolemembership> rolemembers = new List<GroupRolemembership>();
+                foreach (IValue iv in ((Map)m["RESULT"]).Values)
+                {
+                    if (iv is Map)
+                    {
+                        Map data = (Map)iv;
+                        GroupRolemembership member = new GroupRolemembership();
+                        member.RoleID = data["RoleID"].AsUUID;
+                        member.Group = group;
+                        member.Principal = principal;
+                        member.GroupTitle = data["Title"].ToString();
+                        rolemembers.Add(member);
+                    }
+                }
+
+                return rolemembers;
+
+            }
+
+            public List<GroupRolemembership> this[UUI requestingAgent, UUI principal]
+            {
+                get
+                {
+                    List<GroupMembership> gmems = m_MembershipsAccessor[requestingAgent, principal];
+                    List<GroupRolemembership> grm = new List<GroupRolemembership>();
+                    foreach(GroupMembership gmem in gmems)
+                    {
+                        grm.AddRange(GetRolememberships(requestingAgent, gmem.Group, principal));
+                    }
+                    return grm;
+                }
+            }
 
             public void Add(UUI requestingAgent, GroupRolemember rolemember)
             {

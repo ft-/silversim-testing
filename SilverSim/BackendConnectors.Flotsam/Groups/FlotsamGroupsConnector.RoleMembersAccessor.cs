@@ -66,6 +66,29 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
                 }
             }
 
+            public List<GroupRolemembership> this[UUI requestingAgent, UUI principal]
+            {
+                get
+                {
+                    List<GroupRolemembership> gmems = new List<GroupRolemembership>();
+                    Map m = new Map();
+                    m.Add("AgentID", principal.ID);
+                    IValue iv = FlotsamXmlRpcGetCall(requestingAgent, "groups.getAgentRoles", m);
+                    if (iv is AnArray)
+                    {
+                        foreach (IValue v in ((AnArray)iv))
+                        {
+                            if (v is Map)
+                            {
+                                GroupRolemembership gmem = v.ToGroupRolemembership();
+                                gmems.Add(gmem);
+                            }
+                        }
+                    }
+                    return gmems;
+                }
+            }
+
             public List<GroupRolemember> this[UUI requestingAgent, UGI group, UUID roleID]
             {
                 get 
