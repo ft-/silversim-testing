@@ -64,6 +64,14 @@ namespace SilverSim.ServiceInterfaces.Groups
             }
         }
 
+        public interface IActiveGroupMembershipInterface
+        {
+            GroupActiveMembership this[UUI requestingAgent, UUI principal]
+            {
+                get;
+            }
+        }
+
         public interface IGroupMembersInterface
         {
             GroupMember this[UUI requestingAgent, UGI group, UUI principal]
@@ -208,6 +216,11 @@ namespace SilverSim.ServiceInterfaces.Groups
         }
 
         public abstract IGroupSelectInterface ActiveGroup
+        {
+            get;
+        }
+
+        public abstract IActiveGroupMembershipInterface ActiveMembership
         {
             get;
         }

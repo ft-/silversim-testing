@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.BackendConnectors.Robust.Common;
 using SilverSim.Main.Common.HttpClient;
 using SilverSim.Types;
+using SilverSim.Types.Groups;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,19 +36,19 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
 {
     public partial class RobustGroupsConnector
     {
-        class ActiveGroupAccessor : IGroupSelectInterface
+        public class ActiveGroupMembershipAccesor : IActiveGroupMembershipInterface
         {
             public int TimeoutMs = 20000;
             string m_Uri;
 
-            public ActiveGroupAccessor(string uri)
+            public ActiveGroupMembershipAccesor(string uri)
             {
                 m_Uri = uri;
             }
 
-            public UGI this[UUI requestingAgent, UUI principal]
+            public GroupActiveMembership this[UUI requestingAgent, UUI principal]
             {
-                get
+                get 
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
                     post["AgentID"] = principal.ToString();
@@ -64,26 +65,13 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                         throw new KeyNotFoundException();
                     }
 
-                    return m["RESULT"].ToGroupMemberFromMembership().Group;
-                }
-                set
-                {
-                    Dictionary<string, string> post = new Dictionary<string, string>();
-                    post["AgentID"] = principal.ToString();
-                    post["GroupID"] = (string)value.ID;
-                    post["RequestingAgentID"] = (string)requestingAgent.ID;
-                    post["OP"] = "GROUP";
-                    post["METHOD"] = "SETACTIVE";
-
-                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
-                    if (!m.ContainsKey("RESULT"))
-                    {
-                        throw new KeyNotFoundException();
-                    }
-                    if (m["RESULT"].ToString() == "NULL")
-                    {
-                        throw new KeyNotFoundException();
-                    }
+                    GroupActiveMembership gam = new GroupActiveMembership();
+                    Map res = (Map)m["RESULT"];
+                    gam.User = principal;
+                    gam.Group.ID = res["GroupID"].ToString();
+                    gam.Group.GroupName = res["GroupName"].ToString();
+                    gam.SelectedRoleID = res["ActiveRole"].AsUUID;
+                    return gam;
                 }
             }
         }

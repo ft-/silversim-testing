@@ -514,6 +514,45 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if(null == groupsService)
+            {
+                return;
+            }
+
+            GroupInfo ginfo;
+            try
+            {
+                ginfo = groupsService.Groups[agent.Owner, new UGI(req.GroupID)];
+            }
+            catch
+            {
+                return;
+            }
+
+            GroupProfileReply reply = new GroupProfileReply();
+            reply.AgentID = req.AgentID;
+            reply.GroupID = req.GroupID;
+            reply.Name = ginfo.ID.GroupName;
+            reply.Charter = ginfo.Charter;
+            reply.ShowInList = ginfo.IsShownInList;
+            reply.InsigniaID = ginfo.InsigniaID;
+            reply.FounderID = ginfo.Founder.ID;
+            reply.MembershipFee = ginfo.MembershipFee;
+            reply.OpenEnrollment = ginfo.IsOpenEnrollment;
+            reply.Money = 0;
+            reply.GroupMembershipCount = ginfo.MemberCount;
+            reply.GroupRolesCount = ginfo.RoleCount;
+            reply.AllowPublish = ginfo.IsAllowPublish;
+            reply.MaturePublish = ginfo.IsMaturePublish;
+            reply.OwnerRoleID = ginfo.OwnerRoleID;
+
+#warning TODO: both fields need some kind of setup
+            reply.MemberTitle = "";
+            reply.PowersMask = GroupPowers.None;
+
+            agent.SendMessageAlways(reply, scene.ID);
         }
         #endregion
 
