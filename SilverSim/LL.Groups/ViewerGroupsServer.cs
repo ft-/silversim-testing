@@ -33,6 +33,7 @@ using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
@@ -348,6 +349,52 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if(null == groupsService)
+            {
+                return;
+            }
+
+            GroupInfo groupinfo = new GroupInfo();
+            groupinfo.Name = req.Name;
+            groupinfo.Charter = req.Charter;
+            groupinfo.IsShownInList = req.ShowInList;
+            groupinfo.InsigniaID = req.InsigniaID;
+            groupinfo.MembershipFee = req.MembershipFee;
+            groupinfo.IsOpenEnrollment = req.OpenEnrollment;
+            groupinfo.IsAllowPublish = req.AllowPublish;
+            groupinfo.IsMaturePublish = req.MaturePublish;
+
+            CreateGroupReply reply = new CreateGroupReply();
+            reply.AgentID = req.AgentID;
+
+            EconomyServiceInterface economyService = scene.EconomyService;
+            try
+            {
+                if (null != economyService && scene.EconomyData.PriceGroupCreate > 0)
+                {
+                    economyService.ChargeAmount(agent.Owner, EconomyServiceInterface.TransactionType.GroupCreate, scene.EconomyData.PriceGroupCreate, delegate()
+                    {
+                        groupinfo = groupsService.Groups.Create(agent.Owner, groupinfo);
+                    });
+                }
+                else
+                {
+                    groupinfo = groupsService.Groups.Create(agent.Owner, groupinfo);
+                }
+                reply.GroupID = groupinfo.ID.ID;
+                reply.Success = true;
+                agent.SendMessageAlways(reply, scene.ID);
+            }
+            catch
+            {
+                reply.GroupID = UUID.Zero;
+                reply.Success = false;
+                agent.SendMessageAlways(reply, scene.ID);
+                return;
+            }
+            SendAgentGroupDataUpdate(agent, scene, groupsService, groupinfo.ID);
         }
 
         void HandleUpdateGroupInfo(LLAgent agent, SceneInterface scene, Message m)
@@ -368,6 +415,47 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if(null == groupsService)
+            {
+                return;
+            }
+
+            JoinGroupReply reply = new JoinGroupReply();
+            reply.AgentID = req.AgentID;
+            reply.GroupID = req.GroupID;
+            reply.Success = false;
+            GroupInfo ginfo;
+
+            try
+            {
+                ginfo = groupsService.Groups[agent.Owner, new UGI(req.GroupID)];
+            }
+            catch
+            {
+                agent.SendMessageAlways(reply, scene.ID);
+                return;
+            }
+
+            if (!ginfo.IsOpenEnrollment)
+            {
+                agent.SendMessageAlways(reply, scene.ID);
+                return;
+            }
+            else
+            {
+                GroupMember member = new GroupMember();
+                try
+                {
+                    GroupMember gmem = groupsService.Members.Add(agent.Owner, new UGI(req.GroupID), agent.Owner, UUID.Zero, "");
+                    reply.Success = true;
+                }
+                catch
+                {
+                }
+                agent.SendMessageAlways(reply, scene.ID);
+            }
         }
 
         void HandleLeaveGroupRequest(LLAgent agent, SceneInterface scene, Message m)
@@ -378,6 +466,34 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if (null == groupsService)
+            {
+                return;
+            }
+
+            AgentDropGroup dropGroup = new AgentDropGroup();
+            dropGroup.AgentID = req.AgentID;
+            dropGroup.GroupID = req.GroupID;
+            LeaveGroupReply reply = new LeaveGroupReply();
+            reply.AgentID = req.AgentID;
+            reply.GroupID = req.GroupID;
+            reply.Success = false;
+            try
+            {
+                groupsService.Members.Delete(agent.Owner, new UGI(req.GroupID), agent.Owner);
+                reply.Success = true;
+            }
+            catch
+            {
+
+            }
+            if(reply.Success)
+            {
+                agent.SendMessageAlways(dropGroup, scene.ID);
+            }
+            agent.SendMessageAlways(reply, scene.ID);
         }
 
         void HandleInviteGroupRequest(LLAgent agent, SceneInterface scene, Message m)
@@ -518,6 +634,30 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if(null == groupsService)
+            {
+                return;
+            }
+
+            try
+            {
+                if (req.GroupID != UUID.Zero)
+                {
+                    GroupMember gmem = groupsService.Members[agent.Owner, new UGI(req.GroupID), agent.Owner];
+                    groupsService.ActiveGroup[agent.Owner, agent.Owner] = gmem.Group;
+                }
+                else
+                {
+                    groupsService.ActiveGroup[agent.Owner, agent.Owner] = UGI.Unknown;
+                }
+            }
+            catch
+            {
+                return;
+            }
+            
         }
         #endregion
 
@@ -572,6 +712,25 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if (null == groupsService)
+            {
+                return;
+            }
+
+            if ((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.Accountable) != 0)
+            {
+                try
+                {
+                    groupsService.Members.SetContribution(agent.Owner, new UGI(req.GroupID), agent.Owner, req.Contribution);
+                }
+                catch
+                {
+                    return;
+                }
+                SendAgentGroupDataUpdate(agent, scene, groupsService, new UGI(req.GroupID));
+            }
         }
 
         void HandleSetGroupAcceptNotices(LLAgent agent, SceneInterface scene, Message m)
@@ -581,6 +740,25 @@ namespace SilverSim.LL.Groups
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
+            }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if(null == groupsService)
+            {
+                return;
+            }
+
+            if ((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.ChangeOptions) != 0)
+            {
+                try
+                {
+                    groupsService.Members.Update(agent.Owner, new UGI(req.GroupID), agent.Owner, req.AcceptNotices, req.ListInProfile);
+                }
+                catch
+                {
+                    return;
+                }
+                SendAgentGroupDataUpdate(agent, scene, groupsService, new UGI(req.GroupID));
             }
         }
         #endregion

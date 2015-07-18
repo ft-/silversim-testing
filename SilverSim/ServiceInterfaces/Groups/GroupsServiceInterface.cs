@@ -82,6 +82,8 @@ namespace SilverSim.ServiceInterfaces.Groups
             }
 
             GroupMember Add(UUI requestingAgent, UGI group, UUI principal, UUID roleID, string accessToken);
+            void SetContribution(UUI requestingagent, UGI group, UUI principal, int contribution);
+            void Update(UUI requestingagent, UGI group, UUI principal, bool acceptNotices, bool listInProfile);
             void Delete(UUI requestingAgent, UGI group, UUI principal);
         }
 

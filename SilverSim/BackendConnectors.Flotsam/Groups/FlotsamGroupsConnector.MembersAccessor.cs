@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Types.Groups;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -105,6 +106,21 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
                 m.Add("GroupID", group.ID);
                 FlotsamXmlRpcCall(requestingAgent, "groups.addAgentToGroup", m);
                 return this[requestingAgent, group, principal];
+            }
+
+            public void SetContribution(UUI requestingAgent, UGI group, UUI principal, int contribution)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Update(UUI requestingAgent, UGI group, UUI principal, bool acceptNotices, bool listInProfile)
+            {
+                Map m = new Map();
+                m.Add("AgentID", principal.ID);
+                m.Add("GroupID", group.ID);
+                m.Add("AcceptNotices", acceptNotices ? 1 : 0);
+                m.Add("ListInProfile", listInProfile ? 1 : 0);
+                FlotsamXmlRpcCall(requestingAgent, "groups.setAgentGroupInfo", m);
             }
 
             public void Delete(UUI requestingAgent, UGI group, UUI principal)

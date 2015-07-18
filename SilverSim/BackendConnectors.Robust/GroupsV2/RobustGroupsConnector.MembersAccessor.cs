@@ -153,6 +153,23 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 return m["RESULT"].ToGroupMemberFromMembership();
             }
 
+            public void SetContribution(UUI requestingAgent, UGI group, UUI principal, int contribution)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void Update(UUI requestingAgent, UGI group, UUI principal, bool acceptNotices, bool listInProfile)
+            {
+                Dictionary<string, string> post = new Dictionary<string, string>();
+                post["AgentID"] = principal.ToString();
+                post["GroupID"] = (string)group.ID;
+                post["AcceptNotices"] = acceptNotices.ToString();
+                post["ListInProfile"] = listInProfile.ToString();
+                post["RequestingAgentID"] = requestingAgent.ToString();
+                post["METHOD"] = "UPDATEMEMBERSHIP";
+                BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
+            }
+
             public void Delete(UUI requestingAgent, UGI group, UUI principal)
             {
                 Dictionary<string, string> post = new Dictionary<string, string>();
