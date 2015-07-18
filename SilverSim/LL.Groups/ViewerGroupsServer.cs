@@ -522,6 +522,8 @@ namespace SilverSim.LL.Groups
             }
 
             GroupInfo ginfo;
+            GroupActiveMembership gam;
+            GroupRole gr;
             try
             {
                 ginfo = groupsService.Groups[agent.Owner, new UGI(req.GroupID)];
@@ -529,6 +531,18 @@ namespace SilverSim.LL.Groups
             catch
             {
                 return;
+            }
+
+            try
+            {
+                gam = groupsService.ActiveMembership[agent.Owner, agent.Owner];
+                gr = groupsService.Roles[agent.Owner, gam.Group, gam.SelectedRoleID];
+            }
+            catch
+            {
+                gr = new GroupRole();
+                gr.Title = "";
+                gr.Powers = GroupPowers.None;
             }
 
             GroupProfileReply reply = new GroupProfileReply();
@@ -548,9 +562,8 @@ namespace SilverSim.LL.Groups
             reply.MaturePublish = ginfo.IsMaturePublish;
             reply.OwnerRoleID = ginfo.OwnerRoleID;
 
-#warning TODO: both fields need some kind of setup
-            reply.MemberTitle = "";
-            reply.PowersMask = GroupPowers.None;
+            reply.MemberTitle = gr.Title;
+            reply.PowersMask = gr.Powers;
 
             agent.SendMessageAlways(reply, scene.ID);
         }
