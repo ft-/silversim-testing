@@ -25,6 +25,7 @@ exception statement from your version.
 
 using System;
 using SilverSim.Types;
+using SilverSim.Types.IM;
 
 namespace SilverSim.LL.Messages
 {
@@ -112,6 +113,16 @@ namespace SilverSim.LL.Messages
         public GenericMessageHandler(string method)
         {
             Method = method;
+        }
+    }
+
+    [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
+    public class IMMessageHandler : Attribute
+    {
+        public GridInstantMessageDialog Dialog;
+        public IMMessageHandler(GridInstantMessageDialog dialog)
+        {
+            Dialog = dialog;
         }
     }
 

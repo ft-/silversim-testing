@@ -27,15 +27,18 @@ using log4net;
 using Nini.Config;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
+using SilverSim.LL.Messages.Agent;
 using SilverSim.LL.Messages.Groups;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using ThreadedClasses;
 
@@ -213,6 +216,46 @@ namespace SilverSim.LL.Groups
                 }
             }
         }
+
+        #region Agent Data Update Handling
+        void SendAllAgentsGroupDataUpdate(SceneInterface scene, GroupsServiceInterface groupsService, UGI group)
+        {
+            foreach(IAgent agent in scene.Agents)
+            {
+                SendAgentGroupDataUpdate(agent, scene, groupsService, group);
+            }
+        }
+
+        void SendAgentGroupDataUpdate(IAgent agent, SceneInterface scene, GroupsServiceInterface groupsService, UGI group)
+        {
+            try
+            {
+                List<GroupMembership> gmems = groupsService.Memberships[agent.Owner, agent.Owner];
+                if (gmems.Count(gmem => gmem.Group.ID == group.ID) != 0)
+                { /* still a lot work with that check but we are at least gentle with the viewer here */
+                    AgentGroupDataUpdate update = new AgentGroupDataUpdate();
+                    update.AgentID = agent.Owner.ID;
+                    foreach (GroupMembership gmem in gmems)
+                    {
+                        AgentGroupDataUpdate.GroupDataEntry d = new AgentGroupDataUpdate.GroupDataEntry();
+                        d.ListInProfile = gmem.ListInProfile;
+                        d.GroupID = gmem.Group.ID;
+                        d.GroupPowers = gmem.GroupPowers;
+                        d.AcceptNotices = gmem.AcceptNotices;
+                        d.GroupInsigniaID = gmem.GroupInsigniaID;
+                        d.Contribution = gmem.Contribution;
+                        d.GroupName = gmem.Group.GroupName;
+                        update.GroupData.Add(d);
+                    }
+                    agent.SendMessageAlways(update, scene.ID);
+                }
+            }
+            catch
+            {
+
+            }
+        }
+        #endregion
 
         #region Group Notice
         void HandleGroupNoticesListRequest(LLAgent agent, SceneInterface scene, Message m)

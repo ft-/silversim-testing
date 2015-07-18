@@ -23,47 +23,31 @@ exception statement from your version.
 
 */
 
-using SilverSim.Types;
-using System;
+using SilverSim.LL.Messages;
+using SilverSim.LL.Messages.IM;
+using SilverSim.Types.IM;
 
-namespace SilverSim.LL.Messages.Groups
+namespace SilverSim.LL.Core
 {
-    [UDPMessage(MessageType.GroupRoleChanges)]
-    [Reliable]
-    [NotTrusted]
-    public class GroupRoleChanges : Message
+    public partial class LLAgent
     {
-        public UUID AgentID;
-        public UUID SessionID;
-        public UUID GroupID;
-
-        public UUID RoleID;
-        public UUID MemberID;
-
-        public enum ChangeType : uint
+        [IMMessageHandler(GridInstantMessageDialog.MessageFromAgent)]
+        [IMMessageHandler(GridInstantMessageDialog.StartTyping)]
+        [IMMessageHandler(GridInstantMessageDialog.StopTyping)]
+        [IMMessageHandler(GridInstantMessageDialog.BusyAutoResponse)]
+        public void HandleIM(LLAgent nop, Circuit circuit, Message m)
         {
-            Add = 0,
-            Remove = 1
-        }
+            GridInstantMessage im = (GridInstantMessage)(ImprovedInstantMessage)m;
+            im.IsFromGroup = false;
+            im.FromAgent.ID = m_AgentID;
 
-        public ChangeType Change;
+            im.OnResult = circuit.OnIMResult;
 
-        public GroupRoleChanges()
-        {
-
-        }
-
-        public static Message Decode(UDPPacket p)
-        {
-            GroupRoleChanges m = new GroupRoleChanges();
-            m.AgentID = p.ReadUUID();
-            m.SessionID = p.ReadUUID();
-            m.GroupID = p.ReadUUID();
-            m.RoleID = p.ReadUUID();
-            m.MemberID = p.ReadUUID();
-            m.Change = (ChangeType)p.ReadUInt32();
-
-            return m;
+            LLUDPServer server = circuit.Server;
+            if (server != null)
+            {
+                server.RouteIM(im);
+            }
         }
     }
 }

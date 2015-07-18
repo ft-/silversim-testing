@@ -41,6 +41,16 @@ namespace SilverSim.LL.Messages.Groups
         public UUID SessionID = UUID.Zero;
         public UUID GroupID = UUID.Zero;
 
+        public enum RoleUpdateType : byte
+        {
+            NoUpdate = 0,
+            Updatedata = 1,
+            UpdatePowers = 2,
+            UpdateAll = 3,
+            Create = 4,
+            Delete = 5
+        }
+
         public struct RoleDataEntry
         {
             public UUID RoleID;
@@ -48,7 +58,7 @@ namespace SilverSim.LL.Messages.Groups
             public string Description;
             public string Title;
             public GroupPowers Powers;
-            public byte UpdateType;
+            public RoleUpdateType UpdateType;
         }
 
         public List<RoleDataEntry> RoleData = new List<RoleDataEntry>();
@@ -74,7 +84,7 @@ namespace SilverSim.LL.Messages.Groups
                 e.Description = p.ReadStringLen8();
                 e.Title = p.ReadStringLen8();
                 e.Powers = (GroupPowers)p.ReadUInt64();
-                e.UpdateType = p.ReadUInt8();
+                e.UpdateType = (RoleUpdateType)p.ReadUInt8();
                 m.RoleData.Add(e);
             }
             return m;

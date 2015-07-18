@@ -91,6 +91,25 @@ namespace SilverSim.LL.Messages.IM
             }
         }
 
+        public static explicit operator GridInstantMessage(ImprovedInstantMessage m)
+        {
+            GridInstantMessage im = new GridInstantMessage();
+            im.FromAgent.ID = m.AgentID;
+            im.IsFromGroup = m.FromGroup;
+            im.ToAgent.ID = m.ToAgentID;
+            im.ParentEstateID = m.ParentEstateID;
+            im.RegionID = m.RegionID;
+            im.Position = m.Position;
+            im.IsOffline = m.IsOffline;
+            im.Dialog = m.Dialog;
+            im.IMSessionID = m.ID;
+            im.Timestamp = m.Timestamp;
+            im.FromAgent.FullName = m.FromAgentName;
+            im.Message = m.Message;
+            im.BinaryBucket = m.BinaryBucket;
+            return im;
+        }
+
         public override void Serialize(UDPPacket p)
         {
             p.WriteMessageType(Number);
@@ -109,6 +128,26 @@ namespace SilverSim.LL.Messages.IM
             p.WriteStringLen16(Message);
             p.WriteUInt16((ushort)BinaryBucket.Length);
             p.WriteBytes(BinaryBucket);
+        }
+
+        public static ImprovedInstantMessage Decode(UDPPacket p)
+        {
+            ImprovedInstantMessage m = new ImprovedInstantMessage();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.FromGroup = p.ReadBoolean();
+            m.ToAgentID = p.ReadUUID();
+            m.ParentEstateID = p.ReadUInt32();
+            m.RegionID = p.ReadUUID();
+            m.Position = p.ReadVector3f();
+            m.IsOffline = p.ReadBoolean();
+            m.Dialog = (GridInstantMessageDialog)p.ReadUInt8();
+            m.ID = p.ReadUUID();
+            m.Timestamp = Date.UnixTimeToDateTime(p.ReadUInt32());
+            m.FromAgentName = p.ReadStringLen8();
+            m.Message = p.ReadStringLen16();
+            m.BinaryBucket = p.ReadBytes((int)(uint)p.ReadUInt16());
+            return m;
         }
     }
 }

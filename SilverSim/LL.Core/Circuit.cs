@@ -84,6 +84,7 @@ namespace SilverSim.LL.Core
         private BlockingQueue<Message> m_TextureDownloadQueue = new BlockingQueue<Message>();
         private Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
         private Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
+        private Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
 
         private Thread m_InventoryThread;
         private bool m_InventoryThreadRunning = false;
@@ -98,6 +99,14 @@ namespace SilverSim.LL.Core
         int m_AgentUpdatesReceived = 0;
         int m_UnackedBytes = 0;
         object m_UnackedBytesLock = new object();
+
+        internal LLUDPServer Server
+        {
+            get
+            {
+                return m_Server;
+            }
+        }
 
         private uint NextSequenceNumber
         {
@@ -428,6 +437,10 @@ namespace SilverSim.LL.Core
                         {
                             m_Log.FatalFormat("Field {0} of {1} registered duplicate message {1}", fi.Name, t.GetType(), pa.Number.ToString());
                         }
+                        else if(pa.Number == MessageType.ImprovedInstantMessage || pa.Number == MessageType.GenericMessage)
+                        {
+                            m_Log.FatalFormat("Field {0} of {1} tries to register unallowed message {1}", fi.Name, t.GetType(), pa.Number.ToString());
+                        }
                         else
                         {
                             try
@@ -460,6 +473,26 @@ namespace SilverSim.LL.Core
                             }
                         }
                     }
+
+                    IMMessageHandler[] ims = (IMMessageHandler[])Attribute.GetCustomAttributes(fi, typeof(IMMessageHandler));
+                    foreach (IMMessageHandler im in ims)
+                    {
+                        if (m_IMMessageRouting.ContainsKey(im.Dialog))
+                        {
+                            m_Log.FatalFormat("Field {0} of {1} registered duplicate im {1}", fi.Name, t.GetType(), im.Dialog.ToString());
+                        }
+                        else
+                        {
+                            try
+                            {
+                                m_IMMessageRouting.Add(im.Dialog, DeriveActionDelegateFromFieldInfo(fi, t, o, "im " + im.Dialog.ToString()));
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                    }
                 }
 
                 foreach (MethodInfo mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
@@ -470,12 +503,17 @@ namespace SilverSim.LL.Core
                     }
                     PacketHandler[] pas = (PacketHandler[])Attribute.GetCustomAttributes(mi, typeof(PacketHandler));
                     GenericMessageHandler[] gms = (GenericMessageHandler[])Attribute.GetCustomAttributes(mi, typeof(GenericMessageHandler));
+                    IMMessageHandler[] ims = (IMMessageHandler[])Attribute.GetCustomAttributes(mi, typeof(IMMessageHandler));
 
                     foreach (PacketHandler pa in pas)
                     {
                         if (m_MessageRouting.ContainsKey(pa.Number))
                         {
                             m_Log.FatalFormat("Method {0} registered duplicate message {1}", mi.Name, pa.Number.ToString());
+                        }
+                        else if (pa.Number == MessageType.ImprovedInstantMessage || pa.Number == MessageType.GenericMessage)
+                        {
+                            m_Log.FatalFormat("Method {0} tries to register unallowed message {1}", mi.Name, pa.Number.ToString());
                         }
                         else
                         {
@@ -508,8 +546,28 @@ namespace SilverSim.LL.Core
                             }
                         }
                     }
+
+                    foreach (IMMessageHandler im in ims)
+                    {
+                        if (m_IMMessageRouting.ContainsKey(im.Dialog))
+                        {
+                            m_Log.FatalFormat("Method {0} registered duplicate im {1}", mi.Name, im.Dialog.ToString());
+                        }
+                        else
+                        {
+                            try
+                            {
+                                m_IMMessageRouting.Add(im.Dialog, DeriveActionDelegateFromMethodInfo(mi, t, o, "im " + im.Dialog.ToString()));
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                    }
+
 #if DEBUG
-                    if (pas.Length == 0 && gms.Length == 0)
+                    if (pas.Length == 0 && gms.Length == 0 && ims.Length == 0)
                     {
                         if (mi.ReturnType != typeof(void))
                         {
@@ -968,40 +1026,6 @@ namespace SilverSim.LL.Core
                     }
                     break;
 
-                case MessageType.ImprovedInstantMessage:
-                    /* IM uses a different internal format, so decode it and pass it on */
-                    if(!pck.ReadUUID().Equals(AgentID))
-                    {
-
-                    }
-                    else if (!pck.ReadUUID().Equals(SessionID))
-                    {
-
-                    }
-                    else
-                    {
-                        GridInstantMessage im = new GridInstantMessage();
-                        im.FromAgent.ID = AgentID;
-                        pck.ReadBoolean();
-                        im.IsFromGroup = false;
-                        im.ToAgent.ID = pck.ReadUUID();
-                        im.ParentEstateID = pck.ReadUInt32();
-                        im.RegionID = pck.ReadUUID();
-                        im.Position = pck.ReadVector3f();
-                        im.IsOffline = pck.ReadBoolean();
-                        im.Dialog = (GridInstantMessageDialog) pck.ReadUInt8();
-                        im.IMSessionID = pck.ReadUUID();
-                        im.Timestamp = Date.UnixTimeToDateTime(pck.ReadUInt32());
-                        im.FromAgent.FullName = pck.ReadStringLen8();
-                        im.Message = pck.ReadStringLen16();
-                        im.BinaryBucket = pck.ReadBytes(pck.ReadUInt16());
-                        im.OnResult = OnIMResult;
-                        /* TODO: pass on to IMService, add onresult to the im */
-                        m_Server.RouteIM(im);
-                    }
-                    
-                    break;
-
                 case MessageType.TransferRequest:
                     {
                         /* we need differentiation here of SimInventoryItem */
@@ -1060,6 +1084,23 @@ namespace SilverSim.LL.Core
                         {
                             mdel(m);
                         }
+                        else if(m.Number == MessageType.ImprovedInstantMessage)
+                        {
+                            ImprovedInstantMessage im = (ImprovedInstantMessage)m;
+                            if(im.CircuitAgentID != im.AgentID ||
+                                im.CircuitSessionID != im.SessionID)
+                            {
+                                break;
+                            }
+                            if(m_IMMessageRouting.TryGetValue(im.Dialog, out mdel))
+                            {
+                                mdel(m);
+                            }
+                            else
+                            {
+                                m_Log.DebugFormat("Unhandled im message {0} received", im.Dialog.ToString());
+                            }
+                        }
                         else if (m.Number == MessageType.GenericMessage)
                         {
                             SilverSim.LL.Messages.Generic.GenericMessage genMsg = (SilverSim.LL.Messages.Generic.GenericMessage)m;
@@ -1085,7 +1126,7 @@ namespace SilverSim.LL.Core
             }
         }
 
-        void OnIMResult(GridInstantMessage im, bool success)
+        internal void OnIMResult(GridInstantMessage im, bool success)
         {
             if (!success)
             {
