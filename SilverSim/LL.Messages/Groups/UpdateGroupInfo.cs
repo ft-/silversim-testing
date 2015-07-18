@@ -35,7 +35,7 @@ namespace SilverSim.LL.Messages.Groups
     [Reliable]
     [Zerocoded]
     [NotTrusted]
-    class UpdateGroupInfo : Message
+    public class UpdateGroupInfo : Message
     {
         public UUID AgentID;
         public UUID SessionID;

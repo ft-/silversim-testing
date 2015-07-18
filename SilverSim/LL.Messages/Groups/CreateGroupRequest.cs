@@ -31,7 +31,7 @@ namespace SilverSim.LL.Messages.Groups
     [Reliable]
     [Zerocoded]
     [NotTrusted]
-    class CreateGroupRequest : Message
+    public class CreateGroupRequest : Message
     {
         public UUID AgentID;
         public UUID SessionID;

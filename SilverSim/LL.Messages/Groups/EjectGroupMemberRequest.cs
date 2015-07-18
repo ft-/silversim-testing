@@ -31,7 +31,7 @@ namespace SilverSim.LL.Messages.Groups
     [Reliable]
     [UDPMessage(MessageType.EjectGroupMemberRequest)]
     [NotTrusted]
-    class EjectGroupMemberRequest : Message
+    public class EjectGroupMemberRequest : Message
     {
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;

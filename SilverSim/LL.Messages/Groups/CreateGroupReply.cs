@@ -30,7 +30,7 @@ namespace SilverSim.LL.Messages.Groups
     [UDPMessage(MessageType.CreateGroupReply)]
     [Reliable]
     [Trusted]
-    class CreateGroupReply : Message
+    public class CreateGroupReply : Message
     {
         public UUID AgentID = UUID.Zero;
         public UUID GroupID = UUID.Zero;
