@@ -45,6 +45,14 @@ namespace SilverSim.LL.Messages.Groups
             public string Subject;
             public bool HasAttachment;
             public AssetType AssetType;
+
+            public int SizeInMessage
+            {
+                get
+                {
+                    return 24 + FromName.Length + Subject.Length;
+                }
+            }
         }
 
         public List<GroupNoticeData> Data = new List<GroupNoticeData>();

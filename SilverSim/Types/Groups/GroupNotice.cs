@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.Types.Asset;
 namespace SilverSim.Types.Groups
 {
     public class GroupNotice
@@ -34,7 +35,7 @@ namespace SilverSim.Types.Groups
         public string Subject = string.Empty;
         public string Message = string.Empty;
         public bool HasAttachment = false;
-        public int AttachmentType = 0;
+        public AssetType AttachmentType = 0;
         public string AttachmentName = "";
         public UUID AttachmentItemID = UUID.Zero;
         public UUI AttachmentOwner = UUI.Unknown;

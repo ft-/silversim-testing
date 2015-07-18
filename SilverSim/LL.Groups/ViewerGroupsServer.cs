@@ -214,6 +214,7 @@ namespace SilverSim.LL.Groups
             }
         }
 
+        #region Group Notice
         void HandleGroupNoticesListRequest(LLAgent agent, SceneInterface scene, Message m)
         {
             GroupNoticesListRequest req = (GroupNoticesListRequest)m;
@@ -222,8 +223,73 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
-        }
+            GroupsServiceInterface groupsService = scene.GroupsService;
 
+            if(groupsService == null)
+            {
+                GroupNoticesListReply reply = new GroupNoticesListReply();
+                reply.AgentID = req.AgentID;
+                reply.GroupID = req.GroupID;
+                agent.SendMessageAlways(reply, scene.ID);
+            }
+            else if((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.ReceiveNotices) != 0)
+            {
+                List<GroupNotice> notices;
+                try
+                {
+                    notices = groupsService.Notices.GetNotices(agent.Owner, new UGI(req.GroupID));
+                }
+                catch
+                {
+                    notices = new List<GroupNotice>();
+                }
+
+                GroupNoticesListReply reply = null;
+                int messageFill = 0;
+
+                foreach(GroupNotice notice in notices)
+                {
+                    GroupNoticesListReply.GroupNoticeData d = new GroupNoticesListReply.GroupNoticeData();
+                    d.NoticeID = notice.ID;
+                    d.Timestamp = notice.Timestamp;
+                    d.FromName = notice.FromName;
+                    d.Subject = notice.Subject;
+                    d.HasAttachment = notice.HasAttachment;
+                    d.AssetType = notice.AttachmentType;
+
+                    if(reply != null && messageFill + d.SizeInMessage > 1400)
+                    {
+                        agent.SendMessageAlways(reply, scene.ID);
+                        reply = null;
+                    }
+
+                    if(null == reply)
+                    {
+                        reply = new GroupNoticesListReply();
+                        reply.AgentID = req.AgentID;
+                        reply.GroupID = req.GroupID;
+                        messageFill = 0;
+                    }
+
+                    reply.Data.Add(d);
+                    messageFill += d.SizeInMessage;
+                }
+                if(null != reply)
+                {
+                    agent.SendMessageAlways(reply, scene.ID);
+                }
+            }
+            else
+            {
+                GroupNoticesListReply reply = new GroupNoticesListReply();
+                reply.AgentID = req.AgentID;
+                reply.GroupID = req.GroupID;
+                agent.SendMessageAlways(reply, scene.ID);
+            }
+        }
+        #endregion
+
+        #region Groups
         void HandleCreateGroupRequest(LLAgent agent, SceneInterface scene, Message m)
         {
             CreateGroupRequest req = (CreateGroupRequest)m;
@@ -244,29 +310,9 @@ namespace SilverSim.LL.Groups
             }
         }
 
-        void HandleGroupRoleChanges(LLAgent agent, SceneInterface scene, Message m)
-        {
-            GroupRoleChanges req = (GroupRoleChanges)m;
-            if (req.CircuitAgentID != req.AgentID ||
-                req.CircuitSessionID != req.SessionID)
-            {
-                return;
-            }
-        }
-
         void HandleJoinGroupRequest(LLAgent agent, SceneInterface scene, Message m)
         {
             JoinGroupRequest req = (JoinGroupRequest)m;
-            if (req.CircuitAgentID != req.AgentID ||
-                req.CircuitSessionID != req.SessionID)
-            {
-                return;
-            }
-        }
-
-        void HandleEjectGroupMemberRequest(LLAgent agent, SceneInterface scene, Message m)
-        {
-            EjectGroupMemberRequest req = (EjectGroupMemberRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
             {
@@ -303,7 +349,85 @@ namespace SilverSim.LL.Groups
                 return;
             }
         }
+        #endregion
 
+        #region GroupRole
+        void HandleGroupRoleChanges(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupRoleChanges req = (GroupRoleChanges)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupRoleDataRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupRoleDataRequest req = (GroupRoleDataRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupRoleMembersRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupRoleMembersRequest req = (GroupRoleMembersRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupRoleUpdate(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupRoleUpdate req = (GroupRoleUpdate)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+        #endregion
+
+        #region Group members
+        void HandleEjectGroupMemberRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            EjectGroupMemberRequest req = (EjectGroupMemberRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+        #endregion
+
+        #region Group Titles
+        void HandleGroupTitlesRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupTitlesRequest req = (GroupTitlesRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupTitleUpdate(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupTitleUpdate req = (GroupTitleUpdate)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+        #endregion
+
+        #region Group Account
         void HandleGroupAccountSummaryRequest(LLAgent agent, SceneInterface scene, Message m)
         {
             GroupAccountSummaryRequest req = (GroupAccountSummaryRequest)m;
@@ -333,7 +457,21 @@ namespace SilverSim.LL.Groups
                 return;
             }
         }
+        #endregion
 
+        #region Active Group Selection
+        void HandleActivateGroup(LLAgent agent, SceneInterface scene, Message m)
+        {
+            ActivateGroup req = (ActivateGroup)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+        #endregion
+
+        #region Group Proposals
         void HandleGroupActiveProposalsRequest(LLAgent agent, SceneInterface scene, Message m)
         {
             GroupActiveProposalsRequest req = (GroupActiveProposalsRequest)m;
@@ -373,17 +511,9 @@ namespace SilverSim.LL.Groups
                 return;
             }
         }
+        #endregion
 
-        void HandleActivateGroup(LLAgent agent, SceneInterface scene, Message m)
-        {
-            ActivateGroup req = (ActivateGroup)m;
-            if (req.CircuitAgentID != req.AgentID ||
-                req.CircuitSessionID != req.SessionID)
-            {
-                return;
-            }
-        }
-
+        #region Member group params
         void HandleSetGroupContribution(LLAgent agent, SceneInterface scene, Message m)
         {
             SetGroupContribution req = (SetGroupContribution)m;
@@ -403,56 +533,7 @@ namespace SilverSim.LL.Groups
                 return;
             }
         }
-
-        void HandleGroupRoleDataRequest(LLAgent agent, SceneInterface scene, Message m)
-        {
-            GroupRoleDataRequest req = (GroupRoleDataRequest)m;
-            if (req.CircuitAgentID != req.AgentID ||
-                req.CircuitSessionID != req.SessionID)
-            {
-                return;
-            }
-        }
-
-        void HandleGroupRoleMembersRequest(LLAgent agent, SceneInterface scene, Message m)
-        {
-            GroupRoleMembersRequest req = (GroupRoleMembersRequest)m;
-            if (req.CircuitAgentID != req.AgentID ||
-                req.CircuitSessionID != req.SessionID)
-            {
-                return;
-            }
-        }
-
-        void HandleGroupTitlesRequest(LLAgent agent, SceneInterface scene, Message m)
-        {
-            GroupTitlesRequest req = (GroupTitlesRequest)m;
-            if (req.CircuitAgentID != req.AgentID ||
-                req.CircuitSessionID != req.SessionID)
-            {
-                return;
-            }
-        }
-
-        void HandleGroupTitleUpdate(LLAgent agent, SceneInterface scene, Message m)
-        {
-            GroupTitleUpdate req = (GroupTitleUpdate)m;
-            if (req.CircuitAgentID != req.AgentID ||
-                req.CircuitSessionID != req.SessionID)
-            {
-                return;
-            }
-        }
-
-        void HandleGroupRoleUpdate(LLAgent agent, SceneInterface scene, Message m)
-        {
-            GroupRoleUpdate req = (GroupRoleUpdate)m;
-            if (req.CircuitAgentID != req.AgentID ||
-                req.CircuitSessionID != req.SessionID)
-            {
-                return;
-            }
-        }
+        #endregion
 
         #region Utility
         GroupPowers GetGroupPowers(LLAgent agent, GroupsServiceInterface groupsService, UGI group)

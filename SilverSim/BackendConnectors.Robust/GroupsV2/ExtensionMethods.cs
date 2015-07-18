@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
+using SilverSim.Types.Asset;
 using SilverSim.Types.Groups;
 using System;
 using System.Collections.Generic;
@@ -357,7 +358,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             {
                 notice.AttachmentItemID = m["AttachmentItemID"].AsUUID;
                 notice.AttachmentName = m["AttachmentName"].ToString();
-                notice.AttachmentType = m["AttachmentType"].AsInt;
+                notice.AttachmentType = (AssetType)m["AttachmentType"].AsInt;
                 if ("" != m["AttachmentOwnerID"].ToString())
                 {
                     notice.AttachmentOwner = new UUI(m["AttachmentOwnerID"].ToString());
