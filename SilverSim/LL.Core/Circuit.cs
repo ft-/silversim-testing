@@ -1144,7 +1144,7 @@ namespace SilverSim.LL.Core
                         m.Position = Vector3.Zero;
                         m.IsOffline = false;
                         m.Timestamp = new Date();
-                        m.Dialog = GridInstantMessageDialog.MessageFromAgent;
+                        m.Dialog = GridInstantMessageDialog.BusyAutoResponse;
                         m.ID = im.IMSessionID;
                         m.Message = "User not logged in. Message not saved.";
                         SendMessage(m);

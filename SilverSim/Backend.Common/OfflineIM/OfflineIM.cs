@@ -103,7 +103,7 @@ namespace SilverSim.Backend.Common.OfflineIM
                     GridInstantMessage response_im = new GridInstantMessage();
                     response_im.FromAgent = im.ToAgent;
                     response_im.ToAgent = im.FromAgent;
-                    response_im.Dialog = GridInstantMessageDialog.MessageFromAgent;
+                    response_im.Dialog = GridInstantMessageDialog.BusyAutoResponse;
                     response_im.IsFromGroup = false;
                     response_im.Message = "User is not logged in. Message saved.";
                     response_im.IMSessionID = im.IMSessionID;

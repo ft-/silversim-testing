@@ -36,6 +36,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
+using SilverSim.Types.IM;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -72,6 +73,12 @@ namespace SilverSim.LL.Groups
         [PacketHandler(MessageType.GroupTitlesRequest)]
         [PacketHandler(MessageType.GroupTitleUpdate)]
         [PacketHandler(MessageType.GroupRoleUpdate)]
+        [IMMessageHandler(GridInstantMessageDialog.GroupInvitationAccept)]
+        [IMMessageHandler(GridInstantMessageDialog.GroupInvitationDecline)]
+        [IMMessageHandler(GridInstantMessageDialog.GroupNotice)]
+        [IMMessageHandler(GridInstantMessageDialog.GroupNoticeInventoryAccepted)]
+        [IMMessageHandler(GridInstantMessageDialog.SessionGroupStart)]
+        [IMMessageHandler(GridInstantMessageDialog.SessionSend)]
         BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
 
         bool m_ShutdownGroups = false;
