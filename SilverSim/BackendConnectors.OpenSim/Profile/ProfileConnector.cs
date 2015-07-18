@@ -47,6 +47,7 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
 
         public ProfileConnector(string url)
         {
+            TimeoutMs = 20000;
             m_Classifieds = new AutoDetectClassifiedsConnector(this, url);
             m_Picks = new AutoDetectPicksConnector(this, url);
             m_Notes = new AutoDetectNotesConnector(this, url);

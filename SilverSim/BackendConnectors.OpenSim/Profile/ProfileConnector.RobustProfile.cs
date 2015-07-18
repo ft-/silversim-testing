@@ -296,7 +296,8 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     Map reslist = (((Map)res)["result"]) as Map;
                     ProfileProperties props = new ProfileProperties();
 
-                    props.User.ID = reslist["UserId"].AsUUID;
+                    props.User = user;
+                    props.Partner = UUI.Unknown;
                     props.Partner.ID = reslist["PartnerId"].AsUUID;
                     props.PublishProfile = (ABoolean)reslist["PublishProfile"];
                     props.PublishMature = (ABoolean)reslist["PublishMature"];

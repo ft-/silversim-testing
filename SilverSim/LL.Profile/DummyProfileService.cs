@@ -161,9 +161,9 @@ namespace SilverSim.LL.Profile
                     props.SkillsMask = 0;
                     props.SkillsText = "";
                     props.Language = "";
-                    props.ImageID = "5748decc-f629-461c-9a36-a35a221fe21f";
+                    props.ImageID = UUID.Zero;
                     props.AboutText = "";
-                    props.FirstLifeImageID = "5748decc-f629-461c-9a36-a35a221fe21f";
+                    props.FirstLifeImageID = UUID.Zero;
                     props.FirstLifeText = "";
                     return props;
                 }

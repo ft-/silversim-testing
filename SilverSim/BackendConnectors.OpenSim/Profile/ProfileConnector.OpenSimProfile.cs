@@ -307,6 +307,8 @@ namespace SilverSim.BackendConnectors.OpenSim.Profile
                     map.Add("avatar_id", user.ID);
                     Map res = (Map)(((AnArray)OpenSimXmlRpcCall("avatar_properties_request", map))[0]);
                     ProfileProperties props = new ProfileProperties();
+                    props.User = user;
+                    props.Partner = UUI.Unknown;
                     props.Partner.ID = res["Partner"].AsUUID;
                     props.WebUrl = res["ProfileUrl"].ToString();
                     props.WantToMask = res["wantmask"].AsUInt;
