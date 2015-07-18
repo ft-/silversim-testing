@@ -56,6 +56,14 @@ namespace SilverSim.ServiceInterfaces.Groups
             List<DirGroupInfo> GetGroupsByName(UUI requestingAgent, string query);
         }
 
+        public interface IGroupMembershipsInterface
+        {
+            List<GroupMembership> this[UUI requestingAgent, UUI principal]
+            {
+                get;
+            }
+        }
+
         public interface IGroupMembersInterface
         {
             GroupMember this[UUI requestingAgent, UGI group, UUI principal]
@@ -183,6 +191,11 @@ namespace SilverSim.ServiceInterfaces.Groups
         }
 
         public abstract IGroupMembersInterface Members
+        {
+            get;
+        }
+
+        public abstract IGroupMembershipsInterface Memberships
         {
             get;
         }

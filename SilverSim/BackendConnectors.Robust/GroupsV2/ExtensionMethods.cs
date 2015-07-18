@@ -200,6 +200,47 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             return member;
         }
 
+        public static GroupMembership ToGroupMembership(this IValue iv)
+        {
+            Map m = (Map)iv;
+            GroupMembership member = new GroupMembership();
+
+            if (m.ContainsKey("GroupID"))
+            {
+                member.Group.ID = m["GroupID"].AsUUID;
+            }
+
+            if (m.ContainsKey("GroupName"))
+            {
+                member.Group.GroupName = m["GroupName"].ToString();
+            }
+
+            if (m.ContainsKey("GroupPicture"))
+            {
+                member.GroupInsigniaID = m["GroupPicture"].AsUUID;
+            }
+
+            if(m.ContainsKey("GroupPowers"))
+            {
+                member.GroupPowers = (GroupPowers)ulong.Parse(m["GroupPowers"].ToString());
+            }
+
+            if (m.ContainsKey("Contribution"))
+            {
+                member.Contribution = m["Contribution"].AsInt;
+            }
+            if (m.ContainsKey("ListInProfile"))
+            {
+                member.ListInProfile = bool.Parse(m["ListInProfile"].ToString());
+            }
+            if (m.ContainsKey("AcceptNotices"))
+            {
+                member.AcceptNotices = bool.Parse(m["AcceptNotices"].ToString());
+            }
+
+            return member;
+        }
+
         public static GroupMember ToGroupMember(this IValue iv, UGI group)
         {
             Map m = (Map)iv;

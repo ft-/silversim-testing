@@ -36,6 +36,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
+using SilverSim.Types.Groups;
 using SilverSim.Types.Profile;
 using System;
 using System.Collections.Generic;
@@ -990,9 +991,40 @@ namespace SilverSim.LL.Profile
             res2.AvatarID = req.AvatarID;
             agent.SendMessageAlways(res2, scene.ID);
 
+
             AvatarGroupsReply res3 = new AvatarGroupsReply();
             res3.AgentID = req.AgentID;
             res3.AvatarID = req.AvatarID;
+            /* when the scene has a groups service, we check which groups the avatar has */
+            if(null != scene.GroupsService)
+            {
+                try
+                {
+                    List<GroupMembership> gmems = scene.GroupsService.Memberships[uui, uui];
+
+                    foreach(GroupMembership gmem in gmems)
+                    {
+                        AvatarGroupsReply.GroupDataEntry d = new AvatarGroupsReply.GroupDataEntry();
+                        d.GroupPowers = gmem.GroupPowers;
+                        d.AcceptNotices = gmem.AcceptNotices;
+                        d.GroupTitle = gmem.GroupTitle;
+                        d.GroupName = gmem.Group.GroupName;
+                        d.GroupInsigniaID = gmem.GroupInsigniaID;
+                        d.ListInProfile = gmem.ListInProfile;
+                        res3.GroupData.Add(d);
+                    }
+
+                }
+                catch
+#if DEBUG
+                    (Exception e)
+#endif
+                {
+#if DEBUG
+                    m_Log.Debug("Exception at groups request", e);
+#endif
+                }
+            }
             agent.SendMessageAlways(res3, scene.ID);
         }
 

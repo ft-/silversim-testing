@@ -24,9 +24,10 @@ exception statement from your version.
 */
 
 using SilverSim.Types;
-using MapType = SilverSim.Types.Map;
+using SilverSim.Types.Groups;
 using System;
 using System.Collections.Generic;
+using MapType = SilverSim.Types.Map;
 
 namespace SilverSim.LL.Messages.Agent
 {
@@ -41,7 +42,7 @@ namespace SilverSim.LL.Messages.Agent
         {
             public bool ListInProfile; /* <- not in UDP message */
             public UUID GroupID;
-            public UInt64 GroupPowers;
+            public GroupPowers GroupPowers;
             public bool AcceptNotices;
             public UUID GroupInsigniaID;
             public Int32 Contribution;
@@ -63,7 +64,7 @@ namespace SilverSim.LL.Messages.Agent
             foreach(GroupDataEntry d in GroupData)
             {
                 p.WriteUUID(d.GroupID);
-                p.WriteUInt64(d.GroupPowers);
+                p.WriteUInt64((UInt64)d.GroupPowers);
                 p.WriteBoolean(d.AcceptNotices);
                 p.WriteUUID(d.GroupInsigniaID);
                 p.WriteInt32(d.Contribution);

@@ -76,6 +76,7 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
         MembersAccessor m_Members;
         RoleMembersAccessor m_Rolemembers;
         ActiveGroupAccessor m_ActiveGroup;
+        MembershipsAccessor m_Memberships;
         InvitesAccessor m_Invites;
         NoticesAccessor m_Notices;
         int m_TimeoutMs = 20000;
@@ -92,6 +93,7 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
                 m_Groups.TimeoutMs = value;
                 m_GroupRoles.TimeoutMs = value;
                 m_Members.TimeoutMs = value;
+                m_Memberships.TimeoutMs = value;
                 m_Rolemembers.TimeoutMs = value;
                 m_ActiveGroup.TimeoutMs = value;
                 m_Invites.TimeoutMs = value;
@@ -104,6 +106,7 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
             m_Groups = new GroupsAccessor(uri);
             m_GroupRoles = new GroupRolesAccessor(uri);
             m_Members = new MembersAccessor(uri);
+            m_Memberships = new MembershipsAccessor(uri);
             m_Rolemembers = new RoleMembersAccessor(uri);
             m_ActiveGroup = new ActiveGroupAccessor(uri);
             m_Invites = new InvitesAccessor(uri);
@@ -208,6 +211,14 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
             get
             {
                 return m_Members;
+            }
+        }
+
+        public override IGroupMembershipsInterface Memberships
+        {
+            get 
+            {
+                return m_Memberships;
             }
         }
 

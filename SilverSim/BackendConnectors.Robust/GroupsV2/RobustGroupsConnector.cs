@@ -39,6 +39,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
         GroupsAccessor m_Groups;
         GroupRolesAccessor m_GroupRoles;
         MembersAccessor m_Members;
+        MembershipsAccessor m_Memberships;
         RoleMembersAccessor m_Rolemembers;
         ActiveGroupAccessor m_ActiveGroup;
         InvitesAccessor m_Invites;
@@ -57,6 +58,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 m_Groups.TimeoutMs = value;
                 m_GroupRoles.TimeoutMs = value;
                 m_Members.TimeoutMs = value;
+                m_Memberships.TimeoutMs = value;
                 m_Rolemembers.TimeoutMs = value;
                 m_ActiveGroup.TimeoutMs = value;
                 m_Invites.TimeoutMs = value;
@@ -74,6 +76,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             m_Groups = new GroupsAccessor(uri, serviceUri);
             m_GroupRoles = new GroupRolesAccessor(uri);
             m_Members = new MembersAccessor(uri);
+            m_Memberships = new MembershipsAccessor(uri);
             m_Rolemembers = new RoleMembersAccessor(uri);
             m_ActiveGroup = new ActiveGroupAccessor(uri);
             m_Invites = new InvitesAccessor(uri);
@@ -105,6 +108,14 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             get 
             {
                 return m_Members;
+            }
+        }
+
+        public override IGroupMembershipsInterface Memberships
+        {
+            get 
+            {
+                return m_Memberships;
             }
         }
 
