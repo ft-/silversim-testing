@@ -23,14 +23,18 @@ exception statement from your version.
 
 */
 
+using log4net;
 using Nini.Config;
 using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
+using SilverSim.LL.Messages.Groups;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
@@ -39,6 +43,8 @@ namespace SilverSim.LL.Groups
 {
     public class ViewerGroupsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("LL GROUPS");
+
         [PacketHandler(MessageType.GroupNoticesListRequest)]
         [PacketHandler(MessageType.CreateGroupRequest)]
         [PacketHandler(MessageType.UpdateGroupInfo)]
@@ -94,10 +100,361 @@ namespace SilverSim.LL.Groups
                 }
 
                 Message m = req.Value;
+                SceneInterface scene = req.Key.Scene;
+                if (scene == null)
+                {
+                    continue;
+                }
 
+                try
+                {
+                    switch(m.Number)
+                    {
+                        case MessageType.GroupNoticesListRequest:
+                            HandleGroupNoticesListRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.CreateGroupRequest:
+                            HandleCreateGroupRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.UpdateGroupInfo:
+                            HandleUpdateGroupInfo(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupRoleChanges:
+                            HandleGroupRoleChanges(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.JoinGroupRequest:
+                            HandleJoinGroupRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.EjectGroupMemberRequest:
+                            HandleEjectGroupMemberRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.LeaveGroupRequest:
+                            HandleLeaveGroupRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.InviteGroupRequest:
+                            HandleInviteGroupRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupProfileRequest:
+                            HandleGroupProfileRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupAccountSummaryRequest:
+                            HandleGroupAccountSummaryRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupAccountDetailsRequest:
+                            HandleGroupAccountDetailsRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupAccountTransactionsRequest:
+                            HandleGroupAccountTransactionsRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupActiveProposalsRequest:
+                            HandleGroupActiveProposalsRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupVoteHistoryRequest:
+                            HandleGroupVoteHistoryRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.StartGroupProposal:
+                            HandleStartGroupProposal(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupProposalBallot:
+                            HandleGroupProposalBallot(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.ActivateGroup:
+                            HandleActivateGroup(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.SetGroupContribution:
+                            HandleSetGroupContribution(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.SetGroupAcceptNotices:
+                            HandleSetGroupContribution(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupRoleDataRequest:
+                            HandleGroupRoleDataRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupRoleMembersRequest:
+                            HandleGroupRoleMembersRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupTitlesRequest:
+                            HandleGroupTitlesRequest(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupTitleUpdate:
+                            HandleGroupTitleUpdate(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupRoleUpdate:
+                            HandleGroupRoleUpdate(req.Key.Agent, scene, m);
+                            break;
+                    }
+                }
+                catch (Exception e)
+                {
+                    m_Log.Debug("Unexpected exception " + e.Message, e);
+                }
             }
         }
 
+        void HandleGroupNoticesListRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupNoticesListRequest req = (GroupNoticesListRequest)m;
+            if(req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleCreateGroupRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            CreateGroupRequest req = (CreateGroupRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleUpdateGroupInfo(LLAgent agent, SceneInterface scene, Message m)
+        {
+            UpdateGroupInfo req = (UpdateGroupInfo)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupRoleChanges(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupRoleChanges req = (GroupRoleChanges)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleJoinGroupRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            JoinGroupRequest req = (JoinGroupRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleEjectGroupMemberRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            EjectGroupMemberRequest req = (EjectGroupMemberRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleLeaveGroupRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            LeaveGroupRequest req = (LeaveGroupRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleInviteGroupRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            InviteGroupRequest req = (InviteGroupRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupProfileRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupProfileRequest req = (GroupProfileRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupAccountSummaryRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupAccountSummaryRequest req = (GroupAccountSummaryRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupAccountDetailsRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupAccountDetailsRequest req = (GroupAccountDetailsRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupAccountTransactionsRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupAccountTransactionsRequest req = (GroupAccountTransactionsRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupActiveProposalsRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupActiveProposalsRequest req = (GroupActiveProposalsRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupVoteHistoryRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupVoteHistoryRequest req = (GroupVoteHistoryRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleStartGroupProposal(LLAgent agent, SceneInterface scene, Message m)
+        {
+            StartGroupProposal req = (StartGroupProposal)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupProposalBallot(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupProposalBallot req = (GroupProposalBallot)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleActivateGroup(LLAgent agent, SceneInterface scene, Message m)
+        {
+            ActivateGroup req = (ActivateGroup)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleSetGroupContribution(LLAgent agent, SceneInterface scene, Message m)
+        {
+            SetGroupContribution req = (SetGroupContribution)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleSetGroupAcceptNotices(LLAgent agent, SceneInterface scene, Message m)
+        {
+            SetGroupAcceptNotices req = (SetGroupAcceptNotices)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupRoleDataRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupRoleDataRequest req = (GroupRoleDataRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupRoleMembersRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupRoleMembersRequest req = (GroupRoleMembersRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupTitlesRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupTitlesRequest req = (GroupTitlesRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupTitleUpdate(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupTitleUpdate req = (GroupTitleUpdate)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        void HandleGroupRoleUpdate(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupRoleUpdate req = (GroupRoleUpdate)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+        }
+
+        #region Utility
         GroupPowers GetGroupPowers(LLAgent agent, GroupsServiceInterface groupsService, UGI group)
         {
             if(null == groupsService)
@@ -113,12 +470,15 @@ namespace SilverSim.LL.Groups
 
             return GroupPowers.None;
         }
+        #endregion
 
+        #region Capability
         [CapabilityHandler("GroupMemberData")]
         public void HandleGroupMemberDataCapability(LLAgent agent, Circuit circuit, HttpRequest req)
         {
             req.ErrorResponse(System.Net.HttpStatusCode.InternalServerError, "Internal Server Error");
         }
+        #endregion
 
         public ShutdownOrder ShutdownOrder
         {
