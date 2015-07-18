@@ -25,12 +25,14 @@ exception statement from your version.
 
 using SilverSim.Types;
 using System.Collections.Generic;
+using MapType = SilverSim.Types.Map;
 
 namespace SilverSim.LL.Messages.Inventory
 {
     [UDPMessage(MessageType.RemoveInventoryItem)]
     [Reliable]
     [NotTrusted]
+    [EventQueueGet("RemoveInventoryItem")]
     public class RemoveInventoryItem : Message
     {
         public UUID AgentID;
@@ -55,6 +57,29 @@ namespace SilverSim.LL.Messages.Inventory
             }
 
             return m;
+        }
+
+        public override IValue SerializeEQG()
+        {
+            MapType llsd = new MapType();
+            MapType agentData = new MapType();
+            AnArray agentDataArray = new AnArray();
+            agentData.Add("AgentID", AgentID);
+            agentData.Add("SessionID", SessionID);
+            agentDataArray.Add(agentData);
+            llsd.Add("AgentData", agentDataArray);
+
+            AnArray itemDataArray = new AnArray();
+            foreach(UUID itemID in InventoryData)
+            {
+                MapType itemData = new MapType();
+                itemData.Add("ItemID", itemID);
+                itemData.Add("AgentID", AgentID);
+                itemDataArray.Add(itemData);
+            }
+            llsd.Add("InventoryData", itemDataArray);
+
+            return llsd;
         }
     }
 }

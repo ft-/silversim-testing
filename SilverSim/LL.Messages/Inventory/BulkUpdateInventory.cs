@@ -28,15 +28,18 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using MapType = SilverSim.Types.Map;
 
 namespace SilverSim.LL.Messages.Inventory
 {
     [UDPMessage(MessageType.BulkUpdateInventory)]
     [Reliable]
     [Trusted]
+    [EventQueueGet("BulkUpdateInventory")]
     public class BulkUpdateInventory : Message
     {
         public UUID AgentID;
+        public UUID SessionID; /* serialized in EQG */
         public UUID TransactionID;
 
         public struct FolderDataEntry
@@ -72,6 +75,35 @@ namespace SilverSim.LL.Messages.Inventory
             public string Name;
             public string Description;
             public UInt32 CreationDate;
+
+            public uint Checksum
+            {
+                get
+                {
+                    uint checksum = 0;
+
+                    checksum += AssetID.LLChecksum; // AssetID
+                    checksum += FolderID.LLChecksum; // FolderID
+                    checksum += ItemID.LLChecksum; // ItemID
+
+                    checksum += CreatorID.LLChecksum; // CreatorID
+                    checksum += OwnerID.LLChecksum; // OwnerID
+                    checksum += GroupID.LLChecksum; // GroupID
+
+                    checksum += (uint)OwnerMask;
+                    checksum += (uint)NextOwnerMask;
+                    checksum += (uint)EveryoneMask;
+                    checksum += (uint)GroupMask;
+
+                    checksum += Flags; // Flags
+                    checksum += (uint)InvType; // InvType
+                    checksum += (uint)Type; // Type 
+                    checksum += (uint)CreationDate; // CreationDate
+                    checksum += (uint)SalePrice;    // SalePrice
+                    checksum += (uint)((uint)SaleType * 0x07073096); // SaleType
+                    return checksum;
+                }
+            }
         }
 
         public List<ItemDataEntry> ItemData = new List<ItemDataEntry>();
@@ -172,31 +204,77 @@ namespace SilverSim.LL.Messages.Inventory
                 p.WriteStringLen8(d.Name);
                 p.WriteStringLen8(d.Description);
                 p.WriteUInt32(d.CreationDate);
-
-                uint checksum = 0;
-
-                checksum += d.AssetID.LLChecksum; // AssetID
-                checksum += d.FolderID.LLChecksum; // FolderID
-                checksum += d.ItemID.LLChecksum; // ItemID
-
-                checksum += d.CreatorID.LLChecksum; // CreatorID
-                checksum += d.OwnerID.LLChecksum; // OwnerID
-                checksum += d.GroupID.LLChecksum; // GroupID
-
-                checksum += (uint)d.OwnerMask;
-                checksum += (uint)d.NextOwnerMask;
-                checksum += (uint)d.EveryoneMask;
-                checksum += (uint)d.GroupMask;
-
-                checksum += d.Flags; // Flags
-                checksum += (uint)d.InvType; // InvType
-                checksum += (uint)d.Type; // Type 
-                checksum += (uint)d.CreationDate; // CreationDate
-                checksum += (uint)d.SalePrice;    // SalePrice
-                checksum += (uint)((uint)d.SaleType * 0x07073096); // SaleType
-
-                p.WriteUInt32(checksum);
+                p.WriteUInt32(d.Checksum);
             }
+        }
+
+        BinaryData EncodeU32ToBinary(uint val)
+        {
+            byte[] ret = BitConverter.GetBytes(val);
+            if(BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(ret);
+            }
+            return new BinaryData(ret);
+        }
+
+        public override IValue SerializeEQG()
+        {
+            MapType llsd = new MapType();
+
+            AnArray agentDataArray = new AnArray();
+            MapType agentData = new MapType();
+            agentData.Add("AgentID", AgentID);
+            agentData.Add("SessionID", SessionID);
+            agentData.Add("TransactionID", TransactionID);
+            agentDataArray.Add(agentData);
+            llsd.Add("AgentData", agentDataArray);
+
+            AnArray folderDataArray = new AnArray();
+
+            foreach(FolderDataEntry folder in FolderData)
+            {
+                MapType folderData = new MapType();
+                folderData.Add("FolderID", folder.FolderID);
+                folderData.Add("AgentID", AgentID);
+                folderData.Add("ParentID", folder.ParentID);
+                folderData.Add("Type", (int)folder.Type);
+                folderData.Add("Name", folder.Name);
+                folderDataArray.Add(folderData);
+            }
+            llsd.Add("FolderData", folderDataArray);
+
+            AnArray itemDataArray = new AnArray();
+            foreach(ItemDataEntry item in ItemData)
+            {
+                MapType itemData = new MapType();
+                itemData.Add("ItemID", item.ItemID);
+                itemData.Add("FolderID", item.FolderID);
+                itemData.Add("CreatorID", item.CreatorID);
+                itemData.Add("OwnerID", item.OwnerID);
+                itemData.Add("GroupID", item.GroupID);
+                itemData.Add("BaseMask", EncodeU32ToBinary((uint)item.BaseMask));
+                itemData.Add("OwnerMask", EncodeU32ToBinary((uint)item.OwnerMask));
+                itemData.Add("GroupMask", EncodeU32ToBinary((uint)item.GroupMask));
+                itemData.Add("EveryoneMask", EncodeU32ToBinary((uint)item.EveryoneMask));
+                itemData.Add("NextOwnerMask", EncodeU32ToBinary((uint)item.NextOwnerMask));
+                itemData.Add("GroupOwned", item.IsGroupOwned);
+                itemData.Add("AssetID", item.AssetID);
+                itemData.Add("Type", (int)item.Type);
+                itemData.Add("InvType", (int)item.InvType);
+                itemData.Add("Flags", EncodeU32ToBinary(item.Flags));
+                itemData.Add("SaleType", (int)item.SaleType);
+                itemData.Add("SalePrice", item.SalePrice);
+                itemData.Add("Name", item.Name);
+                itemData.Add("Description", item.Description);
+                itemData.Add("CreationDate", (int)item.CreationDate);
+                itemData.Add("CRC", EncodeU32ToBinary(item.Checksum));
+                itemData.Add("CallbackID", 0);
+                itemDataArray.Add(itemData);
+            }
+            llsd.Add("ItemData", itemDataArray);
+
+            return llsd;
         }
     }
 }

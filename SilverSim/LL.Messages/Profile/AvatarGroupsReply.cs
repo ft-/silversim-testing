@@ -27,6 +27,7 @@ using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System;
 using System.Collections.Generic;
+using MapType = SilverSim.Types.Map;
 
 namespace SilverSim.LL.Messages.Profile
 {
@@ -34,6 +35,7 @@ namespace SilverSim.LL.Messages.Profile
     [Reliable]
     [Zerocoded]
     [Trusted]
+    [EventQueueGet("AvatarGroupsReply")]
     public class AvatarGroupsReply : Message
     {
         public UUID AgentID = UUID.Zero;
@@ -47,6 +49,7 @@ namespace SilverSim.LL.Messages.Profile
             public UUID GroupID;
             public string GroupName;
             public UUID GroupInsigniaID;
+            public bool ListInProfile;
         }
 
         public List<GroupDataEntry> GroupData = new List<GroupDataEntry>();
@@ -73,6 +76,40 @@ namespace SilverSim.LL.Messages.Profile
                 p.WriteUUID(d.GroupInsigniaID);
             }
             p.WriteBoolean(ListInProfile);
+        }
+
+        public override IValue SerializeEQG()
+        {
+            MapType llsd = new MapType();
+
+            AnArray agentDataArray = new AnArray();
+            MapType agentData = new MapType();
+            agentData.Add("AgentID", AgentID);
+            agentData.Add("AvatarID", AvatarID);
+            agentDataArray.Add(agentData);
+            llsd.Add("AgentData", agentDataArray);
+
+            AnArray groupDataArray = new AnArray();
+            AnArray newGroupDataArray = new AnArray();
+
+            foreach(GroupDataEntry e in GroupData)
+            {
+                MapType groupData = new MapType();
+                MapType newGroupData = new MapType();
+                groupData.Add("GroupPowers", ((ulong)e.GroupPowers).ToString());
+                groupData.Add("AcceptNotices", e.AcceptNotices);
+                groupData.Add("GroupTitle", e.GroupTitle);
+                groupData.Add("GroupID", e.GroupID);
+                groupData.Add("GroupName", e.GroupName);
+                groupData.Add("GroupInsigniaID", e.GroupInsigniaID);
+                newGroupData.Add("ListInProfile", e.ListInProfile);
+                groupDataArray.Add(groupData);
+                newGroupDataArray.Add(newGroupData);
+            }
+            llsd.Add("GroupData", groupDataArray);
+            llsd.Add("NewGroupData", newGroupDataArray);
+
+            return llsd;
         }
     }
 }
