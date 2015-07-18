@@ -40,6 +40,7 @@ using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
@@ -815,6 +816,14 @@ namespace SilverSim.LL.Core
             }
         }
 
+        public OfflineIMServiceInterface OfflineIMService
+        {
+            get
+            {
+                return m_OfflineIMService;
+            }
+        }
+
         public GroupsServiceInterface GroupsService
         {
             get
@@ -914,6 +923,7 @@ namespace SilverSim.LL.Core
         private GridUserServiceInterface m_GridUserService;
         private GridServiceInterface m_GridService;
         private EconomyServiceInterface m_EconomyService;
+        private OfflineIMServiceInterface m_OfflineIMService;
 
         #endregion
 
@@ -944,6 +954,7 @@ namespace SilverSim.LL.Core
             m_GridUserService = serviceList.Get<GridUserServiceInterface>();
             m_GridService = serviceList.Get<GridServiceInterface>();
             m_EconomyService = serviceList.Get<EconomyServiceInterface>();
+            m_OfflineIMService = serviceList.Get<OfflineIMServiceInterface>();
             HomeURI = homeURI;
             FirstName = firstName;
             LastName = lastName;

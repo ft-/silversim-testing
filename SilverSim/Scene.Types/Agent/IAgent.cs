@@ -32,6 +32,7 @@ using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
@@ -168,6 +169,11 @@ namespace SilverSim.Scene.Types.Agent
         }
 
         EconomyServiceInterface EconomyService
+        {
+            get;
+        }
+
+        OfflineIMServiceInterface OfflineIMService
         {
             get;
         }
