@@ -818,6 +818,96 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
+
+            GroupPowers powers = GetGroupPowers(agent, groupsService, new UGI(req.GroupID));
+            bool haveChanges = false;
+
+            foreach(GroupRoleUpdate.RoleDataEntry gru in req.RoleData)
+            {
+                switch(gru.UpdateType)
+                {
+                    case GroupRoleUpdate.RoleUpdateType.Create:
+                        if((powers & GroupPowers.CreateRole) != 0)
+                        {
+                            GroupRole info = new GroupRole();
+                            info.Group = new UGI(req.GroupID);
+                            info.ID = UUID.Random;
+                            info.Name = gru.Name;
+                            info.Description = gru.Description;
+                            info.Title = gru.Title;
+                            info.Powers = gru.Powers;
+                            try
+                            {
+                                groupsService.Roles.Add(agent.Owner, info);
+                                haveChanges = true;
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                        break;
+
+                    case GroupRoleUpdate.RoleUpdateType.Delete:
+                        if((powers & GroupPowers.DeleteRole) != 0)
+                        {
+                            try
+                            {
+                                groupsService.Roles.Delete(agent.Owner, new UGI(req.GroupID), gru.RoleID);
+                                haveChanges = true;
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                        break;
+
+                    case GroupRoleUpdate.RoleUpdateType.UpdateAll:
+                    case GroupRoleUpdate.RoleUpdateType.UpdateData:
+                    case GroupRoleUpdate.RoleUpdateType.UpdatePowers:
+                        if ((powers & GroupPowers.RoleProperties) != 0)
+                        {
+                            GroupRole role;
+                            try
+                            {
+                                role = groupsService.Roles[agent.Owner, new UGI(req.GroupID), gru.RoleID];
+                            }
+                            catch
+                            {
+                                break;
+                            }
+
+                            if(gru.UpdateType == GroupRoleUpdate.RoleUpdateType.UpdateAll ||
+                                gru.UpdateType == GroupRoleUpdate.RoleUpdateType.UpdateData)
+                            {
+                                role.Description = gru.Description;
+                                role.Title = gru.Title;
+                                role.Name = gru.Name;
+                            }
+                            if(gru.UpdateType == GroupRoleUpdate.RoleUpdateType.UpdateAll ||
+                                gru.UpdateType == GroupRoleUpdate.RoleUpdateType.UpdatePowers)
+                            {
+                                role.Powers = gru.Powers;
+                            }
+                            try
+                            {
+                                groupsService.Roles.Update(agent.Owner, role);
+                                haveChanges = true;
+                            }
+                            catch
+                            {
+
+                            }
+                        }
+                        break;
+                }
+            }
+
+            if(haveChanges)
+            {
+                SendAllAgentsGroupDataUpdate(scene, groupsService, new UGI(req.GroupID));
+            }
         }
         #endregion
 
