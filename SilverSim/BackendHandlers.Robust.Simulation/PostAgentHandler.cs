@@ -27,6 +27,7 @@ using log4net;
 using Nini.Config;
 using SilverSim.BackendConnectors.Robust.Asset;
 using SilverSim.BackendConnectors.Robust.GridUser;
+using SilverSim.BackendConnectors.Robust.IM;
 using SilverSim.BackendConnectors.Robust.Inventory;
 using SilverSim.BackendConnectors.Robust.Presence;
 using SilverSim.BackendConnectors.Robust.UserAgent;
@@ -44,6 +45,7 @@ using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
@@ -94,6 +96,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             public string FriendsServerURI = string.Empty;
             public string GatekeeperURI = string.Empty;
             public string ProfileServerURI = string.Empty;
+            public string OfflineIMServerURI = string.Empty;
             public readonly List<UUID> ValidForSims = new List<UUID>(); /* if empty, all sims are valid */
 
             public GridParameterMap()
@@ -113,6 +116,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 m.AvatarServerURI = AvatarServerURI;
                 m.FriendsServerURI = FriendsServerURI;
                 m.ProfileServerURI = ProfileServerURI;
+                m.OfflineIMServerURI = OfflineIMServerURI;
                 m.ValidForSims.AddRange(ValidForSims);
                 return m;
             }
@@ -205,6 +209,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     map.PresenceServerURI = section.GetString("PresenceServerURI", string.Empty);
                     map.AvatarServerURI = section.GetString("AvatarServerURI", string.Empty);
                     map.InventoryServerURI = section.GetString("InventoryServerURI");
+                    map.OfflineIMServerURI = section.GetString("OfflineIMServerURI", string.Empty);
 
                     if (!Uri.IsWellFormedUriString(map.HomeURI, UriKind.Absolute))
                     {
@@ -229,6 +234,11 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     else if (map.AvatarServerURI != "" && !Uri.IsWellFormedUriString(map.AvatarServerURI, UriKind.Absolute))
                     {
                         m_Log.WarnFormat("Skipping section {0} for invalid URI in AvatarServerURI {1}", section.Name, map.AvatarServerURI);
+                        continue;
+                    }
+                    else if(map.OfflineIMServerURI != "" && !Uri.IsWellFormedUriString(map.OfflineIMServerURI, UriKind.Absolute))
+                    {
+                        m_Log.WarnFormat("Skipping section {0} for invalid URI in OfflineIMServerURI {1}", section.Name, map.OfflineIMServerURI);
                         continue;
                     }
                     else if (!Uri.IsWellFormedUriString(map.AssetServerURI, UriKind.Absolute))
@@ -442,6 +452,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 PresenceServiceInterface presenceService = null;
                 GridUserServiceInterface gridUserService = null;
                 FriendsServiceInterface friendsService = null;
+                OfflineIMServiceInterface offlineIMService = null;
                 string profileServiceURI = string.Empty;
 
                 GridParameterMap gridparams = FindGridParameterMap(agentPost.Account.Principal.HomeURI.ToString(), scene);
@@ -460,6 +471,10 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                     if (!string.IsNullOrEmpty(gridparams.PresenceServerURI))
                     {
                         presenceService = new RobustPresenceConnector(gridparams.PresenceServerURI, agentPost.Account.Principal.HomeURI.ToString());
+                    }
+                    if(!string.IsNullOrEmpty(gridparams.OfflineIMServerURI))
+                    {
+                        offlineIMService = new RobustOfflineIMConnector(gridparams.OfflineIMServerURI);
                     }
                 }
                 else
@@ -601,6 +616,7 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 serviceList.Add(presenceService);
                 serviceList.Add(gridUserService);
                 serviceList.Add(gridService);
+                serviceList.Add(offlineIMService);
                 List<GridType> supportedGridTypes = new List<GridType>();
                 supportedGridTypes.Add(new GridType("opensim-robust"));
 
