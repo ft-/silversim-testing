@@ -29,18 +29,24 @@ using SilverSim.LL.Core;
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Agent;
 using SilverSim.LL.Messages.Groups;
+using SilverSim.LL.Messages.IM;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using SilverSim.Types.IM;
+using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Text;
 using System.Threading;
 using ThreadedClasses;
 
@@ -82,6 +88,8 @@ namespace SilverSim.LL.Groups
         [IMMessageHandler(GridInstantMessageDialog.SessionSend)]
         BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
 
+        BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>> IMGroupNoticeQueue = new BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>>();
+
         bool m_ShutdownGroups = false;
 
         public ViewerGroupsServer()
@@ -92,6 +100,68 @@ namespace SilverSim.LL.Groups
         public void Startup(ConfigurationLoader loader)
         {
             new Thread(HandlerThread).Start();
+            new Thread(IMThread).Start();
+        }
+
+        public void IMThread()
+        {
+            Thread.CurrentThread.Name = "Groups IM Thread";
+
+            while(!m_ShutdownGroups)
+            {
+                KeyValuePair<SceneInterface, GridInstantMessage> req;
+                try
+                {
+                    req = IMGroupNoticeQueue.Dequeue(1000);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                GroupsServiceInterface groupsService = req.Key.GroupsService;
+
+                if(null == groupsService)
+                {
+                    continue;
+                }
+
+                GridInstantMessage gim = req.Value;
+                List<GroupMember> gmems;
+                try
+                {
+                    gmems = groupsService.Members[gim.FromAgent, gim.FromGroup];
+                }
+                catch
+                {
+                    continue;
+                }
+
+                foreach(GroupMember gmem in gmems)
+                {
+                    if(gim.Dialog == GridInstantMessageDialog.GroupNotice)
+                    {
+                        if(!gmem.IsAcceptNotices)
+                        {
+                            continue;
+                        }
+                        else if(0 == (GetGroupPowers(gmem.Principal, groupsService, gim.FromGroup) & GroupPowers.ReceiveNotices))
+                        {
+                            continue;
+                        }
+                    }
+
+                    GridInstantMessage ngim = gim.Clone();
+                    try
+                    {
+                        IMRouter.SendSync(ngim);
+                    }
+                    catch
+                    {
+                        /* just ignore in case something bad happens */
+                    }
+                }
+            }
         }
 
         public void HandlerThread()
@@ -216,6 +286,27 @@ namespace SilverSim.LL.Groups
                         case MessageType.GroupRoleUpdate:
                             HandleGroupRoleUpdate(req.Key.Agent, scene, m);
                             break;
+
+                        case MessageType.ImprovedInstantMessage:
+                            {
+                                ImprovedInstantMessage im = (ImprovedInstantMessage)m;
+                                switch(im.Dialog)
+                                {
+                                    case GridInstantMessageDialog.GroupInvitationAccept:
+                                        break;
+
+                                    case GridInstantMessageDialog.GroupInvitationDecline:
+                                        break;
+
+                                    case GridInstantMessageDialog.GroupNotice:
+                                        HandleGroupNotice(req.Key.Agent, scene, im);
+                                        break;
+
+                                    case GridInstantMessageDialog.GroupNoticeInventoryAccepted:
+                                        break;
+                                }
+                            }
+                            break;
                     }
                 }
                 catch (Exception e)
@@ -266,6 +357,83 @@ namespace SilverSim.LL.Groups
         #endregion
 
         #region Group Notice
+        void HandleGroupNotice(LLAgent agent, SceneInterface scene, ImprovedInstantMessage m)
+        {
+            /* no validation needed with IM, that is already done in circuit */
+            GroupsServiceInterface groupsService = scene.GroupsService;
+
+            if(groupsService == null)
+            {
+                return;
+            }
+            
+            UGI group;
+            try
+            {
+                group = groupsService.Groups[agent.Owner, m.ToAgentID];
+            }
+            catch
+            {
+                return;
+            }
+
+            if((GetGroupPowers(agent.Owner, groupsService, group) & GroupPowers.SendNotices) == 0)
+            {
+                return;
+            }
+
+            InventoryItem item = null;
+
+            if(m.BinaryBucket.Length >= 1 && m.BinaryBucket[0] > 0)
+            {
+                try
+                {
+                    IValue iv = LLSD_XML.Deserialize(new MemoryStream(m.BinaryBucket));
+                    if(iv is Map)
+                    {
+                        Map binBuck = (Map)iv;
+                        UUID itemID = binBuck["item_id"].AsUUID;
+                        UUID ownerID = binBuck["owner_id"].AsUUID;
+                        item = agent.InventoryService.Item[ownerID, itemID];
+                    }
+                }
+                catch
+                {
+
+                }
+            }
+
+            GroupNotice gn = new GroupNotice();
+            gn.ID = UUID.Random;
+            gn.Group = group;
+            gn.FromName = agent.Owner.FullName;
+            string[] submsg = m.Message.Split(new char[] {'|'}, 2);
+            gn.Subject = submsg.Length > 1 ? submsg[0] : string.Empty;
+            gn.Message = submsg.Length > 1 ? submsg[1] : submsg[0];
+            gn.HasAttachment = item != null;
+            gn.AttachmentType = item != null ? item.AssetType : Types.Asset.AssetType.Unknown;
+            gn.AttachmentName = item != null ? item.Name : string.Empty;
+            gn.AttachmentItemID = item != null ? item.ID : UUID.Zero;
+            gn.AttachmentOwner = item !=  null ? item.Owner : UUI.Unknown;
+
+            GridInstantMessage gim = new GridInstantMessage();
+            gim.FromAgent = agent.Owner;
+            gim.Dialog = GridInstantMessageDialog.GroupNotice;
+            gim.IsFromGroup = true;
+            gim.Message = m.Message;
+            gim.IMSessionID = gn.ID;
+            gim.BinaryBucket = m.BinaryBucket;
+
+            try
+            {
+                groupsService.Notices.Add(agent.Owner, gn);
+                IMGroupNoticeQueue.Enqueue(new KeyValuePair<SceneInterface, GridInstantMessage>(scene, gim));
+            }
+            catch
+            {
+            }
+        }
+
         void HandleGroupNoticesListRequest(LLAgent agent, SceneInterface scene, Message m)
         {
             GroupNoticesListRequest req = (GroupNoticesListRequest)m;
@@ -283,7 +451,7 @@ namespace SilverSim.LL.Groups
                 reply.GroupID = req.GroupID;
                 agent.SendMessageAlways(reply, scene.ID);
             }
-            else if((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.ReceiveNotices) != 0)
+            else if((GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.ReceiveNotices) != 0)
             {
                 List<GroupNotice> notices;
                 try
@@ -421,12 +589,12 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
-            if ((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.ChangeOptions) != 0)
+            if ((GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.ChangeOptions) != 0)
             {
                 ginfo.IsOpenEnrollment = req.OpenEnrollment;
                 ginfo.MembershipFee = req.MembershipFee;
             }
-            if ((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.ChangeIdentity) != 0)
+            if ((GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.ChangeIdentity) != 0)
             {
                 ginfo.Charter = req.Charter;
                 ginfo.IsShownInList = req.ShowInList;
@@ -637,7 +805,7 @@ namespace SilverSim.LL.Groups
             switch(req.Change)
             {
                 case GroupRoleChanges.ChangeType.Add:
-                    if((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.AssignMemberLimited) != 0)
+                    if((GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.AssignMemberLimited) != 0)
                     {
                         try
                         {
@@ -648,7 +816,7 @@ namespace SilverSim.LL.Groups
                             break;
                         }
                     }
-                    else if ((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.AssignMember) == 0)
+                    else if ((GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.AssignMember) == 0)
                     {
                         break;
                     }
@@ -669,7 +837,7 @@ namespace SilverSim.LL.Groups
                     break;
 
                 case GroupRoleChanges.ChangeType.Remove:
-                    if ((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.RemoveMember) == 0)
+                    if ((GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.RemoveMember) == 0)
                     {
                         break;
                     }
@@ -819,7 +987,7 @@ namespace SilverSim.LL.Groups
                 return;
             }
 
-            GroupPowers powers = GetGroupPowers(agent, groupsService, new UGI(req.GroupID));
+            GroupPowers powers = GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID));
             bool haveChanges = false;
 
             foreach(GroupRoleUpdate.RoleDataEntry gru in req.RoleData)
@@ -1149,7 +1317,7 @@ namespace SilverSim.LL.Groups
                 return;
             }
 
-            if ((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.Accountable) != 0)
+            if ((GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.Accountable) != 0)
             {
                 try
                 {
@@ -1178,7 +1346,7 @@ namespace SilverSim.LL.Groups
                 return;
             }
 
-            if ((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.ChangeOptions) != 0)
+            if ((GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.ChangeOptions) != 0)
             {
                 try
                 {
@@ -1194,13 +1362,13 @@ namespace SilverSim.LL.Groups
         #endregion
 
         #region Utility
-        GroupPowers GetGroupPowers(LLAgent agent, GroupsServiceInterface groupsService, UGI group)
+        GroupPowers GetGroupPowers(UUI agent, GroupsServiceInterface groupsService, UGI group)
         {
             if(null == groupsService)
             {
                 return GroupPowers.None;
             }
-            List<GroupRole> roles = groupsService.Roles[agent.Owner, group, agent.Owner];
+            List<GroupRole> roles = groupsService.Roles[agent, group, agent];
             GroupPowers powers = GroupPowers.None;
             foreach(GroupRole role in roles)
             {

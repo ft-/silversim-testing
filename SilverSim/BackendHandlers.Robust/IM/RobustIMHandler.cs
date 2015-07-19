@@ -61,10 +61,11 @@ namespace SilverSim.BackendConnectors.Robust.IM
                 im.NoOfflineIMStore = m_DisallowOfflineIM;
                 Map d = (Map)req.Params[0];
 
-                im.FromAgent.ID = d["from_agent_id"].ToString();
+                im.FromAgent.ID = d["from_agent_id"].AsUUID;
+                im.FromGroup.ID = d["from_agent_id"].AsUUID;
                 im.ToAgent.ID = d["to_agent_id"].ToString();
-                im.IMSessionID = d["im_session_id"].ToString();
-                im.RegionID = d["region_id"].ToString();
+                im.IMSessionID = d["im_session_id"].AsUUID;
+                im.RegionID = d["region_id"].AsUUID;
                 im.Timestamp = Date.UnixTimeToDateTime(d["timestamp"].AsULong);
                 im.FromAgent.FullName = d["from_agent_name"].ToString();
                 if(d.ContainsKey("message"))

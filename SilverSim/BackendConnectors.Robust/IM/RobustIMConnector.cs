@@ -52,7 +52,14 @@ namespace SilverSim.BackendConnectors.Robust.IM
             XMLRPC.XmlRpcRequest req = new XMLRPC.XmlRpcRequest();
             
             Map p = new Map();
-            p.Add("from_agent_id", im.FromAgent.ID);
+            if (im.IsFromGroup)
+            {
+                p.Add("from_agent_id", im.FromGroup.ID);
+            }
+            else
+            {
+                p.Add("from_agent_id", im.FromAgent.ID);
+            }
             p.Add("from_agent_session", UUID.Zero);
             p.Add("to_agent_id", im.ToAgent.ID);
             p.Add("im_session_id", im.IMSessionID);

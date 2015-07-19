@@ -58,7 +58,14 @@ namespace SilverSim.LL.Messages.IM
 
         public ImprovedInstantMessage(GridInstantMessage gim)
         {
-            AgentID = gim.FromAgent.ID;
+            if (gim.IsFromGroup)
+            {
+                AgentID = gim.FromGroup.ID;
+            }
+            else
+            {
+                AgentID = gim.FromAgent.ID;
+            }
             SessionID = UUID.Zero;
             FromAgentName = gim.FromAgent.FullName;
             ToAgentID = gim.ToAgent.ID;
@@ -95,6 +102,7 @@ namespace SilverSim.LL.Messages.IM
         {
             GridInstantMessage im = new GridInstantMessage();
             im.FromAgent.ID = m.AgentID;
+            im.FromGroup.ID = m.AgentID;
             im.IsFromGroup = m.FromGroup;
             im.ToAgent.ID = m.ToAgentID;
             im.ParentEstateID = m.ParentEstateID;

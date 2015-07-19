@@ -70,7 +70,14 @@ namespace SilverSim.BackendConnectors.Robust.IM
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["BinaryBucket"] = BitConverter.ToString(im.BinaryBucket).Replace("-", string.Empty);
             post["Dialog"] = ((int)im.Dialog).ToString();
-            post["FromAgentID"] = (string)im.FromAgent.ID;
+            if (im.IsFromGroup)
+            {
+                post["FromAgentID"] = (string)im.FromGroup.ID;
+            }
+            else
+            {
+                post["FromAgentID"] = (string)im.FromAgent.ID;
+            }
             post["FromAgentName"] = im.FromAgent.FullName;
             bool isFromGroup = !im.IsFromGroup.Equals(UUID.Zero);
             post["FromGroup"] = isFromGroup.ToString();
