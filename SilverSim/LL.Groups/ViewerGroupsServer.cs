@@ -525,7 +525,8 @@ namespace SilverSim.LL.Groups
             }
 
             GroupInfo groupinfo = new GroupInfo();
-            groupinfo.Name = req.Name;
+            groupinfo.ID.GroupName = req.Name;
+            groupinfo.Founder = agent.Owner;
             groupinfo.Charter = req.Charter;
             groupinfo.IsShownInList = req.ShowInList;
             groupinfo.InsigniaID = req.InsigniaID;

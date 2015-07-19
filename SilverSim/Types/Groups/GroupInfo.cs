@@ -40,7 +40,6 @@ namespace SilverSim.Types.Groups
     public class GroupInfo
     {
         public UGI ID = UGI.Unknown;
-        public string Name = "";
         public string Charter = "";
         public string Location = "";
         public UUID InsigniaID = UUID.Zero;

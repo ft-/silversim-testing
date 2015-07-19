@@ -110,7 +110,11 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
 
             if(m.ContainsKey("ServiceLocation"))
             {
-                group.ID.HomeURI = new Uri(m["ServiceLocation"].ToString());
+                string uri = m["ServiceLocation"].ToString();
+                if (Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+                {
+                    group.ID.HomeURI = new Uri(uri);
+                }
             }
             if(group.ID.HomeURI == null)
             {

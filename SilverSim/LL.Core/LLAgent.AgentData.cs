@@ -54,7 +54,7 @@ namespace SilverSim.LL.Core
                                 gi = circuit.Agent.GroupsService.Groups[Owner, new UGI(adu.ActiveGroupID)];
                                 gm = circuit.Agent.GroupsService.Members[Owner, gi.ID, Owner];
                                 gr = circuit.Agent.GroupsService.Roles[Owner, gi.ID, gm.SelectedRoleID];
-                                adu.GroupName = gi.Name;
+                                adu.GroupName = gi.ID.GroupName;
                                 adu.GroupTitle = gr.Title;
                                 adu.GroupPowers = gr.Powers;
                             }

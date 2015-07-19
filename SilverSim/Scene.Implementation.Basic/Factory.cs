@@ -46,6 +46,7 @@ namespace SilverSim.Scene.Implementation.Basic
         ChatServiceFactoryInterface m_ChatFactory;
         string m_ChatFactoryName;
         string m_GroupsNameServiceName;
+        string m_GroupsServiceName;
         string m_AssetServiceName;
         string m_AssetCacheServiceName;
         string m_GridServiceName;
@@ -58,6 +59,7 @@ namespace SilverSim.Scene.Implementation.Basic
         AssetServiceInterface m_AssetService;
         AssetServiceInterface m_AssetCacheService;
         GridServiceInterface m_GridService;
+        GroupsServiceInterface m_GroupsService = null;
         ServerParamServiceInterface m_ServerParamService;
         IMServiceInterface m_IMService;
         EstateServiceInterface m_EstateService;
@@ -69,6 +71,7 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             m_ChatFactoryName = ownConfig.GetString("ChatService", "Chat");
             m_GroupsNameServiceName = ownConfig.GetString("GroupsNameService", "");
+            m_GroupsServiceName = ownConfig.GetString("GroupsService", "");
             m_AssetServiceName = ownConfig.GetString("AssetService", "AssetService");
             m_AssetCacheServiceName = ownConfig.GetString("AssetCacheService", m_AssetServiceName);
             m_GridServiceName = ownConfig.GetString("GridService", "GridService");
@@ -98,6 +101,10 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 m_GroupsNameService = loader.GetService<GroupsNameServiceInterface>(m_GroupsNameServiceName);
             }
+            if (m_GroupsServiceName != "")
+            {
+                m_GroupsService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
+            }
             m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
             m_AssetCacheService = loader.GetService<AssetServiceInterface>(m_AssetCacheServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
@@ -116,6 +123,7 @@ namespace SilverSim.Scene.Implementation.Basic
             return new BasicScene(m_ChatFactory.Instantiate(), 
                 m_IMService, 
                 m_GroupsNameService, 
+                m_GroupsService,
                 m_AssetService,
                 m_AssetCacheService,
                 m_GridService,
