@@ -86,6 +86,49 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                     }
                 }
             }
+
+            public UUID this[UUI requestingAgent, UGI group, UUI principal]
+            {
+                get
+                {
+                    Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["AgentID"] = principal.ToString();
+                    post["RequestingAgentID"] = requestingAgent.ToString();
+                    post["METHOD"] = "GETMEMBERSHIP";
+
+                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                    if (!m.ContainsKey("RESULT"))
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    if (m["RESULT"].ToString() == "NULL")
+                    {
+                        throw new KeyNotFoundException();
+                    }
+
+                    return m["RESULT"].ToGroupMemberFromMembership().SelectedRoleID;
+                }
+                set
+                {
+                    Dictionary<string, string> post = new Dictionary<string, string>();
+                    post["AgentID"] = principal.ToString();
+                    post["GroupID"] = (string)group.ID;
+                    post["RoleID"] = (string)value;
+                    post["RequestingAgentID"] = (string)requestingAgent.ID;
+                    post["OP"] = "ROLE";
+                    post["METHOD"] = "SETACTIVE";
+
+                    Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
+                    if (!m.ContainsKey("RESULT"))
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    if (m["RESULT"].ToString() == "NULL")
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                }
+            }
         }
     }
 }

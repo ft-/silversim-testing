@@ -148,6 +148,13 @@ namespace SilverSim.ServiceInterfaces.Groups
                 get;
                 set;
             }
+
+            /* get/set active role id */
+            UUID this[UUI requestingAgent, UGI group, UUI principal]
+            {
+                get;
+                set;
+            }
         }
 
         public interface IGroupInvitesInterface

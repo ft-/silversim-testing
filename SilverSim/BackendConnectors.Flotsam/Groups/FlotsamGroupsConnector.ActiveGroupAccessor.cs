@@ -71,6 +71,41 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
                     FlotsamXmlRpcCall(requestingAgent, "groups.setAgentActiveGroup", m);
                 }
             }
+
+            public UUID this[UUI requestingAgent, UGI group, UUI principal]
+            {
+                get
+                {
+                    Map m = new Map();
+                    m["AgentID"] = principal.ID;
+                    IValue iv = FlotsamXmlRpcGetCall(requestingAgent, "groups.getAgentActiveMembership", m);
+                    if (!(iv is Map))
+                    {
+                        throw new AccessFailedException();
+                    }
+
+                    m = (Map)iv;
+                    if (m.ContainsKey("error"))
+                    {
+                        if (m["error"].ToString() == "No Active Group Specified")
+                        {
+                            return UUID.Zero;
+                        }
+                        throw new AccessFailedException();
+                    }
+
+                    return m["SelectedRoleID"].AsUUID;
+                }
+
+                set
+                {
+                    Map m = new Map();
+                    m["AgentID"] = principal.ID;
+                    m["GroupID"] = group.ID;
+                    m["SelectedRoleID"] = value;
+                    FlotsamXmlRpcCall(requestingAgent, "groups.setAgentGroupInfo", m);
+                }
+            }
         }
     }
 }

@@ -52,8 +52,6 @@ namespace SilverSim.LL.Messages.Groups
             }
         }
 
-        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
-
         public List<GroupDataEntry> GroupData = new List<GroupDataEntry>();
 
         public GroupTitlesReply()

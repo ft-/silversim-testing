@@ -405,6 +405,45 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if (null == groupsService)
+            {
+                return;
+            }
+
+            GroupInfo ginfo;
+            try
+            {
+                ginfo = groupsService.Groups[agent.Owner, new UGI(req.GroupID)];
+            }
+            catch
+            {
+                return;
+            }
+            if ((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.ChangeOptions) != 0)
+            {
+                ginfo.IsOpenEnrollment = req.OpenEnrollment;
+                ginfo.MembershipFee = req.MembershipFee;
+            }
+            if ((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.ChangeIdentity) != 0)
+            {
+                ginfo.Charter = req.Charter;
+                ginfo.IsShownInList = req.ShowInList;
+                ginfo.InsigniaID = req.InsigniaID;
+                ginfo.IsAllowPublish = req.AllowPublish;
+                ginfo.IsMaturePublish = req.MaturePublish;
+            }
+
+            try
+            {
+                groupsService.Groups.Update(agent.Owner, ginfo);
+            }
+            catch
+            {
+                return;
+            }
+            SendAllAgentsGroupDataUpdate(scene, groupsService, ginfo.ID);
         }
 
         void HandleJoinGroupRequest(LLAgent agent, SceneInterface scene, Message m)
@@ -588,6 +627,55 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if (null == groupsService)
+            {
+                return;
+            }
+
+            List<GroupRole> rolemembers;
+            try
+            {
+                rolemembers = groupsService.Roles[agent.Owner, new UGI(req.GroupID)];
+            }
+            catch
+            {
+                rolemembers = new List<GroupRole>();
+            }
+
+            GroupRoleDataReply reply = null;
+            int messageFill = 0;
+            foreach(GroupRole role in rolemembers)
+            {
+                GroupRoleDataReply.RoleDataEntry d = new GroupRoleDataReply.RoleDataEntry();
+                d.Name = role.Name;
+                d.Powers = role.Powers;
+                d.RoleID = role.ID;
+                d.Title = role.Title;
+                d.Members = role.Members;
+                d.Description = role.Description;
+
+                if(messageFill + d.SizeInMessage > 1400)
+                {
+                    agent.SendMessageAlways(reply, scene.ID);
+                    reply = null;
+                }
+                if(null == reply)
+                {
+                    reply = new GroupRoleDataReply();
+                    reply.AgentID = req.AgentID;
+                    reply.RequestID = req.RequestID;
+                    reply.RoleCount = rolemembers.Count;
+                    messageFill = 0;
+                }
+
+                reply.RoleData.Add(d);
+            }
+            if(null != reply)
+            {
+                agent.SendMessageAlways(reply, scene.ID);
+            }
         }
 
         void HandleGroupRoleMembersRequest(LLAgent agent, SceneInterface scene, Message m)
@@ -597,6 +685,52 @@ namespace SilverSim.LL.Groups
                 req.CircuitSessionID != req.SessionID)
             {
                 return;
+            }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if (null == groupsService)
+            {
+                return;
+            }
+
+            List<GroupRolemember> rolemembers;
+            try
+            {
+                rolemembers = groupsService.Rolemembers[agent.Owner, new UGI(req.GroupID)];
+            }
+            catch
+            {
+                rolemembers = new List<GroupRolemember>();
+            }
+
+            GroupRoleMembersReply reply = null;
+            int messageFill = 0;
+            foreach (GroupRolemember role in rolemembers)
+            {
+                GroupRoleMembersReply.MemberDataEntry d = new GroupRoleMembersReply.MemberDataEntry();
+                d.MemberID = role.Principal.ID;
+                d.RoleID = role.RoleID;
+
+                if (messageFill + d.SizeInMessage > 1400)
+                {
+                    agent.SendMessageAlways(reply, scene.ID);
+                    reply = null;
+                }
+                if (null == reply)
+                {
+                    reply = new GroupRoleMembersReply();
+                    reply.AgentID = req.AgentID;
+                    reply.RequestID = req.RequestID;
+                    reply.GroupID = req.GroupID;
+                    reply.TotalPairs = (uint)rolemembers.Count;
+                    messageFill = 0;
+                }
+
+                reply.MemberData.Add(d);
+            }
+            if (null != reply)
+            {
+                agent.SendMessageAlways(reply, scene.ID);
             }
         }
 
@@ -694,6 +828,32 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if (null == groupsService)
+            {
+                return;
+            }
+
+            try
+            {
+                GroupRolemember grm = groupsService.Rolemembers[agent.Owner, new UGI(req.GroupID), req.TitleRoleID, agent.Owner];
+            }
+            catch
+            {
+                return;
+            }
+
+            try
+            {
+                groupsService.ActiveGroup[agent.Owner, new UGI(req.GroupID), agent.Owner] = req.TitleRoleID;
+            }
+            catch
+            {
+                return;
+            }
+
+            SendAllAgentsGroupDataUpdate(scene, groupsService, new UGI(req.GroupID));
         }
         #endregion
 
@@ -761,7 +921,7 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
-            
+            SendAgentGroupDataUpdate(agent, scene, groupsService, new UGI(req.GroupID));
         }
         #endregion
 

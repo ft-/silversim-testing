@@ -35,7 +35,7 @@ namespace SilverSim.Types.Groups
         public GroupPowers Powers;
 
         #region Informational fields
-        public int Members = 0;
+        public uint Members = 0;
         #endregion
 
         public GroupRole()

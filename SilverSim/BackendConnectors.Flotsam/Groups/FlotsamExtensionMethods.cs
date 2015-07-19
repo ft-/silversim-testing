@@ -139,7 +139,7 @@ namespace SilverSim.BackendConnectors.Flotsam.Groups
             GroupRole role = new GroupRole();
             role.Group = group;
             role.ID = m["RoleID"].AsUUID;
-            role.Members = m["Members"].AsInt;
+            role.Members = m["Members"].AsUInt;
             role.Name = m["Name"].ToString();
             role.Description = m["Description"].ToString();
             role.Title = m["Title"].ToString();

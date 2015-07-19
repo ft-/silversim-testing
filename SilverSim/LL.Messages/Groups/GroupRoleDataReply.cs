@@ -48,6 +48,14 @@ namespace SilverSim.LL.Messages.Groups
             public string Description;
             public GroupPowers Powers;
             public UInt32 Members;
+
+            public int SizeInMessage
+            {
+                get
+                {
+                    return 34 + UTF8NoBOM.GetByteCount(Title) + UTF8NoBOM.GetByteCount(Description) + UTF8NoBOM.GetByteCount(Name);
+                }
+            }
         }
         public List<RoleDataEntry> RoleData = new List<RoleDataEntry>();
 

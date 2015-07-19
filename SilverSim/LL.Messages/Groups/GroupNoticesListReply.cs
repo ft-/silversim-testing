@@ -38,8 +38,6 @@ namespace SilverSim.LL.Messages.Groups
         public UUID AgentID;
         public UUID GroupID;
 
-        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
-
         public struct GroupNoticeData
         {
             public UUID NoticeID;

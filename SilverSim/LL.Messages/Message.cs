@@ -26,6 +26,7 @@ exception statement from your version.
 using System;
 using SilverSim.Types;
 using SilverSim.Types.IM;
+using System.Text;
 
 namespace SilverSim.LL.Messages
 {
@@ -201,6 +202,8 @@ namespace SilverSim.LL.Messages
                 }
             }
         }
+
+        protected static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         #region Overloaded methods
         public virtual string TypeDescription

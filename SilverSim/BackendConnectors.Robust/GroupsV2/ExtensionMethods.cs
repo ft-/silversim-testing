@@ -288,7 +288,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             }
             if(m.ContainsKey("Members"))
             {
-                role.Members = m["Members"].AsInt;
+                role.Members = m["Members"].AsUInt;
             }
             if(m.ContainsKey("Name"))
             {

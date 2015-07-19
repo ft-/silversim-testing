@@ -45,6 +45,14 @@ namespace SilverSim.LL.Messages.Groups
         {
             public UUID RoleID;
             public UUID MemberID;
+
+            public int SizeInMessage
+            {
+                get
+                {
+                    return 32;
+                }
+            }
         }
 
         public List<MemberDataEntry> MemberData = new List<MemberDataEntry>();

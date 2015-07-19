@@ -52,6 +52,14 @@ namespace SilverSim.LL.Messages.Groups
             public GroupPowers AgentPowers;
             public string Title;
             public bool IsOwner;
+
+            public int SizeInMessage
+            {
+                get
+                {
+                    return 33 + UTF8NoBOM.GetByteCount(Title) + UTF8NoBOM.GetByteCount(OnlineStatus);
+                }
+            }
         }
 
         public List<MemberDataEntry> MemberData = new List<MemberDataEntry>();
