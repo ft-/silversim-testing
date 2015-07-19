@@ -23,30 +23,13 @@ exception statement from your version.
 
 */
 
-using log4net;
-using Nini.Config;
-using SilverSim.Main.Common;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Types;
 
-namespace SilverSim.BackendConnectors.Robust.GroupsV2
+namespace SilverSim.LL.Core
 {
-    [PluginName("GroupsV2")]
-    public class Factory : IPluginFactory
+    public interface ITriggerOnRootAgentActions : IProtocolExtender
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("ROBUST GROUPS CONNECTOR");
-
-        public Factory()
-        {
-
-        }
-
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            if (!ownSection.Contains("URI"))
-            {
-                m_Log.FatalFormat("Missing 'URI' in section {0}", ownSection.Name);
-                throw new ConfigurationLoader.ConfigurationError();
-            }
-            return new RobustGroupsConnector(ownSection.GetString("URI"), ownSection.GetString("HomeURI", ""), ownSection.GetString("UserAccountService", ""));
-        }
+        void TriggerOnRootAgent(UUID agent, SceneInterface scene);
     }
 }

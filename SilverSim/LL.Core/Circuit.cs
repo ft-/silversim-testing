@@ -85,6 +85,7 @@ namespace SilverSim.LL.Core
         private Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
         private Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
         private Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
+        internal List<ITriggerOnRootAgentActions> m_TriggerOnRootAgentActions = new List<ITriggerOnRootAgentActions>();
 
         private Thread m_InventoryThread;
         private bool m_InventoryThreadRunning = false;
@@ -730,6 +731,11 @@ namespace SilverSim.LL.Core
                     if(interfaces.Contains(typeof(ICapabilityExtender)))
                     {
                         AddCapabilityExtensions(o, regionSeedID);
+                    }
+
+                    if(interfaces.Contains(typeof(ITriggerOnRootAgentActions)))
+                    {
+                        m_TriggerOnRootAgentActions.Add((ITriggerOnRootAgentActions)o);
                     }
                 }
             }

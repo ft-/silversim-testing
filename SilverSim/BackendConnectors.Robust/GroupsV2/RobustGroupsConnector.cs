@@ -27,8 +27,10 @@ using SilverSim.BackendConnectors.Robust.Common;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpClient;
 using SilverSim.Main.Common.Rpc;
+using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
+using SilverSim.Types.Account;
 using System;
 using System.Collections.Generic;
 
@@ -45,6 +47,8 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
         InvitesAccessor m_Invites;
         NoticesAccessor m_Notices;
         ActiveGroupMembershipAccesor m_ActiveGroupMembership;
+        UserAccountServiceInterface m_UserAccountService;
+        string m_UserAccountServiceName = "";
         int m_TimeoutMs = 20000;
 
         public int TimeoutMs
@@ -68,26 +72,50 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             }
         }
 
-        public RobustGroupsConnector(string uri, string serviceUri)
+        string GetGroupsAgentID(UUI agent)
+        {
+            if (null == m_UserAccountService)
+            {
+                return agent.ToString();
+            }
+            try
+            {
+                UserAccount account = m_UserAccountService[UUID.Zero, agent.ID];
+                return (string)agent.ID;
+            }
+            catch
+            {
+                return agent.ToString();
+            }
+        }
+
+        public delegate string GetGroupsAgentIDDelegate(UUI agent);
+
+        public RobustGroupsConnector(string uri, string serviceUri, string userAccountServiceName)
         {
             if(!uri.EndsWith("/"))
             {
                 uri += "/";
             }
             uri += "groups";
-            m_Groups = new GroupsAccessor(uri, serviceUri);
-            m_GroupRoles = new GroupRolesAccessor(uri);
-            m_Members = new MembersAccessor(uri);
-            m_Memberships = new MembershipsAccessor(uri);
-            m_ActiveGroup = new ActiveGroupAccessor(uri);
-            m_Invites = new InvitesAccessor(uri);
-            m_Notices = new NoticesAccessor(uri);
-            m_ActiveGroupMembership = new ActiveGroupMembershipAccesor(uri);
-            m_Rolemembers = new RoleMembersAccessor(uri, m_Memberships);
+            m_UserAccountServiceName = userAccountServiceName;
+            m_Groups = new GroupsAccessor(uri, serviceUri, GetGroupsAgentID);
+            m_GroupRoles = new GroupRolesAccessor(uri, GetGroupsAgentID);
+            m_Members = new MembersAccessor(uri, GetGroupsAgentID);
+            m_Memberships = new MembershipsAccessor(uri, GetGroupsAgentID);
+            m_ActiveGroup = new ActiveGroupAccessor(uri, GetGroupsAgentID);
+            m_Invites = new InvitesAccessor(uri, GetGroupsAgentID);
+            m_Notices = new NoticesAccessor(uri, GetGroupsAgentID);
+            m_ActiveGroupMembership = new ActiveGroupMembershipAccesor(uri, GetGroupsAgentID);
+            m_Rolemembers = new RoleMembersAccessor(uri, m_Memberships, GetGroupsAgentID);
         }
 
         public void Startup(ConfigurationLoader loader)
         {
+            if(!string.IsNullOrEmpty(m_UserAccountServiceName))
+            {
+                m_UserAccountService = loader.GetService<UserAccountServiceInterface>(m_UserAccountServiceName);
+            }
         }
 
         public override IGroupsInterface Groups

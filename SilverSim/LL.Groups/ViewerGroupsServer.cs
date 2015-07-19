@@ -52,7 +52,7 @@ using ThreadedClasses;
 
 namespace SilverSim.LL.Groups
 {
-    public class ViewerGroupsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
+    public class ViewerGroupsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown, ITriggerOnRootAgentActions
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL GROUPS");
 
@@ -87,6 +87,7 @@ namespace SilverSim.LL.Groups
         [IMMessageHandler(GridInstantMessageDialog.SessionGroupStart)]
         [IMMessageHandler(GridInstantMessageDialog.SessionSend)]
         BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
+        BlockingQueue<KeyValuePair<UUID, SceneInterface>> AgentGroupDataUpdateQueue = new BlockingQueue<KeyValuePair<UUID, SceneInterface>>();
 
         BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>> IMGroupNoticeQueue = new BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>>();
 
@@ -101,6 +102,42 @@ namespace SilverSim.LL.Groups
         {
             new Thread(HandlerThread).Start();
             new Thread(IMThread).Start();
+            new Thread(AgentGroupDataUpdateQueueThread).Start();
+        }
+
+        public void AgentGroupDataUpdateQueueThread()
+        {
+            Thread.CurrentThread.Name = "Groups AgentGroupDataUpdate Thread";
+            while (!m_ShutdownGroups)
+            {
+                KeyValuePair<UUID, SceneInterface> req;
+                try
+                {
+                    req = AgentGroupDataUpdateQueue.Dequeue(1000);
+                }
+                catch
+                {
+                    continue;
+                }
+
+                GroupsServiceInterface groupsService = req.Value.GroupsService;
+
+                if (null == groupsService)
+                {
+                    continue;
+                }
+
+                IAgent agent;
+                try
+                {
+                    agent = req.Value.Agents[req.Key];
+                }
+                catch
+                {
+                    continue;
+                }
+                SendAgentGroupDataUpdate(agent, req.Value, groupsService, null);
+            }
         }
 
         public void IMThread()
@@ -325,12 +362,17 @@ namespace SilverSim.LL.Groups
             }
         }
 
+        public void TriggerOnRootAgent(UUID agent, SceneInterface scene)
+        {
+            AgentGroupDataUpdateQueue.Enqueue(new KeyValuePair<UUID, SceneInterface>(agent, scene));
+        }
+
         void SendAgentGroupDataUpdate(IAgent agent, SceneInterface scene, GroupsServiceInterface groupsService, UGI group)
         {
             try
             {
                 List<GroupMembership> gmems = groupsService.Memberships[agent.Owner, agent.Owner];
-                if (gmems.Count(gmem => gmem.Group.ID == group.ID) != 0)
+                if (group == null || gmems.Count(gmem => gmem.Group.ID == group.ID) != 0)
                 { /* still a lot work with that check but we are at least gentle with the viewer here */
                     AgentGroupDataUpdate update = new AgentGroupDataUpdate();
                     update.AgentID = agent.Owner.ID;
@@ -350,8 +392,13 @@ namespace SilverSim.LL.Groups
                 }
             }
             catch
+#if DEBUG
+                (Exception e)
+#endif
             {
-
+#if DEBUG
+                m_Log.Debug("Exception when sending AgentGroupDataUpdate", e);
+#endif
             }
         }
         #endregion

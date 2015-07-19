@@ -40,10 +40,12 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
         {
             public int TimeoutMs = 20000;
             string m_Uri;
+            GetGroupsAgentIDDelegate m_GetGroupsAgentID;
 
-            public InvitesAccessor(string uri)
+            public InvitesAccessor(string uri, GetGroupsAgentIDDelegate getGroupsAgentID)
             {
                 m_Uri = uri;
+                m_GetGroupsAgentID = getGroupsAgentID;
             }
 
             public GroupInvite this[UUI requestingAgent, UUID groupInviteID]
@@ -52,7 +54,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 { 
                     Dictionary<string, string> post = new Dictionary<string, string>();
                     post["InviteID"] = (string)groupInviteID;
-                    post["RequestingAgentID"] = requestingAgent.ToString();
+                    post["RequestingAgentID"] = m_GetGroupsAgentID(requestingAgent);
                     post["OP"] = "GET";
                     post["METHOD"] = "INVITE";
 
@@ -104,8 +106,8 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 post["InviteID"] = (string)invite.ID;
                 post["GroupID"] = (string)invite.Group.ID;
                 post["RoleID"] = (string)invite.RoleID;
-                post["AgentID"] = invite.Principal.ToString();
-                post["RequestingAgentID"] = requestingAgent.ToString();
+                post["AgentID"] = m_GetGroupsAgentID(invite.Principal);
+                post["RequestingAgentID"] = m_GetGroupsAgentID(requestingAgent);
                 post["OP"] = "ADD";
                 post["METHOD"] = "INVITE";
                 BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
@@ -116,7 +118,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 Dictionary<string, string> post = new Dictionary<string, string>();
                 post["METHOD"] = "INVITE";
                 post["OP"] = "DELETE";
-                post["RequestingAgentID"] = requestingAgent.ToString();
+                post["RequestingAgentID"] = m_GetGroupsAgentID(requestingAgent);
                 post["InviteID"] = (string)inviteID;
                 BooleanResponseRequest(m_Uri, post, false, TimeoutMs);
             }

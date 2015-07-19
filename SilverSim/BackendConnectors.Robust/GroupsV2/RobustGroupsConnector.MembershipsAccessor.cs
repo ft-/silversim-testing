@@ -40,10 +40,12 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
         {
             public int TimeoutMs = 20000;
             string m_Uri;
+            GetGroupsAgentIDDelegate m_GetGroupsAgentID;
 
-            public MembershipsAccessor(string uri)
+            public MembershipsAccessor(string uri, GetGroupsAgentIDDelegate getGroupsAgentID)
             {
                 m_Uri = uri;
+                m_GetGroupsAgentID = getGroupsAgentID;
             }
 
             public List<GroupMembership> this[UUI requestingAgent, UUI principal]
@@ -51,9 +53,9 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 get 
                 {
                     Dictionary<string, string> post = new Dictionary<string, string>();
-                    post["AgentID"] = principal.ToString();
+                    post["AgentID"] = m_GetGroupsAgentID(principal);
                     post["ALL"] = "true";
-                    post["RequestingAgentID"] = requestingAgent.ToString();
+                    post["RequestingAgentID"] = m_GetGroupsAgentID(requestingAgent);
                     post["METHOD"] = "GETMEMBERSHIP";
                     Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
                     if (!m.ContainsKey("RESULT"))
@@ -62,6 +64,10 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                     }
                     if (m["RESULT"].ToString() == "NULL")
                     {
+                        if(m["REASON"].ToString() == "No memberships")
+                        {
+                            return new List<GroupMembership>();
+                        }
                         throw new AccessFailedException(m["REASON"].ToString());
                     }
 

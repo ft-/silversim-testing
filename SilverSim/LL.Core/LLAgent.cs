@@ -1173,7 +1173,16 @@ namespace SilverSim.LL.Core
                     clu.AgentData.Add(ad);
                     circuit.SendMessage(clu);
 
-                    circuit.Scene.Environment.UpdateWindlightProfileToClient(this);
+                    SceneInterface scene = circuit.Scene;
+                    if (scene != null)
+                    {
+                        scene.Environment.UpdateWindlightProfileToClient(this);
+
+                        foreach (ITriggerOnRootAgentActions action in circuit.m_TriggerOnRootAgentActions)
+                        {
+                            action.TriggerOnRootAgent(ID, scene);
+                        }
+                    }
                 }
             }
         }

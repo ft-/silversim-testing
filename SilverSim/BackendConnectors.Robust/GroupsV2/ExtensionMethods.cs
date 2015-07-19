@@ -337,11 +337,11 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             return member;
         }
 
-        public static Dictionary<string, string> ToPost(this GroupRolemember m)
+        public static Dictionary<string, string> ToPost(this GroupRolemember m, RobustGroupsConnector.GetGroupsAgentIDDelegate getGroupsAgentID)
         {
             Dictionary<string, string> post = new Dictionary<string,string>();
             post["RoleID"] = (string)m.RoleID;
-            post["MemberID"] = m.Principal.ToString();
+            post["MemberID"] = getGroupsAgentID(m.Principal);
 
             return post;
         }
@@ -371,7 +371,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
             return notice;
         }
 
-        public static Dictionary<string, string> ToPost(this GroupNotice notice)
+        public static Dictionary<string, string> ToPost(this GroupNotice notice, RobustGroupsConnector.GetGroupsAgentIDDelegate getGroupsAgentID)
         {
             Dictionary<string, string> post = new Dictionary<string, string>();
             post["NoticeID"] = (string)notice.ID;
@@ -386,7 +386,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                 post["AttachmentType"] = ((int)notice.AttachmentType).ToString();
                 if (notice.AttachmentOwner != null && notice.AttachmentOwner.ID != UUID.Zero)
                 {
-                    post["AttachmentOwnerID"] = notice.AttachmentOwner.ToString();
+                    post["AttachmentOwnerID"] = getGroupsAgentID(notice.AttachmentOwner);
                 }
                 else
                 {
