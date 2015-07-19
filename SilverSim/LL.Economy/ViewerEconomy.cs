@@ -173,7 +173,7 @@ namespace SilverSim.LL.Economy
                     }
                     else
                     {
-                        mbrep.MoneyBalance = 1000000000;
+                        mbrep.MoneyBalance = 0;
                     }
                     mbrep.TransactionSuccess = true;
                 }
