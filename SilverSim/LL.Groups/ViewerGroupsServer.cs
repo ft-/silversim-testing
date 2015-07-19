@@ -617,6 +617,74 @@ namespace SilverSim.LL.Groups
             {
                 return;
             }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if (null == groupsService)
+            {
+                return;
+            }
+
+            UUI principalUUI;
+            try
+            {
+                principalUUI = scene.AvatarNameService[req.MemberID];
+            }
+            catch
+            {
+                return;
+            }
+
+            switch(req.Change)
+            {
+                case GroupRoleChanges.ChangeType.Add:
+                    if((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.AssignMemberLimited) != 0)
+                    {
+                        try
+                        {
+                            GroupRolemember grm = groupsService.Rolemembers[agent.Owner, new UGI(req.GroupID), req.RoleID, agent.Owner];
+                        }
+                        catch
+                        {
+                            break;
+                        }
+                    }
+                    else if ((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.AssignMember) == 0)
+                    {
+                        break;
+                    }
+
+                    try
+                    {
+                        GroupRolemember grm = new GroupRolemember();
+                        grm.Group = new UGI(req.GroupID);
+                        grm.Principal = principalUUI;
+                        grm.RoleID = req.RoleID;
+                        groupsService.Rolemembers.Add(agent.Owner, grm);
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                    SendAllAgentsGroupDataUpdate(scene, groupsService, new UGI(req.GroupID));
+                    break;
+
+                case GroupRoleChanges.ChangeType.Remove:
+                    if ((GetGroupPowers(agent, groupsService, new UGI(req.GroupID)) & GroupPowers.RemoveMember) == 0)
+                    {
+                        break;
+                    }
+
+                    try
+                    {
+                        groupsService.Rolemembers.Delete(agent.Owner, new UGI(req.GroupID), req.RoleID, principalUUI);
+                    }
+                    catch
+                    {
+                        break;
+                    }
+                    SendAllAgentsGroupDataUpdate(scene, groupsService, new UGI(req.GroupID));
+                    break;
+            }
         }
 
         void HandleGroupRoleDataRequest(LLAgent agent, SceneInterface scene, Message m)
@@ -671,6 +739,7 @@ namespace SilverSim.LL.Groups
                 }
 
                 reply.RoleData.Add(d);
+                messageFill += d.SizeInMessage;
             }
             if(null != reply)
             {
@@ -727,6 +796,7 @@ namespace SilverSim.LL.Groups
                 }
 
                 reply.MemberData.Add(d);
+                messageFill += d.SizeInMessage;
             }
             if (null != reply)
             {
@@ -739,6 +809,12 @@ namespace SilverSim.LL.Groups
             GroupRoleUpdate req = (GroupRoleUpdate)m;
             if (req.CircuitAgentID != req.AgentID ||
                 req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if (null == groupsService)
             {
                 return;
             }

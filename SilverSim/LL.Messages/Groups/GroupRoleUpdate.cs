@@ -44,7 +44,7 @@ namespace SilverSim.LL.Messages.Groups
         public enum RoleUpdateType : byte
         {
             NoUpdate = 0,
-            Updatedata = 1,
+            UpdateData = 1,
             UpdatePowers = 2,
             UpdateAll = 3,
             Create = 4,
