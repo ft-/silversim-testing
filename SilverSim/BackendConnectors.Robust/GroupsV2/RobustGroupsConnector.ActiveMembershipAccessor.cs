@@ -55,7 +55,6 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                     Dictionary<string, string> post = new Dictionary<string, string>();
                     post["AgentID"] = m_GetGroupsAgentID(principal);
                     post["RequestingAgentID"] = m_GetGroupsAgentID(requestingAgent);
-                    post["GroupID"] = (string)UUID.Zero;
                     post["METHOD"] = "GETMEMBERSHIP";
 
                     Map m = OpenSimResponse.Deserialize(HttpRequestHandler.DoStreamPostRequest(m_Uri, null, post, false, TimeoutMs));
@@ -71,7 +70,7 @@ namespace SilverSim.BackendConnectors.Robust.GroupsV2
                     GroupActiveMembership gam = new GroupActiveMembership();
                     Map res = (Map)m["RESULT"];
                     gam.User = principal;
-                    gam.Group.ID = res["GroupID"].ToString();
+                    gam.Group = new UGI(res["GroupID"].AsUUID);
                     gam.Group.GroupName = res["GroupName"].ToString();
                     gam.SelectedRoleID = res["ActiveRole"].AsUUID;
                     return gam;

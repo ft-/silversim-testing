@@ -604,10 +604,11 @@ namespace SilverSim.LL.Groups
                 reply.Success = true;
                 agent.SendMessageAlways(reply, scene.ID);
             }
-            catch
+            catch(Exception e)
             {
                 reply.GroupID = UUID.Zero;
                 reply.Success = false;
+                reply.Message = e.Message;
                 agent.SendMessageAlways(reply, scene.ID);
                 return;
             }
@@ -634,8 +635,9 @@ namespace SilverSim.LL.Groups
             {
                 ginfo = groupsService.Groups[agent.Owner, new UGI(req.GroupID)];
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Info("UpdateGroupInfo: Get", e);
                 return;
             }
             if ((GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.ChangeOptions) != 0)
@@ -656,8 +658,9 @@ namespace SilverSim.LL.Groups
             {
                 groupsService.Groups.Update(agent.Owner, ginfo);
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Info("UpdateGroupInfo: Update", e);
                 return;
             }
             SendAllAgentsGroupDataUpdate(scene, groupsService, ginfo.ID);
@@ -688,8 +691,9 @@ namespace SilverSim.LL.Groups
             {
                 ginfo = groupsService.Groups[agent.Owner, new UGI(req.GroupID)];
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Info("JoinGroupRequest", e);
                 agent.SendMessageAlways(reply, scene.ID);
                 return;
             }
@@ -707,8 +711,9 @@ namespace SilverSim.LL.Groups
                     GroupMember gmem = groupsService.Members.Add(agent.Owner, new UGI(req.GroupID), agent.Owner, UUID.Zero, "");
                     reply.Success = true;
                 }
-                catch
+                catch(Exception e)
                 {
+                    m_Log.Info("JoinGroupRequest", e);
                 }
                 agent.SendMessageAlways(reply, scene.ID);
             }
@@ -741,9 +746,9 @@ namespace SilverSim.LL.Groups
                 groupsService.Members.Delete(agent.Owner, new UGI(req.GroupID), agent.Owner);
                 reply.Success = true;
             }
-            catch
+            catch(Exception e)
             {
-
+                m_Log.Info("LeaveGroupRequest", e);
             }
             if(reply.Success)
             {
@@ -784,8 +789,9 @@ namespace SilverSim.LL.Groups
             {
                 ginfo = groupsService.Groups[agent.Owner, new UGI(req.GroupID)];
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Info("GroupProfileRequest", e);
                 return;
             }
 
@@ -794,8 +800,12 @@ namespace SilverSim.LL.Groups
                 gam = groupsService.ActiveMembership[agent.Owner, agent.Owner];
                 gr = groupsService.Roles[agent.Owner, gam.Group, gam.SelectedRoleID];
             }
-            catch
+            catch(Exception e)
             {
+                if (!(e is KeyNotFoundException))
+                {
+                    m_Log.Info("GroupProfileRequest", e);
+                }
                 gr = new GroupRole();
                 gr.Title = "";
                 gr.Powers = GroupPowers.None;
@@ -846,8 +856,9 @@ namespace SilverSim.LL.Groups
             {
                 principalUUI = scene.AvatarNameService[req.MemberID];
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Info("GroupRoleChanges", e);
                 return;
             }
 
@@ -924,8 +935,9 @@ namespace SilverSim.LL.Groups
             {
                 rolemembers = groupsService.Roles[agent.Owner, new UGI(req.GroupID)];
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Info("GroupRoleDataRequest", e);
                 rolemembers = new List<GroupRole>();
             }
 
@@ -951,6 +963,7 @@ namespace SilverSim.LL.Groups
                     reply = new GroupRoleDataReply();
                     reply.AgentID = req.AgentID;
                     reply.RequestID = req.RequestID;
+                    reply.GroupID = req.GroupID;
                     reply.RoleCount = rolemembers.Count;
                     messageFill = 0;
                 }
@@ -984,8 +997,9 @@ namespace SilverSim.LL.Groups
             {
                 rolemembers = groupsService.Rolemembers[agent.Owner, new UGI(req.GroupID)];
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Info("GroupRoleMembersRequest", e);
                 rolemembers = new List<GroupRolemember>();
             }
 
@@ -1058,9 +1072,9 @@ namespace SilverSim.LL.Groups
                                 groupsService.Roles.Add(agent.Owner, info);
                                 haveChanges = true;
                             }
-                            catch
+                            catch(Exception e)
                             {
-
+                                m_Log.Info("GroupRoleUpdate.Create", e);
                             }
                         }
                         break;
@@ -1073,9 +1087,9 @@ namespace SilverSim.LL.Groups
                                 groupsService.Roles.Delete(agent.Owner, new UGI(req.GroupID), gru.RoleID);
                                 haveChanges = true;
                             }
-                            catch
+                            catch(Exception e)
                             {
-
+                                m_Log.Info("GroupRoleUpdate.Delete", e);
                             }
                         }
                         break;
@@ -1090,8 +1104,9 @@ namespace SilverSim.LL.Groups
                             {
                                 role = groupsService.Roles[agent.Owner, new UGI(req.GroupID), gru.RoleID];
                             }
-                            catch
+                            catch(Exception e)
                             {
+                                m_Log.Info("GroupRoleUpdate.Update", e);
                                 break;
                             }
 
@@ -1112,9 +1127,9 @@ namespace SilverSim.LL.Groups
                                 groupsService.Roles.Update(agent.Owner, role);
                                 haveChanges = true;
                             }
-                            catch
+                            catch(Exception e)
                             {
-
+                                m_Log.Info("GroupRoleUpdate.Update", e);
                             }
                         }
                         break;
@@ -1188,8 +1203,9 @@ namespace SilverSim.LL.Groups
                     reply.GroupData.Add(d);
                 }
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Info("GroupTitlesRequest", e);
                 if (null == reply)
                 {
                     reply = new GroupTitlesReply();
@@ -1222,8 +1238,9 @@ namespace SilverSim.LL.Groups
             {
                 GroupRolemember grm = groupsService.Rolemembers[agent.Owner, new UGI(req.GroupID), req.TitleRoleID, agent.Owner];
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Info("GroupTitleUpdate", e);
                 return;
             }
 
@@ -1300,8 +1317,9 @@ namespace SilverSim.LL.Groups
                     groupsService.ActiveGroup[agent.Owner, agent.Owner] = UGI.Unknown;
                 }
             }
-            catch
+            catch(Exception e)
             {
+                m_Log.Info("ActivateGroup", e);
                 return;
             }
             SendAgentGroupDataUpdate(agent, scene, groupsService, new UGI(req.GroupID));
@@ -1372,8 +1390,9 @@ namespace SilverSim.LL.Groups
                 {
                     groupsService.Members.SetContribution(agent.Owner, new UGI(req.GroupID), agent.Owner, req.Contribution);
                 }
-                catch
+                catch(Exception e)
                 {
+                    m_Log.Info("SetGroupContribution", e);
                     return;
                 }
                 SendAgentGroupDataUpdate(agent, scene, groupsService, new UGI(req.GroupID));
@@ -1401,8 +1420,9 @@ namespace SilverSim.LL.Groups
                 {
                     groupsService.Members.Update(agent.Owner, new UGI(req.GroupID), agent.Owner, req.AcceptNotices, req.ListInProfile);
                 }
-                catch
+                catch(Exception e)
                 {
+                    m_Log.Info("SetGroupAcceptNotices", e);
                     return;
                 }
                 SendAgentGroupDataUpdate(agent, scene, groupsService, new UGI(req.GroupID));
