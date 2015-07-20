@@ -114,7 +114,7 @@ namespace SilverSim.BackendConnectors.Robust.IM
                 throw new IMOfflineStoreFailedException(map.ContainsKey("REASON") ? map["REASON"].ToString() : "Unknown Error");
             }
             List<GridInstantMessage> ims = new List<GridInstantMessage>();
-            foreach(IValue v in map.Values)
+            foreach(IValue v in ((Map)(map["RESULT"])).Values)
             {
                 if(!(v is Map))
                 {
@@ -127,6 +127,7 @@ namespace SilverSim.BackendConnectors.Robust.IM
                 im.Dialog = (GridInstantMessageDialog) m["Dialog"].AsInt;
                 im.FromAgent.ID = m["FromAgentID"].ToString();
                 im.FromAgent.FullName = m["FromAgentName"].ToString();
+                im.FromGroup.ID = m["FromAgentID"].ToString();
                 im.IsFromGroup = m["FromGroup"].AsBoolean;
                 im.IMSessionID = m["SessionID"].ToString();
                 im.Message = m["Message"].ToString();
