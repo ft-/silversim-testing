@@ -46,6 +46,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading;
 using ThreadedClasses;
@@ -1428,10 +1429,135 @@ namespace SilverSim.LL.Groups
         #endregion
 
         #region Capability
+        static string PowersToString(GroupPowers powers)
+        {
+            UInt64 p = (UInt64)powers;
+            return p.ToString("X");
+        }
+
         [CapabilityHandler("GroupMemberData")]
         public void HandleGroupMemberDataCapability(LLAgent agent, Circuit circuit, HttpRequest req)
         {
-            req.ErrorResponse(System.Net.HttpStatusCode.InternalServerError, "Internal Server Error");
+            if(req.Method != "POST")
+            {
+                req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            SceneInterface scene = circuit.Scene;
+            if(null == scene)
+            {
+                req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if(null == groupsService)
+            {
+                req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                return;
+            }
+
+            IValue iv;
+            UGI group;
+            try
+            {
+                iv = LLSD_XML.Deserialize(req.Body);
+                group = new UGI(((Map)iv)["group_id"].AsUUID);
+            }
+            catch(Exception e)
+            {
+                m_Log.WarnFormat("Invalid LLSD-XML received at GroupMemberData", e);
+                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                return;
+            }
+            if(!(iv is Map))
+            {
+                m_Log.WarnFormat("Invalid LLSD-XML received at GroupMemberData");
+                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                return;
+            }
+
+            Map res = new Map();
+            res.Add("agent_id", agent.ID);
+            res.Add("group_id", group.ID);
+
+            List<GroupMember> gmems;
+            try
+            {
+
+                gmems = groupsService.Members[circuit.Agent.Owner, group];
+            }
+            catch
+            {
+                gmems = new List<GroupMember>();
+            }
+
+            res.Add("member_count", gmems.Count);
+
+            Map membersmap = new Map();
+            GroupInfo ginfo = groupsService.Groups[agent.Owner, group];
+            List<GroupRole> groupRoles = groupsService.Roles[agent.Owner, group];
+            Dictionary<UUID, GroupRole> groupRolesMap = new Dictionary<UUID,GroupRole>();
+            List<GroupRolemember> ownerGroupRoleMembers = groupsService.Rolemembers[agent.Owner, group, ginfo.OwnerRoleID];
+            List<string> groupTitles = new List<string>();
+            groupTitles.Add("");
+            GroupPowers defaultPowers = GroupPowers.None;
+            foreach(GroupRole role in groupRoles)
+            {
+                groupRolesMap.Add(role.ID, role);
+                if(role.ID == UUID.Zero)
+                {
+                    groupTitles[0] = role.Title;
+                    defaultPowers = role.Powers;
+                }
+                else if(!groupTitles.Contains(role.Title))
+                {
+                    groupTitles.Add(role.Title);
+                }
+            }
+
+            foreach(GroupMember gmem in gmems)
+            {
+                Map outmap = new Map();
+                outmap.Add("donated_square_meters", 0);
+                membersmap.Add(gmem.Principal.ID.ToString(), outmap);
+                try
+                {
+                    GroupActiveMembership gam = groupsService.ActiveMembership[gmem.Principal, gmem.Principal];
+                    outmap.Add("powers", PowersToString(GetGroupPowers(gmem.Principal, groupsService, group)));
+                    if(groupRolesMap.ContainsKey(gam.SelectedRoleID))
+                    {
+                        int i = groupTitles.IndexOf(groupRolesMap[gam.SelectedRoleID].Title);
+                        if(i >= 0)
+                        {
+                            outmap.Add("title", gam.SelectedRoleID);
+                        }
+                    }
+
+                    if(ownerGroupRoleMembers.Count(rolemember => rolemember.Principal.EqualsGrid(gmem.Principal)) > 0)
+                    {
+                        outmap.Add("owner", true);
+                    }
+                }
+                catch
+                {
+
+                }
+            }
+            res.Add("members", membersmap);
+            AnArray groupTitlesArray = new AnArray();
+            foreach(string s in groupTitles)
+            {
+                groupTitlesArray.Add(s);
+            }
+            Map defaultsMap = new Map();
+            defaultsMap.Add("default_powers", PowersToString(defaultPowers));
+            res.Add("defaults", defaultsMap);
+            res.Add("titles", groupTitlesArray);
+
+            HttpResponse httpres = req.BeginResponse("application/llsd+xml");
+            LLSD_XML.Serialize(res, httpres.GetOutputStream());
+            httpres.Close();
         }
         #endregion
 
