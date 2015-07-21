@@ -54,7 +54,7 @@ namespace SilverSim.LL.Core
                             if (adu.ActiveGroupID != UUID.Zero)
                             {
                                 gr = groupsService.Roles[Owner, gm.Group, gm.SelectedRoleID];
-                                adu.GroupName = gm.Group.GroupName;
+                                adu.GroupName = string.Empty; // gm.Group.GroupName;
                                 adu.GroupTitle = gr.Title;
                                 adu.GroupPowers = gr.Powers;
                             }

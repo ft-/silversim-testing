@@ -107,6 +107,44 @@ namespace SilverSim.LL.Groups
             new Thread(AgentGroupDataUpdateQueueThread).Start();
         }
 
+        void SendAgentDataUpdate(IAgent agent, GroupsServiceInterface groupsService, SceneInterface scene)
+        {
+            Messages.Agent.AgentDataUpdate adu = new Messages.Agent.AgentDataUpdate();
+            try
+            {
+                GroupRole gr;
+                GroupActiveMembership gm = groupsService.ActiveMembership[agent.Owner, agent.Owner];
+                adu.ActiveGroupID = groupsService.ActiveGroup[agent.Owner, agent.Owner].ID;
+                if (adu.ActiveGroupID != UUID.Zero)
+                {
+                    gr = groupsService.Roles[agent.Owner, gm.Group, gm.SelectedRoleID];
+                    adu.GroupName = string.Empty; // gm.Group.GroupName;
+                    adu.GroupTitle = gr.Title;
+                    adu.GroupPowers = gr.Powers;
+                }
+            }
+            catch
+#if DEBUG
+ (Exception e)
+#endif
+            {
+#if DEBUG
+                m_Log.Debug("SendAgentDataUpdate", e);
+#endif
+                adu.ActiveGroupID = UUID.Zero;
+                adu.GroupName = string.Empty;
+                adu.GroupTitle = string.Empty;
+                adu.GroupPowers = GroupPowers.None;
+            }
+            adu.AgentID = agent.Owner.ID;
+            adu.FirstName = agent.Owner.FirstName;
+            adu.LastName = agent.Owner.LastName;
+            foreach(IAgent cagent in scene.Agents)
+            {
+                cagent.SendMessageAlways(adu, scene.ID);
+            }
+        }
+
         public void AgentGroupDataUpdateQueueThread()
         {
             Thread.CurrentThread.Name = "Groups AgentGroupDataUpdate Thread";
@@ -1260,6 +1298,7 @@ namespace SilverSim.LL.Groups
             }
 
             SendAllAgentsGroupDataUpdate(scene, groupsService, new UGI(req.GroupID));
+            SendAgentDataUpdate(agent, groupsService, scene);
         }
         #endregion
 
@@ -1329,6 +1368,7 @@ namespace SilverSim.LL.Groups
                 return;
             }
             SendAgentGroupDataUpdate(agent, scene, groupsService, new UGI(req.GroupID));
+            SendAgentDataUpdate(agent, groupsService, scene);
         }
         #endregion
 
