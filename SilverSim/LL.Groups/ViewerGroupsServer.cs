@@ -77,6 +77,7 @@ namespace SilverSim.LL.Groups
         [PacketHandler(MessageType.SetGroupContribution)]
         [PacketHandler(MessageType.SetGroupAcceptNotices)]
         [PacketHandler(MessageType.GroupRoleDataRequest)]
+        [PacketHandler(MessageType.GroupMembersRequest)]
         [PacketHandler(MessageType.GroupRoleMembersRequest)]
         [PacketHandler(MessageType.GroupTitlesRequest)]
         [PacketHandler(MessageType.GroupTitleUpdate)]
@@ -323,6 +324,10 @@ namespace SilverSim.LL.Groups
 
                         case MessageType.GroupRoleUpdate:
                             HandleGroupRoleUpdate(req.Key.Agent, scene, m);
+                            break;
+
+                        case MessageType.GroupMembersRequest:
+                            HandleGroupMembersRequest(req.Key.Agent, scene, m);
                             break;
 
                         case MessageType.ImprovedInstantMessage:
@@ -1455,6 +1460,89 @@ namespace SilverSim.LL.Groups
             return p.ToString("X");
         }
 
+        void HandleGroupMembersRequest(LLAgent agent, SceneInterface scene, Message m)
+        {
+            GroupMembersRequest req = (GroupMembersRequest)m;
+            if (req.CircuitAgentID != req.AgentID ||
+                req.CircuitSessionID != req.SessionID)
+            {
+                return;
+            }
+
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if (null == groupsService)
+            {
+                return;
+            }
+
+            List<GroupMember> gmems;
+            UGI group = new UGI(req.GroupID);
+            try
+            {
+
+                gmems = groupsService.Members[agent.Owner, group];
+            }
+            catch
+            {
+                gmems = new List<GroupMember>();
+            }
+
+            Map membersmap = new Map();
+            GroupInfo ginfo = groupsService.Groups[agent.Owner, group];
+            List<GroupRolemember> ownerGroupRoleMembers = groupsService.Rolemembers[agent.Owner, group, ginfo.OwnerRoleID];
+
+            GroupMembersReply reply = null;
+            int messageFill = 0;
+
+            foreach (GroupMember gmem in gmems)
+            {
+                GroupMembersReply.MemberDataEntry d = new GroupMembersReply.MemberDataEntry();
+                d.AgentID = gmem.Principal.ID;
+                d.AgentPowers = GroupPowers.None;
+                d.Contribution = 0;
+                d.IsOwner = false;
+                d.OnlineStatus = "offline";
+                d.Title = string.Empty;
+                try
+                {
+                    GroupMembership gam = groupsService.Memberships[gmem.Principal, group, gmem.Principal];
+                    d.AgentPowers = gam.GroupPowers;
+                    d.Title = gam.GroupTitle;
+
+                    if (ownerGroupRoleMembers.Count(rolemember => rolemember.Principal.EqualsGrid(gmem.Principal)) > 0)
+                    {
+                        d.IsOwner = true;
+                    }
+                }
+                catch
+                {
+
+                }
+                if(null != reply && d.SizeInMessage + messageFill > 1400)
+                {
+                    agent.SendMessageAlways(reply, scene.ID);
+                    reply = null;
+                }
+
+                if(null == reply)
+                {
+                    reply = new GroupMembersReply();
+                    reply.AgentID = req.AgentID;
+                    reply.GroupID = req.GroupID;
+                    reply.MemberCount = gmems.Count;
+                    reply.RequestID = req.RequestID;
+                    messageFill = 0;
+                }
+                reply.MemberData.Add(d);
+                messageFill += d.SizeInMessage;
+            }
+
+            if(null != reply)
+            {
+                agent.SendMessageAlways(reply, scene.ID);
+            }
+        }
+
         [CapabilityHandler("GroupMemberData")]
         public void HandleGroupMemberDataCapability(LLAgent agent, Circuit circuit, HttpRequest req)
         {
@@ -1517,14 +1605,12 @@ namespace SilverSim.LL.Groups
             Map membersmap = new Map();
             GroupInfo ginfo = groupsService.Groups[agent.Owner, group];
             List<GroupRole> groupRoles = groupsService.Roles[agent.Owner, group];
-            Dictionary<UUID, GroupRole> groupRolesMap = new Dictionary<UUID,GroupRole>();
             List<GroupRolemember> ownerGroupRoleMembers = groupsService.Rolemembers[agent.Owner, group, ginfo.OwnerRoleID];
             List<string> groupTitles = new List<string>();
             groupTitles.Add("");
             GroupPowers defaultPowers = GroupPowers.None;
             foreach(GroupRole role in groupRoles)
             {
-                groupRolesMap.Add(role.ID, role);
                 if(role.ID == UUID.Zero)
                 {
                     groupTitles[0] = role.Title;
@@ -1543,14 +1629,14 @@ namespace SilverSim.LL.Groups
                 membersmap.Add(gmem.Principal.ID.ToString(), outmap);
                 try
                 {
-                    GroupActiveMembership gam = groupsService.ActiveMembership[gmem.Principal, gmem.Principal];
+                    GroupMembership gam = groupsService.Memberships[gmem.Principal, group, gmem.Principal];
                     outmap.Add("powers", PowersToString(GetGroupPowers(gmem.Principal, groupsService, group)));
-                    if(groupRolesMap.ContainsKey(gam.SelectedRoleID))
+                    if (groupTitles.Contains(gam.GroupTitle))
                     {
-                        int i = groupTitles.IndexOf(groupRolesMap[gam.SelectedRoleID].Title);
+                        int i = groupTitles.IndexOf(gam.GroupTitle);
                         if(i >= 0)
                         {
-                            outmap.Add("title", gam.SelectedRoleID);
+                            outmap.Add("title", i);
                         }
                     }
 

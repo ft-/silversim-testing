@@ -58,6 +58,11 @@ namespace SilverSim.ServiceInterfaces.Groups
 
         public interface IGroupMembershipsInterface
         {
+            GroupMembership this[UUI requestingAgent, UGI group, UUI principal]
+            {
+                get;
+            }
+
             List<GroupMembership> this[UUI requestingAgent, UUI principal]
             {
                 get;
