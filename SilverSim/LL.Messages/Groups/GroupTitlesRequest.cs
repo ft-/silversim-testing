@@ -28,7 +28,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.LL.Messages.Groups
 {
-    [UDPMessage(MessageType.GroupTitlesReply)]
+    [UDPMessage(MessageType.GroupTitlesRequest)]
     [Reliable]
     [Zerocoded]
     [NotTrusted]

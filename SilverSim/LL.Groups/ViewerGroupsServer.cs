@@ -1201,6 +1201,7 @@ namespace SilverSim.LL.Groups
                         reply = new GroupTitlesReply();
                         reply.AgentID = req.AgentID;
                         reply.GroupID = req.GroupID;
+                        reply.RequestID = req.RequestID;
                         messageFill = 0;
                     }
 
@@ -1509,9 +1510,13 @@ namespace SilverSim.LL.Groups
                     d.AgentPowers = gam.GroupPowers;
                     d.Title = gam.GroupTitle;
 
-                    if (ownerGroupRoleMembers.Count(rolemember => rolemember.Principal.EqualsGrid(gmem.Principal)) > 0)
+                    foreach (GroupRolemember grm in ownerGroupRoleMembers)
                     {
-                        d.IsOwner = true;
+                        if (grm.Principal.EqualsGrid(gmem.Principal))
+                        {
+                            d.IsOwner = true;
+                            break;
+                        }
                     }
                 }
                 catch
@@ -1630,7 +1635,7 @@ namespace SilverSim.LL.Groups
                 try
                 {
                     GroupMembership gam = groupsService.Memberships[gmem.Principal, group, gmem.Principal];
-                    outmap.Add("powers", PowersToString(GetGroupPowers(gmem.Principal, groupsService, group)));
+                    outmap.Add("powers", PowersToString(gam.GroupPowers));
                     if (groupTitles.Contains(gam.GroupTitle))
                     {
                         int i = groupTitles.IndexOf(gam.GroupTitle);
@@ -1640,9 +1645,13 @@ namespace SilverSim.LL.Groups
                         }
                     }
 
-                    if(ownerGroupRoleMembers.Count(rolemember => rolemember.Principal.EqualsGrid(gmem.Principal)) > 0)
+                    foreach (GroupRolemember grm in ownerGroupRoleMembers)
                     {
-                        outmap.Add("owner", true);
+                        if (grm.Principal.EqualsGrid(gmem.Principal))
+                        {
+                            outmap.Add("owner", true);
+                            break;
+                        }
                     }
                 }
                 catch
