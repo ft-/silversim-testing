@@ -56,7 +56,14 @@ namespace SilverSim.LL.Messages.Agent
             p.WriteStringLen8(GroupTitle);
             p.WriteUUID(ActiveGroupID);
             p.WriteUInt64((UInt64)GroupPowers);
-            p.WriteStringLen8(GroupName);
+            if (GroupName == "")
+            {
+                p.WriteUInt8(0);
+            }
+            else
+            {
+                p.WriteStringLen8(GroupName);
+            }
         }
     }
 }
