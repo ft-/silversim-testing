@@ -31,7 +31,9 @@ using SilverSim.LL.Messages.Search;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
+using SilverSim.Types.Groups;
 using System;
 using System.Collections.Generic;
 using System.Net;
@@ -179,7 +181,57 @@ namespace SilverSim.LL.Search
 
         void ProcessDirFindQuery_Groups(LLAgent agent, SceneInterface scene, DirFindQuery req)
         {
+            DirGroupsReply res = null;
 
+            GroupsServiceInterface groupsService = scene.GroupsService;
+            if(null == groupsService)
+            {
+                res = new DirGroupsReply();
+                res.AgentID = req.AgentID;
+                res.QueryID = req.QueryID;
+                agent.SendMessageAlways(res, scene.ID);
+                return;
+            }
+
+            List<DirGroupInfo> gis = groupsService.Groups.GetGroupsByName(agent.Owner, req.QueryText);
+            if(gis.Count == 0)
+            {
+                res = new DirGroupsReply();
+                res.AgentID = req.AgentID;
+                res.QueryID = req.QueryID;
+                agent.SendMessageAlways(res, scene.ID);
+                return;
+            }
+            UDPPacket t = new UDPPacket();
+            foreach (DirGroupInfo gi in gis)
+            {
+                if (null == res)
+                {
+                    res = new DirGroupsReply();
+                    res.AgentID = req.AgentID;
+                    res.QueryID = req.QueryID;
+                }
+
+                DirGroupsReply.QueryReplyData d = new DirGroupsReply.QueryReplyData();
+                d.GroupID = gi.ID.ID;
+                d.GroupName = gi.ID.GroupName;
+                d.Members = gi.MemberCount;
+                d.SearchOrder = gi.SearchOrder;
+
+                res.QueryReplies.Add(d);
+
+                t.Reset();
+                res.Serialize(t);
+                if (t.DataLength >= 1400)
+                {
+                    agent.SendMessageAlways(res, scene.ID);
+                    res = null;
+                }
+            }
+            if (res != null)
+            {
+                agent.SendMessageAlways(res, scene.ID);
+            }
         }
 
         void ProcessDirFindQuery_Events(LLAgent agent, SceneInterface scene, DirFindQuery req)
