@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Names;
 using SilverSim.ServiceInterfaces.AvatarName;
+using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 
 namespace SilverSim.LL.Core
@@ -37,6 +38,7 @@ namespace SilverSim.LL.Core
         {
             UUIDGroupNameRequest req = (UUIDGroupNameRequest)m;
             UUIDGroupNameReply rep = new UUIDGroupNameReply();
+            GroupsServiceInterface groupsService = Scene.GroupsService;
 
             foreach(UUID id in req.UUIDNameBlock)
             {
@@ -48,9 +50,9 @@ namespace SilverSim.LL.Core
                 {
                     try
                     {
-                        if (null != Agent.GroupsService)
+                        if (null != groupsService)
                         {
-                            rep.UUIDNameBlock.Add(new UUIDGroupNameReply.Data(Agent.GroupsService.Groups[Agent.Owner, id]));
+                            rep.UUIDNameBlock.Add(new UUIDGroupNameReply.Data(groupsService.Groups[Agent.Owner, id]));
                         }
                     }
                     catch
