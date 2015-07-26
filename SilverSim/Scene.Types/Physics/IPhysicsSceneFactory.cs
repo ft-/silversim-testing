@@ -23,16 +23,12 @@ exception statement from your version.
 
 */
 
-using Nini.Config;
-using SilverSim.Main.Common;
+using SilverSim.Scene.Types.Scene;
 
-namespace SilverSim.Scene.Physics.Bullet.Implementation
+namespace SilverSim.Scene.Types.Physics
 {
-    public class PluginFactory : IPluginFactory
+    public interface IPhysicsSceneFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
-        {
-            return new BulletSceneFactory(ownSection);
-        }
+        IPhysicsScene InstantiatePhysicsScene(SceneInterface scene);
     }
 }

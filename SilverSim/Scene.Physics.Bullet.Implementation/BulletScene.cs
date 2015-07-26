@@ -23,16 +23,27 @@ exception statement from your version.
 
 */
 
-using Nini.Config;
-using SilverSim.Main.Common;
+using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Physics;
+using System;
 
 namespace SilverSim.Scene.Physics.Bullet.Implementation
 {
-    public class PluginFactory : IPluginFactory
+    public class BulletScene : IPhysicsScene
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        public void Add(IObject obj)
         {
-            return new BulletSceneFactory(ownSection);
+            throw new NotImplementedException();
+        }
+
+        public void Remove(IObject obj)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void RemoveAll()
+        {
+            throw new NotImplementedException();
         }
     }
 }

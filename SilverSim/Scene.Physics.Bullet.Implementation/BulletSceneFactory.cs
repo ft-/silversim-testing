@@ -25,14 +25,26 @@ exception statement from your version.
 
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Scene.Types.Physics;
+using SilverSim.Scene.Types.Scene;
+using System;
 
 namespace SilverSim.Scene.Physics.Bullet.Implementation
 {
-    public class PluginFactory : IPluginFactory
+    public class BulletSceneFactory : IPlugin, IPhysicsSceneFactory
     {
-        public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
+        public BulletSceneFactory(IConfig ownSection)
         {
-            return new BulletSceneFactory(ownSection);
+
+        }
+
+        public void Startup(ConfigurationLoader loader)
+        {
+        }
+
+        public IPhysicsScene InstantiatePhysicsScene(SceneInterface scene)
+        {
+            throw new NotImplementedException();
         }
     }
 }
