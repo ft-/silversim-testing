@@ -27,6 +27,7 @@ using System;
 
 namespace SilverSim.Types
 {
+    /** <summary> Universal User Identifier </summary> */
     public sealed class UUI : IEquatable<UUI>
     {
         public UUID ID = UUID.Zero;
