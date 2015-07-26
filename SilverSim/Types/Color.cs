@@ -83,6 +83,27 @@ namespace SilverSim.Types
         #endregion
 
         #region Properties
+        public double GetR
+        {
+            get
+            {
+                return R;
+            }
+        }
+        public double GetG
+        {
+            get
+            {
+                return G;
+            }
+        }
+        public double GetB
+        {
+            get
+            {
+                return B;
+            }
+        }
         public Vector3 AsVector3
         {
             get
