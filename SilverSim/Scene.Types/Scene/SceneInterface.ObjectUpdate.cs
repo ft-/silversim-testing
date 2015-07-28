@@ -41,6 +41,10 @@ namespace SilverSim.Scene.Types.Scene
             {
                 a.ScheduleUpdate(objinfo, ID);
             }
+            foreach(ISceneListener l in SceneListeners)
+            {
+                l.ScheduleUpdate(objinfo, ID);
+            }
         }
 
         private SilverSim.LL.Messages.Object.ObjectUpdate AgentToObjectUpdate(IAgent agent)

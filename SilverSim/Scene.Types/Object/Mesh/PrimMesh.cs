@@ -21,35 +21,21 @@ this exception to your version of the code, but you are not
 obligated to do so. If you do not wish to do so, delete this
 exception statement from your version.
 
+===============================================================================
+The following code segment is based on SL viewer code which is distributed under LGPL V2.1.
+ 
 */
 
-using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Physics;
-using SilverSim.Scene.Types.Scene;
+using SilverSim.Types;
 using System;
 
-namespace SilverSim.Scene.Physics.Bullet.Implementation
+namespace SilverSim.Scene.Types.Object.Mesh
 {
-    public partial class BulletScene : IPhysicsScene, ISceneListener
+    public static class PrimMesh
     {
-        public void RemoveAll()
+        public static Mesh ShapeToMesh(this ObjectPart.PrimitiveShape shape)
         {
             throw new NotImplementedException();
-        }
-
-        public void Add(IObject obj)
-        {
-
-        }
-
-        void UpdateObject(IObject obj)
-        {
-
-        }
-
-        public void Remove(IObject obj)
-        {
-
         }
     }
 }

@@ -23,33 +23,30 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Physics;
-using SilverSim.Scene.Types.Scene;
+using SilverSim.Types;
+using SilverSim.Types.Asset;
 using System;
+using System.IO;
 
-namespace SilverSim.Scene.Physics.Bullet.Implementation
+namespace SilverSim.Scene.Types.Object.Mesh
 {
-    public partial class BulletScene : IPhysicsScene, ISceneListener
+    public static class LLMesh
     {
-        public void RemoveAll()
+        public static Mesh LLMeshToMesh(this AssetData data)
+        {
+            if (data.Type != AssetType.Mesh)
+            {
+                throw new InvalidSculptMeshAssetException();
+            }
+            using (Stream s = data.InputStream)
+            {
+                return s.LLMeshToMesh();
+            }
+        }
+
+        public static Mesh LLMeshToMesh(this Stream st)
         {
             throw new NotImplementedException();
-        }
-
-        public void Add(IObject obj)
-        {
-
-        }
-
-        void UpdateObject(IObject obj)
-        {
-
-        }
-
-        public void Remove(IObject obj)
-        {
-
         }
     }
 }

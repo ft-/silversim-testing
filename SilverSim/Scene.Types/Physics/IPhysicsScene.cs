@@ -33,8 +33,8 @@ namespace SilverSim.Scene.Types.Physics
 {
     public interface IPhysicsScene
     {
+        void RemoveAll();
         void Add(IObject obj);
         void Remove(IObject obj);
-        void RemoveAll();
     }
 }

@@ -23,31 +23,38 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Physics;
-using SilverSim.Scene.Types.Scene;
+using SilverSim.Types;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace SilverSim.Scene.Physics.Bullet.Implementation
+namespace SilverSim.Scene.Types.Object.Mesh
 {
-    public partial class BulletScene : IPhysicsScene, ISceneListener
+    public sealed class Mesh
     {
-        public void RemoveAll()
+        public struct Triangle
         {
-            throw new NotImplementedException();
+            public int PrimFaceIndex;
+
+            public int VectorIndex0;
+            public int VectorIndex1;
+            public int VectorIndex2;
+
+            public int NormalIndex0;
+            public int NormalIndex1;
+            public int NormalIndex2;
+
+            public int UVIndex0;
+            public int UVIndex1;
+            public int UVIndex2;
         }
 
-        public void Add(IObject obj)
-        {
+        public List<Vector3> Vertices = new List<Vector3>();
+        public List<Vector3> Normals = new List<Vector3>();
+        public List<Triangle> Triangles = new List<Triangle>();
 
-        }
-
-        void UpdateObject(IObject obj)
-        {
-
-        }
-
-        public void Remove(IObject obj)
+        public Mesh()
         {
 
         }

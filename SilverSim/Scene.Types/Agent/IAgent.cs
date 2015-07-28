@@ -26,6 +26,7 @@ exception statement from your version.
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Friends;
@@ -46,7 +47,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Agent
 {
-    public interface IAgent : IObject
+    public interface IAgent : IObject, ISceneListener
     {
         string DisplayName { get; set; }
         string FirstName { get; set; }
@@ -182,7 +183,6 @@ namespace SilverSim.Scene.Types.Agent
         void SendMessageAlways(Message m, UUID fromSceneID);
         void SendAlertMessage(string msg, UUID fromSceneID);
         void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID);
-        void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID);
         void HandleMessage(ChildAgentUpdate m);
         void HandleMessage(ChildAgentPositionUpdate m);
 

@@ -328,6 +328,11 @@ namespace SilverSim.Types
             }
         }
 
+        public static Vector3 Lerp(Vector3 lhs, Vector3 rhs, double c)
+        {
+            return lhs + (rhs - lhs) * c;
+        }
+
         #region Operators
         public static bool operator ==(Vector3 value1, Vector3 value2)
         {

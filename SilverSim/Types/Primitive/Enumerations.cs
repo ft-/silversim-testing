@@ -166,7 +166,9 @@ namespace SilverSim.Types.Primitive
         IsometricTriangle = 2,
         EquilateralTriangle = 3,
         RightTriangle = 4,
-        HalfCircle = 5
+        HalfCircle = 5,
+
+        Mask = 0x0F
     }
 
     public enum PrimitiveProfileHollowShape : byte
@@ -174,7 +176,9 @@ namespace SilverSim.Types.Primitive
         Same = 0,
         Circle = 16,
         Square = 32,
-        Triangle = 48
+        Triangle = 48,
+
+        Mask = 0xF0
     }
 
     public enum PrimitiveExtrusion : byte
@@ -190,7 +194,7 @@ namespace SilverSim.Types.Primitive
         Default = 0x00,
         Circle = 0x10,
         Square = 0x20,
-        Triangle = 0x30
+        Triangle = 0x30,
     }
 
     [Flags]

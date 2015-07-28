@@ -23,33 +23,11 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Physics;
-using SilverSim.Scene.Types.Scene;
 using System;
 
-namespace SilverSim.Scene.Physics.Bullet.Implementation
+namespace SilverSim.Scene.Types.Object.Mesh
 {
-    public partial class BulletScene : IPhysicsScene, ISceneListener
+    public class InvalidLLMeshAssetException : Exception
     {
-        public void RemoveAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Add(IObject obj)
-        {
-
-        }
-
-        void UpdateObject(IObject obj)
-        {
-
-        }
-
-        public void Remove(IObject obj)
-        {
-
-        }
     }
 }

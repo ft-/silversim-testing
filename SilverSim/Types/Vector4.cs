@@ -158,6 +158,11 @@ namespace SilverSim.Types
 
         #region Static Methods
 
+        public static Vector3 Lerp(Vector3 lhs, Vector3 rhs, double c)
+        {
+            return lhs + (rhs - lhs) * c;
+        }
+
         public static Vector4 Add(Vector4 value1, Vector4 value2)
         {
             value1.W += value2.W;

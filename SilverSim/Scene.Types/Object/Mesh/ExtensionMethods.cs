@@ -23,33 +23,28 @@ exception statement from your version.
 
 */
 
-using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Physics;
-using SilverSim.Scene.Types.Scene;
+using SilverSim.Types;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
-namespace SilverSim.Scene.Physics.Bullet.Implementation
+namespace SilverSim.Scene.Types.Object.Mesh
 {
-    public partial class BulletScene : IPhysicsScene, ISceneListener
+    public static class ExtensionMethods
     {
-        public void RemoveAll()
+        public static object ToMesh(this ObjectPart part)
         {
+            ObjectPart.PrimitiveShape shape = part.Shape;
+            Vector3 scale = part.Size;
+            Quaternion rotLocal = Quaternion.Identity;
+            Vector3 posLocal = Vector3.Zero;
+            if(part != part.ObjectGroup.RootPart)
+            {
+                rotLocal = part.LocalRotation;
+                posLocal = part.LocalPosition;
+            }
             throw new NotImplementedException();
-        }
-
-        public void Add(IObject obj)
-        {
-
-        }
-
-        void UpdateObject(IObject obj)
-        {
-
-        }
-
-        public void Remove(IObject obj)
-        {
-
         }
     }
 }

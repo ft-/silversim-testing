@@ -7,6 +7,11 @@ namespace SilverSim.Types
 {
     public static class TypeExtensionMethods
     {
+        public static double Lerp(this double a, double b, double u)
+        {
+            return a + ((b - a) * u);
+        }
+
         public static double Clamp(this double val, double min, double max)
         {
             if(val < min)

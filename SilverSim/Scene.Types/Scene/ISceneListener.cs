@@ -24,32 +24,12 @@ exception statement from your version.
 */
 
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Physics;
-using SilverSim.Scene.Types.Scene;
-using System;
+using SilverSim.Types;
 
-namespace SilverSim.Scene.Physics.Bullet.Implementation
+namespace SilverSim.Scene.Types.Scene
 {
-    public partial class BulletScene : IPhysicsScene, ISceneListener
+    public interface ISceneListener
     {
-        public void RemoveAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Add(IObject obj)
-        {
-
-        }
-
-        void UpdateObject(IObject obj)
-        {
-
-        }
-
-        public void Remove(IObject obj)
-        {
-
-        }
+        void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID);
     }
 }

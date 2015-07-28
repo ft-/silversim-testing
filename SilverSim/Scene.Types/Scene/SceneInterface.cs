@@ -119,6 +119,7 @@ namespace SilverSim.Scene.Types.Scene
         public GroupsNameServiceInterface GroupsNameService { get; protected set; }
         public AvatarNameServiceInterface AvatarNameService { get; private set; }
         public readonly RwLockedList<AvatarNameServiceInterface> AvatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
+        public readonly RwLockedList<ISceneListener> SceneListeners = new RwLockedList<ISceneListener>();
         public GridServiceInterface GridService { get; protected set; }
         public EconomyServiceInterface EconomyService { get; protected set; }
         public EstateServiceInterface EstateService { get; protected set; }
