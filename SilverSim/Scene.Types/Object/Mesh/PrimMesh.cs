@@ -20,20 +20,18 @@ or based on this code. If you modify this code, you may extend
 this exception to your version of the code, but you are not
 obligated to do so. If you do not wish to do so, delete this
 exception statement from your version.
-
-===============================================================================
-The following code segment is based on SL viewer code which is distributed under LGPL V2.1.
  
 */
 
 using SilverSim.Types;
+using SilverSim.Types.Primitive;
 using System;
 
 namespace SilverSim.Scene.Types.Object.Mesh
 {
     public static class PrimMesh
     {
-        public static Mesh ShapeToMesh(this ObjectPart.PrimitiveShape shape)
+        internal static Mesh ShapeToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
         {
             throw new NotImplementedException();
         }

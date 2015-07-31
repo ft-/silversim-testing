@@ -25,6 +25,7 @@ exception statement from your version.
 
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Primitive;
 using System;
 using System.IO;
 
@@ -32,7 +33,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
 {
     public static class LLMesh
     {
-        public static Mesh LLMeshToMesh(this AssetData data)
+        internal static Mesh LLMeshToMesh(this AssetData data, ObjectPart.PrimitiveShape.Decoded shape)
         {
             if (data.Type != AssetType.Mesh)
             {
@@ -40,11 +41,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
             }
             using (Stream s = data.InputStream)
             {
-                return s.LLMeshToMesh();
+                return s.LLMeshToMesh(shape);
             }
         }
 
-        public static Mesh LLMeshToMesh(this Stream st)
+        internal static Mesh LLMeshToMesh(this Stream st, ObjectPart.PrimitiveShape.Decoded shape)
         {
             throw new NotImplementedException();
         }

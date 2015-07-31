@@ -155,6 +155,9 @@ namespace SilverSim.Types.Primitive
         Plane = 3,
         Cylinder = 4,
         Mesh = 5,
+
+        TypeMask = 0x3F,
+
         Invert = 64,
         Mirror = 128
     }

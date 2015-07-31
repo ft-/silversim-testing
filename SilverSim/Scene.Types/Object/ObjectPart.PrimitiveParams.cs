@@ -252,6 +252,14 @@ namespace SilverSim.Scene.Types.Object
 
             public struct Decoded
             {
+                #region Overall Params
+                public PrimitiveShapeType ShapeType;
+                public PrimitiveSculptType SculptType;
+                public UUID SculptMap;
+                public bool IsSculptInverted;
+                public bool IsSculptMirrored;
+                #endregion
+
                 #region Profile Params
                 public PrimitiveProfileShape ProfileShape;
                 public PrimitiveProfileHollowShape HoleShape;
@@ -290,6 +298,12 @@ namespace SilverSim.Scene.Types.Object
                 {
                     Decoded d = new Decoded();
 
+                    d.ShapeType = Type;
+                    d.SculptType = SculptType;
+                    d.SculptMap = SculptMap;
+                    d.IsSculptInverted = IsSculptInverted;
+                    d.IsSculptMirrored = IsSculptMirrored;
+
                     #region Profile Params
                     d.ProfileBegin = (ProfileBegin * CutQuanta).Clamp(0f, 1f);
                     d.ProfileEnd = (ProfileEnd * CutQuanta).Clamp(0f, 1f);
@@ -307,18 +321,18 @@ namespace SilverSim.Scene.Types.Object
                         ((200 - PathScaleY) * ScaleQuanta).Clamp(0f, 1f),
                         0f);
                     d.Shear = new Vector3(
-                        (PathShearX * ScaleQuanta).Clamp(0f, 1f),
-                        (PathShearY * ScaleQuanta).Clamp(0f, 1f),
+                        (PathShearX * ScaleQuanta - 0.5).Clamp(-0.5, 0.5),
+                        (PathShearY * ScaleQuanta - 0.5).Clamp(-0.5, 0.5),
                         0f);
-                    d.TwistBegin = PathTwistBegin * ScaleQuanta;
-                    d.TwistEnd = PathTwist * ScaleQuanta;
-                    d.RadiusOffset = PathRadiusOffset * ScaleQuanta;
+                    d.TwistBegin = (PathTwistBegin * ScaleQuanta).Clamp(-1f, 1f);
+                    d.TwistEnd = (PathTwist * ScaleQuanta).Clamp(-1f, 1f);
+                    d.RadiusOffset = (PathRadiusOffset * ScaleQuanta);
                     d.Taper = new Vector3(
-                        PathTaperX * TaperQuanta,
-                        PathTaperY * TaperQuanta,
+                        (PathTaperX * TaperQuanta).Clamp(-1f, 1f),
+                        (PathTaperY * TaperQuanta).Clamp(-1f, 1f),
                         0f);
-                    d.Revolutions = PathRevolutions * RevQuanta + 1f;
-                    d.Skew = PathSkew * ScaleQuanta;
+                    d.Revolutions = (PathRevolutions * RevQuanta + 1f).Clamp(1f, 4f);
+                    d.Skew = (PathSkew * ScaleQuanta).Clamp(-0.95, 0.95);
                     #endregion
 
                     return d;

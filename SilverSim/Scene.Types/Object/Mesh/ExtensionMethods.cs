@@ -23,7 +23,9 @@ exception statement from your version.
 
 */
 
+using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
+using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,17 +35,36 @@ namespace SilverSim.Scene.Types.Object.Mesh
 {
     public static class ExtensionMethods
     {
-        public static object ToMesh(this ObjectPart part)
+        public static Mesh ToMesh(this ObjectPart part, AssetServiceInterface assetService)
         {
-            ObjectPart.PrimitiveShape shape = part.Shape;
-            Vector3 scale = part.Size;
-            Quaternion rotLocal = Quaternion.Identity;
-            Vector3 posLocal = Vector3.Zero;
-            if(part != part.ObjectGroup.RootPart)
+            ObjectPart.PrimitiveShape.Decoded shape = part.Shape.DecodedParams;
+
+            return part.Shape.DecodedParams.ToMesh(assetService);
+        }
+
+        public static Mesh ToMesh(this ObjectPart.PrimitiveShape shape, AssetServiceInterface assetService)
+        {
+            return shape.DecodedParams.ToMesh(assetService);
+        }
+
+        public static Mesh ToMesh(this ObjectPart.PrimitiveShape.Decoded shape, AssetServiceInterface assetService)
+        {
+            switch(shape.ShapeType)
             {
-                rotLocal = part.LocalRotation;
-                posLocal = part.LocalPosition;
+                case PrimitiveShapeType.Sculpt:
+                    switch(shape.SculptType & PrimitiveSculptType.TypeMask)
+                    {
+                        case PrimitiveSculptType.Mesh:
+                            return assetService[shape.SculptMap].LLMeshToMesh(shape);
+
+                        default:
+                            return assetService[shape.SculptMap].SculptMeshToMesh(shape);
+                    }
+
+                default:
+                    return shape.ShapeToMesh();
             }
+
             throw new NotImplementedException();
         }
     }

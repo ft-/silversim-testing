@@ -21,9 +21,6 @@ this exception to your version of the code, but you are not
 obligated to do so. If you do not wish to do so, delete this
 exception statement from your version.
 
-===============================================================================
-The following code segment is based on SL viewer code which is distributed under LGPL V2.1.
- 
 */
 
 using CSJ2K;
@@ -39,7 +36,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
 {
     public static class SculptMesh
     {
-        public static Mesh SculptMeshToMesh(this AssetData data, ObjectPart.PrimitiveShape shape)
+        internal static Mesh SculptMeshToMesh(this AssetData data, ObjectPart.PrimitiveShape.Decoded shape)
         {
             if(data.Type != AssetType.Texture)
             {
@@ -51,7 +48,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             }
         }
 
-        public static Mesh SculptMeshToMesh(this Stream st, ObjectPart.PrimitiveShape shape)
+        internal static Mesh SculptMeshToMesh(this Stream st, ObjectPart.PrimitiveShape.Decoded shape)
         {
             using (Image im = J2kImage.FromStream(st))
             {
@@ -60,7 +57,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             }
         }
 
-        public static Mesh SculptMeshToMesh(this Bitmap bitmap, ObjectPart.PrimitiveShape shape)
+        internal static Mesh SculptMeshToMesh(this Bitmap bitmap, ObjectPart.PrimitiveShape.Decoded shape)
         {
 
             throw new NotImplementedException();
