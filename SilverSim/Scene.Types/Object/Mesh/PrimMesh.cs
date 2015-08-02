@@ -23,6 +23,7 @@ exception statement from your version.
  
 */
 
+using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
@@ -53,19 +54,27 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
         internal static Mesh ShapeToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
         {
+            Mesh mesh;
             switch (shape.ShapeType)
             {
                 case PrimitiveShapeType.Box:
                 case PrimitiveShapeType.Cylinder:
                 case PrimitiveShapeType.Prism:
-                    return shape.BoxCylPrismToMesh();
+                    mesh = shape.BoxCylPrismToMesh();
+                    break;
 
                 case PrimitiveShapeType.Ring:
                 case PrimitiveShapeType.Torus:
                 case PrimitiveShapeType.Tube:
-                    return shape.AdvancedToMesh();
+                case PrimitiveShapeType.Sphere:
+                    mesh = shape.AdvancedToMesh();
+                    break;
+
+                default:
+                    throw new NotImplementedException();
             }
-            throw new NotImplementedException();
+
+            return mesh;
         }
 
     }

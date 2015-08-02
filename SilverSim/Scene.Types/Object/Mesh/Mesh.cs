@@ -58,5 +58,55 @@ namespace SilverSim.Scene.Types.Object.Mesh
         {
 
         }
+
+        public void Optimize()
+        {
+            /* collapse all identical vertices */
+            List<Vector3> NewVertices = new List<Vector3>();
+            Dictionary<int, int> VertexMap = new Dictionary<int,int>();
+            List<Triangle> NewTriangles = new List<Triangle>();
+
+            /* identify all duplicate meshes */
+            for(int i = 0; i < Vertices.Count; ++i)
+            {
+                Vector3 v = Vertices[i];
+                int newIdx = NewVertices.IndexOf(v);
+                if(newIdx < 0)
+                {
+                    newIdx = NewVertices.Count;
+                    NewVertices.Add(v);
+                }
+                VertexMap.Add(i, newIdx);
+            }
+
+            /* remap all vertices */
+            for(int i = 0; i < Triangles.Count; ++i)
+            {
+                Triangle tri = Triangles[i];
+                tri.VectorIndex0 = VertexMap[tri.VectorIndex0];
+                tri.VectorIndex1 = VertexMap[tri.VectorIndex1];
+                tri.VectorIndex2 = VertexMap[tri.VectorIndex2];
+
+                if(tri.VectorIndex0 != tri.VectorIndex1 && tri.VectorIndex0 != tri.VectorIndex2 &&
+                    tri.VectorIndex1 != tri.VectorIndex2)
+                {
+                    /* 0 is != 1 and 0 != 2 and 1 != 2
+                     * 
+                     * so, 1 cannot be either 0 or 2.
+                     * so, 0 cannot be either 1 or 2.
+                     * so, 2 cannot be either 0 or 1.
+                     * 
+                     * This makes a nice non-degenerate triangle.
+                     */
+                    NewTriangles.Add(tri);
+                }
+            }
+
+            /* use new vertex list */
+            Vertices = NewVertices;
+
+            /* use new triangle list */
+            Triangles = NewTriangles;
+        }
     }
 }

@@ -49,23 +49,31 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
         public static Mesh ToMesh(this ObjectPart.PrimitiveShape.Decoded shape, AssetServiceInterface assetService)
         {
+            Mesh mesh;
             switch(shape.ShapeType)
             {
                 case PrimitiveShapeType.Sculpt:
                     switch(shape.SculptType & PrimitiveSculptType.TypeMask)
                     {
                         case PrimitiveSculptType.Mesh:
-                            return assetService[shape.SculptMap].LLMeshToMesh(shape);
+                            mesh = assetService[shape.SculptMap].LLMeshToMesh(shape);
+                            break;
 
                         default:
-                            return assetService[shape.SculptMap].SculptMeshToMesh(shape);
+                            mesh = assetService[shape.SculptMap].SculptMeshToMesh(shape);
+                            break;
                     }
+                    break;
 
                 default:
-                    return shape.ShapeToMesh();
+                    mesh = shape.ShapeToMesh();
+                    break;
             }
 
-            throw new NotImplementedException();
+            /* clean up de-generate triangles and duplicate vertices */
+            mesh.Optimize();
+
+            return mesh;
         }
     }
 }
