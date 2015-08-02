@@ -23,6 +23,7 @@ exception statement from your version.
 
 */
 
+using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Primitive;
@@ -33,7 +34,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
 {
     public static class LLMesh
     {
-        internal static Mesh LLMeshToMesh(this AssetData data, ObjectPart.PrimitiveShape.Decoded shape)
+        internal static Mesh LLMeshToMesh(this AssetData data, ObjectPart.PrimitiveShape.Decoded shape, bool usePhysicsMesh)
         {
             if (data.Type != AssetType.Mesh)
             {
@@ -41,12 +42,13 @@ namespace SilverSim.Scene.Types.Object.Mesh
             }
             using (Stream s = data.InputStream)
             {
-                return s.LLMeshToMesh(shape);
+                return s.LLMeshToMesh(shape, usePhysicsMesh);
             }
         }
 
-        internal static Mesh LLMeshToMesh(this Stream st, ObjectPart.PrimitiveShape.Decoded shape)
+        internal static Mesh LLMeshToMesh(this Stream st, ObjectPart.PrimitiveShape.Decoded shape, bool usePhysicsMesh)
         {
+            /* this is a format of multiple parts */
             throw new NotImplementedException();
         }
     }

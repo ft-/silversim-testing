@@ -47,7 +47,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return shape.DecodedParams.ToMesh(assetService);
         }
 
-        public static Mesh ToMesh(this ObjectPart.PrimitiveShape.Decoded shape, AssetServiceInterface assetService)
+        public static Mesh ToMesh(this ObjectPart.PrimitiveShape.Decoded shape, AssetServiceInterface assetService, bool usePhysicsMesh = false)
         {
             Mesh mesh;
             switch(shape.ShapeType)
@@ -56,7 +56,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     switch(shape.SculptType & PrimitiveSculptType.TypeMask)
                     {
                         case PrimitiveSculptType.Mesh:
-                            mesh = assetService[shape.SculptMap].LLMeshToMesh(shape);
+                            mesh = assetService[shape.SculptMap].LLMeshToMesh(shape, usePhysicsMesh);
                             break;
 
                         default:
