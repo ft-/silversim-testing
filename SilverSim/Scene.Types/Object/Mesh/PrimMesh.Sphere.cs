@@ -128,7 +128,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
         #endregion
 
         #region Calculate Sphere 2D Path
-        static Vector3 CalcTrigonInSpherePoint(double angle)
+        static Vector3 CalcTrapezoidInSpherePoint(double angle)
         {
             Vector3 c_p1;
             Vector3 c_p2;
@@ -136,17 +136,17 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             if (angle < Math.PI / 3)
             {
-                c_p1 = TRIGON_P0;
-                c_p2 = TRIGON_P1;
+                c_p1 = TRAPEZOID_P0;
+                c_p2 = TRAPEZOID_P1;
             }
             else if(angle < Math.PI * 2 / 3)
             {
-                c_p1 = TRIGON_P1;
-                c_p2 = TRIGON_P2;
+                c_p1 = TRAPEZOID_P1;
+                c_p2 = TRAPEZOID_P2;
             }
             {
-                c_p1 = TRIGON_P2;
-                c_p2 = TRIGON_P3;
+                c_p1 = TRAPEZOID_P2;
+                c_p2 = TRAPEZOID_P3;
             }
 
             double above_div_common;
@@ -231,8 +231,8 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     switch (shape.HoleShape)
                     {
                         case PrimitiveProfileHollowShape.Triangle:
-                            /* Even though, the option is called Triangle. It is actually a Trigon. */
-                            innerDirectionalVec = CalcTrigonInSpherePoint(startangle) * (shape.ProfileHollow * 0.5);
+                            /* Even though, the option is called Triangle. It is actually a Trapezoid. */
+                            innerDirectionalVec = CalcTrapezoidInSpherePoint(startangle) * (shape.ProfileHollow * 0.5);
                             break;
 
                         case PrimitiveProfileHollowShape.Same:

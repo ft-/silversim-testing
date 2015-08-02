@@ -33,22 +33,22 @@ namespace SilverSim.Scene.Types.Object.Mesh
     {
         static readonly Vector3 START_VECTOR_BOX;
 
-        static readonly Vector3 TRIGON_P0;
-        static readonly Vector3 TRIGON_P1;
-        static readonly Vector3 TRIGON_P2;
-        static readonly Vector3 TRIGON_P3;
+        static readonly Vector3 TRAPEZOID_P0;
+        static readonly Vector3 TRAPEZOID_P1;
+        static readonly Vector3 TRAPEZOID_P2;
+        static readonly Vector3 TRAPEZOID_P3;
 
         static PrimMesh()
         {
             START_VECTOR_BOX = new Vector3(-1, -1, 0).Normalize();
 
-            /* the hole shape inside a sphere is a tri-gon but not a tri-angle.
-             * So, it is called Trigon here.
+            /* the hole shape inside a sphere is a trapezoid but not a tri-angle.
+             * So, it is called trapezoid here.
              */
-            TRIGON_P0 = Vector3.UnitX;
-            TRIGON_P1 = TRIGON_P0.Rotate2D_XY(60 / 180 * Math.PI);
-            TRIGON_P2 = TRIGON_P0.Rotate2D_XY(120 / 180 * Math.PI);
-            TRIGON_P3 = -Vector3.UnitX;
+            TRAPEZOID_P0 = Vector3.UnitX;
+            TRAPEZOID_P1 = TRAPEZOID_P0.Rotate2D_XY(60 / 180 * Math.PI);
+            TRAPEZOID_P2 = TRAPEZOID_P0.Rotate2D_XY(120 / 180 * Math.PI);
+            TRAPEZOID_P3 = -Vector3.UnitX;
         }
 
         internal static Mesh ShapeToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
