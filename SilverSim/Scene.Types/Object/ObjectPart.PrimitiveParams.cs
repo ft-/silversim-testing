@@ -263,32 +263,50 @@ namespace SilverSim.Scene.Types.Object
                 #region Profile Params
                 public PrimitiveProfileShape ProfileShape;
                 public PrimitiveProfileHollowShape HoleShape;
+                /** <summary>value range 0f to 1f</summary> */
                 public double ProfileBegin;
+                /** <summary>value range 0f to 1f</summary> */
                 public double ProfileEnd;
+                /** <summary>value range 0f to 0.99f</summary> */
                 public double ProfileHollow;
                 public bool IsHollow;
                 #endregion
 
                 #region Path Params
+                /** <summary>value range 0f to 1f</summary> */
                 public double PathBegin;
+                public bool IsOpen;
+                /** <summary>value range 0f to 1f</summary> */
                 public double PathEnd;
-                public Vector3 Scale;
-                public Vector3 Shear;
+                /** <summary>value range 0f to 1f</summary> */
+                public Vector3 PathScale;
+                /** <summary>value range -1f to 1f</summary> */
+                public Vector3 TopShear;
+                /** <summary>value range -1f to 1f</summary> */
                 public double TwistBegin;
+                /** <summary>value range -1f to 1f</summary> */
                 public double TwistEnd;
                 public double RadiusOffset;
+                /** <summary>value range -1f to 1f</summary> */
                 public Vector3 Taper;
+                /** <summary>value range 1f to 4f</summary> */
                 public double Revolutions;
+                /** <summary>value range -0.95f to 0.95f</summary> */
                 public double Skew;
                 #endregion
             }
 
-
+            /** <summary>divides by 50000</summary> */
             const double CutQuanta = 0.00002f;
+            /** <summary>divides by 100</summary> */
             const double ScaleQuanta = 0.01f;
+            /** <summary>divides by 100</summary> */
             const double ShearQuanta = 0.01f;
+            /** <summary>divides by 100</summary> */
             const double TaperQuanta = 0.01f;
+            /** <summary>0.015f</summary> */
             const double RevQuanta = 0.015f;
+            /** <summary>divides by 50000</summary> */
             const double HollowQuanta = 0.00002f;
 
 
@@ -307,20 +325,28 @@ namespace SilverSim.Scene.Types.Object
                     #region Profile Params
                     d.ProfileBegin = (ProfileBegin * CutQuanta).Clamp(0f, 1f);
                     d.ProfileEnd = (ProfileEnd * CutQuanta).Clamp(0f, 1f);
-                    d.ProfileHollow = (ProfileHollow * HollowQuanta).Clamp(0f, 1f);
-                    d.IsHollow = ProfileHollow > 0;
+                    d.IsOpen = (ProfileBegin != 0 || ProfileEnd != 50000);
                     d.ProfileShape = (PrimitiveProfileShape)(ProfileCurve & (byte)PrimitiveProfileShape.Mask);
                     d.HoleShape = (PrimitiveProfileHollowShape)(ProfileCurve & (byte)PrimitiveProfileHollowShape.Mask);
+                    if ((Type != PrimitiveShapeType.Box || Type != PrimitiveShapeType.Tube) && d.HoleShape == PrimitiveProfileHollowShape.Square)
+                    {
+                        d.ProfileHollow = (ProfileHollow * HollowQuanta).Clamp(0f, 0.7f);
+                    }
+                    else
+                    {
+                        d.ProfileHollow = (ProfileHollow * HollowQuanta).Clamp(0f, 0.99f);
+                    }
+                    d.IsHollow = ProfileHollow > 0;
                     #endregion
 
                     #region Path Rarams
                     d.PathBegin = (PathBegin * CutQuanta).Clamp(0f, 1f);
                     d.PathEnd = ((100 - PathEnd) * CutQuanta).Clamp(0f, 1f);
-                    d.Scale = new Vector3(
+                    d.PathScale = new Vector3(
                         ((200 - PathScaleX) * ScaleQuanta).Clamp(0f, 1f),
                         ((200 - PathScaleY) * ScaleQuanta).Clamp(0f, 1f),
                         0f);
-                    d.Shear = new Vector3(
+                    d.TopShear = new Vector3(
                         (PathShearX * ScaleQuanta - 0.5).Clamp(-0.5, 0.5),
                         (PathShearY * ScaleQuanta - 0.5).Clamp(-0.5, 0.5),
                         0f);
@@ -332,7 +358,7 @@ namespace SilverSim.Scene.Types.Object
                         (PathTaperY * TaperQuanta).Clamp(-1f, 1f),
                         0f);
                     d.Revolutions = (PathRevolutions * RevQuanta + 1f).Clamp(1f, 4f);
-                    d.Skew = (PathSkew * ScaleQuanta).Clamp(-0.95, 0.95);
+                    d.Skew = (PathSkew * ScaleQuanta).Clamp(-1f, 1f);
                     #endregion
 
                     return d;
