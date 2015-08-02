@@ -41,7 +41,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                             paramList.Add(new Vector3(PathTwistBegin / 100f, PathTwist / 100f, 0)); => twist
                             paramList.Add(new Vector3(ProfileBegin / 50000f, 1 - ProfileEnd / 50000f, 0)); => dimple
          * 
-         * additionally, topshear, pathscale, revolutions and skew avail
+         * additionally, pathscale, revolutions and skew avail
          */
 
         #region extrude sphere
@@ -51,7 +51,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
             double twist = twistBegin.Lerp(twistEnd, cut);
             double angle = 0.0.Lerp(shape.Revolutions * 2 * Math.PI, cut);
             Vector3 topSize = new Vector3();
-            Vector3 shear = new Vector3();
             Vector3 taper = new Vector3();
             double radiusOffset;
 
@@ -71,25 +70,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
             else
             {
                 topSize.Y = 1.0.Clamp(1f - shape.PathScale.Y, cut);
-            }
-            #endregion
-
-            #region top_shear
-            if (shape.TopShear.X < 0f)
-            {
-                shear.X = 1.0.Clamp(1f + shape.TopShear.X, 1f - cut);
-            }
-            else
-            {
-                shear.X = 1.0.Clamp(1f - shape.TopShear.X, cut);
-            }
-            if (shape.TopShear.Y < 0f)
-            {
-                shear.Y = 1.0.Clamp(1f + shape.TopShear.Y, 1f - cut);
-            }
-            else
-            {
-                shear.Y = 1.0.Clamp(1f - shape.TopShear.Y, 1f - cut);
             }
             #endregion
 
@@ -138,8 +118,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 outvertex.Z *= (1 / (shape.Skew * shape.Revolutions));
                 outvertex.Z += shape.Skew * shape.Revolutions * cut;
                 outvertex += outvertex.Rotate2D_XY(angle);
-                outvertex.Z += outvertex.X * shape.TopShear.X;
-                outvertex.Y += outvertex.X * shape.TopShear.Y;
                 outvertex.X *= radiusOffset;
                 outvertex.Y *= radiusOffset;
 
