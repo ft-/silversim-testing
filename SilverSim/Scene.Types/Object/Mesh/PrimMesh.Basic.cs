@@ -32,25 +32,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
 {
     public static partial class PrimMesh
     {
-        static readonly Vector3 START_VECTOR_BOX;
-
-        static PrimMesh()
-        {
-            START_VECTOR_BOX = new Vector3(-1, -1, 0).Normalize();
-        }
-
-        internal static Mesh ShapeToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
-        {
-            switch(shape.ShapeType)
-            {
-                case PrimitiveShapeType.Box:
-                case PrimitiveShapeType.Cylinder:
-                case PrimitiveShapeType.Prism:
-                    return shape.BoxCylPrismToMesh();
-            }
-            throw new NotImplementedException();
-        }
-
         #region Box/Cylinder/Prism calculation
         static List<Vector3> ExtrudeBasic(this PathDetails path, ObjectPart.PrimitiveShape.Decoded shape, double twistBegin, double twistEnd, double cut)
         {
