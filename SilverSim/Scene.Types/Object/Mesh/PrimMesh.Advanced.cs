@@ -27,8 +27,6 @@ using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Scene.Types.Object.Mesh
 {
@@ -158,6 +156,10 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     path = CalcTubePath(shape);
                     break;
 
+                case PrimitiveShapeType.Sphere:
+                    path = CalcSpherePath(shape);
+                    break;
+
                 default:
                     throw new NotImplementedException();
             }
@@ -165,15 +167,26 @@ namespace SilverSim.Scene.Types.Object.Mesh
             double cut = shape.PathBegin;
             double cutEnd = shape.PathEnd;
             double cutStep = (cutEnd - cut) / 36f / shape.Revolutions;
-            double twistBegin = shape.TwistBegin * Math.PI;
-            double twistEnd = shape.TwistEnd * Math.PI;
+            double twistBegin = shape.TwistBegin * Math.PI * 2;
+            double twistEnd = shape.TwistEnd * Math.PI * 2;
 
             Mesh mesh = new Mesh();
-            for (; cut < cutEnd; cut += cutStep)
+            if (shape.ShapeType == PrimitiveShapeType.Sphere)
             {
-                mesh.Vertices.AddRange(path.ExtrudeAdvanced(shape, twistBegin, twistEnd, cut));
+                for (; cut < cutEnd; cut += cutStep)
+                {
+                    mesh.Vertices.AddRange(path.ExtrudeSphere(shape, twistBegin, twistEnd, cut));
+                }
+                mesh.Vertices.AddRange(path.ExtrudeSphere(shape, twistBegin, twistEnd, cutEnd));
             }
-            mesh.Vertices.AddRange(path.ExtrudeAdvanced(shape, twistBegin, twistEnd, cutEnd));
+            else
+            {
+                for (; cut < cutEnd; cut += cutStep)
+                {
+                    mesh.Vertices.AddRange(path.ExtrudeAdvanced(shape, twistBegin, twistEnd, cut));
+                }
+                mesh.Vertices.AddRange(path.ExtrudeAdvanced(shape, twistBegin, twistEnd, cutEnd));
+            }
 
             int verticeRowCount = path.Vertices.Count;
             int verticeTotalCount = mesh.Vertices.Count;

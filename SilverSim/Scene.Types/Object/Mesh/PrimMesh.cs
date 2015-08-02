@@ -26,9 +26,6 @@ exception statement from your version.
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Scene.Types.Object.Mesh
 {
@@ -36,9 +33,22 @@ namespace SilverSim.Scene.Types.Object.Mesh
     {
         static readonly Vector3 START_VECTOR_BOX;
 
+        static readonly Vector3 TRIGON_P0;
+        static readonly Vector3 TRIGON_P1;
+        static readonly Vector3 TRIGON_P2;
+        static readonly Vector3 TRIGON_P3;
+
         static PrimMesh()
         {
             START_VECTOR_BOX = new Vector3(-1, -1, 0).Normalize();
+
+            /* the hole shape inside a sphere is a tri-gon but not a tri-angle.
+             * So, it is called Trigon here.
+             */
+            TRIGON_P0 = Vector3.UnitX;
+            TRIGON_P1 = TRIGON_P0.Rotate2D_XY(60 / 180 * Math.PI);
+            TRIGON_P2 = TRIGON_P0.Rotate2D_XY(120 / 180 * Math.PI);
+            TRIGON_P3 = -Vector3.UnitX;
         }
 
         internal static Mesh ShapeToMesh(this ObjectPart.PrimitiveShape.Decoded shape)
