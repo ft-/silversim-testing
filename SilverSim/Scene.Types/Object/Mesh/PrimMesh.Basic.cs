@@ -104,7 +104,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 outvertex.X *= topSize.X;
                 outvertex.Y *= topSize.Y;
                 outvertex += shape.TopShear;
-                outvertex = outvertex.Rotate2D(twist);
+                outvertex = outvertex.Rotate2D_XY(twist);
                 outvertex.Z = cut - 0.5;
                 extrusionPath.Add(outvertex);
             }
@@ -272,12 +272,20 @@ namespace SilverSim.Scene.Types.Object.Mesh
         #endregion
 
         #region 2D Path calculation
-        static Vector3 Rotate2D(this Vector3 vec, double angle)
+        static Vector3 Rotate2D_XY(this Vector3 vec, double angle)
         {
             return new Vector3(
                 vec.Y * Math.Sin(angle) + vec.X * Math.Cos(angle),
                 vec.X * Math.Sin(angle) + vec.Y * Math.Cos(angle),
                 0);
+        }
+
+        static Vector3 Rotate2D_YZ(this Vector3 vec, double angle)
+        {
+            return new Vector3(
+                0,
+                vec.Z * Math.Sin(angle) + vec.Y * Math.Cos(angle),
+                vec.Y * Math.Sin(angle) + vec.Z * Math.Cos(angle));
         }
 
         const double TRIANGLE_ANGLE_SECTIONS = 2f / 3f * Math.PI;
@@ -371,7 +379,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 Vector3 startPoint = START_VECTOR_BOX * 0.5;
                 for (; startangle < endangle; startangle += stepangle)
                 {
-                    Vector3 outerDirectionalVec = startPoint.Rotate2D(startangle);
+                    Vector3 outerDirectionalVec = startPoint.Rotate2D_XY(startangle);
                     Vector3 innerDirectionalVec = outerDirectionalVec;
 
                     /* outer normalize on single component to 0.5, simplifies algorithm */
@@ -425,7 +433,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 Vector3 startPoint = START_VECTOR_BOX * 0.5;
                 for (; startangle < endangle; startangle += stepangle )
                 {
-                    Vector3 directionalVec = startPoint.Rotate2D(startangle);
+                    Vector3 directionalVec = startPoint.Rotate2D_XY(startangle);
                     /* normalize on single component to 0.5, simplifies algorithm */
                     if (Math.Abs(directionalVec.X) > Math.Abs(directionalVec.Y))
                     {
@@ -474,7 +482,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 Vector3 startPoint = Vector3.UnitX * 0.5;
                 for (; startangle < endangle; startangle += stepangle)
                 {
-                    Vector3 outerDirectionalVec = startPoint.Rotate2D(startangle);
+                    Vector3 outerDirectionalVec = startPoint.Rotate2D_XY(startangle);
                     Vector3 innerDirectionalVec = outerDirectionalVec;
 
                     switch (shape.HoleShape)
@@ -519,7 +527,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 Vector3 startPoint = Vector3.UnitX * 0.5;
                 for (; startangle < endangle; startangle += stepangle)
                 {
-                    Vector3 directionalVec = startPoint.Rotate2D(startangle);
+                    Vector3 directionalVec = startPoint.Rotate2D_XY(startangle);
                     Path.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
@@ -571,12 +579,12 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
                         case PrimitiveProfileHollowShape.Circle:
                             /* circle is simple as we are calculating with such objects */
-                            innerDirectionalVec = startPoint.Rotate2D(startangle);
+                            innerDirectionalVec = startPoint.Rotate2D_XY(startangle);
                             innerDirectionalVec *= (shape.ProfileHollow * 0.5);
                             break;
 
                         case PrimitiveProfileHollowShape.Square:
-                            innerDirectionalVec = startPoint.Rotate2D(startangle);
+                            innerDirectionalVec = startPoint.Rotate2D_XY(startangle);
                             /* inner normalize on single component to 0.5 * hollow */
                             if (Math.Abs(innerDirectionalVec.X) > Math.Abs(innerDirectionalVec.Y))
                             {
@@ -606,7 +614,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 Vector3 startPoint = Vector3.UnitX * 0.5;
                 for (; startangle < endangle; startangle += stepangle)
                 {
-                    Vector3 directionalVec = startPoint.Rotate2D(startangle);
+                    Vector3 directionalVec = startPoint.Rotate2D_XY(startangle);
                     Path.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
