@@ -140,7 +140,7 @@ namespace SilverSim.Types.Asset.Format
                         if(test.Contains("xmlns:xmlns:"))
                         {
                             /* stupid mono XmlTextReader and XmlTextWriter when using as specified it adds more and more xmlns after each iteration 
-                             * when uses as filter parser and writer.
+                             * when used as filter parser and writer.
                              */
                             int pos;
                             while((pos = test.IndexOf("xmlns:xmlns:")) >= 0)
