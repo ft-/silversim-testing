@@ -140,9 +140,22 @@ namespace SilverSim.Types.Asset.Format
                         if(test.Contains("xmlns:xmlns:"))
                         {
                             /* stupid mono XmlTextReader and XmlTextWriter when using as specified it adds more and more xmlns after each iteration */
-                            while (test.Contains("xmlns:xmlns:"))
+                            int pos;
+                            while((pos = test.IndexOf("xmlns:xmlns:")) >= 0)
                             {
-                                test = test.Replace("xmlns:xmlns:", "xmlns:");
+                                int cpos = pos;
+                                for(; cpos < test.Length && test[cpos] != '='; ++cpos)
+                                {
+
+                                }
+                                if(cpos == test.Length)
+                                {
+                                    /* no equal sign is weird */
+                                    break;
+                                }
+                                string repl = test.Substring(pos, cpos - pos);
+                                string replnew = repl.Substring(repl.LastIndexOf("xmlns:"));
+                                test = test.Replace(repl, replnew);
                             }
                             byte[] newbuf = new byte[m_BufFill - tagend - 1];
                             Buffer.BlockCopy(m_Buffer, tagend + 1, newbuf, 0, m_BufFill - tagend - 1);
