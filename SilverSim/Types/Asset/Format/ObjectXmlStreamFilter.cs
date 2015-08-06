@@ -137,9 +137,13 @@ namespace SilverSim.Types.Asset.Format
                     string test = UTF8NoBOM.GetString(m_Buffer, 0, tagend + 1);
                     if(test.StartsWith("<SceneObjectPart"))
                     {
-                        if(test.Contains("xmlns:xmlns"))
+                        if(test.Contains("xmlns:xmlns:"))
                         {
-                            test = test.Replace("xmlns:xmlns:", "xmlns:");
+                            /* stupid mono XmlTextReader and XmlTextWriter when using as specified it adds more and more xmlns after each iteration */
+                            while (test.Contains("xmlns:xmlns:"))
+                            {
+                                test = test.Replace("xmlns:xmlns:", "xmlns:");
+                            }
                             byte[] newbuf = new byte[m_BufFill - tagend - 1];
                             Buffer.BlockCopy(m_Buffer, tagend + 1, newbuf, 0, m_BufFill - tagend - 1);
                             byte[] newstr = UTF8NoBOM.GetBytes(test);
