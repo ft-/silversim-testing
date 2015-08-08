@@ -38,6 +38,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(1.0)]
         public int llClearPrimMedia(ScriptInstance Instance, int face)
         {
             return llClearLinkMedia(Instance, LINK_THIS, face);
@@ -137,6 +138,7 @@ namespace SilverSim.Scripting.LSL.API.Primitive
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(1.0)]
         public int llSetPrimMediaParams(ScriptInstance Instance, int face, AnArray param)
         {
             return llSetLinkMedia(Instance, LINK_THIS, face, param);

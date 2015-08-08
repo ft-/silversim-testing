@@ -18,6 +18,7 @@
 	<!-- only for compilation, bullet loader will actually pre-load the right version -->
 	<Reference name="BulletSharp" path="../../bin/platform-libs/windows/64/" localCopy="false"/>
 	<Reference name="SilverSim.Types" localCopy="false"/>
+	<Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
 	<Reference name="SilverSim.Scene.Types" localCopy="false"/>
   <Reference name="SilverSim.Main.Common" localCopy="false"/>
 	<Reference name="SilverSim.Scene.Physics.Common" localCopy="false"/>
