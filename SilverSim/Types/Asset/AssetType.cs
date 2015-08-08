@@ -38,8 +38,7 @@ namespace SilverSim.Types.Asset
         Clothing = 5,
         Object = 6,
         Notecard = 7,
-        Folder = 8,
-        RootFolder = 9,
+        RootFolder = 8,
         LSLText = 10,
         LSLBytecode = 11,
         TextureTGA = 12,
@@ -64,6 +63,8 @@ namespace SilverSim.Types.Asset
         Mesh = 49,
         Inbox = 50,
         Outbox = 51,
-        BasicRoot = 51,
+        BasicRoot = 52,
+        MarketplaceListings = 53,
+        MarketplaceStock = 54
     }
 }
