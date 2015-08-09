@@ -24,6 +24,7 @@ exception statement from your version.
 */
 
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
 
@@ -123,8 +124,28 @@ namespace SilverSim.Scripting.LSL.API.Chat
         [APILevel(APIFlags.LSL)]
         public void llMapDestination(ScriptInstance Instance, string simname, Vector3 pos, Vector3 look_at)
         {
-#warning Implement llMapDestination
-            throw new NotImplementedException();
+            lock(Instance)
+            {
+                Script script = (Script)Instance;
+
+                foreach (DetectInfo detinfo in script.m_Detected)
+                {
+                    try
+                    {
+                        SilverSim.LL.Messages.Script.ScriptTeleportRequest m = new LL.Messages.Script.ScriptTeleportRequest();
+                        m.ObjectName = Instance.Part.ObjectGroup.Name;
+                        m.SimName = simname;
+                        m.SimPosition = pos;
+                        m.LookAt = look_at;
+
+                        Instance.Part.ObjectGroup.Scene.Agents[detinfo.Object.ID].SendMessageAlways(m, Instance.Part.ObjectGroup.Scene.ID);
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
         }
     }
 }
