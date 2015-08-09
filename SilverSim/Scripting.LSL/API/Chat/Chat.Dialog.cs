@@ -122,6 +122,7 @@ namespace SilverSim.Scripting.LSL.API.Chat
         }
 
         [APILevel(APIFlags.LSL)]
+        [ForcedSleep(1)]
         public void llMapDestination(ScriptInstance Instance, string simname, Vector3 pos, Vector3 look_at)
         {
             lock(Instance)
