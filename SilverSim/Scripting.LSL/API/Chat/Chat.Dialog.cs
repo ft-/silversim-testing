@@ -37,6 +37,22 @@ namespace SilverSim.Scripting.LSL.API.Chat
         {
             lock (Instance)
             {
+                if (message.Length > 511)
+                {
+                    throw new ArgumentException("Message more than 511 characters");
+                }
+                else if(message == "")
+                {
+                    throw new ArgumentException("Message is empty");
+                }
+                else if(buttons.Count > 12)
+                {
+                    throw new ArgumentException("Too many buttons");
+                }
+                else if(buttons.Count == 0)
+                {
+                    throw new ArgumentException("At least one button must be defined");
+                }
                 SilverSim.LL.Messages.Script.ScriptDialog m = new SilverSim.LL.Messages.Script.ScriptDialog();
                 m.Message = message.Substring(0, 256);
                 m.ObjectID = Instance.Part.ObjectGroup.ID;
@@ -47,9 +63,13 @@ namespace SilverSim.Scripting.LSL.API.Chat
                 m.ChatChannel = channel;
                 for (int c = 0; c < buttons.Count && c < 12; ++c )
                 {
-                    if(buttons.ToString().Equals(""))
+                    if(buttons[c].ToString().Equals(""))
                     {
                         throw new ArgumentException("button label cannot be blank");
+                    }
+                    else if(buttons[c].ToString().Length > 24)
+                    {
+                        throw new ArgumentException("button label cannot be more than 24 characters");
                     }
                     m.Buttons.Add(buttons.ToString());
                 }
