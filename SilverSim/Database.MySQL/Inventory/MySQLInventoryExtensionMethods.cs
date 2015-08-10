@@ -1,4 +1,6 @@
-﻿using MySql.Data.MySqlClient;
+﻿// SilverSim is distributed under the terms of the
+// GNU Affero General Public License v3
+using MySql.Data.MySqlClient;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;

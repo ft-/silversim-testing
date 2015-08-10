@@ -1,4 +1,6 @@
-﻿using SilverSim.LL.Messages;
+﻿// SilverSim is distributed under the terms of the
+// GNU Affero General Public License v3
+using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Generic;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;

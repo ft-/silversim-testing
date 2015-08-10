@@ -30,5 +30,6 @@
 		<Match pattern="*.cs" recurse="true"/>
 		<Match pattern="ProductAssemblyInfo.cs" path=".." recurse="false"/>
 		<Match pattern="Prebuild.xml" recurse="false" buildAction="None"/>
+		<Match pattern="Product.licenseheader" path=".." recurse="false" buildAction="None"/>
 	</Files>
 </Project>

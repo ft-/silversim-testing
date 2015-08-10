@@ -1,4 +1,6 @@
-﻿using SilverSim.Scene.Types.Object;
+﻿// SilverSim is distributed under the terms of the
+// GNU Affero General Public License v3
+using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Asset.Format;
