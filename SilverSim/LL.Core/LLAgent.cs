@@ -948,6 +948,7 @@ namespace SilverSim.LL.Core
         {
             lock (this)
             {
+                DetachAllAttachments();
                 if (m_EconomyService != null)
                 {
                     m_EconomyService.Logout(Owner, SessionID, m_SecureSessionID);
@@ -969,6 +970,7 @@ namespace SilverSim.LL.Core
         {
             lock (this)
             {
+                DetachAllAttachments();
                 if (m_EconomyService != null)
                 {
                     m_EconomyService.Logout(Owner, SessionID, m_SecureSessionID);

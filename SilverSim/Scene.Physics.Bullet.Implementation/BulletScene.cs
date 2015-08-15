@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.LL.Messages.LayerData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
@@ -8,7 +9,7 @@ using System;
 
 namespace SilverSim.Scene.Physics.Bullet.Implementation
 {
-    public partial class BulletScene : IPhysicsScene, ISceneListener
+    public partial class BulletScene : IPhysicsScene, ISceneListener, ITerrainListener
     {
         public void RemoveAll()
         {
@@ -28,6 +29,10 @@ namespace SilverSim.Scene.Physics.Bullet.Implementation
         public void Remove(IObject obj)
         {
 
+        }
+
+        public void TerrainUpdate(LayerPatch layerpath)
+        {
         }
     }
 }

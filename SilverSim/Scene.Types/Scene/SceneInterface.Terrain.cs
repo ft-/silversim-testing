@@ -30,6 +30,8 @@ namespace SilverSim.Scene.Types.Scene
 
             private LayerPatch[,] m_TerrainPatches;
 
+            public readonly RwLockedList<ITerrainListener> TerrainListeners = new RwLockedList<ITerrainListener>();
+
             public TerrainController(SceneInterface scene)
             {
                 uint x;
@@ -194,6 +196,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 set
                 {
+                    LayerPatch lp = null;
                     if (x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
                     {
                         throw new KeyNotFoundException();
@@ -202,7 +205,7 @@ namespace SilverSim.Scene.Types.Scene
                     m_TerrainRwLock.AcquireWriterLock(-1);
                     try
                     {
-                        LayerPatch lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES]; 
+                        lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES]; 
                         lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] = (float)value;
                     }
 #if DEBUG
@@ -216,11 +219,19 @@ namespace SilverSim.Scene.Types.Scene
                         m_TerrainRwLock.ReleaseWriterLock();
                     }
                     UpdateTerrainDataToClients();
+                    if(lp != null)
+                    {
+                        foreach (ITerrainListener listener in TerrainListeners)
+                        {
+                            listener.TerrainUpdate(new LayerPatch(lp));
+                        }
+                    }
                 }
             }
 
             public LayerPatch AdjustTerrain(uint x, uint y, double change)
             {
+                LayerPatch lp = null;
                 if (x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
                 {
                     throw new KeyNotFoundException();
@@ -229,13 +240,13 @@ namespace SilverSim.Scene.Types.Scene
                 m_TerrainRwLock.AcquireWriterLock(-1);
                 try
                 {
-                    LayerPatch lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+                    lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
                     lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] += (float)change;
-                    return lp;
                 }
 #if DEBUG
                 catch (Exception e)
                 {
+                    lp = null;
                     m_Log.Debug(string.Format("Terrain Change at {0},{1} failed", x, y), e);
                 }
 #endif
@@ -243,7 +254,14 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     m_TerrainRwLock.ReleaseWriterLock();
                 }
-                return null;
+                if (lp != null)
+                {
+                    foreach (ITerrainListener listener in TerrainListeners)
+                    {
+                        listener.TerrainUpdate(new LayerPatch(lp));
+                    }
+                }
+                return lp;
             }
 
             public LayerPatch BlendTerrain(uint x, uint y, double newval, double mix /* 0. orig only , 1. new only */)
@@ -328,6 +346,10 @@ namespace SilverSim.Scene.Types.Scene
                     foreach(LayerPatch p in value)
                     {
                         Patch.Update(p);
+                        foreach (ITerrainListener listener in TerrainListeners)
+                        {
+                            listener.TerrainUpdate(new LayerPatch(p));
+                        }
                     }
                 }
             }
