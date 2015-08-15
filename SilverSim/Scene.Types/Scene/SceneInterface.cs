@@ -106,6 +106,7 @@ namespace SilverSim.Scene.Types.Scene
         private NotecardCache m_NotecardCache;
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }
         public string GatekeeperURI { get; protected set; }
+
         public bool IsSceneEnabled
         {
             get
