@@ -243,13 +243,16 @@ namespace SilverSim.Scene.Types.Scene
                     lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
                     lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] += (float)change;
                 }
+                catch 
 #if DEBUG
-                catch (Exception e)
+                    (Exception e)
+#endif
                 {
                     lp = null;
+#if DEBUG
                     m_Log.Debug(string.Format("Terrain Change at {0},{1} failed", x, y), e);
-                }
 #endif
+                }
                 finally
                 {
                     m_TerrainRwLock.ReleaseWriterLock();
