@@ -18,6 +18,8 @@ namespace SilverSim.Scene.Physics.Bullet.Implementation
         public static IndexedMesh ToBulletMesh(this Mesh mesh, Vector3 position, Vector3 scale, Quaternion rot)
         {
             IndexedMesh bulletmesh = new IndexedMesh();
+            bulletmesh.Allocate(mesh.Vertices.Count, 1, mesh.Triangles.Count * 3, 1);
+            int vidx = 0;
             foreach (Vector3 vi in mesh.Vertices)
             {
                 Vector3 v = vi;
@@ -26,14 +28,15 @@ namespace SilverSim.Scene.Physics.Bullet.Implementation
                 v.Y = v.Y * scale.Y;
                 v.Z = v.Z * scale.Z;
                 v += position;
-                bulletmesh.Vertices.Add(v);
+                bulletmesh.Vertices[vidx++] = v;
             }
 
+            int tridx = 0;
             foreach (Mesh.Triangle tri in mesh.Triangles)
             {
-                bulletmesh.TriangleIndices.Add(tri.VectorIndex0);
-                bulletmesh.TriangleIndices.Add(tri.VectorIndex1);
-                bulletmesh.TriangleIndices.Add(tri.VectorIndex2);
+                bulletmesh.TriangleIndices[tridx++] = tri.VectorIndex0;
+                bulletmesh.TriangleIndices[tridx++] = tri.VectorIndex1;
+                bulletmesh.TriangleIndices[tridx++] = tri.VectorIndex2;
             }
 
             return bulletmesh;
