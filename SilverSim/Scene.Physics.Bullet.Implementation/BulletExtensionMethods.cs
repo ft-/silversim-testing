@@ -6,10 +6,6 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Object.Mesh;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Scene.Physics.Bullet.Implementation
 {
@@ -18,7 +14,7 @@ namespace SilverSim.Scene.Physics.Bullet.Implementation
         public static IndexedMesh ToBulletMesh(this Mesh mesh, Vector3 position, Vector3 scale, Quaternion rot)
         {
             IndexedMesh bulletmesh = new IndexedMesh();
-            bulletmesh.Allocate(mesh.Vertices.Count, 1, mesh.Triangles.Count * 3, 1);
+            bulletmesh.Allocate(mesh.Vertices.Count, 1, mesh.Triangles.Count * 3, 4);
             int vidx = 0;
             foreach (Vector3 vi in mesh.Vertices)
             {
