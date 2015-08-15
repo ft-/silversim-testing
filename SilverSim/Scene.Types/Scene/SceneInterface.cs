@@ -106,7 +106,24 @@ namespace SilverSim.Scene.Types.Scene
         private NotecardCache m_NotecardCache;
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }
         public string GatekeeperURI { get; protected set; }
-        public bool IsSceneEnabled { get; set; }
+        public bool IsSceneEnabled
+        {
+            get
+            {
+                return LoginControl.IsLoginEnabled;
+            }
+            set
+            {
+                if(value)
+                {
+                    LoginControl.Ready(ReadyFlags.LoginsEnable);
+                }
+                else
+                {
+                    LoginControl.NotReady(ReadyFlags.LoginsEnable);
+                }
+            }
+        }
 
         public abstract void LoadSceneAsync();
 
@@ -219,9 +236,20 @@ namespace SilverSim.Scene.Types.Scene
 
         private const uint PARCEL_BLOCK_SIZE = 4;
 
+        void LoginsEnabledHandler(bool state)
+        {
+            if(state)
+            {
+                m_Log.WarnFormat("LOGINS ENABLED at {0} (ID {1})", Name, ID);
+            }
+            else
+            {
+                m_Log.WarnFormat("LOGINS DISABLED at {0} (ID {1})", Name, ID);
+            }
+        }
+
         public SceneInterface(UInt32 sizeX, UInt32 sizeY)
         {
-            IsSceneEnabled = false;
             SizeX = sizeX;
             SizeY = sizeY;
             AssetService = new DefaultAssetService(this);
@@ -231,6 +259,7 @@ namespace SilverSim.Scene.Types.Scene
             RegionSecret = UUID.Random;
             LastIPAddress = new IPAddress(0);
             m_NotecardCache = new NotecardCache(this);
+            LoginControl.OnLoginsEnabled += LoginsEnabledHandler;
 
             /* basic capabilities */
 
@@ -239,6 +268,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void InvokeOnRemove()
         {
+            LoginControl.OnLoginsEnabled -= LoginsEnabledHandler;
             if (null != OnRemove)
             {
                 foreach (Action<SceneInterface> del in OnRemove.GetInvocationList())

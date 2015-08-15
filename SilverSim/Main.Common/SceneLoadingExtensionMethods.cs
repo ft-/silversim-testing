@@ -212,7 +212,7 @@ namespace SilverSim.Main.Common
                     }
                 }
 
-                loadparams.Scene.IsSceneEnabled = true;
+                loadparams.Scene.LoginControl.Ready(SceneInterface.ReadyFlags.SceneObjects);
             }
             finally
             {

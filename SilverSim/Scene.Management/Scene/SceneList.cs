@@ -94,6 +94,7 @@ namespace SilverSim.Scene.Management.Scene
 
         public void Remove(SceneInterface scene)
         {
+            scene.LoginControl.NotReady(SceneInterface.ReadyFlags.Remove);
             m_Log.InfoFormat("Removing region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
             if (OnRegionRemove != null)
             {

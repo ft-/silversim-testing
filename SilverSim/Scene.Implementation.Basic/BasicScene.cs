@@ -297,6 +297,10 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 PhysicsScene = physicsFactory.InstantiatePhysicsScene(this);
             }
+            else
+            {
+                LoginControl.Ready(ReadyFlags.PhysicsTerrain);
+            }
         }
         #endregion
 
