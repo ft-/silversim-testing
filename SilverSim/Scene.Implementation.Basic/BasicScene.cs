@@ -11,6 +11,7 @@ using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
@@ -255,6 +256,7 @@ namespace SilverSim.Scene.Implementation.Basic
             List<AvatarNameServiceInterface> avatarNameServices,
             SimulationDataStorageInterface simulationDataStorage,
             EstateServiceInterface estateService,
+            IPhysicsSceneFactory physicsFactory,
             Dictionary<string, string> capabilitiesConfig)
         : base(ri.Size.X, ri.Size.Y)
         {
@@ -291,6 +293,10 @@ namespace SilverSim.Scene.Implementation.Basic
             RegionPort = ri.ServerPort;
             m_UDPServer.Start();
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures("", "", "", true));
+            if(null != physicsFactory)
+            {
+                PhysicsScene = physicsFactory.InstantiatePhysicsScene(this);
+            }
         }
         #endregion
 

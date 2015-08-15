@@ -6,6 +6,7 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
@@ -31,6 +32,7 @@ namespace SilverSim.Scene.Implementation.Basic
         string m_IMServiceName;
         string m_EstateServiceName;
         string m_SimulationDataStorageName;
+        string m_PhysicsName;
         List<string> m_AvatarNameServiceNames = new List<string>();
 
         GroupsNameServiceInterface m_GroupsNameService = null;
@@ -43,6 +45,7 @@ namespace SilverSim.Scene.Implementation.Basic
         EstateServiceInterface m_EstateService;
         SimulationDataStorageInterface m_SimulationDataStorage;
         Dictionary<string, string> m_CapabilitiesConfig;
+        IPhysicsSceneFactory m_PhysicsFactory;
         List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
 
         public SceneFactory(IConfig ownConfig)
@@ -56,6 +59,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_IMServiceName = ownConfig.GetString("IMService", "IMService");
             m_SimulationDataStorageName = ownConfig.GetString("SimulationDataStorage", "SimulationDataStorage");
             m_EstateServiceName = ownConfig.GetString("EstateService", "EstateService");
+            m_PhysicsName = ownConfig.GetString("Physics", "");
             string avatarNameServices = ownConfig.GetString("AvatarNameServices", "");
             foreach(string p in avatarNameServices.Split(','))
             {
@@ -82,6 +86,10 @@ namespace SilverSim.Scene.Implementation.Basic
             if (m_GroupsServiceName != "")
             {
                 m_GroupsService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
+            }
+            if (m_PhysicsName != "")
+            {
+                m_PhysicsFactory = loader.GetService<IPhysicsSceneFactory>(m_PhysicsName);
             }
             m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
             m_AssetCacheService = loader.GetService<AssetServiceInterface>(m_AssetCacheServiceName);
@@ -110,6 +118,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_AvatarNameServices,
                 m_SimulationDataStorage,
                 m_EstateService,
+                m_PhysicsFactory,
                 m_CapabilitiesConfig);
         }
     }

@@ -22,7 +22,7 @@ namespace SilverSim.Scene.Physics.Bullet.Implementation
 
         public IPhysicsScene InstantiatePhysicsScene(SceneInterface scene)
         {
-            throw new NotImplementedException();
+            return new BulletScene(scene);
         }
     }
 }

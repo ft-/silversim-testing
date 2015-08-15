@@ -114,6 +114,7 @@ namespace SilverSim.Scene.Management.Scene
                 }
             }
             scene.InvokeOnRemove();
+            scene.PhysicsScene.Shutdown();
             m_RegionNames.Remove(scene.ID);
             base.Remove(scene.ID);
         }

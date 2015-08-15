@@ -14,5 +14,7 @@ namespace SilverSim.Scene.Types.Physics
         void RemoveAll();
         void Add(IObject obj);
         void Remove(IObject obj);
+
+        void Shutdown();
     }
 }

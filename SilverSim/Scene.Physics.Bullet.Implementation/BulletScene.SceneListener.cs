@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Physics.Bullet.Implementation
@@ -23,6 +24,7 @@ namespace SilverSim.Scene.Physics.Bullet.Implementation
 
         void BulletUpdateThread()
         {
+            Thread.CurrentThread.Name = "Bullet:Object:Update (" + m_Scene.RegionData.ID + ") Thread";
             while (!m_StopBulletThreads)
             {
                 ObjectUpdateInfo info;
@@ -48,6 +50,7 @@ namespace SilverSim.Scene.Physics.Bullet.Implementation
 
         void BulletAddThread()
         {
+            Thread.CurrentThread.Name = "Bullet:Object:Add (" + m_Scene.RegionData.ID + ") Thread";
             while (!m_StopBulletThreads)
             {
                 ObjectUpdateInfo info;

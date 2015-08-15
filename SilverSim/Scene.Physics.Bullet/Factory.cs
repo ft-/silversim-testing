@@ -15,43 +15,82 @@ namespace SilverSim.Scene.Physics.Bullet
         static object BulletSharpLock = new object();
         static Assembly BulletSharpAssembly = null;
 
+        private Assembly MyResolveEventHandler(object sender, ResolveEventArgs args)
+        {
+            AssemblyName aName = new AssemblyName(args.Name);
+            if (aName.Name == "BulletSharp")
+            {
+                return BulletSharpAssembly;
+            }
+            return null;
+        }
+
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            if(IsWindows())
+            lock (BulletSharpLock)
             {
-                lock (BulletSharpLock)
+                if (null == BulletSharpAssembly)
                 {
-                    if(BulletSharpAssembly != null)
-                    {
+                    /* we need a special helper to actually do the BulletSharp resolver */
+                    AppDomain.CurrentDomain.AssemblyResolve += new ResolveEventHandler(MyResolveEventHandler);
+                }
 
-                    }
-                    else if (Is64BitProcess())
-                    {
-                        BulletSharpAssembly = Assembly.LoadFile(Path.GetFullPath("platform-libs/windows/64/BulletSharp.dll"));
-                    }
-                    else
-                    {
-                        BulletSharpAssembly = Assembly.LoadFile(Path.GetFullPath("platform-libs/windows/32/BulletSharp.dll"));
-                    }
+                switch (Environment.OSVersion.Platform)
+                { 
+                    case PlatformID.Win32NT:
+                    case PlatformID.Win32S:
+                    case PlatformID.Win32Windows:
+                    case PlatformID.WinCE:
+                        if(BulletSharpAssembly != null)
+                        {
+
+                        }
+                        else if (Environment.Is64BitProcess)
+                        {
+                            BulletSharpAssembly = Assembly.LoadFile(Path.GetFullPath("platform-libs/windows/64/BulletSharp.dll"));
+                        }
+                        else
+                        {
+                            BulletSharpAssembly = Assembly.LoadFile(Path.GetFullPath("platform-libs/windows/32/BulletSharp.dll"));
+                        }
+                        break;
+
+                    case PlatformID.MacOSX:
+                        if(BulletSharpAssembly != null)
+                        {
+
+                        }
+                        else if (Environment.Is64BitProcess)
+                        {
+                            BulletSharpAssembly = Assembly.LoadFile(Path.GetFullPath("platform-libs/macosx/64/BulletSharp.dll"));
+                        }
+                        else
+                        {
+                            BulletSharpAssembly = Assembly.LoadFile(Path.GetFullPath("platform-libs/macosx/32/BulletSharp.dll"));
+                        }
+                        break;
+
+                    case PlatformID.Unix:
+                        if(BulletSharpAssembly != null)
+                        {
+
+                        }
+                        else if (Environment.Is64BitProcess)
+                        {
+                            BulletSharpAssembly = Assembly.LoadFile(Path.GetFullPath("platform-libs/linux/64/BulletSharp.dll"));
+                        }
+                        else
+                        {
+                            BulletSharpAssembly = Assembly.LoadFile(Path.GetFullPath("platform-libs/linux/32/BulletSharp.dll"));
+                        }
+                        break;
+
+                    default:
+                        throw new NotSupportedException("Unsupported platform " + Environment.OSVersion.Platform.ToString() + " for bullet physics");
                 }
             }
             Assembly PhysicsImplementation = Assembly.LoadFile(Path.GetFullPath("plugins/SilverSim.Scene.Physics.Bullet.Implementation.dll"));
             return ((IPluginFactory)PhysicsImplementation.CreateInstance("SilverSim.Scene.Physics.Bullet.Implementation.PluginFactory")).Initialize(loader, ownSection);
-        }
-
-        static bool IsWindows()
-        {
-            PlatformID platformId = Environment.OSVersion.Platform;
-
-            return (platformId == PlatformID.Win32NT
-                || platformId == PlatformID.Win32S
-                || platformId == PlatformID.Win32Windows
-                || platformId == PlatformID.WinCE);
-        }
-
-        static bool Is64BitProcess()
-        {
-            return IntPtr.Size == 8;
         }
     }
 }

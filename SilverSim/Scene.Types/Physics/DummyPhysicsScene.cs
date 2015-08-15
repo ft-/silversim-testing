@@ -21,6 +21,11 @@ namespace SilverSim.Scene.Types.Physics
 
         }
 
+        public void Shutdown()
+        {
+
+        }
+
         public void RemoveAll()
         {
         }
