@@ -48,12 +48,15 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
                 try
                 {
+#if DEBUG
+                    m_Log.DebugFormat("Storing terrain segment {0},{1} for region {2} ({3})", lp.X, lp.Y, Name, ID);
+#endif
                     m_SimulationDataStorage.Terrains[ID, lp.ExtendedPatchID] = lp;
                     m_LastStoredTerrainSerial[lp.ExtendedPatchID] = lp.Serial;
                 }
                 catch (Exception e)
                 {
-                    m_Log.WarnFormat("Failed to store terrain segment {0},{1}: Reason: {2}", lp.X, lp.Y, e.Message);
+                    m_Log.WarnFormat("Failed to store terrain segment {0},{1} for region {3} ({4}): Reason: {2}", lp.X, lp.Y, e.Message, Name, ID);
                 }
             }
         }
