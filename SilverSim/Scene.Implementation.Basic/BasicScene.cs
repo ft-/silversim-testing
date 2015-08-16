@@ -493,7 +493,7 @@ namespace SilverSim.Scene.Implementation.Basic
         public override void ClearObjects()
         {
             List<ObjectGroup> objects = new List<ObjectGroup>();
-            foreach(ObjectGroup obj in Objects)
+            foreach(ObjectGroup obj in ObjectGroups)
             {
                 if(!obj.IsAttached)
                 {

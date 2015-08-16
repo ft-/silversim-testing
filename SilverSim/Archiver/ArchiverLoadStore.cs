@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpClient;
@@ -20,6 +21,8 @@ namespace SilverSim.Archiver
     [Description("IAR/OAR Plugin")]
     class ArchiverLoadStore : IPlugin
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("IAR/OAR ARCHIVER");
+
         public ArchiverLoadStore()
         {
 
@@ -308,6 +311,7 @@ namespace SilverSim.Archiver
             }
             catch (Exception e)
             {
+                m_Log.Info("OAR load exception encountered", e);
                 io.Write(e.Message);
             }
             try
