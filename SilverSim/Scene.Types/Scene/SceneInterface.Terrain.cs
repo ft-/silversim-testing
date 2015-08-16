@@ -181,6 +181,14 @@ namespace SilverSim.Scene.Types.Scene
                     }
                 }
             }
+            public void UpdateTerrainListeners(LayerPatch layerpatch)
+            {
+                layerpatch = new LayerPatch(layerpatch);
+                foreach (ITerrainListener listener in TerrainListeners)
+                {
+                    listener.TerrainUpdate(layerpatch);
+                }
+            }
             #endregion
 
             #region Properties
@@ -231,7 +239,6 @@ namespace SilverSim.Scene.Types.Scene
 
             public LayerPatch AdjustTerrain(uint x, uint y, double change)
             {
-                LayerPatch lp = null;
                 if (x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
                 {
                     throw new KeyNotFoundException();
@@ -240,31 +247,21 @@ namespace SilverSim.Scene.Types.Scene
                 m_TerrainRwLock.AcquireWriterLock(-1);
                 try
                 {
-                    lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
+                    LayerPatch lp = m_TerrainPatches[x / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
                     lp.Data[y % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, x % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES] += (float)change;
+                    return lp;
                 }
-                catch 
 #if DEBUG
-                    (Exception e)
-#endif
+                catch (Exception e)
                 {
-                    lp = null;
-#if DEBUG
                     m_Log.Debug(string.Format("Terrain Change at {0},{1} failed", x, y), e);
-#endif
                 }
+#endif
                 finally
                 {
                     m_TerrainRwLock.ReleaseWriterLock();
                 }
-                if (lp != null)
-                {
-                    foreach (ITerrainListener listener in TerrainListeners)
-                    {
-                        listener.TerrainUpdate(new LayerPatch(lp));
-                    }
-                }
-                return lp;
+                return null;
             }
 
             public LayerPatch BlendTerrain(uint x, uint y, double newval, double mix /* 0. orig only , 1. new only */)

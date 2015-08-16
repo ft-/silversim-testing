@@ -8,6 +8,7 @@ namespace SilverSim.Main.Common
         LogoutAgents = -20,
         LogoutRegion = -10,
         Any = 0,
+        LogoutDatabase = 10
     }
 
     public interface IPluginShutdown

@@ -246,6 +246,7 @@ namespace SilverSim.LL.TerrainEdit
                 foreach (LayerPatch lp in changed)
                 {
                     lp.IncrementSerial();
+                    scene.Terrain.UpdateTerrainListeners(lp);
                 }
                 scene.Terrain.UpdateTerrainDataToClients();
             }
@@ -310,6 +311,7 @@ namespace SilverSim.LL.TerrainEdit
                 foreach (LayerPatch lp in changed)
                 {
                     lp.IncrementSerial();
+                    scene.Terrain.UpdateTerrainListeners(lp);
                 }
                 scene.Terrain.UpdateTerrainDataToClients();
             }
@@ -469,6 +471,7 @@ namespace SilverSim.LL.TerrainEdit
                 foreach (LayerPatch lp in changed)
                 {
                     lp.IncrementSerial();
+                    scene.Terrain.UpdateTerrainListeners(lp);
                 }
                 scene.Terrain.UpdateTerrainDataToClients();
             }
@@ -540,6 +543,7 @@ namespace SilverSim.LL.TerrainEdit
                 foreach (LayerPatch lp in changed)
                 {
                     lp.IncrementSerial();
+                    scene.Terrain.UpdateTerrainListeners(lp);
                 }
                 scene.Terrain.UpdateTerrainDataToClients();
             }
@@ -571,6 +575,7 @@ namespace SilverSim.LL.TerrainEdit
                 foreach (LayerPatch lp in changed)
                 {
                     lp.IncrementSerial();
+                    scene.Terrain.UpdateTerrainListeners(lp);
                 }
                 scene.Terrain.UpdateTerrainDataToClients();
             }
@@ -600,6 +605,7 @@ namespace SilverSim.LL.TerrainEdit
                 foreach (LayerPatch lp in changed)
                 {
                     lp.IncrementSerial();
+                    scene.Terrain.UpdateTerrainListeners(lp);
                 }
                 scene.Terrain.UpdateTerrainDataToClients();
             }
@@ -651,6 +657,7 @@ namespace SilverSim.LL.TerrainEdit
                 foreach (LayerPatch lp in changed)
                 {
                     lp.IncrementSerial();
+                    scene.Terrain.UpdateTerrainListeners(lp);
                 }
                 scene.Terrain.UpdateTerrainDataToClients();
             }
@@ -698,6 +705,7 @@ namespace SilverSim.LL.TerrainEdit
                 foreach (LayerPatch lp in changed)
                 {
                     lp.IncrementSerial();
+                    scene.Terrain.UpdateTerrainListeners(lp);
                 }
                 scene.Terrain.UpdateTerrainDataToClients();
             }
@@ -736,6 +744,7 @@ namespace SilverSim.LL.TerrainEdit
                 foreach (LayerPatch lp in changed)
                 {
                     lp.IncrementSerial();
+                    scene.Terrain.UpdateTerrainListeners(lp);
                 }
                 scene.Terrain.UpdateTerrainDataToClients();
             }

@@ -37,11 +37,12 @@ using ThreadedClasses;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
-    class BasicScene : SceneInterface
+    partial class BasicScene : SceneInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("BASIC SCENE");
 
         #region Fields
+        bool m_StopBasicSceneThreads = false;
         protected internal readonly RwLockedDoubleDictionary<UUID, UInt32, ObjectPart> m_Primitives = new RwLockedDoubleDictionary<UUID, UInt32, ObjectPart>();
         protected internal readonly RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
         //protected internal readonly RwLockedDoubleDictionary<UUID, int, ParcelInfo> m_Parcels = new RwLockedDoubleDictionary<UUID, int, ParcelInfo>();
@@ -293,6 +294,8 @@ namespace SilverSim.Scene.Implementation.Basic
             RegionPort = ri.ServerPort;
             m_UDPServer.Start();
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures("", "", "", true));
+            Terrain.TerrainListeners.Add(this);
+            new Thread(StoreTerrainProcess).Start();
             if(null != physicsFactory)
             {
                 PhysicsScene = physicsFactory.InstantiatePhysicsScene(this);
@@ -322,6 +325,8 @@ namespace SilverSim.Scene.Implementation.Basic
 
         private void RemoveScene(SceneInterface s)
         {
+            m_StopBasicSceneThreads = true;
+            Terrain.TerrainListeners.Remove(this);
             IMRouter.SceneIM.Remove(IMSend);
             m_UDPServer.Shutdown();
             m_UDPServer = null;
@@ -554,19 +559,6 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Scene LL Message interface
-#if OLD
-        public override void HandleSimulatorMessage(Message m)
-        {
-            switch(m.Number)
-            {
-                case MessageType.ObjectGrab: /* => simulator */
-                case MessageType.ObjectGrabUpdate: /* => simulator */
-                case MessageType.ObjectDeGrab: /* => simulator */
-                    break;
-            }
-        }
-#endif
-
         [PacketHandler(MessageType.RequestRegionInfo)]
         public void HandleRequestRegionInfo(Message m)
         {
