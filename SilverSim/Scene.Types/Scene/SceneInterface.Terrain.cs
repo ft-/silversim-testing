@@ -354,6 +354,7 @@ namespace SilverSim.Scene.Types.Scene
                             listener.TerrainUpdate(new LayerPatch(p));
                         }
                     }
+                    UpdateTerrainDataToClients();
                 }
             }
 
