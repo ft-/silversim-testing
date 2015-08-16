@@ -16,5 +16,11 @@ namespace SilverSim.Scene.Types.Physics
         void Remove(IObject obj);
 
         void Shutdown();
+
+        double PhysicsFPS { get; }
+
+        double PhysicsDilationTime { get; } /* in seconds */
+
+        double PhysicsExecutionTime { get; } /* in seconds */
     }
 }

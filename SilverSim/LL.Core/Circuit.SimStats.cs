@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.LL.Messages.Simulator;
 using SilverSim.LL.Core.Capabilities;
+using SilverSim.Scene.Types.Physics;
 
 namespace SilverSim.LL.Core
 {
@@ -107,6 +108,12 @@ namespace SilverSim.LL.Core
             m_SimStatsData[(int)SimStatIndex.AgentUpdates].StatValue = agentUpdatesReceived * 1000f / deltatime;
             m_SimStatsData[(int)SimStatIndex.UnAckedBytes].StatValue = m_UnackedBytes;
             m_SimStatsData[(int)SimStatIndex.TotalPrim].StatValue = Scene.Primitives.Count;
+            IPhysicsScene physics = Scene.PhysicsScene;
+            if(physics != null)
+            {
+                m_SimStatsData[(int)SimStatIndex.PhysicsFPS].StatValue = physics.PhysicsFPS;
+                m_SimStatsData[(int)SimStatIndex.PhysicsTimeMs].StatValue = physics.PhysicsExecutionTime * 1000f;
+            }
 
             SimStats stats = new SimStats();
             stats.RegionX = Scene.RegionData.Location.X;

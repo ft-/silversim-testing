@@ -30,6 +30,31 @@ namespace SilverSim.Scene.Types.Physics
         {
         }
 
+
+        public double PhysicsDilationTime
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
+        public double PhysicsExecutionTime
+        {
+            get
+            {
+                return 0f;
+            }
+        }
+
+        public double PhysicsFPS
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
         public static readonly DummyPhysicsScene SharedInstance = new DummyPhysicsScene();
     }
 }

@@ -209,6 +209,7 @@ namespace SilverSim.Scene.Physics.Bullet.Implementation
             m_TerrainFilled = true;
             m_Log.Info("Fill terrain completed");
             m_Scene.LoginControl.Ready(Types.Scene.SceneInterface.ReadyFlags.PhysicsTerrain);
+            EnablePhysicsInternally();
             #endregion
 
             while (!m_StopBulletThreads)
