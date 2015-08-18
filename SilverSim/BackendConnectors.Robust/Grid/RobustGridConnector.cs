@@ -119,7 +119,7 @@ namespace SilverSim.BackendConnectors.Robust.Grid
             post["serverPort"] = regionInfo.ServerPort.ToString();
             post["regionMapTexture"] = (string)regionInfo.RegionMapTexture;
             post["parcelMapTexture"] = (string)regionInfo.ParcelMapTexture;
-            post["access"] = regionInfo.Access.ToString();
+            post["access"] = ((uint)regionInfo.Access).ToString();
             post["regionSecret"] = regionInfo.RegionSecret;
             post["owner_uuid"] = (string)regionInfo.Owner.ID;
             post["Token"] = "";
