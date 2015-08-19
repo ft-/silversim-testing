@@ -1232,7 +1232,8 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 /* CAUTION! never ever make version parameters a configuration parameter */
                 _result.Add("version", PROTOCOL_VERSION);
                 response.Add("_Result", _result);
-                HttpResponse res = req.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                HttpResponse res = req.BeginResponse(HttpStatusCode.OK, "OK");
+                JSON.Serialize(response, res.GetOutputStream());
                 res.Close();
             }
             else
