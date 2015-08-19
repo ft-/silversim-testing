@@ -351,6 +351,31 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
 
         }
 
+        void AgentPostHandler(HttpRequest req)
+        {
+            if (req.Method == "POST")
+            {
+                AgentPostHandler_POST(req);
+            }
+            else if (req.Method == "PUT")
+            {
+                AgentPostHandler_PUT(req);
+            }
+            else if (req.Method == "DELETE")
+            {
+                AgentPostHandler_DELETE(req);
+            }
+            else if (req.Method == "QUERYACCESS")
+            {
+                AgentPostHandler_QUERYACCESS(req);
+            }
+            else
+            {
+                HttpResponse res = req.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                res.Close();
+            }
+        }
+
         void AgentPostHandler_POST(HttpRequest req)
         {
             UUID agentID;
@@ -1283,31 +1308,6 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
             res = req.BeginResponse(HttpStatusCode.OK, "OK");
             JSON.Serialize(response, res.GetOutputStream());
             res.Close();
-        }
-
-        public void AgentPostHandler(HttpRequest req)
-        {
-            if (req.Method == "POST")
-            {
-                AgentPostHandler_POST(req);
-            }
-            else if(req.Method == "PUT")
-            {
-                AgentPostHandler_PUT(req);
-            }
-            else if(req.Method == "DELETE")
-            {
-                AgentPostHandler_DELETE(req);
-            }
-            else if(req.Method == "QUERYACCESS")
-            {
-                AgentPostHandler_QUERYACCESS(req);
-            }
-            else
-            {
-                HttpResponse res = req.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
-                res.Close();
-            }
         }
     }
     #endregion
