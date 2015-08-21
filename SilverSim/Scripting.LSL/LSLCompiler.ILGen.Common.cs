@@ -178,7 +178,7 @@ namespace SilverSim.Scripting.LSL
 
         public static int LSL_IntegerMultiply(int a, int b)
         {
-            long c = a * b;
+            long c = (long)a * b;
             if(c > Int32.MaxValue)
             {
                 c = -1;
