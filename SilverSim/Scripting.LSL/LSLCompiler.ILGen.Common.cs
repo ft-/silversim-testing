@@ -178,8 +178,16 @@ namespace SilverSim.Scripting.LSL
 
         public static int LSL_IntegerMultiply(int a, int b)
         {
-#warning implement overflow behaviour for integer multiply
-            return a * b;
+            long c = a * b;
+            if(c > Int32.MaxValue)
+            {
+                c = -1;
+            }
+            else if(c < Int32.MinValue)
+            {
+                c = 1;
+            }
+            return (int)c;
         }
 
         public static int LSL_IntegerDivision(int a, int b)
