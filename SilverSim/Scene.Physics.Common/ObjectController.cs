@@ -29,6 +29,7 @@ namespace SilverSim.Scene.Physics.Common
 
         public abstract Vector3 DeltaLinearVelocity { set; }
         public abstract Vector3 DeltaAngularVelocity { set; }
+        public abstract Vector3 ControlTargetVelocity { set; }
         public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
         public bool IsPhantom
         {

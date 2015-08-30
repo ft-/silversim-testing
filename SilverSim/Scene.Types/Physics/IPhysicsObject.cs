@@ -15,6 +15,7 @@ namespace SilverSim.Scene.Types.Physics
         Vector3 AppliedTorque { set; }
         Vector3 LinearImpulse { set; }
         Vector3 AngularImpulse { set; }
+        Vector3 ControlTargetVelocity { set; }
 
         bool IsPhysicsActive { get; set; } /* disables updates of object */
         bool IsPhantom { get; set; }

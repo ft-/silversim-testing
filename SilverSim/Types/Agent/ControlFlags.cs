@@ -137,6 +137,16 @@ namespace SilverSim.Types.Agent
         {
             return (flags & ControlFlags.NudgeUpNeg) != ControlFlags.None;
         }
+
+        public static bool HasTurnLeft(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.TurnLeft) != ControlFlags.None;
+        }
+
+        public static bool HasTurnRight(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.TurnRight) != ControlFlags.None;
+        }
         #endregion
     }
 }

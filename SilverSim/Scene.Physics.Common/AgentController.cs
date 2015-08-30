@@ -44,6 +44,8 @@ namespace SilverSim.Scene.Physics.Common
         public abstract bool IsVolumeDetect { get; set; }
         public abstract bool IsAgentCollisionActive { get; set; }
 
+        public abstract Vector3 ControlTargetVelocity { set; }
+
         public bool ContributesToCollisionSurfaceAsChild 
         {
             get

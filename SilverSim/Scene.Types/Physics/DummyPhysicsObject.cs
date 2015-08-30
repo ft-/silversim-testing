@@ -32,6 +32,8 @@ namespace SilverSim.Scene.Types.Physics
         public Vector3 AppliedTorque { set { } }
         public Vector3 LinearImpulse { set { } }
         public Vector3 AngularImpulse { set { } }
+
+        public Vector3 ControlTargetVelocity { set { } }
         #endregion
 
         public double Mass 
