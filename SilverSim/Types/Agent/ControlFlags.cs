@@ -44,4 +44,99 @@ namespace SilverSim.Types.Agent
         MouseLookLButtonDown = 1 << 30,
         MouseLookLButtonUp = 1u << 31
     }
+
+    public static class ControlFlagsExtension
+    {
+        public static bool HasMouselook(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.MouseLook) != ControlFlags.None;
+        }
+
+        public static bool HasLeftButtonDown(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.MouseLookLButtonDown) != ControlFlags.None;
+        }
+
+        public static bool HasStandUp(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.StandUp) != ControlFlags.None;
+        }
+
+        public static bool HasSitOnGround(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.SitOnGround) != ControlFlags.None;
+        }
+
+        public static bool HasFly(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.Fly) != ControlFlags.None;
+        }
+
+        public static bool HasStop(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.Stop) != ControlFlags.None;
+        }
+
+        #region Controls
+        public static bool HasForward(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.AtPos) != ControlFlags.None;
+        }
+
+        public static bool HasBack(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.AtNeg) != ControlFlags.None;
+        }
+
+        public static bool HasLeft(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.LeftPos) != ControlFlags.None;
+        }
+
+        public static bool HasRight(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.LeftNeg) != ControlFlags.None;
+        }
+
+        public static bool HasUp(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.UpPos) != ControlFlags.None;
+        }
+
+        public static bool HasDown(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.UpNeg) != ControlFlags.None;
+        }
+
+        public static bool HasForwardNudge(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.NudgeAtPos) != ControlFlags.None;
+        }
+
+        public static bool HasBackwardNudge(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.NudgeAtNeg) != ControlFlags.None;
+        }
+
+        public static bool HasLeftNudge(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.NudgeLeftPos) != ControlFlags.None;
+        }
+
+        public static bool HasRightNudge(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.NudgeLeftNeg) != ControlFlags.None;
+        }
+
+        public static bool HasUpNudge(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.NudgeUpPos) != ControlFlags.None;
+        }
+
+        public static bool HasDownNudge(this ControlFlags flags)
+        {
+            return (flags & ControlFlags.NudgeUpNeg) != ControlFlags.None;
+        }
+        #endregion
+    }
 }

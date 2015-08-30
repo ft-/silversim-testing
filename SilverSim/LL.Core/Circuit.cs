@@ -1056,9 +1056,17 @@ namespace SilverSim.LL.Core
                         /* we got a decoder, so we can make use of it */
                         m.ReceivedOnCircuitCode = CircuitCode;
                         m.CircuitAgentID = new UUID(AgentID);
-                        m.CircuitAgentOwner = Agent.Owner;
-                        m.CircuitSessionID = new UUID(SessionID);
-                        m.CircuitSceneID = new UUID(Scene.ID);
+                        try
+                        {
+                            m.CircuitAgentOwner = Agent.Owner;
+                            m.CircuitSessionID = new UUID(SessionID);
+                            m.CircuitSceneID = new UUID(Scene.ID);
+                        }
+                        catch
+                        {
+                            /* this is a specific error that happens only during logout */
+                            return;
+                        }
 
                         /* we keep the circuit relatively dumb so that we have no other logic than how to send and receive messages to the viewer.
                             * It merely collects delegates to other objects as well to call specific functions.

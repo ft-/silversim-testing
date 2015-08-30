@@ -237,15 +237,18 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        void SetDefaultAnimation(string anim_state)
+        public void SetDefaultAnimation(string anim_state)
         {
             if (m_AnimStates.Contains<string>(anim_state))
             {
                 lock (this)
                 {
-                    StopAnimation(m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
-                    m_CurrentDefaultAnimation = anim_state;
-                    PlayAnimation(m_AnimationOverride[anim_state], UUID.Zero);
+                    if (m_CurrentDefaultAnimation != anim_state)
+                    {
+                        StopAnimation(m_AnimationOverride[m_CurrentDefaultAnimation], UUID.Zero);
+                        m_CurrentDefaultAnimation = anim_state;
+                        PlayAnimation(m_AnimationOverride[anim_state], UUID.Zero);
+                    }
                 }
             }
         }

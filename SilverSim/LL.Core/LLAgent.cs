@@ -24,6 +24,7 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Types.Parcel;
@@ -90,6 +91,7 @@ namespace SilverSim.LL.Core
         public UInt32 LocalID { get; set; }
         public Uri HomeURI { get; private set; }
         public UUID SessionID { get; private set; }
+        public double DrawDistance { get; private set; }
 
         public TeleportFlags TeleportFlags = TeleportFlags.None;
         #endregion
@@ -1203,20 +1205,6 @@ namespace SilverSim.LL.Core
             Messages.MuteList.UseCachedMuteList res = new Messages.MuteList.UseCachedMuteList();
             res.AgentID = req.AgentID;
             SendMessageAlways(res, m.CircuitSceneID);
-        }
-
-        [PacketHandler(MessageType.AgentUpdate)]
-        void HandleAgentUpdateMessage(Message m)
-        {
-            /* only AgentUpdate is passed here */
-            Messages.Agent.AgentUpdate au = (Messages.Agent.AgentUpdate)m;
-
-            if(au.CircuitSceneID != m_CurrentSceneID)
-            {
-                return;
-            }
-
-            /* this is for the root agent */
         }
 
         public void HandleMessage(ChildAgentUpdate m)
