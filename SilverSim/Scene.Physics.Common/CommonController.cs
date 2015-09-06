@@ -78,5 +78,12 @@ namespace SilverSim.Scene.Physics.Common
             return (targetvel - obj.Velocity) * factor;
         }
         #endregion
+
+        #region Target Rotation Motor
+        protected Vector3 TargetRotationMotor(IObject obj, Quaternion targetrot, double factor, double dt)
+        {
+            return (targetrot / obj.Rotation).AsVector3 * factor;
+        }
+        #endregion
     }
 }

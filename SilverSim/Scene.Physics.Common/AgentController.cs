@@ -44,7 +44,28 @@ namespace SilverSim.Scene.Physics.Common
         public abstract bool IsVolumeDetect { get; set; }
         public abstract bool IsAgentCollisionActive { get; set; }
 
-        public abstract Vector3 ControlTargetVelocity { set; }
+        Vector3 m_ControlTargetVelocity = Vector3.Zero;
+        public Vector3 ControlTargetVelocity 
+        {
+            set
+            {
+                lock (this)
+                {
+                    m_ControlTargetVelocity = value;
+                }
+            }
+        }
+
+        Vector3 ControlTargetVelocityInput
+        {
+            get
+            {
+                lock(this)
+                {
+                    return m_ControlTargetVelocity;
+                }
+            }
+        }
 
         public bool ContributesToCollisionSurfaceAsChild 
         {
@@ -189,6 +210,9 @@ namespace SilverSim.Scene.Physics.Common
                 linearForce += BuoyancyMotor(m_Agent, dt);
                 linearForce += GravityMotor(m_Agent, dt);
                 linearForce += HoverMotor(m_Agent, dt);
+                linearForce += TargetVelocityMotor(m_Agent, ControlTargetVelocityInput, 1f, dt);
+
+                angularTorque += TargetRotationMotor(m_Agent, m_Agent.BodyRotation, 1f, dt);
 
                 lock (this)
                 {

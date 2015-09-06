@@ -181,6 +181,8 @@ namespace SilverSim.Scene.Types.Agent
             set;
         }
 
+        Quaternion BodyRotation { get; set; }
+
         void ResetAnimationOverride(string anim_state);
         void SetAnimationOverride(string anim_state, UUID anim);
         string GetAnimationOverride(string anim_state);
