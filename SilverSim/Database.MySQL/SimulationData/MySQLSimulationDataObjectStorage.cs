@@ -267,6 +267,8 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                                 objpart.ParticleSystemBytes = dbReader.GetBytes("ParticleSystem");
                                 objpart.ExtraParamsBytes = dbReader.GetBytes("ExtraParams");
+                                objpart.TextureEntryBytes = dbReader.GetBytes("TextureEntryBytes");
+                                objpart.TextureAnimationBytes = dbReader.GetBytes("TextureAnimationBytes");
 
                                 objpart.ScriptAccessPin = (int)dbReader["ScriptAccessPin"];
 
@@ -527,6 +529,9 @@ namespace SilverSim.Database.MySQL.SimulationData
 
             p["ParticleSystem"] = objpart.ParticleSystemBytes;
 
+            p["TextureEntryBytes"] = objpart.TextureEntryBytes;
+            p["TextureAnimationBytes"] = objpart.TextureAnimationBytes;
+
             p["ScriptAccessPin"] = objpart.ScriptAccessPin;
 
             using(MemoryStream ms = new MemoryStream())
@@ -713,7 +718,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "ParticleSystem BLOB," +
                 "ExtraParams BLOB," +
                 "ScriptAccessPin INT(11) NOT NULL DEFAULT '0'," +
-                "PRIMARY KEY(ID, RootPartID))"
+                "PRIMARY KEY(ID, RootPartID))",
+                "ALTER TABLE %tablename% ADD COLUMN (TextureEntryBytes BLOB, TextureAnimationBytes BLOB),"
         };
         #endregion
     }
