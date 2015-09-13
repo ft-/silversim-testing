@@ -1028,6 +1028,7 @@ namespace SilverSim.Main.Common
         {
             List<IPluginShutdown> shutdownLogoutAgentsList = new List<IPluginShutdown>();
             List<IPluginShutdown> shutdownLogoutRegionsList = new List<IPluginShutdown>();
+            List<IPluginShutdown> shutdownLogoutDatabaseList = new List<IPluginShutdown>();
             List<IPluginShutdown> shutdownAnyList = new List<IPluginShutdown>();
 
             foreach(IPluginShutdown s in GetServices<IPluginShutdown>().Values)
@@ -1037,6 +1038,7 @@ namespace SilverSim.Main.Common
                     case ShutdownOrder.Any: shutdownAnyList.Add(s); break;
                     case ShutdownOrder.LogoutAgents: shutdownLogoutAgentsList.Add(s); break;
                     case ShutdownOrder.LogoutRegion: shutdownLogoutRegionsList.Add(s); break;
+                    case ShutdownOrder.LogoutDatabase: shutdownLogoutDatabaseList.Add(s); break;
                 }
             }
 
@@ -1053,6 +1055,11 @@ namespace SilverSim.Main.Common
             }
 
             foreach (IPluginShutdown s in shutdownAnyList)
+            {
+                s.Shutdown();
+            }
+
+            foreach(IPluginShutdown s in shutdownLogoutDatabaseList)
             {
                 s.Shutdown();
             }

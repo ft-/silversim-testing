@@ -8,6 +8,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
+using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
@@ -155,11 +156,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                             objgroup.IsPhantom = MySQLUtilities.GetBoolean(dbReader, "IsPhantom");
                             objgroup.IsPhysics = MySQLUtilities.GetBoolean(dbReader, "IsPhysics");
                             objgroup.IsTempOnRez = MySQLUtilities.GetBoolean(dbReader, "IsTempOnRez");
-                            objgroup.Owner = new UUI((string)dbReader["Owner"]);
+                            objgroup.Owner = dbReader.GetUUI("Owner");
                             objgroup.LastOwner = new UUI((string)dbReader["LastOwner"]);
-                            objgroup.Group = new UGI((string)dbReader["Group"]);
-                            originalAssetID = new UUID((string)dbReader["OriginalAssetID"]);
-                            nextOwnerAssetID = new UUID((string)dbReader["NextOwnerAssetID"]);
+                            objgroup.Group = dbReader.GetUGI("Group");
+                            originalAssetID = dbReader.GetUUID("OriginalAssetID");
+                            nextOwnerAssetID = dbReader.GetUUID("NextOwnerAssetID");
                             objgroup.SaleType = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
                             objgroup.SalePrice = (int)dbReader["SalePrice"];
                             objgroup.PayPrice0 = (int)dbReader["PayPrice0"];
@@ -167,6 +168,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                             objgroup.PayPrice2 = (int)dbReader["PayPrice2"];
                             objgroup.PayPrice3 = (int)dbReader["PayPrice3"];
                             objgroup.PayPrice4 = (int)dbReader["PayPrice4"];
+                            objgroup.AttachedPos = dbReader.GetVector("AttachedPos");
+                            objgroup.AttachPoint = (AttachmentPoint)(uint)dbReader["AttachPoint"];
                         }
                     }
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE RootPartID LIKE ?id ORDER BY LinkNumber", connection))
@@ -177,7 +180,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                             while(dbReader.Read())
                             {
                                 ObjectPart objpart = new ObjectPart();
-                                objpart.ID = (string)dbReader["ID"];
+                                objpart.ID = dbReader.GetUUID("ID");
+                                objpart.LoadedLinkNumber = (int)dbReader["LinkNumber"];
                                 objpart.Position = MySQLUtilities.GetVector(dbReader, "Position");
                                 objpart.Rotation = MySQLUtilities.GetQuaternion(dbReader, "Rotation");
                                 objpart.SitText = (string)dbReader["SitText"];
@@ -186,8 +190,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 objpart.Description = (string)dbReader["Description"];
                                 objpart.SitTargetOffset = MySQLUtilities.GetVector(dbReader, "SitTargetOffset");
                                 objpart.SitTargetOrientation = MySQLUtilities.GetQuaternion(dbReader, "SitTargetOrientation");
-                                objpart.Creator = new UUI((string)dbReader["Creator"]);
+                                objpart.Creator = dbReader.GetUUI("Creator");
                                 objpart.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
+                                objpart.Flags = (PrimitiveFlags)(uint)dbReader["Flags"];
 
                                 objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)(int)dbReader["PhysicsShapeType"];
                                 objpart.Material = (PrimitiveMaterial)(int)dbReader["Material"];
@@ -221,14 +226,14 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 objpart.Flexible = fp;
 
                                 ObjectPart.SoundParam sound = new ObjectPart.SoundParam();
-                                sound.SoundID = (string)dbReader["LoopedSound"];
+                                sound.SoundID = dbReader.GetUUID("LoopedSound");
                                 sound.Radius = (double)dbReader["SoundRadius"];
                                 sound.Gain = (double)dbReader["SoundGain"];
                                 sound.Flags = (PrimitiveSoundFlags)(uint)dbReader["SoundFlags"];
                                 objpart.Sound = sound;
 
                                 ObjectPart.CollisionSoundParam collisionsound = new ObjectPart.CollisionSoundParam();
-                                collisionsound.ImpactSound = (string)dbReader["ImpactSound"];
+                                collisionsound.ImpactSound = dbReader.GetUUID("ImpactSound");
                                 collisionsound.ImpactVolume = (double)dbReader["ImpactVolume"];
                                 objpart.CollisionSound = collisionsound;
 
@@ -252,14 +257,16 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 ps.ProfileCurve = (byte)(uint)dbReader["ProfileCurve"];
                                 ps.ProfileEnd = (ushort)(uint)dbReader["ProfileEnd"];
                                 ps.ProfileHollow = (ushort)(uint)dbReader["ProfileHollow"];
-                                ps.IsSculptInverted = MySQLUtilities.GetBoolean(dbReader, "IsShapeSculptInverted");
-                                ps.IsSculptMirrored = MySQLUtilities.GetBoolean(dbReader, "IsShapeSculptMirrored");
-                                ps.SculptMap = (string)dbReader["ShapeSculptMap"];
+                                ps.IsSculptInverted = dbReader.GetBoolean("IsShapeSculptInverted");
+                                ps.IsSculptMirrored = dbReader.GetBoolean("IsShapeSculptMirrored");
+                                ps.SculptMap = dbReader.GetUUID("ShapeSculptMap");
                                 ps.SculptType = (PrimitiveSculptType)(int)dbReader["ShapeSculptType"];
                                 ps.Type = (PrimitiveShapeType)(int)dbReader["ShapeType"];
+                                ps.PCode = (PrimitiveCode)(uint)dbReader["PCode"];
                                 objpart.Shape = ps;
 
-                                objpart.ParticleSystemBytes = MySQLUtilities.GetBytes(dbReader, "ParticleSystem");
+                                objpart.ParticleSystemBytes = dbReader.GetBytes("ParticleSystem");
+                                objpart.ExtraParamsBytes = dbReader.GetBytes("ExtraParams");
 
                                 objpart.ScriptAccessPin = (int)dbReader["ScriptAccessPin"];
 
@@ -278,6 +285,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                     }
                     objgroup.OriginalAssetID = originalAssetID;
                     objgroup.NextOwnerAssetID = nextOwnerAssetID;
+                }
+                objgroup.FinalizeObject();
+                foreach (ObjectPart opart in objgroup.Values)
+                {
+                    opart.SerialNumberLoadedFromDatabase = opart.SerialNumber;
                 }
                 return objgroup;
             }
@@ -318,16 +330,19 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE ID LIKE ?id", connection))
+                connection.InsideTransaction(delegate()
                 {
-                    cmd.Parameters.AddWithValue("?id", obj);
-                    cmd.ExecuteNonQuery();
-                }
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE ID LIKE ?id", connection))
-                {
-                    cmd.Parameters.AddWithValue("?id", obj);
-                    cmd.ExecuteNonQuery();
-                }
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE ?id", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?id", obj);
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE ID LIKE ?id", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?id", obj);
+                        cmd.ExecuteNonQuery();
+                    }
+                });
             }
         }
 
@@ -336,16 +351,24 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE RootPartID LIKE ?id"))
+                connection.InsideTransaction(delegate()
                 {
-                    cmd.Parameters.AddWithValue("?id", obj);
-                    cmd.ExecuteNonQuery();
-                }
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM objects WHERE RootPartID LIKE ?id"))
-                {
-                    cmd.Parameters.AddWithValue("?id", obj);
-                    cmd.ExecuteNonQuery();
-                }
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE EXISTS (SELECT null FROM prims WHERE primitems.PrimID LIKE prims.ID AND prims.RootPartID LIKE ?id)", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?id", obj);
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE RootPartID LIKE ?id", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?id", obj);
+                        cmd.ExecuteNonQuery();
+                    }
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM objects WHERE ID LIKE ?id", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?id", obj);
+                        cmd.ExecuteNonQuery();
+                    }
+                });
             }
         }
 
@@ -388,6 +411,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
             Dictionary<string, object> p = new Dictionary<string, object>();
             p["ID"] = objgroup.ID;
+            p["RegionID"] = objgroup.Scene.ID;
             p["IsVolumeDetect"] = objgroup.IsVolumeDetect ? 1 : 0;
             p["IsPhantom"] = objgroup.IsPhantom ? 1 : 0;
             p["IsPhysics"] = objgroup.IsPhysics ? 1 : 0;
@@ -404,6 +428,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["PayPrice2"] = objgroup.PayPrice2;
             p["PayPrice3"] = objgroup.PayPrice3;
             p["PayPrice4"] = objgroup.PayPrice4;
+            p["AttachedPos"] = objgroup.AttachedPos;
+            p["AttachPoint"] = (uint)objgroup.AttachPoint;
 
             MySQLUtilities.ReplaceInsertInto(connection, "objects", p);
         }
@@ -416,6 +442,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
             Dictionary<string, object> p = new Dictionary<string, object>();
             p["ID"] = objpart.ID;
+            p["LinkNumber"] = objpart.LinkNumber;
+            p["RootPartID"] = objpart.ObjectGroup.RootPart.ID;
             p["Position"] = objpart.Position;
             p["Rotation"] = objpart.Rotation;
             p["SitText"] = objpart.SitText;
@@ -431,6 +459,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["MediaURL"] = objpart.MediaURL;
             p["Creator"] = objpart.Creator.ToString();
             p["CreationDate"] = objpart.CreationDate.AsULong;
+            p["Flags"] = (uint)objpart.Flags;
 
             p["AngularVelocity"] = objpart.AngularVelocity;
 
@@ -492,6 +521,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["ShapeSculptMap"] = ps.SculptMap;
             p["ShapeSculptType"] = (int)ps.SculptType;
             p["ShapeType"] = (int)ps.Type;
+            p["PCode"] = (int)ps.PCode;
+
+            p["ExtraParams"] = objpart.ExtraParamsBytes;
 
             p["ParticleSystem"] = objpart.ParticleSystemBytes;
 
@@ -547,7 +579,14 @@ namespace SilverSim.Database.MySQL.SimulationData
                         "PayPrice2 INT(11) NOT NULL DEFAULT '0'," + 
                         "PayPrice3 INT(11) NOT NULL DEFAULT '0'," + 
                         "PayPrice4 INT(11) NOT NULL DEFAULT '0'" + 
-        "),"
+                        "),",
+            "ALTER TABLE %tablename% ADD COLUMN (" +
+                "AttachedPosX REAL NOT NULL DEFAULT '0'," + 
+                "AttachedPosY REAL NOT NULL DEFAULT '0'," + 
+                "AttachedPosZ REAL NOT NULL DEFAULT '0'," + 
+                "AttachPoint INT(11) UNSIGNED NOT NULL DEFAULT '0'" +
+                "),"
+
         };
 
         private static readonly string[] PrimItemsMigrations = new string[]{
@@ -586,30 +625,57 @@ namespace SilverSim.Database.MySQL.SimulationData
             "CREATE TABLE %tablename% (" +
                 "ID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "RootPartID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "Position VARCHAR(255) NOT NULL," +
-                "Rotation VARCHAR(255) NOT NULL," +
+                "LinkNumber INT(11) NOT NULL," + 
+                "Flags INT(11) UNSIGNED NOT NULL," +
+                "PositionX REAL NOT NULL," +
+                "PositionY REAL NOT NULL," +
+                "PositionZ REAL NOT NULL," +
+                "RotationX REAL NOT NULL," +
+                "RotationY REAL NOT NULL," +
+                "RotationZ REAL NOT NULL," +
+                "RotationW REAL NOT NULL," +
                 "SitText TEXT," +
                 "TouchText TEXT," +
                 "Creator VARCHAR(255) NOT NULL DEFAULT ''," +
                 "CreationDate BIGINT(20) NOT NULL DEFAULT '0'," +
-                "Name VARCHAR(255) NOT NULL DEFAULT ''," +
+                "Name VARCHAR(64) NOT NULL DEFAULT ''," +
                 "Description VARCHAR(255) NOT NULL DEFAULT ''," +
-                "SitTargetOffset VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
-                "SitTargetOrientation VARCHAR(255) NOT NULL DEFAULT '<0,0,0,1>'," +
+                "DynAttrs BLOB," +
+                "SitTargetOffsetX DOUBLE NOT NULL DEFAULT '0'," +
+                "SitTargetOffsetY DOUBLE NOT NULL DEFAULT '0'," +
+                "SitTargetOffsetZ DOUBLE NOT NULL DEFAULT '0'," +
+                "SitTargetOrientationX DOUBLE NOT NULL DEFAULT '0'," +
+                "SitTargetOrientationY DOUBLE NOT NULL DEFAULT '0'," +
+                "SitTargetOrientationZ DOUBLE NOT NULL DEFAULT '0'," +
+                "SitTargetOrientationW DOUBLE NOT NULL DEFAULT '1'," +
                 "PhysicsShapeType INT(11) NOT NULL DEFAULT '0'," +
                 "Material INT(11) NOT NULL DEFAULT '0'," +
-                "Size VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
-                "Slice VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
+                "SizeX REAL NOT NULL DEFAULT '0'," +
+                "SizeY REAL NOT NULL DEFAULT '0'," +
+                "SizeZ REAL NOT NULL DEFAULT '0'," +
+                "SliceX REAL NOT NULL DEFAULT '0'," +
+                "SliceY REAL NOT NULL DEFAULT '0'," +
+                "SliceZ REAL NOT NULL DEFAULT '0'," +
                 "MediaURL VARCHAR(255) NOT NULL DEFAULT ''," +
-                "AngularVelocity VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
+                "AngularVelocityX REAL NOT NULL DEFAULT '0'," +
+                "AngularVelocityY REAL NOT NULL DEFAULT '0'," +
+                "AngularVelocityZ REAL NOT NULL DEFAULT '0'," +
                 "LightEnabled INT(1) NOT NULL DEFAULT '0'," +
-                "LightColor VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
+                "LightColorRed REAL NOT NULL DEFAULT '0'," +
+                "LightColorGreen REAL NOT NULL DEFAULT '0'," +
+                "LightColorBlue REAL NOT NULL DEFAULT '0'," +
                 "LightIntensity REAL NOT NULL DEFAULT '0'," +
                 "LightRadius REAL NOT NULL DEFAULT '0'," +
                 "LightFalloff REAL NOT NULL DEFAULT '0'," +
                 "HoverText TEXT," +
-                "HoverTextColor VARCHAR(255) NOT NULL DEFAULT '<0,0,0>'," +
+                "HoverTextColorRed REAL NOT NULL DEFAULT '0'," +
+                "HoverTextColorGreen REAL NOT NULL DEFAULT '0'," +
+                "HoverTextColorBlue REAL NOT NULL DEFAULT '0'," +
+                "HoverTextColorAlpha REAL NOT NULL DEFAULT '0'," +
                 "IsFlexible INT(1) NOT NULL DEFAULT '0'," +
+                "FlexibleForceX REAL NOT NULL DEFAULT '0'," +
+                "FlexibleForceY REAL NOT NULL DEFAULT '0'," +
+                "FlexibleForceZ REAL NOT NULL DEFAULT '0'," +
                 "FlexibleFriction REAL NOT NULL DEFAULT '0'," +
                 "FlexibleGravity REAL NOT NULL DEFAULT '0'," +
                 "FlexibleSoftness INT(11) NOT NULL DEFAULT '0'," +
@@ -643,7 +709,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "ShapeSculptMap CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "ShapeSculptType INT(11) NOT NULL DEFAULT '0'," +
                 "ShapeType INT(11) NOT NULL DEFAULT '0'," +
+                "PCode INT(11) UNSIGNED NOT NULL," + 
                 "ParticleSystem BLOB," +
+                "ExtraParams BLOB," +
                 "ScriptAccessPin INT(11) NOT NULL DEFAULT '0'," +
                 "PRIMARY KEY(ID, RootPartID))"
         };

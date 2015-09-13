@@ -1488,6 +1488,15 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        public void FinalizeObject()
+        {
+            foreach (ObjectPart part in this.Values)
+            {
+                part.ObjectGroup = this;
+                part.UpdateData(ObjectPart.UpdateDataFlags.All);
+            }
+        }
+
         static void fromXmlGroupScriptStates(XmlTextReader reader, ObjectGroup group)
         {
             UUID itemID = UUID.Zero;

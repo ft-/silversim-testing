@@ -193,7 +193,7 @@ namespace SilverSim.LL.Core
             {
                 agentMovementDirection *= 1.5f;
             }
-            ((IAgentPhysicsObject)PhysicsActor).ControlTargetVelocity = agentMovementDirection;
+            //((IAgentPhysicsObject)PhysicsActor).ControlTargetVelocity = agentMovementDirection;
         }
 
         [PacketHandler(MessageType.SetAlwaysRun)]

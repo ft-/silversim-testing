@@ -295,6 +295,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_UDPServer.Start();
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures("", "", "", true));
             Terrain.TerrainListeners.Add(this);
+            SceneListeners.Add(m_SimulationDataStorage);
             new Thread(StoreTerrainProcess).Start();
             if(null != physicsFactory)
             {
@@ -326,6 +327,7 @@ namespace SilverSim.Scene.Implementation.Basic
         private void RemoveScene(SceneInterface s)
         {
             m_StopBasicSceneThreads = true;
+            SceneListeners.Remove(m_SimulationDataStorage);
             Terrain.TerrainListeners.Remove(this);
             IMRouter.SceneIM.Remove(IMSend);
             m_UDPServer.Shutdown();

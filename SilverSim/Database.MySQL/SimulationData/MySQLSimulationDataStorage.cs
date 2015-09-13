@@ -11,7 +11,7 @@ using SilverSim.ServiceInterfaces.Database;
 namespace SilverSim.Database.MySQL.SimulationData
 {
     #region Service Implementation
-    public class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin
+    public class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
         private string m_ConnectionString;
@@ -34,7 +34,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         public void Startup(ConfigurationLoader loader)
         {
-
+            StartStorageThread();
         }
         #endregion
 
@@ -97,6 +97,19 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_EnvironmentStorage.ProcessMigrations();
         }
         #endregion
+
+        public ShutdownOrder ShutdownOrder
+        {
+            get 
+            {
+                return ShutdownOrder.LogoutDatabase;
+            }
+        }
+
+        public void Shutdown()
+        {
+            StopStorageThread();
+        }
     }
     #endregion
 

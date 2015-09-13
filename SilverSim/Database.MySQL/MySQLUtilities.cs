@@ -524,6 +524,40 @@ namespace SilverSim.Database.MySQL
             }
         }
 
+        public static UUI GetUUI(this MySqlDataReader dbReader, string prefix)
+        {
+            object v = dbReader[prefix];
+            if (v is Guid)
+            {
+                return new UUI((Guid)v);
+            }
+            else if (v is string)
+            {
+                return new UUI((string)v);
+            }
+            else
+            {
+                throw new InvalidCastException("GetUUI could not convert value for " + prefix);
+            }
+        }
+
+        public static UGI GetUGI(this MySqlDataReader dbReader, string prefix)
+        {
+            object v = dbReader[prefix];
+            if (v is Guid)
+            {
+                return new UGI((Guid)v);
+            }
+            else if (v is string)
+            {
+                return new UGI((string)v);
+            }
+            else
+            {
+                throw new InvalidCastException("GetUGI could not convert value for " + prefix);
+            }
+        }
+
         public static Date GetDate(this MySqlDataReader dbReader, string prefix)
         {
             return Date.UnixTimeToDateTime(ulong.Parse(dbReader[prefix].ToString()));

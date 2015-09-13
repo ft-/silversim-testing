@@ -189,12 +189,28 @@ namespace SilverSim.Scene.Types.Object
         public void SendKillObject()
         {
             m_ObjectUpdateInfo.KillObject();
-            ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+            ObjectGroup grp = ObjectGroup;
+            if (null != grp)
+            {
+                SceneInterface scene = grp.Scene;
+                if (null != scene)
+                {
+                    scene.ScheduleUpdate(m_ObjectUpdateInfo);
+                }
+            }
         }
 
         public void SendObjectUpdate()
         {
-            ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
+            ObjectGroup grp = ObjectGroup;
+            if (null != grp)
+            {
+                SceneInterface scene = grp.Scene;
+                if (null != scene)
+                {
+                    scene.ScheduleUpdate(m_ObjectUpdateInfo);
+                }
+            }
         }
 
         public ObjectUpdateInfo UpdateInfo
@@ -511,6 +527,7 @@ namespace SilverSim.Scene.Types.Object
 
         public ObjectGroup ObjectGroup { get; internal set; }
         public ObjectPartInventory Inventory { get; private set; }
+        public int SerialNumberLoadedFromDatabase = 0; /* <summary>only to be set within DB modules</summary> */
 
         public bool IsChanged { get; private set; }
 
@@ -934,6 +951,7 @@ namespace SilverSim.Scene.Types.Object
                 lock(this)
                 {
                     m_ID = value;
+                    Inventory.PartID = value;
                 }
                 lock(m_UpdateDataLock)
                 {

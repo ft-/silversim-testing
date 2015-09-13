@@ -5,6 +5,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System.Collections.Generic;
+using System.Threading;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
@@ -92,6 +93,11 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             m_StopStorageThread = true;
         }
 
+        protected void StartStorageThread()
+        {
+            new Thread(StorageThread).Start();
+        }
+
         protected void StorageThread()
         {
             while(!m_StopStorageThread || m_StorageRequestQueue.Count != 0)
@@ -115,7 +121,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                     Objects.DeleteObjectPart(info.Part.ID);
                     Objects.DeleteObjectGroup(info.Part.ObjectGroup.ID);
                 }
-                else
+                else if (info.Part.SerialNumberLoadedFromDatabase != info.Part.SerialNumber)
                 {
                     ObjectGroup grp = info.Part.ObjectGroup;
                     if(null != grp && !grp.IsTemporary)
@@ -124,6 +130,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                         Objects.UpdateObjectPart(info.Part);
                     }
                 }
+                info.Part.SerialNumberLoadedFromDatabase = 0;
             }
         }
 

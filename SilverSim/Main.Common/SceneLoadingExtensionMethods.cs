@@ -4,6 +4,7 @@
 using log4net;
 using SilverSim.LL.Messages.LayerData;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
@@ -143,12 +144,14 @@ namespace SilverSim.Main.Common
                         {
                             lock (loadparams.Scene.m_LoaderThreadLock)
                             {
-                                loadparams.Scene.Add(loadparams.SimulationDataStorage.Objects[loadparams.Scene.ID, objectid]);
+                                ObjectGroup grp = loadparams.SimulationDataStorage.Objects[loadparams.Scene.ID, objectid];
+                                grp.FinalizeObject();
+                                loadparams.Scene.Add(grp);
                             }
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("Loading object {0} for {3} ({4}) failed: {2}: {1}", objectid, e.Message, e.GetType().FullName, loadparams.Scene.RegionData.Name, loadparams.Scene.ID);
+                            m_Log.WarnFormat("Loading object {0} for {3} ({4}) failed: {2}: {1}\n{5}", objectid, e.Message, e.GetType().FullName, loadparams.Scene.RegionData.Name, loadparams.Scene.ID, e.StackTrace.ToString());
                         }
                     }
                 }
