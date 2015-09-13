@@ -16,13 +16,23 @@ namespace SilverSim.Scene.Types.Object
 {
     public class ObjectPartInventory : RwLockedSortedDoubleDictionary<UUID, string, ObjectPartInventoryItem>
     {
-        public delegate void OnChangeDelegate();
+        public enum ChangeAction
+        {
+            Add,
+            Change,
+            Remove
+        }
+
+        public delegate void OnChangeDelegate(ChangeAction change, UUID primID, UUID itemID);
         public event OnChangeDelegate OnChange;
 
         public int InventorySerial = 1;
 
+        public UUID PartID { get; internal set; }
+
         public ObjectPartInventory()
         {
+            PartID = UUID.Zero;
         }
 
         #region LSL style accessors
@@ -151,14 +161,19 @@ namespace SilverSim.Scene.Types.Object
             {
                 foreach (OnChangeDelegate d in addDelegate.GetInvocationList())
                 {
-                    d();
+                    d(ChangeAction.Add, PartID, item.ID);
                 }
             }
         }
 
         public new void ChangeKey(string newKey, string oldKey)
         {
-            base.ChangeKey(newKey, oldKey);
+            ObjectPartInventoryItem item;
+            lock (this)
+            {
+                base.ChangeKey(newKey, oldKey);
+                item = base[newKey];
+            }
             Interlocked.Increment(ref InventorySerial);
 
             var updateDelegate = OnChange;
@@ -166,7 +181,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 foreach (OnChangeDelegate d in updateDelegate.GetInvocationList())
                 {
-                    d();
+                    d(ChangeAction.Change, PartID, item.ID);
                 }
             }
         }
@@ -195,7 +210,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 foreach (OnChangeDelegate d in updateDelegate.GetInvocationList())
                 {
-                    d();
+                    d(ChangeAction.Add, PartID, newItem.ID);
                 }
             }
         }
@@ -210,7 +225,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     foreach (OnChangeDelegate d in updateDelegate.GetInvocationList())
                     {
-                        d();
+                        d(ChangeAction.Remove, PartID, key1);
                     }
                 }
                 return true;
@@ -220,7 +235,8 @@ namespace SilverSim.Scene.Types.Object
 
         public new bool Remove(string key2)
         {
-            if (base.Remove(key2))
+            ObjectPartInventoryItem item;
+            if (base.Remove(key2, out item))
             {
                 Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
@@ -228,7 +244,43 @@ namespace SilverSim.Scene.Types.Object
                 {
                     foreach (OnChangeDelegate d in updateDelegate.GetInvocationList())
                     {
-                        d();
+                        d(ChangeAction.Remove, PartID, item.ID);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public new bool Remove(UUID key1, out ObjectPartInventoryItem item)
+        {
+            if (base.Remove(key1, out item))
+            {
+                Interlocked.Increment(ref InventorySerial);
+                var updateDelegate = OnChange;
+                if (updateDelegate != null)
+                {
+                    foreach (OnChangeDelegate d in updateDelegate.GetInvocationList())
+                    {
+                        d(ChangeAction.Remove, PartID, item.ID);
+                    }
+                }
+                return true;
+            }
+            return false;
+        }
+
+        public new bool Remove(string key2, out ObjectPartInventoryItem item)
+        {
+            if (base.Remove(key2, out item))
+            {
+                Interlocked.Increment(ref InventorySerial);
+                var updateDelegate = OnChange;
+                if (updateDelegate != null)
+                {
+                    foreach (OnChangeDelegate d in updateDelegate.GetInvocationList())
+                    {
+                        d(ChangeAction.Remove, PartID, item.ID);
                     }
                 }
                 return true;
@@ -246,7 +298,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     foreach (OnChangeDelegate d in updateDelegate.GetInvocationList())
                     {
-                        d();
+                        d(ChangeAction.Remove, PartID, key1);
                     }
                 }
                 return true;

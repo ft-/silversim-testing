@@ -205,7 +205,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        void OnInventoryChange()
+        void OnInventoryChange(ObjectPartInventory.ChangeAction action, UUID primID, UUID itemID)
         {
             IsChanged = m_IsChangedEnabled;
             lock (m_UpdateDataLock)
