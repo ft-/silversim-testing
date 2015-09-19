@@ -665,6 +665,7 @@ namespace SilverSim.Database.MySQL
                     log.InfoFormat("[MYSQL MIGRATION]: Updating {0} to revision {1}", tablename, revision);
                     using(MySqlCommand cmd = new MySqlCommand(sqlcmd, connection))
                     {
+                        cmd.CommandTimeout = 3600;
                         if(cmd.ExecuteNonQuery() < 0)
                         {
                             throw new MySQLMigrationException(string.Format("Failed to update {0} to revision {1}", tablename, revision));

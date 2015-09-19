@@ -31,7 +31,7 @@ namespace SilverSim.Scene.Types.Object
         public event Action<IObject> OnPositionChange;
         #endregion
 
-        private UInt32 m_LocalID;
+        private UInt32 m_LocalID = 0;
         public UInt32 LocalID 
         {
             get
@@ -40,8 +40,10 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
+                bool incSerial;
                 lock(this)
                 {
+                    incSerial = m_LocalID != 0;
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID] = (byte)(value & 0xFF);
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 1] = (byte)((value >> 8) & 0xFF);
                     m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.LocalID + 2] = (byte)((value >> 16) & 0xFF);
@@ -49,7 +51,7 @@ namespace SilverSim.Scene.Types.Object
                     m_ObjectUpdateInfo.LocalID = value;
                     m_LocalID = value;
                 }
-                UpdateData(UpdateDataFlags.Full);
+                UpdateData(UpdateDataFlags.All, incSerial);
             }
         }
 

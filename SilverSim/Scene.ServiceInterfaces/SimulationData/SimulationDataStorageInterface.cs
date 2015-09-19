@@ -46,48 +46,6 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             get;
         }
 
-        public void StoreScene(SceneInterface scene)
-        {
-            #region Store Objects
-            List<UUID> objectsToDelete = Objects.ObjectsInRegion(scene.ID);
-            List<UUID> primsToDelete = Objects.PrimitivesInRegion(scene.ID);
-            foreach(ObjectGroup objgroup in scene.Objects)
-            {
-                if(objgroup.IsTemporary)
-                {
-                    /* Do not store temporary objects */
-                    continue;
-                }
-
-                objectsToDelete.Remove(objgroup.ID);
-                foreach (ObjectPart objpart in objgroup.Values)
-                {
-                    primsToDelete.Remove(objpart.ID);
-                    if(!objgroup.IsChanged && objpart.IsChanged)
-                    {
-                        Objects.UpdateObjectPart(objpart);
-                    }
-                    else
-                    {
-                        Objects.UpdateObjectPartInventory(objpart);
-                    }
-                }
-
-                Objects.UpdateObjectGroup(objgroup);
-            }
-
-            foreach(UUID id in primsToDelete)
-            {
-                Objects.DeleteObjectPart(id);
-            }
-
-            foreach(UUID id in objectsToDelete)
-            {
-                Objects.DeleteObjectGroup(id);
-            }
-            #endregion
-        }
-
         readonly BlockingQueue<KeyValuePair<ObjectUpdateInfo, UUID>> m_StorageRequestQueue = new BlockingQueue<KeyValuePair<ObjectUpdateInfo, UUID>>();
         bool m_StopStorageThread = false;
 
@@ -132,17 +90,13 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                     ObjectGroup grp = info.Part.ObjectGroup;
                     if(null != grp && !grp.IsTemporary)
                     {
-                        if (grp.RootPart == info.Part)
-                        {
-                            Objects.UpdateObjectGroup(grp);
-                        }
                         Objects.UpdateObjectPart(info.Part);
                     }
                 }
                 info.Part.SerialNumberLoadedFromDatabase = 0;
-                time -= Environment.TickCount;
+                time = Environment.TickCount - time;
 
-                if(m_StopStorageThread && m_StorageRequestQueue.Count % 100 == 0)
+                if(m_StorageRequestQueue.Count % 100 == 0)
                 {
                     m_StorageLog.InfoFormat("{0} primitives left to store", m_StorageRequestQueue.Count);
                 }

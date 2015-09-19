@@ -33,8 +33,6 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         public abstract void DeleteObjectPart(UUID obj);
         public abstract void DeleteObjectGroup(UUID obj);
 
-        public abstract void UpdateObjectGroup(ObjectGroup objgroup);
         public abstract void UpdateObjectPart(ObjectPart objpart);
-        public abstract void UpdateObjectPartInventory(ObjectPart objpart);
     }
 }

@@ -193,14 +193,22 @@ namespace SilverSim.Scene.Types.Object
 
         public void UpdateData(UpdateDataFlags flags)
         {
+            UpdateData(flags, true);
+        }
+
+        void UpdateData(UpdateDataFlags flags, bool incSerial)
+        {
             lock (m_UpdateDataLock)
             {
-                int objectSerial = m_ObjectSerial + 1;
-                if (objectSerial == 0)
+                if (incSerial || 0 == m_ObjectSerial)
                 {
-                    objectSerial = 1;
+                    int objectSerial = m_ObjectSerial + 1;
+                    if (objectSerial == 0)
+                    {
+                        objectSerial = 1;
+                    }
+                    m_ObjectSerial = objectSerial;
                 }
-                m_ObjectSerial = objectSerial;
 
                 if(m_FullUpdateData == null)
                 {

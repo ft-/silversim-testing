@@ -145,7 +145,6 @@ namespace SilverSim.Main.Common
                         {
                             lock (loadparams.Scene.m_LoaderThreadLock)
                             {
-                                grp.FinalizeObject();
                                 loadparams.Scene.Add(grp);
                             }
                         }
