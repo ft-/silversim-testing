@@ -442,6 +442,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     foreach(ObjectPart objpart in objgroup.Values)
                     {
                         Interlocked.Increment(ref m_PrimitiveCount);
+                        objpart.UpdateData(ObjectPart.UpdateDataFlags.Full | ObjectPart.UpdateDataFlags.Terse);
                         objpart.SendObjectUpdate();
                     }
                     Interlocked.Increment(ref m_ObjectCount);
