@@ -78,8 +78,6 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
                 info = req.Key;
 
-                int time = Environment.TickCount;
-
                 if(info.IsKilled)
                 {
                     Objects.DeleteObjectPart(info.Part.ID);
@@ -94,7 +92,6 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                     }
                 }
                 info.Part.SerialNumberLoadedFromDatabase = 0;
-                time = Environment.TickCount - time;
 
                 if(m_StorageRequestQueue.Count % 100 == 0)
                 {
