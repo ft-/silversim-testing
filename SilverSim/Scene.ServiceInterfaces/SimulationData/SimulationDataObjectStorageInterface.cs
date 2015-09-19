@@ -20,6 +20,12 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             get;
         }
 
+        /* load all objects of region */
+        public abstract List<ObjectGroup> this[UUID regionID]
+        {
+            get;
+        }
+
         public abstract List<UUID> ObjectsInRegion(UUID key);
 
         public abstract List<UUID> PrimitivesInRegion(UUID key);

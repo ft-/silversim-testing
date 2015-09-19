@@ -14,6 +14,7 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.IO;
 
 namespace SilverSim.Database.MySQL.SimulationData
@@ -127,6 +128,187 @@ namespace SilverSim.Database.MySQL.SimulationData
                         }
                     }
                 }
+            }
+        }
+
+        public override List<ObjectGroup> this[UUID regionID]
+        {
+            get
+            {
+                Dictionary<UUID, ObjectGroup> objGroups = new Dictionary<UUID, ObjectGroup>();
+                Dictionary<UUID, UUID> originalAssetIDs = new Dictionary<UUID, UUID>();
+                Dictionary<UUID, UUID> nextOwnerAssetIDs = new Dictionary<UUID, UUID>();
+                using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                {
+                    connection.Open();
+                    UUID objgroupID = UUID.Zero;
+                    try
+                    {
+                        using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM objects WHERE RegionID LIKE ?regionid", connection))
+                        {
+                            cmd.CommandTimeout = 3600;
+                            cmd.Parameters.AddWithValue("?regionid", regionID);
+                            using(MySqlDataReader dbReader = cmd.ExecuteReader())
+                            {
+                                if (!dbReader.Read())
+                                {
+                                    throw new InvalidOperationException();
+                                }
+
+                                objgroupID = MySQLUtilities.GetUUID(dbReader, "id");
+                                ObjectGroup objgroup = new ObjectGroup();
+                                objgroup.IsVolumeDetect = MySQLUtilities.GetBoolean(dbReader, "IsVolumeDetect");
+                                objgroup.IsPhantom = MySQLUtilities.GetBoolean(dbReader, "IsPhantom");
+                                objgroup.IsPhysics = MySQLUtilities.GetBoolean(dbReader, "IsPhysics");
+                                objgroup.IsTempOnRez = MySQLUtilities.GetBoolean(dbReader, "IsTempOnRez");
+                                objgroup.Owner = dbReader.GetUUI("Owner");
+                                objgroup.LastOwner = new UUI((string)dbReader["LastOwner"]);
+                                objgroup.Group = dbReader.GetUGI("Group");
+                                originalAssetIDs[objgroupID] = dbReader.GetUUID("OriginalAssetID");
+                                nextOwnerAssetIDs[objgroupID] = dbReader.GetUUID("NextOwnerAssetID");
+                                objgroup.SaleType = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
+                                objgroup.SalePrice = (int)dbReader["SalePrice"];
+                                objgroup.PayPrice0 = (int)dbReader["PayPrice0"];
+                                objgroup.PayPrice1 = (int)dbReader["PayPrice1"];
+                                objgroup.PayPrice2 = (int)dbReader["PayPrice2"];
+                                objgroup.PayPrice3 = (int)dbReader["PayPrice3"];
+                                objgroup.PayPrice4 = (int)dbReader["PayPrice4"];
+                                objgroup.AttachedPos = dbReader.GetVector("AttachedPos");
+                                objgroup.AttachPoint = (AttachmentPoint)(uint)dbReader["AttachPoint"];
+                                objGroups[objgroupID] = objgroup;
+                            }
+                        }
+
+                        using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM prims WHERE EXISTS (SELECT null FROM objects WHERE prims.RootPartID LIKE objects.id AND regionID LIKE ?regionid) ORDER BY RootPartID, LinkNumber", connection))
+                        {
+                            cmd.CommandTimeout = 3600;
+                            cmd.Parameters.AddWithValue("?regionid", regionID);
+                            using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                            {
+                                while (dbReader.Read())
+                                {
+                                    ObjectPart objpart = new ObjectPart();
+                                    objpart.ID = dbReader.GetUUID("ID");
+                                    objpart.LoadedLinkNumber = (int)dbReader["LinkNumber"];
+                                    objpart.Position = MySQLUtilities.GetVector(dbReader, "Position");
+                                    objpart.Rotation = MySQLUtilities.GetQuaternion(dbReader, "Rotation");
+                                    objpart.SitText = (string)dbReader["SitText"];
+                                    objpart.TouchText = (string)dbReader["TouchText"];
+                                    objpart.Name = (string)dbReader["Name"];
+                                    objpart.Description = (string)dbReader["Description"];
+                                    objpart.SitTargetOffset = MySQLUtilities.GetVector(dbReader, "SitTargetOffset");
+                                    objpart.SitTargetOrientation = MySQLUtilities.GetQuaternion(dbReader, "SitTargetOrientation");
+                                    objpart.Creator = dbReader.GetUUI("Creator");
+                                    objpart.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
+                                    objpart.Flags = (PrimitiveFlags)(uint)dbReader["Flags"];
+
+                                    objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)(int)dbReader["PhysicsShapeType"];
+                                    objpart.Material = (PrimitiveMaterial)(int)dbReader["Material"];
+                                    objpart.Size = MySQLUtilities.GetVector(dbReader, "Size");
+                                    objpart.Slice = MySQLUtilities.GetVector(dbReader, "Slice");
+
+                                    objpart.MediaURL = (string)dbReader["MediaURL"];
+
+                                    objpart.AngularVelocity = MySQLUtilities.GetVector(dbReader, "AngularVelocity");
+
+                                    ObjectPart.PointLightParam lp = new ObjectPart.PointLightParam();
+                                    lp.IsLight = MySQLUtilities.GetBoolean(dbReader, "LightEnabled");
+                                    lp.LightColor = MySQLUtilities.GetColor(dbReader, "LightColor");
+                                    lp.Intensity = (double)dbReader["LightIntensity"];
+                                    lp.Radius = (double)dbReader["LightRadius"];
+                                    lp.Falloff = (double)dbReader["LightFalloff"];
+                                    objpart.PointLight = lp;
+
+                                    ObjectPart.TextParam tp = new ObjectPart.TextParam();
+                                    tp.Text = (string)dbReader["HoverText"];
+                                    tp.TextColor = MySQLUtilities.GetColorAlpha(dbReader, "HoverTextColor");
+                                    objpart.Text = tp;
+
+                                    ObjectPart.FlexibleParam fp = new ObjectPart.FlexibleParam();
+                                    fp.IsFlexible = MySQLUtilities.GetBoolean(dbReader, "IsFlexible");
+                                    fp.Friction = (double)dbReader["FlexibleFriction"];
+                                    fp.Gravity = (double)dbReader["FlexibleGravity"];
+                                    fp.Softness = (int)dbReader["FlexibleSoftness"];
+                                    fp.Wind = (double)dbReader["FlexibleWind"];
+                                    fp.Force = MySQLUtilities.GetVector(dbReader, "FlexibleForce");
+                                    objpart.Flexible = fp;
+
+                                    ObjectPart.SoundParam sound = new ObjectPart.SoundParam();
+                                    sound.SoundID = dbReader.GetUUID("LoopedSound");
+                                    sound.Radius = (double)dbReader["SoundRadius"];
+                                    sound.Gain = (double)dbReader["SoundGain"];
+                                    sound.Flags = (PrimitiveSoundFlags)(uint)dbReader["SoundFlags"];
+                                    objpart.Sound = sound;
+
+                                    ObjectPart.CollisionSoundParam collisionsound = new ObjectPart.CollisionSoundParam();
+                                    collisionsound.ImpactSound = dbReader.GetUUID("ImpactSound");
+                                    collisionsound.ImpactVolume = (double)dbReader["ImpactVolume"];
+                                    objpart.CollisionSound = collisionsound;
+
+                                    ObjectPart.PrimitiveShape ps = new ObjectPart.PrimitiveShape();
+
+                                    ps.PathBegin = (ushort)(uint)dbReader["PathBegin"];
+                                    ps.PathCurve = (byte)(uint)dbReader["PathCurve"];
+                                    ps.PathEnd = (ushort)(uint)dbReader["PathEnd"];
+                                    ps.PathRadiusOffset = (sbyte)(int)dbReader["PathRadiusOffset"];
+                                    ps.PathRevolutions = (byte)(uint)dbReader["PathRevolutions"];
+                                    ps.PathScaleX = (byte)(uint)dbReader["PathScaleX"];
+                                    ps.PathScaleY = (byte)(uint)dbReader["PathScaleY"];
+                                    ps.PathShearX = (byte)(uint)dbReader["PathShearX"];
+                                    ps.PathShearY = (byte)(uint)dbReader["PathShearY"];
+                                    ps.PathSkew = (sbyte)(int)dbReader["PathSkew"];
+                                    ps.PathTaperX = (sbyte)(int)dbReader["PathTaperX"];
+                                    ps.PathTaperY = (sbyte)(int)dbReader["PathTaperY"];
+                                    ps.PathTwist = (sbyte)(int)dbReader["PathTwist"];
+                                    ps.PathTwistBegin = (sbyte)(int)dbReader["PathTwistBegin"];
+                                    ps.ProfileBegin = (ushort)(uint)dbReader["ProfileBegin"];
+                                    ps.ProfileCurve = (byte)(uint)dbReader["ProfileCurve"];
+                                    ps.ProfileEnd = (ushort)(uint)dbReader["ProfileEnd"];
+                                    ps.ProfileHollow = (ushort)(uint)dbReader["ProfileHollow"];
+                                    ps.IsSculptInverted = dbReader.GetBoolean("IsShapeSculptInverted");
+                                    ps.IsSculptMirrored = dbReader.GetBoolean("IsShapeSculptMirrored");
+                                    ps.SculptMap = dbReader.GetUUID("ShapeSculptMap");
+                                    ps.SculptType = (PrimitiveSculptType)(int)dbReader["ShapeSculptType"];
+                                    ps.Type = (PrimitiveShapeType)(int)dbReader["ShapeType"];
+                                    ps.PCode = (PrimitiveCode)(uint)dbReader["PCode"];
+                                    objpart.Shape = ps;
+
+                                    objpart.ParticleSystemBytes = dbReader.GetBytes("ParticleSystem");
+                                    objpart.ExtraParamsBytes = dbReader.GetBytes("ExtraParams");
+                                    objpart.TextureEntryBytes = dbReader.GetBytes("TextureEntryBytes");
+                                    objpart.TextureAnimationBytes = dbReader.GetBytes("TextureAnimationBytes");
+
+                                    objpart.ScriptAccessPin = (int)dbReader["ScriptAccessPin"];
+
+                                    using (MemoryStream ms = new MemoryStream((byte[])dbReader["DynAttrs"]))
+                                    {
+                                        foreach (KeyValuePair<string, IValue> kvp in (Map)LLSD_Binary.Deserialize(ms))
+                                        {
+                                            objpart.DynAttrs.Add(kvp.Key, kvp.Value);
+                                        }
+                                    }
+
+                                    LoadInventory(objpart);
+                                    ObjectGroup objgroup = objGroups[dbReader.GetUUID("RootPartID")];
+                                    objgroup.Add((int)dbReader["LinkNumber"], objpart.ID, objpart);
+                                }
+                            }
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        m_Log.ErrorFormat("Failed to load object {0}: {1}\n{2}", objgroupID, e.Message, e.StackTrace.ToString());
+                        objGroups.Remove(objgroupID);
+                    }
+                }
+
+                foreach(ObjectGroup objgroup in objGroups.Values)
+                {
+                    objgroup.OriginalAssetID = originalAssetIDs[objgroup.ID];
+                    objgroup.NextOwnerAssetID = nextOwnerAssetIDs[objgroup.ID];
+                }
+
+                return new List<ObjectGroup>(objGroups.Values);
             }
         }
 

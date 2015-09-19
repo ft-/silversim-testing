@@ -138,20 +138,20 @@ namespace SilverSim.Main.Common
                 }
                 if (objects.Count != 0)
                 {
-                    foreach (UUID objectid in objects)
+                    List<ObjectGroup> objGroups = loadparams.SimulationDataStorage.Objects[loadparams.Scene.ID];
+                    foreach (ObjectGroup grp in objGroups)
                     {
                         try
                         {
                             lock (loadparams.Scene.m_LoaderThreadLock)
                             {
-                                ObjectGroup grp = loadparams.SimulationDataStorage.Objects[loadparams.Scene.ID, objectid];
                                 grp.FinalizeObject();
                                 loadparams.Scene.Add(grp);
                             }
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("Loading object {0} for {3} ({4}) failed: {2}: {1}\n{5}", objectid, e.Message, e.GetType().FullName, loadparams.Scene.RegionData.Name, loadparams.Scene.ID, e.StackTrace.ToString());
+                            m_Log.WarnFormat("Loading object {0} for {3} ({4}) failed: {2}: {1}\n{5}", grp.ID, e.Message, e.GetType().FullName, loadparams.Scene.RegionData.Name, loadparams.Scene.ID, e.StackTrace.ToString());
                         }
                     }
                 }

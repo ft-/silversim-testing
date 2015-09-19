@@ -1,9 +1,11 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
@@ -12,6 +14,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
     public abstract class SimulationDataStorageInterface : ISceneListener
     {
+        private readonly ILog m_StorageLog = LogManager.GetLogger("STORAGE THREAD");
         #region Constructor
         public SimulationDataStorageInterface()
         {
@@ -100,6 +103,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
         protected void StorageThread()
         {
+            Thread.CurrentThread.Name = "Storage Thread";
             while(!m_StopStorageThread || m_StorageRequestQueue.Count != 0)
             {
                 /* thread always runs until queue is empty it does not stop before */
@@ -116,6 +120,8 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
                 info = req.Key;
 
+                int time = Environment.TickCount;
+
                 if(info.IsKilled)
                 {
                     Objects.DeleteObjectPart(info.Part.ID);
@@ -126,11 +132,20 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                     ObjectGroup grp = info.Part.ObjectGroup;
                     if(null != grp && !grp.IsTemporary)
                     {
-                        Objects.UpdateObjectGroup(grp);
+                        if (grp.RootPart == info.Part)
+                        {
+                            Objects.UpdateObjectGroup(grp);
+                        }
                         Objects.UpdateObjectPart(info.Part);
                     }
                 }
                 info.Part.SerialNumberLoadedFromDatabase = 0;
+                time -= Environment.TickCount;
+
+                if(m_StopStorageThread && m_StorageRequestQueue.Count % 100 == 0)
+                {
+                    m_StorageLog.InfoFormat("{0} primitives left to store", m_StorageRequestQueue.Count);
+                }
             }
         }
 
