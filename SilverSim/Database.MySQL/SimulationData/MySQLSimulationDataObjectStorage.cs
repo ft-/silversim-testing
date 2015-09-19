@@ -310,7 +310,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                                         }
                                     }
 
-                                    LoadInventory(objpart);
                                     objGroupParts[rootPartID].Add(objpart.LoadedLinkNumber, objpart);
                                     objPartIDs.Add(objpart.ID);
                                     if ((++primcount) % 5000 == 0)
