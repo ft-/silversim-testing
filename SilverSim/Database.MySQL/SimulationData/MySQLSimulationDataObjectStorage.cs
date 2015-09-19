@@ -29,6 +29,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_ConnectionString = connectionString;
         }
 
+        #region Objects and Prims within a region by UUID
         public override List<UUID> ObjectsInRegion(UUID key)
         {
             List<UUID> objects = new List<UUID>();
@@ -72,65 +73,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
             return objects;
         }
+        #endregion
 
-        private void LoadInventory(ObjectPart objpart)
-        {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM primitems WHERE PrimID LIKE ?id", connection))
-                {
-                    cmd.Parameters.AddWithValue("?id", objpart.ID);
-                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                    {
-                        ObjectPartInventoryItem item;
-
-                        while (dbReader.Read())
-                        {
-                            item = new ObjectPartInventoryItem();
-                            item.AssetID = dbReader.GetUUID("AssetID");
-                            item.AssetType = (AssetType)(int)dbReader["AssetType"];
-                            item.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
-                            item.Creator = dbReader.GetUUI("Creator");
-                            item.Description = (string)dbReader["Description"];
-                            item.Flags = (uint)dbReader["Flags"];
-                            item.Group = dbReader.GetUGI("Group");
-                            item.IsGroupOwned = (uint)dbReader["GroupOwned"] != 0;
-                            item.ID = dbReader.GetUUID("InventoryID");
-                            item.InventoryType = (InventoryType)(int)dbReader["InventoryType"];
-                            item.LastOwner = new UUI((string)dbReader["LastOwner"]);
-                            item.Name = (string)dbReader["Name"];
-                            item.Owner = dbReader.GetUUI("Owner");
-                            item.ParentFolderID = dbReader.GetUUID("ParentFolderID");
-                            item.Permissions.Base = (InventoryPermissionsMask)(uint)dbReader["BasePermissions"];
-                            item.Permissions.Current = (InventoryPermissionsMask)(uint)dbReader["CurrentPermissions"];
-                            item.Permissions.EveryOne = (InventoryPermissionsMask)(uint)dbReader["EveryOnePermissions"];
-                            item.Permissions.Group = (InventoryPermissionsMask)(uint)dbReader["GroupPermissions"];
-                            item.Permissions.NextOwner = (InventoryPermissionsMask)(uint)dbReader["NextOwnerPermissions"];
-                            item.SaleInfo.Type = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
-                            item.SaleInfo.Price = (int)dbReader["SalePrice"];
-                            item.SaleInfo.PermMask = (InventoryPermissionsMask)(uint)dbReader["SalePermMask"];
-                            ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
-                            if ((string)dbReader["PermsGranter"] != "")
-                            {
-                                try
-                                {
-                                    grantinfo.PermsGranter = dbReader.GetUUI("PermsGranter");
-                                }
-                                catch
-                                {
-
-                                }
-                            }
-                            grantinfo.PermsMask = (Types.Script.ScriptPermissions)(uint)dbReader["PermsMask"];
-
-                            objpart.Inventory.Add(item.ID, item.Name, item);
-                        }
-                    }
-                }
-            }
-        }
-
+        #region Load all object groups of a single region
         public override List<ObjectGroup> this[UUID regionID]
         {
             get
@@ -424,6 +369,66 @@ namespace SilverSim.Database.MySQL.SimulationData
                 return new List<ObjectGroup>(objGroups.Values);
             }
         }
+        #endregion
+
+        #region Load single object group
+        private void LoadInventory(ObjectPart objpart)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM primitems WHERE PrimID LIKE ?id", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", objpart.ID);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        ObjectPartInventoryItem item;
+
+                        while (dbReader.Read())
+                        {
+                            item = new ObjectPartInventoryItem();
+                            item.AssetID = dbReader.GetUUID("AssetID");
+                            item.AssetType = (AssetType)(int)dbReader["AssetType"];
+                            item.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
+                            item.Creator = dbReader.GetUUI("Creator");
+                            item.Description = (string)dbReader["Description"];
+                            item.Flags = (uint)dbReader["Flags"];
+                            item.Group = dbReader.GetUGI("Group");
+                            item.IsGroupOwned = (uint)dbReader["GroupOwned"] != 0;
+                            item.ID = dbReader.GetUUID("InventoryID");
+                            item.InventoryType = (InventoryType)(int)dbReader["InventoryType"];
+                            item.LastOwner = new UUI((string)dbReader["LastOwner"]);
+                            item.Name = (string)dbReader["Name"];
+                            item.Owner = dbReader.GetUUI("Owner");
+                            item.ParentFolderID = dbReader.GetUUID("ParentFolderID");
+                            item.Permissions.Base = (InventoryPermissionsMask)(uint)dbReader["BasePermissions"];
+                            item.Permissions.Current = (InventoryPermissionsMask)(uint)dbReader["CurrentPermissions"];
+                            item.Permissions.EveryOne = (InventoryPermissionsMask)(uint)dbReader["EveryOnePermissions"];
+                            item.Permissions.Group = (InventoryPermissionsMask)(uint)dbReader["GroupPermissions"];
+                            item.Permissions.NextOwner = (InventoryPermissionsMask)(uint)dbReader["NextOwnerPermissions"];
+                            item.SaleInfo.Type = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
+                            item.SaleInfo.Price = (int)dbReader["SalePrice"];
+                            item.SaleInfo.PermMask = (InventoryPermissionsMask)(uint)dbReader["SalePermMask"];
+                            ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
+                            if ((string)dbReader["PermsGranter"] != "")
+                            {
+                                try
+                                {
+                                    grantinfo.PermsGranter = dbReader.GetUUI("PermsGranter");
+                                }
+                                catch
+                                {
+
+                                }
+                            }
+                            grantinfo.PermsMask = (Types.Script.ScriptPermissions)(uint)dbReader["PermsMask"];
+
+                            objpart.Inventory.Add(item.ID, item.Name, item);
+                        }
+                    }
+                }
+            }
+        }
 
         public override ObjectGroup this[UUID regionID, UUID key]
         {
@@ -593,25 +598,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                 return objgroup;
             }
         }
+        #endregion
 
-        public override void UpdateObjectPart(ObjectPart objpart)
-        {
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                ObjectGroup grp = objpart.ObjectGroup;
-                connection.Open();
-                if (null != grp && objpart.LinkNumber == 1)
-                {
-                    UpdateObjectGroup(connection, grp);
-                }
-                UpdateObjectPart(connection, objpart);
-                foreach (ObjectPartInventoryItem item in objpart.Inventory.Values)
-                {
-                    UpdateObjectPartInventoryItem(connection, objpart.ID, item);
-                }
-            }
-        }
-
+        #region Delete functions
         public override void DeleteObjectPart(UUID obj)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -658,8 +647,27 @@ namespace SilverSim.Database.MySQL.SimulationData
                 });
             }
         }
+        #endregion
 
         #region Storage Functions
+        public override void UpdateObjectPart(ObjectPart objpart)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                ObjectGroup grp = objpart.ObjectGroup;
+                connection.Open();
+                if (null != grp && objpart.LinkNumber == 1)
+                {
+                    UpdateObjectGroup(connection, grp);
+                }
+                UpdateObjectPart(connection, objpart);
+                foreach (ObjectPartInventoryItem item in objpart.Inventory.Values)
+                {
+                    UpdateObjectPartInventoryItem(connection, objpart.ID, item);
+                }
+            }
+        }
+
         private void UpdateObjectPartInventoryItem(MySqlConnection connection, UUID primID, ObjectPartInventoryItem item)
         {
             Dictionary<string, object> p = new Dictionary<string, object>();
@@ -832,6 +840,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         #endregion
 
+        #region IDBServiceInterface
         public void VerifyConnection()
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -839,6 +848,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 connection.Open();
             }
         }
+        #endregion
 
         #region Migrations
         public void ProcessMigrations()
