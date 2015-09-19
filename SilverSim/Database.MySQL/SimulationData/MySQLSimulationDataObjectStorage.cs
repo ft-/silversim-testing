@@ -86,6 +86,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                 Dictionary<UUID, SortedDictionary<int, ObjectPart>> objGroupParts = new Dictionary<UUID, SortedDictionary<int, ObjectPart>>();
                 List<UUID> objPartIDs = new List<UUID>();
                 Dictionary<UUID, List<ObjectPartInventoryItem>> objPartInventoryItems = new Dictionary<UUID, List<ObjectPartInventoryItem>>();
+                List<UUID> orphanedPrims = new List<UUID>();
+                List<KeyValuePair<UUID, UUID>> orphanedPrimInventories = new List<KeyValuePair<UUID, UUID>>();
 
                 using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
@@ -137,7 +139,6 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                     m_Log.InfoFormat("Loading prims for region ID {0}", regionID);
                     int primcount = 0;
-
                     using (MySqlCommand cmd = new MySqlCommand("SELECT prims.* FROM objects INNER JOIN prims ON objects.id LIKE prims.RootPartID WHERE objects.regionID LIKE ?regionid", connection))
                     {
                         cmd.CommandTimeout = 3600;
@@ -265,6 +266,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 else
                                 {
                                     m_Log.InfoFormat("Found orphan primitive for region ID {0}: {1}", regionID, dbReader.GetUUID("ID"));
+                                    orphanedPrims.Add(dbReader.GetUUID("ID"));
                                 }
                             }
                         }
@@ -333,6 +335,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 else
                                 {
                                     m_Log.InfoFormat("orphan prim inventory found for region ID {0}: {1}", regionID, dbReader.GetUUID("InventoryID"));
+                                    orphanedPrimInventories.Add(new KeyValuePair<UUID, UUID>(primID, dbReader.GetUUID("InventoryID")));
                                 }
                             }
                         }
@@ -340,22 +343,46 @@ namespace SilverSim.Database.MySQL.SimulationData
                     m_Log.InfoFormat("Loaded prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
                 }
 
+                List<UUID> removeObjGroups = new List<UUID>();
                 foreach(KeyValuePair<UUID, ObjectGroup> kvp in objGroups)
                 {
-                    foreach(ObjectPart objpart in objGroupParts[kvp.Key].Values)
+                    if (!objGroupParts.ContainsKey(kvp.Key))
                     {
-                        if(objPartInventoryItems.ContainsKey(objpart.ID))
-                        {
-                            foreach(ObjectPartInventoryItem item in objPartInventoryItems[objpart.ID])
-                            {
-                                objpart.Inventory.Add(item.ID, item.Name, item);
-                            }
-                        }
-                        kvp.Value.Add(objpart.LoadedLinkNumber, objpart.ID, objpart);
+                        DeleteObjectGroup(kvp.Key);
+                        removeObjGroups.Add(kvp.Key);
                     }
-                    kvp.Value.OriginalAssetID = originalAssetIDs[kvp.Value.ID];
-                    kvp.Value.NextOwnerAssetID = nextOwnerAssetIDs[kvp.Value.ID];
-                    kvp.Value.FinalizeObject();
+                    else
+                    {
+                        foreach (ObjectPart objpart in objGroupParts[kvp.Key].Values)
+                        {
+                            if (objPartInventoryItems.ContainsKey(objpart.ID))
+                            {
+                                foreach (ObjectPartInventoryItem item in objPartInventoryItems[objpart.ID])
+                                {
+                                    objpart.Inventory.Add(item.ID, item.Name, item);
+                                }
+                            }
+                            kvp.Value.Add(objpart.LoadedLinkNumber, objpart.ID, objpart);
+                        }
+                        kvp.Value.OriginalAssetID = originalAssetIDs[kvp.Value.ID];
+                        kvp.Value.NextOwnerAssetID = nextOwnerAssetIDs[kvp.Value.ID];
+                        kvp.Value.FinalizeObject();
+                    }
+                }
+
+                foreach (UUID key in removeObjGroups)
+                {
+                    objGroups.Remove(key);
+                }
+
+                foreach(UUID orphanedPrim in orphanedPrims)
+                {
+                    DeleteObjectPart(orphanedPrim);
+                }
+
+                foreach(KeyValuePair<UUID, UUID> kvp in orphanedPrimInventories)
+                {
+                    DeleteObjectPartPrimItem(kvp.Key, kvp.Value);
                 }
 
                 foreach (KeyValuePair<UUID, ObjectGroup> kvp in objGroups)
@@ -601,6 +628,20 @@ namespace SilverSim.Database.MySQL.SimulationData
         #endregion
 
         #region Delete functions
+        void DeleteObjectPartPrimItem(UUID primID, UUID itemID)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE ?primid AND InventoryID LIKE ?itemid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?primid", primID);
+                    cmd.Parameters.AddWithValue("?itemid", itemID);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
         public override void DeleteObjectPart(UUID obj)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -668,174 +709,220 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
+        const string UpdateObjectPartInventoryItemSql = "REPLACE INTO primitems " +
+            "(AssetId, AssetType, CreationDate, Creator, Description, Flags, Group, GroupOwned, PrimID, `Name`, InventoryID, " +
+            "InventoryType, LastOwner, Owner, ParentFolderID, BasePermissions, CurrentPermissions, EveryOnePermissions, " + 
+            "GroupPermissions, NextOwnerPermissions, SaleType, SalePrice, SalePermMask, PermsGranter, PermsMask)" +
+            "VALUES (?AssetId, ?AssetType, ?CreationDate, ?Creator, ?Description, ?Flags, ?Group, ?GroupOwned, ?PrimID, ?Name, ?InventoryID, " +
+            "?InventoryType, ?LastOwner, ?Owner, ?ParentFolderID, ?BasePermissions, ?CurrentPermissions, ?EveryOnePermissions, " +
+            "?GroupPermissions, ?NextOwnerPermissions, ?SaleType, ?SalePrice, ?SalePermMask, ?PermsGranter, ?PermsMask)";
         private void UpdateObjectPartInventoryItem(MySqlConnection connection, UUID primID, ObjectPartInventoryItem item)
         {
-            Dictionary<string, object> p = new Dictionary<string, object>();
-            p["AssetId"] = item.AssetID;
-            p["AssetType"] = (int)item.AssetType;
-            p["CreationDate"] = item.CreationDate;
-            p["Creator"] = item.Creator.ToString();
-            p["Description"] = item.Description;
-            p["Flags"] = item.Flags;
-            p["Group"] = item.Group.ToString();
-            p["GroupOwned"] = item.IsGroupOwned;
-            p["PrimID"] = primID;
-            p["Name"] = item.Name;
-            p["InventoryID"] = item.ID;
-            p["InventoryType"] = (int)item.InventoryType;
-            p["LastOwner"] = item.LastOwner.ToString();
-            p["Owner"] = item.Owner.ToString();
-            p["ParentFolderID"] = item.ParentFolderID;
-            p["BasePermissions"] = item.Permissions.Base;
-            p["CurrentPermissions"] = item.Permissions.Current;
-            p["EveryOnePermissions"] = item.Permissions.EveryOne;
-            p["GroupPermissions"] = item.Permissions.Group;
-            p["NextOwnerPermissions"] = item.Permissions.NextOwner;
-            p["SaleType"] = item.SaleInfo.Type;
-            p["SalePrice"] = item.SaleInfo.Price;
-            p["SalePermMask"] = item.SaleInfo.PermMask;
-            ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
-            p["PermsGranter"] = grantinfo.PermsGranter.ToString();
-            p["PermsMask"] = (uint)grantinfo.PermsMask;
-            MySQLUtilities.ReplaceInsertInto(connection, "primitems", p);
+            using(MySqlCommand cmd = new MySqlCommand(UpdateObjectGroupSql, connection))
+            {
+                cmd.Parameters.AddWithValue("?AssetId", item.AssetID.ToString());
+                cmd.Parameters.AddWithValue("?AssetType", (int)item.AssetType);
+                cmd.Parameters.AddWithValue("?CreationDate", item.CreationDate.AsULong);
+                cmd.Parameters.AddWithValue("?Creator", item.Creator.ToString());
+                cmd.Parameters.AddWithValue("?Description", item.Description);
+                cmd.Parameters.AddWithValue("?Flags", item.Flags);
+                cmd.Parameters.AddWithValue("?Group", item.Group.ToString());
+                cmd.Parameters.AddWithValue("?GroupOwned", item.IsGroupOwned ? 1 : 0);
+                cmd.Parameters.AddWithValue("?PrimID", primID.ToString());
+                cmd.Parameters.AddWithValue("?Name", item.Name);
+                cmd.Parameters.AddWithValue("?InventoryID", item.ID.ToString());
+                cmd.Parameters.AddWithValue("?InventoryType", (int)item.InventoryType);
+                cmd.Parameters.AddWithValue("?LastOwner", item.LastOwner.ToString());
+                cmd.Parameters.AddWithValue("vOwner", item.Owner.ToString());
+                cmd.Parameters.AddWithValue("?ParentFolderID", item.ParentFolderID.ToString());
+                cmd.Parameters.AddWithValue("?BasePermissions", (uint)item.Permissions.Base);
+                cmd.Parameters.AddWithValue("?CurrentPermissions", (uint)item.Permissions.Current);
+                cmd.Parameters.AddWithValue("?EveryOnePermissions", (uint)item.Permissions.EveryOne);
+                cmd.Parameters.AddWithValue("?GroupPermissions", (uint)item.Permissions.Group);
+                cmd.Parameters.AddWithValue("?NextOwnerPermissions", (uint)item.Permissions.NextOwner);
+                cmd.Parameters.AddWithValue("?SaleType", (uint)item.SaleInfo.Type);
+                cmd.Parameters.AddWithValue("?SalePrice", item.SaleInfo.Price);
+                cmd.Parameters.AddWithValue("?SalePermMask", (uint)item.SaleInfo.PermMask);
+                ObjectPartInventoryItem.PermsGranterInfo grantinfo = item.PermsGranter;
+                cmd.Parameters.AddWithValue("?PermsGranter", grantinfo.PermsGranter.ToString());
+                cmd.Parameters.AddWithValue("?PermsMask", (uint)grantinfo.PermsMask);
+                if (cmd.ExecuteNonQuery() < 1)
+                {
+                    throw new MySQLUtilities.MySQLInsertException();
+                }
+            }
         }
 
+        const string UpdateObjectGroupSql = "REPLACE INTO objects " + 
+            "(ID, RegionID, IsVolumeDetect, IsPhantom, IsPhysics, IsTempOnRez, Owner, LastOwner, `Group`, OriginalAssetID, NextOwnerAssetID, SaleType, SalePrice, PayPrice0, PayPrice1, PayPrice2, PayPrice3, PayPrice4, AttachedPosX, AttachedPosY, AttachedPosZ, AttachPoint)" + 
+            "VALUES (?ID, ?RegionID, ?IsVolumeDetect, ?IsPhantom, ?IsPhysics, ?IsTempOnRez, ?Owner, ?LastOwner, ?Group, ?OriginalAssetID, ?NextOwnerAssetID, ?SaleType, ?SalePrice, ?PayPrice0, ?PayPrice1, ?PayPrice2, ?PayPrice3, ?PayPrice4, ?AttachedPosX, ?AttachedPosY, ?AttachedPosZ, ?AttachPoint)";
         private void UpdateObjectGroup(MySqlConnection connection, ObjectGroup objgroup)
         {
             if(objgroup.IsTemporary)
             {
                 return;
             }
-            Dictionary<string, object> p = new Dictionary<string, object>();
-            p["ID"] = objgroup.ID;
-            p["RegionID"] = objgroup.Scene.ID;
-            p["IsVolumeDetect"] = objgroup.IsVolumeDetect ? 1 : 0;
-            p["IsPhantom"] = objgroup.IsPhantom ? 1 : 0;
-            p["IsPhysics"] = objgroup.IsPhysics ? 1 : 0;
-            p["IsTempOnRez"] = objgroup.IsTempOnRez ? 1 : 0;
-            p["Owner"] = objgroup.Owner.ToString();
-            p["LastOwner"] = objgroup.LastOwner.ToString();
-            p["Group"] = objgroup.Group.ToString();
-            p["OriginalAssetID"] = objgroup.OriginalAssetID.ToString();
-            p["NextOwnerAssetID"] = objgroup.NextOwnerAssetID.ToString();
-            p["SaleType"] = (int)objgroup.SaleType;
-            p["SalePrice"] = objgroup.SalePrice;
-            p["PayPrice0"] = objgroup.PayPrice0;
-            p["PayPrice1"] = objgroup.PayPrice1;
-            p["PayPrice2"] = objgroup.PayPrice2;
-            p["PayPrice3"] = objgroup.PayPrice3;
-            p["PayPrice4"] = objgroup.PayPrice4;
-            p["AttachedPos"] = objgroup.AttachedPos;
-            p["AttachPoint"] = (uint)objgroup.AttachPoint;
-
-            MySQLUtilities.ReplaceInsertInto(connection, "objects", p);
+            using(MySqlCommand cmd = new MySqlCommand(UpdateObjectGroupSql, connection))
+            {
+                cmd.Parameters.AddWithValue("?ID", objgroup.ID.ToString());
+                cmd.Parameters.AddWithValue("?RegionID", objgroup.Scene.ID.ToString());
+                cmd.Parameters.AddWithValue("?IsVolumeDetect", objgroup.IsVolumeDetect ? 1 : 0);
+                cmd.Parameters.AddWithValue("?IsPhantom", objgroup.IsPhantom ? 1 : 0);
+                cmd.Parameters.AddWithValue("?IsPhysics", objgroup.IsPhysics ? 1 : 0);
+                cmd.Parameters.AddWithValue("?IsTempOnRez", objgroup.IsTempOnRez ? 1 : 0);
+                cmd.Parameters.AddWithValue("?Owner", objgroup.Owner.ToString());
+                cmd.Parameters.AddWithValue("?LastOwner", objgroup.LastOwner.ToString());
+                cmd.Parameters.AddWithValue("?Group", objgroup.Group.ToString());
+                cmd.Parameters.AddWithValue("?OriginalAssetID", objgroup.OriginalAssetID.ToString());
+                cmd.Parameters.AddWithValue("?NextOwnerAssetID", objgroup.NextOwnerAssetID.ToString());
+                cmd.Parameters.AddWithValue("?SaleType", (int)objgroup.SaleType);
+                cmd.Parameters.AddWithValue("?SalePrice", objgroup.SalePrice);
+                cmd.Parameters.AddWithValue("?PayPrice0", objgroup.PayPrice0);
+                cmd.Parameters.AddWithValue("?PayPrice1", objgroup.PayPrice1);
+                cmd.Parameters.AddWithValue("?PayPrice2", objgroup.PayPrice2);
+                cmd.Parameters.AddWithValue("?PayPrice3", objgroup.PayPrice3);
+                cmd.Parameters.AddWithValue("?PayPrice4", objgroup.PayPrice4);
+                cmd.Parameters.AddWithValue("?AttachedPosX", objgroup.AttachedPos.X);
+                cmd.Parameters.AddWithValue("?AttachedPosY", objgroup.AttachedPos.Y);
+                cmd.Parameters.AddWithValue("?AttachedPosZ", objgroup.AttachedPos.Z);
+                cmd.Parameters.AddWithValue("?AttachPoint", (uint)objgroup.AttachPoint);
+                if (cmd.ExecuteNonQuery() < 1)
+                {
+                    throw new MySQLUtilities.MySQLInsertException();
+                }
+            }
         }
 
+        const string UpdateObjectPartSql = "REPLACE INTO prims (`PhysicsShapeType`,`ID`,`LinkNumber`,`RootPartID`,`PositionX`,`PositionY`,`PositionZ`,`RotationX`,`RotationY`,`RotationZ`,`RotationW`,`SitText`,`TouchText`,`Name`,`Description`,`SitTargetOffsetX`,`SitTargetOffsetY`,`SitTargetOffsetZ`,`SitTargetOrientationX`,`SitTargetOrientationY`,`SitTargetOrientationZ`,`SitTargetOrientationW`,`ShapeType`,`Material`,`SizeX`,`SizeY`,`SizeZ`,`SliceX`,`SliceY`,`SliceZ`,`MediaURL`,`Creator`,`CreationDate`,`Flags`,`AngularVelocityX`,`AngularVelocityY`,`AngularVelocityZ`,`LightEnabled`,`LightColorRed`,`LightColorGreen`,`LightColorBlue`,`LightIntensity`,`LightRadius`,`LightFalloff`,`HoverText`,`HoverTextColorRed`,`HoverTextColorGreen`,`HoverTextColorBlue`,`IsFlexible`,`FlexibleFriction`,`FlexibleGravity`,`FlexibleSoftness`,`FlexibleWind`,`FlexibleForceX`,`FlexibleForceY`,`FlexibleForceZ`,`LoopedSound`,`SoundRadius`,`SoundGain`,`SoundFlags`,`ImpactSound`,`ImpactVolume`,`IsShapeSculptInverted`,`IsShapeSculptMirrored`,`ShapeSculptMap`,`ShapeSculptType`,`PathBegin`,`PathCurve`,`PathEnd`,`PathRadiusOffset`,`PathRevolutions`,`PathScaleX`,`PathScaleY`,`PathShearX`,`PathshearY`,`PathSkew`,`PathTaperX`,`PathTaperY`,`PathTwist`,`PathTwistBegin`,`ProfileBegin`,`ProfileCurve`,`ProfileEnd`,`ProfileHollow`,`PCode`,`ExtraParams`,`ParticleSystem`,`TextureEntryBytes`,`TextureAnimationBytes`,`ScriptAccessPin`,`DynAttrs`) VALUES (?v_PhysicsShapeType,?v_ID,?v_LinkNumber,?v_RootPartID,?v_PositionX,?v_PositionY,?v_PositionZ,?v_RotationX,?v_RotationY,?v_RotationZ,?v_RotationW,?v_SitText,?v_TouchText,?v_Name,?v_Description,?v_SitTargetOffsetX,?v_SitTargetOffsetY,?v_SitTargetOffsetZ,?v_SitTargetOrientationX,?v_SitTargetOrientationY,?v_SitTargetOrientationZ,?v_SitTargetOrientationW,?v_ShapeType,?v_Material,?v_SizeX,?v_SizeY,?v_SizeZ,?v_SliceX,?v_SliceY,?v_SliceZ,?v_MediaURL,?v_Creator,?v_CreationDate,?v_Flags,?v_AngularVelocityX,?v_AngularVelocityY,?v_AngularVelocityZ,?v_LightEnabled,?v_LightColorRed,?v_LightColorGreen,?v_LightColorBlue,?v_LightIntensity,?v_LightRadius,?v_LightFalloff,?v_HoverText,?v_HoverTextColorRed,?v_HoverTextColorGreen,?v_HoverTextColorBlue,?v_IsFlexible,?v_FlexibleFriction,?v_FlexibleGravity,?v_FlexibleSoftness,?v_FlexibleWind,?v_FlexibleForceX,?v_FlexibleForceY,?v_FlexibleForceZ,?v_LoopedSound,?v_SoundRadius,?v_SoundGain,?v_SoundFlags,?v_ImpactSound,?v_ImpactVolume,?v_IsShapeSculptInverted,?v_IsShapeSculptMirrored,?v_ShapeSculptMap,?v_ShapeSculptType,?v_PathBegin,?v_PathCurve,?v_PathEnd,?v_PathRadiusOffset,?v_PathRevolutions,?v_PathScaleX,?v_PathScaleY,?v_PathShearX,?v_PathshearY,?v_PathSkew,?v_PathTaperX,?v_PathTaperY,?v_PathTwist,?v_PathTwistBegin,?v_ProfileBegin,?v_ProfileCurve,?v_ProfileEnd,?v_ProfileHollow,?v_PCode,?v_ExtraParams,?v_ParticleSystem,?v_TextureEntryBytes,?v_TextureAnimationBytes,?v_ScriptAccessPin,?v_DynAttrs)";
         private void UpdateObjectPart(MySqlConnection connection, ObjectPart objpart)
         {
             if(objpart.ObjectGroup.IsTemporary || objpart.ObjectGroup.IsTempOnRez)
             {
                 return;
             }
-            Dictionary<string, object> p = new Dictionary<string, object>();
-            p["ID"] = objpart.ID;
-            p["LinkNumber"] = objpart.LinkNumber;
-            p["RootPartID"] = objpart.ObjectGroup.RootPart.ID;
-            p["Position"] = objpart.Position;
-            p["Rotation"] = objpart.Rotation;
-            p["SitText"] = objpart.SitText;
-            p["TouchText"] = objpart.TouchText;
-            p["Name"] = objpart.Name;
-            p["Description"] = objpart.Description;
-            p["SitTargetOffset"] = objpart.SitTargetOffset;
-            p["SitTargetOrientation"] = objpart.SitTargetOrientation;
-            p["ShapeType"] = (int)objpart.PhysicsShapeType;
-            p["Material"] = (int)objpart.Material;
-            p["Size"] = objpart.Size;
-            p["Slice"] = objpart.Slice;
-            p["MediaURL"] = objpart.MediaURL;
-            p["Creator"] = objpart.Creator.ToString();
-            p["CreationDate"] = objpart.CreationDate.AsULong;
-            p["Flags"] = (uint)objpart.Flags;
 
-            p["AngularVelocity"] = objpart.AngularVelocity;
+            using (MySqlCommand cmd = new MySqlCommand(UpdateObjectPartSql, connection))
+            {
+                cmd.Parameters.AddWithValue("?v_ID", objpart.ID.ToString());
+                cmd.Parameters.AddWithValue("?v_LinkNumber", objpart.LinkNumber);
+                cmd.Parameters.AddWithValue("?v_RootPartID", objpart.ObjectGroup.RootPart.ID.ToString());
+                cmd.Parameters.AddWithValue("?v_PositionX", objpart.Position.X);
+                cmd.Parameters.AddWithValue("?v_PositionY", objpart.Position.Y);
+                cmd.Parameters.AddWithValue("?v_PositionZ", objpart.Position.Z);
+                cmd.Parameters.AddWithValue("?v_RotationX", objpart.Rotation.X);
+                cmd.Parameters.AddWithValue("?v_RotationY", objpart.Rotation.Y);
+                cmd.Parameters.AddWithValue("?v_RotationZ", objpart.Rotation.Z);
+                cmd.Parameters.AddWithValue("?v_RotationW", objpart.Rotation.W);
+                cmd.Parameters.AddWithValue("?v_SitText", objpart.SitText);
+                cmd.Parameters.AddWithValue("?v_TouchText", objpart.TouchText);
+                cmd.Parameters.AddWithValue("?v_Name", objpart.Name);
+                cmd.Parameters.AddWithValue("?v_Description", objpart.Description);
+                cmd.Parameters.AddWithValue("?v_SitTargetOffsetX", objpart.SitTargetOffset.X);
+                cmd.Parameters.AddWithValue("?v_SitTargetOffsetY", objpart.SitTargetOffset.Y);
+                cmd.Parameters.AddWithValue("?v_SitTargetOffsetZ", objpart.SitTargetOffset.Z);
+                cmd.Parameters.AddWithValue("?v_SitTargetOrientationX", objpart.SitTargetOrientation.X);
+                cmd.Parameters.AddWithValue("?v_SitTargetOrientationY", objpart.SitTargetOrientation.Y);
+                cmd.Parameters.AddWithValue("?v_SitTargetOrientationZ", objpart.SitTargetOrientation.Z);
+                cmd.Parameters.AddWithValue("?v_SitTargetOrientationW", objpart.SitTargetOrientation.W);
+                cmd.Parameters.AddWithValue("?v_PhysicsShapeType", (int)objpart.PhysicsShapeType);
+                cmd.Parameters.AddWithValue("?v_Material", (int)objpart.Material);
+                cmd.Parameters.AddWithValue("?v_SizeX", objpart.Size.X);
+                cmd.Parameters.AddWithValue("?v_SizeY", objpart.Size.Y);
+                cmd.Parameters.AddWithValue("?v_SizeZ", objpart.Size.Z);
+                cmd.Parameters.AddWithValue("?v_SliceX", objpart.Slice.X);
+                cmd.Parameters.AddWithValue("?v_SliceY", objpart.Slice.Y);
+                cmd.Parameters.AddWithValue("?v_SliceZ", objpart.Slice.Z);
+                cmd.Parameters.AddWithValue("?v_MediaURL", objpart.MediaURL);
+                cmd.Parameters.AddWithValue("?v_Creator", objpart.Creator.ToString());
+                cmd.Parameters.AddWithValue("?v_CreationDate", objpart.CreationDate.AsULong);
+                cmd.Parameters.AddWithValue("?v_Flags", (uint)objpart.Flags);
 
-            ObjectPart.PointLightParam lp = objpart.PointLight;
-            p["LightEnabled"] = lp.IsLight;
-            p["LightColor"] = lp.LightColor;
-            p["LightIntensity"] = lp.Intensity;
-            p["LightRadius"] = lp.Radius;
-            p["LightFalloff"] = lp.Falloff;
+                cmd.Parameters.AddWithValue("?v_AngularVelocityX", objpart.AngularVelocity.X);
+                cmd.Parameters.AddWithValue("?v_AngularVelocityY", objpart.AngularVelocity.Y);
+                cmd.Parameters.AddWithValue("?v_AngularVelocityZ", objpart.AngularVelocity.Z);
 
-            ObjectPart.TextParam tp = objpart.Text;
-            p["HoverText"] = tp.Text;
-            p["HoverTextColor"] = tp.TextColor;
+                ObjectPart.PointLightParam lp = objpart.PointLight;
+                cmd.Parameters.AddWithValue("?v_LightEnabled", lp.IsLight ? 1 : 0);
+                cmd.Parameters.AddWithValue("?v_LightColorRed", lp.LightColor.R);
+                cmd.Parameters.AddWithValue("?v_LightColorGreen", lp.LightColor.G);
+                cmd.Parameters.AddWithValue("?v_LightColorBlue", lp.LightColor.B);
+                cmd.Parameters.AddWithValue("?v_LightIntensity", lp.Intensity);
+                cmd.Parameters.AddWithValue("?v_LightRadius", lp.Radius);
+                cmd.Parameters.AddWithValue("?v_LightFalloff", lp.Falloff);
 
-            ObjectPart.FlexibleParam fp = objpart.Flexible;
-            p["IsFlexible"] = fp.IsFlexible;
-            p["FlexibleFriction"] = fp.Friction;
-            p["FlexibleGravity"] = fp.Gravity;
-            p["FlexibleSoftness"] = fp.Softness;
-            p["FlexibleWind"] = fp.Wind;
-            p["FlexibleForce"] = fp.Force;
+                ObjectPart.TextParam tp = objpart.Text;
+                cmd.Parameters.AddWithValue("?v_HoverText", tp.Text);
+                cmd.Parameters.AddWithValue("?v_HoverTextColorRed", tp.TextColor.R);
+                cmd.Parameters.AddWithValue("?v_HoverTextColorGreen", tp.TextColor.G);
+                cmd.Parameters.AddWithValue("?v_HoverTextColorBlue", tp.TextColor.B);
+                cmd.Parameters.AddWithValue("?v_HoverTextColorAlpha", tp.TextColor.A);
 
-            ObjectPart.SoundParam sound = objpart.Sound;
-            p["LoopedSound"] = sound.SoundID;
-            p["SoundRadius"] = sound.Radius;
-            p["SoundGain"] = sound.Gain;
-            p["SoundFlags"] = sound.Flags;
+                ObjectPart.FlexibleParam fp = objpart.Flexible;
+                cmd.Parameters.AddWithValue("?v_IsFlexible", fp.IsFlexible ? 1 : 0);
+                cmd.Parameters.AddWithValue("?v_FlexibleFriction", fp.Friction);
+                cmd.Parameters.AddWithValue("?v_FlexibleGravity", fp.Gravity);
+                cmd.Parameters.AddWithValue("?v_FlexibleSoftness", fp.Softness);
+                cmd.Parameters.AddWithValue("?v_FlexibleWind", fp.Wind);
+                cmd.Parameters.AddWithValue("?v_FlexibleForceX", fp.Force.X);
+                cmd.Parameters.AddWithValue("?v_FlexibleForceY", fp.Force.X);
+                cmd.Parameters.AddWithValue("?v_FlexibleForceZ", fp.Force.X);
 
-            ObjectPart.CollisionSoundParam collisionsound = objpart.CollisionSound;
-            p["ImpactSound"] = collisionsound.ImpactSound;
-            p["ImpactVolume"] = collisionsound.ImpactVolume;
+                ObjectPart.SoundParam sound = objpart.Sound;
+                cmd.Parameters.AddWithValue("?v_LoopedSound", sound.SoundID.ToString());
+                cmd.Parameters.AddWithValue("?v_SoundRadius", sound.Radius);
+                cmd.Parameters.AddWithValue("?v_SoundGain", sound.Gain);
+                cmd.Parameters.AddWithValue("?v_SoundFlags", (uint)sound.Flags);
 
-            ObjectPart.PrimitiveShape ps = objpart.Shape;
-            p["IsShapeSculptInverted"] = ps.IsSculptInverted;
-            p["IsShapeSculptMirrored"] = ps.IsSculptMirrored;
-            p["ShapeSculptMap"] = ps.SculptMap;
-            p["ShapeSculptType"] = (int)ps.SculptType;
-            p["ShapeType"] = (int)ps.Type;
-            p["PathBegin"] = ps.PathBegin;
-            p["PathCurve"] = ps.PathCurve;
-            p["PathEnd"] = ps.PathEnd;
-            p["PathRadiusOffset"] = ps.PathRadiusOffset;
-            p["PathRevolutions"] = ps.PathRevolutions;
-            p["PathScaleX"] = ps.PathScaleX;
-            p["PathScaleY"] = ps.PathScaleY;
-            p["PathShearX"] = ps.PathShearX;
-            p["PathshearY"] = ps.PathShearY;
-            p["PathSkew"] = ps.PathSkew;
-            p["PathTaperX"] = ps.PathTaperX;
-            p["PathTaperY"] = ps.PathTaperY;
-            p["PathTwist"] = ps.PathTwist;
-            p["PathTwistBegin"] = ps.PathTwistBegin;
-            p["ProfileBegin"] = ps.ProfileBegin;
-            p["ProfileCurve"] = ps.ProfileCurve;
-            p["ProfileEnd"] = ps.ProfileEnd;
-            p["ProfileHollow"] = ps.ProfileHollow;
-            p["IsShapeSculptInverted"] = ps.IsSculptInverted ? 1 : 0;
-            p["IsShapeSculptMirrored"] = ps.IsSculptMirrored ? 1 : 0;
-            p["ShapeSculptMap"] = ps.SculptMap;
-            p["ShapeSculptType"] = (int)ps.SculptType;
-            p["ShapeType"] = (int)ps.Type;
-            p["PCode"] = (int)ps.PCode;
+                ObjectPart.CollisionSoundParam collisionsound = objpart.CollisionSound;
+                cmd.Parameters.AddWithValue("?v_ImpactSound", collisionsound.ImpactSound.ToString());
+                cmd.Parameters.AddWithValue("?v_ImpactVolume", collisionsound.ImpactVolume);
 
-            p["ExtraParams"] = objpart.ExtraParamsBytes;
+                ObjectPart.PrimitiveShape ps = objpart.Shape;
+                cmd.Parameters.AddWithValue("?v_IsShapeSculptInverted", ps.IsSculptInverted ? 1 : 0);
+                cmd.Parameters.AddWithValue("?v_IsShapeSculptMirrored", ps.IsSculptMirrored ? 1 : 0);
+                cmd.Parameters.AddWithValue("?v_ShapeSculptMap", ps.SculptMap.ToString());
+                cmd.Parameters.AddWithValue("?v_ShapeSculptType", (int)ps.SculptType);
+                cmd.Parameters.AddWithValue("?v_ShapeType", (int)ps.Type);
+                cmd.Parameters.AddWithValue("?v_PathBegin", ps.PathBegin);
+                cmd.Parameters.AddWithValue("?v_PathCurve", ps.PathCurve);
+                cmd.Parameters.AddWithValue("?v_PathEnd", ps.PathEnd);
+                cmd.Parameters.AddWithValue("?v_PathRadiusOffset", ps.PathRadiusOffset);
+                cmd.Parameters.AddWithValue("?v_PathRevolutions", ps.PathRevolutions);
+                cmd.Parameters.AddWithValue("?v_PathScaleX", ps.PathScaleX);
+                cmd.Parameters.AddWithValue("?v_PathScaleY", ps.PathScaleY);
+                cmd.Parameters.AddWithValue("?v_PathShearX", ps.PathShearX);
+                cmd.Parameters.AddWithValue("?v_PathshearY", ps.PathShearY);
+                cmd.Parameters.AddWithValue("?v_PathSkew", ps.PathSkew);
+                cmd.Parameters.AddWithValue("?v_PathTaperX", ps.PathTaperX);
+                cmd.Parameters.AddWithValue("?v_PathTaperY", ps.PathTaperY);
+                cmd.Parameters.AddWithValue("?v_PathTwist", ps.PathTwist);
+                cmd.Parameters.AddWithValue("?v_PathTwistBegin", ps.PathTwistBegin);
+                cmd.Parameters.AddWithValue("?v_ProfileBegin", ps.ProfileBegin);
+                cmd.Parameters.AddWithValue("?v_ProfileCurve", ps.ProfileCurve);
+                cmd.Parameters.AddWithValue("?v_ProfileEnd", ps.ProfileEnd);
+                cmd.Parameters.AddWithValue("?v_ProfileHollow", ps.ProfileHollow);
+                cmd.Parameters.AddWithValue("?v_PCode", (int)ps.PCode);
 
-            p["ParticleSystem"] = objpart.ParticleSystemBytes;
+                cmd.Parameters.AddWithValue("?v_ExtraParams", objpart.ExtraParamsBytes);
 
-            p["TextureEntryBytes"] = objpart.TextureEntryBytes;
-            p["TextureAnimationBytes"] = objpart.TextureAnimationBytes;
+                cmd.Parameters.AddWithValue("?v_ParticleSystem", objpart.ParticleSystemBytes);
 
-            p["ScriptAccessPin"] = objpart.ScriptAccessPin;
+                cmd.Parameters.AddWithValue("?v_TextureEntryBytes", objpart.TextureEntryBytes);
+                cmd.Parameters.AddWithValue("?v_TextureAnimationBytes", objpart.TextureAnimationBytes);
 
-            using(MemoryStream ms = new MemoryStream())
-            { 
-                LLSD_Binary.Serialize(objpart.DynAttrs, ms);
-                p["DynAttrs"] = ms.GetBuffer();
+                cmd.Parameters.AddWithValue("?v_ScriptAccessPin", objpart.ScriptAccessPin);
+
+                using(MemoryStream ms = new MemoryStream())
+                { 
+                    LLSD_Binary.Serialize(objpart.DynAttrs, ms);
+                    cmd.Parameters.AddWithValue("?v_DynAttrs", ms.GetBuffer());
+                }
+
+                if (cmd.ExecuteNonQuery() < 1)
+                {
+                    throw new MySQLUtilities.MySQLInsertException();
+                }
             }
-
-            MySQLUtilities.ReplaceInsertInto(connection, "prims", p);
         }
 
         #endregion
