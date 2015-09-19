@@ -21,6 +21,8 @@ namespace SilverSim.Main.Common.CmdIO
         public static readonly RwLockedDictionary<string, CommandDelegate> SetCommands = new RwLockedDictionary<string, CommandDelegate>();
         public static readonly RwLockedDictionary<string, CommandDelegate> GetCommands = new RwLockedDictionary<string, CommandDelegate>();
         public static readonly RwLockedDictionary<string, CommandDelegate> ChangeCommands = new RwLockedDictionary<string, CommandDelegate>();
+        public static readonly RwLockedDictionary<string, CommandDelegate> ClearCommands = new RwLockedDictionary<string, CommandDelegate>();
+        public static readonly RwLockedDictionary<string, CommandDelegate> EmptyCommands = new RwLockedDictionary<string, CommandDelegate>();
 
         static CommandRegistry()
         {
@@ -32,6 +34,8 @@ namespace SilverSim.Main.Common.CmdIO
             Commands.Add("create", new CommandType("create", CreateCommands).Command_Handler);
             Commands.Add("delete", new CommandType("delete", DeleteCommands).Command_Handler);
             Commands.Add("change", new CommandType("change", ChangeCommands).Command_Handler);
+            Commands.Add("clear", new CommandType("clear", ClearCommands).Command_Handler);
+            Commands.Add("empty", new CommandType("empty", EmptyCommands).Command_Handler);
         }
 
         class CommandType
