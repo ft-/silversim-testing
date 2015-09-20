@@ -45,6 +45,7 @@ namespace SilverSim.Scene.Implementation.Basic
         bool m_StopBasicSceneThreads = false;
         protected internal readonly RwLockedDoubleDictionary<UUID, UInt32, ObjectPart> m_Primitives = new RwLockedDoubleDictionary<UUID, UInt32, ObjectPart>();
         protected internal readonly RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
+        protected internal readonly RwLockedDictionary<UUID, IAgent> m_Agents = new RwLockedDictionary<UUID, IAgent>();
         //protected internal readonly RwLockedDoubleDictionary<UUID, int, ParcelInfo> m_Parcels = new RwLockedDoubleDictionary<UUID, int, ParcelInfo>();
         private LLUDPServer m_UDPServer;
         #endregion
@@ -199,12 +200,11 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        class BasicSceneAgents : DefaultSceneAgentInterface
+        class BasicSceneAgents : ISceneAgents
         {
             BasicScene m_BasicScene;
 
             public BasicSceneAgents(BasicScene scene)
-                : base(scene)
             {
                 m_BasicScene = scene;
             }
@@ -216,6 +216,74 @@ namespace SilverSim.Scene.Implementation.Basic
                     return m_BasicScene.m_AgentCount;
                 }
             }
+
+            public IAgent this[UUID id]
+            {
+                get 
+                {
+                    return m_BasicScene.m_Agents[id];
+                }
+            }
+
+            public IEnumerator<IAgent> GetEnumerator()
+            {
+                return m_BasicScene.m_Agents.Values.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+        }
+
+        class BasicSceneRootAgents : ISceneAgents
+        {
+            BasicScene m_BasicScene;
+
+            public BasicSceneRootAgents(BasicScene scene)
+            {
+                m_BasicScene = scene;
+            }
+
+            public virtual new int Count
+            {
+                get
+                {
+                    int count = 0;
+                    foreach(IAgent agent in this)
+                    {
+                        ++count;
+                    }
+                    return count;
+                }
+            }
+
+            public IAgent this[UUID id]
+            {
+                get
+                {
+                    return m_BasicScene.m_Agents[id];
+                }
+            }
+
+            public IEnumerator<IAgent> GetEnumerator()
+            {
+                ICollection<IAgent> agents = m_BasicScene.m_Agents.Values;
+                List<IAgent> rootAgents = new List<IAgent>();
+                foreach(IAgent agent in agents)
+                {
+                    if(agent.IsInScene(m_BasicScene))
+                    {
+                        rootAgents.Add(agent);
+                    }
+                }
+                return rootAgents.GetEnumerator();
+            }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
         }
         #endregion
 
@@ -226,7 +294,7 @@ namespace SilverSim.Scene.Implementation.Basic
         private BasicSceneObjectParts m_SceneObjectParts;
         private DefaultSceneObjectGroupInterface m_SceneObjectGroups;
         private BasicSceneAgents m_SceneAgents;
-        private DefaultSceneRootAgentInterface m_SceneRootAgents;
+        private BasicSceneRootAgents m_SceneRootAgents;
         private SimulationDataStorageInterface m_SimulationDataStorage;
 
         public override T GetService<T>()
@@ -273,7 +341,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_SceneObjectParts = new BasicSceneObjectParts(this);
             m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
             m_SceneAgents = new BasicSceneAgents(this);
-            m_SceneRootAgents = new DefaultSceneRootAgentInterface(this);
+            m_SceneRootAgents = new BasicSceneRootAgents(this);
             m_SceneParcels = new BasicSceneParcels(this);
             ServerParamService = serverParamService;
             CapabilitiesConfig = capabilitiesConfig;
@@ -465,11 +533,13 @@ namespace SilverSim.Scene.Implementation.Basic
                     m_Objects.Add(obj.ID, obj);
                     if (obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
                     {
+                        m_Agents.Add(obj.ID, (IAgent)obj);
                         Interlocked.Increment(ref m_AgentCount);
                     }
                 }
                 catch
                 {
+                    m_Objects.Remove(obj.ID);
                     RemoveLocalID(obj);
                 }
             }
