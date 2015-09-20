@@ -116,12 +116,13 @@ namespace SilverSim.Database.MySQL.SimulationData
             StopStorageThread();
         }
 
+        int m_ProcessedPrims = 0;
+
         protected override void StorageWorkerThread(object p)
         {
             StorageThreadInfo s = (StorageThreadInfo)p;
             Thread.CurrentThread.Name = "Storage Worker Thread";
             bool m_SelfStopStorageThread = false;
-            int count = 0;
             int retries = 20;
             using(MySqlConnection connection = new MySqlConnection())
             {
@@ -198,7 +199,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                         }
                     }
                     info.Part.SerialNumberLoadedFromDatabase = 0;
-                    if (++count % 100 == 0)
+                    int count = Interlocked.Increment(ref m_ProcessedPrims);
+                    if (count % 100 == 0)
                     {
                         m_Log.DebugFormat("Processed {0} prims", count);
                     }
