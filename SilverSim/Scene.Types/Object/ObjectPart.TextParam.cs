@@ -29,6 +29,40 @@ namespace SilverSim.Scene.Types.Object
             public string Text = string.Empty;
             public ColorAlpha TextColor = new ColorAlpha(0, 0, 0, 0);
             #endregion
+
+            public byte[] Serialization
+            {
+                get
+                {
+                    byte[] textBytes = UTF8NoBOM.GetBytes(Text);
+                    byte[] serialization = new byte[4 + textBytes.Length];
+                    Buffer.BlockCopy(textBytes, 0, serialization, 4, textBytes.Length);
+                    serialization[0] = TextColor.R_AsByte;
+                    serialization[1] = TextColor.G_AsByte;
+                    serialization[2] = TextColor.B_AsByte;
+                    serialization[3] = TextColor.A_AsByte;
+                    return serialization;
+                }
+                set
+                {
+                    if(value.Length < 4)
+                    {
+                        throw new ArgumentException("array length must be at least 4.");
+                    }
+                    TextColor.R_AsByte = value[0];
+                    TextColor.G_AsByte = value[1];
+                    TextColor.B_AsByte = value[2];
+                    TextColor.A_AsByte = value[3];
+                    if (value.Length > 4)
+                    {
+                        Text = UTF8NoBOM.GetString(value, 4, value.Length - 4);
+                    }
+                    else
+                    {
+                        Text = string.Empty;
+                    }
+                }
+            }
         }
         private readonly TextParam m_Text = new TextParam();
 

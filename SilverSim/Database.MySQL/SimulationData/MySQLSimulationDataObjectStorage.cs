@@ -75,6 +75,75 @@ namespace SilverSim.Database.MySQL.SimulationData
         }
         #endregion
 
+        #region helpers
+        ObjectPart FromDbReader(MySqlDataReader dbReader)
+        {
+            ObjectPart objpart = new ObjectPart();
+            objpart.ID = dbReader.GetUUID("ID");
+            objpart.LoadedLinkNumber = (int)dbReader["LinkNumber"];
+            objpart.Position = MySQLUtilities.GetVector(dbReader, "Position");
+            objpart.Rotation = MySQLUtilities.GetQuaternion(dbReader, "Rotation");
+            objpart.SitText = (string)dbReader["SitText"];
+            objpart.TouchText = (string)dbReader["TouchText"];
+            objpart.Name = (string)dbReader["Name"];
+            objpart.Description = (string)dbReader["Description"];
+            objpart.SitTargetOffset = MySQLUtilities.GetVector(dbReader, "SitTargetOffset");
+            objpart.SitTargetOrientation = MySQLUtilities.GetQuaternion(dbReader, "SitTargetOrientation");
+            objpart.Creator = dbReader.GetUUI("Creator");
+            objpart.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
+            objpart.Flags = (PrimitiveFlags)(uint)dbReader["Flags"];
+
+            objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)(int)dbReader["PhysicsShapeType"];
+            objpart.Material = (PrimitiveMaterial)(int)dbReader["Material"];
+            objpart.Size = MySQLUtilities.GetVector(dbReader, "Size");
+            objpart.Slice = MySQLUtilities.GetVector(dbReader, "Slice");
+
+            objpart.MediaURL = (string)dbReader["MediaURL"];
+
+            objpart.AngularVelocity = MySQLUtilities.GetVector(dbReader, "AngularVelocity");
+
+            ObjectPart.PointLightParam lp = new ObjectPart.PointLightParam();
+            lp.Serialization = (byte[])dbReader["LightData"];
+            objpart.PointLight = lp;
+
+            ObjectPart.TextParam tp = new ObjectPart.TextParam();
+            tp.Serialization = (byte[])dbReader["HoverTextData"];
+            objpart.Text = tp;
+
+            ObjectPart.FlexibleParam fp = new ObjectPart.FlexibleParam();
+            fp.Serialization = (byte[])dbReader["FlexibleData"];
+            objpart.Flexible = fp;
+
+            ObjectPart.SoundParam sound = new ObjectPart.SoundParam();
+            sound.Serialization = (byte[])dbReader["LoopedSoundData"];
+            objpart.Sound = sound;
+
+            ObjectPart.CollisionSoundParam collisionsound = new ObjectPart.CollisionSoundParam();
+            collisionsound.Serialization = (byte[])dbReader["ImpactSoundData"];
+            objpart.CollisionSound = collisionsound;
+
+            ObjectPart.PrimitiveShape ps = new ObjectPart.PrimitiveShape();
+            ps.Serialization = (byte[])dbReader["PrimitiveShapeData"];
+            objpart.Shape = ps;
+
+            objpart.ParticleSystemBytes = dbReader.GetBytes("ParticleSystem");
+            objpart.TextureEntryBytes = dbReader.GetBytes("TextureEntryBytes");
+            objpart.TextureAnimationBytes = dbReader.GetBytes("TextureAnimationBytes");
+
+            objpart.ScriptAccessPin = (int)dbReader["ScriptAccessPin"];
+            objpart.LoadedLinkNumber = (int)dbReader["LinkNumber"];
+
+            using (MemoryStream ms = new MemoryStream((byte[])dbReader["DynAttrs"]))
+            {
+                foreach (KeyValuePair<string, IValue> kvp in (Map)LLSD_Binary.Deserialize(ms))
+                {
+                    objpart.DynAttrs.Add(kvp.Key, kvp.Value);
+                }
+            }
+            return objpart;
+        }
+        #endregion
+
         #region Load all object groups of a single region
         public override List<ObjectGroup> this[UUID regionID]
         {
@@ -154,107 +223,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                                     {
                                         objGroupParts.Add(rootPartID, new SortedDictionary<int, ObjectPart>());
                                     }
-                                    ObjectPart objpart = new ObjectPart();
-                                    objpart.ID = dbReader.GetUUID("ID");
-                                    objpart.LoadedLinkNumber = (int)dbReader["LinkNumber"];
-                                    objpart.Position = MySQLUtilities.GetVector(dbReader, "Position");
-                                    objpart.Rotation = MySQLUtilities.GetQuaternion(dbReader, "Rotation");
-                                    objpart.SitText = (string)dbReader["SitText"];
-                                    objpart.TouchText = (string)dbReader["TouchText"];
-                                    objpart.Name = (string)dbReader["Name"];
-                                    objpart.Description = (string)dbReader["Description"];
-                                    objpart.SitTargetOffset = MySQLUtilities.GetVector(dbReader, "SitTargetOffset");
-                                    objpart.SitTargetOrientation = MySQLUtilities.GetQuaternion(dbReader, "SitTargetOrientation");
-                                    objpart.Creator = dbReader.GetUUI("Creator");
-                                    objpart.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
-                                    objpart.Flags = (PrimitiveFlags)(uint)dbReader["Flags"];
 
-                                    objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)(int)dbReader["PhysicsShapeType"];
-                                    objpart.Material = (PrimitiveMaterial)(int)dbReader["Material"];
-                                    objpart.Size = MySQLUtilities.GetVector(dbReader, "Size");
-                                    objpart.Slice = MySQLUtilities.GetVector(dbReader, "Slice");
-
-                                    objpart.MediaURL = (string)dbReader["MediaURL"];
-
-                                    objpart.AngularVelocity = MySQLUtilities.GetVector(dbReader, "AngularVelocity");
-
-                                    ObjectPart.PointLightParam lp = new ObjectPart.PointLightParam();
-                                    lp.IsLight = MySQLUtilities.GetBoolean(dbReader, "LightEnabled");
-                                    lp.LightColor = MySQLUtilities.GetColor(dbReader, "LightColor");
-                                    lp.Intensity = (double)dbReader["LightIntensity"];
-                                    lp.Radius = (double)dbReader["LightRadius"];
-                                    lp.Falloff = (double)dbReader["LightFalloff"];
-                                    objpart.PointLight = lp;
-
-                                    ObjectPart.TextParam tp = new ObjectPart.TextParam();
-                                    tp.Text = (string)dbReader["HoverText"];
-                                    tp.TextColor = MySQLUtilities.GetColorAlpha(dbReader, "HoverTextColor");
-                                    objpart.Text = tp;
-
-                                    ObjectPart.FlexibleParam fp = new ObjectPart.FlexibleParam();
-                                    fp.IsFlexible = MySQLUtilities.GetBoolean(dbReader, "IsFlexible");
-                                    fp.Friction = (double)dbReader["FlexibleFriction"];
-                                    fp.Gravity = (double)dbReader["FlexibleGravity"];
-                                    fp.Softness = (int)dbReader["FlexibleSoftness"];
-                                    fp.Wind = (double)dbReader["FlexibleWind"];
-                                    fp.Force = MySQLUtilities.GetVector(dbReader, "FlexibleForce");
-                                    objpart.Flexible = fp;
-
-                                    ObjectPart.SoundParam sound = new ObjectPart.SoundParam();
-                                    sound.SoundID = dbReader.GetUUID("LoopedSound");
-                                    sound.Radius = (double)dbReader["SoundRadius"];
-                                    sound.Gain = (double)dbReader["SoundGain"];
-                                    sound.Flags = (PrimitiveSoundFlags)(uint)dbReader["SoundFlags"];
-                                    objpart.Sound = sound;
-
-                                    ObjectPart.CollisionSoundParam collisionsound = new ObjectPart.CollisionSoundParam();
-                                    collisionsound.ImpactSound = dbReader.GetUUID("ImpactSound");
-                                    collisionsound.ImpactVolume = (double)dbReader["ImpactVolume"];
-                                    objpart.CollisionSound = collisionsound;
-
-                                    ObjectPart.PrimitiveShape ps = new ObjectPart.PrimitiveShape();
-
-                                    ps.PathBegin = (ushort)(uint)dbReader["PathBegin"];
-                                    ps.PathCurve = (byte)(uint)dbReader["PathCurve"];
-                                    ps.PathEnd = (ushort)(uint)dbReader["PathEnd"];
-                                    ps.PathRadiusOffset = (sbyte)(int)dbReader["PathRadiusOffset"];
-                                    ps.PathRevolutions = (byte)(uint)dbReader["PathRevolutions"];
-                                    ps.PathScaleX = (byte)(uint)dbReader["PathScaleX"];
-                                    ps.PathScaleY = (byte)(uint)dbReader["PathScaleY"];
-                                    ps.PathShearX = (byte)(uint)dbReader["PathShearX"];
-                                    ps.PathShearY = (byte)(uint)dbReader["PathShearY"];
-                                    ps.PathSkew = (sbyte)(int)dbReader["PathSkew"];
-                                    ps.PathTaperX = (sbyte)(int)dbReader["PathTaperX"];
-                                    ps.PathTaperY = (sbyte)(int)dbReader["PathTaperY"];
-                                    ps.PathTwist = (sbyte)(int)dbReader["PathTwist"];
-                                    ps.PathTwistBegin = (sbyte)(int)dbReader["PathTwistBegin"];
-                                    ps.ProfileBegin = (ushort)(uint)dbReader["ProfileBegin"];
-                                    ps.ProfileCurve = (byte)(uint)dbReader["ProfileCurve"];
-                                    ps.ProfileEnd = (ushort)(uint)dbReader["ProfileEnd"];
-                                    ps.ProfileHollow = (ushort)(uint)dbReader["ProfileHollow"];
-                                    ps.IsSculptInverted = dbReader.GetBoolean("IsShapeSculptInverted");
-                                    ps.IsSculptMirrored = dbReader.GetBoolean("IsShapeSculptMirrored");
-                                    ps.SculptMap = dbReader.GetUUID("ShapeSculptMap");
-                                    ps.SculptType = (PrimitiveSculptType)(int)dbReader["ShapeSculptType"];
-                                    ps.Type = (PrimitiveShapeType)(int)dbReader["ShapeType"];
-                                    ps.PCode = (PrimitiveCode)(uint)dbReader["PCode"];
-                                    objpart.Shape = ps;
-
-                                    objpart.ParticleSystemBytes = dbReader.GetBytes("ParticleSystem");
-                                    objpart.ExtraParamsBytes = dbReader.GetBytes("ExtraParams");
-                                    objpart.TextureEntryBytes = dbReader.GetBytes("TextureEntryBytes");
-                                    objpart.TextureAnimationBytes = dbReader.GetBytes("TextureAnimationBytes");
-
-                                    objpart.ScriptAccessPin = (int)dbReader["ScriptAccessPin"];
-                                    objpart.LoadedLinkNumber = (int)dbReader["LinkNumber"];
-
-                                    using (MemoryStream ms = new MemoryStream((byte[])dbReader["DynAttrs"]))
-                                    {
-                                        foreach (KeyValuePair<string, IValue> kvp in (Map)LLSD_Binary.Deserialize(ms))
-                                        {
-                                            objpart.DynAttrs.Add(kvp.Key, kvp.Value);
-                                        }
-                                    }
+                                    ObjectPart objpart = FromDbReader(dbReader);
 
                                     objGroupParts[rootPartID].Add(objpart.LoadedLinkNumber, objpart);
                                     objPartIDs.Add(objpart.ID);
@@ -460,107 +430,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         {
                             while(dbReader.Read())
                             {
-                                ObjectPart objpart = new ObjectPart();
-                                objpart.ID = dbReader.GetUUID("ID");
-                                objpart.LoadedLinkNumber = (int)dbReader["LinkNumber"];
-                                objpart.Position = MySQLUtilities.GetVector(dbReader, "Position");
-                                objpart.Rotation = MySQLUtilities.GetQuaternion(dbReader, "Rotation");
-                                objpart.SitText = (string)dbReader["SitText"];
-                                objpart.TouchText = (string)dbReader["TouchText"];
-                                objpart.Name = (string)dbReader["Name"];
-                                objpart.Description = (string)dbReader["Description"];
-                                objpart.SitTargetOffset = MySQLUtilities.GetVector(dbReader, "SitTargetOffset");
-                                objpart.SitTargetOrientation = MySQLUtilities.GetQuaternion(dbReader, "SitTargetOrientation");
-                                objpart.Creator = dbReader.GetUUI("Creator");
-                                objpart.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
-                                objpart.Flags = (PrimitiveFlags)(uint)dbReader["Flags"];
-
-                                objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)(int)dbReader["PhysicsShapeType"];
-                                objpart.Material = (PrimitiveMaterial)(int)dbReader["Material"];
-                                objpart.Size = MySQLUtilities.GetVector(dbReader, "Size");
-                                objpart.Slice = MySQLUtilities.GetVector(dbReader, "Slice");
-
-                                objpart.MediaURL = (string)dbReader["MediaURL"];
-
-                                objpart.AngularVelocity = MySQLUtilities.GetVector(dbReader, "AngularVelocity");
-
-                                ObjectPart.PointLightParam lp = new ObjectPart.PointLightParam();
-                                lp.IsLight = MySQLUtilities.GetBoolean(dbReader, "LightEnabled");
-                                lp.LightColor = MySQLUtilities.GetColor(dbReader, "LightColor");
-                                lp.Intensity = (double)dbReader["LightIntensity"];
-                                lp.Radius = (double)dbReader["LightRadius"];
-                                lp.Falloff = (double)dbReader["LightFalloff"];
-                                objpart.PointLight = lp;
-
-                                ObjectPart.TextParam tp = new ObjectPart.TextParam();
-                                tp.Text = (string)dbReader["HoverText"];
-                                tp.TextColor = MySQLUtilities.GetColorAlpha(dbReader, "HoverTextColor");
-                                objpart.Text = tp;
-
-                                ObjectPart.FlexibleParam fp = new ObjectPart.FlexibleParam();
-                                fp.IsFlexible = MySQLUtilities.GetBoolean(dbReader, "IsFlexible");
-                                fp.Friction = (double)dbReader["FlexibleFriction"];
-                                fp.Gravity = (double)dbReader["FlexibleGravity"];
-                                fp.Softness = (int)dbReader["FlexibleSoftness"];
-                                fp.Wind = (double)dbReader["FlexibleWind"];
-                                fp.Force = MySQLUtilities.GetVector(dbReader, "FlexibleForce");
-                                objpart.Flexible = fp;
-
-                                ObjectPart.SoundParam sound = new ObjectPart.SoundParam();
-                                sound.SoundID = dbReader.GetUUID("LoopedSound");
-                                sound.Radius = (double)dbReader["SoundRadius"];
-                                sound.Gain = (double)dbReader["SoundGain"];
-                                sound.Flags = (PrimitiveSoundFlags)(uint)dbReader["SoundFlags"];
-                                objpart.Sound = sound;
-
-                                ObjectPart.CollisionSoundParam collisionsound = new ObjectPart.CollisionSoundParam();
-                                collisionsound.ImpactSound = dbReader.GetUUID("ImpactSound");
-                                collisionsound.ImpactVolume = (double)dbReader["ImpactVolume"];
-                                objpart.CollisionSound = collisionsound;
-
-                                ObjectPart.PrimitiveShape ps = new ObjectPart.PrimitiveShape();
-
-                                ps.PathBegin = (ushort)(uint)dbReader["PathBegin"];
-                                ps.PathCurve = (byte)(uint)dbReader["PathCurve"];
-                                ps.PathEnd = (ushort)(uint)dbReader["PathEnd"];
-                                ps.PathRadiusOffset = (sbyte)(int)dbReader["PathRadiusOffset"];
-                                ps.PathRevolutions = (byte)(uint)dbReader["PathRevolutions"];
-                                ps.PathScaleX = (byte)(uint)dbReader["PathScaleX"];
-                                ps.PathScaleY = (byte)(uint)dbReader["PathScaleY"];
-                                ps.PathShearX = (byte)(uint)dbReader["PathShearX"];
-                                ps.PathShearY = (byte)(uint)dbReader["PathShearY"];
-                                ps.PathSkew = (sbyte)(int)dbReader["PathSkew"];
-                                ps.PathTaperX = (sbyte)(int)dbReader["PathTaperX"];
-                                ps.PathTaperY = (sbyte)(int)dbReader["PathTaperY"];
-                                ps.PathTwist = (sbyte)(int)dbReader["PathTwist"];
-                                ps.PathTwistBegin = (sbyte)(int)dbReader["PathTwistBegin"];
-                                ps.ProfileBegin = (ushort)(uint)dbReader["ProfileBegin"];
-                                ps.ProfileCurve = (byte)(uint)dbReader["ProfileCurve"];
-                                ps.ProfileEnd = (ushort)(uint)dbReader["ProfileEnd"];
-                                ps.ProfileHollow = (ushort)(uint)dbReader["ProfileHollow"];
-                                ps.IsSculptInverted = dbReader.GetBoolean("IsShapeSculptInverted");
-                                ps.IsSculptMirrored = dbReader.GetBoolean("IsShapeSculptMirrored");
-                                ps.SculptMap = dbReader.GetUUID("ShapeSculptMap");
-                                ps.SculptType = (PrimitiveSculptType)(int)dbReader["ShapeSculptType"];
-                                ps.Type = (PrimitiveShapeType)(int)dbReader["ShapeType"];
-                                ps.PCode = (PrimitiveCode)(uint)dbReader["PCode"];
-                                objpart.Shape = ps;
-
-                                objpart.ParticleSystemBytes = dbReader.GetBytes("ParticleSystem");
-                                objpart.ExtraParamsBytes = dbReader.GetBytes("ExtraParams");
-                                objpart.TextureEntryBytes = dbReader.GetBytes("TextureEntryBytes");
-                                objpart.TextureAnimationBytes = dbReader.GetBytes("TextureAnimationBytes");
-
-                                objpart.ScriptAccessPin = (int)dbReader["ScriptAccessPin"];
-
-                                using (MemoryStream ms = new MemoryStream((byte[])dbReader["DynAttrs"]))
-                                {
-                                    foreach(KeyValuePair<string, IValue> kvp in (Map)LLSD_Binary.Deserialize(ms))
-                                    {
-                                        objpart.DynAttrs.Add(kvp.Key, kvp.Value);
-                                    }
-                                }
-
+                                ObjectPart objpart = FromDbReader(dbReader);
                                 LoadInventory(objpart);
                                 objgroup.Add((int)dbReader["LinkNumber"], objpart.ID, objpart);
                             }
@@ -769,7 +639,21 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
-        const string UpdateObjectPartSql = "REPLACE INTO prims (`PhysicsShapeType`,`ID`,`LinkNumber`,`RootPartID`,`PositionX`,`PositionY`,`PositionZ`,`RotationX`,`RotationY`,`RotationZ`,`RotationW`,`SitText`,`TouchText`,`Name`,`Description`,`SitTargetOffsetX`,`SitTargetOffsetY`,`SitTargetOffsetZ`,`SitTargetOrientationX`,`SitTargetOrientationY`,`SitTargetOrientationZ`,`SitTargetOrientationW`,`ShapeType`,`Material`,`SizeX`,`SizeY`,`SizeZ`,`SliceX`,`SliceY`,`SliceZ`,`MediaURL`,`Creator`,`CreationDate`,`Flags`,`AngularVelocityX`,`AngularVelocityY`,`AngularVelocityZ`,`LightEnabled`,`LightColorRed`,`LightColorGreen`,`LightColorBlue`,`LightIntensity`,`LightRadius`,`LightFalloff`,`HoverText`,`HoverTextColorRed`,`HoverTextColorGreen`,`HoverTextColorBlue`,`IsFlexible`,`FlexibleFriction`,`FlexibleGravity`,`FlexibleSoftness`,`FlexibleWind`,`FlexibleForceX`,`FlexibleForceY`,`FlexibleForceZ`,`LoopedSound`,`SoundRadius`,`SoundGain`,`SoundFlags`,`ImpactSound`,`ImpactVolume`,`IsShapeSculptInverted`,`IsShapeSculptMirrored`,`ShapeSculptMap`,`ShapeSculptType`,`PathBegin`,`PathCurve`,`PathEnd`,`PathRadiusOffset`,`PathRevolutions`,`PathScaleX`,`PathScaleY`,`PathShearX`,`PathshearY`,`PathSkew`,`PathTaperX`,`PathTaperY`,`PathTwist`,`PathTwistBegin`,`ProfileBegin`,`ProfileCurve`,`ProfileEnd`,`ProfileHollow`,`PCode`,`ExtraParams`,`ParticleSystem`,`TextureEntryBytes`,`TextureAnimationBytes`,`ScriptAccessPin`,`DynAttrs`) VALUES (?v_PhysicsShapeType,?v_ID,?v_LinkNumber,?v_RootPartID,?v_PositionX,?v_PositionY,?v_PositionZ,?v_RotationX,?v_RotationY,?v_RotationZ,?v_RotationW,?v_SitText,?v_TouchText,?v_Name,?v_Description,?v_SitTargetOffsetX,?v_SitTargetOffsetY,?v_SitTargetOffsetZ,?v_SitTargetOrientationX,?v_SitTargetOrientationY,?v_SitTargetOrientationZ,?v_SitTargetOrientationW,?v_ShapeType,?v_Material,?v_SizeX,?v_SizeY,?v_SizeZ,?v_SliceX,?v_SliceY,?v_SliceZ,?v_MediaURL,?v_Creator,?v_CreationDate,?v_Flags,?v_AngularVelocityX,?v_AngularVelocityY,?v_AngularVelocityZ,?v_LightEnabled,?v_LightColorRed,?v_LightColorGreen,?v_LightColorBlue,?v_LightIntensity,?v_LightRadius,?v_LightFalloff,?v_HoverText,?v_HoverTextColorRed,?v_HoverTextColorGreen,?v_HoverTextColorBlue,?v_IsFlexible,?v_FlexibleFriction,?v_FlexibleGravity,?v_FlexibleSoftness,?v_FlexibleWind,?v_FlexibleForceX,?v_FlexibleForceY,?v_FlexibleForceZ,?v_LoopedSound,?v_SoundRadius,?v_SoundGain,?v_SoundFlags,?v_ImpactSound,?v_ImpactVolume,?v_IsShapeSculptInverted,?v_IsShapeSculptMirrored,?v_ShapeSculptMap,?v_ShapeSculptType,?v_PathBegin,?v_PathCurve,?v_PathEnd,?v_PathRadiusOffset,?v_PathRevolutions,?v_PathScaleX,?v_PathScaleY,?v_PathShearX,?v_PathshearY,?v_PathSkew,?v_PathTaperX,?v_PathTaperY,?v_PathTwist,?v_PathTwistBegin,?v_ProfileBegin,?v_ProfileCurve,?v_ProfileEnd,?v_ProfileHollow,?v_PCode,?v_ExtraParams,?v_ParticleSystem,?v_TextureEntryBytes,?v_TextureAnimationBytes,?v_ScriptAccessPin,?v_DynAttrs)";
+        const string UpdateObjectPartSql = "REPLACE INTO prims (" +
+                "`PhysicsShapeType`,`ID`,`LinkNumber`,`RootPartID`,`PositionX`,`PositionY`,`PositionZ`,`RotationX`,`RotationY`,`RotationZ`,`RotationW`," +
+                "`SitText`,`TouchText`,`Name`,`Description`,`SitTargetOffsetX`,`SitTargetOffsetY`,`SitTargetOffsetZ`," +
+                "`SitTargetOrientationX`,`SitTargetOrientationY`,`SitTargetOrientationZ`,`SitTargetOrientationW`," +
+                "`Material`,`SizeX`,`SizeY`,`SizeZ`,`SliceX`,`SliceY`,`SliceZ`,`MediaURL`,`Creator`,`CreationDate`," +
+                "`Flags`,`AngularVelocityX`,`AngularVelocityY`,`AngularVelocityZ`,`LightData`,`HoverTextData`,`FlexibleData`," +
+                "`LoopedSoundData`,`ImpactSoundData`,`PrimitiveShapeData`," +
+                "`ParticleSystem`,`TextureEntryBytes`,`TextureAnimationBytes`,`ScriptAccessPin`,`DynAttrs`) VALUES " +
+                "(?v_PhysicsShapeType,?v_ID,?v_LinkNumber,?v_RootPartID,?v_PositionX,?v_PositionY,?v_PositionZ,?v_RotationX,?v_RotationY,?v_RotationZ," +
+                "?v_RotationW,?v_SitText,?v_TouchText,?v_Name,?v_Description,?v_SitTargetOffsetX,?v_SitTargetOffsetY,?v_SitTargetOffsetZ," +
+                "?v_SitTargetOrientationX,?v_SitTargetOrientationY,?v_SitTargetOrientationZ,?v_SitTargetOrientationW," +
+                "?v_Material,?v_SizeX,?v_SizeY,?v_SizeZ,?v_SliceX,?v_SliceY,?v_SliceZ,?v_MediaURL,?v_Creator,?v_CreationDate," +
+                "?v_Flags,?v_AngularVelocityX,?v_AngularVelocityY,?v_AngularVelocityZ,?v_LightData,?v_HoverTextData,?v_FlexibleData," +
+                "?v_LoopedSoundData,?v_ImpactSoundData,?v_PrimitiveShapeData," +
+                "?v_ParticleSystem,?v_TextureEntryBytes,?v_TextureAnimationBytes,?v_ScriptAccessPin,?v_DynAttrs)";
         private void UpdateObjectPart(MySqlConnection connection, ObjectPart objpart)
         {
             if(objpart.ObjectGroup.IsTemporary || objpart.ObjectGroup.IsTempOnRez)
@@ -812,80 +696,18 @@ namespace SilverSim.Database.MySQL.SimulationData
                 cmd.Parameters.AddWithValue("?v_Creator", objpart.Creator.ToString());
                 cmd.Parameters.AddWithValue("?v_CreationDate", objpart.CreationDate.AsULong);
                 cmd.Parameters.AddWithValue("?v_Flags", (uint)objpart.Flags);
-
                 cmd.Parameters.AddWithValue("?v_AngularVelocityX", objpart.AngularVelocity.X);
                 cmd.Parameters.AddWithValue("?v_AngularVelocityY", objpart.AngularVelocity.Y);
                 cmd.Parameters.AddWithValue("?v_AngularVelocityZ", objpart.AngularVelocity.Z);
-
-                ObjectPart.PointLightParam lp = objpart.PointLight;
-                cmd.Parameters.AddWithValue("?v_LightEnabled", lp.IsLight ? 1 : 0);
-                cmd.Parameters.AddWithValue("?v_LightColorRed", lp.LightColor.R);
-                cmd.Parameters.AddWithValue("?v_LightColorGreen", lp.LightColor.G);
-                cmd.Parameters.AddWithValue("?v_LightColorBlue", lp.LightColor.B);
-                cmd.Parameters.AddWithValue("?v_LightIntensity", lp.Intensity);
-                cmd.Parameters.AddWithValue("?v_LightRadius", lp.Radius);
-                cmd.Parameters.AddWithValue("?v_LightFalloff", lp.Falloff);
-
-                ObjectPart.TextParam tp = objpart.Text;
-                cmd.Parameters.AddWithValue("?v_HoverText", tp.Text);
-                cmd.Parameters.AddWithValue("?v_HoverTextColorRed", tp.TextColor.R);
-                cmd.Parameters.AddWithValue("?v_HoverTextColorGreen", tp.TextColor.G);
-                cmd.Parameters.AddWithValue("?v_HoverTextColorBlue", tp.TextColor.B);
-                cmd.Parameters.AddWithValue("?v_HoverTextColorAlpha", tp.TextColor.A);
-
-                ObjectPart.FlexibleParam fp = objpart.Flexible;
-                cmd.Parameters.AddWithValue("?v_IsFlexible", fp.IsFlexible ? 1 : 0);
-                cmd.Parameters.AddWithValue("?v_FlexibleFriction", fp.Friction);
-                cmd.Parameters.AddWithValue("?v_FlexibleGravity", fp.Gravity);
-                cmd.Parameters.AddWithValue("?v_FlexibleSoftness", fp.Softness);
-                cmd.Parameters.AddWithValue("?v_FlexibleWind", fp.Wind);
-                cmd.Parameters.AddWithValue("?v_FlexibleForceX", fp.Force.X);
-                cmd.Parameters.AddWithValue("?v_FlexibleForceY", fp.Force.X);
-                cmd.Parameters.AddWithValue("?v_FlexibleForceZ", fp.Force.X);
-
-                ObjectPart.SoundParam sound = objpart.Sound;
-                cmd.Parameters.AddWithValue("?v_LoopedSound", sound.SoundID.ToString());
-                cmd.Parameters.AddWithValue("?v_SoundRadius", sound.Radius);
-                cmd.Parameters.AddWithValue("?v_SoundGain", sound.Gain);
-                cmd.Parameters.AddWithValue("?v_SoundFlags", (uint)sound.Flags);
-
-                ObjectPart.CollisionSoundParam collisionsound = objpart.CollisionSound;
-                cmd.Parameters.AddWithValue("?v_ImpactSound", collisionsound.ImpactSound.ToString());
-                cmd.Parameters.AddWithValue("?v_ImpactVolume", collisionsound.ImpactVolume);
-
-                ObjectPart.PrimitiveShape ps = objpart.Shape;
-                cmd.Parameters.AddWithValue("?v_IsShapeSculptInverted", ps.IsSculptInverted ? 1 : 0);
-                cmd.Parameters.AddWithValue("?v_IsShapeSculptMirrored", ps.IsSculptMirrored ? 1 : 0);
-                cmd.Parameters.AddWithValue("?v_ShapeSculptMap", ps.SculptMap.ToString());
-                cmd.Parameters.AddWithValue("?v_ShapeSculptType", (int)ps.SculptType);
-                cmd.Parameters.AddWithValue("?v_ShapeType", (int)ps.Type);
-                cmd.Parameters.AddWithValue("?v_PathBegin", ps.PathBegin);
-                cmd.Parameters.AddWithValue("?v_PathCurve", ps.PathCurve);
-                cmd.Parameters.AddWithValue("?v_PathEnd", ps.PathEnd);
-                cmd.Parameters.AddWithValue("?v_PathRadiusOffset", ps.PathRadiusOffset);
-                cmd.Parameters.AddWithValue("?v_PathRevolutions", ps.PathRevolutions);
-                cmd.Parameters.AddWithValue("?v_PathScaleX", ps.PathScaleX);
-                cmd.Parameters.AddWithValue("?v_PathScaleY", ps.PathScaleY);
-                cmd.Parameters.AddWithValue("?v_PathShearX", ps.PathShearX);
-                cmd.Parameters.AddWithValue("?v_PathshearY", ps.PathShearY);
-                cmd.Parameters.AddWithValue("?v_PathSkew", ps.PathSkew);
-                cmd.Parameters.AddWithValue("?v_PathTaperX", ps.PathTaperX);
-                cmd.Parameters.AddWithValue("?v_PathTaperY", ps.PathTaperY);
-                cmd.Parameters.AddWithValue("?v_PathTwist", ps.PathTwist);
-                cmd.Parameters.AddWithValue("?v_PathTwistBegin", ps.PathTwistBegin);
-                cmd.Parameters.AddWithValue("?v_ProfileBegin", ps.ProfileBegin);
-                cmd.Parameters.AddWithValue("?v_ProfileCurve", ps.ProfileCurve);
-                cmd.Parameters.AddWithValue("?v_ProfileEnd", ps.ProfileEnd);
-                cmd.Parameters.AddWithValue("?v_ProfileHollow", ps.ProfileHollow);
-                cmd.Parameters.AddWithValue("?v_PCode", (int)ps.PCode);
-
-                cmd.Parameters.AddWithValue("?v_ExtraParams", objpart.ExtraParamsBytes);
-
+                cmd.Parameters.AddWithValue("?v_LightData", objpart.PointLight.Serialization);
+                cmd.Parameters.AddWithValue("?v_HoverTextData", objpart.Text.Serialization);
+                cmd.Parameters.AddWithValue("?v_FlexibleData", objpart.Flexible.Serialization);
+                cmd.Parameters.AddWithValue("?v_LoopedSoundData", objpart.Sound.Serialization);
+                cmd.Parameters.AddWithValue("?v_ImpactSoundData", objpart.CollisionSound.Serialization);
+                cmd.Parameters.AddWithValue("?v_PrimitiveShapeData", objpart.Shape.Serialization);
                 cmd.Parameters.AddWithValue("?v_ParticleSystem", objpart.ParticleSystemBytes);
-
                 cmd.Parameters.AddWithValue("?v_TextureEntryBytes", objpart.TextureEntryBytes);
                 cmd.Parameters.AddWithValue("?v_TextureAnimationBytes", objpart.TextureAnimationBytes);
-
                 cmd.Parameters.AddWithValue("?v_ScriptAccessPin", objpart.ScriptAccessPin);
 
                 using(MemoryStream ms = new MemoryStream())
@@ -1025,63 +847,19 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "AngularVelocityX REAL NOT NULL DEFAULT '0'," +
                 "AngularVelocityY REAL NOT NULL DEFAULT '0'," +
                 "AngularVelocityZ REAL NOT NULL DEFAULT '0'," +
-                "LightEnabled INT(1) NOT NULL DEFAULT '0'," +
-                "LightColorRed REAL NOT NULL DEFAULT '0'," +
-                "LightColorGreen REAL NOT NULL DEFAULT '0'," +
-                "LightColorBlue REAL NOT NULL DEFAULT '0'," +
-                "LightIntensity REAL NOT NULL DEFAULT '0'," +
-                "LightRadius REAL NOT NULL DEFAULT '0'," +
-                "LightFalloff REAL NOT NULL DEFAULT '0'," +
-                "HoverText TEXT," +
-                "HoverTextColorRed REAL NOT NULL DEFAULT '0'," +
-                "HoverTextColorGreen REAL NOT NULL DEFAULT '0'," +
-                "HoverTextColorBlue REAL NOT NULL DEFAULT '0'," +
-                "HoverTextColorAlpha REAL NOT NULL DEFAULT '0'," +
-                "IsFlexible INT(1) NOT NULL DEFAULT '0'," +
-                "FlexibleForceX REAL NOT NULL DEFAULT '0'," +
-                "FlexibleForceY REAL NOT NULL DEFAULT '0'," +
-                "FlexibleForceZ REAL NOT NULL DEFAULT '0'," +
-                "FlexibleFriction REAL NOT NULL DEFAULT '0'," +
-                "FlexibleGravity REAL NOT NULL DEFAULT '0'," +
-                "FlexibleSoftness INT(11) NOT NULL DEFAULT '0'," +
-                "FlexibleWind REAL NOT NULL DEFAULT '0'," +
-                "LoopedSound CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "SoundRadius REAL NOT NULL DEFAULT '0'," +
-                "SoundGain REAL NOT NULL DEFAULT '0'," +
-                "SoundFlags INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
-                "ImpactSound CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "ImpactVolume REAL NOT NULL DEFAULT '0'," +
-                "PathBegin INT(11) UNSIGNED NOT NULL," +
-                "PathCurve INT(11) UNSIGNED NOT NULL," +
-                "PathEnd INT(11) UNSIGNED NOT NULL," +
-                "PathRadiusOffset INT(11) NOT NULL," +
-                "PathRevolutions INT(11) UNSIGNED NOT NULL," + 
-                "PathScaleX INT(11) UNSIGNED NOT NULL," +
-                "PathScaleY INT(11) UNSIGNED NOT NULL," +
-                "PathShearX INT(11) UNSIGNED NOT NULL," +
-                "PathShearY INT(11) UNSIGNED NOT NULL," +
-                "PathSkew INT(11) NOT NULL," +
-                "PathTaperX INT(11) NOT NULL," +
-                "PathTaperY INT(11) NOT NULL," +
-                "PathTwist INT(11) NOT NULL," +
-                "PathTwistBegin INT(11) NOT NULL," +
-                "ProfileBegin INT(11) UNSIGNED NOT NULL," +
-                "ProfileCurve INT(11) UNSIGNED NOT NULL," +
-                "ProfileEnd INT(11) UNSIGNED NOT NULL," +
-                "ProfileHollow INT(11) UNSIGNED NOT NULL," +
-                "IsShapeSculptInverted INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "IsShapeSculptMirrored INT(1) UNSIGNED NOT NULL DEFAULT '0'," +
-                "ShapeSculptMap CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
-                "ShapeSculptType INT(11) NOT NULL DEFAULT '0'," +
-                "ShapeType INT(11) NOT NULL DEFAULT '0'," +
-                "PCode INT(11) UNSIGNED NOT NULL," + 
+                "LightData BLOB," +
+                "HoverTextData BLOB," +
+                "FlexibleData BLOB," +
+                "LoopedSoundData BLOB," +
+                "ImpactSoundData BLOB," +
+                "PrimitiveShapeData BLOB," +
                 "ParticleSystem BLOB," +
-                "ExtraParams BLOB," +
+                "TextureEntryBytes BLOB," + 
                 "ScriptAccessPin INT(11) NOT NULL DEFAULT '0'," +
-                "PRIMARY KEY(ID, RootPartID))",
-            "ALTER TABLE %tablename% ADD COLUMN (TextureEntryBytes BLOB, TextureAnimationBytes BLOB),",
-            "ALTER TABLE %tablename% ADD KEY RootPartID (RootPartID), ADD UNIQUE KEY ID (ID),",
-            "ALTER TABLE %tablename% ADD KEY LinkNumber (LinkNumber),",
+                "TextureAnimationBytes BLOB," +
+                "KEY RootPartID (RootPartID)," +
+                "UNIQUE KEY ID (ID)," +
+                "PRIMARY KEY(ID, RootPartID))"
         };
         #endregion
     }

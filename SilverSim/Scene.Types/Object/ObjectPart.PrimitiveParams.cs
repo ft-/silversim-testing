@@ -22,35 +22,131 @@ namespace SilverSim.Scene.Types.Object
             #endregion
 
             #region Fields
-            public PrimitiveShapeType Type = PrimitiveShapeType.Box;
+            public PrimitiveShapeType Type = PrimitiveShapeType.Box; /* byte / 16 */
 
-            public UUID SculptMap = UUID.Zero;
-            public PrimitiveSculptType SculptType = PrimitiveSculptType.Sphere;
-            public bool IsSculptInverted = false;
-            public bool IsSculptMirrored = false;
+            public UUID SculptMap = UUID.Zero; /* 0 */
+            public PrimitiveSculptType SculptType = PrimitiveSculptType.Sphere; /* byte / 17 */
+            public bool IsSculptInverted = false; /* 18 */
+            public bool IsSculptMirrored = false; /* 19 */
 
-            public ushort PathBegin;
-            public byte PathCurve;
-            public ushort PathEnd;
-            public sbyte PathRadiusOffset;
-            public byte PathRevolutions;
-            public byte PathScaleX;
-            public byte PathScaleY;
-            public byte PathShearX;
-            public byte PathShearY;
-            public sbyte PathSkew;
-            public sbyte PathTaperX;
-            public sbyte PathTaperY;
-            public sbyte PathTwist;
-            public sbyte PathTwistBegin;
-            public ushort ProfileBegin;
-            public byte ProfileCurve;
-            public ushort ProfileEnd;
-            public ushort ProfileHollow;
+            public ushort PathBegin; /* 20 */
+            public byte PathCurve; /* 22 */
+            public ushort PathEnd; /* 23 */
+            public sbyte PathRadiusOffset; /* 25 */
+            public byte PathRevolutions; /* 26 */
+            public byte PathScaleX; /* 27 */
+            public byte PathScaleY; /* 28 */
+            public byte PathShearX; /* 29 */
+            public byte PathShearY; /* 30 */
+            public sbyte PathSkew; /* 31 */
+            public sbyte PathTaperX; /* 32 */
+            public sbyte PathTaperY; /* 33 */
+            public sbyte PathTwist; /* 34 */
+            public sbyte PathTwistBegin; /* 35 */
+            public ushort ProfileBegin; /* 36 */
+            public byte ProfileCurve; /* 38 */
+            public ushort ProfileEnd; /* 39 */
+            public ushort ProfileHollow; /* 41 */
 
-            public PrimitiveCode PCode;
+            public PrimitiveCode PCode; /* byte / 43 */
 
-            public byte State;
+            public byte State; /* 44 */
+            #endregion
+
+            #region Serialization
+            public byte[] Serialization
+            {
+                get
+                {
+                    byte[] serialized = new byte[45];
+                    SculptMap.ToBytes(serialized, 0);
+                    serialized[16] = (byte)Type;
+                    serialized[17] = (byte)SculptType;
+                    serialized[18] = (byte)(IsSculptInverted ? 1 : 0);
+                    serialized[19] = (byte)(IsSculptMirrored ? 1 : 0);
+                    Buffer.BlockCopy(BitConverter.GetBytes(PathBegin), 0, serialized, 20, 2);
+                    serialized[22] = PathCurve;
+                    Buffer.BlockCopy(BitConverter.GetBytes(PathEnd), 0, serialized, 23, 2);
+                    serialized[25] = (byte)PathRadiusOffset;
+                    serialized[26] = PathRevolutions;
+                    serialized[27] = PathScaleX;
+                    serialized[28] = PathScaleY;
+                    serialized[29] = PathShearX;
+                    serialized[30] = PathShearY;
+                    serialized[31] = (byte)PathSkew;
+                    serialized[32] = (byte)PathTaperX;
+                    serialized[33] = (byte)PathTaperY;
+                    serialized[34] = (byte)PathTwist;
+                    serialized[35] = (byte)PathTwistBegin;
+                    Buffer.BlockCopy(BitConverter.GetBytes(ProfileBegin), 0, serialized, 36, 2);
+                    serialized[38] = ProfileCurve;
+                    Buffer.BlockCopy(BitConverter.GetBytes(ProfileEnd), 0, serialized, 39, 2);
+                    Buffer.BlockCopy(BitConverter.GetBytes(ProfileHollow), 0, serialized, 41, 2);
+                    serialized[43] = (byte)PCode;
+                    serialized[44] = State;
+                    if(!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(serialized, 20, 2);
+                        Array.Reverse(serialized, 23, 2);
+                        Array.Reverse(serialized, 36, 2);
+                        Array.Reverse(serialized, 39, 2);
+                        Array.Reverse(serialized, 41, 2);
+                    }
+
+                    return serialized;
+                }
+
+                set
+                {
+                    if(value.Length != 45)
+                    {
+                        throw new ArgumentOutOfRangeException("Array length must be 45.");
+                    }
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(value, 20, 2);
+                        Array.Reverse(value, 23, 2);
+                        Array.Reverse(value, 36, 2);
+                        Array.Reverse(value, 39, 2);
+                        Array.Reverse(value, 41, 2);
+                    }
+
+                    SculptMap.FromBytes(value, 0);
+                    Type = (PrimitiveShapeType)value[16];
+                    SculptType = (PrimitiveSculptType)value[17];
+                    IsSculptInverted = value[18] != 0;
+                    IsSculptMirrored = value[19] != 0;
+                    PathBegin = BitConverter.ToUInt16(value, 20);
+                    PathCurve = value[22];
+                    PathEnd = BitConverter.ToUInt16(value, 23);
+                    PathRadiusOffset = (sbyte)value[25];
+                    PathRevolutions = value[26];
+                    PathScaleX = value[27];
+                    PathScaleY = value[28];
+                    PathShearX = value[29];
+                    PathShearY = value[30];
+                    PathSkew = (sbyte)value[31];
+                    PathTaperX = (sbyte)value[32];
+                    PathTaperY = (sbyte)value[33];
+                    PathTwist = (sbyte)value[34];
+                    PathTwistBegin = (sbyte)value[35];
+                    ProfileBegin = BitConverter.ToUInt16(value, 36);
+                    ProfileCurve = value[38];
+                    ProfileEnd = BitConverter.ToUInt16(value, 39);
+                    ProfileHollow = BitConverter.ToUInt16(value, 41);
+                    PCode = (PrimitiveCode)value[43];
+                    State = value[44];
+
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(value, 20, 2);
+                        Array.Reverse(value, 23, 2);
+                        Array.Reverse(value, 36, 2);
+                        Array.Reverse(value, 39, 2);
+                        Array.Reverse(value, 41, 2);
+                    }
+                }
+            }
             #endregion
 
             #region Properties

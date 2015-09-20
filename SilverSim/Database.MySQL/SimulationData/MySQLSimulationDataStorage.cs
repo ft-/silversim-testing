@@ -10,6 +10,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
+using System;
 using System.Collections.Generic;
 using System.Threading;
 
@@ -124,7 +125,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             Thread.CurrentThread.Name = "Storage Worker Thread";
             bool m_SelfStopStorageThread = false;
             int retries = 20;
-            using(MySqlConnection connection = new MySqlConnection())
+            using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 bool connected = false;
                 while (!connected)
@@ -177,16 +178,16 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 m_ObjectStorage.UpdateObjectPartInner(connection, info.Part);
                                 m_KnownSerialNumbers[info.LocalID] = info.SerialNumber;
                             }
-                            catch
+                            catch(Exception e)
                             {
                                 SceneInterface scene = grp.Scene;
                                 if (scene != null)
                                 {
-                                    m_Log.WarnFormat("Failed to update prim {0} for {1}", info.Part.ID, scene.ID);
+                                    m_Log.WarnFormat("Failed to update prim {0} for {1}: {2}\n{3}", info.Part.ID, scene.ID, e.Message, e.StackTrace.ToString());
                                 }
                                 else
                                 {
-                                    m_Log.WarnFormat("Failed to update prim {0}", info.Part.ID);
+                                    m_Log.WarnFormat("Failed to update prim {0}: {1}\n{2}", info.Part.ID, e.Message, e.StackTrace.ToString());
                                 }
                             }
                         }
@@ -198,7 +199,6 @@ namespace SilverSim.Database.MySQL.SimulationData
                             m_KnownSerialNumbers.Remove(info.LocalID);
                         }
                     }
-                    info.Part.SerialNumberLoadedFromDatabase = 0;
                     int count = Interlocked.Increment(ref m_ProcessedPrims);
                     if (count % 100 == 0)
                     {

@@ -134,6 +134,63 @@ namespace SilverSim.Scene.Types.Object
             public double Tension = 0;
             public Vector3 Force = Vector3.Zero;
             #endregion
+
+            public byte[] Serialization
+            {
+                get
+                {
+                    byte[] serialized = new byte[49];
+                    Force.ToBytes(serialized, 0);
+                    Buffer.BlockCopy(BitConverter.GetBytes(Softness), 0, serialized, 12, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(Gravity), 0, serialized, 16, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(Friction), 0, serialized, 24, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(Wind), 0, serialized, 32, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(Tension), 0, serialized, 40, 8);
+                    serialized[48] = IsFlexible ? (byte)1 : (byte)0;
+                    if(!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(serialized, 12, 4);
+                        Array.Reverse(serialized, 16, 8);
+                        Array.Reverse(serialized, 24, 8);
+                        Array.Reverse(serialized, 32, 8);
+                        Array.Reverse(serialized, 40, 8);
+                    }
+                    return serialized;
+                }
+                
+                set
+                {
+                    if(value.Length != 49)
+                    {
+                        throw new ArgumentException("Array length must be 49.");
+                    }
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(value, 12, 4);
+                        Array.Reverse(value, 16, 8);
+                        Array.Reverse(value, 24, 8);
+                        Array.Reverse(value, 32, 8);
+                        Array.Reverse(value, 40, 8);
+                    }
+
+                    Force.FromBytes(value, 0);
+                    Softness = BitConverter.ToInt32(value, 12);
+                    Gravity = BitConverter.ToDouble(value, 16);
+                    Friction = BitConverter.ToDouble(value, 24);
+                    Wind = BitConverter.ToDouble(value, 32);
+                    Tension = BitConverter.ToDouble(value, 40);
+                    IsFlexible = value[48] != 0;
+
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(value, 12, 4);
+                        Array.Reverse(value, 16, 8);
+                        Array.Reverse(value, 24, 8);
+                        Array.Reverse(value, 32, 8);
+                        Array.Reverse(value, 40, 8);
+                    }
+                }
+            }
         }
         private readonly FlexibleParam m_Flexible = new FlexibleParam();
         public class PointLightParam
@@ -153,6 +210,60 @@ namespace SilverSim.Scene.Types.Object
             public double Cutoff = 0;
             public double Falloff = 0;
             #endregion
+
+            public byte[] Serialization
+            {
+                get
+                {
+                    byte[] serialized = new byte[36];
+                    serialized[0] = IsLight ? (byte)1: (byte)0;
+                    serialized[1] = LightColor.R_AsByte;
+                    serialized[2] = LightColor.G_AsByte;
+                    serialized[3] = LightColor.B_AsByte;
+                    Buffer.BlockCopy(BitConverter.GetBytes(Intensity), 0, serialized, 4, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(Radius), 0, serialized, 12, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(Cutoff), 0, serialized, 20, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(Falloff), 0, serialized, 28, 8);
+                    if(!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(serialized, 4, 8);
+                        Array.Reverse(serialized, 12, 8);
+                        Array.Reverse(serialized, 20, 8);
+                        Array.Reverse(serialized, 28, 8);
+                    }
+                    return serialized;
+                }
+                set
+                {
+                    if(value.Length != 36)
+                    {
+                        throw new ArgumentException("Array length must be 36.");
+                    }
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(value, 4, 8);
+                        Array.Reverse(value, 12, 8);
+                        Array.Reverse(value, 20, 8);
+                        Array.Reverse(value, 28, 8);
+                    }
+                    IsLight = value[0] != 0;
+                    LightColor.R_AsByte = value[1];
+                    LightColor.G_AsByte = value[2];
+                    LightColor.B_AsByte = value[3];
+                    Intensity = BitConverter.ToDouble(value, 4);
+                    Radius = BitConverter.ToDouble(value, 12);
+                    Cutoff = BitConverter.ToDouble(value, 20);
+                    Falloff = BitConverter.ToDouble(value, 28);
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(value, 4, 8);
+                        Array.Reverse(value, 12, 8);
+                        Array.Reverse(value, 20, 8);
+                        Array.Reverse(value, 28, 8);
+                    }
+
+                }
+            }
         }
         private readonly PointLightParam m_PointLight = new PointLightParam();
 
@@ -172,6 +283,51 @@ namespace SilverSim.Scene.Types.Object
             public double ProjectionFocus;
             public double ProjectionAmbience;
             #endregion
+
+            public byte[] Serialization
+            {
+                get
+                {
+                    byte[] serialized = new byte[41];
+                    ProjectionTextureID.ToBytes(serialized, 0);
+                    Buffer.BlockCopy(BitConverter.GetBytes(ProjectionFOV), 0, serialized, 16, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(ProjectionFocus), 0, serialized, 24, 8);
+                    Buffer.BlockCopy(BitConverter.GetBytes(ProjectionAmbience), 0, serialized, 32, 8);
+                    serialized[40] = IsProjecting ? (byte)1 : (byte)0;
+                    if(!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(serialized, 16, 8);
+                        Array.Reverse(serialized, 24, 8);
+                        Array.Reverse(serialized, 32, 8);
+                    }
+                    return serialized;
+                }
+                set
+                {
+                    if(value.Length != 41)
+                    {
+                        throw new ArgumentException("Array length must be 41.");
+                    }
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(value, 16, 8);
+                        Array.Reverse(value, 24, 8);
+                        Array.Reverse(value, 32, 8);
+                    }
+
+                    ProjectionTextureID.FromBytes(value, 0);
+                    ProjectionFOV = BitConverter.ToDouble(value, 16);
+                    ProjectionFocus = BitConverter.ToDouble(value, 24);
+                    ProjectionAmbience = BitConverter.ToDouble(value, 32);
+
+                    if (!BitConverter.IsLittleEndian)
+                    {
+                        Array.Reverse(value, 16, 8);
+                        Array.Reverse(value, 24, 8);
+                        Array.Reverse(value, 32, 8);
+                    }
+                }
+            }
         }
 
         private readonly ProjectionParam m_Projection = new ProjectionParam();
