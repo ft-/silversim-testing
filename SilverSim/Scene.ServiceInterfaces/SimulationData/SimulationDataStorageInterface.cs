@@ -46,8 +46,22 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             get;
         }
 
-        readonly BlockingQueue<KeyValuePair<ObjectUpdateInfo, UUID>> m_StorageRequestQueue = new BlockingQueue<KeyValuePair<ObjectUpdateInfo, UUID>>();
-        bool m_StopStorageThread = false;
+        protected class StorageThreadInfo
+        {
+            public readonly BlockingQueue<ObjectUpdateInfo> StorageRequestQueue = new BlockingQueue<ObjectUpdateInfo>();
+            public readonly RwLockedList<uint> AssignedLocalIDs = new RwLockedList<uint>();
+            public StorageThreadInfo()
+            {
+
+            }
+        }
+        protected readonly List<StorageThreadInfo> m_StorageThreads = new List<StorageThreadInfo>();
+        protected readonly BlockingQueue<ObjectUpdateInfo> m_StorageMainRequestQueue = new BlockingQueue<ObjectUpdateInfo>();
+        protected int m_ActiveStorageRequests = 0;
+        protected bool m_StopStorageThread = false;
+        int m_MaxStorageThreads = 50;
+        int m_StorageThreadDivider = 10;
+        protected readonly RwLockedDictionary<uint, int> m_KnownSerialNumbers = new RwLockedDictionary<uint, int>();
 
         protected void StopStorageThread()
         {
@@ -56,53 +70,117 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
         protected void StartStorageThread()
         {
-            new Thread(StorageThread).Start();
+            new Thread(StorageMainThread).Start();
         }
 
-        protected void StorageThread()
+        void StartStorageThreadInstance(ObjectUpdateInfo info)
         {
-            Thread.CurrentThread.Name = "Storage Thread";
-            while(!m_StopStorageThread || m_StorageRequestQueue.Count != 0)
+            StorageThreadInfo sti = new StorageThreadInfo();
+            sti.StorageRequestQueue.Enqueue(info);
+            sti.AssignedLocalIDs.Add(info.LocalID);
+            new Thread(StorageWorkerThread).Start(sti);
+            m_StorageThreads.Add(sti);
+        }
+
+        protected void StorageMainThread()
+        {
+            Thread.CurrentThread.Name = "Storage Main Thread";
+            while(!m_StopStorageThread || m_StorageMainRequestQueue.Count != 0)
             {
-                /* thread always runs until queue is empty it does not stop before */
-                KeyValuePair<ObjectUpdateInfo, UUID> req;
-                ObjectUpdateInfo info;
+                ObjectUpdateInfo req;
                 try
                 {
-                    req = m_StorageRequestQueue.Dequeue(1000);
+                    req = m_StorageMainRequestQueue.Dequeue(1000);
                 }
                 catch
                 {
                     continue;
                 }
 
-                info = req.Key;
-
-                if(info.IsKilled)
+                int serialNumber = req.SerialNumber;
+                int knownSerial;
+                if(req.IsKilled)
                 {
-                    Objects.DeleteObjectPart(info.Part.ID);
-                    Objects.DeleteObjectGroup(info.Part.ObjectGroup.ID);
+                    /* has to be processed */
                 }
-                else if (info.Part.SerialNumberLoadedFromDatabase != info.Part.SerialNumber)
+                else if (req.Part.SerialNumberLoadedFromDatabase == serialNumber)
                 {
-                    ObjectGroup grp = info.Part.ObjectGroup;
-                    if(null != grp && !grp.IsTemporary)
+                    req.Part.SerialNumberLoadedFromDatabase = 0;
+                    if (serialNumber == req.SerialNumber)
                     {
-                        Objects.UpdateObjectPart(info.Part);
+                        /* ignore those */
+                        continue;
                     }
                 }
-                info.Part.SerialNumberLoadedFromDatabase = 0;
-
-                if(m_StorageRequestQueue.Count % 100 == 0)
+                else if (m_KnownSerialNumbers.TryGetValue(req.LocalID, out knownSerial))
                 {
-                    m_StorageLog.InfoFormat("{0} primitives left to store", m_StorageRequestQueue.Count);
+                    if(knownSerial == req.SerialNumber)
+                    {
+                        /* ignore it */
+                        continue;
+                    }
+                }
+
+                Interlocked.Increment(ref m_ActiveStorageRequests);
+                int reqthreads = m_ActiveStorageRequests / m_StorageThreadDivider + 1;
+                if(reqthreads > m_MaxStorageThreads)
+                {
+                    reqthreads = m_MaxStorageThreads;
+                }
+
+                StorageThreadInfo selected_sti = null;
+                StorageThreadInfo lowest_sti = null;
+                int lowest_count = 0;
+                lock (m_StorageThreads)
+                {
+                    foreach (StorageThreadInfo sti in m_StorageThreads)
+                    {
+                        if(sti.AssignedLocalIDs.Contains(req.LocalID))
+                        {
+                            selected_sti = sti;
+                            break;
+                        }
+                        if(sti.StorageRequestQueue.Count < lowest_count || lowest_count == 0)
+                        {
+                            if (m_StorageThreads.Count >= reqthreads)
+                            {
+                                lowest_count = sti.StorageRequestQueue.Count;
+                                lowest_sti = sti;
+                            }
+                        }
+                    }
+
+                    /* if one request has been scheduled, schedule to same thread */
+                    if(selected_sti != null)
+                    {
+                        selected_sti.StorageRequestQueue.Enqueue(req);
+                    }
+                    else if(lowest_sti != null)
+                    {
+                        lowest_sti.AssignedLocalIDs.Add(req.LocalID);
+                        lowest_sti.StorageRequestQueue.Enqueue(req);
+                    }
+                }
+
+                if(lowest_sti == null && selected_sti == null)
+                {
+                    try
+                    {
+                        StartStorageThreadInstance(req);
+                    }
+                    catch
+                    {
+                        
+                    }
                 }
             }
         }
 
+        protected abstract void StorageWorkerThread(object p);
+
         public void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID)
         {
-            m_StorageRequestQueue.Enqueue(new KeyValuePair<ObjectUpdateInfo, UUID>(info, fromSceneID));
+            m_StorageMainRequestQueue.Enqueue(info);
         }
     }
 }

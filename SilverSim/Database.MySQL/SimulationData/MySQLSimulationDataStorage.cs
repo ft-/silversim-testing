@@ -6,7 +6,12 @@ using MySql.Data.MySqlClient;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Database;
+using SilverSim.Types;
+using System.Collections.Generic;
+using System.Threading;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -110,6 +115,99 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             StopStorageThread();
         }
+
+        protected override void StorageWorkerThread(object p)
+        {
+            StorageThreadInfo s = (StorageThreadInfo)p;
+            Thread.CurrentThread.Name = "Storage Worker Thread";
+            bool m_SelfStopStorageThread = false;
+            int count = 0;
+            int retries = 20;
+            using(MySqlConnection connection = new MySqlConnection())
+            {
+                bool connected = false;
+                while (!connected)
+                {
+                    try
+                    {
+                        connection.Open();
+                        connected = true;
+                    }
+                    catch
+                    {
+                        Thread.Sleep(1000);
+                        if (--retries == 0)
+                        {
+                            return;
+                        }
+                    }
+                }
+                while((!m_StopStorageThread && !m_SelfStopStorageThread) || s.StorageRequestQueue.Count != 0)
+                {
+                    /* thread always runs until queue is empty it does not stop before */
+                    ObjectUpdateInfo info;
+                    try
+                    {
+                        info = s.StorageRequestQueue.Dequeue(5000);
+                    }
+                    catch
+                    {
+                        lock (m_StorageThreads)
+                        {
+                            m_StorageThreads.Remove(s);
+                        }
+                        m_SelfStopStorageThread = true;
+                        continue;
+                    }
+
+                    if(info.IsKilled)
+                    {
+                        m_ObjectStorage.DeleteObjectPart(connection, info.Part.ID);
+                        m_ObjectStorage.DeleteObjectGroup(connection, info.Part.ObjectGroup.ID);
+                        m_KnownSerialNumbers.Remove(info.LocalID);
+                    }
+                    else
+                    {
+                        ObjectGroup grp = info.Part.ObjectGroup;
+                        if(null != grp && !grp.IsTemporary)
+                        {
+                            try
+                            {
+                                m_ObjectStorage.UpdateObjectPartInner(connection, info.Part);
+                                m_KnownSerialNumbers[info.LocalID] = info.SerialNumber;
+                            }
+                            catch
+                            {
+                                SceneInterface scene = grp.Scene;
+                                if (scene != null)
+                                {
+                                    m_Log.WarnFormat("Failed to update prim {0} for {1}", info.Part.ID, scene.ID);
+                                }
+                                else
+                                {
+                                    m_Log.WarnFormat("Failed to update prim {0}", info.Part.ID);
+                                }
+                            }
+                        }
+                        else if(m_KnownSerialNumbers.ContainsKey(info.LocalID))
+                        {
+                            /* handle persistent => temporary change */
+                            m_ObjectStorage.DeleteObjectPart(connection, info.Part.ID);
+                            m_ObjectStorage.DeleteObjectGroup(connection, info.Part.ObjectGroup.ID);
+                            m_KnownSerialNumbers.Remove(info.LocalID);
+                        }
+                    }
+                    info.Part.SerialNumberLoadedFromDatabase = 0;
+                    if (++count % 100 == 0)
+                    {
+                        m_Log.DebugFormat("Processed {0} prims", count);
+                    }
+                    s.AssignedLocalIDs.Remove(info.Part.LocalID);
+                    Interlocked.Decrement(ref m_ActiveStorageRequests);
+                }
+            }
+        }
+
     }
     #endregion
 

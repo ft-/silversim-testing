@@ -85,7 +85,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 Dictionary<UUID, UUID> nextOwnerAssetIDs = new Dictionary<UUID, UUID>();
                 Dictionary<UUID, SortedDictionary<int, ObjectPart>> objGroupParts = new Dictionary<UUID, SortedDictionary<int, ObjectPart>>();
                 List<UUID> objPartIDs = new List<UUID>();
-                Dictionary<UUID, List<ObjectPartInventoryItem>> objPartInventoryItems = new Dictionary<UUID, List<ObjectPartInventoryItem>>();
+                Dictionary<UUID, ObjectPart> objParts = new Dictionary<UUID,ObjectPart>();
                 List<UUID> orphanedPrims = new List<UUID>();
                 List<KeyValuePair<UUID, UUID>> orphanedPrimInventories = new List<KeyValuePair<UUID, UUID>>();
 
@@ -130,7 +130,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 }
                                 catch(Exception e)
                                 {
-                                    m_Log.ErrorFormat("Failed to load object {0}: {1}\n{2}", objgroupID, e.Message, e.StackTrace.ToString());
+                                    m_Log.WarnFormat("Failed to load object {0}: {1}\n{2}", objgroupID, e.Message, e.StackTrace.ToString());
                                     objGroups.Remove(objgroupID);
                                 }
                             }
@@ -258,6 +258,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                                     objGroupParts[rootPartID].Add(objpart.LoadedLinkNumber, objpart);
                                     objPartIDs.Add(objpart.ID);
+                                    objParts[objpart.ID] = objpart;
                                     if ((++primcount) % 5000 == 0)
                                     {
                                         m_Log.InfoFormat("Loading prims for region ID {0} - {1} loaded", regionID, primcount);
@@ -265,7 +266,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 }
                                 else
                                 {
-                                    m_Log.InfoFormat("Found orphan primitive for region ID {0}: {1}", regionID, dbReader.GetUUID("ID"));
+                                    m_Log.WarnFormat("deleting orphan prim in region ID {0}: {1}", regionID, dbReader.GetUUID("ID"));
                                     orphanedPrims.Add(dbReader.GetUUID("ID"));
                                 }
                             }
@@ -274,70 +275,13 @@ namespace SilverSim.Database.MySQL.SimulationData
                     m_Log.InfoFormat("Loaded prims for region ID {0} - {1} loaded", regionID, primcount);
 
                     int primitemcount = 0;
-                    m_Log.InfoFormat("Loading prim inventories for region ID {0} - {1} loaded", regionID, primcount);
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT primitems.* FROM primitems INNER JOIN (objects INNER JOIN prims ON objects.id LIKE prims.RootPartID) ON primitems.PrimID LIKE prims.ID WHERE objects.regionID LIKE ?regionid", connection))
+                    m_Log.InfoFormat("Loading prim inventories for region ID {0}", regionID);
+                    foreach(ObjectPart part in objParts.Values)
                     {
-                        cmd.CommandTimeout = 3600;
-                        cmd.Parameters.AddWithValue("?regionid", regionID);
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        LoadInventory(connection, part);
+                        if ((++primitemcount) % 5000 == 0)
                         {
-                            while (dbReader.Read())
-                            {
-                                UUID primID = dbReader.GetUUID("PrimID");
-                                if (objPartIDs.Contains(primID))
-                                {
-                                    ObjectPartInventoryItem item = new ObjectPartInventoryItem();
-                                    item.AssetID = dbReader.GetUUID("AssetID");
-                                    item.AssetType = (AssetType)(int)dbReader["AssetType"];
-                                    item.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
-                                    item.Creator = dbReader.GetUUI("Creator");
-                                    item.Description = (string)dbReader["Description"];
-                                    item.Flags = (uint)dbReader["Flags"];
-                                    item.Group = dbReader.GetUGI("Group");
-                                    item.IsGroupOwned = (uint)dbReader["GroupOwned"] != 0;
-                                    item.ID = dbReader.GetUUID("InventoryID");
-                                    item.InventoryType = (InventoryType)(int)dbReader["InventoryType"];
-                                    item.LastOwner = new UUI((string)dbReader["LastOwner"]);
-                                    item.Name = (string)dbReader["Name"];
-                                    item.Owner = dbReader.GetUUI("Owner");
-                                    item.ParentFolderID = dbReader.GetUUID("ParentFolderID");
-                                    item.Permissions.Base = (InventoryPermissionsMask)(uint)dbReader["BasePermissions"];
-                                    item.Permissions.Current = (InventoryPermissionsMask)(uint)dbReader["CurrentPermissions"];
-                                    item.Permissions.EveryOne = (InventoryPermissionsMask)(uint)dbReader["EveryOnePermissions"];
-                                    item.Permissions.Group = (InventoryPermissionsMask)(uint)dbReader["GroupPermissions"];
-                                    item.Permissions.NextOwner = (InventoryPermissionsMask)(uint)dbReader["NextOwnerPermissions"];
-                                    item.SaleInfo.Type = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
-                                    item.SaleInfo.Price = (int)dbReader["SalePrice"];
-                                    item.SaleInfo.PermMask = (InventoryPermissionsMask)(uint)dbReader["SalePermMask"];
-                                    ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
-                                    if ((string)dbReader["PermsGranter"] != "")
-                                    {
-                                        try
-                                        {
-                                            grantinfo.PermsGranter = dbReader.GetUUI("PermsGranter");
-                                        }
-                                        catch
-                                        {
-
-                                        }
-                                    }
-                                    if(!objPartInventoryItems.ContainsKey(primID))
-                                    {
-                                        objPartInventoryItems.Add(primID, new List<ObjectPartInventoryItem>());
-                                    }
-                                    objPartInventoryItems[primID].Add(item);
-                                    grantinfo.PermsMask = (Types.Script.ScriptPermissions)(uint)dbReader["PermsMask"];
-                                    if ((++primitemcount) % 5000 == 0)
-                                    {
-                                        m_Log.InfoFormat("Loading prim inventories for region ID {0} - {1} loaded", regionID, primcount);
-                                    }
-                                }
-                                else
-                                {
-                                    m_Log.InfoFormat("orphan prim inventory found for region ID {0}: {1}", regionID, dbReader.GetUUID("InventoryID"));
-                                    orphanedPrimInventories.Add(new KeyValuePair<UUID, UUID>(primID, dbReader.GetUUID("InventoryID")));
-                                }
-                            }
+                            m_Log.InfoFormat("Loading prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
                         }
                     }
                     m_Log.InfoFormat("Loaded prim inventories for region ID {0} - {1} loaded", regionID, primitemcount);
@@ -355,18 +299,21 @@ namespace SilverSim.Database.MySQL.SimulationData
                     {
                         foreach (ObjectPart objpart in objGroupParts[kvp.Key].Values)
                         {
-                            if (objPartInventoryItems.ContainsKey(objpart.ID))
-                            {
-                                foreach (ObjectPartInventoryItem item in objPartInventoryItems[objpart.ID])
-                                {
-                                    objpart.Inventory.Add(item.ID, item.Name, item);
-                                }
-                            }
                             kvp.Value.Add(objpart.LoadedLinkNumber, objpart.ID, objpart);
                         }
-                        kvp.Value.OriginalAssetID = originalAssetIDs[kvp.Value.ID];
-                        kvp.Value.NextOwnerAssetID = nextOwnerAssetIDs[kvp.Value.ID];
-                        kvp.Value.FinalizeObject();
+
+                        try
+                        {
+                            kvp.Value.OriginalAssetID = originalAssetIDs[kvp.Value.ID];
+                            kvp.Value.NextOwnerAssetID = nextOwnerAssetIDs[kvp.Value.ID];
+                            kvp.Value.FinalizeObject();
+                        }
+                        catch
+                        {
+                            m_Log.WarnFormat("deleting orphan object in region ID {0}: {1}", regionID, kvp.Key);
+                            DeleteObjectGroup(kvp.Key);
+                            removeObjGroups.Add(kvp.Key);
+                        }
                     }
                 }
 
@@ -404,54 +351,59 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM primitems WHERE PrimID LIKE ?id", connection))
+                LoadInventory(connection, objpart);
+            }
+        }
+
+        private void LoadInventory(MySqlConnection connection, ObjectPart objpart)
+        {
+            using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM primitems WHERE PrimID LIKE ?id", connection))
+            {
+                cmd.Parameters.AddWithValue("?id", objpart.ID);
+                using (MySqlDataReader dbReader = cmd.ExecuteReader())
                 {
-                    cmd.Parameters.AddWithValue("?id", objpart.ID);
-                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    ObjectPartInventoryItem item;
+
+                    while (dbReader.Read())
                     {
-                        ObjectPartInventoryItem item;
-
-                        while (dbReader.Read())
+                        item = new ObjectPartInventoryItem();
+                        item.AssetID = dbReader.GetUUID("AssetID");
+                        item.AssetType = (AssetType)(int)dbReader["AssetType"];
+                        item.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
+                        item.Creator = dbReader.GetUUI("Creator");
+                        item.Description = (string)dbReader["Description"];
+                        item.Flags = (uint)dbReader["Flags"];
+                        item.Group = dbReader.GetUGI("Group");
+                        item.IsGroupOwned = (uint)dbReader["GroupOwned"] != 0;
+                        item.ID = dbReader.GetUUID("InventoryID");
+                        item.InventoryType = (InventoryType)(int)dbReader["InventoryType"];
+                        item.LastOwner = new UUI((string)dbReader["LastOwner"]);
+                        item.Name = (string)dbReader["Name"];
+                        item.Owner = dbReader.GetUUI("Owner");
+                        item.ParentFolderID = dbReader.GetUUID("ParentFolderID");
+                        item.Permissions.Base = (InventoryPermissionsMask)(uint)dbReader["BasePermissions"];
+                        item.Permissions.Current = (InventoryPermissionsMask)(uint)dbReader["CurrentPermissions"];
+                        item.Permissions.EveryOne = (InventoryPermissionsMask)(uint)dbReader["EveryOnePermissions"];
+                        item.Permissions.Group = (InventoryPermissionsMask)(uint)dbReader["GroupPermissions"];
+                        item.Permissions.NextOwner = (InventoryPermissionsMask)(uint)dbReader["NextOwnerPermissions"];
+                        item.SaleInfo.Type = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
+                        item.SaleInfo.Price = (int)dbReader["SalePrice"];
+                        item.SaleInfo.PermMask = (InventoryPermissionsMask)(uint)dbReader["SalePermMask"];
+                        ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
+                        if ((string)dbReader["PermsGranter"] != "")
                         {
-                            item = new ObjectPartInventoryItem();
-                            item.AssetID = dbReader.GetUUID("AssetID");
-                            item.AssetType = (AssetType)(int)dbReader["AssetType"];
-                            item.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
-                            item.Creator = dbReader.GetUUI("Creator");
-                            item.Description = (string)dbReader["Description"];
-                            item.Flags = (uint)dbReader["Flags"];
-                            item.Group = dbReader.GetUGI("Group");
-                            item.IsGroupOwned = (uint)dbReader["GroupOwned"] != 0;
-                            item.ID = dbReader.GetUUID("InventoryID");
-                            item.InventoryType = (InventoryType)(int)dbReader["InventoryType"];
-                            item.LastOwner = new UUI((string)dbReader["LastOwner"]);
-                            item.Name = (string)dbReader["Name"];
-                            item.Owner = dbReader.GetUUI("Owner");
-                            item.ParentFolderID = dbReader.GetUUID("ParentFolderID");
-                            item.Permissions.Base = (InventoryPermissionsMask)(uint)dbReader["BasePermissions"];
-                            item.Permissions.Current = (InventoryPermissionsMask)(uint)dbReader["CurrentPermissions"];
-                            item.Permissions.EveryOne = (InventoryPermissionsMask)(uint)dbReader["EveryOnePermissions"];
-                            item.Permissions.Group = (InventoryPermissionsMask)(uint)dbReader["GroupPermissions"];
-                            item.Permissions.NextOwner = (InventoryPermissionsMask)(uint)dbReader["NextOwnerPermissions"];
-                            item.SaleInfo.Type = (InventoryItem.SaleInfoData.SaleType)(int)dbReader["SaleType"];
-                            item.SaleInfo.Price = (int)dbReader["SalePrice"];
-                            item.SaleInfo.PermMask = (InventoryPermissionsMask)(uint)dbReader["SalePermMask"];
-                            ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
-                            if ((string)dbReader["PermsGranter"] != "")
+                            try
                             {
-                                try
-                                {
-                                    grantinfo.PermsGranter = dbReader.GetUUI("PermsGranter");
-                                }
-                                catch
-                                {
-
-                                }
+                                grantinfo.PermsGranter = dbReader.GetUUI("PermsGranter");
                             }
-                            grantinfo.PermsMask = (Types.Script.ScriptPermissions)(uint)dbReader["PermsMask"];
+                            catch
+                            {
 
-                            objpart.Inventory.Add(item.ID, item.Name, item);
+                            }
                         }
+                        grantinfo.PermsMask = (Types.Script.ScriptPermissions)(uint)dbReader["PermsMask"];
+
+                        objpart.Inventory.Add(item.ID, item.Name, item);
                     }
                 }
             }
@@ -647,20 +599,25 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(delegate()
-                {
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE ?id", connection))
-                    {
-                        cmd.Parameters.AddWithValue("?id", obj);
-                        cmd.ExecuteNonQuery();
-                    }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE ID LIKE ?id", connection))
-                    {
-                        cmd.Parameters.AddWithValue("?id", obj);
-                        cmd.ExecuteNonQuery();
-                    }
-                });
+                DeleteObjectPart(connection, obj);
             }
+        }
+
+        public void DeleteObjectPart(MySqlConnection connection, UUID obj)
+        {
+            connection.InsideTransaction(delegate()
+            {
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE ?id", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", obj);
+                    cmd.ExecuteNonQuery();
+                }
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE ID LIKE ?id", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", obj);
+                    cmd.ExecuteNonQuery();
+                }
+            });
         }
 
         public override void DeleteObjectGroup(UUID obj)
@@ -668,25 +625,30 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                connection.InsideTransaction(delegate()
-                {
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE EXISTS (SELECT null FROM prims WHERE primitems.PrimID LIKE prims.ID AND prims.RootPartID LIKE ?id)", connection))
-                    {
-                        cmd.Parameters.AddWithValue("?id", obj);
-                        cmd.ExecuteNonQuery();
-                    }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE RootPartID LIKE ?id", connection))
-                    {
-                        cmd.Parameters.AddWithValue("?id", obj);
-                        cmd.ExecuteNonQuery();
-                    }
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM objects WHERE ID LIKE ?id", connection))
-                    {
-                        cmd.Parameters.AddWithValue("?id", obj);
-                        cmd.ExecuteNonQuery();
-                    }
-                });
+                DeleteObjectGroup(connection, obj);
             }
+        }
+
+        public void DeleteObjectGroup(MySqlConnection connection, UUID obj)
+        {
+            connection.InsideTransaction(delegate()
+            {
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE EXISTS (SELECT null FROM prims WHERE primitems.PrimID LIKE prims.ID AND prims.RootPartID LIKE ?id)", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", obj);
+                    cmd.ExecuteNonQuery();
+                }
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE RootPartID LIKE ?id", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", obj);
+                    cmd.ExecuteNonQuery();
+                }
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM objects WHERE ID LIKE ?id", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", obj);
+                    cmd.ExecuteNonQuery();
+                }
+            });
         }
         #endregion
 
@@ -709,8 +671,22 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
+        public void UpdateObjectPartInner(MySqlConnection connection, ObjectPart objpart)
+        {
+            ObjectGroup grp = objpart.ObjectGroup;
+            if (null != grp && objpart.LinkNumber == 1)
+            {
+                UpdateObjectGroup(connection, grp);
+            }
+            UpdateObjectPart(connection, objpart);
+            foreach (ObjectPartInventoryItem item in objpart.Inventory.Values)
+            {
+                UpdateObjectPartInventoryItem(connection, objpart.ID, item);
+            }
+        }
+
         const string UpdateObjectPartInventoryItemSql = "REPLACE INTO primitems " +
-            "(AssetId, AssetType, CreationDate, Creator, Description, Flags, Group, GroupOwned, PrimID, `Name`, InventoryID, " +
+            "(AssetId, AssetType, CreationDate, Creator, Description, Flags, `Group`, GroupOwned, PrimID, `Name`, InventoryID, " +
             "InventoryType, LastOwner, Owner, ParentFolderID, BasePermissions, CurrentPermissions, EveryOnePermissions, " + 
             "GroupPermissions, NextOwnerPermissions, SaleType, SalePrice, SalePermMask, PermsGranter, PermsMask)" +
             "VALUES (?AssetId, ?AssetType, ?CreationDate, ?Creator, ?Description, ?Flags, ?Group, ?GroupOwned, ?PrimID, ?Name, ?InventoryID, " +
@@ -718,7 +694,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             "?GroupPermissions, ?NextOwnerPermissions, ?SaleType, ?SalePrice, ?SalePermMask, ?PermsGranter, ?PermsMask)";
         private void UpdateObjectPartInventoryItem(MySqlConnection connection, UUID primID, ObjectPartInventoryItem item)
         {
-            using(MySqlCommand cmd = new MySqlCommand(UpdateObjectGroupSql, connection))
+            using (MySqlCommand cmd = new MySqlCommand(UpdateObjectPartInventoryItemSql, connection))
             {
                 cmd.Parameters.AddWithValue("?AssetId", item.AssetID.ToString());
                 cmd.Parameters.AddWithValue("?AssetType", (int)item.AssetType);
@@ -733,7 +709,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 cmd.Parameters.AddWithValue("?InventoryID", item.ID.ToString());
                 cmd.Parameters.AddWithValue("?InventoryType", (int)item.InventoryType);
                 cmd.Parameters.AddWithValue("?LastOwner", item.LastOwner.ToString());
-                cmd.Parameters.AddWithValue("vOwner", item.Owner.ToString());
+                cmd.Parameters.AddWithValue("?Owner", item.Owner.ToString());
                 cmd.Parameters.AddWithValue("?ParentFolderID", item.ParentFolderID.ToString());
                 cmd.Parameters.AddWithValue("?BasePermissions", (uint)item.Permissions.Base);
                 cmd.Parameters.AddWithValue("?CurrentPermissions", (uint)item.Permissions.Current);

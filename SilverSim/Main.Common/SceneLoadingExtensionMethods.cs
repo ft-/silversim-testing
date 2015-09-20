@@ -44,6 +44,7 @@ namespace SilverSim.Main.Common
         public static void LoadSceneThread(object o)
         {
             SceneLoadingParams loadparams = (SceneLoadingParams)o;
+            Thread.CurrentThread.Name = "Scene Loading Thread for " + loadparams.Scene.Name + " (" + loadparams.Scene.ID + ")";
             List<UUID> parcels;
             try
             {
@@ -139,6 +140,7 @@ namespace SilverSim.Main.Common
                 if (objects.Count != 0)
                 {
                     List<ObjectGroup> objGroups = loadparams.SimulationDataStorage.Objects[loadparams.Scene.ID];
+                    m_Log.InfoFormat("Adding objects to {0} ({1})", loadparams.Scene.RegionData.Name, loadparams.Scene.ID);
                     foreach (ObjectGroup grp in objGroups)
                     {
                         try
@@ -163,6 +165,7 @@ namespace SilverSim.Main.Common
                     m_Log.InfoFormat("Loaded {0} objects for {1} ({2})", objects.Count, loadparams.Scene.RegionData.Name, loadparams.Scene.ID);
                 }
 
+                m_Log.InfoFormat("Loading terrain for {0} ({1})", loadparams.Scene.RegionData.Name, loadparams.Scene.ID);
                 List<LayerPatch> patches;
                 lock (loadparams.Scene.m_LoaderThreadLock)
                 {
