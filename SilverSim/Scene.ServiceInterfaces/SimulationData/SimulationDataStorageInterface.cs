@@ -109,6 +109,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                     if (serialNumber == req.SerialNumber)
                     {
                         /* ignore those */
+                        m_KnownSerialNumbers[req.LocalID] = serialNumber;
                         continue;
                     }
                 }
