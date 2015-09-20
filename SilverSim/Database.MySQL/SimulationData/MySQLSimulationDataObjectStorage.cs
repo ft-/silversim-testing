@@ -859,7 +859,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "TextureAnimationBytes BLOB," +
                 "KEY RootPartID (RootPartID)," +
                 "UNIQUE KEY ID (ID)," +
-                "PRIMARY KEY(ID, RootPartID))"
+                "PRIMARY KEY(ID, RootPartID)) ROW_FORMAT=DYNAMIC "
         };
         #endregion
     }
