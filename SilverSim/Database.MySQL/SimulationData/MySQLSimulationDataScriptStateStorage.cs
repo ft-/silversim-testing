@@ -36,9 +36,9 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM scriptstates WHERE RegionID LIKE ?regionID AND PrimID LIKE ?primID AND ItemID LIKE ?itemID", connection))
                     {
-                        cmd.Parameters.AddWithValue("?regionID", regionID);
-                        cmd.Parameters.AddWithValue("?primID", primID);
-                        cmd.Parameters.AddWithValue("?itemID", itemID);
+                        cmd.Parameters.AddWithValue("?regionID", regionID.ToString());
+                        cmd.Parameters.AddWithValue("?primID", primID.ToString());
+                        cmd.Parameters.AddWithValue("?itemID", itemID.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (dbReader.Read())
@@ -60,9 +60,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                     {
                         using(MySqlCommand cmd = new MySqlCommand("DELETE FROM scriptstates WHERE RegionID LIKE ?regionID AND PrimID LIKE ?primID AND ItemID LIKE ?itemID", connection))
                         {
-                            cmd.Parameters.AddWithValue("?regionID", regionID);
-                            cmd.Parameters.AddWithValue("?primID", primID);
-                            cmd.Parameters.AddWithValue("?itemID", itemID);
+                            cmd.Parameters.AddWithValue("?regionID", regionID.ToString());
+                            cmd.Parameters.AddWithValue("?primID", primID.ToString());
+                            cmd.Parameters.AddWithValue("?itemID", itemID.ToString());
                             cmd.ExecuteNonQuery();
                         }
                     }

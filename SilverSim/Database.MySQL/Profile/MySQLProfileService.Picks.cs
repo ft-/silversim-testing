@@ -28,7 +28,7 @@ namespace SilverSim.Database.MySQL.Profile
                     conn.Open();
                     using(MySqlCommand cmd = new MySqlCommand("SELECT pickuuid, `name` FROM userpicks WHERE creatoruuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", user.ID);
+                        cmd.Parameters.AddWithValue("?uuid", user.ID.ToString());
                         using(MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while(reader.Read())
@@ -51,7 +51,7 @@ namespace SilverSim.Database.MySQL.Profile
                         conn.Open();
                         using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM userpicks WHERE pickuuid LIKE ?uuid", conn))
                         {
-                            cmd.Parameters.AddWithValue("?uuid", id);
+                            cmd.Parameters.AddWithValue("?uuid", id.ToString());
                             using(MySqlDataReader reader = cmd.ExecuteReader())
                             {
                                 if(reader.Read())
@@ -82,13 +82,13 @@ namespace SilverSim.Database.MySQL.Profile
             public void Update(ProfilePick value)
             {
                 Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                replaceVals["pickuuid"] = value.PickID;
-                replaceVals["creatoruuid"] = value.Creator.ID;
+                replaceVals["pickuuid"] = value.PickID.ToString();
+                replaceVals["creatoruuid"] = value.Creator.ID.ToString();
                 replaceVals["toppick"] = value.TopPick ? 1 : 0;
-                replaceVals["parceluuid"] = value.ParcelID;
+                replaceVals["parceluuid"] = value.ParcelID.ToString();
                 replaceVals["name"] = value.Name;
                 replaceVals["description"] = value.Description;
-                replaceVals["snapshotuuid"] = value.SnapshotID;
+                replaceVals["snapshotuuid"] = value.SnapshotID.ToString();
                 replaceVals["parcelname"] = value.ParcelName;
                 replaceVals["originalname"] = value.OriginalName;
                 replaceVals["simname"] = value.SimName;

@@ -73,7 +73,7 @@ namespace SilverSim.Database.MySQL.AvatarName
 
                     using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE AvatarID LIKE ?avatarid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?avatarid", key);
+                        cmd.Parameters.AddWithValue("?avatarid", key.ToString());
                         using(MySqlDataReader dbreader = cmd.ExecuteReader())
                         {
                             if(!dbreader.Read())
@@ -101,7 +101,7 @@ namespace SilverSim.Database.MySQL.AvatarName
 
                         using (MySqlCommand cmd = new MySqlCommand("DELETE FROM avatarnames WHERE AvatarID LIKE ?id", connection))
                         {
-                            cmd.Parameters.AddWithValue("?id", key);
+                            cmd.Parameters.AddWithValue("?id", key.ToString());
                             if(cmd.ExecuteNonQuery() < 1)
                             {
                                 throw new KeyNotFoundException();
@@ -113,8 +113,8 @@ namespace SilverSim.Database.MySQL.AvatarName
                 else if(value.IsAuthoritative) /* do not store non-authoritative entries */
                 {
                     Dictionary<string, object> data = new Dictionary<string, object>();
-                    data["AvatarID"] = value.ID;
-                    data["HomeURI"] = value.HomeURI;
+                    data["AvatarID"] = value.ID.ToString();
+                    data["HomeURI"] = value.HomeURI.ToString();
                     data["FirstName"] = value.FirstName;
                     data["LastName"] = value.LastName;
                     using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))

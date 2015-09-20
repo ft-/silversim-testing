@@ -85,8 +85,8 @@ namespace SilverSim.Database.MySQL.Groups
 
                 using (MySqlCommand cmd = new MySqlCommand("REPLACE INTO groupnames (GroupID, HomeURI, GroupName) VALUES (?groupID, ?homeURI, ?groupName)", connection))
                 {
-                    cmd.Parameters.AddWithValue("?groupID", group.ID);
-                    cmd.Parameters.AddWithValue("?homeURI", group.HomeURI);
+                    cmd.Parameters.AddWithValue("?groupID", group.ID.ToString());
+                    cmd.Parameters.AddWithValue("?homeURI", group.HomeURI.ToString());
                     cmd.Parameters.AddWithValue("?groupName", group.GroupName);
                     cmd.ExecuteNonQuery();
                 }

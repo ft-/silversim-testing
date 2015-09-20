@@ -54,7 +54,7 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT EstateID FROM estate_regionmap WHERE RegionID = ?regionid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?regionid", regionID);
+                        cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                         using(MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if(reader.Read())
@@ -70,7 +70,7 @@ namespace SilverSim.Database.MySQL.Estate
             {
                 Dictionary<string, object> vals = new Dictionary<string,object>();
                 vals["EstateID"] = value;
-                vals["RegionID"] = regionID;
+                vals["RegionID"] = regionID.ToString();
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();

@@ -70,7 +70,7 @@ namespace SilverSim.Database.MySQL.GridUser
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM griduser WHERE ID LIKE ?id", conn))
                     {
-                        cmd.Parameters.AddWithValue("?id", userID);
+                        cmd.Parameters.AddWithValue("?id", userID.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (dbReader.Read())
@@ -99,7 +99,7 @@ namespace SilverSim.Database.MySQL.GridUser
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET IsOnline = 1, LastLogin = ?curtime WHERE ID LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", userID.ID);
+                    cmd.Parameters.AddWithValue("?id", userID.ID.ToString());
                     cmd.Parameters.AddWithValue("?curtime", Date.GetUnixTime());
                     if (cmd.ExecuteNonQuery() >= 1)
                     {
@@ -108,7 +108,7 @@ namespace SilverSim.Database.MySQL.GridUser
                 }
 
                 Dictionary<string, object> param = new Dictionary<string,object>();
-                param["ID"] = userID.ID;
+                param["ID"] = userID.ID.ToString();
                 param["LastLogin"] = Date.GetUnixTime();
                 param["IsOnline"] = 1;
                 conn.ReplaceInsertInto("griduser", param);
@@ -123,7 +123,7 @@ namespace SilverSim.Database.MySQL.GridUser
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET IsOnline = 1, LastLogin = ?curtime WHERE ID LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", userID.ID);
+                    cmd.Parameters.AddWithValue("?id", userID.ID.ToString());
                     cmd.Parameters.AddWithValue("?curtime", Date.GetUnixTime());
                     if (cmd.ExecuteNonQuery() < 1)
                     {
@@ -140,9 +140,9 @@ namespace SilverSim.Database.MySQL.GridUser
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET IsOnline = 0, LastLogout = ?curtime, LastRegionID = ?regionID, LastPosition = ?position, LastLookAt = ?lookAt WHERE ID LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", userID.ID);
+                    cmd.Parameters.AddWithValue("?id", userID.ID.ToString());
                     cmd.Parameters.AddWithValue("?curtime", Date.GetUnixTime());
-                    cmd.Parameters.AddWithValue("?regionID", lastRegionID);
+                    cmd.Parameters.AddWithValue("?regionID", lastRegionID.ToString());
                     cmd.Parameters.AddWithValue("?position", lastPosition.ToString());
                     cmd.Parameters.AddWithValue("?lookAt", lastLookAt.ToString());
                     if (cmd.ExecuteNonQuery() < 1)
@@ -160,8 +160,8 @@ namespace SilverSim.Database.MySQL.GridUser
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET HomeRegionID = ?regionID, HomePosition = ?position, HomeLookAt = ?lookAt WHERE ID LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", userID.ID);
-                    cmd.Parameters.AddWithValue("?regionID", homeRegionID);
+                    cmd.Parameters.AddWithValue("?id", userID.ID.ToString());
+                    cmd.Parameters.AddWithValue("?regionID", homeRegionID.ToString());
                     cmd.Parameters.AddWithValue("?position", homePosition.ToString());
                     cmd.Parameters.AddWithValue("?lookAt", homeLookAt.ToString());
                     if (cmd.ExecuteNonQuery() < 1)
@@ -179,8 +179,8 @@ namespace SilverSim.Database.MySQL.GridUser
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("UPDATE griduser SET LastRegionID = ?regionID, LastPosition = ?position, LastLookAt = ?lookAt WHERE ID LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", userID.ID);
-                    cmd.Parameters.AddWithValue("?regionID", lastRegionID);
+                    cmd.Parameters.AddWithValue("?id", userID.ID.ToString());
+                    cmd.Parameters.AddWithValue("?regionID", lastRegionID.ToString());
                     cmd.Parameters.AddWithValue("?position", lastPosition.ToString());
                     cmd.Parameters.AddWithValue("?lookAt", lastLookAt.ToString());
                     if (cmd.ExecuteNonQuery() < 1)
@@ -199,7 +199,7 @@ namespace SilverSim.Database.MySQL.GridUser
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM griduser WHERE ID LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", userAccount);
+                    cmd.Parameters.AddWithValue("?id", userAccount.ToString());
                     cmd.ExecuteNonQuery();
                 }
             }

@@ -28,8 +28,8 @@ namespace SilverSim.Database.MySQL.Profile
                         conn.Open();
                         using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM usernotes WHERE useruuid LIKE ?user AND targetuuid LIKE ?target", conn))
                         {
-                            cmd.Parameters.AddWithValue("?user", user.ID);
-                            cmd.Parameters.AddWithValue("?target", target.ID);
+                            cmd.Parameters.AddWithValue("?user", user.ID.ToString());
+                            cmd.Parameters.AddWithValue("?target", target.ID.ToString());
                             using(MySqlDataReader reader = cmd.ExecuteReader())
                             {
                                 if(reader.Read())
@@ -44,8 +44,8 @@ namespace SilverSim.Database.MySQL.Profile
                 set
                 {
                     Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                    replaceVals["user"] = user.ID;
-                    replaceVals["target"] = target.ID;
+                    replaceVals["user"] = user.ID.ToString();
+                    replaceVals["target"] = target.ID.ToString();
                     replaceVals["notes"] = value;
                     using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {

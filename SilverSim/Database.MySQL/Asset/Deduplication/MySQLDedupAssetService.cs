@@ -53,7 +53,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT id, access_time FROM assetrefs WHERE id LIKE ?id", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", key);
+                    cmd.Parameters.AddWithValue("?id", key.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if(dbReader.Read())
@@ -139,7 +139,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assetrefs INNER JOIN assetdata ON assetrefs.hash = assetdata.hash AND assetrefs.assetType = assetdata.assetType WHERE id LIKE ?id", conn))
                     {
-                        cmd.Parameters.AddWithValue("?id", key);
+                        cmd.Parameters.AddWithValue("?id", key.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (dbReader.Read())
@@ -262,13 +262,13 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             {
                                 // create unix epoch time
                                 ulong now = Date.GetUnixTime();
-                                cmd.Parameters.AddWithValue("?id", asset.ID);
+                                cmd.Parameters.AddWithValue("?id", asset.ID.ToString());
                                 cmd.Parameters.AddWithValue("?name", assetName);
                                 cmd.Parameters.AddWithValue("?assetType", (int)asset.Type);
-                                cmd.Parameters.AddWithValue("?temporary", asset.Temporary);
+                                cmd.Parameters.AddWithValue("?temporary", asset.Temporary ? 1 : 0);
                                 cmd.Parameters.AddWithValue("?create_time", now);
                                 cmd.Parameters.AddWithValue("?access_time", now);
-                                cmd.Parameters.AddWithValue("?CreatorID", asset.Creator.ID);
+                                cmd.Parameters.AddWithValue("?CreatorID", asset.Creator.ID.ToString());
                                 cmd.Parameters.AddWithValue("?asset_flags", (uint)asset.Flags);
                                 cmd.Parameters.AddWithValue("?hash", sha1data);
                                 if (1 > cmd.ExecuteNonQuery())
@@ -295,7 +295,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM assetrefs WHERE id=?id AND asset_flags <> 0", conn))
                 {
-                    cmd.Parameters.AddWithValue("?id", id);
+                    cmd.Parameters.AddWithValue("?id", id.ToString());
                 }
             }
         }

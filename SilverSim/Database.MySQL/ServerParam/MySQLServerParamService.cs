@@ -122,7 +122,7 @@ namespace SilverSim.Database.MySQL.ServerParam
 
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
                     {
-                        cmd.Parameters.AddWithValue("?regionid", regionID);
+                        cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                         cmd.Parameters.AddWithValue("?parametername", parameter);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
@@ -158,7 +158,7 @@ namespace SilverSim.Database.MySQL.ServerParam
                     connection.InsideTransaction(delegate()
                     {
                         Dictionary<string, object> param = new Dictionary<string, object>();
-                        param["regionid"] = regionID;
+                        param["regionid"] = regionID.ToString();
                         param["parametername"] = parameter;
                         param["parametervalue"] = value;
                         connection.ReplaceInsertInto("serverparams", param);
@@ -178,7 +178,7 @@ namespace SilverSim.Database.MySQL.ServerParam
                 {
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
                     {
-                        cmd.Parameters.AddWithValue("?regionid", regionID);
+                        cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                         cmd.Parameters.AddWithValue("?parametername", parameter);
                         if(cmd.ExecuteNonQuery() >= 1)
                         {

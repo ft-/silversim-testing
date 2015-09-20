@@ -72,8 +72,8 @@ namespace SilverSim.Database.MySQL.Grid
                     connection.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE uuid LIKE ?id AND ScopeID LIKE ?scopeid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?id", regionID);
-                        cmd.Parameters.AddWithValue("?scopeid", ScopeID);
+                        cmd.Parameters.AddWithValue("?id", regionID.ToString());
+                        cmd.Parameters.AddWithValue("?scopeid", ScopeID.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (dbReader.Read())
@@ -99,7 +99,7 @@ namespace SilverSim.Database.MySQL.Grid
                     {
                         cmd.Parameters.AddWithValue("?x", gridX);
                         cmd.Parameters.AddWithValue("?y", gridY);
-                        cmd.Parameters.AddWithValue("?scopeid", ScopeID);
+                        cmd.Parameters.AddWithValue("?scopeid", ScopeID.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (dbReader.Read())
@@ -124,7 +124,7 @@ namespace SilverSim.Database.MySQL.Grid
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE regionName LIKE ?name AND ScopeID LIKE ?scopeid", connection))
                     {
                         cmd.Parameters.AddWithValue("?name", regionName);
-                        cmd.Parameters.AddWithValue("?scopeid", ScopeID);
+                        cmd.Parameters.AddWithValue("?scopeid", ScopeID.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (dbReader.Read())
@@ -148,7 +148,7 @@ namespace SilverSim.Database.MySQL.Grid
                     connection.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE uuid LIKE ?id", connection))
                     {
-                        cmd.Parameters.AddWithValue("?id", regionID);
+                        cmd.Parameters.AddWithValue("?id", regionID.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (dbReader.Read())
@@ -204,7 +204,7 @@ namespace SilverSim.Database.MySQL.Grid
                 {
                     using(MySqlCommand cmd = new MySqlCommand("SELECT uuid FROM regions WHERE ScopeID LIKE ?scopeid AND regionName LIKE ?name LIMIT 1", conn))
                     {
-                        cmd.Parameters.AddWithValue("?scopeid", regionInfo.ScopeID);
+                        cmd.Parameters.AddWithValue("?scopeid", regionInfo.ScopeID.ToString());
                         cmd.Parameters.AddWithValue("?name", regionInfo.Name);
                         using(MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
@@ -230,8 +230,8 @@ namespace SilverSim.Database.MySQL.Grid
                     cmd.Parameters.AddWithValue("?ymin", regionInfo.Location.Y);
                     cmd.Parameters.AddWithValue("?xmax", regionInfo.Location.X + regionInfo.Size.X);
                     cmd.Parameters.AddWithValue("?ymax", regionInfo.Location.Y + regionInfo.Size.Y);
-                    cmd.Parameters.AddWithValue("?regionid", regionInfo.ID);
-                    cmd.Parameters.AddWithValue("?scopeid", regionInfo.ScopeID);
+                    cmd.Parameters.AddWithValue("?regionid", regionInfo.ID.ToString());
+                    cmd.Parameters.AddWithValue("?scopeid", regionInfo.ScopeID.ToString());
                     using(MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         if (dbReader.Read())
@@ -245,7 +245,7 @@ namespace SilverSim.Database.MySQL.Grid
                 }
 
                 Dictionary<string, object> regionData = new Dictionary<string, object>();
-                regionData["uuid"] = regionInfo.ID;
+                regionData["uuid"] = regionInfo.ID.ToString();
                 regionData["regionName"] = regionInfo.Name;
                 regionData["loc"] = regionInfo.Location;
                 regionData["size"] = regionInfo.Size;
@@ -258,11 +258,11 @@ namespace SilverSim.Database.MySQL.Grid
                 regionData["parcelMapTexture"] = regionInfo.ParcelMapTexture;
                 regionData["access"] = (uint)regionInfo.Access;
                 regionData["regionSecret"] = regionInfo.RegionSecret;
-                regionData["owner"] = regionInfo.Owner;
+                regionData["owner"] = regionInfo.Owner.ToString();
                 regionData["AuthenticatingToken"] = regionInfo.AuthenticatingToken;
-                regionData["AuthenticatingPrincipalID"] = regionInfo.AuthenticatingPrincipalID;
+                regionData["AuthenticatingPrincipalID"] = regionInfo.AuthenticatingPrincipalID.ToString();
                 regionData["flags"] = (uint)regionInfo.Flags;
-                regionData["ScopeID"] = regionInfo.ScopeID;
+                regionData["ScopeID"] = regionInfo.ScopeID.ToString();
 
                 MySQLUtilities.ReplaceInsertInto(conn, "regions", regionData);
             }
@@ -280,8 +280,8 @@ namespace SilverSim.Database.MySQL.Grid
                     /* first line deletes only when region is not persistent */
                     using(MySqlCommand cmd = new MySqlCommand("DELETE FROM regions WHERE ScopeID LIKE ?scopeid AND uuid LIKE ?regionid AND (flags & ?persistent) != 0", conn))
                     {
-                        cmd.Parameters.AddWithValue("?scopeid", ScopeID);
-                        cmd.Parameters.AddWithValue("?regionid", RegionID);
+                        cmd.Parameters.AddWithValue("?scopeid", ScopeID.ToString());
+                        cmd.Parameters.AddWithValue("?regionid", RegionID.ToString());
                         cmd.Parameters.AddWithValue("?persistent", (uint)RegionFlags.Persistent);
                         cmd.ExecuteNonQuery();
                     }
@@ -291,8 +291,8 @@ namespace SilverSim.Database.MySQL.Grid
 
                 using (MySqlCommand cmd = new MySqlCommand("UPDATE regions SET flags = flags - ?online, last_seen=?unixtime WHERE ScopeID LIKE ?scopeid AND uuid LIKE ?regionid AND (flags & ?online) != 0", conn))
                 {
-                    cmd.Parameters.AddWithValue("?scopeid", ScopeID);
-                    cmd.Parameters.AddWithValue("?regionid", RegionID);
+                    cmd.Parameters.AddWithValue("?scopeid", ScopeID.ToString());
+                    cmd.Parameters.AddWithValue("?regionid", RegionID.ToString());
                     cmd.Parameters.AddWithValue("?online", (uint)RegionFlags.RegionOnline);
                     cmd.ExecuteNonQuery();
                 }
@@ -306,8 +306,8 @@ namespace SilverSim.Database.MySQL.Grid
                 conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM regions WHERE ScopeID LIKE ?scopeid AND uuid LIKE ?regionid", conn))
                 {
-                    cmd.Parameters.AddWithValue("?scopeid", scopeID);
-                    cmd.Parameters.AddWithValue("?regionid", regionID);
+                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                     cmd.ExecuteNonQuery();
                 }
             }
@@ -326,7 +326,7 @@ namespace SilverSim.Database.MySQL.Grid
                 using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
                 {
                     cmd.Parameters.AddWithValue("?flag", (uint)RegionFlags.DefaultRegion);
-                    cmd.Parameters.AddWithValue("?scopeid", ScopeID);
+                    cmd.Parameters.AddWithValue("?scopeid", ScopeID.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while(dbReader.Read())
@@ -350,7 +350,7 @@ namespace SilverSim.Database.MySQL.Grid
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
                 {
                     cmd.Parameters.AddWithValue("?flag", (uint)RegionFlags.RegionOnline);
-                    cmd.Parameters.AddWithValue("?scopeid", ScopeID);
+                    cmd.Parameters.AddWithValue("?scopeid", ScopeID.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
@@ -397,7 +397,7 @@ namespace SilverSim.Database.MySQL.Grid
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
                 {
                     cmd.Parameters.AddWithValue("?flags", (uint)RegionFlags.FallbackRegion);
-                    cmd.Parameters.AddWithValue("?scopeid", ScopeID);
+                    cmd.Parameters.AddWithValue("?scopeid", ScopeID.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
@@ -421,7 +421,7 @@ namespace SilverSim.Database.MySQL.Grid
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
                 {
                     cmd.Parameters.AddWithValue("?flags", (uint)RegionFlags.DefaultHGRegion);
-                    cmd.Parameters.AddWithValue("?scopeid", ScopeID);
+                    cmd.Parameters.AddWithValue("?scopeid", ScopeID.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
@@ -449,7 +449,7 @@ namespace SilverSim.Database.MySQL.Grid
                         "(locX >= ?xmax AND locY >= ?ymax AND locX + sizeX > ?xmax AND locY + sizeY > ?ymax)" +
                         ") AND ScopeID LIKE ?scopeid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?scopeid", ScopeID);
+                    cmd.Parameters.AddWithValue("?scopeid", ScopeID.ToString());
                     cmd.Parameters.AddWithValue("?xmin", min.X);
                     cmd.Parameters.AddWithValue("?ymin", min.Y);
                     cmd.Parameters.AddWithValue("?xmax", max.X);
@@ -484,7 +484,7 @@ namespace SilverSim.Database.MySQL.Grid
                                                             ") AND " +
                                                             "ScopeID LIKE ?scopeid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?scopeid", ScopeID);
+                    cmd.Parameters.AddWithValue("?scopeid", ScopeID.ToString());
                     cmd.Parameters.AddWithValue("?locX", ri.Location.X);
                     cmd.Parameters.AddWithValue("?locY", ri.Location.Y);
                     cmd.Parameters.AddWithValue("?maxX", (ri.Size.X + ri.Location.X));
@@ -533,8 +533,9 @@ namespace SilverSim.Database.MySQL.Grid
             {
                 connection.Open();
 
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE regionName LIKE '"+MySqlHelper.EscapeString(searchString)+"%'", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE ScopeID LIKE ?scopeid AND regionName LIKE '"+MySqlHelper.EscapeString(searchString)+"%'", connection))
                 {
+                    cmd.Parameters.AddWithValue("?scopeid", ScopeID.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())

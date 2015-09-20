@@ -138,8 +138,8 @@ namespace SilverSim.Database.MySQL.Estate
                     Dictionary<string, object> dict = new Dictionary<string, object>();
                     dict["ID"] = value.ID;
                     dict["Name"] = value.Name;
-                    dict["OwnerID"] = value.Owner.ID;
-                    dict["Flags"] = value.Flags;
+                    dict["OwnerID"] = value.Owner.ID.ToString();
+                    dict["Flags"] = (uint)value.Flags;
                     dict["PricePerMeter"] = value.PricePerMeter;
                     dict["BillableFactor"] = value.BillableFactor;
                     dict["SunPosition"] = value.SunPosition;

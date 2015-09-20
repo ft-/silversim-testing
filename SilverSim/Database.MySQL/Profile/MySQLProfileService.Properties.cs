@@ -28,7 +28,7 @@ namespace SilverSim.Database.MySQL.Profile
                         conn.Open();
                         using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM userprofile where useruuid LIKE ?uuid", conn))
                         {
-                            cmd.Parameters.AddWithValue("?uuid", user.ID);
+                            cmd.Parameters.AddWithValue("?uuid", user.ID.ToString());
                             using (MySqlDataReader reader = cmd.ExecuteReader())
                             {
                                 if (reader.Read())
@@ -67,15 +67,15 @@ namespace SilverSim.Database.MySQL.Profile
                 set
                 {
                     Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                    replaceVals["useruuid"] = user.ID;
+                    replaceVals["useruuid"] = user.ID.ToString();
                     if ((flags & PropertiesUpdateFlags.Properties) != 0)
                     {
                         replaceVals["profileAllowPublish"] = value.PublishProfile ? 1 : 0;
                         replaceVals["profileMaturePublish"] = value.PublishMature ? 1 : 0;
                         replaceVals["profileURL"] = value.WebUrl;
-                        replaceVals["profileImage"] = value.ImageID;
+                        replaceVals["profileImage"] = value.ImageID.ToString();
                         replaceVals["profileAboutText"] = value.AboutText;
-                        replaceVals["profileFirstImage"] = value.FirstLifeImageID;
+                        replaceVals["profileFirstImage"] = value.FirstLifeImageID.ToString();
                         replaceVals["profileFirstText"] = value.FirstLifeText;
                     }
                     if((flags & PropertiesUpdateFlags.Interests) != 0)

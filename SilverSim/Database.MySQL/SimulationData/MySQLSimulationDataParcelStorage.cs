@@ -30,8 +30,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                     connection.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM parcels WHERE RegionID LIKE ?regionID AND ParcelID LIKE ?parcelID", connection))
                     {
-                        cmd.Parameters.AddWithValue("?regionID", regionID);
-                        cmd.Parameters.AddWithValue("?parcelID", parcelID);
+                        cmd.Parameters.AddWithValue("?regionID", regionID.ToString());
+                        cmd.Parameters.AddWithValue("?parcelID", parcelID.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (!dbReader.Read())
@@ -95,7 +95,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 connection.Open();
                 using(MySqlCommand cmd = new MySqlCommand("SELECT ParcelID FROM parcels WHERE RegionID LIKE ?regionID", connection))
                 {
-                    cmd.Parameters.AddWithValue("?regionID", key);
+                    cmd.Parameters.AddWithValue("?regionID", key.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
@@ -111,23 +111,23 @@ namespace SilverSim.Database.MySQL.SimulationData
         public override void Store(UUID regionID, ParcelInfo parcel)
         {
             Dictionary<string, object> p = new Dictionary<string, object>();
-            p["RegionID"] = regionID;
-            p["ParcelID"] = parcel.ID;
+            p["RegionID"] = regionID.ToString();
+            p["ParcelID"] = parcel.ID.ToString();
             p["LocalID"] = parcel.LocalID;
             p["Bitmap"] = parcel.LandBitmap.Data;
             p["BitmapWidth"] = parcel.LandBitmap.BitmapWidth;
             p["BitmapHeight"] = parcel.LandBitmap.BitmapHeight;
             p["Name"] = parcel.Name;
             p["Description"] = parcel.Description;
-            p["Owner"] = parcel.Owner;
-            p["IsGroupOwned"] = parcel.GroupOwned;
+            p["Owner"] = parcel.Owner.ToString();
+            p["IsGroupOwned"] = parcel.GroupOwned ? 1 : 0;
             p["Area"] = parcel.Area;
-            p["AuctionID"] = parcel.AuctionID;
-            p["AuthBuyer"] = parcel.AuthBuyer;
+            p["AuctionID"] = parcel.AuctionID.ToString();
+            p["AuthBuyer"] = parcel.AuthBuyer.ToString();
             p["Category"] = (int)parcel.Category;
             p["ClaimDate"] = parcel.ClaimDate.AsULong;
             p["ClaimPrice"] = parcel.ClaimPrice;
-            p["Group"] = parcel.Group;
+            p["Group"] = parcel.Group.ToString();
             p["Flags"] = (uint)parcel.Flags;
             p["LandingType"] = (int)parcel.LandingType;
             p["LandingPosition"] = parcel.LandingPosition;
@@ -135,8 +135,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["Status"] = (int)parcel.Status;
             p["MusicURI"] = parcel.MusicURI;
             p["MediaURI"] = parcel.MediaURI;
-            p["MediaID"] = parcel.MediaID;
-            p["SnapshotID"] = parcel.SnapshotID;
+            p["MediaID"] = parcel.MediaID.ToString();
+            p["SnapshotID"] = parcel.SnapshotID.ToString();
             p["SalePrice"] = parcel.SalePrice;
             p["OtherCleanTime"] = parcel.OtherCleanTime;
             p["MediaAutoScale"] = parcel.MediaAutoScale ? 1 : 0;

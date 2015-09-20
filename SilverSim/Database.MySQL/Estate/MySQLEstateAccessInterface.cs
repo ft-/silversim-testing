@@ -68,7 +68,7 @@ namespace SilverSim.Database.MySQL.Estate
                     using (MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_users WHERE EstateID = ?estateid AND UserID LIKE ?userid", conn))
                     {
                         cmd.Parameters.AddWithValue("?estateid", estateID);
-                        cmd.Parameters.AddWithValue("?userid", agent.ID);
+                        cmd.Parameters.AddWithValue("?userid", agent.ID.ToString());
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             return reader.Read();
@@ -94,7 +94,7 @@ namespace SilverSim.Database.MySQL.Estate
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("?estateid", estateID);
-                        cmd.Parameters.AddWithValue("?userid", agent.ID);
+                        cmd.Parameters.AddWithValue("?userid", agent.ID.ToString());
                         if (cmd.ExecuteNonQuery() < 1)
                         {
                             throw new EstateUpdateFailedException();

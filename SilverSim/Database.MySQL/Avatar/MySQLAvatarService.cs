@@ -40,7 +40,7 @@ namespace SilverSim.Database.MySQL.Avatar
                     connection.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT `Name`,`Value` FROM avatars WHERE PrincipalID LIKE ?principalid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?principalid", avatarID);
+                        cmd.Parameters.AddWithValue("?principalid", avatarID.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             while (dbReader.Read())
@@ -62,7 +62,7 @@ namespace SilverSim.Database.MySQL.Avatar
                     {
                         using (MySqlCommand cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID LIKE ?principalid", connection))
                         {
-                            cmd.Parameters.AddWithValue("?principalid", avatarID);
+                            cmd.Parameters.AddWithValue("?principalid", avatarID.ToString());
                             cmd.ExecuteNonQuery();
                         }
                     }
@@ -72,12 +72,12 @@ namespace SilverSim.Database.MySQL.Avatar
                         {
                             using (MySqlCommand cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID LIKE ?principalid", connection))
                             {
-                                cmd.Parameters.AddWithValue("?principalid", avatarID);
+                                cmd.Parameters.AddWithValue("?principalid", avatarID.ToString());
                                 cmd.ExecuteNonQuery();
                             }
 
                             Dictionary<string, object> vals = new Dictionary<string, object>();
-                            vals["PrincipalID"] = avatarID;
+                            vals["PrincipalID"] = avatarID.ToString();
                             foreach (KeyValuePair<string, string> kvp in value)
                             {
                                 vals["Name"] = kvp.Key;
@@ -105,7 +105,7 @@ namespace SilverSim.Database.MySQL.Avatar
                         {
                             using (MySqlCommand cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID LIKE ?principalid AND `Name` LIKE ?name", connection))
                             {
-                                cmd.Parameters.AddWithValue("?principalid", avatarID);
+                                cmd.Parameters.AddWithValue("?principalid", avatarID.ToString());
                                 cmd.Parameters.AddWithValue("?name", key);
                                 using (MySqlDataReader dbReader = cmd.ExecuteReader())
                                 {
@@ -142,7 +142,7 @@ namespace SilverSim.Database.MySQL.Avatar
                     connection.Open();
 
                     Dictionary<string, object> vals = new Dictionary<string, object>();
-                    vals["PrincipalID"] = avatarID;
+                    vals["PrincipalID"] = avatarID.ToString();
 
                     connection.InsideTransaction(delegate()
                     {
@@ -167,7 +167,7 @@ namespace SilverSim.Database.MySQL.Avatar
                     connection.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID LIKE ?principalid AND `Name` LIKE ?name", connection))
                     {
-                        cmd.Parameters.AddWithValue("?principalid", avatarID);
+                        cmd.Parameters.AddWithValue("?principalid", avatarID.ToString());
                         cmd.Parameters.AddWithValue("?name", itemKey);
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
@@ -187,7 +187,7 @@ namespace SilverSim.Database.MySQL.Avatar
                 {
                     connection.Open();
                     Dictionary<string, object> vals = new Dictionary<string, object>();
-                    vals["PrincipalID"] = avatarID;
+                    vals["PrincipalID"] = avatarID.ToString();
                     vals["Name"] = itemKey;
                     vals["Value"] = value;
                     connection.ReplaceInsertInto("avatars", vals);
@@ -206,7 +206,7 @@ namespace SilverSim.Database.MySQL.Avatar
                     {
                         using (MySqlCommand cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID LIKE ?principalid AND `Name` LIKE ?name", connection))
                         {
-                            cmd.Parameters.AddWithValue("?principalid", avatarID);
+                            cmd.Parameters.AddWithValue("?principalid", avatarID.ToString());
                             cmd.Parameters.AddWithValue("?name", name);
                             cmd.ExecuteNonQuery();
                         }
@@ -222,7 +222,7 @@ namespace SilverSim.Database.MySQL.Avatar
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM avatars WHERE PrincipalID LIKE ?principalid AND `Name` LIKE ?name", connection))
                 {
-                    cmd.Parameters.AddWithValue("?principalid", avatarID);
+                    cmd.Parameters.AddWithValue("?principalid", avatarID.ToString());
                     cmd.Parameters.AddWithValue("?name", name);
                     cmd.ExecuteNonQuery();
                 }

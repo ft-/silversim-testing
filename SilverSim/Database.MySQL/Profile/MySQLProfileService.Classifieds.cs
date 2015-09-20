@@ -28,7 +28,7 @@ namespace SilverSim.Database.MySQL.Profile
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT classifieduuid, `name` FROM classifieds WHERE creatoruuid LIKE ?uuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?uuid", user.ID);
+                        cmd.Parameters.AddWithValue("?uuid", user.ID.ToString());
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
@@ -51,7 +51,7 @@ namespace SilverSim.Database.MySQL.Profile
                         conn.Open();
                         using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM classifieds WHERE classifieduuid LIKE ?uuid", conn))
                         {
-                            cmd.Parameters.AddWithValue("?uuid", id);
+                            cmd.Parameters.AddWithValue("?uuid", id.ToString());
                             using (MySqlDataReader reader = cmd.ExecuteReader())
                             {
                                 if (reader.Read())
@@ -84,16 +84,16 @@ namespace SilverSim.Database.MySQL.Profile
             public void Update(ProfileClassified c)
             {
                 Dictionary<string, object> replaceVals = new Dictionary<string, object>();
-                replaceVals["classifieduuid"] = c.ClassifiedID;
-                replaceVals["creatoruuid"] = c.Creator.ID;
+                replaceVals["classifieduuid"] = c.ClassifiedID.ToString();
+                replaceVals["creatoruuid"] = c.Creator.ID.ToString();
                 replaceVals["creationdate"] = c.CreationDate.AsULong;
                 replaceVals["expirationdate"] = c.ExpirationDate.AsULong;
                 replaceVals["category"] = c.Category;
                 replaceVals["name"] = c.Name;
                 replaceVals["description"] = c.Description;
-                replaceVals["parceluuid"] = c.ParcelID;
+                replaceVals["parceluuid"] = c.ParcelID.ToString();
                 replaceVals["parentestate"] = c.ParentEstate;
-                replaceVals["snapshotuuid"] = c.SnapshotID;
+                replaceVals["snapshotuuid"] = c.SnapshotID.ToString();
                 replaceVals["simname"] = c.SimName;
                 replaceVals["posglobal"] = c.GlobalPos.ToString();
                 replaceVals["parcelname"] = c.ParcelName;
@@ -113,7 +113,7 @@ namespace SilverSim.Database.MySQL.Profile
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM classifieds WHERE classifieduuid LIKE ?classifieduuid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?classifieduuid", id);
+                        cmd.Parameters.AddWithValue("?classifieduuid", id.ToString());
                         if (1 > cmd.ExecuteNonQuery())
                         {
                             throw new InvalidOperationException();

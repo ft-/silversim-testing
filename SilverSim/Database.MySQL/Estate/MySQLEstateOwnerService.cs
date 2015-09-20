@@ -48,7 +48,7 @@ namespace SilverSim.Database.MySQL.Estate
                     using (MySqlCommand cmd = new MySqlCommand("UPDATE estates SET OwnerID = ?ownerid WHERE ID = ?id", conn))
                     {
                         cmd.Parameters.AddWithValue("?id", EstateID);
-                        cmd.Parameters.AddWithValue("?ownerid", value.ID);
+                        cmd.Parameters.AddWithValue("?ownerid", value.ID.ToString());
                         if(cmd.ExecuteNonQuery() < 1)
                         {
                             throw new EstateUpdateFailedException();

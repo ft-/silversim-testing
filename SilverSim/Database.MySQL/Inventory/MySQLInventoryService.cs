@@ -55,7 +55,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND AssetType = ?assettype AND (flags & 1) <>0", connection))
                 {
-                    cmd.Parameters.AddWithValue("?ownerid", PrincipalID);
+                    cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
                     cmd.Parameters.AddWithValue("?assettype", (int)AssetType.Gesture);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -143,12 +143,12 @@ namespace SilverSim.Database.MySQL.Inventory
                 {
                     using(MySqlCommand cmd = new MySqlCommand("DELETE FROM inventoryitems WHERE OwnerID LIKE ?ownerid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?ownerid", userAccount);
+                        cmd.Parameters.AddWithValue("?ownerid", userAccount.ToString());
                         cmd.ExecuteNonQuery();
                     }
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM inventoryfolders WHERE OwnerID LIKE ?ownerid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?ownerid", userAccount);
+                        cmd.Parameters.AddWithValue("?ownerid", userAccount.ToString());
                         cmd.ExecuteNonQuery();
                     }
                 });

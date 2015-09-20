@@ -27,7 +27,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assetrefs WHERE id=?id", conn))
                     {
-                        cmd.Parameters.AddWithValue("?id", key);
+                        cmd.Parameters.AddWithValue("?id", key.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (dbReader.Read())
