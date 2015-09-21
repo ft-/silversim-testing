@@ -20,6 +20,3 @@ data
 
 obj
 
-# we make bin no-add primarily
-# however, if needed we can force an addition by using git add -f
-bin
