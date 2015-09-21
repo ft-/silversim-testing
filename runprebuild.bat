@@ -1,6 +1,6 @@
 @echo OFF
 
-bin\Prebuild.exe /target vs2010
+Prebuild\Prebuild.exe /target vs2010
 
 setlocal ENABLEEXTENSIONS
 set KEY_NAME="HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\MSBuild\ToolsVersions\4.0"

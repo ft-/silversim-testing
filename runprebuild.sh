@@ -4,27 +4,27 @@ case "$1" in
 
   'clean')
 
-    mono bin/Prebuild.exe /clean
+    mono Prebuild/Prebuild.exe /clean
 
   ;;
 
 
   'autoclean')
 
-    echo y|mono bin/Prebuild.exe /clean
+    echo y|mono Prebuild/Prebuild.exe /clean
 
   ;;
 
 
   'vs2010')
   
-    mono bin/Prebuild.exe /target vs2010
+    mono Prebuild/Prebuild.exe /target vs2010
   
   ;;
 
   *)
 
-    mono bin/Prebuild.exe /target vs2010
+    mono Prebuild/Prebuild.exe /target vs2010
 
   ;;
 
