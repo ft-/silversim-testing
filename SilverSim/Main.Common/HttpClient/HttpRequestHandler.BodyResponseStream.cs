@@ -14,7 +14,6 @@ namespace SilverSim.Main.Common.HttpClient
             private AbstractHttpStream m_Input;
             private long m_RemainingLength;
             private long m_ContentLength;
-            private static readonly byte[] FillBytes = new byte[10240];
             private bool m_KeepAlive;
             string m_Scheme;
             string m_Host;
