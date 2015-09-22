@@ -209,7 +209,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_BasicScene = scene;
             }
 
-            public virtual new int Count
+            public int Count
             {
                 get
                 {
@@ -245,7 +245,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_BasicScene = scene;
             }
 
-            public virtual new int Count
+            public int Count
             {
                 get
                 {
