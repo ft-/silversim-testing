@@ -255,13 +255,13 @@ namespace SilverSim.Scene.Types.Scene
                 catch (Exception e)
                 {
                     m_Log.Debug(string.Format("Terrain Change at {0},{1} failed", x, y), e);
+                    throw;
                 }
 #endif
                 finally
                 {
                     m_TerrainRwLock.ReleaseWriterLock();
                 }
-                return null;
             }
 
             public LayerPatch BlendTerrain(uint x, uint y, double newval, double mix /* 0. orig only , 1. new only */)
@@ -284,13 +284,13 @@ namespace SilverSim.Scene.Types.Scene
                 catch (Exception e)
                 {
                     m_Log.Debug(string.Format("Terrain Change at {0},{1} failed", x, y), e);
+                    throw;
                 }
 #endif
                 finally
                 {
                     m_TerrainRwLock.ReleaseWriterLock();
                 }
-                return null;
             }
 
             public double this[Vector3 pos]
