@@ -4,3 +4,6 @@
 [submodule "Prebuild"]
 	path = Prebuild
 	url = git@148.251.83.135:silversim-prebuild-binaries
+[submodule "data"]
+	path = data
+	url = git@148.251.83.135:silversim-data-dev
