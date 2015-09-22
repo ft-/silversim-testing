@@ -11,7 +11,6 @@ namespace SilverSim.Main.Common.HttpClient
     {
         private static string BuildQueryString(IDictionary<string, string> parameters)
         {
-            List<string> items = new List<string>(parameters.Count);
             string outStr = string.Empty;
             foreach(KeyValuePair<string, string> kvp in parameters)
             {
