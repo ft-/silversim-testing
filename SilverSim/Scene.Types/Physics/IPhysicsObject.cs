@@ -3,10 +3,11 @@
 
 using SilverSim.Types;
 using SilverSim.Scene.Types.Physics.Vehicle;
+using System;
 
 namespace SilverSim.Scene.Types.Physics
 {
-    public interface IPhysicsObject
+    public interface IPhysicsObject : IDisposable
     {
         /* position, acceleration, velocity (angular and linear) is pushed to target object when IsPhysicsActive equals true */
         Vector3 DeltaLinearVelocity { set; }

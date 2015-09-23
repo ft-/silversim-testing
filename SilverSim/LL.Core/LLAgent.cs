@@ -459,7 +459,7 @@ namespace SilverSim.LL.Core
         {
             lock (this)
             {
-                return m_CurrentSceneID == scene.ID;
+                return SceneID == scene.ID;
             }
         }
 
@@ -467,11 +467,17 @@ namespace SilverSim.LL.Core
         {
             get
             {
-                return m_CurrentSceneID;
+                lock (this)
+                {
+                    return m_CurrentSceneID;
+                }
             }
             set
             {
-                m_CurrentSceneID = value;
+                lock (this)
+                {
+                    m_CurrentSceneID = value;
+                }
             }
         }
         #endregion
@@ -873,7 +879,8 @@ namespace SilverSim.LL.Core
         public bool IMSend(GridInstantMessage gim)
         {
             Circuit c;
-            if(Circuits.TryGetValue(m_CurrentSceneID, out c))
+            UUID sceneID = SceneID;
+            if (Circuits.TryGetValue(sceneID, out c))
             {
                 Messages.IM.ImprovedInstantMessage im = new Messages.IM.ImprovedInstantMessage(gim);
                 if (gim.IsSystemMessage)
@@ -884,7 +891,7 @@ namespace SilverSim.LL.Core
                     im.ParentEstateID = 0;
                     im.Position = Vector3.Zero;
                 }
-                SendMessageAlways(im, m_CurrentSceneID);
+                SendMessageAlways(im, sceneID);
                 return true;
             }
             return false;
@@ -938,7 +945,6 @@ namespace SilverSim.LL.Core
             HomeURI = homeURI;
             FirstName = firstName;
             LastName = lastName;
-            PhysicsActor = DummyPhysicsObject.SharedInstance;
             InitAnimations();
             if (m_EconomyService != null)
             {
@@ -991,7 +997,15 @@ namespace SilverSim.LL.Core
         }
 
         #region Physics Linkage
-        IPhysicsObject m_PhysicsActor = DummyPhysicsObject.SharedInstance;
+        readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
+
+        public RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
+        {
+            get
+            {
+                return m_PhysicsActors;
+            }
+        }
 
         public IPhysicsObject PhysicsActor
         {
@@ -999,14 +1013,33 @@ namespace SilverSim.LL.Core
             {
                 lock(this)
                 {
-                    return m_PhysicsActor;
+                    IPhysicsObject obj;
+                    if(!PhysicsActors.TryGetValue(SceneID, out obj))
+                    {
+                        obj = DummyPhysicsObject.SharedInstance;
+                    }
+                    return obj;
                 }
             }
+        }
+
+        /* property here instead of a method. A lot more clear that we update something. */
+        object m_PhysicsUpdateLock = new object();
+        public PhysicsStateData PhysicsUpdate
+        {
             set
             {
-                lock(this)
+                lock (m_PhysicsUpdateLock)
                 {
-                    m_PhysicsActor = value;
+                    if (SceneID == value.SceneID)
+                    {
+                        Position = value.Position;
+                        Rotation = value.Rotation;
+                        Velocity = value.Velocity;
+                        AngularVelocity = value.AngularVelocity;
+                        Acceleration = value.Acceleration;
+                        AngularAcceleration = value.AngularAcceleration;
+                    }
                 }
             }
         }
@@ -1128,10 +1161,10 @@ namespace SilverSim.LL.Core
                         gm.SessionID = circuit.SessionID;
                         gm.GodLevel = 0;
                         gm.Token = UUID.Zero;
-                        SendMessageIfRootAgent(gm, m_CurrentSceneID);
+                        SendMessageIfRootAgent(gm, SceneID);
                         m_IsActiveGod = false;
                     }
-                    m_CurrentSceneID = circuit.Scene.ID;
+                    SceneID = circuit.Scene.ID;
 
                     Messages.Circuit.AgentMovementComplete amc = new Messages.Circuit.AgentMovementComplete();
                     amc.AgentID = cam.AgentID;
@@ -1229,7 +1262,7 @@ namespace SilverSim.LL.Core
 
         public void SendMessageIfRootAgent(Message m, UUID fromSceneID)
         {
-            if(fromSceneID == m_CurrentSceneID)
+            if (fromSceneID == SceneID)
             {
                 SendMessageAlways(m, fromSceneID);
             }
@@ -1272,7 +1305,7 @@ namespace SilverSim.LL.Core
         public GridVector GetRootAgentGridPosition(GridVector defPos)
         {
             Circuit circuit;
-            if(Circuits.TryGetValue(m_CurrentSceneID, out circuit))
+            if (Circuits.TryGetValue(SceneID, out circuit))
             {
                 return circuit.Scene.GridPosition;
             }

@@ -10,6 +10,7 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
+using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
@@ -127,7 +128,6 @@ namespace SilverSim.Scene.Types.Object
         {
             AgentSitting = new AgentSittingInterface(this);
             IsChanged = false;
-            PhysicsActor = DummyPhysicsObject.SharedInstance;
         }
 
         public void Dispose()
@@ -137,7 +137,15 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Physics Linkage
-        IPhysicsObject m_PhysicsActor = DummyPhysicsObject.SharedInstance;
+        readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
+
+        public RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
+        {
+            get
+            {
+                return m_PhysicsActors;
+            }
+        }
 
         public IPhysicsObject PhysicsActor
         {
@@ -145,18 +153,42 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    return m_PhysicsActor;
-                }
-            }
-            set
-            {
-                lock(this)
-                {
-                    m_PhysicsActor = value;
+                    IPhysicsObject obj;
+                    SceneInterface scene = Scene;
+                    if(scene == null)
+                    {
+                        obj = DummyPhysicsObject.SharedInstance;
+                    }
+                    else if (!m_PhysicsActors.TryGetValue(scene.ID, out obj))
+                    {
+                        obj = DummyPhysicsObject.SharedInstance;
+                    }
+                    return obj;
                 }
             }
         }
 
+
+        /* property here instead of a method. A lot more clear that we update something. */
+        object m_PhysicsUpdateLock = new object();
+        public PhysicsStateData PhysicsUpdate
+        {
+            set
+            {
+                lock (m_PhysicsUpdateLock)
+                {
+                    if (Scene.ID == value.SceneID)
+                    {
+                        Position = value.Position;
+                        Rotation = value.Rotation;
+                        Velocity = value.Velocity;
+                        AngularVelocity = value.AngularVelocity;
+                        Acceleration = value.Acceleration;
+                        AngularAcceleration = value.AngularAcceleration;
+                    }
+                }
+            }
+        }
         #endregion
 
         public UUID OriginalAssetID /* will be set to UUID.Zero when anything has been changed */
@@ -309,7 +341,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public SilverSim.Types.Inventory.InventoryItem.SaleInfoData.SaleType SaleType
+        public InventoryItem.SaleInfoData.SaleType SaleType
         {
             get
             {

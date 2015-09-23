@@ -371,6 +371,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }
             else
             {
+                PhysicsScene = new DummyPhysicsScene(ID);
                 LoginControl.Ready(ReadyFlags.PhysicsTerrain);
             }
         }
@@ -535,10 +536,12 @@ namespace SilverSim.Scene.Implementation.Basic
                     {
                         m_Agents.Add(obj.ID, (IAgent)obj);
                         Interlocked.Increment(ref m_AgentCount);
+                        PhysicsScene.Add(obj);
                     }
                 }
                 catch
                 {
+                    m_Agents.Remove(obj.ID);
                     m_Objects.Remove(obj.ID);
                     RemoveLocalID(obj);
                 }
@@ -578,7 +581,10 @@ namespace SilverSim.Scene.Implementation.Basic
             }
             foreach(ObjectGroup obj in objects)
             {
-                Remove(obj);
+                if (!obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
+                {
+                    Remove(obj);
+                }
             }
         }
 
@@ -605,7 +611,12 @@ namespace SilverSim.Scene.Implementation.Basic
             else if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
             {
                 IAgent agent = (IAgent)obj;
-                /* TODO: remove attachments */
+                List<ObjectGroup> grps = agent.Attachments.RemoveAll();
+                foreach(ObjectGroup grp in grps)
+                {
+                    Remove(grp);
+                }
+                PhysicsScene.Remove(agent);
                 m_Objects.Remove(agent.ID);
                 SendKillObjectToAgents(agent.LocalID);
                 RemoveLocalID(agent);

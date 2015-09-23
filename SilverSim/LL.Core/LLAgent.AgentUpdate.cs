@@ -207,7 +207,7 @@ namespace SilverSim.LL.Core
                 return;
             }
 
-            if (sar.CircuitSceneID != m_CurrentSceneID)
+            if (sar.CircuitSceneID != SceneID)
             {
                 return;
             }
@@ -229,7 +229,7 @@ namespace SilverSim.LL.Core
                 return;
             }
 
-            if (au.CircuitSceneID != m_CurrentSceneID)
+            if (au.CircuitSceneID != SceneID)
             {
                 return;
             }

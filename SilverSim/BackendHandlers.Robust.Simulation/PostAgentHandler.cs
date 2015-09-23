@@ -675,17 +675,20 @@ namespace SilverSim.BackendHandlers.Robust.Simulation
                 DoAgentResponse(req, e.Message, false);
                 return;
             }
-            if (null != gridUserService && !agentPost.Circuit.IsChild)
+            if (!agentPost.Circuit.IsChild)
             {
                 /* make agent a root agent */
                 agent.SceneID = scene.ID;
-                try
+                if (null != gridUserService)
                 {
-                    gridUserService.SetPosition(agent.Owner, scene.ID, agent.GlobalPosition, agent.LookAt);
-                }
-                catch (Exception e)
-                {
-                    m_Log.Warn("Could not contact GridUserService", e);
+                    try
+                    {
+                        gridUserService.SetPosition(agent.Owner, scene.ID, agent.GlobalPosition, agent.LookAt);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.Warn("Could not contact GridUserService", e);
+                    }
                 }
             }
 

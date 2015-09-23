@@ -266,12 +266,12 @@ namespace SilverSim.LL.Core
             }
             catch
             {
-                SendAlertMessage("ALERT: CantFindInvItem", m_CurrentSceneID);
+                SendAlertMessage("ALERT: CantFindInvItem", SceneID);
                 return;
             }
             if(item.AssetType != AssetType.Object)
             {
-                SendAlertMessage("ALERT: InvalidObjectParams", m_CurrentSceneID);
+                SendAlertMessage("ALERT: InvalidObjectParams", SceneID);
                 return;
             }
             AssetData data;
@@ -282,11 +282,11 @@ namespace SilverSim.LL.Core
             catch(Exception e)
             {
                 m_Log.WarnFormat("Attaching item {0} / asset {1} not possible due {2}: {3}", item.ID, item.AssetID, e.GetType().FullName, e.ToString());
-                SendAlertMessage("ALERT: CantFindInvItem", m_CurrentSceneID);
+                SendAlertMessage("ALERT: CantFindInvItem", SceneID);
                 return;
             }
 
-            RezAttachmentHandler rezAttachHandler = new RezAttachmentHandler(Circuits[m_CurrentSceneID].Scene, itemID, item.AssetID, AssetService, Owner, attachpointFlagged);
+            RezAttachmentHandler rezAttachHandler = new RezAttachmentHandler(Circuits[SceneID].Scene, itemID, item.AssetID, AssetService, Owner, attachpointFlagged);
             ThreadPool.UnsafeQueueUserWorkItem(HandleAssetTransferWorkItem, rezAttachHandler);
         }
 
@@ -327,7 +327,7 @@ namespace SilverSim.LL.Core
                 }
                 catch
                 {
-                    SendAlertMessage("Could not store attachment data", m_CurrentSceneID);
+                    SendAlertMessage("Could not store attachment data", SceneID);
                     return;
                 }
                 try
@@ -335,7 +335,7 @@ namespace SilverSim.LL.Core
                     InventoryItem item = InventoryService.Item[ID, entry.ItemID];
                     if (item.AssetType != AssetType.Object)
                     {
-                        SendAlertMessage("Could not store attachment data", m_CurrentSceneID);
+                        SendAlertMessage("Could not store attachment data", SceneID);
                         return;
                     }
                     else
@@ -346,7 +346,7 @@ namespace SilverSim.LL.Core
                 }
                 catch
                 {
-                    SendAlertMessage("Could not store attachment data within item", m_CurrentSceneID);
+                    SendAlertMessage("Could not store attachment data within item", SceneID);
                     return;
                 }
             }

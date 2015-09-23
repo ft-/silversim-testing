@@ -13,6 +13,11 @@ namespace SilverSim.Scene.Types.Physics
 
         }
 
+        public void Dispose()
+        {
+
+        }
+
         #region Injecting parameters properties
         public Vector3 DeltaLinearVelocity 
         { 

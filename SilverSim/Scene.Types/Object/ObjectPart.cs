@@ -161,29 +161,26 @@ namespace SilverSim.Scene.Types.Object
         #region Physics Linkage
         IPhysicsObject m_PhysicsActor = DummyPhysicsObject.SharedInstance;
 
+        public RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
+        {
+            get
+            {
+                throw new NotSupportedException();
+            }
+        }
         public IPhysicsObject PhysicsActor
         {
             get
             {
-                lock(this)
-                {
-                    return m_PhysicsActor;
-                }
+                throw new NotSupportedException();
             }
+        }
+
+        public PhysicsStateData PhysicsUpdate
+        {
             set
             {
-                if(value == null)
-                {
-                    throw new ArgumentNullException();
-                }
-                lock(this)
-                {
-                    if(m_PhysicsActor.IsPhysicsActive)
-                    {
-                        throw new InvalidOperationException("PhysicsObject must be deactivated before removing");
-                    }
-                    m_PhysicsActor = value;
-                }
+
             }
         }
         #endregion

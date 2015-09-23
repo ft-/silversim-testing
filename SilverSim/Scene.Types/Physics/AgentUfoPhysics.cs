@@ -16,9 +16,12 @@ namespace SilverSim.Scene.Types.Physics
         Timer m_UfoTimer;
         IAgent m_Agent;
         Vector3 m_ControlTargetVelocity = Vector3.Zero;
+        PhysicsStateData m_StateData;
 
-        public AgentUfoPhysics(IAgent agent)
+        public AgentUfoPhysics(IAgent agent, UUID sceneID)
         {
+            m_StateData = new PhysicsStateData(agent, sceneID);
+
             m_UfoTimer = new Timer(0.1);
             m_UfoTimer.Elapsed += UfoTimerFunction;
             m_Agent = agent;
@@ -44,7 +47,12 @@ namespace SilverSim.Scene.Types.Physics
             {
                 controlTarget = m_ControlTargetVelocity;
             }
-            m_Agent.Position += controlTarget / 10f;
+            m_StateData.Position += controlTarget / 10f;
+            IAgent agent = m_Agent;
+            if(agent != null)
+            {
+                agent.PhysicsUpdate = m_StateData;
+            }
         }
 
         public Vector3 DeltaLinearVelocity

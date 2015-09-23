@@ -8,6 +8,7 @@ using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -148,9 +149,19 @@ namespace SilverSim.Scene.Types.Object
             get;
         }
 
+        RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
+        {
+            get;
+        }
+    
         IPhysicsObject PhysicsActor
         {
             get;
+        }
+
+        /* property here instead of a method. A lot more clear that we update something. */
+        PhysicsStateData PhysicsUpdate
+        {
             set;
         }
         #endregion

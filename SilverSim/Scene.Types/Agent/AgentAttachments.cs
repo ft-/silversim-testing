@@ -97,5 +97,25 @@ namespace SilverSim.Scene.Types.Agent
                 m_AttachmentsRwLock.ReleaseWriterLock();
             }
         }
+
+        public List<ObjectGroup> RemoveAll()
+        {
+            m_AttachmentsRwLock.AcquireWriterLock(-1);
+            try
+            {
+                List<ObjectGroup> attachments = new List<ObjectGroup>(m_AllAttachments.Values);
+                foreach(Dictionary<UUID, ObjectGroup> dict in m_AttachmentsPerPoint.Values)
+                {
+                    dict.Clear();
+                }
+                attachments.Clear();
+                m_AllAttachments.Clear();
+                return attachments;
+            }
+            finally
+            {
+                m_AttachmentsRwLock.ReleaseWriterLock();
+            }
+        }
     }
 }

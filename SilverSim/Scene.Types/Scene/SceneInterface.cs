@@ -129,7 +129,7 @@ namespace SilverSim.Scene.Types.Scene
         public abstract void LoadSceneAsync();
 
         #region Physics
-        IPhysicsScene m_PhysicsScene = DummyPhysicsScene.SharedInstance;
+        IPhysicsScene m_PhysicsScene = null;
         object m_PhysicsSceneChangeLock = new object();
 
         public IPhysicsScene PhysicsScene
@@ -149,7 +149,10 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 lock (m_PhysicsSceneChangeLock)
                 {
-                    m_PhysicsScene.RemoveAll();
+                    if (null != m_PhysicsScene)
+                    {
+                        m_PhysicsScene.RemoveAll();
+                    }
                     m_PhysicsScene = value;
                     foreach(ObjectPart p in Primitives)
                     {

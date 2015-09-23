@@ -4,21 +4,28 @@
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Types;
 using System.Linq;
+using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Physics
 {
     public class DummyPhysicsScene : IPhysicsScene
     {
-        public DummyPhysicsScene()
+        UUID m_SceneID;
+        RwLockedList<IObject> m_Agents = new RwLockedList<IObject>();
+
+        public DummyPhysicsScene(UUID sceneID)
         {
+            m_SceneID = sceneID;
         }
 
         public void Add(IObject obj)
         {
             if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
             {
-                ((IAgent)obj).PhysicsActor = new AgentUfoPhysics((IAgent)obj);
+                ((IAgent)obj).PhysicsActors.Add(m_SceneID, new AgentUfoPhysics((IAgent)obj, m_SceneID));
+                m_Agents.Add(obj);
             }
         }
 
@@ -26,22 +33,27 @@ namespace SilverSim.Scene.Types.Physics
         {
             if (obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
             {
-                IPhysicsObject physobj = ((IAgent)obj).PhysicsActor;
-                if(physobj is AgentUfoPhysics)
-                {
-                    ((IAgent)obj).PhysicsActor = new DummyPhysicsObject();
-                    ((AgentUfoPhysics)physobj).Dispose();
-                }
+                IPhysicsObject physobj;
+                m_Agents.Remove(obj);
+                obj.PhysicsActors.Remove(m_SceneID, out physobj);
+                physobj.Dispose();
             }
         }
 
         public void Shutdown()
         {
-
+            foreach (IObject obj in m_Agents)
+            {
+                Remove(obj);
+            }
         }
 
         public void RemoveAll()
         {
+            foreach(IObject obj in m_Agents)
+            {
+                Remove(obj);
+            }
         }
 
 
@@ -68,7 +80,5 @@ namespace SilverSim.Scene.Types.Physics
                 return 0;
             }
         }
-
-        public static readonly DummyPhysicsScene SharedInstance = new DummyPhysicsScene();
     }
 }

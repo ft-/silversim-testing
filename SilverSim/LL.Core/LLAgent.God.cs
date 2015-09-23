@@ -61,7 +61,7 @@ namespace SilverSim.LL.Core
 
         private bool CheckForGodPowers(UUID sceneID, UUID agentID)
         {
-            if(sceneID != m_CurrentSceneID)
+            if (sceneID != SceneID)
             {
                 return false;
             }

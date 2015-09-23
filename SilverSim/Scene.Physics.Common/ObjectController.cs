@@ -17,6 +17,11 @@ namespace SilverSim.Scene.Physics.Common
         bool m_ContributesToCollisionSurfaceAsChild;
         bool m_VolumeDetect;
 
+        public void Dispose()
+        {
+            m_Part = null;
+        }
+
         public ObjectController(ObjectPart part)
         {
             m_Part = part;

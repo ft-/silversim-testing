@@ -17,6 +17,11 @@ namespace SilverSim.Scene.Physics.Common
             m_Agent = agent;
         }
 
+        public void Dispose()
+        {
+            m_Agent = null;
+        }
+
         public abstract Vector3 DeltaLinearVelocity { set; }
         public abstract Vector3 DeltaAngularVelocity { set; }
         public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
