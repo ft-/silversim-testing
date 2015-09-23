@@ -162,7 +162,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         continue;
                     }
 
-                    if(info.IsKilled || info.Part.ObjectGroup.IsAttached)
+                    if(info.IsKilled)
                     {
                         m_ObjectStorage.DeleteObjectPart(connection, info.Part.ID);
                         m_ObjectStorage.DeleteObjectGroup(connection, info.Part.ObjectGroup.ID);
@@ -171,7 +171,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                     else
                     {
                         ObjectGroup grp = info.Part.ObjectGroup;
-                        if(null != grp && !grp.IsTemporary)
+                        if(null != grp && !grp.IsTemporary && !grp.IsAttached)
                         {
                             try
                             {
