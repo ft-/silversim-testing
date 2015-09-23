@@ -7,7 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 
-namespace SilverSim.Archiver.Tar
+namespace SilverSim.Main.Common.Tar
 {
     public class TarArchiveReader : Stream
     {

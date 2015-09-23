@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 
-namespace SilverSim.Archiver.Tar
+namespace SilverSim.Main.Common.Tar
 {
     public class TarArchiveWriter
     {
