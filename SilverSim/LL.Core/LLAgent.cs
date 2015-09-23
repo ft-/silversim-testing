@@ -1021,7 +1021,7 @@ namespace SilverSim.LL.Core
                     IPhysicsObject obj;
                     if(!PhysicsActors.TryGetValue(SceneID, out obj))
                     {
-                        obj = DummyPhysicsObject.SharedInstance;
+                        obj = DummyAgentPhysicsObject.SharedInstance;
                     }
                     return obj;
                 }
