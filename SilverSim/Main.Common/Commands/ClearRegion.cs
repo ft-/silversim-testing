@@ -35,7 +35,7 @@ namespace SilverSim.Main.Common.Commands
                 return;
             }
             scene.ClearObjects();
-            scene.ClearParcels();
+            //scene.ClearParcels();
             io.Write("Region cleared.");
         }
     }
