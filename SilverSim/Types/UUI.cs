@@ -75,7 +75,14 @@ namespace SilverSim.Types
         {
             get
             {
-                return string.Format("{0};{1} {2}", HomeURI.ToString(), FirstName, LastName);
+                if (HomeURI != null)
+                {
+                    return string.Format("{0};{1} {2}", HomeURI.ToString(), FirstName, LastName);
+                }
+                else
+                {
+                    return string.Empty;
+                }
             }
             set
             {

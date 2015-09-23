@@ -549,7 +549,7 @@ namespace SilverSim.Types
         {
             get
             {
-                return System.String.Format(EnUsCulture, "{0", X);
+                return System.String.Format(EnUsCulture, "{0}", X);
             }
         }
 
@@ -557,7 +557,7 @@ namespace SilverSim.Types
         {
             get
             {
-                return System.String.Format(EnUsCulture, "{0", Y);
+                return System.String.Format(EnUsCulture, "{0}", Y);
             }
         }
 
@@ -565,7 +565,7 @@ namespace SilverSim.Types
         {
             get
             {
-                return System.String.Format(EnUsCulture, "{0", Z);
+                return System.String.Format(EnUsCulture, "{0}", Z);
             }
         }
 
@@ -573,7 +573,7 @@ namespace SilverSim.Types
         {
             get
             {
-                return System.String.Format(EnUsCulture, "{0", W);
+                return System.String.Format(EnUsCulture, "{0}", W);
             }
         }
 
