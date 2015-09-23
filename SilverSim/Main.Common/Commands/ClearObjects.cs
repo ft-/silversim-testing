@@ -25,7 +25,7 @@ namespace SilverSim.Main.Common.Commands
             {
                 scene = SceneManager.Scenes[limitedToScene];
             }
-            else if (UUID.Zero == io.SelectedScene)
+            else if (UUID.Zero != io.SelectedScene)
             {
                 scene = SceneManager.Scenes[io.SelectedScene];
             }

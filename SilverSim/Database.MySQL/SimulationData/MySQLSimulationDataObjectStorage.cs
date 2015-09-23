@@ -475,19 +475,16 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         public void DeleteObjectPart(MySqlConnection connection, UUID obj)
         {
-            connection.InsideTransaction(delegate()
+            using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE ?id", connection))
             {
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE PrimID LIKE ?id", connection))
-                {
-                    cmd.Parameters.AddWithValue("?id", obj);
-                    cmd.ExecuteNonQuery();
-                }
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE ID LIKE ?id", connection))
-                {
-                    cmd.Parameters.AddWithValue("?id", obj);
-                    cmd.ExecuteNonQuery();
-                }
-            });
+                cmd.Parameters.AddWithValue("?id", obj);
+                cmd.ExecuteNonQuery();
+            }
+            using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE ID LIKE ?id", connection))
+            {
+                cmd.Parameters.AddWithValue("?id", obj);
+                cmd.ExecuteNonQuery();
+            }
         }
 
         public override void DeleteObjectGroup(UUID obj)
@@ -501,24 +498,21 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         public void DeleteObjectGroup(MySqlConnection connection, UUID obj)
         {
-            connection.InsideTransaction(delegate()
+            using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE EXISTS (SELECT null FROM prims WHERE primitems.PrimID LIKE prims.ID AND prims.RootPartID LIKE ?id)", connection))
             {
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM primitems WHERE EXISTS (SELECT null FROM prims WHERE primitems.PrimID LIKE prims.ID AND prims.RootPartID LIKE ?id)", connection))
-                {
-                    cmd.Parameters.AddWithValue("?id", obj);
-                    cmd.ExecuteNonQuery();
-                }
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE RootPartID LIKE ?id", connection))
-                {
-                    cmd.Parameters.AddWithValue("?id", obj);
-                    cmd.ExecuteNonQuery();
-                }
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM objects WHERE ID LIKE ?id", connection))
-                {
-                    cmd.Parameters.AddWithValue("?id", obj);
-                    cmd.ExecuteNonQuery();
-                }
-            });
+                cmd.Parameters.AddWithValue("?id", obj);
+                cmd.ExecuteNonQuery();
+            }
+            using (MySqlCommand cmd = new MySqlCommand("DELETE FROM prims WHERE RootPartID LIKE ?id", connection))
+            {
+                cmd.Parameters.AddWithValue("?id", obj);
+                cmd.ExecuteNonQuery();
+            }
+            using (MySqlCommand cmd = new MySqlCommand("DELETE FROM objects WHERE ID LIKE ?id", connection))
+            {
+                cmd.Parameters.AddWithValue("?id", obj);
+                cmd.ExecuteNonQuery();
+            }
         }
         #endregion
 
