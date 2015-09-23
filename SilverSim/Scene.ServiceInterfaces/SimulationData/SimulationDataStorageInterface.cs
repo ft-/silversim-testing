@@ -115,11 +115,16 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                 }
                 else if (m_KnownSerialNumbers.TryGetValue(req.LocalID, out knownSerial))
                 {
-                    if(knownSerial == req.SerialNumber)
+                    if(knownSerial == req.SerialNumber && !req.Part.ObjectGroup.IsAttached)
                     {
                         /* ignore it */
                         continue;
                     }
+                }
+                else if(req.Part.ObjectGroup.IsAttached)
+                {
+                    /* ignore it */
+                    continue;
                 }
 
                 Interlocked.Increment(ref m_ActiveStorageRequests);

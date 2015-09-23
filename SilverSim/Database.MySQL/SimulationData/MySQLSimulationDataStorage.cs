@@ -162,7 +162,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         continue;
                     }
 
-                    if(info.IsKilled)
+                    if(info.IsKilled || info.Part.ObjectGroup.IsAttached)
                     {
                         m_ObjectStorage.DeleteObjectPart(connection, info.Part.ID);
                         m_ObjectStorage.DeleteObjectGroup(connection, info.Part.ObjectGroup.ID);
