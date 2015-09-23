@@ -33,5 +33,8 @@ namespace SilverSim.Scene.Types.Physics
         Quaternion this[VehicleRotationParamId id] { get; set; }
         Vector3 this[VehicleVectorParamId id] { get; set; }
         double this[VehicleFloatParamId id] { get; set; }
+
+        void TransferState(IPhysicsObject target, Vector3 positionOffset);
+        void ReceiveState(PhysicsStateData data, Vector3 positionOffset);
     }
 }

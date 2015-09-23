@@ -18,6 +18,14 @@ namespace SilverSim.Scene.Types.Physics
 
         }
 
+        public void TransferState(IPhysicsObject target, Vector3 positionOffset)
+        {
+        }
+
+        public void ReceiveState(PhysicsStateData data, Vector3 positionOffset)
+        {
+        }
+
         #region Injecting parameters properties
         public Vector3 DeltaLinearVelocity 
         { 

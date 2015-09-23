@@ -12,22 +12,49 @@ namespace SilverSim.Scene.Physics.Common
 {
     public abstract class ObjectController : CommonPhysicsController, IPhysicsObject
     {
-        protected ObjectPart m_Part;
+        protected ObjectGroup m_Group;
         bool m_Phantom;
         bool m_ContributesToCollisionSurfaceAsChild;
         bool m_VolumeDetect;
+        PhysicsStateData m_StateData;
 
         public void Dispose()
         {
-            m_Part = null;
+            m_Group = null;
         }
 
-        public ObjectController(ObjectPart part)
+        public ObjectController(ObjectGroup part, UUID sceneID)
         {
-            m_Part = part;
+            m_StateData = new PhysicsStateData(part, sceneID);
+            m_Group = part;
             m_Phantom = true;
             m_ContributesToCollisionSurfaceAsChild = false;
             m_VolumeDetect = false;
+        }
+
+        public void TransferState(IPhysicsObject target, Vector3 positionOffset)
+        {
+            lock (this)
+            {
+                IsPhysicsActive = false;
+                target.ReceiveState(m_StateData, positionOffset);
+                IsPhysicsActive = true;
+            }
+        }
+
+        public void ReceiveState(PhysicsStateData data, Vector3 positionOffset)
+        {
+            lock (this)
+            {
+                IsPhysicsActive = false;
+                m_StateData.Position = data.Position + positionOffset;
+                m_StateData.Rotation = data.Rotation;
+                m_StateData.Velocity = data.Velocity;
+                m_StateData.AngularVelocity = data.AngularVelocity;
+                m_StateData.Acceleration = data.Acceleration;
+                m_StateData.AngularAcceleration = data.AngularAcceleration;
+                IsPhysicsActive = true;
+            }
         }
 
         public abstract void UpdateCollisionInfo();
@@ -604,9 +631,9 @@ namespace SilverSim.Scene.Physics.Common
                 Vector3 linearForce = Vector3.Zero;
                 Vector3 angularTorque = Vector3.Zero;
 
-                linearForce += BuoyancyMotor(m_Part, dt);
-                linearForce += GravityMotor(m_Part, dt);
-                linearForce += HoverMotor(m_Part, dt);
+                linearForce += BuoyancyMotor(m_Group, dt);
+                linearForce += GravityMotor(m_Group, dt);
+                linearForce += HoverMotor(m_Group, dt);
 
                 lock(this)
                 {
@@ -619,13 +646,13 @@ namespace SilverSim.Scene.Physics.Common
                 }
 
                 /* process acceleration and velocity */
-                m_Part.Acceleration = linearForce / Mass;
+                m_Group.Acceleration = linearForce / Mass;
 #warning implement inertia applied mass correctly
-                m_Part.AngularAcceleration = angularTorque / Mass;
+                m_Group.AngularAcceleration = angularTorque / Mass;
 
                 /* we need to scale the accelerations towards timescale */
-                DeltaLinearVelocity = m_Part.Acceleration * dt;
-                DeltaAngularVelocity = m_Part.AngularAcceleration * dt;
+                DeltaLinearVelocity = m_Group.Acceleration * dt;
+                DeltaAngularVelocity = m_Group.AngularAcceleration * dt;
             }
         }
 

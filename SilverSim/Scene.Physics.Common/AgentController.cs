@@ -11,15 +11,42 @@ namespace SilverSim.Scene.Physics.Common
     public abstract class AgentController : CommonPhysicsController, IAgentPhysicsObject
     {
         IAgent m_Agent;
+        PhysicsStateData m_StateData;
 
-        public AgentController(IAgent agent)
+        public AgentController(IAgent agent, UUID sceneID)
         {
             m_Agent = agent;
+            m_StateData = new PhysicsStateData(agent, sceneID);
         }
 
         public void Dispose()
         {
             m_Agent = null;
+        }
+
+        public void TransferState(IPhysicsObject target, Vector3 positionOffset)
+        {
+            lock (this)
+            {
+                IsPhysicsActive = false;
+                target.ReceiveState(m_StateData, positionOffset);
+                IsPhysicsActive = true;
+            }
+        }
+
+        public void ReceiveState(PhysicsStateData data, Vector3 positionOffset)
+        {
+            lock (this)
+            {
+                IsPhysicsActive = false;
+                m_StateData.Position = data.Position + positionOffset;
+                m_StateData.Rotation = data.Rotation;
+                m_StateData.Velocity = data.Velocity;
+                m_StateData.AngularVelocity = data.AngularVelocity;
+                m_StateData.Acceleration = data.Acceleration;
+                m_StateData.AngularAcceleration = data.AngularAcceleration;
+                IsPhysicsActive = true;
+            }
         }
 
         public abstract Vector3 DeltaLinearVelocity { set; }

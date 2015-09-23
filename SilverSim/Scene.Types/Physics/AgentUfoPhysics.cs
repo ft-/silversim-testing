@@ -24,6 +24,7 @@ namespace SilverSim.Scene.Types.Physics
 
             m_UfoTimer = new Timer(0.1);
             m_UfoTimer.Elapsed += UfoTimerFunction;
+            IsPhysicsActive = true;
             m_Agent = agent;
             m_UfoTimer.Start();
         }
@@ -53,20 +54,48 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        public void TransferState(IPhysicsObject target, Vector3 positionOffset)
+        {
+            lock(this)
+            {
+                IsPhysicsActive = false;
+                target.ReceiveState(m_StateData, positionOffset);
+                IsPhysicsActive = true;
+            }
+        }
+
+        public void ReceiveState(PhysicsStateData data, Vector3 positionOffset)
+        {
+            lock (this)
+            {
+                IsPhysicsActive = false;
+                m_StateData.Position = data.Position + positionOffset;
+                m_StateData.Rotation = data.Rotation;
+                m_StateData.Velocity = data.Velocity;
+                m_StateData.AngularVelocity = data.AngularVelocity;
+                m_StateData.Acceleration = data.Acceleration;
+                m_StateData.AngularAcceleration = data.AngularAcceleration;
+                IsPhysicsActive = true;
+            }
+        }
+
         void UfoTimerFunction(object sender, ElapsedEventArgs e)
         {
             Vector3 controlTarget;
-            lock (this)
+            if (IsPhysicsActive)
             {
-                controlTarget = m_ControlTargetVelocity;
-            }
-            m_StateData.Position += controlTarget / 10f;
-            m_StateData.Velocity = controlTarget;
-            IAgent agent = m_Agent;
-            if(agent != null)
-            {
-                m_StateData.Rotation = agent.BodyRotation;
-                agent.PhysicsUpdate = m_StateData;
+                lock (this)
+                {
+                    controlTarget = m_ControlTargetVelocity;
+                }
+                m_StateData.Position += controlTarget / 10f;
+                m_StateData.Velocity = controlTarget;
+                IAgent agent = m_Agent;
+                if (agent != null)
+                {
+                    m_StateData.Rotation = agent.BodyRotation;
+                    agent.PhysicsUpdate = m_StateData;
+                }
             }
         }
 
@@ -125,13 +154,8 @@ namespace SilverSim.Scene.Types.Physics
 
         public bool IsPhysicsActive
         {
-            get
-            {
-                return false;
-            }
-            set
-            {
-            }
+            get;
+            set;
         }
 
         public bool IsPhantom
