@@ -760,6 +760,9 @@ namespace SilverSim.Main.Common
             CmdIO.CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("regions", ShowRegionsCommand);
             CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCommand);
+            CmdIO.CommandRegistry.ClearCommands.Add("region", Commands.ClearRegion.CmdHandler);
+            CmdIO.CommandRegistry.ClearCommands.Add("objects", Commands.ClearObjects.CmdHandler);
+            CmdIO.CommandRegistry.ClearCommands.Add("parcels", Commands.ClearParcels.CmdHandler);
 
             while(m_Sources.Count != 0)
             {
