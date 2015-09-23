@@ -61,6 +61,7 @@ namespace SilverSim.Scene.Types.Physics
                 controlTarget = m_ControlTargetVelocity;
             }
             m_StateData.Position += controlTarget / 10f;
+            m_StateData.Velocity = controlTarget;
             IAgent agent = m_Agent;
             if(agent != null)
             {
