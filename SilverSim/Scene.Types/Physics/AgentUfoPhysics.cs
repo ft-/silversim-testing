@@ -11,7 +11,7 @@ using System.Timers;
 
 namespace SilverSim.Scene.Types.Physics
 {
-    public class AgentUfoPhysics : IPhysicsObject, IDisposable
+    public class AgentUfoPhysics : IAgentPhysicsObject, IDisposable
     {
         Timer m_UfoTimer;
         IAgent m_Agent;
@@ -40,6 +40,19 @@ namespace SilverSim.Scene.Types.Physics
             m_UfoTimer.Elapsed -= UfoTimerFunction;
         }
 
+        public bool IsAgentCollisionActive 
+        {
+            get
+            {
+                return false;
+            }
+
+            set
+            {
+
+            }
+        }
+
         void UfoTimerFunction(object sender, ElapsedEventArgs e)
         {
             Vector3 controlTarget;
@@ -51,6 +64,7 @@ namespace SilverSim.Scene.Types.Physics
             IAgent agent = m_Agent;
             if(agent != null)
             {
+                m_StateData.Rotation = agent.BodyRotation;
                 agent.PhysicsUpdate = m_StateData;
             }
         }

@@ -111,7 +111,7 @@ namespace SilverSim.LL.Core
         }
 
         #region IObject Calls
-        public void InvokeOnPositionUpdate(IObject obj)
+        public void InvokeOnPositionUpdate()
         {
             var e = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
             if (e != null)
@@ -120,6 +120,11 @@ namespace SilverSim.LL.Core
                 {
                     del(this);
                 }
+            }
+            Circuit c;
+            if(Circuits.TryGetValue(SceneID, out c))
+            {
+                c.Scene.SendAgentObjectToAllAgents(this);
             }
         }
         #endregion
@@ -248,7 +253,7 @@ namespace SilverSim.LL.Core
                         m_GlobalPosition = value;
                     }
                 }
-                InvokeOnPositionUpdate(this);
+                InvokeOnPositionUpdate();
             }
         }
 
@@ -324,7 +329,7 @@ namespace SilverSim.LL.Core
                 {
                     m_GlobalPosition = value;
                 }
-                InvokeOnPositionUpdate(this);
+                InvokeOnPositionUpdate();
             }
         }
 
@@ -357,7 +362,7 @@ namespace SilverSim.LL.Core
                         m_GlobalPosition = value;
                     }
                 }
-                InvokeOnPositionUpdate(this);
+                InvokeOnPositionUpdate();
             }
         }
 
@@ -412,7 +417,7 @@ namespace SilverSim.LL.Core
                         m_GlobalRotation = value;
                     }
                 }
-                InvokeOnPositionUpdate(this);
+                InvokeOnPositionUpdate();
             }
         }
 
@@ -439,7 +444,7 @@ namespace SilverSim.LL.Core
                 {
                     m_GlobalRotation = value;
                 }
-                InvokeOnPositionUpdate(this);
+                InvokeOnPositionUpdate();
             }
         }
 
@@ -1024,22 +1029,27 @@ namespace SilverSim.LL.Core
         }
 
         /* property here instead of a method. A lot more clear that we update something. */
-        object m_PhysicsUpdateLock = new object();
         public PhysicsStateData PhysicsUpdate
         {
             set
             {
-                lock (m_PhysicsUpdateLock)
+                bool updateProcessed = false;
+                lock (this)
                 {
-                    if (SceneID == value.SceneID)
+                    if (SceneID == value.SceneID && null == m_SittingOnObject)
                     {
-                        Position = value.Position;
-                        Rotation = value.Rotation;
-                        Velocity = value.Velocity;
-                        AngularVelocity = value.AngularVelocity;
-                        Acceleration = value.Acceleration;
-                        AngularAcceleration = value.AngularAcceleration;
+                        m_GlobalPosition = value.Position;
+                        m_GlobalRotation = value.Rotation;
+                        m_Velocity = value.Velocity;
+                        m_AngularVelocity = value.AngularVelocity;
+                        m_Acceleration = value.Acceleration;
+                        m_AngularAcceleration = value.AngularAcceleration;
+                        updateProcessed = true;
                     }
+                }
+                if (updateProcessed)
+                {
+                    InvokeOnPositionUpdate();
                 }
             }
         }
