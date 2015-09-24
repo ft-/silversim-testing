@@ -6,6 +6,5 @@ namespace SilverSim.Scene.Management.Scene
     public static class SceneManager
     {
         public static readonly SceneList Scenes = new SceneList();
-        public static readonly NeighborList Neighbors = new NeighborList();
     }
 }
