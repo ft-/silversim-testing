@@ -85,7 +85,7 @@ namespace SilverSim.ServiceInterfaces.Neighbor
                     /* skip we are not our own neighbor */
                 }
                 // The r.RegionFlags == null check only needs to be made for simulators before 2015-01-14 (pre 0.8.1).
-                else if ((ri.Flags & RegionFlags.RegionOnline) != 0)
+                else if ((ri.Flags & RegionFlags.RegionOnline) == 0)
                 {
                     /* skip offline regions */
                 }
