@@ -939,11 +939,22 @@ namespace SilverSim.Main.Common
         {
             if (args[0] == "help")
             {
-                io.Write("change region <region name>");
+                io.Write("change region <region name>\nchange region to root");
             }
             else if(limitedToScene != UUID.Zero)
             {
                 io.Write("change region is not possible with limited console");
+            }
+            else if(args.Count == 4)
+            {
+                if(args[2] != "to" || args[3] != "root")
+                {
+                    io.Write("invalid parameters for change region");
+                }
+                else
+                {
+                    io.SelectedScene = UUID.Zero;
+                }
             }
             else if(args.Count == 3)
             {
