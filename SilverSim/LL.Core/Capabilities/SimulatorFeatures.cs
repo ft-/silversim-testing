@@ -11,7 +11,7 @@ namespace SilverSim.LL.Core.Capabilities
 {
     public class SimulatorFeatures : ICapabilityInterface
     {
-        public static readonly Map Features = new Map();
+        public readonly Map Features = new Map();
 
         public string CapabilityName 
         { 
