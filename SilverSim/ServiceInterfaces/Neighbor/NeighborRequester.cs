@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Neighbor
 {
-    public static class NeighborRequester
+    public class NeighborRequester
     {
         const int MAXIMUM_VIEW_RANGE = 1024;
         const int MAXIMUM_REGION_SIZE = 8192;
