@@ -1197,7 +1197,6 @@ namespace SilverSim.Scene.Types.Object
             {
                 writer.WriteEndElement();
             }
-            writer.WriteEndElement();
             writer.WriteStartElement("OtherParts");
             foreach (ObjectPart p in parts)
             {
@@ -1247,6 +1246,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 writer.WriteEndElement();
             }
+            writer.WriteEndElement();
         }
         #endregion
 
