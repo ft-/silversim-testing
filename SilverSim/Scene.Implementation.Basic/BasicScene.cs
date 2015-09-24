@@ -378,12 +378,6 @@ namespace SilverSim.Scene.Implementation.Basic
                 PhysicsScene = new DummyPhysicsScene(ID);
                 LoginControl.Ready(ReadyFlags.PhysicsTerrain);
             }
-            if (null != m_NeighborService)
-            {
-                RegionInfo rInfo = RegionData;
-                rInfo.Flags |= RegionFlags.RegionOnline;
-                m_NeighborService.notifyNeighborStatus(rInfo);
-            }
         }
         #endregion
 
@@ -652,6 +646,12 @@ namespace SilverSim.Scene.Implementation.Basic
         #region Scene Loading
         public override void LoadSceneAsync()
         {
+            if (null != m_NeighborService)
+            {
+                RegionInfo rInfo = RegionData;
+                rInfo.Flags |= RegionFlags.RegionOnline;
+                m_NeighborService.notifyNeighborStatus(rInfo);
+            }
             this.LoadSceneAsync(m_SimulationDataStorage);
         }
         #endregion
