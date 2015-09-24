@@ -364,6 +364,8 @@ namespace SilverSim.Scene.Implementation.Basic
             OnRemove += RemoveScene;
             ExternalHostName = ri.ServerIP;
             RegionPort = ri.ServerPort;
+            ServerURI = ri.ServerURI;
+            ServerHttpPort = ri.ServerHttpPort;
             m_UDPServer.Start();
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures("", "", "", true));
             Terrain.TerrainListeners.Add(this);

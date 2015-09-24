@@ -74,6 +74,8 @@ namespace SilverSim.Scene.Types.Scene
         public UUID ID { get; protected set; }
         public UUID RegionSecret { get; private set; }
         public uint RegionPort { get; protected set; }
+        public uint ServerHttpPort { get; protected set; }
+        public string ServerURI { get; protected set; }
         public uint SizeX { get; private set; }
         public uint SizeY { get; private set; }
         public string Name { get; protected set; }
@@ -177,6 +179,8 @@ namespace SilverSim.Scene.Types.Scene
                 reg.Location = GridPosition;
                 reg.Name = Name;
                 reg.Owner = Owner;
+                reg.ServerURI = ServerURI;
+                reg.ServerHttpPort = ServerHttpPort;
                 reg.ParcelMapTexture = UUID.Zero;
                 reg.RegionMapTexture = UUID.Zero;
                 reg.RegionSecret = (string)RegionSecret;
