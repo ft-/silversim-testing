@@ -21,6 +21,7 @@ using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
+using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
@@ -296,6 +297,7 @@ namespace SilverSim.Scene.Implementation.Basic
         private BasicSceneAgents m_SceneAgents;
         private BasicSceneRootAgents m_SceneRootAgents;
         private SimulationDataStorageInterface m_SimulationDataStorage;
+        private NeighborServiceInterface m_NeighborService;
 
         public override T GetService<T>()
         {
@@ -326,6 +328,7 @@ namespace SilverSim.Scene.Implementation.Basic
             SimulationDataStorageInterface simulationDataStorage,
             EstateServiceInterface estateService,
             IPhysicsSceneFactory physicsFactory,
+            NeighborServiceInterface neighborService,
             Dictionary<string, string> capabilitiesConfig)
         : base(ri.Size.X, ri.Size.Y)
         {
@@ -333,6 +336,7 @@ namespace SilverSim.Scene.Implementation.Basic
             GroupsNameService = groupsNameService;
             GroupsService = groupsService;
             EstateService = estateService;
+            m_NeighborService = neighborService;
             m_SimulationDataStorage = simulationDataStorage;
             PersistentAssetService = persistentAssetService;
             TemporaryAssetService = temporaryAssetService;
@@ -374,6 +378,12 @@ namespace SilverSim.Scene.Implementation.Basic
                 PhysicsScene = new DummyPhysicsScene(ID);
                 LoginControl.Ready(ReadyFlags.PhysicsTerrain);
             }
+            if (null != m_NeighborService)
+            {
+                RegionInfo rInfo = RegionData;
+                rInfo.Flags |= RegionFlags.RegionOnline;
+                m_NeighborService.notifyNeighborStatus(rInfo);
+            }
         }
         #endregion
 
@@ -396,6 +406,12 @@ namespace SilverSim.Scene.Implementation.Basic
         private void RemoveScene(SceneInterface s)
         {
             m_StopBasicSceneThreads = true;
+            if (null != m_NeighborService)
+            {
+                RegionInfo rInfo = s.RegionData;
+                rInfo.Flags &= (~RegionFlags.RegionOnline);
+                m_NeighborService.notifyNeighborStatus(rInfo);
+            }
             SceneListeners.Remove(m_SimulationDataStorage);
             Terrain.TerrainListeners.Remove(this);
             IMRouter.SceneIM.Remove(IMSend);

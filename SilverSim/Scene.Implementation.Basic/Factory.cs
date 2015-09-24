@@ -14,6 +14,7 @@ using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
+using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
@@ -33,6 +34,7 @@ namespace SilverSim.Scene.Implementation.Basic
         string m_EstateServiceName;
         string m_SimulationDataStorageName;
         string m_PhysicsName;
+        string m_NeighborServiceName;
         List<string> m_AvatarNameServiceNames = new List<string>();
 
         GroupsNameServiceInterface m_GroupsNameService = null;
@@ -46,6 +48,7 @@ namespace SilverSim.Scene.Implementation.Basic
         SimulationDataStorageInterface m_SimulationDataStorage;
         Dictionary<string, string> m_CapabilitiesConfig;
         IPhysicsSceneFactory m_PhysicsFactory;
+        NeighborServiceInterface m_NeighborService;
         List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
 
         public SceneFactory(IConfig ownConfig)
@@ -60,6 +63,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_SimulationDataStorageName = ownConfig.GetString("SimulationDataStorage", "SimulationDataStorage");
             m_EstateServiceName = ownConfig.GetString("EstateService", "EstateService");
             m_PhysicsName = ownConfig.GetString("Physics", "");
+            m_NeighborServiceName = ownConfig.GetString("NeighborService", "NeighborService");
             string avatarNameServices = ownConfig.GetString("AvatarNameServices", "");
             foreach(string p in avatarNameServices.Split(','))
             {
@@ -91,6 +95,10 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 m_PhysicsFactory = loader.GetService<IPhysicsSceneFactory>(m_PhysicsName);
             }
+            if (m_NeighborServiceName != "")
+            {
+                m_NeighborService = loader.GetService<NeighborServiceInterface>(m_NeighborServiceName);
+            }
             m_AssetService = loader.GetService<AssetServiceInterface>(m_AssetServiceName);
             m_AssetCacheService = loader.GetService<AssetServiceInterface>(m_AssetCacheServiceName);
             m_GridService = loader.GetService<GridServiceInterface>(m_GridServiceName);
@@ -119,6 +127,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_SimulationDataStorage,
                 m_EstateService,
                 m_PhysicsFactory,
+                m_NeighborService,
                 m_CapabilitiesConfig);
         }
     }
