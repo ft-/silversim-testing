@@ -289,6 +289,16 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        public virtual void NotifyNeighborOnline(RegionInfo rinfo)
+        {
+
+        }
+
+        public virtual void NotifyNeighborOffline(RegionInfo rinfo)
+        {
+
+        }
+
         public abstract void Add(IObject obj);
         public abstract bool Remove(IObject obj, Script.ScriptInstance instance = null);
         public abstract void ClearObjects();
