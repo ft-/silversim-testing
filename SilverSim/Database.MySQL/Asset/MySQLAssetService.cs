@@ -139,8 +139,8 @@ namespace SilverSim.Database.MySQL.Asset
                             if (dbReader.Read())
                             {
                                 AssetData asset = new AssetData();
-                                asset.ID = new UUID(dbReader["id"].ToString());
-                                asset.Data = (byte[])dbReader["data"];
+                                asset.ID = dbReader.GetUUID("id");
+                                asset.Data = dbReader.GetBytes("data");
                                 asset.Type = (AssetType)(int)dbReader["assetType"];
                                 asset.Name = (string)dbReader["name"];
                                 asset.CreateTime = Date.UnixTimeToDateTime(ulong.Parse(dbReader["create_time"].ToString()));

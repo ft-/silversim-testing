@@ -146,7 +146,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             {
                                 AssetData asset = new AssetData();
                                 asset.ID = dbReader.GetUUID("id");
-                                asset.Data = (byte[])dbReader["data"];
+                                asset.Data = dbReader.GetBytes("data");
                                 asset.Type = (AssetType)(int)dbReader["assetType"];
                                 asset.Name = (string)dbReader["name"];
                                 asset.CreateTime = dbReader.GetDate("create_time");
