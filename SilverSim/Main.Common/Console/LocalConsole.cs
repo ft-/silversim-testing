@@ -24,9 +24,12 @@ namespace SilverSim.Main.Common.Console
         private Thread m_LogThread;
         private Thread m_InputThread;
         private bool m_Shutdown = false;
+        private string m_ConsoleTitle;
 
-        public LocalConsole()
+        public LocalConsole(string consoleTitle)
         {
+            m_ConsoleTitle = consoleTitle;
+            System.Console.Title = consoleTitle;
             CmdPrompt = "# ";
             m_LogThread = new Thread(LogThread);
             m_LogThread.Start();
@@ -519,9 +522,11 @@ namespace SilverSim.Main.Common.Console
 
             for ( ;; )
             {
+                string consoleTitle;
                 if (SelectedScene == null)
                 {
                     CmdPrompt = "(root) # ";
+                    consoleTitle = m_ConsoleTitle + " # (root)";
                 }
                 else
                 {
@@ -529,18 +534,36 @@ namespace SilverSim.Main.Common.Console
                     if (SceneManager.Scenes.TryGetValue(SelectedScene, out scene))
                     {
                         CmdPrompt = scene.Name + " # ";
+                        consoleTitle = m_ConsoleTitle + " # " + scene.Name;
                     }
                     else
                     {
                         CmdPrompt = "(root) # ";
                         SelectedScene = UUID.Zero;
+                        consoleTitle = m_ConsoleTitle + " # (root)";
                     }
+                }
+                try
+                {
+                    System.Console.Title = consoleTitle;
+                }
+                catch
+                {
+
                 }
                 string cmd = ReadLine(CmdPrompt, true);
 
                 if (cmd == string.Empty)
                 {
                     continue;
+                }
+                try
+                {
+                    System.Console.Title = consoleTitle + " $ " + cmd;
+                }
+                catch
+                {
+
                 }
 
                 if (m_CmdHistory.Count >= 100)

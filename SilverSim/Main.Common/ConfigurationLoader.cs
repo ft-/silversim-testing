@@ -807,13 +807,20 @@ namespace SilverSim.Main.Common
             }
 
             IConfig consoleConfig = m_Config.Configs["Console"];
+            string consoleTitle = string.Empty;
+            if(null != consoleConfig)
+            {
+                consoleTitle = consoleConfig.GetString("ConsoleTitle", consoleTitle);
+            }
+
+            consoleTitle += ": " + VersionInfo.ProductName + " (" + VersionInfo.Version + ")";
             if (null == consoleConfig || consoleConfig.GetBoolean("EnableLocalConsole", true) && localConsoleControl == LocalConsole.Allowed)
             {
-                PluginInstances.Add("LocalConsole", new Console.LocalConsole());
+                PluginInstances.Add("LocalConsole", new Console.LocalConsole(consoleTitle));
             }
             else if (null == consoleConfig || consoleConfig.GetBoolean("EnableLogConsole", false) && localConsoleControl == LocalConsole.Allowed)
             {
-                PluginInstances.Add("LogConsole", new Console.LogConsole());
+                PluginInstances.Add("LogConsole", new Console.LogConsole(consoleTitle));
             }
 
             m_Log.InfoFormat("Product: {0}", VersionInfo.ProductName);

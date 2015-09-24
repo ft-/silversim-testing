@@ -15,8 +15,16 @@ namespace SilverSim.Main.Common.Console
         private Thread m_LogThread;
         private bool m_Shutdown = false;
 
-        public LogConsole()
+        public LogConsole(string consoleTitle)
         {
+            try
+            {
+                System.Console.Title = consoleTitle;
+            }
+            catch
+            {
+
+            }
             m_LogThread = new Thread(LogThread);
             m_LogThread.Start();
             Log.LogController.Queues.Add(m_LogQueue);
