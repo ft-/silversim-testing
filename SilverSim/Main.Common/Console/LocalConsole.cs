@@ -2,6 +2,9 @@
 // GNU Affero General Public License v3
 
 using log4net.Core;
+using SilverSim.Scene.Management.Scene;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Types;
 using System;
 using System.Text;
 using System.Threading;
@@ -516,6 +519,23 @@ namespace SilverSim.Main.Common.Console
 
             for ( ;; )
             {
+                if (SelectedScene == null)
+                {
+                    CmdPrompt = "(root) # ";
+                }
+                else
+                {
+                    SceneInterface scene;
+                    if (SceneManager.Scenes.TryGetValue(SelectedScene, out scene))
+                    {
+                        CmdPrompt = scene.Name + " # ";
+                    }
+                    else
+                    {
+                        CmdPrompt = "(root) # ";
+                        SelectedScene = UUID.Zero;
+                    }
+                }
                 string cmd = ReadLine(CmdPrompt, true);
 
                 if (cmd == string.Empty)
