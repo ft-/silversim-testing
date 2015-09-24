@@ -819,6 +819,8 @@ namespace SilverSim.Main.Common
             m_Log.InfoFormat("Product: {0}", VersionInfo.ProductName);
             m_Log.InfoFormat("Version: {0}", VersionInfo.Version);
             m_Log.InfoFormat("Runtime: {0} {1}", VersionInfo.RuntimeInformation, VersionInfo.MachineWidth);
+            m_Log.InfoFormat("OS Version: {0}", Environment.OSVersion.ToString());
+            m_Log.InfoFormat("CLR Runtime Version: {0}", Environment.Version);
 
             m_Log.Info("Loading specified modules");
             LoadModules();
