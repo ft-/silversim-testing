@@ -61,5 +61,20 @@ namespace SilverSim.Types
                 return val;
             }
         }
+
+        public static Vector3 AgentLookAt(this Quaternion quat)
+        {
+            double roll;
+            double pitch;
+            double yaw;
+            quat.GetEulerAngles(out roll, out pitch, out yaw);
+            return new Vector3(Math.Cos(yaw), Math.Sin(yaw), 0);
+        }
+
+        public static Quaternion AgentLookAtToQuaternion(this Vector3 lookat)
+        {
+            double yaw = Math.Atan2(lookat.Y, lookat.X);
+            return Quaternion.CreateFromEulers(0, 0, yaw);
+        }
     }
 }
