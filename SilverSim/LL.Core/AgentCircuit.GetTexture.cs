@@ -11,7 +11,7 @@ using System.Net;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         void Cap_GetTexture(HttpRequest httpreq)
         {
@@ -101,7 +101,7 @@ namespace SilverSim.LL.Core
                 }
                 catch(Exception e2)
                 {
-                    if (m_Server.LogAssetFailures)
+                    if (Server.LogAssetFailures)
                     {
                         m_Log.DebugFormat("Failed to download image {0} (Cap_GetTexture): {1} or {2}\nA: {3}\nB: {4}", textureID, e1.Message, e2.Message, e1.StackTrace.ToString(), e2.StackTrace.ToString());
                     }

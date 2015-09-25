@@ -10,7 +10,7 @@ using System.Xml;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         void WriteAvatarNameData(XmlTextWriter writer, UUI nd)
         {

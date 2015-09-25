@@ -13,7 +13,7 @@ using SilverSim.Scene.Types.Physics;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         enum SimStatIndex : int
         {
@@ -75,7 +75,7 @@ namespace SilverSim.LL.Core
         int m_LastPacketsSent = 0;
         int m_LastAgentUpdatesReceived = 0;
 
-        void SendSimStats(int deltatime)
+        protected override void SendSimStats(int deltatime)
         {
             int packetsReceived = m_PacketsReceived - m_LastPacketsReceived;
             int packetsSent = m_PacketsSent - m_LastPacketsSent;

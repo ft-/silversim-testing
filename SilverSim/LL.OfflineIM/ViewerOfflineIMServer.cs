@@ -18,7 +18,7 @@ namespace SilverSim.LL.OfflineIM
     public class ViewerOfflineIMServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
         [PacketHandler(MessageType.RetrieveInstantMessages)]
-        BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
+        BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         bool m_ShutdownOfflineIM = false;
 
@@ -38,7 +38,7 @@ namespace SilverSim.LL.OfflineIM
 
             while (!m_ShutdownOfflineIM)
             {
-                KeyValuePair<Circuit, Message> req;
+                KeyValuePair<AgentCircuit, Message> req;
                 try
                 {
                     req = RequestQueue.Dequeue(1000);

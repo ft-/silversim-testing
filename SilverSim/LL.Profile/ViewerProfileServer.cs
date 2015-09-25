@@ -48,7 +48,7 @@ namespace SilverSim.LL.Profile
         [GenericMessageHandler("avatarpicksrequest")]
         [GenericMessageHandler("pickinforequest")]
         [GenericMessageHandler("avatarnotesrequest")]
-        BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
+        BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
         bool m_ShutdownProfile = false;
         List<IUserAgentServicePlugin> m_UserAgentServices;
         List<IProfileServicePlugin> m_ProfileServices;
@@ -121,7 +121,7 @@ namespace SilverSim.LL.Profile
 
             while (!m_ShutdownProfile)
             {
-                KeyValuePair<Circuit, Message> req;
+                KeyValuePair<AgentCircuit, Message> req;
                 try
                 {
                     req = RequestQueue.Dequeue(1000);

@@ -172,7 +172,7 @@ namespace SilverSim.LL.Core
                 }
                 m_InboundRunning = false;
             }
-            foreach(Circuit c in m_Circuits.Values)
+            foreach (Circuit c in m_Circuits.Values)
             {
                 c.Stop();
                 c.Dispose();
@@ -238,74 +238,78 @@ namespace SilverSim.LL.Core
                             {
                                 UUID sessionID = pck.ReadUUID();
                                 UUID agentID = pck.ReadUUID();
-                                /* there it is check for SessionID and AgentID */
-                                if (!circuit.SessionID.Equals(sessionID))
+                                if (circuit is AgentCircuit)
                                 {
-                                    /* no match on SessionID */
-                                }
-                                else if (!circuit.AgentID.Equals(agentID))
-                                {
-                                    /* no match on AgentID */
-                                }
-                                else
-                                {
-                                    /* it matches, so we have to change the actual key */
-                                    IPEndPoint endpoint = new IPEndPoint(0, 0);
-                                    EndPoint ep = endpoint.Create(pck.RemoteEndPoint.Serialize());
-                                    m_Circuits.Remove(circuit.CircuitCode);
-                                    m_Circuits.Add(ep, circuit.CircuitCode, circuit);
-                                    circuit.RemoteEndPoint = ep;
-                                    try
+                                    AgentCircuit acircuit = (AgentCircuit)circuit;
+                                    /* there it is check for SessionID and AgentID */
+                                    if (!acircuit.SessionID.Equals(sessionID))
                                     {
-                                        circuit.Start();
-
-                                        SceneInterface scene = Scene;
-                                        Messages.Region.RegionHandshake rh = new Messages.Region.RegionHandshake();
-                                        rh.RegionFlags = 0;
-                                        rh.SimAccess = scene.RegionData.Access;
-                                        rh.SimName = scene.Name;
-                                        rh.SimOwner = scene.Owner.ID;
-                                        rh.IsEstateManager = scene.IsEstateManager(new UUI(circuit.Agent.ID, circuit.Agent.FirstName, circuit.Agent.LastName, circuit.Agent.HomeURI));
-                                        rh.WaterHeight = scene.RegionSettings.WaterHeight;
-                                        rh.BillableFactor = 1;
-                                        rh.TerrainStartHeight00 = scene.RegionSettings.Elevation1SW;
-                                        rh.TerrainStartHeight01 = scene.RegionSettings.Elevation2SW;
-                                        rh.TerrainStartHeight10 = scene.RegionSettings.Elevation1NW;
-                                        rh.TerrainStartHeight11 = scene.RegionSettings.Elevation2NW;
-                                        rh.TerrainHeightRange00 = scene.RegionSettings.Elevation1SE;
-                                        rh.TerrainHeightRange01 = scene.RegionSettings.Elevation2SE;
-                                        rh.TerrainHeightRange10 = scene.RegionSettings.Elevation1NE;
-                                        rh.TerrainHeightRange11 = scene.RegionSettings.Elevation2NE;
-                                        rh.TerrainBase0 = UUID.Zero;
-                                        rh.TerrainBase1 = UUID.Zero;
-                                        rh.TerrainBase2 = UUID.Zero;
-                                        rh.TerrainBase3 = UUID.Zero;
-                                        rh.TerrainDetail0 = scene.RegionSettings.TerrainTexture1;
-                                        rh.TerrainDetail1 = scene.RegionSettings.TerrainTexture2;
-                                        rh.TerrainDetail2 = scene.RegionSettings.TerrainTexture3;
-                                        rh.TerrainDetail3 = scene.RegionSettings.TerrainTexture4;
-                                        rh.RegionID = scene.ID;
-                                        rh.CacheID = UUID.Random;
-                                        rh.CPUClassID = 9;
-                                        rh.CPURatio = 1;
-                                        rh.ColoName = "";
-                                        rh.ProductSKU = VersionInfo.SimulatorVersion;
-                                        rh.ProductName = VersionInfo.ProductName;
-
-                                        Messages.Region.RegionHandshake.RegionExtDataEntry entry = new Messages.Region.RegionHandshake.RegionExtDataEntry();
-                                        entry.RegionFlagsExtended = 0;
-                                        entry.RegionProtocols = 0; /* 0 => no SSB, 1 => SSB */
-                                        rh.RegionExtData.Add(entry);
-
-                                        /* Immediate Ack */
-                                        SendPacketTo(UDPPacket.PacketAckImmediate(pck.SequenceNumber), ep);
-                                        
-                                        circuit.SendMessage(rh);
+                                        /* no match on SessionID */
                                     }
-                                    catch(Exception e)
+                                    else if (!acircuit.AgentID.Equals(agentID))
                                     {
-                                        m_Log.DebugFormat("UseCircuitCode Exception {0} {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
-                                        circuit.Stop();
+                                        /* no match on AgentID */
+                                    }
+                                    else
+                                    {
+                                        /* it matches, so we have to change the actual key */
+                                        IPEndPoint endpoint = new IPEndPoint(0, 0);
+                                        EndPoint ep = endpoint.Create(pck.RemoteEndPoint.Serialize());
+                                        m_Circuits.Remove(circuit.CircuitCode);
+                                        m_Circuits.Add(ep, circuit.CircuitCode, circuit);
+                                        circuit.RemoteEndPoint = ep;
+                                        try
+                                        {
+                                            circuit.Start();
+
+                                            SceneInterface scene = Scene;
+                                            Messages.Region.RegionHandshake rh = new Messages.Region.RegionHandshake();
+                                            rh.RegionFlags = 0;
+                                            rh.SimAccess = scene.RegionData.Access;
+                                            rh.SimName = scene.Name;
+                                            rh.SimOwner = scene.Owner.ID;
+                                            rh.IsEstateManager = scene.IsEstateManager(new UUI(acircuit.Agent.ID, acircuit.Agent.FirstName, acircuit.Agent.LastName, acircuit.Agent.HomeURI));
+                                            rh.WaterHeight = scene.RegionSettings.WaterHeight;
+                                            rh.BillableFactor = 1;
+                                            rh.TerrainStartHeight00 = scene.RegionSettings.Elevation1SW;
+                                            rh.TerrainStartHeight01 = scene.RegionSettings.Elevation2SW;
+                                            rh.TerrainStartHeight10 = scene.RegionSettings.Elevation1NW;
+                                            rh.TerrainStartHeight11 = scene.RegionSettings.Elevation2NW;
+                                            rh.TerrainHeightRange00 = scene.RegionSettings.Elevation1SE;
+                                            rh.TerrainHeightRange01 = scene.RegionSettings.Elevation2SE;
+                                            rh.TerrainHeightRange10 = scene.RegionSettings.Elevation1NE;
+                                            rh.TerrainHeightRange11 = scene.RegionSettings.Elevation2NE;
+                                            rh.TerrainBase0 = UUID.Zero;
+                                            rh.TerrainBase1 = UUID.Zero;
+                                            rh.TerrainBase2 = UUID.Zero;
+                                            rh.TerrainBase3 = UUID.Zero;
+                                            rh.TerrainDetail0 = scene.RegionSettings.TerrainTexture1;
+                                            rh.TerrainDetail1 = scene.RegionSettings.TerrainTexture2;
+                                            rh.TerrainDetail2 = scene.RegionSettings.TerrainTexture3;
+                                            rh.TerrainDetail3 = scene.RegionSettings.TerrainTexture4;
+                                            rh.RegionID = scene.ID;
+                                            rh.CacheID = UUID.Random;
+                                            rh.CPUClassID = 9;
+                                            rh.CPURatio = 1;
+                                            rh.ColoName = "";
+                                            rh.ProductSKU = VersionInfo.SimulatorVersion;
+                                            rh.ProductName = VersionInfo.ProductName;
+
+                                            Messages.Region.RegionHandshake.RegionExtDataEntry entry = new Messages.Region.RegionHandshake.RegionExtDataEntry();
+                                            entry.RegionFlagsExtended = 0;
+                                            entry.RegionProtocols = 0; /* 0 => no SSB, 1 => SSB */
+                                            rh.RegionExtData.Add(entry);
+
+                                            /* Immediate Ack */
+                                            SendPacketTo(UDPPacket.PacketAckImmediate(pck.SequenceNumber), ep);
+
+                                            circuit.SendMessage(rh);
+                                        }
+                                        catch (Exception e)
+                                        {
+                                            m_Log.DebugFormat("UseCircuitCode Exception {0} {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                                            circuit.Stop();
+                                        }
                                     }
                                 }
                             }
@@ -392,7 +396,11 @@ namespace SilverSim.LL.Core
             m_Circuits.Add(c.RemoteEndPoint, c.CircuitCode, c);
             try
             {
-                m_Agents.Add(c.AgentID, c.Agent);
+                if (c is AgentCircuit)
+                {
+                    AgentCircuit ac = (AgentCircuit)c;
+                    m_Agents.Add(ac.AgentID, ac.Agent);
+                }
             }
             catch
             {
@@ -403,7 +411,11 @@ namespace SilverSim.LL.Core
 
         public void RemoveCircuit(Circuit c)
         {
-            m_Agents.Remove(c.AgentID);
+            if (c is AgentCircuit)
+            {
+                AgentCircuit ac = (AgentCircuit)c;
+                m_Agents.Remove(ac.AgentID);
+            }
             m_Circuits.Remove(c.RemoteEndPoint, c.CircuitCode);
         }
 

@@ -27,7 +27,11 @@ namespace SilverSim.LL.Core
         {
             m_Circuits.ForEach(delegate(Circuit circ)
             {
-                circ.ScheduleUpdate(info);
+                if (circ is AgentCircuit)
+                {
+                    AgentCircuit acirc = (AgentCircuit)circ;
+                    acirc.ScheduleUpdate(info);
+                }
             });
         }
     }

@@ -13,7 +13,7 @@ namespace SilverSim.LL.Core
         [IMMessageHandler(GridInstantMessageDialog.StartTyping)]
         [IMMessageHandler(GridInstantMessageDialog.StopTyping)]
         [IMMessageHandler(GridInstantMessageDialog.BusyAutoResponse)]
-        public void HandleIM(LLAgent nop, Circuit circuit, Message m)
+        public void HandleIM(LLAgent nop, AgentCircuit circuit, Message m)
         {
             GridInstantMessage im = (GridInstantMessage)(ImprovedInstantMessage)m;
             im.IsFromGroup = false;

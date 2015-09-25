@@ -24,7 +24,7 @@ namespace SilverSim.LL.Economy
 
         [PacketHandler(MessageType.MoneyBalanceRequest)]
         [PacketHandler(MessageType.EconomyDataRequest)]
-        BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
+        BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         bool m_ShutdownEconomy = false;
 
@@ -44,7 +44,7 @@ namespace SilverSim.LL.Economy
 
             while (!m_ShutdownEconomy)
             {
-                KeyValuePair<Circuit, Message> req;
+                KeyValuePair<AgentCircuit, Message> req;
                 try
                 {
                     req = RequestQueue.Dequeue(1000);
@@ -76,7 +76,7 @@ namespace SilverSim.LL.Economy
             }
         }
 
-        void HandleEconomyDataRequest(Circuit circuit, Message m)
+        void HandleEconomyDataRequest(AgentCircuit circuit, Message m)
         {
             EconomyDataRequest mbr = (EconomyDataRequest)m;
             SceneInterface scene;
@@ -118,7 +118,7 @@ namespace SilverSim.LL.Economy
             agent.SendMessageAlways(ed, scene.ID);
         }
 
-        void HandleMoneyBalanceRequest(Circuit circuit, Message m)
+        void HandleMoneyBalanceRequest(AgentCircuit circuit, Message m)
         {
             Messages.Economy.MoneyBalanceRequest mbr = (Messages.Economy.MoneyBalanceRequest)m;
             if (mbr.AgentID == mbr.CircuitAgentID && mbr.SessionID == mbr.CircuitSessionID)

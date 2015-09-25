@@ -16,7 +16,7 @@ namespace SilverSim.LL.Core
         {
             Name = name;
         }
-        public delegate void CapabilityDelegate(LLAgent agent, Circuit circuit, HttpRequest req);
+        public delegate void CapabilityDelegate(LLAgent agent, AgentCircuit circuit, HttpRequest req);
     }
 
     public interface ICapabilityExtender : IProtocolExtender

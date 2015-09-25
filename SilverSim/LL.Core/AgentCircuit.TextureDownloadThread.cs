@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         private const int IMAGE_PACKET_SIZE = 1000;
         private const int IMAGE_FIRST_PACKET_SIZE = 600;
@@ -114,7 +114,7 @@ namespace SilverSim.LL.Core
                         }
                         catch (Exception e2)
                         {
-                            if (m_Server.LogAssetFailures)
+                            if (Server.LogAssetFailures)
                             {
                                 m_Log.DebugFormat("Failed to download image {0} (RequestImage): {1} or {2}\nA: {3}\nB: {4}", imageRequest.ImageID, e1.Message, e2.Message, e1.StackTrace.ToString(), e2.StackTrace.ToString());
                             }

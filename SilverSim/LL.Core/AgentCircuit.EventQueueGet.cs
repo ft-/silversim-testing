@@ -12,11 +12,16 @@ using ThreadedClasses;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         BlockingQueue<Message> m_EventQueue = new BlockingQueue<Message>();
         bool m_EventQueueEnabled = true;
         int m_EventQueueEventId = 1;
+
+        protected override void SendViaEventQueueGet(Message m)
+        {
+            m_EventQueue.Enqueue(m);
+        }
 
         void Cap_EventQueueGet(HttpRequest httpreq)
         {

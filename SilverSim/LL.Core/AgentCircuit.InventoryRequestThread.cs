@@ -13,7 +13,7 @@ using System.Threading;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         #region Fetch Inventory Thread
         private const int MAX_FOLDERS_PER_PACKET = 6;
@@ -163,7 +163,7 @@ namespace SilverSim.LL.Core
                                 }
                                 catch(Exception e2)
                                 {
-                                    if (m_Server.LogAssetFailures)
+                                    if (Server.LogAssetFailures)
                                     {
                                         m_Log.DebugFormat("Failed to download asset {0} (TransferPacket): {1} or {2}", assetID, e1.Message, e2.Message);
                                     }
@@ -172,7 +172,7 @@ namespace SilverSim.LL.Core
                                 }
                             }
 
-                            if(m_Server.LogTransferPacket)
+                            if(Server.LogTransferPacket)
                             {
                                 m_Log.DebugFormat("Starting to download asset {0} (TransferPacket)", assetID);
                             }
@@ -231,7 +231,7 @@ namespace SilverSim.LL.Core
                                 }
                                 SendMessage(tp);
                             }
-                            if (m_Server.LogTransferPacket)
+                            if (Server.LogTransferPacket)
                             {
                                 m_Log.DebugFormat("Completed download of asset {0} (TransferPacket)", assetID);
                             }

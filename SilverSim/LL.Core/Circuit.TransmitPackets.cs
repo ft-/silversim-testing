@@ -1,20 +1,80 @@
-﻿// SilverSim is distributed under the terms of the
-// GNU Affero General Public License v3
-
-using SilverSim.LL.Messages;
+﻿using SilverSim.LL.Messages;
 using System;
-using System.Threading;
 using System.Collections.Generic;
-using SilverSim.Scene.Types.Scene;
+using System.Linq;
+using System.Text;
+using System.Threading;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public abstract partial class Circuit
     {
+        protected abstract void SendViaEventQueueGet(Message m);
+
+        [IgnoreMethod]
+        public void SendMessage(Message m)
+        {
+            if (m.IsReliable && m_CircuitIsClosing)
+            {
+                m.OnSendComplete(false);
+                return;
+            }
+
+            try
+            {
+                switch (m.Number)
+                {
+#if HOWTODEAL
+                    case MessageType.DisableSimulator:
+                        break;
+#endif
+                    case 0: /* only Event Queue support */
+                        if (Attribute.GetCustomAttribute(m.GetType(), typeof(EventQueueGet)) != null)
+                        {
+                            SendViaEventQueueGet(m);
+                        }
+                        else
+                        {
+                            m_Log.ErrorFormat("Type {0} misses EventQueueGet attribute", m.GetType().FullName);
+                        }
+                        break;
+
+                    default:
+                        if (Attribute.GetCustomAttribute(m.GetType(), typeof(EventQueueGet)) != null)
+                        {
+                            SendViaEventQueueGet(m);
+                        }
+                        else
+                        {
+                            m_TxQueue.Enqueue(m);
+                        }
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                m_Log.ErrorFormat("{0} at {1}", e.ToString(), e.StackTrace.ToString());
+            }
+
+            /* Unreliable message direct acknowledge */
+            if (!m.IsReliable)
+            {
+                try
+                {
+                    m.OnSendComplete(true);
+                }
+                catch (Exception e)
+                {
+                    m_Log.ErrorFormat("OnSendCompletion: {0} at {1}", e.ToString(), e.StackTrace.ToString());
+                }
+            }
+        }
+
+
         #region LLUDP Packet transmitter
 
         /* we limit by amount of acks here (concept from TCP, more or less as window approach) */
-        int[] m_AckThrottlingCount = new int[(int)Message.QueueOutType.NumQueues];
+        protected int[] m_AckThrottlingCount = new int[(int)Message.QueueOutType.NumQueues];
 
         private static readonly Dictionary<MessageType, Message.QueueOutType> m_QueueOutTable = new Dictionary<MessageType, Message.QueueOutType>();
         static void InitializeTransmitQueueRouting()
@@ -31,26 +91,18 @@ namespace SilverSim.LL.Core
         void InitializeTransmitQueueing()
         {
             int i;
-            for(i = 0; i < m_AckThrottlingCount.Length; ++i)
+            for (i = 0; i < m_AckThrottlingCount.Length; ++i)
             {
                 m_AckThrottlingCount[i] = 0;
             }
         }
 
-        const int TRANSMIT_THROTTLE_MTU = 1500;
-        const int MAX_DATA_MTU = 1400;
+        protected const int TRANSMIT_THROTTLE_MTU = 1500;
+        protected const int MAX_DATA_MTU = 1400;
 
-        [PacketHandler(MessageType.AgentThrottle)]
-        void HandleThrottlePacket(Message msg)
-        {
-            Messages.Agent.AgentThrottle m = (Messages.Agent.AgentThrottle)msg;
-            if(m.SessionID != SessionID || m.AgentID != AgentID)
-            {
-                return;
-            }
-        }
+        protected bool m_CircuitIsClosing = false;
 
-        bool m_CircuitIsClosing = false;
+        protected abstract void SendSimStats(int dt);
 
         private void TerminateCircuit()
         {
@@ -72,40 +124,14 @@ namespace SilverSim.LL.Core
                     }
                 }
             }
-            if (Agent.IsInScene(Scene))
+
+            LLUDPServer server = m_Server;
+            if (null != server)
             {
-                try
-                {
-                    Agent.GridUserService.LoggedOut(Agent.Owner, Scene.ID, Agent.GlobalPosition, Agent.LookAt);
-                }
-                catch
-                {
-
-                }
-                try
-                {
-                    Agent.PresenceService[SessionID, Agent.Owner.ID] = null;
-                }
-                catch
-                {
-
-                }
-            }
-            Agent.Circuits.Remove(CircuitCode);
-
-            SceneInterface scene = Scene;
-            if (null != scene)
-            {
-                LLUDPServer server = (LLUDPServer)scene.UDPServer;
-                if (server != null)
-                {
-                    server.RemoveCircuit(this);
-                }
+                //server.RemoveCircuit(this);
             }
 
             Stop();
-            Agent = null;
-            Scene = null;
             return;
         }
 
@@ -138,9 +164,9 @@ namespace SilverSim.LL.Core
                 int qcount;
                 int timeout = 10;
                 qcount = 0;
-                foreach(Queue<Message> q in QueueList)
+                foreach (Queue<Message> q in QueueList)
                 {
-                    if(q.Count > 0)
+                    if (q.Count > 0)
                     {
                         timeout = 0;
                     }
@@ -227,10 +253,10 @@ namespace SilverSim.LL.Core
                 do
                 {
                     /* make high packets pass low priority packets */
-                    for(int queueidx = 0; queueidx < QueueList.Length; ++queueidx)
+                    for (int queueidx = 0; queueidx < QueueList.Length; ++queueidx)
                     {
                         Queue<Message> q = QueueList[queueidx];
-                        if(q.Count == 0)
+                        if (q.Count == 0)
                         {
                             continue;
                         }
@@ -242,7 +268,7 @@ namespace SilverSim.LL.Core
                         try
                         {
                             m = q.Dequeue();
-                            if(QueueCount[queueidx] > 0)
+                            if (QueueCount[queueidx] > 0)
                             {
                                 --QueueCount[queueidx];
                             }
@@ -322,7 +348,7 @@ namespace SilverSim.LL.Core
                                     }
                                 }
                             }
-                            catch(Exception e)
+                            catch (Exception e)
                             {
                                 m_Log.DebugFormat("Failed to serialize message of type {0}: {1}\n{2}", m.TypeDescription, e.Message, e.StackTrace.ToString());
                             }
@@ -330,27 +356,27 @@ namespace SilverSim.LL.Core
                     }
 
                     qcount = 0;
-                    for(int queueidx = 0; queueidx < QueueCount.Length; ++queueidx)
+                    for (int queueidx = 0; queueidx < QueueCount.Length; ++queueidx)
                     {
                         qcount += QueueCount[queueidx];
                     }
-                } while(qcount != 0);
+                } while (qcount != 0);
 
                 if (Environment.TickCount - m_LastReceivedPacketAtTime >= 60000)
                 {
-                    m_Log.InfoFormat("Packet Timeout for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
+                    LogMsgOnTimeout();
                     TerminateCircuit();
                     return;
                 }
 
                 if (Environment.TickCount - m_LogoutReplySentAtTime >= 10000 && m_LogoutReplySent)
                 {
-                    m_Log.InfoFormat("LogoutReply for agent {0} {1} ({2}) timed out", Agent.FirstName, Agent.LastName, Agent.ID);
+                    LogMsgLogoutReply();
                     TerminateCircuit();
                     return;
                 }
 
-                if(Environment.TickCount - lastSimStatsTick >= 1000)
+                if (Environment.TickCount - lastSimStatsTick >= 1000)
                 {
                     int deltatime = Environment.TickCount - lastSimStatsTick;
                     lastSimStatsTick = Environment.TickCount;
@@ -406,6 +432,10 @@ namespace SilverSim.LL.Core
             }
             m_TxRunning = false;
         }
+
+        protected abstract void LogMsgOnTimeout();
+        protected abstract void LogMsgLogoutReply();
+
         #endregion
     }
 }

@@ -17,7 +17,7 @@ namespace SilverSim.LL.Core
             Messages.Agent.AgentDataUpdateRequest adur = (Messages.Agent.AgentDataUpdateRequest)m;
             if (adur.AgentID == ID && adur.SessionID == adur.CircuitSessionID)
             {
-                Circuit circuit;
+                AgentCircuit circuit;
                 if (Circuits.TryGetValue(adur.ReceivedOnCircuitCode, out circuit))
                 {
                     Messages.Agent.AgentDataUpdate adu = new Messages.Agent.AgentDataUpdate();

@@ -147,7 +147,7 @@ namespace SilverSim.LL.TerrainEdit
         }
 
         [PacketHandler(MessageType.ModifyLand)]
-        void HandleMessage(LLAgent agent, Circuit circuit, Message m)
+        void HandleMessage(LLAgent agent, AgentCircuit circuit, Message m)
         {
             ModifyLand req = (ModifyLand)m;
             if (req.CircuitSessionID != req.SessionID ||

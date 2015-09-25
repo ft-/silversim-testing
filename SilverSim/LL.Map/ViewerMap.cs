@@ -27,11 +27,11 @@ namespace SilverSim.LL.Map
 
         [PacketHandler(MessageType.MapBlockRequest)]
         [PacketHandler(MessageType.MapNameRequest)]
-        BlockingQueue<KeyValuePair<Circuit, Message>> MapBlocksRequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
+        BlockingQueue<KeyValuePair<AgentCircuit, Message>> MapBlocksRequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         [PacketHandler(MessageType.MapLayerRequest)]
         [PacketHandler(MessageType.MapItemRequest)]
-        BlockingQueue<KeyValuePair<Circuit, Message>> MapDetailsRequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
+        BlockingQueue<KeyValuePair<AgentCircuit, Message>> MapDetailsRequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         List<IForeignGridConnectorPlugin> m_ForeignGridConnectorPlugins;
 
@@ -52,7 +52,7 @@ namespace SilverSim.LL.Map
 
         public void HandlerThread(object o)
         {
-            BlockingQueue<KeyValuePair<Circuit, Message>> requestQueue = (BlockingQueue<KeyValuePair<Circuit, Message>>)o;
+            BlockingQueue<KeyValuePair<AgentCircuit, Message>> requestQueue = (BlockingQueue<KeyValuePair<AgentCircuit, Message>>)o;
             if (requestQueue == MapDetailsRequestQueue)
             {
                 Thread.CurrentThread.Name = "Map Details Handler Thread";
@@ -64,7 +64,7 @@ namespace SilverSim.LL.Map
 
             while (!m_ShutdownMap)
             {
-                KeyValuePair<Circuit, Message> req;
+                KeyValuePair<AgentCircuit, Message> req;
                 try
                 {
                     req = requestQueue.Dequeue(1000);

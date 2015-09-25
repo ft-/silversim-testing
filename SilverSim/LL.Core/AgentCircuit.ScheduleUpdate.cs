@@ -14,9 +14,8 @@ using SilverSim.Types.Inventory;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
-        private ThreadedClasses.BlockingQueue<UDPPacket> m_TxObjectPool = new BlockingQueue<UDPPacket>();
         private ThreadedClasses.BlockingQueue<ObjectUpdateInfo> m_TxObjectQueue = new BlockingQueue<ObjectUpdateInfo>();
         private bool m_TriggerFirstUpdate = false;
 
@@ -60,7 +59,7 @@ namespace SilverSim.LL.Core
                     m_UnackedBytes += p.DataLength;
                 }
             }
-            m_Server.SendPacketTo(p, RemoteEndPoint);
+            Server.SendPacketTo(p, RemoteEndPoint);
         }
 
         private UDPPacket GetTxObjectPoolPacket()

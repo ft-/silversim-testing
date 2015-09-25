@@ -12,7 +12,7 @@ using System.Xml;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         void WriteInventoryFolderContent(XmlTextWriter writer, InventoryFolderContent folder, 
             bool fetch_folders,

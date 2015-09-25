@@ -11,7 +11,7 @@ using System.Net;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         void Cap_GetMesh(HttpRequest httpreq)
         {

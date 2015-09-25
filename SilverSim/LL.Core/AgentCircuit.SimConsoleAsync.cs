@@ -19,7 +19,7 @@ using SilverSim.Main.Common.CmdIO;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         void Cap_SimConsoleAsync(HttpRequest httpreq)
         {
@@ -69,8 +69,8 @@ namespace SilverSim.LL.Core
 
         class SimConsoleAsyncTTY : TTY
         {
-            Circuit m_Circuit;
-            public SimConsoleAsyncTTY(Circuit c)
+            AgentCircuit m_Circuit;
+            public SimConsoleAsyncTTY(AgentCircuit c)
             {
                 m_Circuit = c;
             }

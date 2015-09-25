@@ -31,7 +31,7 @@ namespace SilverSim.LL.Core
                 return;
             }
 
-            Circuit circuit;
+            AgentCircuit circuit;
             if(!Circuits.TryGetValue(req.CircuitSceneID, out circuit))
             {
                 return;
@@ -224,7 +224,7 @@ namespace SilverSim.LL.Core
             msg.Invoice = req.Invoice;
             msg.TransactionID = req.TransactionID;
             msg.Method = "estateupdateinfo";
-            Circuit circuit;
+            AgentCircuit circuit;
             if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
             {
                 SceneInterface scene = circuit.Scene;
@@ -276,7 +276,7 @@ namespace SilverSim.LL.Core
                 return;
             }
 
-            Circuit circuit;
+            AgentCircuit circuit;
             if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
             {
                 SceneInterface scene = circuit.Scene;
@@ -312,7 +312,7 @@ namespace SilverSim.LL.Core
 
         void EstateOwner_TextureHeights(EstateOwnerMessage req)
         {
-            Circuit circuit;
+            AgentCircuit circuit;
             if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
             {
                 SceneInterface scene = circuit.Scene;
@@ -376,7 +376,7 @@ namespace SilverSim.LL.Core
                 return;
             }
 
-            Circuit circuit;
+            AgentCircuit circuit;
             if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
             {
                 SceneInterface scene = circuit.Scene;
@@ -439,7 +439,7 @@ namespace SilverSim.LL.Core
             UUID invoice = req.Invoice;
             string message = UTF8NoBOM.GetString(req.ParamList[4]);
 
-            Circuit circuit;
+            AgentCircuit circuit;
 
             if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
             {
@@ -477,7 +477,7 @@ namespace SilverSim.LL.Core
             }
             UUID invoice = req.Invoice;
             UUID SenderID = Owner.ID;
-            Circuit circuit;
+            AgentCircuit circuit;
 
             if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
             {

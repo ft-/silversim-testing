@@ -16,7 +16,7 @@ using System.Xml;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         void Cap_RenderMaterials(HttpRequest httpreq)
         {

@@ -12,7 +12,7 @@ using System.Text;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         void Cap_MeshUploadFlag(HttpRequest httpreq)
         {

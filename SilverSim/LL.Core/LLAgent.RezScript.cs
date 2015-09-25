@@ -50,7 +50,7 @@ namespace SilverSim.LL.Core
             }
             SceneInterface scene;
             ObjectPart part;
-            Circuit circuit;
+            AgentCircuit circuit;
             try
             {
                 circuit = Circuits[req.InventoryBlock.FolderID];
@@ -72,7 +72,7 @@ namespace SilverSim.LL.Core
             }
         }
 
-        void RezScriptFromAgentInventory(Circuit circuit, ObjectPart part, RezScript req)
+        void RezScriptFromAgentInventory(AgentCircuit circuit, ObjectPart part, RezScript req)
         {
             UUID itemID = req.InventoryBlock.ItemID;
             InventoryItem item;
@@ -167,7 +167,7 @@ namespace SilverSim.LL.Core
             }
         }
 
-        void RezNewScript(Circuit circuit, ObjectPart part, RezScript req)
+        void RezNewScript(AgentCircuit circuit, ObjectPart part, RezScript req)
         {
             AssetData data;
             try
@@ -186,7 +186,7 @@ namespace SilverSim.LL.Core
             RezActualScript(circuit, part, req, data);
         }
 
-        void RezActualScript(Circuit circuit, ObjectPart part, RezScript req, AssetData data)
+        void RezActualScript(AgentCircuit circuit, ObjectPart part, RezScript req, AssetData data)
         {
             if(!part.CheckPermissions(Owner, Group, InventoryPermissionsMask.Modify))
             {

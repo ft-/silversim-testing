@@ -18,7 +18,7 @@ namespace SilverSim.LL.Core
     {
         void SendAnimations(AvatarAnimation m)
         {
-            Circuits.ForEach(delegate(Circuit c)
+            Circuits.ForEach(delegate(AgentCircuit c)
             {
                 c.Scene.SendAgentAnimToAllAgents(m);
             });

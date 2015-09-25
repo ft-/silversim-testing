@@ -66,7 +66,7 @@ namespace SilverSim.LL.Groups
         [IMMessageHandler(GridInstantMessageDialog.GroupNoticeInventoryAccepted)]
         [IMMessageHandler(GridInstantMessageDialog.SessionGroupStart)]
         [IMMessageHandler(GridInstantMessageDialog.SessionSend)]
-        BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
+        BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
         BlockingQueue<KeyValuePair<UUID, SceneInterface>> AgentGroupDataUpdateQueue = new BlockingQueue<KeyValuePair<UUID, SceneInterface>>();
 
         BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>> IMGroupNoticeQueue = new BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>>();
@@ -225,7 +225,7 @@ namespace SilverSim.LL.Groups
 
             while (!m_ShutdownGroups)
             {
-                KeyValuePair<Circuit, Message> req;
+                KeyValuePair<AgentCircuit, Message> req;
                 try
                 {
                     req = RequestQueue.Dequeue(1000);
@@ -1567,7 +1567,7 @@ namespace SilverSim.LL.Groups
         }
 
         [CapabilityHandler("GroupMemberData")]
-        public void HandleGroupMemberDataCapability(LLAgent agent, Circuit circuit, HttpRequest req)
+        public void HandleGroupMemberDataCapability(LLAgent agent, AgentCircuit circuit, HttpRequest req)
         {
             if(req.Method != "POST")
             {

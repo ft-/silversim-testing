@@ -9,7 +9,7 @@ using SilverSim.Types;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         [PacketHandler(MessageType.UUIDGroupNameRequest)]
         void GroupNameLookup(Message m)

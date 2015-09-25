@@ -14,7 +14,7 @@ using SilverSim.Types.Inventory;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         void WriteInventoryItem(InventoryItem item, XmlTextWriter writer)
         {

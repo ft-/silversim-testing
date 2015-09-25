@@ -32,7 +32,7 @@ namespace SilverSim.LL.Search
         [PacketHandler(MessageType.DirLandQuery)]
         [PacketHandler(MessageType.DirPopularQuery)]
         [PacketHandler(MessageType.DirFindQuery)]
-        BlockingQueue<KeyValuePair<Circuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<Circuit, Message>>();
+        BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         bool m_ShutdownSearch = false;
 
@@ -51,7 +51,7 @@ namespace SilverSim.LL.Search
 
             while(!m_ShutdownSearch)
             {
-                KeyValuePair<Circuit, Message> req;
+                KeyValuePair<AgentCircuit, Message> req;
                 try
                 {
                     req = RequestQueue.Dequeue(1000);
@@ -83,8 +83,8 @@ namespace SilverSim.LL.Search
             }
         }
 
-        [Circuit.IgnoreMethod]
-        void ProcessDirFindQuery(LLAgent agent, Circuit circuit, Message m)
+        [AgentCircuit.IgnoreMethod]
+        void ProcessDirFindQuery(LLAgent agent, AgentCircuit circuit, Message m)
         {
             DirFindQuery req = (DirFindQuery)m;
             SceneInterface scene = circuit.Scene;
@@ -217,8 +217,8 @@ namespace SilverSim.LL.Search
 
         }
 
-        [Circuit.IgnoreMethod]
-        void ProcessAvatarPickerRequest(LLAgent agent, Circuit circuit, Message m)
+        [AgentCircuit.IgnoreMethod]
+        void ProcessAvatarPickerRequest(LLAgent agent, AgentCircuit circuit, Message m)
         {
             AvatarPickerRequest req = (AvatarPickerRequest)m;
             AvatarPickerReply res = new AvatarPickerReply();
@@ -272,7 +272,7 @@ namespace SilverSim.LL.Search
         }
 
         [CapabilityHandler("AvatarPickerSearch")]
-        public void HandleAvatarPickerSearchCapability(LLAgent agent, Circuit circuit, HttpRequest req)
+        public void HandleAvatarPickerSearchCapability(LLAgent agent, AgentCircuit circuit, HttpRequest req)
         {
             string[] parts = req.RawUrl.Substring(1).Split('/');
             if (req.Method != "GET")

@@ -16,7 +16,7 @@ using System.Xml;
 
 namespace SilverSim.LL.Core
 {
-    public partial class Circuit
+    public partial class AgentCircuit
     {
         #region Capabilities registration
         public void AddCapability(string type, UUID id, Action<HttpRequest> del)
@@ -225,7 +225,7 @@ namespace SilverSim.LL.Core
             WeakReference m_Circuit;
             CapabilityHandler.CapabilityDelegate m_Delegate;
 
-            public ExtenderCapabilityCaller(LLAgent agent, Circuit circuit, CapabilityHandler.CapabilityDelegate del)
+            public ExtenderCapabilityCaller(LLAgent agent, AgentCircuit circuit, CapabilityHandler.CapabilityDelegate del)
             {
                 m_Agent = new WeakReference(agent, false);
                 m_Circuit = new WeakReference(circuit, false);
@@ -235,7 +235,7 @@ namespace SilverSim.LL.Core
             public void HttpRequestHandler(HttpRequest req)
             {
                 LLAgent agent = m_Agent.Target as LLAgent;
-                Circuit circuit = m_Circuit.Target as Circuit;
+                AgentCircuit circuit = m_Circuit.Target as AgentCircuit;
                 if (agent != null && circuit != null)
                 {
                     m_Delegate(agent, circuit, req);
@@ -296,7 +296,7 @@ namespace SilverSim.LL.Core
             }, capConfig);
             AddDefCapabilityFactory("UploadBakedTexture", regionSeedID, delegate(LLAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new Capabilities.UploadBakedTexture(agent.Owner, m_Server.Scene.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new Capabilities.UploadBakedTexture(agent.Owner, Server.Scene.AssetService, localHostName);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);

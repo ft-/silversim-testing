@@ -97,7 +97,7 @@ namespace SilverSim.LL.Core
         #endregion
 
         /* Circuits: UUID is SceneID */
-        public readonly RwLockedDoubleDictionary<UInt32, UUID, Circuit> Circuits = new RwLockedDoubleDictionary<UInt32, UUID, Circuit>();
+        public readonly RwLockedDoubleDictionary<UInt32, UUID, AgentCircuit> Circuits = new RwLockedDoubleDictionary<UInt32, UUID, AgentCircuit>();
         public readonly RwLockedDictionary<GridVector, string> KnownChildAgentURIs = new RwLockedDictionary<GridVector, string>();
 
         private readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> m_TransmittedTerrainSerials = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>>(delegate() { return new RwLockedDictionary<uint, uint>(); });
@@ -121,7 +121,7 @@ namespace SilverSim.LL.Core
                     del(this);
                 }
             }
-            Circuit c;
+            AgentCircuit c;
             if(Circuits.TryGetValue(SceneID, out c))
             {
                 c.Scene.SendAgentObjectToAllAgents(this);
@@ -883,7 +883,7 @@ namespace SilverSim.LL.Core
         #region IAgent Methods
         public bool IMSend(GridInstantMessage gim)
         {
-            Circuit c;
+            AgentCircuit c;
             UUID sceneID = SceneID;
             if (Circuits.TryGetValue(sceneID, out c))
             {
@@ -1057,7 +1057,7 @@ namespace SilverSim.LL.Core
 
         public RwLockedList<UUID> SelectedObjects(UUID scene)
         {
-            Circuit circuit;
+            AgentCircuit circuit;
             if(Circuits.TryGetValue(scene, out circuit))
             {
                 return circuit.SelectedObjects;
@@ -1129,7 +1129,7 @@ namespace SilverSim.LL.Core
         void HandleRegionHandshakeReply(Message m)
         {
             Messages.Region.RegionHandshakeReply rhr = (Messages.Region.RegionHandshakeReply)m;
-            Circuit circuit;
+            AgentCircuit circuit;
             if (Circuits.TryGetValue(rhr.ReceivedOnCircuitCode, out circuit))
             {
                 /* Add our agent to scene */
@@ -1157,7 +1157,7 @@ namespace SilverSim.LL.Core
         void HandleCompleteAgentMovement(Message m)
         {
             Messages.Circuit.CompleteAgentMovement cam = (Messages.Circuit.CompleteAgentMovement)m;
-            Circuit circuit;
+            AgentCircuit circuit;
             if ((this.TeleportFlags & TeleportFlags.ViaLogin) != 0 && (this.TeleportFlags & TeleportFlags.ViaHGLogin) == 0)
             {
                 if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
@@ -1218,7 +1218,7 @@ namespace SilverSim.LL.Core
             Messages.Circuit.LogoutRequest lr = (Messages.Circuit.LogoutRequest)m;
             /* agent wants to logout */
             m_Log.InfoFormat("Agent {0} {1} ({0}) wants to logout", FirstName, LastName, ID);
-            foreach (Circuit c in Circuits.Values)
+            foreach (AgentCircuit c in Circuits.Values)
             {
                 c.Scene.Remove(this);
                 if (c.Scene.ID != lr.CircuitSceneID)
@@ -1263,7 +1263,7 @@ namespace SilverSim.LL.Core
 
         public void ScheduleUpdate(ObjectUpdateInfo info, UUID fromSceneID)
         {
-            Circuit circuit;
+            AgentCircuit circuit;
             if(Circuits.TryGetValue(fromSceneID, out circuit))
             {
                 circuit.ScheduleUpdate(info);
@@ -1287,7 +1287,7 @@ namespace SilverSim.LL.Core
             im.IsOffline = false;
             im.Position = Vector3.Zero;
             im.Message = message;
-            Circuit circuit;
+            AgentCircuit circuit;
             if (Circuits.TryGetValue(fromSceneID, out circuit))
             {
                 if (IsInScene(circuit.Scene))
@@ -1305,7 +1305,7 @@ namespace SilverSim.LL.Core
 
         public void SendMessageAlways(Message m, UUID fromSceneID)
         {
-            Circuit circuit;
+            AgentCircuit circuit;
             if(Circuits.TryGetValue(fromSceneID, out circuit))
             {
                 circuit.SendMessage(m);
@@ -1314,7 +1314,7 @@ namespace SilverSim.LL.Core
 
         public GridVector GetRootAgentGridPosition(GridVector defPos)
         {
-            Circuit circuit;
+            AgentCircuit circuit;
             if (Circuits.TryGetValue(SceneID, out circuit))
             {
                 return circuit.Scene.GridPosition;
