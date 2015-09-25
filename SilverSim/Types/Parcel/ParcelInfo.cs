@@ -28,9 +28,9 @@ namespace SilverSim.Types.Parcel
 
     public enum TeleportLandingType : byte
     {
-        None = 0,
+        Blocked = 0,
         LandingPoint = 1,
-        Direct = 2
+        Anywhere = 2
     }
 
     [Flags]
@@ -118,7 +118,7 @@ namespace SilverSim.Types.Parcel
                             ParcelFlags.AllowOtherScripts |
                             ParcelFlags.SoundLocal |
                             ParcelFlags.AllowVoiceChat;
-        public TeleportLandingType LandingType = TeleportLandingType.None;
+        public TeleportLandingType LandingType = TeleportLandingType.Blocked;
         public Vector3 LandingPosition = Vector3.Zero;
         public Vector3 LandingLookAt = Vector3.Zero;
         public string Name = string.Empty;
