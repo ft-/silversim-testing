@@ -3,6 +3,8 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
+using SilverSim.Types.Grid;
+using SilverSim.Types.Parcel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,9 +14,33 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
-        public void DetermineInitialAgentLocation(IAgent agent, Vector3 destinationLocation, Vector3 destinationLookAt)
+        public void DetermineInitialAgentLocation(IAgent agent, TeleportFlags teleportFlags, Vector3 destinationLocation, Vector3 destinationLookAt)
         {
             GridVector size = RegionData.Size;
+            if (destinationLocation.X < 0 || destinationLocation.X >= size.X)
+            {
+                destinationLocation.X = size.X / 2f;
+            }
+            if (destinationLocation.Y < 0 || destinationLocation.Y >= size.X)
+            {
+                destinationLocation.Y = size.Y / 2f;
+            }
+
+            ParcelInfo p = Parcels[destinationLocation];
+            switch(p.LandingType)
+            {
+                case TeleportLandingType.None:
+                    break;
+
+                case TeleportLandingType.Direct:
+                    break;
+
+                case TeleportLandingType.LandingPoint:
+                    destinationLocation = p.LandingPosition;
+                    destinationLookAt = p.LandingLookAt;
+                    break;
+            }
+
             if (destinationLocation.X < 0 || destinationLocation.X >= size.X)
             {
                 destinationLocation.X = size.X / 2f;
