@@ -46,7 +46,7 @@ namespace SilverSim.LL.Core
 
         public override void Dispose()
         {
-            
+            Scene = null;
         }
 
         protected override void CheckForeNewDataToSend()
@@ -197,7 +197,6 @@ namespace SilverSim.LL.Core
             /* no sim stats */
         }
 
-#if FF      
         public SceneInterface Scene
         {
             get
@@ -226,7 +225,7 @@ namespace SilverSim.LL.Core
                         {
                             try
                             {
-                                m_ChatListener = m_ChatService.AddRegionListener(PUBLIC_CHANNEL, "", UUID.Zero, "", ChatGetAgentUUID, ChatGetAgentPosition, ChatListenerAction);
+                                m_ChatListener = m_ChatService.AddChatPassListener(ChatListenerAction);
                             }
                             catch
                             {
@@ -237,7 +236,6 @@ namespace SilverSim.LL.Core
                 }
             }
         }
-#endif
 
         #region Chat Listener
         const int PUBLIC_CHANNEL = 0;
