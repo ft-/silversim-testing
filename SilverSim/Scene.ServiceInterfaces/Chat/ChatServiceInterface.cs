@@ -75,5 +75,8 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
         public abstract Listener AddListenRegex(int channel, string name, UUID id, string message, Int32 regexBitfield, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> action);
 
         public abstract Listener AddRegionListener(int channel, string name, UUID id, string message, GetUUIDDelegate getuuid, Action<ListenEvent> send);
+
+        /* only to be used for SimCircuit */
+        public abstract Listener AddChatPassListener(Action<ListenEvent> send);
     }
 }

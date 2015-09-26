@@ -4,6 +4,8 @@
 using log4net;
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.IM;
+using SilverSim.Scene.ServiceInterfaces.Chat;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
@@ -21,18 +23,25 @@ namespace SilverSim.LL.Core
         public UUID RemoteSceneID { get; protected set; }
         public UUID SessionID { get; protected set; }
         public GridVector RemoteLocation { get; protected set; }
+        public Vector3 RemoteOffset { get; protected set; }
+        SceneInterface m_Scene = null;
+        private object m_SceneSetLock = new object();
+        private ChatServiceInterface m_ChatService;
+        private ChatServiceInterface.Listener m_ChatListener;
 
         public SimCircuit(
             LLUDPServer server,
             UInt32 circuitcode,
             UUID remoteSceneID,
             UUID sessionID,
-            GridVector remoteLocation)
+            GridVector remoteLocation,
+            Vector3 remoteOffset)
             : base(server, circuitcode)
         {
             RemoteSceneID = remoteSceneID;
             SessionID = sessionID;
             RemoteLocation = remoteLocation;
+            RemoteOffset = remoteOffset;
         }
 
         public override void Dispose()
@@ -89,7 +98,12 @@ namespace SilverSim.LL.Core
                         double radius = pck.ReadFloat();
                         byte simAccess = pck.ReadUInt8();
                         ev.Message = pck.ReadStringLen16();
-                        Server.RouteChat(ev);
+                        SceneInterface scene = m_Scene;
+                        if (scene != null)
+                        {
+                            ev.OriginSceneID = scene.ID;
+                            Server.RouteChat(ev);
+                        }
                     }
                     break;
 
@@ -182,5 +196,84 @@ namespace SilverSim.LL.Core
         {
             /* no sim stats */
         }
+
+#if FF      
+        public SceneInterface Scene
+        {
+            get
+            {
+                return m_Scene;
+            }
+
+            set
+            {
+                lock (m_SceneSetLock) /* scene change serialization */
+                {
+                    if (null != m_Scene)
+                    {
+                        if (m_ChatListener != null)
+                        {
+                            m_ChatListener.Remove();
+                            m_ChatListener = null;
+                        }
+                        m_ChatService = null;
+                    }
+                    m_Scene = value;
+                    if (null != m_Scene)
+                    {
+                        m_ChatService = m_Scene.GetService<ChatServiceInterface>();
+                        if (null != m_ChatService)
+                        {
+                            try
+                            {
+                                m_ChatListener = m_ChatService.AddRegionListener(PUBLIC_CHANNEL, "", UUID.Zero, "", ChatGetAgentUUID, ChatGetAgentPosition, ChatListenerAction);
+                            }
+                            catch
+                            {
+                                m_ChatService = null;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+#endif
+
+        #region Chat Listener
+        const int PUBLIC_CHANNEL = 0;
+        const int DEBUG_CHANNEL = 0x7FFFFFFF;
+
+        private void ChatListenerAction(ListenEvent le)
+        {
+            if(ListenEvent.ChatSourceType.Agent == le.SourceType ||
+                DEBUG_CHANNEL == le.Channel)
+            {
+                /* do not route agent communication or debug messages.
+                 * Agents have childs. 
+                 */
+                return;
+            }
+            SceneInterface scene = m_Scene;
+            if(null == scene)
+            {
+                return;
+            }
+            else if(scene.ID == le.OriginSceneID)
+            {
+                /* do not route back messages */
+                return;
+            }
+            Messages.Chat.ChatPass cp = new Messages.Chat.ChatPass();
+            cp.ChatType = (Messages.Chat.ChatType)(byte)le.Type;
+            cp.Name = le.Name;
+            cp.Message = le.Message;
+            cp.Position = le.GlobalPosition + RemoteOffset;
+            cp.ID = le.ID;
+            cp.SourceType = (Messages.Chat.ChatSourceType)(byte)le.SourceType;
+            cp.OwnerID = le.OwnerID;
+            cp.Channel = le.Channel;
+            SendMessage(cp);
+        }
+        #endregion
     }
 }

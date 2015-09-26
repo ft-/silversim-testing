@@ -41,5 +41,6 @@ namespace SilverSim.Scene.Types.Script.Events
         public UUID OwnerID;
         public string Message;
         public int ButtonIndex;
+        public UUID OriginSceneID; /* used for Origin when doing sim neighbor passing */
     }
 }
