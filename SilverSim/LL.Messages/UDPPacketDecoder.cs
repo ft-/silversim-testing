@@ -23,6 +23,10 @@ namespace SilverSim.LL.Messages
             {
                 if(t.IsSubclassOf(typeof(Message)))
                 {
+                    if(null != Attribute.GetCustomAttribute(t, typeof(Trusted)) && !allowtrusteddecode)
+                    {
+                        continue;
+                    }
                     UDPMessage m = (UDPMessage)Attribute.GetCustomAttribute(t, typeof(UDPMessage));
                     if(m != null)
                     {

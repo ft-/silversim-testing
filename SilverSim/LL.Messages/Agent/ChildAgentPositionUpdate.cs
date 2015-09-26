@@ -10,7 +10,7 @@ namespace SilverSim.LL.Messages.Agent
     [Trusted]
     public class ChildAgentPositionUpdate : Message
     {
-        public UInt64 RegionHandle;
+        public GridVector RegionLocation;
         public UInt32 ViewerCircuitCode;
         public UUID AgentID;
         public UUID SessionID;
@@ -26,6 +26,41 @@ namespace SilverSim.LL.Messages.Agent
         public ChildAgentPositionUpdate()
         {
 
+        }
+
+        public static Message Decode(UDPPacket p)
+        {
+            ChildAgentPositionUpdate m = new ChildAgentPositionUpdate();
+            m.RegionLocation.RegionHandle = p.ReadUInt64();
+            m.ViewerCircuitCode = p.ReadUInt32();
+            m.AgentID = p.ReadUUID();
+            m.SessionID = p.ReadUUID();
+            m.AgentPosition = p.ReadVector3f();
+            m.AgentVelocity = p.ReadVector3f();
+            m.Center = p.ReadVector3f();
+            m.Size = p.ReadVector3f();
+            m.AtAxis = p.ReadVector3f();
+            m.LeftAxis = p.ReadVector3f();
+            m.UpAxis = p.ReadVector3f();
+            m.ChangedGrid = p.ReadBoolean();
+            return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteMessageType(MessageType.ChildAgentPositionUpdate);
+            p.WriteUInt64(RegionLocation.RegionHandle);
+            p.WriteUInt32(ViewerCircuitCode);
+            p.WriteUUID(AgentID);
+            p.WriteUUID(SessionID);
+            p.WriteVector3f(AgentPosition);
+            p.WriteVector3f(AgentVelocity);
+            p.WriteVector3f(Center);
+            p.WriteVector3f(Size);
+            p.WriteVector3f(AtAxis);
+            p.WriteVector3f(LeftAxis);
+            p.WriteVector3f(UpAxis);
+            p.WriteBoolean(ChangedGrid);
         }
     }
 }
