@@ -176,8 +176,6 @@ namespace SilverSim.LL.Core
         }
         #endregion
 
-        public C5.TreeDictionary<uint, UDPPacket> m_UnackedPacketsHash = new C5.TreeDictionary<uint,UDPPacket>();
-
         class MessageHandlerExtenderKeyValuePairCircuitQueue
         {
             WeakReference m_Circuit;
