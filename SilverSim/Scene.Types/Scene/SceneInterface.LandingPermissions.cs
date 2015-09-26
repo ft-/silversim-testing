@@ -195,6 +195,9 @@ namespace SilverSim.Scene.Types.Scene
                 !IsPossibleGod(agent.Owner))
             {
                 estateInfo = CheckEstateRights(agent);
+                if(RegionSettings.TelehubObject != UUID.Zero && (estateInfo.Flags & RegionOptionFlags.AllowDirectTeleport) == 0)
+                {
+                }
 
                 if(!CheckParcelAccessRights(agent, p))
                 {

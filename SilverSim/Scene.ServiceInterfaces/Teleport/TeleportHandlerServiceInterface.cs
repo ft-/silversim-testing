@@ -3,6 +3,7 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
+using SilverSim.Types.Grid;
 
 namespace SilverSim.ServiceInterfaces.Teleport
 {
@@ -16,5 +17,6 @@ namespace SilverSim.ServiceInterfaces.Teleport
         public abstract void Cancel();
         public abstract void ReleaseAgent(UUID fromSceneID);
         public abstract void CloseAgentOnRelease(UUID fromSceneID);
+        public abstract uint EnableSimulator(IAgent agent, DestinationInfo destinationRegion);
     }
 }

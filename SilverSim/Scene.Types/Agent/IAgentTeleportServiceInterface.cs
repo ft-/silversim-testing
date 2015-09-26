@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using SilverSim.Types.Grid;
 
 namespace SilverSim.Scene.Types.Agent
 {
@@ -11,5 +12,6 @@ namespace SilverSim.Scene.Types.Agent
         void Cancel();
         void ReleaseAgent(UUID fromSceneID);
         void CloseAgentOnRelease(UUID fromSceneID);
+        uint EnableSimulator(IAgent agent, DestinationInfo destinationRegion);
     }
 }

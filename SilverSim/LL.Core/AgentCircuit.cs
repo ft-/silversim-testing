@@ -28,7 +28,7 @@ namespace SilverSim.LL.Core
     public partial class AgentCircuit : Circuit
     {
         internal readonly RwLockedList<UUID> SelectedObjects = new RwLockedList<UUID>();
-        private static readonly ILog m_Log = LogManager.GetLogger("LL AGENTCIRCUIT");
+        private static readonly ILog m_Log = LogManager.GetLogger("LL AGENT CIRCUIT");
         private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
         private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
         public UUID SessionID = UUID.Zero;
@@ -45,9 +45,6 @@ namespace SilverSim.LL.Core
         private Thread m_TextureDownloadThread;
         private bool m_TextureDownloadThreadRunning = false;
         private BlockingQueue<Message> m_TextureDownloadQueue = new BlockingQueue<Message>();
-        private Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
-        private Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
-        private Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
         internal List<ITriggerOnRootAgentActions> m_TriggerOnRootAgentActions = new List<ITriggerOnRootAgentActions>();
 
         private Thread m_InventoryThread;
@@ -59,14 +56,6 @@ namespace SilverSim.LL.Core
         private bool m_ObjectUpdateThreadRunning = false;
 
         int m_AgentUpdatesReceived = 0;
-
-        [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-        public class IgnoreMethod : Attribute
-        {
-            public IgnoreMethod()
-            {
-            }
-        }
 
         public SceneInterface Scene
         {
