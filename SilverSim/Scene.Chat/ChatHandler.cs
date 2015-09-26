@@ -42,6 +42,23 @@ namespace SilverSim.Scene.Chat
             }
             if(ev.Channel != DEBUG_CHANNEL)
             {
+                switch(ev.Type)
+                {
+                    case ListenEvent.ChatType.Say:
+                        break;
+
+                    case ListenEvent.ChatType.Shout:
+                        break;
+
+                    case ListenEvent.ChatType.Whisper:
+                        break;
+
+                    case ListenEvent.ChatType.Region:
+                        break;
+
+                    default:
+                        return;
+                }
                 foreach(Listener li in m_ChannelPass)
                 {
                     li.Send(ev);

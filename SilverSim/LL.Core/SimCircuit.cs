@@ -256,9 +256,9 @@ namespace SilverSim.LL.Core
             {
                 return;
             }
-            else if(scene.ID == le.OriginSceneID)
+            else if(le.OriginSceneID != UUID.Zero)
             {
-                /* do not route back messages */
+                /* do not route routed messages */
                 return;
             }
             Messages.Chat.ChatPass cp = new Messages.Chat.ChatPass();
