@@ -33,6 +33,7 @@ using SilverSim.Types.Primitive;
 using SilverSim.Types.Script;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using ThreadedClasses;
 
 namespace SilverSim.LL.Core
@@ -1275,6 +1276,25 @@ namespace SilverSim.LL.Core
             res.AgentID = req.AgentID;
             SendMessageAlways(res, m.CircuitSceneID);
         }
+
+        #region Enable Simulator call for Teleport handling
+        public void EnableSimulator(UUID originSceneID, uint circuitCode, string capsURI, DestinationInfo destinationInfo)
+        {
+            Messages.Circuit.EnableSimulator ensim = new Messages.Circuit.EnableSimulator();
+            Messages.Circuit.EstablishAgentCommunication estagent = new Messages.Circuit.EstablishAgentCommunication();
+            ensim.RegionSize = destinationInfo.Size;
+            ensim.SimIP = ((IPEndPoint)destinationInfo.SimIP).Address;
+            ensim.SimPort = (ushort)destinationInfo.ServerPort;
+            ensim.GridPosition = destinationInfo.Location;
+            estagent.AgentID = ID;
+            estagent.GridPosition = destinationInfo.Location;
+            estagent.RegionSize = destinationInfo.Size;
+            estagent.SeedCapability = capsURI;
+            estagent.SimIpAndPort = new System.Net.IPEndPoint(((IPEndPoint)destinationInfo.SimIP).Address, (int)destinationInfo.ServerPort);
+            SendMessageIfRootAgent(ensim, originSceneID);
+            SendMessageIfRootAgent(estagent, originSceneID);
+        }
+        #endregion
 
         public void HandleMessage(ChildAgentUpdate m)
         {

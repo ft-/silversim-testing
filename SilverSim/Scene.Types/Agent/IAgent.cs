@@ -19,6 +19,7 @@ using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
+using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Types.Script;
 using System.Collections.Generic;
@@ -41,6 +42,8 @@ namespace SilverSim.Scene.Types.Agent
         bool IMSend(GridInstantMessage im);
 
         RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials { get; }
+
+        void EnableSimulator(UUID originSceneID, uint circuitCode, string capsURI, DestinationInfo destinationInfo);
 
         IAgentTeleportServiceInterface ActiveTeleportService
         {

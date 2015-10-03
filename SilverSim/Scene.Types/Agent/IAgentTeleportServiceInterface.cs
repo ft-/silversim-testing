@@ -12,6 +12,6 @@ namespace SilverSim.Scene.Types.Agent
         void Cancel();
         void ReleaseAgent(UUID fromSceneID);
         void CloseAgentOnRelease(UUID fromSceneID);
-        void EnableSimulator(IAgent agent, DestinationInfo destinationRegion);
+        void EnableSimulator(UUID fromSceneID, IAgent agent, DestinationInfo destinationRegion);
     }
 }

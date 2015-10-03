@@ -17,6 +17,6 @@ namespace SilverSim.ServiceInterfaces.Teleport
         public abstract void Cancel();
         public abstract void ReleaseAgent(UUID fromSceneID);
         public abstract void CloseAgentOnRelease(UUID fromSceneID);
-        public abstract void EnableSimulator(IAgent agent, DestinationInfo destinationRegion);
+        public abstract void EnableSimulator(UUID fromSceneID, IAgent agent, DestinationInfo destinationRegion);
     }
 }
