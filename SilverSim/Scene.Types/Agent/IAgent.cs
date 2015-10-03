@@ -36,6 +36,7 @@ namespace SilverSim.Scene.Types.Agent
 
         ClientInfo Client { get; }
         SessionInfo Session { get; }
+        UserAccount UntrustedAccountInfo { get; }
 
         List<GridType> SupportedGridTypes { get; }
 

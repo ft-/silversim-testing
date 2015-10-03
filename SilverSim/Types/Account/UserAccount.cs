@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Types.Account
@@ -20,6 +21,18 @@ namespace SilverSim.Types.Account
         public UserAccount()
         {
 
+        }
+
+        public UserAccount(UserAccount src)
+        {
+            Principal = new UUI(src.Principal);
+            ScopeID = src.ScopeID;
+            Email = src.Email;
+            Created = src.Created;
+            UserLevel = src.UserLevel;
+            UserFlags = src.UserFlags;
+            UserTitle = src.UserTitle;
+            ServiceURLs = new Dictionary<string, string>(src.ServiceURLs);
         }
     }
 }
