@@ -46,7 +46,6 @@ namespace SilverSim.LL.Core
         #region Agent fields
         private UUID m_AgentID;
         private UUID m_CurrentSceneID;
-        int m_UntrustedUserLevel;
         #endregion
 
         ClientInfo m_ClientInfo;
@@ -963,7 +962,7 @@ namespace SilverSim.LL.Core
             UUID secureSessionID,
             string serviceSessionID,
             ClientInfo clientInfo,
-            int untrustedUserLevel,
+            UserAccount untrustedAccountInfo,
             AgentServiceList serviceList,
             List<GridType> supportedGridTypes
             )
@@ -972,7 +971,7 @@ namespace SilverSim.LL.Core
             CollisionPlane = Vector4.UnitW;
             m_AgentID = agentID;
             SessionID = sessionID;
-            m_UntrustedUserLevel = untrustedUserLevel;
+            m_UntrustedAccountInfo = untrustedAccountInfo;
             m_SecureSessionID = secureSessionID;
             m_ServiceSessionID = serviceSessionID;
             m_ClientInfo = clientInfo;
