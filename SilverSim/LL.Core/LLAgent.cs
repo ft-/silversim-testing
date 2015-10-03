@@ -78,13 +78,16 @@ namespace SilverSim.LL.Core
             }
         }
 
-        List<GridType> m_SupportedGridTypes;
-
         public List<GridType> SupportedGridTypes 
-        { 
+        {
             get
             {
-                return m_SupportedGridTypes;
+                List<GridType> gridTypes = new List<GridType>();
+                foreach (IAgentTeleportServiceInterface agentteleport in m_TeleportServices)
+                {
+                    gridTypes.Add(agentteleport.GridType);
+                }
+                return gridTypes;
             }
         }
 
@@ -953,6 +956,7 @@ namespace SilverSim.LL.Core
 
         UUID m_SecureSessionID;
         string m_ServiceSessionID;
+        List<IAgentTeleportServiceInterface> m_TeleportServices;
 
         public LLAgent(UUID agentID,
             string firstName,
@@ -963,11 +967,9 @@ namespace SilverSim.LL.Core
             string serviceSessionID,
             ClientInfo clientInfo,
             UserAccount untrustedAccountInfo,
-            AgentServiceList serviceList,
-            List<GridType> supportedGridTypes
-            )
+            AgentServiceList serviceList)
         {
-            m_SupportedGridTypes = supportedGridTypes;
+            m_TeleportServices = serviceList.GetAll<IAgentTeleportServiceInterface>();
             CollisionPlane = Vector4.UnitW;
             m_AgentID = agentID;
             SessionID = sessionID;

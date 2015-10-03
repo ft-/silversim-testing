@@ -40,5 +40,18 @@ namespace SilverSim.Scene.Types.Agent
             }
             return default(T);
         }
+
+        public List<T> GetAll<T>()
+        {
+            List<T> result = new List<T>();
+            foreach(object c in this)
+            {
+                if(typeof(T).IsAssignableFrom(c.GetType()))
+                {
+                    result.Add((T)c);
+                }
+            }
+            return result;
+        }
     }
 }

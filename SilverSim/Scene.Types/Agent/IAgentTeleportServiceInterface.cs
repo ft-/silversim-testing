@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 
@@ -13,5 +14,6 @@ namespace SilverSim.Scene.Types.Agent
         void ReleaseAgent(UUID fromSceneID);
         void CloseAgentOnRelease(UUID fromSceneID);
         void EnableSimulator(UUID fromSceneID, IAgent agent, DestinationInfo destinationRegion);
+        GridType GridType { get; }
     }
 }

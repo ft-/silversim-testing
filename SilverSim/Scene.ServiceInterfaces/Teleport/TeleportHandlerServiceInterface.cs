@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Scene.Types.Agent;
+using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 
@@ -18,5 +19,6 @@ namespace SilverSim.ServiceInterfaces.Teleport
         public abstract void ReleaseAgent(UUID fromSceneID);
         public abstract void CloseAgentOnRelease(UUID fromSceneID);
         public abstract void EnableSimulator(UUID fromSceneID, IAgent agent, DestinationInfo destinationRegion);
+        public abstract GridType GridType { get; }
     }
 }
