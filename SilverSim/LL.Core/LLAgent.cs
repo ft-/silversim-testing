@@ -24,6 +24,7 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
+using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
@@ -45,6 +46,26 @@ namespace SilverSim.LL.Core
         private UUID m_AgentID;
         private UUID m_CurrentSceneID;
         #endregion
+
+        ClientInfo m_ClientInfo;
+        public ClientInfo Client 
+        { 
+            get
+            {
+                return m_ClientInfo;
+            }
+        }
+        public SessionInfo Session 
+        {
+            get
+            {
+                SessionInfo info = new SessionInfo();
+                info.SessionID = SessionID;
+                info.SecureSessionID = m_SecureSessionID;
+                info.ServiceSessionID = m_ServiceSessionID;
+                return info;
+            }
+        }
 
         List<GridType> m_SupportedGridTypes;
 
@@ -920,6 +941,7 @@ namespace SilverSim.LL.Core
         #endregion
 
         UUID m_SecureSessionID;
+        string m_ServiceSessionID;
 
         public LLAgent(UUID agentID,
             string firstName,
@@ -927,6 +949,8 @@ namespace SilverSim.LL.Core
             Uri homeURI,
             UUID sessionID,
             UUID secureSessionID,
+            string serviceSessionID,
+            ClientInfo clientInfo,
             AgentServiceList serviceList,
             List<GridType> supportedGridTypes
             )
@@ -936,6 +960,8 @@ namespace SilverSim.LL.Core
             m_AgentID = agentID;
             SessionID = sessionID;
             m_SecureSessionID = secureSessionID;
+            m_ServiceSessionID = serviceSessionID;
+            m_ClientInfo = clientInfo;
             m_AssetService = serviceList.Get<AssetServiceInterface>();
             m_InventoryService = serviceList.Get<InventoryServiceInterface>();
             m_GroupsService = serviceList.Get<GroupsServiceInterface>();

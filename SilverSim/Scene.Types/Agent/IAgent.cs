@@ -17,6 +17,7 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
+using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
 using SilverSim.Types.IM;
 using SilverSim.Types.Script;
@@ -31,6 +32,9 @@ namespace SilverSim.Scene.Types.Agent
         string FirstName { get; set; }
         string LastName { get; set; }
         UUID SceneID { get; set; }
+
+        ClientInfo Client { get; }
+        SessionInfo Session { get; }
 
         List<GridType> SupportedGridTypes { get; }
 

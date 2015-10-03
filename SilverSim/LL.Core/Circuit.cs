@@ -1,16 +1,9 @@
 ﻿using log4net;
 using SilverSim.LL.Messages;
-using SilverSim.LL.Messages.IM;
-using SilverSim.Scene.Types.Agent;
-using SilverSim.Scene.Types.Script.Events;
-using SilverSim.Types;
 using SilverSim.Types.IM;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Reflection;
-using System.Text;
 using System.Threading;
 using ThreadedClasses;
 
