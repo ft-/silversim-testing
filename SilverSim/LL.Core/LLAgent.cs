@@ -8,6 +8,7 @@ using SilverSim.LL.Messages.Parcel;
 using SilverSim.LL.Messages.Script;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Neighbor;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
@@ -47,6 +48,16 @@ namespace SilverSim.LL.Core
         private UUID m_AgentID;
         private UUID m_CurrentSceneID;
         #endregion
+
+        readonly List<AgentChildInfo> m_ActiveChilds = new List<AgentChildInfo>();
+
+        public List<AgentChildInfo> ActiveChilds
+        {
+            get
+            {
+                return m_ActiveChilds;
+            }
+        }
 
         ClientInfo m_ClientInfo;
         public ClientInfo Client 

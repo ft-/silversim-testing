@@ -6,7 +6,7 @@ using SilverSim.Types.Grid;
 
 namespace SilverSim.Scene.Types.Neighbor
 {
-    public struct AgentNeighborInfo
+    public struct AgentChildInfo
     {
         public IAgentTeleportServiceInterface TeleportService;
         public DestinationInfo DestinationInfo;

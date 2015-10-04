@@ -3,6 +3,7 @@
 
 using SilverSim.LL.Messages;
 using SilverSim.LL.Messages.Agent;
+using SilverSim.Scene.Types.Neighbor;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Asset;
@@ -39,6 +40,8 @@ namespace SilverSim.Scene.Types.Agent
         UserAccount UntrustedAccountInfo { get; }
 
         List<GridType> SupportedGridTypes { get; }
+
+        List<AgentChildInfo> ActiveChilds { get; }
 
         bool IMSend(GridInstantMessage im);
 
