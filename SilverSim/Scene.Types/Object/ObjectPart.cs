@@ -995,10 +995,6 @@ namespace SilverSim.Scene.Types.Object
             return true;
         }
 
-        #region Media Properties
-        public PrimitiveMedia Media = null;
-        #endregion
-
         #region Physics Properties
 
         double m_PhysicsDensity = 1000f;
@@ -1886,7 +1882,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "Media":
-                                part.Media = PrimitiveMedia.fromXml(reader);
+                                part.m_Media = PrimitiveMedia.fromXml(reader);
                                 break;
 
                             default:

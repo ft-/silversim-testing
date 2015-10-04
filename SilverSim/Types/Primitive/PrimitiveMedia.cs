@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.StructuredData.LLSD;
+using System.Collections.Generic;
 using System.Xml;
 using ThreadedClasses;
 
@@ -61,6 +62,7 @@ namespace SilverSim.Types.Primitive
 
             public static explicit operator Map(Entry e)
             {
+                lock(e)
                 {
                     Map m = new Map();
                     m.Add("alt_image_enable", e.IsAlternativeImageEnabled);
@@ -88,6 +90,36 @@ namespace SilverSim.Types.Primitive
                     m.Add("whitelist_enable", e.IsWhiteListEnabled);
                     return m;
                 }
+            }
+
+            public static explicit operator Entry(Map m)
+            {
+                Entry e = new Entry();
+                e.IsAlternativeImageEnabled = m["alt_image_enable"].AsBoolean;
+                e.IsAutoLoop = m["auto_loop"].AsBoolean;
+                e.IsAutoPlay = m["auto_play"].AsBoolean;
+                e.IsAutoScale = m["auto_scale"].AsBoolean;
+                e.IsAutoZoom = m["auto_zoom"].AsBoolean;
+                e.Controls = (PrimitiveMediaControls)m["controls"].AsInt;
+                e.CurrentURL = m["current_url"].ToString();
+                e.IsInteractOnFirstClick = m["first_click_interfact"].AsBoolean;
+                e.Width = m["width_pixels"].AsInt;
+                e.Height = m["height_pixels"].AsInt;
+                e.HomeURL = m["home_url"].ToString();
+                e.ControlPermissions = (PrimitiveMediaPermission)m["perms_control"].AsInt;
+                e.InteractPermissions = (PrimitiveMediaPermission)m["perms_interact"].AsInt;
+
+                if (m.ContainsKey("whitelist") && m["whitelist"] is AnArray)
+                {
+                    List<string> whiteList = new List<string>();
+                    foreach (IValue iv in (AnArray)m["whitelist"])
+                    {
+                        whiteList.Add(iv.ToString());
+                    }
+                    e.WhiteList = whiteList.ToArray();
+                }
+                e.IsWhiteListEnabled = m["whitelist_enable"].AsBoolean;
+                return e;
             }
 
             public void ToXml(XmlTextWriter writer)
