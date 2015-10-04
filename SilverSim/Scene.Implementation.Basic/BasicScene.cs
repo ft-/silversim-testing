@@ -48,7 +48,7 @@ namespace SilverSim.Scene.Implementation.Basic
         protected internal readonly RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
         protected internal readonly RwLockedDictionary<UUID, IAgent> m_Agents = new RwLockedDictionary<UUID, IAgent>();
         //protected internal readonly RwLockedDoubleDictionary<UUID, int, ParcelInfo> m_Parcels = new RwLockedDoubleDictionary<UUID, int, ParcelInfo>();
-        private LLUDPServer m_UDPServer;
+        private UDPCircuitsManager m_UDPServer;
         #endregion
 
         #region Interface wrappers
@@ -332,7 +332,7 @@ namespace SilverSim.Scene.Implementation.Basic
             Dictionary<string, string> capabilitiesConfig)
         : base(ri.Size.X, ri.Size.Y)
         {
-            m_UDPServer = new LLUDPServer(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
+            m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
             GroupsNameService = groupsNameService;
             GroupsService = groupsService;
             EstateService = estateService;
