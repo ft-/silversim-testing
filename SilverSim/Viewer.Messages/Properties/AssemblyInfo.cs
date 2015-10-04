@@ -2,6 +2,6 @@
 // GNU Affero General Public License v3
 using System.Reflection;
 
-[assembly: AssemblyTitle("LL Viewer Message Definitions")]
+[assembly: AssemblyTitle("Viewer Message Definitions")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]

@@ -2,6 +2,6 @@
 // GNU Affero General Public License v3
 using System.Reflection;
 
-[assembly: AssemblyTitle("LL Viewer Core Protocol Implementation - TerrainEdit Module")]
+[assembly: AssemblyTitle("Viewer Core Protocol Implementation - TerrainEdit Module")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
