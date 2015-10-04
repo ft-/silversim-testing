@@ -784,10 +784,6 @@ namespace SilverSim.Main.Common
             CmdIO.CommandRegistry.ShowCommands.Add("memory", ShowMemoryCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("threadcount", ShowThreadCountCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
-            CmdIO.CommandRegistry.ShowCommands.Add("regions", ShowRegionsCommand);
-            CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCommand);
-            CmdIO.CommandRegistry.ClearCommands.Add("region", Commands.ClearRegion.CmdHandler);
-            CmdIO.CommandRegistry.ClearCommands.Add("objects", Commands.ClearObjects.CmdHandler);
             //CmdIO.CommandRegistry.ClearCommands.Add("parcels", Commands.ClearParcels.CmdHandler);
 
             while(m_Sources.Count != 0)
@@ -927,6 +923,17 @@ namespace SilverSim.Main.Common
             ICollection<IRegionLoaderInterface> regionLoaders = GetServices<IRegionLoaderInterface>().Values;
             if (regionLoaders.Count != 0)
             {
+                CmdIO.CommandRegistry.ShowCommands.Add("regions", ShowRegionsCommand);
+                CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCommand);
+                CmdIO.CommandRegistry.ClearCommands.Add("region", Commands.ClearRegion.CmdHandler);
+                CmdIO.CommandRegistry.ClearCommands.Add("objects", Commands.ClearObjects.CmdHandler);
+
+                /* we have to bypass the circular issue we would get when trying to do it via using */
+                Assembly assembly = Assembly.Load("SilverSim.Viewer.Core");
+                Type t = assembly.GetType("SilverSim.Viewer.Core.SimCircuitEstablishService");
+                MethodInfo m = t.GetMethod("HandleSimCircuitRequest");
+                httpServer.StartsWithUriHandlers.Add("/circuit", (BaseHttpServer.HttpRequestDelegate)System.Delegate.CreateDelegate(typeof(BaseHttpServer.HttpRequestDelegate), m));
+
                 m_Log.Info("Loading regions");
                 foreach (IRegionLoaderInterface regionLoader in GetServices<IRegionLoaderInterface>().Values)
                 {

@@ -23,6 +23,7 @@ namespace SilverSim.Viewer.Core
         public UUID RemoteSceneID { get; protected set; }
         public UUID SessionID { get; protected set; }
         public GridVector RemoteLocation { get; protected set; }
+        /* <summary>RemoteOffset = RemoteGlobalPosition - LocalGlobalPosition</summary> */
         public Vector3 RemoteOffset { get; protected set; }
         SceneInterface m_Scene = null;
         private object m_SceneSetLock = new object();

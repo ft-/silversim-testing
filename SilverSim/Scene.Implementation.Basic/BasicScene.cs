@@ -485,7 +485,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }    
         }
 
-        public override ILLUDPServer UDPServer
+        public override IUDPCircuitsManager UDPServer
         {
             get
             {

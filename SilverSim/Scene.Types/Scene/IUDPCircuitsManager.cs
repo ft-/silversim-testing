@@ -7,7 +7,7 @@ using SilverSim.Scene.Types.Object;
 
 namespace SilverSim.Scene.Types.Scene
 {
-    public interface ILLUDPServer
+    public interface IUDPCircuitsManager
     {
         void SendMessageToAgent(UUID agentID, Message m);
         void ScheduleUpdate(ObjectUpdateInfo info);

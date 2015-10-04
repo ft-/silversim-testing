@@ -307,7 +307,7 @@ namespace SilverSim.Scene.Types.Scene
         public abstract bool Remove(IObject obj, Script.ScriptInstance instance = null);
         public abstract void ClearObjects();
 
-        public abstract ILLUDPServer UDPServer { get; }
+        public abstract IUDPCircuitsManager UDPServer { get; }
 
         public void TriggerIPChanged(IPAddress ip)
         {
