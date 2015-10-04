@@ -13,6 +13,7 @@ namespace SilverSim.Scene.Types.Agent
         void Cancel();
         void ReleaseAgent(UUID fromSceneID);
         void CloseAgentOnRelease(UUID fromSceneID);
+        void DisableSimulator(UUID fromSceneID, IAgent agent, RegionInfo regionInfo);
         void EnableSimulator(UUID fromSceneID, IAgent agent, DestinationInfo destinationRegion);
         GridType GridType { get; }
     }
