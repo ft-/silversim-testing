@@ -34,7 +34,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             set
             {
-                if (null != m_EnvironmentSettings)
+                if (null != value)
                 {
                     m_EnvironmentSettings = new EnvironmentSettings(m_EnvironmentSettings);
                 }
