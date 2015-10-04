@@ -128,7 +128,7 @@ namespace SilverSim.Viewer.Core
             LLUDPServer server = m_Server;
             if (null != server)
             {
-                //server.RemoveCircuit(this);
+                server.RemoveCircuit(this);
             }
 
             Stop();
