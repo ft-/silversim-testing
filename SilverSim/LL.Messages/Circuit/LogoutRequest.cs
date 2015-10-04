@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Circuit
+namespace SilverSim.Viewer.Messages.Circuit
 {
     [UDPMessage(MessageType.LogoutRequest)]
     [Reliable]

@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Parcel
+namespace SilverSim.Viewer.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelClaim)]
     [Reliable]

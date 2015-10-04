@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Parcel
+namespace SilverSim.Viewer.Messages.Parcel
 {
     [UDPMessage(MessageType.ParcelInfoRequest)]
     [Reliable]

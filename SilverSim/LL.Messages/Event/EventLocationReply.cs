@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Event
+namespace SilverSim.Viewer.Messages.Event
 {
     [UDPMessage(MessageType.EventLocationReply)]
     [Reliable]

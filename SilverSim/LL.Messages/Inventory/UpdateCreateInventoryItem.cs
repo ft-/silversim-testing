@@ -9,7 +9,7 @@ using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Asset;
 
-namespace SilverSim.LL.Messages.Inventory
+namespace SilverSim.Viewer.Messages.Inventory
 {
     [UDPMessage(MessageType.UpdateCreateInventoryItem)]
     [Reliable]

@@ -9,10 +9,10 @@ using SilverSim.Scene.Types.Object;
 using ThreadedClasses;
 using System.Threading;
 using SilverSim.Scene.Types.Agent;
-using SilverSim.LL.Messages;
+using SilverSim.Viewer.Messages;
 using SilverSim.Types.Inventory;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {

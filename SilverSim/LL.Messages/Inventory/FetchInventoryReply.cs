@@ -7,7 +7,7 @@ using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Inventory
+namespace SilverSim.Viewer.Messages.Inventory
 {
     [UDPMessage(MessageType.FetchInventoryReply)]
     [Reliable]

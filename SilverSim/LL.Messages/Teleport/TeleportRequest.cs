@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Teleport
+namespace SilverSim.Viewer.Messages.Teleport
 {
     [UDPMessage(MessageType.TeleportRequest)]
     [Reliable]

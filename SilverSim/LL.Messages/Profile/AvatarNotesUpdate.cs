@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Profile
+namespace SilverSim.Viewer.Messages.Profile
 {
     [UDPMessage(MessageType.AvatarNotesUpdate)]
     [Reliable]

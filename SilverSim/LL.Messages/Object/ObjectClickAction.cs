@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using SilverSim.Types.Primitive;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.Viewer.Messages.Object
 {
     [UDPMessage(MessageType.ObjectClickAction)]
     [Reliable]

@@ -3,9 +3,9 @@
 
 using log4net;
 using Nini.Config;
-using SilverSim.LL.Core;
-using SilverSim.LL.Messages;
-using SilverSim.LL.Messages.Map;
+using SilverSim.Viewer.Core;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Map;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Agent;
@@ -19,7 +19,7 @@ using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
 
-namespace SilverSim.LL.Map
+namespace SilverSim.Viewer.Map
 {
     public class ViewerMap : IPlugin, IPluginShutdown, IPacketHandlerExtender
     {

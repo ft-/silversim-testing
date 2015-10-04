@@ -6,8 +6,8 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 using SilverSim.Types.Script;
-using SilverSim.LL.Messages.Agent;
-using SilverSim.LL.Messages.Avatar;
+using SilverSim.Viewer.Messages.Agent;
+using SilverSim.Viewer.Messages.Avatar;
 
 namespace SilverSim.Scene.Types.Agent
 {

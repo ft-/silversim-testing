@@ -3,7 +3,7 @@
 
 using SilverSim.Scene.Types.Object;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class LLUDPServer
     {

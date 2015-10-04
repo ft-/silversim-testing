@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.Groups
+namespace SilverSim.Viewer.Messages.Groups
 {
     [UDPMessage(MessageType.JoinGroupRequest)]
     [Reliable]

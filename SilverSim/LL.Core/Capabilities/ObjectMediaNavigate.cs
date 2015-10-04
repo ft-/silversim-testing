@@ -17,7 +17,7 @@ using ThreadedClasses;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Object;
 
-namespace SilverSim.LL.Core.Capabilities
+namespace SilverSim.Viewer.Core.Capabilities
 {
     public class ObjectMediaNavigate : ICapabilityInterface
     {

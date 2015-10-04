@@ -2,14 +2,14 @@
 // GNU Affero General Public License v3
 
 using Nini.Config;
-using SilverSim.LL.Core;
-using SilverSim.LL.Messages;
+using SilverSim.Viewer.Core;
+using SilverSim.Viewer.Messages;
 using SilverSim.Main.Common;
 using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
 
-namespace SilverSim.LL.Friends
+namespace SilverSim.Viewer.Friends
 {
     public class ViewerFriendsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {

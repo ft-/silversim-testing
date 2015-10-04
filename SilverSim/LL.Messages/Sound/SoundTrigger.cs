@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Sound
+namespace SilverSim.Viewer.Messages.Sound
 {
     [UDPMessage(MessageType.SoundTrigger)]
     [NotTrusted]

@@ -15,7 +15,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace SilverSim.LL.Core.Capabilities
+namespace SilverSim.Viewer.Core.Capabilities
 {
     public class ObjectAdd : ICapabilityInterface
     {

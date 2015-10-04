@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Friend
+namespace SilverSim.Viewer.Messages.Friend
 {
     [UDPMessage(MessageType.DeclineFriendship)]
     [Reliable]

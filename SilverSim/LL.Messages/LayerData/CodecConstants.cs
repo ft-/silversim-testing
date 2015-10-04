@@ -3,7 +3,7 @@
 
 using System;
 
-namespace SilverSim.LL.Messages.LayerData
+namespace SilverSim.Viewer.Messages.LayerData
 {
     public static partial class LayerCompressor
     {

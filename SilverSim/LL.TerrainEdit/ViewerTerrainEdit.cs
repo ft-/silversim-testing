@@ -3,10 +3,10 @@
 
 using log4net;
 using Nini.Config;
-using SilverSim.LL.Core;
-using SilverSim.LL.Messages;
-using SilverSim.LL.Messages.Land;
-using SilverSim.LL.Messages.LayerData;
+using SilverSim.Viewer.Core;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Land;
+using SilverSim.Viewer.Messages.LayerData;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
@@ -14,7 +14,7 @@ using System;
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace SilverSim.LL.TerrainEdit
+namespace SilverSim.Viewer.TerrainEdit
 {
     public class ViewerTerrainEdit : IPlugin, IPacketHandlerExtender
     {

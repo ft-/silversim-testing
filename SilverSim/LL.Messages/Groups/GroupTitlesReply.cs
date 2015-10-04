@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System.Collections.Generic;
 using System.Text;
 
-namespace SilverSim.LL.Messages.Groups
+namespace SilverSim.Viewer.Messages.Groups
 {
     [UDPMessage(MessageType.GroupTitlesReply)]
     [Reliable]

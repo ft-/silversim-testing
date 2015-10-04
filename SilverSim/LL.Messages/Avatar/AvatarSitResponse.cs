@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Avatar
+namespace SilverSim.Viewer.Messages.Avatar
 {
     [UDPMessage(MessageType.AvatarSitResponse)]
     [Reliable]

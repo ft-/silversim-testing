@@ -15,7 +15,7 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types;
 using ThreadedClasses;
 
-namespace SilverSim.LL.Core.Capabilities
+namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UpdateScriptAgent : UploadAssetAbstractCapability
     {

@@ -3,7 +3,7 @@
 
 using SilverSim.Main.Common.HttpServer;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public interface ICapabilityInterface
     {

@@ -2,10 +2,10 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.LL.Messages;
-using SilverSim.LL.Messages.Agent;
-using SilverSim.LL.Messages.Parcel;
-using SilverSim.LL.Messages.Script;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Agent;
+using SilverSim.Viewer.Messages.Parcel;
+using SilverSim.Viewer.Messages.Script;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Neighbor;
@@ -36,7 +36,7 @@ using System.Collections.Generic;
 using System.Net;
 using ThreadedClasses;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class LLAgent : IAgent, IDisposable
     {
@@ -1369,7 +1369,7 @@ namespace SilverSim.LL.Core
 
         public void SendAlertMessage(string msg, UUID fromSceneID)
         {
-            SilverSim.LL.Messages.Alert.AlertMessage m = new Messages.Alert.AlertMessage(msg);
+            SilverSim.Viewer.Messages.Alert.AlertMessage m = new Messages.Alert.AlertMessage(msg);
             SendMessageAlways(m, fromSceneID);
         }
 

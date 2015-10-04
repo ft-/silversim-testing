@@ -8,7 +8,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-namespace SilverSim.LL.Messages
+namespace SilverSim.Viewer.Messages
 {
     public class UDPPacket
     {

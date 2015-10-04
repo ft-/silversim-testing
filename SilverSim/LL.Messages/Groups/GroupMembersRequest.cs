@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Groups
+namespace SilverSim.Viewer.Messages.Groups
 {
     [UDPMessage(MessageType.GroupMembersRequest)]
     [Reliable]

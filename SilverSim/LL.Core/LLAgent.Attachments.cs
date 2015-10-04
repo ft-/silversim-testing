@@ -1,7 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.LL.Messages;
+using SilverSim.Viewer.Messages;
 using SilverSim.Main.Common.Transfer;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
@@ -16,7 +16,7 @@ using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class LLAgent
     {
@@ -44,7 +44,7 @@ namespace SilverSim.LL.Core
             {
                 case MessageType.RezMultipleAttachmentsFromInv:
                     {
-                        SilverSim.LL.Messages.Object.RezMultipleAttachmentsFromInv req = (SilverSim.LL.Messages.Object.RezMultipleAttachmentsFromInv)m;
+                        SilverSim.Viewer.Messages.Object.RezMultipleAttachmentsFromInv req = (SilverSim.Viewer.Messages.Object.RezMultipleAttachmentsFromInv)m;
                         if(req.SessionID != SessionID || req.AgentID != ID)
                         {
                             return;
@@ -55,7 +55,7 @@ namespace SilverSim.LL.Core
                             DetachAllAttachments();
                         }
 
-                        foreach (SilverSim.LL.Messages.Object.RezMultipleAttachmentsFromInv.ObjectDataS d in req.ObjectData)
+                        foreach (SilverSim.Viewer.Messages.Object.RezMultipleAttachmentsFromInv.ObjectDataS d in req.ObjectData)
                         {
                             RezAttachment(d.ItemID, d.AttachmentPoint);
                         }
@@ -64,7 +64,7 @@ namespace SilverSim.LL.Core
 
                 case MessageType.RezSingleAttachmentFromInv:
                     {
-                        SilverSim.LL.Messages.Object.RezSingleAttachmentFromInv req = (SilverSim.LL.Messages.Object.RezSingleAttachmentFromInv)m;
+                        SilverSim.Viewer.Messages.Object.RezSingleAttachmentFromInv req = (SilverSim.Viewer.Messages.Object.RezSingleAttachmentFromInv)m;
                         if (req.SessionID != SessionID || req.AgentID != ID)
                         {
                             return;
@@ -82,7 +82,7 @@ namespace SilverSim.LL.Core
             List<DetachEntry> detachList = new List<DetachEntry>();
             if(m.Number == MessageType.ObjectDetach)
             {
-                SilverSim.LL.Messages.Object.ObjectDetach req = (SilverSim.LL.Messages.Object.ObjectDetach)m;
+                SilverSim.Viewer.Messages.Object.ObjectDetach req = (SilverSim.Viewer.Messages.Object.ObjectDetach)m;
                 if (req.SessionID != SessionID || req.AgentID != ID)
                 {
                     return;
@@ -99,7 +99,7 @@ namespace SilverSim.LL.Core
             }
             else if(m.Number == MessageType.DetachAttachmentIntoInv)
             {
-                SilverSim.LL.Messages.Object.DetachAttachmentIntoInv req = (SilverSim.LL.Messages.Object.DetachAttachmentIntoInv)m;
+                SilverSim.Viewer.Messages.Object.DetachAttachmentIntoInv req = (SilverSim.Viewer.Messages.Object.DetachAttachmentIntoInv)m;
                 if (req.AgentID != ID)
                 {
                     return;

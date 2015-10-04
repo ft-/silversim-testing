@@ -4,7 +4,7 @@
 using SilverSim.Types.Grid;
 using System;
 
-namespace SilverSim.LL.Messages.Teleport
+namespace SilverSim.Viewer.Messages.Teleport
 {
     [UDPMessage(MessageType.TeleportStart)]
     [Reliable]

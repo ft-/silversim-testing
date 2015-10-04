@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Image
+namespace SilverSim.Viewer.Messages.Image
 {
     [UDPMessage(MessageType.RequestImage)]
     [Reliable]

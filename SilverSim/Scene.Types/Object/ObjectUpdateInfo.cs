@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
-using SilverSim.LL.Messages;
+using SilverSim.Viewer.Messages;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 

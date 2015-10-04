@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Search
+namespace SilverSim.Viewer.Messages.Search
 {
     [UDPMessage(MessageType.AvatarPickerRequest)]
     [Reliable]

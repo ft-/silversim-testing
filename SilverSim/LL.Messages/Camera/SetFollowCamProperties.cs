@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Camera
+namespace SilverSim.Viewer.Messages.Camera
 {
     [UDPMessage(MessageType.SetFollowCamProperties)]
     [Reliable]

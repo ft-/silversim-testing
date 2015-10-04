@@ -2,11 +2,11 @@
 // GNU Affero General Public License v3
 
 using Nini.Config;
-using SilverSim.LL.Core;
-using SilverSim.LL.Messages;
+using SilverSim.Viewer.Core;
+using SilverSim.Viewer.Messages;
 using SilverSim.Main.Common;
 
-namespace SilverSim.LL.Teleport
+namespace SilverSim.Viewer.Teleport
 {
     public class ViewerTeleport : IPlugin, IPacketHandlerExtender
     {

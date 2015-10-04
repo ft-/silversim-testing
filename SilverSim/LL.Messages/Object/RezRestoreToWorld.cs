@@ -6,7 +6,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.Viewer.Messages.Object
 {
     [UDPMessage(MessageType.RezRestoreToWorld)]
     [Reliable]

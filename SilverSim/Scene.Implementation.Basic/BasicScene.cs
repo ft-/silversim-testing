@@ -2,9 +2,9 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.LL.Core;
-using SilverSim.LL.Core.Capabilities;
-using SilverSim.LL.Messages;
+using SilverSim.Viewer.Core;
+using SilverSim.Viewer.Core.Capabilities;
+using SilverSim.Viewer.Messages;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.IM;
 using SilverSim.Scene.ServiceInterfaces.Chat;
@@ -662,13 +662,13 @@ namespace SilverSim.Scene.Implementation.Basic
         [PacketHandler(MessageType.RequestRegionInfo)]
         public void HandleRequestRegionInfo(Message m)
         {
-            SilverSim.LL.Messages.Region.RequestRegionInfo req = (SilverSim.LL.Messages.Region.RequestRegionInfo)m;
+            SilverSim.Viewer.Messages.Region.RequestRegionInfo req = (SilverSim.Viewer.Messages.Region.RequestRegionInfo)m;
             if(req.SessionID != req.CircuitSessionID || req.AgentID != req.CircuitAgentID)
             {
                 return;
             }
 
-            SilverSim.LL.Messages.Region.RegionInfo res = new LL.Messages.Region.RegionInfo();
+            SilverSim.Viewer.Messages.Region.RegionInfo res = new Viewer.Messages.Region.RegionInfo();
             res.AgentID = req.AgentID;
             res.SessionID = req.SessionID;
 

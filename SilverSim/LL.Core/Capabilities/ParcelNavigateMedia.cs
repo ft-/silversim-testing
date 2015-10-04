@@ -16,7 +16,7 @@ using SilverSim.StructuredData.LLSD;
 using ThreadedClasses;
 using SilverSim.Scene.Types.Scene;
 
-namespace SilverSim.LL.Core.Capabilities
+namespace SilverSim.Viewer.Core.Capabilities
 {
     public class ParcelNavigateMedia : ICapabilityInterface
     {

@@ -15,7 +15,7 @@ using ThreadedClasses;
 using System.IO;
 using System;
 
-namespace SilverSim.LL.Core.Capabilities
+namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UpdateScriptTask : UploadAssetAbstractCapability
     {

@@ -1,11 +1,11 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.LL.Messages;
-using SilverSim.LL.Messages.IM;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.IM;
 using SilverSim.Types.IM;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class LLAgent
     {

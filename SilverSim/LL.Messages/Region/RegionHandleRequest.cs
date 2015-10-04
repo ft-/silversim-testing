@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Region
+namespace SilverSim.Viewer.Messages.Region
 {
     [UDPMessage(MessageType.RegionHandleRequest)]
     [Reliable]

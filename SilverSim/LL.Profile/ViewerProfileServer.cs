@@ -3,11 +3,11 @@
 
 using log4net;
 using Nini.Config;
-using SilverSim.LL.Core;
-using SilverSim.LL.Messages;
-using SilverSim.LL.Messages.Generic;
-using SilverSim.LL.Messages.Profile;
-using SilverSim.LL.Messages.Search;
+using SilverSim.Viewer.Core;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Generic;
+using SilverSim.Viewer.Messages.Profile;
+using SilverSim.Viewer.Messages.Search;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
@@ -24,7 +24,7 @@ using System.Threading;
 using System.Timers;
 using ThreadedClasses;
 
-namespace SilverSim.LL.Profile
+namespace SilverSim.Viewer.Profile
 {
     public class ViewerProfileServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {

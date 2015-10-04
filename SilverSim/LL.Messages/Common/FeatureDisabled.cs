@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Common
+namespace SilverSim.Viewer.Messages.Common
 {
     [UDPMessage(MessageType.FeatureDisabled)]
     [Reliable]

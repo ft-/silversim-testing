@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.LayerData
+namespace SilverSim.Viewer.Messages.LayerData
 {
     public class LayerPatch
     {

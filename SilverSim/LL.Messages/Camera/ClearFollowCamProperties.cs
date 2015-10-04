@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Camera
+namespace SilverSim.Viewer.Messages.Camera
 {
     [UDPMessage(MessageType.ClearFollowCamProperties)]
     [Reliable]

@@ -12,7 +12,7 @@ using System.Xml;
 using SilverSim.StructuredData.LLSD;
 using SilverSim.Types.Inventory;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {

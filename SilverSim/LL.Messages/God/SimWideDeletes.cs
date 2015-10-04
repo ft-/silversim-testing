@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.God
+namespace SilverSim.Viewer.Messages.God
 {
     [UDPMessage(MessageType.SimWideDeletes)]
     [Reliable]

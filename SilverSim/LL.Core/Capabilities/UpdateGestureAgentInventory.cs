@@ -9,7 +9,7 @@ using SilverSim.Types.Inventory;
 using System.Collections.Generic;
 using ThreadedClasses;
 
-namespace SilverSim.LL.Core.Capabilities
+namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UpdateGestureAgentInventory : UploadAssetAbstractCapability
     {

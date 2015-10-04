@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.God
+namespace SilverSim.Viewer.Messages.God
 {
     [UDPMessage(MessageType.GrantGodlikePowers)]
     [Reliable]

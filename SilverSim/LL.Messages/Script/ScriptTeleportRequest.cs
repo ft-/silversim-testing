@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Script
+namespace SilverSim.Viewer.Messages.Script
 {
     [UDPMessage(MessageType.ScriptTeleportRequest)]
     [Reliable]

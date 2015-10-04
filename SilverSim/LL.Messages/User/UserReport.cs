@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.User
+namespace SilverSim.Viewer.Messages.User
 {
     [UDPMessage(MessageType.UserReport)]
     [Reliable]

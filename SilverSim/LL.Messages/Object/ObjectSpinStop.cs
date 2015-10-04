@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.Viewer.Messages.Object
 {
     [UDPMessage(MessageType.ObjectSpinStop)]
     [Reliable]

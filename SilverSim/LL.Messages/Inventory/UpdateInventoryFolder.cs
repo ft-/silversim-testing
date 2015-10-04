@@ -5,7 +5,7 @@ using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Inventory
+namespace SilverSim.Viewer.Messages.Inventory
 {
     [UDPMessage(MessageType.UpdateInventoryFolder)]
     [Reliable]

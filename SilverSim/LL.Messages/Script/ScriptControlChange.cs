@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Script
+namespace SilverSim.Viewer.Messages.Script
 {
     [UDPMessage(MessageType.ScriptControlChange)]
     [Reliable]

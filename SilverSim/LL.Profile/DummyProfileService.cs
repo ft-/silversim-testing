@@ -7,7 +7,7 @@ using SilverSim.Types.Profile;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Profile
+namespace SilverSim.Viewer.Profile
 {
     class DummyProfileService : ProfileServiceInterface
     {

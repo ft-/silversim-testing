@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 
-namespace SilverSim.LL.Messages.Agent
+namespace SilverSim.Viewer.Messages.Agent
 {
     [UDPMessage(MessageType.AgentUpdate)]
     [NotTrusted]

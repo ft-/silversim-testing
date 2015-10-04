@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.TaskInventory
+namespace SilverSim.Viewer.Messages.TaskInventory
 {
     [UDPMessage(MessageType.RequestTaskInventory)]
     [Reliable]

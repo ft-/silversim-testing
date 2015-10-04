@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Console
+namespace SilverSim.Viewer.Messages.Console
 {
     [EventQueueGet("SimConsoleResponse")]
     [Trusted]

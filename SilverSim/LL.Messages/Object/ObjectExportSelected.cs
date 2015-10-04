@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.Viewer.Messages.Object
 {
     [UDPMessage(MessageType.ObjectExportSelected)]
     [Reliable]

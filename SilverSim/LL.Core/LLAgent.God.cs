@@ -5,14 +5,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.Types;
-using SilverSim.LL;
+using SilverSim.Viewer;
 using SilverSim.Scene.Types;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Management.Scene;
-using SilverSim.LL.Messages;
-using SilverSim.LL.Messages.God;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.God;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class LLAgent
     {

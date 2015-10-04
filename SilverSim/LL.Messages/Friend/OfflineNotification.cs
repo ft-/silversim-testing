@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Friend
+namespace SilverSim.Viewer.Messages.Friend
 {
     [UDPMessage(MessageType.OfflineNotification)]
     [Reliable]

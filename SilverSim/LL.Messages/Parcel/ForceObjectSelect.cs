@@ -28,7 +28,7 @@ exception statement from your version.
 
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Parcel
+namespace SilverSim.Viewer.Messages.Parcel
 {
     [UDPMessage(MessageType.ForceObjectSelect)]
     [Reliable]

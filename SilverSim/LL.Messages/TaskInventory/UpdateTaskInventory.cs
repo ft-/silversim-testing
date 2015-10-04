@@ -6,7 +6,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 
-namespace SilverSim.LL.Messages.TaskInventory
+namespace SilverSim.Viewer.Messages.TaskInventory
 {
     [UDPMessage(MessageType.UpdateTaskInventory)]
     [Reliable]

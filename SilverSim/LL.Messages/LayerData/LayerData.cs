@@ -3,7 +3,7 @@
 
 using System;
 
-namespace SilverSim.LL.Messages.LayerData
+namespace SilverSim.Viewer.Messages.LayerData
 {
     [UDPMessage(MessageType.LayerData)]
     [Reliable]

@@ -3,7 +3,7 @@
 
 using log4net;
 using MySql.Data.MySqlClient;
-using SilverSim.LL.Messages.LayerData;
+using SilverSim.Viewer.Messages.LayerData;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Types;
 using System;

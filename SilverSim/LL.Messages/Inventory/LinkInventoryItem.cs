@@ -6,7 +6,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 
-namespace SilverSim.LL.Messages.Inventory
+namespace SilverSim.Viewer.Messages.Inventory
 {
     [UDPMessage(MessageType.LinkInventoryItem)]
     [Reliable]

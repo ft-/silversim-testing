@@ -5,7 +5,7 @@ using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.Viewer.Messages.Object
 {
     [UDPMessage(MessageType.ObjectPropertiesFamily)]
     [Reliable]

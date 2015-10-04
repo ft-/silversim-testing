@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Search
+namespace SilverSim.Viewer.Messages.Search
 {
     [UDPMessage(MessageType.PlacesReply)]
     [Reliable]

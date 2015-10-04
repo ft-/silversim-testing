@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.Search
+namespace SilverSim.Viewer.Messages.Search
 {
     [UDPMessage(MessageType.DirClassifiedQuery)]
     [Reliable]

@@ -1,13 +1,13 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.LL.Core;
+using SilverSim.Viewer.Core;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
 using System.Net;
 
-namespace SilverSim.LL.Core.Capabilities
+namespace SilverSim.Viewer.Core.Capabilities
 {
     public class SimulatorFeatures : ICapabilityInterface
     {

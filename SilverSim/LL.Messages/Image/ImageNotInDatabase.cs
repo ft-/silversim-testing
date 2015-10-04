@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Image
+namespace SilverSim.Viewer.Messages.Image
 {
     [UDPMessage(MessageType.ImageNotInDatabase)]
     [Reliable]

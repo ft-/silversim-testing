@@ -4,7 +4,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Simulator
+namespace SilverSim.Viewer.Messages.Simulator
 {
     [UDPMessage(MessageType.SimStats)]
     [Trusted]

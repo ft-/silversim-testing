@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.Profile
+namespace SilverSim.Viewer.Messages.Profile
 {
     [UDPMessage(MessageType.PickInfoReply)]
     [Reliable]

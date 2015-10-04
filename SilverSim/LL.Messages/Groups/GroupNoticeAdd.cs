@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using SilverSim.Types.IM;
 
-namespace SilverSim.LL.Messages.Groups
+namespace SilverSim.Viewer.Messages.Groups
 {
     [UDPMessage(MessageType.GroupNoticeAdd)]
     [Reliable]

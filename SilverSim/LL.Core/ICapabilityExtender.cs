@@ -4,7 +4,7 @@
 using SilverSim.Main.Common.HttpServer;
 using System;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     /* used on methods compatible with FactoryDelegate */

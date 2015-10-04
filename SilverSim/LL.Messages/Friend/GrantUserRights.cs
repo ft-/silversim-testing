@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Friend
+namespace SilverSim.Viewer.Messages.Friend
 {
     [UDPMessage(MessageType.GrantUserRights)]
     [Reliable]

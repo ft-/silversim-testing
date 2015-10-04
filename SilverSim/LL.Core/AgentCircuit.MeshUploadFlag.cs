@@ -10,7 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {

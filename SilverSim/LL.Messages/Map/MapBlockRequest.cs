@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.Map
+namespace SilverSim.Viewer.Messages.Map
 {
     [UDPMessage(MessageType.MapBlockRequest)]
     [Reliable]

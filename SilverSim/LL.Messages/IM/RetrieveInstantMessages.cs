@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.IM
+namespace SilverSim.Viewer.Messages.IM
 {
     [UDPMessage(MessageType.RetrieveInstantMessages)]
     [Reliable]

@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Gestures
+namespace SilverSim.Viewer.Messages.Gestures
 {
     [UDPMessage(MessageType.ActivateGestures)]
     [Reliable]

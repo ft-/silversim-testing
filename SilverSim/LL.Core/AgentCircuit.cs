@@ -2,9 +2,9 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.LL.Messages;
-using SilverSim.LL.Messages.Economy;
-using SilverSim.LL.Messages.IM;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Economy;
+using SilverSim.Viewer.Messages.IM;
 using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.ServiceInterfaces.Chat;
@@ -23,7 +23,7 @@ using System.Text;
 using System.Threading;
 using ThreadedClasses;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit : Circuit
     {
@@ -840,7 +840,7 @@ namespace SilverSim.LL.Core
                         }
                         else if (m.Number == MessageType.GenericMessage)
                         {
-                            SilverSim.LL.Messages.Generic.GenericMessage genMsg = (SilverSim.LL.Messages.Generic.GenericMessage)m;
+                            SilverSim.Viewer.Messages.Generic.GenericMessage genMsg = (SilverSim.Viewer.Messages.Generic.GenericMessage)m;
                             if (m_GenericMessageRouting.TryGetValue(genMsg.Method, out mdel))
                             {
                                 mdel(m);

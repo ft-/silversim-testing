@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 
-namespace SilverSim.LL.Messages.Teleport
+namespace SilverSim.Viewer.Messages.Teleport
 {
     [UDPMessage(MessageType.TeleportLureRequest)]
     [Reliable]

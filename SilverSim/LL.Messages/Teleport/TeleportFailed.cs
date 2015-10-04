@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Teleport
+namespace SilverSim.Viewer.Messages.Teleport
 {
     [UDPMessage(MessageType.TeleportFailed)]
     [Reliable]

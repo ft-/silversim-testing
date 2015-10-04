@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Appearance
+namespace SilverSim.Viewer.Messages.Appearance
 {
     [UDPMessage(MessageType.ViewerEffect)]
     [NotTrusted]

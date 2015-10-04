@@ -1,5 +1,5 @@
 ﻿using log4net;
-using SilverSim.LL.Messages;
+using SilverSim.Viewer.Messages;
 using SilverSim.Types.IM;
 using System;
 using System.Collections.Generic;
@@ -7,7 +7,7 @@ using System.Net;
 using System.Threading;
 using ThreadedClasses;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public abstract partial class Circuit : IDisposable
     {

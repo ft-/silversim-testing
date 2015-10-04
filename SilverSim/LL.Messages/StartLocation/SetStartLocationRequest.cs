@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.StartLocation
+namespace SilverSim.Viewer.Messages.StartLocation
 {
     [UDPMessage(MessageType.SetStartLocationRequest)]
     [Reliable]

@@ -1,8 +1,8 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.LL.Messages;
-using SilverSim.LL.Messages.Parcel;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Parcel;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;

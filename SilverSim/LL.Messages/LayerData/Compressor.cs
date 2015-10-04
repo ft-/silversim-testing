@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.LayerData
+namespace SilverSim.Viewer.Messages.LayerData
 {
     public static partial class LayerCompressor
     {

@@ -2,7 +2,7 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.LL.Messages;
+using SilverSim.Viewer.Messages;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
@@ -29,13 +29,13 @@ using System;
 using System.Collections.Generic;
 using ThreadedClasses;
 using System.Threading;
-using SilverSim.LL.Messages.Script;
+using SilverSim.Viewer.Messages.Script;
 using System.IO;
 using SilverSim.Scripting.Common;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types.Asset;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class LLAgent
     {

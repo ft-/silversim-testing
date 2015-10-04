@@ -6,7 +6,7 @@ using SilverSim.Types.Groups;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Groups
+namespace SilverSim.Viewer.Messages.Groups
 {
     [UDPMessage(MessageType.GroupRoleDataReply)]
     [Reliable]

@@ -14,10 +14,10 @@ using SilverSim.StructuredData.LLSD;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Asset;
 using ThreadedClasses;
-using SilverSim.LL.Messages;
+using SilverSim.Viewer.Messages;
 using SilverSim.Main.Common.CmdIO;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {

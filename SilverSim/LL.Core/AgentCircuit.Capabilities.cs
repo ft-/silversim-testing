@@ -1,7 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.LL.Core.Capabilities;
+using SilverSim.Viewer.Core.Capabilities;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
@@ -14,7 +14,7 @@ using System.Net;
 using System.Reflection;
 using System.Xml;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {

@@ -3,7 +3,7 @@
 
 using System;
 
-namespace SilverSim.LL.Messages.Economy
+namespace SilverSim.Viewer.Messages.Economy
 {
     [UDPMessage(MessageType.EconomyData)]
     [Reliable]

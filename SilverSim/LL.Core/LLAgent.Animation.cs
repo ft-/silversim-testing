@@ -7,12 +7,12 @@ using System.Linq;
 using System.Text;
 using ThreadedClasses;
 using SilverSim.Types;
-using SilverSim.LL.Messages.Avatar;
-using SilverSim.LL.Messages.Agent;
+using SilverSim.Viewer.Messages.Avatar;
+using SilverSim.Viewer.Messages.Agent;
 using SilverSim.Scene.Types.Agent;
-using SilverSim.LL.Messages;
+using SilverSim.Viewer.Messages;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class LLAgent
     {

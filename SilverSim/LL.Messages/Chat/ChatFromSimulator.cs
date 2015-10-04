@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Chat
+namespace SilverSim.Viewer.Messages.Chat
 {
     [UDPMessage(MessageType.ChatFromSimulator)]
     [Reliable]

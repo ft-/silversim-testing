@@ -1,7 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.LL.Messages.Avatar;
+using SilverSim.Viewer.Messages.Avatar;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
@@ -25,10 +25,10 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private SilverSim.LL.Messages.Object.ObjectUpdate AgentToObjectUpdate(IAgent agent)
+        private SilverSim.Viewer.Messages.Object.ObjectUpdate AgentToObjectUpdate(IAgent agent)
         {
-            SilverSim.LL.Messages.Object.ObjectUpdate m = new LL.Messages.Object.ObjectUpdate();
-            SilverSim.LL.Messages.Object.ObjectUpdate.ObjData d = new LL.Messages.Object.ObjectUpdate.ObjData();
+            SilverSim.Viewer.Messages.Object.ObjectUpdate m = new Viewer.Messages.Object.ObjectUpdate();
+            SilverSim.Viewer.Messages.Object.ObjectUpdate.ObjData d = new Viewer.Messages.Object.ObjectUpdate.ObjData();
             d.Data = new byte[0];
             d.ExtraParams = new byte[1];
             d.FullID = agent.ID;
@@ -79,13 +79,13 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendAgentObjectToAgent(IAgent agent, IAgent targetAgent)
         {
-            SilverSim.LL.Messages.Object.ObjectUpdate m = AgentToObjectUpdate(agent);
+            SilverSim.Viewer.Messages.Object.ObjectUpdate m = AgentToObjectUpdate(agent);
             targetAgent.SendMessageAlways(m, ID);
         }
 
         public void SendAgentObjectToAllAgents(IAgent agent)
         {
-            SilverSim.LL.Messages.Object.ObjectUpdate m = AgentToObjectUpdate(agent);
+            SilverSim.Viewer.Messages.Object.ObjectUpdate m = AgentToObjectUpdate(agent);
             foreach (IAgent a in Agents)
             {
                 a.SendMessageAlways(m, ID);
@@ -109,7 +109,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendKillObjectToAgents(List<UInt32> localids)
         {
-            SilverSim.LL.Messages.Object.KillObject m = new LL.Messages.Object.KillObject();
+            SilverSim.Viewer.Messages.Object.KillObject m = new Viewer.Messages.Object.KillObject();
             m.LocalIDs.AddRange(localids);
             
             foreach(IAgent a in Agents)
@@ -120,7 +120,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendKillObjectToAgents(UInt32 localid)
         {
-            SilverSim.LL.Messages.Object.KillObject m = new LL.Messages.Object.KillObject();
+            SilverSim.Viewer.Messages.Object.KillObject m = new Viewer.Messages.Object.KillObject();
             m.LocalIDs.Add(localid);
 
             foreach (IAgent a in Agents)

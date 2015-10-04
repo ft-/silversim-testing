@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Map
+namespace SilverSim.Viewer.Messages.Map
 {
     [UDPMessage(MessageType.MapItemReply)]
     [Reliable]

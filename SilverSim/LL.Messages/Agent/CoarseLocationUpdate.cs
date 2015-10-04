@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Agent
+namespace SilverSim.Viewer.Messages.Agent
 {
     [UDPMessage(MessageType.CoarseLocationUpdate)]
     [Trusted]

@@ -3,7 +3,7 @@
 
 using System;
 
-namespace SilverSim.LL.Messages.Map
+namespace SilverSim.Viewer.Messages.Map
 {
     [Flags]
     public enum MapAgentFlags : uint

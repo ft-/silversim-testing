@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.Event
+namespace SilverSim.Viewer.Messages.Event
 {
     [UDPMessage(MessageType.EventNotificationAddRequest)]
     [Reliable]

@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System.Collections.Generic;
 using MapType = SilverSim.Types.Map;
 
-namespace SilverSim.LL.Messages.Inventory
+namespace SilverSim.Viewer.Messages.Inventory
 {
     [UDPMessage(MessageType.RemoveInventoryItem)]
     [Reliable]

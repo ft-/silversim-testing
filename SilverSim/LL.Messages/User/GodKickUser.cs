@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.User
+namespace SilverSim.Viewer.Messages.User
 {
     [UDPMessage(MessageType.GodKickUser)]
     [Reliable]

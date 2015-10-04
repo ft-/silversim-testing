@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Appearance
+namespace SilverSim.Viewer.Messages.Appearance
 {
     [UDPMessage(MessageType.AgentSetAppearance)]
     [Reliable]

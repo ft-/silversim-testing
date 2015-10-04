@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.CallingCard
+namespace SilverSim.Viewer.Messages.CallingCard
 {
     [UDPMessage(MessageType.OfferCallingCard)]
     [Reliable]

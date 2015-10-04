@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.MuteList
+namespace SilverSim.Viewer.Messages.MuteList
 {
     [UDPMessage(MessageType.MuteListUpdate)]
     [Reliable]

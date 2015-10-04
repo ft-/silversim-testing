@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.CallingCard
+namespace SilverSim.Viewer.Messages.CallingCard
 {
     [UDPMessage(MessageType.AcceptCallingCard)]
     [Reliable]

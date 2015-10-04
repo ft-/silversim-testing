@@ -11,7 +11,7 @@ using System.Net;
 using System.Text;
 using System.Xml;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {

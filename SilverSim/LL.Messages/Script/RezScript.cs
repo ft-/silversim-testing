@@ -6,7 +6,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 
-namespace SilverSim.LL.Messages.Script
+namespace SilverSim.Viewer.Messages.Script
 {
     [UDPMessage(MessageType.RezScript)]
     [Reliable]

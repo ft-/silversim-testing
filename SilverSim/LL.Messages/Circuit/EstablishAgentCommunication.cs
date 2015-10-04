@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System.Net;
 
-namespace SilverSim.LL.Messages.Circuit
+namespace SilverSim.Viewer.Messages.Circuit
 {
     [EventQueueGet("EstablishAgentCommunication")]
     [Trusted]

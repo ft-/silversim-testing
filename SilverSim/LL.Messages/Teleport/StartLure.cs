@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Teleport
+namespace SilverSim.Viewer.Messages.Teleport
 {
     [UDPMessage(MessageType.StartLure)]
     [Reliable]

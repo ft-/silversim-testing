@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Land
+namespace SilverSim.Viewer.Messages.Land
 {
     [UDPMessage(MessageType.LandStatReply)]
     [Reliable]

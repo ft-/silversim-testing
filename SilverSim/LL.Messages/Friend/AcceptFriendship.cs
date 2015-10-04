@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SilverSim.LL.Messages.Friend
+namespace SilverSim.Viewer.Messages.Friend
 {
     [UDPMessage(MessageType.AcceptFriendship)]
     [Reliable]

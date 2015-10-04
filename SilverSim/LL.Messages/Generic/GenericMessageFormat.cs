@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Generic
+namespace SilverSim.Viewer.Messages.Generic
 {
     public abstract class GenericMessageFormat : Message
     {

@@ -7,7 +7,7 @@ using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Object
+namespace SilverSim.Viewer.Messages.Object
 {
     [UDPMessage(MessageType.RezMultipleAttachmentsFromInv)]
     [Reliable]

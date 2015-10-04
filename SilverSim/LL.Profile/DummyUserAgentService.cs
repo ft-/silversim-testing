@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SilverSim.LL.Profile
+namespace SilverSim.Viewer.Profile
 {
     class DummyUserAgentService : UserAgentServiceInterface
     {

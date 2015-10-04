@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.Script
+namespace SilverSim.Viewer.Messages.Script
 {
     [UDPMessage(MessageType.RevokePermissions)]
     [Reliable]

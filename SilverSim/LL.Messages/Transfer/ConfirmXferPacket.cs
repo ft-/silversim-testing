@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.Transfer
+namespace SilverSim.Viewer.Messages.Transfer
 {
     [UDPMessage(MessageType.ConfirmXferPacket)]
     [Reliable]

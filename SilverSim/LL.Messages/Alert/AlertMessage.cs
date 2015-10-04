@@ -3,7 +3,7 @@
 
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Alert
+namespace SilverSim.Viewer.Messages.Alert
 {
     [UDPMessage(MessageType.AlertMessage)]
     [Reliable]

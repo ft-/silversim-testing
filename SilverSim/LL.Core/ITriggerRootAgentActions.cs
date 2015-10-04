@@ -4,7 +4,7 @@
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public interface ITriggerOnRootAgentActions : IProtocolExtender
     {

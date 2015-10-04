@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using MapType = SilverSim.Types.Map;
 
-namespace SilverSim.LL.Messages.Agent
+namespace SilverSim.Viewer.Messages.Agent
 {
     [UDPMessage(MessageType.AgentGroupDataUpdate)]
     [Reliable]

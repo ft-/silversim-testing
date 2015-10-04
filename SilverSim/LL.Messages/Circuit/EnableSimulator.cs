@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System;
 using System.Net;
 
-namespace SilverSim.LL.Messages.Circuit
+namespace SilverSim.Viewer.Messages.Circuit
 {
     [UDPMessage(MessageType.EnableSimulator)]
     [Reliable]

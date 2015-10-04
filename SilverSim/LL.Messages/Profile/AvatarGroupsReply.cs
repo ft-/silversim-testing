@@ -7,7 +7,7 @@ using System;
 using System.Collections.Generic;
 using MapType = SilverSim.Types.Map;
 
-namespace SilverSim.LL.Messages.Profile
+namespace SilverSim.Viewer.Messages.Profile
 {
     [UDPMessage(MessageType.AvatarGroupsReply)]
     [Reliable]

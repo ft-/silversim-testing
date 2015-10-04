@@ -7,7 +7,7 @@ using SilverSim.Types.Groups;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Agent
+namespace SilverSim.Viewer.Messages.Agent
 {
     [Trusted]
     public class ChildAgentUpdate : Message

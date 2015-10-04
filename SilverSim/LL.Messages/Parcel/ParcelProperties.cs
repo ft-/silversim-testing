@@ -6,7 +6,7 @@ using MapType = SilverSim.Types.Map;
 using SilverSim.Types.Parcel;
 using System;
 
-namespace SilverSim.LL.Messages.Parcel
+namespace SilverSim.Viewer.Messages.Parcel
 {
     [EventQueueGet("ParcelProperties")]
     [Trusted]

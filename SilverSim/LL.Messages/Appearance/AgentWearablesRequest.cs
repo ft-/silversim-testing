@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Appearance
+namespace SilverSim.Viewer.Messages.Appearance
 {
     [UDPMessage(MessageType.AgentWearablesRequest)]
     [Reliable]

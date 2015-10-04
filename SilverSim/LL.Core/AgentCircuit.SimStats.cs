@@ -1,17 +1,17 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.LL.Messages;
+using SilverSim.Viewer.Messages;
 using System;
 using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using SilverSim.LL.Messages.Simulator;
-using SilverSim.LL.Core.Capabilities;
+using SilverSim.Viewer.Messages.Simulator;
+using SilverSim.Viewer.Core.Capabilities;
 using SilverSim.Scene.Types.Physics;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {

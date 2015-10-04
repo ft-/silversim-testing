@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Transfer
+namespace SilverSim.Viewer.Messages.Transfer
 {
     [UDPMessage(MessageType.TransferAbort)]
     [Reliable]

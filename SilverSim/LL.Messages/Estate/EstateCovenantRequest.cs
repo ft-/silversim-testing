@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Estate
+namespace SilverSim.Viewer.Messages.Estate
 {
     [UDPMessage(MessageType.EstateCovenantRequest)]
     [Reliable]

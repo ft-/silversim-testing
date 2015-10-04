@@ -13,7 +13,7 @@ using SilverSim.Types;
 using ThreadedClasses;
 using log4net;
 
-namespace SilverSim.LL.Core.Capabilities
+namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UploadBakedTexture : UploadAssetAbstractCapability
     {

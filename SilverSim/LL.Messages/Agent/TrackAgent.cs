@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Agent
+namespace SilverSim.Viewer.Messages.Agent
 {
     [UDPMessage(MessageType.TrackAgent)]
     [NotTrusted]

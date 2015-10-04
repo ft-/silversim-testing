@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Appearance
+namespace SilverSim.Viewer.Messages.Appearance
 {
     [UDPMessage(MessageType.AgentWearablesUpdate)]
     [Reliable]

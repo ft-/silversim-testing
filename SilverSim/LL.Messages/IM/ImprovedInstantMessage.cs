@@ -5,7 +5,7 @@ using SilverSim.Types;
 using SilverSim.Types.IM;
 using System;
 
-namespace SilverSim.LL.Messages.IM
+namespace SilverSim.Viewer.Messages.IM
 {
     [UDPMessage(MessageType.ImprovedInstantMessage)]
     [Reliable]

@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Names
+namespace SilverSim.Viewer.Messages.Names
 {
     [UDPMessage(MessageType.UUIDGroupNameRequest)]
     [Reliable]

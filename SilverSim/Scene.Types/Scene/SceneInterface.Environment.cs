@@ -7,10 +7,10 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types;
 using SilverSim.Scene.Types.Agent;
-using SilverSim.LL.Messages.Generic;
-using SilverSim.LL.Messages.LayerData;
-using SilverSim.LL.Messages.Region;
-using SilverSim.LL.Messages;
+using SilverSim.Viewer.Messages.Generic;
+using SilverSim.Viewer.Messages.LayerData;
+using SilverSim.Viewer.Messages.Region;
+using SilverSim.Viewer.Messages;
 using System.Threading;
 using SilverSim.Scene.Types.WindLight;
 

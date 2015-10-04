@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.Circuit
+namespace SilverSim.Viewer.Messages.Circuit
 {
     [UDPMessage(MessageType.UseCircuitCode)]
     [Reliable]

@@ -1,7 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-namespace SilverSim.LL.Messages
+namespace SilverSim.Viewer.Messages
 {
     public class AcksReceived : Message
     {

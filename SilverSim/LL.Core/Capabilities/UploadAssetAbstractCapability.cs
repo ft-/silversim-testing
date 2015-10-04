@@ -9,7 +9,7 @@ using System;
 using System.IO;
 using System.Net;
 
-namespace SilverSim.LL.Core.Capabilities
+namespace SilverSim.Viewer.Core.Capabilities
 {
     public abstract class UploadAssetAbstractCapability : ICapabilityInterface
     {

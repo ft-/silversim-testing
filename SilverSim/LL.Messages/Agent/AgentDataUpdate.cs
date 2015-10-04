@@ -5,7 +5,7 @@ using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System;
 
-namespace SilverSim.LL.Messages.Agent
+namespace SilverSim.Viewer.Messages.Agent
 {
     [UDPMessage(MessageType.AgentDataUpdate)]
     [Reliable]

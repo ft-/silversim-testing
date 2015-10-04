@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Economy
+namespace SilverSim.Viewer.Messages.Economy
 {
     [UDPMessage(MessageType.MoneyBalanceRequest)]
     [Reliable]

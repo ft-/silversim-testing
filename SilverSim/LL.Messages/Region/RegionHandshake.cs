@@ -7,7 +7,7 @@ using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Region
+namespace SilverSim.Viewer.Messages.Region
 {
     [UDPMessage(MessageType.RegionHandshake)]
     [Reliable]

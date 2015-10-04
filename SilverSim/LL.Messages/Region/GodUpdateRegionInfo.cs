@@ -4,7 +4,7 @@
 using SilverSim.Types;
 using System;
 
-namespace SilverSim.LL.Messages.Region
+namespace SilverSim.Viewer.Messages.Region
 {
     [UDPMessage(MessageType.GodUpdateRegionInfo)]
     [Reliable]

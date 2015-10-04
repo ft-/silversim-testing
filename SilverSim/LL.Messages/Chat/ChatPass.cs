@@ -5,7 +5,7 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System;
 
-namespace SilverSim.LL.Messages.Chat
+namespace SilverSim.Viewer.Messages.Chat
 {
     [UDPMessage(MessageType.ChatPass)]
     [Reliable]

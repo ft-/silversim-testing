@@ -8,7 +8,7 @@ using System.Text;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 
-namespace SilverSim.LL.Messages.Transfer
+namespace SilverSim.Viewer.Messages.Transfer
 {
     [UDPMessage(MessageType.AssetUploadComplete)]
     [Reliable]

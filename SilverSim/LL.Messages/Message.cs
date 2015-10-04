@@ -6,7 +6,7 @@ using SilverSim.Types;
 using SilverSim.Types.IM;
 using System.Text;
 
-namespace SilverSim.LL.Messages
+namespace SilverSim.Viewer.Messages
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     public class Reliable : Attribute

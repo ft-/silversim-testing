@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Net;
 using System.Xml;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {

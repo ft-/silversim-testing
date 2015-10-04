@@ -3,7 +3,7 @@
 
 using SilverSim.Types;
 
-namespace SilverSim.LL.Messages.Generic
+namespace SilverSim.Viewer.Messages.Generic
 {
     [UDPMessage(MessageType.GenericMessage)]
     [Reliable]

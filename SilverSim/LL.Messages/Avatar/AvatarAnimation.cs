@@ -5,7 +5,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 
-namespace SilverSim.LL.Messages.Avatar
+namespace SilverSim.Viewer.Messages.Avatar
 {
     [UDPMessage(MessageType.AvatarAnimation)]
     [Reliable]

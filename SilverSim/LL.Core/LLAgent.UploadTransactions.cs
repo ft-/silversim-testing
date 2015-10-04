@@ -1,8 +1,8 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.LL.Messages;
-using SilverSim.LL.Messages.Transfer;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Transfer;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using ThreadedClasses;
 
-namespace SilverSim.LL.Core
+namespace SilverSim.Viewer.Core
 {
     public partial class LLAgent
     {

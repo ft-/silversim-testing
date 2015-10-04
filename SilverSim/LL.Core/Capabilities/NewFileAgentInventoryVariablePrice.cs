@@ -16,7 +16,7 @@ using System.IO;
 using SilverSim.Types.Primitive;
 using System.Xml;
 
-namespace SilverSim.LL.Core.Capabilities
+namespace SilverSim.Viewer.Core.Capabilities
 {
     public class NewFileAgentInventoryVariablePrice : UploadAssetAbstractCapability
     {
