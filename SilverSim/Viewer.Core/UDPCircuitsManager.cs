@@ -95,7 +95,7 @@ namespace SilverSim.Viewer.Core
             m_ChatThread = new Thread(ChatSendHandler);
             m_ChatThread.Start();
             m_UdpSocket.Bind(ep);
-            m_Log.InfoFormat("Initialized UDP Server at {0}:{1}", bindAddress.ToString(), port);
+            m_Log.InfoFormat("Initialized UDP Circuits Manager at {0}:{1}", bindAddress.ToString(), port);
         }
 
         public void SendMessageToCircuit(UInt32 circuitcode, Message m)
