@@ -88,6 +88,5 @@ namespace SilverSim.Scene.Types.Object
             TriggerOnUpdate(ChangedEvent.ChangedFlags.Media);
         }
         #endregion
-
     }
 }
