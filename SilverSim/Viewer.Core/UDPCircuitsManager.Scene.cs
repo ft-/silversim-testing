@@ -5,7 +5,7 @@ using SilverSim.Scene.Types.Object;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLUDPServer
+    public partial class UDPCircuitsManager
     {
         public void ScheduleUpdate(ObjectUpdateInfo info)
         {

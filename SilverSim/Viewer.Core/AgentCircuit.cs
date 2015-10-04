@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Core
         private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
         public UUID SessionID = UUID.Zero;
         public UUID AgentID = UUID.Zero;
-        public LLAgent Agent = null;
+        public ViewerAgent Agent = null;
         private SceneInterface m_Scene;
         private RwLockedDictionary<string, UUID> m_RegisteredCapabilities = new RwLockedDictionary<string, UUID>();
         private CapsHttpRedirector m_CapsRedirector;
@@ -203,9 +203,9 @@ namespace SilverSim.Viewer.Core
             WeakReference m_Circuit;
             HandlerDelegate m_Delegate;
 
-            public delegate void HandlerDelegate(LLAgent agent, AgentCircuit circuit, Message m);
+            public delegate void HandlerDelegate(ViewerAgent agent, AgentCircuit circuit, Message m);
 
-            public MessageHandlerExtenderLLAgent(LLAgent agent, AgentCircuit circuit, HandlerDelegate del)
+            public MessageHandlerExtenderLLAgent(ViewerAgent agent, AgentCircuit circuit, HandlerDelegate del)
             {
                 m_Agent = new WeakReference(agent, false);
                 m_Circuit = new WeakReference(circuit, false);
@@ -214,7 +214,7 @@ namespace SilverSim.Viewer.Core
 
             public void Handler(Message m)
             {
-                LLAgent agent = m_Agent.Target as LLAgent;
+                ViewerAgent agent = m_Agent.Target as ViewerAgent;
                 AgentCircuit circuit = m_Circuit.Target as AgentCircuit;
                 if (agent != null && circuit != null)
                 {
@@ -296,7 +296,7 @@ namespace SilverSim.Viewer.Core
             }
             else if (mi.GetParameters().Length == 3)
             {
-                if (mi.GetParameters()[0].ParameterType != typeof(LLAgent) ||
+                if (mi.GetParameters()[0].ParameterType != typeof(ViewerAgent) ||
                     mi.GetParameters()[1].ParameterType != typeof(AgentCircuit) ||
                     mi.GetParameters()[2].ParameterType != typeof(Message))
                 {
@@ -505,7 +505,7 @@ namespace SilverSim.Viewer.Core
                         }
                         else if(mi.GetParameters().Length == 3)
                         {
-                            if( mi.GetParameters()[0].ParameterType == typeof(LLAgent) &&
+                            if( mi.GetParameters()[0].ParameterType == typeof(ViewerAgent) &&
                                 mi.GetParameters()[1].ParameterType == typeof(AgentCircuit) &&
                                 mi.GetParameters()[2].ParameterType == typeof(Message))
                             {
@@ -568,7 +568,7 @@ namespace SilverSim.Viewer.Core
                     {
                         m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
                     }
-                    else if (mi.GetParameters()[0].ParameterType != typeof(LLAgent))
+                    else if (mi.GetParameters()[0].ParameterType != typeof(ViewerAgent))
                     {
                         m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
                     }
@@ -600,8 +600,8 @@ namespace SilverSim.Viewer.Core
         }
 
         public AgentCircuit(
-            LLAgent agent, 
-            LLUDPServer server,
+            ViewerAgent agent, 
+            UDPCircuitsManager server,
             UInt32 circuitcode,
             CapsHttpRedirector capsredirector, 
             UUID regionSeedID, 

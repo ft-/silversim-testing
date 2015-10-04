@@ -7,13 +7,13 @@ using SilverSim.Types.IM;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLAgent
+    public partial class ViewerAgent
     {
         [IMMessageHandler(GridInstantMessageDialog.MessageFromAgent)]
         [IMMessageHandler(GridInstantMessageDialog.StartTyping)]
         [IMMessageHandler(GridInstantMessageDialog.StopTyping)]
         [IMMessageHandler(GridInstantMessageDialog.BusyAutoResponse)]
-        public void HandleIM(LLAgent nop, AgentCircuit circuit, Message m)
+        public void HandleIM(ViewerAgent nop, AgentCircuit circuit, Message m)
         {
             GridInstantMessage im = (GridInstantMessage)(ImprovedInstantMessage)m;
             im.IsFromGroup = false;
@@ -21,7 +21,7 @@ namespace SilverSim.Viewer.Core
 
             im.OnResult = circuit.OnIMResult;
 
-            LLUDPServer server = circuit.Server;
+            UDPCircuitsManager server = circuit.Server;
             if (server != null)
             {
                 server.RouteIM(im);

@@ -18,7 +18,7 @@ namespace SilverSim.Viewer.Core
         private Thread m_TxThread = null;
         private int __SequenceNumber = 0;
         private NonblockingQueue<UInt32> m_AckList = new NonblockingQueue<UInt32>();
-        private LLUDPServer m_Server;
+        private UDPCircuitsManager m_Server;
         public EndPoint RemoteEndPoint;
         private RwLockedDictionary<byte, int> m_PingSendTicks = new RwLockedDictionary<byte, int>();
         public int LastMeasuredLatencyTickCount { get; private set; }
@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Core
         protected int m_UnackedBytes = 0;
         protected object m_UnackedBytesLock = new object();
 
-        internal LLUDPServer Server
+        internal UDPCircuitsManager Server
         {
             get
             {
@@ -65,7 +65,7 @@ namespace SilverSim.Viewer.Core
         public C5.TreeDictionary<uint, UDPPacket> m_UnackedPacketsHash = new C5.TreeDictionary<uint, UDPPacket>();
 
         public Circuit(            
-            LLUDPServer server,
+            UDPCircuitsManager server,
             UInt32 circuitcode)
         {
             m_Server = server;

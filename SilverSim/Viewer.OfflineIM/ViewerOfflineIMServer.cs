@@ -57,7 +57,7 @@ namespace SilverSim.Viewer.OfflineIM
                     continue;
                 }
 
-                LLAgent agent = req.Key.Agent;
+                ViewerAgent agent = req.Key.Agent;
 
                 OfflineIMServiceInterface offlineIMService = agent.OfflineIMService;
                 if(null != offlineIMService)

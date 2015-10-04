@@ -11,7 +11,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLAgent
+    public partial class ViewerAgent
     {
         public class DownloadTransferData
         {

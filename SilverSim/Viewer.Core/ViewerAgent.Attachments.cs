@@ -18,7 +18,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLAgent
+    public partial class ViewerAgent
     {
         readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID,UInt32,KeyValuePair<UUID, UUID>>();
 

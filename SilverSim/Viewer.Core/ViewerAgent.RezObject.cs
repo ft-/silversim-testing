@@ -17,7 +17,7 @@ using System.Threading;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLAgent
+    public partial class ViewerAgent
     {
         class AgentRezObjectHandler  : RezObjectHandler
         {

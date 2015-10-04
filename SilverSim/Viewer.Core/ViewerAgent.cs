@@ -38,9 +38,9 @@ using ThreadedClasses;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLAgent : IAgent, IDisposable
+    public partial class ViewerAgent : IAgent, IDisposable
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("LL AGENT");
+        private static readonly ILog m_Log = LogManager.GetLogger("VIEWER AGENT");
         public event Action<IObject> OnPositionChange;
 
         #region Agent fields
@@ -968,7 +968,7 @@ namespace SilverSim.Viewer.Core
         string m_ServiceSessionID;
         List<IAgentTeleportServiceInterface> m_TeleportServices;
 
-        public LLAgent(UUID agentID,
+        public ViewerAgent(UUID agentID,
             string firstName,
             string lastName,
             Uri homeURI,
@@ -1008,7 +1008,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        ~LLAgent()
+        ~ViewerAgent()
         {
             lock (this)
             {
@@ -1276,7 +1276,7 @@ namespace SilverSim.Viewer.Core
                 {
                     c.Stop();
                     Circuits.Remove(c.CircuitCode, c.Scene.ID);
-                    ((LLUDPServer)c.Scene.UDPServer).RemoveCircuit(c);
+                    ((UDPCircuitsManager)c.Scene.UDPServer).RemoveCircuit(c);
                 }
                 else
                 {

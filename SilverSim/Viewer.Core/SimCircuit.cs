@@ -30,7 +30,7 @@ namespace SilverSim.Viewer.Core
         private ChatServiceInterface.Listener m_ChatListener;
 
         public SimCircuit(
-            LLUDPServer server,
+            UDPCircuitsManager server,
             UInt32 circuitcode,
             UUID remoteSceneID,
             UUID sessionID,

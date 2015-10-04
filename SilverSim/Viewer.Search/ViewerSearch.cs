@@ -84,7 +84,7 @@ namespace SilverSim.Viewer.Search
         }
 
         [AgentCircuit.IgnoreMethod]
-        void ProcessDirFindQuery(LLAgent agent, AgentCircuit circuit, Message m)
+        void ProcessDirFindQuery(ViewerAgent agent, AgentCircuit circuit, Message m)
         {
             DirFindQuery req = (DirFindQuery)m;
             SceneInterface scene = circuit.Scene;
@@ -115,7 +115,7 @@ namespace SilverSim.Viewer.Search
             }
         }
 
-        void ProcessDirFindQuery_People(LLAgent agent, SceneInterface scene, DirFindQuery req)
+        void ProcessDirFindQuery_People(ViewerAgent agent, SceneInterface scene, DirFindQuery req)
         {
             DirPeopleReply res = null;
             UDPPacket t = new UDPPacket();
@@ -157,7 +157,7 @@ namespace SilverSim.Viewer.Search
             }
         }
 
-        void ProcessDirFindQuery_Groups(LLAgent agent, SceneInterface scene, DirFindQuery req)
+        void ProcessDirFindQuery_Groups(ViewerAgent agent, SceneInterface scene, DirFindQuery req)
         {
             DirGroupsReply res = null;
 
@@ -212,13 +212,13 @@ namespace SilverSim.Viewer.Search
             }
         }
 
-        void ProcessDirFindQuery_Events(LLAgent agent, SceneInterface scene, DirFindQuery req)
+        void ProcessDirFindQuery_Events(ViewerAgent agent, SceneInterface scene, DirFindQuery req)
         {
 
         }
 
         [AgentCircuit.IgnoreMethod]
-        void ProcessAvatarPickerRequest(LLAgent agent, AgentCircuit circuit, Message m)
+        void ProcessAvatarPickerRequest(ViewerAgent agent, AgentCircuit circuit, Message m)
         {
             AvatarPickerRequest req = (AvatarPickerRequest)m;
             AvatarPickerReply res = new AvatarPickerReply();
@@ -272,7 +272,7 @@ namespace SilverSim.Viewer.Search
         }
 
         [CapabilityHandler("AvatarPickerSearch")]
-        public void HandleAvatarPickerSearchCapability(LLAgent agent, AgentCircuit circuit, HttpRequest req)
+        public void HandleAvatarPickerSearchCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest req)
         {
             string[] parts = req.RawUrl.Substring(1).Split('/');
             if (req.Method != "GET")

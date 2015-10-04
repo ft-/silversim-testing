@@ -27,7 +27,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        private LLAgent m_Agent;
+        private ViewerAgent m_Agent;
         private SceneInterface m_Scene;
         private readonly RwLockedDictionary<UUID, TransactionInfo> m_Transactions = new RwLockedDictionary<UUID, TransactionInfo>();
 
@@ -47,7 +47,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public UpdateGestureTaskInventory(LLAgent agent, SceneInterface scene, string serverURI)
+        public UpdateGestureTaskInventory(ViewerAgent agent, SceneInterface scene, string serverURI)
             : base(agent.Owner, serverURI)
         {
             m_Agent = agent;

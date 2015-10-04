@@ -56,7 +56,7 @@ namespace SilverSim.Viewer.TerrainEdit
             }
         }
 
-        public delegate void ModifyLandEffect(LLAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data);
+        public delegate void ModifyLandEffect(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data);
 
         Dictionary<StandardTerrainEffect, ModifyLandEffect> m_PaintEffects = new Dictionary<StandardTerrainEffect, ModifyLandEffect>();
         Dictionary<StandardTerrainEffect, ModifyLandEffect> m_FloodEffects = new Dictionary<StandardTerrainEffect, ModifyLandEffect>();
@@ -82,7 +82,7 @@ namespace SilverSim.Viewer.TerrainEdit
                 {
                     m_Log.FatalFormat("Method {0} does not match in parameter count", mi.Name);
                 }
-                else if(mi.GetParameters()[0].ParameterType != typeof(LLAgent))
+                else if(mi.GetParameters()[0].ParameterType != typeof(ViewerAgent))
                 {
                     m_Log.FatalFormat("Method {0} does not match in parameters", mi.Name);
                 }
@@ -119,7 +119,7 @@ namespace SilverSim.Viewer.TerrainEdit
                 {
                     m_Log.FatalFormat("Method {0} does not match in parameter count", mi.Name);
                 }
-                else if (mi.GetParameters()[0].ParameterType != typeof(LLAgent))
+                else if (mi.GetParameters()[0].ParameterType != typeof(ViewerAgent))
                 {
                     m_Log.FatalFormat("Method {0} does not match in parameters", mi.Name);
                 }
@@ -147,7 +147,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PacketHandler(MessageType.ModifyLand)]
-        void HandleMessage(LLAgent agent, AgentCircuit circuit, Message m)
+        void HandleMessage(ViewerAgent agent, AgentCircuit circuit, Message m)
         {
             ModifyLand req = (ModifyLand)m;
             if (req.CircuitSessionID != req.SessionID ||
@@ -184,7 +184,7 @@ namespace SilverSim.Viewer.TerrainEdit
 
         #region Paint Effects
         [PaintEffect(StandardTerrainEffect.Raise)]
-        void RaiseSphere(LLAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        void RaiseSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -253,7 +253,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PaintEffect(StandardTerrainEffect.Lower)]
-        void LowerSphere(LLAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        void LowerSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -318,7 +318,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PaintEffect(StandardTerrainEffect.Flatten)]
-        void FlattenSphere(LLAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        void FlattenSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -407,7 +407,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PaintEffect(StandardTerrainEffect.Smooth)]
-        void SmoothSphere(LLAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        void SmoothSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -478,7 +478,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PaintEffect(StandardTerrainEffect.Noise)]
-        void NoiseSphere(LLAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        void NoiseSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -552,7 +552,7 @@ namespace SilverSim.Viewer.TerrainEdit
 
         #region Flood Effects
         [FloodEffect(StandardTerrainEffect.Raise)]
-        void RaiseArea(LLAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        void RaiseArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
             for (int x = (int)data.West; x < (int)data.East; x++)
@@ -582,7 +582,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [FloodEffect(StandardTerrainEffect.Lower)]
-        void LowerArea(LLAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        void LowerArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
             for (int x = (int)data.West; x < (int)data.East; x++)
@@ -612,7 +612,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [FloodEffect(StandardTerrainEffect.Flatten)]
-        void FlattenArea(LLAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        void FlattenArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -664,7 +664,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [FloodEffect(StandardTerrainEffect.Smooth)]
-        void SmoothArea(LLAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        void SmoothArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -712,7 +712,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [FloodEffect(StandardTerrainEffect.Noise)]
-        void NoiseArea(LLAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        void NoiseArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 

@@ -32,7 +32,7 @@ using System.Threading;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLAgent
+    public partial class ViewerAgent
     {
         private readonly AgentAttachments m_Attachments = new AgentAttachments();
         private readonly AgentWearables m_Wearables = new AgentWearables();

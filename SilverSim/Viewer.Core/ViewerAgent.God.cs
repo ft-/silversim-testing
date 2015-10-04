@@ -14,7 +14,7 @@ using SilverSim.Viewer.Messages.God;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLAgent
+    public partial class ViewerAgent
     {
         [PacketHandler(MessageType.RequestGodlikePowers)]
         void HandleRequestGodlikePowers(Message p)

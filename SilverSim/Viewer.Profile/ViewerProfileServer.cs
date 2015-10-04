@@ -320,7 +320,7 @@ namespace SilverSim.Viewer.Profile
         #endregion
 
         #region Classifieds
-        void HandleDirClassifiedQuery(LLAgent agent, SceneInterface scene, Message m)
+        void HandleDirClassifiedQuery(ViewerAgent agent, SceneInterface scene, Message m)
         {
             DirClassifiedQuery req = (DirClassifiedQuery)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -331,7 +331,7 @@ namespace SilverSim.Viewer.Profile
 
         }
 
-        void HandleAvatarClassifiedsRequest(LLAgent agent, SceneInterface scene, GenericMessage m)
+        void HandleAvatarClassifiedsRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
         {
             if(m.AgentID != m.CircuitAgentID ||
                 m.SessionID != m.CircuitSessionID)
@@ -407,7 +407,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        void HandleClassifiedInfoRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleClassifiedInfoRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             ClassifiedInfoRequest req = (ClassifiedInfoRequest)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -463,7 +463,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        void HandleClassifiedInfoUpdate(LLAgent agent, SceneInterface scene, Message m)
+        void HandleClassifiedInfoUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             ClassifiedInfoUpdate req = (ClassifiedInfoUpdate)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -498,7 +498,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        void HandleClassifiedDelete(LLAgent agent, SceneInterface scene, Message m)
+        void HandleClassifiedDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
             ClassifiedDelete req = (ClassifiedDelete)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -522,7 +522,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        void HandleClassifiedGodDelete(LLAgent agent, SceneInterface scene, Message m)
+        void HandleClassifiedGodDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
             ClassifiedGodDelete req = (ClassifiedGodDelete)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -535,7 +535,7 @@ namespace SilverSim.Viewer.Profile
         #endregion
 
         #region Notes
-        void HandleAvatarNotesRequest(LLAgent agent, SceneInterface scene, GenericMessage m)
+        void HandleAvatarNotesRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
         {
             if (m.AgentID != m.CircuitAgentID ||
                 m.SessionID != m.CircuitSessionID)
@@ -579,7 +579,7 @@ namespace SilverSim.Viewer.Profile
             agent.SendMessageAlways(reply, scene.ID);
         }
 
-        void HandleAvatarNotesUpdate(LLAgent agent, SceneInterface scene, Message m)
+        void HandleAvatarNotesUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             AvatarNotesUpdate req = (AvatarNotesUpdate)m;
             if(req.AgentID != req.CircuitAgentID ||
@@ -605,7 +605,7 @@ namespace SilverSim.Viewer.Profile
         #endregion
 
         #region Picks
-        void HandleAvatarPicksRequest(LLAgent agent, SceneInterface scene, GenericMessage m)
+        void HandleAvatarPicksRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
         {
             if(m.AgentID != m.CircuitAgentID ||
                 m.SessionID != m.CircuitSessionID)
@@ -680,7 +680,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        void HandlePickInfoRequest(LLAgent agent, SceneInterface scene, GenericMessage m)
+        void HandlePickInfoRequest(ViewerAgent agent, SceneInterface scene, GenericMessage m)
         {
             if (m.AgentID != m.CircuitAgentID ||
                 m.SessionID != m.CircuitSessionID)
@@ -742,7 +742,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        void HandlePickInfoUpdate(LLAgent agent, SceneInterface scene, Message m)
+        void HandlePickInfoUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             PickInfoUpdate req = (PickInfoUpdate)m;
             if(req.AgentID != req.CircuitAgentID ||
@@ -775,7 +775,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        void HandlePickDelete(LLAgent agent, SceneInterface scene, Message m)
+        void HandlePickDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
             PickDelete req = (PickDelete)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -799,7 +799,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        void HandlePickGodDelete(LLAgent agent, SceneInterface scene, Message m)
+        void HandlePickGodDelete(ViewerAgent agent, SceneInterface scene, Message m)
         {
             PickGodDelete req = (PickGodDelete)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -812,7 +812,7 @@ namespace SilverSim.Viewer.Profile
         #endregion
 
         #region User Info
-        void HandleUserInfoRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleUserInfoRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             UserInfoRequest req = (UserInfoRequest)m;
             if (req.CircuitSessionID != req.SessionID ||
@@ -849,7 +849,7 @@ namespace SilverSim.Viewer.Profile
             agent.SendMessageAlways(reply, scene.ID);
         }
 
-        void HandleUpdateUserInfo(LLAgent agent, SceneInterface scene, Message m)
+        void HandleUpdateUserInfo(ViewerAgent agent, SceneInterface scene, Message m)
         {
             UpdateUserInfo req = (UpdateUserInfo)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -880,7 +880,7 @@ namespace SilverSim.Viewer.Profile
         #endregion
 
         #region Avatar Properties
-        void HandleAvatarPropertiesRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleAvatarPropertiesRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             AvatarPropertiesRequest req = (AvatarPropertiesRequest)m;
             if(req.CircuitSessionID != req.SessionID ||
@@ -1006,7 +1006,7 @@ namespace SilverSim.Viewer.Profile
             agent.SendMessageAlways(res3, scene.ID);
         }
 
-        void HandleAvatarPropertiesUpdate(LLAgent agent, SceneInterface scene, Message m)
+        void HandleAvatarPropertiesUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             AvatarPropertiesUpdate req = (AvatarPropertiesUpdate)m;
             if (req.AgentID != req.CircuitAgentID ||
@@ -1046,7 +1046,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        void HandleAvatarInterestsUpdate(LLAgent agent, SceneInterface scene, Message m)
+        void HandleAvatarInterestsUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             AvatarInterestsUpdate req = (AvatarInterestsUpdate)m;
             if (req.AgentID != req.CircuitAgentID ||

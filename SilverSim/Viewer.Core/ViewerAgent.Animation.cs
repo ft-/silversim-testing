@@ -14,7 +14,7 @@ using SilverSim.Viewer.Messages;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLAgent
+    public partial class ViewerAgent
     {
         void SendAnimations(AvatarAnimation m)
         {

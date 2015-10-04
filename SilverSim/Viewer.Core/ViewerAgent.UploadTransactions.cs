@@ -13,7 +13,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLAgent
+    public partial class ViewerAgent
     {
         UInt64 m_NextXferID;
         UInt64 NextXferID

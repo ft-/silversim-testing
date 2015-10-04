@@ -13,7 +13,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UpdateGestureAgentInventory : UploadAssetAbstractCapability
     {
-        LLAgent m_Agent;
+        ViewerAgent m_Agent;
         private InventoryServiceInterface m_InventoryService;
         private AssetServiceInterface m_AssetService;
         private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public UpdateGestureAgentInventory(LLAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI)
+        public UpdateGestureAgentInventory(ViewerAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI)
             : base(agent.Owner, serverURI)
         {
             m_InventoryService = inventoryService;

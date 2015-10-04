@@ -19,7 +19,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UpdateScriptAgent : UploadAssetAbstractCapability
     {
-        private LLAgent m_Agent;
+        private ViewerAgent m_Agent;
         private InventoryServiceInterface m_InventoryService;
         private AssetServiceInterface m_AssetService;
         private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
@@ -40,7 +40,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public UpdateScriptAgent(LLAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI)
+        public UpdateScriptAgent(ViewerAgent agent, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI)
             : base(agent.Owner, serverURI)
         {
             m_Agent = agent;

@@ -9,7 +9,7 @@ using System;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLAgent
+    public partial class ViewerAgent
     {
         [PacketHandler(MessageType.AgentDataUpdateRequest)]
         void HandleAgentDataUpdateRequest(Message m)

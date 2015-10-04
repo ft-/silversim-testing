@@ -16,7 +16,7 @@ namespace SilverSim.Viewer.Core
         {
             Name = name;
         }
-        public delegate void CapabilityDelegate(LLAgent agent, AgentCircuit circuit, HttpRequest req);
+        public delegate void CapabilityDelegate(ViewerAgent agent, AgentCircuit circuit, HttpRequest req);
     }
 
     public interface ICapabilityExtender : IProtocolExtender

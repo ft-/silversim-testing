@@ -37,7 +37,7 @@ using SilverSim.Types.Asset;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLAgent
+    public partial class ViewerAgent
     {
         [PacketHandler(MessageType.RezScript)]
         void HandleRezScript(Message m)

@@ -80,7 +80,7 @@ namespace SilverSim.Viewer.Economy
         {
             EconomyDataRequest mbr = (EconomyDataRequest)m;
             SceneInterface scene;
-            LLAgent agent;
+            ViewerAgent agent;
             try
             {
                 scene = circuit.Scene;
@@ -124,7 +124,7 @@ namespace SilverSim.Viewer.Economy
             if (mbr.AgentID == mbr.CircuitAgentID && mbr.SessionID == mbr.CircuitSessionID)
             {
                 SceneInterface scene;
-                LLAgent agent;
+                ViewerAgent agent;
                 try
                 {
                     scene = circuit.Scene;

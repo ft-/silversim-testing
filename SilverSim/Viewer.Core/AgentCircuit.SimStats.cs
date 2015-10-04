@@ -81,7 +81,7 @@ namespace SilverSim.Viewer.Core
             int packetsSent = m_PacketsSent - m_LastPacketsSent;
             int agentUpdatesReceived = m_AgentUpdatesReceived - m_LastAgentUpdatesReceived;
             int activeUploads = 0;
-            LLAgent agent = Agent;
+            ViewerAgent agent = Agent;
             if (agent != null)
             {
                 activeUploads += agent.m_TerrainTransactions.Count + agent.m_AssetTransactions.Count;

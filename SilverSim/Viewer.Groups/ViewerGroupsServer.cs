@@ -426,7 +426,7 @@ namespace SilverSim.Viewer.Groups
         #endregion
 
         #region Group Notice
-        void HandleGroupNotice(LLAgent agent, SceneInterface scene, ImprovedInstantMessage m)
+        void HandleGroupNotice(ViewerAgent agent, SceneInterface scene, ImprovedInstantMessage m)
         {
             /* no validation needed with IM, that is already done in circuit */
             GroupsServiceInterface groupsService = scene.GroupsService;
@@ -503,7 +503,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleGroupNoticesListRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupNoticesListRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupNoticesListRequest req = (GroupNoticesListRequest)m;
             if(req.CircuitAgentID != req.AgentID ||
@@ -578,7 +578,7 @@ namespace SilverSim.Viewer.Groups
         #endregion
 
         #region Groups
-        void HandleCreateGroupRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleCreateGroupRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             CreateGroupRequest req = (CreateGroupRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -636,7 +636,7 @@ namespace SilverSim.Viewer.Groups
             SendAgentGroupDataUpdate(agent, scene, groupsService, groupinfo.ID);
         }
 
-        void HandleUpdateGroupInfo(LLAgent agent, SceneInterface scene, Message m)
+        void HandleUpdateGroupInfo(ViewerAgent agent, SceneInterface scene, Message m)
         {
             UpdateGroupInfo req = (UpdateGroupInfo)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -687,7 +687,7 @@ namespace SilverSim.Viewer.Groups
             SendAllAgentsGroupDataUpdate(scene, groupsService, ginfo.ID);
         }
 
-        void HandleJoinGroupRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleJoinGroupRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             JoinGroupRequest req = (JoinGroupRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -740,7 +740,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleLeaveGroupRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleLeaveGroupRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             LeaveGroupRequest req = (LeaveGroupRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -778,7 +778,7 @@ namespace SilverSim.Viewer.Groups
             agent.SendMessageAlways(reply, scene.ID);
         }
 
-        void HandleInviteGroupRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleInviteGroupRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             InviteGroupRequest req = (InviteGroupRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -788,7 +788,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleGroupProfileRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupProfileRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupProfileRequest req = (GroupProfileRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -857,7 +857,7 @@ namespace SilverSim.Viewer.Groups
         #endregion
 
         #region GroupRole
-        void HandleGroupRoleChanges(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupRoleChanges(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupRoleChanges req = (GroupRoleChanges)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -936,7 +936,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleGroupRoleDataRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupRoleDataRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupRoleDataRequest req = (GroupRoleDataRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -998,7 +998,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleGroupRoleMembersRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupRoleMembersRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupRoleMembersRequest req = (GroupRoleMembersRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1056,7 +1056,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleGroupRoleUpdate(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupRoleUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupRoleUpdate req = (GroupRoleUpdate)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1165,7 +1165,7 @@ namespace SilverSim.Viewer.Groups
         #endregion
 
         #region Group members
-        void HandleEjectGroupMemberRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleEjectGroupMemberRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             EjectGroupMemberRequest req = (EjectGroupMemberRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1177,7 +1177,7 @@ namespace SilverSim.Viewer.Groups
         #endregion
 
         #region Group Titles
-        void HandleGroupTitlesRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupTitlesRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupTitlesRequest req = (GroupTitlesRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1241,7 +1241,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleGroupTitleUpdate(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupTitleUpdate(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupTitleUpdate req = (GroupTitleUpdate)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1281,7 +1281,7 @@ namespace SilverSim.Viewer.Groups
         #endregion
 
         #region Group Account
-        void HandleGroupAccountSummaryRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupAccountSummaryRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupAccountSummaryRequest req = (GroupAccountSummaryRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1291,7 +1291,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleGroupAccountDetailsRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupAccountDetailsRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupAccountDetailsRequest req = (GroupAccountDetailsRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1301,7 +1301,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleGroupAccountTransactionsRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupAccountTransactionsRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupAccountTransactionsRequest req = (GroupAccountTransactionsRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1313,7 +1313,7 @@ namespace SilverSim.Viewer.Groups
         #endregion
 
         #region Active Group Selection
-        void HandleActivateGroup(LLAgent agent, SceneInterface scene, Message m)
+        void HandleActivateGroup(ViewerAgent agent, SceneInterface scene, Message m)
         {
             ActivateGroup req = (ActivateGroup)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1351,7 +1351,7 @@ namespace SilverSim.Viewer.Groups
         #endregion
 
         #region Group Proposals
-        void HandleGroupActiveProposalsRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupActiveProposalsRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupActiveProposalsRequest req = (GroupActiveProposalsRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1361,7 +1361,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleGroupVoteHistoryRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupVoteHistoryRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupVoteHistoryRequest req = (GroupVoteHistoryRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1371,7 +1371,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleStartGroupProposal(LLAgent agent, SceneInterface scene, Message m)
+        void HandleStartGroupProposal(ViewerAgent agent, SceneInterface scene, Message m)
         {
             StartGroupProposal req = (StartGroupProposal)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1381,7 +1381,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleGroupProposalBallot(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupProposalBallot(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupProposalBallot req = (GroupProposalBallot)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1393,7 +1393,7 @@ namespace SilverSim.Viewer.Groups
         #endregion
 
         #region Member group params
-        void HandleSetGroupContribution(LLAgent agent, SceneInterface scene, Message m)
+        void HandleSetGroupContribution(ViewerAgent agent, SceneInterface scene, Message m)
         {
             SetGroupContribution req = (SetGroupContribution)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1423,7 +1423,7 @@ namespace SilverSim.Viewer.Groups
             }
         }
 
-        void HandleSetGroupAcceptNotices(LLAgent agent, SceneInterface scene, Message m)
+        void HandleSetGroupAcceptNotices(ViewerAgent agent, SceneInterface scene, Message m)
         {
             SetGroupAcceptNotices req = (SetGroupAcceptNotices)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1479,7 +1479,7 @@ namespace SilverSim.Viewer.Groups
             return p.ToString("X");
         }
 
-        void HandleGroupMembersRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleGroupMembersRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             GroupMembersRequest req = (GroupMembersRequest)m;
             if (req.CircuitAgentID != req.AgentID ||
@@ -1567,7 +1567,7 @@ namespace SilverSim.Viewer.Groups
         }
 
         [CapabilityHandler("GroupMemberData")]
-        public void HandleGroupMemberDataCapability(LLAgent agent, AgentCircuit circuit, HttpRequest req)
+        public void HandleGroupMemberDataCapability(ViewerAgent agent, AgentCircuit circuit, HttpRequest req)
         {
             if(req.Method != "POST")
             {

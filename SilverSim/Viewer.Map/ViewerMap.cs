@@ -108,7 +108,7 @@ namespace SilverSim.Viewer.Map
         }
 
         #region MapNameRequest and MapBlockRequest
-        void HandleMapBlockRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleMapBlockRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             List<MapBlockReply.DataEntry> results = new List<MapBlockReply.DataEntry>();
             MapBlockRequest req = (MapBlockRequest)m;
@@ -149,7 +149,7 @@ namespace SilverSim.Viewer.Map
             SendMapBlocks(agent, scene, req.Flags, results);
         }
 
-        void HandleMapNameRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleMapNameRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             MapNameRequest req = (MapNameRequest)m;
             if(req.CircuitAgentID != req.AgentID ||
@@ -316,7 +316,7 @@ namespace SilverSim.Viewer.Map
             SendMapBlocks(agent, scene, req.Flags, results);
         }
 
-        void SendMapBlocks(LLAgent agent, SceneInterface scene, MapAgentFlags mapflags, List<MapBlockReply.DataEntry> mapBlocks)
+        void SendMapBlocks(ViewerAgent agent, SceneInterface scene, MapAgentFlags mapflags, List<MapBlockReply.DataEntry> mapBlocks)
         {
             MapBlockReply.DataEntry end = new MapBlockReply.DataEntry();
             end.Agents = 0;
@@ -361,7 +361,7 @@ namespace SilverSim.Viewer.Map
         #endregion
 
         #region MapItemRequest
-        void HandleMapItemRequest(LLAgent agent, SceneInterface scene, Message m)
+        void HandleMapItemRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             MapItemRequest req = (MapItemRequest)m;
             if(req.CircuitAgentID != req.AgentID ||
@@ -404,7 +404,7 @@ namespace SilverSim.Viewer.Map
                         /* local */
                         foreach(IAgent sceneagent in accessScene.Agents)
                         {
-                            if(sceneagent.IsInScene(accessScene) && !sceneagent.Owner.Equals(agent.Owner) && sceneagent is LLAgent)
+                            if(sceneagent.IsInScene(accessScene) && !sceneagent.Owner.Equals(agent.Owner) && sceneagent is ViewerAgent)
                             {
                                 MapItemReply.DataEntry d = new MapItemReply.DataEntry();
                                 d.X = (ushort)sceneagent.GlobalPosition.X;

@@ -33,9 +33,9 @@ namespace SilverSim.Viewer.Core
     #endregion
 
     #region LLUDP Server
-    public partial class LLUDPServer : IDisposable, ILLUDPServer
+    public partial class UDPCircuitsManager : IDisposable, ILLUDPServer
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("LLUDP SERVER");
+        private static readonly ILog m_Log = LogManager.GetLogger("UDP CIRCUITS MANAGER");
         IPAddress m_BindAddress;
         int m_BindPort;
         Socket m_UdpSocket;
@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Core
         IMServiceInterface m_IMService;
         ChatServiceInterface m_ChatService;
         BlockingQueue<IScriptEvent> m_ChatQueue = new BlockingQueue<IScriptEvent>();
-        RwLockedDictionary<UUID, LLAgent> m_Agents = new RwLockedDictionary<UUID, LLAgent>();
+        RwLockedDictionary<UUID, ViewerAgent> m_Agents = new RwLockedDictionary<UUID, ViewerAgent>();
         Thread m_ChatThread;
         private object m_UseCircuitCodeProcessingLock = new object();
         
@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Core
         public bool LogAssetFailures = false;
         public bool LogTransferPacket = false;
 
-        public LLUDPServer(IPAddress bindAddress, int port, IMServiceInterface imService, ChatServiceInterface chatService, SceneInterface scene)
+        public UDPCircuitsManager(IPAddress bindAddress, int port, IMServiceInterface imService, ChatServiceInterface chatService, SceneInterface scene)
         {
             Scene = scene;
             m_IMService = imService;
@@ -423,7 +423,7 @@ namespace SilverSim.Viewer.Core
         {
             try
             {
-                LLAgent agent = m_Agents[agentID];
+                ViewerAgent agent = m_Agents[agentID];
                 agent.Circuits[Scene.ID].SendMessage(m);
             }
             catch

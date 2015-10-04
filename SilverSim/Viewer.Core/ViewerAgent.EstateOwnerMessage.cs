@@ -14,7 +14,7 @@ using System.Text;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class LLAgent
+    public partial class ViewerAgent
     {
         byte[] StringToBytes(string s)
         {
