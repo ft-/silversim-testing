@@ -162,7 +162,10 @@ namespace SilverSim.LL.Core.Capabilities
                 }
             }
 
-            part.UpdateMedia(media, m_Agent.ID);
+            if (part.CheckPermissions(m_Agent, part.ObjectGroup.Group, Types.Inventory.InventoryPermissionsMask.Modify))
+            {
+                part.UpdateMedia(media, m_Agent.ID);
+            }
 
             resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
             resp.ContentType = "text/plain";
