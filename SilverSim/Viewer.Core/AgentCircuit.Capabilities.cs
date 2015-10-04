@@ -349,7 +349,8 @@ namespace SilverSim.Viewer.Core
                 return capability;
             }, capConfig);
             //AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, delegate(LLAgent agent) { return new Capabilities.ParcelNavigateMedia(agent.Owner, Scene); }, capConfig);
-            //AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, delegate(LLAgent agent) { return new Capabilities.ObjectMediaNavigate(agent.Owner, Scene); }, capConfig);
+            AddDefCapabilityFactory("ObjectMedia", regionSeedID, delegate(LLAgent agent) { return new Capabilities.ObjectMedia(agent.Owner, Scene); }, capConfig);
+            AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, delegate(LLAgent agent) { return new Capabilities.ObjectMediaNavigate(agent.Owner, Scene); }, capConfig);
         }
         #endregion
     }
