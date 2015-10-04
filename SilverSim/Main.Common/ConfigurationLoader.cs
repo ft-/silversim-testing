@@ -88,6 +88,33 @@ namespace SilverSim.Main.Common
         private RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
         private ManualResetEvent m_ShutdownEvent;
         static readonly Dictionary<Type, string> m_FeaturesTable = new Dictionary<Type, string>();
+        private RwLockedDictionary<string, string> m_HeloResponseHeaders = new RwLockedDictionary<string, string>();
+
+        public void SetHeloResponseHeader(string key, string val)
+        {
+            m_HeloResponseHeaders[key] = val;
+        }
+
+        public void HeloResponseHandler(HttpRequest req)
+        {
+            if(req.Method != "GET" && req.Method != "HEAD")
+            {
+                req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                return;
+            }
+
+            HttpResponse res = req.BeginResponse();
+            res.ContentType = "text/plain";
+            foreach(KeyValuePair<string, string> kvp in m_HeloResponseHeaders)
+            {
+                res.Headers.Add(kvp.Key, kvp.Value);
+            }
+            if (SceneManager.Scenes.Count != 0)
+            {
+                res.Headers["X-UDP-InterSim"] = "supported";
+            }
+            res.Close();
+        }
 
         static ConfigurationLoader()
         {
@@ -806,6 +833,15 @@ namespace SilverSim.Main.Common
                 m_Log.Info("configured log4net using defaults");
             }
 
+            IConfig heloConfig = m_Config.Configs["Helo.Headers"];
+            if(null != heloConfig)
+            {
+                foreach (string key in heloConfig.GetKeys())
+                {
+                    SetHeloResponseHeader(key, heloConfig.GetString(key));
+                }
+            }
+
             IConfig consoleConfig = m_Config.Configs["Console"];
             string consoleTitle = string.Empty;
             if(null != consoleConfig)
@@ -863,10 +899,14 @@ namespace SilverSim.Main.Common
                 throw new ConfigurationError();
             }
 
-            PluginInstances.Add("HttpServer", new BaseHttpServer(httpConfig));
+            BaseHttpServer httpServer;
+
+            PluginInstances.Add("HttpServer", httpServer = new BaseHttpServer(httpConfig));
             PluginInstances.Add("XmlRpcServer", new HttpXmlRpcHandler());
             PluginInstances.Add("JSON2.0RpcServer", new HttpJson20RpcHandler());
             PluginInstances.Add("CapsRedirector", new CapsHttpRedirector());
+
+            httpServer.UriHandlers.Add("/helo", HeloResponseHandler);
 
             m_Log.Info("Initing extra modules");
             foreach (IPlugin instance in PluginInstances.Values)
