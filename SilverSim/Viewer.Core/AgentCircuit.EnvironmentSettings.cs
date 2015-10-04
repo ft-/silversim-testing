@@ -105,7 +105,21 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            EnvironmentPostResponse(httpreq, UUID.Zero, false, "Setting not yet supported");
+            if (Scene.IsEstateManager(Agent.Owner) || (Agent.IsActiveGod && Agent.IsInScene(Scene)))
+            {
+                try
+                {
+                    Scene.EnvironmentSettings = envsettings;
+                    EnvironmentPostResponse(httpreq, UUID.Zero, true, "");
+                    /* reading back EnvironmentSettings happens by RegionInfo UDP message */
+                    /* Viewer triggers that by updating RegionInfo through UDP message */
+                    return;
+                }
+                catch
+                {
+                }
+            }
+            EnvironmentPostResponse(httpreq, UUID.Zero, false, "Insufficient estate permissions, settings has not been saved.");
         }
     }
 }
