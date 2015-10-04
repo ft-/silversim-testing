@@ -49,9 +49,9 @@ namespace SilverSim.LL.Core
         private UUID m_CurrentSceneID;
         #endregion
 
-        readonly List<AgentChildInfo> m_ActiveChilds = new List<AgentChildInfo>();
+        readonly Dictionary<UUID, AgentChildInfo> m_ActiveChilds = new Dictionary<UUID, AgentChildInfo>();
 
-        public List<AgentChildInfo> ActiveChilds
+        public Dictionary<UUID, AgentChildInfo> ActiveChilds
         {
             get
             {

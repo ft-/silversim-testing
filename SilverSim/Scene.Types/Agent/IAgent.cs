@@ -41,7 +41,7 @@ namespace SilverSim.Scene.Types.Agent
 
         List<GridType> SupportedGridTypes { get; }
 
-        List<AgentChildInfo> ActiveChilds { get; }
+        Dictionary<UUID, AgentChildInfo> ActiveChilds { get; }
 
         bool IMSend(GridInstantMessage im);
 
