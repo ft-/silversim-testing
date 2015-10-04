@@ -1,17 +1,14 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Types;
 using SilverSim.Types.Account;
-using SilverSim.Types.Grid;
 using SilverSim.Types.Agent;
-using System.IO;
-using SilverSim.StructuredData.JSON;
 using SilverSim.Types.Asset.Format;
+using SilverSim.Types.Grid;
+using System;
+using System.Collections.Generic;
+using System.IO;
 using ThreadedClasses;
 
 namespace SilverSim.StructuredData.Agent

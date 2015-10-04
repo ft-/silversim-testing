@@ -26,7 +26,6 @@ using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
 using SilverSim.Types.Account;
-using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Types.Parcel;
