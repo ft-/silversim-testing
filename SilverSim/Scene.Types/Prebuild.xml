@@ -16,9 +16,9 @@
 	<Reference name="System"/>
 	<Reference name="System.Core"/>
 	<Reference name="System.Xml"/>
-  <Reference name="System.Drawing"/>
-  <Reference name="CSJ2K" path="../../bin/" localCopy="false"/>
-	<Reference name="SilverSim.LL.Messages" localCopy="false"/>
+	<Reference name="System.Drawing"/>
+	<Reference name="CSJ2K" path="../../bin/" localCopy="false"/>
+	<Reference name="SilverSim.Viewer.Messages" localCopy="false"/>
 	<Reference name="SilverSim.Types" localCopy="false"/>
 	<Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
 	<Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>

@@ -23,8 +23,8 @@
 	<Reference name="SilverSim.Scene.Management" localCopy="false"/>
 	<Reference name="SilverSim.Main.Common" localCopy="false"/>
 	<Reference name="SilverSim.Scripting.Common" localCopy="false"/>
-	<Reference name="SilverSim.LL.Core" localCopy="false"/>
-	<Reference name="SilverSim.LL.Messages" localCopy="false"/>
+	<Reference name="SilverSim.Viewer.Core" localCopy="false"/>
+	<Reference name="SilverSim.Viewer.Messages" localCopy="false"/>
 		<Reference name="Nini" path="../../bin/" localCopy="false"/>
 	<Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
 	<Files>

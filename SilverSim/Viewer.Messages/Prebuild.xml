@@ -1,5 +1,5 @@
 <?xml version="1.0"?>
-<Project frameworkVersion="v4_0" name="SilverSim.LL.Messages" path="SilverSim/LL.Messages" type="Library">
+<Project frameworkVersion="v4_0" name="SilverSim.Viewer.Messages" path="SilverSim/Viewer.Messages" type="Library">
 	<Configuration name="Release">
 		<Options>
 			<OutputPath>../../bin/</OutputPath>

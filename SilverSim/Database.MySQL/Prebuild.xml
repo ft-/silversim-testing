@@ -20,7 +20,7 @@
 	<Reference name="SilverSim.ServiceInterfaces" localCopy="false"/>
 	<Reference name="SilverSim.Scene.Types" localCopy="false"/>
 	<Reference name="SilverSim.Scene.ServiceInterfaces" localCopy="false"/>
-	<Reference name="SilverSim.LL.Messages" localCopy="false"/>
+	<Reference name="SilverSim.Viewer.Messages" localCopy="false"/>
 	<Reference name="SilverSim.Main.Common" localCopy="false"/>
 	<Reference name="MySql.Data" path="../../bin/" localCopy="false"/>
 	<Reference name="ThreadedClasses" path="../../bin/" localCopy="false"/>
