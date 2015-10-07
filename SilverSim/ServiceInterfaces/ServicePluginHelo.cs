@@ -1,6 +1,9 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Http.Client;
+using System.Collections.Generic;
+using System.IO;
 using System.Net;
 
 namespace SilverSim.ServiceInterfaces
@@ -28,17 +31,22 @@ namespace SilverSim.ServiceInterfaces
                 uri = uri.TrimEnd('/') + "/helo/";
             }
 
+            Dictionary<string, string> headers = new Dictionary<string,string>();
             try
             {
-                WebRequest req = HttpWebRequest.Create(uri);
-                using (WebResponse response = req.GetResponse())
+                using (Stream responseStream = HttpRequestHandler.DoStreamRequest("HEAD", uri, null, "", "", false, 20000, headers))
                 {
-                    if (response.Headers.Get("X-Handlers-Provided") == null)
+                    using (StreamReader reader = new StreamReader(responseStream))
                     {
-                        return "opensim-robust"; /* let us assume Robust API */
+                        string ign = reader.ReadToEnd();
                     }
-                    return response.Headers.Get("X-Handlers-Provided");
                 }
+
+                if (!headers.ContainsKey("X-Handlers-Provided"))
+                {
+                    return "opensim-robust"; /* let us assume Robust API */
+                }
+                return headers["X-Handlers-Provided"];
             }
             catch
             {
