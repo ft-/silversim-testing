@@ -10,7 +10,7 @@ namespace SilverSim.ServiceInterfaces.Asset
     public abstract class AssetServiceInterface
     {
         #region Exists methods
-        public abstract void exists(UUID key);
+        public abstract bool exists(UUID key);
         public abstract Dictionary<UUID, bool> exists(List<UUID> assets);
         #endregion
 

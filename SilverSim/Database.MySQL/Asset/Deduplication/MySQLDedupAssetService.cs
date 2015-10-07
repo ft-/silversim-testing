@@ -46,7 +46,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #endregion
 
         #region Exists methods
-        public override void exists(UUID key)
+        public override bool exists(UUID key)
         {
             using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
@@ -72,12 +72,12 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                     }
                                 }
                             }
-                            return;
+                            return true;
                         }
                     }
                 }
             }
-            throw new AssetNotFound(key);
+            return false;
         }
 
         public override Dictionary<UUID, bool> exists(List<UUID> assets)

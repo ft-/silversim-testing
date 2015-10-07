@@ -241,23 +241,17 @@ namespace SilverSim.Scene.Types.Scene
                 return asset1;
             }
 
-            public override void exists(UUID key)
+            public override bool exists(UUID key)
             {
-                try
+                if(m_Scene.TemporaryAssetService.exists(key))
                 {
-                    m_Scene.TemporaryAssetService.exists(key);
+                    return true;
                 }
-                catch
+                if(m_Scene.PersistentAssetService.exists(key))
                 {
-                    try
-                    {
-                        m_Scene.PersistentAssetService.exists(key);
-                    }
-                    catch
-                    {
-                        ResourceAssets.exists(key);
-                    }
+                    return true;
                 }
+                return ResourceAssets.exists(key);
             }
 
             public override void Store(AssetData asset)

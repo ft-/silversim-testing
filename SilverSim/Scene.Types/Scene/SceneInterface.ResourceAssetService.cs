@@ -39,6 +39,12 @@ namespace SilverSim.Scene.Types.Scene
                     }
                 });
             }
+
+            public bool exists(UUID key)
+            {
+                string resourcename = "SilverSim.Scene.Types.Resources.Assets." + key + ".gz";
+                return m_Resources.Contains(resourcename);
+            }
         }
 
         private class ResourceAssetMetadataService : AssetMetadataServiceInterface
@@ -145,22 +151,14 @@ namespace SilverSim.Scene.Types.Scene
                 Dictionary<UUID, bool> asset1 = new Dictionary<UUID, bool>();
                 foreach (UUID key in assets)
                 {
-                    try
-                    {
-                        AssetData ad = m_ResourceAssets.getAsset(key);
-                        asset1[key] = true;
-                    }
-                    catch
-                    {
-                        asset1[key] = false;
-                    }
+                    asset1[key] = m_ResourceAssets.exists(key);
                 }
                 return asset1;
             }
 
-            public override void exists(UUID key)
+            public override bool exists(UUID key)
             {
-                AssetData ad = m_ResourceAssets.getAsset(key);
+                return m_ResourceAssets.exists(key);
             }
 
             public override void Store(AssetData asset)
