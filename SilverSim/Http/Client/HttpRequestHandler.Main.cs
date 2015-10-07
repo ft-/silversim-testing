@@ -137,6 +137,10 @@ namespace SilverSim.Http.Client
 
                 reqdata += "Expect: 100-continue\r\n";
             }
+            if (!SupportsPipelining)
+            {
+                reqdata += "Connection: close\r\n";
+            }
 
 #if DEBUG
             /* disable gzip encoding for debugging */

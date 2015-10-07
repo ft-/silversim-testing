@@ -12,6 +12,12 @@ namespace SilverSim.Http.Client
 {
     public static partial class HttpRequestHandler
     {
+#if SUPPORT_PIPELINING
+        public const bool SupportsPipelining = true;
+#else
+        public const bool SupportsPipelining = false;
+#endif
+
         struct StreamInfo
         {
             public int ValidUntil;
