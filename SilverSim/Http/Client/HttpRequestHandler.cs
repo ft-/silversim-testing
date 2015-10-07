@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Web;
 
-namespace SilverSim.Main.Common.HttpClient
+namespace SilverSim.Http.Client
 {
     public static partial class HttpRequestHandler
     {

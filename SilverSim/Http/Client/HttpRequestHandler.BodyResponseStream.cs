@@ -1,11 +1,10 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Main.Common.Http;
 using System;
 using System.IO;
 
-namespace SilverSim.Main.Common.HttpClient
+namespace SilverSim.Http.Client
 {
     public static partial class HttpRequestHandler
     {

@@ -5,7 +5,7 @@ using System;
 using System.IO;
 using System.Text;
 
-namespace SilverSim.Main.Common.Http
+namespace SilverSim.Http
 {
     public class HttpWriteChunkedBodyStream : Stream
     {

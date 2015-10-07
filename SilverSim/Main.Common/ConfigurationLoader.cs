@@ -5,7 +5,7 @@ using log4net;
 using log4net.Config;
 using Nini.Config;
 using SilverSim.Main.Common.Caps;
-using SilverSim.Main.Common.HttpClient;
+using SilverSim.Http.Client;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;

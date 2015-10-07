@@ -3,13 +3,11 @@
 
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 
-namespace SilverSim.Main.Common.Http
+namespace SilverSim.Http
 {
     public class HttpStream : AbstractHttpStream
     {

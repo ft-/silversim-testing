@@ -1,7 +1,6 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Main.Common.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -9,7 +8,7 @@ using System.IO.Compression;
 using System.Text;
 using System.Web;
 
-namespace SilverSim.Main.Common.HttpClient
+namespace SilverSim.Http.Client
 {
     public static partial class HttpRequestHandler
     {
@@ -202,7 +201,7 @@ namespace SilverSim.Main.Common.HttpClient
                     }
                     s.ReadTimeout = timeoutms;
                 }
-                catch(SilverSim.Main.Common.Http.HttpStream.TimeoutException)
+                catch(HttpStream.TimeoutException)
                 {
 
                 }

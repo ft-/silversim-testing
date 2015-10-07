@@ -7,7 +7,7 @@ using System.IO;
 using System.Net;
 using System.IO.Compression;
 using System.Text;
-using SilverSim.Main.Common.Http;
+using SilverSim.Http;
 
 namespace SilverSim.Main.Common.HttpServer
 {

@@ -3,18 +3,12 @@
 
 //#define SUPPORT_PIPELINING
 
-using SilverSim.Main.Common.Http;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net.Security;
 using System.Net.Sockets;
-using System.Text;
 using System.Timers;
 using ThreadedClasses;
 
-namespace SilverSim.Main.Common.HttpClient
+namespace SilverSim.Http.Client
 {
     public static partial class HttpRequestHandler
     {

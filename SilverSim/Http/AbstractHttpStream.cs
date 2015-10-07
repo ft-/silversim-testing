@@ -4,7 +4,7 @@
 using System;
 using System.IO;
 
-namespace SilverSim.Main.Common.Http
+namespace SilverSim.Http
 {
     public class HttpHeaderFormatException : Exception
     {

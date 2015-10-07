@@ -4,7 +4,7 @@
 using System;
 using System.IO;
 
-namespace SilverSim.Main.Common.HttpClient
+namespace SilverSim.Http.Client
 {
     public static partial class HttpRequestHandler
     {

@@ -3,7 +3,7 @@
 
 using log4net;
 using Nini.Config;
-using SilverSim.Main.Common.Http;
+using SilverSim.Http;
 using System;
 using System.Collections.Generic;
 using System.IO;
