@@ -431,6 +431,19 @@ namespace SilverSim.Viewer.Core
 
             }
         }
+
+        public ICircuit UseSimCircuit(IPEndPoint ep, UUID sessionID, SceneInterface thisScene, UUID remoteSceneID, uint circuitcode, GridVector remoteLocation, Vector3 remoteOffset)
+        {
+            SimCircuit circuit = new SimCircuit(this, circuitcode, remoteSceneID, sessionID, remoteLocation, remoteOffset);
+            circuit.Scene = thisScene;
+            AddCircuit(circuit);
+            Messages.Circuit.UseCircuitCode useCircuitCode = new Messages.Circuit.UseCircuitCode();
+            useCircuitCode.SessionID = sessionID;
+            useCircuitCode.AgentID = thisScene.ID;
+            useCircuitCode.CircuitCode = circuitcode;
+            circuit.SendMessage(useCircuitCode);
+            return circuit;
+        }
     }
     #endregion
 }

@@ -9,7 +9,7 @@ namespace SilverSim.Viewer.Messages.Circuit
     [UDPMessage(MessageType.UseCircuitCode)]
     [Reliable]
     [NotTrusted]
-    class UseCircuitCode : Message
+    public class UseCircuitCode : Message
     {
         public UInt32 CircuitCode = 0;
         public UUID SessionID = UUID.Zero;
@@ -27,6 +27,14 @@ namespace SilverSim.Viewer.Messages.Circuit
             m.SessionID = p.ReadUUID();
             m.AgentID = p.ReadUUID();
             return m;
+        }
+
+        public override void Serialize(UDPPacket p)
+        {
+            p.WriteMessageType(MessageType.UseCircuitCode);
+            p.WriteUInt32(CircuitCode);
+            p.WriteUUID(SessionID);
+            p.WriteUUID(AgentID);
         }
     }
 }

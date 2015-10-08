@@ -6,10 +6,11 @@ using System.Collections.Generic;
 using System.Net;
 using System.Threading;
 using ThreadedClasses;
+using SilverSim.Scene.Types.Scene;
 
 namespace SilverSim.Viewer.Core
 {
-    public abstract partial class Circuit : IDisposable
+    public abstract partial class Circuit : IDisposable, ICircuit
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL CIRCUIT");
         public UInt32 CircuitCode { get; private set; }
