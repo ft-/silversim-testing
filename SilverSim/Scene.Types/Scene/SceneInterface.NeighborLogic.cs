@@ -15,7 +15,7 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
-        public struct LocalNeighborEntry
+        public struct NeighborEntry
         {
             /* <summary>RemoteOffset = RemoteGlobalPosition - LocalGlobalPosition</summary> */
             [Description("RemoteOffset = RemoteGlobalPosition - LocalGlobalPosition")]
@@ -24,18 +24,45 @@ namespace SilverSim.Scene.Types.Scene
             public RegionInfo RemoteRegionData;
         }
 
-        public readonly Dictionary<UUID, LocalNeighborEntry> Neighbors = new Dictionary<UUID, LocalNeighborEntry>();
+        public readonly Dictionary<UUID, NeighborEntry> Neighbors = new Dictionary<UUID, NeighborEntry>();
 
         public delegate bool TryGetSceneDelegate(UUID id, out SceneInterface scene);
         public TryGetSceneDelegate TryGetScene = null;
 
+        public void ChatPassInbound(UUID fromRegionID, ListenEvent ev)
+        {
+            bool chatPassInboundDefault = true;
+            if (null != ServerParamService)
+            {
+                chatPassInboundDefault = ServerParamService.GetBoolean(ID, "ChatPassInEnable", true);
+                chatPassInboundDefault = ServerParamService.GetBoolean(fromRegionID, "ChatPassInEnable", chatPassInboundDefault);
+            }
+            if(chatPassInboundDefault)
+            {
+                SendChatPass(ev);
+            }
+        }
+
         protected void ChatPassLocalNeighbors(ListenEvent le)
         {
-            foreach (KeyValuePair<UUID, LocalNeighborEntry> kvp in Neighbors)
+            bool chatPassDefault = true;
+            if (null != ServerParamService)
             {
-#warning Implement ChatPass rights system
+                chatPassDefault = ServerParamService.GetBoolean(ID, "ChatPassOutEnable", true);
+            }
+            foreach (KeyValuePair<UUID, NeighborEntry> kvp in Neighbors)
+            {
                 SceneInterface remoteScene;
                 TryGetSceneDelegate m_TryGetScene = TryGetScene;
+                if(null == ServerParamService)
+                {
+
+                }
+                else if(!ServerParamService.GetBoolean(kvp.Key, "ChatPassOutEnable", chatPassDefault))
+                {
+                    continue;
+                }
+
                 if(null != kvp.Value.RemoteCircuit)
                 {
                     Vector3 newPosition = le.GlobalPosition + kvp.Value.RemoteOffset;;
@@ -99,7 +126,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 if(!Neighbors.ContainsKey(rinfo.ID))
                 {
-                    LocalNeighborEntry lne = new LocalNeighborEntry();
+                    NeighborEntry lne = new NeighborEntry();
                     lne.RemoteOffset = rinfo.Location - RegionData.Location;
                     lne.RemoteRegionData = rinfo;
                     Neighbors[rinfo.ID] = lne;

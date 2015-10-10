@@ -100,7 +100,7 @@ namespace SilverSim.Viewer.Core
                         if (scene != null)
                         {
                             ev.OriginSceneID = scene.ID;
-                            Server.RouteChat(ev);
+                            scene.ChatPassInbound(RemoteSceneID, ev);
                         }
                     }
                     break;
