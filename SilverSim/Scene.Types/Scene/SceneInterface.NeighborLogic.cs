@@ -10,12 +10,13 @@ using SilverSim.StructuredData.LLSD;
 using System.ComponentModel;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Viewer.Messages.Chat;
+using System.Net;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
-        public struct NeighborEntry
+        public class NeighborEntry
         {
             /* <summary>RemoteOffset = RemoteGlobalPosition - LocalGlobalPosition</summary> */
             [Description("RemoteOffset = RemoteGlobalPosition - LocalGlobalPosition")]
@@ -36,6 +37,8 @@ namespace SilverSim.Scene.Types.Scene
             {
                 chatPassInboundDefault = ServerParamService.GetBoolean(ID, "ChatPassInEnable", true);
                 chatPassInboundDefault = ServerParamService.GetBoolean(fromRegionID, "ChatPassInEnable", chatPassInboundDefault);
+                chatPassInboundDefault = ServerParamService.GetBoolean(ID, "ChatPassInEnable_" + ev.ID.ToString(), chatPassInboundDefault);
+                chatPassInboundDefault = ServerParamService.GetBoolean(fromRegionID, "ChatPassInEnable_" + ev.ID.ToString(), chatPassInboundDefault);
             }
             if(chatPassInboundDefault)
             {
@@ -58,9 +61,17 @@ namespace SilverSim.Scene.Types.Scene
                 {
 
                 }
-                else if(!ServerParamService.GetBoolean(kvp.Key, "ChatPassOutEnable", chatPassDefault))
+                else
                 {
-                    continue;
+                    bool chatPass;
+                    chatPass = ServerParamService.GetBoolean(kvp.Key, "ChatPassOutEnable", chatPassDefault);
+                    chatPass = ServerParamService.GetBoolean(ID, "ChatPassOutEnable_" + le.ID.ToString(), chatPass);
+                    chatPass = ServerParamService.GetBoolean(kvp.Key, "ChatPassOutEnable_" + le.ID.ToString(), chatPass);
+
+                    if (!chatPass)
+                    {
+                        continue;
+                    }
                 }
 
                 if(null != kvp.Value.RemoteCircuit)
@@ -169,6 +180,10 @@ namespace SilverSim.Scene.Types.Scene
                 reqdata = ms.GetBuffer();
             }
 
+            /* try DNS lookup before triggering add circuit code */
+            IPAddress[] addresses = Dns.GetHostAddresses(destinationInfo.ServerIP);
+            IPEndPoint ep = new IPEndPoint(addresses[0], (int)destinationInfo.ServerPort);
+
             IValue iv = LLSD_XML.Deserialize(
                 HttpRequestHandler.DoStreamRequest(
                 "POST", 
@@ -187,6 +202,15 @@ namespace SilverSim.Scene.Types.Scene
             Map resmap = (Map)iv;
             circuitCode = resmap["circuit_code"].AsUInt;
             sessionID = resmap["session_id"].AsUUID;
+            ICircuit simCircuit = UDPServer.UseSimCircuit(
+                ep, 
+                sessionID, 
+                this, 
+                destinationInfo.ID, 
+                circuitCode, 
+                destinationInfo.Location, 
+                destinationInfo.Location - RegionData.Location);
+            Neighbors[destinationInfo.ID].RemoteCircuit = simCircuit;
         }
     }
 }
