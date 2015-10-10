@@ -36,6 +36,7 @@ using System.Net;
 using System.Threading;
 using ThreadedClasses;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Scene.Management.Scene;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -342,6 +343,9 @@ namespace SilverSim.Scene.Implementation.Basic
             Dictionary<string, string> capabilitiesConfig)
         : base(ri.Size.X, ri.Size.Y)
         {
+            /* next line is there to break the circular dependencies */
+            TryGetScene = SceneManager.Scenes.TryGetValue;
+
             m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
             GroupsNameService = groupsNameService;
             GroupsService = groupsService;
