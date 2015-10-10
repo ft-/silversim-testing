@@ -134,7 +134,7 @@ namespace SilverSim.Viewer.Core
         {
             GridVector thisRegionPos = Scene.GridPosition;
             GridVector rootAgentRegionPos = Agent.GetRootAgentGridPosition(thisRegionPos);
-            GridVector diff = rootAgentRegionPos - thisRegionPos;
+            Vector3 diff = rootAgentRegionPos - thisRegionPos;
             Vector3 agentPos = Agent.GlobalPosition;
             agentPos.X += diff.X;
             agentPos.Y += diff.Y;

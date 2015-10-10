@@ -35,6 +35,7 @@ using System.Linq;
 using System.Net;
 using System.Threading;
 using ThreadedClasses;
+using SilverSim.Scene.Types.Script.Events;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -308,6 +309,15 @@ namespace SilverSim.Scene.Implementation.Basic
             else
             {
                 return base.GetService<T>();
+            }
+        }
+
+        protected virtual new void SendChatPass(ListenEvent le)
+        {
+            ChatServiceInterface chatService = m_ChatService;
+            if (null != chatService)
+            {
+                chatService.Send(le);
             }
         }
 

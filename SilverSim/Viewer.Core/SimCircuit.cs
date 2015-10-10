@@ -26,9 +26,6 @@ namespace SilverSim.Viewer.Core
         /* <summary>RemoteOffset = RemoteGlobalPosition - LocalGlobalPosition</summary> */
         public Vector3 RemoteOffset { get; protected set; }
         SceneInterface m_Scene = null;
-        private object m_SceneSetLock = new object();
-        private ChatServiceInterface m_ChatService;
-        private ChatServiceInterface.Listener m_ChatListener;
 
         public SimCircuit(
             UDPCircuitsManager server,
@@ -207,72 +204,8 @@ namespace SilverSim.Viewer.Core
 
             set
             {
-                lock (m_SceneSetLock) /* scene change serialization */
-                {
-                    if (null != m_Scene)
-                    {
-                        if (m_ChatListener != null)
-                        {
-                            m_ChatListener.Remove();
-                            m_ChatListener = null;
-                        }
-                        m_ChatService = null;
-                    }
-                    m_Scene = value;
-                    if (null != m_Scene)
-                    {
-                        m_ChatService = m_Scene.GetService<ChatServiceInterface>();
-                        if (null != m_ChatService)
-                        {
-                            try
-                            {
-                                m_ChatListener = m_ChatService.AddChatPassListener(ChatListenerAction);
-                            }
-                            catch
-                            {
-                                m_ChatService = null;
-                            }
-                        }
-                    }
-                }
+                m_Scene = value;
             }
         }
-
-        #region Chat Listener
-        const int PUBLIC_CHANNEL = 0;
-        const int DEBUG_CHANNEL = 0x7FFFFFFF;
-
-        private void ChatListenerAction(ListenEvent le)
-        {
-            if(ListenEvent.ChatSourceType.Agent == le.SourceType ||
-                DEBUG_CHANNEL == le.Channel)
-            {
-                /* do not route agent communication or debug messages.
-                 * Agents have childs. 
-                 */
-                return;
-            }
-            SceneInterface scene = m_Scene;
-            if(null == scene)
-            {
-                return;
-            }
-            else if(le.OriginSceneID != UUID.Zero)
-            {
-                /* do not route routed messages */
-                return;
-            }
-            Messages.Chat.ChatPass cp = new Messages.Chat.ChatPass();
-            cp.ChatType = (Messages.Chat.ChatType)(byte)le.Type;
-            cp.Name = le.Name;
-            cp.Message = le.Message;
-            cp.Position = le.GlobalPosition + RemoteOffset;
-            cp.ID = le.ID;
-            cp.SourceType = (Messages.Chat.ChatSourceType)(byte)le.SourceType;
-            cp.OwnerID = le.OwnerID;
-            cp.Channel = le.Channel;
-            SendMessage(cp);
-        }
-        #endregion
     }
 }

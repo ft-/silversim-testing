@@ -7,11 +7,82 @@ using System.Collections.Generic;
 using System.IO;
 using SilverSim.Types;
 using SilverSim.StructuredData.LLSD;
+using System.ComponentModel;
+using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Viewer.Messages.Chat;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
+        public struct LocalNeighborEntry
+        {
+            /* <summary>RemoteOffset = RemoteGlobalPosition - LocalGlobalPosition</summary> */
+            [Description("RemoteOffset = RemoteGlobalPosition - LocalGlobalPosition")]
+            public Vector3 RemoteOffset;
+            public ICircuit RemoteCircuit;
+            public RegionInfo RemoteRegionData;
+        }
+
+        public readonly Dictionary<UUID, LocalNeighborEntry> Neighbors = new Dictionary<UUID, LocalNeighborEntry>();
+
+        public delegate bool TryGetSceneDelegate(UUID id, out SceneInterface scene);
+        public TryGetSceneDelegate TryGetScene = null;
+
+        protected void ChatPassLocalNeighbors(ListenEvent le)
+        {
+            foreach (KeyValuePair<UUID, LocalNeighborEntry> kvp in Neighbors)
+            {
+#warning Implement ChatPass rights system
+                SceneInterface remoteScene;
+                TryGetSceneDelegate m_TryGetScene = TryGetScene;
+                if(null != kvp.Value.RemoteCircuit)
+                {
+                    Vector3 newPosition = le.GlobalPosition + kvp.Value.RemoteOffset;;
+                    if (newPosition.X >= -le.Distance && 
+                        newPosition.Y >= -le.Distance &&
+                        newPosition.X <= kvp.Value.RemoteRegionData.Size.X + le.Distance &&
+                        newPosition.Y <= kvp.Value.RemoteRegionData.Size.Y + le.Distance)
+                    {
+                        ChatPass cp = new ChatPass();
+                        cp.ChatType = (ChatType)(byte)le.Type;
+                        cp.Name = le.Name;
+                        cp.Message = le.Message;
+                        cp.Position = newPosition;
+                        cp.ID = le.ID;
+                        cp.SourceType = (ChatSourceType)(byte)le.SourceType;
+                        cp.OwnerID = le.OwnerID;
+                        cp.Channel = le.Channel;
+                        kvp.Value.RemoteCircuit.SendMessage(cp);
+                    }
+                }
+                else if (null == m_TryGetScene)
+                {
+
+                }
+                else if (m_TryGetScene(kvp.Key, out remoteScene))
+                {
+                    Vector3 newPosition = le.GlobalPosition + kvp.Value.RemoteOffset;;
+                    if (newPosition.X >= -le.Distance &&
+                        newPosition.Y >= -le.Distance &&
+                        newPosition.X <= kvp.Value.RemoteRegionData.Size.X + le.Distance &&
+                        newPosition.Y <= kvp.Value.RemoteRegionData.Size.Y + le.Distance)
+                    {
+                        ListenEvent routedle = new ListenEvent(le);
+                        routedle.OriginSceneID = ID;
+                        routedle.GlobalPosition = newPosition;
+
+                        remoteScene.SendChatPass(routedle);
+                    }
+                }
+            }
+        }
+
+        protected virtual void SendChatPass(ListenEvent le)
+        {
+
+        }
+
         public virtual void NotifyNeighborOnline(RegionInfo rinfo)
         {
             VerifyNeighbor(rinfo);
@@ -19,14 +90,20 @@ namespace SilverSim.Scene.Types.Scene
 
         public virtual void NotifyNeighborOffline(RegionInfo rinfo)
         {
-
+            Neighbors.Remove(rinfo.ID);
         }
 
         void VerifyNeighbor(RegionInfo rinfo)
         {
             if(rinfo.ServerURI == RegionData.ServerURI)
             {
-                /* ignore same instance */
+                if(!Neighbors.ContainsKey(rinfo.ID))
+                {
+                    LocalNeighborEntry lne = new LocalNeighborEntry();
+                    lne.RemoteOffset = rinfo.Location - RegionData.Location;
+                    lne.RemoteRegionData = rinfo;
+                    Neighbors[rinfo.ID] = lne;
+                }
                 return;
             }
 

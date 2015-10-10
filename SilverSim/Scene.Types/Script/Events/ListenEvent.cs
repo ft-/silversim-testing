@@ -28,6 +28,9 @@ namespace SilverSim.Scene.Types.Script.Events
             Object = 2,
         }
 
+        public const int PUBLIC_CHANNEL = 0;
+        public const int DEBUG_CHANNEL = 0x7FFFFFFF;
+
         #region Extension Fields for Chat Router
         public Vector3 GlobalPosition;
         public UUID TargetID; /* SayTo when not UUID.Zero */
@@ -42,5 +45,22 @@ namespace SilverSim.Scene.Types.Script.Events
         public string Message;
         public int ButtonIndex;
         public UUID OriginSceneID; /* used for Origin when doing sim neighbor passing */
+        public double Distance;
+
+        public ListenEvent(ListenEvent le)
+        {
+            GlobalPosition = le.GlobalPosition;
+            TargetID = le.TargetID;
+            Type = le.Type;
+            SourceType = le.SourceType;
+            Channel = le.Channel;
+            Name = le.Name;
+            ID = le.ID;
+            OwnerID = le.OwnerID;
+            Message = le.Message;
+            ButtonIndex = le.ButtonIndex;
+            OriginSceneID = le.OriginSceneID;
+            Distance = le.Distance;
+        }
     }
 }

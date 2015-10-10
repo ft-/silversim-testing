@@ -13,7 +13,7 @@ namespace SilverSim.Scene.Chat
     class ChatHandler : ChatServiceInterface
     {
         private RwLockedDictionary<int, ChannelInfo> m_Channels = new RwLockedDictionary<int, ChannelInfo>();
-        private RwLockedList<Listener> m_ChannelPass = new RwLockedList<Listener>();
+        private RwLockedList<Listener> m_ChatPass = new RwLockedList<Listener>();
 
         #region Constructor
         public ChatHandler(double whisperDistance, double sayDistance, double shoutDistance)
@@ -31,8 +31,6 @@ namespace SilverSim.Scene.Chat
         #endregion
 
         #region Send Chat
-        const int DEBUG_CHANNEL = 0x7FFFFFFF;
-
         public override void Send(ListenEvent ev)
         {
             ChannelInfo ci;
@@ -40,17 +38,20 @@ namespace SilverSim.Scene.Chat
             {
                 ci.Send(ev);
             }
-            if(ev.Channel != DEBUG_CHANNEL)
+            if(ev.Channel != ListenEvent.DEBUG_CHANNEL)
             {
                 switch(ev.Type)
                 {
                     case ListenEvent.ChatType.Say:
+                        ev.Distance = SayDistance;
                         break;
 
                     case ListenEvent.ChatType.Shout:
+                        ev.Distance = ShoutDistance;
                         break;
 
                     case ListenEvent.ChatType.Whisper:
+                        ev.Distance = WhisperDistance;
                         break;
 
                     case ListenEvent.ChatType.Region:
@@ -59,9 +60,13 @@ namespace SilverSim.Scene.Chat
                     default:
                         return;
                 }
-                foreach(Listener li in m_ChannelPass)
+                if(ev.SourceType == ListenEvent.ChatSourceType.Object &&
+                    ev.OriginSceneID == UUID.Zero)
                 {
-                    li.Send(ev);
+                    foreach(Listener li in m_ChatPass)
+                    {
+                        li.Send(ev);
+                    }
                 }
             }
         }
@@ -157,7 +162,7 @@ namespace SilverSim.Scene.Chat
         public override Listener AddChatPassListener(Action<ListenEvent> send)
         {
             Listener li = new RegionListenerInfo(this, 0, "", UUID.Zero, "", GetPassListenerUUID, send);
-            m_ChannelPass.Add(li);
+            m_ChatPass.Add(li);
             return li;
         }
 
@@ -172,7 +177,7 @@ namespace SilverSim.Scene.Chat
                 channel.Listeners.Remove(listener);
                 m_Channels.RemoveIf(listener.Channel, delegate(ChannelInfo ch) { return ch.Listeners.Count == 0; });
             }
-            m_ChannelPass.Remove(listener);
+            m_ChatPass.Remove(listener);
         }
         #endregion
     }

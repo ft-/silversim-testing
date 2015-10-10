@@ -58,9 +58,9 @@ namespace SilverSim.Types
             return new GridVector(a.X + b.X, a.Y + b.Y);
         }
 
-        public static GridVector operator-(GridVector a, GridVector b)
+        public static Vector3 operator-(GridVector a, GridVector b)
         {
-            return new GridVector(a.X - b.X, a.Y - b.Y);
+            return new Vector3((double)a.X - (double)b.X, (double)a.Y - (double)b.Y, 0f);
         }
         public static implicit operator Vector3(GridVector v)
         {
