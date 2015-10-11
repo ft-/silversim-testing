@@ -132,7 +132,7 @@ namespace SilverSim.Viewer.Core
                 {
                     break;
                 }
-                else if(ev is ListenEvent)
+                else if(ev is ListenEvent && null != m_ChatService)
                 {
                     m_ChatService.Send((ListenEvent)ev);
                 }

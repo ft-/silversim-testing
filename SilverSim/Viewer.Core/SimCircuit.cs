@@ -17,7 +17,7 @@ namespace SilverSim.Viewer.Core
 {
     public class SimCircuit : Circuit
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("LL SIM CIRCUIT");
+        private static readonly ILog m_Log = LogManager.GetLogger("SIM CIRCUIT");
         private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder(true);
 
         public UUID RemoteSceneID { get; protected set; }
