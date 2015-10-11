@@ -93,7 +93,7 @@ namespace SilverSim.Viewer.Core
         }
 
         #region Receive logic
-        protected abstract void CheckForeNewDataToSend();
+        protected abstract void CheckForNewDataToSend();
         protected abstract void OnCircuitSpecificPacketReceived(MessageType mType, UDPPacket p);
         protected abstract void LogMsgOnLogoutCompletion();
 
@@ -158,7 +158,7 @@ namespace SilverSim.Viewer.Core
                     }
                     if (ackedObjects)
                     {
-                        CheckForeNewDataToSend();
+                        CheckForNewDataToSend();
                     }
 
                     lock (m_LogoutReplyLock)
@@ -258,7 +258,7 @@ namespace SilverSim.Viewer.Core
                     }
                     if (ackedObjects)
                     {
-                        CheckForeNewDataToSend();
+                        CheckForNewDataToSend();
                     }
 
                     lock (m_UnackedBytesLock)

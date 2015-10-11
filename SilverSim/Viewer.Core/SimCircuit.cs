@@ -47,7 +47,7 @@ namespace SilverSim.Viewer.Core
             Scene = null;
         }
 
-        protected override void CheckForeNewDataToSend()
+        protected override void CheckForNewDataToSend()
         {
         }
 

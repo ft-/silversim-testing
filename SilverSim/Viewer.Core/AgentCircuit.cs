@@ -693,7 +693,7 @@ namespace SilverSim.Viewer.Core
         }
 
         #region Receive Logic
-        protected override void CheckForeNewDataToSend()
+        protected override void CheckForNewDataToSend()
         {
             m_TxObjectQueue.Enqueue(null);
         }
