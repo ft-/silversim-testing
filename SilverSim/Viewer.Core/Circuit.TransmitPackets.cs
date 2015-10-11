@@ -104,9 +104,22 @@ namespace SilverSim.Viewer.Core
 
         protected abstract void SendSimStats(int dt);
 
+        public event Action OnTerminateCircuit;
+
         private void TerminateCircuit()
         {
             m_CircuitIsClosing = true;
+
+            /* events are not exactly thread-safe, so we have to take the value first */
+            var ev = OnTerminateCircuit;
+            if (null != ev)
+            {
+                foreach (Action d in ev.GetInvocationList())
+                {
+                    d.Invoke();
+                }
+            }
+
             lock (m_UnackedPacketsHash)
             {
                 foreach (UDPPacket unacked in m_UnackedPacketsHash.Values)

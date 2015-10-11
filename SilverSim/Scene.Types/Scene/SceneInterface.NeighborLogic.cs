@@ -1,15 +1,15 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Types.Grid;
 using SilverSim.Http.Client;
-using System.Collections.Generic;
-using System.IO;
-using SilverSim.Types;
-using SilverSim.StructuredData.LLSD;
-using System.ComponentModel;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.StructuredData.LLSD;
+using SilverSim.Types;
+using SilverSim.Types.Grid;
 using SilverSim.Viewer.Messages.Chat;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.IO;
 using System.Net;
 
 namespace SilverSim.Scene.Types.Scene
