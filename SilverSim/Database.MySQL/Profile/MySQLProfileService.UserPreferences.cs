@@ -50,7 +50,6 @@ namespace SilverSim.Database.MySQL.Profile
                             }
                         }
                     }
-                    throw new KeyNotFoundException();
                 }
                 set
                 {

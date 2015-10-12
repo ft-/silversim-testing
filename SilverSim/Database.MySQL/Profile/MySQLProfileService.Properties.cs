@@ -59,7 +59,6 @@ namespace SilverSim.Database.MySQL.Profile
                             }
                         }
                     }
-                    throw new KeyNotFoundException();
                 }
             }
             public ProfileProperties this[UUI user, PropertiesUpdateFlags flags]

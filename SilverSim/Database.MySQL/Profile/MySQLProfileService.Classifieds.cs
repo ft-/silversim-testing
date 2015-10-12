@@ -39,7 +39,6 @@ namespace SilverSim.Database.MySQL.Profile
                         }
                     }
                 }
-                throw new KeyNotFoundException();
             }
 
             public ProfileClassified this[UUI user, UUID id]
