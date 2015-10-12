@@ -22,10 +22,11 @@ namespace SilverSim.Main
             {
                 m_ConfigLoader = new ConfigurationLoader(args, m_ShutdownEvent);
             }
-            catch
+            catch(ConfigurationLoader.ConfigurationError
 #if DEBUG
-                (ConfigurationLoader.ConfigurationError e)
+                        e
 #endif
+                )
             {
 #if DEBUG
                 System.Console.Write(e.StackTrace.ToString());
