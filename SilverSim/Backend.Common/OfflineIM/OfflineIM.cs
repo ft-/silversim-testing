@@ -68,7 +68,10 @@ namespace SilverSim.Backend.Common.OfflineIM
             {
                 m_OfflineIMService.storeOfflineIM(im);
             }
-            catch(Exception e)
+            catch
+#if DEBUG
+                (Exception e)
+#endif
             {
 #if DEBUG
                 m_Log.Warn("Storing of IM failed", e);
