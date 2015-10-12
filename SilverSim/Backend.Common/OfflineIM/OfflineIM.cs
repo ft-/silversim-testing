@@ -16,7 +16,9 @@ namespace SilverSim.Backend.Common.OfflineIM
     #region Service implementation
     class OfflineIM : IPlugin, IPluginShutdown
     {
+#if DEBUG
         private static readonly ILog m_Log = LogManager.GetLogger("OFFLINE IM");
+#endif
         string m_AvatarNameServiceName;
         string m_OfflineIMServiceName;
 
