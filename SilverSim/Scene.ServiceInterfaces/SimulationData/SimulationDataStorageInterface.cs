@@ -14,7 +14,6 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
     public abstract class SimulationDataStorageInterface : ISceneListener
     {
-        private readonly ILog m_StorageLog = LogManager.GetLogger("STORAGE THREAD");
         #region Constructor
         public SimulationDataStorageInterface()
         {

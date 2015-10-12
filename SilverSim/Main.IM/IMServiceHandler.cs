@@ -18,7 +18,6 @@ namespace SilverSim.Main.IM
         protected internal BlockingQueue<GridInstantMessage> m_Queue = new BlockingQueue<GridInstantMessage>();
         protected internal RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
         private uint m_MaxThreads;
-        private static readonly ILog m_Log = LogManager.GetLogger("IM SERVICE");
 
         void IMSendThread(object s)
         {
@@ -78,7 +77,6 @@ namespace SilverSim.Main.IM
     [PluginName("IMService")]
     public class IMServiceHandlerFactory : IPluginFactory
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("IM SERVICE");
         public IMServiceHandlerFactory()
         {
 
