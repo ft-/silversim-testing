@@ -136,7 +136,6 @@ namespace SilverSim.Database.MySQL.Avatar
                     throw new ArgumentException("value and itemKeys must have identical Count");
                 }
 
-                List<string> result = new List<string>();
                 using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
@@ -161,7 +160,6 @@ namespace SilverSim.Database.MySQL.Avatar
         {
             get
             {
-                Dictionary<string, string> result = new Dictionary<string, string>();
                 using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();

@@ -48,7 +48,6 @@ namespace SilverSim.Database.MySQL.Estate
         {
             get
             {
-                List<UUID> regionList = new List<UUID>();
                 using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
