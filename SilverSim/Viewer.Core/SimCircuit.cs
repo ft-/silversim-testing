@@ -93,8 +93,8 @@ namespace SilverSim.Viewer.Core
                         ev.Name = pck.ReadStringLen8();
                         ev.SourceType = (ListenEvent.ChatSourceType)pck.ReadUInt8();
                         ev.Type = (ListenEvent.ChatType)pck.ReadUInt8();
-                        double radius = pck.ReadFloat();
-                        byte simAccess = pck.ReadUInt8();
+                        /* radius */ pck.ReadFloat();
+                        /* simaccess */ pck.ReadUInt8();
                         ev.Message = pck.ReadStringLen16();
                         SceneInterface scene = m_Scene;
                         if (scene != null)

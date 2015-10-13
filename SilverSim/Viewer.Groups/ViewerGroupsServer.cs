@@ -726,10 +726,9 @@ namespace SilverSim.Viewer.Groups
             }
             else
             {
-                GroupMember member = new GroupMember();
                 try
                 {
-                    GroupMember gmem = groupsService.Members.Add(agent.Owner, new UGI(req.GroupID), agent.Owner, UUID.Zero, "");
+                    groupsService.Members.Add(agent.Owner, new UGI(req.GroupID), agent.Owner, UUID.Zero, "");
                     reply.Success = true;
                 }
                 catch(Exception e)
@@ -1506,7 +1505,6 @@ namespace SilverSim.Viewer.Groups
                 gmems = new List<GroupMember>();
             }
 
-            Map membersmap = new Map();
             GroupInfo ginfo = groupsService.Groups[agent.Owner, group];
             List<GroupRolemember> ownerGroupRoleMembers = groupsService.Rolemembers[agent.Owner, group, ginfo.OwnerRoleID];
 

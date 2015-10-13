@@ -78,7 +78,6 @@ namespace SilverSim.Viewer.Economy
 
         void HandleEconomyDataRequest(AgentCircuit circuit, Message m)
         {
-            EconomyDataRequest mbr = (EconomyDataRequest)m;
             SceneInterface scene;
             ViewerAgent agent;
             try

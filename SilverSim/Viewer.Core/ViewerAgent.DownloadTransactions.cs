@@ -78,7 +78,6 @@ namespace SilverSim.Viewer.Core
                 }
 
                 SendXferPacket res = new SendXferPacket();
-                int remainingdatalen = tdata.Data.Length - tdata.Position;
                 res.Packet = ++tdata.Packet;
                 if (tdata.Data.Length > 1400)
                 {

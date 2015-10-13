@@ -716,9 +716,6 @@ namespace SilverSim.Viewer.TerrainEdit
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
-            double area = modify.Size;
-            double step = modify.Size / 4;
-
             for (int x = (int)data.West; x < (int)data.East; x++)
             {
                 for (int y = (int)data.South; y < (int)data.North; y++)

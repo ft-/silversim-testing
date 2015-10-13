@@ -238,7 +238,6 @@ namespace SilverSim.Viewer.Core
             ControlFlags knownScriptControls = TakenControls;
             ControlFlags edge = m_ActiveAgentControlFlags ^ au.ControlFlags;
             m_ActiveAgentControlFlags = au.ControlFlags;
-            ControlFlags scriptControlFlags = m_ActiveAgentControlFlags & knownScriptControls;
             DrawDistance = au.Far;
 
             if (m_ActiveAgentControlFlags.HasStandUp())
