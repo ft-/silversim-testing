@@ -375,7 +375,6 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
-            ParcelProperties res = new ParcelProperties();
             try
             {
                 ParcelInfo pinfo = Parcels[req.LocalID];

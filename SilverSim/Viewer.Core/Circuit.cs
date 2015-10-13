@@ -269,7 +269,7 @@ namespace SilverSim.Viewer.Core
 
                 case MessageType.StartPingCheck:
                     byte pingID = pck.ReadUInt8();
-                    UInt32 oldestUnacked = pck.ReadUInt32();
+                    pck.ReadUInt32();
 
                     UDPPacket newpck = new UDPPacket();
                     newpck.WriteMessageType(MessageType.CompletePingCheck);

@@ -216,9 +216,6 @@ namespace SilverSim.Scene.Types.Scene
                 m_Scene = scene;
                 m_SunData.SunDirection = new Vector3();
 
-                int xPatches = (int)scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                int yPatches = (int)scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-
                 m_WindData.ReaderWriterLock = new ReaderWriterLock();
 
                 m_WindData.PatchX = new LayerPatch();

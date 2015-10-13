@@ -1874,9 +1874,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "SculptEntry":
-                                {
-                                    bool sculpted = reader.ReadElementValueAsBoolean();
-                                }
+                                reader.ReadElementValueAsBoolean();
                                 break;
 
                             case "Media":

@@ -118,7 +118,6 @@ namespace SilverSim.Viewer.Core.Capabilities
         void UploadObject(UUID transactionID, AssetData data)
         {
             Map m = (Map)LLSD_XML.Deserialize(data.InputStream);
-            string assetName = data.Name;
             AnArray instance_list = (AnArray)m["instance_list"];
             AnArray mesh_list = (AnArray)m["mesh_list"];
             AnArray texture_list = (AnArray)m["texture_list"];

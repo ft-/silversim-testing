@@ -120,7 +120,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
 
                     string fname = "inventory_" + UUID.Random.ToString() + ".tmp";
-                    ulong xferid = agent.AddNewFile(fname, ms.GetBuffer());
+                    agent.AddNewFile(fname, ms.GetBuffer());
 
                     ReplyTaskInventory res = new ReplyTaskInventory();
                     res.Serial = (short)part.Inventory.InventorySerial;

@@ -152,7 +152,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     using (StreamReader reader = new StreamReader(responseStream))
                     {
-                        string ign = reader.ReadToEnd();
+                        reader.ReadToEnd();
                     }
                 }
             }

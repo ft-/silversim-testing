@@ -124,7 +124,6 @@ namespace SilverSim.Viewer.Core
             {
                 HttpResponse httpres;
                 Stream o;
-                List<KeyValuePair<int, int>> contentranges = new List<KeyValuePair<int, int>>();
 
                 string[] ranges = httpreq["Range"].Split(' ');
                 if(ranges.Length > 1)

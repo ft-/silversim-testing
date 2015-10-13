@@ -22,7 +22,6 @@ namespace SilverSim.Viewer.Core
             }
             else
             {
-                string utcstring = DateTime.Now.AddDays(1).ToUniversalTime().ToString("yyyy\\-MM\\-dd\\THH\\-mm\\-ss\\Z");
                 HttpResponse res = httpreq.BeginResponse();
                 res.ContentType = "application/llsd+xml";
                 Map m = new Map();
