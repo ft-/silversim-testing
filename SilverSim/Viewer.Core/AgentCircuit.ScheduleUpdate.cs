@@ -41,7 +41,6 @@ namespace SilverSim.Viewer.Core
             p.OutQueue = Message.QueueOutType.Object;
             p.Flush();
             p.SequenceNumber = NextSequenceNumber;
-            int savedDataLength = p.DataLength;
 
             Interlocked.Increment(ref m_PacketsSent);
             p.EnqueuedAtTime = Environment.TickCount;
