@@ -159,8 +159,6 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Physics Linkage
-        IPhysicsObject m_PhysicsActor = DummyPhysicsObject.SharedInstance;
-
         public RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
         {
             get
