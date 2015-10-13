@@ -37,7 +37,7 @@ namespace SilverSim.ServiceInterfaces
                 {
                     using (StreamReader reader = new StreamReader(responseStream))
                     {
-                        string ign = reader.ReadToEnd();
+                        reader.ReadToEnd();
                     }
                 }
 
