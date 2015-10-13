@@ -25,7 +25,6 @@ namespace SilverSim.Viewer.Core
 
         void Cap_EventQueueGet(HttpRequest httpreq)
         {
-            IValue iv;
             if (httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
@@ -34,7 +33,7 @@ namespace SilverSim.Viewer.Core
 
             try
             {
-                iv = LLSD_XML.Deserialize(httpreq.Body);
+                LLSD_XML.Deserialize(httpreq.Body);
             }
             catch (Exception e)
             {

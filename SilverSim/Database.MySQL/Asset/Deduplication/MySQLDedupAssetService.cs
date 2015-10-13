@@ -230,8 +230,6 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                     {
                         using (cmd)
                         {
-                            // create unix epoch time
-                            ulong now = Date.GetUnixTime();
                             cmd.Parameters.AddWithValue("?hash", sha1data);
                             cmd.Parameters.AddWithValue("?assetType", (int)asset.Type);
                             cmd.Parameters.AddWithValue("?data", asset.Data);
