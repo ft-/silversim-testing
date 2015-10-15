@@ -860,6 +860,15 @@ namespace SilverSim.Main.Common
             m_Log.InfoFormat("Runtime: {0} {1}", VersionInfo.RuntimeInformation, VersionInfo.MachineWidth);
             m_Log.InfoFormat("OS Version: {0}", Environment.OSVersion.ToString());
             m_Log.InfoFormat("CLR Runtime Version: {0}", Environment.Version);
+            Type type = Type.GetType("Mono.Runtime");
+            if (type != null)
+            {
+                MethodInfo displayName = type.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
+                if (displayName != null)
+                {
+                    m_Log.InfoFormat("Mono Version String: " + displayName.Invoke(null, null));
+                }
+            }
 
             m_Log.Info("Loading specified modules");
             LoadModules();
