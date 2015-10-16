@@ -784,7 +784,6 @@ namespace SilverSim.Main.Common
             CmdIO.CommandRegistry.ShowCommands.Add("memory", ShowMemoryCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("threadcount", ShowThreadCountCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
-            //CmdIO.CommandRegistry.ClearCommands.Add("parcels", Commands.ClearParcels.CmdHandler);
 
             while(m_Sources.Count != 0)
             {
@@ -936,6 +935,7 @@ namespace SilverSim.Main.Common
                 CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCommand);
                 CmdIO.CommandRegistry.ClearCommands.Add("region", Commands.ClearRegion.CmdHandler);
                 CmdIO.CommandRegistry.ClearCommands.Add("objects", Commands.ClearObjects.CmdHandler);
+                //CmdIO.CommandRegistry.ClearCommands.Add("parcels", Commands.ClearParcels.CmdHandler);
 
                 /* we have to bypass the circular issue we would get when trying to do it via using */
                 Assembly assembly = Assembly.Load("SilverSim.Viewer.Core");
