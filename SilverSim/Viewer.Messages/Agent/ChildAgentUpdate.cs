@@ -16,7 +16,7 @@ namespace SilverSim.Viewer.Messages.Agent
         public UUID RegionID;
         #endregion
 
-        public UInt64 RegionHandle;
+        public GridVector RegionLocation;
         public UInt32 ViewerCircuitCode;
         public UUID AgentID;
         public UUID SessionID;

@@ -1006,10 +1006,12 @@ namespace SilverSim.Viewer.Core
             {
                 m_EconomyService.Login(Owner, SessionID, m_SecureSessionID);
             }
+            OnPositionChange += ChildUpdateOnPositionChange;
         }
 
         ~ViewerAgent()
         {
+            OnPositionChange -= ChildUpdateOnPositionChange;
             lock (this)
             {
                 DetachAllAttachments();
@@ -1032,6 +1034,7 @@ namespace SilverSim.Viewer.Core
 
         public void Dispose()
         {
+            OnPositionChange -= ChildUpdateOnPositionChange;
             lock (this)
             {
                 DetachAllAttachments();

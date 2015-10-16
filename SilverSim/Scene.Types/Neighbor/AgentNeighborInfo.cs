@@ -9,6 +9,7 @@ namespace SilverSim.Scene.Types.Neighbor
     public struct AgentChildInfo
     {
         public IAgentTeleportServiceInterface TeleportService;
+        public IAgentChildUpdateServiceInterface ChildAgentUpdateService;
         public DestinationInfo DestinationInfo;
     }
 }

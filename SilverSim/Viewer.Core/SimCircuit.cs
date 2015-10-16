@@ -12,6 +12,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using SilverSim.Scene.Types.Agent;
+using SilverSim.Viewer.Messages.Agent;
 
 namespace SilverSim.Viewer.Core
 {
@@ -205,6 +207,39 @@ namespace SilverSim.Viewer.Core
             set
             {
                 m_Scene = value;
+            }
+        }
+
+        public class ChildAgentUpdater : IAgentChildUpdateServiceInterface
+        {
+            SimCircuit m_Circuit;
+            uint m_ViewerCircuitCode;
+
+            public ChildAgentUpdater(SimCircuit circuit, uint viewercircuitcode)
+            {
+                m_Circuit = circuit;
+                m_ViewerCircuitCode = viewercircuitcode;
+            }
+
+            public void SendMessage(ChildAgentPositionUpdate m)
+            {
+                m.ViewerCircuitCode = m_ViewerCircuitCode;
+                m.SessionID = m_Circuit.SessionID;
+                m.AgentID = m_Circuit.RemoteSceneID;
+                m_Circuit.SendMessage(m);
+            }
+
+            public void SendMessage(ChildAgentUpdate m)
+            {
+                m.ViewerCircuitCode = m_ViewerCircuitCode;
+                m.SessionID = m_Circuit.SessionID;
+                m.AgentID = m_Circuit.RemoteSceneID;
+                m_Circuit.SendMessage(m);
+            }
+
+            public void Disconnect()
+            {
+                /* not needed */
             }
         }
     }
