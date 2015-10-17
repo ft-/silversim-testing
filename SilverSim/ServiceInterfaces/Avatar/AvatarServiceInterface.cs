@@ -7,6 +7,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Avatar
 {
+    [Serializable]
     public class AvatarUpdateFailedException : Exception
     {
         public AvatarUpdateFailedException()

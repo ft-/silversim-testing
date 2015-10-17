@@ -39,6 +39,7 @@ namespace SilverSim.ServiceInterfaces.UserAgents
 
         public abstract UUI GetUUI(UUI user, UUI targetUserID);
 
+        [Serializable]
         public class RequestFailedException : Exception
         {
             public RequestFailedException()

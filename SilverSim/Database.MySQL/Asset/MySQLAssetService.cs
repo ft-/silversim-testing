@@ -168,7 +168,7 @@ namespace SilverSim.Database.MySQL.Asset
                         }
                     }
                 }
-                throw new AssetNotFound(key);
+                throw new AssetNotFoundException(key);
             }
         }
 
@@ -242,7 +242,7 @@ namespace SilverSim.Database.MySQL.Asset
                             cmd.Parameters.AddWithValue("?data", asset.Data);
                             if(1 > cmd.ExecuteNonQuery())
                             {
-                                throw new AssetStoreFailed(asset.ID);
+                                throw new AssetStoreFailedException(asset.ID);
                             }
                         }
                     }
@@ -252,7 +252,7 @@ namespace SilverSim.Database.MySQL.Asset
                             string.Format("MySQL failure creating asset {0} with name {1}.  Exception  ",
                                 asset.ID, asset.Name)
                             , e);
-                        throw new AssetStoreFailed(asset.ID);
+                        throw new AssetStoreFailedException(asset.ID);
                     }
                 }
             }
@@ -270,7 +270,7 @@ namespace SilverSim.Database.MySQL.Asset
                     cmd.Parameters.AddWithValue("?id", id.ToString());
                     if(cmd.ExecuteNonQuery() < 1)
                     {
-                        throw new AssetNotDeleted(id);
+                        throw new AssetNotDeletedException(id);
                     }
                 }
             }

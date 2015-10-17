@@ -20,6 +20,7 @@ namespace SilverSim.ServiceInterfaces.Authorization
             public AppearanceInfo AppearanceInfo;
         }
 
+        [Serializable]
         public class NotAuthorizedException : Exception
         {
             public NotAuthorizedException(string msg)

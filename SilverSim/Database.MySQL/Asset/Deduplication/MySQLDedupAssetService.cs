@@ -174,7 +174,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                         }
                     }
                 }
-                throw new AssetNotFound(key);
+                throw new AssetNotFoundException(key);
             }
         }
 
@@ -235,7 +235,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                             cmd.Parameters.AddWithValue("?data", asset.Data);
                             if (cmd.ExecuteNonQuery() < 1)
                             {
-                                throw new AssetStoreFailed(asset.ID);
+                                throw new AssetStoreFailedException(asset.ID);
                             }
                         }
                     }
@@ -271,13 +271,13 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                 cmd.Parameters.AddWithValue("?hash", sha1data);
                                 if (1 > cmd.ExecuteNonQuery())
                                 {
-                                    throw new AssetStoreFailed(asset.ID);
+                                    throw new AssetStoreFailedException(asset.ID);
                                 }
                             }
                         }
                         catch (Exception)
                         {
-                            throw new AssetStoreFailed(asset.ID);
+                            throw new AssetStoreFailedException(asset.ID);
                         }
                     }
                 });

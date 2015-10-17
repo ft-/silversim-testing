@@ -10,9 +10,13 @@ namespace SilverSim.ServiceInterfaces.Friends
 {
     public abstract class FriendsServiceInterface
     {
+        [Serializable]
         public class FriendUpdateFailedException : Exception
         {
+            public FriendUpdateFailedException()
+            {
 
+            }
         }
 
         public FriendsServiceInterface()

@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Grid
 {
+    [Serializable]
     public class GridRegionUpdateFailedException : Exception
     {
         public GridRegionUpdateFailedException()
@@ -21,6 +22,7 @@ namespace SilverSim.ServiceInterfaces.Grid
         }
     }
 
+    [Serializable]
     public class GridRegionNotFoundException : Exception
     {
         public GridRegionNotFoundException()
@@ -34,6 +36,7 @@ namespace SilverSim.ServiceInterfaces.Grid
         }
     }
 
+    [Serializable]
     public class GridServiceInaccessibleException : Exception
     {
         public GridServiceInaccessibleException()

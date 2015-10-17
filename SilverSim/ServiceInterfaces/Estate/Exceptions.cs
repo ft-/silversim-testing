@@ -8,6 +8,7 @@ using System.Text;
 
 namespace SilverSim.ServiceInterfaces.Estate
 {
+    [Serializable]
     public class EstateUpdateFailedException : Exception
     {
         public EstateUpdateFailedException()

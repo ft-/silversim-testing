@@ -29,7 +29,7 @@ namespace SilverSim.Scene.Types.Scene
                     string resourcename = "SilverSim.Scene.Types.Resources.Assets." + key + ".gz";
                     if(!m_Resources.Contains(resourcename))
                     {
-                        throw new AssetNotFound(key);
+                        throw new AssetNotFoundException(key);
                     }
                     Stream resource = GetType().Assembly.GetManifestResourceStream(resourcename);
                     using(GZipStream gz = new GZipStream(resource, CompressionMode.Decompress))

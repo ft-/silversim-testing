@@ -38,7 +38,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                         }
                     }
                 }
-                throw new AssetNotFound(key);
+                throw new AssetNotFoundException(key);
             }
         }
         #endregion

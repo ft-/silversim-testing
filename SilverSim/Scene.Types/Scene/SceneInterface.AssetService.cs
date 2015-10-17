@@ -217,7 +217,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 if(!success)
                 {
-                    throw new AssetNotFound(id);
+                    throw new AssetNotFoundException(id);
                 }
             }
 

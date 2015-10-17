@@ -68,7 +68,7 @@ namespace SilverSim.Types.Primitive
             {
                 if (index >= MAX_TEXTURE_FACES)
                 {
-                    throw new IndexOutOfRangeException();
+                    throw new KeyNotFoundException();
                 }
 
                 if (FaceTextures[index] == null)

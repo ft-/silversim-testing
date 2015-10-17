@@ -6,35 +6,45 @@ using System;
 
 namespace SilverSim.ServiceInterfaces.Asset
 {
-    public class HGAccessNotSupported : Exception {}
+    [Serializable]
+    public class HGAccessNotSupportedException : Exception
+    {
+        public HGAccessNotSupportedException()
+        {
 
-    public class AssetNotFound : Exception
+        }
+    }
+
+    [Serializable]
+    public class AssetNotFoundException : Exception
     {
         public UUID ID { get; private set; }
 
-        public AssetNotFound(UUID key)
+        public AssetNotFoundException(UUID key)
             : base(string.Format("Asset {0} not found", key))
         {
             ID = key;
         }
     }
 
-    public class AssetNotDeleted : Exception
+    [Serializable]
+    public class AssetNotDeletedException : Exception
     {
         public UUID ID { get; private set; }
 
-        public AssetNotDeleted(UUID key)
+        public AssetNotDeletedException(UUID key)
             : base(string.Format("Asset {0} not deleted", key))
         {
             ID = key;
         }
     }
 
-    public class AssetStoreFailed : Exception
+    [Serializable]
+    public class AssetStoreFailedException : Exception
     {
         public UUID ID { get; private set; }
 
-        public AssetStoreFailed(UUID key)
+        public AssetStoreFailedException(UUID key)
             : base(string.Format("Asset {0} not stored", key))
         {
             ID = key;

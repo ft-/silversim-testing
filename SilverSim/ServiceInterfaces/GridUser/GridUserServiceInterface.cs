@@ -8,6 +8,7 @@ using System;
 
 namespace SilverSim.ServiceInterfaces.GridUser
 {
+    [Serializable]
     public class GridUserNotFoundException : Exception
     {
         public GridUserNotFoundException()
@@ -15,6 +16,8 @@ namespace SilverSim.ServiceInterfaces.GridUser
 
         }
     }
+
+    [Serializable]
     public class GridUserUpdateFailedException : Exception
     {
         public GridUserUpdateFailedException()
