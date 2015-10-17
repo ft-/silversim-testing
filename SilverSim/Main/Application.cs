@@ -10,8 +10,8 @@ namespace SilverSim.Main
 {
     public static class Application
     {
-        public static ConfigurationLoader m_ConfigLoader;
-        public static ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
+        static ConfigurationLoader m_ConfigLoader;
+        static ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
 
         static void Main(string[] args)
         {

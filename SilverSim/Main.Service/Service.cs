@@ -68,9 +68,9 @@ namespace SilverSim.Main.Service
             return base.OnPowerEvent(powerStatus);
         }
 
-        public ConfigurationLoader m_ConfigLoader;
-        public ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
-        public ManualResetEvent m_ShutdownCompleteEvent = new ManualResetEvent(false);
+        ConfigurationLoader m_ConfigLoader;
+        ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
+        ManualResetEvent m_ShutdownCompleteEvent = new ManualResetEvent(false);
 
         void ServiceMain(object obj)
         {
