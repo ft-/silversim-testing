@@ -31,8 +31,8 @@ namespace SilverSim.Types.Grid
         public string GridURI = string.Empty; /* empty when addressing local grid */
         public static class ProtocolVariantId
         {
-            public const string Local = "";
-            public const string OpenSim = "OpenSim";
+            public static readonly string Local = string.Empty;
+            public static readonly string OpenSim = "OpenSim";
         }
         #endregion
 
