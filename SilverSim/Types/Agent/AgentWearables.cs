@@ -159,14 +159,6 @@ namespace SilverSim.Types.Agent
             }
             set
             {
-                foreach (KeyValuePair<WearableType, List<WearableInfo>> kvp in value)
-                {
-                    if(kvp.Key >= WearableType.NumWearables)
-                    {
-                        throw new ArgumentException();
-                    }
-                }
-
                 m_WearablesUpdateLock.AcquireWriterLock(-1);
                 try
                 {
@@ -177,7 +169,10 @@ namespace SilverSim.Types.Agent
 
                     foreach (KeyValuePair<WearableType, List<WearableInfo>> kvp in value)
                     {
-                        m_Wearables[kvp.Key] = new List<WearableInfo>(kvp.Value);
+                        if (kvp.Key < WearableType.NumWearables)
+                        {
+                            m_Wearables[kvp.Key] = new List<WearableInfo>(kvp.Value);
+                        }
                     }
                 }
                 finally
