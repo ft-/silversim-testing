@@ -7,7 +7,6 @@ using System.IO;
 
 namespace SilverSim.Types.Asset
 {
-    [Serializable]
     public class AssetData : AssetMetadata, Format.IReferencesAccessor
     {
         public byte[] Data = new byte[0];

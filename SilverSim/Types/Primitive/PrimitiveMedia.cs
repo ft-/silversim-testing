@@ -164,59 +164,6 @@ namespace SilverSim.Types.Primitive
             }
         }
 
-        static void fromXmlOSData(PrimitiveMedia media, XmlTextReader reader)
-        {
-            for (; ; )
-            {
-                if (!reader.Read())
-                {
-                    throw new XmlException();
-                }
-
-                switch (reader.NodeType)
-                {
-                    case XmlNodeType.Element:
-                        if (reader.IsEmptyElement)
-                        {
-                            break;
-                        }
-                        switch (reader.Name)
-                        {
-                            case "llsd":
-                                IValue v = LLSD_XML.DeserializeLLSDNode(reader);
-                                if (v is AnArray)
-                                {
-                                    AnArray a = (AnArray)v;
-                                    foreach (IValue iv in a)
-                                    {
-                                        if (iv is Map)
-                                        {
-                                            Map m = (Map)iv;
-                                            media.Add(new Entry(m));
-                                        }
-                                    }
-                                }
-                                break;
-
-                            default:
-                                reader.ReadToEndElement();
-                                break;
-                        }
-                        break;
-
-                    case XmlNodeType.EndElement:
-                        if (reader.Name != "OSData")
-                        {
-                            throw new XmlException();
-                        }
-                        return;
-
-                    default:
-                        break;
-                }
-            }
-        }
-
         static void fromXmlOSMedia(PrimitiveMedia media, XmlTextReader reader)
         {
             for (; ; )

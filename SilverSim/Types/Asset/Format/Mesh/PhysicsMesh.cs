@@ -26,7 +26,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             }
             catch
             {
-                throw new NotAMeshFormat();
+                throw new NotAMeshFormatException();
             }
 
             Map physicsMap;
@@ -44,7 +44,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             }
             else
             {
-                throw new NotAMeshFormat();
+                throw new NotAMeshFormatException();
             }
 
             int physOffset = physicsMap["offset"].AsInt + start;
@@ -52,7 +52,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
 
             if(physOffset < start || physSize <= 0)
             {
-                throw new NotAMeshFormat();
+                throw new NotAMeshFormatException();
             }
 
             Load(asset.Data, physOffset, physSize);

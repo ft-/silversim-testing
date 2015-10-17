@@ -93,6 +93,7 @@ namespace SilverSim.Types.Primitive
             return BitConverter.ToSingle(bytes, 0);
         }
 
+        /*
         private void FloatToBytes(float value, byte[] bufbytes, int pos)
         {
             byte[] bytes = BitConverter.GetBytes(value);
@@ -100,6 +101,7 @@ namespace SilverSim.Types.Primitive
                 Array.Reverse(bytes);
             Buffer.BlockCopy(bytes, 0, bufbytes, pos, 4);
         }
+         * */
 
         private static float TEOffsetFloat(byte[] bytes, int pos)
         {

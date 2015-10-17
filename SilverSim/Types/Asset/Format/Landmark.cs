@@ -29,7 +29,7 @@ namespace SilverSim.Types.Asset.Format
             string[] versioninfo = lines[0].Split(new char[]{' '}, StringSplitOptions.RemoveEmptyEntries);
             if(versioninfo[0] != "Landmark")
             {
-                throw new NotALandmarkFormat();
+                throw new NotALandmarkFormatException();
             }
 
             for(int idx = 1; idx < lines.Length; ++idx)

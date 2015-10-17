@@ -141,7 +141,7 @@ namespace SilverSim.Types.Asset.Format
 
             while('\n' != (c = stream.ReadByte()) && c != -1)
             {
-                data += (char)c;
+                data += ((char)c).ToString();
             }
 
             data = data.Trim();
@@ -152,7 +152,7 @@ namespace SilverSim.Types.Asset.Format
         {
             if(readLine(assetdata) != "{")
             {
-                throw new NotANotecardFormat();
+                throw new NotANotecardFormatException();
             }
             while(true)
             {
@@ -202,7 +202,7 @@ namespace SilverSim.Types.Asset.Format
                         break;
 
                     default:
-                        throw new NotANotecardFormat();
+                        throw new NotANotecardFormatException();
                 }
             }
         }
@@ -211,7 +211,7 @@ namespace SilverSim.Types.Asset.Format
         {
             if(readLine(assetdata) != "{")
             {
-                throw new NotANotecardFormat();
+                throw new NotANotecardFormatException();
             }
             while(true)
             {
@@ -237,7 +237,7 @@ namespace SilverSim.Types.Asset.Format
                         break;
 
                     default:
-                        throw new NotANotecardFormat();
+                        throw new NotANotecardFormatException();
                 }
             }
         }
@@ -247,7 +247,7 @@ namespace SilverSim.Types.Asset.Format
             NotecardInventoryItem item = new NotecardInventoryItem();
             if(readLine(assetdata) != "{")
             {
-                throw new NotANotecardFormat();
+                throw new NotANotecardFormatException();
             }
             while(true)
             {
@@ -304,7 +304,7 @@ namespace SilverSim.Types.Asset.Format
                 }
                 else
                 {
-                    throw new NotANotecardFormat();
+                    throw new NotANotecardFormatException();
                 }       
             }
         }
@@ -315,7 +315,7 @@ namespace SilverSim.Types.Asset.Format
             uint extcharindex = 0;
             if(readLine(assetdata) != "{")
             {
-                throw new NotANotecardFormat();
+                throw new NotANotecardFormatException();
             }
             while(true)
             {
@@ -324,7 +324,7 @@ namespace SilverSim.Types.Asset.Format
                 {
                     if(item == null)
                     {
-                        throw new NotANotecardFormat();
+                        throw new NotANotecardFormatException();
                     }
                     return item;
                 }
@@ -341,7 +341,7 @@ namespace SilverSim.Types.Asset.Format
                 }
                 else
                 {
-                    throw new NotANotecardFormat();
+                    throw new NotANotecardFormatException();
                 }
             }
         }
@@ -351,7 +351,7 @@ namespace SilverSim.Types.Asset.Format
             Inventory = new NotecardInventory();
             if(readLine(assetdata) != "{")
             {
-                throw new NotANotecardFormat();
+                throw new NotANotecardFormatException();
             }
             while(true)
             {
@@ -373,7 +373,7 @@ namespace SilverSim.Types.Asset.Format
                 }
                 else
                 {
-                    throw new NotANotecardFormat();
+                    throw new NotANotecardFormatException();
                 }
             }
         }
@@ -382,7 +382,7 @@ namespace SilverSim.Types.Asset.Format
         {
             if(readLine(assetdata) != "{")
             {
-                throw new NotANotecardFormat();
+                throw new NotANotecardFormatException();
             }
             while(true)
             {
@@ -403,13 +403,13 @@ namespace SilverSim.Types.Asset.Format
                     byte[] buffer = new byte[datalen];
                     if(datalen != assetdata.Read(buffer, 0, datalen))
                     {
-                        throw new NotANotecardFormat();
+                        throw new NotANotecardFormatException();
                     }
                     Text = Encoding.UTF8.GetString(buffer);
                 }
                 else
                 {
-                    throw new NotANotecardFormat();
+                    throw new NotANotecardFormatException();
                 }
             }
         }

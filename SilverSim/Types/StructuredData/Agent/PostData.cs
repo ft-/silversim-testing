@@ -22,9 +22,10 @@ namespace SilverSim.StructuredData.Agent
         public AppearanceInfo Appearance = new AppearanceInfo();
         public UserAccount Account = new UserAccount();
 
-        public class InvalidAgentPostSerialization : Exception
+        [Serializable]
+        public class InvalidAgentPostSerializationException : Exception
         {
-            public InvalidAgentPostSerialization(string message)
+            public InvalidAgentPostSerializationException(string message)
                 : base(message)
             {
 
@@ -42,7 +43,7 @@ namespace SilverSim.StructuredData.Agent
             IValue json = JSON.JSON.Deserialize(input);
             if (!(json is Map))
             {
-                throw new InvalidAgentPostSerialization("Invalid JSON AgentPostData");
+                throw new InvalidAgentPostSerializationException("Invalid JSON AgentPostData");
             }
             Map parms = (Map)json;
 
@@ -138,7 +139,7 @@ namespace SilverSim.StructuredData.Agent
                 AnArray array = (AnArray)parms["service_urls"];
                 if (array.Count % 2 != 0)
                 {
-                    throw new InvalidAgentPostSerialization("Invalid service_urls block in AgentPostData");
+                    throw new InvalidAgentPostSerializationException("Invalid service_urls block in AgentPostData");
                 }
                 int i;
                 for (i = 0; i < array.Count; i += 2)
@@ -249,10 +250,6 @@ namespace SilverSim.StructuredData.Agent
             w.Write(string.Format("\"{0}\":\"{1}\"", JSON.JSON.SerializeString(name), JSON.JSON.SerializeString((string)value)));
         }
         private void WriteJSONValue(TextWriter w, string name, uint value)
-        {
-            w.Write(string.Format("\"{0}\":{1}", JSON.JSON.SerializeString(name), value));
-        }
-        private void WriteJSONValue(TextWriter w, string name, int value)
         {
             w.Write(string.Format("\"{0}\":{1}", JSON.JSON.SerializeString(name), value));
         }

@@ -64,7 +64,7 @@ namespace SilverSim.Types
         {
             if(v.m_Value == null)
             {
-                throw new ArgumentNullException();
+                return null;
             }
             return new Uri(v.m_Value.ToString());
         }

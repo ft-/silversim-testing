@@ -12,7 +12,14 @@ namespace SilverSim.StructuredData.LLSD
 {
     public static class LLSD_XML
     {
-        public class InvalidLLSDXmlSerialization : Exception { }
+        [Serializable]
+        public class InvalidLLSDXmlSerializationException : Exception
+        {
+            public InvalidLLSDXmlSerializationException()
+            {
+
+            }
+        }
 
         #region Main LLSD+XML Deserialization
         private static string GetTextNode(XmlTextReader input)
@@ -27,7 +34,7 @@ namespace SilverSim.StructuredData.LLSD
             {
                 if(!input.Read())
                 {
-                    throw new InvalidLLSDXmlSerialization();
+                    throw new InvalidLLSDXmlSerializationException();
                 }
                 switch(input.NodeType)
                 {
@@ -41,7 +48,7 @@ namespace SilverSim.StructuredData.LLSD
                     case XmlNodeType.EndElement:
                         if(input.Name != elementName)
                         {
-                            throw new InvalidLLSDXmlSerialization();
+                            throw new InvalidLLSDXmlSerializationException();
                         }
                         else
                         {
@@ -69,7 +76,7 @@ namespace SilverSim.StructuredData.LLSD
                     {
                         if(!input.Read())
                         {
-                            throw new InvalidLLSDXmlSerialization();
+                            throw new InvalidLLSDXmlSerializationException();
                         }
 
                         switch(input.NodeType)
@@ -81,7 +88,7 @@ namespace SilverSim.StructuredData.LLSD
                                 }
                                 else
                                 {
-                                    throw new InvalidLLSDXmlSerialization();
+                                    throw new InvalidLLSDXmlSerializationException();
                                 }
 
                             case XmlNodeType.Element:
@@ -109,7 +116,7 @@ namespace SilverSim.StructuredData.LLSD
                     }
                     else
                     {
-                        throw new InvalidLLSDXmlSerialization();
+                        throw new InvalidLLSDXmlSerializationException();
                     }
 
                 case "date":
@@ -134,7 +141,7 @@ namespace SilverSim.StructuredData.LLSD
                     {
                         if(!input.Read())
                         {
-                            throw new InvalidLLSDXmlSerialization();
+                            throw new InvalidLLSDXmlSerializationException();
                         }
 
                         switch(input.NodeType)
@@ -144,13 +151,13 @@ namespace SilverSim.StructuredData.LLSD
                                 {
                                     if(in_entity)
                                     {
-                                        throw new InvalidLLSDXmlSerialization();
+                                        throw new InvalidLLSDXmlSerializationException();
                                     }
                                     return map;
                                 }
                                 else
                                 {
-                                    throw new InvalidLLSDXmlSerialization();
+                                    throw new InvalidLLSDXmlSerializationException();
                                 }
 
                             case XmlNodeType.Element:
@@ -204,7 +211,7 @@ namespace SilverSim.StructuredData.LLSD
                     return new UUID(GetTextNode(input));
                     
                 default:
-                    throw new InvalidLLSDXmlSerialization();
+                    throw new InvalidLLSDXmlSerializationException();
             }
         }
 
@@ -216,7 +223,7 @@ namespace SilverSim.StructuredData.LLSD
             {
                 if(!input.Read())
                 {
-                    throw new InvalidLLSDXmlSerialization();
+                    throw new InvalidLLSDXmlSerializationException();
                 }
 
                 switch(input.NodeType)
@@ -224,7 +231,7 @@ namespace SilverSim.StructuredData.LLSD
                     case XmlNodeType.Element:
                         if(value != null)
                         {
-                            throw new InvalidLLSDXmlSerialization();
+                            throw new InvalidLLSDXmlSerializationException();
                         }
                         value = DeserializeInternal(input);
                         break;
@@ -232,11 +239,11 @@ namespace SilverSim.StructuredData.LLSD
                     case XmlNodeType.EndElement:
                         if(input.Name != "llsd")
                         {
-                            throw new InvalidLLSDXmlSerialization();
+                            throw new InvalidLLSDXmlSerializationException();
                         }
                         if(value == null)
                         {
-                            throw new InvalidLLSDXmlSerialization();
+                            throw new InvalidLLSDXmlSerializationException();
                         }
                         return value;
 
@@ -258,7 +265,7 @@ namespace SilverSim.StructuredData.LLSD
             {
                 if (!inp.Read())
                 {
-                    throw new InvalidLLSDXmlSerialization();
+                    throw new InvalidLLSDXmlSerializationException();
                 }
 
                 switch (inp.NodeType)
@@ -270,7 +277,7 @@ namespace SilverSim.StructuredData.LLSD
                         }
                         else
                         {
-                            throw new InvalidLLSDXmlSerialization();
+                            throw new InvalidLLSDXmlSerializationException();
                         }
                 }
             }

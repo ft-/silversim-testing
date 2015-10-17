@@ -10,7 +10,14 @@ namespace SilverSim.StructuredData.JSON
 {
     public static class JSON
     {
-        public class InvalidJSONSerialization : Exception { }
+        [Serializable]
+        public class InvalidJSONSerializationException : Exception 
+        {
+            public InvalidJSONSerializationException()
+            {
+
+            }
+        }
 
         #region Main JSON Deserialization
         private static string ReadString(StreamReader io, char eos)
@@ -31,11 +38,11 @@ namespace SilverSim.StructuredData.JSON
                     {
                         c = '\n';
                     }
-                    s += c;
+                    s += c.ToString();
                 }
                 else
                 {
-                    s += c;
+                    s += c.ToString();
                 }
             }
             return s;
@@ -84,7 +91,7 @@ namespace SilverSim.StructuredData.JSON
                             break;
                         }
                         c = (char)io.Read();
-                        input += c;
+                        input += c.ToString();
                     }
 
                     if(input == "true")
@@ -106,7 +113,7 @@ namespace SilverSim.StructuredData.JSON
                             double f;
                             if(!Double.TryParse(input, out f))
                             {
-                                throw new InvalidJSONSerialization();
+                                throw new InvalidJSONSerializationException();
                             }
                             return new Real(f);
                         }
@@ -115,7 +122,7 @@ namespace SilverSim.StructuredData.JSON
                             Int32 i;
                             if(!Int32.TryParse(input, out i))
                             {
-                                throw new InvalidJSONSerialization();
+                                throw new InvalidJSONSerializationException();
                             }
                             return new Integer(i);
                         }
@@ -152,7 +159,7 @@ namespace SilverSim.StructuredData.JSON
                     int bc = io.Peek();
                     if(bc == -1)
                     {
-                        throw new InvalidJSONSerialization();
+                        throw new InvalidJSONSerializationException();
                     }
                     c = (char)bc;
 
@@ -167,7 +174,7 @@ namespace SilverSim.StructuredData.JSON
                 }
                 else
                 {
-                    throw new InvalidJSONSerialization();
+                    throw new InvalidJSONSerializationException();
                 }
             }
         }
@@ -190,7 +197,7 @@ namespace SilverSim.StructuredData.JSON
                 c = (char)io.Read();
                 if(c != ':')
                 {
-                    throw new InvalidJSONSerialization();
+                    throw new InvalidJSONSerializationException();
                 }
                 map[key.ToString()] = ParseValue(io);
                 do
@@ -207,7 +214,7 @@ namespace SilverSim.StructuredData.JSON
                     int bc = io.Peek();
                     if(bc == -1)
                     {
-                        throw new InvalidJSONSerialization();
+                        throw new InvalidJSONSerializationException();
                     }
                     c = (char)bc;
 
@@ -222,7 +229,7 @@ namespace SilverSim.StructuredData.JSON
                 }
                 else
                 {
-                    throw new InvalidJSONSerialization();
+                    throw new InvalidJSONSerializationException();
                 }
             }
         }
@@ -235,7 +242,7 @@ namespace SilverSim.StructuredData.JSON
                 char c = (char)sr.Peek();
                 if(c != '{' && c != '[')
                 {
-                    throw new InvalidJSONSerialization();
+                    throw new InvalidJSONSerializationException();
                 }
                 return ParseValue(sr);
             }
@@ -254,7 +261,7 @@ namespace SilverSim.StructuredData.JSON
                     case '\r': o += "\\r"; break;
                     case '\"': o += "\\\""; break;
                     case '\'': o += "\\'"; break;
-                    default: o += s[i]; break;
+                    default: o += s[i].ToString(); break;
                 }
             }
             return o;
@@ -338,7 +345,7 @@ namespace SilverSim.StructuredData.JSON
             }
             else
             {
-                throw new InvalidJSONSerialization();
+                throw new InvalidJSONSerializationException();
             }
         }
         #endregion

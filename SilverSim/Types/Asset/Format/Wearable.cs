@@ -58,7 +58,7 @@ namespace SilverSim.Types.Asset.Format
             string[] versioninfo = lines[0].Split(new char[] { ' ', '\t' }, StringSplitOptions.RemoveEmptyEntries);
             if(versioninfo[0] != "LLWearable")
             {
-                throw new NotAWearableFormat();
+                throw new NotAWearableFormatException();
             }
 
             SaleInfo.PermMask = (InventoryPermissionsMask)0x7FFFFFFF;
@@ -106,11 +106,11 @@ namespace SilverSim.Types.Asset.Format
                 {
                     if(lines[++idx].Trim() != "{")
                     {
-                        throw new NotAWearableFormat();
+                        throw new NotAWearableFormatException();
                     }
                     if (idx == lines.Length)
                     {
-                        throw new NotAWearableFormat();
+                        throw new NotAWearableFormatException();
                     }
                     while ((line = lines[idx].Trim()) != "}")
                     {
@@ -157,7 +157,7 @@ namespace SilverSim.Types.Asset.Format
 
                         if(++idx == lines.Length)
                         {
-                            throw new NotAWearableFormat();
+                            throw new NotAWearableFormatException();
                         }
                     }
                 }
@@ -165,11 +165,11 @@ namespace SilverSim.Types.Asset.Format
                 {
                     if (lines[++idx].Trim() != "{")
                     {
-                        throw new NotAWearableFormat();
+                        throw new NotAWearableFormatException();
                     }
                     if (idx == lines.Length)
                     {
-                        throw new NotAWearableFormat();
+                        throw new NotAWearableFormatException();
                     }
                     while ((line = lines[idx].Trim()) != "}")
                     {
@@ -192,7 +192,7 @@ namespace SilverSim.Types.Asset.Format
 
                         if (++idx == lines.Length)
                         {
-                            throw new NotAWearableFormat();
+                            throw new NotAWearableFormatException();
                         }
                     }
                 }

@@ -113,18 +113,6 @@ namespace SilverSim.Types
             return new Date(dateTime);
         }
 
-        /// <summary>
-        /// Convert a UNIX timestamp to a native DateTime object
-        /// </summary>
-        /// <param name="timestamp">A signed integer representing a UNIX
-        /// timestamp</param>
-        /// <returns>A DateTime object containing the same time specified in
-        /// the given timestamp</returns>
-        private static Date UnixTimeToDateTime(int timestamp)
-        {
-            return UnixTimeToDateTime((uint)timestamp);
-        }
-
         public ulong DateTimeToUnixTime()
         {
             TimeSpan ts = (m_Value - Epoch);

@@ -5,49 +5,55 @@ using System;
 
 namespace SilverSim.Types.Asset.Format
 {
-    public class NotAMeshFormat : Exception
+    [Serializable]
+    public class NotAMeshFormatException : Exception
     {
-        public NotAMeshFormat()
+        public NotAMeshFormatException()
         {
 
         }
     }
 
-    public class NotAMaterialFormat : Exception
+    [Serializable]
+    public class NotAMaterialFormatException : Exception
     {
-        public NotAMaterialFormat()
+        public NotAMaterialFormatException()
         {
 
         }
     }
 
-    public class NotANotecardFormat : Exception
+    [Serializable]
+    public class NotANotecardFormatException : Exception
     {
-        public NotANotecardFormat()
+        public NotANotecardFormatException()
         {
 
         }
     }
 
-    public class NotALandmarkFormat : Exception
+    [Serializable]
+    public class NotALandmarkFormatException : Exception
     {
-        public NotALandmarkFormat()
+        public NotALandmarkFormatException()
         {
 
         }
     }
 
-    public class NotAWearableFormat : Exception
+    [Serializable]
+    public class NotAWearableFormatException : Exception
     {
-        public NotAWearableFormat()
+        public NotAWearableFormatException()
         {
 
         }
     }
 
-    public class NotAGestureFormat : Exception
+    [Serializable]
+    public class NotAGestureFormatException : Exception
     {
-        public NotAGestureFormat()
+        public NotAGestureFormatException()
         {
 
         }

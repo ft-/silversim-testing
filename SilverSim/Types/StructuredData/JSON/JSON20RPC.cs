@@ -22,6 +22,7 @@ namespace SilverSim.StructuredData.JSON
             return JSON.Serialize(request);
         }
 
+        [Serializable]
         public class InvalidJSON20RPCResponseException : Exception
         {
             public InvalidJSON20RPCResponseException()
@@ -30,6 +31,7 @@ namespace SilverSim.StructuredData.JSON
             }
         }
 
+        [Serializable]
         public class JSON20RPCException : Exception
         {
             public int FaultCode;

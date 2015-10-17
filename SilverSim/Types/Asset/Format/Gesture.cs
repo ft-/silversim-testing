@@ -19,13 +19,13 @@ namespace SilverSim.Types.Asset.Format
         };
 
         #region Steps
-        public interface Step
+        public interface IStep
         {
             StepType Type { get; }
             string Serialize();
         }
 
-        public class StepAnimation : Step
+        public class StepAnimation : IStep
         {
             public StepType Type
             {
@@ -58,7 +58,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        public class StepSound : Step
+        public class StepSound : IStep
         {
             public StepType Type
             {
@@ -89,7 +89,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        public class StepChat : Step
+        public class StepChat : IStep
         {
             public StepType Type
             {
@@ -118,7 +118,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        public class StepWait : Step
+        public class StepWait : IStep
         {
             public StepType Type
             {
@@ -161,7 +161,7 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        public class StepEndOfGesture : Step
+        public class StepEndOfGesture : IStep
         {
             public StepType Type
             {
@@ -189,7 +189,7 @@ namespace SilverSim.Types.Asset.Format
         public uint TriggerKeyMask;
         public string Trigger;
         public string ReplaceWith;
-        public List<Step> Sequence = new List<Step>();
+        public List<IStep> Sequence = new List<IStep>();
         #endregion
 
         #region Constructors
@@ -206,54 +206,54 @@ namespace SilverSim.Types.Asset.Format
             List<string>.Enumerator e = lines.GetEnumerator();
             if(!e.MoveNext())
             {
-                throw new NotAGestureFormat();
+                throw new NotAGestureFormatException();
             }
 
             if(int.Parse(e.Current) != 2)
             {
-                throw new NotAGestureFormat();
+                throw new NotAGestureFormatException();
             }
 
             if (!e.MoveNext())
             {
-                throw new NotAGestureFormat();
+                throw new NotAGestureFormatException();
             }
             TriggerKey = byte.Parse(e.Current);
 
             if (!e.MoveNext())
             {
-                throw new NotAGestureFormat();
+                throw new NotAGestureFormatException();
             }
             TriggerKeyMask = byte.Parse(e.Current);
 
             if (!e.MoveNext())
             {
-                throw new NotAGestureFormat();
+                throw new NotAGestureFormatException();
             }
             Trigger = e.Current;
 
             if (!e.MoveNext())
             {
-                throw new NotAGestureFormat();
+                throw new NotAGestureFormatException();
             }
             ReplaceWith = e.Current;
 
             if (!e.MoveNext())
             {
-                throw new NotAGestureFormat();
+                throw new NotAGestureFormatException();
             }
             int count = int.Parse(e.Current);
 
             if(count < 0)
             {
-                throw new NotAGestureFormat();
+                throw new NotAGestureFormatException();
             }
 
             for(int idx = 0; idx < count; ++idx)
             {
                 if (!e.MoveNext())
                 {
-                    throw new NotAGestureFormat();
+                    throw new NotAGestureFormatException();
                 }
                 StepType type = (StepType)int.Parse(e.Current);
 
@@ -327,7 +327,7 @@ namespace SilverSim.Types.Asset.Format
                         break;
 
                     default:
-                        throw new NotAGestureFormat();
+                        throw new NotAGestureFormatException();
                 }
             }
         }
@@ -339,7 +339,7 @@ namespace SilverSim.Types.Asset.Format
             get
             {
                 List<UUID> refs = new List<UUID>();
-                foreach(Step step in Sequence)
+                foreach(IStep step in Sequence)
                 {
                     if(step is StepSound)
                     {
@@ -373,8 +373,8 @@ namespace SilverSim.Types.Asset.Format
             AssetData asset = new AssetData();
             StringBuilder sb = new StringBuilder();
             sb.Append("2\n");
-            sb.Append(v.TriggerKey + "\n");
-            sb.Append(v.TriggerKeyMask + "\n");
+            sb.Append(v.TriggerKey.ToString() + "\n");
+            sb.Append(v.TriggerKeyMask.ToString() + "\n");
             sb.Append(v.Trigger + "\n");
             sb.Append(v.ReplaceWith + "\n");
 
@@ -383,12 +383,12 @@ namespace SilverSim.Types.Asset.Format
             if(v.Sequence != null)
             {
                 count = v.Sequence.Count;
-                sb.Append(count + "\n");
+                sb.Append(count.ToString() + "\n");
             }
 
             for (int i = 0; i < count; ++i)
             {
-                Step s = v.Sequence[i];
+                IStep s = v.Sequence[i];
                 sb.Append(s.Serialize());
             }
 

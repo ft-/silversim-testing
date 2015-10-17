@@ -300,7 +300,7 @@ namespace SilverSim.Types
             }
             else
             {
-                throw new ArgumentException("Can't use fixed point packing for " + totalBits);
+                throw new ArgumentException("Can't use fixed point packing for " + totalBits.ToString());
             }
         }
 

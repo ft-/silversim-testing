@@ -30,7 +30,7 @@ namespace SilverSim.Types
                 string[] parts = value.Split(new char[] { ';' }, 2, StringSplitOptions.None);
                 if(parts.Length < 2)
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException("\"" + value + "\" is not a GroupData string");
                 }
                 HomeURI = new Uri(parts[0]);
                 GroupName = parts[1];

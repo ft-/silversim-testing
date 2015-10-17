@@ -14,9 +14,10 @@ namespace SilverSim.StructuredData.AssetXml
     {
 
         #region Asset Deserialization
-        public class InvalidAssetSerialization : Exception
+        [Serializable]
+        public class InvalidAssetSerializationException : Exception
         {
-            public InvalidAssetSerialization()
+            public InvalidAssetSerializationException()
             {
             }
         }
@@ -27,7 +28,7 @@ namespace SilverSim.StructuredData.AssetXml
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidAssetSerialization();
+                    throw new InvalidAssetSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -41,14 +42,14 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             default:
-                                throw new InvalidAssetSerialization();
+                                throw new InvalidAssetSerializationException();
                         }
                         break;
 
                     case XmlNodeType.EndElement:
                         if (reader.Name != "FullID")
                         {
-                            throw new InvalidAssetSerialization();
+                            throw new InvalidAssetSerializationException();
                         }
 
                         return;
@@ -63,7 +64,7 @@ namespace SilverSim.StructuredData.AssetXml
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidAssetSerialization();
+                    throw new InvalidAssetSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -167,14 +168,14 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             default:
-                                throw new InvalidAssetSerialization();
+                                throw new InvalidAssetSerializationException();
                         }
                         break;
 
                     case XmlNodeType.EndElement:
                         if (reader.Name != "AssetBase")
                         {
-                            throw new InvalidAssetSerialization();
+                            throw new InvalidAssetSerializationException();
                         }
 
                         return asset;
@@ -190,7 +191,7 @@ namespace SilverSim.StructuredData.AssetXml
                 {
                     if (!reader.Read())
                     {
-                        throw new InvalidAssetSerialization();
+                        throw new InvalidAssetSerializationException();
                     }
 
                     switch (reader.NodeType)
@@ -198,13 +199,13 @@ namespace SilverSim.StructuredData.AssetXml
                         case XmlNodeType.Element:
                             if (reader.Name != "AssetBase")
                             {
-                                throw new InvalidAssetSerialization();
+                                throw new InvalidAssetSerializationException();
                             }
 
                             return parseAssetDataInternal(reader);
 
                         case XmlNodeType.EndElement:
-                            throw new InvalidAssetSerialization();
+                            throw new InvalidAssetSerializationException();
                     }
                 }
             }
@@ -212,9 +213,10 @@ namespace SilverSim.StructuredData.AssetXml
         #endregion
 
         #region Asset Metadata Deserialization
-        public class InvalidAssetMetadataSerialization : Exception
+        [Serializable]
+        public class InvalidAssetMetadataSerializationException : Exception
         {
-            public InvalidAssetMetadataSerialization()
+            public InvalidAssetMetadataSerializationException()
             {
             }
         }
@@ -226,7 +228,7 @@ namespace SilverSim.StructuredData.AssetXml
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidAssetMetadataSerialization();
+                    throw new InvalidAssetMetadataSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -291,14 +293,14 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             default:
-                                throw new InvalidAssetMetadataSerialization();
+                                throw new InvalidAssetMetadataSerializationException();
                         }
                         break;
 
                     case XmlNodeType.EndElement:
                         if (reader.Name != "AssetMetadata")
                         {
-                            throw new InvalidAssetMetadataSerialization();
+                            throw new InvalidAssetMetadataSerializationException();
                         }
 
                         return asset;
@@ -314,7 +316,7 @@ namespace SilverSim.StructuredData.AssetXml
                 {
                     if (!reader.Read())
                     {
-                        throw new InvalidAssetMetadataSerialization();
+                        throw new InvalidAssetMetadataSerializationException();
                     }
 
                     switch (reader.NodeType)
@@ -322,13 +324,13 @@ namespace SilverSim.StructuredData.AssetXml
                         case XmlNodeType.Element:
                             if (reader.Name != "AssetMetadata")
                             {
-                                throw new InvalidAssetMetadataSerialization();
+                                throw new InvalidAssetMetadataSerializationException();
                             }
 
                             return parseAssetMetadataInternal(reader);
 
                         case XmlNodeType.EndElement:
-                            throw new InvalidAssetMetadataSerialization();
+                            throw new InvalidAssetMetadataSerializationException();
                     }
                 }
             }

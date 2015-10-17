@@ -5,7 +5,6 @@ using System;
 
 namespace SilverSim.Types.Asset
 {
-    [Serializable]
     public class AssetMetadata
     {
         public UUID ID = UUID.Zero;
@@ -56,7 +55,7 @@ namespace SilverSim.Types.Asset
         {
             get
             {
-                return "assets/" + ID + FileExtension;
+                return "assets/" + ID.ToString() + FileExtension;
             }
             set
             {

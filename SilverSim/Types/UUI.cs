@@ -61,11 +61,11 @@ namespace SilverSim.Types
             Uri h = HomeURI;
             if (h != null)
             {
-                return ID.GetHashCode() ^ FirstName.GetHashCode() ^ LastName.GetHashCode() ^ h.GetHashCode();
+                return ID.GetHashCode() ^ h.GetHashCode();
             }
             else
             {
-                return ID.GetHashCode() ^ FirstName.GetHashCode() ^ LastName.GetHashCode();
+                return ID.GetHashCode();
             }
         }
 
@@ -89,7 +89,7 @@ namespace SilverSim.Types
                 string[] parts = value.Split(new char[] { ';' }, 2, StringSplitOptions.None);
                 if (parts.Length < 2)
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException("\"" + value + "\" is not a valid CreatorData string");
                 }
                 HomeURI = new Uri(parts[0]);
                 string[] names = parts[1].Split(new char[] { ' ' }, 2, StringSplitOptions.None);

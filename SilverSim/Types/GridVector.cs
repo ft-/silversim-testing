@@ -28,7 +28,7 @@ namespace SilverSim.Types
             string[] x = v.Split(new char[] { ',' });
             if(x.Length != 2)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("v is not a valid GridVector string");
             }
             X = uint.Parse(x[0]);
             Y = uint.Parse(x[1]);
@@ -39,7 +39,7 @@ namespace SilverSim.Types
             string[] x = v.Split(new char[] { ',' });
             if (x.Length != 2)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("v is not a valid GridVector string");
             }
             X = uint.Parse(x[0]) * multiplier;
             Y = uint.Parse(x[1]) * multiplier;

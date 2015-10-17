@@ -11,7 +11,14 @@ namespace SilverSim.StructuredData.LLSD
 {
     public static class LLSD_Binary
     {
-        class InvalidLLSDBinarySerialization : Exception { }
+        [Serializable]
+        public class InvalidLLSDBinarySerializationException : Exception 
+        {
+            public InvalidLLSDBinarySerializationException()
+            {
+
+            }
+        }
 
         #region Main LLSD+Binary Deserialization
         private static Int32 ReadInt32(Stream input)
@@ -19,7 +26,7 @@ namespace SilverSim.StructuredData.LLSD
             byte[] data = new byte[4];
             if (4 != input.Read(data, 0, 4))
             {
-                throw new InvalidLLSDBinarySerialization();
+                throw new InvalidLLSDBinarySerializationException();
             }
 
             if (!BitConverter.IsLittleEndian)
@@ -53,7 +60,7 @@ namespace SilverSim.StructuredData.LLSD
                     data = new byte[8];
                     if (8 != input.Read(data, 0, 8))
                     {
-                        throw new InvalidLLSDBinarySerialization();
+                        throw new InvalidLLSDBinarySerializationException();
                     }
 
                     if(!BitConverter.IsLittleEndian)
@@ -67,7 +74,7 @@ namespace SilverSim.StructuredData.LLSD
                     data = new byte[16];
                     if(16 != input.Read(data, 0, 16))
                     {
-                        throw new InvalidLLSDBinarySerialization();
+                        throw new InvalidLLSDBinarySerializationException();
                     }
 
                     return new UUID(data, 0);
@@ -79,7 +86,7 @@ namespace SilverSim.StructuredData.LLSD
 
                     if (datalen != input.Read(data, 0, datalen))
                     {
-                        throw new InvalidLLSDBinarySerialization();
+                        throw new InvalidLLSDBinarySerializationException();
                     }
 
                     return new BinaryData(data);
@@ -91,7 +98,7 @@ namespace SilverSim.StructuredData.LLSD
 
                     if (datalen != input.Read(data, 0, datalen))
                     {
-                        throw new InvalidLLSDBinarySerialization();
+                        throw new InvalidLLSDBinarySerializationException();
                     }
 
                     return new AString(Encoding.UTF8.GetString(data));
@@ -103,7 +110,7 @@ namespace SilverSim.StructuredData.LLSD
 
                     if (datalen != input.Read(data, 0, datalen))
                     {
-                        throw new InvalidLLSDBinarySerialization();
+                        throw new InvalidLLSDBinarySerializationException();
                     }
 
                     return new URI(Encoding.UTF8.GetString(data));
@@ -112,7 +119,7 @@ namespace SilverSim.StructuredData.LLSD
                     data = new byte[8];
                     if(8 != input.Read(data, 0, 8))
                     {
-                        throw new InvalidLLSDBinarySerialization();
+                        throw new InvalidLLSDBinarySerializationException();
                     }
 
                     return new Date(data, 0);
@@ -126,7 +133,7 @@ namespace SilverSim.StructuredData.LLSD
                     }
                     if(']' != input.ReadByte())
                     {
-                        throw new InvalidLLSDBinarySerialization();
+                        throw new InvalidLLSDBinarySerializationException();
                     }
                     return newArray;
 
@@ -142,7 +149,7 @@ namespace SilverSim.StructuredData.LLSD
 
                         if (datalen != input.Read(data, 0, datalen))
                         {
-                            throw new InvalidLLSDBinarySerialization();
+                            throw new InvalidLLSDBinarySerializationException();
                         }
 
                         key = Encoding.UTF8.GetString(data);
@@ -152,12 +159,12 @@ namespace SilverSim.StructuredData.LLSD
                     }
                     if('}' != input.ReadByte())
                     {
-                        throw new InvalidLLSDBinarySerialization();
+                        throw new InvalidLLSDBinarySerializationException();
                     }
                     return newMap;
 
                 default:
-                    throw new InvalidLLSDBinarySerialization();
+                    throw new InvalidLLSDBinarySerializationException();
             }
         }
         #endregion Main LLSD+Binary Deserialization
@@ -168,11 +175,11 @@ namespace SilverSim.StructuredData.LLSD
             int b;
             while(0xa != (b = input.ReadByte()))
             {
-                a += (char)b;
+                a += ((char)b).ToString();
             }
             if(a != "<? LLSD/Binary ?>")
             {
-                throw new InvalidLLSDBinarySerialization();
+                throw new InvalidLLSDBinarySerializationException();
             }
             return DeserializeInternal(input);
         }

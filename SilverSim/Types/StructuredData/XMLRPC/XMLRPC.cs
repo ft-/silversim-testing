@@ -11,8 +11,16 @@ namespace SilverSim.Types.StructuredData.XMLRPC
 {
     public static class XMLRPC
     {
-        public class InvalidXmlRpcSerialization : Exception { }
+        [Serializable]
+        public class InvalidXmlRpcSerialization : Exception 
+        {
+            public InvalidXmlRpcSerialization()
+            {
 
+            }
+        }
+
+        [Serializable]
         public class XmlRpcFaultException : Exception
         {
             public int FaultCode;
@@ -405,6 +413,11 @@ namespace SilverSim.Types.StructuredData.XMLRPC
 
         public static XmlRpcResponse DeserializeResponse(XmlTextReader reader)
         {
+            if(null == reader)
+            {
+                throw new ArgumentNullException();
+            }
+
             for(;;)
             {
                 if(!reader.Read())
