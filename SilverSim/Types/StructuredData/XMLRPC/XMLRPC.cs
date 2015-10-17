@@ -12,9 +12,9 @@ namespace SilverSim.Types.StructuredData.XMLRPC
     public static class XMLRPC
     {
         [Serializable]
-        public class InvalidXmlRpcSerialization : Exception 
+        public class InvalidXmlRpcSerializationException : Exception 
         {
-            public InvalidXmlRpcSerialization()
+            public InvalidXmlRpcSerializationException()
             {
 
             }
@@ -39,7 +39,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -49,32 +49,32 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                         {
                             if (reader.IsEmptyElement)
                             {
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                             }
                             fieldname = reader.ReadElementValueAsString();
                         }
                         else if (reader.Name == "value")
                         {
-                            if(fieldname == string.Empty)
+                            if(string.IsNullOrEmpty(fieldname))
                             {
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                             }
                             if (reader.IsEmptyElement)
                             {
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                             }
                             map.Add(fieldname, DeserializeValue(reader));
                         }
                         else
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         break;
 
                     case XmlNodeType.EndElement:
                         if (reader.Name != "member")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return;
                 }
@@ -88,7 +88,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -98,20 +98,20 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                         {
                             if (reader.IsEmptyElement)
                             {
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                             }
                             DeserializeStructMember(reader, iv);
                         }
                         else
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         break;
 
                     case XmlNodeType.EndElement:
                         if (reader.Name != "struct")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return iv;
                 }
@@ -125,7 +125,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -135,20 +135,20 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                         {
                             if (reader.IsEmptyElement)
                             {
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                             }
                             ar.Add(DeserializeValue(reader));
                         }
                         else
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         break;
 
                     case XmlNodeType.EndElement:
                         if (reader.Name != "data")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return;
                 }
@@ -162,7 +162,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -172,20 +172,20 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                         {
                             if (reader.IsEmptyElement)
                             {
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                             }
                             DeserializeArrayData(reader, iv);
                         }
                         else
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         break;
 
                     case XmlNodeType.EndElement:
                         if (reader.Name != "array")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return iv;
                 }
@@ -199,7 +199,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if(!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch(reader.NodeType)
@@ -211,7 +211,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                             case "int":
                                 if(reader.IsEmptyElement)
                                 {
-                                    throw new InvalidXmlRpcSerialization();
+                                    throw new InvalidXmlRpcSerializationException();
                                 }
                                 iv = new Integer(reader.ReadElementValueAsInt());
                                 break;
@@ -219,7 +219,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                             case "boolean":
                                 if(reader.IsEmptyElement)
                                 {
-                                    throw new InvalidXmlRpcSerialization();
+                                    throw new InvalidXmlRpcSerializationException();
                                 }
                                 iv = new ABoolean(reader.ReadElementValueAsInt() != 0);
                                 break;
@@ -231,13 +231,13 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                             case "double":
                                 if(reader.IsEmptyElement)
                                 {
-                                    throw new InvalidXmlRpcSerialization();
+                                    throw new InvalidXmlRpcSerializationException();
                                 }
                                 iv = new Real(reader.ReadElementValueAsDouble());
                                 break;
 
                             case "dateTime.iso8601":
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                                 //break;
 
                             case "base64":
@@ -271,11 +271,11 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                     case XmlNodeType.EndElement:
                         if(reader.Name != "value")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         if(iv == null)
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return iv;
                 }
@@ -292,7 +292,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -302,7 +302,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                         {
                             if (reader.IsEmptyElement)
                             {
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                             }
                             array.Add(DeserializeResponseParam(reader));
                         }
@@ -311,7 +311,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                     case XmlNodeType.EndElement:
                         if (reader.Name != "params")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return array;
                 }
@@ -325,7 +325,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -345,14 +345,14 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                                 break;
 
                             default:
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                         }
                         break;
 
                     case XmlNodeType.EndElement:
                         if (reader.Name != "methodCall")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return req;
                 }
@@ -377,7 +377,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -385,11 +385,11 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                     case XmlNodeType.Element:
                         if (reader.Name != "methodCall")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         if (reader.IsEmptyElement)
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return DeserializeRequestInner(reader);
                 }
@@ -422,7 +422,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if(!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -430,11 +430,11 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                     case XmlNodeType.Element:
                         if (reader.Name != "methodResponse")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         if(reader.IsEmptyElement)
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return DeserializeResponseInner(reader);
                 }
@@ -448,7 +448,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if(!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch(reader.NodeType)
@@ -458,7 +458,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                         {
                             if(reader.IsEmptyElement)
                             {
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                             }
                             iv = DeserializeValue(reader);
                         }
@@ -467,11 +467,11 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                     case XmlNodeType.EndElement:
                         if(reader.Name != "param")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         if (iv == null)
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return iv;
                 }
@@ -485,7 +485,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -495,7 +495,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                         {
                             if (reader.IsEmptyElement)
                             {
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                             }
                             iv = DeserializeValue(reader);
                         }
@@ -504,11 +504,11 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                     case XmlNodeType.EndElement:
                         if (reader.Name != "fault")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         if (iv == null)
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return iv;
                 }
@@ -522,7 +522,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -532,7 +532,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                         {
                             if (reader.IsEmptyElement)
                             {
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                             }
                             iv = DeserializeResponseParam(reader);
                         }
@@ -541,11 +541,11 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                     case XmlNodeType.EndElement:
                         if (reader.Name != "params")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         if(iv == null)
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return iv;
                 }
@@ -559,7 +559,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             {
                 if (!reader.Read())
                 {
-                    throw new InvalidXmlRpcSerialization();
+                    throw new InvalidXmlRpcSerializationException();
                 }
 
                 switch (reader.NodeType)
@@ -577,7 +577,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                             case "fault":
                                 if (reader.IsEmptyElement)
                                 {
-                                    throw new InvalidXmlRpcSerialization();
+                                    throw new InvalidXmlRpcSerializationException();
                                 }
                                 else
                                 {
@@ -591,24 +591,24 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                                         }
                                         else
                                         {
-                                            throw new InvalidXmlRpcSerialization();
+                                            throw new InvalidXmlRpcSerializationException();
                                         }
                                     }
                                     else
                                     {
-                                        throw new InvalidXmlRpcSerialization();
+                                        throw new InvalidXmlRpcSerializationException();
                                     }
                                 }
 
                             default:
-                                throw new InvalidXmlRpcSerialization();
+                                throw new InvalidXmlRpcSerializationException();
                         }
                         break;
 
                     case XmlNodeType.EndElement:
                         if(reader.Name != "methodResponse")
                         {
-                            throw new InvalidXmlRpcSerialization();
+                            throw new InvalidXmlRpcSerializationException();
                         }
                         return res;
                 }
@@ -633,7 +633,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                 w.WriteNamedValue("dateTime.iso8601", iv.);
                 w.WriteEndElement();
                  * */
-                throw new InvalidXmlRpcSerialization();
+                throw new InvalidXmlRpcSerializationException();
             }
             else if(iv is AString)
             {
