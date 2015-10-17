@@ -332,7 +332,7 @@ namespace SilverSim.StructuredData.Agent
             /*-----------------------------------------------------------------*/
             /* Service URLs */
             w.Write("serviceurls:{");
-            prefix = "";
+            prefix = string.Empty;
             foreach (KeyValuePair<string, string> kvp in Account.ServiceURLs)
             {
                 w.Write(prefix);
@@ -341,7 +341,7 @@ namespace SilverSim.StructuredData.Agent
             }
             w.Write("},");
             w.Write("service_urls:[");
-            prefix = "";
+            prefix = string.Empty;
             foreach (KeyValuePair<string, string> kvp in Account.ServiceURLs)
             {
                 w.Write(prefix);
@@ -364,7 +364,7 @@ namespace SilverSim.StructuredData.Agent
             }
             WriteJSONString(w, "visualparams", vParams); w.Write(",");
             w.Write("\"textures\":[");
-            prefix = "";
+            prefix = string.Empty;
             {
                 int i;
                 for (i = 0; i < AppearanceInfo.AvatarTextureData.TextureCount; ++i)
