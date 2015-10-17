@@ -111,7 +111,7 @@ namespace SilverSim.Types
             {
                 if (HomeURI == null)
                 {
-                    return string.Format("{0} {1}", FirstName.Replace(" ", "."), LastName.Replace(" ", "."));
+                    return string.Format("{0} {1}", FirstName.Replace(' ', '.'), LastName.Replace(' ', '.'));
                 }
                 else
                 {
@@ -124,7 +124,7 @@ namespace SilverSim.Types
                     {
                         hostName = HomeURI.Host + ":" + HomeURI.Port.ToString();
                     }
-                    return string.Format("{0}.{1} @{2}", FirstName.Replace(" ", "."), LastName.Replace(" ", "."), hostName);
+                    return string.Format("{0}.{1} @{2}", FirstName.Replace(' ', '.'), LastName.Replace(' ', '.'), hostName);
                 }
             }
             set

@@ -47,7 +47,7 @@ namespace SilverSim.Types
                 }
                 else
                 {
-                    return string.Format("{0} @{1}", GroupName.Replace(" ", "."), HomeURI.ToString());
+                    return string.Format("{0} @{1}", GroupName.Replace(' ', '.'), HomeURI.ToString());
                 }
             }
             set
