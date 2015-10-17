@@ -9,8 +9,8 @@ namespace SilverSim.Http
     public class HttpReadChunkedBodyStream : Stream
     {
         private Stream m_Input;
-        private int m_RemainingChunkLength = 0;
-        private bool m_EndOfChunked = false;
+        private int m_RemainingChunkLength;
+        private bool m_EndOfChunked;
 
         private string ReadHeaderLine()
         {
@@ -22,7 +22,7 @@ namespace SilverSim.Http
                 {
                     throw new EndOfStreamException();
                 }
-                headerLine += (char)c;
+                headerLine += ((char)c).ToString();
             }
 
             if (m_Input.ReadByte() != '\n')
@@ -136,7 +136,7 @@ namespace SilverSim.Http
             }
         }
 
-        protected new void Dispose(bool disposing)
+        protected virtual new void Dispose(bool disposing)
         {
             if (m_Input != null)
             {
@@ -169,7 +169,7 @@ namespace SilverSim.Http
                 {
                     string chunkHeader = ReadHeaderLine();
                     string[] chunkFields = chunkHeader.Split(';');
-                    if (chunkFields[0] == "")
+                    if (chunkFields[0].Length == 0)
                     {
                         m_EndOfChunked = true;
 
@@ -180,7 +180,7 @@ namespace SilverSim.Http
                         if (0 == m_RemainingChunkLength)
                         {
                             m_EndOfChunked = true;
-                            while ((chunkHeader = ReadHeaderLine()) != string.Empty)
+                            while ((chunkHeader = ReadHeaderLine()).Length != 0)
                             {
                             }
                         }

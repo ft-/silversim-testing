@@ -10,14 +10,15 @@ namespace SilverSim.Http
     public class HttpWriteChunkedBodyStream : Stream
     {
         private Stream m_Output;
-        private long m_WrittenLength = 0;
+        private long m_WrittenLength;
         private byte[] StreamBuffer = new byte[10240];
-        private int BufferFill = 0;
+        private int BufferFill;
         private byte[] EOB = new byte[2] { (byte)'\r', (byte)'\n' };
 
         public HttpWriteChunkedBodyStream(Stream output)
         {
             m_Output = output;
+            m_WrittenLength = 0;
         }
 
         public override bool CanRead
@@ -103,7 +104,7 @@ namespace SilverSim.Http
             }
         }
 
-        protected new void Dispose(bool disposing)
+        protected virtual new void Dispose(bool disposing)
         {
             if (m_Output != null)
             {

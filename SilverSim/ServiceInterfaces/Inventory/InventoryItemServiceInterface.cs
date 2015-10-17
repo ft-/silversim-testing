@@ -18,7 +18,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
             get;
         }
 
-        public abstract InventoryItem this[UUID PrincipalID, UUID key]
+        public abstract InventoryItem this[UUID principalID, UUID key]
         {
             get;
         }
@@ -48,17 +48,17 @@ namespace SilverSim.ServiceInterfaces.Inventory
         public abstract void Add(InventoryItem item);
         public abstract void Update(InventoryItem item);
 
-        public abstract void Delete(UUID PrincipalID, UUID ID);
-        public abstract void Move(UUID PrincipalID, UUID ID, UUID newFolder);
+        public abstract void Delete(UUID principalID, UUID id);
+        public abstract void Move(UUID principalID, UUID id, UUID newFolder);
 
-        public virtual List<UUID> Delete(UUID PrincipalID, List<UUID> IDs)
+        public virtual List<UUID> Delete(UUID principalID, List<UUID> ids)
         {
             List<UUID> deleted = new List<UUID>();
-            foreach(UUID id in IDs)
+            foreach(UUID id in ids)
             {
                 try
                 {
-                    Delete(PrincipalID, id);
+                    Delete(principalID, id);
                     deleted.Add(id);
                 }
                 catch

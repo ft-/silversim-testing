@@ -55,25 +55,25 @@ namespace SilverSim.ServiceInterfaces.Grid
         #endregion
 
         #region Accessors
-        public abstract RegionInfo this[UUID ScopeID, UUID regionID]
+        public abstract RegionInfo this[UUID scopeID, UUID regionID]
         {
             get;
         }
 
-        public RegionInfo this[UUID ScopeID, GridVector position]
+        public RegionInfo this[UUID scopeID, GridVector position]
         {
             get
             {
-                return this[ScopeID, position.X, position.Y];
+                return this[scopeID, position.X, position.Y];
             }
         }
 
-        public abstract RegionInfo this[UUID ScopeID, uint gridX, uint gridY]
+        public abstract RegionInfo this[UUID scopeID, uint gridX, uint gridY]
         {
             get;
         }
 
-        public abstract RegionInfo this[UUID ScopeID, string regionName]
+        public abstract RegionInfo this[UUID scopeID, string regionName]
         {
             get;
         }
@@ -87,22 +87,22 @@ namespace SilverSim.ServiceInterfaces.Grid
 
         #region Region Registration
         public abstract void RegisterRegion(RegionInfo regionInfo);
-        public abstract void UnregisterRegion(UUID ScopeID, UUID RegionID);
+        public abstract void UnregisterRegion(UUID scopeID, UUID regionID);
         public abstract void DeleteRegion(UUID scopeID, UUID regionID);
         #endregion
 
         #region List accessors
-        public abstract List<RegionInfo> GetDefaultRegions(UUID ScopeID);
-        public abstract List<RegionInfo> GetFallbackRegions(UUID ScopeID);
-        public abstract List<RegionInfo> GetDefaultHypergridRegions(UUID ScopeID);
-        public abstract List<RegionInfo> GetRegionsByRange(UUID ScopeID, GridVector min, GridVector max);
-        public abstract List<RegionInfo> GetNeighbours(UUID ScopeID, UUID RegionID);
-        public abstract List<RegionInfo> GetAllRegions(UUID ScopeID);
-        public abstract List<RegionInfo> GetOnlineRegions(UUID ScopeID);
+        public abstract List<RegionInfo> GetDefaultRegions(UUID scopeID);
+        public abstract List<RegionInfo> GetFallbackRegions(UUID scopeID);
+        public abstract List<RegionInfo> GetDefaultHypergridRegions(UUID scopeID);
+        public abstract List<RegionInfo> GetRegionsByRange(UUID scopeID, GridVector min, GridVector max);
+        public abstract List<RegionInfo> GetNeighbours(UUID scopeID, UUID regionID);
+        public abstract List<RegionInfo> GetAllRegions(UUID scopeID);
+        public abstract List<RegionInfo> GetOnlineRegions(UUID scopeID);
         public abstract List<RegionInfo> GetOnlineRegions();
         public abstract Dictionary<string, string> GetGridExtraFeatures();
 
-        public abstract List<RegionInfo> SearchRegionsByName(UUID ScopeID, string searchString);
+        public abstract List<RegionInfo> SearchRegionsByName(UUID scopeID, string searchString);
         #endregion
     }
 }

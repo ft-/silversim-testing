@@ -66,7 +66,7 @@ namespace SilverSim.ServiceInterfaces.Economy
             StipendDelta = 10005,
         }
 
-        public interface MoneyBalanceAccessor
+        public interface IMoneyBalanceAccessor
         {
             Int32 this[UUI agentID] { get; set; }
         }
@@ -80,7 +80,7 @@ namespace SilverSim.ServiceInterfaces.Economy
 
         public abstract void Logout(UUI agentID, UUID sessionID, UUID secureSessionID);
 
-        public abstract MoneyBalanceAccessor MoneyBalance { get; }
+        public abstract IMoneyBalanceAccessor MoneyBalance { get; }
 
         public abstract void ChargeAmount(UUI agentID, TransactionType type, int amount, Action processOperation); /* exception from action results into abort */
 

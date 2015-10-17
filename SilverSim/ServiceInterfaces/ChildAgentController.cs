@@ -22,9 +22,9 @@ namespace SilverSim.ServiceInterfaces
         }
         public class ChildConnection
         {
-            public ChildConnectionState State = ChildConnectionState.Keep;
+            public ChildConnectionState State;
             public string ServerURI = string.Empty;
-            public RegionInfo RegionInfo = null; /* only valid when Establish is set */
+            public RegionInfo RegionInfo; /* only valid when Establish is set */
 
             public ChildConnection()
             {

@@ -3,9 +3,11 @@
 
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 
 namespace SilverSim.Http
 {
+    [Serializable]
     public class HttpHeaderFormatException : Exception
     {
         public HttpHeaderFormatException()
@@ -14,6 +16,7 @@ namespace SilverSim.Http
         }
     }
 
+    [Serializable]
     public abstract class AbstractHttpStream : Stream
     {
         public AbstractHttpStream()

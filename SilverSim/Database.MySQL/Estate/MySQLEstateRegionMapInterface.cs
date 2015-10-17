@@ -11,7 +11,7 @@ using MySql.Data.MySqlClient;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    public class MySQLEstateRegionMapInterface : EstateRegionMapServiceInterface
+    public class MySQLEstateRegionMapInterface : IEstateRegionMapServiceInterface
     {
         string m_ConnectionString;
 

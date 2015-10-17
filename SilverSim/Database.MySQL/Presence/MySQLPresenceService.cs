@@ -163,7 +163,7 @@ namespace SilverSim.Database.MySQL.Presence
             }
         }
 
-        public override void logoutRegion(UUID regionID)
+        public override void LogoutRegion(UUID regionID)
         {
             using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {

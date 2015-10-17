@@ -22,9 +22,9 @@ namespace SilverSim.ServiceInterfaces.Inventory
             get;
         }
 
-        public abstract List<InventoryItem> getActiveGestures(UUID PrincipalID);
+        public abstract List<InventoryItem> GetActiveGestures(UUID principalID);
 
-        void verifyInventoryFolder(UUID principalID, UUID parentFolderID, string name, AssetType type)
+        void VerifyInventoryFolder(UUID principalID, UUID parentFolderID, string name, AssetType type)
         {
             InventoryFolder folder;
             try
@@ -43,17 +43,17 @@ namespace SilverSim.ServiceInterfaces.Inventory
             }
         }
 
-        public virtual void checkInventory(UUID PrincipalID)
+        public virtual void CheckInventory(UUID principalID)
         {
             InventoryFolder rootFolder;
             try
             {
-                rootFolder = Folder[PrincipalID, AssetType.RootFolder];
+                rootFolder = Folder[principalID, AssetType.RootFolder];
             }
             catch
             {
                 rootFolder = new InventoryFolder();
-                rootFolder.Owner.ID = PrincipalID;
+                rootFolder.Owner.ID = principalID;
                 rootFolder.Name = "My Inventory";
                 rootFolder.InventoryType = InventoryType.Folder;
                 rootFolder.ParentFolderID = UUID.Zero;
@@ -61,23 +61,23 @@ namespace SilverSim.ServiceInterfaces.Inventory
                 Folder.Add(rootFolder);
             }
 
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Animations", AssetType.Animation);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Body Parts", AssetType.Bodypart);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Calling Cards", AssetType.CallingCard);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Clothing", AssetType.Clothing);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Gestures", AssetType.Gesture);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Landmarks", AssetType.Landmark);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Lost And Found", AssetType.LostAndFoundFolder);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Notecards", AssetType.Notecard);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Objects", AssetType.Object);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Photo Album", AssetType.SnapshotFolder);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Scripts", AssetType.LSLText);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Sounds", AssetType.Sound);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Textures", AssetType.Texture);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Trash", AssetType.TrashFolder);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Current Outfit", AssetType.CurrentOutfitFolder);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "My Outfits", AssetType.MyOutfitsFolder);
-            verifyInventoryFolder(PrincipalID, rootFolder.ID, "Favorites", AssetType.FavoriteFolder);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Animations", AssetType.Animation);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Body Parts", AssetType.Bodypart);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Calling Cards", AssetType.CallingCard);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Clothing", AssetType.Clothing);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Gestures", AssetType.Gesture);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Landmarks", AssetType.Landmark);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Lost And Found", AssetType.LostAndFoundFolder);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Notecards", AssetType.Notecard);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Objects", AssetType.Object);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Photo Album", AssetType.SnapshotFolder);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Scripts", AssetType.LSLText);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Sounds", AssetType.Sound);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Textures", AssetType.Texture);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Trash", AssetType.TrashFolder);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Current Outfit", AssetType.CurrentOutfitFolder);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "My Outfits", AssetType.MyOutfitsFolder);
+            VerifyInventoryFolder(principalID, rootFolder.ID, "Favorites", AssetType.FavoriteFolder);
         }
         #endregion
 

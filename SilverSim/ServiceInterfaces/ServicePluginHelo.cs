@@ -33,7 +33,7 @@ namespace SilverSim.ServiceInterfaces
             Dictionary<string, string> headers = new Dictionary<string,string>();
             try
             {
-                using (Stream responseStream = HttpRequestHandler.DoStreamRequest("HEAD", uri, null, "", "", false, 20000, headers))
+                using (Stream responseStream = HttpRequestHandler.DoStreamRequest("HEAD", uri, null, string.Empty, string.Empty, false, 20000, headers))
                 {
                     using (StreamReader reader = new StreamReader(responseStream))
                     {

@@ -64,7 +64,7 @@ namespace SilverSim.Viewer.OfflineIM
                 {
                     try
                     {
-                        foreach (GridInstantMessage gim in offlineIMService.getOfflineIMs(agent.Owner.ID))
+                        foreach (GridInstantMessage gim in offlineIMService.GetOfflineIMs(agent.Owner.ID))
                         {
                             try
                             {

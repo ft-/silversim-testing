@@ -12,6 +12,6 @@ namespace SilverSim.ServiceInterfaces.Neighbor
 
         }
 
-        public abstract void notifyNeighborStatus(RegionInfo fromRegion);
+        public abstract void NotifyNeighborStatus(RegionInfo fromRegion);
     }
 }

@@ -17,25 +17,25 @@ namespace SilverSim.ServiceInterfaces.Experience
 
         }
 
-        public interface ExperienceInterface
+        public interface IExperienceInterface
         {
             ExperienceInfo this[UUID experienceID] { get; set; }
         }
 
-        public abstract ExperienceInterface Experiences { get; }
+        public abstract IExperienceInterface Experiences { get; }
 
-        public interface ExperiencePermissionsInterface
+        public interface IExperiencePermissionsInterface
         {
             ExperiencePermissionsInfo this[UUID experienceID, UUI agent] { get; set; }
         }
 
-        public abstract ExperiencePermissionsInterface ExperiencePermissions { get; }
+        public abstract IExperiencePermissionsInterface ExperiencePermissions { get; }
 
-        public interface ExperienceKeyInterface
+        public interface IExperienceKeyInterface
         {
             string this[UUID experienceID, string key] { get; set; }
         }
 
-        public abstract ExperienceKeyInterface Keys { get; }
+        public abstract IExperienceKeyInterface Keys { get; }
     }
 }

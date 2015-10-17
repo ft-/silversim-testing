@@ -24,7 +24,7 @@ namespace SilverSim.Viewer.Profile
             }
 
 
-            public Dictionary<UUID, string> getClassifieds(UUI user)
+            public Dictionary<UUID, string> GetClassifieds(UUI user)
             {
                 return new Dictionary<UUID, string>();
             }
@@ -52,7 +52,7 @@ namespace SilverSim.Viewer.Profile
 
             }
 
-            public Dictionary<UUID, string> getPicks(UUI user)
+            public Dictionary<UUID, string> GetPicks(UUI user)
             {
                 return new Dictionary<UUID, string>();
             }

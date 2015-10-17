@@ -367,7 +367,7 @@ namespace SilverSim.Viewer.Profile
             Dictionary<UUID, string> classifieds;
             try
             {
-                classifieds = serviceData.ProfileService.Classifieds.getClassifieds(uui);
+                classifieds = serviceData.ProfileService.Classifieds.GetClassifieds(uui);
             }
             catch
             {
@@ -641,7 +641,7 @@ namespace SilverSim.Viewer.Profile
             Dictionary<UUID, string> picks;
             try
             {
-                picks = serviceData.ProfileService.Picks.getPicks(uui);
+                picks = serviceData.ProfileService.Picks.GetPicks(uui);
             }
             catch
             {

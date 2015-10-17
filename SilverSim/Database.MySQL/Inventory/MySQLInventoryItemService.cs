@@ -108,7 +108,7 @@ namespace SilverSim.Database.MySQL.Inventory
                     cmd.Parameters.AddWithValue("?itemid", ID.ToString());
                     if (1 > cmd.ExecuteNonQuery())
                     {
-                        throw new InventoryItemNotFound(ID);
+                        throw new InventoryItemNotFoundException(ID);
                     }
                 }
             }
@@ -127,7 +127,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 {
                     if (cmd.ExecuteNonQuery() < 1)
                     {
-                        throw new InventoryFolderNotStored(ID);
+                        throw new InventoryFolderNotStoredException(ID);
                     }
                 }
             }
@@ -148,7 +148,7 @@ namespace SilverSim.Database.MySQL.Inventory
                         cmd.Parameters.AddWithValue("?folderid", folderID.ToString());
                         if (cmd.ExecuteNonQuery() < 1)
                         {
-                            throw new InventoryFolderNotStored(folderID);
+                            throw new InventoryFolderNotStoredException(folderID);
                         }
                     }
                 }

@@ -40,7 +40,7 @@ namespace SilverSim.Database.MySQL.Inventory
                     }
                 }
 
-                throw new InventoryFolderNotFound(key);
+                throw new InventoryFolderNotFoundException(key);
             }
         }
 
@@ -65,7 +65,7 @@ namespace SilverSim.Database.MySQL.Inventory
                     }
                 }
 
-                throw new InventoryFolderNotFound(key);
+                throw new InventoryFolderNotFoundException(key);
             }
         }
 
@@ -108,11 +108,11 @@ namespace SilverSim.Database.MySQL.Inventory
                     }
                 }
 
-                throw new InventoryFolderTypeNotFound(type);
+                throw new InventoryFolderTypeNotFoundException(type);
             }
         }
 
-        public override List<InventoryFolder> getFolders(UUID PrincipalID, UUID key)
+        public override List<InventoryFolder> GetFolders(UUID PrincipalID, UUID key)
         {
             List<InventoryFolder> folders = new List<InventoryFolder>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -135,7 +135,7 @@ namespace SilverSim.Database.MySQL.Inventory
             return folders;
         }
 
-        public virtual new List<InventoryFolder> getInventorySkeleton(UUID PrincipalID)
+        public virtual new List<InventoryFolder> GetInventorySkeleton(UUID PrincipalID)
         {
             List<InventoryFolder> folders = new List<InventoryFolder>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -157,7 +157,7 @@ namespace SilverSim.Database.MySQL.Inventory
             return folders;
         }
 
-        public override List<InventoryItem> getItems(UUID PrincipalID, UUID key)
+        public override List<InventoryItem> GetItems(UUID PrincipalID, UUID key)
         {
             List<InventoryItem> items = new List<InventoryItem>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -199,7 +199,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 }
                 catch
                 {
-                    throw new InventoryFolderNotStored(folder.ID);
+                    throw new InventoryFolderNotStoredException(folder.ID);
                 }
             }
 
@@ -223,7 +223,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 }
                 catch
                 {
-                    throw new InventoryFolderNotStored(folder.ID);
+                    throw new InventoryFolderNotStoredException(folder.ID);
                 }
             }
             IncrementVersionNoExcept(folder.Owner.ID, folder.ParentFolderID);
@@ -245,7 +245,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 {
                     if (cmd.ExecuteNonQuery() < 1)
                     {
-                        throw new InventoryFolderNotStored(folderID);
+                        throw new InventoryFolderNotStoredException(folderID);
                     }
                 }
             }
@@ -399,7 +399,7 @@ namespace SilverSim.Database.MySQL.Inventory
                     cmd.Parameters.AddWithValue("?folderid", folderID.ToString());
                     if (cmd.ExecuteNonQuery() < 1)
                     {
-                        throw new InventoryFolderNotStored(folderID);
+                        throw new InventoryFolderNotStoredException(folderID);
                     }
                 }
             }

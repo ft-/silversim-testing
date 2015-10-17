@@ -12,7 +12,7 @@ namespace SilverSim.Database.MySQL.Estate
     {
         string m_ConnectionString;
 
-        class MySQLListAccess : ListAccess
+        class MySQLListAccess : IListAccess
         {
             string m_ConnectionString;
 
@@ -102,7 +102,7 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        public override EstateManagerServiceInterface.ListAccess All
+        public override EstateManagerServiceInterface.IListAccess All
         {
             get
             {

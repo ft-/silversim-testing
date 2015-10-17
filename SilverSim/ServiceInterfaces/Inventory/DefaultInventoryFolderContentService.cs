@@ -30,7 +30,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
 
                 try
                 {
-                    folderContent.Folders = m_Service.getFolders(principalID, folderID);
+                    folderContent.Folders = m_Service.GetFolders(principalID, folderID);
                 }
                 catch
                 {
@@ -39,7 +39,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
 
                 try
                 {
-                    folderContent.Items = m_Service.getItems(principalID, folderID);
+                    folderContent.Items = m_Service.GetItems(principalID, folderID);
                 }
                 catch
                 {

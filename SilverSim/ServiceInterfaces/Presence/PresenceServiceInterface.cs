@@ -63,6 +63,6 @@ namespace SilverSim.ServiceInterfaces.Presence
             set; /* setting null means logout, != null login message */
         }
 
-        public abstract void logoutRegion(UUID regionID);
+        public abstract void LogoutRegion(UUID regionID);
     }
 }

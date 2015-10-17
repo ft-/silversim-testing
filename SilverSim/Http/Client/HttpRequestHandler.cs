@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Web;
@@ -14,7 +15,7 @@ namespace SilverSim.Http.Client
             string outStr = string.Empty;
             foreach(KeyValuePair<string, string> kvp in parameters)
             {
-                if(outStr != string.Empty)
+                if(!string.IsNullOrEmpty(outStr))
                 {
                     outStr += "&";
                 }
@@ -80,7 +81,7 @@ namespace SilverSim.Http.Client
         }
 
         /*---------------------------------------------------------------------*/
-        public static string DoRequest(string method, string url, IDictionary<string, string> getValues, string content_type, int content_length, StreamPostDelegate postdelegate, bool compressed, int timeoutms)
+        public static string DoRequest(string method, string url, IDictionary<string, string> getValues, string content_type, int content_length, Action<Stream> postdelegate, bool compressed, int timeoutms)
         {
             using (Stream responseStream = DoStreamRequest(method, url, getValues, content_type, content_length, postdelegate, compressed, timeoutms))
             {

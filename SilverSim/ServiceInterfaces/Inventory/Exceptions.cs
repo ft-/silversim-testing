@@ -9,11 +9,11 @@ using System;
 namespace SilverSim.ServiceInterfaces.Inventory
 {
     [Serializable]
-    public class InventoryItemNotFound : Exception
+    public class InventoryItemNotFoundException : Exception
     {
         public UUID ID { get; private set; }
 
-        public InventoryItemNotFound(UUID key)
+        public InventoryItemNotFoundException(UUID key)
             : base(string.Format("InventoryItem {0} not found", key))
         {
             ID = key;
@@ -21,11 +21,11 @@ namespace SilverSim.ServiceInterfaces.Inventory
     }
 
     [Serializable]
-    public class InventoryItemNotStored : Exception
+    public class InventoryItemNotStoredException : Exception
     {
         public UUID ID { get; private set; }
 
-        public InventoryItemNotStored(UUID key)
+        public InventoryItemNotStoredException(UUID key)
             : base(string.Format("InventoryItem {0} not stored", key))
         {
             ID = key;
@@ -33,11 +33,11 @@ namespace SilverSim.ServiceInterfaces.Inventory
     }
 
     [Serializable]
-    public class InventoryFolderNotFound : Exception
+    public class InventoryFolderNotFoundException : Exception
     {
         public UUID ID { get; private set; }
 
-        public InventoryFolderNotFound(UUID key)
+        public InventoryFolderNotFoundException(UUID key)
             : base(string.Format("InventoryFolder {0} not found", key))
         {
             ID = key;
@@ -45,11 +45,11 @@ namespace SilverSim.ServiceInterfaces.Inventory
     }
 
     [Serializable]
-    public class InventoryFolderTypeNotFound : Exception
+    public class InventoryFolderTypeNotFoundException : Exception
     {
         public AssetType Type { get; private set; }
 
-        public InventoryFolderTypeNotFound(AssetType type)
+        public InventoryFolderTypeNotFoundException(AssetType type)
             : base(string.Format("InventoryFolder for type {0} not found", type))
         {
             Type = type;
@@ -57,11 +57,11 @@ namespace SilverSim.ServiceInterfaces.Inventory
     }
 
     [Serializable]
-    public class InventoryFolderNotStored : Exception
+    public class InventoryFolderNotStoredException : Exception
     {
         public UUID ID { get; private set; }
 
-        public InventoryFolderNotStored(UUID key)
+        public InventoryFolderNotStoredException(UUID key)
             : base(string.Format("InventoryFolder {0} not stored", key))
         {
             ID = key;
@@ -69,9 +69,9 @@ namespace SilverSim.ServiceInterfaces.Inventory
     }
 
     [Serializable]
-    public class InventoryInaccessible : Exception
+    public class InventoryInaccessibleException : Exception
     {
-        public InventoryInaccessible()
+        public InventoryInaccessibleException()
         {
 
         }

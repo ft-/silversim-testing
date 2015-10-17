@@ -421,7 +421,7 @@ namespace SilverSim.Viewer.Core
 
                             try
                             {
-                                folders = Agent.InventoryService.Folder.getFolders(req.OwnerID, req.FolderID);
+                                folders = Agent.InventoryService.Folder.GetFolders(req.OwnerID, req.FolderID);
                             }
                             catch
                             {
@@ -430,7 +430,7 @@ namespace SilverSim.Viewer.Core
 
                             try
                             {
-                                items = Agent.InventoryService.Folder.getItems(req.OwnerID, req.FolderID);
+                                items = Agent.InventoryService.Folder.GetItems(req.OwnerID, req.FolderID);
                             }
                             catch
                             {

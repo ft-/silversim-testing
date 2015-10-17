@@ -13,6 +13,7 @@ namespace SilverSim.Http.Client
     public static partial class HttpRequestHandler
     {
         /*---------------------------------------------------------------------*/
+        [Serializable]
         public class BadHttpResponseException : Exception
         {
             public BadHttpResponseException()
@@ -25,13 +26,13 @@ namespace SilverSim.Http.Client
         static void ReadHeaderLines(AbstractHttpStream s, IDictionary<string, string> headers)
         {
             headers.Clear();
-            string lastHeader = "";
+            string lastHeader = string.Empty;
             string hdrline;
-            while ((hdrline = s.ReadHeaderLine()) != "")
+            while ((hdrline = s.ReadHeaderLine()).Length != 0)
             {
                 if (hdrline.StartsWith(" "))
                 {
-                    if (lastHeader != string.Empty)
+                    if (lastHeader.Length != 0)
                     {
                         headers[lastHeader] += hdrline.Trim();
                     }
@@ -69,7 +70,7 @@ namespace SilverSim.Http.Client
             byte[] buffer = new byte[0];
             int content_length = 0;
 
-            if (post != string.Empty)
+            if (post.Length != 0)
             {
                 buffer = UTF8NoBOM.GetBytes(post);
 
@@ -97,14 +98,13 @@ namespace SilverSim.Http.Client
         }
 
         /*---------------------------------------------------------------------*/
-        public delegate void StreamPostDelegate(Stream output);
         public static Stream DoStreamRequest(
             string method, 
             string url, 
             IDictionary<string, string> getValues, 
             string content_type, 
             int content_length, 
-            StreamPostDelegate postdelegate, 
+            Action<Stream> postdelegate, 
             bool compressed, 
             int timeoutms, 
             IDictionary<string, string> headers = null)
@@ -125,7 +125,7 @@ namespace SilverSim.Http.Client
                 reqdata = string.Format("{0} {1} HTTP/1.1\r\nHost: {2}:{3}\r\nAccept: */*\r\n", method, uri.PathAndQuery, uri.Host, uri.Port);
             }
             bool doPost = false;
-            if (content_type != string.Empty)
+            if (content_type.Length != 0)
             {
                 doPost = true;
                 reqdata += string.Format("Content-Type: {0}\r\nContent-Length: {1}\r\n", content_type, content_length);
@@ -199,7 +199,7 @@ namespace SilverSim.Http.Client
                         throw new HttpException(int.Parse(splits[1]), splits[2]);
                     }
 
-                    while (s.ReadHeaderLine() != "")
+                    while (s.ReadHeaderLine().Length != 0)
                     {
 
                     }

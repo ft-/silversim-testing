@@ -66,7 +66,7 @@ namespace SilverSim.Backend.Common.OfflineIM
 
             try
             {
-                m_OfflineIMService.storeOfflineIM(im);
+                m_OfflineIMService.StoreOfflineIM(im);
             }
             catch
 #if DEBUG

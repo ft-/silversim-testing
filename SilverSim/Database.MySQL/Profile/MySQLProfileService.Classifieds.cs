@@ -20,7 +20,7 @@ namespace SilverSim.Database.MySQL.Profile
                 m_ConnectionString = connectionString;
             }
 
-            public Dictionary<UUID, string> getClassifieds(UUI user)
+            public Dictionary<UUID, string> GetClassifieds(UUI user)
             {
                 Dictionary<UUID, string> res = new Dictionary<UUID, string>();
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))

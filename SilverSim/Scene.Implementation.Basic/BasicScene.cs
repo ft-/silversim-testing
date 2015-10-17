@@ -420,7 +420,7 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 RegionInfo rInfo = s.RegionData;
                 rInfo.Flags &= (~RegionFlags.RegionOnline);
-                m_NeighborService.notifyNeighborStatus(rInfo);
+                m_NeighborService.NotifyNeighborStatus(rInfo);
             }
             SceneListeners.Remove(m_SimulationDataStorage);
             Terrain.TerrainListeners.Remove(this);
@@ -666,7 +666,7 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 RegionInfo rInfo = RegionData;
                 rInfo.Flags |= RegionFlags.RegionOnline;
-                m_NeighborService.notifyNeighborStatus(rInfo);
+                m_NeighborService.NotifyNeighborStatus(rInfo);
             }
             this.LoadSceneAsync(m_SimulationDataStorage);
         }

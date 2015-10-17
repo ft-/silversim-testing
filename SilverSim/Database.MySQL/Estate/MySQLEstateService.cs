@@ -248,7 +248,7 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        public override EstateRegionMapServiceInterface RegionMap
+        public override IEstateRegionMapServiceInterface RegionMap
         {
             get 
             {

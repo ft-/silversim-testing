@@ -8,14 +8,14 @@ namespace SilverSim.Http.Client
 {
     public static partial class HttpRequestHandler
     {
-        class RequestBodyStream : Stream
+        public class RequestBodyStream : Stream
         {
             private Stream m_Output;
             private long m_RemainingLength;
             private long m_ContentLength;
             private static readonly byte[] FillBytes = new byte[10240];
 
-            public RequestBodyStream(Stream output, long contentLength)
+            internal RequestBodyStream(Stream output, long contentLength)
             {
                 m_RemainingLength = contentLength;
                 m_Output = output;
@@ -74,7 +74,7 @@ namespace SilverSim.Http.Client
                 }
             }
 
-            public new int WriteTimeout
+            public virtual new int WriteTimeout
             {
                 get
                 {
@@ -86,12 +86,12 @@ namespace SilverSim.Http.Client
                 }
             }
 
-            public new IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+            public virtual new IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
             {
                 throw new NotSupportedException();
             }
 
-            public new void Close()
+            public virtual new void Close()
             {
                 if (m_Output != null)
                 {
@@ -110,7 +110,7 @@ namespace SilverSim.Http.Client
                 }
             }
 
-            protected new void Dispose(bool disposing)
+            protected virtual new void Dispose(bool disposing)
             {
                 if (m_Output != null)
                 {

@@ -47,7 +47,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override List<InventoryItem> getActiveGestures(UUID PrincipalID)
+        public override List<InventoryItem> GetActiveGestures(UUID PrincipalID)
         {
             List<InventoryItem> items = new List<InventoryItem>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))

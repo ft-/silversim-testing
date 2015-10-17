@@ -30,6 +30,6 @@ namespace SilverSim.ServiceInterfaces.Estate
         public abstract IEstateOwnerServiceInterface EstateOwner { get; }
         public abstract EstateAccessServiceInterface EstateAccess { get; }
         public abstract EstateGroupsServiceInterface EstateGroup { get; }
-        public abstract EstateRegionMapServiceInterface RegionMap { get; }
+        public abstract IEstateRegionMapServiceInterface RegionMap { get; }
     }
 }

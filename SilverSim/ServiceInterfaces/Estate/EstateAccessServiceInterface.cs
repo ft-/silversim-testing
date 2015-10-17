@@ -8,7 +8,7 @@ namespace SilverSim.ServiceInterfaces.Estate
 {
     public abstract class EstateAccessServiceInterface
     {
-        public interface ListAccess
+        public interface IListAccess
         {
             List<UUI> this[uint estateID] { get; }
         }
@@ -20,6 +20,6 @@ namespace SilverSim.ServiceInterfaces.Estate
 
         public abstract bool this[uint estateID, UUI agent] { get; set; }
 
-        public abstract ListAccess All { get; }
+        public abstract IListAccess All { get; }
     }
 }

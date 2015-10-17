@@ -16,7 +16,7 @@ namespace SilverSim.Database.MySQL.Estate
         string m_ConnectionString;
         MySQLListAccess m_ListAccess;
 
-        class MySQLListAccess : ListAccess
+        class MySQLListAccess : IListAccess
         {
             string m_ConnectionString;
 
@@ -104,7 +104,7 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        public override ListAccess All
+        public override IListAccess All
         {
             get 
             {

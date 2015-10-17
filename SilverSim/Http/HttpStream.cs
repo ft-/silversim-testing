@@ -13,10 +13,11 @@ namespace SilverSim.Http
     {
         Socket m_Socket;
         byte[] m_Buffer;
-        int m_BufferPos = 0;
-        int m_BufferFill = 0;
+        int m_BufferPos;
+        int m_BufferFill;
         int m_ReadTimeout = 5000;
 
+        [Serializable]
         public class TimeoutException : Exception
         {
             public TimeoutException()

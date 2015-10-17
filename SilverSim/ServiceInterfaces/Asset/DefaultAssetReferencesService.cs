@@ -9,7 +9,7 @@ using ThreadedClasses;
 
 namespace SilverSim.ServiceInterfaces.Asset
 {
-    public class DefaultAssetReferencesService : AssetReferencesServiceInterface, IDisposable
+    public sealed class DefaultAssetReferencesService : AssetReferencesServiceInterface, IDisposable
     {
         #region Fields
         private AssetServiceInterface m_Service;

@@ -23,6 +23,7 @@ namespace SilverSim.ServiceInterfaces.IM
         }
     }
 
+    [Serializable]
     public class IMOfflineRetrieveFailedException : Exception
     {
         public IMOfflineRetrieveFailedException()
@@ -47,9 +48,9 @@ namespace SilverSim.ServiceInterfaces.IM
         #endregion
 
         #region Methods
-        public abstract void storeOfflineIM(GridInstantMessage im);
-        public abstract List<GridInstantMessage> getOfflineIMs(UUID principalID);
-        public abstract void deleteOfflineIM(ulong offlineImID);
+        public abstract void StoreOfflineIM(GridInstantMessage im);
+        public abstract List<GridInstantMessage> GetOfflineIMs(UUID principalID);
+        public abstract void DeleteOfflineIM(ulong offlineImID);
         #endregion
     }
 }
