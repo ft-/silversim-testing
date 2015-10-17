@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace SilverSim.Main.Service
 {
-    class MainService : ServiceBase
+    sealed class MainService : ServiceBase
     {
         public const string SERVICE_NAME = "SilverSim";
 

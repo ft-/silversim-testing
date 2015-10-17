@@ -8,7 +8,7 @@ using System.Threading;
 
 namespace SilverSim.Main
 {
-    public static class Application
+    static class Application
     {
         static ConfigurationLoader m_ConfigLoader;
         static ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
