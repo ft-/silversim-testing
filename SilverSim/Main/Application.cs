@@ -29,7 +29,7 @@ namespace SilverSim.Main
                 )
             {
 #if DEBUG
-                System.Console.Write(e.StackTrace.ToString());
+                System.Console.Write(e.StackTrace);
                 System.Console.WriteLine();
 #endif
                 Environment.Exit(1);

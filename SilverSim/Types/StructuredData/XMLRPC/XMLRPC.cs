@@ -47,7 +47,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                         }
                         else if (reader.Name == "value")
                         {
-                            if(fieldname == "")
+                            if(fieldname == string.Empty)
                             {
                                 throw new InvalidXmlRpcSerialization();
                             }
@@ -361,6 +361,10 @@ namespace SilverSim.Types.StructuredData.XMLRPC
 
         public static XmlRpcRequest DeserializeRequest(XmlTextReader reader)
         {
+            if(null == reader)
+            {
+                throw new ArgumentNullException();
+            }
             for (; ; )
             {
                 if (!reader.Read())
@@ -389,7 +393,11 @@ namespace SilverSim.Types.StructuredData.XMLRPC
         #region Deserialization (Response)
         public static XmlRpcResponse DeserializeResponse(Stream o)
         {
-            using(XmlTextReader reader = new XmlTextReader(o))
+            if (null == o)
+            {
+                throw new ArgumentNullException();
+            }
+            using (XmlTextReader reader = new XmlTextReader(o))
             {
                 return DeserializeResponse(reader);
             }
@@ -766,7 +774,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
 
         public class XmlRpcFaultResponse
         {
-            public int FaultCode = 0;
+            public int FaultCode;
             public string FaultString = string.Empty;
 
             public XmlRpcFaultResponse()
