@@ -144,7 +144,7 @@ namespace SilverSim.Types
         }
 
         #region Helpers
-        public ABoolean AsBoolean { get { return new ABoolean(m_Value != ""); } }
+        public ABoolean AsBoolean { get { return new ABoolean(!string.IsNullOrEmpty(m_Value)); } }
         public Integer AsInteger { get { return new Integer(Int32.Parse(m_Value)); } }
         public Quaternion AsQuaternion { get { return Quaternion.Parse(m_Value); } }
         public Real AsReal { get { return Real.Parse(m_Value); } }

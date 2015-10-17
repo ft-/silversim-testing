@@ -133,7 +133,7 @@ namespace SilverSim.Types
                 if (names.Length < 2)
                 {
                     FirstName = names[0];
-                    LastName = "";
+                    LastName = string.Empty;
                     HomeURI = null;
                 }
                 else
@@ -146,7 +146,7 @@ namespace SilverSim.Types
                         if (names.Length < 2)
                         {
                             FirstName = names[0];
-                            LastName = "";
+                            LastName = string.Empty;
                         }
                         else
                         {

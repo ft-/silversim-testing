@@ -385,7 +385,7 @@ namespace SilverSim.StructuredData.Agent
                     }
                     List<AgentWearables.WearableInfo> wearables = Appearance.Wearables[(WearableType)i];
                     w.Write("[");
-                    prefix = "";
+                    prefix = string.Empty;
                     foreach (AgentWearables.WearableInfo wi in wearables)
                     {
                         w.Write(prefix);
@@ -404,7 +404,7 @@ namespace SilverSim.StructuredData.Agent
             }
             w.Write("], \"attachments\":[");
             {
-                prefix = "";
+                prefix = string.Empty;
                 foreach(KeyValuePair<AttachmentPoint, RwLockedDictionary<UUID, UUID>> kvp in Appearance.Attachments)
                 {
                     foreach (KeyValuePair<UUID, UUID> kvpInner in kvp.Value)

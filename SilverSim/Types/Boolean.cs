@@ -100,7 +100,7 @@ namespace SilverSim.Types
         public Integer AsInteger { get { return new Integer(m_Value ? 1 : 0); } }
         public Quaternion AsQuaternion { get { return new Quaternion(0, 0, 0, m_Value ? 1 : 0); } }
         public Real AsReal { get { return new Real(m_Value ? 1 : 0); } }
-        public AString AsString { get { return new AString(m_Value ? "1" : ""); } }
+        public AString AsString { get { return new AString(m_Value ? "1" : string.Empty); } }
         public UUID AsUUID { get { return new UUID(); } }
         public Vector3 AsVector3 { get { return new Vector3(m_Value ? 1 : 0); } }
         public uint AsUInt { get { return m_Value ? (uint)1 : 0; } }

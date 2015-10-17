@@ -11,12 +11,12 @@ namespace SilverSim.Types.Primitive
         private ColorAlpha m_TextureColor = new ColorAlpha(1, 1, 1, 1);
         private float m_RepeatU = 1;
         private float m_RepeatV = 1;
-        private float m_OffsetU = 0;
-        private float m_OffsetV = 0;
-        private float m_Rotation = 0;
-        private float m_Glow = 0;
-        private byte m_Material = 0;
-        private byte m_MediaByte = 0;
+        private float m_OffsetU;
+        private float m_OffsetV;
+        private float m_Rotation;
+        private float m_Glow;
+        private byte m_Material;
+        private byte m_MediaByte;
         private TextureAttributes m_AttributeFlags = TextureAttributes.None;
         private UUID m_TextureID = DEFAULT_TEXTURE;
         private UUID m_MaterialID = UUID.Zero;
@@ -421,7 +421,7 @@ namespace SilverSim.Types.Primitive
             return String.Format("Color: {0} RepeatU: {1} RepeatV: {2} OffsetU: {3} OffsetV: {4} " +
                 "Rotation: {5} Bump: {6} Shiny: {7} Fullbright: {8} Mapping: {9} Media: {10} Glow: {11} ID: {12} MaterialID: {13}",
                 TextureColor, RepeatU, RepeatV, OffsetU, OffsetV, Rotation, Bump, Shiny, FullBright, TexMapType,
-                MediaFlags, Glow, TextureID, MaterialID);
+                MediaFlags, Glow, TextureID.ToString(), MaterialID.ToString());
         }
 
         public TextureEntryFace(TextureEntryFace defaultTexture)
