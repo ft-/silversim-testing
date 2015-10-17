@@ -16,8 +16,9 @@ namespace SilverSim.Main.Service
         public MainService()
         {
             ServiceName = SERVICE_NAME;
-            EventLog.Source = SERVICE_NAME;
-            EventLog.Log = "Application";
+            EventLog eventLog = EventLog;
+            eventLog.Source = SERVICE_NAME;
+            eventLog.Log = "Application";
 
             CanHandlePowerEvent = false;
             CanHandleSessionChangeEvent = false;
@@ -25,9 +26,9 @@ namespace SilverSim.Main.Service
             CanShutdown = true;
             CanStop = true;
 
-            if (!EventLog.SourceExists(EventLog.Source))
+            if (!EventLog.SourceExists(eventLog.Source))
             {
-                EventLog.CreateEventSource(EventLog.Source, EventLog.Log);
+                EventLog.CreateEventSource(eventLog.Source, eventLog.Log);
             }
         }
 
@@ -84,11 +85,11 @@ namespace SilverSim.Main.Service
             }
             catch (ConfigurationLoader.ConfigurationError e)
             {
-                EventLog.WriteEntry(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace.ToString());
+                EventLog.WriteEntry(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
             }
             catch (Exception e)
             {
-                EventLog.WriteEntry(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace.ToString());
+                EventLog.WriteEntry(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
             }
 
             m_ShutdownEvent.WaitOne();
