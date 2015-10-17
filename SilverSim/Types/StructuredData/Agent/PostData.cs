@@ -150,7 +150,7 @@ namespace SilverSim.StructuredData.Agent
 
             if (agentparams.Account.ServiceURLs.ContainsKey("GatekeeperURI"))
             {
-                if (agentparams.Account.ServiceURLs["GatekeeperURI"] == "" || agentparams.Account.ServiceURLs["GatekeeperURI"] == "/")
+                if (string.IsNullOrEmpty(agentparams.Account.ServiceURLs["GatekeeperURI"]) || agentparams.Account.ServiceURLs["GatekeeperURI"] == "/")
                 {
                     agentparams.Account.ServiceURLs["GatekeeperURI"] = agentparams.Account.ServiceURLs["HomeURI"];
                 }
@@ -286,7 +286,7 @@ namespace SilverSim.StructuredData.Agent
             WriteJSONString(w, "caps_path", Circuit.CapsPath); w.Write(",");
             WriteJSONValue(w, "child", Circuit.IsChild); w.Write(",");
             w.Write("\"children_seeds\":[");
-            prefix = "";
+            prefix = string.Empty;
             foreach(KeyValuePair<UInt64, string> kvp in Circuit.ChildrenCapSeeds)
             {
                 w.Write(prefix);
@@ -356,7 +356,7 @@ namespace SilverSim.StructuredData.Agent
             string vParams = string.Empty;
             foreach(byte v in Appearance.VisualParams)
             {
-                if(vParams != string.Empty)
+                if(!string.IsNullOrEmpty(vParams))
                 {
                     vParams += ",";
                 }

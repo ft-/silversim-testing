@@ -23,7 +23,7 @@ namespace SilverSim.StructuredData.JSON
         private static string ReadString(StreamReader io, char eos)
         {
             char c;
-            string s = "";
+            string s = string.Empty;
             while(eos != (c = (char) io.Read()))
             {
                 if(c == '\\')
@@ -82,7 +82,7 @@ namespace SilverSim.StructuredData.JSON
                     return ParseMap(io);
 
                 default:
-                    string input = "";
+                    string input = string.Empty;
                     for (; ;)
                     {
                         c = (char) io.Peek();
@@ -270,7 +270,7 @@ namespace SilverSim.StructuredData.JSON
         private static void SerializeStruct(TextWriter io, Map map)
         {
             io.Write('{');
-            string needcomma = "";
+            string needcomma = string.Empty;
             foreach(KeyValuePair<string, IValue> kvp in map)
             {
                 io.Write(needcomma);
@@ -283,7 +283,7 @@ namespace SilverSim.StructuredData.JSON
         private static void SerializeArray(TextWriter io, AnArray arr)
         {
             io.Write('[');
-            string needcomma = "";
+            string needcomma = string.Empty;
             foreach(IValue val in arr)
             {
                 io.Write(needcomma);

@@ -94,7 +94,7 @@ namespace SilverSim.StructuredData.AssetXml
                             case "Name":
                                 if (reader.IsEmptyElement)
                                 {
-                                    asset.Name = "";
+                                    asset.Name = string.Empty;
                                 }
                                 else
                                 {
