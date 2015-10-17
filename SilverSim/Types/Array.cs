@@ -164,7 +164,6 @@ namespace SilverSim.Types
             {
                 m_Array = array;
                 m_CurrentIndex = -1;
-                m_MarkIndex = 0;
             }
             public IValue Current 
             { 

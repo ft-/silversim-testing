@@ -17,7 +17,7 @@ namespace SilverSim.Types.GridUser
         public UUID LastRegionID = UUID.Zero;
         public Vector3 LastPosition = Vector3.Zero;
         public Vector3 LastLookAt = Vector3.Zero;
-        public bool IsOnline = false;
+        public bool IsOnline;
         public Date LastLogin = new Date();
         public Date LastLogout = new Date();
     }

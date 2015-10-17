@@ -30,7 +30,6 @@ namespace SilverSim.Types
 
         public Integer()
         {
-            m_Value = 0;
         }
 
         public Integer(Int32 val)

@@ -283,7 +283,7 @@ namespace SilverSim.StructuredData.Agent
             /*-----------------------------------------------------------------*/
             /* Circuit Info */
             WriteJSONString(w, "circuit_code", Circuit.CircuitCode.ToString()); w.Write(",");
-            WriteJSONString(w, "caps_path", Circuit.CapsPath.ToString()); w.Write(",");
+            WriteJSONString(w, "caps_path", Circuit.CapsPath); w.Write(",");
             WriteJSONValue(w, "child", Circuit.IsChild); w.Write(",");
             w.Write("\"children_seeds\":[");
             prefix = "";

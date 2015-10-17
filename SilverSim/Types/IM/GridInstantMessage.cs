@@ -11,20 +11,20 @@ namespace SilverSim.Types.IM
         public UGI FromGroup = UGI.Unknown;
         public UUI ToAgent = UUI.Unknown;
         public GridInstantMessageDialog Dialog;
-        public bool IsFromGroup = false;
+        public bool IsFromGroup;
         public string Message = string.Empty;
         public UUID IMSessionID = UUID.Zero;
-        public bool IsOffline = false;
+        public bool IsOffline;
         public Vector3 Position = Vector3.Zero;
         public byte[] BinaryBucket = new byte[0];
-        public uint ParentEstateID = 0;
+        public uint ParentEstateID;
         public UUID RegionID = UUID.Zero;
         public Date Timestamp = new Date();
 
         public delegate void OnResultDelegate(GridInstantMessage im, bool success);
         public OnResultDelegate OnResult;
-        public bool NoOfflineIMStore = false;
-        public bool IsSystemMessage = false;
+        public bool NoOfflineIMStore;
+        public bool IsSystemMessage;
 
         /* can be used for storing the result */
         public bool ResultInfo;

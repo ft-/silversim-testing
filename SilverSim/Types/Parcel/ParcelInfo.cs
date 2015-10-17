@@ -99,15 +99,15 @@ namespace SilverSim.Types.Parcel
 
     public class ParcelInfo
     {
-        public int Area = 0;
-        public uint AuctionID = 0;
+        public int Area;
+        public uint AuctionID;
         public UUI AuthBuyer = new UUI();
-        public ParcelCategory Category = ParcelCategory.None;
+        public ParcelCategory Category;
         public Date ClaimDate = new Date();
-        public int ClaimPrice = 0;
+        public int ClaimPrice;
         public UUID ID = UUID.Random;
         public UGI Group = UGI.Unknown;
-        public bool GroupOwned = false;
+        public bool GroupOwned;
         public string Description = string.Empty;
         public ParcelFlags Flags = ParcelFlags.AllowFly |
                             ParcelFlags.AllowLandmark |
@@ -118,21 +118,21 @@ namespace SilverSim.Types.Parcel
                             ParcelFlags.AllowOtherScripts |
                             ParcelFlags.SoundLocal |
                             ParcelFlags.AllowVoiceChat;
-        public TeleportLandingType LandingType = TeleportLandingType.Blocked;
+        public TeleportLandingType LandingType;
         public Vector3 LandingPosition = Vector3.Zero;
         public Vector3 LandingLookAt = Vector3.Zero;
         public string Name = string.Empty;
-        public ParcelStatus Status = ParcelStatus.Leased;
-        public int LocalID = 0;
-        public URI MusicURI = null;
-        public URI MediaURI = null;
+        public ParcelStatus Status;
+        public int LocalID;
+        public URI MusicURI;
+        public URI MediaURI;
         public UUID MediaID;
         public UUI Owner = new UUI();
         public UUID SnapshotID = UUID.Zero;
         public Int32 SalePrice;
         public Int32 OtherCleanTime;
         public bool MediaAutoScale;
-        public Int32 RentPrice = 0;
+        public Int32 RentPrice;
         public Vector3 AABBMin;
         public Vector3 AABBMax;
         public double ParcelPrimBonus;

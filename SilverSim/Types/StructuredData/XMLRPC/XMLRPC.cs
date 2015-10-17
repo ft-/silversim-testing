@@ -371,7 +371,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
         {
             if(null == reader)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("reader");
             }
             for (; ; )
             {
@@ -403,7 +403,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
         {
             if (null == o)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("o");
             }
             using (XmlTextReader reader = new XmlTextReader(o))
             {
@@ -415,7 +415,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
         {
             if(null == reader)
             {
-                throw new ArgumentNullException();
+                throw new ArgumentNullException("reader");
             }
 
             for(;;)

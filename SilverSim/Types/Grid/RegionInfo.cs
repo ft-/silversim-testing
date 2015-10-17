@@ -18,15 +18,15 @@ namespace SilverSim.Types.Grid
         public GridVector Size = GridVector.Zero;
         public string Name = string.Empty;
         public string ServerIP = string.Empty;
-        public uint ServerHttpPort = 0;
+        public uint ServerHttpPort;
         public string ServerURI = string.Empty;
-        public uint ServerPort = 0;
+        public uint ServerPort;
         public UUID RegionMapTexture = UUID.Zero;
         public UUID ParcelMapTexture = UUID.Zero;
-        public RegionAccess Access = 0;
+        public RegionAccess Access;
         public string RegionSecret = string.Empty;
         public UUI Owner = UUI.Unknown;
-        public RegionFlags Flags = 0;
+        public RegionFlags Flags;
         public string ProtocolVariant = ProtocolVariantId.Local;
         public string GridURI = string.Empty; /* empty when addressing local grid */
         public static class ProtocolVariantId

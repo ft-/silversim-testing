@@ -12,8 +12,8 @@ namespace SilverSim.Types.Asset.Format
     public class ObjectXmlStreamFilter : Stream
     {
         byte[] m_Buffer = new byte[10240];
-        int m_BufFill = 0;
-        int m_BufUsed = 0;
+        int m_BufFill;
+        int m_BufUsed;
         Stream m_BufInput;
 
         public ObjectXmlStreamFilter(Stream input)

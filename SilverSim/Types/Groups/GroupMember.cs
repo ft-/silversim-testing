@@ -8,10 +8,10 @@ namespace SilverSim.Types.Groups
         public UGI Group = UGI.Unknown;
         public UUI Principal = UUI.Unknown;
         public UUID SelectedRoleID = UUID.Zero;
-        public int Contribution = 0;
-        public bool IsListInProfile = false;
-        public bool IsAcceptNotices = false;
-        public string AccessToken = "";
+        public int Contribution;
+        public bool IsListInProfile;
+        public bool IsAcceptNotices;
+        public string AccessToken = string.Empty;
 
         public GroupMember()
         {

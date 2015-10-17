@@ -9,12 +9,12 @@ namespace SilverSim.Types.Account
     {
         public UUI Principal = UUI.Unknown;
         public UUID ScopeID = UUID.Zero;
-        public string Email = "";
+        public string Email = string.Empty;
         public Date Created = new Date();
         public int UserLevel = -1;
-        public int UserFlags = 0;
-        public string UserTitle = "";
-        public bool IsLocalToGrid = false;
+        public int UserFlags;
+        public string UserTitle = string.Empty;
+        public bool IsLocalToGrid;
         public Dictionary<string, string> ServiceURLs = new Dictionary<string,string>(); /* only valid when IsLocalToGrid is set to false */
 
         public UserAccount()

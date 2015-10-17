@@ -11,7 +11,7 @@ namespace SilverSim.Types.Estate
 {
     public class EstateInfo
     {
-        public uint ID = 0;
+        public uint ID;
         public uint ParentEstateID = 1;
         public string Name = "My Estate";
         public RegionOptionFlags Flags = RegionOptionFlags.AllowDirectTeleport | 
@@ -20,7 +20,7 @@ namespace SilverSim.Types.Estate
             RegionOptionFlags.AllowVoice | 
             RegionOptionFlags.PublicAllowed;
         public UUI Owner = UUI.Unknown;
-        public int PricePerMeter = 0;
+        public int PricePerMeter;
         public double BillableFactor = 1;
         public double SunPosition = 1;
         public string AbuseEmail = string.Empty;

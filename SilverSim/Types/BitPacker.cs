@@ -19,7 +19,6 @@ namespace SilverSim.Types
 
         public BitPacker(byte[] data)
         {
-            m_BitPos = 0;
             Data = data;
         }
 

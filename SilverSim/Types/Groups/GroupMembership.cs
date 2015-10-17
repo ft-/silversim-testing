@@ -13,11 +13,11 @@ namespace SilverSim.Types.Groups
         public UGI Group = UGI.Unknown;
         public UUI Principal = UUI.Unknown;
         public GroupPowers GroupPowers = GroupPowers.None;
-        public bool AcceptNotices = false;
+        public bool AcceptNotices;
         public UUID GroupInsigniaID = UUID.Zero;
-        public Int32 Contribution = 0;
+        public Int32 Contribution;
         public string GroupTitle = string.Empty;
-        public bool ListInProfile = false;
+        public bool ListInProfile;
 
         public GroupMembership()
         {

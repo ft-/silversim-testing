@@ -12,7 +12,7 @@ namespace SilverSim.Types.Asset.Format
 {
     public class Notecard : IReferencesAccessor
     {
-        public NotecardInventory Inventory = null;
+        public NotecardInventory Inventory;
         public string Text = string.Empty;
         private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
 

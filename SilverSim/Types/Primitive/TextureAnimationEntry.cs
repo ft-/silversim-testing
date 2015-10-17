@@ -20,13 +20,13 @@ namespace SilverSim.Types.Primitive
             SCALE = 0x40
         }
 
-        public TextureAnimMode Flags = TextureAnimMode.ANIM_OFF;
-        public sbyte Face = 0;
-        public byte SizeX = 0;
-        public byte SizeY = 0;
-        public float Start = 0;
-        public float Length = 0;
-        public float Rate = 0;
+        public TextureAnimMode Flags;
+        public sbyte Face;
+        public byte SizeX;
+        public byte SizeY;
+        public float Start;
+        public float Length;
+        public float Rate;
 
         public TextureAnimationEntry()
         {

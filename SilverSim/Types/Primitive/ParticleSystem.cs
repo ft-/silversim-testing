@@ -91,15 +91,15 @@ namespace SilverSim.Types.Primitive
             OneMinusSourceAlpha = 9,
         }
 
-        public uint CRC = 0;
+        public uint CRC;
         /// <summary>Particle Flags</summary>
         /// <remarks>There appears to be more data packed in to this area
         /// for many particle systems. It doesn't appear to be flag values
         /// and serialization breaks unless there is a flag for every
         /// possible bit so it is left as an unsigned integer</remarks>
-        public uint PartFlags = 0;
+        public uint PartFlags;
         /// <summary><seealso cref="T:SourcePattern"/> pattern of particles</summary>
-        public SourcePattern Pattern = SourcePattern.None;
+        public SourcePattern Pattern;
         /// <summary>A <see langword="float"/> representing the maximimum age (in seconds) particle will be displayed</summary>
         /// <remarks>Maximum value is 30 seconds</remarks>
         public float MaxAge = 10;
@@ -107,16 +107,16 @@ namespace SilverSim.Types.Primitive
         /// from when the particle source comes into view, 
         /// or the particle system's creation, that the object will emits particles; 
         /// after this time period no more particles are emitted</summary>
-        public float StartAge = 0;
+        public float StartAge;
         /// <summary>A <see langword="float"/> in radians that specifies where particles will not be created</summary>
-        public float InnerAngle = 0;
+        public float InnerAngle;
         /// <summary>A <see langword="float"/> in radians that specifies where particles will be created</summary>
-        public float OuterAngle = 0;
+        public float OuterAngle;
         /// <summary>A <see langword="float"/> representing the number of seconds between burts.</summary>
         public float BurstRate = 0.1f;
         /// <summary>A <see langword="float"/> representing the number of meters
         /// around the center of the source where particles will be created.</summary>
-        public float BurstRadius = 0;
+        public float BurstRadius;
         /// <summary>A <see langword="float"/> representing in seconds, the minimum speed between bursts of new particles 
         /// being emitted</summary>
         public float BurstSpeedMin = 1;
@@ -133,9 +133,9 @@ namespace SilverSim.Types.Primitive
         /// <summary>The <see cref="T:UUID"/> Key of the specified target object or avatar particles will follow</summary>
         public UUID Target = UUID.Zero;
         /// <summary>Flags of particle from <seealso cref="T:ParticleDataFlags"/></summary>
-        public ParticleDataFlags PartDataFlags = ParticleDataFlags.None;
+        public ParticleDataFlags PartDataFlags;
         /// <summary>Max Age particle system will emit particles for</summary>
-        public float PartMaxAge = 0;
+        public float PartMaxAge;
         /// <summary>The <see cref="T:Color4"/> the particle has at the beginning of its lifecycle</summary>
         public ColorAlpha PartStartColor = ColorAlpha.White;
         /// <summary>The <see cref="T:Color4"/> the particle has at the ending of its lifecycle</summary>
@@ -155,10 +155,10 @@ namespace SilverSim.Types.Primitive
 
         /// <summary>A <see langword="float"/> that represents the start glow value</summary>
         /// <remarks>Minimum value is 0, maximum value is 1</remarks>
-        public float PartStartGlow = 0;
+        public float PartStartGlow;
         /// <summary>A <see langword="float"/> that represents the end glow value</summary>
         /// <remarks>Minimum value is 0, maximum value is 1</remarks>
-        public float PartEndGlow = 0;
+        public float PartEndGlow;
 
         /// <summary>OpenGL blend function to use at particle source</summary>
         public BlendFunc BlendFuncSource = BlendFunc.SourceAlpha;
@@ -216,20 +216,13 @@ namespace SilverSim.Types.Primitive
         /// <param name="pos">Start position for BitPacker</param>
         public ParticleSystem(byte[] data, int pos)
         {
-            PartStartGlow = 0f;
-            PartEndGlow = 0f;
             BlendFuncSource = BlendFunc.SourceAlpha;
             BlendFuncDest = BlendFunc.OneMinusSourceAlpha;
 
-            CRC = PartFlags = 0;
-            Pattern = SourcePattern.None;
             MaxAge = StartAge = InnerAngle = OuterAngle = BurstRate = BurstRadius = BurstSpeedMin =
                 BurstSpeedMax = 0.0f;
-            BurstPartCount = 0;
             AngularVelocity = PartAcceleration = Vector3.Zero;
             Texture = Target = UUID.Zero;
-            PartDataFlags = ParticleDataFlags.None;
-            PartMaxAge = 0.0f;
             PartStartColor = PartEndColor = ColorAlpha.Black;
             PartStartScaleX = PartStartScaleY = PartEndScaleX = PartEndScaleY = 0.0f;
 

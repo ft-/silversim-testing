@@ -8,7 +8,7 @@ namespace SilverSim.Types.Asset.Format
     public class NotecardInventoryItem : InventoryItem
     {
         #region Fields
-        public uint ExtCharIndex = 0;
+        public uint ExtCharIndex;
         #endregion
 
         #region Constructor

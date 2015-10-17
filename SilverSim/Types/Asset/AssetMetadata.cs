@@ -8,12 +8,12 @@ namespace SilverSim.Types.Asset
     public class AssetMetadata
     {
         public UUID ID = UUID.Zero;
-        public bool Local = false; /* not for serialization */
-        public bool Temporary = false;
+        public bool Local; /* field not for serialization */
+        public bool Temporary;
         public AssetType Type = AssetType.Unknown;
         public string Name = string.Empty;
         public UUI Creator = UUI.Unknown;
-        public AssetFlags Flags = AssetFlags.Normal;
+        public AssetFlags Flags;
         public Date CreateTime = new Date();
         public Date AccessTime = new Date();
 
@@ -46,7 +46,7 @@ namespace SilverSim.Types.Asset
                     case AssetType.Simstate: return "_simstate.bin";
                     case AssetType.Mesh: return "_mesh.llmesh";
                     case AssetType.Material: return "_material.xml";
-                    default: throw new Exception("Unmapped asset type " + Type.ToString());
+                    default: throw new ArgumentException("Unmapped asset type " + Type.ToString());
                 }
             }
         }
@@ -138,7 +138,7 @@ namespace SilverSim.Types.Asset
                 }
                 else
                 {
-                    throw new Exception("Unknown extension " + value);
+                    throw new ArgumentException("Unknown extension " + value);
                 }
 
                 int lastOf = value.LastIndexOf('/');

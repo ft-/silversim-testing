@@ -14,22 +14,22 @@ namespace SilverSim.Types.Asset.Format
         #region Fields
         public UUID MaterialID;
         public int AlphaMaskCutoff = 1;
-        public int DiffuseAlphaMode = 0;
-        public int EnvIntensity = 0;
+        public int DiffuseAlphaMode;
+        public int EnvIntensity;
         public UUID NormMap = UUID.Zero;
-        public int NormOffsetX = 0;
-        public int NormOffsetY = 0;
+        public int NormOffsetX;
+        public int NormOffsetY;
         public int NormRepeatX = 10000;
         public int NormRepeatY = 10000;
-        public int NormRotation = 0;
+        public int NormRotation;
         public ColorAlpha SpecColor = ColorAlpha.White;
         public int SpecExp = DEFAULT_SPECULAR_LIGHT_EXPONENT;
         public UUID SpecMap = UUID.Zero;
-        public int SpecOffsetX = 0;
-        public int SpecOffsetY = 0;
+        public int SpecOffsetX;
+        public int SpecOffsetY;
         public int SpecRepeatX = 10000;
         public int SpecRepeatY = 10000;
-        public int SpecRotation = 0;
+        public int SpecRotation;
         #endregion
 
         public const double MATERIALS_MULTIPLIER = 10000f;

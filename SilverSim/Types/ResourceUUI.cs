@@ -8,7 +8,7 @@ namespace SilverSim.Types
     public sealed class ResourceUUI
     {
         public UUID ID = UUID.Zero;
-        public Uri LocationURI = null;
+        public Uri LocationURI;
 
         public ResourceUUI()
         {

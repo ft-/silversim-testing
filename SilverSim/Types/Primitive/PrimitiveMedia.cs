@@ -17,19 +17,19 @@ namespace SilverSim.Types.Primitive
 
             }
 
-            public bool IsAutoLoop = false;
-            public bool IsAutoPlay = false;
-            public bool IsAutoScale = false;
-            public bool IsAutoZoom = false;
+            public bool IsAutoLoop;
+            public bool IsAutoPlay;
+            public bool IsAutoScale;
+            public bool IsAutoZoom;
             public int Width;
             public int Height;
             public PrimitiveMediaPermission ControlPermissions = PrimitiveMediaPermission.All;
-            public PrimitiveMediaControls Controls = PrimitiveMediaControls.Standard;
+            public PrimitiveMediaControls Controls;
             public string CurrentURL = string.Empty;
-            public bool IsAlternativeImageEnabled = false;
-            public bool IsWhiteListEnabled = false;
+            public bool IsAlternativeImageEnabled;
+            public bool IsWhiteListEnabled;
             public string HomeURL = string.Empty;
-            public bool IsInteractOnFirstClick = true;
+            public bool IsInteractOnFirstClick;
             public PrimitiveMediaPermission InteractPermissions = PrimitiveMediaPermission.All;
             public string[] WhiteList = new string[0];
 

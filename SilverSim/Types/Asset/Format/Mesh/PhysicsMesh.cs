@@ -15,7 +15,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
         {
             if (asset.Type != AssetType.Mesh)
             {
-                throw new ArgumentException();
+                throw new NotAMeshFormatException();
             }
             Map meshmap;
             int start;

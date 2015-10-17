@@ -14,7 +14,7 @@ namespace SilverSim.Types.Inventory
         public string Name = string.Empty;
         public string Description = string.Empty;
         public InventoryType InventoryType = InventoryType.Unknown;
-        public uint Flags = 0;
+        public uint Flags;
         public UUI Owner = new UUI();
         public UUI LastOwner = new UUI();
         #endregion
@@ -77,7 +77,7 @@ namespace SilverSim.Types.Inventory
                         case "copy": Type = SaleType.Copy; break;
                         case "cntn": Type = SaleType.Content; break;
                         default:
-                            throw new ArgumentException();
+                            throw new ArgumentException("invalid type name " + value);
                     }
                 }
             }
@@ -88,7 +88,7 @@ namespace SilverSim.Types.Inventory
 
         #region Group Information
         public UGI Group = UGI.Unknown;
-        public bool IsGroupOwned = false;
+        public bool IsGroupOwned;
         #endregion
 
         #region Asset Information

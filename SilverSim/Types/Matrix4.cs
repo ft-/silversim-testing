@@ -380,7 +380,7 @@ namespace SilverSim.Types
             return m;
         }
 
-        public static Matrix4 CreateFromQuaternion(Quaternion quaternion)
+        public static explicit operator Matrix4(Quaternion quaternion)
         {
             Matrix4 matrix;
 

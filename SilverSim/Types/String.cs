@@ -35,7 +35,7 @@ namespace SilverSim.Types
 
         public AString(string val)
         {
-            m_Value = (string)val.Clone();
+            m_Value = val;
         }
 
         public int CompareTo(AString v)
@@ -60,7 +60,7 @@ namespace SilverSim.Types
 
         public override string ToString()
         {
-            return (string)m_Value.Clone();
+            return m_Value;
         }
 
         public AString Substring(Int32 startIndex)

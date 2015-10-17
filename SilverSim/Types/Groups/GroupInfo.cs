@@ -6,8 +6,8 @@ namespace SilverSim.Types.Groups
     public class DirGroupInfo
     {
         public UGI ID = UGI.Unknown;
-        public int MemberCount = 0;
-        public float SearchOrder = 0;
+        public int MemberCount;
+        public float SearchOrder;
 
         public DirGroupInfo()
         {
@@ -18,20 +18,20 @@ namespace SilverSim.Types.Groups
     public class GroupInfo
     {
         public UGI ID = UGI.Unknown;
-        public string Charter = "";
-        public string Location = "";
+        public string Charter = string.Empty;
+        public string Location = string.Empty;
         public UUID InsigniaID = UUID.Zero;
         public UUI Founder = UUI.Unknown;
-        public int MembershipFee = 0;
-        public bool IsOpenEnrollment = false;
-        public bool IsShownInList = false;
-        public bool IsAllowPublish = false;
-        public bool IsMaturePublish = false;
+        public int MembershipFee;
+        public bool IsOpenEnrollment;
+        public bool IsShownInList;
+        public bool IsAllowPublish;
+        public bool IsMaturePublish;
         public UUID OwnerRoleID = UUID.Zero;
 
         #region Informational fields
-        public int MemberCount = 0;
-        public int RoleCount = 0;
+        public int MemberCount;
+        public int RoleCount;
         #endregion
 
         public GroupInfo()

@@ -12,7 +12,7 @@ namespace SilverSim.Types.Asset.Format
         public UUID RegionID = UUID.Zero;
         public Vector3 LocalPos = Vector3.Zero;
         public GridVector Location = GridVector.Zero;
-        public URI GatekeeperURI = null;
+        public URI GatekeeperURI;
         #endregion
 
         #region Constructors

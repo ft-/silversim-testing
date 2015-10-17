@@ -32,7 +32,6 @@ namespace SilverSim.Types
         #region Constructors
         public ABoolean()
         {
-            m_Value = false;
         }
 
         public ABoolean(bool val)
