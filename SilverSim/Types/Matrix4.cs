@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
@@ -1009,7 +1010,7 @@ namespace SilverSim.Types
                             case 3:
                                 return M14;
                             default:
-                                throw new IndexOutOfRangeException("Matrix4 row and column values must be from 0-3");
+                                throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                         }
                     case 1:
                         switch (column)
@@ -1023,7 +1024,7 @@ namespace SilverSim.Types
                             case 3:
                                 return M24;
                             default:
-                                throw new IndexOutOfRangeException("Matrix4 row and column values must be from 0-3");
+                                throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                         }
                     case 2:
                         switch (column)
@@ -1037,7 +1038,7 @@ namespace SilverSim.Types
                             case 3:
                                 return M34;
                             default:
-                                throw new IndexOutOfRangeException("Matrix4 row and column values must be from 0-3");
+                                throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                         }
                     case 3:
                         switch (column)
@@ -1051,10 +1052,10 @@ namespace SilverSim.Types
                             case 3:
                                 return M44;
                             default:
-                                throw new IndexOutOfRangeException("Matrix4 row and column values must be from 0-3");
+                                throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                         }
                     default:
-                        throw new IndexOutOfRangeException("Matrix4 row and column values must be from 0-3");
+                        throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                 }
             }
             set
@@ -1073,7 +1074,7 @@ namespace SilverSim.Types
                             case 3:
                                 M14 = value; return;
                             default:
-                                throw new IndexOutOfRangeException("Matrix4 row and column values must be from 0-3");
+                                throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                         }
                     case 1:
                         switch (column)
@@ -1087,7 +1088,7 @@ namespace SilverSim.Types
                             case 3:
                                 M24 = value; return;
                             default:
-                                throw new IndexOutOfRangeException("Matrix4 row and column values must be from 0-3");
+                                throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                         }
                     case 2:
                         switch (column)
@@ -1101,7 +1102,7 @@ namespace SilverSim.Types
                             case 3:
                                 M34 = value; return;
                             default:
-                                throw new IndexOutOfRangeException("Matrix4 row and column values must be from 0-3");
+                                throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                         }
                     case 3:
                         switch (column)
@@ -1115,10 +1116,10 @@ namespace SilverSim.Types
                             case 3:
                                 M44 = value; return;
                             default:
-                                throw new IndexOutOfRangeException("Matrix4 row and column values must be from 0-3");
+                                throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                         }
                     default:
-                        throw new IndexOutOfRangeException("Matrix4 row and column values must be from 0-3");
+                        throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                 }
             }
         }
