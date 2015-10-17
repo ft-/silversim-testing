@@ -11,6 +11,6 @@ namespace SilverSim.ServiceInterfaces.Account
     /* this is a multi-service interface, that has to be implemented by all relevant classes */
     public interface IUserAccountDeleteServiceInterface
     {
-        void Remove(UUID scopeID, UUID userAccount);
+        void Remove(UUID scopeID, UUID accountID);
     }
 }

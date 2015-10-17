@@ -230,6 +230,7 @@ namespace SilverSim.ServiceInterfaces.Groups
             get;
         }
 
+        [Serializable]
         public class AccessFailedException : Exception
         {
             public AccessFailedException()

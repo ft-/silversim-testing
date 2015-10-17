@@ -16,7 +16,7 @@ namespace SilverSim.ServiceInterfaces.Estate
 
         }
 
-        public abstract EstateInfo this[uint EstateID]
+        public abstract EstateInfo this[uint estateID]
         {
             get;
             set;

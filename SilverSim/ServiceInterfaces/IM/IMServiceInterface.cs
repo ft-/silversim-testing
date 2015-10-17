@@ -6,6 +6,7 @@ using System;
 
 namespace SilverSim.ServiceInterfaces.IM
 {
+    [Serializable]
     public class IMSendFailedException : Exception
     {
         public IMSendFailedException()

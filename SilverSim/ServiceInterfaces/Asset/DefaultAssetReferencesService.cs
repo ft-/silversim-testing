@@ -29,21 +29,21 @@ namespace SilverSim.ServiceInterfaces.Asset
         #endregion
 
         #region Accessor
-        public override List<UUID> this[UUID asset]
+        public override List<UUID> this[UUID key]
         {
             get
             {
                 List<UUID> result;
-                if(m_ReferencesCache.TryGetValue(asset, out result))
+                if(m_ReferencesCache.TryGetValue(key, out result))
                 {
                     /* this action is cheaper than re-requesting the asset over and over again */
                     return new List<UUID>(result);
                 }
 
-                AssetData data = m_Service[asset];
+                AssetData data = m_Service[key];
                 try
                 {
-                    return new List<UUID>(m_ReferencesCache[asset] = data.References);
+                    return new List<UUID>(m_ReferencesCache[key] = data.References);
                 }
                 catch
                 {

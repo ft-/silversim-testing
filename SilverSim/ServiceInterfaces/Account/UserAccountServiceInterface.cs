@@ -41,7 +41,7 @@ namespace SilverSim.ServiceInterfaces.Account
             get;
         }
 
-        public abstract List<UserAccount> GetAccounts(UUID ScopeID, string query);
+        public abstract List<UserAccount> GetAccounts(UUID scopeID, string query);
 
         #region Optionally supported services
         public abstract void Add(UserAccount userAccount);

@@ -221,17 +221,17 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            public override Dictionary<UUID, bool> exists(List<UUID> assets)
+            public override Dictionary<UUID, bool> Exists(List<UUID> assets)
             {
-                Dictionary<UUID, bool> asset1 = m_Scene.TemporaryAssetService.exists(assets);
-                foreach(KeyValuePair<UUID, bool> kvp in m_Scene.PersistentAssetService.exists(assets))
+                Dictionary<UUID, bool> asset1 = m_Scene.TemporaryAssetService.Exists(assets);
+                foreach(KeyValuePair<UUID, bool> kvp in m_Scene.PersistentAssetService.Exists(assets))
                 {
                     if(kvp.Value)
                     {
                         asset1[kvp.Key] = true;
                     }
                 }
-                foreach (KeyValuePair<UUID, bool> kvp in ResourceAssets.exists(assets))
+                foreach (KeyValuePair<UUID, bool> kvp in ResourceAssets.Exists(assets))
                 {
                     if(kvp.Value)
                     {
@@ -241,17 +241,17 @@ namespace SilverSim.Scene.Types.Scene
                 return asset1;
             }
 
-            public override bool exists(UUID key)
+            public override bool Exists(UUID key)
             {
-                if(m_Scene.TemporaryAssetService.exists(key))
+                if(m_Scene.TemporaryAssetService.Exists(key))
                 {
                     return true;
                 }
-                if(m_Scene.PersistentAssetService.exists(key))
+                if(m_Scene.PersistentAssetService.Exists(key))
                 {
                     return true;
                 }
-                return ResourceAssets.exists(key);
+                return ResourceAssets.Exists(key);
             }
 
             public override void Store(AssetData asset)

@@ -145,7 +145,7 @@ namespace SilverSim.Scene.Types.Scene
             {
             }
 
-            public override Dictionary<UUID, bool> exists(List<UUID> assets)
+            public override Dictionary<UUID, bool> Exists(List<UUID> assets)
             {
                 Dictionary<UUID, bool> asset1 = new Dictionary<UUID, bool>();
                 foreach (UUID key in assets)
@@ -155,7 +155,7 @@ namespace SilverSim.Scene.Types.Scene
                 return asset1;
             }
 
-            public override bool exists(UUID key)
+            public override bool Exists(UUID key)
             {
                 return m_ResourceAssets.exists(key);
             }

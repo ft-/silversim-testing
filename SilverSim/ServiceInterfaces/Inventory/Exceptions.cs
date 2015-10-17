@@ -8,6 +8,7 @@ using System;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
+    [Serializable]
     public class InventoryItemNotFound : Exception
     {
         public UUID ID { get; private set; }
@@ -19,6 +20,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
         }
     }
 
+    [Serializable]
     public class InventoryItemNotStored : Exception
     {
         public UUID ID { get; private set; }
@@ -30,6 +32,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
         }
     }
 
+    [Serializable]
     public class InventoryFolderNotFound : Exception
     {
         public UUID ID { get; private set; }
@@ -41,6 +44,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
         }
     }
 
+    [Serializable]
     public class InventoryFolderTypeNotFound : Exception
     {
         public AssetType Type { get; private set; }
@@ -52,6 +56,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
         }
     }
 
+    [Serializable]
     public class InventoryFolderNotStored : Exception
     {
         public UUID ID { get; private set; }
@@ -63,6 +68,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
         }
     }
 
+    [Serializable]
     public class InventoryInaccessible : Exception
     {
         public InventoryInaccessible()

@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using System.Reflection;
+using System.Runtime.InteropServices;
 
 [assembly: AssemblyProduct("SilverSim/Arriba")]
 [assembly: AssemblyCompany("SilverSim Development")]
@@ -13,3 +14,4 @@ using System.Reflection;
 [assembly: AssemblyFileVersion("0.0.0.0")]
 
 [assembly: SilverSim.Types.Assembly.InterfaceVersion("0.0.0.0")]
+[assembly: ComVisible(false)]

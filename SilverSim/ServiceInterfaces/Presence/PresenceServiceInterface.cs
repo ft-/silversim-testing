@@ -8,7 +8,8 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Presence
 {
-    public class PresenceUpdateFailedException : Exception
+    [Serializable]
+    public sealed class PresenceUpdateFailedException : Exception
     {
         public PresenceUpdateFailedException()
         {
@@ -16,7 +17,8 @@ namespace SilverSim.ServiceInterfaces.Presence
         }
     }
 
-    public class PresenceNotFoundException : Exception
+    [Serializable]
+    public sealed class PresenceNotFoundException : Exception
     {
         public PresenceNotFoundException()
         {
@@ -24,7 +26,8 @@ namespace SilverSim.ServiceInterfaces.Presence
         }
     }
 
-    public class PresenceLogoutRegionFailedException : Exception
+    [Serializable]
+    public sealed class PresenceLogoutRegionFailedException : Exception
     {
         public PresenceLogoutRegionFailedException()
         {

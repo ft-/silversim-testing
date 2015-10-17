@@ -8,7 +8,7 @@ namespace SilverSim.ServiceInterfaces.Estate
 {
     public interface EstateRegionMapServiceInterface
     {
-        List<UUID> this[uint EstateID] { get; }
+        List<UUID> this[uint estateID] { get; }
         uint this[UUID regionID] { get; set; }
     }
 }

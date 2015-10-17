@@ -45,7 +45,7 @@ namespace SilverSim.Main.Common.Transfer
                     current_assetids = new_assetids;
                     new_assetids = new List<UUID>();
 
-                    Dictionary<UUID, bool> exists_assetids = m_DestinationAssetService.exists(current_assetids);
+                    Dictionary<UUID, bool> exists_assetids = m_DestinationAssetService.Exists(current_assetids);
 
                     foreach(UUID assetid_new in current_assetids)
                     {

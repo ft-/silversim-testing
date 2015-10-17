@@ -7,6 +7,6 @@ namespace SilverSim.ServiceInterfaces.Estate
 {
     public interface IEstateOwnerServiceInterface
     {
-        UUI this[uint EstateID] { get; set; }
+        UUI this[uint estateID] { get; set; }
     }
 }

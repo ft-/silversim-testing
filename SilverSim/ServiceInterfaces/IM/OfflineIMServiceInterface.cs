@@ -8,6 +8,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.IM
 {
+    [Serializable]
     public class IMOfflineStoreFailedException : Exception
     {
         public IMOfflineStoreFailedException()
