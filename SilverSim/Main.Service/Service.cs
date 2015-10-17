@@ -75,6 +75,7 @@ namespace SilverSim.Main.Service
         void ServiceMain(object obj)
         {
             string[] args = (string[])obj;
+            EventLog eventLog = EventLog;
 
             m_ShutdownCompleteEvent.Reset();
 
@@ -85,11 +86,11 @@ namespace SilverSim.Main.Service
             }
             catch (ConfigurationLoader.ConfigurationError e)
             {
-                EventLog.WriteEntry(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
+                eventLog.WriteEntry(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
             }
             catch (Exception e)
             {
-                EventLog.WriteEntry(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
+                eventLog.WriteEntry(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
             }
 
             m_ShutdownEvent.WaitOne();
