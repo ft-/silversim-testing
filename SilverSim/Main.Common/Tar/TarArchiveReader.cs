@@ -12,6 +12,7 @@ namespace SilverSim.Main.Common.Tar
     public class TarArchiveReader : Stream
     {
         /* TarArchiveReader has Stream support, so that we can directly apply XmlTextReader and so on */
+        [Serializable]
         public class EndOfTarException : Exception
         {
             public EndOfTarException()

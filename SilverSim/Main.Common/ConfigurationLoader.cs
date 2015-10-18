@@ -47,7 +47,7 @@ namespace SilverSim.Main.Common
 {
     public class ConfigurationLoader
     {
-        class ResourceAssetPlugin : SceneInterface.ResourceAssetService, IPlugin
+        sealed class ResourceAssetPlugin : SceneInterface.ResourceAssetService, IPlugin
         {
             public ResourceAssetPlugin()
             {
@@ -60,6 +60,7 @@ namespace SilverSim.Main.Common
             }
         }
 
+        [Serializable]
         public class TestingError : Exception
         {
             public TestingError()
@@ -68,6 +69,7 @@ namespace SilverSim.Main.Common
             }
         }
 
+        [Serializable]
         public class ConfigurationError : Exception
         {
             public ConfigurationError()
@@ -884,7 +886,7 @@ namespace SilverSim.Main.Common
                 catch(Exception e)
                 {
                     m_Log.FatalFormat("Database connection verification for {0} failed", p.Key);
-                    throw e;
+                    throw;
                 }
             }
 
