@@ -21,7 +21,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
-    class SceneFactory : SceneFactoryInterface, IPlugin
+    sealed class SceneFactory : SceneFactoryInterface, IPlugin
     {
         ChatServiceFactoryInterface m_ChatFactory;
         string m_ChatFactoryName;
@@ -37,11 +37,11 @@ namespace SilverSim.Scene.Implementation.Basic
         string m_NeighborServiceName;
         List<string> m_AvatarNameServiceNames = new List<string>();
 
-        GroupsNameServiceInterface m_GroupsNameService = null;
+        GroupsNameServiceInterface m_GroupsNameService;
         AssetServiceInterface m_AssetService;
         AssetServiceInterface m_AssetCacheService;
         GridServiceInterface m_GridService;
-        GroupsServiceInterface m_GroupsService = null;
+        GroupsServiceInterface m_GroupsService;
         ServerParamServiceInterface m_ServerParamService;
         IMServiceInterface m_IMService;
         EstateServiceInterface m_EstateService;
@@ -54,17 +54,17 @@ namespace SilverSim.Scene.Implementation.Basic
         public SceneFactory(IConfig ownConfig)
         {
             m_ChatFactoryName = ownConfig.GetString("ChatService", "Chat");
-            m_GroupsNameServiceName = ownConfig.GetString("GroupsNameService", "");
-            m_GroupsServiceName = ownConfig.GetString("GroupsService", "");
+            m_GroupsNameServiceName = ownConfig.GetString("GroupsNameService", string.Empty);
+            m_GroupsServiceName = ownConfig.GetString("GroupsService", string.Empty);
             m_AssetServiceName = ownConfig.GetString("AssetService", "AssetService");
             m_AssetCacheServiceName = ownConfig.GetString("AssetCacheService", m_AssetServiceName);
             m_GridServiceName = ownConfig.GetString("GridService", "GridService");
             m_IMServiceName = ownConfig.GetString("IMService", "IMService");
             m_SimulationDataStorageName = ownConfig.GetString("SimulationDataStorage", "SimulationDataStorage");
             m_EstateServiceName = ownConfig.GetString("EstateService", "EstateService");
-            m_PhysicsName = ownConfig.GetString("Physics", "");
+            m_PhysicsName = ownConfig.GetString("Physics", string.Empty);
             m_NeighborServiceName = ownConfig.GetString("NeighborService", "NeighborService");
-            string avatarNameServices = ownConfig.GetString("AvatarNameServices", "");
+            string avatarNameServices = ownConfig.GetString("AvatarNameServices", string.Empty);
             foreach(string p in avatarNameServices.Split(','))
             {
                 m_AvatarNameServiceNames.Add(p.Trim());
@@ -83,19 +83,19 @@ namespace SilverSim.Scene.Implementation.Basic
         public void Startup(ConfigurationLoader loader)
         {
             m_ChatFactory = loader.GetService<ChatServiceFactoryInterface>(m_ChatFactoryName);
-            if (m_GroupsNameServiceName != "")
+            if (m_GroupsNameServiceName.Length != 0)
             {
                 m_GroupsNameService = loader.GetService<GroupsNameServiceInterface>(m_GroupsNameServiceName);
             }
-            if (m_GroupsServiceName != "")
+            if (m_GroupsServiceName.Length != 0)
             {
                 m_GroupsService = loader.GetService<GroupsServiceInterface>(m_GroupsServiceName);
             }
-            if (m_PhysicsName != "")
+            if (m_PhysicsName.Length != 0)
             {
                 m_PhysicsFactory = loader.GetService<IPhysicsSceneFactory>(m_PhysicsName);
             }
-            if (m_NeighborServiceName != "")
+            if (m_NeighborServiceName.Length != 0)
             {
                 m_NeighborService = loader.GetService<NeighborServiceInterface>(m_NeighborServiceName);
             }

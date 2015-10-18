@@ -24,7 +24,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         void StoreTerrainProcess()
         {
-            Thread.CurrentThread.Name = "Terrain:Store for " + ID;
+            Thread.CurrentThread.Name = "Terrain:Store for " + ID.ToString();
             while(!m_StopBasicSceneThreads)
             {
                 LayerPatch lp;

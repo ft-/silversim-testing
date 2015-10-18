@@ -40,12 +40,12 @@ using SilverSim.Scene.Management.Scene;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
-    partial class BasicScene : SceneInterface
+    public partial class BasicScene : SceneInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("BASIC SCENE");
 
         #region Fields
-        bool m_StopBasicSceneThreads = false;
+        bool m_StopBasicSceneThreads;
         protected internal readonly RwLockedDoubleDictionary<UUID, UInt32, ObjectPart> m_Primitives = new RwLockedDoubleDictionary<UUID, UInt32, ObjectPart>();
         protected internal readonly RwLockedDictionary<UUID, IObject> m_Objects = new RwLockedDictionary<UUID, IObject>();
         protected internal readonly RwLockedDictionary<UUID, IAgent> m_Agents = new RwLockedDictionary<UUID, IAgent>();
@@ -54,11 +54,11 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Interface wrappers
-        class BasicSceneObjects : ISceneObjects
+        sealed class BasicSceneObjectsCollection : ISceneObjects
         {
             private BasicScene m_Scene;
 
-            public BasicSceneObjects(BasicScene scene)
+            public BasicSceneObjectsCollection(BasicScene scene)
             {
                 m_Scene = scene;
             }
@@ -102,11 +102,11 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        class BasicSceneObjectParts : ISceneObjectParts
+        sealed class BasicSceneObjectPartsCollection : ISceneObjectParts
         {
             private BasicScene m_Scene;
 
-            public BasicSceneObjectParts(BasicScene scene)
+            public BasicSceneObjectPartsCollection(BasicScene scene)
             {
                 m_Scene = scene;
             }
@@ -146,11 +146,11 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        class BasicSceneParcels : ISceneParcels
+        sealed class BasicSceneParcelsCollection : ISceneParcels
         {
             private BasicScene m_Scene;
 
-            public BasicSceneParcels(BasicScene scene)
+            public BasicSceneParcelsCollection(BasicScene scene)
             {
                 m_Scene = scene;
             }
@@ -203,11 +203,11 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        class BasicSceneAgents : ISceneAgents
+        sealed class BasicSceneAgentsCollection : ISceneAgents
         {
             BasicScene m_BasicScene;
 
-            public BasicSceneAgents(BasicScene scene)
+            public BasicSceneAgentsCollection(BasicScene scene)
             {
                 m_BasicScene = scene;
             }
@@ -239,11 +239,11 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        class BasicSceneRootAgents : ISceneAgents
+        sealed class BasicSceneRootAgentsCollection : ISceneAgents
         {
             BasicScene m_BasicScene;
 
-            public BasicSceneRootAgents(BasicScene scene)
+            public BasicSceneRootAgentsCollection(BasicScene scene)
             {
                 m_BasicScene = scene;
             }
@@ -292,16 +292,16 @@ namespace SilverSim.Scene.Implementation.Basic
 
         #region Services
         private ChatServiceInterface m_ChatService;
-        private BasicSceneObjects m_SceneObjects;
-        private BasicSceneParcels m_SceneParcels;
-        private BasicSceneObjectParts m_SceneObjectParts;
+        private BasicSceneObjectsCollection m_SceneObjects;
+        private BasicSceneParcelsCollection m_SceneParcels;
+        private BasicSceneObjectPartsCollection m_SceneObjectParts;
         private DefaultSceneObjectGroupInterface m_SceneObjectGroups;
-        private BasicSceneAgents m_SceneAgents;
-        private BasicSceneRootAgents m_SceneRootAgents;
+        private BasicSceneAgentsCollection m_SceneAgents;
+        private BasicSceneRootAgentsCollection m_SceneRootAgents;
         private SimulationDataStorageInterface m_SimulationDataStorage;
         private NeighborServiceInterface m_NeighborService;
 
-        public override T GetService<T>()
+        public virtual new T GetService<T>()
         {
             if(typeof(T).IsAssignableFrom(typeof(ChatServiceInterface)))
             {
@@ -325,7 +325,7 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Constructor
-        public BasicScene(
+        internal BasicScene(
             ChatServiceInterface chatService, 
             IMServiceInterface imService,
             GroupsNameServiceInterface groupsNameService,
@@ -355,12 +355,12 @@ namespace SilverSim.Scene.Implementation.Basic
             PersistentAssetService = persistentAssetService;
             TemporaryAssetService = temporaryAssetService;
             GridService = gridService;
-            m_SceneObjects = new BasicSceneObjects(this);
-            m_SceneObjectParts = new BasicSceneObjectParts(this);
+            m_SceneObjects = new BasicSceneObjectsCollection(this);
+            m_SceneObjectParts = new BasicSceneObjectPartsCollection(this);
             m_SceneObjectGroups = new DefaultSceneObjectGroupInterface(this);
-            m_SceneAgents = new BasicSceneAgents(this);
-            m_SceneRootAgents = new BasicSceneRootAgents(this);
-            m_SceneParcels = new BasicSceneParcels(this);
+            m_SceneAgents = new BasicSceneAgentsCollection(this);
+            m_SceneRootAgents = new BasicSceneRootAgentsCollection(this);
+            m_SceneParcels = new BasicSceneParcelsCollection(this);
             ServerParamService = serverParamService;
             CapabilitiesConfig = capabilitiesConfig;
             foreach (AvatarNameServiceInterface avNameService in avatarNameServices)
@@ -381,7 +381,7 @@ namespace SilverSim.Scene.Implementation.Basic
             ServerURI = ri.ServerURI;
             ServerHttpPort = ri.ServerHttpPort;
             m_UDPServer.Start();
-            SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures("", "", "", true));
+            SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures(string.Empty, string.Empty, string.Empty, true));
             Terrain.TerrainListeners.Add(this);
             SceneListeners.Add(m_SimulationDataStorage);
             new Thread(StoreTerrainProcess).Start();
@@ -439,9 +439,10 @@ namespace SilverSim.Scene.Implementation.Basic
                 List<ObjectUpdateInfo> infos = new List<ObjectUpdateInfo>();
                 foreach(IObject obj in m_Objects.Values)
                 {
-                    if(obj is ObjectGroup)
+                    ObjectGroup objgrp = obj as ObjectGroup;
+                    if (null != objgrp)
                     {
-                        foreach(ObjectPart part in ((ObjectGroup)obj).ValuesByKey1)
+                        foreach (ObjectPart part in objgrp.ValuesByKey1)
                         {
                             infos.Add(part.UpdateInfo);
                         }
@@ -510,15 +511,15 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Add and Remove
-        internal int m_ObjectCount = 0;
-        internal int m_PrimitiveCount = 0;
-        internal int m_AgentCount = 0;
+        internal int m_ObjectCount;
+        internal int m_PrimitiveCount;
+        internal int m_AgentCount;
 
         public override void Add(IObject obj)
         {
-            if(obj is ObjectGroup)
+            ObjectGroup objgroup = obj as ObjectGroup;
+            if (null != objgroup)
             {
-                ObjectGroup objgroup = (ObjectGroup)obj;
                 List<ObjectPart> removeAgain = new List<ObjectPart>();
 
                 AddLegacyMaterials(objgroup);
@@ -543,7 +544,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
                 catch(Exception e)
                 {
-                    m_Log.DebugFormat("Failed to add object: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace.ToString());
+                    m_Log.DebugFormat("Failed to add object: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                     m_Objects.Remove(objgroup.ID);
                     foreach (ObjectPart objpart in removeAgain)
                     {
@@ -620,10 +621,9 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 return false;
             }
-            if (obj is ObjectGroup)
+            ObjectGroup objgroup = obj as ObjectGroup;
+            if (null != objgroup)
             {
-                ObjectGroup objgroup = (ObjectGroup)obj;
-
                 foreach (ObjectPart objpart in objgroup.Values)
                 {
                     Interlocked.Decrement(ref m_PrimitiveCount);
