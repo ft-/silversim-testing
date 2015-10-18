@@ -10,7 +10,7 @@ using SilverSim.Scene.Types.Scene;
 
 namespace SilverSim.Viewer.Core
 {
-    public abstract partial class Circuit : IDisposable, ICircuit
+    public abstract partial class Circuit : ICircuit
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL CIRCUIT");
         public UInt32 CircuitCode { get; private set; }
@@ -80,13 +80,6 @@ namespace SilverSim.Viewer.Core
             }
             InitializeTransmitQueueing();
         }
-
-        ~Circuit()
-        {
-            Dispose();
-        }
-
-        public abstract void Dispose();
 
         static Circuit()
         {

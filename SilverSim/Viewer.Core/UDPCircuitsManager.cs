@@ -175,7 +175,6 @@ namespace SilverSim.Viewer.Core
             foreach (Circuit c in m_Circuits.Values)
             {
                 c.Stop();
-                c.Dispose();
             }
         }
 

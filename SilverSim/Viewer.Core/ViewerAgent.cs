@@ -38,7 +38,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Viewer.Core
 {
-    public partial class ViewerAgent : IAgent, IDisposable
+    public partial class ViewerAgent : IAgent
     {
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER AGENT");
         public event Action<IObject> OnPositionChange;
@@ -1010,29 +1010,6 @@ namespace SilverSim.Viewer.Core
         }
 
         ~ViewerAgent()
-        {
-            OnPositionChange -= ChildUpdateOnPositionChange;
-            lock (this)
-            {
-                DetachAllAttachments();
-                if (m_EconomyService != null)
-                {
-                    m_EconomyService.Logout(Owner, SessionID, m_SecureSessionID);
-                }
-                m_SittingOnObject = null;
-                m_AssetService = null;
-                m_InventoryService = null;
-                m_GroupsService = null;
-                m_ProfileService = null;
-                m_FriendsService = null;
-                m_UserAgentService = null;
-                m_PresenceService = null;
-                m_GridUserService = null;
-                m_GridService = null;
-            }
-        }
-
-        public void Dispose()
         {
             OnPositionChange -= ChildUpdateOnPositionChange;
             lock (this)

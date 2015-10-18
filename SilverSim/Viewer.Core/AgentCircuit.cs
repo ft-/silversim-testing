@@ -673,10 +673,17 @@ namespace SilverSim.Viewer.Core
 
         ~AgentCircuit()
         {
+            foreach (KeyValuePair<string, UUID> kvp in m_RegisteredCapabilities)
+            {
+                m_CapsRedirector.Caps[kvp.Key].Remove(kvp.Value);
+            }
+            if (null != Agent && null != Scene)
+            {
+                Agent.Circuits.Remove(CircuitCode, Scene.ID);
+            }
             m_UploadCapabilities.Clear();
             Agent = null;
             Scene = null;
-            Dispose();
         }
 
         protected override void LogMsgOnLogoutCompletion()
@@ -941,20 +948,5 @@ namespace SilverSim.Viewer.Core
             m_EventQueueEnabled = false;
         }
         #endregion
-
-        public override void Dispose()
-        {
-            Scene = null;
-            foreach(KeyValuePair<string, UUID> kvp in m_RegisteredCapabilities)
-            {
-                m_CapsRedirector.Caps[kvp.Key].Remove(kvp.Value);
-            }
-            if(null != Agent && null != Scene)
-            {
-                Agent.Circuits.Remove(CircuitCode, Scene.ID);
-            }
-            m_RegisteredCapabilities.Clear();
-            Agent = null;
-        }
     }
 }

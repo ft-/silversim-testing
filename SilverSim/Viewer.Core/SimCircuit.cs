@@ -44,7 +44,7 @@ namespace SilverSim.Viewer.Core
             RemoteOffset = remoteOffset;
         }
 
-        public override void Dispose()
+        ~SimCircuit()
         {
             Scene = null;
         }
