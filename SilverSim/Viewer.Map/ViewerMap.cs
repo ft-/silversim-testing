@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Map
 
         List<IForeignGridConnectorPlugin> m_ForeignGridConnectorPlugins;
 
-        bool m_ShutdownMap = false;
+        bool m_ShutdownMap;
 
         public ViewerMap()
         {
@@ -193,7 +193,7 @@ namespace SilverSim.Viewer.Map
                     }
                     else
                     {
-                        regionName = ""; /* Default Region */
+                        regionName = string.Empty; /* Default Region */
                     }
                     isForeignGridTarget = true;
                 }
@@ -216,7 +216,7 @@ namespace SilverSim.Viewer.Map
             {
                 /* this is a foreign Grid URI for the Default Region */
                 gatekeeperURI = req.Name;
-                regionName = "";
+                regionName = string.Empty;
             }
             else
             {
@@ -227,7 +227,7 @@ namespace SilverSim.Viewer.Map
             {
                 RegionInfo ri = null;
                 bool foundRegionButWrongProtocol = false;
-                string foundProtocolName = "";
+                string foundProtocolName = string.Empty;
                 foreach(IForeignGridConnectorPlugin foreignGrid in m_ForeignGridConnectorPlugins)
                 {
                     if(foreignGrid.IsProtocolSupported(gatekeeperURI))
@@ -322,7 +322,7 @@ namespace SilverSim.Viewer.Map
             end.Agents = 0;
             end.Access = RegionAccess.NonExistent;
             end.MapImageID = UUID.Zero;
-            end.Name = "";
+            end.Name = string.Empty;
             end.RegionFlags = RegionFlags.None;
             end.WaterHeight = 0;
             end.X = 0;
