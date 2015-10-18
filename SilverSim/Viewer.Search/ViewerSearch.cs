@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Search
         [PacketHandler(MessageType.DirFindQuery)]
         BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
-        bool m_ShutdownSearch = false;
+        bool m_ShutdownSearch;
 
         public ViewerSearch()
         {
@@ -264,7 +264,7 @@ namespace SilverSim.Viewer.Search
                 }
                 else
                 {
-                    d.LastName = "";
+                    d.LastName = string.Empty;
                 }
                 res.Data.Add(d);
             }
@@ -311,7 +311,7 @@ namespace SilverSim.Viewer.Search
 
             if (string.IsNullOrEmpty(names) || names.Length < 3)
             {
-                req.ErrorResponse(HttpStatusCode.NotFound, "");
+                req.ErrorResponse(HttpStatusCode.NotFound, string.Empty);
                 return;
             }
 
@@ -320,52 +320,54 @@ namespace SilverSim.Viewer.Search
             SceneInterface scene = circuit.Scene;
             if(scene == null)
             {
-                req.ErrorResponse(HttpStatusCode.NotFound, "");
+                req.ErrorResponse(HttpStatusCode.NotFound, string.Empty);
                 return;
             }
 
             string[] nameparts = names.Split(' ');
             if(nameparts.Length > 2 || nameparts.Length < 1)
             {
-                req.ErrorResponse(HttpStatusCode.NotFound, "");
+                req.ErrorResponse(HttpStatusCode.NotFound, string.Empty);
                 return;
             }
 
             List<UUI> results = scene.AvatarNameService.Search(nameparts);
-            HttpResponse res = req.BeginResponse("application/llsd+xml");
-            using (XmlTextWriter writer = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM))
+            using (HttpResponse res = req.BeginResponse("application/llsd+xml"))
             {
-                writer.WriteStartElement("llsd");
-                writer.WriteStartElement("map");
+                using (XmlTextWriter writer = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM))
                 {
-                    writer.WriteNamedValue("key", "next_page_url");
-                    writer.WriteNamedValue("string", req.RawUrl);
-                    writer.WriteNamedValue("key", "agents");
-                    writer.WriteStartElement("array");
-                    for (int offset = page_number * page_size; offset < (page_number + 1) * page_size && offset < results.Count; ++page_size)
+                    writer.WriteStartElement("llsd");
+                    writer.WriteStartElement("map");
                     {
-                        writer.WriteStartElement("map");
+                        writer.WriteNamedValue("key", "next_page_url");
+                        writer.WriteNamedValue("string", req.RawUrl);
+                        writer.WriteNamedValue("key", "agents");
+                        writer.WriteStartElement("array");
+                        for (int offset = page_number * page_size; offset < (page_number + 1) * page_size && offset < results.Count; ++page_size)
                         {
-                            UUI uui = results[offset];
-                            writer.WriteNamedValue("key", "username");
-                            writer.WriteNamedValue("string", uui.FullName);
-                            writer.WriteNamedValue("key", "display_name");
-                            writer.WriteNamedValue("string", uui.FullName);
-                            writer.WriteNamedValue("key", "legacy_first_name");
-                            writer.WriteNamedValue("string", uui.FirstName);
-                            writer.WriteNamedValue("key", "legacy_last_name");
-                            writer.WriteNamedValue("string", uui.LastName);
-                            writer.WriteNamedValue("key", "id");
-                            writer.WriteNamedValue("uuid", uui.ID);
-                            writer.WriteNamedValue("key", "is_display_name_default");
-                            writer.WriteNamedValue("boolean", false);
+                            writer.WriteStartElement("map");
+                            {
+                                UUI uui = results[offset];
+                                writer.WriteNamedValue("key", "username");
+                                writer.WriteNamedValue("string", uui.FullName);
+                                writer.WriteNamedValue("key", "display_name");
+                                writer.WriteNamedValue("string", uui.FullName);
+                                writer.WriteNamedValue("key", "legacy_first_name");
+                                writer.WriteNamedValue("string", uui.FirstName);
+                                writer.WriteNamedValue("key", "legacy_last_name");
+                                writer.WriteNamedValue("string", uui.LastName);
+                                writer.WriteNamedValue("key", "id");
+                                writer.WriteNamedValue("uuid", uui.ID);
+                                writer.WriteNamedValue("key", "is_display_name_default");
+                                writer.WriteNamedValue("boolean", false);
+                            }
+                            writer.WriteEndElement();
                         }
                         writer.WriteEndElement();
                     }
                     writer.WriteEndElement();
+                    writer.WriteEndElement();
                 }
-                writer.WriteEndElement();
-                writer.WriteEndElement();
             }
         }
 

@@ -20,7 +20,7 @@ namespace SilverSim.Viewer.OfflineIM
         [PacketHandler(MessageType.RetrieveInstantMessages)]
         BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
-        bool m_ShutdownOfflineIM = false;
+        bool m_ShutdownOfflineIM;
 
         public ViewerOfflineIMServer()
         {

@@ -49,12 +49,12 @@ namespace SilverSim.Viewer.Profile
         [GenericMessageHandler("pickinforequest")]
         [GenericMessageHandler("avatarnotesrequest")]
         BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
-        bool m_ShutdownProfile = false;
+        bool m_ShutdownProfile;
         List<IUserAgentServicePlugin> m_UserAgentServices;
         List<IProfileServicePlugin> m_ProfileServices;
         System.Timers.Timer m_CleanupTimer = new System.Timers.Timer(10000);
 
-        class ProfileServiceData
+        sealed class ProfileServiceData
         {
             public ProfileServiceInterface ProfileService;
             public UserAgentServiceInterface UserAgentService;
@@ -733,7 +733,7 @@ namespace SilverSim.Viewer.Profile
                 reply.SnapshotID = pick.SnapshotID;
                 reply.SortOrder = pick.SortOrder;
                 reply.TopPick = pick.TopPick;
-                reply.User = "";
+                reply.User = string.Empty;
                 agent.SendMessageAlways(reply, scene.ID);
             }
             catch
@@ -844,7 +844,7 @@ namespace SilverSim.Viewer.Profile
             {
                 reply.DirectoryVisibility = "hidden";
             }
-            reply.EMail = "";
+            reply.EMail = string.Empty;
             reply.IMViaEmail = prefs.IMviaEmail;
             agent.SendMessageAlways(reply, scene.ID);
         }
@@ -1025,9 +1025,9 @@ namespace SilverSim.Viewer.Profile
             props.FirstLifeImageID = UUID.Zero;
             props.Partner = UUI.Unknown;
             props.User = agent.Owner;
-            props.SkillsText = "";
-            props.WantToText = "";
-            props.Language = "";
+            props.SkillsText = string.Empty;
+            props.WantToText = string.Empty;
+            props.Language = string.Empty;
 
             props.AboutText = req.AboutText;
             props.FirstLifeText = req.FLAboutText;
@@ -1063,8 +1063,8 @@ namespace SilverSim.Viewer.Profile
             ProfileProperties props = new ProfileProperties();
             props.ImageID = UUID.Zero;
             props.FirstLifeImageID = UUID.Zero;
-            props.FirstLifeText = "";
-            props.AboutText = "";
+            props.FirstLifeText = string.Empty;
+            props.AboutText = string.Empty;
             props.Partner = UUI.Unknown;
             props.User = agent.Owner;
             props.SkillsMask = req.SkillsMask;

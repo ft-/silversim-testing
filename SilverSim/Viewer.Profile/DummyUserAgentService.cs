@@ -10,7 +10,7 @@ using System.Text;
 
 namespace SilverSim.Viewer.Profile
 {
-    class DummyUserAgentService : UserAgentServiceInterface
+    sealed class DummyUserAgentService : UserAgentServiceInterface
     {
         public DummyUserAgentService()
         {
@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Profile
             UserInfo dummyInfo = new UserInfo();
             dummyInfo.FirstName = user.FirstName;
             dummyInfo.LastName = user.LastName;
-            dummyInfo.UserTitle = "";
+            dummyInfo.UserTitle = string.Empty;
             dummyInfo.UserFlags = 0;
             dummyInfo.UserCreated = new Date();
             return dummyInfo;

@@ -9,14 +9,14 @@ using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Profile
 {
-    class DummyProfileService : ProfileServiceInterface
+    sealed class DummyProfileService : ProfileServiceInterface
     {
         public DummyProfileService()
         {
 
         }
 
-        class DummyClassifieds : IClassifiedsInterface
+        sealed class DummyClassifieds : IClassifiedsInterface
         {
             public DummyClassifieds()
             {
@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        class DummyPicks : IPicksInterface
+        sealed class DummyPicks : IPicksInterface
         {
             public DummyPicks()
             {
@@ -73,7 +73,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        class DummyNotes : INotesInterface
+        sealed class DummyNotes : INotesInterface
         {
             public DummyNotes()
             {
@@ -93,7 +93,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        class DummyUserPrefs : IUserPreferencesInterface
+        sealed class DummyUserPrefs : IUserPreferencesInterface
         {
             public DummyUserPrefs()
             {
@@ -117,7 +117,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        class DummyProperties : IPropertiesInterface
+        sealed class DummyProperties : IPropertiesInterface
         {
             public DummyProperties()
             {
@@ -135,14 +135,14 @@ namespace SilverSim.Viewer.Profile
                     props.PublishMature = false;
                     props.WebUrl = string.Empty;
                     props.WantToMask = 0;
-                    props.WantToText = "";
+                    props.WantToText = string.Empty;
                     props.SkillsMask = 0;
-                    props.SkillsText = "";
-                    props.Language = "";
+                    props.SkillsText = string.Empty;
+                    props.Language = string.Empty;
                     props.ImageID = UUID.Zero;
-                    props.AboutText = "";
+                    props.AboutText = string.Empty;
                     props.FirstLifeImageID = UUID.Zero;
-                    props.FirstLifeText = "";
+                    props.FirstLifeText = string.Empty;
                     return props;
                 }
             }
