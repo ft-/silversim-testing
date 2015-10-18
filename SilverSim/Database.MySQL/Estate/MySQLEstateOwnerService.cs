@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    sealed class MySQLEstateOwnerService : IEstateOwnerServiceInterface
+    public sealed class MySQLEstateOwnerService : IEstateOwnerServiceInterface
     {
         string m_ConnectionString;
 

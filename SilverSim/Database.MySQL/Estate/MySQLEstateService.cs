@@ -14,7 +14,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.Estate
 {
     #region Service Implementation
-    sealed class MySQLEstateService : EstateServiceInterface, IDBServiceInterface, IPlugin
+    public sealed class MySQLEstateService : EstateServiceInterface, IDBServiceInterface, IPlugin
     {
         string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ESTATE SERVICE");
