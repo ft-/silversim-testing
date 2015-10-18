@@ -17,16 +17,16 @@ namespace SilverSim.Viewer.Core
     public partial class ViewerAgent
     {
         #region Agent Controls Field
-        ControlFlags m_TakenControls = ControlFlags.None;
-        ControlFlags m_IgnoredControls = ControlFlags.None;
+        ControlFlags m_TakenControls;
+        ControlFlags m_IgnoredControls;
         Quaternion m_HeadRotation = Quaternion.Identity;
         Quaternion m_BodyRotation = Quaternion.Identity;
-        ControlFlags m_ActiveAgentControlFlags = ControlFlags.None;
-        bool m_IsRunning = false;
+        ControlFlags m_ActiveAgentControlFlags;
+        bool m_IsRunning;
         public class ScriptControlData
         {
-            public ControlFlags Taken = ControlFlags.None;
-            public ControlFlags Ignored = ControlFlags.None;
+            public ControlFlags Taken;
+            public ControlFlags Ignored;
 
             public ScriptControlData()
             {

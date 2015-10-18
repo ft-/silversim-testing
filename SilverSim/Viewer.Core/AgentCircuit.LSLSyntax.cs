@@ -20,34 +20,38 @@ namespace SilverSim.Viewer.Core
     {
         void Cap_LSLSyntax(HttpRequest httpreq)
         {
-            IValue o;
             if (httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
             }
 
+            Map reqmap;
             try
             {
-                o = LLSD_XML.Deserialize(httpreq.Body);
+                reqmap = LLSD_XML.Deserialize(httpreq.Body) as Map;
             }
             catch (Exception e)
             {
-                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace.ToString());
+                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace);
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (!(o is Map))
+            if (null == reqmap)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
 
-            HttpResponse res = httpreq.BeginResponse("application/llsd+xml");
-            IScriptCompiler compiler = CompilerRegistry.ScriptCompilers["lsl"];
-            MethodInfo mi = compiler.GetType().GetMethod("WriteLSLSyntaxFile", new Type[] { typeof(Stream) });
-            mi.Invoke(compiler, new object[] { res.GetOutputStream() });
-            res.Close();
+            using (HttpResponse res = httpreq.BeginResponse("application/llsd+xml"))
+            {
+                IScriptCompiler compiler = CompilerRegistry.ScriptCompilers["lsl"];
+                MethodInfo mi = compiler.GetType().GetMethod("WriteLSLSyntaxFile", new Type[] { typeof(Stream) });
+                using (Stream o = res.GetOutputStream())
+                {
+                    mi.Invoke(compiler, new object[] { o });
+                }
+            }
         }
     }
 }

@@ -261,7 +261,7 @@ namespace SilverSim.Viewer.Core
                                         continue;
                                     }
                                     item.ID = UUID.Random;
-                                    if(reqd.NewName != "")
+                                    if(reqd.NewName.Length != 0)
                                     {
                                         item.Name = reqd.NewName;
                                     }
@@ -326,7 +326,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch(Exception e)
                             {
-                                m_Log.DebugFormat("Cannot create inventory folder: {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace.ToString());
+                                m_Log.DebugFormat("Cannot create inventory folder: {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                                 SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInvFolder"));
                             }
                         }
@@ -569,7 +569,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch(Exception e)
                             {
-                                m_Log.DebugFormat("LinkInventoryItem failed {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace.ToString());
+                                m_Log.DebugFormat("LinkInventoryItem failed {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
 
                                 Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
                                 res.Message = "ALERT: CantCreateInventory";
@@ -594,7 +594,7 @@ namespace SilverSim.Viewer.Core
                                 }
                                 catch(Exception e)
                                 {
-                                    m_Log.DebugFormat("MoveInventoryFolder failed {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace.ToString());
+                                    m_Log.DebugFormat("MoveInventoryFolder failed {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                                 }
                             }
                         }
@@ -616,7 +616,7 @@ namespace SilverSim.Viewer.Core
                                 }
                                 catch (Exception e)
                                 {
-                                    m_Log.DebugFormat("MoveInventoryItem failed {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace.ToString());
+                                    m_Log.DebugFormat("MoveInventoryItem failed {0} {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                                 }
                             }
                         }

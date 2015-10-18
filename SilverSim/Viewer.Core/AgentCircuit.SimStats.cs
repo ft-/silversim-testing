@@ -71,11 +71,11 @@ namespace SilverSim.Viewer.Core
             m_SimStatsData[(int)SimStatIndex.SimSpareTimeMs] = new SimStats.Data(SimStats.Data.StatType.SimSpareTimeMs, 0);
         }
 
-        int m_LastPacketsReceived = 0;
-        int m_LastPacketsSent = 0;
-        int m_LastAgentUpdatesReceived = 0;
+        int m_LastPacketsReceived;
+        int m_LastPacketsSent;
+        int m_LastAgentUpdatesReceived;
 
-        protected override void SendSimStats(int deltatime)
+        protected override void SendSimStats(int dt)
         {
             int packetsReceived = m_PacketsReceived - m_LastPacketsReceived;
             int packetsSent = m_PacketsSent - m_LastPacketsSent;
@@ -94,8 +94,8 @@ namespace SilverSim.Viewer.Core
             m_LastPacketsReceived = m_PacketsReceived;
             m_LastAgentUpdatesReceived = m_AgentUpdatesReceived;
 
-            m_SimStatsData[(int)SimStatIndex.InPacketsPerSecond].StatValue = packetsReceived * 1000f / deltatime;
-            m_SimStatsData[(int)SimStatIndex.OutPacketsPerSecond].StatValue = packetsSent * 1000f / deltatime;
+            m_SimStatsData[(int)SimStatIndex.InPacketsPerSecond].StatValue = (double)packetsReceived * 1000f / dt;
+            m_SimStatsData[(int)SimStatIndex.OutPacketsPerSecond].StatValue = (double)packetsSent * 1000f / dt;
             if (agent != null)
             {
                 m_SimStatsData[(int)SimStatIndex.PendingDownloads].StatValue = m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count + agent.m_DownloadTransfers.Count;
@@ -105,7 +105,7 @@ namespace SilverSim.Viewer.Core
                 m_SimStatsData[(int)SimStatIndex.PendingDownloads].StatValue = m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count;
             }
             m_SimStatsData[(int)SimStatIndex.PendingUploads].StatValue = activeUploads;
-            m_SimStatsData[(int)SimStatIndex.AgentUpdates].StatValue = agentUpdatesReceived * 1000f / deltatime;
+            m_SimStatsData[(int)SimStatIndex.AgentUpdates].StatValue = (double)agentUpdatesReceived * 1000f / dt;
             m_SimStatsData[(int)SimStatIndex.UnAckedBytes].StatValue = m_UnackedBytes;
             m_SimStatsData[(int)SimStatIndex.TotalPrim].StatValue = Scene.Primitives.Count;
             IPhysicsScene physics = Scene.PhysicsScene;

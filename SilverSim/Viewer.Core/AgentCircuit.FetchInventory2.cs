@@ -78,83 +78,85 @@ namespace SilverSim.Viewer.Core
             }
             catch (Exception e)
             {
-                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace.ToString());
+                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace);
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (!(o is Map))
+
+            Map reqmap = o as Map;
+            if (null == reqmap)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
 
-            Map reqmap = (Map)o;
 
-            HttpResponse res = httpreq.BeginResponse();
-            XmlTextWriter text = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM);
-            List<UUID> baditems = new List<UUID>();
-            text.WriteStartElement("llsd");
-            text.WriteStartElement("map");
-            text.WriteKeyValuePair("agent_id", AgentID);
-            bool wroteheader = false;
-
-            foreach(IValue iv in (AnArray)reqmap["items"])
+            using (HttpResponse res = httpreq.BeginResponse())
             {
-                if(!(iv is Map))
+                using (XmlTextWriter text = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM))
                 {
-                    continue;
-                }
+                    List<UUID> baditems = new List<UUID>();
+                    text.WriteStartElement("llsd");
+                    text.WriteStartElement("map");
+                    text.WriteKeyValuePair("agent_id", AgentID);
+                    bool wroteheader = false;
 
-                Map itemmap = (Map) iv;
-                if(!itemmap.ContainsKey("item_id"))
-                {
-                    continue;
-                }
-                UUID itemid = itemmap["item_id"].AsUUID;
-                InventoryItem item;
-                if(itemid == UUID.Zero)
-                {
-                    baditems.Add(itemid);
-                    continue;
-                }
-                try
-                {
-                    item = Agent.InventoryService.Item[AgentID, itemid];
-                }
-                catch
-                {
-                    baditems.Add(itemid);
-                    continue;
-                }
-                if (!wroteheader)
-                {
-                    wroteheader = true;
-                    text.WriteNamedValue("key", "items");
-                    text.WriteStartElement("array");
-                }
-                WriteInventoryItem(item, text);
-            }
-            if(wroteheader)
-            {
-                text.WriteEndElement();
-            }
-            if(baditems.Count != 0)
-            {
-                text.WriteStartElement("key");
-                text.WriteValue("bad_items");
-                text.WriteEndElement();
-                text.WriteStartElement("array");
-                foreach(UUID id in baditems)
-                {
-                    text.WriteNamedValue("uuid", id);
-                }
-                text.WriteEndElement();
-            }
-            text.WriteEndElement();
-            text.WriteEndElement();
-            text.Flush();
+                    foreach (IValue iv in (AnArray)reqmap["items"])
+                    {
+                        Map itemmap = iv as Map;
+                        if (null == itemmap)
+                        {
+                            continue;
+                        }
 
-            res.Close();
+                        if (!itemmap.ContainsKey("item_id"))
+                        {
+                            continue;
+                        }
+                        UUID itemid = itemmap["item_id"].AsUUID;
+                        InventoryItem item;
+                        if (itemid == UUID.Zero)
+                        {
+                            baditems.Add(itemid);
+                            continue;
+                        }
+                        try
+                        {
+                            item = Agent.InventoryService.Item[AgentID, itemid];
+                        }
+                        catch
+                        {
+                            baditems.Add(itemid);
+                            continue;
+                        }
+                        if (!wroteheader)
+                        {
+                            wroteheader = true;
+                            text.WriteNamedValue("key", "items");
+                            text.WriteStartElement("array");
+                        }
+                        WriteInventoryItem(item, text);
+                    }
+                    if (wroteheader)
+                    {
+                        text.WriteEndElement();
+                    }
+                    if (baditems.Count != 0)
+                    {
+                        text.WriteStartElement("key");
+                        text.WriteValue("bad_items");
+                        text.WriteEndElement();
+                        text.WriteStartElement("array");
+                        foreach (UUID id in baditems)
+                        {
+                            text.WriteNamedValue("uuid", id);
+                        }
+                        text.WriteEndElement();
+                    }
+                    text.WriteEndElement();
+                    text.WriteEndElement();
+                }
+            }
         }
     }
 }

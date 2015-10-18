@@ -103,7 +103,7 @@ namespace SilverSim.Viewer.Core
                 {
                     if (Server.LogAssetFailures)
                     {
-                        m_Log.DebugFormat("Failed to download image {0} (Cap_GetTexture): {1} or {2}\nA: {3}\nB: {4}", textureID, e1.Message, e2.Message, e1.StackTrace.ToString(), e2.StackTrace.ToString());
+                        m_Log.DebugFormat("Failed to download image {0} (Cap_GetTexture): {1} or {2}\nA: {3}\nB: {4}", textureID, e1.Message, e2.Message, e1.StackTrace, e2.StackTrace);
                     }
                     httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                     return;
@@ -122,16 +122,16 @@ namespace SilverSim.Viewer.Core
 
             if (httpreq.ContainsHeader("Range"))
             {
-                HttpResponse httpres;
-                Stream o;
-
                 string[] ranges = httpreq["Range"].Split(' ');
                 if(ranges.Length > 1)
                 {
-                    httpres = httpreq.BeginResponse("image/x-j2c");
-                    o = httpres.GetOutputStream(asset.Data.LongLength);
-                    o.Write(asset.Data, 0, asset.Data.Length);
-                    httpres.Close();
+                    using (HttpResponse httpres = httpreq.BeginResponse("image/x-j2c"))
+                    {
+                        using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
+                        {
+                            o.Write(asset.Data, 0, asset.Data.Length);
+                        }
+                    }
                     return;
                 }
 
@@ -152,10 +152,13 @@ namespace SilverSim.Viewer.Core
 
                 if(p[0] != "bytes")
                 {
-                    httpres = httpreq.BeginResponse("image/x-j2c");
-                    o = httpres.GetOutputStream(asset.Data.LongLength);
-                    o.Write(asset.Data, 0, asset.Data.Length);
-                    httpres.Close();
+                    using (HttpResponse httpres = httpreq.BeginResponse("image/x-j2c"))
+                    {
+                        using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
+                        {
+                            o.Write(asset.Data, 0, asset.Data.Length);
+                        }
+                    }
                     return;
                 }
 
@@ -179,7 +182,10 @@ namespace SilverSim.Viewer.Core
                      */
                     if(start >= asset.Data.Length)
                     {
-                        httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "image/x-j2c").Close();
+                        using(HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "image/x-j2c"))
+                        {
+
+                        }
                         return;
                     }
                     if (start > end)
@@ -198,10 +204,13 @@ namespace SilverSim.Viewer.Core
                     }
                     if (start == 0 && end == asset.Data.Length - 1)
                     {
-                        httpres = httpreq.BeginResponse("image/x-j2c");
-                        o = httpres.GetOutputStream(asset.Data.LongLength);
-                        o.Write(asset.Data, 0, asset.Data.Length);
-                        httpres.Close();
+                        using (HttpResponse httpres = httpreq.BeginResponse("image/x-j2c"))
+                        {
+                            using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
+                            {
+                                o.Write(asset.Data, 0, asset.Data.Length);
+                            }
+                        }
                         return;
                     }
                 }
@@ -212,18 +221,24 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
 
-                httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "image/x-j2c");
-                httpres.Headers["Content-Range"] = string.Format("bytes {0}-{1}/{2}", start, end, asset.Data.Length);
-                o = httpres.GetOutputStream(end - start + 1);
-                o.Write(asset.Data, start, end - start + 1);
-                httpres.Close();
+                using (HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "image/x-j2c"))
+                {
+                    httpres.Headers["Content-Range"] = string.Format("bytes {0}-{1}/{2}", start, end, asset.Data.Length);
+                    using (Stream o = httpres.GetOutputStream(end - start + 1))
+                    {
+                        o.Write(asset.Data, start, end - start + 1);
+                    }
+                }
             }
             else
             {
-                HttpResponse httpres = httpreq.BeginResponse("image/x-j2c");
-                Stream o = httpres.GetOutputStream(asset.Data.LongLength);
-                o.Write(asset.Data, 0, asset.Data.Length);
-                httpres.Close();
+                using (HttpResponse httpres = httpreq.BeginResponse("image/x-j2c"))
+                {
+                    using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
+                    {
+                        o.Write(asset.Data, 0, asset.Data.Length);
+                    }
+                }
             }
         }
     }

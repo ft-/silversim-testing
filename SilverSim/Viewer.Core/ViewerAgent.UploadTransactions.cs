@@ -31,21 +31,21 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        internal class UploadTransaction
+        public class UploadTransaction
         {
             public List<byte[]> DataBlocks = new List<byte[]>();
             public UInt64 XferID;
             public string Filename;
 
-            public UploadTransaction()
+            internal UploadTransaction()
             {
 
             }
         }
 
-        internal class TerrainUploadTransaction : UploadTransaction
+        public class TerrainUploadTransaction : UploadTransaction
         {
-            public TerrainUploadTransaction()
+            internal TerrainUploadTransaction()
             {
 
             }
@@ -61,7 +61,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        internal class AssetUploadTransaction : UploadTransaction
+        public class AssetUploadTransaction : UploadTransaction
         {
             public UUID AssetID;
             public AssetType AssetType;
@@ -69,7 +69,7 @@ namespace SilverSim.Viewer.Core
             public bool IsLocal;
             public bool IsTemporary;
 
-            public AssetUploadTransaction()
+            internal AssetUploadTransaction()
             {
 
             }
@@ -186,7 +186,7 @@ namespace SilverSim.Viewer.Core
                 reqxfer.VFileType = (short)transaction.AssetType;
                 reqxfer.VFileID = transaction.AssetID;
                 reqxfer.FilePath = 0;
-                reqxfer.Filename = "";
+                reqxfer.Filename = string.Empty;
                 SendMessageAlways(reqxfer, m.CircuitSceneID);
             }
         }

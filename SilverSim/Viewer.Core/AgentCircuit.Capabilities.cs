@@ -59,7 +59,7 @@ namespace SilverSim.Viewer.Core
             }
             else if (Scene.CapabilitiesConfig.TryGetValue(capType, out capsUriStr) && uri != "localhost")
             {
-                if (uri == "")
+                if (0 == uri.Length)
                 {
                     return true;
                 }
@@ -74,7 +74,7 @@ namespace SilverSim.Viewer.Core
                             switch(c)
                             {
                                 case '$':
-                                    uri += '$';
+                                    uri += "$";
                                     break;
 
                                 case 'h':
@@ -108,7 +108,7 @@ namespace SilverSim.Viewer.Core
                         }
                         else
                         {
-                            uri += c;
+                            uri += c.ToString();
                         }
                     }
                     return true;
@@ -132,11 +132,12 @@ namespace SilverSim.Viewer.Core
             }
             catch (Exception e)
             {
-                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace.ToString());
+                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace);
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
-            if (!(o is AnArray))
+            AnArray oarray = o as AnArray;
+            if (null == oarray)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
@@ -144,7 +145,7 @@ namespace SilverSim.Viewer.Core
 
             Dictionary<string, string> capsUri = new Dictionary<string, string>();
 
-            foreach (IValue v in (AnArray)o)
+            foreach (IValue v in oarray)
             {
                 UUID capsID;
                 string capsUriStr = string.Empty;
@@ -164,21 +165,25 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            HttpResponse res = httpreq.BeginResponse();
-            res.ContentType = "application/llsd+xml";
-            Stream tw = res.GetOutputStream();
-            XmlTextWriter text = new XmlTextWriter(tw, UTF8NoBOM);
-            text.WriteStartElement("llsd");
-            text.WriteStartElement("map");
-            foreach (KeyValuePair<string, string> kvp in capsUri)
+            using (HttpResponse res = httpreq.BeginResponse())
             {
-                text.WriteKeyValuePair(kvp.Key, kvp.Value);
+                res.ContentType = "application/llsd+xml";
+                using (Stream tw = res.GetOutputStream())
+                {
+                    using (XmlTextWriter text = new XmlTextWriter(tw, UTF8NoBOM))
+                    {
+                        text.WriteStartElement("llsd");
+                        text.WriteStartElement("map");
+                        foreach (KeyValuePair<string, string> kvp in capsUri)
+                        {
+                            text.WriteKeyValuePair(kvp.Key, kvp.Value);
+                        }
+                        text.WriteEndElement();
+                        text.WriteEndElement();
+                        text.Flush();
+                    }
+                }
             }
-            text.WriteEndElement();
-            text.WriteEndElement();
-            text.Flush();
-
-            res.Close();
         }
         #endregion
 
@@ -201,8 +206,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public delegate ICapabilityInterface DefCapabilityInstantiate(ViewerAgent agent);
-        public void AddDefCapabilityFactory(string capabilityType, UUID seedID, DefCapabilityInstantiate del, Dictionary<string, string> capConfig)
+        public void AddDefCapabilityFactory(string capabilityType, UUID seedID, Func<ViewerAgent, ICapabilityInterface> del, Dictionary<string, string> capConfig)
         {
             if(IsLocalHost(capConfig, capabilityType))
             {
@@ -210,7 +214,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public void AddExtenderCapability(string capabilityType, UUID seedID, CapabilityHandler.CapabilityDelegate del, Dictionary<string, string> capConfig)
+        public void AddExtenderCapability(string capabilityType, UUID seedID, Action<ViewerAgent, AgentCircuit, HttpRequest> del, Dictionary<string, string> capConfig)
         {
             if (IsLocalHost(capConfig, capabilityType))
             {
@@ -218,14 +222,14 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        class ExtenderCapabilityCaller
+        sealed class ExtenderCapabilityCaller
         {
             /* Weak reference kills the hard referencing */
             WeakReference m_Agent;
             WeakReference m_Circuit;
-            CapabilityHandler.CapabilityDelegate m_Delegate;
+            Action<ViewerAgent, AgentCircuit, HttpRequest> m_Delegate;
 
-            public ExtenderCapabilityCaller(ViewerAgent agent, AgentCircuit circuit, CapabilityHandler.CapabilityDelegate del)
+            public ExtenderCapabilityCaller(ViewerAgent agent, AgentCircuit circuit, Action<ViewerAgent, AgentCircuit, HttpRequest> del)
             {
                 m_Agent = new WeakReference(agent, false);
                 m_Circuit = new WeakReference(circuit, false);
@@ -264,7 +268,7 @@ namespace SilverSim.Viewer.Core
                 /* The LSLCompiler is the only one that has this method */
                 /* there has to be LSLSyntaxId which contains the hash of the file as UUID */
                 IScriptCompiler compiler = CompilerRegistry.ScriptCompilers["lsl"];
-                MethodInfo mi = compiler.GetType().GetMethod("GetLSLSyntaxId", new Type[0]);
+                MethodInfo mi = compiler.GetType().GetMethod("GetLSLSyntaxId", Type.EmptyTypes);
                 if(compiler.GetType().GetMethod("WriteLSLSyntaxFile", new Type[] { typeof(Stream)}) != null && mi != null)
                 {
                     AddDefCapability("LSLSyntax", regionSeedID, Cap_LSLSyntax, capConfig);

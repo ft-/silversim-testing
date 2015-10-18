@@ -19,7 +19,7 @@ namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
-        class AgentRezObjectHandler  : RezObjectHandler
+        sealed class AgentRezObjectHandler  : RezObjectHandler
         {
             public AgentRezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
                 : base(scene, targetpos, assetid, source, rezzingagent, rezparams, itemOwnerPermissions)

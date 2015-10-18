@@ -37,14 +37,13 @@ namespace SilverSim.Viewer.Core
             }
             catch (Exception e)
             {
-                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace.ToString());
+                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace);
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
 
             int timeout = 30;
             Message m = null;
-            HttpResponse res;
             while(timeout -- != 0)
             {
                 if(!m_EventQueueEnabled)
@@ -64,14 +63,15 @@ namespace SilverSim.Viewer.Core
 
             if(null == m)
             {
-                res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:");
-                res.MinorVersion = 0;
-                using(TextWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+                using (HttpResponse res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:"))
                 {
-                    w.Write("Upstream error: ");
-                    w.Flush();
+                    res.MinorVersion = 0;
+                    using (TextWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+                    {
+                        w.Write("Upstream error: ");
+                        w.Flush();
+                    }
                 }
-                res.Close();
                 return;
             }
 
@@ -90,15 +90,16 @@ namespace SilverSim.Viewer.Core
                 }
                 catch (Exception e)
                 {
-                    m_Log.DebugFormat("Unsupported message {0} in EventQueueGet: {1}\n{2}", m.GetType().FullName, e.Message, e.StackTrace.ToString());
-                    res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:");
-                    res.MinorVersion = 0;
-                    using (TextWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+                    m_Log.DebugFormat("Unsupported message {0} in EventQueueGet: {1}\n{2}", m.GetType().FullName, e.Message, e.StackTrace);
+                    using (HttpResponse res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:"))
                     {
-                        w.Write("Upstream error: ");
-                        w.Flush();
+                        res.MinorVersion = 0;
+                        using (TextWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+                        {
+                            w.Write("Upstream error: ");
+                            w.Flush();
+                        }
                     }
-                    res.Close();
                     return;
                 }
                 Map ev = new Map();
@@ -120,11 +121,14 @@ namespace SilverSim.Viewer.Core
             result.Add("events", eventarr);
             result.Add("id", m_EventQueueEventId++);
 
-            res = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
-            res.ContentType = "application/llsd+xml";
-            Stream o = res.GetOutputStream();
-            LLSD_XML.Serialize(result, o);
-            res.Close();
+            using (HttpResponse res = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+            {
+                res.ContentType = "application/llsd+xml";
+                using (Stream o = res.GetOutputStream())
+                {
+                    LLSD_XML.Serialize(result, o);
+                }
+            }
         }
     }
 }

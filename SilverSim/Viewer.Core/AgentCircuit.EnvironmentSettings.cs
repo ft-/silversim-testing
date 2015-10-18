@@ -35,61 +35,63 @@ namespace SilverSim.Viewer.Core
 
         public void Cap_EnvironmentSettings_GET(HttpRequest httpreq)
         {
-            HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml");
-            EnvironmentSettings settings = Scene.EnvironmentSettings;
-            if(settings != null)
+            using (HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml"))
             {
-                settings.Serialize(httpres.GetOutputStream(), Scene.ID);
-                httpres.Close();
-            }
-            else
-            {
-                using(XmlTextWriter writer = new XmlTextWriter(httpres.GetOutputStream(), UTF8NoBOM))
+                EnvironmentSettings settings = Scene.EnvironmentSettings;
+                if (settings != null)
                 {
-                    writer.WriteStartElement("llsd");
+                    settings.Serialize(httpres.GetOutputStream(), Scene.ID);
+                    httpres.Close();
+                }
+                else
+                {
+                    using (XmlTextWriter writer = new XmlTextWriter(httpres.GetOutputStream(), UTF8NoBOM))
                     {
-                        writer.WriteStartElement("array");
+                        writer.WriteStartElement("llsd");
                         {
-                            writer.WriteStartElement("map");
+                            writer.WriteStartElement("array");
                             {
-                                writer.WriteNamedValue("key", "messageID");
-                                writer.WriteNamedValue("uuid", UUID.Zero);
-                                writer.WriteNamedValue("key", "regionID");
-                                writer.WriteNamedValue("uuid", Scene.ID);
+                                writer.WriteStartElement("map");
+                                {
+                                    writer.WriteNamedValue("key", "messageID");
+                                    writer.WriteNamedValue("uuid", UUID.Zero);
+                                    writer.WriteNamedValue("key", "regionID");
+                                    writer.WriteNamedValue("uuid", Scene.ID);
+                                }
+                                writer.WriteEndElement();
                             }
                             writer.WriteEndElement();
                         }
                         writer.WriteEndElement();
                     }
-                    writer.WriteEndElement();
                 }
-                httpres.Close();
             }
         }
 
         public void EnvironmentPostResponse(HttpRequest httpreq, UUID messageID, bool success, string failreason)
         {
-            HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml");
-            using(XmlTextWriter writer = new XmlTextWriter(httpres.GetOutputStream(), UTF8NoBOM))
+            using (HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml"))
             {
-                writer.WriteStartElement("llsd");
+                using (XmlTextWriter writer = new XmlTextWriter(httpres.GetOutputStream(), UTF8NoBOM))
                 {
-                    writer.WriteStartElement("map");
+                    writer.WriteStartElement("llsd");
                     {
-                        writer.WriteNamedValue("key", "regionID");
-                        writer.WriteNamedValue("uuid", Scene.ID);
-                        writer.WriteNamedValue("key", "messageID");
-                        writer.WriteNamedValue("uuid", messageID);
-                        writer.WriteNamedValue("key", "success");
-                        writer.WriteNamedValue("boolean", success);
-                        writer.WriteNamedValue("key", "fail_reason");
-                        writer.WriteNamedValue("string", failreason);
+                        writer.WriteStartElement("map");
+                        {
+                            writer.WriteNamedValue("key", "regionID");
+                            writer.WriteNamedValue("uuid", Scene.ID);
+                            writer.WriteNamedValue("key", "messageID");
+                            writer.WriteNamedValue("uuid", messageID);
+                            writer.WriteNamedValue("key", "success");
+                            writer.WriteNamedValue("boolean", success);
+                            writer.WriteNamedValue("key", "fail_reason");
+                            writer.WriteNamedValue("string", failreason);
+                        }
+                        writer.WriteEndElement();
                     }
                     writer.WriteEndElement();
                 }
-                writer.WriteEndElement();
             }
-            httpres.Close();
         }
 
         public void Cap_EnvironmentSettings_POST(HttpRequest httpreq)
@@ -110,7 +112,7 @@ namespace SilverSim.Viewer.Core
                 try
                 {
                     Scene.EnvironmentSettings = envsettings;
-                    EnvironmentPostResponse(httpreq, UUID.Zero, true, "");
+                    EnvironmentPostResponse(httpreq, UUID.Zero, true, string.Empty);
                     /* reading back EnvironmentSettings happens by RegionInfo UDP message */
                     /* Viewer triggers that by updating RegionInfo through UDP message */
                     return;

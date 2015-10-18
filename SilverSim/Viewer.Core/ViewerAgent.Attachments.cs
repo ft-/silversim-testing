@@ -132,14 +132,14 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        class RezAttachmentHandler : AssetTransferWorkItem
+        public class RezAttachmentHandler : AssetTransferWorkItem
         {
             SceneInterface m_Scene;
             UUID m_ItemID;
             UUI m_RezzingAgent;
             AttachmentPoint m_AttachPoint;
 
-            public RezAttachmentHandler(SceneInterface scene, UUID itemid, UUID assetid, AssetServiceInterface source, UUI rezzingagent, AttachmentPoint attachPoint)
+            internal RezAttachmentHandler(SceneInterface scene, UUID itemid, UUID assetid, AssetServiceInterface source, UUI rezzingagent, AttachmentPoint attachPoint)
                 : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
             {
                 m_Scene = scene;
@@ -148,7 +148,7 @@ namespace SilverSim.Viewer.Core
                 m_AttachPoint = attachPoint;
             }
 
-            protected void SendAlertMessage(string msg)
+            void SendAlertMessage(string msg)
             {
                 try
                 {

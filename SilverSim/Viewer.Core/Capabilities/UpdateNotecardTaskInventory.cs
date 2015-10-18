@@ -15,7 +15,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UpdateNotecardTaskInventory : UploadAssetAbstractCapability
     {
-        class TransactionInfo
+        sealed class TransactionInfo
         {
             public UUID TaskID;
             public UUID ItemID;

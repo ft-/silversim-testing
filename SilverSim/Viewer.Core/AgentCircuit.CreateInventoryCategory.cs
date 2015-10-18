@@ -11,6 +11,7 @@ using System.Net;
 using System.Xml;
 using SilverSim.StructuredData.LLSD;
 using SilverSim.Types.Inventory;
+using System.IO;
 
 namespace SilverSim.Viewer.Core
 {
@@ -31,17 +32,18 @@ namespace SilverSim.Viewer.Core
             }
             catch (Exception e)
             {
-                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace.ToString());
+                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace);
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (!(o is Map))
+
+            Map reqmap = o as Map;
+            if(null == reqmap)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
 
-            Map reqmap = (Map)o;
             InventoryFolder folder = new InventoryFolder();
             folder.ID = reqmap["folder_id"].AsUUID;
             folder.ParentFolderID = reqmap["parent_id"].AsUUID;
@@ -64,9 +66,13 @@ namespace SilverSim.Viewer.Core
             resmap.Add("parent_id", folder.ParentFolderID);
             resmap.Add("type", (int)folder.InventoryType);
             resmap.Add("name", folder.Name);
-            HttpResponse res = httpreq.BeginResponse();
-            LLSD_XML.Serialize(resmap, res.GetOutputStream());
-            res.Close();
+            using (HttpResponse res = httpreq.BeginResponse())
+            {
+                using (Stream stream = res.GetOutputStream())
+                {
+                    LLSD_XML.Serialize(resmap, stream);
+                }
+            }
         }
     }
 }

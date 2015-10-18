@@ -41,7 +41,7 @@ namespace SilverSim.Viewer.Core
         Socket m_UdpSocket;
         NonblockingQueue<UDPReceivePacket> m_InboundBufferQueue = new NonblockingQueue<UDPReceivePacket>();
         RwLockedDoubleDictionary<EndPoint, uint, Circuit> m_Circuits = new RwLockedDoubleDictionary<EndPoint, uint, Circuit>();
-        bool m_InboundRunning = false;
+        bool m_InboundRunning;
         IMServiceInterface m_IMService;
         ChatServiceInterface m_ChatService;
         BlockingQueue<IScriptEvent> m_ChatQueue = new BlockingQueue<IScriptEvent>();
@@ -50,8 +50,8 @@ namespace SilverSim.Viewer.Core
         private object m_UseCircuitCodeProcessingLock = new object();
         
         public SceneInterface Scene { get; private set; }
-        public bool LogAssetFailures = false;
-        public bool LogTransferPacket = false;
+        public bool LogAssetFailures;
+        public bool LogTransferPacket;
 
         public UDPCircuitsManager(IPAddress bindAddress, int port, IMServiceInterface imService, ChatServiceInterface chatService, SceneInterface scene)
         {
@@ -154,10 +154,10 @@ namespace SilverSim.Viewer.Core
                     BeginUdpReceive();
                     m_Log.InfoFormat("Started at {0}:{1}", m_BindAddress.ToString(), m_BindPort);
                 }
-                catch(Exception e)
+                catch
                 {
                     m_InboundRunning = false;
-                    throw e;
+                    throw;
                 }
             }
         }
@@ -238,9 +238,9 @@ namespace SilverSim.Viewer.Core
                             {
                                 UUID sessionID = pck.ReadUUID();
                                 UUID agentID = pck.ReadUUID();
-                                if (circuit is AgentCircuit)
+                                AgentCircuit acircuit = circuit as AgentCircuit;
+                                if (null != acircuit)
                                 {
-                                    AgentCircuit acircuit = (AgentCircuit)circuit;
                                     /* there it is check for SessionID and AgentID */
                                     if (!acircuit.SessionID.Equals(sessionID))
                                     {
@@ -291,7 +291,7 @@ namespace SilverSim.Viewer.Core
                                             rh.CacheID = UUID.Random;
                                             rh.CPUClassID = 9;
                                             rh.CPURatio = 1;
-                                            rh.ColoName = "";
+                                            rh.ColoName = string.Empty;
                                             rh.ProductSKU = VersionInfo.SimulatorVersion;
                                             rh.ProductName = VersionInfo.ProductName;
 
@@ -307,7 +307,7 @@ namespace SilverSim.Viewer.Core
                                         }
                                         catch (Exception e)
                                         {
-                                            m_Log.DebugFormat("UseCircuitCode Exception {0} {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                                            m_Log.DebugFormat("UseCircuitCode Exception {0} {1}\n{2}", e.GetType().Name, e.Message, e.StackTrace);
                                             circuit.Stop();
                                         }
                                     }
@@ -362,7 +362,7 @@ namespace SilverSim.Viewer.Core
             catch(Exception e)
             {
                 /* we catch all issues here */
-                m_Log.ErrorFormat("Exception {0} => {1} at {2}", e.GetType().Name, e.ToString(), e.StackTrace.ToString());
+                m_Log.ErrorFormat("Exception {0} => {1} at {2}", e.GetType().Name, e.ToString(), e.StackTrace);
             }
             /* return the buffer to the pool */
             m_InboundBufferQueue.Enqueue(pck);
@@ -396,9 +396,9 @@ namespace SilverSim.Viewer.Core
             m_Circuits.Add(c.RemoteEndPoint, c.CircuitCode, c);
             try
             {
-                if (c is AgentCircuit)
+                AgentCircuit ac = c as AgentCircuit;
+                if (null != ac)
                 {
-                    AgentCircuit ac = (AgentCircuit)c;
                     m_Agents.Add(ac.AgentID, ac.Agent);
                 }
             }
@@ -411,9 +411,9 @@ namespace SilverSim.Viewer.Core
 
         public void RemoveCircuit(Circuit c)
         {
-            if (c is AgentCircuit)
+            AgentCircuit ac = c as AgentCircuit;
+            if (null != ac)
             {
-                AgentCircuit ac = (AgentCircuit)c;
                 m_Agents.Remove(ac.AgentID);
             }
             m_Circuits.Remove(c.RemoteEndPoint, c.CircuitCode);

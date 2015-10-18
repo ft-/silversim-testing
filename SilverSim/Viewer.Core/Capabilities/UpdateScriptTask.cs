@@ -19,7 +19,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UpdateScriptTask : UploadAssetAbstractCapability
     {
-        class TransactionInfo
+        sealed class TransactionInfo
         {
             public UUID TaskID;
             public UUID ItemID;

@@ -15,16 +15,16 @@ namespace SilverSim.Viewer.Core
         private static readonly ILog m_Log = LogManager.GetLogger("LL CIRCUIT");
         public UInt32 CircuitCode { get; private set; }
         protected BlockingQueue<Message> m_TxQueue = new BlockingQueue<Message>();
-        private bool m_TxRunning = false;
-        private Thread m_TxThread = null;
-        private int __SequenceNumber = 0;
+        private bool m_TxRunning;
+        private Thread m_TxThread;
+        private int __SequenceNumber;
         private NonblockingQueue<UInt32> m_AckList = new NonblockingQueue<UInt32>();
         private UDPCircuitsManager m_Server;
         public EndPoint RemoteEndPoint;
         private RwLockedDictionary<byte, int> m_PingSendTicks = new RwLockedDictionary<byte, int>();
         public int LastMeasuredLatencyTickCount { get; private set; }
-        private uint m_LogoutReplySeqNo = 0;
-        private bool m_LogoutReplySent = false;
+        private uint m_LogoutReplySeqNo;
+        private bool m_LogoutReplySent;
         private object m_LogoutReplyLock = new object(); /* this is only for guarding access sequence to m_LogoutReply* variables */
         private int m_LogoutReplySentAtTime;
         private int m_LastReceivedPacketAtTime;
@@ -34,9 +34,9 @@ namespace SilverSim.Viewer.Core
         protected Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
 
         protected ThreadedClasses.BlockingQueue<UDPPacket> m_TxObjectPool = new BlockingQueue<UDPPacket>();
-        protected int m_PacketsReceived = 0;
-        protected int m_PacketsSent = 0;
-        protected int m_UnackedBytes = 0;
+        protected int m_PacketsReceived;
+        protected int m_PacketsSent;
+        protected int m_UnackedBytes;
         protected object m_UnackedBytesLock = new object();
 
         internal UDPCircuitsManager Server
@@ -56,7 +56,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-        public class IgnoreMethod : Attribute
+        public sealed class IgnoreMethod : Attribute
         {
             public IgnoreMethod()
             {
@@ -78,6 +78,7 @@ namespace SilverSim.Viewer.Core
             {
                 m_TxObjectPool.Enqueue(new UDPPacket());
             }
+            InitializeTransmitQueueing();
         }
 
         ~Circuit()
@@ -147,7 +148,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch (Exception e)
                             {
-                                m_Log.WarnFormat("OnSendCompletion: Exception {0} at {1}", e.ToString(), e.StackTrace.ToString());
+                                m_Log.WarnFormat("OnSendCompletion: Exception {0} at {1}", e.ToString(), e.StackTrace);
                             }
                         }
                     }
@@ -236,7 +237,7 @@ namespace SilverSim.Viewer.Core
                                 }
                                 catch (Exception e)
                                 {
-                                    m_Log.WarnFormat("OnSendCompletion: Exception {0} at {1}", e.ToString(), e.StackTrace.ToString());
+                                    m_Log.WarnFormat("OnSendCompletion: Exception {0} at {1}", e.ToString(), e.StackTrace);
                                 }
                             }
                         }

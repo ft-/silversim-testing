@@ -6,6 +6,7 @@ using SilverSim.Main.Common.HttpServer;
 using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
 using System.Net;
+using System.IO;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -50,24 +51,28 @@ namespace SilverSim.Viewer.Core.Capabilities
                 extrasMap.Add("ExportSupported", true);
             }
             if (extrasMap.Count > 0)
+            {
                 Features.Add("OpenSimExtras", extrasMap);
+            }
         }
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
-            HttpResponse res;
             if(httpreq.Method != "GET")
             {
-                res = httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
             }
             else
             {
-                res = httpreq.BeginResponse();
-                res.ContentType = "application/llsd+xml";
-                LLSD_XML.Serialize(Features, res.GetOutputStream());
+                using (HttpResponse res = httpreq.BeginResponse())
+                {
+                    res.ContentType = "application/llsd+xml";
+                    using (Stream s = res.GetOutputStream())
+                    {
+                        LLSD_XML.Serialize(Features, s);
+                    }
+                }
             }
-
-            res.Close();
         }
     }
 }

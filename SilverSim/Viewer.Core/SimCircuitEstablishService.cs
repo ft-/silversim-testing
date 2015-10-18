@@ -46,22 +46,22 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            IValue v;
+            Map reqmap;
             try
             {
-                v = LLSD_XML.Deserialize(req.Body);
+                reqmap = LLSD_XML.Deserialize(req.Body) as Map;
             }
             catch
             {
                 req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
-            if(!(v is Map))
+            if(null == reqmap)
             {
                 req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
-            Map reqmap = (Map)v;
+
             UUID regionID = reqmap["to_region_id"].AsUUID;
             UUID fromRegionID = reqmap["from_region_id"].AsUUID;
             UUID scopeID = reqmap["scope_id"].AsUUID;
@@ -104,12 +104,13 @@ namespace SilverSim.Viewer.Core
             Map resmap = new Map();
             resmap.Add("circuit_code", circuitCode);
             resmap.Add("session_id", sessionID);
-            HttpResponse res = req.BeginResponse("application/llsd+xml");
-            using (Stream o = res.GetOutputStream())
+            using (HttpResponse res = req.BeginResponse("application/llsd+xml"))
             {
-                LLSD_XML.Serialize(resmap, o);
+                using (Stream o = res.GetOutputStream())
+                {
+                    LLSD_XML.Serialize(resmap, o);
+                }
             }
-            res.Close();
         }
     }
 }

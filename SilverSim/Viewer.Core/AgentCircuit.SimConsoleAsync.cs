@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Core
             }
             catch (Exception e)
             {
-                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace.ToString());
+                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace);
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
@@ -58,16 +58,17 @@ namespace SilverSim.Viewer.Core
                 CommandRegistry.ExecuteCommand(tty.GetCmdLine(message), tty, Scene.ID);
             }
 
-            HttpResponse res;
-            res = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
-            res.ContentType = "application/llsd+xml";
-            Stream o = res.GetOutputStream();
-            LLSD_XML.Serialize(new BinaryData(new byte[1] { 0 }), o);
-            res.Close();
-
+            using (HttpResponse res = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+            {
+                res.ContentType = "application/llsd+xml";
+                using (Stream o = res.GetOutputStream())
+                {
+                    LLSD_XML.Serialize(new BinaryData(new byte[1] { 0 }), o);
+                }
+            }
         }
 
-        class SimConsoleAsyncTTY : TTY
+        sealed class SimConsoleAsyncTTY : TTY
         {
             AgentCircuit m_Circuit;
             public SimConsoleAsyncTTY(AgentCircuit c)

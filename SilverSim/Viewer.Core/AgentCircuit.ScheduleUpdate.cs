@@ -17,7 +17,7 @@ namespace SilverSim.Viewer.Core
     public partial class AgentCircuit
     {
         private ThreadedClasses.BlockingQueue<ObjectUpdateInfo> m_TxObjectQueue = new BlockingQueue<ObjectUpdateInfo>();
-        private bool m_TriggerFirstUpdate = false;
+        private bool m_TriggerFirstUpdate;
 
         public void ScheduleUpdate(ObjectUpdateInfo info)
         {

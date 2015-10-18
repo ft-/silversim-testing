@@ -48,7 +48,7 @@ namespace SilverSim.Viewer.Core
             }
             set
             {
-                throw new NotImplementedException();
+                throw new NotSupportedException();
             }
         }
 
@@ -78,7 +78,7 @@ namespace SilverSim.Viewer.Core
         private readonly AppearanceInfo.AvatarTextureData m_Textures = new AppearanceInfo.AvatarTextureData();
         public double AvatarHeight;
         public UInt32 Serial = 1;
-        public readonly static int MaxVisualParams = 260;
+        public const int MaxVisualParams = 260;
         private const int NUM_AVATAR_TEXTURES = 21;
         private byte[] m_TextureEntry = new byte[0];
 

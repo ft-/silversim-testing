@@ -136,6 +136,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        [Flags]
         enum EstateAccessCodes : uint
         {
             AccessOptions = 1,
@@ -144,7 +145,7 @@ namespace SilverSim.Viewer.Core
             EstateManagers = 8
         }
 
-        void sendEstateList(UUID transactionID, UUID invoice, EstateAccessCodes code, List<UUI> data, uint estateID, UUID fromSceneID)
+        void SendEstateList(UUID transactionID, UUID invoice, EstateAccessCodes code, List<UUI> data, uint estateID, UUID fromSceneID)
         {
             int i;
             for(i = 0; i < data.Count;)
@@ -184,7 +185,7 @@ namespace SilverSim.Viewer.Core
         }
 
         /* this is groups only, so no code check inside */
-        void sendEstateList(UUID transactionID, UUID invoice, EstateAccessCodes code, List<UGI> data, uint estateID, UUID fromSceneID)
+        void SendEstateList(UUID transactionID, UUID invoice, EstateAccessCodes code, List<UGI> data, uint estateID, UUID fromSceneID)
         {
             int i;
             for (i = 0; i < data.Count; )
@@ -244,21 +245,21 @@ namespace SilverSim.Viewer.Core
 
                 SendMessageIfRootAgent(msg, req.CircuitSceneID);
 
-                sendEstateList(
+                SendEstateList(
                     req.TransactionID,
                     req.Invoice,
                     EstateAccessCodes.EstateManagers,
                     scene.EstateService.EstateManager.All[estateID], 
                     estateID, 
                     req.CircuitSceneID);
-                sendEstateList(
+                SendEstateList(
                     req.TransactionID,
                     req.Invoice, 
                     EstateAccessCodes.AccessOptions, 
                     scene.EstateService.EstateAccess.All[estateID], 
                     estateID, 
                     req.CircuitSceneID);
-                sendEstateList(
+                SendEstateList(
                     req.TransactionID,
                     req.Invoice,
                     EstateAccessCodes.AllowedGroups,

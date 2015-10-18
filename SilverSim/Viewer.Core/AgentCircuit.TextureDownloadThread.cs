@@ -15,7 +15,7 @@ namespace SilverSim.Viewer.Core
         private const int IMAGE_FIRST_PACKET_SIZE = 600;
 
         #region Texture Download Thread
-        public bool LogUDPTextureDownloads = false;
+        public bool LogUDPTextureDownloads;
         private void TextureDownloadThread(object param)
         {
             Thread.CurrentThread.Name = string.Format("LLUDP:Texture Downloader for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
@@ -116,7 +116,7 @@ namespace SilverSim.Viewer.Core
                         {
                             if (Server.LogAssetFailures)
                             {
-                                m_Log.DebugFormat("Failed to download image {0} (RequestImage): {1} or {2}\nA: {3}\nB: {4}", imageRequest.ImageID, e1.Message, e2.Message, e1.StackTrace.ToString(), e2.StackTrace.ToString());
+                                m_Log.DebugFormat("Failed to download image {0} (RequestImage): {1} or {2}\nA: {3}\nB: {4}", imageRequest.ImageID, e1.Message, e2.Message, e1.StackTrace, e2.StackTrace);
                             }
                             Messages.Image.ImageNotInDatabase failres = new Messages.Image.ImageNotInDatabase();
                             failres.ID = imageRequest.ImageID;

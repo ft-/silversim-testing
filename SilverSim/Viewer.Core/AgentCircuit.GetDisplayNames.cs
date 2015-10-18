@@ -75,93 +75,94 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
-            HttpResponse res = httpreq.BeginResponse();
-            XmlTextWriter text = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM);
-            text.WriteStartElement("llsd");
-            text.WriteStartElement("map");
-
-            bool haveAgents = false;
-
-            foreach(UUID id in uuids)
+            using (HttpResponse res = httpreq.BeginResponse())
             {
-                UUI nd;
-                try
+                using (XmlTextWriter text = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM))
                 {
-                    nd = Scene.AvatarNameService[id];
-                }
-                catch
-                {
-                    baduuids.Add((string)id);
-                    continue;
-                }
-                if (!haveAgents)
-                {
-                    text.WriteNamedValue("key", "agents");
-                    text.WriteStartElement("array");
-                    haveAgents = true;
-                }
+                    text.WriteStartElement("llsd");
+                    text.WriteStartElement("map");
 
-                WriteAvatarNameData(text, nd);
+                    bool haveAgents = false;
+
+                    foreach (UUID id in uuids)
+                    {
+                        UUI nd;
+                        try
+                        {
+                            nd = Scene.AvatarNameService[id];
+                        }
+                        catch
+                        {
+                            baduuids.Add((string)id);
+                            continue;
+                        }
+                        if (!haveAgents)
+                        {
+                            text.WriteNamedValue("key", "agents");
+                            text.WriteStartElement("array");
+                            haveAgents = true;
+                        }
+
+                        WriteAvatarNameData(text, nd);
+                    }
+
+                    foreach (string name in names)
+                    {
+                        UUI nd;
+                        string[] nameparts = name.Split('.');
+                        if (nameparts.Length < 2)
+                        {
+                            nameparts = new string[] { nameparts[0], string.Empty };
+                        }
+                        try
+                        {
+                            nd = Scene.AvatarNameService[nameparts[0], nameparts[1]];
+                        }
+                        catch
+                        {
+                            badnames.Add(name);
+                            continue;
+                        }
+                        if (!haveAgents)
+                        {
+                            text.WriteNamedValue("key", "haveAgents");
+                            text.WriteStartElement("array");
+                            haveAgents = true;
+                        }
+
+                        WriteAvatarNameData(text, nd);
+                    }
+
+                    if (haveAgents)
+                    {
+                        text.WriteEndElement();
+                    }
+
+                    if (baduuids.Count != 0)
+                    {
+                        text.WriteKeyValuePair("key", "bad_ids");
+                        text.WriteStartElement("array");
+                        foreach (UUID id in baduuids)
+                        {
+                            text.WriteKeyValuePair("uuid", id);
+                        }
+                        text.WriteEndElement();
+                    }
+
+                    if (badnames.Count != 0)
+                    {
+                        text.WriteKeyValuePair("key", "bad_names");
+                        text.WriteStartElement("array");
+                        foreach (string name in badnames)
+                        {
+                            text.WriteKeyValuePair("string", name);
+                        }
+                        text.WriteEndElement();
+                    }
+                    text.WriteEndElement();
+                    text.WriteEndElement();
+                }
             }
-
-            foreach(string name in names)
-            {
-                UUI nd;
-                string[] nameparts = name.Split('.');
-                if(nameparts.Length < 2)
-                {
-                    nameparts = new string[] { nameparts[0], "" };
-                }
-                try
-                {
-                    nd = Scene.AvatarNameService[nameparts[0], nameparts[1]];
-                }
-                catch
-                {
-                    badnames.Add(name);
-                    continue;
-                }
-                if (!haveAgents)
-                {
-                    text.WriteNamedValue("key", "haveAgents");
-                    text.WriteStartElement("array");
-                    haveAgents = true;
-                }
-
-                WriteAvatarNameData(text, nd);
-            }
-
-            if(haveAgents)
-            {
-                text.WriteEndElement();
-            }
-
-            if(baduuids.Count != 0)
-            {
-                text.WriteKeyValuePair("key", "bad_ids");
-                text.WriteStartElement("array");
-                foreach(UUID id in baduuids)
-                {
-                    text.WriteKeyValuePair("uuid", id);
-                }
-                text.WriteEndElement();
-            }
-
-            if (badnames.Count != 0)
-            {
-                text.WriteKeyValuePair("key", "bad_names");
-                text.WriteStartElement("array");
-                foreach (string name in badnames)
-                {
-                    text.WriteKeyValuePair("string", name);
-                }
-                text.WriteEndElement();
-            }
-            text.WriteEndElement();
-            text.WriteEndElement();
-            text.Flush();
-
-            res.Close();
         }
     }
 }

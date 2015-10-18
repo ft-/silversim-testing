@@ -112,7 +112,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        IAgentTeleportServiceInterface m_ActiveTeleportService = null;
+        IAgentTeleportServiceInterface m_ActiveTeleportService;
         public IAgentTeleportServiceInterface ActiveTeleportService
         {
             get
@@ -138,7 +138,7 @@ namespace SilverSim.Viewer.Core
         public UUID SessionID { get; private set; }
         public double DrawDistance { get; private set; }
 
-        public TeleportFlags TeleportFlags = TeleportFlags.None;
+        public TeleportFlags TeleportFlags;
         #endregion
 
         /* Circuits: UUID is SceneID */
@@ -820,7 +820,7 @@ namespace SilverSim.Viewer.Core
 
         public Dictionary<string, string> ServiceURLs = new Dictionary<string, string>();
 
-        private bool m_IsActiveGod = false;
+        private bool m_IsActiveGod;
 
         public bool IsActiveGod
         {
@@ -1122,7 +1122,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        int m_NextParcelSequenceId = 0;
+        int m_NextParcelSequenceId;
 
         public int NextParcelSequenceId
         {

@@ -74,29 +74,28 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
-            HttpResponse resp;
             if (httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
             }
 
-            IValue o;
+            Map reqmap;
             try
             {
-                o = LLSD_XML.Deserialize(httpreq.Body);
+                reqmap = LLSD_XML.Deserialize(httpreq.Body) as Map;
             }
             catch
             {
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (!(o is Map))
+            if (null == reqmap)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
-            Map reqmap = (Map)o;
+
             UUID objectID = reqmap["object_id"].AsUUID;
             string currentURL = reqmap["current_url"].ToString();
             int textureIndex = reqmap["texture_index"].AsInt;
@@ -140,17 +139,19 @@ namespace SilverSim.Viewer.Core.Capabilities
 
             if(entry == null)
             {
-                resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
-                resp.ContentType = "text/plain";
-                resp.Close();
+                using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+                {
+                    resp.ContentType = "text/plain";
+                }
                 return;
             }
 
             if (entry.IsWhiteListEnabled && !CheckUrlAgainstWhiteList(currentURL, entry))
             {
-                resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
-                resp.ContentType = "text/plain";
-                resp.Close();
+                using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+                {
+                    resp.ContentType = "text/plain";
+                }
                 return;
             }
             if(entry != null)
@@ -159,13 +160,14 @@ namespace SilverSim.Viewer.Core.Capabilities
                 part.UpdateMediaFace(textureIndex, entry, m_Agent.ID);
             }
 
-            resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
-            resp.ContentType = "application/llsd+xml";
-            using(Stream s = resp.GetOutputStream())
+            using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
             {
-                LLSD_XML.Serialize(new Undef(), s);
+                resp.ContentType = "application/llsd+xml";
+                using (Stream s = resp.GetOutputStream())
+                {
+                    LLSD_XML.Serialize(new Undef(), s);
+                }
             }
-            resp.Close();
         }
     }
 }

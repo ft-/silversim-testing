@@ -94,18 +94,19 @@ namespace SilverSim.Viewer.Core
 
             if (httpreq.ContainsHeader("Range"))
             {
-                HttpResponse httpres;
-                Stream o;
                 List<KeyValuePair<int, int>> contentranges = new List<KeyValuePair<int, int>>();
 
                 string[] ranges = httpreq["Range"].Split(' ');
 
                 if(ranges.Length > 1)
                 {
-                    httpres = httpreq.BeginResponse("application/vnd.ll.mesh");
-                    o = httpres.GetOutputStream(asset.Data.LongLength);
-                    o.Write(asset.Data, 0, asset.Data.Length);
-                    httpres.Close();
+                    using (HttpResponse httpres = httpreq.BeginResponse("application/vnd.ll.mesh"))
+                    {
+                        using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
+                        {
+                            o.Write(asset.Data, 0, asset.Data.Length);
+                        }
+                    }
                     return;
                 }
 
@@ -127,10 +128,13 @@ namespace SilverSim.Viewer.Core
 
                 if (p[0] != "bytes")
                 {
-                    httpres = httpreq.BeginResponse("application/vnd.ll.mesh");
-                    o = httpres.GetOutputStream(asset.Data.LongLength);
-                    o.Write(asset.Data, 0, asset.Data.Length);
-                    httpres.Close();
+                    using (HttpResponse httpres = httpreq.BeginResponse("application/vnd.ll.mesh"))
+                    {
+                        using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
+                        {
+                            o.Write(asset.Data, 0, asset.Data.Length);
+                        }
+                    }
                     return;
                 }
 
@@ -150,7 +154,10 @@ namespace SilverSim.Viewer.Core
                      */
                     if (start >= asset.Data.Length)
                     {
-                        httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh").Close();
+                        using(HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh"))
+                        {
+
+                        }
                         return;
                     }
                     if (start > end)
@@ -169,10 +176,13 @@ namespace SilverSim.Viewer.Core
                     }
                     if (start == 0 && end == asset.Data.Length - 1)
                     {
-                        httpres = httpreq.BeginResponse("application/vnd.ll.mesh");
-                        o = httpres.GetOutputStream(asset.Data.LongLength);
-                        o.Write(asset.Data, 0, asset.Data.Length);
-                        httpres.Close();
+                        using (HttpResponse httpres = httpreq.BeginResponse("application/vnd.ll.mesh"))
+                        {
+                            using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
+                            {
+                                o.Write(asset.Data, 0, asset.Data.Length);
+                            }
+                        }
                         return;
                     }
                     contentranges.Add(new KeyValuePair<int, int>(start, end));
@@ -184,18 +194,24 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
 
-                httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh");
-                httpres.Headers["Content-Range"] = string.Format("bytes {0}-{1}/{2}", start, end, asset.Data.Length);
-                o = httpres.GetOutputStream(end - start + 1);
-                o.Write(asset.Data, start, end - start + 1);
-                httpres.Close();
+                using (HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.PartialContent, "Partial Content", "application/vnd.ll.mesh"))
+                {
+                    httpres.Headers["Content-Range"] = string.Format("bytes {0}-{1}/{2}", start, end, asset.Data.Length);
+                    using (Stream o = httpres.GetOutputStream(end - start + 1))
+                    {
+                        o.Write(asset.Data, start, end - start + 1);
+                    }
+                }
             }
             else
             {
-                HttpResponse httpres = httpreq.BeginResponse("application/vnd.ll.mesh");
-                Stream o = httpres.GetOutputStream(asset.Data.LongLength);
-                o.Write(asset.Data, 0, asset.Data.Length);
-                httpres.Close();
+                using (HttpResponse httpres = httpreq.BeginResponse("application/vnd.ll.mesh"))
+                {
+                    using (Stream o = httpres.GetOutputStream(asset.Data.LongLength))
+                    {
+                        o.Write(asset.Data, 0, asset.Data.Length);
+                    }
+                }
             }
         }
     }

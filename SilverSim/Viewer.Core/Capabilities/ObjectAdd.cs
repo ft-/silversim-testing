@@ -37,16 +37,16 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         UInt32 BinToUInt(IValue v)
         {
-            if(!(v is BinaryData))
+            BinaryData bd = v as BinaryData;
+            if (null == bd)
             {
-                throw new ArgumentException();
+                throw new ArgumentOutOfRangeException("v");
             }
 
-            BinaryData bd = (BinaryData)v;
             byte[] b = bd;
             if(b.Length != 4)
             {
-                throw new ArgumentException();
+                throw new ArgumentOutOfRangeException("v");
             }
 
             if(BitConverter.IsLittleEndian)
@@ -58,7 +58,6 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
-            HttpResponse res;
             IValue iv;
             if (httpreq.Method != "POST")
             {
@@ -71,9 +70,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
+
+            Map rm;
             try
             {
-                iv = LLSD_XML.Deserialize(httpreq.Body);
+                rm = LLSD_XML.Deserialize(httpreq.Body) as Map;
             }
             catch
             {
@@ -81,13 +82,12 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            if(!(iv is Map))
+            if(null == rm)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                 return;
             }
 
-            Map rm = (Map)iv;
             Messages.Object.ObjectAdd m = new Messages.Object.ObjectAdd();
             m.AgentID = m_Creator.ID;
             try
@@ -225,13 +225,14 @@ namespace SilverSim.Viewer.Core.Capabilities
             if (BitConverter.IsLittleEndian)
                 Array.Reverse(resultbytes);
 
-            res = httpreq.BeginResponse("application/xml");
-            using(StreamWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+            using (HttpResponse res = httpreq.BeginResponse("application/xml"))
             {
-                w.Write(string.Format("<llsd><map><key>local_id</key><binary encoding=\"base64\">{0}</binary></map></llsd>", Convert.ToBase64String(resultbytes)));
-                w.Flush();
+                using (StreamWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+                {
+                    w.Write(string.Format("<llsd><map><key>local_id</key><binary encoding=\"base64\">{0}</binary></map></llsd>", Convert.ToBase64String(resultbytes)));
+                    w.Flush();
+                }
             }
-            res.Close();
         }
 
         static Encoding UTF8NoBOM = new UTF8Encoding(false);

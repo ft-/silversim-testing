@@ -331,11 +331,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                 writer.WriteNamedValue("Velocity", Vector3.Zero);
                 writer.WriteNamedValue("AngularVelocity", Vector3.Zero);
                 writer.WriteNamedValue("Acceleration", Vector3.Zero);
-                writer.WriteNamedValue("Description", "");
+                writer.WriteNamedValue("Description", string.Empty);
                 writer.WriteNamedValue("Color", new ColorAlpha(1, 1, 1, 1));
-                writer.WriteNamedValue("Text", "");
-                writer.WriteNamedValue("SitName", "");
-                writer.WriteNamedValue("TouchName", "");
+                writer.WriteNamedValue("Text", string.Empty);
+                writer.WriteNamedValue("SitName", string.Empty);
+                writer.WriteNamedValue("TouchName", string.Empty);
                 writer.WriteNamedValue("LinkNum", linknumber);
                 writer.WriteNamedValue("ClickAction", 0);
                 writer.WriteStartElement("Shape");

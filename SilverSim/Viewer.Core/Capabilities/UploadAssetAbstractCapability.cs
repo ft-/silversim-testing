@@ -31,7 +31,8 @@ namespace SilverSim.Viewer.Core.Capabilities
         protected abstract AssetType NewAssetType { get; }
         public abstract int ActiveUploads { get; }
 
-        protected class UrlNotFoundException : Exception
+        [Serializable]
+        public class UrlNotFoundException : Exception
         {
             public UrlNotFoundException()
             {
@@ -39,7 +40,8 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        protected class InsufficientFundsException : Exception
+        [Serializable]
+        public class InsufficientFundsException : Exception
         {
             public InsufficientFundsException()
             {
@@ -47,7 +49,8 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        protected class UploadErrorException : Exception
+        [Serializable]
+        public class UploadErrorException : Exception
         {
             public UploadErrorException(string message)
                 : base(message)
@@ -75,21 +78,22 @@ namespace SilverSim.Viewer.Core.Capabilities
                     httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                     return;
                 }
+
+                Map reqmap;
                 try
                 {
-                    o = LLSD_XML.Deserialize(httpreq.Body);
+                    reqmap = LLSD_XML.Deserialize(httpreq.Body) as Map;
                 }
                 catch
                 {
                     httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
                     return;
                 }
-                if (!(o is Map))
+                if (null == reqmap)
                 {
                     httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                     return;
                 }
-                Map reqmap = (Map)o;
 
                 try
                 {
@@ -101,10 +105,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                     llsderrorreply.Add("state", "error");
                     llsderrorreply.Add("message", e.Message);
 
-                    HttpResponse httperrorres = httpreq.BeginResponse();
-                    Stream outErrorStream = httperrorres.GetOutputStream();
-                    LLSD_XML.Serialize(llsderrorreply, outErrorStream);
-                    httperrorres.Close();
+                    using (HttpResponse httperrorres = httpreq.BeginResponse())
+                    {
+                        using (Stream outErrorStream = httperrorres.GetOutputStream())
+                        {
+                            LLSD_XML.Serialize(llsderrorreply, outErrorStream);
+                        }
+                    }
                     return;
                 }
                 catch(InsufficientFundsException)
@@ -112,10 +119,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                     Map llsderrorreply = new Map();
                     llsderrorreply.Add("state", "insufficient funds");
 
-                    HttpResponse httperrorres = httpreq.BeginResponse();
-                    Stream outErrorStream = httperrorres.GetOutputStream();
-                    LLSD_XML.Serialize(llsderrorreply, outErrorStream);
-                    httperrorres.Close();
+                    using (HttpResponse httperrorres = httpreq.BeginResponse())
+                    {
+                        using (Stream outErrorStream = httperrorres.GetOutputStream())
+                        {
+                            LLSD_XML.Serialize(llsderrorreply, outErrorStream);
+                        }
+                    }
                     return;
                 }
                 catch
@@ -128,10 +138,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                 llsdreply.Add("state", "upload");
                 llsdreply.Add("uploader", m_ServerURI + httpreq.RawUrl + "/Upload/" + uploadID.ToString());
 
-                HttpResponse httpres = httpreq.BeginResponse();
-                Stream outStream = httpres.GetOutputStream();
-                LLSD_XML.Serialize(llsdreply, outStream);
-                httpres.Close();
+                using (HttpResponse httpres = httpreq.BeginResponse())
+                {
+                    using (Stream outStream = httpres.GetOutputStream())
+                    {
+                        LLSD_XML.Serialize(llsdreply, outStream);
+                    }
+                }
             }
             else if(parts[3] != "Upload" || parts.Length < 4)
             {
@@ -158,7 +171,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 asset.ID = NewAssetID;
                 asset.Local = AssetIsLocal;
                 asset.Temporary = AssetIsTemporary;
-                asset.Name = "";
+                asset.Name = string.Empty;
                 asset.Creator = m_Creator;
 
                 Map llsdreply;
@@ -177,11 +190,14 @@ namespace SilverSim.Viewer.Core.Capabilities
                     llsderrorreply.Add("state", "error");
                     llsderrorreply.Add("message", e.Message);
 
-                    HttpResponse httperrorres = httpreq.BeginResponse();
-                    httperrorres.ContentType = "application/llsd+xml";
-                    Stream outErrorStream = httperrorres.GetOutputStream();
-                    LLSD_XML.Serialize(llsderrorreply, outErrorStream);
-                    httperrorres.Close();
+                    using (HttpResponse httperrorres = httpreq.BeginResponse())
+                    {
+                        httperrorres.ContentType = "application/llsd+xml";
+                        using (Stream outErrorStream = httperrorres.GetOutputStream())
+                        {
+                            LLSD_XML.Serialize(llsderrorreply, outErrorStream);
+                        }
+                    }
                     return;
                 }
                 catch (InsufficientFundsException)
@@ -189,11 +205,14 @@ namespace SilverSim.Viewer.Core.Capabilities
                     Map llsderrorreply = new Map();
                     llsderrorreply.Add("state", "insufficient funds");
 
-                    HttpResponse httperrorres = httpreq.BeginResponse();
-                    httperrorres.ContentType = "application/llsd+xml";
-                    Stream outErrorStream = httperrorres.GetOutputStream();
-                    LLSD_XML.Serialize(llsderrorreply, outErrorStream);
-                    httperrorres.Close();
+                    using (HttpResponse httperrorres = httpreq.BeginResponse())
+                    {
+                        httperrorres.ContentType = "application/llsd+xml";
+                        using (Stream outErrorStream = httperrorres.GetOutputStream())
+                        {
+                            LLSD_XML.Serialize(llsderrorreply, outErrorStream);
+                        }
+                    }
                     return;
                 }
                 catch
@@ -205,11 +224,14 @@ namespace SilverSim.Viewer.Core.Capabilities
                 llsdreply.Add("new_asset", asset.ID);
                 llsdreply.Add("state", "complete");
 
-                HttpResponse httpres = httpreq.BeginResponse();
-                httpres.ContentType = "application/llsd+xml";
-                Stream outStream = httpres.GetOutputStream();
-                LLSD_XML.Serialize(llsdreply, outStream);
-                httpres.Close();
+                using (HttpResponse httpres = httpreq.BeginResponse())
+                {
+                    httpres.ContentType = "application/llsd+xml";
+                    using (Stream outStream = httpres.GetOutputStream())
+                    {
+                        LLSD_XML.Serialize(llsdreply, outStream);
+                    }
+                }
             }
         }
     }

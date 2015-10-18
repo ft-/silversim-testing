@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Core
         private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
         public UUID SessionID = UUID.Zero;
         public UUID AgentID = UUID.Zero;
-        public ViewerAgent Agent = null;
+        public ViewerAgent Agent;
         private SceneInterface m_Scene;
         private RwLockedDictionary<string, UUID> m_RegisteredCapabilities = new RwLockedDictionary<string, UUID>();
         private CapsHttpRedirector m_CapsRedirector;
@@ -43,19 +43,19 @@ namespace SilverSim.Viewer.Core
         private ChatServiceInterface.Listener m_DebugChannelListener;
 
         private Thread m_TextureDownloadThread;
-        private bool m_TextureDownloadThreadRunning = false;
+        private bool m_TextureDownloadThreadRunning;
         private BlockingQueue<Message> m_TextureDownloadQueue = new BlockingQueue<Message>();
         internal List<ITriggerOnRootAgentActions> m_TriggerOnRootAgentActions = new List<ITriggerOnRootAgentActions>();
 
         private Thread m_InventoryThread;
-        private bool m_InventoryThreadRunning = false;
+        private bool m_InventoryThreadRunning;
         private BlockingQueue<Message> m_InventoryRequestQueue = new BlockingQueue<Message>();
         public string GatekeeperURI { get; protected set; }
 
         private Thread m_ObjectUpdateThread;
-        private bool m_ObjectUpdateThreadRunning = false;
+        private bool m_ObjectUpdateThreadRunning;
 
-        int m_AgentUpdatesReceived = 0;
+        int m_AgentUpdatesReceived;
 
         public SceneInterface Scene
         {
@@ -109,7 +109,7 @@ namespace SilverSim.Viewer.Core
                         {
                             try
                             {
-                                m_ChatListener = m_ChatService.AddAgentListen(PUBLIC_CHANNEL, "", UUID.Zero, "", ChatGetAgentUUID, ChatGetAgentPosition, ChatListenerAction);
+                                m_ChatListener = m_ChatService.AddAgentListen(PUBLIC_CHANNEL, string.Empty, UUID.Zero, string.Empty, ChatGetAgentUUID, ChatGetAgentPosition, ChatListenerAction);
                             }
                             catch
                             {
@@ -117,7 +117,7 @@ namespace SilverSim.Viewer.Core
                             }
                             try
                             {
-                                m_DebugChannelListener = m_ChatService.AddAgentListen(DEBUG_CHANNEL, "", UUID.Zero, "", ChatGetAgentUUID, ChatGetAgentPosition, ChatListenerAction);
+                                m_DebugChannelListener = m_ChatService.AddAgentListen(DEBUG_CHANNEL, string.Empty, UUID.Zero, string.Empty, ChatGetAgentUUID, ChatGetAgentPosition, ChatListenerAction);
                             }
                             catch
                             {
@@ -176,7 +176,7 @@ namespace SilverSim.Viewer.Core
         }
         #endregion
 
-        class MessageHandlerExtenderKeyValuePairCircuitQueue
+        sealed class MessageHandlerExtenderKeyValuePairCircuitQueue
         {
             WeakReference m_Circuit;
             Queue<KeyValuePair<AgentCircuit, Message>> m_Queue;
@@ -197,15 +197,16 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        class MessageHandlerExtenderLLAgent
+        sealed class MessageHandlerExtenderViewerAgent
         {
             WeakReference m_Agent;
             WeakReference m_Circuit;
-            HandlerDelegate m_Delegate;
+            Action<ViewerAgent, AgentCircuit, Message> m_Delegate;
 
-            public delegate void HandlerDelegate(ViewerAgent agent, AgentCircuit circuit, Message m);
+            // for documentation
+            //public delegate void HandlerDelegate(ViewerAgent agent, AgentCircuit circuit, Message m);
 
-            public MessageHandlerExtenderLLAgent(ViewerAgent agent, AgentCircuit circuit, HandlerDelegate del)
+            public MessageHandlerExtenderViewerAgent(ViewerAgent agent, AgentCircuit circuit, Action<ViewerAgent, AgentCircuit, Message> del)
             {
                 m_Agent = new WeakReference(agent, false);
                 m_Circuit = new WeakReference(circuit, false);
@@ -223,14 +224,15 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        class MessageHandlerExtenderIAgent
+        sealed class MessageHandlerExtenderIAgent
         {
             WeakReference m_Agent;
-            HandlerDelegate m_Delegate;
+            Action<IAgent, Message> m_Delegate;
 
-            public delegate void HandlerDelegate(IAgent agent, Message m);
+            //for documentation
+            //public delegate void HandlerDelegate(IAgent agent, Message m);
 
-            public MessageHandlerExtenderIAgent(IAgent agent, HandlerDelegate del)
+            public MessageHandlerExtenderIAgent(IAgent agent, Action<IAgent, Message> del)
             {
                 m_Agent = new WeakReference(agent, false);
                 m_Delegate = del;
@@ -285,7 +287,7 @@ namespace SilverSim.Viewer.Core
                 m_Log.FatalFormat("Field {0} of {1} is not derived from Queue<Message> or Queue<KeyValuePair<Circuit, Message>>", fi.Name, t.GetType());
             }
 
-            throw new Exception();
+            throw new ArgumentException("Handler resolver error");
         }
 
         Action<Message> DeriveActionDelegateFromMethodInfo(MethodInfo mi, Type t, object o, string info)
@@ -307,8 +309,8 @@ namespace SilverSim.Viewer.Core
 #if DEBUG
                     m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, info);
 #endif
-                    return new MessageHandlerExtenderLLAgent(Agent, this,
-                        (MessageHandlerExtenderLLAgent.HandlerDelegate)Delegate.CreateDelegate(typeof(MessageHandlerExtenderLLAgent.HandlerDelegate), o, mi)).Handler;
+                    return new MessageHandlerExtenderViewerAgent(Agent, this,
+                        (Action<ViewerAgent, AgentCircuit, Message>)Delegate.CreateDelegate(typeof(Action<ViewerAgent, AgentCircuit, Message>), o, mi)).Handler;
                 }
             }
             else if (mi.GetParameters().Length == 2)
@@ -324,7 +326,7 @@ namespace SilverSim.Viewer.Core
                     m_Log.InfoFormat("Method {0} of {1} registered for {2}", mi.Name, t.Name, info);
 #endif
                     return new MessageHandlerExtenderIAgent(Agent,
-                        (MessageHandlerExtenderIAgent.HandlerDelegate)Delegate.CreateDelegate(typeof(MessageHandlerExtenderIAgent.HandlerDelegate), o, mi)).Handler;
+                        (Action<IAgent, Message>)Delegate.CreateDelegate(typeof(Action<IAgent, Message>), o, mi)).Handler;
                 }
             }
             else if (mi.GetParameters().Length != 1)
@@ -343,7 +345,7 @@ namespace SilverSim.Viewer.Core
                 return (Action<Message>)Delegate.CreateDelegate(typeof(Action<Message>), o, mi);
             }
 
-            throw new Exception();
+            throw new ArgumentException("Handler resolver error");
         }
 
         void AddMessageRouting(object o)
@@ -587,7 +589,7 @@ namespace SilverSim.Viewer.Core
 #endif
                         try
                         {
-                            AddExtenderCapability(ca.Name, regionSeedID, (CapabilityHandler.CapabilityDelegate)Delegate.CreateDelegate(typeof(CapabilityHandler.CapabilityDelegate), o, mi), Server.Scene.CapabilitiesConfig);
+                            AddExtenderCapability(ca.Name, regionSeedID, (Action<ViewerAgent, AgentCircuit, HttpRequest>)Delegate.CreateDelegate(typeof(Action<ViewerAgent, AgentCircuit, HttpRequest>), o, mi), Server.Scene.CapabilitiesConfig);
                         }
                         catch (Exception e)
                         {
@@ -698,18 +700,18 @@ namespace SilverSim.Viewer.Core
             m_TxObjectQueue.Enqueue(null);
         }
 
-        protected override void OnCircuitSpecificPacketReceived(MessageType mType, UDPPacket pck)
+        protected override void OnCircuitSpecificPacketReceived(MessageType mType, UDPPacket p)
         {
             /* we know the message type now, so we have to decode it when possible */
             switch(mType)
             { 
                 case MessageType.ScriptDialogReply:
                     /* script dialog uses a different internal format, so we decode it specifically */
-                    if(!pck.ReadUUID().Equals(AgentID))
+                    if(!p.ReadUUID().Equals(AgentID))
                     {
 
                     }
-                    else if (!pck.ReadUUID().Equals(SessionID))
+                    else if (!p.ReadUUID().Equals(SessionID))
                     {
 
                     }
@@ -717,10 +719,10 @@ namespace SilverSim.Viewer.Core
                     {
                         /* specific decoder for ListenEvent */
                         ListenEvent ev = new ListenEvent();
-                        ev.TargetID = pck.ReadUUID();
-                        ev.Channel = pck.ReadInt32();
-                        ev.ButtonIndex = pck.ReadInt32();
-                        ev.Message = pck.ReadStringLen8();
+                        ev.TargetID = p.ReadUUID();
+                        ev.Channel = p.ReadInt32();
+                        ev.ButtonIndex = p.ReadInt32();
+                        ev.Message = p.ReadStringLen8();
                         ev.ID = AgentID;
                         ev.Type = ListenEvent.ChatType.Say;
                         Server.RouteChat(ev);
@@ -729,11 +731,11 @@ namespace SilverSim.Viewer.Core
 
                 case MessageType.ChatFromViewer:
                     /* chat uses a different internal format, so we decode it specifically */
-                    if(!pck.ReadUUID().Equals(AgentID))
+                    if(!p.ReadUUID().Equals(AgentID))
                     {
 
                     }
-                    else if (!pck.ReadUUID().Equals(SessionID))
+                    else if (!p.ReadUUID().Equals(SessionID))
                     {
 
                     }
@@ -741,11 +743,11 @@ namespace SilverSim.Viewer.Core
                     {
                         ListenEvent ev = new ListenEvent();
                         ev.ID = AgentID;
-                        ev.Message = pck.ReadStringLen16();
-                        byte type = pck.ReadUInt8();
+                        ev.Message = p.ReadStringLen16();
+                        byte type = p.ReadUInt8();
 
                         ev.Type = (ListenEvent.ChatType)type;
-                        ev.Channel = pck.ReadInt32();
+                        ev.Channel = p.ReadInt32();
                         ev.GlobalPosition = Agent.GlobalPosition;
                         ev.Name = Agent.Name;
                         ev.TargetID = UUID.Zero;
@@ -759,7 +761,7 @@ namespace SilverSim.Viewer.Core
                     {
                         /* we need differentiation here of SimInventoryItem */
                         Action<Message> mdel;
-                        Messages.Transfer.TransferRequest m = Messages.Transfer.TransferRequest.Decode(pck);
+                        Messages.Transfer.TransferRequest m = Messages.Transfer.TransferRequest.Decode(p);
                         if(m.SourceType == Messages.Transfer.SourceType.SimInventoryItem)
                         {
                             if(m.Params.Length >= 96)
@@ -797,7 +799,7 @@ namespace SilverSim.Viewer.Core
                     }
                     if(m_PacketDecoder.PacketTypes.TryGetValue(mType, out del))
                     {
-                        Message m = del(pck);
+                        Message m = del(p);
                         /* we got a decoder, so we can make use of it */
                         m.ReceivedOnCircuitCode = CircuitCode;
                         m.CircuitAgentID = new UUID(AgentID);

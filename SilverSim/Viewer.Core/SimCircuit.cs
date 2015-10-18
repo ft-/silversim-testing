@@ -27,7 +27,7 @@ namespace SilverSim.Viewer.Core
         public GridVector RemoteLocation { get; protected set; }
         /* <summary>RemoteOffset = RemoteGlobalPosition - LocalGlobalPosition</summary> */
         public Vector3 RemoteOffset { get; protected set; }
-        SceneInterface m_Scene = null;
+        SceneInterface m_Scene;
 
         public SimCircuit(
             UDPCircuitsManager server,
@@ -68,7 +68,7 @@ namespace SilverSim.Viewer.Core
             
         }
 
-        protected override void OnCircuitSpecificPacketReceived(MessageType mType, UDPPacket pck)
+        protected override void OnCircuitSpecificPacketReceived(MessageType mType, UDPPacket p)
         {
             /* we know the message type now, so we have to decode it when possible */
             switch (mType)
@@ -88,16 +88,16 @@ namespace SilverSim.Viewer.Core
                 case MessageType.ChatPass:
                     {
                         ListenEvent ev = new ListenEvent();
-                        ev.Channel = pck.ReadInt32();
-                        ev.GlobalPosition = pck.ReadVector3f();
-                        ev.ID = pck.ReadUUID();
-                        ev.OwnerID = pck.ReadUUID();
-                        ev.Name = pck.ReadStringLen8();
-                        ev.SourceType = (ListenEvent.ChatSourceType)pck.ReadUInt8();
-                        ev.Type = (ListenEvent.ChatType)pck.ReadUInt8();
-                        /* radius */ pck.ReadFloat();
-                        /* simaccess */ pck.ReadUInt8();
-                        ev.Message = pck.ReadStringLen16();
+                        ev.Channel = p.ReadInt32();
+                        ev.GlobalPosition = p.ReadVector3f();
+                        ev.ID = p.ReadUUID();
+                        ev.OwnerID = p.ReadUUID();
+                        ev.Name = p.ReadStringLen8();
+                        ev.SourceType = (ListenEvent.ChatSourceType)p.ReadUInt8();
+                        ev.Type = (ListenEvent.ChatType)p.ReadUInt8();
+                        /* radius */ p.ReadFloat();
+                        /* simaccess */ p.ReadUInt8();
+                        ev.Message = p.ReadStringLen16();
                         SceneInterface scene = m_Scene;
                         if (scene != null)
                         {
@@ -111,7 +111,7 @@ namespace SilverSim.Viewer.Core
                     Func<UDPPacket, Message> del;
                     if (m_PacketDecoder.PacketTypes.TryGetValue(mType, out del))
                     {
-                        Message m = del(pck);
+                        Message m = del(p);
                         /* we got a decoder, so we can make use of it */
                         m.ReceivedOnCircuitCode = CircuitCode;
                         m.CircuitAgentID = new UUID(RemoteSceneID);

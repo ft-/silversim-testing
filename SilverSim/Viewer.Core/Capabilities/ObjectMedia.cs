@@ -39,22 +39,22 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            IValue o;
+            Map reqmap;
             try
             {
-                o = LLSD_XML.Deserialize(httpreq.Body);
+                reqmap = LLSD_XML.Deserialize(httpreq.Body) as Map;
             }
             catch
             {
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (!(o is Map))
+            if (null == reqmap)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
-            Map reqmap = (Map)o;
+
             if(!reqmap.ContainsKey("verb"))
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Invalid request");
@@ -79,7 +79,6 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         void HandleObjectMediaRequest(HttpRequest httpreq, Map reqmap)
         {
-            HttpResponse resp;
             UUID objectID = reqmap["object_id"].AsUUID;
             ObjectPart part;
             try
@@ -88,9 +87,10 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
             catch
             {
-                resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
-                resp.ContentType = "text/plain";
-                resp.Close();
+                using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+                {
+                    resp.ContentType = "text/plain";
+                }
                 return;
             }
 
@@ -99,9 +99,10 @@ namespace SilverSim.Viewer.Core.Capabilities
             PrimitiveMedia mediaList = part.Media;
             if(null == mediaList)
             {
-                resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
-                resp.ContentType = "text/plain";
-                resp.Close();
+                using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+                {
+                    resp.ContentType = "text/plain";
+                }
                 return;
             }
             AnArray mediaData = new AnArray();
@@ -118,19 +119,18 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
             res.Add("object_media_data", mediaData);
             res.Add("object_media_version", part.MediaURL);
-            resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
-            resp.ContentType = "application/llsd+xml";
-            using(Stream o = resp.GetOutputStream())
+            using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
             {
-                LLSD_XML.Serialize(res, o);
+                resp.ContentType = "application/llsd+xml";
+                using (Stream o = resp.GetOutputStream())
+                {
+                    LLSD_XML.Serialize(res, o);
+                }
             }
-            resp.Close();
-
         }
 
         void HandleObjectMediaUpdate(HttpRequest httpreq, Map reqmap)
         {
-            HttpResponse resp;
             UUID objectID = reqmap["object_id"].AsUUID;
             ObjectPart part;
             try
@@ -139,18 +139,20 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
             catch
             {
-                resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
-                resp.ContentType = "text/plain";
-                resp.Close();
+                using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+                {
+                    resp.ContentType = "text/plain";
+                }
                 return;
             }
 
             PrimitiveMedia media = new PrimitiveMedia();
             foreach (IValue v in (AnArray)reqmap["object_media_data"])
             {
-                if (v is Map)
+                Map vm = v as Map;
+                if (null != vm)
                 {
-                    media.Add((PrimitiveMedia.Entry)((Map)v));
+                    media.Add((PrimitiveMedia.Entry)vm);
                 }
                 else
                 {
@@ -163,9 +165,10 @@ namespace SilverSim.Viewer.Core.Capabilities
                 part.UpdateMedia(media, m_Agent.ID);
             }
 
-            resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
-            resp.ContentType = "text/plain";
-            resp.Close();
+            using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+            {
+                resp.ContentType = "text/plain";
+            }
         }
     }
 }

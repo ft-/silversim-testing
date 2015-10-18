@@ -15,8 +15,8 @@ namespace SilverSim.Viewer.Core
     {
         public class DownloadTransferData
         {
-            public int Position = 0;
-            public uint Packet = 0;
+            public int Position;
+            public uint Packet;
             public byte[] Data;
             public ulong XferID;
 

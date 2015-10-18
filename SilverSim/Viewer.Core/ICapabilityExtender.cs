@@ -8,15 +8,16 @@ namespace SilverSim.Viewer.Core
 {
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     /* used on methods compatible with FactoryDelegate */
-    public class CapabilityHandler : Attribute
+    public sealed class CapabilityHandler : Attribute
     {
-        public readonly string Name;
+        public string Name { get; private set; }
 
         public CapabilityHandler(string name)
         {
             Name = name;
         }
-        public delegate void CapabilityDelegate(ViewerAgent agent, AgentCircuit circuit, HttpRequest req);
+        // for documentation
+        // public delegate void CapabilityDelegate(ViewerAgent agent, AgentCircuit circuit, HttpRequest req);
     }
 
     public interface ICapabilityExtender : IProtocolExtender

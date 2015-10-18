@@ -90,164 +90,167 @@ namespace SilverSim.Viewer.Core
             }
             catch (Exception e)
             {
-                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace.ToString());
+                m_Log.WarnFormat("Invalid LLSD_XML: {0} {1}", e.Message, e.StackTrace);
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (!(o is Map))
+
+            Map reqmap = o as Map;
+            if (null == reqmap)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
-            Map reqmap = (Map)o;
 
-            HttpResponse res = httpreq.BeginResponse();
-            XmlTextWriter text = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM);
-            List<UUID> badfolders = new List<UUID>();
-            text.WriteStartElement("llsd");
-            text.WriteStartElement("map");
-            bool wroteheader = false;
-
-            Dictionary<UUID, List<Map>> folderRequests = new Dictionary<UUID, List<Map>>();
-
-            foreach (IValue iv in (AnArray)reqmap["folders"])
+            using (HttpResponse res = httpreq.BeginResponse())
             {
-                if (!(iv is Map))
+                using (XmlTextWriter text = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM))
                 {
-                    continue;
-                }
+                    List<UUID> badfolders = new List<UUID>();
+                    text.WriteStartElement("llsd");
+                    text.WriteStartElement("map");
+                    bool wroteheader = false;
 
-                Map itemmap = (Map)iv;
-                if (!itemmap.ContainsKey("folder_id") || 
-                    !itemmap.ContainsKey("fetch_folders") ||
-                    !itemmap.ContainsKey("fetch_items"))
-                {
-                    continue;
-                }
-                UUID ownerid = itemmap["owner_id"].AsUUID;
-                if (!folderRequests.ContainsKey(ownerid))
-                {
-                    folderRequests[ownerid] = new List<Map>();
-                }
-                folderRequests[ownerid].Add(itemmap);
-            }
+                    Dictionary<UUID, List<Map>> folderRequests = new Dictionary<UUID, List<Map>>();
 
-            Dictionary<UUID, Dictionary<UUID, InventoryFolderContent>> folderContents = new Dictionary<UUID, Dictionary<UUID, InventoryFolderContent>>();
-            foreach (KeyValuePair<UUID, List<Map>> req in folderRequests)
-            {
-                List<UUID> list = new List<UUID>();
-                foreach(Map fm in req.Value)
-                {
-                    if (fm["folder_id"].AsUUID != UUID.Zero)
+                    AnArray foldersreqarray = (AnArray)reqmap["folders"];
+                    foreach (IValue iv1 in foldersreqarray)
                     {
-                        list.Add(fm["folder_id"].AsUUID);
-                    }
-                }
-                try
-                {
-                    List<InventoryFolderContent> folderContentRes = Agent.InventoryService.Folder.Content[AgentID, list.ToArray()];
-                    foreach (InventoryFolderContent folderContent in folderContentRes)
-                    {
-                        if(!folderContents.ContainsKey(req.Key))
+                        Map itemmap = iv1 as Map;
+                        if (null == itemmap)
                         {
-                            folderContents.Add(req.Key, new Dictionary<UUID, InventoryFolderContent>());
-                        }
-                        folderContents[req.Key][folderContent.FolderID] = folderContent;
-                    }
-                }
-                catch
-                {
-
-                }
-            }
-
-            foreach (IValue iv in (AnArray)reqmap["folders"])
-            {
-                if (!(iv is Map))
-                {
-                    continue;
-                }
-
-                Map itemmap = (Map)iv;
-                if (!itemmap.ContainsKey("folder_id") || 
-                    !itemmap.ContainsKey("fetch_folders") ||
-                    !itemmap.ContainsKey("fetch_items"))
-                {
-                    continue;
-                }
-
-                UUID folderid = itemmap["folder_id"].AsUUID;
-                UUID ownerid = itemmap["owner_id"].AsUUID;
-                bool fetch_folders = itemmap["fetch_folders"].AsBoolean;
-                bool fetch_items = itemmap["fetch_items"].AsBoolean;
-
-
-                if (folderContents.ContainsKey(ownerid))
-                {
-                    if (folderContents[ownerid].ContainsKey(folderid))
-                    {
-                        InventoryFolderContent fc = folderContents[ownerid][folderid];
-                        List<InventoryItem> linkeditems = new List<InventoryItem>();
-                        List<UUID> linkeditemids = new List<UUID>();
-
-                        foreach (InventoryItem item in fc.Items)
-                        {
-                            if (item.AssetType == Types.Asset.AssetType.Link)
-                            {
-                                linkeditemids.Add(item.AssetID);
-                            }
-                            else if (item.AssetType == Types.Asset.AssetType.LinkFolder)
-                            {
-
-                            }
+                            continue;
                         }
 
+                        if (!itemmap.ContainsKey("folder_id") ||
+                            !itemmap.ContainsKey("fetch_folders") ||
+                            !itemmap.ContainsKey("fetch_items"))
+                        {
+                            continue;
+                        }
+                        UUID ownerid = itemmap["owner_id"].AsUUID;
+                        if (!folderRequests.ContainsKey(ownerid))
+                        {
+                            folderRequests[ownerid] = new List<Map>();
+                        }
+                        folderRequests[ownerid].Add(itemmap);
+                    }
+
+                    Dictionary<UUID, Dictionary<UUID, InventoryFolderContent>> folderContents = new Dictionary<UUID, Dictionary<UUID, InventoryFolderContent>>();
+                    foreach (KeyValuePair<UUID, List<Map>> req in folderRequests)
+                    {
+                        List<UUID> list = new List<UUID>();
+                        foreach (Map fm in req.Value)
+                        {
+                            if (fm["folder_id"].AsUUID != UUID.Zero)
+                            {
+                                list.Add(fm["folder_id"].AsUUID);
+                            }
+                        }
                         try
                         {
-                            linkeditems = Agent.InventoryService.Item[ownerid, linkeditemids];
+                            List<InventoryFolderContent> folderContentRes = Agent.InventoryService.Folder.Content[AgentID, list.ToArray()];
+                            foreach (InventoryFolderContent folderContent in folderContentRes)
+                            {
+                                if (!folderContents.ContainsKey(req.Key))
+                                {
+                                    folderContents.Add(req.Key, new Dictionary<UUID, InventoryFolderContent>());
+                                }
+                                folderContents[req.Key][folderContent.FolderID] = folderContent;
+                            }
                         }
                         catch
                         {
 
                         }
-                        if (!wroteheader)
+                    }
+
+                    foreach (IValue iv in foldersreqarray)
+                    {
+                        Map itemmap = iv as Map;
+                        if (null == iv)
                         {
-                            wroteheader = true;
-                            text.WriteNamedValue("key", "folders");
-                            text.WriteStartElement("array");
+                            continue;
                         }
 
-                        WriteInventoryFolderContent(text, fc, fetch_folders, fetch_items, linkeditems);
-                    }
-                    else
-                    {
-                        badfolders.Add(folderid);
-                    }
-                }
-                else
-                {
-                    badfolders.Add(folderid);
-                }
-            }
-            if (wroteheader)
-            {
-                text.WriteEndElement();
-            }
-            if (badfolders.Count != 0)
-            {
-                text.WriteNamedValue("key", "bad_folders");
-                text.WriteStartElement("array");
-                foreach (UUID id in badfolders)
-                {
-                    text.WriteNamedValue("uuid", id);
-                }
-                text.WriteEndElement();
-            }
-            text.WriteEndElement();
-            text.WriteEndElement();
-            text.Flush();
+                        if (!itemmap.ContainsKey("folder_id") ||
+                            !itemmap.ContainsKey("fetch_folders") ||
+                            !itemmap.ContainsKey("fetch_items"))
+                        {
+                            continue;
+                        }
 
-            res.Close();
+                        UUID folderid = itemmap["folder_id"].AsUUID;
+                        UUID ownerid = itemmap["owner_id"].AsUUID;
+                        bool fetch_folders = itemmap["fetch_folders"].AsBoolean;
+                        bool fetch_items = itemmap["fetch_items"].AsBoolean;
+
+
+                        if (folderContents.ContainsKey(ownerid))
+                        {
+                            if (folderContents[ownerid].ContainsKey(folderid))
+                            {
+                                InventoryFolderContent fc = folderContents[ownerid][folderid];
+                                List<InventoryItem> linkeditems = new List<InventoryItem>();
+                                List<UUID> linkeditemids = new List<UUID>();
+
+                                foreach (InventoryItem item in fc.Items)
+                                {
+                                    if (item.AssetType == Types.Asset.AssetType.Link)
+                                    {
+                                        linkeditemids.Add(item.AssetID);
+                                    }
+                                    else if (item.AssetType == Types.Asset.AssetType.LinkFolder)
+                                    {
+
+                                    }
+                                }
+
+                                try
+                                {
+                                    linkeditems = Agent.InventoryService.Item[ownerid, linkeditemids];
+                                }
+                                catch
+                                {
+
+                                }
+                                if (!wroteheader)
+                                {
+                                    wroteheader = true;
+                                    text.WriteNamedValue("key", "folders");
+                                    text.WriteStartElement("array");
+                                }
+
+                                WriteInventoryFolderContent(text, fc, fetch_folders, fetch_items, linkeditems);
+                            }
+                            else
+                            {
+                                badfolders.Add(folderid);
+                            }
+                        }
+                        else
+                        {
+                            badfolders.Add(folderid);
+                        }
+                    }
+                    if (wroteheader)
+                    {
+                        text.WriteEndElement();
+                    }
+                    if (badfolders.Count != 0)
+                    {
+                        text.WriteNamedValue("key", "bad_folders");
+                        text.WriteStartElement("array");
+                        foreach (UUID id in badfolders)
+                        {
+                            text.WriteNamedValue("uuid", id);
+                        }
+                        text.WriteEndElement();
+                    }
+                    text.WriteEndElement();
+                    text.WriteEndElement();
+                }
+            }
         }
     }
 }

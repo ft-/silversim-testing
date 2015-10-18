@@ -15,6 +15,7 @@ using SilverSim.Types;
 using SilverSim.StructuredData.LLSD;
 using ThreadedClasses;
 using SilverSim.Scene.Types.Scene;
+using System.IO;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -45,22 +46,21 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            IValue o;
+            Map reqmap;
             try
             {
-                o = LLSD_XML.Deserialize(httpreq.Body);
+                reqmap = LLSD_XML.Deserialize(httpreq.Body) as Map;
             }
             catch
             {
                 httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");
                 return;
             }
-            if (!(o is Map))
+            if (null == reqmap)
             {
                 httpreq.ErrorResponse(HttpStatusCode.BadRequest, "Misformatted LLSD-XML");
                 return;
             }
-            Map reqmap = (Map)o;
 
             if(reqmap["agent-id"].AsUUID != m_Agent.ID)
             {
@@ -74,10 +74,14 @@ namespace SilverSim.Viewer.Core.Capabilities
 #warning Implement ParcelNavigateMedia
 
             Map m = new Map();
-            HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK");
-            resp.ContentType = "application/llsd+xml";
-            LLSD_XML.Serialize(m, resp.GetOutputStream());
-            resp.Close();
+            using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))
+            {
+                resp.ContentType = "application/llsd+xml";
+                using (Stream s = resp.GetOutputStream())
+                {
+                    LLSD_XML.Serialize(m, s);
+                }
+            }
         }
     }
 }

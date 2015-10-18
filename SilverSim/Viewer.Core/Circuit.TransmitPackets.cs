@@ -53,7 +53,7 @@ namespace SilverSim.Viewer.Core
             }
             catch (Exception e)
             {
-                m_Log.ErrorFormat("{0} at {1}", e.ToString(), e.StackTrace.ToString());
+                m_Log.ErrorFormat("{0} at {1}", e.ToString(), e.StackTrace);
             }
 
             /* Unreliable message direct acknowledge */
@@ -65,7 +65,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch (Exception e)
                 {
-                    m_Log.ErrorFormat("OnSendCompletion: {0} at {1}", e.ToString(), e.StackTrace.ToString());
+                    m_Log.ErrorFormat("OnSendCompletion: {0} at {1}", e.ToString(), e.StackTrace);
                 }
             }
         }
@@ -100,7 +100,7 @@ namespace SilverSim.Viewer.Core
         protected const int TRANSMIT_THROTTLE_MTU = 1500;
         protected const int MAX_DATA_MTU = 1400;
 
-        protected bool m_CircuitIsClosing = false;
+        protected bool m_CircuitIsClosing;
 
         protected abstract void SendSimStats(int dt);
 
@@ -187,6 +187,7 @@ namespace SilverSim.Viewer.Core
 
                 qcount = m_TxQueue.Count + 1;
                 m = null;
+                CancelTxThread cancelmsg = null;
                 while (qcount > 0)
                 {
                     try
@@ -199,7 +200,7 @@ namespace SilverSim.Viewer.Core
                     }
                     timeout = 0;
                     --qcount;
-                    if (m is CancelTxThread)
+                    if (null != (cancelmsg = m as CancelTxThread))
                     {
                         break;
                     }
@@ -252,7 +253,7 @@ namespace SilverSim.Viewer.Core
                         LowPriorityQueue.Enqueue(m);
                     }
                 }
-                if (m is CancelTxThread)
+                if (null != cancelmsg)
                 {
                     break;
                 }
@@ -363,7 +364,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch (Exception e)
                             {
-                                m_Log.DebugFormat("Failed to serialize message of type {0}: {1}\n{2}", m.TypeDescription, e.Message, e.StackTrace.ToString());
+                                m_Log.DebugFormat("Failed to serialize message of type {0}: {1}\n{2}", m.TypeDescription, e.Message, e.StackTrace);
                             }
                         }
                     }
