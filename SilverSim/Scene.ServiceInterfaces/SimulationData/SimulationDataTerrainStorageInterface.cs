@@ -10,7 +10,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
     public abstract class SimulationDataTerrainStorageInterface
     {
-        public abstract LayerPatch this[UUID regionID, uint ExtendedPatchID]
+        public abstract LayerPatch this[UUID regionID, uint extendedPatchID]
         {
             get;
             set;
@@ -20,6 +20,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             get;
         }
 
+        [Serializable]
         public class TerrainStorageFailedException : Exception
         {
             public TerrainStorageFailedException(UUID regionID, uint extendedPatchID)

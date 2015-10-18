@@ -56,8 +56,8 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         }
         protected readonly List<StorageThreadInfo> m_StorageThreads = new List<StorageThreadInfo>();
         protected readonly BlockingQueue<ObjectUpdateInfo> m_StorageMainRequestQueue = new BlockingQueue<ObjectUpdateInfo>();
-        protected int m_ActiveStorageRequests = 0;
-        protected bool m_StopStorageThread = false;
+        protected int m_ActiveStorageRequests;
+        protected bool m_StopStorageThread;
         int m_MaxStorageThreads = 50;
         int m_StorageThreadDivider = 10;
         protected readonly RwLockedDictionary<uint, int> m_KnownSerialNumbers = new RwLockedDictionary<uint, int>();
