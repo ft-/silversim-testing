@@ -16,17 +16,4 @@ namespace SilverSim.Scripting.Common
 
         }
     }
-
-
-    [Serializable]
-    [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-    public sealed class ScriptFunctionName : Attribute
-    {
-        public string Name { get; private set; }
-
-        public ScriptFunctionName(string name)
-        {
-            Name = name;
-        }
-    }
 }
