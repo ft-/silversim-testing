@@ -63,11 +63,6 @@ namespace SilverSim.Main.Service
             base.OnShutdown();
         }
 
-        protected override bool OnPowerEvent(PowerBroadcastStatus powerStatus)
-        {
-            return base.OnPowerEvent(powerStatus);
-        }
-
         ConfigurationLoader m_ConfigLoader;
         ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
         ManualResetEvent m_ShutdownCompleteEvent = new ManualResetEvent(false);
