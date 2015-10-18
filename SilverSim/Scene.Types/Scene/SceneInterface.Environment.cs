@@ -144,11 +144,11 @@ namespace SilverSim.Scene.Types.Scene
                 public ReaderWriterLock ReaderWriterLock;
             }
 
-            class WindDataAccessor
+            public class WindDataAccessor
             {
                 private EnvironmentController m_Controller;
 
-                public WindDataAccessor(EnvironmentController controller)
+                internal WindDataAccessor(EnvironmentController controller)
                 {
                     m_Controller = controller;
                 }
@@ -203,7 +203,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            bool m_WindlightValid = false;
+            bool m_WindlightValid;
             WindlightSkyData m_SkyWindlight = new WindlightSkyData();
             WindlightWaterData m_WaterWindlight = new WindlightWaterData();
             SunData m_SunData = new SunData();
@@ -287,11 +287,11 @@ namespace SilverSim.Scene.Types.Scene
 
                 if (m_WindlightValid)
                 {
-                    m = compileWindlightSettings(m_SkyWindlight, m_WaterWindlight);
+                    m = CompileWindlightSettings(m_SkyWindlight, m_WaterWindlight);
                 }
                 else
                 {
-                    m = compileResetWindlightSettings();
+                    m = CompileResetWindlightSettings();
                 }
 
                 SendToAllClients(m);
@@ -302,11 +302,11 @@ namespace SilverSim.Scene.Types.Scene
                 GenericMessage m;
                 if (m_WindlightValid)
                 {
-                    m = compileWindlightSettings(m_SkyWindlight, m_WaterWindlight);
+                    m = CompileWindlightSettings(m_SkyWindlight, m_WaterWindlight);
                 }
                 else
                 {
-                    m = compileResetWindlightSettings();
+                    m = CompileResetWindlightSettings();
                 }
                 agent.SendMessageAlways(m, m_Scene.ID);
             }
@@ -347,7 +347,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             #region Windlight message compiler
-            private GenericMessage compileResetWindlightSettings()
+            private GenericMessage CompileResetWindlightSettings()
             {
                 GenericMessage m = new GenericMessage();
                 m.Method = "WindlightReset";
@@ -355,7 +355,7 @@ namespace SilverSim.Scene.Types.Scene
                 return m;
             }
 
-            private GenericMessage compileWindlightSettings(WindlightSkyData skyWindlight, WindlightWaterData waterWindlight)
+            private GenericMessage CompileWindlightSettings(WindlightSkyData skyWindlight, WindlightWaterData waterWindlight)
             {
                 GenericMessage m = new GenericMessage();
                 m.Method = "Windlight";

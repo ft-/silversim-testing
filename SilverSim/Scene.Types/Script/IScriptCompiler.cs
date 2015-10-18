@@ -10,6 +10,7 @@ using System.Xml;
 
 namespace SilverSim.Scene.Types.Script
 {
+    [Serializable]
     public class CompilerException : Exception
     {
         public Dictionary<int, string> Messages = new Dictionary<int,string>();
@@ -32,7 +33,7 @@ namespace SilverSim.Scene.Types.Script
                 string o = string.Empty;
                 foreach(KeyValuePair<int, string> m in Messages)
                 {
-                    if(o != "")
+                    if(o.Length != 0)
                     {
                         o += "\n";
                     }

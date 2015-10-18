@@ -299,10 +299,10 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return new Vector3(x_above_div / below_div, y_above_div / below_div, 0);
         }
 
-        class PathDetails
+        sealed class PathDetails
         {
             public List<Vector3> Vertices = new List<Vector3>();
-            public bool IsOpenHollow = false;
+            public bool IsOpenHollow;
 
             public PathDetails()
             {

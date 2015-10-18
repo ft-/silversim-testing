@@ -8,9 +8,10 @@ namespace SilverSim.Scene.Types.Script
 {
     [Serializable]
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class ScriptApiName : Attribute
+    public sealed class ScriptApiName : Attribute
     {
-        public readonly string Name;
+        public string Name { get; private set; }
+
         public ScriptApiName(string name)
         {
             Name = name;
@@ -19,9 +20,10 @@ namespace SilverSim.Scene.Types.Script
 
     [Serializable]
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, Inherited = false)]
-    public class ScriptEngineUsage : Attribute
+    public sealed class ScriptEngineUsage : Attribute
     {
-        public string Name;
+        public string Name { get; private set; }
+
         public ScriptEngineUsage(string name)
         {
             Name = name;

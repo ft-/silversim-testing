@@ -59,7 +59,7 @@ namespace SilverSim.Scene.Types.Scene
                 AssetData asset = m_Scene.AssetService[assetid];
                 if(asset.Type != AssetType.Notecard)
                 {
-                    throw new ArgumentException();
+                    throw new NotANotecardFormatException();
                 }
 
                 m_LastAccessed[assetid] = Environment.TickCount;

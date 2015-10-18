@@ -22,12 +22,12 @@ namespace SilverSim.Scene.Types.Object
             #endregion
 
             #region Fields
-            public PrimitiveShapeType Type = PrimitiveShapeType.Box; /* byte / 16 */
+            public PrimitiveShapeType Type; /* byte / 16 */
 
             public UUID SculptMap = UUID.Zero; /* 0 */
             public PrimitiveSculptType SculptType = PrimitiveSculptType.Sphere; /* byte / 17 */
-            public bool IsSculptInverted = false; /* 18 */
-            public bool IsSculptMirrored = false; /* 19 */
+            public bool IsSculptInverted; /* 18 */
+            public bool IsSculptMirrored; /* 19 */
 
             public ushort PathBegin; /* 20 */
             public byte PathCurve; /* 22 */
@@ -100,7 +100,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     if(value.Length != 45)
                     {
-                        throw new ArgumentOutOfRangeException("Array length must be 45.");
+                        throw new ArgumentException("Array length must be 45.");
                     }
                     if (!BitConverter.IsLittleEndian)
                     {
@@ -1631,7 +1631,7 @@ namespace SilverSim.Scene.Types.Object
                     return texitem.AssetID;
                 }
             }
-            throw new Exception("texture does not name either a inventory item or a uuid");
+            throw new ArgumentException("texture does not name either a inventory item or a uuid");
         }
 
         public void SetTexPrimitiveParams(TextureEntryFace face, PrimitiveParamsType type, AnArray.MarkEnumerator enumerator)

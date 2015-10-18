@@ -63,7 +63,7 @@ namespace SilverSim.Main.Common.Transfer
 
             try
             {
-                objgroups = ObjectXML.fromAsset(data, m_RezzingAgent);
+                objgroups = ObjectXML.FromAsset(data, m_RezzingAgent);
             }
             catch
             {

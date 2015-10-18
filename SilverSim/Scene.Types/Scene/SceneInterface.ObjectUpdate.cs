@@ -34,8 +34,8 @@ namespace SilverSim.Scene.Types.Scene
             d.FullID = agent.ID;
             d.LocalID = agent.LocalID;
             d.Material = PrimitiveMaterial.Flesh;
-            d.MediaURL = "";
-            d.NameValue = string.Format("FirstName STRING RW SV {0}\nLastName STRING RW SV {1}\nTitle STRING RW SV {2}", agent.FirstName, agent.LastName, "");
+            d.MediaURL = string.Empty;
+            d.NameValue = string.Format("FirstName STRING RW SV {0}\nLastName STRING RW SV {1}\nTitle STRING RW SV {2}", agent.FirstName, agent.LastName, string.Empty);
             d.ObjectData = new byte[76];
             agent.CollisionPlane.ToBytes(d.ObjectData, 0);
             agent.Position.ToBytes(d.ObjectData, 16);
@@ -65,7 +65,7 @@ namespace SilverSim.Scene.Types.Scene
             d.Material = PrimitiveMaterial.Flesh;
             d.PSBlock = new byte[0];
             d.Scale = new SilverSim.Types.Vector3(0.45f, 0.6f, 1.9f);
-            d.Text = "";
+            d.Text = string.Empty;
             d.TextColor = new SilverSim.Types.ColorAlpha(0, 0, 0, 0);
             d.TextureAnim = new byte[0];
             d.TextureEntry = new byte[0];

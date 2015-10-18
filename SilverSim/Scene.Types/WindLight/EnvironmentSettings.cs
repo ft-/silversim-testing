@@ -94,6 +94,7 @@ namespace SilverSim.Scene.Types.WindLight
             writer.WriteEndElement();
         }
 
+        [Serializable]
         public class EnvironmentSettingsSerializationException : Exception
         {
             public EnvironmentSettingsSerializationException()

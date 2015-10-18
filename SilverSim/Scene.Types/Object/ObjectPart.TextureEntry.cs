@@ -40,7 +40,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     lock (this)
                     {
-                        m_MediaURL = "";
+                        m_MediaURL = string.Empty;
                     }
                 }
                 TriggerOnUpdate(0);

@@ -165,7 +165,7 @@ namespace SilverSim.Scene.Types.Script
                     /* TODO: implement estate managers */
                 }
             }
-            throw new Exception(string.Format("Function {0} not allowed", name));
+            throw new InvalidOperationException(string.Format("Function {0} not allowed", name));
         }
         #endregion
     }

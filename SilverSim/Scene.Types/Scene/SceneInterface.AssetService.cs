@@ -11,11 +11,11 @@ namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
-        private class DefaultAssetMetadataService : AssetMetadataServiceInterface
+        public class DefaultAssetMetadataService : AssetMetadataServiceInterface
         {
             SceneInterface m_Scene;
 
-            public DefaultAssetMetadataService(SceneInterface scene)
+            internal DefaultAssetMetadataService(SceneInterface scene)
             {
                 m_Scene = scene;
             }
@@ -45,11 +45,11 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private class DefaultAssetDataService : AssetDataServiceInterface
+        public class DefaultAssetDataService : AssetDataServiceInterface
         {
             SceneInterface m_Scene;
 
-            public DefaultAssetDataService(SceneInterface scene)
+            internal DefaultAssetDataService(SceneInterface scene)
             {
                 m_Scene = scene;
             }
@@ -89,11 +89,11 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private class DefaultAssetReferencesService : AssetReferencesServiceInterface
+        public class DefaultAssetReferencesService : AssetReferencesServiceInterface
         {
             SceneInterface m_Scene;
 
-            public DefaultAssetReferencesService(SceneInterface scene)
+            internal DefaultAssetReferencesService(SceneInterface scene)
             {
                 m_Scene = scene;
             }
@@ -121,14 +121,14 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private class DefaultAssetService : AssetServiceInterface
+        public class DefaultAssetService : AssetServiceInterface
         {
             SceneInterface m_Scene;
             DefaultAssetMetadataService m_MetadataService;
             DefaultAssetDataService m_DataService;
             DefaultAssetReferencesService m_ReferencesService;
 
-            public DefaultAssetService(SceneInterface si)
+            internal DefaultAssetService(SceneInterface si)
             {
                 m_Scene = si;
                 m_MetadataService = new DefaultAssetMetadataService(si);

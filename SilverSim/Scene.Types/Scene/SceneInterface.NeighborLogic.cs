@@ -28,7 +28,7 @@ namespace SilverSim.Scene.Types.Scene
         public readonly Dictionary<UUID, NeighborEntry> Neighbors = new Dictionary<UUID, NeighborEntry>();
 
         public delegate bool TryGetSceneDelegate(UUID id, out SceneInterface scene);
-        public TryGetSceneDelegate TryGetScene = null;
+        public TryGetSceneDelegate TryGetScene;
 
         public void ChatPassInbound(UUID fromRegionID, ListenEvent ev)
         {
@@ -148,7 +148,7 @@ namespace SilverSim.Scene.Types.Scene
             Dictionary<string, string> headers = new Dictionary<string,string>();
             try
             {
-                using (Stream responseStream = HttpRequestHandler.DoStreamRequest("HEAD", rinfo.ServerURI + "helo", null, "", "", false, 20000, headers))
+                using (Stream responseStream = HttpRequestHandler.DoStreamRequest("HEAD", rinfo.ServerURI + "helo", null, string.Empty, string.Empty, false, 20000, headers))
                 {
                     using (StreamReader reader = new StreamReader(responseStream))
                     {

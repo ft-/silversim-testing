@@ -16,6 +16,21 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
+        [Serializable]
+        public class ParcelAccessDeniedException : Exception
+        {
+            public ParcelAccessDeniedException()
+            {
+
+            }
+
+            public ParcelAccessDeniedException(string msg)
+                : base(msg)
+            {
+
+            }
+        }
+
         bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel)
         {
             string nop;
@@ -142,7 +157,7 @@ namespace SilverSim.Scene.Types.Scene
 
             if(null == selectedParcel)
             {
-                throw new Exception("No parcels for teleporting to found.");
+                throw new ParcelAccessDeniedException("No parcels for teleporting to found.");
             }
             return selectedParcel;
         }
@@ -168,7 +183,7 @@ namespace SilverSim.Scene.Types.Scene
                             return estateInfo;
                         }
                     }
-                    throw new Exception("You are not allowed to enter the estate.");
+                    throw new ParcelAccessDeniedException("You are not allowed to enter the estate.");
                 }
             }
 

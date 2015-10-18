@@ -78,7 +78,7 @@ namespace SilverSim.Scene.Types.Object
         public class PermsGranterInfo
         {
             public UUI PermsGranter = UUI.Unknown;
-            public ScriptPermissions PermsMask = ScriptPermissions.None;
+            public ScriptPermissions PermsMask;
 
             public PermsGranterInfo()
             {
@@ -92,7 +92,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private PermsGranterInfo m_PermsGranter = null;
+        private PermsGranterInfo m_PermsGranter;
         public PermsGranterInfo PermsGranter 
         { 
             get
@@ -127,11 +127,11 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Fields
-        private ScriptInstance m_ScriptInstance = null;
+        private ScriptInstance m_ScriptInstance;
         #endregion
 
         #region Properties
-        IScriptState m_ScriptState = null;
+        IScriptState m_ScriptState;
         public IScriptState ScriptState
         {
             get

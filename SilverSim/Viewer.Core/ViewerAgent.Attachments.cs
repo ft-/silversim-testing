@@ -178,7 +178,7 @@ namespace SilverSim.Viewer.Core
 
                 try
                 {
-                    objgroups = ObjectXML.fromAsset(data, m_RezzingAgent);
+                    objgroups = ObjectXML.FromAsset(data, m_RezzingAgent);
                 }
                 catch(Exception e)
                 {

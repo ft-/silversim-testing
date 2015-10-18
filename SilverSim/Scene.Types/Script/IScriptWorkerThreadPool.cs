@@ -5,6 +5,7 @@ using System;
 
 namespace SilverSim.Scene.Types.Script
 {
+    [Serializable]
     public class ScriptAbortException : Exception
     {
         public ScriptAbortException()

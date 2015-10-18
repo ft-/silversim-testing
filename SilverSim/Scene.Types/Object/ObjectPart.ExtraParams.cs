@@ -15,8 +15,8 @@ namespace SilverSim.Scene.Types.Object
         private byte[] m_ExtraParamsBytes = new byte[0];
         private ReaderWriterLock m_ExtraParamsLock = new ReaderWriterLock();
 
-        private bool m_IsFacelightDisabled = false;
-        private bool m_IsAttachmentLightsDisabled = false;
+        private bool m_IsFacelightDisabled;
+        private bool m_IsAttachmentLightsDisabled;
         private double m_FacelightLimitIntensity = 1;
         private double m_AttachmentLightLimitIntensity = 1;
 
@@ -126,12 +126,12 @@ namespace SilverSim.Scene.Types.Object
             #endregion
 
             #region Fields
-            public bool IsFlexible = false;
-            public int Softness = 0;
-            public double Gravity = 0;
-            public double Friction = 0;
-            public double Wind = 0;
-            public double Tension = 0;
+            public bool IsFlexible;
+            public int Softness;
+            public double Gravity;
+            public double Friction;
+            public double Wind;
+            public double Tension;
             public Vector3 Force = Vector3.Zero;
             #endregion
 
@@ -203,12 +203,12 @@ namespace SilverSim.Scene.Types.Object
             #endregion
 
             #region Fields
-            public bool IsLight = false;
+            public bool IsLight;
             public Color LightColor = new Color();
-            public double Intensity = 0;
-            public double Radius = 0;
-            public double Cutoff = 0;
-            public double Falloff = 0;
+            public double Intensity;
+            public double Radius;
+            public double Cutoff;
+            public double Falloff;
             #endregion
 
             public byte[] Serialization
@@ -277,7 +277,7 @@ namespace SilverSim.Scene.Types.Object
             #endregion
 
             #region Fields
-            public bool IsProjecting = false;
+            public bool IsProjecting;
             public UUID ProjectionTextureID = UUID.Zero;
             public double ProjectionFOV;
             public double ProjectionFocus;

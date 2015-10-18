@@ -13,11 +13,11 @@ namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
-        private class DefaultAvatarNameService : AvatarNameServiceInterface
+        public class DefaultAvatarNameService : AvatarNameServiceInterface
         {
             RwLockedList<AvatarNameServiceInterface> m_ServiceList;
 
-            public DefaultAvatarNameService(RwLockedList<AvatarNameServiceInterface> serviceList)
+            internal DefaultAvatarNameService(RwLockedList<AvatarNameServiceInterface> serviceList)
             {
                 m_ServiceList = serviceList;
             }

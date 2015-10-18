@@ -67,7 +67,7 @@ namespace SilverSim.Scene.Types.Scene
         public readonly RegionSettings RegionSettings = new RegionSettings();
 
         #region Scene Loading fields (do not use for anything else)
-        public Thread m_LoaderThread = null;
+        public Thread m_LoaderThread;
         public object m_LoaderThreadLock = new object();
         #endregion
 
@@ -131,7 +131,7 @@ namespace SilverSim.Scene.Types.Scene
         public abstract void LoadSceneAsync();
 
         #region Physics
-        IPhysicsScene m_PhysicsScene = null;
+        IPhysicsScene m_PhysicsScene;
         object m_PhysicsSceneChangeLock = new object();
 
         public IPhysicsScene PhysicsScene
@@ -147,7 +147,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 if(value == null)
                 {
-                    throw new ArgumentNullException();
+                    throw new ArgumentNullException("value");
                 }
                 lock (m_PhysicsSceneChangeLock)
                 {
@@ -238,7 +238,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             else
             {
-                throw new ArgumentException();
+                throw new ArgumentException("Unknown target type " + typeof(T).FullName);
             }
         }
 
@@ -287,7 +287,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     catch (Exception e)
                     {
-                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                     }
                 }
             }
@@ -312,7 +312,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     catch (Exception e)
                     {
-                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                     }
                 }
             }
@@ -324,7 +324,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         private readonly RwLockedDictionary<UInt32, IObject> m_LocalIDs = new RwLockedDictionary<uint, IObject>();
-        private UInt32 m_LastLocalID = 0;
+        private UInt32 m_LastLocalID;
         private object m_LastLocalIDLock = new object();
 
         private UInt32 NextLocalID

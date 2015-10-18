@@ -5,6 +5,7 @@ using System;
 
 namespace SilverSim.Scene.Types.Object
 {
+    [Serializable]
     public class InvalidObjectXmlException : Exception
     {
         public InvalidObjectXmlException()
@@ -13,8 +14,12 @@ namespace SilverSim.Scene.Types.Object
         }
     }
 
+    [Serializable]
     public class ObjectDeserializationFailedDueKey : Exception
     {
+        public ObjectDeserializationFailedDueKey()
+        {
 
+        }
     }
 }

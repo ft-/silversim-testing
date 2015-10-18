@@ -29,7 +29,7 @@ namespace SilverSim.Scene.Types.Object
             lock (this)
             {
                 m_Media = null;
-                m_MediaURL = "";
+                m_MediaURL = string.Empty;
             }
             TriggerOnUpdate(ChangedEvent.ChangedFlags.Media);
         }

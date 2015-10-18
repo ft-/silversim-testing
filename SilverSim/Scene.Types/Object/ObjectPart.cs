@@ -31,7 +31,7 @@ namespace SilverSim.Scene.Types.Object
         public event Action<IObject> OnPositionChange;
         #endregion
 
-        private UInt32 m_LocalID = 0;
+        private UInt32 m_LocalID;
         public UInt32 LocalID 
         {
             get
@@ -62,22 +62,22 @@ namespace SilverSim.Scene.Types.Object
         private Vector3 m_LocalPosition = Vector3.Zero;
         private Quaternion m_LocalRotation = Quaternion.Identity;
         private Vector3 m_Slice = new Vector3(0, 1, 0);
-        private PrimitivePhysicsShapeType m_PhysicsShapeType = PrimitivePhysicsShapeType.Prim;
+        private PrimitivePhysicsShapeType m_PhysicsShapeType;
         private PrimitiveMaterial m_Material = PrimitiveMaterial.Wood;
         private Vector3 m_Size = new Vector3(0.5, 0.5, 0.5);
         private string m_SitText = string.Empty;
         private string m_TouchText = string.Empty;
         private Vector3 m_SitTargetOffset = Vector3.Zero;
         private Quaternion m_SitTargetOrientation = Quaternion.Identity;
-        private bool m_IsAllowedDrop = false;
-        private ClickActionType m_ClickAction = ClickActionType.None;
-        private bool m_IsPassCollisions = false;
-        private bool m_IsPassTouches = false;
+        private bool m_IsAllowedDrop;
+        private ClickActionType m_ClickAction;
+        private bool m_IsPassCollisions;
+        private bool m_IsPassTouches;
         private Vector3 m_AngularVelocity = Vector3.Zero;
         private Vector3 m_Velocity = Vector3.Zero;
         private UUI m_Creator = UUI.Unknown;
         private Date m_CreationDate = new Date();
-        private PrimitiveFlags m_PrimitiveFlags = PrimitiveFlags.None;
+        private PrimitiveFlags m_PrimitiveFlags;
         private Map m_DynAttrMap = new Map();
 
         public Map DynAttrs
@@ -90,7 +90,7 @@ namespace SilverSim.Scene.Types.Object
 
         private SilverSim.Types.Inventory.InventoryPermissionsData m_Permissions = new SilverSim.Types.Inventory.InventoryPermissionsData();
 
-        public int ScriptAccessPin = 0;
+        public int ScriptAccessPin;
 
         public int LoadedLinkNumber; /* not authoritative, just for loading from XML */
 
@@ -251,7 +251,7 @@ namespace SilverSim.Scene.Types.Object
                     }
                     catch (Exception e)
                     {
-                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                     }
                 }
             }
@@ -282,7 +282,7 @@ namespace SilverSim.Scene.Types.Object
                     }
                     catch (Exception e)
                     {
-                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                     }
                 }
             }
@@ -524,11 +524,11 @@ namespace SilverSim.Scene.Types.Object
 
         public ObjectGroup ObjectGroup { get; internal set; }
         public ObjectPartInventory Inventory { get; private set; }
-        public int SerialNumberLoadedFromDatabase = 0; /* <summary>only to be set within DB modules</summary> */
+        public int SerialNumberLoadedFromDatabase; /* <summary>only to be set within DB modules</summary> */
 
         public bool IsChanged { get; private set; }
 
-        bool m_IsChangedEnabled = false;
+        bool m_IsChangedEnabled;
 
         public bool IsChangedEnabled
         {
@@ -1267,20 +1267,20 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Link / Unlink
-        protected internal void LinkToObjectGroup(ObjectGroup group)
+        protected internal void Link(ObjectGroup group)
         {
             lock(this)
             {
                 if(ObjectGroup != null)
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException("ObjectGroup is already set");
                 }
                 ObjectGroup = group;
                 UpdateData(UpdateDataFlags.All);
             }
         }
 
-        protected internal void UnlinkFromObjectGroup()
+        protected internal void Unlink()
         {
             lock (this)
             {
@@ -1553,7 +1553,7 @@ namespace SilverSim.Scene.Types.Object
                     {
                         flags |= PrimitiveFlags.Scripted;
                     }
-                    writer.WriteNamedValue("Flags", flags.ToString().Replace(",", ""));
+                    writer.WriteNamedValue("Flags", flags.ToString().Replace(",", string.Empty));
                     CollisionSoundParam sp = CollisionSound;
                     writer.WriteUUID("CollisionSound", sp.ImpactSound);
                     writer.WriteNamedValue("CollisionSoundVolume", sp.ImpactVolume);

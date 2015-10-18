@@ -14,19 +14,19 @@ namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
-        private class ResourceAssetAccessor : RwLockedDictionary<UUID, AssetData>
+        public class ResourceAssetAccessor : RwLockedDictionary<UUID, AssetData>
         {
             private List<string> m_Resources;
-            public ResourceAssetAccessor()
+            internal ResourceAssetAccessor()
             {
                 m_Resources = new List<string>(GetType().Assembly.GetManifestResourceNames());
             }
 
-            public AssetData getAsset(UUID key)
+            public AssetData GetAsset(UUID key)
             {
                 return this.GetOrAddIfNotExists(key, delegate()
                 {
-                    string resourcename = "SilverSim.Scene.Types.Resources.Assets." + key + ".gz";
+                    string resourcename = "SilverSim.Scene.Types.Resources.Assets." + key.ToString() + ".gz";
                     if(!m_Resources.Contains(resourcename))
                     {
                         throw new AssetNotFoundException(key);
@@ -39,18 +39,18 @@ namespace SilverSim.Scene.Types.Scene
                 });
             }
 
-            public bool exists(UUID key)
+            public bool Exists(UUID key)
             {
-                string resourcename = "SilverSim.Scene.Types.Resources.Assets." + key + ".gz";
+                string resourcename = "SilverSim.Scene.Types.Resources.Assets." + key.ToString() + ".gz";
                 return m_Resources.Contains(resourcename);
             }
         }
 
-        private class ResourceAssetMetadataService : AssetMetadataServiceInterface
+        public class ResourceAssetMetadataService : AssetMetadataServiceInterface
         {
             ResourceAssetAccessor m_ResourceAssets;
 
-            public ResourceAssetMetadataService(ResourceAssetAccessor resourceAssets)
+            internal ResourceAssetMetadataService(ResourceAssetAccessor resourceAssets)
             {
                 m_ResourceAssets = resourceAssets;
             }
@@ -59,7 +59,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    AssetData ad = m_ResourceAssets.getAsset(key);
+                    AssetData ad = m_ResourceAssets.GetAsset(key);
                     AssetMetadata md = new AssetMetadata();
                     md.AccessTime = ad.AccessTime;
                     md.CreateTime = ad.CreateTime;
@@ -75,11 +75,11 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        private class ResourceAssetDataService : AssetDataServiceInterface
+        public class ResourceAssetDataService : AssetDataServiceInterface
         {
             ResourceAssetAccessor m_ResourceAssets;
 
-            public ResourceAssetDataService(ResourceAssetAccessor resourceAssets)
+            internal ResourceAssetDataService(ResourceAssetAccessor resourceAssets)
             {
                 m_ResourceAssets = resourceAssets;
             }
@@ -88,7 +88,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    AssetData ad = m_ResourceAssets.getAsset(key);
+                    AssetData ad = m_ResourceAssets.GetAsset(key);
                     return new MemoryStream(ad.Data);
                 }
             }
@@ -137,7 +137,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    return m_ResourceAssets.getAsset(key);
+                    return m_ResourceAssets.GetAsset(key);
                 }
             }
 
@@ -150,14 +150,14 @@ namespace SilverSim.Scene.Types.Scene
                 Dictionary<UUID, bool> asset1 = new Dictionary<UUID, bool>();
                 foreach (UUID key in assets)
                 {
-                    asset1[key] = m_ResourceAssets.exists(key);
+                    asset1[key] = m_ResourceAssets.Exists(key);
                 }
                 return asset1;
             }
 
             public override bool Exists(UUID key)
             {
-                return m_ResourceAssets.exists(key);
+                return m_ResourceAssets.Exists(key);
             }
 
             public override void Store(AssetData asset)

@@ -53,11 +53,11 @@ namespace SilverSim.Scene.Types.Scene
             return GetEnumerator();
         }
 
-        class ObjectGroupEnumerator : IEnumerator<ObjectGroup>
+        public class ObjectGroupEnumerator : IEnumerator<ObjectGroup>
         {
             IEnumerator m_Enum;
 
-            public ObjectGroupEnumerator(IEnumerator enumerator)
+            internal ObjectGroupEnumerator(IEnumerator enumerator)
             {
                 m_Enum = enumerator;
             }

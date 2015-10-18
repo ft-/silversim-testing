@@ -76,13 +76,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        /* OpenSim brain-deadness filter */
-        static string FilterBrokenTags(string xmlin)
-        {
-            return xmlin.Replace("<SceneObjectPart xmlns:xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">", "<SceneObjectPart xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xmlns:xsd=\"http://www.w3.org/2001/XMLSchema\">");
-        }
-
-        public static List<ObjectGroup> fromAsset(AssetData data, UUI currentOwner)
+        public static List<ObjectGroup> FromAsset(AssetData data, UUI currentOwner)
         {
             if(data.Type != AssetType.Object)
             {
@@ -91,19 +85,19 @@ namespace SilverSim.Scene.Types.Object
 
             using (Stream xmlstream = data.InputStream)
             {
-                return fromXml(xmlstream, currentOwner);
+                return FromXml(xmlstream, currentOwner);
             }
         }
 
-        public static List<ObjectGroup> fromXml(Stream xmlstream, UUI currentOwner)
+        public static List<ObjectGroup> FromXml(Stream xmlstream, UUI currentOwner)
         {
             using (XmlTextReader reader = new XmlTextReader(new ObjectXmlStreamFilter(xmlstream)))
             {
-                return fromXml(reader, currentOwner);
+                return FromXml(reader, currentOwner);
             }
         }
 
-        static List<ObjectGroup> fromXml(XmlTextReader reader, UUI currentOwner)
+        static List<ObjectGroup> FromXml(XmlTextReader reader, UUI currentOwner)
         {
             for(;;)
             {
@@ -117,10 +111,10 @@ namespace SilverSim.Scene.Types.Object
                     switch(reader.Name)
                     {
                         case "SceneObjectGroup":
-                            return fromXmlSingleObject(reader, currentOwner);
+                            return FromXmlSingleObject(reader, currentOwner);
 
                         case "CoalescedObject":
-                            return fromXmlCoalescedObject(reader, currentOwner);
+                            return FromXmlCoalescedObject(reader, currentOwner);
 
                         default:
                             throw new InvalidObjectXmlException();
@@ -129,7 +123,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        static List<ObjectGroup> fromXmlSingleObject(XmlTextReader reader, UUI currentOwner)
+        static List<ObjectGroup> FromXmlSingleObject(XmlTextReader reader, UUI currentOwner)
         {
             List<ObjectGroup> list = new List<ObjectGroup>();
 
@@ -137,7 +131,7 @@ namespace SilverSim.Scene.Types.Object
             return list;
         }
 
-        static List<ObjectGroup> fromXmlCoalescedObject(XmlTextReader reader, UUI currentOwner)
+        static List<ObjectGroup> FromXmlCoalescedObject(XmlTextReader reader, UUI currentOwner)
         {
             List<ObjectGroup> list = new List<ObjectGroup>();
             for(;;)
@@ -182,7 +176,7 @@ namespace SilverSim.Scene.Types.Object
                                     }
                                     while (reader.MoveToNextAttribute());
                                 }
-                                ObjectGroup grp = fromXmlSingleWithinCoalescedObject(reader, currentOwner);
+                                ObjectGroup grp = FromXmlSingleWithinCoalescedObject(reader, currentOwner);
                                 grp.Position = sogpos;
                                 list.Add(grp);
                                 break;
@@ -206,7 +200,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        static ObjectGroup fromXmlSingleWithinCoalescedObject(XmlTextReader reader, UUI currentOwner)
+        static ObjectGroup FromXmlSingleWithinCoalescedObject(XmlTextReader reader, UUI currentOwner)
         {
             ObjectGroup grp = null;
             for (; ; )

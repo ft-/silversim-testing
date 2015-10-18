@@ -14,7 +14,7 @@ namespace SilverSim.Scene.Types.Object
     public class ObjectUpdateInfo
     {
 
-        private bool m_Killed = false;
+        private bool m_Killed;
         public uint LocalID;
         public ObjectPart Part { get; private set; }
         public ObjectUpdateInfo(ObjectPart part)
@@ -29,20 +29,6 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_Killed = true;
             }
-        }
-
-        private int clampSignedTo(double val, double imin, double imax, int omin, int omax)
-        {
-            double range = val * (omax - omin) / (imax - imin);
-            range += omin;
-            return (int)range;
-        }
-
-        private uint clampUnsignedTo(double val, double imin, double imax, uint omin, uint omax)
-        {
-            double range = val * (omax - omin) / (imax - imin);
-            range += omin;
-            return (uint)range;
         }
 
         public bool IsKilled

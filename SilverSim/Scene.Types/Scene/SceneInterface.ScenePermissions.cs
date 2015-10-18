@@ -84,9 +84,9 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             string god_agents;
-            god_agents = ServerParamService.GetString(ID, "god_agents", "");
+            god_agents = ServerParamService.GetString(ID, "god_agents", string.Empty);
             string[] god_agents_list = god_agents.Split(new char[] { '|' });
-            if(god_agents_list.Length != 1 || god_agents_list[0] != string.Empty)
+            if(god_agents_list.Length != 1 || god_agents_list[0].Length != 0)
             {
                 foreach(string god_agent in god_agents_list)
                 {

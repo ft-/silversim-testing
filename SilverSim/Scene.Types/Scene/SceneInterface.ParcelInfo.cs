@@ -254,7 +254,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             else
             {
-                prop.MusicURL = "";
+                prop.MusicURL = string.Empty;
             }
             if (null != pinfo.MediaURI)
             {
@@ -262,7 +262,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             else
             {
-                prop.MediaURL = "";
+                prop.MediaURL = string.Empty;
             }
             prop.MediaID = pinfo.MediaID;
             prop.MediaAutoScale = pinfo.MediaAutoScale;
@@ -284,11 +284,11 @@ namespace SilverSim.Scene.Types.Scene
             prop.SeeAVs = true;
             prop.AnyAVSounds = true;
             prop.GroupAVSounds = true;
-            prop.MediaDesc = "";
+            prop.MediaDesc = string.Empty;
             prop.MediaHeight = 0;
             prop.MediaWidth = 0;
             prop.MediaLoop = false;
-            prop.MediaType = "";
+            prop.MediaType = string.Empty;
             prop.ObscureMedia = false;
             prop.ObscureMusic = false;
 

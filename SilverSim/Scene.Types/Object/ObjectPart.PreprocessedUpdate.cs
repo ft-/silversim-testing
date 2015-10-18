@@ -19,7 +19,7 @@ namespace SilverSim.Scene.Types.Object
         byte[] m_PropUpdateData;
         object m_UpdateDataLock = new object();
 
-        int m_ObjectSerial = 0;
+        int m_ObjectSerial;
 
         public int SerialNumber
         {
@@ -154,32 +154,6 @@ namespace SilverSim.Scene.Types.Object
             Terse = 2,
             Properties = 4,
             All = 0xFFFFFFFF
-        }
-
-        void PutUInt32LEToBytes(byte[] b, int offset, UInt32 v)
-        {
-            b[offset + 0] = (byte)((v >> 0) & 0xFF);
-            b[offset + 1] = (byte)((v >> 8) & 0xFF);
-            b[offset + 2] = (byte)((v >> 16) & 0xFF);
-            b[offset + 3] = (byte)((v >> 24) & 0xFF);
-        }
-
-        void PutUInt64LEToBytes(byte[] b, int offset, UInt64 v)
-        {
-            b[offset + 0] = (byte)((v >> 0) & 0xFF);
-            b[offset + 1] = (byte)((v >> 8) & 0xFF);
-            b[offset + 2] = (byte)((v >> 16) & 0xFF);
-            b[offset + 3] = (byte)((v >> 24) & 0xFF);
-            b[offset + 4] = (byte)((v >> 32) & 0xFF);
-            b[offset + 5] = (byte)((v >> 40) & 0xFF);
-            b[offset + 6] = (byte)((v >> 48) & 0xFF);
-            b[offset + 7] = (byte)((v >> 56) & 0xFF);
-        }
-
-        void PutUInt16LEToBytes(byte[] b, int offset, UInt16 v)
-        {
-            b[offset + 0] = (byte)((v >> 0) & 0xFF);
-            b[offset + 1] = (byte)((v >> 8) & 0xFF);
         }
 
         void PutInt32LEToBytes(byte[] b, int offset, Int32 vs)
@@ -323,7 +297,7 @@ namespace SilverSim.Scene.Types.Object
 
                     if(ObjectGroup == null)
                     {
-                        name = "";
+                        name = string.Empty;
                     }
                     else if (ObjectGroup.IsAttached)
                     {

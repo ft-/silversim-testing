@@ -16,19 +16,19 @@ namespace SilverSim.Scene.Types.Scene
         public static readonly UUID DEFAULT_TERRAIN_TEXTURE_3 = new UUID("179cdabd-398a-9b6b-1391-4dc333ba321f");
         public static readonly UUID DEFAULT_TERRAIN_TEXTURE_4 = new UUID("beb169c7-11ea-fff2-efe5-0f24dc881df2");
 
-        public bool BlockTerraform = false;
-        public bool BlockFly = false;
-        public bool AllowDamage = false;
-        public bool RestrictPushing = false;
-        public bool AllowLandResell = false;
-        public bool AllowLandJoinDivide = false;
-        public bool BlockShowInSearch = false;
+        public bool BlockTerraform;
+        public bool BlockFly;
+        public bool AllowDamage;
+        public bool RestrictPushing;
+        public bool AllowLandResell;
+        public bool AllowLandJoinDivide;
+        public bool BlockShowInSearch;
         public int AgentLimit = 40;
         public double ObjectBonus = 1.0;
-        public int Maturity = 0;
-        public bool DisableScripts = false;
-        public bool DisableCollisions = false;
-        public bool DisablePhysics = false;
+        public int Maturity;
+        public bool DisableScripts;
+        public bool DisableCollisions;
+        public bool DisablePhysics;
 
         private UUID m_TerrainTexture1 = DEFAULT_TERRAIN_TEXTURE_1;
         public UUID TerrainTexture1
@@ -123,7 +123,7 @@ namespace SilverSim.Scene.Types.Scene
         public double TerrainRaiseLimit = 100;
         public double TerrainLowerLimit = -100;
 
-        public bool Sandbox = false;
+        public bool Sandbox;
 
         public UUID TelehubObject = UUID.Zero;
     }

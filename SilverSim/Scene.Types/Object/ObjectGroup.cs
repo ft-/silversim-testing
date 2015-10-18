@@ -21,7 +21,7 @@ namespace SilverSim.Scene.Types.Object
 {
     public class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject, IDisposable
     {
-        static IScriptCompilerRegistry m_CompilerRegistry = null;
+        static IScriptCompilerRegistry m_CompilerRegistry;
         public static IScriptCompilerRegistry CompilerRegistry
         {
             get
@@ -67,10 +67,10 @@ namespace SilverSim.Scene.Types.Object
         public const int LINK_THIS = -4;
         public const int LINK_ROOT = 1;
 
-        private bool m_IsTempOnRez = false;
-        private bool m_IsTemporary = false;
-        private bool m_IsGroupOwned = false;
-        private AttachmentPoint m_AttachPoint = AttachmentPoint.NotAttached;
+        private bool m_IsTempOnRez;
+        private bool m_IsTemporary;
+        private bool m_IsGroupOwned;
+        private AttachmentPoint m_AttachPoint;
         private Vector3 m_AttachedPos = Vector3.Zero;
         private Vector3 m_Velocity = Vector3.Zero;
         private UGI m_Group = UGI.Unknown;
@@ -83,7 +83,7 @@ namespace SilverSim.Scene.Types.Object
         public SceneInterface Scene { get; set; }
         public UUID FromItemID = UUID.Zero; /* used for attachments */
 
-        AssetServiceInterface m_AssetService = null;
+        AssetServiceInterface m_AssetService;
         public AssetServiceInterface AssetService /* specific for attachments usage */
         { 
             get
@@ -106,7 +106,7 @@ namespace SilverSim.Scene.Types.Object
         private Vector3 m_Acceleration = Vector3.Zero;
         private Vector3 m_AngularAcceleration = Vector3.Zero;
 
-        bool m_IsChangedEnabled = false;
+        bool m_IsChangedEnabled;
         public bool IsChangedEnabled
         {
             get
@@ -250,7 +250,7 @@ namespace SilverSim.Scene.Types.Object
                     }
                     catch (Exception e)
                     {
-                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                        m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                     }
                 }
             }
@@ -411,7 +411,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        bool m_IsAttached = false;
+        bool m_IsAttached;
 
         public bool IsAttached
         {
@@ -1251,7 +1251,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
-        static ObjectPart parseOtherPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
+        static ObjectPart ParseOtherPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
             ObjectPart otherPart = null;
             if (reader.IsEmptyElement)
@@ -1298,7 +1298,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        static void fromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
+        static void FromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
             ObjectPart part;
             SortedDictionary<int, ObjectPart> links = new SortedDictionary<int, ObjectPart>();
@@ -1324,7 +1324,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                part = parseOtherPart(reader, group, currentOwner);
+                                part = ParseOtherPart(reader, group, currentOwner);
                                 links.Add(part.LoadedLinkNumber, part);
                                 break;
 
@@ -1368,7 +1368,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        static ObjectPart parseRootPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
+        static ObjectPart ParseRootPart(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
             ObjectPart rootPart = null;
             if(reader.IsEmptyElement)
@@ -1454,7 +1454,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                rootPart = parseRootPart(reader, group, currentOwner);
+                                rootPart = ParseRootPart(reader, group, currentOwner);
                                 break;
 
                             case "SceneObjectPart":
@@ -1479,7 +1479,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     break;
                                 }
-                                fromXmlOtherParts(reader, group, currentOwner);
+                                FromXmlOtherParts(reader, group, currentOwner);
                                 break;
 
                             case "KeyframeMotion":
@@ -1491,7 +1491,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     break;
                                 }
-                                fromXmlGroupScriptStates(reader, group);
+                                FromXmlGroupScriptStates(reader, group);
                                 break;
 
                             default:
@@ -1529,7 +1529,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        static void fromXmlGroupScriptStates(XmlTextReader reader, ObjectGroup group)
+        static void FromXmlGroupScriptStates(XmlTextReader reader, ObjectGroup group)
         {
             UUID itemID = UUID.Zero;
 
@@ -1568,7 +1568,7 @@ namespace SilverSim.Scene.Types.Object
                                     while (reader.MoveToNextAttribute());
                                 }
 
-                                fromXmlSavedScriptState(reader, group, itemID);
+                                FromXmlSavedScriptState(reader, group, itemID);
                                 break;
 
                             default:
@@ -1590,7 +1590,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        static void fromXmlSavedScriptStateInner(XmlTextReader reader, ObjectGroup group, UUID itemID)
+        static void FromXmlSavedScriptStateInner(XmlTextReader reader, ObjectGroup group, UUID itemID)
         {
             string tagname = reader.Name;
             Dictionary<string, string> attrs = new Dictionary<string, string>();
@@ -1663,7 +1663,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        static void fromXmlSavedScriptState(XmlTextReader reader, ObjectGroup group, UUID itemID)
+        static void FromXmlSavedScriptState(XmlTextReader reader, ObjectGroup group, UUID itemID)
         {
             for (; ; )
             {
@@ -1682,7 +1682,7 @@ namespace SilverSim.Scene.Types.Object
                         switch (reader.Name)
                         {
                             case "State":
-                                fromXmlSavedScriptStateInner(reader, group, itemID);
+                                FromXmlSavedScriptStateInner(reader, group, itemID);
                                 break;
 
                             default:

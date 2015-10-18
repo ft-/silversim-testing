@@ -176,7 +176,7 @@ namespace SilverSim.Scene.Types.Object
         }
         private readonly CollisionSoundParam m_CollisionSound = new CollisionSoundParam();
 
-        private bool m_IsSoundQueueing = false;
+        private bool m_IsSoundQueueing;
 
         public CollisionSoundParam CollisionSound
         {

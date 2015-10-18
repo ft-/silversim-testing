@@ -308,7 +308,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
-        ObjectPartInventoryItem fromXML(XmlTextReader reader, UUI currentOwner)
+        ObjectPartInventoryItem FromXML(XmlTextReader reader, UUI currentOwner)
         {
             ObjectPartInventoryItem item = new ObjectPartInventoryItem();
             item.Owner = currentOwner;
@@ -463,7 +463,7 @@ namespace SilverSim.Scene.Types.Object
                         switch(reader.Name)
                         {
                             case "TaskInventoryItem":
-                                Add(fromXML(reader, currentOwner), false);
+                                Add(FromXML(reader, currentOwner), false);
                                 break;
 
                             default:

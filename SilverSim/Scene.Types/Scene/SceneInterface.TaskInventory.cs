@@ -71,32 +71,32 @@ namespace SilverSim.Scene.Types.Scene
                             w.Write(string.Format(
                                 "\tinv_item\t0\n" +
                                 "\t{{\n" +
-                                "\t\titem_id\t{1}\n" +
-                                "\t\tparent_id\t{2}\n" +
+                                "\t\titem_id\t{0}\n" +
+                                "\t\tparent_id\t{1}\n" +
                                 "\t\tpermissions 0\n" +
                                 "\t\t{{\n" +
-                                "\t\t\tbase_mask\t{3:x8}\n" +
-                                "\t\t\towner_mask\t{4:x8}\n" +
-                                "\t\t\tgroup_mask\t{5:x8}\n" +
-                                "\t\t\teveryone_mask\t{6:x8}\n" +
-                                "\t\t\tnext_owner_mask\t{7:x8}\n" +
-                                "\t\t\tcreator_id\t{8}\n" +
-                                "\t\t\towner_id\t{9}\n" +
-                                "\t\t\tlast_owner_id\t{10}\n" +
-                                "\t\t\tgroup_id\t{11}\n" +
+                                "\t\t\tbase_mask\t{2:x8}\n" +
+                                "\t\t\towner_mask\t{3:x8}\n" +
+                                "\t\t\tgroup_mask\t{4:x8}\n" +
+                                "\t\t\teveryone_mask\t{5:x8}\n" +
+                                "\t\t\tnext_owner_mask\t{6:x8}\n" +
+                                "\t\t\tcreator_id\t{7}\n" +
+                                "\t\t\towner_id\t{8}\n" +
+                                "\t\t\tlast_owner_id\t{9}\n" +
+                                "\t\t\tgroup_id\t{10}\n" +
                                 "\t\t}}\n" +
-                                "\t\tasset_id\t{12}\n" +
-                                "\t\ttype\t{13}\n" +
-                                "\t\tinv_type\t{14}\n" +
-                                "\t\tflags\t{15:x8}\n" +
+                                "\t\tasset_id\t{11}\n" +
+                                "\t\ttype\t{12}\n" +
+                                "\t\tinv_type\t{13}\n" +
+                                "\t\tflags\t{14:x8}\n" +
                                 "\t\tsale_info 0\n" +
                                 "\t\t{{\n" +
-                                "\t\t\tsale_type\t{16}\n" +
-                                "\t\t\tsale_price\t{17}\n" +
+                                "\t\t\tsale_type\t{15}\n" +
+                                "\t\t\tsale_price\t{16}\n" +
                                 "\t\t}}\n" +
-                                "\t\tname\t{18}|\n" +
-                                "\t\tdesc\t{19}|\n" +
-                                "\t\tcreation_date\t{20}\n" +
+                                "\t\tname\t{17}|\n" +
+                                "\t\tdesc\t{18}|\n" +
+                                "\t\tcreation_date\t{19}\n" +
                                 "\t}}\n", item.ID, part.ID,
                                             (uint)item.Permissions.Base,
                                             (uint)item.Permissions.Current,

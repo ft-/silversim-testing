@@ -92,7 +92,7 @@ namespace SilverSim.Scene.Types.StructuredData
         {
             if (v.Length == 0)
             {
-                writer.WriteElementString(name, "");
+                writer.WriteElementString(name, string.Empty);
             }
             else
             {
@@ -123,7 +123,7 @@ namespace SilverSim.Scene.Types.StructuredData
             Serialize(writer, "CreatorID", part.Creator.ID);
             Serialize(writer, "FolderID", UUID.Zero);
             Serialize(writer, "InventorySerial", 1);
-            Serialize(writer, "", part.ID);
+            Serialize(writer, string.Empty, part.ID);
             Serialize(writer, "LocalId", part.LocalID);
             Serialize(writer, "Name", part.Name);
             Serialize(writer, "Material", (uint)part.Material);
@@ -172,11 +172,12 @@ namespace SilverSim.Scene.Types.StructuredData
             Serialize(writer, "ProfileHollow", shape.ProfileHollow);
             Serialize(writer, "State", shape.State);
             Serialize(writer, "LastAttachPoint", (uint)part.ObjectGroup.AttachPoint);
+#warning Implement <ProfileShape> and <HollowShape>
             /*
             <ProfileShape>Square</ProfileShape>
             <HollowShape>Same</HollowShape>
              */
-            //Serialize(writer, "ProfileShape", );
+            //Serialize(writer, "ProfileShape", (uint)shape);
             //Serialize(writer, "HollowShape", (uint)shape.ProfileHollow);
             Serialize(writer, "SculptTexture", shape.SculptMap);
             Serialize(writer, "SculptType", (uint)shape.SculptType);
@@ -201,6 +202,7 @@ namespace SilverSim.Scene.Types.StructuredData
             Serialize(writer, "LightIntensity", lightparam.Intensity);
             Serialize(writer, "FlexiEntry", flexparam.IsFlexible);
             Serialize(writer, "LightEntry", lightparam.IsLight);
+#warning Implement <SculptEntry>
             //Serialize(writer, "SculptEntry", )
             writer.WriteEndElement();
 
@@ -223,29 +225,21 @@ namespace SilverSim.Scene.Types.StructuredData
             Serialize(writer, "GroupMask", (uint)part.GroupMask);
             Serialize(writer, "EveryoneMask", (uint)part.EveryoneMask);
             Serialize(writer, "NextOwnerMask", (uint)part.NextOwnerMask);
+#warning Implement <Flags>
             /*
           <Flags>None</Flags>
              */
             ObjectPart.CollisionSoundParam collparam = part.CollisionSound;
             Serialize(writer, "CollisionSound", collparam.ImpactSound);
             Serialize(writer, "CollisionSoundVolume", collparam.ImpactVolume);
-            /*
-          <AttachedPos>
-            <X>0</X>
-            <Y>0</Y>
-            <Z>0</Z>
-          </AttachedPos>
-          */
-            //Serialize(writer, "AttachedPos", part.Group.AttachedPos);
+            Serialize(writer, "AttachedPos", part.ObjectGroup.AttachedPos);
             Serialize(writer, "TextureAnimation", part.TextureAnimationBytes);
             Serialize(writer, "ParticleSystem", part.ParticleSystemBytes);
-            /*
-            <PayPrice0>-2</PayPrice0>
-            <PayPrice1>-2</PayPrice1>
-            <PayPrice2>-2</PayPrice2>
-            <PayPrice3>-2</PayPrice3>
-            <PayPrice4>-2</PayPrice4>
-              */
+            Serialize(writer, "PayPrice0", part.ObjectGroup.PayPrice0);
+            Serialize(writer, "PayPrice1", part.ObjectGroup.PayPrice1);
+            Serialize(writer, "PayPrice2", part.ObjectGroup.PayPrice2);
+            Serialize(writer, "PayPrice3", part.ObjectGroup.PayPrice3);
+            Serialize(writer, "PayPrice4", part.ObjectGroup.PayPrice4);
             Serialize(writer, "CreatorData", part.Creator.CreatorData);
             writer.WriteEndElement();
         }
