@@ -6,7 +6,7 @@ using System;
 namespace SilverSim.LoadStore.Terrain
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    class TerrainStorageType : Attribute
+    sealed class TerrainStorageType : Attribute
     {
         public TerrainStorageType()
         {

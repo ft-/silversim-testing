@@ -106,7 +106,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
                 }
                 else
                 {
-                    throw new Exception("Invalid file format");
+                    throw new ArgumentException("Invalid file format");
                 }
             }
         }
@@ -133,8 +133,8 @@ namespace SilverSim.LoadStore.Terrain.Formats
         {
             short[] outdata = new short[terrain.Count * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
             uint linewidth = 0;
-            float heightMax = terrain[0][0, 0];
-            float heightMin = terrain[0][0, 0];
+            double heightMax = terrain[0][0, 0];
+            double heightMin = terrain[0][0, 0];
             uint minX = terrain[0].X;
             uint minY = terrain[0].Y;
             uint maxX = terrain[0].X;

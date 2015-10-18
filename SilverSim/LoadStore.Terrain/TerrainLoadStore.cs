@@ -50,7 +50,7 @@ namespace SilverSim.LoadStore.Terrain
             string[] parts = inp.Split(',');
             if(parts.Length != 2)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("inp");
             }
             x = uint.Parse(parts[0]);
             y = uint.Parse(parts[1]);
