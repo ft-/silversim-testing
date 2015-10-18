@@ -10,19 +10,20 @@ namespace SilverSim.Main.Common.CmdIO
 {
     public static class CommandRegistry 
     {
-        public delegate void CommandDelegate(List<string> args, TTY io, UUID limitedToScene /* is UUID.Zero for all allowed */);
+        // for documentation:
+        //public delegate void CommandDelegate(List<string> args, TTY io, UUID limitedToScene /* is UUID.Zero for all allowed */);
 
-        public static readonly RwLockedDictionary<string, CommandDelegate> Commands = new RwLockedDictionary<string, CommandDelegate>();
-        public static readonly RwLockedDictionary<string, CommandDelegate> CreateCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static readonly RwLockedDictionary<string, CommandDelegate> DeleteCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static readonly RwLockedDictionary<string, CommandDelegate> LoadCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static readonly RwLockedDictionary<string, CommandDelegate> SaveCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static readonly RwLockedDictionary<string, CommandDelegate> ShowCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static readonly RwLockedDictionary<string, CommandDelegate> SetCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static readonly RwLockedDictionary<string, CommandDelegate> GetCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static readonly RwLockedDictionary<string, CommandDelegate> ChangeCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static readonly RwLockedDictionary<string, CommandDelegate> ClearCommands = new RwLockedDictionary<string, CommandDelegate>();
-        public static readonly RwLockedDictionary<string, CommandDelegate> EmptyCommands = new RwLockedDictionary<string, CommandDelegate>();
+        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> Commands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> CreateCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> DeleteCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> LoadCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> SaveCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ShowCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> SetCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> GetCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ChangeCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> ClearCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> EmptyCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
 
         static CommandRegistry()
         {
@@ -38,11 +39,11 @@ namespace SilverSim.Main.Common.CmdIO
             Commands.Add("empty", new CommandType("empty", EmptyCommands).Command_Handler);
         }
 
-        class CommandType
+        sealed class CommandType
         {
             string m_Command;
-            RwLockedDictionary<string, CommandDelegate> m_Dict;
-            public CommandType(string command, RwLockedDictionary<string, CommandDelegate> dict)
+            RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_Dict;
+            public CommandType(string command, RwLockedDictionary<string, Action<List<string>, TTY, UUID>> dict)
             {
                 m_Command = command;
                 m_Dict = dict;
@@ -50,7 +51,7 @@ namespace SilverSim.Main.Common.CmdIO
 
             public void Command_Handler(List<string> args, TTY io, UUID limitedToScene)
             {
-                CommandDelegate del;
+                Action<List<string>, TTY, UUID> del;
                 if (args.Count < 2)
                 {
                     if (args[0] == "help")
@@ -97,7 +98,7 @@ namespace SilverSim.Main.Common.CmdIO
 
         public static void ExecuteCommand(List<string> args, TTY io, UUID limitedToScene)
         {
-            CommandDelegate del;
+            Action<List<string>, TTY, UUID> del;
             if(args.Count == 0)
             {
                 return;

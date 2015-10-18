@@ -2,17 +2,15 @@
 // GNU Affero General Public License v3
 
 using System;
-using System.Runtime.InteropServices;
 
 namespace SilverSim.Main.Common
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    [ComVisible(true)]
-    public class PluginName : Attribute
+    public sealed class PluginName : Attribute
     {
-        public PluginName(string pluginName)
+        public PluginName(string name)
         {
-            Name = pluginName;
+            Name = name;
         }
 
         public string Name { get; private set; }

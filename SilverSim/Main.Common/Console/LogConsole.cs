@@ -13,7 +13,7 @@ namespace SilverSim.Main.Common.Console
     {
         private BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();
         private Thread m_LogThread;
-        private bool m_Shutdown = false;
+        private bool m_Shutdown;
 
         public LogConsole(string consoleTitle)
         {

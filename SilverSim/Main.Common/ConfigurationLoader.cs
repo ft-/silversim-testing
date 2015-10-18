@@ -4,8 +4,8 @@
 using log4net;
 using log4net.Config;
 using Nini.Config;
-using SilverSim.Main.Common.Caps;
 using SilverSim.Http.Client;
+using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
@@ -45,7 +45,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Main.Common
 {
-    public class ConfigurationLoader
+    public sealed class ConfigurationLoader : IDisposable
     {
         sealed class ResourceAssetPlugin : SceneInterface.ResourceAssetService, IPlugin
         {
@@ -61,32 +61,37 @@ namespace SilverSim.Main.Common
         }
 
         [Serializable]
-        public class TestingError : Exception
+        public class TestingErrorException : Exception
         {
-            public TestingError()
+            public TestingErrorException()
             {
 
             }
         }
 
         [Serializable]
-        public class ConfigurationError : Exception
+        public class ConfigurationErrorException : Exception
         {
-            public ConfigurationError()
+            public ConfigurationErrorException()
             {
 
             }
 
-            public ConfigurationError(string msg)
+            public ConfigurationErrorException(string msg)
                 : base(msg)
             {
 
             }
         }
 
+        public void Dispose()
+        {
+            m_ShutdownEvent.Dispose();
+        }
+
         private ILog m_Log;
         private IConfigSource m_Config = new IniConfigSource();
-        private Queue<CFG_ISource> m_Sources = new Queue<CFG_ISource>();
+        private Queue<ICFG_Source> m_Sources = new Queue<ICFG_Source>();
         private RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
         private ManualResetEvent m_ShutdownEvent;
         static readonly Dictionary<Type, string> m_FeaturesTable = new Dictionary<Type, string>();
@@ -105,17 +110,18 @@ namespace SilverSim.Main.Common
                 return;
             }
 
-            HttpResponse res = req.BeginResponse();
-            res.ContentType = "text/plain";
-            foreach(KeyValuePair<string, string> kvp in m_HeloResponseHeaders)
+            using (HttpResponse res = req.BeginResponse())
             {
-                res.Headers.Add(kvp.Key, kvp.Value);
+                res.ContentType = "text/plain";
+                foreach (KeyValuePair<string, string> kvp in m_HeloResponseHeaders)
+                {
+                    res.Headers.Add(kvp.Key, kvp.Value);
+                }
+                if (SceneManager.Scenes.Count != 0)
+                {
+                    res.Headers["X-UDP-InterSim"] = "supported";
+                }
             }
-            if (SceneManager.Scenes.Count != 0)
-            {
-                res.Headers["X-UDP-InterSim"] = "supported";
-            }
-            res.Close();
         }
 
         static ConfigurationLoader()
@@ -211,7 +217,7 @@ namespace SilverSim.Main.Common
         }
 
         #region Configuration Loader Helpers
-        private interface CFG_ISource
+        private interface ICFG_Source
         {
             IConfigSource ConfigSource { get; }
             string Name { get; }
@@ -219,7 +225,7 @@ namespace SilverSim.Main.Common
             string DirName { get; }
         }
 
-        private class CFG_IniFileSource : CFG_ISource
+        sealed class CFG_IniFileSource : ICFG_Source
         {
             string m_FileName;
             public CFG_IniFileSource(string fileName)
@@ -260,7 +266,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        private class CFG_NiniXmlFileSource : CFG_ISource
+        sealed class CFG_NiniXmlFileSource : ICFG_Source
         {
             string m_Filename;
             public CFG_NiniXmlFileSource(string fileName)
@@ -301,7 +307,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        private class CFG_NiniXmlUriSource : CFG_ISource
+        sealed class CFG_NiniXmlUriSource : ICFG_Source
         {
             string m_Uri;
             public CFG_NiniXmlUriSource(string uri)
@@ -343,7 +349,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        private class CFG_IniResourceSource : CFG_ISource
+        sealed class CFG_IniResourceSource : ICFG_Source
         {
             string m_Name;
             string m_Info;
@@ -397,7 +403,7 @@ namespace SilverSim.Main.Common
                 get
                 {
                     Assembly assembly;
-                    if(m_Assembly != string.Empty)
+                    if(m_Assembly.Length != 0)
                     {
                         try
                         {
@@ -429,7 +435,7 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Config Source Management
-        private void AddSource(CFG_ISource cfgsource, string file)
+        private void AddSource(ICFG_Source cfgsource, string file)
         {
             Uri configUri;
             if(Uri.TryCreate(file, UriKind.Absolute,
@@ -457,7 +463,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        private void AddIncludes(CFG_ISource cfgsource)
+        private void AddIncludes(ICFG_Source cfgsource)
         {
             foreach(IConfig config in m_Config.Configs)
             {
@@ -504,13 +510,14 @@ namespace SilverSim.Main.Common
         {
             foreach(object o in assembly.GetCustomAttributes(false))
             {
-                if(o is SilverSim.Types.Assembly.InterfaceVersion)
+                SilverSim.Types.Assembly.InterfaceVersion attr = o as SilverSim.Types.Assembly.InterfaceVersion;
+                if (null != attr)
                 {
-                    return (SilverSim.Types.Assembly.InterfaceVersion)o;
+                    return attr;
                 }
             }
             m_Log.FatalFormat("Assembly {0} misses InterfaceVersion information", assembly.FullName);
-            throw new ConfigurationError();
+            throw new ConfigurationErrorException();
         }
  
         private Type FindPluginInAssembly(Assembly assembly, string pluginName)
@@ -546,7 +553,7 @@ namespace SilverSim.Main.Common
                         if(modulenameparts.Length < 2)
                         {
                             m_Log.FatalFormat("Invalid Module in section {0}: {1}", config.Name, modulename);
-                            throw new ConfigurationError();
+                            throw new ConfigurationErrorException();
                         }
                         string assemblyname = "plugins/" + modulenameparts[0] + ".dll";
                         Assembly assembly;
@@ -557,14 +564,14 @@ namespace SilverSim.Main.Common
                         catch
                         {
                             m_Log.FatalFormat("Failed to load module {0}", assemblyname);
-                            throw new ConfigurationError();
+                            throw new ConfigurationErrorException();
                         }
 
                         SilverSim.Types.Assembly.InterfaceVersion loadedVersion = GetInterfaceVersion(assembly);
                         if(loadedVersion.Version != ownVersion.Version)
                         {
                             m_Log.FatalFormat("Failed to load module {0}: interface version mismatch: {2} != {1}", assemblyname, ownVersion, loadedVersion);
-                            throw new ConfigurationError();
+                            throw new ConfigurationErrorException();
                         }
 
                         /* try to load class from assembly */
@@ -576,20 +583,20 @@ namespace SilverSim.Main.Common
                         catch(Exception e)
                         {
                             m_Log.FatalFormat("Failed to load factory for {1} in module {0}: {2}", assemblyname, modulenameparts[1], e.Message);
-                            throw new ConfigurationError();
+                            throw new ConfigurationErrorException();
                         }
 
                         if(t == null)
                         {
                             m_Log.FatalFormat("Failed to load factory for {1} in module {0}: factory not found", assemblyname, modulenameparts[1]);
-                            throw new ConfigurationError();
+                            throw new ConfigurationErrorException();
                         }
 
                         /* check type inheritance first */
                         if (!t.GetInterfaces().Contains(typeof(IPluginFactory)))
                         {
                             m_Log.FatalFormat("Failed to load factory for {1} in module {0}: not a factory", assemblyname, modulenameparts[1]);
-                            throw new ConfigurationError();
+                            throw new ConfigurationErrorException();
                         }
 
                         IPluginFactory module = (IPluginFactory)assembly.CreateInstance(t.FullName);
@@ -688,7 +695,7 @@ namespace SilverSim.Main.Common
                 }
                 if (config.Contains(parts[1]))
                 {
-                    if (config.Get(parts[1]) != string.Empty)
+                    if (config.Get(parts[1]).Length != 0)
                     {
                         string configname = resourceMap.GetString(key) + "." + config.Get(parts[1]) + ".ini";
                         AddResourceConfig(configname,
@@ -712,14 +719,14 @@ namespace SilverSim.Main.Common
                     {
                         System.Console.Write("Self referencing Use");
                         System.Console.WriteLine();
-                        throw new ConfigurationError();
+                        throw new ConfigurationErrorException();
                     }
                     IConfig configSection = m_Config.Configs[section];
                     if(!configSection.Contains("IsTemplate"))
                     {
                         System.Console.Write("Use does not reference a valid template");
                         System.Console.WriteLine();
-                        throw new ConfigurationError();
+                        throw new ConfigurationErrorException();
                     }
                     foreach (string fromkey in configSection.GetKeys())
                     {
@@ -765,16 +772,16 @@ namespace SilverSim.Main.Common
                     break;
 
                 case "testing":
-                    defaultConfigName = "";
+                    defaultConfigName = string.Empty;
                     defaultsIniName = "Testing.defaults.ini";
                     break;
 
                 default:
-                    throw new Exception("Invalid mode parameter");
+                    throw new ArgumentException("Invalid mode parameter");
             }
             string mainConfig = startup.GetString("config", defaultConfigName);
 
-            if (defaultsIniName != "")
+            if (defaultsIniName.Length != 0)
             {
                 m_Sources.Enqueue(new CFG_IniResourceSource(defaultsIniName));
             }
@@ -789,7 +796,7 @@ namespace SilverSim.Main.Common
 
             while(m_Sources.Count != 0)
             {
-                CFG_ISource source = m_Sources.Dequeue();
+                ICFG_Source source = m_Sources.Dequeue();
                 try
                 {
                     m_Config.Merge(source.ConfigSource);
@@ -798,7 +805,7 @@ namespace SilverSim.Main.Common
                 {
                     System.Console.Write(String.Format(source.Message, source.Name));
                     System.Console.WriteLine();
-                    throw new ConfigurationError();
+                    throw new ConfigurationErrorException();
                 }
                 AddIncludes(source);
                 ProcessImportResources();
@@ -816,7 +823,7 @@ namespace SilverSim.Main.Common
             }
 
             /* Initialize Log system */
-            if (logConfigFile != String.Empty)
+            if (logConfigFile.Length != 0)
             {
                 XmlConfigurator.Configure(new System.IO.FileInfo(logConfigFile));
                 m_Log = LogManager.GetLogger("MAIN");
@@ -902,7 +909,7 @@ namespace SilverSim.Main.Common
             if(null == httpConfig)
             {
                 m_Log.Fatal("Missing configuration section [Network]");
-                throw new ConfigurationError();
+                throw new ConfigurationErrorException();
             }
 
             BaseHttpServer httpServer;
@@ -943,7 +950,7 @@ namespace SilverSim.Main.Common
                 Assembly assembly = Assembly.Load("SilverSim.Viewer.Core");
                 Type t = assembly.GetType("SilverSim.Viewer.Core.SimCircuitEstablishService");
                 MethodInfo m = t.GetMethod("HandleSimCircuitRequest");
-                httpServer.StartsWithUriHandlers.Add("/circuit", (BaseHttpServer.HttpRequestDelegate)System.Delegate.CreateDelegate(typeof(BaseHttpServer.HttpRequestDelegate), m));
+                httpServer.StartsWithUriHandlers.Add("/circuit", (Action<HttpRequest>)System.Delegate.CreateDelegate(typeof(Action<HttpRequest>), m));
 
                 m_Log.Info("Loading regions");
                 foreach (IRegionLoaderInterface regionLoader in GetServices<IRegionLoaderInterface>().Values)

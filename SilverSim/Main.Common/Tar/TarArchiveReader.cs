@@ -30,7 +30,7 @@ namespace SilverSim.Main.Common.Tar
 
         int m_Position;
         Stream m_Stream;
-        int m_LengthOfData = 0;
+        int m_LengthOfData;
 
         public TarArchiveReader(Stream s)
         {
@@ -131,7 +131,7 @@ namespace SilverSim.Main.Common.Tar
         {
             get 
             { 
-                throw new NotImplementedException(); 
+                throw new NotSupportedException(); 
             }
         }
 
@@ -139,11 +139,11 @@ namespace SilverSim.Main.Common.Tar
         {
             get
             {
-                throw new NotImplementedException();
+                throw new NotSupportedException();
             }
             set
             {
-                throw new NotImplementedException();
+                throw new NotSupportedException();
             }
         }
 
@@ -181,17 +181,17 @@ namespace SilverSim.Main.Common.Tar
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public override void SetLength(long value)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 }

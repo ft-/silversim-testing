@@ -44,7 +44,7 @@ namespace SilverSim.Main.Common
         public static void LoadSceneThread(object o)
         {
             SceneLoadingParams loadparams = (SceneLoadingParams)o;
-            Thread.CurrentThread.Name = "Scene Loading Thread for " + loadparams.Scene.Name + " (" + loadparams.Scene.ID + ")";
+            Thread.CurrentThread.Name = "Scene Loading Thread for " + loadparams.Scene.Name + " (" + loadparams.Scene.ID.ToString() + ")";
             List<UUID> parcels;
             try
             {
@@ -152,7 +152,7 @@ namespace SilverSim.Main.Common
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("Loading object {0} for {3} ({4}) failed: {2}: {1}\n{5}", grp.ID, e.Message, e.GetType().FullName, loadparams.Scene.RegionData.Name, loadparams.Scene.ID, e.StackTrace.ToString());
+                            m_Log.WarnFormat("Loading object {0} for {3} ({4}) failed: {2}: {1}\n{5}", grp.ID, e.Message, e.GetType().FullName, loadparams.Scene.RegionData.Name, loadparams.Scene.ID, e.StackTrace);
                         }
                     }
                 }

@@ -79,7 +79,7 @@ namespace SilverSim.Main.Service
             {
                 m_ConfigLoader = new ConfigurationLoader(args, m_ShutdownEvent, ConfigurationLoader.LocalConsole.Disallowed);
             }
-            catch (ConfigurationLoader.ConfigurationError e)
+            catch (ConfigurationLoader.ConfigurationErrorException e)
             {
                 eventLog.WriteEntry(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message) + e.StackTrace);
             }

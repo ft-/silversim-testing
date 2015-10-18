@@ -32,21 +32,18 @@ namespace SilverSim.Main.Common.Caps
                 }
                 catch
                 {
-                    HttpResponse res = httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found");
-                    res.Close();
+                    httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                     return;
                 }
 
                 if(!Caps.ContainsKey("SEED"))
                 {
-                    HttpResponse res = httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found");
-                    res.Close();
+                    httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                     return;
                 }
                 else if(!Caps["SEED"].TryGetValue(regionSeedUuid, out del))
                 {
-                    HttpResponse res = httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found");
-                    res.Close();
+                    httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                     return;
                 }
                 else
@@ -59,8 +56,7 @@ namespace SilverSim.Main.Common.Caps
 
             if(parts.Length < 3)
             {
-                HttpResponse res = httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found");
-                res.Close();
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
 
@@ -71,22 +67,19 @@ namespace SilverSim.Main.Common.Caps
             }
             catch
             {
-                HttpResponse res = httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found");
-                res.Close();
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
 
             RwLockedDictionary<UUID, Action<HttpRequest>> dict;
             if(!Caps.TryGetValue(parts[1], out dict))
             {
-                HttpResponse res = httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found");
-                res.Close();
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
             else if(!dict.TryGetValue(capsUUID, out del))
             {
-                HttpResponse res = httpreq.BeginResponse(HttpStatusCode.NotFound, "Not Found");
-                res.Close();
+                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
             }
             else

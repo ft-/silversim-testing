@@ -56,7 +56,7 @@ namespace SilverSim.Main.Common.CmdIO
         public string GetInput(string prompt, string defaultvalue)
         {
             string res = ReadLine(String.Format("{0} [{1}]: ", prompt, defaultvalue), true);
-            if(res == string.Empty)
+            if(0 == res.Length)
             {
                 res = defaultvalue;
             }
@@ -73,7 +73,7 @@ namespace SilverSim.Main.Common.CmdIO
         {
             List<string> cmdargs = new List<string>();
             cmdline = cmdline.Trim();
-            if (cmdline == string.Empty)
+            if (0 == cmdline.Length)
             {
                 return cmdargs;
             }
@@ -91,7 +91,7 @@ namespace SilverSim.Main.Common.CmdIO
                     if (hasescape)
                     {
                         hasescape = false;
-                        argument += c;
+                        argument += c.ToString();
                     }
                     else
                     {
@@ -108,7 +108,7 @@ namespace SilverSim.Main.Common.CmdIO
                                 break;
 
                             default:
-                                argument += c;
+                                argument += c.ToString();
                                 break;
                         }
                     }
@@ -118,7 +118,7 @@ namespace SilverSim.Main.Common.CmdIO
                     if (hasescape)
                     {
                         hasescape = false;
-                        argument += c;
+                        argument += c.ToString();
                     }
                     else
                     {
@@ -135,7 +135,7 @@ namespace SilverSim.Main.Common.CmdIO
                                 break;
 
                             default:
-                                argument += c;
+                                argument += c.ToString();
                                 break;
                         }
                     }
@@ -145,7 +145,7 @@ namespace SilverSim.Main.Common.CmdIO
                     if (inargument)
                     {
                         cmdargs.Add(argument);
-                        argument = "";
+                        argument = string.Empty;
                     }
                     inargument = false;
                 }
@@ -154,7 +154,7 @@ namespace SilverSim.Main.Common.CmdIO
                     if(inargument)
                     {
                         cmdargs.Add(argument);
-                        argument = "";
+                        argument = string.Empty;
                     }
                     indoublequotes = true;
                 }
@@ -163,13 +163,13 @@ namespace SilverSim.Main.Common.CmdIO
                     if (inargument)
                     {
                         cmdargs.Add(argument);
-                        argument = "";
+                        argument = string.Empty;
                     }
                     insinglequotes = true;
                 }
                 else
                 {
-                    argument += c;
+                    argument += c.ToString();
                     inargument = true;
                 }
             }

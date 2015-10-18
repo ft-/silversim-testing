@@ -14,17 +14,21 @@ using ThreadedClasses;
 
 namespace SilverSim.Main.Common.HttpServer
 {
-    class HttpJson20RpcHandler : IPlugin, IPluginShutdown
+    public class HttpJson20RpcHandler : IPlugin, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("JSON2.0RPC SERVER");
 
-        public delegate IValue Json20RpcDelegate(string method, IValue req);
+        internal RwLockedDictionary<string, Func<string, IValue, IValue>> Json20RpcMethods = new RwLockedDictionary<string, Func<string, IValue, IValue>>();
 
-        public RwLockedDictionary<string, Json20RpcDelegate> Json20RpcMethods = new RwLockedDictionary<string, Json20RpcDelegate>();
-
+        [Serializable]
         public class JSON20RpcException : Exception
         {
             public int StatusCode;
+
+            public JSON20RpcException()
+            {
+
+            }
 
             public JSON20RpcException(int statusCode, string message)
                 : base(message)
@@ -36,15 +40,15 @@ namespace SilverSim.Main.Common.HttpServer
         void RequestHandler(HttpRequest httpreq)
         {
             IValue req;
-            HttpResponse httpres;
             if (httpreq.Method != "POST")
             {
-                httpres = httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
-                httpres.Close();
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
             }
             
-            IValue res; 
+            IValue res;
+            Map reqmap;
+            AnArray reqarr;
             
             try
             {
@@ -56,36 +60,41 @@ namespace SilverSim.Main.Common.HttpServer
             }
             if(req == null)
             {
-                res = FaultResponse(-32700, "Invalid JSON20 RPC Request", "");
+                res = FaultResponse(-32700, "Invalid JSON20 RPC Request", string.Empty);
             }
-            else if(req is Map)
+            else if(null != (reqmap = (req as Map)))
             {
-                res = ProcessJsonRequest((Map)req);
+                res = ProcessJsonRequest(reqmap);
             }
-            else if(req is AnArray)
+            else if(null != (reqarr = (req as AnArray)))
             {
                 AnArray o = new AnArray();
-                foreach(IValue v in (AnArray)req)
+                foreach (IValue v in reqarr)
                 {
-                    if (v is Map)
+                    reqmap = v as Map;
+                    if (null != reqmap)
                     {
-                        o.Add(ProcessJsonRequest((Map)v));
+                        o.Add(ProcessJsonRequest(reqmap));
                     }
                 }
                 res = o;
             }
             else
             {
-                res = FaultResponse(-32700, "Invalid JSON20 RPC Request", "");
+                res = FaultResponse(-32700, "Invalid JSON20 RPC Request", string.Empty);
             }
-            httpres = httpreq.BeginResponse("application/json-rpc");
-            JSON.Serialize(res, httpres.GetOutputStream());
-            httpres.Close();
+            using (HttpResponse httpres = httpreq.BeginResponse("application/json-rpc"))
+            {
+                using (Stream o = httpres.GetOutputStream())
+                {
+                    JSON.Serialize(res, o);
+                }
+            }
         }
 
         Map ProcessJsonRequest(Map req)
         {
-            Json20RpcDelegate del;
+            Func<string, IValue, IValue> del;
             string method = req["method"].ToString();
             if (Json20RpcMethods.TryGetValue(method, out del))
             {
@@ -106,7 +115,7 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 catch (Exception e)
                 {
-                    m_Log.WarnFormat("Unexpected exception at XMRPC method {0}: {1}\n{2}", req["method"], e.GetType().Name, e.StackTrace.ToString());
+                    m_Log.WarnFormat("Unexpected exception at XMRPC method {0}: {1}\n{2}", req["method"], e.GetType().Name, e.StackTrace);
                     return FaultResponse(-32700, "Internal service error", req["id"].ToString());
                 }
             }

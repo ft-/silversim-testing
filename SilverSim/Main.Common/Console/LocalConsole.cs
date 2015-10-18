@@ -14,7 +14,7 @@ namespace SilverSim.Main.Common.Console
 {
     public class LocalConsole : CmdIO.TTY, IPlugin, IPluginShutdown
     {
-        private int m_CursorXPosition = 0;
+        private int m_CursorXPosition;
         private int m_CursorYPosition = -1;
         private StringBuilder m_CommandLineBuffer = new StringBuilder();
         private bool m_EchoInput = true;
@@ -23,7 +23,8 @@ namespace SilverSim.Main.Common.Console
         private BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();
         private Thread m_LogThread;
         private Thread m_InputThread;
-        private bool m_Shutdown = false;
+        object m_InputThreadLock = new object();
+        private bool m_Shutdown;
         private string m_ConsoleTitle;
 
         public LocalConsole(string consoleTitle)
@@ -60,7 +61,7 @@ namespace SilverSim.Main.Common.Console
         public void Shutdown()
         {
             m_Shutdown = true;
-            lock (m_InputThread)
+            lock (m_InputThreadLock)
             {
                 m_InputThread.Abort();
             }
@@ -553,7 +554,7 @@ namespace SilverSim.Main.Common.Console
                 }
                 string cmd = ReadLine(CmdPrompt, true);
 
-                if (cmd == string.Empty)
+                if (0 == cmd.Length)
                 {
                     continue;
                 }
@@ -571,7 +572,7 @@ namespace SilverSim.Main.Common.Console
                     m_CmdHistory.RemoveAt(0);
                 }
                 m_CmdHistory.Add(cmd);
-                lock (m_InputThread)
+                lock (m_InputThreadLock)
                 {
                     CmdIO.CommandRegistry.ExecuteCommand(GetCmdLine(cmd), this);
                 }

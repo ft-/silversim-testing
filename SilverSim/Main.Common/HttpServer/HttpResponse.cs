@@ -11,9 +11,10 @@ using SilverSim.Http;
 
 namespace SilverSim.Main.Common.HttpServer
 {
-    public class HttpResponse : IDisposable
+    public sealed class HttpResponse : IDisposable
     {
         #region Connection Close Signalling
+        [Serializable]
         public class ConnectionCloseException : Exception
         {
             public ConnectionCloseException()
@@ -22,6 +23,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
+        [Serializable]
         public class DisconnectFromThreadException : Exception
         {
             public DisconnectFromThreadException()
@@ -38,10 +40,10 @@ namespace SilverSim.Main.Common.HttpServer
         public uint MajorVersion;
         public uint MinorVersion;
         public bool IsCloseConnection { get; private set; }
-        private bool m_IsHeaderSent = false;
-        private Stream ResponseBody = null;
-        private bool IsChunkedAccepted = false;
-        private List<string> AcceptedEncodings = null;
+        private bool m_IsHeaderSent;
+        private Stream ResponseBody;
+        private bool IsChunkedAccepted;
+        private List<string> AcceptedEncodings;
         private static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         public string ContentType
@@ -62,7 +64,7 @@ namespace SilverSim.Main.Common.HttpServer
             m_Output = output;
             MajorVersion = request.MajorVersion;
             MinorVersion = request.MinorVersion;
-            IsCloseConnection = HttpRequest.ConnectionModeEnum.Close == request.ConnectionMode;
+            IsCloseConnection = HttpConnectionMode.Close == request.ConnectionMode;
             StatusCode = statusCode;
             StatusDescription = statusDescription;
             IsChunkedAccepted = request.ContainsHeader("TE");
@@ -79,18 +81,20 @@ namespace SilverSim.Main.Common.HttpServer
 
         private void SendHeaders()
         {
-            MemoryStream ms = new MemoryStream();
-            using (TextWriter w = new StreamWriter(ms, UTF8NoBOM))
+            using (MemoryStream ms = new MemoryStream())
             {
-                w.Write(string.Format("HTTP/{0}.{1} {2} {3}\r\n", MajorVersion, MinorVersion, (uint)StatusCode, StatusDescription.Replace("\n", "").Replace("\r", "")));
-                foreach (KeyValuePair<string, string> kvp in Headers)
+                using (TextWriter w = new StreamWriter(ms, UTF8NoBOM))
                 {
-                    w.Write(string.Format("{0}: {1}\r\n", kvp.Key.Replace("\r", "").Replace("\n", ""), kvp.Value.Replace("\r", "").Replace("\n", "")));
+                    w.Write(string.Format("HTTP/{0}.{1} {2} {3}\r\n", MajorVersion, MinorVersion, (uint)StatusCode, StatusDescription.Replace("\n", string.Empty).Replace("\r", string.Empty)));
+                    foreach (KeyValuePair<string, string> kvp in Headers)
+                    {
+                        w.Write(string.Format("{0}: {1}\r\n", kvp.Key.Replace("\r", string.Empty).Replace("\n", string.Empty), kvp.Value.Replace("\r", string.Empty).Replace("\n", string.Empty)));
+                    }
+                    w.Write("\r\n");
+                    w.Flush();
+                    m_Output.Write(ms.GetBuffer(), 0, (int)ms.Length);
+                    m_Output.Flush();
                 }
-                w.Write("\r\n");
-                w.Flush();
-                m_Output.Write(ms.GetBuffer(), 0, (int)ms.Length);
-                m_Output.Flush();
             }
             m_IsHeaderSent = true;
         }
@@ -182,6 +186,10 @@ namespace SilverSim.Main.Common.HttpServer
         public void Dispose()
         {
             Close();
+            if (null != m_Output)
+            {
+                m_Output.Dispose();
+            }
         }
     }
 }

@@ -20,20 +20,18 @@ namespace SilverSim.Main.Common.HttpServer
     {
         private static readonly ILog m_Log = LogManager.GetLogger("HTTP SERVER");
 
-        public delegate void HttpRequestDelegate(HttpRequest context);
-
-        public RwLockedDictionary<string, HttpRequestDelegate> StartsWithUriHandlers = new RwLockedDictionary<string, HttpRequestDelegate>();
-        public RwLockedDictionary<string, HttpRequestDelegate> UriHandlers = new RwLockedDictionary<string, HttpRequestDelegate>();
-        public RwLockedDictionary<string, HttpRequestDelegate> RootUriContentTypeHandlers = new RwLockedDictionary<string, HttpRequestDelegate>();
+        public RwLockedDictionary<string, Action<HttpRequest>> StartsWithUriHandlers = new RwLockedDictionary<string, Action<HttpRequest>>();
+        public RwLockedDictionary<string, Action<HttpRequest>> UriHandlers = new RwLockedDictionary<string, Action<HttpRequest>>();
+        public RwLockedDictionary<string, Action<HttpRequest>> RootUriContentTypeHandlers = new RwLockedDictionary<string, Action<HttpRequest>>();
 
         private TcpListener m_Listener;
         public uint Port { get; private set; }
         public string ExternalHostName { get; private set; }
         public string Scheme { get; private set; }
 
-        private bool m_IsBehindProxy = false;
+        private bool m_IsBehindProxy;
 
-        X509Certificate m_ServerCertificate = null;
+        X509Certificate m_ServerCertificate;
 
         public BaseHttpServer(IConfig httpConfig)
         {
@@ -125,9 +123,13 @@ namespace SilverSim.Main.Common.HttpServer
                     {
                         return;
                     }
+                    catch(InvalidDataException)
+                    {
+                        return;
+                    }
                     catch (Exception e)
                     {
-                        m_Log.WarnFormat("Unexpected exception: {0}\n{1}", e.GetType().Name, e.StackTrace.ToString());
+                        m_Log.WarnFormat("Unexpected exception: {0}\n{1}", e.GetType().Name, e.StackTrace);
                         return;
                     }
 
@@ -137,7 +139,7 @@ namespace SilverSim.Main.Common.HttpServer
                         res.Close();
                     }
 
-                    HttpRequestDelegate del;
+                    Action<HttpRequest> del;
                     if (req.RawUrl == "/" && RootUriContentTypeHandlers.TryGetValue(req.ContentType, out del))
                     {
                         try
@@ -155,7 +157,7 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
+                            m_Log.WarnFormat("Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
                         }
                         req.Close();
                     }
@@ -176,13 +178,13 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
+                            m_Log.WarnFormat("Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
                         }
                         req.Close();
                     }
                     else
                     {
-                        foreach (KeyValuePair<string, HttpRequestDelegate> kvp in StartsWithUriHandlers)
+                        foreach (KeyValuePair<string, Action<HttpRequest>> kvp in StartsWithUriHandlers)
                         {
                             if (req.RawUrl.StartsWith(kvp.Key))
                             {
@@ -201,7 +203,7 @@ namespace SilverSim.Main.Common.HttpServer
                                 }
                                 catch (Exception e)
                                 {
-                                    m_Log.WarnFormat("Unexpected exception at {0} {1}: {2}\n{3}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace.ToString());
+                                    m_Log.WarnFormat("Unexpected exception at {0} {1}: {2}\n{3}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
                                 }
                                 req.Close();
                                 return;
@@ -225,7 +227,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
             catch (Exception e)
             {
-                m_Log.DebugFormat("Exception: {0}\n{1}", e.GetType().Name, e.StackTrace.ToString());
+                m_Log.DebugFormat("Exception: {0}\n{1}", e.GetType().Name, e.StackTrace);
             }
             finally
             {

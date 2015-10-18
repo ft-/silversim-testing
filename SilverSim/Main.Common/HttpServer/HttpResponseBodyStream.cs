@@ -6,7 +6,7 @@ using System.IO;
 
 namespace SilverSim.Main.Common.HttpServer
 {
-    public class HttpResponseBodyStream : Stream
+    public sealed class HttpResponseBodyStream : Stream
     {
         private Stream m_Output;
         private long m_RemainingLength;
@@ -27,7 +27,6 @@ namespace SilverSim.Main.Common.HttpServer
             m_RemainingLength = 0;
             m_Output = output;
             m_ContentLength = 0;
-            m_HasLimitedLength = false;
         }
 
         public override bool CanRead

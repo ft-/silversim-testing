@@ -4,6 +4,7 @@
 using log4net;
 using SilverSim.Types.StructuredData.XMLRPC;
 using System;
+using System.IO;
 using System.Net;
 using ThreadedClasses;
 
@@ -13,17 +14,14 @@ namespace SilverSim.Main.Common.HttpServer
     {
         private static readonly ILog m_Log = LogManager.GetLogger("XMLRPC SERVER");
 
-        public delegate XMLRPC.XmlRpcResponse XmlRpcDelegate(XMLRPC.XmlRpcRequest req);
-
-        public RwLockedDictionary<string, XmlRpcDelegate> XmlRpcMethods = new RwLockedDictionary<string,XmlRpcDelegate>();
+        public RwLockedDictionary<string, Func<XMLRPC.XmlRpcRequest, XMLRPC.XmlRpcResponse>> XmlRpcMethods = new RwLockedDictionary<string, Func<XMLRPC.XmlRpcRequest, XMLRPC.XmlRpcResponse>>();
 
         void RequestHandler(HttpRequest httpreq)
         {
             XMLRPC.XmlRpcRequest req;
             if(httpreq.Method != "POST")
             {
-                HttpResponse httpres = httpreq.BeginResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
-                httpres.Close();
+                httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 return;
             }
             try
@@ -39,7 +37,7 @@ namespace SilverSim.Main.Common.HttpServer
                 return;
             }
 
-            XmlRpcDelegate del;
+            Func<XMLRPC.XmlRpcRequest, XMLRPC.XmlRpcResponse> del;
             XMLRPC.XmlRpcResponse res;
             if(XmlRpcMethods.TryGetValue(req.MethodName, out del))
             {
@@ -54,15 +52,19 @@ namespace SilverSim.Main.Common.HttpServer
                 }
                 catch(Exception e)
                 {
-                    m_Log.WarnFormat("Unexpected exception at XMRPC method {0}: {1}\n{2}", req.MethodName, e.GetType().Name, e.StackTrace.ToString());
+                    m_Log.WarnFormat("Unexpected exception at XMRPC method {0}: {1}\n{2}", req.MethodName, e.GetType().Name, e.StackTrace);
                     FaultResponse(httpreq.BeginResponse(), -32700, "Internal service error");
                     return;
                 }
 
-                HttpResponse response = httpreq.BeginResponse();
-                response.ContentType = "text/xml";
-                res.Serialize(response.GetOutputStream());
-                response.Close();
+                using (HttpResponse response = httpreq.BeginResponse())
+                {
+                    response.ContentType = "text/xml";
+                    using (Stream o = response.GetOutputStream())
+                    {
+                        res.Serialize(o);
+                    }
+                }
             }
             else
             {

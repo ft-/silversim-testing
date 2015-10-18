@@ -7,7 +7,7 @@ using System.Text;
 
 namespace SilverSim.Main.Common.HttpServer
 {
-    public class HttpRequestBodyStream : Stream
+    public sealed class HttpRequestBodyStream : Stream
     {
         private Stream m_Input;
         private long m_RemainingLength;

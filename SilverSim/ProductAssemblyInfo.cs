@@ -1,6 +1,7 @@
 // SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
@@ -15,3 +16,4 @@ using System.Runtime.InteropServices;
 
 [assembly: SilverSim.Types.Assembly.InterfaceVersion("0.0.0.0")]
 [assembly: ComVisible(false)]
+[assembly: CLSCompliant(false)]

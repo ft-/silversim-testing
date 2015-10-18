@@ -32,11 +32,11 @@ namespace SilverSim.Main.Common.Tar
                 return;
             }
             string[] dirparts = dirname.Split('/');
-            string dirpath = "";
+            string dirpath = string.Empty;
 
             foreach(string dirpart in dirparts)
             {
-                if(dirpath != "")
+                if(dirpath.Length != 0)
                 {
                     dirpath += "/";
                 }
