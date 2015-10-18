@@ -17,25 +17,25 @@ namespace SilverSim.Viewer.Messages.Region
         public UUID SessionID = UUID.Zero;
 
         public string SimName = string.Empty;
-        public UInt32 EstateID = 0;
-        public UInt32 ParentEstateID = 0;
-        public RegionFlags RegionFlags = 0;
-        public RegionAccess SimAccess = 0;
-        public UInt32 MaxAgents = 0;
-        public double BillableFactor = 0;
-        public double ObjectBonusFactor = 0;
-        public double WaterHeight = 0;
-        public double TerrainRaiseLimit = 0;
-        public double TerrainLowerLimit = 0;
-        public Int32 PricePerMeter = 0;
-        public Int32 RedirectGridX = 0;
-        public Int32 RedirectGridY = 0;
-        public bool UseEstateSun = false;
-        public double SunHour = 0;
+        public UInt32 EstateID;
+        public UInt32 ParentEstateID;
+        public RegionFlags RegionFlags;
+        public RegionAccess SimAccess;
+        public UInt32 MaxAgents;
+        public double BillableFactor;
+        public double ObjectBonusFactor;
+        public double WaterHeight;
+        public double TerrainRaiseLimit;
+        public double TerrainLowerLimit;
+        public Int32 PricePerMeter;
+        public Int32 RedirectGridX;
+        public Int32 RedirectGridY;
+        public bool UseEstateSun;
+        public double SunHour;
         public string ProductSKU = string.Empty;
         public string ProductName = string.Empty;
-        public UInt32 HardMaxAgents = 0;
-        public UInt32 HardMaxObjects = 0;
+        public UInt32 HardMaxAgents;
+        public UInt32 HardMaxObjects;
 
         public List<UInt64> RegionFlagsExtended = new List<UInt64>();
 

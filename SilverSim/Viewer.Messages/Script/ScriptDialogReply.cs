@@ -17,9 +17,9 @@ namespace SilverSim.Viewer.Messages.Script
 
         public UUID ObjectID = UUID.Zero;
 
-        public Int32 ChatChannel = 0;
-        public Int32 ButtonIndex = 0;
-        public string ButtonLabel = "";
+        public Int32 ChatChannel;
+        public Int32 ButtonIndex;
+        public string ButtonLabel = string.Empty;
 
         public ScriptDialogReply()
         {

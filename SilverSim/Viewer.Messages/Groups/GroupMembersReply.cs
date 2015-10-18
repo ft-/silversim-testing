@@ -20,7 +20,7 @@ namespace SilverSim.Viewer.Messages.Groups
 
         public UUID GroupID = UUID.Zero;
         public UUID RequestID = UUID.Zero;
-        public int MemberCount = 0;
+        public int MemberCount;
 
         public struct MemberDataEntry
         {

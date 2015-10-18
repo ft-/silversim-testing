@@ -15,7 +15,7 @@ namespace SilverSim.Viewer.Messages.Script
         public UUID SessionID = UUID.Zero;
         public UUID TaskID = UUID.Zero;
         public UUID ItemID = UUID.Zero;
-        public UInt32 Questions = 0;
+        public UInt32 Questions;
 
         public ScriptAnswerYes()
         {

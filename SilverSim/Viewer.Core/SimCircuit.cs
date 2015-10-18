@@ -108,7 +108,7 @@ namespace SilverSim.Viewer.Core
                     break;
 
                 default:
-                    UDPPacketDecoder.PacketDecoderDelegate del;
+                    Func<UDPPacket, Message> del;
                     if (m_PacketDecoder.PacketTypes.TryGetValue(mType, out del))
                     {
                         Message m = del(pck);

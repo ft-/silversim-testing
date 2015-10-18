@@ -15,17 +15,17 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID AgentID = UUID.Zero;
         public UUID GroupID = UUID.Zero;
         public UUID RequestID = UUID.Zero;
-        public int IntervalDays = 0;
-        public int CurrentInterval = 0;
+        public int IntervalDays;
+        public int CurrentInterval;
         public string StartDate = string.Empty;
 
         public class HistoryDataEntry
         {
             public string Time = string.Empty;
             public string User = string.Empty;
-            public int Type = 0;
+            public int Type;
             public string Item = string.Empty;
-            public int Amount = 0;
+            public int Amount;
 
             public HistoryDataEntry()
             {

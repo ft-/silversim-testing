@@ -15,7 +15,7 @@ namespace SilverSim.Viewer.Messages.Object
     {
         public UUID AgentID = UUID.Zero;
         public UUID RequestID = UUID.Zero;
-        public Int16 VolumeDetail = 0;
+        public Int16 VolumeDetail;
 
         public List<UUID> ObjectIDs = new List<UUID>();
 

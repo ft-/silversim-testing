@@ -26,10 +26,10 @@ namespace SilverSim.Viewer.Messages.Land
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
         
-        public byte Action = 0;
-        public byte Size = 0;
-        public double Seconds = 0;
-        public double Height = 0;
+        public byte Action;
+        public byte Size;
+        public double Seconds;
+        public double Height;
 
         public List<Data> ParcelData = new List<Data>();
 

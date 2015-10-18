@@ -14,12 +14,12 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
 
-        public Int32 SequenceID = 0;
-        public double West = 0;
-        public double South = 0;
-        public double East = 0;
-        public double North = 0;
-        public bool SnapSelection = false;
+        public Int32 SequenceID;
+        public double West;
+        public double South;
+        public double East;
+        public double North;
+        public bool SnapSelection;
 
         public ParcelPropertiesRequest()
         {

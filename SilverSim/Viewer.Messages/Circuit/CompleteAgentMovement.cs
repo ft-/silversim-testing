@@ -13,7 +13,7 @@ namespace SilverSim.Viewer.Messages.Circuit
     {
         public UUID SessionID = UUID.Zero;
         public UUID AgentID = UUID.Zero;
-        public UInt32 CircuitCode = 0;
+        public UInt32 CircuitCode;
 
         public CompleteAgentMovement()
         {

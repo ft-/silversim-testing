@@ -790,7 +790,7 @@ namespace SilverSim.Viewer.Core
                     break;
 
                 default:
-                    UDPPacketDecoder.PacketDecoderDelegate del;
+                    Func<UDPPacket, Message> del;
                     if(mType == MessageType.AgentUpdate)
                     {
                         Interlocked.Increment(ref m_AgentUpdatesReceived);

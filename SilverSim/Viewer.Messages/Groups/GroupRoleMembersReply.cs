@@ -17,7 +17,7 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID AgentID = UUID.Zero;
         public UUID GroupID = UUID.Zero;
         public UUID RequestID = UUID.Zero;
-        public UInt32 TotalPairs = 0;
+        public UInt32 TotalPairs;
 
         public struct MemberDataEntry
         {

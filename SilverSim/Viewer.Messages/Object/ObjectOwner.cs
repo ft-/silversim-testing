@@ -15,7 +15,7 @@ namespace SilverSim.Viewer.Messages.Object
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
 
-        public bool HasGodBit = false;
+        public bool HasGodBit;
 
         public UUID OwnerID = UUID.Zero;
         public UUID GroupID = UUID.Zero;

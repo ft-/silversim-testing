@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Messages.Profile
         }
 
         public List<GroupDataEntry> GroupData = new List<GroupDataEntry>();
-        public bool ListInProfile = false;
+        public bool ListInProfile;
 
         public AvatarGroupsReply()
         {

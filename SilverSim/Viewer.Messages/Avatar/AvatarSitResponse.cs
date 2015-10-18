@@ -11,12 +11,12 @@ namespace SilverSim.Viewer.Messages.Avatar
     public class AvatarSitResponse : Message
     {
         public UUID SitObject = UUID.Zero;
-        public bool IsAutoPilot = false;
+        public bool IsAutoPilot;
         public Vector3 SitPosition = Vector3.Zero;
         public Quaternion SitRotation = Quaternion.Identity;
         public Vector3 CameraEyeOffset = Vector3.Zero;
         public Vector3 CameraAtOffset = Vector3.Zero;
-        public bool ForceMouselook = false;
+        public bool ForceMouselook;
 
         public AvatarSitResponse()
         {

@@ -12,8 +12,8 @@ namespace SilverSim.Viewer.Messages.Groups
     {
         public UUID AgentID = UUID.Zero;
         public UUID GroupID = UUID.Zero;
-        public bool Success = false;
-        public string Message = "";
+        public bool Success;
+        public string Message = string.Empty;
 
         public CreateGroupReply()
         {

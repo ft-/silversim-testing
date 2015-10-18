@@ -17,12 +17,12 @@ namespace SilverSim.Viewer.Messages.Profile
         public UUID ImageID = UUID.Zero;
         public UUID FLImageID = UUID.Zero;
         public UUID PartnerID = UUID.Zero;
-        public string AboutText;
-        public string FLAboutText;
-        public string BornOn;
-        public string ProfileURL;
+        public string AboutText = string.Empty;
+        public string FLAboutText = string.Empty;
+        public string BornOn = string.Empty;
+        public string ProfileURL = string.Empty;
         public byte[] CharterMember = new byte[1];
-        public UInt32 Flags = 0;
+        public UInt32 Flags;
 
         public AvatarPropertiesReply()
         {

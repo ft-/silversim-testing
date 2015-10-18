@@ -14,13 +14,13 @@ namespace SilverSim.Viewer.Messages.Region
     [Trusted]
     public class RegionHandshake : Message
     {
-        public RegionOptionFlags RegionFlags = RegionOptionFlags.None;
-        public RegionAccess SimAccess = 0;
+        public RegionOptionFlags RegionFlags;
+        public RegionAccess SimAccess;
         public string SimName = string.Empty;
         public UUID SimOwner = UUID.Zero;
-        public bool IsEstateManager = false;
-        public double WaterHeight = 0f;
-        public double BillableFactor = 0f;
+        public bool IsEstateManager;
+        public double WaterHeight;
+        public double BillableFactor;
         public UUID CacheID = UUID.Zero;
         public UUID TerrainBase0 = UUID.Zero;
         public UUID TerrainBase1 = UUID.Zero;
@@ -30,19 +30,19 @@ namespace SilverSim.Viewer.Messages.Region
         public UUID TerrainDetail1 = UUID.Zero;
         public UUID TerrainDetail2 = UUID.Zero;
         public UUID TerrainDetail3 = UUID.Zero;
-        public double TerrainStartHeight00 = 0f;
-        public double TerrainStartHeight01 = 0f;
-        public double TerrainStartHeight10 = 0f;
-        public double TerrainStartHeight11 = 0f;
-        public double TerrainHeightRange00 = 0f;
-        public double TerrainHeightRange01 = 0f;
-        public double TerrainHeightRange10 = 0f;
-        public double TerrainHeightRange11 = 0f;
+        public double TerrainStartHeight00;
+        public double TerrainStartHeight01;
+        public double TerrainStartHeight10;
+        public double TerrainStartHeight11;
+        public double TerrainHeightRange00;
+        public double TerrainHeightRange01;
+        public double TerrainHeightRange10;
+        public double TerrainHeightRange11;
 
         public UUID RegionID = UUID.Zero;
 
-        public Int32 CPUClassID = 0;
-        public Int32 CPURatio = 0;
+        public Int32 CPUClassID;
+        public Int32 CPURatio;
         public string ColoName = string.Empty;
         public string ProductSKU = string.Empty;
         public string ProductName = string.Empty;

@@ -16,18 +16,18 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID GroupID = UUID.Zero;
         public string Name = string.Empty;
         public string Charter = string.Empty;
-        public bool ShowInList = false;
+        public bool ShowInList;
         public string MemberTitle = string.Empty;
-        public GroupPowers PowersMask = GroupPowers.None;
+        public GroupPowers PowersMask;
         public UUID InsigniaID = UUID.Zero;
         public UUID FounderID = UUID.Zero;
-        public int MembershipFee = 0;
-        public bool OpenEnrollment = false;
-        public int Money = 0;
-        public int GroupMembershipCount = 0;
-        public int GroupRolesCount = 0;
-        public bool AllowPublish = false;
-        public bool MaturePublish = false;
+        public int MembershipFee;
+        public bool OpenEnrollment;
+        public int Money;
+        public int GroupMembershipCount;
+        public int GroupRolesCount;
+        public bool AllowPublish;
+        public bool MaturePublish;
         public UUID OwnerRoleID = UUID.Zero;
 
         public GroupProfileReply()

@@ -21,7 +21,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
-        public AttachmentPoint AttachmentPoint = 0;
+        public AttachmentPoint AttachmentPoint;
 
         public List<Data> ObjectData = new List<Data>();
 

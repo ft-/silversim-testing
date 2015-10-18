@@ -16,25 +16,25 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
 
-        public Int32 LocalID = 0;
-        public UInt32 Flags = 0;
-        public ParcelFlags ParcelFlags = ParcelFlags.None;
-        public Int32 SalePrice = 0;
+        public Int32 LocalID;
+        public UInt32 Flags;
+        public ParcelFlags ParcelFlags;
+        public Int32 SalePrice;
         public string Name = string.Empty;
         public string Description = string.Empty;
         public string MusicURL = string.Empty;
         public string MediaURL = string.Empty;
         public UUID MediaID = UUID.Zero;
-        public bool MediaAutoScale = false;
+        public bool MediaAutoScale;
         public UUID GroupID = UUID.Zero;
-        public Int32 PassPrice = 0;
-        public double PassHours = 0;
-        public ParcelCategory Category = 0;
+        public Int32 PassPrice;
+        public double PassHours;
+        public ParcelCategory Category;
         public UUID AuthBuyerID = UUID.Zero;
         public UUID SnapshotID = UUID.Zero;
         public Vector3 UserLocation = Vector3.Zero;
         public Vector3 UserLookAt = Vector3.Zero;
-        public TeleportLandingType LandingType = 0;
+        public TeleportLandingType LandingType;
 
         public ParcelPropertiesUpdate()
         {

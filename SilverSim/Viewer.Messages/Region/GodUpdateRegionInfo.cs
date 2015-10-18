@@ -15,13 +15,13 @@ namespace SilverSim.Viewer.Messages.Region
         public UUID SessionID = UUID.Zero;
 
         public string SimName = string.Empty;
-        public UInt32 EstateID = 0;
-        public UInt32 ParentEstateID = 0;
-        public UInt32 RegionFlags = 0;
-        public double BillableFactor = 0;
-        public Int32 PricePerMeter = 0;
-        public Int32 RedirectGridX = 0;
-        public Int32 RedirectGridY = 0;
+        public UInt32 EstateID;
+        public UInt32 ParentEstateID;
+        public UInt32 RegionFlags;
+        public double BillableFactor;
+        public Int32 PricePerMeter;
+        public Int32 RedirectGridX;
+        public Int32 RedirectGridY;
 
         public GodUpdateRegionInfo()
         {

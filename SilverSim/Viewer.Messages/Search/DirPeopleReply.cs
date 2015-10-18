@@ -12,9 +12,9 @@ namespace SilverSim.Viewer.Messages.Search
     [Trusted]
     public class DirPeopleReply : Message
     {
-        public UUID AgentID;
+        public UUID AgentID = UUID.Zero;
 
-        public UUID QueryID;
+        public UUID QueryID = UUID.Zero;
 
         public class QueryReplyData
         {
@@ -22,8 +22,8 @@ namespace SilverSim.Viewer.Messages.Search
             public string FirstName = string.Empty;
             public string LastName = string.Empty;
             public string Group = string.Empty;
-            public bool Online = false;
-            public int Reputation = 0;
+            public bool Online;
+            public int Reputation;
 
             public QueryReplyData()
             {

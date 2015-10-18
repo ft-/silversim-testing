@@ -13,9 +13,9 @@ namespace SilverSim.Viewer.Messages.Script
         public string ObjectName;
         public UUID ObjectID = UUID.Zero;
         public UUID OwnerID = UUID.Zero;
-        public bool OwnerIsGroup = false;
-        public string Message;
-        public string URL;
+        public bool OwnerIsGroup;
+        public string Message = string.Empty;
+        public string URL = string.Empty;
 
         public LoadURL()
         {

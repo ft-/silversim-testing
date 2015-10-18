@@ -14,11 +14,11 @@ namespace SilverSim.Viewer.Messages.Object
     {
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
-        public UInt32 ObjectLocalID = 0;
-        public bool UsePhysics = false;
-        public bool IsTemporary = false;
-        public bool IsPhantom = false;
-        public bool CastsShadows = false;
+        public UInt32 ObjectLocalID;
+        public bool UsePhysics;
+        public bool IsTemporary;
+        public bool IsPhantom;
+        public bool CastsShadows;
 
         public ObjectFlagUpdate()
         {

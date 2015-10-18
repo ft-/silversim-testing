@@ -15,7 +15,7 @@ namespace SilverSim.Viewer.Messages.Appearance
     public class AvatarAppearance : Message
     {
         public UUID Sender = UUID.Zero;
-        public bool IsTrial = false;
+        public bool IsTrial;
 
         public byte[] TextureEntry;
 

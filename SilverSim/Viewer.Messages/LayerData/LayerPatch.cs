@@ -48,7 +48,7 @@ namespace SilverSim.Viewer.Messages.LayerData
 
         public float[,] Data = new float[16,16];
 
-        internal uint PackedSerial = 0;
+        internal uint PackedSerial;
         private byte[] PackedDataBytes = new byte[651]; /* maximum length of a single 16 by 16 patch when packed perfectly bad */
         internal BitPacker PackedData;
 
@@ -73,8 +73,6 @@ namespace SilverSim.Viewer.Messages.LayerData
         public LayerPatch(double defaultHeight)
         {
             PackedData = new BitPacker(PackedDataBytes);
-            X = 0;
-            Y = 0;
             int x, y;
             for (y = 0; y < 16; ++y)
             {
@@ -108,7 +106,7 @@ namespace SilverSim.Viewer.Messages.LayerData
         {
             if(X != p.X || Y != p.Y)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("p does not match in its parameters X and Y.");
             }
             int x, y;
             lock (this)
@@ -131,7 +129,7 @@ namespace SilverSim.Viewer.Messages.LayerData
         {
             if (X != p.X || Y != p.Y)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("p does not match in its parameters X and Y.");
             }
             int x, y;
             lock (this)
@@ -220,7 +218,7 @@ namespace SilverSim.Viewer.Messages.LayerData
 
                 if(src.Length != 4 * 256 + 4)
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException("Terrain serialization data length does not match 1028 bytes");
                 }
                 if (!BitConverter.IsLittleEndian)
                 {

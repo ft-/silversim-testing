@@ -15,8 +15,8 @@ namespace SilverSim.Viewer.Messages.Parcel
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
 
-        public Int32 SequenceID = 0;
-        public Int32 LocalID = 0;
+        public Int32 SequenceID;
+        public Int32 LocalID;
 
         public ParcelPropertiesRequestByID()
         {

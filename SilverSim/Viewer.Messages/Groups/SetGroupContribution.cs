@@ -13,7 +13,7 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
         public UUID GroupID = UUID.Zero;
-        public int Contribution = 0;
+        public int Contribution;
 
         public SetGroupContribution()
         {

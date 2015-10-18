@@ -13,7 +13,7 @@ namespace SilverSim.Viewer.Messages.Region
     {
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
-        public UInt32 Flags = 0;
+        public UInt32 Flags;
 
         public RegionHandshakeReply()
         {

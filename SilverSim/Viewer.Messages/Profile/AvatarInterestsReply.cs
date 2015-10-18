@@ -14,9 +14,9 @@ namespace SilverSim.Viewer.Messages.Profile
     {
         public UUID AgentID = UUID.Zero;
         public UUID AvatarID = UUID.Zero;
-        public UInt32 WantToMask = 0;
+        public UInt32 WantToMask;
         public string WantToText = string.Empty;
-        public UInt32 SkillsMask = 0;
+        public UInt32 SkillsMask;
         public string SkillsText = string.Empty;
         public string LanguagesText = string.Empty;
 

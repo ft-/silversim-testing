@@ -12,9 +12,9 @@ namespace SilverSim.Viewer.Messages.Image
     public class ImageData : Message
     {
         public UUID ID = UUID.Zero;
-        public ImageCodec Codec = ImageCodec.Invalid;
-        public UInt32 Size = 0;
-        public UInt16 Packets = 0;
+        public ImageCodec Codec;
+        public UInt32 Size;
+        public UInt16 Packets;
         public byte[] Data = new byte[0];
 
         public ImageData()

@@ -24,7 +24,7 @@ namespace SilverSim.Viewer.Messages.Object
 
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
-        public UInt32 ObjectLocalID = 0;
+        public UInt32 ObjectLocalID;
 
         public List<Data> ObjectData = new List<Data>();
 

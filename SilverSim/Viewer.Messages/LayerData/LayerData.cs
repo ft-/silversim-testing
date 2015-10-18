@@ -12,6 +12,7 @@ namespace SilverSim.Viewer.Messages.LayerData
     {
         public enum LayerDataType : byte
         {
+            Invalid = 0,
             Land = 0x4C,
             LandExtended = 0x4D,
             Water = 0x57,
@@ -22,7 +23,7 @@ namespace SilverSim.Viewer.Messages.LayerData
             CloudExtended = 0x3A
         }
 
-        public LayerDataType LayerType = 0;
+        public LayerDataType LayerType;
         public byte[] Data = new byte[0];
 
         public LayerData()

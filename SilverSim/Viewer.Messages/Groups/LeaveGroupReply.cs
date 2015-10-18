@@ -12,7 +12,7 @@ namespace SilverSim.Viewer.Messages.Groups
     {
         public UUID AgentID = UUID.Zero;
         public UUID GroupID = UUID.Zero;
-        public bool Success = false;
+        public bool Success;
 
         public LeaveGroupReply()
         {

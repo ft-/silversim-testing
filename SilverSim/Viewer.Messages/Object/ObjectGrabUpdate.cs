@@ -24,10 +24,10 @@ namespace SilverSim.Viewer.Messages.Object
 
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
-        public UInt32 ObjectLocalID = 0;
+        public UInt32 ObjectLocalID;
         public Vector3 GrabOffsetInitial = Vector3.Zero;
         public Vector3 GrabPosition = Vector3.Zero;
-        public UInt32 TimeSinceLast = 0;
+        public UInt32 TimeSinceLast;
 
         public List<Data> ObjectData = new List<Data>();
 

@@ -9,7 +9,7 @@ using System.Text;
 namespace SilverSim.Viewer.Messages
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class Reliable : Attribute
+    public sealed class Reliable : Attribute
     {
         public Reliable()
         {
@@ -18,7 +18,7 @@ namespace SilverSim.Viewer.Messages
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class Zerocoded : Attribute
+    public sealed class Zerocoded : Attribute
     {
         public Zerocoded()
         {
@@ -27,7 +27,7 @@ namespace SilverSim.Viewer.Messages
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class Trusted : Attribute
+    public sealed class Trusted : Attribute
     {
         public Trusted()
         {
@@ -36,7 +36,7 @@ namespace SilverSim.Viewer.Messages
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class NotTrusted : Attribute
+    public sealed class NotTrusted : Attribute
     {
         public NotTrusted()
         {
@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Messages
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class UDPDeprecated : Attribute
+    public sealed class UDPDeprecated : Attribute
     {
         public UDPDeprecated()
         {
@@ -54,9 +54,9 @@ namespace SilverSim.Viewer.Messages
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class UDPMessage : Attribute
+    public sealed class UDPMessage : Attribute
     {
-        public readonly MessageType Number;
+        public MessageType Number { get; private set; }
 
         public UDPMessage(MessageType number)
         {
@@ -65,9 +65,9 @@ namespace SilverSim.Viewer.Messages
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class EventQueueGet : Attribute
+    public sealed class EventQueueGet : Attribute
     {
-        public readonly string Name;
+        public string Name { get; private set; }
         
         public EventQueueGet(string name)
         {
@@ -76,19 +76,19 @@ namespace SilverSim.Viewer.Messages
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
-    public class PacketHandler : Attribute
+    public sealed class PacketHandler : Attribute
     {
-        public MessageType Number;
-        public PacketHandler(MessageType type)
+        public MessageType Number { get; private set; }
+        public PacketHandler(MessageType number)
         {
-            Number = type;
+            Number = number;
         }
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
-    public class GenericMessageHandler : Attribute
+    public sealed class GenericMessageHandler : Attribute
     {
-        public string Method;
+        public string Method { get; private set; }
         public GenericMessageHandler(string method)
         {
             Method = method;
@@ -96,9 +96,9 @@ namespace SilverSim.Viewer.Messages
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
-    public class IMMessageHandler : Attribute
+    public sealed class IMMessageHandler : Attribute
     {
-        public GridInstantMessageDialog Dialog;
+        public GridInstantMessageDialog Dialog { get; private set; }
         public IMMessageHandler(GridInstantMessageDialog dialog)
         {
             Dialog = dialog;
@@ -135,7 +135,6 @@ namespace SilverSim.Viewer.Messages
         public QueueOutType OutQueue = QueueOutType.Low;
 
         public UInt32 ReceivedOnCircuitCode;
-        public delegate void Send(UInt32 circuitCode, Message m);
         public UUID CircuitSessionID = UUID.Zero;
         public UUID CircuitAgentID = UUID.Zero;
         public UUID CircuitSceneID = UUID.Zero;
@@ -161,7 +160,7 @@ namespace SilverSim.Viewer.Messages
         }
         #endregion
 
-        public bool ForceZeroFlag = false;
+        public bool ForceZeroFlag;
 
         /* only used rarely for certain things like teleport protocol */
         /* reliable is triggered when the message is acknowledged by viewer with true */
@@ -181,7 +180,7 @@ namespace SilverSim.Viewer.Messages
             }
         }
 
-        protected static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
+        protected static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         #region Overloaded methods
         public virtual string TypeDescription

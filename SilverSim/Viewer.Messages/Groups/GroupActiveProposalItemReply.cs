@@ -19,7 +19,7 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID GroupID = UUID.Zero;
 
         public UUID TransactionID = UUID.Zero;
-        public UInt32 TotalNumItems = 0;
+        public UInt32 TotalNumItems;
 
         public struct ProposalDataEntry
         {

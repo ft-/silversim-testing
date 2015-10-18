@@ -17,7 +17,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             Single = 0,
             Multiple = 1
         }
-        public RequestResultType RequestResult = RequestResultType.Single;
+        public RequestResultType RequestResult;
         public Int32 SequenceID;
         public bool SnapSelection;
         public Int32 SelfCount;

@@ -16,7 +16,7 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID AgentID = UUID.Zero;
         public UUID GroupID = UUID.Zero;
         public UUID RequestID = UUID.Zero;
-        public int RoleCount = 0;
+        public int RoleCount;
 
         public struct RoleDataEntry
         {

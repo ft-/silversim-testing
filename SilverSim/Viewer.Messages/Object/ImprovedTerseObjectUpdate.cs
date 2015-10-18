@@ -13,7 +13,7 @@ namespace SilverSim.Viewer.Messages.Object
     public class ImprovedTerseObjectUpdate : Message
     {
         public GridVector GridPosition;
-        public UInt16 TimeDilation = 0;
+        public UInt16 TimeDilation;
 
         public class ObjData
         {

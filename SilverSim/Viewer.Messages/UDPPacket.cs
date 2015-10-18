@@ -14,18 +14,18 @@ namespace SilverSim.Viewer.Messages
     {
         public const int DEFAULT_BUFFER_SIZE = 4096;
 
-        public readonly byte[] Data;
+        public byte[] Data { get; protected set; }
 
         public int DataLength = 6;
 
         public int DataPos = 6;
 
-        public int TransferredAtTime = 0;
-        public int EnqueuedAtTime = 0;
-        public uint ResentCount = 0;
+        public int TransferredAtTime;
+        public int EnqueuedAtTime;
+        public uint ResentCount;
 
         public Message.QueueOutType OutQueue = Message.QueueOutType.Low;
-        public Message AckMessage = null; /* only used by Circuit */
+        public Message AckMessage; /* only used by Circuit */
 
         public UInt32 SequenceNumber
         {
@@ -262,7 +262,7 @@ namespace SilverSim.Viewer.Messages
             }
         }
 
-        private byte zleCount = 0;
+        private byte zleCount;
 
         public static UDPPacket PacketAckImmediate(UInt32 seqno)
         {
@@ -289,7 +289,7 @@ namespace SilverSim.Viewer.Messages
 
         public override string ToString()
         {
-            string dmp = "";
+            string dmp = string.Empty;
             for(int i = 0; i < DataLength; ++i)
             {
                 if(i != 0)

@@ -67,13 +67,13 @@ namespace SilverSim.Viewer.Messages.Simulator
             }
         }
 
-        public UInt32 RegionX = 0;
-        public UInt32 RegionY = 0;
-        public UInt32 RegionFlags = 0;
-        public UInt32 ObjectCapacity = 0;
+        public UInt32 RegionX;
+        public UInt32 RegionY;
+        public UInt32 RegionFlags;
+        public UInt32 ObjectCapacity;
 
         public Data[] Stat = new Data[0];
-        public Int32 PID = 0;
+        public Int32 PID;
         public UInt64[] RegionFlagsExtended = new UInt64[0];
 
         public SimStats()

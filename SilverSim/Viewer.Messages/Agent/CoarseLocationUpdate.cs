@@ -11,8 +11,8 @@ namespace SilverSim.Viewer.Messages.Agent
     [Trusted]
     public class CoarseLocationUpdate : Message
     {
-        public Int16 You = 0;
-        public Int16 Prey = 0;
+        public Int16 You;
+        public Int16 Prey;
 
         public struct AgentDataEntry
         {

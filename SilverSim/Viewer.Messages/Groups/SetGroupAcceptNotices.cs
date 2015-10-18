@@ -14,8 +14,8 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID SessionID = UUID.Zero;
 
         public UUID GroupID = UUID.Zero;
-        public bool AcceptNotices = false;
-        public bool ListInProfile = false;
+        public bool AcceptNotices;
+        public bool ListInProfile;
 
         public SetGroupAcceptNotices()
         {

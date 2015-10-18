@@ -16,8 +16,8 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID GroupID = UUID.Zero;
 
         public UUID RequestID = UUID.Zero;
-        public int IntervalDays = 0;
-        public int CurrentInterval = 0;
+        public int IntervalDays;
+        public int CurrentInterval;
 
         public GroupAccountSummaryRequest()
         {

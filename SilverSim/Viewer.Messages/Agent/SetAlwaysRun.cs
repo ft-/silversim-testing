@@ -12,7 +12,7 @@ namespace SilverSim.Viewer.Messages.Agent
     {
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
-        public bool AlwaysRun = false;
+        public bool AlwaysRun;
 
         public SetAlwaysRun()
         {

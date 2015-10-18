@@ -14,7 +14,7 @@ namespace SilverSim.Viewer.Messages.Object
         public UUID AgentID = UUID.Zero;
         public UUID SessionID = UUID.Zero;
 
-        public UInt32 RequestFlags = 0;
+        public UInt32 RequestFlags;
         public UUID ObjectID = UUID.Zero;
 
         public RequestObjectPropertiesFamily()

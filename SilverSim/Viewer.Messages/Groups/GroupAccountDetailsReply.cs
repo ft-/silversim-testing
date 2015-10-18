@@ -14,11 +14,11 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID AgentID = UUID.Zero;
         public UUID GroupID = UUID.Zero;
         public UUID RequestID = UUID.Zero;
-        public int IntervalDays = 0;
-        public int CurrentInterval = 0;
+        public int IntervalDays;
+        public int CurrentInterval;
         public string StartDate = string.Empty;
         public string Description = string.Empty;
-        public int Amount = 0;
+        public int Amount;
 
         public GroupAccountDetailsReply()
         {

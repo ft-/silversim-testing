@@ -16,7 +16,7 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID GroupID = UUID.Zero;
 
         public UUID TransactionID = UUID.Zero;
-        public UInt32 TotalNumItems = 0;
+        public UInt32 TotalNumItems;
 
         public UUID VoteID = UUID.Zero;
         public string TerseDataID = string.Empty;
@@ -25,8 +25,8 @@ namespace SilverSim.Viewer.Messages.Groups
         public UUID VoteInitiatorID = UUID.Zero;
         public string VoteType = string.Empty;
         public string VoteResult = string.Empty;
-        public float Majority = 0;
-        public int Quorum = 0;
+        public float Majority;
+        public int Quorum;
         public string ProposalText = string.Empty;
 
         public struct VoteItemData

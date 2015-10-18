@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Messages.Agent
             p.WriteStringLen8(GroupTitle);
             p.WriteUUID(ActiveGroupID);
             p.WriteUInt64((UInt64)GroupPowers);
-            if (GroupName == "")
+            if (GroupName.Length == 0)
             {
                 p.WriteUInt8(0);
             }

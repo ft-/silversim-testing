@@ -12,7 +12,7 @@ namespace SilverSim.Viewer.Messages.Estate
     public class EstateCovenantReply : Message
     {
         public UUID CovenantID = UUID.Zero;
-        public UInt32 CovenantTimestamp = 0;
+        public UInt32 CovenantTimestamp;
         public string EstateName = string.Empty;
         public UUID EstateOwnerID = UUID.Zero;
 

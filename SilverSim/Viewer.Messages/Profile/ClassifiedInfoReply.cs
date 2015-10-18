@@ -17,17 +17,17 @@ namespace SilverSim.Viewer.Messages.Profile
         public UUID CreatorID = UUID.Zero;
         public Date CreationDate = new Date();
         public Date ExpirationDate = new Date();
-        public int Category = 0;
+        public int Category;
         public string Name = string.Empty;
         public string Description = string.Empty;
         public UUID ParcelID = UUID.Zero;
-        public int ParentEstate = 0;
+        public int ParentEstate;
         public UUID SnapshotID = UUID.Zero;
         public string SimName = string.Empty;
         public Vector3 PosGlobal = Vector3.Zero;
         public string ParcelName = string.Empty;
-        public byte ClassifiedFlags = 0;
-        public int PriceForListing = 0;
+        public byte ClassifiedFlags;
+        public int PriceForListing;
 
         public ClassifiedInfoReply()
         {

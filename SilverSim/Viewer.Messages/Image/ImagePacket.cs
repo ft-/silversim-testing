@@ -12,7 +12,7 @@ namespace SilverSim.Viewer.Messages.Image
     public class ImagePacket : Message
     {
         public UUID ID = UUID.Zero;
-        public UInt16 Packet = 0;
+        public UInt16 Packet;
         public byte[] Data = new byte[0];
 
         public ImagePacket()

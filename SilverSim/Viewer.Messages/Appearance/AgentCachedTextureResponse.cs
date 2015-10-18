@@ -28,7 +28,7 @@ namespace SilverSim.Viewer.Messages.Appearance
             {
                 TextureIndex = textureIndex;
                 TextureID = textureID;
-                HostName = "";
+                HostName = string.Empty;
             }
         }
 

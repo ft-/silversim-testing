@@ -12,8 +12,7 @@ namespace SilverSim.Viewer.Messages
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LLUDP PACKET DECODER");
 
-        public delegate Message PacketDecoderDelegate(UDPPacket p);
-        public readonly Dictionary<MessageType, PacketDecoderDelegate> PacketTypes = new Dictionary<MessageType,PacketDecoderDelegate>();
+        public readonly Dictionary<MessageType, Func<UDPPacket, Message>> PacketTypes = new Dictionary<MessageType, Func<UDPPacket, Message>>();
 
         public UDPPacketDecoder(bool allowtrusteddecode = false)
         {
@@ -48,7 +47,7 @@ namespace SilverSim.Viewer.Messages
                         }
                         else
                         {
-                            PacketTypes.Add(m.Number, (PacketDecoderDelegate)Delegate.CreateDelegate(typeof(PacketDecoderDelegate), mi));
+                            PacketTypes.Add(m.Number, (Func<UDPPacket, Message>)Delegate.CreateDelegate(typeof(Func<UDPPacket, Message>), mi));
                             ++numpackettypes;
                         }
                     }
