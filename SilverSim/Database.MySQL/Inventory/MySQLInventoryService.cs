@@ -159,7 +159,7 @@ namespace SilverSim.Database.MySQL.Inventory
 
     #region Factory
     [PluginName("Inventory")]
-    sealed class MySQLInventoryServiceFactory : IPluginFactory
+    public class MySQLInventoryServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
         public MySQLInventoryServiceFactory()

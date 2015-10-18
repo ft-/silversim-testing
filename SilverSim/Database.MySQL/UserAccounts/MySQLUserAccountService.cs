@@ -263,7 +263,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
     #region Factory
     [PluginName("UserAccounts")]
-    sealed class MySQLUserAccountServiceFactory : IPluginFactory
+    public class MySQLUserAccountServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNT SERVICE");
         public MySQLUserAccountServiceFactory()

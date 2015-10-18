@@ -260,7 +260,7 @@ namespace SilverSim.Database.MySQL.Estate
 
     #region Factory
     [PluginName("Estate")]
-    sealed class MySQLEstateServiceFactory : IPluginFactory
+    public class MySQLEstateServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ESTATE SERVICE");
         public MySQLEstateServiceFactory()

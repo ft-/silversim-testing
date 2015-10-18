@@ -588,7 +588,7 @@ namespace SilverSim.Database.MySQL.Grid
 
     #region Factory
     [PluginName("Grid")]
-    sealed class MySQLGridServiceFactory : IPluginFactory
+    public class MySQLGridServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRID SERVICE");
         public MySQLGridServiceFactory()

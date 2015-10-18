@@ -14,7 +14,7 @@ using System;
 namespace SilverSim.Backend.Common.OfflineIM
 {
     #region Service implementation
-    class OfflineIM : IPlugin, IPluginShutdown
+    sealed class OfflineIM : IPlugin, IPluginShutdown
     {
 #if DEBUG
         private static readonly ILog m_Log = LogManager.GetLogger("OFFLINE IM");
@@ -129,18 +129,22 @@ namespace SilverSim.Backend.Common.OfflineIM
     [PluginName("OfflineIMHandler")]
     public class OfflineIMFactory : IPluginFactory
     {
+        public OfflineIMFactory()
+        {
+
+        }
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig)
         {
-            string avatarNameServiceName = ownConfig.GetString("GridAvatarNameService", "");
-            string offlineIMServiceName = ownConfig.GetString("OfflineIMService", "");
+            string avatarNameServiceName = ownConfig.GetString("GridAvatarNameService", string.Empty);
+            string offlineIMServiceName = ownConfig.GetString("OfflineIMService", string.Empty);
             if (string.IsNullOrEmpty(avatarNameServiceName))
             {
-                throw new Exception("GridAvatarNameService not set");
+                throw new ArgumentException("GridAvatarNameService not set");
             }
             if (string.IsNullOrEmpty(offlineIMServiceName))
             {
-                throw new Exception("OfflineIMService not set");
+                throw new ArgumentException("OfflineIMService not set");
             }
             return new OfflineIM(avatarNameServiceName, offlineIMServiceName);
         }

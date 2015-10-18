@@ -209,7 +209,7 @@ namespace SilverSim.Database.MySQL.GridUser
 
     #region Factory
     [PluginName("GridUser")]
-    sealed class MySQLGridUserServiceFactory : IPluginFactory
+    public class MySQLGridUserServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRIDUSER SERVICE");
         public MySQLGridUserServiceFactory()

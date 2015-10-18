@@ -193,7 +193,7 @@ namespace SilverSim.Database.MySQL.Presence
 
     #region Factory
     [PluginName("Presence")]
-    sealed class MySQLPresenceServiceFactory : IPluginFactory
+    public class MySQLPresenceServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PRESENCE SERVICE");
         public MySQLPresenceServiceFactory()
