@@ -19,7 +19,7 @@ namespace SilverSim.Viewer.Friends
         [PacketHandler(MessageType.GrantUserRights)]
         BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
-        bool m_ShutdownFriends = false;
+        bool m_ShutdownFriends;
 
         public ViewerFriendsServer()
         {
