@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types.IM;
+using System;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Management.IM
@@ -9,12 +10,10 @@ namespace SilverSim.Scene.Management.IM
     public static class IMRouter
     {
         #region Fields
-        public static RwLockedList<OnSendDelegate> OfflineIM = new RwLockedList<OnSendDelegate>();
-        public static RwLockedList<OnSendDelegate> GridIM = new RwLockedList<OnSendDelegate>();
-        public static RwLockedList<OnSendDelegate> SceneIM = new RwLockedList<OnSendDelegate>();
+        public static RwLockedList<Func<GridInstantMessage, bool>> OfflineIM = new RwLockedList<Func<GridInstantMessage, bool>>();
+        public static RwLockedList<Func<GridInstantMessage, bool>> GridIM = new RwLockedList<Func<GridInstantMessage, bool>>();
+        public static RwLockedList<Func<GridInstantMessage, bool>> SceneIM = new RwLockedList<Func<GridInstantMessage, bool>>();
         #endregion
-
-        public delegate bool OnSendDelegate(GridInstantMessage im);
 
         #region Methods
         public static void SendWithResultDelegate(GridInstantMessage im)
@@ -25,17 +24,17 @@ namespace SilverSim.Scene.Management.IM
         public static bool SendSync(GridInstantMessage im)
         {
             bool success = false;
-            foreach (OnSendDelegate del in SceneIM)
+            foreach (Func<GridInstantMessage, bool> del in SceneIM)
             {
                 success = success || del(im);
             }
-            foreach (OnSendDelegate del in GridIM)
+            foreach (Func<GridInstantMessage, bool> del in GridIM)
             {
                 success = success || del(im);
             }
             if (!success)
             {
-                foreach (OnSendDelegate del in OfflineIM)
+                foreach (Func<GridInstantMessage, bool> del in OfflineIM)
                 {
                     success = del(im);
                     if (success)

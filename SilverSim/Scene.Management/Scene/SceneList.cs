@@ -70,7 +70,7 @@ namespace SilverSim.Scene.Management.Scene
                         }
                         catch (Exception e)
                         {
-                            m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                            m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                         }
                     }
                 }
@@ -109,7 +109,7 @@ namespace SilverSim.Scene.Management.Scene
                         }
                         catch (Exception e)
                         {
-                            m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace.ToString());
+                            m_Log.DebugFormat("Exception {0}:{1} at {2}", e.GetType().Name, e.Message, e.StackTrace);
                         }
                     }
                 }

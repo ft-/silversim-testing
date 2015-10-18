@@ -11,8 +11,7 @@ namespace SilverSim.Scene.Management.Scene
 {
     public class NeighborList : RwLockedDictionary<UUID, RegionInfo>
     {
-        public delegate void NeighborAddOrUpdateDelegate(RegionInfo ri);
-        public event NeighborAddOrUpdateDelegate OnNeighborAddOrUpdate;
+        public event Action<RegionInfo> OnNeighborAddOrUpdate;
         public Action<RegionInfo> OnNeighborRemove;
 
         public NeighborList()
@@ -106,7 +105,7 @@ namespace SilverSim.Scene.Management.Scene
             var ev = OnNeighborAddOrUpdate;
             if(ev != null)
             {
-                foreach(NeighborAddOrUpdateDelegate del in ev.GetInvocationList())
+                foreach (Action<RegionInfo> del in ev.GetInvocationList())
                 {
                     del(region);
                 }
