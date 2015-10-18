@@ -30,7 +30,7 @@ namespace SilverSim.Viewer.Core
         internal RwLockedDoubleDictionary<string, ulong, DownloadTransferData> m_DownloadTransfers = new RwLockedDoubleDictionary<string, ulong, DownloadTransferData>();
 
         [PacketHandler(MessageType.RequestXfer)]
-        internal void HandleRequestXfer(Message m)
+        void HandleRequestXfer(Message m)
         {
             RequestXfer req = (RequestXfer)m;
             DownloadTransferData tdata;
@@ -66,7 +66,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.ConfirmXferPacket)]
-        internal void HandleConfirmXferPacket(Message m)
+        void HandleConfirmXferPacket(Message m)
         {
             ConfirmXferPacket req = (ConfirmXferPacket)m;
             DownloadTransferData tdata;

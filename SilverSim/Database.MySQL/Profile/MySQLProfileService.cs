@@ -215,7 +215,7 @@ namespace SilverSim.Database.MySQL.Profile
 
     #region Factory
     [PluginName("Profile")]
-    sealed class MySQLProfileServiceFactory : IPluginFactory
+    public sealed class MySQLProfileServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PROFILE SERVICE");
         public MySQLProfileServiceFactory()

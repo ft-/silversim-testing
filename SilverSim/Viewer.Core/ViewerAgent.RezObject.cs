@@ -43,7 +43,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.RezObject)]
-        internal void HandleRezObject(Message m)
+        void HandleRezObject(Message m)
         {
             Messages.Object.RezObject req = (Messages.Object.RezObject)m;
             if(req.AgentID != req.CircuitAgentID || req.SessionID != req.CircuitSessionID)
@@ -110,7 +110,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.RezObjectFromNotecard)]
-        internal void HandleRezObjectFromNotecard(Message m)
+        void HandleRezObjectFromNotecard(Message m)
         {
             Messages.Object.RezObjectFromNotecard req = (Messages.Object.RezObjectFromNotecard)m;
             if (req.AgentID != req.CircuitAgentID || req.SessionID != req.CircuitSessionID)

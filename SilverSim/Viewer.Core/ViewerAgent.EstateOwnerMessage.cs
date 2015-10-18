@@ -22,7 +22,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.EstateOwnerMessage)]
-        internal void HandleEstateOwnerMessage(Message m)
+        void HandleEstateOwnerMessage(Message m)
         {
             EstateOwnerMessage req = (EstateOwnerMessage)m;
             if(req.SessionID != SessionID ||

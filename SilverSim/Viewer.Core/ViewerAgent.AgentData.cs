@@ -12,7 +12,7 @@ namespace SilverSim.Viewer.Core
     public partial class ViewerAgent
     {
         [PacketHandler(MessageType.AgentDataUpdateRequest)]
-        internal void HandleAgentDataUpdateRequest(Message m)
+        void HandleAgentDataUpdateRequest(Message m)
         {
             Messages.Agent.AgentDataUpdateRequest adur = (Messages.Agent.AgentDataUpdateRequest)m;
             if (adur.AgentID == ID && adur.SessionID == adur.CircuitSessionID)

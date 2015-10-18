@@ -40,7 +40,7 @@ namespace SilverSim.Viewer.Core
     public partial class ViewerAgent
     {
         [PacketHandler(MessageType.RezScript)]
-        internal void HandleRezScript(Message m)
+        void HandleRezScript(Message m)
         {
             RezScript req = (RezScript)m;
             if(req.CircuitSessionID != req.SessionID ||

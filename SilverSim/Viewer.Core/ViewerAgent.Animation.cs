@@ -64,7 +64,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentAnimation)]
-        internal void HandleAgentAnimation(Message m)
+        void HandleAgentAnimation(Message m)
         {
             AgentAnimation req = (AgentAnimation)m;
 

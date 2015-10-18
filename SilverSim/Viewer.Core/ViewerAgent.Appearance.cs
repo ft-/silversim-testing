@@ -195,7 +195,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentSetAppearance)]
-        internal void HandleSetAgentAppearance(Message p)
+        void HandleSetAgentAppearance(Message p)
         {
             Messages.Appearance.AgentSetAppearance m = (Messages.Appearance.AgentSetAppearance)p;
             if (m.AgentID != ID || m.SessionID != m.CircuitSessionID)
@@ -238,7 +238,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentWearablesRequest)]
-        internal void HandleAgentWearablesRequest(Message p)
+        void HandleAgentWearablesRequest(Message p)
         {
             Messages.Appearance.AgentWearablesRequest m = (Messages.Appearance.AgentWearablesRequest)p;
             if(m.AgentID != ID || m.SessionID != m.CircuitSessionID)
@@ -266,7 +266,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentIsNowWearing)]
-        internal void HandleAgentIsNowWearing(Message p)
+        void HandleAgentIsNowWearing(Message p)
         {
             Messages.Appearance.AgentIsNowWearing m = (Messages.Appearance.AgentIsNowWearing)p;
             if (m.AgentID != ID || m.SessionID != m.CircuitSessionID)
@@ -296,7 +296,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentCachedTexture)]
-        internal void HandleAgentCachedTexture(Message p)
+        void HandleAgentCachedTexture(Message p)
         {
             Messages.Appearance.AgentCachedTexture m = (Messages.Appearance.AgentCachedTexture)p;
             if (m.AgentID != ID || m.SessionID != m.CircuitSessionID)
