@@ -96,7 +96,7 @@ namespace SilverSim.Database.MySQL.Profile
                         catch
                         {
                             replaceVals.Remove("useruuid");
-                            conn.UpdateSet("userprofile", replaceVals, "useruuid LIKE '" + user.ID + "'");
+                            conn.UpdateSet("userprofile", replaceVals, "useruuid LIKE '" + user.ID.ToString() + "'");
                         }
                     }
                 }
