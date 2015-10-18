@@ -12,7 +12,7 @@ namespace SilverSim.Scene.Types.Scene
     public partial class SceneInterface
     {
         [PacketHandler(MessageType.ScriptAnswerYes)]
-        void HandleScriptAnswerYes(Message m)
+        internal void HandleScriptAnswerYes(Message m)
         {
             ScriptAnswerYes req = (ScriptAnswerYes)m;
             if(req.CircuitAgentID != req.AgentID ||
@@ -45,7 +45,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.RevokePermissions)]
-        void HandleRevokePermissions(Message m)
+        internal void HandleRevokePermissions(Message m)
         {
             RevokePermissions req = (RevokePermissions)m;
             if (req.CircuitAgentID != req.AgentID ||

@@ -103,7 +103,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.SoundTrigger)]
-        void HandleSoundTrigger(Message m)
+        internal void HandleSoundTrigger(Message m)
         {
             SoundTrigger req = (SoundTrigger)m;
             if(req.OwnerID != UUID.Zero && req.ObjectID != req.CircuitAgentID)

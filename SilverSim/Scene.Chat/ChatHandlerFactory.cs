@@ -8,7 +8,7 @@ using Nini.Config;
 namespace SilverSim.Scene.Chat
 {
     #region Chat Factory Service
-    sealed class ChatHandlerFactory : ChatServiceFactoryInterface, IPlugin
+    public sealed class ChatHandlerFactory : ChatServiceFactoryInterface, IPlugin
     {
         private double m_WhisperDistance;
         private double m_SayDistance;

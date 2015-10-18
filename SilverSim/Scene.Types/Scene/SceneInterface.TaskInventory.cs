@@ -17,7 +17,7 @@ namespace SilverSim.Scene.Types.Scene
     public partial class SceneInterface
     {
         [PacketHandler(MessageType.RequestTaskInventory)]
-        void HandleRequestTaskInventory(Message m)
+        internal void HandleRequestTaskInventory(Message m)
         {
             RequestTaskInventory req = (RequestTaskInventory)m;
             if(req.CircuitAgentID != req.AgentID ||

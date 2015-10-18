@@ -21,7 +21,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
-    sealed class SceneFactory : SceneFactoryInterface, IPlugin
+    public sealed class SceneFactory : SceneFactoryInterface, IPlugin
     {
         ChatServiceFactoryInterface m_ChatFactory;
         string m_ChatFactoryName;

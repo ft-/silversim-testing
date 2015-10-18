@@ -17,7 +17,7 @@ using System.Threading;
 namespace SilverSim.Database.MySQL.SimulationData
 {
     #region Service Implementation
-    public class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin, IPluginShutdown
+    public sealed class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
         private string m_ConnectionString;

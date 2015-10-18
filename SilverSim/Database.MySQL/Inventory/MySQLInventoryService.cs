@@ -17,7 +17,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.Inventory
 {
     #region Service Implementation
-    sealed class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
+    public sealed class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         string m_ConnectionString;
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");

@@ -15,7 +15,7 @@ namespace SilverSim.Scene.Types.Scene
     public abstract partial class SceneInterface
     {
         [PacketHandler(MessageType.RegionHandleRequest)]
-        void HandleRegionHandleRequest(Message m)
+        internal void HandleRegionHandleRequest(Message m)
         {
             SilverSim.Viewer.Messages.Region.RegionHandleRequest req = (SilverSim.Viewer.Messages.Region.RegionHandleRequest)m;
             SilverSim.Viewer.Messages.Region.RegionIDAndHandleReply res;

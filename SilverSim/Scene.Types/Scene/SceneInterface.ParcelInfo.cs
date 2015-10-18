@@ -172,7 +172,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ParcelInfoRequest)]
-        void HandleParcelInfoRequest(Message m)
+        internal void HandleParcelInfoRequest(Message m)
         {
             ParcelInfoRequest req = (ParcelInfoRequest)m;
             if(req.CircuitAgentID != req.AgentID ||
@@ -296,7 +296,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ParcelPropertiesRequest)]
-        void HandleParcelPropertiesRequest(Message m)
+        internal void HandleParcelPropertiesRequest(Message m)
         {
             Dictionary<UUID, ParcelInfo> results = new Dictionary<UUID, ParcelInfo>();
             ParcelPropertiesRequest req = (ParcelPropertiesRequest)m;
@@ -367,7 +367,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ParcelPropertiesRequestByID)]
-        void HandleParcelPropertiesRequestByID(Message m)
+        internal void HandleParcelPropertiesRequestByID(Message m)
         {
             ParcelPropertiesRequestByID req = (ParcelPropertiesRequestByID)m;
             if (req.CircuitSessionID != req.SessionID ||

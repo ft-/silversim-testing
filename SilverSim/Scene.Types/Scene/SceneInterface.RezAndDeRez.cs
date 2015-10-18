@@ -42,7 +42,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.DeRezObject)]
-        void HandleDeRezObject(Message m)
+        internal void HandleDeRezObject(Message m)
         {
             SilverSim.Viewer.Messages.Object.DeRezAck ackres;
             SilverSim.Viewer.Messages.Object.DeRezObject req = (SilverSim.Viewer.Messages.Object.DeRezObject)m;

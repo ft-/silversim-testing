@@ -14,7 +14,7 @@ using System;
 namespace SilverSim.Backend.Common.OfflineIM
 {
     #region Service implementation
-    sealed class OfflineIM : IPlugin, IPluginShutdown
+    public sealed class OfflineIM : IPlugin, IPluginShutdown
     {
 #if DEBUG
         private static readonly ILog m_Log = LogManager.GetLogger("OFFLINE IM");
