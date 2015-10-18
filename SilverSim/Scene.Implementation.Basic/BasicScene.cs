@@ -54,11 +54,11 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Interface wrappers
-        sealed class BasicSceneObjectsCollection : ISceneObjects
+        public sealed class BasicSceneObjectsCollection : ISceneObjects
         {
             private BasicScene m_Scene;
 
-            public BasicSceneObjectsCollection(BasicScene scene)
+            internal BasicSceneObjectsCollection(BasicScene scene)
             {
                 m_Scene = scene;
             }
@@ -102,11 +102,11 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        sealed class BasicSceneObjectPartsCollection : ISceneObjectParts
+        public sealed class BasicSceneObjectPartsCollection : ISceneObjectParts
         {
             private BasicScene m_Scene;
 
-            public BasicSceneObjectPartsCollection(BasicScene scene)
+            internal BasicSceneObjectPartsCollection(BasicScene scene)
             {
                 m_Scene = scene;
             }
@@ -146,11 +146,11 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        sealed class BasicSceneParcelsCollection : ISceneParcels
+        public sealed class BasicSceneParcelsCollection : ISceneParcels
         {
             private BasicScene m_Scene;
 
-            public BasicSceneParcelsCollection(BasicScene scene)
+            internal BasicSceneParcelsCollection(BasicScene scene)
             {
                 m_Scene = scene;
             }
@@ -203,11 +203,11 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        sealed class BasicSceneAgentsCollection : ISceneAgents
+        public sealed class BasicSceneAgentsCollection : ISceneAgents
         {
             BasicScene m_BasicScene;
 
-            public BasicSceneAgentsCollection(BasicScene scene)
+            internal BasicSceneAgentsCollection(BasicScene scene)
             {
                 m_BasicScene = scene;
             }
@@ -239,11 +239,11 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        sealed class BasicSceneRootAgentsCollection : ISceneAgents
+        public sealed class BasicSceneRootAgentsCollection : ISceneAgents
         {
             BasicScene m_BasicScene;
 
-            public BasicSceneRootAgentsCollection(BasicScene scene)
+            internal BasicSceneRootAgentsCollection(BasicScene scene)
             {
                 m_BasicScene = scene;
             }
