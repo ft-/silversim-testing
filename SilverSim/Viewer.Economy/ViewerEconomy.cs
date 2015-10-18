@@ -26,7 +26,7 @@ namespace SilverSim.Viewer.Economy
         [PacketHandler(MessageType.EconomyDataRequest)]
         BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
-        bool m_ShutdownEconomy = false;
+        bool m_ShutdownEconomy;
 
         public ViewerEconomy()
         {
