@@ -14,8 +14,8 @@ namespace SilverSim.Scene.Chat
         private string m_Name;
         private UUID m_ID;
         private string m_Message;
-        private ChatServiceInterface.GetUUIDDelegate m_GetUUID;
-        private ChatServiceInterface.GetPositionDelegate m_GetPos;
+        private Func<UUID> m_GetUUID;
+        private Func<Vector3> m_GetPos;
         private Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
         private bool m_IsAgent;
@@ -29,8 +29,8 @@ namespace SilverSim.Scene.Chat
             string name,
             UUID id, 
             string message,
-            ChatServiceInterface.GetUUIDDelegate getuuid, 
-            ChatServiceInterface.GetPositionDelegate getpos, 
+            Func<UUID> getuuid, 
+            Func<Vector3> getpos, 
             Action<ListenEvent> send,
             bool isAgent)
         {
@@ -48,7 +48,7 @@ namespace SilverSim.Scene.Chat
 
         public override void Remove()
         {
-            m_Handler.RemoveListener(this);
+            m_Handler.Remove(this);
         }
 
         public override int Channel
@@ -59,7 +59,7 @@ namespace SilverSim.Scene.Chat
             }
         }
 
-        public override ChatServiceInterface.GetPositionDelegate GetPosition
+        public override Func<Vector3> GetPosition
         {
             get
             {
@@ -67,7 +67,7 @@ namespace SilverSim.Scene.Chat
             }
         }
 
-        public override ChatServiceInterface.GetUUIDDelegate GetUUID
+        public override Func<UUID> GetUUID
         {
             get
             {

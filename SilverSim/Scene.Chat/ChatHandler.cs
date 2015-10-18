@@ -10,13 +10,13 @@ using ThreadedClasses;
 namespace SilverSim.Scene.Chat
 {
     #region Service Implementation
-    class ChatHandler : ChatServiceInterface
+    public class ChatHandler : ChatServiceInterface
     {
         private RwLockedDictionary<int, ChannelInfo> m_Channels = new RwLockedDictionary<int, ChannelInfo>();
         private RwLockedList<Listener> m_ChatPass = new RwLockedList<Listener>();
 
         #region Constructor
-        public ChatHandler(double whisperDistance, double sayDistance, double shoutDistance)
+        internal ChatHandler(double whisperDistance, double sayDistance, double shoutDistance)
         {
             WhisperDistance = whisperDistance;
             SayDistance = sayDistance;
@@ -73,7 +73,7 @@ namespace SilverSim.Scene.Chat
         #endregion
 
         #region Register Listeners
-        public override Listener AddListen(int channel, string name, UUID id, string message, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> send)
+        public override Listener AddListen(int channel, string name, UUID id, string message, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> send)
         {
             Listener li = new ListenerInfo(this, channel, name, id, message, getuuid, getpos, send, false);
 
@@ -93,7 +93,7 @@ namespace SilverSim.Scene.Chat
             return li;
         }
 
-        public override Listener AddAgentListen(int channel, string name, UUID id, string message, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> send)
+        public override Listener AddAgentListen(int channel, string name, UUID id, string message, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> send)
         {
             Listener li = new ListenerInfo(this, channel, name, id, message, getuuid, getpos, send, true);
 
@@ -113,7 +113,7 @@ namespace SilverSim.Scene.Chat
             return li;
         }
 
-        public override Listener AddListenRegex(int channel, string name, UUID id, string message, Int32 regexBitfield, GetUUIDDelegate getuuid, GetPositionDelegate getpos, Action<ListenEvent> send)
+        public override Listener AddListenRegex(int channel, string name, UUID id, string message, Int32 regexBitfield, Func<UUID> getuuid, Func<Vector3> getpos, Action<ListenEvent> send)
         {
             Listener li = new RegexListenerInfo(this, channel, name, id, message, regexBitfield, getuuid, getpos, send);
 
@@ -133,7 +133,7 @@ namespace SilverSim.Scene.Chat
             return li;
         }
 
-        public override Listener AddRegionListener(int channel, string name, UUID id, string message, GetUUIDDelegate getuuid, Action<ListenEvent> send)
+        public override Listener AddRegionListener(int channel, string name, UUID id, string message, Func<UUID> getuuid, Action<ListenEvent> send)
         {
             Listener li = new RegionListenerInfo(this, channel, name, id, message, getuuid, send);
 
@@ -161,7 +161,7 @@ namespace SilverSim.Scene.Chat
 
         public override Listener AddChatPassListener(Action<ListenEvent> send)
         {
-            Listener li = new RegionListenerInfo(this, 0, "", UUID.Zero, "", GetPassListenerUUID, send);
+            Listener li = new RegionListenerInfo(this, 0, string.Empty, UUID.Zero, string.Empty, GetPassListenerUUID, send);
             m_ChatPass.Add(li);
             return li;
         }
@@ -169,7 +169,7 @@ namespace SilverSim.Scene.Chat
         #endregion
 
         #region Remove Listener
-        protected internal void RemoveListener(Listener listener)
+        protected internal void Remove(Listener listener)
         {
             ChannelInfo channel;
             if (m_Channels.TryGetValue(listener.Channel, out channel))

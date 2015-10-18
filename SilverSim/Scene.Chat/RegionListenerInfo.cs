@@ -10,7 +10,7 @@ namespace SilverSim.Scene.Chat
 {
     class RegionListenerInfo : ListenerInfo
     {
-        public new bool IsIgnorePosition
+        public virtual new bool IsIgnorePosition
         {
             get
             {
@@ -29,7 +29,7 @@ namespace SilverSim.Scene.Chat
             string name,
             UUID id, 
             string message,
-            ChatServiceInterface.GetUUIDDelegate getuuid, 
+            Func<UUID> getuuid, 
             Action<ListenEvent> send)
             : base(handler, channel, name, id, message, getuuid, GetPositionFunc, send, false)
         {

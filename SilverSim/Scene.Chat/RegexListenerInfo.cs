@@ -9,18 +9,18 @@ using System.Text.RegularExpressions;
 
 namespace SilverSim.Scene.Chat
 {
-    class RegexListenerInfo : ChatServiceInterface.Listener
+    sealed class RegexListenerInfo : ChatServiceInterface.Listener
     {
-        private int m_Channel;
-        private Regex m_Name = null;
-        private string m_NamePlain = string.Empty;
-        private UUID m_ID;
-        private Regex m_Message = null;
-        private string m_MessagePlain = string.Empty;
-        private Int32 m_RegexBitfield = 0;
-        private ChatServiceInterface.GetUUIDDelegate m_GetUUID;
-        private ChatServiceInterface.GetPositionDelegate m_GetPos;
-        private Action<ListenEvent> m_Send;
+        int m_Channel;
+        Regex m_Name;
+        string m_NamePlain = string.Empty;
+        UUID m_ID;
+        Regex m_Message;
+        string m_MessagePlain = string.Empty;
+        Int32 m_RegexBitfield;
+        Func<UUID> m_GetUUID;
+        Func<Vector3> m_GetPos;
+        Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
         public override bool IsAgent
         {
@@ -39,8 +39,8 @@ namespace SilverSim.Scene.Chat
             UUID id, 
             string message,
             Int32 regexBitfield,
-            ChatServiceInterface.GetUUIDDelegate getuuid, 
-            ChatServiceInterface.GetPositionDelegate getpos, 
+            Func<UUID> getuuid, 
+            Func<Vector3> getpos, 
             Action<ListenEvent> send)
         {
             m_RegexBitfield = regexBitfield;
@@ -77,7 +77,7 @@ namespace SilverSim.Scene.Chat
 
         public override void Remove()
         {
-            m_Handler.RemoveListener(this);
+            m_Handler.Remove(this);
         }
 
         public override int Channel
@@ -88,7 +88,7 @@ namespace SilverSim.Scene.Chat
             }
         }
 
-        public override ChatServiceInterface.GetPositionDelegate GetPosition
+        public override Func<Vector3> GetPosition
         {
             get
             {
@@ -96,7 +96,7 @@ namespace SilverSim.Scene.Chat
             }
         }
 
-        public override ChatServiceInterface.GetUUIDDelegate GetUUID
+        public override Func<UUID> GetUUID
         {
             get
             {

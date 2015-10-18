@@ -8,7 +8,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Scene.Chat
 {
-    class ChannelInfo
+    sealed class ChannelInfo
     {
         public RwLockedList<ChatServiceInterface.Listener> Listeners = new RwLockedList<ChatServiceInterface.Listener>();
         private ChatHandler m_Handler;
