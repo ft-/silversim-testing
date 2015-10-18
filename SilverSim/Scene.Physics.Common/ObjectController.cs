@@ -28,8 +28,6 @@ namespace SilverSim.Scene.Physics.Common
             m_StateData = new PhysicsStateData(part, sceneID);
             m_Group = part;
             m_Phantom = true;
-            m_ContributesToCollisionSurfaceAsChild = false;
-            m_VolumeDetect = false;
         }
 
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)

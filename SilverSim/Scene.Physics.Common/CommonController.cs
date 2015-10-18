@@ -25,7 +25,7 @@ namespace SilverSim.Scene.Physics.Common
             return new Vector3(0, 0, obj.PhysicsActor.Mass * GravityAccelerationConstant);
         }
 
-        double m_Buoyancy = 0f;
+        double m_Buoyancy;
 
         public double Buoyancy 
         {
@@ -55,8 +55,8 @@ namespace SilverSim.Scene.Physics.Common
         #endregion
 
         #region Hover Motor
-        double m_HoverHeight = 0f;
-        bool m_HoverEnabled = false;
+        double m_HoverHeight;
+        bool m_HoverEnabled;
         protected Vector3 HoverMotor(IObject obj, double dt)
         {
             if (m_HoverEnabled)
