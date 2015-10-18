@@ -187,7 +187,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                     cmd.Parameters.AddWithValue("?ScopeID", scopeID.ToString());
                     for (int i = 0; i < words.Length; ++i)
                     {
-                        cmd.Parameters.AddWithValue("?word" + i, words[i]);
+                        cmd.Parameters.AddWithValue("?word" + i.ToString(), words[i]);
                     }
                     using (MySqlDataReader dbreader = cmd.ExecuteReader())
                     {
