@@ -11,7 +11,7 @@ namespace SilverSim.Viewer.Core
     public partial class AgentCircuit
     {
         [PacketHandler(MessageType.ViewerEffect)]
-        void HandleViewerEffect(Message m)
+        internal void HandleViewerEffect(Message m)
         {
             ViewerEffect ve = (ViewerEffect)m;
             if(ve.AgentID != ve.CircuitAgentID ||

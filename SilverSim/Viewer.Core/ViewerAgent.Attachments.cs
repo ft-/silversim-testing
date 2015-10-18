@@ -38,7 +38,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.RezMultipleAttachmentsFromInv)]
         [PacketHandler(MessageType.RezSingleAttachmentFromInv)]
-        void HandleRezAttachment(Message m)
+        internal void HandleRezAttachment(Message m)
         {
             switch(m.Number)
             {
@@ -77,7 +77,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.DetachAttachmentIntoInv)]
         [PacketHandler(MessageType.ObjectDetach)]
-        void HandleDetachAttachment(Message m)
+        internal void HandleDetachAttachment(Message m)
         {
             List<DetachEntry> detachList = new List<DetachEntry>();
             if(m.Number == MessageType.ObjectDetach)

@@ -17,7 +17,7 @@ namespace SilverSim.Viewer.Core
     public partial class ViewerAgent
     {
         [PacketHandler(MessageType.RequestGodlikePowers)]
-        void HandleRequestGodlikePowers(Message p)
+        internal void HandleRequestGodlikePowers(Message p)
         {
             RequestGodlikePowers m = (RequestGodlikePowers)p;
             if(m.AgentID != ID || m.SessionID != m.CircuitSessionID)

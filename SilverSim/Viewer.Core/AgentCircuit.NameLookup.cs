@@ -12,7 +12,7 @@ namespace SilverSim.Viewer.Core
     public partial class AgentCircuit
     {
         [PacketHandler(MessageType.UUIDGroupNameRequest)]
-        void GroupNameLookup(Message m)
+        internal void GroupNameLookup(Message m)
         {
             UUIDGroupNameRequest req = (UUIDGroupNameRequest)m;
             UUIDGroupNameReply rep = new UUIDGroupNameReply();
@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.UUIDNameRequest)]
-        void UserNameLookup(Message m)
+        internal void UserNameLookup(Message m)
         {
             UUIDNameRequest req = (UUIDNameRequest)m;
             UUIDNameReply rep = new UUIDNameReply();

@@ -197,7 +197,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.SetAlwaysRun)]
-        void HandleSetAlwaysRun(Message m)
+        internal void HandleSetAlwaysRun(Message m)
         {
             Messages.Agent.SetAlwaysRun sar = (Messages.Agent.SetAlwaysRun)m;
 
@@ -218,7 +218,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentUpdate)]
-        void HandleAgentUpdateMessage(Message m)
+        internal void HandleAgentUpdateMessage(Message m)
         {
             /* only AgentUpdate is passed here */
             Messages.Agent.AgentUpdate au = (Messages.Agent.AgentUpdate)m;
