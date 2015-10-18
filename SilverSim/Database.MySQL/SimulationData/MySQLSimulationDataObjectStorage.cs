@@ -360,7 +360,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         item.SaleInfo.Price = (int)dbReader["SalePrice"];
                         item.SaleInfo.PermMask = (InventoryPermissionsMask)(uint)dbReader["SalePermMask"];
                         ObjectPartInventoryItem.PermsGranterInfo grantinfo = new ObjectPartInventoryItem.PermsGranterInfo();
-                        if ((string)dbReader["PermsGranter"] != "")
+                        if (((string)dbReader["PermsGranter"]).Length != 0)
                         {
                             try
                             {

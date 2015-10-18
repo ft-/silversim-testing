@@ -471,10 +471,10 @@ namespace SilverSim.Database.MySQL
                 }
             }
 
-            string wherestr = "";
+            string wherestr = string.Empty;
             foreach(KeyValuePair<string, object> w in where)
             {
-                if(wherestr != "")
+                if(wherestr.Length != 0)
                 {
                     wherestr += " AND ";
                 }
