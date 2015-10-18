@@ -16,19 +16,19 @@ using System.Xml;
 
 namespace SilverSim.Scene.RegionLoader.Basic
 {
-    class RegionLoaderService : IPlugin, IRegionLoaderInterface
+    public class RegionLoaderService : IPlugin, IRegionLoaderInterface
     {
-        private string m_RegionStorage;
-        private string m_RegionCfg;
+        private string m_RegionStorage = string.Empty;
+        private string m_RegionCfg = string.Empty;
         private string m_ExternalHostName = string.Empty;
         private GridServiceInterface m_RegionService;
         private SceneFactoryInterface m_SceneFactory;
-        private uint m_HttpPort = 0;
+        private uint m_HttpPort;
         private static readonly ILog m_Log = LogManager.GetLogger("REGION LOADER");
         private string m_Scheme = Uri.UriSchemeHttp;
 
         #region Constructor
-        public RegionLoaderService(string regionStorage, string regionCfg)
+        internal RegionLoaderService(string regionStorage, string regionCfg)
         {
             m_RegionStorage = regionStorage;
             m_RegionCfg = regionCfg;
