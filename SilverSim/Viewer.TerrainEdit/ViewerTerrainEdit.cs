@@ -35,9 +35,9 @@ namespace SilverSim.Viewer.TerrainEdit
         }
         
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-        class PaintEffect : Attribute
+        sealed class PaintEffect : Attribute
         {
-            public StandardTerrainEffect Effect;
+            public StandardTerrainEffect Effect { get; private set; }
 
             public PaintEffect(StandardTerrainEffect effect)
             {
@@ -46,9 +46,9 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
-        class FloodEffect : Attribute
+        sealed class FloodEffect : Attribute
         {
-            public StandardTerrainEffect Effect;
+            public StandardTerrainEffect Effect { get; private set; }
 
             public FloodEffect(StandardTerrainEffect effect)
             {
@@ -56,10 +56,8 @@ namespace SilverSim.Viewer.TerrainEdit
             }
         }
 
-        public delegate void ModifyLandEffect(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data);
-
-        Dictionary<StandardTerrainEffect, ModifyLandEffect> m_PaintEffects = new Dictionary<StandardTerrainEffect, ModifyLandEffect>();
-        Dictionary<StandardTerrainEffect, ModifyLandEffect> m_FloodEffects = new Dictionary<StandardTerrainEffect, ModifyLandEffect>();
+        Dictionary<StandardTerrainEffect, Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>> m_PaintEffects = new Dictionary<StandardTerrainEffect, Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>>();
+        Dictionary<StandardTerrainEffect, Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>> m_FloodEffects = new Dictionary<StandardTerrainEffect, Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>>();
 
         public ViewerTerrainEdit()
         {
@@ -100,7 +98,8 @@ namespace SilverSim.Viewer.TerrainEdit
                 }
                 else
                 {
-                    m_PaintEffects.Add(pe.Effect, (ModifyLandEffect)Delegate.CreateDelegate(typeof(ModifyLandEffect), this, mi));
+                    m_PaintEffects.Add(pe.Effect, (Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>)
+                        Delegate.CreateDelegate(typeof(Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>), this, mi));
                 }
                 FloodEffect fe = (FloodEffect)Attribute.GetCustomAttribute(mi, typeof(FloodEffect));
                 if (fe == null)
@@ -137,7 +136,8 @@ namespace SilverSim.Viewer.TerrainEdit
                 }
                 else
                 {
-                    m_PaintEffects.Add(fe.Effect, (ModifyLandEffect)Delegate.CreateDelegate(typeof(ModifyLandEffect), this, mi));
+                    m_PaintEffects.Add(fe.Effect, (Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>)
+                        Delegate.CreateDelegate(typeof(Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>), this, mi));
                 }
             }
         }
@@ -147,7 +147,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PacketHandler(MessageType.ModifyLand)]
-        void HandleMessage(ViewerAgent agent, AgentCircuit circuit, Message m)
+        public void HandleMessage(ViewerAgent agent, AgentCircuit circuit, Message m)
         {
             ModifyLand req = (ModifyLand)m;
             if (req.CircuitSessionID != req.SessionID ||
@@ -161,7 +161,7 @@ namespace SilverSim.Viewer.TerrainEdit
                 return;
             }
 
-            ModifyLandEffect modifier;
+            Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data> modifier;
             
             foreach (ModifyLand.Data data in req.ParcelData)
             {
@@ -184,7 +184,7 @@ namespace SilverSim.Viewer.TerrainEdit
 
         #region Paint Effects
         [PaintEffect(StandardTerrainEffect.Raise)]
-        void RaiseSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public void RaiseSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -253,7 +253,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PaintEffect(StandardTerrainEffect.Lower)]
-        void LowerSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public void LowerSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -318,7 +318,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PaintEffect(StandardTerrainEffect.Flatten)]
-        void FlattenSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public void FlattenSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -407,7 +407,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PaintEffect(StandardTerrainEffect.Smooth)]
-        void SmoothSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public void SmoothSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -478,7 +478,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PaintEffect(StandardTerrainEffect.Noise)]
-        void NoiseSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public void NoiseSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -552,7 +552,7 @@ namespace SilverSim.Viewer.TerrainEdit
 
         #region Flood Effects
         [FloodEffect(StandardTerrainEffect.Raise)]
-        void RaiseArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public void RaiseArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
             for (int x = (int)data.West; x < (int)data.East; x++)
@@ -582,7 +582,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [FloodEffect(StandardTerrainEffect.Lower)]
-        void LowerArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public void LowerArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
             for (int x = (int)data.West; x < (int)data.East; x++)
@@ -612,7 +612,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [FloodEffect(StandardTerrainEffect.Flatten)]
-        void FlattenArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public void FlattenArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -664,12 +664,12 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [FloodEffect(StandardTerrainEffect.Smooth)]
-        void SmoothArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public void SmoothArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
             double area = modify.Size;
-            double step = modify.Size / 4;
+            double step = area / 4;
 
             for (int x = (int)data.West; x < (int)data.East; x++)
             {
@@ -712,7 +712,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [FloodEffect(StandardTerrainEffect.Noise)]
-        void NoiseArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        public void NoiseArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -725,8 +725,8 @@ namespace SilverSim.Viewer.TerrainEdit
                         continue;
                     }
 
-                    double noise = PerlinNoise2D(x / scene.RegionData.Size.X,
-                                                            y / scene.RegionData.Size.Y, 8, 1);
+                    double noise = PerlinNoise2D((double)x / scene.RegionData.Size.X,
+                                                            (double)y / scene.RegionData.Size.Y, 8, 1);
 
                     LayerPatch lp = scene.Terrain.AdjustTerrain((uint)x, (uint)y, noise * modify.Size);
                     if (lp != null && !changed.Contains(lp))
