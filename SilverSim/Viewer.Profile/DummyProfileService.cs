@@ -9,14 +9,14 @@ using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Profile
 {
-    sealed class DummyProfileService : ProfileServiceInterface
+    public sealed class DummyProfileService : ProfileServiceInterface
     {
         public DummyProfileService()
         {
 
         }
 
-        sealed class DummyClassifieds : IClassifiedsInterface
+        public sealed class DummyClassifieds : IClassifiedsInterface
         {
             public DummyClassifieds()
             {
@@ -45,7 +45,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        sealed class DummyPicks : IPicksInterface
+        public sealed class DummyPicks : IPicksInterface
         {
             public DummyPicks()
             {
@@ -73,7 +73,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        sealed class DummyNotes : INotesInterface
+        public sealed class DummyNotes : INotesInterface
         {
             public DummyNotes()
             {
@@ -93,7 +93,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        sealed class DummyUserPrefs : IUserPreferencesInterface
+        public sealed class DummyUserPrefs : IUserPreferencesInterface
         {
             public DummyUserPrefs()
             {
@@ -117,7 +117,7 @@ namespace SilverSim.Viewer.Profile
             }
         }
 
-        sealed class DummyProperties : IPropertiesInterface
+        public sealed class DummyProperties : IPropertiesInterface
         {
             public DummyProperties()
             {
