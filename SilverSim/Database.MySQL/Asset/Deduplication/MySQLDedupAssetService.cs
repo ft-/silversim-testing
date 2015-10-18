@@ -213,74 +213,76 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #region Store asset method
         public override void Store(AssetData asset)
         {
-            SHA1 sha = new SHA1CryptoServiceProvider();
-            byte[] sha1data = sha.ComputeHash(asset.Data);
-            
-            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            using (SHA1 sha = new SHA1CryptoServiceProvider())
             {
-                conn.Open();
+                byte[] sha1data = sha.ComputeHash(asset.Data);
 
-                conn.InsideTransaction(delegate()
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
-                    using (MySqlCommand cmd =
-                        new MySqlCommand(
-                            "INSERT INTO assetdata (hash, assetType, data)" +
-                            "VALUES(?hash, ?assetType, ?data) ON DUPLICATE KEY UPDATE assetType=assetType",
-                            conn))
-                    {
-                        using (cmd)
-                        {
-                            cmd.Parameters.AddWithValue("?hash", sha1data);
-                            cmd.Parameters.AddWithValue("?assetType", (int)asset.Type);
-                            cmd.Parameters.AddWithValue("?data", asset.Data);
-                            if (cmd.ExecuteNonQuery() < 1)
-                            {
-                                throw new AssetStoreFailedException(asset.ID);
-                            }
-                        }
-                    }
+                    conn.Open();
 
-                    using (MySqlCommand cmd =
-                        new MySqlCommand(
-                            "INSERT INTO assetrefs (id, name, assetType, temporary, create_time, access_time, asset_flags, CreatorID, hash)" +
-                            "VALUES(?id, ?name, ?assetType, ?temporary, ?create_time, ?access_time, ?asset_flags, ?CreatorID, ?hash)",
-                            conn))
+                    conn.InsideTransaction(delegate()
                     {
-                        string assetName = asset.Name;
-                        if (asset.Name.Length > MAX_ASSET_NAME)
-                        {
-                            assetName = asset.Name.Substring(0, MAX_ASSET_NAME);
-                            m_Log.WarnFormat("Name '{0}' for asset {1} truncated from {2} to {3} characters on add",
-                                asset.Name, asset.ID, asset.Name.Length, assetName.Length);
-                        }
-
-                        try
+                        using (MySqlCommand cmd =
+                            new MySqlCommand(
+                                "INSERT INTO assetdata (hash, assetType, data)" +
+                                "VALUES(?hash, ?assetType, ?data) ON DUPLICATE KEY UPDATE assetType=assetType",
+                                conn))
                         {
                             using (cmd)
                             {
-                                // create unix epoch time
-                                ulong now = Date.GetUnixTime();
-                                cmd.Parameters.AddWithValue("?id", asset.ID.ToString());
-                                cmd.Parameters.AddWithValue("?name", assetName);
-                                cmd.Parameters.AddWithValue("?assetType", (int)asset.Type);
-                                cmd.Parameters.AddWithValue("?temporary", asset.Temporary ? 1 : 0);
-                                cmd.Parameters.AddWithValue("?create_time", now);
-                                cmd.Parameters.AddWithValue("?access_time", now);
-                                cmd.Parameters.AddWithValue("?CreatorID", asset.Creator.ID.ToString());
-                                cmd.Parameters.AddWithValue("?asset_flags", (uint)asset.Flags);
                                 cmd.Parameters.AddWithValue("?hash", sha1data);
-                                if (1 > cmd.ExecuteNonQuery())
+                                cmd.Parameters.AddWithValue("?assetType", (int)asset.Type);
+                                cmd.Parameters.AddWithValue("?data", asset.Data);
+                                if (cmd.ExecuteNonQuery() < 1)
                                 {
                                     throw new AssetStoreFailedException(asset.ID);
                                 }
                             }
                         }
-                        catch (Exception)
+
+                        using (MySqlCommand cmd =
+                            new MySqlCommand(
+                                "INSERT INTO assetrefs (id, name, assetType, temporary, create_time, access_time, asset_flags, CreatorID, hash)" +
+                                "VALUES(?id, ?name, ?assetType, ?temporary, ?create_time, ?access_time, ?asset_flags, ?CreatorID, ?hash)",
+                                conn))
                         {
-                            throw new AssetStoreFailedException(asset.ID);
+                            string assetName = asset.Name;
+                            if (asset.Name.Length > MAX_ASSET_NAME)
+                            {
+                                assetName = asset.Name.Substring(0, MAX_ASSET_NAME);
+                                m_Log.WarnFormat("Name '{0}' for asset {1} truncated from {2} to {3} characters on add",
+                                    asset.Name, asset.ID, asset.Name.Length, assetName.Length);
+                            }
+
+                            try
+                            {
+                                using (cmd)
+                                {
+                                    // create unix epoch time
+                                    ulong now = Date.GetUnixTime();
+                                    cmd.Parameters.AddWithValue("?id", asset.ID.ToString());
+                                    cmd.Parameters.AddWithValue("?name", assetName);
+                                    cmd.Parameters.AddWithValue("?assetType", (int)asset.Type);
+                                    cmd.Parameters.AddWithValue("?temporary", asset.Temporary ? 1 : 0);
+                                    cmd.Parameters.AddWithValue("?create_time", now);
+                                    cmd.Parameters.AddWithValue("?access_time", now);
+                                    cmd.Parameters.AddWithValue("?CreatorID", asset.Creator.ID.ToString());
+                                    cmd.Parameters.AddWithValue("?asset_flags", (uint)asset.Flags);
+                                    cmd.Parameters.AddWithValue("?hash", sha1data);
+                                    if (1 > cmd.ExecuteNonQuery())
+                                    {
+                                        throw new AssetStoreFailedException(asset.ID);
+                                    }
+                                }
+                            }
+                            catch (Exception)
+                            {
+                                throw new AssetStoreFailedException(asset.ID);
+                            }
                         }
-                    }
-                });
+                    });
+                }
             }
         }
         #endregion
