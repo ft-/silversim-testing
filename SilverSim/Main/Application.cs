@@ -45,7 +45,7 @@ namespace SilverSim.Main
             {
 #if DEBUG
                 System.Console.Write(String.Format("Exception {0}: {1}", e.GetType().Name, e.Message));
-                System.Console.Write(e.StackTrace.ToString());
+                System.Console.Write(e.StackTrace);
                 System.Console.WriteLine();
 #endif
                 Environment.Exit(1);
