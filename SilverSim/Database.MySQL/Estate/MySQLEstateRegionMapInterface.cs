@@ -11,7 +11,7 @@ using MySql.Data.MySqlClient;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    public class MySQLEstateRegionMapInterface : IEstateRegionMapServiceInterface
+    sealed class MySQLEstateRegionMapInterface : IEstateRegionMapServiceInterface
     {
         string m_ConnectionString;
 
@@ -20,7 +20,7 @@ namespace SilverSim.Database.MySQL.Estate
             m_ConnectionString = connectionString;
         }
 
-        public List<UUID> this[uint EstateID]
+        public List<UUID> this[uint estateID]
         {
             get 
             {
@@ -30,7 +30,7 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT RegionID FROM estate_regionmap WHERE EstateID = ?estateid", conn))
                     {
-                        cmd.Parameters.AddWithValue("?estateid", EstateID);
+                        cmd.Parameters.AddWithValue("?estateid", estateID);
                         using(MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while(reader.Read())

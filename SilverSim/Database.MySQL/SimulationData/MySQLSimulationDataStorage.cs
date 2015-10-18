@@ -117,7 +117,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             StopStorageThread();
         }
 
-        int m_ProcessedPrims = 0;
+        int m_ProcessedPrims;
 
         protected override void StorageWorkerThread(object p)
         {
@@ -183,11 +183,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 SceneInterface scene = grp.Scene;
                                 if (scene != null)
                                 {
-                                    m_Log.WarnFormat("Failed to update prim {0} for {1}: {2}\n{3}", info.Part.ID, scene.ID, e.Message, e.StackTrace.ToString());
+                                    m_Log.WarnFormat("Failed to update prim {0} for {1}: {2}\n{3}", info.Part.ID, scene.ID, e.Message, e.StackTrace);
                                 }
                                 else
                                 {
-                                    m_Log.WarnFormat("Failed to update prim {0}: {1}\n{2}", info.Part.ID, e.Message, e.StackTrace.ToString());
+                                    m_Log.WarnFormat("Failed to update prim {0}: {1}\n{2}", info.Part.ID, e.Message, e.StackTrace);
                                 }
                             }
                         }

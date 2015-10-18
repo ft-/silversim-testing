@@ -17,7 +17,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.Inventory
 {
     #region Service Implementation
-    public class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
+    sealed class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         string m_ConnectionString;
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
@@ -47,7 +47,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override List<InventoryItem> GetActiveGestures(UUID PrincipalID)
+        public override List<InventoryItem> GetActiveGestures(UUID principalID)
         {
             List<InventoryItem> items = new List<InventoryItem>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -55,7 +55,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND AssetType = ?assettype AND (flags & 1) <>0", connection))
                 {
-                    cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                    cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                     cmd.Parameters.AddWithValue("?assettype", (int)AssetType.Gesture);
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -159,7 +159,7 @@ namespace SilverSim.Database.MySQL.Inventory
 
     #region Factory
     [PluginName("Inventory")]
-    public class MySQLInventoryServiceFactory : IPluginFactory
+    sealed class MySQLInventoryServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
         public MySQLInventoryServiceFactory()

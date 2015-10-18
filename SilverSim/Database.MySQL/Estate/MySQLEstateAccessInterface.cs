@@ -11,9 +11,9 @@ using System.Text;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    class MySQLEstateAccessInterface : EstateAccessServiceInterface
+    sealed class MySQLEstateAccessInterface : EstateAccessServiceInterface
     {
-        class MySQLListAccess : IListAccess
+        sealed class MySQLListAccess : IListAccess
         {
             string m_ConnectionString;
             public MySQLListAccess(string connectionString)

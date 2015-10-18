@@ -11,7 +11,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Inventory
 {
-    class MySQLInventoryFolderService : InventoryFolderServiceInterface
+    public class MySQLInventoryFolderService : InventoryFolderServiceInterface
     {
         string m_ConnectionString;
 
@@ -44,7 +44,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override InventoryFolder this[UUID PrincipalID, UUID key]
+        public override InventoryFolder this[UUID principalID, UUID key]
         {
             get 
             {
@@ -53,7 +53,7 @@ namespace SilverSim.Database.MySQL.Inventory
                     connection.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                        cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                         cmd.Parameters.AddWithValue("?folderid", key.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
@@ -69,7 +69,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override InventoryFolder this[UUID PrincipalID, AssetType type]
+        public override InventoryFolder this[UUID principalID, AssetType type]
         {
             get 
             {
@@ -80,7 +80,7 @@ namespace SilverSim.Database.MySQL.Inventory
                     {
                         using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND ParentFolderID = ?parentfolderid", connection))
                         {
-                            cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                            cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                             cmd.Parameters.AddWithValue("?parentfolderid", UUID.Zero.ToString());
                             using (MySqlDataReader dbReader = cmd.ExecuteReader())
                             {
@@ -95,7 +95,7 @@ namespace SilverSim.Database.MySQL.Inventory
                     {
                         using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND InventoryType = ?type", connection))
                         {
-                            cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                            cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                             cmd.Parameters.AddWithValue("?type", (int)type);
                             using (MySqlDataReader dbReader = cmd.ExecuteReader())
                             {
@@ -112,7 +112,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override List<InventoryFolder> GetFolders(UUID PrincipalID, UUID key)
+        public override List<InventoryFolder> GetFolders(UUID principalID, UUID key)
         {
             List<InventoryFolder> folders = new List<InventoryFolder>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -120,7 +120,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND ParentFolderID LIKE ?folderid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                    cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                     cmd.Parameters.AddWithValue("?folderid", key.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -135,7 +135,7 @@ namespace SilverSim.Database.MySQL.Inventory
             return folders;
         }
 
-        public virtual new List<InventoryFolder> GetInventorySkeleton(UUID PrincipalID)
+        public virtual new List<InventoryFolder> GetInventorySkeleton(UUID principalID)
         {
             List<InventoryFolder> folders = new List<InventoryFolder>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -143,7 +143,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                    cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
                         while (dbReader.Read())
@@ -157,7 +157,7 @@ namespace SilverSim.Database.MySQL.Inventory
             return folders;
         }
 
-        public override List<InventoryItem> GetItems(UUID PrincipalID, UUID key)
+        public override List<InventoryItem> GetItems(UUID principalID, UUID key)
         {
             List<InventoryItem> items = new List<InventoryItem>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -165,7 +165,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND ParentFolderID LIKE ?folderid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                    cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                     cmd.Parameters.AddWithValue("?folderid", key.ToString());
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
@@ -229,9 +229,9 @@ namespace SilverSim.Database.MySQL.Inventory
             IncrementVersionNoExcept(folder.Owner.ID, folder.ParentFolderID);
         }
 
-        public override void Move(UUID PrincipalID, UUID folderID, UUID toFolderID)
+        public override void Move(UUID principalID, UUID folderID, UUID toFolderID)
         {
-            InventoryFolder thisfolder = this[PrincipalID, folderID];
+            InventoryFolder thisfolder = this[principalID, folderID];
             if(folderID == toFolderID)
             {
                 throw new ArgumentException();
@@ -249,26 +249,26 @@ namespace SilverSim.Database.MySQL.Inventory
                     }
                 }
             }
-            IncrementVersionNoExcept(PrincipalID, toFolderID);
-            IncrementVersionNoExcept(PrincipalID, thisfolder.ParentFolderID);
+            IncrementVersionNoExcept(principalID, toFolderID);
+            IncrementVersionNoExcept(principalID, thisfolder.ParentFolderID);
         }
 
         #region Delete and Purge
-        public override void Delete(UUID PrincipalID, UUID folderID)
+        public override void Delete(UUID principalID, UUID folderID)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                PurgeOrDelete(PrincipalID, folderID, connection, true);
+                PurgeOrDelete(principalID, folderID, connection, true);
             }
         }
 
-        public override void Purge(UUID PrincipalID, UUID folderID)
+        public override void Purge(UUID principalID, UUID folderID)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                PurgeOrDelete(PrincipalID, folderID, connection, false);
+                PurgeOrDelete(principalID, folderID, connection, false);
             }
         }
 
@@ -278,10 +278,10 @@ namespace SilverSim.Database.MySQL.Inventory
             Purge(folder.Owner.ID, folderID);
         }
 
-        void PurgeOrDelete(UUID PrincipalID, UUID folderID, MySqlConnection connection, bool deleteFolder)
+        void PurgeOrDelete(UUID principalID, UUID folderID, MySqlConnection connection, bool deleteFolder)
         {
             List<UUID> folders;
-            InventoryFolder thisfolder = this[PrincipalID, folderID];
+            InventoryFolder thisfolder = this[principalID, folderID];
 
             using (MySqlCommand cmd = new MySqlCommand("BEGIN", connection))
             {
@@ -297,12 +297,12 @@ namespace SilverSim.Database.MySQL.Inventory
                 }
                 else
                 {
-                    folders = getFolderIDs(PrincipalID, folderID, connection);
+                    folders = GetFolderIDs(principalID, folderID, connection);
                 }
 
                 for (int index = 0; index < folders.Count; ++index)
                 {
-                    foreach (UUID folder in getFolderIDs(PrincipalID, folders[index], connection))
+                    foreach (UUID folder in GetFolderIDs(principalID, folders[index], connection))
                     {
                         if (!folders.Contains(folder))
                         {
@@ -315,7 +315,7 @@ namespace SilverSim.Database.MySQL.Inventory
                 {
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                        cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                         cmd.Parameters.AddWithValue("?folderid", folderID.ToString());
                         try
                         {
@@ -327,7 +327,7 @@ namespace SilverSim.Database.MySQL.Inventory
                     }
                     using (MySqlCommand cmd = new MySqlCommand("DELETE FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND ParentFolderID LIKE ?folderid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                        cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                         cmd.Parameters.AddWithValue("?folderid", folderID.ToString());
                         try
                         {
@@ -341,7 +341,7 @@ namespace SilverSim.Database.MySQL.Inventory
 
                 using (MySqlCommand cmd = new MySqlCommand("UPDATE inventoryfolders SET Version = Version + 1 WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                    cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                     if (deleteFolder)
                     {
                         cmd.Parameters.AddWithValue("?folderid", thisfolder.ParentFolderID.ToString());
@@ -367,12 +367,12 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        List<UUID> getFolderIDs(UUID PrincipalID, UUID key, MySqlConnection connection)
+        List<UUID> GetFolderIDs(UUID principalID, UUID key, MySqlConnection connection)
         {
             List<UUID> folders = new List<UUID>();
             using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND ParentFolderID LIKE ?folderid", connection))
             {
-                cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                 cmd.Parameters.AddWithValue("?folderid", key.ToString());
                 using (MySqlDataReader dbReader = cmd.ExecuteReader())
                 {
@@ -388,14 +388,14 @@ namespace SilverSim.Database.MySQL.Inventory
 
         #endregion
 
-        public override void IncrementVersion(UUID PrincipalID, UUID folderID)
+        public override void IncrementVersion(UUID principalID, UUID folderID)
         {
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("UPDATE inventoryfolders SET Version = Version + 1 WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                    cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                     cmd.Parameters.AddWithValue("?folderid", folderID.ToString());
                     if (cmd.ExecuteNonQuery() < 1)
                     {
@@ -405,11 +405,11 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        void IncrementVersionNoExcept(UUID PrincipalID, UUID folderID)
+        void IncrementVersionNoExcept(UUID principalID, UUID folderID)
         {
             try
             {
-                IncrementVersion(PrincipalID, folderID);
+                IncrementVersion(principalID, folderID);
             }
             catch
             {

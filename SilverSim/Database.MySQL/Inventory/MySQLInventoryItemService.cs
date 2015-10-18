@@ -9,7 +9,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Inventory
 {
-    class MySQLInventoryItemService : InventoryItemServiceInterface
+    sealed class MySQLInventoryItemService : InventoryItemServiceInterface
     {
         string m_ConnectionString;
 
@@ -41,7 +41,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
-        public override InventoryItem this[UUID PrincipalID, UUID key]
+        public override InventoryItem this[UUID principalID, UUID key]
         {
             get 
             {
@@ -50,7 +50,7 @@ namespace SilverSim.Database.MySQL.Inventory
                     connection.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                        cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                         cmd.Parameters.AddWithValue("?itemid", key.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
@@ -96,46 +96,46 @@ namespace SilverSim.Database.MySQL.Inventory
             IncrementVersion(item.Owner.ID, item.ParentFolderID);
         }
 
-        public override void Delete(UUID PrincipalID, UUID ID)
+        public override void Delete(UUID principalID, UUID id)
         {
-            InventoryItem item = this[PrincipalID, ID];
+            InventoryItem item = this[principalID, id];
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand("DELETE FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
-                    cmd.Parameters.AddWithValue("?itemid", ID.ToString());
+                    cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
+                    cmd.Parameters.AddWithValue("?itemid", id.ToString());
                     if (1 > cmd.ExecuteNonQuery())
                     {
-                        throw new InventoryItemNotFoundException(ID);
+                        throw new InventoryItemNotFoundException(id);
                     }
                 }
             }
-            IncrementVersion(PrincipalID, item.ID);
+            IncrementVersion(principalID, item.ID);
         }
 
-        public override void Move(UUID PrincipalID, UUID ID, UUID toFolderID)
+        public override void Move(UUID principalID, UUID id, UUID toFolderID)
         {
-            InventoryItem item = this[PrincipalID, ID];
+            InventoryItem item = this[principalID, id];
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
                 using (MySqlCommand cmd = new MySqlCommand(string.Format("BEGIN; IF EXISTS (SELECT NULL FROM inventoryfolders WHERE ID LIKE '{0}' AND OwnerID LIKE '{2}')" +
-                    "UPDATE inventoryitems SET ParentFolderID = '{0}' WHERE ID = '{1}'; COMMIT", toFolderID, ID, PrincipalID),
+                    "UPDATE inventoryitems SET ParentFolderID = '{0}' WHERE ID = '{1}'; COMMIT", toFolderID, id, principalID),
                     connection))
                 {
                     if (cmd.ExecuteNonQuery() < 1)
                     {
-                        throw new InventoryFolderNotStoredException(ID);
+                        throw new InventoryFolderNotStoredException(id);
                     }
                 }
             }
-            IncrementVersion(PrincipalID, item.ParentFolderID);
-            IncrementVersion(PrincipalID, toFolderID);
+            IncrementVersion(principalID, item.ParentFolderID);
+            IncrementVersion(principalID, toFolderID);
         }
 
-        void IncrementVersion(UUID PrincipalID, UUID folderID)
+        void IncrementVersion(UUID principalID, UUID folderID)
         {
             try
             {
@@ -144,7 +144,7 @@ namespace SilverSim.Database.MySQL.Inventory
                     connection.Open();
                     using (MySqlCommand cmd = new MySqlCommand("UPDATE inventoryfolders SET Version = Version + 1 WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?ownerid", PrincipalID.ToString());
+                        cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
                         cmd.Parameters.AddWithValue("?folderid", folderID.ToString());
                         if (cmd.ExecuteNonQuery() < 1)
                         {

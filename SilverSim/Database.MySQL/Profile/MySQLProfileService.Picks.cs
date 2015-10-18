@@ -9,9 +9,9 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Profile
 {
-    public partial class MySQLProfileService
+    sealed partial class MySQLProfileService
     {
-        class MySQLPicks : IPicksInterface
+        sealed class MySQLPicks : IPicksInterface
         {
             string m_ConnectionString;
 

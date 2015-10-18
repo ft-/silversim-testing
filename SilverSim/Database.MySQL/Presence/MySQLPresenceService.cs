@@ -16,7 +16,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.Presence
 {
     #region Service Implementation
-    class MySQLPresenceService : PresenceServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
+    sealed class MySQLPresenceService : PresenceServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PRESENCE SERVICE");
@@ -193,7 +193,7 @@ namespace SilverSim.Database.MySQL.Presence
 
     #region Factory
     [PluginName("Presence")]
-    class MySQLPresenceServiceFactory : IPluginFactory
+    sealed class MySQLPresenceServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PRESENCE SERVICE");
         public MySQLPresenceServiceFactory()

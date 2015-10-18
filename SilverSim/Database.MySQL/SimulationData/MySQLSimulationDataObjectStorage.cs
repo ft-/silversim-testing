@@ -199,7 +199,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 }
                                 catch(Exception e)
                                 {
-                                    m_Log.WarnFormat("Failed to load object {0}: {1}\n{2}", objgroupID, e.Message, e.StackTrace.ToString());
+                                    m_Log.WarnFormat("Failed to load object {0}: {1}\n{2}", objgroupID, e.Message, e.StackTrace);
                                     objGroups.Remove(objgroupID);
                                 }
                             }

@@ -11,12 +11,12 @@ using System.Text;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    class MySQLEstateGroupsService : EstateGroupsServiceInterface
+    sealed class MySQLEstateGroupsService : EstateGroupsServiceInterface
     {
         string m_ConnectionString;
         MySQLListAccess m_ListAccess;
 
-        class MySQLListAccess : IListAccess
+        sealed class MySQLListAccess : IListAccess
         {
             string m_ConnectionString;
 

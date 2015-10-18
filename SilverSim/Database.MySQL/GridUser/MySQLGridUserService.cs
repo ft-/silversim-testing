@@ -15,7 +15,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.GridUser
 {
     #region Service Implementation
-    class MySQLGridUserService : GridUserServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
+    sealed class MySQLGridUserService : GridUserServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRIDUSER SERVICE");
@@ -209,7 +209,7 @@ namespace SilverSim.Database.MySQL.GridUser
 
     #region Factory
     [PluginName("GridUser")]
-    class MySQLGridUserServiceFactory : IPluginFactory
+    sealed class MySQLGridUserServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRIDUSER SERVICE");
         public MySQLGridUserServiceFactory()

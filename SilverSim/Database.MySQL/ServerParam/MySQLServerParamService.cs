@@ -14,7 +14,7 @@ using ThreadedClasses;
 namespace SilverSim.Database.MySQL.ServerParam
 {
     #region Service Implementation
-    public class MySQLServerParamService : ServerParamServiceInterface, IDBServiceInterface, IPlugin
+    sealed class MySQLServerParamService : ServerParamServiceInterface, IDBServiceInterface, IPlugin
     {
         string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SERVER PARAM SERVICE");
@@ -204,7 +204,7 @@ namespace SilverSim.Database.MySQL.ServerParam
 
     #region Factory
     [PluginName("ServerParams")]
-    class MySQLServerParamServiceFactory : IPluginFactory
+    sealed class MySQLServerParamServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SERVER PARAM SERVICE");
         public MySQLServerParamServiceFactory()

@@ -14,7 +14,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.Estate
 {
     #region Service Implementation
-    class MySQLEstateService : EstateServiceInterface, IDBServiceInterface, IPlugin
+    sealed class MySQLEstateService : EstateServiceInterface, IDBServiceInterface, IPlugin
     {
         string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ESTATE SERVICE");
@@ -110,7 +110,7 @@ namespace SilverSim.Database.MySQL.Estate
         };
 
 
-        public override EstateInfo this[uint EstateID]
+        public override EstateInfo this[uint estateID]
         {
             get
             {
@@ -119,7 +119,7 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM estates WHERE ID LIKE ?id", conn))
                     {
-                        cmd.Parameters.AddWithValue("?id", EstateID);
+                        cmd.Parameters.AddWithValue("?id", estateID);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if(reader.Read())
@@ -157,7 +157,7 @@ namespace SilverSim.Database.MySQL.Estate
                         conn.Open();
                         using(MySqlCommand cmd = new MySqlCommand("DELETE FROM estates WHERE ID LIKE ?id", conn))
                         {
-                            cmd.Parameters.AddWithValue("?id", EstateID);
+                            cmd.Parameters.AddWithValue("?id", estateID);
                             if(cmd.ExecuteNonQuery() < 1)
                             {
                                 throw new EstateUpdateFailedException();
@@ -260,7 +260,7 @@ namespace SilverSim.Database.MySQL.Estate
 
     #region Factory
     [PluginName("Estate")]
-    class MySQLEstateServiceFactory : IPluginFactory
+    sealed class MySQLEstateServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ESTATE SERVICE");
         public MySQLEstateServiceFactory()

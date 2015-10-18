@@ -14,7 +14,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.AvatarName
 {
     #region Service Implementation
-    class MySQLAvatarNameService : AvatarNameServiceInterface, IDBServiceInterface, IPlugin
+    sealed class MySQLAvatarNameService : AvatarNameServiceInterface, IDBServiceInterface, IPlugin
     {
         string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR NAMES SERVICE");

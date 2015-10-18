@@ -8,11 +8,11 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    class MySQLEstateManagerService : EstateManagerServiceInterface
+    sealed class MySQLEstateManagerService : EstateManagerServiceInterface
     {
         string m_ConnectionString;
 
-        class MySQLListAccess : IListAccess
+        sealed class MySQLListAccess : IListAccess
         {
             string m_ConnectionString;
 

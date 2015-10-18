@@ -14,7 +14,7 @@ using System.Collections.Generic;
 namespace SilverSim.Database.MySQL.UserAccounts
 {
     #region Service Implementation
-    class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin
+    sealed class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin
     {
         string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNT SERVICE");
@@ -263,7 +263,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
 
     #region Factory
     [PluginName("UserAccounts")]
-    class MySQLUserAccountServiceFactory : IPluginFactory
+    sealed class MySQLUserAccountServiceFactory : IPluginFactory
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNT SERVICE");
         public MySQLUserAccountServiceFactory()

@@ -8,7 +8,7 @@ using System.Collections.Generic;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    class MySQLEstateOwnerService : IEstateOwnerServiceInterface
+    sealed class MySQLEstateOwnerService : IEstateOwnerServiceInterface
     {
         string m_ConnectionString;
 
@@ -17,7 +17,7 @@ namespace SilverSim.Database.MySQL.Estate
             m_ConnectionString = connectionString;
         }
 
-        public UUI this[uint EstateID]
+        public UUI this[uint estateID]
         {
             get
             {
@@ -26,7 +26,7 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("SELECT OwnerID FROM estates WHERE ID = ?id", conn))
                     {
-                        cmd.Parameters.AddWithValue("?id", EstateID);
+                        cmd.Parameters.AddWithValue("?id", estateID);
                         using(MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if(reader.Read())
@@ -47,7 +47,7 @@ namespace SilverSim.Database.MySQL.Estate
                     conn.Open();
                     using (MySqlCommand cmd = new MySqlCommand("UPDATE estates SET OwnerID = ?ownerid WHERE ID = ?id", conn))
                     {
-                        cmd.Parameters.AddWithValue("?id", EstateID);
+                        cmd.Parameters.AddWithValue("?id", estateID);
                         cmd.Parameters.AddWithValue("?ownerid", value.ID.ToString());
                         if(cmd.ExecuteNonQuery() < 1)
                         {
