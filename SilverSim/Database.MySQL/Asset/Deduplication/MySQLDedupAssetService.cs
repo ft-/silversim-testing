@@ -344,7 +344,7 @@ id, name, description, assetType, local, temporary, create_time, access_time, as
         };
         #endregion
 
-        private static readonly int MAX_ASSET_NAME = 64;
+        private const int MAX_ASSET_NAME = 64;
     }
     #endregion
 
