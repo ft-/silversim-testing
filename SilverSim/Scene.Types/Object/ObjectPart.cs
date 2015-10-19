@@ -127,15 +127,6 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
-        #region Disconnect
-        ~ObjectPart()
-        {
-            Inventory.OnChange -= OnInventoryChange;
-            m_ObjectUpdateInfo.KillObject();
-            ObjectGroup.Scene.ScheduleUpdate(m_ObjectUpdateInfo);
-        }
-        #endregion
-
         #region Permissions
         public bool IsLocked
         {

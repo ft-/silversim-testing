@@ -129,11 +129,6 @@ namespace SilverSim.Scene.Types.Object
             AgentSitting = new AgentSittingInterface(this);
             IsChanged = false;
         }
-
-        ~ObjectGroup()
-        {
-            Scene = null;
-        }
         #endregion
 
         #region Physics Linkage
