@@ -200,10 +200,6 @@ namespace SilverSim.Scene.Types.Object
                 }
                 Add(newItem, false);
             }
-            if(oldItem != null)
-            {
-                oldItem.Dispose();
-            }
             Interlocked.Increment(ref InventorySerial);
             var updateDelegate = OnChange;
             if (updateDelegate != null)

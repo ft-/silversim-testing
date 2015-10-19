@@ -7,7 +7,7 @@ using System;
 
 namespace SilverSim.Scene.Types.Physics
 {
-    public interface IPhysicsObject : IDisposable
+    public interface IPhysicsObject
     {
         /* position, acceleration, velocity (angular and linear) is pushed to target object when IsPhysicsActive equals true */
         Vector3 DeltaLinearVelocity { set; }

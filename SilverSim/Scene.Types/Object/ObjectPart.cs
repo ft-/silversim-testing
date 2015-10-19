@@ -21,7 +21,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
 {
-    public partial class ObjectPart : IObject, IDisposable
+    public partial class ObjectPart : IObject
     {
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT PART");
 
@@ -127,8 +127,8 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
-        #region Dispose
-        public void Dispose()
+        #region Disconnect
+        ~ObjectPart()
         {
             Inventory.OnChange -= OnInventoryChange;
             m_ObjectUpdateInfo.KillObject();

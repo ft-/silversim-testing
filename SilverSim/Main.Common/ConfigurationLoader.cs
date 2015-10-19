@@ -45,7 +45,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Main.Common
 {
-    public sealed class ConfigurationLoader : IDisposable
+    public sealed class ConfigurationLoader
     {
         sealed class ResourceAssetPlugin : SceneInterface.ResourceAssetService, IPlugin
         {
@@ -84,7 +84,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        public void Dispose()
+        ~ConfigurationLoader()
         {
             m_ShutdownEvent.Dispose();
         }

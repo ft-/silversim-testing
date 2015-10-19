@@ -154,7 +154,7 @@ namespace SilverSim.Types
         }
 
         #region Stateful Enumerator
-        public class MarkEnumerator : IEnumerator<IValue>, IDisposable, IEnumerator
+        public class MarkEnumerator : IEnumerator<IValue>, IEnumerator
         {
             private int m_CurrentIndex;
             private int m_MarkIndex;
@@ -183,6 +183,7 @@ namespace SilverSim.Types
 
             public void Dispose()
             {
+                m_Array = null;
             }
 
             public void Reset()

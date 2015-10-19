@@ -36,7 +36,6 @@ namespace SilverSim.Scene.Types.Physics
                 IPhysicsObject physobj;
                 m_Agents.Remove(obj);
                 obj.PhysicsActors.Remove(m_SceneID, out physobj);
-                physobj.Dispose();
             }
         }
 

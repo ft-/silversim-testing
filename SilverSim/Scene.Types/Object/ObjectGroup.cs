@@ -19,7 +19,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
 {
-    public class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject, IDisposable
+    public class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject
     {
         static IScriptCompilerRegistry m_CompilerRegistry;
         public static IScriptCompilerRegistry CompilerRegistry
@@ -130,7 +130,7 @@ namespace SilverSim.Scene.Types.Object
             IsChanged = false;
         }
 
-        public void Dispose()
+        ~ObjectGroup()
         {
             Scene = null;
         }

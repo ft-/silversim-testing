@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Core
     #endregion
 
     #region LLUDP Server
-    public partial class UDPCircuitsManager : IDisposable, IUDPCircuitsManager
+    public partial class UDPCircuitsManager : IUDPCircuitsManager
     {
         private static readonly ILog m_Log = LogManager.GetLogger("UDP CIRCUITS MANAGER");
         IPAddress m_BindAddress;
@@ -105,13 +105,6 @@ namespace SilverSim.Viewer.Core
             {
                 circuit.SendMessage(m);
             }
-        }
-
-        public void Dispose()
-        {
-            Stop();
-            m_ChatQueue.Enqueue(new ShutdownEvent());
-            Scene = null;
         }
 
         public void Shutdown()

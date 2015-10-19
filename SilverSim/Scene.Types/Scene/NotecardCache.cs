@@ -13,7 +13,7 @@ using System.Timers;
 
 namespace SilverSim.Scene.Types.Scene
 {
-    public class NotecardCache : IDisposable
+    public class NotecardCache
     {
         private SceneInterface m_Scene;
         private RwLockedDictionary<UUID, Notecard> m_Notecards = new RwLockedDictionary<UUID,Notecard>();
@@ -28,7 +28,7 @@ namespace SilverSim.Scene.Types.Scene
             m_Timer.Enabled = true;
         }
 
-        public void Dispose()
+        ~NotecardCache()
         {
             m_Timer.Enabled = false;
             m_Timer.Elapsed -= OnTimer;

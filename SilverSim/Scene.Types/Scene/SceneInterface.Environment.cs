@@ -51,7 +51,7 @@ namespace SilverSim.Scene.Types.Scene
 
         }
 
-        public class EnvironmentController : IDisposable
+        public class EnvironmentController
         {
             private const int BASE_REGION_SIZE = 256;
 
@@ -222,7 +222,7 @@ namespace SilverSim.Scene.Types.Scene
                 m_WindData.PatchY = new LayerPatch();
             }
 
-            public void Dispose()
+            ~EnvironmentController()
             {
                 m_Scene = null;
             }

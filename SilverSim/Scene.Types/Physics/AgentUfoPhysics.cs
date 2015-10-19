@@ -11,7 +11,7 @@ using System.Timers;
 
 namespace SilverSim.Scene.Types.Physics
 {
-    public class AgentUfoPhysics : IAgentPhysicsObject, IDisposable
+    public class AgentUfoPhysics : IAgentPhysicsObject
     {
         Timer m_UfoTimer;
         IAgent m_Agent;
@@ -30,12 +30,6 @@ namespace SilverSim.Scene.Types.Physics
         }
 
         ~AgentUfoPhysics()
-        {
-            m_UfoTimer.Stop();
-            m_UfoTimer.Elapsed -= UfoTimerFunction;
-        }
-
-        public void Dispose()
         {
             m_UfoTimer.Stop();
             m_UfoTimer.Elapsed -= UfoTimerFunction;

@@ -10,7 +10,7 @@ using System;
 
 namespace SilverSim.Scene.Types.Object
 {
-    public class ObjectPartInventoryItem : InventoryItem, IDisposable
+    public class ObjectPartInventoryItem : InventoryItem
     {
         #region Constructors
         public ObjectPartInventoryItem()
@@ -177,7 +177,7 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
-        public void Dispose()
+        ~ObjectPartInventoryItem()
         {
             lock(this)
             {

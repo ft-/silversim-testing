@@ -9,18 +9,13 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
 {
     public abstract class ChatServiceInterface
     {
-        public abstract class Listener : IDisposable
+        public abstract class Listener
         {
             public abstract void Remove();
 
             public Listener()
             {
 
-            }
-
-            public void Dispose()
-            {
-                Remove();
             }
 
             public abstract int Channel

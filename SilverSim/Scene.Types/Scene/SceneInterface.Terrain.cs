@@ -20,7 +20,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         public TerrainController Terrain;
 
-        public class TerrainController : IDisposable
+        public class TerrainController
         {
             private const int BASE_REGION_SIZE = 256;
             private const double DEFAULT_TERRAIN_HEIGHT = 21;
@@ -55,7 +55,7 @@ namespace SilverSim.Scene.Types.Scene
                 Patch = new PatchesAccessor(m_TerrainPatches, xPatches, yPatches);
             }
 
-            public void Dispose()
+            ~TerrainController()
             {
                 m_Scene = null;
             }
