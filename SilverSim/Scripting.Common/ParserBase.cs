@@ -9,6 +9,7 @@ namespace SilverSim.Scripting.Common
 {
     public abstract class ParserBase
     {
+        [Serializable]
         public class StackEmptyException : Exception
         {
             public StackEmptyException()
@@ -17,6 +18,7 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        [Serializable]
         public class EndOfStringException : Exception
         {
             public EndOfStringException()
@@ -25,6 +27,7 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        [Serializable]
         public class EndOfFileException : Exception
         {
             public EndOfFileException()
@@ -33,6 +36,7 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        [Serializable]
         public class PreprocessorLineError : Exception
         {
             public PreprocessorLineError()
@@ -42,6 +46,7 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        [Serializable]
         public class ParenthesisMismatchError : Exception
         {
             public ParenthesisMismatchError()
@@ -51,6 +56,7 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        [Serializable]
         public class FileIoError : Exception
         {
             public FileIoError()
@@ -59,6 +65,7 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        [Serializable]
         public class CircularIncludeException : Exception
         {
             public CircularIncludeException(string msg)
@@ -81,13 +88,13 @@ namespace SilverSim.Scripting.Common
 
         }
 
-        public abstract void read(List<string> arguments);
+        public abstract void Read(List<string> arguments);
         protected int cur_linenumber;
         protected string cur_filename;
 
         public int CurrentLineNumber; /* set to start of line */
 
-        public void push(TextReader stream, string filename, int lineNumber = 1)
+        public void Push(TextReader stream, string filename, int lineNumber = 1)
         {
             ParserInput pi = new ParserInput();
             pi.FileName = filename;
@@ -98,7 +105,7 @@ namespace SilverSim.Scripting.Common
             cur_filename = pi.FileName;
         }
 
-        public void pop()
+        public void Pop()
         {
             m_ParserInputs.RemoveAt(m_ParserInputs.Count - 1);
 
@@ -110,7 +117,7 @@ namespace SilverSim.Scripting.Common
             }
         }
 
-        public void begin()
+        public void Begin()
         {
             if(m_ParserInputs.Count == 0)
             {
@@ -118,7 +125,7 @@ namespace SilverSim.Scripting.Common
             }
         }
 
-        public void getfileinfo(out string filename, out int linenumber)
+        public void GetFileInfo(out string filename, out int linenumber)
         {
             if(m_ParserInputs.Count == 0)
             {
@@ -141,7 +148,7 @@ namespace SilverSim.Scripting.Common
             }
         }
 
-        public FileInfo getfileinfo()
+        public FileInfo GetFileInfo()
         {
             if (m_ParserInputs.Count == 0)
             {
@@ -151,7 +158,7 @@ namespace SilverSim.Scripting.Common
             return new FileInfo(cur_filename, cur_linenumber);
         }
 
-        public char readc()
+        public char ReadC()
         {
             if(m_ParserInputs.Count == 0)
             {
@@ -169,7 +176,7 @@ namespace SilverSim.Scripting.Common
                 c = pi.Reader.Read();
                 if(c == -1)
                 {
-                    pop();
+                    Pop();
                     if(0 == m_ParserInputs.Count)
                     {
                         throw new EndOfFileException();
