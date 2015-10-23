@@ -70,12 +70,11 @@ namespace SilverSim.Types.Asset.Format
 
         public Material(AssetData asset)
         {
-            IValue v = LLSD_XML.Deserialize(asset.InputStream);
-            if(!(v is Map))
+            Map m = LLSD_XML.Deserialize(asset.InputStream) as Map;
+            if(null == m)
             {
                 throw new NotAMaterialFormatException();
             }
-            Map m = (Map)v;
 
             MaterialID = asset.ID;
 

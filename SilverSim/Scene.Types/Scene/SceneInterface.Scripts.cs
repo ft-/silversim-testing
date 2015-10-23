@@ -56,10 +56,10 @@ namespace SilverSim.Scene.Types.Scene
 
             try
             {
-                IObject o = Objects[req.ObjectID];
-                if (o is ObjectGroup)
+                ObjectGroup o = Objects[req.ObjectID] as ObjectGroup;
+                if (o != null)
                 {
-                    ((ObjectGroup)o).ForEach(delegate(ObjectPart p)
+                    o.ForEach(delegate(ObjectPart p)
                     {
                         p.Inventory.ForEach(delegate(ObjectPartInventoryItem i)
                         {

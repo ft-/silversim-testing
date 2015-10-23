@@ -57,14 +57,13 @@ namespace SilverSim.Types.Asset.Format
                 {
                     byte[] d = UTF8NoBOM.GetBytes(Text);
                     /* could be an agent appearance notecard, so let us try that */
-                    IValue iv;
+                    Map im;
                     using (Stream i = new MemoryStream(d))
                     {
-                        iv = SilverSim.StructuredData.LLSD.LLSD_XML.Deserialize(i);
+                        im = SilverSim.StructuredData.LLSD.LLSD_XML.Deserialize(i) as Map;
                     }
-                    if (iv is Map)
+                    if (null != im)
                     {
-                        Map im = (Map)iv;
                         if (im.ContainsKey("serial") && im.ContainsKey("height") &&
                             im.ContainsKey("wearables") &&
                             im.ContainsKey("textures") &&

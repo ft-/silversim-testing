@@ -34,10 +34,10 @@ namespace SilverSim.Scene.Types.Scene
         {
             get
             {
-                IObject obj = m_Scene.Objects[id];
-                if(obj is ObjectGroup)
+                ObjectGroup obj = m_Scene.Objects[id] as ObjectGroup;
+                if(null != obj)
                 {
-                    return (ObjectGroup)obj;
+                    return obj;
                 }
                 throw new KeyNotFoundException();
             }

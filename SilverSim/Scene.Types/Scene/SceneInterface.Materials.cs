@@ -159,11 +159,11 @@ namespace SilverSim.Scene.Types.Scene
 
                 foreach(IValue iv in (AnArray)m["Materials"])
                 {
-                    if(!(iv is Map))
+                    Map mmap = iv as Map;
+                    if(null == mmap)
                     {
                         continue;
                     }
-                    Map mmap = (Map)iv;
                     if(!mmap.ContainsKey("ID") || !mmap.ContainsKey("Material"))
                     {
                         continue;
