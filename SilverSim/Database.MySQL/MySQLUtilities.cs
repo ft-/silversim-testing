@@ -432,34 +432,34 @@ namespace SilverSim.Database.MySQL
 
                 if (kvp.Value is Vector3)
                 {
-                    q1 += "`" + kvp.Key.ToString() + "X` = ?v_" + kvp.Key.ToString() + "X,";
-                    q1 += "`" + kvp.Key.ToString() + "Y` = ?v_" + kvp.Key.ToString() + "Y,";
-                    q1 += "`" + kvp.Key.ToString() + "Z` = ?v_" + kvp.Key.ToString() + "Z";
+                    q1 += "`" + kvp.Key + "X` = ?v_" + kvp.Key + "X,";
+                    q1 += "`" + kvp.Key + "Y` = ?v_" + kvp.Key + "Y,";
+                    q1 += "`" + kvp.Key + "Z` = ?v_" + kvp.Key + "Z";
                 }
                 else if (kvp.Value is GridVector)
                 {
-                    q1 += "`" + kvp.Key.ToString() + "X` = ?v_" + kvp.Key.ToString() + "X,";
-                    q1 += "`" + kvp.Key.ToString() + "Y` = ?v_" + kvp.Key.ToString() + "Y";
+                    q1 += "`" + kvp.Key + "X` = ?v_" + kvp.Key + "X,";
+                    q1 += "`" + kvp.Key + "Y` = ?v_" + kvp.Key + "Y";
                 }
                 else if (kvp.Value is Quaternion)
                 {
-                    q1 += "`" + kvp.Key.ToString() + "X` = ?v_" + kvp.Key.ToString() + "X,";
-                    q1 += "`" + kvp.Key.ToString() + "Y` = ?v_" + kvp.Key.ToString() + "Y,";
-                    q1 += "`" + kvp.Key.ToString() + "Z` = ?v_" + kvp.Key.ToString() + "Z,";
-                    q1 += "`" + kvp.Key.ToString() + "W` = ?v_" + kvp.Key.ToString() + "W";
+                    q1 += "`" + kvp.Key + "X` = ?v_" + kvp.Key + "X,";
+                    q1 += "`" + kvp.Key + "Y` = ?v_" + kvp.Key + "Y,";
+                    q1 += "`" + kvp.Key + "Z` = ?v_" + kvp.Key + "Z,";
+                    q1 += "`" + kvp.Key + "W` = ?v_" + kvp.Key + "W";
                 }
                 else if (kvp.Value is Color)
                 {
-                    q1 += "`" + kvp.Key.ToString() + "Red` = ?v_" + kvp.Key.ToString() + "Red,";
-                    q1 += "`" + kvp.Key.ToString() + "Green` = ?v_" + kvp.Key.ToString() + "Green,";
-                    q1 += "`" + kvp.Key.ToString() + "Blue` = ?v_" + kvp.Key.ToString() + "Blue";
+                    q1 += "`" + kvp.Key + "Red` = ?v_" + kvp.Key + "Red,";
+                    q1 += "`" + kvp.Key + "Green` = ?v_" + kvp.Key + "Green,";
+                    q1 += "`" + kvp.Key + "Blue` = ?v_" + kvp.Key + "Blue";
                 }
                 else if (kvp.Value is ColorAlpha)
                 {
-                    q1 += "`" + kvp.Key.ToString() + "Red` = ?v_" + kvp.Key.ToString() + "Red,";
-                    q1 += "`" + kvp.Key.ToString() + "Green` = ?v_" + kvp.Key.ToString() + "Green,";
-                    q1 += "`" + kvp.Key.ToString() + "Blue` = ?v_" + kvp.Key.ToString() + "Blue,";
-                    q1 += "`" + kvp.Key.ToString() + "Alpha` = ?v_" + kvp.Key.ToString() + "Alpha";
+                    q1 += "`" + kvp.Key + "Red` = ?v_" + kvp.Key + "Red,";
+                    q1 += "`" + kvp.Key + "Green` = ?v_" + kvp.Key + "Green,";
+                    q1 += "`" + kvp.Key + "Blue` = ?v_" + kvp.Key + "Blue,";
+                    q1 += "`" + kvp.Key + "Alpha` = ?v_" + kvp.Key + "Alpha";
                 }
                 else if (kvp.Value == null)
                 {
@@ -467,7 +467,7 @@ namespace SilverSim.Database.MySQL
                 }
                 else
                 {
-                    q1 += "`" + kvp.Key.ToString() + "` = ?v_" + kvp.Key.ToString();
+                    q1 += "`" + kvp.Key + "` = ?v_" + kvp.Key;
                 }
             }
 
@@ -478,7 +478,7 @@ namespace SilverSim.Database.MySQL
                 {
                     wherestr += " AND ";
                 }
-                wherestr += string.Format("{0} LIKE ?w_{0}", w.Key, w.Key);
+                wherestr += string.Format("{0} LIKE ?w_{0}", w.Key);
             }
 
             using (MySqlCommand command = new MySqlCommand(q1 + " WHERE " + wherestr, connection))
@@ -510,13 +510,14 @@ namespace SilverSim.Database.MySQL
         public static UUID GetUUID(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
+            string s;
             if(v is Guid)
             {
                 return new UUID((Guid)v);
             }
-            else if(v is string)
+            else if(null != (s = v as string))
             {
-                return new UUID((string)v);
+                return new UUID(s);
             }
             else
             {
@@ -527,13 +528,14 @@ namespace SilverSim.Database.MySQL
         public static UUI GetUUI(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
+            string s;
             if (v is Guid)
             {
                 return new UUI((Guid)v);
             }
-            else if (v is string)
+            else if (null != (s = v as string))
             {
-                return new UUI((string)v);
+                return new UUI(s);
             }
             else
             {
@@ -544,13 +546,14 @@ namespace SilverSim.Database.MySQL
         public static UGI GetUGI(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
+            string s;
             if (v is Guid)
             {
                 return new UGI((Guid)v);
             }
-            else if (v is string)
+            else if (null != (s = v as string))
             {
-                return new UGI((string)v);
+                return new UGI(s);
             }
             else
             {
