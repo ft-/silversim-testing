@@ -21,7 +21,7 @@ namespace SilverSim.Types.Primitive
         private UUID m_TextureID = DEFAULT_TEXTURE;
         private UUID m_MaterialID = UUID.Zero;
 
-        private TextureEntryFace m_DefaultTexture = null;
+        private TextureEntryFace m_DefaultTexture;
 
         // +----------+ S = Shiny
         // | SSFBBBBB | F = Fullbright
@@ -420,7 +420,7 @@ namespace SilverSim.Types.Primitive
         {
             return String.Format("Color: {0} RepeatU: {1} RepeatV: {2} OffsetU: {3} OffsetV: {4} " +
                 "Rotation: {5} Bump: {6} Shiny: {7} Fullbright: {8} Mapping: {9} Media: {10} Glow: {11} ID: {12} MaterialID: {13}",
-                TextureColor, RepeatU, RepeatV, OffsetU, OffsetV, Rotation, Bump, Shiny, FullBright, TexMapType,
+                TextureColor.ToString(), RepeatU, RepeatV, OffsetU, OffsetV, Rotation, Bump.ToString(), Shiny.ToString(), FullBright, TexMapType.ToString(),
                 MediaFlags, Glow, TextureID.ToString(), MaterialID.ToString());
         }
 
