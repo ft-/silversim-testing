@@ -11,7 +11,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Script
 {
-    public abstract class ScriptInstance : MarshalByRefObject
+    public abstract class ScriptInstance
     {
         public abstract void PostEvent(IScriptEvent e);
         public abstract bool IsRunning { get; set; }

@@ -9,7 +9,7 @@ namespace SilverSim.Scripting.Common
 {
     [Serializable]
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public class CompilerUsesRunAndCollectMode : Attribute
+    public sealed class CompilerUsesRunAndCollectMode : Attribute
     {
         public CompilerUsesRunAndCollectMode()
         {

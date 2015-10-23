@@ -37,9 +37,9 @@ namespace SilverSim.Scripting.Common
         }
 
         [Serializable]
-        public class PreprocessorLineError : Exception
+        public class PreprocessorLineErrorException : Exception
         {
-            public PreprocessorLineError()
+            public PreprocessorLineErrorException()
                 : base()
             {
 
@@ -47,9 +47,9 @@ namespace SilverSim.Scripting.Common
         }
 
         [Serializable]
-        public class ParenthesisMismatchError : Exception
+        public class ParenthesisMismatchErrorException : Exception
         {
-            public ParenthesisMismatchError()
+            public ParenthesisMismatchErrorException()
                 : base("')' has no matching '('")
             {
 
@@ -57,9 +57,9 @@ namespace SilverSim.Scripting.Common
         }
 
         [Serializable]
-        public class FileIoError : Exception
+        public class FileIoErrorException : Exception
         {
-            public FileIoError()
+            public FileIoErrorException()
             {
 
             }
@@ -167,7 +167,7 @@ namespace SilverSim.Scripting.Common
             ParserInput pi = m_ParserInputs[m_ParserInputs.Count - 1];
             if(pi.Reader == null)
             {
-                throw new FileIoError();
+                throw new FileIoErrorException();
             }
 
             for(;;)

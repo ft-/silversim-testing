@@ -38,7 +38,7 @@ namespace SilverSim.Scripting.Common
                 {
                     if (String.IsNullOrEmpty(name))
                     {
-                        throw new ArgumentException();
+                        throw new ArgumentException("value");
                     }
                     if (value == null)
                     {
@@ -90,7 +90,7 @@ namespace SilverSim.Scripting.Common
                 else
                 {
                     AppDomain appDom = AppDomain.CreateDomain(
-                        "Script Domain " + assetID, 
+                        "Script Domain " + assetID.ToString(), 
                         AppDomain.CurrentDomain.Evidence);
                     try
                     {

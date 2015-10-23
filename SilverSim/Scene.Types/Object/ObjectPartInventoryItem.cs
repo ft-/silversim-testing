@@ -157,6 +157,12 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(this)
                 {
+                    ScriptInstance instance = m_ScriptInstance;
+                    if (null != instance)
+                    {
+                        instance.Abort();
+                        instance.Remove();
+                    }
                     m_ScriptState = null;
                     m_ScriptInstance = value;
                 }

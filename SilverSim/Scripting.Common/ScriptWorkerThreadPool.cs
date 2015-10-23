@@ -16,7 +16,7 @@ namespace SilverSim.Scripting.Common
         private int m_MaximumThreads = 150;
         public class ScriptThreadContext
         {
-            public ScriptInstance CurrentScriptInstance = null;
+            public ScriptInstance CurrentScriptInstance;
             public Thread ScriptThread;
             public ScriptWorkerThreadPool ThreadPool;
 
@@ -37,7 +37,7 @@ namespace SilverSim.Scripting.Common
             {
                 if(value < 2)
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException("value");
                 }
                 if(value > m_MaximumThreads)
                 {
