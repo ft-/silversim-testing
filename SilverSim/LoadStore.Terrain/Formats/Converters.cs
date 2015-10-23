@@ -45,7 +45,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
             if(bitmap.Width % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES != 0 ||
                 (bitmap.Height % LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES) != 0)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("bitmap wxh is not dividable by LAYER_PATCH_NUM_XY_ENTRIES");
             }
 
             uint x, y, px, py;

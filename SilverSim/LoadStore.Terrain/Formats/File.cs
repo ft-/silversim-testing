@@ -45,12 +45,12 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
         public void SaveFile(string filename, List<LayerPatch> terrain)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public void SaveStream(Stream output, List<LayerPatch> terrain)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public bool SupportsLoading

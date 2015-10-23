@@ -30,7 +30,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
         public List<LayerPatch> LoadFile(string filename, int suggested_width, int suggested_height)
         {
-            using(Stream input = new FileStream(filename, FileMode.Open))
+            using(Stream input = new FileStream(filename, FileMode.Open, FileAccess.Read))
             {
                 return LoadStream(input, suggested_width, suggested_height);
             }
@@ -77,7 +77,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
         public void SaveFile(string filename, List<LayerPatch> terrain)
         {
-            using(Stream output = new FileStream(filename, FileMode.Create))
+            using(Stream output = new FileStream(filename, FileMode.Create, FileAccess.Write))
             {
                 SaveStream(output, terrain);
             }
