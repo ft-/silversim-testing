@@ -40,12 +40,11 @@ namespace SilverSim.StructuredData.Agent
         public static PostData Deserialize(Stream input)
         {
             PostData agentparams = new PostData();
-            IValue json = JSON.JSON.Deserialize(input);
-            if (!(json is Map))
+            Map parms = JSON.JSON.Deserialize(input) as Map;
+            if (null == parms)
             {
                 throw new InvalidAgentPostSerializationException("Invalid JSON AgentPostData");
             }
-            Map parms = (Map)json;
 
             /*-----------------------------------------------------------------*/
             /* SessionInfo */

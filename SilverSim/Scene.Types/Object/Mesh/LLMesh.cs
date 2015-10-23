@@ -95,11 +95,11 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
             foreach(IValue submesh_v in meshArray)
             {
-                if(!(submesh_v is Map))
+                Map submesh = submesh_v as Map;
+                if(null == submesh)
                 {
                     continue;
                 }
-                Map submesh = (Map)submesh_v;
                 if(submesh.ContainsKey("NoGeometry") && submesh["NoGeometry"].AsBoolean)
                 {
                     continue;

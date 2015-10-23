@@ -295,9 +295,13 @@ namespace SilverSim.StructuredData.JSON
 
         private static void SerializeData(TextWriter io, IValue val)
         {
-            if(val is Map)
+            Map map;
+            AnArray array;
+            ABoolean boolean;
+            Date date;
+            if(null != (map = val as Map))
             {
-                SerializeStruct(io, (Map)val);
+                SerializeStruct(io, map);
             }
             else if(val is URI)
             {
@@ -307,14 +311,14 @@ namespace SilverSim.StructuredData.JSON
             {
                 io.Write("\"" + SerializeString(val.ToString()) + "\"");
             }
-            else if(val is Date)
+            else if(null != (date = val as Date))
             {
-                DateTime dt = (Date)val;
+                DateTime dt = date;
                 io.Write("\"" + dt.ToUniversalTime().ToString() + "\"");
             }
-            else if(val is ABoolean)
+            else if(null != (boolean = val as ABoolean))
             {
-                if((ABoolean)val)
+                if (boolean)
                 {
                     io.Write("true");
                 }
@@ -339,9 +343,9 @@ namespace SilverSim.StructuredData.JSON
             {
                 io.Write("\"" + SerializeString(val.ToString()) + "\"");
             }
-            else if(val is AnArray)
+            else if(null != (array = val as AnArray))
             {
-                SerializeArray(io, (AnArray)val);
+                SerializeArray(io, array);
             }
             else
             {

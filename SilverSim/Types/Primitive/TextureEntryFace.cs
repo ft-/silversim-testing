@@ -17,7 +17,7 @@ namespace SilverSim.Types.Primitive
         private float m_Glow;
         private byte m_Material;
         private byte m_MediaByte;
-        private TextureAttributes m_AttributeFlags = TextureAttributes.None;
+        private TextureAttributes m_AttributeFlags /* = TextureAttributes.None */;
         private UUID m_TextureID = DEFAULT_TEXTURE;
         private UUID m_MaterialID = UUID.Zero;
 

@@ -44,12 +44,12 @@ namespace SilverSim.StructuredData.JSON
 
         public static IValue DeserializeResponse(Stream stream)
         {
-            IValue iv = JSON.Deserialize(stream);
-            if(!(iv is Map))
+            Map m = JSON.Deserialize(stream) as Map;
+            if(null == m)
             {
                 throw new InvalidJSON20RPCResponseException();
             }
-            Map m = (Map)iv;
+
             if (m.ContainsKey("error"))
             {
                 int faultCode = -1;

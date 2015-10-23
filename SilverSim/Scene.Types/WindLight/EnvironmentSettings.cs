@@ -106,13 +106,11 @@ namespace SilverSim.Scene.Types.WindLight
         public static EnvironmentSettings Deserialize(Stream input)
         {
             EnvironmentSettings env = new EnvironmentSettings();
-            IValue iv;
-            iv = LLSD_XML.Deserialize(input);
-            if(!(iv is AnArray))
+            AnArray a = LLSD_XML.Deserialize(input) as AnArray;
+            if(null == a)
             {
                 throw new EnvironmentSettingsSerializationException();
             }
-            AnArray a = (AnArray)iv;
 
             AnArray dayCycleArray = (AnArray)a[1];
             Map skyArray = (Map)a[2];

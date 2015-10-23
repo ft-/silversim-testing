@@ -28,7 +28,8 @@ namespace SilverSim.Types
 
         public override bool Equals(object obj)
         {
-            return (obj is UUI) ? this.ID == ((UUI)obj).ID : false;
+            UUI u = obj as UUI;
+            return (null != u) ? this.ID == u.ID : false;
         }
 
         public bool Equals(UUI uui)

@@ -2314,10 +2314,9 @@ namespace SilverSim.Scene.Types.Object
 
                             case "DynAttrs":
                                 {
-                                    IValue da = LLSD_XML.Deserialize(reader);
-                                    if(da is Map)
+                                    Map damap = LLSD_XML.Deserialize(reader) as Map;
+                                    if(null != damap)
                                     {
-                                        Map damap = (Map)da;
                                         foreach(string key in damap.Keys)
                                         {
                                             if(!(damap[key] is Map))

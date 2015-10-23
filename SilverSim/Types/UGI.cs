@@ -93,7 +93,8 @@ namespace SilverSim.Types
 
         public override bool Equals(object obj)
         {
-            return (obj is UGI) ? this.Equals((UGI)obj) : false;
+            UGI u = obj as UGI;
+            return (u != null) ? this.Equals(u) : false;
         }
 
         public bool Equals(UGI ugi)

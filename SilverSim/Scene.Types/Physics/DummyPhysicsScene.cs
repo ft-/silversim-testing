@@ -24,7 +24,8 @@ namespace SilverSim.Scene.Types.Physics
         {
             if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
             {
-                ((IAgent)obj).PhysicsActors.Add(m_SceneID, new AgentUfoPhysics((IAgent)obj, m_SceneID));
+                IAgent agent = (IAgent)obj;
+                agent.PhysicsActors.Add(m_SceneID, new AgentUfoPhysics(agent, m_SceneID));
                 m_Agents.Add(obj);
             }
         }

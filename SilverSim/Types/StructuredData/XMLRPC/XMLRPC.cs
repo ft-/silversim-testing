@@ -581,10 +581,9 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                                 }
                                 else
                                 {
-                                    IValue fault = DeserializeFault(reader);
-                                    if(fault is Map)
+                                    Map f = DeserializeFault(reader) as Map;
+                                    if(null != f)
                                     {
-                                        Map f = (Map)fault;
                                         if(f.ContainsKey("faultCode") && f.ContainsKey("faultString"))
                                         {
                                             throw new XmlRpcFaultException(f["faultCode"].AsInt, f["faultString"].ToString());

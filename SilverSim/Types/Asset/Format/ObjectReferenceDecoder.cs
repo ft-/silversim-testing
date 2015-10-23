@@ -14,7 +14,7 @@ namespace SilverSim.Types.Asset.Format
         public static List<UUID> GetReferences(AssetData data)
         {
             List<UUID> reflist = new List<UUID>();
-            GetReferences(data.InputStream, "", reflist);
+            GetReferences(data.InputStream, string.Empty, reflist);
             return reflist;
         }
 

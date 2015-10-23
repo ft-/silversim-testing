@@ -341,18 +341,20 @@ namespace SilverSim.Types.Asset.Format
                 List<UUID> refs = new List<UUID>();
                 foreach(IStep step in Sequence)
                 {
-                    if(step is StepSound)
+                    StepSound stepsound;
+                    StepAnimation stepanim;
+                    if(null != (stepsound = step as StepSound))
                     {
-                        if (!refs.Contains(((StepSound)step).AssetID))
+                        if (!refs.Contains(stepsound.AssetID))
                         {
-                            refs.Add(((StepSound)step).AssetID);
+                            refs.Add(stepsound.AssetID);
                         }
                     }
-                    else if(step is StepAnimation)
+                    else if(null != (stepanim = step as StepAnimation))
                     {
-                        if (!refs.Contains(((StepAnimation)step).AssetID))
+                        if (!refs.Contains(stepanim.AssetID))
                         {
-                            refs.Add(((StepAnimation)step).AssetID);
+                            refs.Add(stepanim.AssetID);
                         }
                     }
                 }

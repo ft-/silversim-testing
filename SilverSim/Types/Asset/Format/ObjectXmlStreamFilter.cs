@@ -54,7 +54,7 @@ namespace SilverSim.Types.Asset.Format
         {
             get 
             { 
-                throw new NotImplementedException(); 
+                throw new NotSupportedException(); 
             }
         }
 
@@ -62,11 +62,11 @@ namespace SilverSim.Types.Asset.Format
         {
             get
             {
-                throw new NotImplementedException();
+                throw new NotSupportedException();
             }
             set
             {
-                throw new NotImplementedException();
+                throw new NotSupportedException();
             }
         }
 
@@ -172,17 +172,17 @@ namespace SilverSim.Types.Asset.Format
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public override void SetLength(long value)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public new void Dispose()
