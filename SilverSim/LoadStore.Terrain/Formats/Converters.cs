@@ -60,8 +60,9 @@ namespace SilverSim.LoadStore.Terrain.Formats
                     {
                         for (px = 0; px < LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++px)
                         {
-                            patch[px, py] = bitmap.GetPixel((int)(x * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES + px),
-                                (int)(bitmap.Height - y * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES - py - 1)).GetBrightness() * 128f;
+                            long lx = (x * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES + px);
+                            long ly = (bitmap.Height - y * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES - py - 1);
+                            patch[px, py] = bitmap.GetPixel((int)lx, (int)ly).GetBrightness() * 128f;
                         }
                     }
                     patches.Add(patch);
