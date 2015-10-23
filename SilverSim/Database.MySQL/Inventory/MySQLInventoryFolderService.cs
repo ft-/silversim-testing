@@ -234,7 +234,7 @@ namespace SilverSim.Database.MySQL.Inventory
             InventoryFolder thisfolder = this[principalID, folderID];
             if(folderID == toFolderID)
             {
-                throw new ArgumentException();
+                throw new ArgumentException("folderID != toFolderID");
             }
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {

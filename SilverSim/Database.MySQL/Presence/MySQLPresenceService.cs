@@ -89,7 +89,7 @@ namespace SilverSim.Database.MySQL.Presence
         {
             get
             {
-                throw new System.NotImplementedException();
+                throw new NotSupportedException();
             }
             set /* setting null means logout, != null not allowed */
             {

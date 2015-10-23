@@ -55,7 +55,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             {
                 if(value.ExtendedPatchID != extendedPatchID)
                 {
-                    throw new ArgumentException();
+                    throw new ArgumentException("value.ExtendedPatchID != extendedPatchID");
                 }
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {

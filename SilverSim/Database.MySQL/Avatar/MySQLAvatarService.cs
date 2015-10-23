@@ -127,9 +127,13 @@ namespace SilverSim.Database.MySQL.Avatar
 
             set
             {
-                if (value == null || itemKeys == null)
+                if (value == null)
                 {
-                    throw new ArgumentNullException();
+                    throw new ArgumentNullException("value");
+                }
+                else if (itemKeys == null)
+                {
+                    throw new ArgumentNullException("itemKeys");
                 }
                 if (itemKeys.Count != value.Count)
                 {
