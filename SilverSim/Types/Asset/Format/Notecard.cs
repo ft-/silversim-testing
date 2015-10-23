@@ -76,15 +76,17 @@ namespace SilverSim.Types.Asset.Format
                                 {
                                     foreach (IValue w in (AnArray)im["wearables"])
                                     {
-                                        if (w is AnArray)
+                                        AnArray aw = w as AnArray;
+                                        if (aw != null)
                                         {
-                                            foreach (IValue wi in (AnArray)w)
+                                            foreach (IValue wi in aw)
                                             {
-                                                if (wi is Map)
+                                                Map awm = wi as Map;
+                                                if (null != awm)
                                                 {
                                                     try
                                                     {
-                                                        UUID assetID = ((Map)wi)["asset"].AsUUID;
+                                                        UUID assetID = awm["asset"].AsUUID;
                                                         if (!reflist.Contains(assetID))
                                                         {
                                                             reflist.Add(assetID);
@@ -98,15 +100,17 @@ namespace SilverSim.Types.Asset.Format
                                         }
                                     }
                                 }
-                                if (im["attachments"] is AnArray)
+                                AnArray attarray = im["attachments"] as AnArray;
+                                if (attarray != null)
                                 {
-                                    foreach (IValue a in (AnArray)im["attachments"])
+                                    foreach (IValue a in attarray)
                                     {
-                                        if (a is Map)
+                                        Map am = a as Map;
+                                        if (null != am)
                                         {
                                             try
                                             {
-                                                UUID assetID = ((Map)a)["asset"].AsUUID;
+                                                UUID assetID = am["asset"].AsUUID;
                                                 if (!reflist.Contains(assetID))
                                                 {
                                                     reflist.Add(assetID);
