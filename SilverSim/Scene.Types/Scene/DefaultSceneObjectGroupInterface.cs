@@ -43,6 +43,18 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        public bool TryGetValue(UUID id, out ObjectGroup grp)
+        {
+            IObject obj;
+            grp = null;
+            if(!m_Scene.Objects.TryGetValue(id, out obj))
+            {
+                return false;
+            }
+            grp = obj as ObjectGroup;
+            return grp != null;
+        }
+
         public IEnumerator<ObjectGroup> GetEnumerator()
         {
             return new ObjectGroupEnumerator(m_Scene.Objects.GetEnumerator());

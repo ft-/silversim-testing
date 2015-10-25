@@ -30,6 +30,7 @@ namespace SilverSim.Scene.Types.Scene
     public interface ISceneObjects : IEnumerable<IObject>
     {
         IObject this[UUID id] { get; }
+        bool TryGetValue(UUID id, out IObject obj);
         void ForEach(Vector3 pos, double maxdistance, Action<IObject> d);
         int Count { get; }
     }
@@ -37,6 +38,7 @@ namespace SilverSim.Scene.Types.Scene
     public interface ISceneObjectGroups : IEnumerable<ObjectGroup>
     {
         ObjectGroup this[UUID id] { get; }
+        bool TryGetValue(UUID id, out ObjectGroup grp);
         int Count { get; }
     }
 
@@ -44,12 +46,15 @@ namespace SilverSim.Scene.Types.Scene
     {
         ObjectPart this[UUID id] { get; }
         ObjectPart this[UInt32 localId] { get; }
+        bool TryGetValue(UUID id, out ObjectPart part);
+        bool TryGetValue(UInt32 localid, out ObjectPart part);
         int Count { get; }
     }
 
     public interface ISceneAgents : IEnumerable<IAgent>
     {
         IAgent this[UUID id] { get; }
+        bool TryGetValue(UUID id, out IAgent agent);
         int Count { get; }
     }
 
@@ -58,6 +63,10 @@ namespace SilverSim.Scene.Types.Scene
         ParcelInfo this[UUID id] { get; }
         ParcelInfo this[Vector3 position] { get; }
         ParcelInfo this[int localID] { get; }
+
+        bool TryGetValue(UUID id, out ParcelInfo pinfo);
+        bool TryGetValue(Vector3 position, out ParcelInfo pinfo);
+        bool TryGetValue(int localID, out ParcelInfo pinfo);
     }
 
     public abstract partial class SceneInterface

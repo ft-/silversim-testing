@@ -71,6 +71,11 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
             }
 
+            public bool TryGetValue(UUID id, out IObject obj)
+            {
+                return m_Scene.m_Objects.TryGetValue(id, out obj);
+            }
+
             public int Count
             {
                 get
@@ -125,6 +130,16 @@ namespace SilverSim.Scene.Implementation.Basic
                 {
                     return m_Scene.m_Primitives[localID];
                 }
+            }
+
+            public bool TryGetValue(UUID id, out ObjectPart obj)
+            {
+                return m_Scene.m_Primitives.TryGetValue(id, out obj);
+            }
+
+            public bool TryGetValue(UInt32 localID, out ObjectPart obj)
+            {
+                return m_Scene.m_Primitives.TryGetValue(localID, out obj);
             }
 
             public int Count
@@ -192,6 +207,36 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
             }
 
+            public bool TryGetValue(UUID id, out ParcelInfo pinfo)
+            {
+                return m_Scene.m_Parcels.TryGetValue(id, out pinfo);
+            }
+
+            public bool TryGetValue(Vector3 pos, out ParcelInfo pinfo)
+            {
+                pinfo = null;
+                int x = (int)pos.X;
+                int y = (int)pos.Y;
+                if (pos.X < 0 || pos.Y < 0 || x < 0 || y < 0 || x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
+                {
+                    return false;
+                }
+                foreach (ParcelInfo p in m_Scene.m_Parcels.Values)
+                {
+                    if (p.LandBitmap[x / 4, y / 4])
+                    {
+                        pinfo = p;
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            public bool TryGetValue(int localID, out ParcelInfo pinfo)
+            {
+                return m_Scene.m_Parcels.TryGetValue(localID, out pinfo);
+            }
+
             public IEnumerator<ParcelInfo> GetEnumerator()
             {
                 return m_Scene.m_Parcels.Values.GetEnumerator();
@@ -228,6 +273,11 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
             }
 
+            public bool TryGetValue(UUID id, out IAgent obj)
+            {
+                return m_BasicScene.m_Agents.TryGetValue(id, out obj);
+            }
+
             public IEnumerator<IAgent> GetEnumerator()
             {
                 return m_BasicScene.m_Agents.Values.GetEnumerator();
@@ -255,7 +305,10 @@ namespace SilverSim.Scene.Implementation.Basic
                     int count = 0;
                     foreach(IAgent agent in this)
                     {
-                        ++count;
+                        if (agent.IsInScene(m_BasicScene))
+                        {
+                            ++count;
+                        }
                     }
                     return count;
                 }
@@ -265,8 +318,27 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 get
                 {
-                    return m_BasicScene.m_Agents[id];
+                    IAgent ag = m_BasicScene.m_Agents[id];
+                    if(!ag.IsInScene(m_BasicScene))
+                    {
+                        throw new KeyNotFoundException();
+                    }
+                    return ag;
                 }
+            }
+
+            public bool TryGetValue(UUID id, out IAgent obj)
+            {
+                if(!m_BasicScene.m_Agents.TryGetValue(id, out obj))
+                {
+                    return false;
+                }
+                if(!obj.IsInScene(m_BasicScene))
+                {
+                    obj = null;
+                    return false;
+                }
+                return true;
             }
 
             public IEnumerator<IAgent> GetEnumerator()
