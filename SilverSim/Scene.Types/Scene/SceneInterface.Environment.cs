@@ -42,7 +42,6 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     m_EnvironmentSettings = null;
                 }
-                TriggerEnvironmentSettingsChanged();
             }
         }
 
