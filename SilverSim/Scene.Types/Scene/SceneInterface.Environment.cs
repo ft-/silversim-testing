@@ -45,11 +45,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public void TriggerEnvironmentSettingsChanged()
-        {
-
-        }
-
         public class EnvironmentController
         {
             private const int BASE_REGION_SIZE = 256;

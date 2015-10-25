@@ -754,9 +754,34 @@ namespace SilverSim.Scene.Implementation.Basic
                 return;
             }
 
+            IAgent agent;
+            if(m_Agents.TryGetValue(req.AgentID, out agent))
+            {
+                ViewerAgent viewerAgent;
+                if (null != (viewerAgent = agent as ViewerAgent))
+                {
+                    SendRegionInfo(viewerAgent);
+                }
+            }
+        }
+
+        public override void TriggerRegionSettingsChanged()
+        {
+            foreach(IAgent agent in Agents)
+            {
+                ViewerAgent viewerAgent;
+                if(null != (viewerAgent = agent as ViewerAgent))
+                {
+                    SendRegionInfo(viewerAgent);
+                }
+            }
+        }
+
+        protected void SendRegionInfo(ViewerAgent agent)
+        {
             SilverSim.Viewer.Messages.Region.RegionInfo res = new Viewer.Messages.Region.RegionInfo();
-            res.AgentID = req.AgentID;
-            res.SessionID = req.SessionID;
+            res.AgentID = agent.Owner.ID;
+            res.SessionID = agent.SessionID;
 
             res.SimName = RegionData.Name;
             res.EstateID = 1; /* TODO: */
@@ -778,8 +803,9 @@ namespace SilverSim.Scene.Implementation.Basic
             res.ProductName = VersionInfo.ProductName;
             res.RegionFlagsExtended.Add(0);
 
-            UDPServer.SendMessageToAgent(req.AgentID, res);
+            agent.SendMessageAlways(res, ID);
         }
+
         #endregion
     }
 }
