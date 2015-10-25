@@ -80,6 +80,23 @@ namespace SilverSim.Types.Primitive
             }
         }
 
+        public bool TryGetValue(uint index, out TextureEntryFace face)
+        {
+            face = default(TextureEntryFace);
+            if (index >= MAX_TEXTURE_FACES)
+            {
+                return false;
+            }
+
+            if (FaceTextures[index] == null)
+            {
+                FaceTextures[index] = new TextureEntryFace(DefaultTexture);
+            }
+
+            face = FaceTextures[index];
+            return true;
+        }
+
         private static float BytesToFloat(byte[] bytes, int pos)
         {
             if(!BitConverter.IsLittleEndian)
