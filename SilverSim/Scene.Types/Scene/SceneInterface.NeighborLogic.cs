@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Http.Client;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.StructuredData.LLSD;
 using SilverSim.Types;
@@ -131,6 +132,16 @@ namespace SilverSim.Scene.Types.Scene
             Neighbors.Remove(rinfo.ID);
         }
 
+        void CheckAgentsForNeighbors()
+        {
+            foreach(IAgent ag in RootAgents)
+            {
+                if(ag.ActiveTeleportService == null)
+                {
+                }
+            }
+        }
+
         void VerifyNeighbor(RegionInfo rinfo)
         {
             if(rinfo.ServerURI == RegionData.ServerURI)
@@ -141,6 +152,7 @@ namespace SilverSim.Scene.Types.Scene
                     lne.RemoteOffset = rinfo.Location - RegionData.Location;
                     lne.RemoteRegionData = rinfo;
                     Neighbors[rinfo.ID] = lne;
+                    CheckAgentsForNeighbors();
                 }
                 return;
             }
@@ -164,6 +176,17 @@ namespace SilverSim.Scene.Types.Scene
             if(headers.ContainsKey("X-UDP-InterSim"))
             {
                 /* neighbor supports UDP Inter-Sim connects */
+                UUID randomID = UUID.Random;
+                uint circuitID;
+                NeighborEntry lne = new NeighborEntry();
+                lne.RemoteOffset = rinfo.Location - RegionData.Location;
+                lne.RemoteRegionData = rinfo;
+                Neighbors[rinfo.ID] = lne;
+                EnableSimCircuit(rinfo, out randomID, out circuitID);
+            }
+            else
+            {
+                /* we have to keep the original protocol which may be slow */
             }
         }
 
@@ -211,6 +234,7 @@ namespace SilverSim.Scene.Types.Scene
                 destinationInfo.Location, 
                 destinationInfo.Location - RegionData.Location);
             Neighbors[destinationInfo.ID].RemoteCircuit = simCircuit;
+            CheckAgentsForNeighbors();
         }
     }
 }
