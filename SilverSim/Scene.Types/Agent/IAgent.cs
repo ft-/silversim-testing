@@ -77,6 +77,12 @@ namespace SilverSim.Scene.Types.Agent
             get;
         }
 
+        Vector3 CameraPosition
+        {
+            get;
+            set;
+        }
+
         Quaternion CameraRotation
         {
             get;

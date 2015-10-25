@@ -252,6 +252,10 @@ namespace SilverSim.Viewer.Core
 
             HeadRotation = au.HeadRotation;
             BodyRotation = au.BodyRotation;
+            CameraPosition = au.CameraCenter;
+            CameraAtAxis = au.CameraAtAxis;
+            CameraLeftAxis = au.CameraLeftAxis;
+            CameraUpAxis = au.CameraUpAxis;
             ProcessAgentControls();
 
             if (knownScriptControls != ControlFlags.None)
