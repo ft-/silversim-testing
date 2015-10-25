@@ -294,6 +294,18 @@ namespace SilverSim.Scene.Types.Object
 
 
         #region Properties
+        public UGI Group
+        {
+            get
+            {
+                return ObjectGroup.Group;
+            }
+            set
+            {
+                ObjectGroup.Group = value;
+            }
+        }
+
         public InventoryPermissionsMask BaseMask
         {
             get

@@ -70,6 +70,12 @@ namespace SilverSim.Scene.Types.Object
             set;
         }
 
+        UGI Group
+        {
+            get;
+            set;
+        }
+
         string Description
         {
             get;
