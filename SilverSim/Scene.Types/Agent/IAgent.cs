@@ -77,6 +77,30 @@ namespace SilverSim.Scene.Types.Agent
             get;
         }
 
+        Quaternion CameraRotation
+        {
+            get;
+            set;
+        }
+
+        Vector3 CameraAtAxis
+        {
+            get;
+            set;
+        }
+
+        Vector3 CameraLeftAxis
+        {
+            get;
+            set;
+        }
+
+        Vector3 CameraUpAxis
+        {
+            get;
+            set;
+        }
+
         AgentWearables Wearables
         {
             get;

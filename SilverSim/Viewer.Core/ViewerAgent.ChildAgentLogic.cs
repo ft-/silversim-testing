@@ -31,13 +31,13 @@ namespace SilverSim.Viewer.Core
                         m.AgentPosition = GlobalPosition;
                         m.AgentVelocity = Velocity;
                         m.ChangedGrid = false;
-                        //m.AtAxis;
-                        //m.Center;
-                        //m.LeftAxis;
+                        m.AtAxis = CameraAtAxis;
+                        m.Center = CameraPosition;
+                        m.LeftAxis = CameraLeftAxis;
                         m.RegionLocation = scene.RegionData.Location;
                         m.SessionID = SessionID;
                         m.Size = Size;
-                        //m.UpAxis;
+                        m.UpAxis = CameraUpAxis;
                         IAgentChildUpdateServiceInterface childUpdater = kvp.Value.ChildAgentUpdateService;
                         if (childUpdater != null)
                         {
@@ -65,11 +65,11 @@ namespace SilverSim.Viewer.Core
                         m.SessionID = SessionID;
                         m.AgentPosition = GlobalPosition;
                         m.AgentVelocity = Velocity;
-                        //m.Center;
+                        m.Center = CameraPosition;
                         m.Size = Size;
-                        //m.AtAxis;
-                        //m.LeftAxis;
-                        //m.UpAxis;
+                        m.AtAxis = CameraAtAxis;
+                        m.LeftAxis = CameraLeftAxis;
+                        m.UpAxis = CameraUpAxis;
                         m.ChangedGrid = false;
                         m.Far = DrawDistance;
                         m.Aspect = 1;

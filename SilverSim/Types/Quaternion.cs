@@ -517,8 +517,109 @@ namespace SilverSim.Types
                 return false;
             }
         }
-
         #endregion Static Methods
+
+        #region Axes
+        public static Quaternion Axes2Rot(Vector3 fwd, Vector3 left, Vector3 up)
+        {
+            double s;
+            double tr = fwd.X + left.Y + up.Z + 1.0;
+
+            if (tr >= 1.0)
+            {
+                s = 0.5 / Math.Sqrt(tr);
+                return new Quaternion(
+                        (left.Z - up.Y) * s,
+                        (up.X - fwd.Z) * s,
+                        (fwd.Y - left.X) * s,
+                        0.25 / s);
+            }
+            else
+            {
+                double max = (left.Y > up.Z) ? left.Y : up.Z;
+
+                if (max < fwd.X)
+                {
+                    s = Math.Sqrt(fwd.X - (left.Y + up.Z) + 1.0);
+                    double x = s * 0.5;
+                    s = 0.5 / s;
+                    return new Quaternion(
+                            x,
+                            (fwd.Y + left.X) * s,
+                            (up.X + fwd.Z) * s,
+                            (left.Z - up.Y) * s);
+                }
+                else if (max == left.Y)
+                {
+                    s = Math.Sqrt(left.Y - (up.Z + fwd.X) + 1.0);
+                    double y = s * 0.5;
+                    s = 0.5 / s;
+                    return new Quaternion(
+                            (fwd.Y + left.X) * s,
+                            y,
+                            (left.Z + up.Y) * s,
+                            (up.X - fwd.Z) * s);
+                }
+                else
+                {
+                    s = Math.Sqrt(up.Z - (fwd.X + left.Y) + 1.0);
+                    double z = s * 0.5;
+                    s = 0.5 / s;
+                    return new Quaternion(
+                            (up.X + fwd.Z) * s,
+                            (left.Z + up.Y) * s,
+                            z,
+                            (fwd.Y - left.X) * s);
+                }
+            }
+        }
+
+        public Vector3 FwdAxis
+        {
+            get
+            {
+                double x, y, z;
+
+                Normalize();
+
+                x = X * X - Y * Y - Z * Z + W * W;
+                y = 2 * (X * Y + Z * W);
+                z = 2 * (X * Z - Y * W);
+                return new Vector3(x, y, z);
+            }
+        }
+
+        public Vector3 LeftAxis
+        {
+            get
+            {
+                double x, y, z;
+
+                Normalize();
+
+                x = 2 * (X * Y - Z * W);
+                y = -X * X + Y * Y - Z * Z + W * W;
+                z = 2 * (X * W + Y * Z);
+                return new Vector3(x, y, z);
+            }
+        }
+
+        public Vector3 UpAxis
+        {
+            get
+            {
+                double x, y, z;
+
+                Normalize();
+
+                x = 2 * (X * Z + Y * W);
+                y = 2 * (-X * W + Y * Z);
+                z = -X * X - Y * Y + Z * Z + W * W;
+                return new Vector3(x, y, z);
+            }
+        }
+        #endregion
+
 
         #region Overrides
 
