@@ -209,18 +209,18 @@ namespace SilverSim.Scene.Types.Scene
 
             IValue iv = LLSD_XML.Deserialize(
                 HttpRequestHandler.DoStreamRequest(
-                "POST", 
-                destinationInfo.ServerURI + "circuit",
-                null,
-                "application/llsd+xml",
-                reqdata.Length,
-                delegate(Stream s)
-                {
-                    s.Write(reqdata, 0, reqdata.Length);
-                },
-                false,
-                10000,
-                null));
+                    "POST", 
+                    destinationInfo.ServerURI + "circuit",
+                    null,
+                    "application/llsd+xml",
+                    reqdata.Length,
+                    delegate(Stream s)
+                    {
+                        s.Write(reqdata, 0, reqdata.Length);
+                    },
+                    false,
+                    10000,
+                    null));
 
             Map resmap = (Map)iv;
             circuitCode = resmap["circuit_code"].AsUInt;
