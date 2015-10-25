@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Reflection;
 
 namespace SilverSim.Main.Common
 {
@@ -60,7 +61,24 @@ namespace SilverSim.Main.Common
 
                 if(IsPlatformMono)
                 {
-                    ru += "/Mono";
+                    Type type = Type.GetType("Mono.Runtime");
+                    if (type != null)
+                    {
+                        MethodInfo displayName = type.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
+                        if (displayName != null)
+                        {
+                            ru += "/" + displayName.Invoke(null, null);
+                        }
+                        else
+                        {
+                            ru += "/Mono";
+                        }
+                    }
+                    else
+                    {
+                        ru += "/Mono";
+                    }
+
                 }
                 else
                 {
