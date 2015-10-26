@@ -31,7 +31,7 @@ namespace SilverSim.Scene.Types.Object
                 m_Media = null;
                 m_MediaURL = string.Empty;
             }
-            TriggerOnUpdate(ChangedEvent.ChangedFlags.Media);
+            TriggerOnUpdate(UpdateChangedFlags.Media);
         }
 
         public void UpdateMedia(PrimitiveMedia media, UUID updaterID)
@@ -52,7 +52,7 @@ namespace SilverSim.Scene.Types.Object
                 m_MediaURL = mediaURL;
                 m_Media = media;
             }
-            TriggerOnUpdate(ChangedEvent.ChangedFlags.Media);
+            TriggerOnUpdate(UpdateChangedFlags.Media);
         }
 
         public void UpdateMediaFace(int face, PrimitiveMedia.Entry entry, UUID updaterID)
@@ -85,7 +85,7 @@ namespace SilverSim.Scene.Types.Object
                 m_Media[face] = entry;
                 m_MediaURL = mediaURL;
             }
-            TriggerOnUpdate(ChangedEvent.ChangedFlags.Media);
+            TriggerOnUpdate(UpdateChangedFlags.Media);
         }
         #endregion
     }

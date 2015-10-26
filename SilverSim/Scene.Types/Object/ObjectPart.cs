@@ -26,8 +26,7 @@ namespace SilverSim.Scene.Types.Object
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT PART");
 
         #region Events
-        public delegate void OnUpdateDelegate(ObjectPart part, ChangedEvent.ChangedFlags changed);
-        public event OnUpdateDelegate OnUpdate;
+        public event Action<ObjectPart, UpdateChangedFlags> OnUpdate;
         public event Action<IObject> OnPositionChange;
         #endregion
 
@@ -218,10 +217,10 @@ namespace SilverSim.Scene.Types.Object
                 m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial] = (byte)(invSerial % 256);
                 m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial + 1] = (byte)(invSerial / 256);
             }
-            TriggerOnUpdate(ChangedEvent.ChangedFlags.Inventory);
+            TriggerOnUpdate(UpdateChangedFlags.Inventory);
         }
 
-        internal void TriggerOnUpdate(ChangedEvent.ChangedFlags flags)
+        internal void TriggerOnUpdate(UpdateChangedFlags flags)
         {
             /* we have to check the ObjectGroup during setup process before using it here */
             if (null == ObjectGroup)
@@ -234,7 +233,7 @@ namespace SilverSim.Scene.Types.Object
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                foreach (OnUpdateDelegate del in ev.GetInvocationList())
+                foreach (Action<ObjectPart, UpdateChangedFlags> del in ev.GetInvocationList())
                 {
                     try
                     {
@@ -725,7 +724,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_IsAllowedDrop = value;
                 IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(ChangedEvent.ChangedFlags.AllowedDrop);
+                TriggerOnUpdate(UpdateChangedFlags.AllowedDrop);
             }
         }
 
@@ -814,7 +813,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 m_PhysicsShapeType = value;
                 IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(ChangedEvent.ChangedFlags.Shape);
+                TriggerOnUpdate(UpdateChangedFlags.Shape);
             }
         }
 
@@ -896,7 +895,7 @@ namespace SilverSim.Scene.Types.Object
                     value.ToBytes(m_FullUpdateFixedBlock1, (int)FullFixedBlock1Offset.Scale);
                 }
                 IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(ChangedEvent.ChangedFlags.Scale);
+                TriggerOnUpdate(UpdateChangedFlags.Scale);
             }
         }
 
@@ -916,7 +915,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Slice = value;
                 }
                 IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(ChangedEvent.ChangedFlags.Shape);
+                TriggerOnUpdate(UpdateChangedFlags.Shape);
             }
         }
 

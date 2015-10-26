@@ -19,7 +19,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
 {
-    public class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject
+    public partial class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject
     {
         static IScriptCompilerRegistry m_CompilerRegistry;
         public static IScriptCompilerRegistry CompilerRegistry
@@ -44,8 +44,7 @@ namespace SilverSim.Scene.Types.Object
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT GROUP");
 
         #region Events
-        public delegate void OnUpdateDelegate(ObjectGroup objgroup, ChangedEvent.ChangedFlags flags);
-        public event OnUpdateDelegate OnUpdate;
+        public event Action<ObjectGroup, UpdateChangedFlags> OnUpdate;
         public event Action<IObject> OnPositionChange;
         #endregion
 
@@ -131,61 +130,6 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
-        #region Physics Linkage
-        readonly RwLockedDictionary<UUID, IPhysicsObject> m_PhysicsActors = new RwLockedDictionary<UUID, IPhysicsObject>();
-
-        public RwLockedDictionary<UUID, IPhysicsObject> PhysicsActors
-        {
-            get
-            {
-                return m_PhysicsActors;
-            }
-        }
-
-        public IPhysicsObject PhysicsActor
-        {
-            get
-            {
-                lock (this)
-                {
-                    IPhysicsObject obj;
-                    SceneInterface scene = Scene;
-                    if(scene == null)
-                    {
-                        obj = DummyPhysicsObject.SharedInstance;
-                    }
-                    else if (!m_PhysicsActors.TryGetValue(scene.ID, out obj))
-                    {
-                        obj = DummyPhysicsObject.SharedInstance;
-                    }
-                    return obj;
-                }
-            }
-        }
-
-
-        /* property here instead of a method. A lot more clear that we update something. */
-        object m_PhysicsUpdateLock = new object();
-        public PhysicsStateData PhysicsUpdate
-        {
-            set
-            {
-                lock (m_PhysicsUpdateLock)
-                {
-                    if (Scene.ID == value.SceneID)
-                    {
-                        Position = value.Position;
-                        Rotation = value.Rotation;
-                        Velocity = value.Velocity;
-                        AngularVelocity = value.AngularVelocity;
-                        Acceleration = value.Acceleration;
-                        AngularAcceleration = value.AngularAcceleration;
-                    }
-                }
-            }
-        }
-        #endregion
-
         public UUID OriginalAssetID /* will be set to UUID.Zero when anything has been changed */
         {
             get
@@ -222,7 +166,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private void TriggerOnUpdate(ChangedEvent.ChangedFlags flags)
+        private void TriggerOnUpdate(UpdateChangedFlags flags)
         {
             if (Count == 0)
             {
@@ -237,7 +181,7 @@ namespace SilverSim.Scene.Types.Object
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                foreach (OnUpdateDelegate del in ev.GetInvocationList())
+                foreach (Action<ObjectGroup, UpdateChangedFlags> del in ev.GetInvocationList())
                 {
                     try
                     {
@@ -536,20 +480,6 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public bool IsPhantom
-        {
-            get
-            {
-                return PhysicsActor.IsPhantom;
-            }
-            set
-            {
-                PhysicsActor.IsPhantom = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
-            }
-        }
-
         public bool IsGroupOwned
         {
             get
@@ -570,36 +500,8 @@ namespace SilverSim.Scene.Types.Object
                 if (changed)
                 {
                     IsChanged = m_IsChangedEnabled;
-                    TriggerOnUpdate(ChangedEvent.ChangedFlags.Owner);
+                    TriggerOnUpdate(UpdateChangedFlags.Owner);
                 }
-            }
-        }
-
-        public bool IsPhysics
-        {
-            get
-            {
-                return PhysicsActor.IsPhysicsActive;
-            }
-            set
-            {
-                PhysicsActor.IsPhysicsActive = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
-            }
-        }
-
-        public bool IsVolumeDetect
-        {
-            get
-            {
-                return PhysicsActor.IsVolumeDetect;
-            }
-            set
-            {
-                PhysicsActor.IsVolumeDetect = value;
-                IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(0);
             }
         }
 
@@ -659,7 +561,7 @@ namespace SilverSim.Scene.Types.Object
                     m_Owner = value;
                 }
                 IsChanged = m_IsChangedEnabled;
-                TriggerOnUpdate(ChangedEvent.ChangedFlags.Owner);
+                TriggerOnUpdate(UpdateChangedFlags.Owner);
             }
         }
 
