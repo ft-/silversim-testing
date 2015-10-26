@@ -91,6 +91,10 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 return;
             }
+            catch(NullReferenceException) /* de-initialization can result into null references */
+            {
+                return;
+            }
             m_Listener.BeginAcceptSocket(AcceptConnectionCallback, null);
             try
             {
