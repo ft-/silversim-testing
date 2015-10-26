@@ -81,49 +81,52 @@ namespace SilverSim.Database.MySQL.SimulationData
             ObjectPart objpart = new ObjectPart();
             objpart.ID = dbReader.GetUUID("ID");
             objpart.LoadedLinkNumber = (int)dbReader["LinkNumber"];
-            objpart.Position = MySQLUtilities.GetVector(dbReader, "Position");
-            objpart.Rotation = MySQLUtilities.GetQuaternion(dbReader, "Rotation");
+            objpart.Position = dbReader.GetVector("Position");
+            objpart.Rotation = dbReader.GetQuaternion("Rotation");
             objpart.SitText = (string)dbReader["SitText"];
             objpart.TouchText = (string)dbReader["TouchText"];
             objpart.Name = (string)dbReader["Name"];
             objpart.Description = (string)dbReader["Description"];
-            objpart.SitTargetOffset = MySQLUtilities.GetVector(dbReader, "SitTargetOffset");
-            objpart.SitTargetOrientation = MySQLUtilities.GetQuaternion(dbReader, "SitTargetOrientation");
+            objpart.SitTargetOffset = dbReader.GetVector("SitTargetOffset");
+            objpart.SitTargetOrientation = dbReader.GetQuaternion("SitTargetOrientation");
             objpart.Creator = dbReader.GetUUI("Creator");
-            objpart.CreationDate = MySQLUtilities.GetDate(dbReader, "CreationDate");
+            objpart.CreationDate = dbReader.GetDate("CreationDate");
             objpart.Flags = (PrimitiveFlags)(uint)dbReader["Flags"];
+
+            objpart.CameraAtOffset = dbReader.GetVector("CameraAtOffset");
+            objpart.CameraEyeOffset = dbReader.GetVector("CameraEyeOffset");
 
             objpart.PhysicsShapeType = (PrimitivePhysicsShapeType)(int)dbReader["PhysicsShapeType"];
             objpart.Material = (PrimitiveMaterial)(int)dbReader["Material"];
-            objpart.Size = MySQLUtilities.GetVector(dbReader, "Size");
-            objpart.Slice = MySQLUtilities.GetVector(dbReader, "Slice");
+            objpart.Size = dbReader.GetVector("Size");
+            objpart.Slice = dbReader.GetVector("Slice");
 
             objpart.MediaURL = (string)dbReader["MediaURL"];
 
-            objpart.AngularVelocity = MySQLUtilities.GetVector(dbReader, "AngularVelocity");
+            objpart.AngularVelocity = dbReader.GetVector("AngularVelocity");
 
             ObjectPart.PointLightParam lp = new ObjectPart.PointLightParam();
-            lp.Serialization = (byte[])dbReader["LightData"];
+            lp.Serialization = dbReader.GetBytes("LightData");
             objpart.PointLight = lp;
 
             ObjectPart.TextParam tp = new ObjectPart.TextParam();
-            tp.Serialization = (byte[])dbReader["HoverTextData"];
+            tp.Serialization = dbReader.GetBytes("HoverTextData");
             objpart.Text = tp;
 
             ObjectPart.FlexibleParam fp = new ObjectPart.FlexibleParam();
-            fp.Serialization = (byte[])dbReader["FlexibleData"];
+            fp.Serialization = dbReader.GetBytes("FlexibleData");
             objpart.Flexible = fp;
 
             ObjectPart.SoundParam sound = new ObjectPart.SoundParam();
-            sound.Serialization = (byte[])dbReader["LoopedSoundData"];
+            sound.Serialization = dbReader.GetBytes("LoopedSoundData");
             objpart.Sound = sound;
 
             ObjectPart.CollisionSoundParam collisionsound = new ObjectPart.CollisionSoundParam();
-            collisionsound.Serialization = (byte[])dbReader["ImpactSoundData"];
+            collisionsound.Serialization = dbReader.GetBytes("ImpactSoundData");
             objpart.CollisionSound = collisionsound;
 
             ObjectPart.PrimitiveShape ps = new ObjectPart.PrimitiveShape();
-            ps.Serialization = (byte[])dbReader["PrimitiveShapeData"];
+            ps.Serialization = dbReader.GetBytes("PrimitiveShapeData");
             objpart.Shape = ps;
 
             objpart.ParticleSystemBytes = dbReader.GetBytes("ParticleSystem");
@@ -133,7 +136,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             objpart.ScriptAccessPin = (int)dbReader["ScriptAccessPin"];
             objpart.LoadedLinkNumber = (int)dbReader["LinkNumber"];
 
-            using (MemoryStream ms = new MemoryStream((byte[])dbReader["DynAttrs"]))
+            objpart.ForceMouselook = dbReader.GetBoolean("ForceMouselook");
+
+            using (MemoryStream ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
             {
                 foreach (KeyValuePair<string, IValue> kvp in (Map)LLSD_Binary.Deserialize(ms))
                 {
@@ -636,14 +641,18 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "`Material`,`SizeX`,`SizeY`,`SizeZ`,`SliceX`,`SliceY`,`SliceZ`,`MediaURL`,`Creator`,`CreationDate`," +
                 "`Flags`,`AngularVelocityX`,`AngularVelocityY`,`AngularVelocityZ`,`LightData`,`HoverTextData`,`FlexibleData`," +
                 "`LoopedSoundData`,`ImpactSoundData`,`PrimitiveShapeData`," +
-                "`ParticleSystem`,`TextureEntryBytes`,`TextureAnimationBytes`,`ScriptAccessPin`,`DynAttrs`) VALUES " +
+                "`ParticleSystem`,`TextureEntryBytes`,`TextureAnimationBytes`,`ScriptAccessPin`,`DynAttrs`," +
+                "CameraAtOffsetX, CameraAtOffsetY, CameraAtOffsetZ, CameraEyeOffsetX, CameraEyeOffsetY, CameraEyeOffsetZ, ForceMouselook" +
+                ") VALUES " +
                 "(?v_PhysicsShapeType,?v_ID,?v_LinkNumber,?v_RootPartID,?v_PositionX,?v_PositionY,?v_PositionZ,?v_RotationX,?v_RotationY,?v_RotationZ," +
                 "?v_RotationW,?v_SitText,?v_TouchText,?v_Name,?v_Description,?v_SitTargetOffsetX,?v_SitTargetOffsetY,?v_SitTargetOffsetZ," +
                 "?v_SitTargetOrientationX,?v_SitTargetOrientationY,?v_SitTargetOrientationZ,?v_SitTargetOrientationW," +
                 "?v_Material,?v_SizeX,?v_SizeY,?v_SizeZ,?v_SliceX,?v_SliceY,?v_SliceZ,?v_MediaURL,?v_Creator,?v_CreationDate," +
                 "?v_Flags,?v_AngularVelocityX,?v_AngularVelocityY,?v_AngularVelocityZ,?v_LightData,?v_HoverTextData,?v_FlexibleData," +
                 "?v_LoopedSoundData,?v_ImpactSoundData,?v_PrimitiveShapeData," +
-                "?v_ParticleSystem,?v_TextureEntryBytes,?v_TextureAnimationBytes,?v_ScriptAccessPin,?v_DynAttrs)";
+                "?v_ParticleSystem,?v_TextureEntryBytes,?v_TextureAnimationBytes,?v_ScriptAccessPin,?v_DynAttrs, " +
+                "?v_CameraAtOffsetX, ?v_CameraAtOffsetY, ?v_CameraAtOffsetZ, " +
+                "?v_CameraEyeOffsetX, ?v_CameraEyeOffsetY, ?v_CameraEyeOffsetZ, ?v_ForceMouselook)";
         private void UpdateObjectPart(MySqlConnection connection, ObjectPart objpart)
         {
             if(objpart.ObjectGroup.IsTemporary || objpart.ObjectGroup.IsTempOnRez)
@@ -653,42 +662,60 @@ namespace SilverSim.Database.MySQL.SimulationData
 
             using (MySqlCommand cmd = new MySqlCommand(UpdateObjectPartSql, connection))
             {
+                Vector3 v;
+                Quaternion q;
                 cmd.Parameters.AddWithValue("?v_ID", objpart.ID.ToString());
                 cmd.Parameters.AddWithValue("?v_LinkNumber", objpart.LinkNumber);
                 cmd.Parameters.AddWithValue("?v_RootPartID", objpart.ObjectGroup.RootPart.ID.ToString());
-                cmd.Parameters.AddWithValue("?v_PositionX", objpart.Position.X);
-                cmd.Parameters.AddWithValue("?v_PositionY", objpart.Position.Y);
-                cmd.Parameters.AddWithValue("?v_PositionZ", objpart.Position.Z);
-                cmd.Parameters.AddWithValue("?v_RotationX", objpart.Rotation.X);
-                cmd.Parameters.AddWithValue("?v_RotationY", objpart.Rotation.Y);
-                cmd.Parameters.AddWithValue("?v_RotationZ", objpart.Rotation.Z);
-                cmd.Parameters.AddWithValue("?v_RotationW", objpart.Rotation.W);
+                v = objpart.Position;
+                cmd.Parameters.AddWithValue("?v_PositionX", v.X);
+                cmd.Parameters.AddWithValue("?v_PositionY", v.Y);
+                cmd.Parameters.AddWithValue("?v_PositionZ", v.Z);
+
+                q = objpart.Rotation;
+                cmd.Parameters.AddWithValue("?v_RotationX", q.X);
+                cmd.Parameters.AddWithValue("?v_RotationY", q.Y);
+                cmd.Parameters.AddWithValue("?v_RotationZ", q.Z);
+                cmd.Parameters.AddWithValue("?v_RotationW", q.W);
+
                 cmd.Parameters.AddWithValue("?v_SitText", objpart.SitText);
                 cmd.Parameters.AddWithValue("?v_TouchText", objpart.TouchText);
                 cmd.Parameters.AddWithValue("?v_Name", objpart.Name);
                 cmd.Parameters.AddWithValue("?v_Description", objpart.Description);
-                cmd.Parameters.AddWithValue("?v_SitTargetOffsetX", objpart.SitTargetOffset.X);
-                cmd.Parameters.AddWithValue("?v_SitTargetOffsetY", objpart.SitTargetOffset.Y);
-                cmd.Parameters.AddWithValue("?v_SitTargetOffsetZ", objpart.SitTargetOffset.Z);
-                cmd.Parameters.AddWithValue("?v_SitTargetOrientationX", objpart.SitTargetOrientation.X);
-                cmd.Parameters.AddWithValue("?v_SitTargetOrientationY", objpart.SitTargetOrientation.Y);
-                cmd.Parameters.AddWithValue("?v_SitTargetOrientationZ", objpart.SitTargetOrientation.Z);
-                cmd.Parameters.AddWithValue("?v_SitTargetOrientationW", objpart.SitTargetOrientation.W);
+
+                v = objpart.SitTargetOffset;
+                cmd.Parameters.AddWithValue("?v_SitTargetOffsetX", v.X);
+                cmd.Parameters.AddWithValue("?v_SitTargetOffsetY", v.Y);
+                cmd.Parameters.AddWithValue("?v_SitTargetOffsetZ", v.Z);
+
+                q = objpart.SitTargetOrientation;
+                cmd.Parameters.AddWithValue("?v_SitTargetOrientationX", q.X);
+                cmd.Parameters.AddWithValue("?v_SitTargetOrientationY", q.Y);
+                cmd.Parameters.AddWithValue("?v_SitTargetOrientationZ", q.Z);
+                cmd.Parameters.AddWithValue("?v_SitTargetOrientationW", q.W);
+
                 cmd.Parameters.AddWithValue("?v_PhysicsShapeType", (int)objpart.PhysicsShapeType);
                 cmd.Parameters.AddWithValue("?v_Material", (int)objpart.Material);
-                cmd.Parameters.AddWithValue("?v_SizeX", objpart.Size.X);
-                cmd.Parameters.AddWithValue("?v_SizeY", objpart.Size.Y);
-                cmd.Parameters.AddWithValue("?v_SizeZ", objpart.Size.Z);
-                cmd.Parameters.AddWithValue("?v_SliceX", objpart.Slice.X);
-                cmd.Parameters.AddWithValue("?v_SliceY", objpart.Slice.Y);
-                cmd.Parameters.AddWithValue("?v_SliceZ", objpart.Slice.Z);
+
+                v = objpart.Size;
+                cmd.Parameters.AddWithValue("?v_SizeX", v.X);
+                cmd.Parameters.AddWithValue("?v_SizeY", v.Y);
+                cmd.Parameters.AddWithValue("?v_SizeZ", v.Z);
+
+                v = objpart.Slice;
+                cmd.Parameters.AddWithValue("?v_SliceX", v.X);
+                cmd.Parameters.AddWithValue("?v_SliceY", v.Y);
+                cmd.Parameters.AddWithValue("?v_SliceZ", v.Z);
                 cmd.Parameters.AddWithValue("?v_MediaURL", objpart.MediaURL);
                 cmd.Parameters.AddWithValue("?v_Creator", objpart.Creator.ToString());
                 cmd.Parameters.AddWithValue("?v_CreationDate", objpart.CreationDate.AsULong);
                 cmd.Parameters.AddWithValue("?v_Flags", (uint)objpart.Flags);
-                cmd.Parameters.AddWithValue("?v_AngularVelocityX", objpart.AngularVelocity.X);
-                cmd.Parameters.AddWithValue("?v_AngularVelocityY", objpart.AngularVelocity.Y);
-                cmd.Parameters.AddWithValue("?v_AngularVelocityZ", objpart.AngularVelocity.Z);
+
+                v = objpart.AngularVelocity;
+                cmd.Parameters.AddWithValue("?v_AngularVelocityX", v.X);
+                cmd.Parameters.AddWithValue("?v_AngularVelocityY", v.Y);
+                cmd.Parameters.AddWithValue("?v_AngularVelocityZ", v.Z);
+
                 cmd.Parameters.AddWithValue("?v_LightData", objpart.PointLight.Serialization);
                 cmd.Parameters.AddWithValue("?v_HoverTextData", objpart.Text.Serialization);
                 cmd.Parameters.AddWithValue("?v_FlexibleData", objpart.Flexible.Serialization);
@@ -700,7 +727,19 @@ namespace SilverSim.Database.MySQL.SimulationData
                 cmd.Parameters.AddWithValue("?v_TextureAnimationBytes", objpart.TextureAnimationBytes);
                 cmd.Parameters.AddWithValue("?v_ScriptAccessPin", objpart.ScriptAccessPin);
 
-                using(MemoryStream ms = new MemoryStream())
+                v = objpart.CameraAtOffset;
+                cmd.Parameters.AddWithValue("?v_CameraAtOffsetX", v.X);
+                cmd.Parameters.AddWithValue("?v_CameraAtOffsetY", v.Y);
+                cmd.Parameters.AddWithValue("?v_CameraAtOffsetZ", v.Z);
+
+                v = objpart.CameraEyeOffset;
+                cmd.Parameters.AddWithValue("?v_CameraEyeOffsetX", v.X);
+                cmd.Parameters.AddWithValue("?v_CameraEyeOffsetY", v.Y);
+                cmd.Parameters.AddWithValue("?v_CameraEyeOffsetZ", v.Z);
+
+                cmd.Parameters.AddWithValue("?v_ForceMouselook", objpart.ForceMouselook ? 1 : 0);
+
+                using (MemoryStream ms = new MemoryStream())
                 { 
                     LLSD_Binary.Serialize(objpart.DynAttrs, ms);
                     cmd.Parameters.AddWithValue("?v_DynAttrs", ms.GetBuffer());
@@ -849,7 +888,15 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "TextureAnimationBytes BLOB," +
                 "KEY RootPartID (RootPartID)," +
                 "UNIQUE KEY ID (ID)," +
-                "PRIMARY KEY(ID, RootPartID)) ROW_FORMAT=DYNAMIC "
+                "PRIMARY KEY(ID, RootPartID)) ROW_FORMAT=DYNAMIC ",
+            "ALTER TABLE %tablename% ADD COLUMN (" +
+                    "CameraEyeOffsetX REAL NOT NULL DEFAULT '0'," +
+                    "CameraEyeOffsetY REAL NOT NULL DEFAULT '0'," +
+                    "CameraEyeOffsetZ REAL NOT NULL DEFAULT '0'," +
+                    "CameraAtOffsetX REAL NOT NULL DEFAULT '0'," +
+                    "CameraAtOffsetY REAL NOT NULL DEFAULT '0'," +
+                    "CameraAtOffsetZ REAL NOT NULL DEFAULT '0'," +
+                    "ForceMouselook INT(1) UNSIGNED NOT NULL),"
         };
         #endregion
     }

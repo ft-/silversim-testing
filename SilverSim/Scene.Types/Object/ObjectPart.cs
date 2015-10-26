@@ -1938,6 +1938,10 @@ namespace SilverSim.Scene.Types.Object
                                 part.IsAllowedDrop = reader.ReadElementValueAsBoolean();
                                 break;
 
+                            case "ForceMouselook": /* boolean field */
+                                part.ForceMouselook = reader.ReadElementValueAsBoolean();
+                                break;
+
                             case "CreatorID":
                                 {
                                     UUI creator = part.Creator;
@@ -2014,6 +2018,14 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     reader.ReadToEndElement();
                                 }
+                                break;
+
+                            case "CameraEyeOffset": /* extension, not defined in OpenSim format but in WhiteCore format */
+                                part.CameraEyeOffset = reader.ReadElementChildsAsVector3();
+                                break;
+
+                            case "CameraAtOffset": /* extension, not defined in OpenSim format but in WhiteCore format */
+                                part.CameraAtOffset = reader.ReadElementChildsAsVector3();
                                 break;
 
                             case "OffsetPosition":
