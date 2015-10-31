@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Profile
 {
@@ -19,6 +20,7 @@ namespace SilverSim.Database.MySQL.Profile
                 m_ConnectionString = connectionString;
             }
 
+            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public string this[UUI user, UUI target]
             {
                 get

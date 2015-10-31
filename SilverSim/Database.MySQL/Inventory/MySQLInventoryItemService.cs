@@ -6,6 +6,7 @@ using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Inventory
 {
@@ -41,6 +42,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override InventoryItem this[UUID principalID, UUID key]
         {
             get 

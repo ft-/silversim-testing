@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -23,6 +24,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_ConnectionString = connectionString;
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override LayerPatch this[UUID regionID, uint extendedPatchID]
         {
             get

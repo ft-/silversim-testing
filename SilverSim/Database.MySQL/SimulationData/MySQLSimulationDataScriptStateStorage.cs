@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using SilverSim.ServiceInterfaces.Database;
 using MySql.Data.MySqlClient;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -26,6 +27,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         }
 
         /* setting value to null will delete the entry */
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override string this[UUID regionID, UUID primID, UUID itemID] 
         {
             get

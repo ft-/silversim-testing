@@ -6,6 +6,7 @@ using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -58,6 +59,7 @@ namespace SilverSim.Database.MySQL.Estate
             m_ListAccess = new MySQLListAccess(connectionString);
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override bool this[uint estateID, UUI agent]
         {
             get

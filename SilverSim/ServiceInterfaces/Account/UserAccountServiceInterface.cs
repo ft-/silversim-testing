@@ -9,7 +9,7 @@ using System.Collections.Generic;
 namespace SilverSim.ServiceInterfaces.Account
 {
     [Serializable]
-    public class UserAccountNotFoundException : Exception
+    public class UserAccountNotFoundException : KeyNotFoundException
     {
         public UserAccountNotFoundException()
         {

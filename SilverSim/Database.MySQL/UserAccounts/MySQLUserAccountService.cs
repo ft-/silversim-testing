@@ -10,6 +10,7 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.UserAccounts
 {
@@ -57,6 +58,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 "PRIMARY KEY(ID), KEY Email (Email), UNIQUE KEY Name (FirstName, LastName), KEY FirstName (FirstName), KEY LastName (LastName))"
         };
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UserAccount this[UUID scopeID, UUID accountID]
         {
             get
@@ -98,6 +100,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UserAccount this[UUID scopeID, string email]
         {
             get 
@@ -122,6 +125,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UserAccount this[UUID scopeID, string firstName, string lastName]
         {
             get 

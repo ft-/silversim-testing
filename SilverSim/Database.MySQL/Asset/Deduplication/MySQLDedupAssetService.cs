@@ -11,11 +11,13 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Security.Cryptography;
 
 namespace SilverSim.Database.MySQL.Asset.Deduplication
 {
     #region Service Implementation
+    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     public class MySQLDedupAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL DEDUP ASSET SERVICE");

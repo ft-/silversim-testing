@@ -16,6 +16,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -384,6 +385,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override ObjectGroup this[UUID regionID, UUID key]
         {
             get

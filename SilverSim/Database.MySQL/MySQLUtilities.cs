@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using SilverSim.Types.Asset;
+using System.Runtime.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL
 {
@@ -21,21 +23,22 @@ namespace SilverSim.Database.MySQL
         {
             if (!(config.Contains("Server") && config.Contains("Username") && config.Contains("Password") && config.Contains("Database")))
             {
+                string configName = config.Name;
                 if (!config.Contains("Server"))
                 {
-                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Server' missing in [{0}]", config.Name);
+                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Server' missing in [{0}]", configName);
                 }
                 if (!config.Contains("Username"))
                 {
-                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Username' missing in [{0}]", config.Name);
+                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Username' missing in [{0}]", configName);
                 }
                 if (!config.Contains("Password"))
                 {
-                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Password' missing in [{0}]", config.Name);
+                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Password' missing in [{0}]", configName);
                 }
                 if (!config.Contains("Database"))
                 {
-                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Database' missing in [{0}]", config.Name);
+                    log.FatalFormat("[MYSQL CONFIG]: Parameter 'Database' missing in [{0}]", configName);
                 }
                 throw new ConfigurationLoader.ConfigurationErrorException();
             }
@@ -47,27 +50,76 @@ namespace SilverSim.Database.MySQL
         }
         #endregion
 
+        [Serializable]
         public class MySQLInsertException : Exception
         {
             public MySQLInsertException()
             {
 
             }
-        }
 
-        public class MySQLMigrationException : Exception
-        {
-            public MySQLMigrationException(string msg)
+            public MySQLInsertException(string msg)
                 : base(msg)
+            {
+
+            }
+
+            protected MySQLInsertException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public MySQLInsertException(string msg, Exception innerException)
+                : base(msg, innerException)
             {
 
             }
         }
 
+        [Serializable]
+        public class MySQLMigrationException : Exception
+        {
+            public MySQLMigrationException()
+            {
+
+            }
+
+            public MySQLMigrationException(string msg)
+                : base(msg)
+            {
+
+            }
+
+            protected MySQLMigrationException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public MySQLMigrationException(string msg, Exception innerException)
+                : base(msg, innerException)
+            {
+
+            }
+        }
+
+        [Serializable]
         public class MySQLTransactionException : Exception
         {
+            public MySQLTransactionException()
+            {
+
+            }
+
             public MySQLTransactionException(string msg)
                 : base(msg)
+            {
+
+            }
+
+            protected MySQLTransactionException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
             {
 
             }
@@ -80,8 +132,8 @@ namespace SilverSim.Database.MySQL
         }
 
         #region Transaction Helper
-        public delegate void TransactionDelegate();
-        public static void InsideTransaction(this MySqlConnection connection, TransactionDelegate del)
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        public static void InsideTransaction(this MySqlConnection connection, Action del)
         {
             using (MySqlCommand cmd = new MySqlCommand("BEGIN", connection))
             {
@@ -563,7 +615,22 @@ namespace SilverSim.Database.MySQL
 
         public static Date GetDate(this MySqlDataReader dbReader, string prefix)
         {
-            return Date.UnixTimeToDateTime(ulong.Parse(dbReader[prefix].ToString()));
+            ulong v;
+            if (!ulong.TryParse(dbReader[prefix].ToString(), out v))
+            {
+                throw new InvalidCastException("GetDate could not convert value for "+ prefix);
+            }
+            return Date.UnixTimeToDateTime(v);
+        }
+
+        public static Vector3 GetStringFormattedVector(this MySqlDataReader dbReader, string prefix)
+        {
+            Vector3 v;
+            if (!Vector3.TryParse((string)dbReader[prefix], out v))
+            {
+                throw new InvalidCastException("GetVectorFromString could not convert value for" + prefix);
+            }
+            return v;
         }
 
         public static Vector3 GetVector(this MySqlDataReader dbReader, string prefix)
@@ -645,7 +712,12 @@ namespace SilverSim.Database.MySQL
                 {
                     if (dbReader.Read())
                     {
-                        return uint.Parse((string)dbReader["Comment"]);
+                        uint u;
+                        if(!uint.TryParse((string)dbReader["Comment"], out u))
+                        {
+                            throw new InvalidDataException("Comment is not a parseable number");
+                        }
+                        return u;
                     }
                 }
             }

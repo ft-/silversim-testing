@@ -11,10 +11,12 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Asset
 {
     #region Service Implementation
+    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     public class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");
@@ -143,13 +145,13 @@ namespace SilverSim.Database.MySQL.Asset
                                 asset.Data = dbReader.GetBytes("data");
                                 asset.Type = (AssetType)(int)dbReader["assetType"];
                                 asset.Name = (string)dbReader["name"];
-                                asset.CreateTime = Date.UnixTimeToDateTime(ulong.Parse(dbReader["create_time"].ToString()));
-                                asset.AccessTime = Date.UnixTimeToDateTime(ulong.Parse(dbReader["access_time"].ToString()));
+                                asset.CreateTime = dbReader.GetDate("create_time");
+                                asset.AccessTime = dbReader.GetDate("access_time");
                                 asset.Creator.ID = dbReader.GetUUID("CreatorID");
                                 asset.Flags = dbReader.GetAssetFlags("asset_flags");
                                 asset.Temporary = dbReader.GetBoolean("temporary");
 
-                                if (dbReader.GetDate("access_time") - DateTime.UtcNow > TimeSpan.FromHours(1))
+                                if (asset.CreateTime - DateTime.UtcNow > TimeSpan.FromHours(1))
                                 {
                                     /* update access_time */
                                     using (MySqlConnection uconn = new MySqlConnection(m_ConnectionString))

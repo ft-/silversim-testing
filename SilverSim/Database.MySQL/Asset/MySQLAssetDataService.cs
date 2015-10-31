@@ -7,6 +7,7 @@ using SilverSim.Types.Asset;
 using MySql.Data.MySqlClient;
 using System;
 using System.IO;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Asset
 {
@@ -19,6 +20,7 @@ namespace SilverSim.Database.MySQL.Asset
         }
 
         #region Accessor
+        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         public override Stream this[UUID key]
         {
             get

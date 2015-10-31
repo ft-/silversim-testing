@@ -9,7 +9,7 @@ using System;
 namespace SilverSim.ServiceInterfaces.GridUser
 {
     [Serializable]
-    public class GridUserNotFoundException : Exception
+    public class GridUserNotFoundException : KeyNotFoundException
     {
         public GridUserNotFoundException()
         {

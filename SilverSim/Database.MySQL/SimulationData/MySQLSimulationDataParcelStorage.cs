@@ -8,6 +8,7 @@ using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using System.Collections.Generic;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
@@ -21,6 +22,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_ConnectionString = connectionString;
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override ParcelInfo this[UUID regionID, UUID parcelID]
         {
             get

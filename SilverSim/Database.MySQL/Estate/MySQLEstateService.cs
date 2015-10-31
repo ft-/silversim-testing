@@ -10,10 +10,12 @@ using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Types.Estate;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Estate
 {
     #region Service Implementation
+    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     public sealed class MySQLEstateService : EstateServiceInterface, IDBServiceInterface, IPlugin
     {
         string m_ConnectionString;

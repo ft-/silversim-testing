@@ -9,9 +9,11 @@ using SilverSim.ServiceInterfaces.Account;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.Types;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Profile
 {
+    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     public sealed partial class MySQLProfileService : ProfileServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PROFILE SERVICE");

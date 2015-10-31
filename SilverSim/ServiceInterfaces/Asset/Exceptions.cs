@@ -3,6 +3,7 @@
 
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Asset
 {
@@ -16,7 +17,7 @@ namespace SilverSim.ServiceInterfaces.Asset
     }
 
     [Serializable]
-    public class AssetNotFoundException : Exception
+    public class AssetNotFoundException : KeyNotFoundException
     {
         public UUID ID { get; private set; }
 

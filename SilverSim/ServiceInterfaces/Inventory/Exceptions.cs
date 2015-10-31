@@ -5,11 +5,12 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
     [Serializable]
-    public class InventoryItemNotFoundException : Exception
+    public class InventoryItemNotFoundException : KeyNotFoundException
     {
         public UUID ID { get; private set; }
 
@@ -33,7 +34,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
     }
 
     [Serializable]
-    public class InventoryFolderNotFoundException : Exception
+    public class InventoryFolderNotFoundException : KeyNotFoundException
     {
         public UUID ID { get; private set; }
 
@@ -45,7 +46,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
     }
 
     [Serializable]
-    public class InventoryFolderTypeNotFoundException : Exception
+    public class InventoryFolderTypeNotFoundException : KeyNotFoundException
     {
         public AssetType Type { get; private set; }
 

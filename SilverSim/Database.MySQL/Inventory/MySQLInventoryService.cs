@@ -13,6 +13,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Inventory
 {
@@ -31,6 +32,7 @@ namespace SilverSim.Database.MySQL.Inventory
             m_InventoryFolderService = new MySQLInventoryFolderService(connectionString);
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override InventoryFolderServiceInterface Folder
         {
             get
@@ -39,6 +41,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override InventoryItemServiceInterface Item
         {
             get 

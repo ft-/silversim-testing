@@ -9,6 +9,7 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using ThreadedClasses;
 
 namespace SilverSim.Database.MySQL.ServerParam
@@ -88,6 +89,7 @@ namespace SilverSim.Database.MySQL.ServerParam
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override string this[UUID regionID, string parameter, string defvalue]
         {
             get
@@ -102,6 +104,8 @@ namespace SilverSim.Database.MySQL.ServerParam
                 }
             }
         }
+
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override string this[UUID regionID, string parameter]
         {
             get

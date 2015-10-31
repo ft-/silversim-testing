@@ -5,6 +5,7 @@ using MySql.Data.MySqlClient;
 using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Profile
 {
@@ -61,6 +62,9 @@ namespace SilverSim.Database.MySQL.Profile
                     }
                 }
             }
+
+            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+            [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
             public ProfileProperties this[UUI user, PropertiesUpdateFlags flags]
             {
                 set
