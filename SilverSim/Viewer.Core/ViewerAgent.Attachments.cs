@@ -15,6 +15,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -38,6 +39,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.RezMultipleAttachmentsFromInv)]
         [PacketHandler(MessageType.RezSingleAttachmentFromInv)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRezAttachment(Message m)
         {
             switch(m.Number)
@@ -77,6 +79,7 @@ namespace SilverSim.Viewer.Core
 
         [PacketHandler(MessageType.DetachAttachmentIntoInv)]
         [PacketHandler(MessageType.ObjectDetach)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleDetachAttachment(Message m)
         {
             List<DetachEntry> detachList = new List<DetachEntry>();

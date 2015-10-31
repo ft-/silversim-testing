@@ -6,12 +6,14 @@ using SilverSim.Viewer.Messages.Names;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
         [PacketHandler(MessageType.UUIDGroupNameRequest)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void GroupNameLookup(Message m)
         {
             UUIDGroupNameRequest req = (UUIDGroupNameRequest)m;
@@ -45,6 +47,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.UUIDNameRequest)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void UserNameLookup(Message m)
         {
             UUIDNameRequest req = (UUIDNameRequest)m;

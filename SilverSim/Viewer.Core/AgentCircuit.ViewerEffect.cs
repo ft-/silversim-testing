@@ -5,12 +5,14 @@ using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Appearance;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
         [PacketHandler(MessageType.ViewerEffect)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleViewerEffect(Message m)
         {
             ViewerEffect ve = (ViewerEffect)m;

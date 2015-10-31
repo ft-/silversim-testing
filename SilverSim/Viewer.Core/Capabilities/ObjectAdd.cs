@@ -58,7 +58,6 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         public void HttpRequestHandler(HttpRequest httpreq)
         {
-            IValue iv;
             if (httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
