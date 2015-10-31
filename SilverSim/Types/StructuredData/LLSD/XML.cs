@@ -4,18 +4,38 @@
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 
-namespace SilverSim.StructuredData.LLSD
+namespace SilverSim.Types.StructuredData.Llsd
 {
-    public static class LLSD_XML
+    public static class LlsdXml
     {
         [Serializable]
-        public class InvalidLLSDXmlSerializationException : Exception
+        public class InvalidLlsdXmlSerializationException : Exception
         {
-            public InvalidLLSDXmlSerializationException()
+            public InvalidLlsdXmlSerializationException()
+            {
+
+            }
+
+            public InvalidLlsdXmlSerializationException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected InvalidLlsdXmlSerializationException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public InvalidLlsdXmlSerializationException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }
@@ -34,7 +54,7 @@ namespace SilverSim.StructuredData.LLSD
             {
                 if(!input.Read())
                 {
-                    throw new InvalidLLSDXmlSerializationException();
+                    throw new InvalidLlsdXmlSerializationException();
                 }
                 switch(input.NodeType)
                 {
@@ -48,7 +68,7 @@ namespace SilverSim.StructuredData.LLSD
                     case XmlNodeType.EndElement:
                         if(input.Name != elementName)
                         {
-                            throw new InvalidLLSDXmlSerializationException();
+                            throw new InvalidLlsdXmlSerializationException();
                         }
                         else
                         {
@@ -61,6 +81,7 @@ namespace SilverSim.StructuredData.LLSD
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private static IValue DeserializeInternal(XmlTextReader input)
         {
             string element = input.Name;
@@ -76,7 +97,7 @@ namespace SilverSim.StructuredData.LLSD
                     {
                         if(!input.Read())
                         {
-                            throw new InvalidLLSDXmlSerializationException();
+                            throw new InvalidLlsdXmlSerializationException();
                         }
 
                         switch(input.NodeType)
@@ -88,7 +109,7 @@ namespace SilverSim.StructuredData.LLSD
                                 }
                                 else
                                 {
-                                    throw new InvalidLLSDXmlSerializationException();
+                                    throw new InvalidLlsdXmlSerializationException();
                                 }
 
                             case XmlNodeType.Element:
@@ -116,7 +137,7 @@ namespace SilverSim.StructuredData.LLSD
                     }
                     else
                     {
-                        throw new InvalidLLSDXmlSerializationException();
+                        throw new InvalidLlsdXmlSerializationException();
                     }
 
                 case "date":
@@ -127,7 +148,12 @@ namespace SilverSim.StructuredData.LLSD
                     {
                         return new Integer();
                     }
-                    return new Integer(Int32.Parse(GetTextNode(input)));
+                    Int32 inp32val;
+                    if(!Int32.TryParse(GetTextNode(input), out inp32val))
+                    {
+                        throw new InvalidLlsdXmlSerializationException();
+                    }
+                    return new Integer(inp32val);
 
                 case "map":
                     if(input.IsEmptyElement)
@@ -141,7 +167,7 @@ namespace SilverSim.StructuredData.LLSD
                     {
                         if(!input.Read())
                         {
-                            throw new InvalidLLSDXmlSerializationException();
+                            throw new InvalidLlsdXmlSerializationException();
                         }
 
                         switch(input.NodeType)
@@ -151,13 +177,13 @@ namespace SilverSim.StructuredData.LLSD
                                 {
                                     if(in_entity)
                                     {
-                                        throw new InvalidLLSDXmlSerializationException();
+                                        throw new InvalidLlsdXmlSerializationException();
                                     }
                                     return map;
                                 }
                                 else
                                 {
-                                    throw new InvalidLLSDXmlSerializationException();
+                                    throw new InvalidLlsdXmlSerializationException();
                                 }
 
                             case XmlNodeType.Element:
@@ -179,11 +205,18 @@ namespace SilverSim.StructuredData.LLSD
                     }
 
                 case "real":
-                    if(input.IsEmptyElement)
+                    if (input.IsEmptyElement)
                     {
                         return new Real();
                     }
-                    return Real.Parse(GetTextNode(input));
+                    {
+                        Real r_val;
+                        if(!Real.TryParse(GetTextNode(input), out r_val))
+                        {
+                            throw new InvalidLlsdXmlSerializationException();
+                        }
+                        return r_val;
+                    }
 
                 case "string":
                     if(input.IsEmptyElement)
@@ -211,7 +244,7 @@ namespace SilverSim.StructuredData.LLSD
                     return new UUID(GetTextNode(input));
                     
                 default:
-                    throw new InvalidLLSDXmlSerializationException();
+                    throw new InvalidLlsdXmlSerializationException();
             }
         }
 
@@ -223,7 +256,7 @@ namespace SilverSim.StructuredData.LLSD
             {
                 if(!input.Read())
                 {
-                    throw new InvalidLLSDXmlSerializationException();
+                    throw new InvalidLlsdXmlSerializationException();
                 }
 
                 switch(input.NodeType)
@@ -231,7 +264,7 @@ namespace SilverSim.StructuredData.LLSD
                     case XmlNodeType.Element:
                         if(value != null)
                         {
-                            throw new InvalidLLSDXmlSerializationException();
+                            throw new InvalidLlsdXmlSerializationException();
                         }
                         value = DeserializeInternal(input);
                         break;
@@ -239,11 +272,11 @@ namespace SilverSim.StructuredData.LLSD
                     case XmlNodeType.EndElement:
                         if(input.Name != "llsd")
                         {
-                            throw new InvalidLLSDXmlSerializationException();
+                            throw new InvalidLlsdXmlSerializationException();
                         }
                         if(value == null)
                         {
-                            throw new InvalidLLSDXmlSerializationException();
+                            throw new InvalidLlsdXmlSerializationException();
                         }
                         return value;
 
@@ -256,7 +289,10 @@ namespace SilverSim.StructuredData.LLSD
 
         public static IValue Deserialize(Stream input)
         {
-            return Deserialize(new XmlTextReader(input));
+            using (XmlTextReader r = new XmlTextReader(input))
+            {
+                return Deserialize(r);
+            }
         }
 
         public static IValue Deserialize(XmlTextReader inp)
@@ -265,7 +301,7 @@ namespace SilverSim.StructuredData.LLSD
             {
                 if (!inp.Read())
                 {
-                    throw new InvalidLLSDXmlSerializationException();
+                    throw new InvalidLlsdXmlSerializationException();
                 }
 
                 switch (inp.NodeType)
@@ -277,7 +313,7 @@ namespace SilverSim.StructuredData.LLSD
                         }
                         else
                         {
-                            throw new InvalidLLSDXmlSerializationException();
+                            throw new InvalidLlsdXmlSerializationException();
                         }
                 }
             }
@@ -287,11 +323,21 @@ namespace SilverSim.StructuredData.LLSD
 
         private static void SerializeInternal(IValue input, XmlTextWriter output)
         {
-            if (input is SilverSim.Types.Map)
+            Map i_m;
+            AnArray i_a;
+            ABoolean i_bool;
+            Date i_d;
+            Integer i_int;
+            Real i_real;
+            AString i_string;
+            URI i_uri;
+            BinaryData i_bin;
+
+            if (null != (i_m = input as Map))
             {
                 output.WriteStartElement("map");
 
-                foreach (KeyValuePair<string, IValue> kvp in (Map)input)
+                foreach (KeyValuePair<string, IValue> kvp in i_m)
                 {
                     output.WriteStartElement("key");
                     output.WriteString(kvp.Key);
@@ -301,22 +347,21 @@ namespace SilverSim.StructuredData.LLSD
                 }
                 output.WriteEndElement();
             }
-            else if (input is AnArray)
+            else if (null != (i_a = input as AnArray))
             {
                 output.WriteStartElement("array");
-                AnArray i = (AnArray)input;
 
-                foreach (IValue v in i)
+                foreach (IValue v in i_a)
                 {
                     SerializeInternal(v, output);
                 }
 
                 output.WriteEndElement();
             }
-            else if (input is ABoolean)
+            else if (null != (i_bool = input as ABoolean))
             {
                 output.WriteStartElement("boolean");
-                if ((ABoolean)input)
+                if (i_bool)
                 {
                     output.WriteValue("1");
                 }
@@ -326,17 +371,16 @@ namespace SilverSim.StructuredData.LLSD
                 }
                 output.WriteEndElement();
             }
-            else if (input is Date)
+            else if (null != (i_d = input as Date))
             {
                 output.WriteStartElement("date");
-                output.WriteValue(((Date)input).ToString());
+                output.WriteValue(i_d.ToString());
                 output.WriteEndElement();
             }
-            else if (input is Integer)
+            else if (null != (i_int = input as Integer))
             {
-                Integer i = (Integer)input;
                 output.WriteStartElement("integer");
-                output.WriteValue((Int32)i);
+                output.WriteValue(i_int.AsInt);
                 output.WriteEndElement();
             }
             else if (input is Quaternion)
@@ -357,16 +401,16 @@ namespace SilverSim.StructuredData.LLSD
                 output.WriteEndElement();
                 output.WriteEndElement();
             }
-            else if (input is Real)
+            else if (null != (i_real = input as Real))
             {
                 output.WriteStartElement("real");
-                output.WriteValue(input.AsReal);
+                output.WriteValue(i_real.AsReal);
                 output.WriteEndElement();
             }
-            else if (input is AString)
+            else if (null != (i_string = input as AString))
             {
                 output.WriteStartElement("string");
-                output.WriteValue(input.ToString());
+                output.WriteValue(i_string.ToString());
                 output.WriteEndElement();
             }
             else if (input is Undef)
@@ -374,10 +418,10 @@ namespace SilverSim.StructuredData.LLSD
                 output.WriteStartElement("undef");
                 output.WriteEndElement();
             }
-            else if (input is URI)
+            else if (null != (i_uri = input as URI))
             {
                 output.WriteStartElement("uri");
-                output.WriteValue(input.ToString());
+                output.WriteValue(i_uri.ToString());
                 output.WriteEndElement();
             }
             else if (input is UUID)
@@ -401,9 +445,9 @@ namespace SilverSim.StructuredData.LLSD
                 output.WriteEndElement();
                 output.WriteEndElement();
             }
-            else if(input is BinaryData)
+            else if(null != (i_bin = input as BinaryData))
             {
-                byte[] data = ((BinaryData)input);
+                byte[] data = i_bin;
                 output.WriteStartElement("binary");
                 if (data.Length != 0)
                 {
@@ -420,9 +464,10 @@ namespace SilverSim.StructuredData.LLSD
 
         public static void Serialize(IValue value, Stream output)
         {
-            XmlTextWriter text = new XmlTextWriter(output, UTF8NoBOM);
-            Serialize(value, text);
-            text.Flush();
+            using (XmlTextWriter text = new XmlTextWriter(output, UTF8NoBOM))
+            {
+                Serialize(value, text);
+            }
         }
 
         public static void Serialize(IValue value, XmlTextWriter text)

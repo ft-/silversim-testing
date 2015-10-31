@@ -143,7 +143,24 @@ namespace SilverSim.Types
 
         public static Integer Parse(string v)
         {
-            return new Integer(Int32.Parse(v));
+            int i;
+            if(!int.TryParse(v, out i))
+            {
+                throw new ArgumentException("Argument v is not an integer");
+            }
+            return new Integer(i);
+        }
+
+        public static bool TryParse(string v, out Integer res)
+        {
+            res = default(Integer);
+            int i;
+            if(!int.TryParse(v, out i))
+            {
+                return false;
+            }
+            res = new Integer(i);
+            return true;
         }
 
         #region Serialization

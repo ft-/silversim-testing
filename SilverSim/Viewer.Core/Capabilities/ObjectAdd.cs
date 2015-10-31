@@ -3,7 +3,7 @@
 
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Inventory;
@@ -73,7 +73,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             Map rm;
             try
             {
-                rm = LLSD_XML.Deserialize(httpreq.Body) as Map;
+                rm = LlsdXml.Deserialize(httpreq.Body) as Map;
             }
             catch
             {

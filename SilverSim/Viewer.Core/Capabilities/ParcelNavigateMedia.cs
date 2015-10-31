@@ -12,7 +12,7 @@ using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using ThreadedClasses;
 using SilverSim.Scene.Types.Scene;
 using System.IO;
@@ -49,7 +49,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             Map reqmap;
             try
             {
-                reqmap = LLSD_XML.Deserialize(httpreq.Body) as Map;
+                reqmap = LlsdXml.Deserialize(httpreq.Body) as Map;
             }
             catch
             {
@@ -79,7 +79,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 resp.ContentType = "application/llsd+xml";
                 using (Stream s = resp.GetOutputStream())
                 {
-                    LLSD_XML.Serialize(m, s);
+                    LlsdXml.Serialize(m, s);
                 }
             }
         }

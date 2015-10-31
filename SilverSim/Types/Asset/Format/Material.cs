@@ -1,7 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -33,7 +33,9 @@ namespace SilverSim.Types.Asset.Format
         public int SpecRotation;
         #endregion
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const double MATERIALS_MULTIPLIER = 10000f;
+        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const byte DEFAULT_SPECULAR_LIGHT_EXPONENT = (byte)(0.2f * 255);
 
         #region Constructors
@@ -70,9 +72,10 @@ namespace SilverSim.Types.Asset.Format
             SpecRotation = m["SpecRotation"].AsInt;
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public Material(AssetData asset)
         {
-            Map m = LLSD_XML.Deserialize(asset.InputStream) as Map;
+            Map m = LlsdXml.Deserialize(asset.InputStream) as Map;
             if(null == m)
             {
                 throw new NotAMaterialFormatException();
@@ -192,17 +195,19 @@ namespace SilverSim.Types.Asset.Format
         {
             AssetData asset = new AssetData();
             asset.ID = v.MaterialID;
-            MemoryStream ms = new MemoryStream();
-
-            using(XmlTextWriter w = new XmlTextWriter(ms, UTF8NoBOM))
+            using (MemoryStream ms = new MemoryStream())
             {
-                w.WriteStartElement("llsd");
-                v.WriteMap(w);
-                w.WriteEndElement();
-                w.Flush();
-            }
 
-            asset.Data = ms.ToArray();
+                using (XmlTextWriter w = new XmlTextWriter(ms, UTF8NoBOM))
+                {
+                    w.WriteStartElement("llsd");
+                    v.WriteMap(w);
+                    w.WriteEndElement();
+                    w.Flush();
+                }
+
+                asset.Data = ms.ToArray();
+            }
             asset.Type = AssetType.Material;
             asset.Name = "Material";
             return asset;

@@ -2,7 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.StructuredData.AssetXml;
+using SilverSim.Types.StructuredData.AssetXml;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System.Collections.Generic;
@@ -34,7 +34,7 @@ namespace SilverSim.Scene.Types.Scene
                     Stream resource = GetType().Assembly.GetManifestResourceStream(resourcename);
                     using(GZipStream gz = new GZipStream(resource, CompressionMode.Decompress))
                     {
-                        return AssetXml.parseAssetData(gz);
+                        return AssetXml.ParseAssetData(gz);
                     }
                 });
             }

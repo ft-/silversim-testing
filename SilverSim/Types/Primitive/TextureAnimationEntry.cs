@@ -2,12 +2,14 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Primitive
 {
     public class TextureAnimationEntry
     {
         [Flags]
+        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
         public enum TextureAnimMode : byte
         {
             ANIM_OFF = 0x00,

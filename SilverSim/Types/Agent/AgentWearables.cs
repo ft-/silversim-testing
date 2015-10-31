@@ -4,6 +4,7 @@
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 
 namespace SilverSim.Types.Agent
@@ -86,6 +87,7 @@ namespace SilverSim.Types.Agent
         #endregion
 
         #region Wearable, index accessor
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public WearableInfo this[WearableType type, uint index]
         {
             get

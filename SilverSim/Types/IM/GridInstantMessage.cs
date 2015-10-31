@@ -21,8 +21,7 @@ namespace SilverSim.Types.IM
         public UUID RegionID = UUID.Zero;
         public Date Timestamp = new Date();
 
-        public delegate void OnResultDelegate(GridInstantMessage im, bool success);
-        public OnResultDelegate OnResult;
+        public Action<GridInstantMessage, bool /* success */> OnResult;
         public bool NoOfflineIMStore;
         public bool IsSystemMessage;
 

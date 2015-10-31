@@ -4,7 +4,7 @@
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System.IO;
@@ -42,7 +42,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             Map reqmap;
             try
             {
-                reqmap = LLSD_XML.Deserialize(httpreq.Body) as Map;
+                reqmap = LlsdXml.Deserialize(httpreq.Body) as Map;
             }
             catch
             {
@@ -124,7 +124,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 resp.ContentType = "application/llsd+xml";
                 using (Stream o = resp.GetOutputStream())
                 {
-                    LLSD_XML.Serialize(res, o);
+                    LlsdXml.Serialize(res, o);
                 }
             }
         }

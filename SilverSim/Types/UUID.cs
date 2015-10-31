@@ -6,7 +6,7 @@ using System;
 namespace SilverSim.Types
 {
     [Serializable]
-    public struct UUID : IComparable<UUID>, IEquatable<UUID>, IValue
+    public struct UUID : IEquatable<UUID>, IValue
     {
         private Guid m_Guid;
 

@@ -16,7 +16,7 @@ namespace SilverSim.Types.Asset.Format
         #endregion
 
         #region ExtCharIndex Access
-        public NotecardInventoryItem this[uint ExtCharIndex]
+        public NotecardInventoryItem this[uint extCharIndex]
         {
             get
             {
@@ -24,7 +24,7 @@ namespace SilverSim.Types.Asset.Format
                 {
                     ForEach(delegate(NotecardInventoryItem item)
                     {
-                        if(item.ExtCharIndex == ExtCharIndex)
+                        if(item.ExtCharIndex == extCharIndex)
                         {
                             throw new ReturnValueException<NotecardInventoryItem>(item);
                         }
@@ -34,7 +34,7 @@ namespace SilverSim.Types.Asset.Format
                 {
                     return e.Value;
                 }
-                throw new KeyNotFoundException("ExtCharIndex " + ExtCharIndex.ToString() + " not found");
+                throw new KeyNotFoundException("ExtCharIndex " + extCharIndex.ToString() + " not found");
             }
         }
         #endregion

@@ -2,7 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Main.Common;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using log4net;
 using MySql.Data.MySqlClient;
@@ -150,7 +150,7 @@ namespace SilverSim.Database.MySQL
                 {
                     using (MemoryStream stream = new MemoryStream())
                     {
-                        LLSD_Binary.Serialize((AnArray)kvp.Value, stream);
+                        LlsdBinary.Serialize((AnArray)kvp.Value, stream);
                         mysqlparam.AddWithValue("?v_" + kvp.Key, stream.GetBuffer());
                     }
                 }

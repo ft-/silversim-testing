@@ -2,11 +2,13 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace SilverSim.Types
 {
-    public sealed class AString : IComparable<AString>, IEquatable<AString>, IComparable<string>, IEquatable<string>, IValue
+    [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
+    public sealed class AString : IEquatable<AString>, IEquatable<string>, IValue
     {
         private string m_Value;
 
@@ -63,6 +65,24 @@ namespace SilverSim.Types
             return m_Value;
         }
 
+        public override bool Equals(object obj)
+        {
+            AString a;
+            string s;
+            if(null != (s = obj as string))
+            {
+                return m_Value == s;
+            }
+            else if(null != (a = obj as AString))
+            {
+                return m_Value == a.m_Value;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
         public AString Substring(Int32 startIndex)
         {
             return new AString(m_Value.Substring(startIndex));
@@ -79,6 +99,11 @@ namespace SilverSim.Types
             {
                 return new Integer(m_Value.Length);
             }
+        }
+
+        public override int GetHashCode()
+        {
+            return m_Value.GetHashCode();
         }
 
         #region Operators
@@ -102,21 +127,25 @@ namespace SilverSim.Types
             return false;
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator Integer(AString v)
         {
             return Integer.Parse(v.m_Value);
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator Real(AString v)
         {
             return Real.Parse(v.m_Value);
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator double(AString v)
         {
             return Double.Parse(v.m_Value.Trim(), EnUsCulture);
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator Vector3(AString v)
         {
             return new Vector3((double)v);
@@ -145,14 +174,21 @@ namespace SilverSim.Types
 
         #region Helpers
         public ABoolean AsBoolean { get { return new ABoolean(!string.IsNullOrEmpty(m_Value)); } }
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public Integer AsInteger { get { return new Integer(Int32.Parse(m_Value)); } }
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public Quaternion AsQuaternion { get { return Quaternion.Parse(m_Value); } }
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public Real AsReal { get { return Real.Parse(m_Value); } }
         public AString AsString { get { return new AString(m_Value); } }
         public UUID AsUUID { get { return new UUID(m_Value); } }
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public Vector3 AsVector3 { get { return Vector3.Parse(m_Value); } }
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public uint AsUInt { get { return uint.Parse(m_Value); } }
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public int AsInt { get { return int.Parse(m_Value); } }
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public ulong AsULong { get { return ulong.Parse(m_Value); } }
         #endregion
 

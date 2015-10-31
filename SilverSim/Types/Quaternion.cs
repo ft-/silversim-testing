@@ -2,12 +2,14 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace SilverSim.Types
 {
     [StructLayout(LayoutKind.Sequential)]
+    [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
     public struct Quaternion : IEquatable<Quaternion>, IValue
     {
         /// <summary>X value</summary>
@@ -485,37 +487,44 @@ namespace SilverSim.Types
 
         public static Quaternion Parse(string val)
         {
-            char[] splitChar = { ',' };
-            string[] split = val.Replace("<", System.String.Empty).Replace(">", System.String.Empty).Split(splitChar);
-            if (split.Length == 3)
+            Quaternion q;
+            if(!TryParse(val, out q))
             {
-                return new Quaternion(
-                    double.Parse(split[0].Trim(), EnUsCulture),
-                    double.Parse(split[1].Trim(), EnUsCulture),
-                    double.Parse(split[2].Trim(), EnUsCulture));
+                throw new ArgumentException("Invalid quaternion string passed");
             }
-            else
-            {
-                return new Quaternion(
-                    double.Parse(split[0].Trim(), EnUsCulture),
-                    double.Parse(split[1].Trim(), EnUsCulture),
-                    double.Parse(split[2].Trim(), EnUsCulture),
-                    double.Parse(split[3].Trim(), EnUsCulture));
-            }
+            return q;
         }
 
         public static bool TryParse(string val, out Quaternion result)
         {
-            try
+            result = default(Quaternion);
+            char[] splitChar = { ',' };
+            string[] split = val.Replace("<", System.String.Empty).Replace(">", System.String.Empty).Split(splitChar);
+            int splitLength = split.Length;
+            if (splitLength < 3 || splitLength > 4)
             {
-                result = Parse(val);
-                return true;
-            }
-            catch (Exception)
-            {
-                result = new Quaternion();
                 return false;
             }
+            double x, y, z, w;
+            if(!double.TryParse(split[0], NumberStyles.Float, EnUsCulture, out x) ||
+               !double.TryParse(split[1], NumberStyles.Float, EnUsCulture, out y) ||
+                !double.TryParse(split[2], NumberStyles.Float, EnUsCulture, out z))
+            {
+                return false;
+            }
+            if (splitLength == 3)
+            {
+                result = new Quaternion(x, y, z);
+            }
+            else
+            {
+                if (!double.TryParse(split[3], NumberStyles.Float, EnUsCulture, out w))
+                {
+                    return false;
+                }
+                result = new Quaternion(x, y, z, w);
+            }
+            return true;
         }
         #endregion Static Methods
 
@@ -758,6 +767,7 @@ namespace SilverSim.Types
         }
 
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator Quaternion(string val)
         {
             return Quaternion.Parse(val);
@@ -779,6 +789,7 @@ namespace SilverSim.Types
         }
 
         #region Byte conversion
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
         public byte[] AsByte
         {
             get

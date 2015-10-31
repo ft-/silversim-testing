@@ -209,8 +209,6 @@ namespace SilverSim.Scene.Types.Agent
 
         ulong AddNewFile(string filename, byte[] data);
 
-        UGI Group { get; set; }
-
         bool IsActiveGod
         {
             get;

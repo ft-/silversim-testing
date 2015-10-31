@@ -8,10 +8,13 @@ using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.Serialization;
+using System.Text;
 using ThreadedClasses;
 
-namespace SilverSim.StructuredData.Agent
+namespace SilverSim.Types.StructuredData.Agent
 {
     public class PostData
     {
@@ -25,8 +28,25 @@ namespace SilverSim.StructuredData.Agent
         [Serializable]
         public class InvalidAgentPostSerializationException : Exception
         {
+            public InvalidAgentPostSerializationException()
+            {
+
+            }
+
             public InvalidAgentPostSerializationException(string message)
                 : base(message)
+            {
+
+            }
+
+            protected InvalidAgentPostSerializationException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public InvalidAgentPostSerializationException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }
@@ -37,10 +57,12 @@ namespace SilverSim.StructuredData.Agent
 
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static PostData Deserialize(Stream input)
         {
             PostData agentparams = new PostData();
-            Map parms = JSON.JSON.Deserialize(input) as Map;
+            Map parms = Json.Json.Deserialize(input) as Map;
             if (null == parms)
             {
                 throw new InvalidAgentPostSerializationException("Invalid JSON AgentPostData");
@@ -73,7 +95,12 @@ namespace SilverSim.StructuredData.Agent
                 foreach(IValue seedv in children_seeds)
                 {
                     Map seed = (Map)seedv;
-                    agentparams.Circuit.ChildrenCapSeeds[UInt64.Parse(seed["handle"].ToString())] = seed["seed"].ToString();
+                    UInt64 regionhandle;
+                    if (!UInt64.TryParse(seed["handle"].ToString(), out regionhandle))
+                    {
+                        throw new InvalidAgentPostSerializationException();
+                    }
+                    agentparams.Circuit.ChildrenCapSeeds[regionhandle] = seed["seed"].ToString();
                 }
             }
 
@@ -233,7 +260,12 @@ namespace SilverSim.StructuredData.Agent
                 foreach (IValue apv in (AnArray)appearancePack["attachments"])
                 {
                     Map ap = (Map)apv;
-                    agentparams.Appearance.Attachments[(AttachmentPoint)uint.Parse(ap["point"].ToString())][ap["item"].AsUUID] = UUID.Zero;
+                    uint apid;
+                    if (!uint.TryParse(ap["point"].ToString(), out apid))
+                    {
+                        throw new InvalidAgentPostSerializationException();
+                    }
+                    agentparams.Appearance.Attachments[(AttachmentPoint)apid][ap["item"].AsUUID] = UUID.Zero;
                 }
             }
 
@@ -242,189 +274,192 @@ namespace SilverSim.StructuredData.Agent
 
         private void WriteJSONString(TextWriter w, string name, string value)
         {
-            w.Write(string.Format("\"{0}\":\"{1}\"", JSON.JSON.SerializeString(name), JSON.JSON.SerializeString(value)));
+            w.Write(string.Format("\"{0}\":\"{1}\"", Json.Json.SerializeString(name), Json.Json.SerializeString(value)));
         }
         private void WriteJSONString(TextWriter w, string name, UUID value)
         {
-            w.Write(string.Format("\"{0}\":\"{1}\"", JSON.JSON.SerializeString(name), JSON.JSON.SerializeString((string)value)));
+            w.Write(string.Format("\"{0}\":\"{1}\"", Json.Json.SerializeString(name), Json.Json.SerializeString((string)value)));
         }
         private void WriteJSONValue(TextWriter w, string name, uint value)
         {
-            w.Write(string.Format("\"{0}\":{1}", JSON.JSON.SerializeString(name), value));
+            w.Write(string.Format("\"{0}\":{1}", Json.Json.SerializeString(name), value));
         }
         private void WriteJSONValue(TextWriter w, string name, double value)
         {
-            w.Write(string.Format("\"{0}\":{1}", JSON.JSON.SerializeString(name), value));
+            w.Write(string.Format("\"{0}\":{1}", Json.Json.SerializeString(name), value));
         }
         private void WriteJSONValue(TextWriter w, string name, bool value)
         {
             if (value)
             {
-                w.Write(string.Format("\"{0}\":true", JSON.JSON.SerializeString(name)));
+                w.Write(string.Format("\"{0}\":true", Json.Json.SerializeString(name)));
             }
             else
             {
-                w.Write(string.Format("\"{0}\":false", JSON.JSON.SerializeString(name)));
+                w.Write(string.Format("\"{0}\":false", Json.Json.SerializeString(name)));
             }
         }
 
+        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
         public void Serialize(Stream output)
         {
             string prefix;
-            TextWriter w = new StreamWriter(output);
-            w.Write("{");
-            /*-----------------------------------------------------------------*/
-            /* SessionInfo */
-            WriteJSONString(w, "service_session_id", Session.ServiceSessionID); w.Write(",");
-            WriteJSONString(w, "session_id", Session.SessionID); w.Write(",");
-            WriteJSONString(w, "secure_session_id", Session.SecureSessionID); w.Write(",");
-
-            /*-----------------------------------------------------------------*/
-            /* Circuit Info */
-            WriteJSONString(w, "circuit_code", Circuit.CircuitCode.ToString()); w.Write(",");
-            WriteJSONString(w, "caps_path", Circuit.CapsPath); w.Write(",");
-            WriteJSONValue(w, "child", Circuit.IsChild); w.Write(",");
-            w.Write("\"children_seeds\":[");
-            prefix = string.Empty;
-            foreach(KeyValuePair<UInt64, string> kvp in Circuit.ChildrenCapSeeds)
+            using (TextWriter w = new StreamWriter(output, UTF8NoBOM))
             {
-                w.Write(prefix);
                 w.Write("{");
-                WriteJSONString(w, "handle", kvp.Key.ToString()); w.Write(",");
-                WriteJSONString(w, "seed", kvp.Value.ToString());
-                w.Write("}");
-                prefix = ",";
-            }
-            w.Write("],");
+                /*-----------------------------------------------------------------*/
+                /* SessionInfo */
+                WriteJSONString(w, "service_session_id", Session.ServiceSessionID); w.Write(",");
+                WriteJSONString(w, "session_id", Session.SessionID); w.Write(",");
+                WriteJSONString(w, "secure_session_id", Session.SecureSessionID); w.Write(",");
 
-            /*-----------------------------------------------------------------*/
-            /* Destination */
-            WriteJSONString(w, "destination_uuid", Destination.ID); w.Write(",");
-            WriteJSONString(w, "destination_x", Destination.Location.X.ToString()); w.Write(",");
-            WriteJSONString(w, "destination_y", Destination.Location.Y.ToString()); w.Write(",");
-            WriteJSONString(w, "start_pos", Destination.Position.ToString()); w.Write(",");
-            WriteJSONString(w, "teleport_flags", ((uint)Destination.TeleportFlags).ToString());
-            if(!Destination.LocalToGrid)
-            {
-                WriteJSONString(w, "destination_serveruri", Destination.ServerURI); w.Write(",");
-                WriteJSONString(w, "gatekeeper_serveruri", Destination.GatekeeperURI); w.Write(",");
-            }
-            else
-            {
-
-            }
-
-            /*-----------------------------------------------------------------*/
-            /* Account */
-            WriteJSONString(w, "agent_id", Account.Principal.ID); w.Write(",");
-            WriteJSONString(w, "first_name", Account.Principal.FirstName); w.Write(",");
-            WriteJSONString(w, "last_name", Account.Principal.LastName); w.Write(",");
-
-            /*-----------------------------------------------------------------*/
-            /* Client Info */
-            WriteJSONString(w, "client_ip", Client.ClientIP); w.Write(",");
-            WriteJSONString(w, "viewer", Client.ClientVersion); w.Write(",");
-            WriteJSONString(w, "channel", Client.Channel); w.Write(",");
-            WriteJSONString(w, "mac", Client.Mac); w.Write(",");
-            WriteJSONString(w, "id0", Client.ID0); w.Write(",");
-
-            /*-----------------------------------------------------------------*/
-            /* Service URLs */
-            w.Write("serviceurls:{");
-            prefix = string.Empty;
-            foreach (KeyValuePair<string, string> kvp in Account.ServiceURLs)
-            {
-                w.Write(prefix);
-                WriteJSONString(w, kvp.Key, kvp.Value);
-                prefix = ",";
-            }
-            w.Write("},");
-            w.Write("service_urls:[");
-            prefix = string.Empty;
-            foreach (KeyValuePair<string, string> kvp in Account.ServiceURLs)
-            {
-                w.Write(prefix);
-                w.Write(string.Format("\"{0}\", \"{1}\"", JSON.JSON.SerializeString(kvp.Key), JSON.JSON.SerializeString(kvp.Value)));
-                prefix = ",";
-            }
-            w.Write("],");
-
-            w.Write("\"packed_appearance\":{");
-            WriteJSONValue(w, "height", Appearance.AvatarHeight); w.Write(",");
-            WriteJSONValue(w, "serial", Appearance.Serial); w.Write(",");
-            string vParams = string.Empty;
-            foreach(byte v in Appearance.VisualParams)
-            {
-                if(!string.IsNullOrEmpty(vParams))
+                /*-----------------------------------------------------------------*/
+                /* Circuit Info */
+                WriteJSONString(w, "circuit_code", Circuit.CircuitCode.ToString()); w.Write(",");
+                WriteJSONString(w, "caps_path", Circuit.CapsPath); w.Write(",");
+                WriteJSONValue(w, "child", Circuit.IsChild); w.Write(",");
+                w.Write("\"children_seeds\":[");
+                prefix = string.Empty;
+                foreach (KeyValuePair<UInt64, string> kvp in Circuit.ChildrenCapSeeds)
                 {
-                    vParams += ",";
-                }
-                vParams += v.ToString();
-            }
-            WriteJSONString(w, "visualparams", vParams); w.Write(",");
-            w.Write("\"textures\":[");
-            prefix = string.Empty;
-            {
-                int i;
-                for (i = 0; i < AppearanceInfo.AvatarTextureData.TextureCount; ++i)
-                { 
                     w.Write(prefix);
-                    w.Write(string.Format("\"{0}\"", Appearance.AvatarTextures[i]));
+                    w.Write("{");
+                    WriteJSONString(w, "handle", kvp.Key.ToString()); w.Write(",");
+                    WriteJSONString(w, "seed", kvp.Value.ToString());
+                    w.Write("}");
                     prefix = ",";
                 }
-            }
-            w.Write("],\"wearables\":[");
-            {
-                uint i;
-                for (i = 0; i < (uint)WearableType.NumWearables; ++i)
+                w.Write("],");
+
+                /*-----------------------------------------------------------------*/
+                /* Destination */
+                WriteJSONString(w, "destination_uuid", Destination.ID); w.Write(",");
+                WriteJSONString(w, "destination_x", Destination.Location.X.ToString()); w.Write(",");
+                WriteJSONString(w, "destination_y", Destination.Location.Y.ToString()); w.Write(",");
+                WriteJSONString(w, "start_pos", Destination.Position.ToString()); w.Write(",");
+                WriteJSONString(w, "teleport_flags", ((uint)Destination.TeleportFlags).ToString());
+                if (!Destination.LocalToGrid)
                 {
-                    if(i != 0)
-                    {
-                        w.Write(",");
-                    }
-                    List<AgentWearables.WearableInfo> wearables = Appearance.Wearables[(WearableType)i];
-                    w.Write("[");
-                    prefix = string.Empty;
-                    foreach (AgentWearables.WearableInfo wi in wearables)
-                    {
-                        w.Write(prefix);
-                        w.Write("{");
-                        WriteJSONString(w, "item", wi.ItemID);
-                        if(wi.AssetID != UUID.Zero)
-                        {
-                            w.Write(",");
-                            WriteJSONString(w, "asset", wi.AssetID);
-                        }
-                        w.Write("}");
-                        prefix=",";
-                    }
-                    w.Write("]");
+                    WriteJSONString(w, "destination_serveruri", Destination.ServerURI); w.Write(",");
+                    WriteJSONString(w, "gatekeeper_serveruri", Destination.GatekeeperURI); w.Write(",");
                 }
-            }
-            w.Write("], \"attachments\":[");
-            {
-                prefix = string.Empty;
-                foreach(KeyValuePair<AttachmentPoint, RwLockedDictionary<UUID, UUID>> kvp in Appearance.Attachments)
+                else
                 {
-                    foreach (KeyValuePair<UUID, UUID> kvpInner in kvp.Value)
+
+                }
+
+                /*-----------------------------------------------------------------*/
+                /* Account */
+                WriteJSONString(w, "agent_id", Account.Principal.ID); w.Write(",");
+                WriteJSONString(w, "first_name", Account.Principal.FirstName); w.Write(",");
+                WriteJSONString(w, "last_name", Account.Principal.LastName); w.Write(",");
+
+                /*-----------------------------------------------------------------*/
+                /* Client Info */
+                WriteJSONString(w, "client_ip", Client.ClientIP); w.Write(",");
+                WriteJSONString(w, "viewer", Client.ClientVersion); w.Write(",");
+                WriteJSONString(w, "channel", Client.Channel); w.Write(",");
+                WriteJSONString(w, "mac", Client.Mac); w.Write(",");
+                WriteJSONString(w, "id0", Client.ID0); w.Write(",");
+
+                /*-----------------------------------------------------------------*/
+                /* Service URLs */
+                w.Write("serviceurls:{");
+                prefix = string.Empty;
+                foreach (KeyValuePair<string, string> kvp in Account.ServiceURLs)
+                {
+                    w.Write(prefix);
+                    WriteJSONString(w, kvp.Key, kvp.Value);
+                    prefix = ",";
+                }
+                w.Write("},");
+                w.Write("service_urls:[");
+                prefix = string.Empty;
+                foreach (KeyValuePair<string, string> kvp in Account.ServiceURLs)
+                {
+                    w.Write(prefix);
+                    w.Write(string.Format("\"{0}\", \"{1}\"", Json.Json.SerializeString(kvp.Key), Json.Json.SerializeString(kvp.Value)));
+                    prefix = ",";
+                }
+                w.Write("],");
+
+                w.Write("\"packed_appearance\":{");
+                WriteJSONValue(w, "height", Appearance.AvatarHeight); w.Write(",");
+                WriteJSONValue(w, "serial", Appearance.Serial); w.Write(",");
+                string vParams = string.Empty;
+                foreach (byte v in Appearance.VisualParams)
+                {
+                    if (!string.IsNullOrEmpty(vParams))
+                    {
+                        vParams += ",";
+                    }
+                    vParams += v.ToString();
+                }
+                WriteJSONString(w, "visualparams", vParams); w.Write(",");
+                w.Write("\"textures\":[");
+                prefix = string.Empty;
+                {
+                    int i;
+                    for (i = 0; i < AppearanceInfo.AvatarTextureData.TextureCount; ++i)
                     {
                         w.Write(prefix);
-                        w.Write("{");
-                        WriteJSONValue(w, "point", (uint)kvp.Key);
-                        WriteJSONString(w, "item", kvpInner.Key);
-                        if (kvpInner.Value != UUID.Zero)
-                        {
-                            WriteJSONString(w, "asset", kvpInner.Value);
-                        }
-                        w.Write("}");
+                        w.Write(string.Format("\"{0}\"", Appearance.AvatarTextures[i]));
                         prefix = ",";
                     }
                 }
-            }
-            w.Write("]");
+                w.Write("],\"wearables\":[");
+                {
+                    uint i;
+                    for (i = 0; i < (uint)WearableType.NumWearables; ++i)
+                    {
+                        if (i != 0)
+                        {
+                            w.Write(",");
+                        }
+                        List<AgentWearables.WearableInfo> wearables = Appearance.Wearables[(WearableType)i];
+                        w.Write("[");
+                        prefix = string.Empty;
+                        foreach (AgentWearables.WearableInfo wi in wearables)
+                        {
+                            w.Write(prefix);
+                            w.Write("{");
+                            WriteJSONString(w, "item", wi.ItemID);
+                            if (wi.AssetID != UUID.Zero)
+                            {
+                                w.Write(",");
+                                WriteJSONString(w, "asset", wi.AssetID);
+                            }
+                            w.Write("}");
+                            prefix = ",";
+                        }
+                        w.Write("]");
+                    }
+                }
+                w.Write("], \"attachments\":[");
+                {
+                    prefix = string.Empty;
+                    foreach (KeyValuePair<AttachmentPoint, RwLockedDictionary<UUID, UUID>> kvp in Appearance.Attachments)
+                    {
+                        foreach (KeyValuePair<UUID, UUID> kvpInner in kvp.Value)
+                        {
+                            w.Write(prefix);
+                            w.Write("{");
+                            WriteJSONValue(w, "point", (uint)kvp.Key);
+                            WriteJSONString(w, "item", kvpInner.Key);
+                            if (kvpInner.Value != UUID.Zero)
+                            {
+                                WriteJSONString(w, "asset", kvpInner.Value);
+                            }
+                            w.Write("}");
+                            prefix = ",";
+                        }
+                    }
+                }
+                w.Write("]");
 
-            w.Write("}"); /* packed_appearance */
-            w.Write("}");
+                w.Write("}"); /* packed_appearance */
+                w.Write("}");
+            }
         }
     }
 }

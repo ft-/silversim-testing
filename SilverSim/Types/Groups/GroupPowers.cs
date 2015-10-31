@@ -2,10 +2,13 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Groups
 {
-    [Flags] public enum GroupPowers : ulong
+    [Flags]
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    public enum GroupPowers : ulong
     {
         None = 0,
 

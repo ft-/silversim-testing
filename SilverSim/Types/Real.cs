@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 
 namespace SilverSim.Types
@@ -187,9 +188,22 @@ namespace SilverSim.Types
         }
         #endregion Operators
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static Real Parse(string v)
         {
             return new Real(Double.Parse(v.Trim(), EnUsCulture));
+        }
+
+        public static bool TryParse(string v, out Real res)
+        {
+            res = default(Real);
+            double f;
+            if(!Double.TryParse(v.Trim(), NumberStyles.Float, EnUsCulture, out f))
+            {
+                return false;
+            }
+            res = new Real(f);
+            return true;
         }
 
         #region Helpers

@@ -5,15 +5,34 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 
-namespace SilverSim.StructuredData.JSON
+namespace SilverSim.Types.StructuredData.Json
 {
-    public static class JSON
+    public static class Json
     {
         [Serializable]
-        public class InvalidJSONSerializationException : Exception 
+        public class InvalidJsonSerializationException : Exception 
         {
-            public InvalidJSONSerializationException()
+            public InvalidJsonSerializationException()
+            {
+
+            }
+
+            public InvalidJsonSerializationException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected InvalidJsonSerializationException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public InvalidJsonSerializationException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }
@@ -113,7 +132,7 @@ namespace SilverSim.StructuredData.JSON
                             double f;
                             if(!Double.TryParse(input, out f))
                             {
-                                throw new InvalidJSONSerializationException();
+                                throw new InvalidJsonSerializationException();
                             }
                             return new Real(f);
                         }
@@ -122,7 +141,7 @@ namespace SilverSim.StructuredData.JSON
                             Int32 i;
                             if(!Int32.TryParse(input, out i))
                             {
-                                throw new InvalidJSONSerializationException();
+                                throw new InvalidJsonSerializationException();
                             }
                             return new Integer(i);
                         }
@@ -159,7 +178,7 @@ namespace SilverSim.StructuredData.JSON
                     int bc = io.Peek();
                     if(bc == -1)
                     {
-                        throw new InvalidJSONSerializationException();
+                        throw new InvalidJsonSerializationException();
                     }
                     c = (char)bc;
 
@@ -174,7 +193,7 @@ namespace SilverSim.StructuredData.JSON
                 }
                 else
                 {
-                    throw new InvalidJSONSerializationException();
+                    throw new InvalidJsonSerializationException();
                 }
             }
         }
@@ -197,7 +216,7 @@ namespace SilverSim.StructuredData.JSON
                 c = (char)io.Read();
                 if(c != ':')
                 {
-                    throw new InvalidJSONSerializationException();
+                    throw new InvalidJsonSerializationException();
                 }
                 map[key.ToString()] = ParseValue(io);
                 do
@@ -214,7 +233,7 @@ namespace SilverSim.StructuredData.JSON
                     int bc = io.Peek();
                     if(bc == -1)
                     {
-                        throw new InvalidJSONSerializationException();
+                        throw new InvalidJsonSerializationException();
                     }
                     c = (char)bc;
 
@@ -229,7 +248,7 @@ namespace SilverSim.StructuredData.JSON
                 }
                 else
                 {
-                    throw new InvalidJSONSerializationException();
+                    throw new InvalidJsonSerializationException();
                 }
             }
         }
@@ -242,7 +261,7 @@ namespace SilverSim.StructuredData.JSON
                 char c = (char)sr.Peek();
                 if(c != '{' && c != '[')
                 {
-                    throw new InvalidJSONSerializationException();
+                    throw new InvalidJsonSerializationException();
                 }
                 return ParseValue(sr);
             }
@@ -349,7 +368,7 @@ namespace SilverSim.StructuredData.JSON
             }
             else
             {
-                throw new InvalidJSONSerializationException();
+                throw new InvalidJsonSerializationException();
             }
         }
         #endregion

@@ -11,7 +11,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types;
 using ThreadedClasses;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using System.IO;
 using SilverSim.Types.Primitive;
 using System.Xml;
@@ -117,7 +117,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
         void UploadObject(UUID transactionID, AssetData data)
         {
-            Map m = (Map)LLSD_XML.Deserialize(data.InputStream);
+            Map m = (Map)LlsdXml.Deserialize(data.InputStream);
             AnArray instance_list = (AnArray)m["instance_list"];
             AnArray mesh_list = (AnArray)m["mesh_list"];
             AnArray texture_list = (AnArray)m["texture_list"];
@@ -228,7 +228,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                                     }
                                     else
                                     {
-                                        LLSD_Binary.Serialize(mesh_list[idx], meshstream);
+                                        LlsdBinary.Serialize(mesh_list[idx], meshstream);
                                     }
                                     meshstream.Flush();
                                     AssetData newasset = new AssetData();

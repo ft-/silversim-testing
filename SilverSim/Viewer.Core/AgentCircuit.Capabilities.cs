@@ -5,7 +5,7 @@ using SilverSim.Viewer.Core.Capabilities;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
@@ -128,7 +128,7 @@ namespace SilverSim.Viewer.Core
 
             try
             {
-                o = LLSD_XML.Deserialize(httpreq.Body);
+                o = LlsdXml.Deserialize(httpreq.Body);
             }
             catch (Exception e)
             {

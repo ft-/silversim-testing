@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Globalization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types
 {
-    public struct Vector4 : IComparable<Vector4>, IEquatable<Vector4>
+    [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
+    public struct Vector4 : IEquatable<Vector4>
     {
         public double X;
         public double Y;
@@ -85,13 +87,9 @@ namespace SilverSim.Types
             return Length().CompareTo(vector.Length());
         }
 
-        private static bool isFinite(double value)
-        {
-            return !(Double.IsNaN(value) || Double.IsInfinity(value));
-        }
         public bool IsFinite()
         {
-            return (isFinite(X) && isFinite(Y) && isFinite(Z) && isFinite(W));
+            return (X.IsFinite() && Y.IsFinite() && Z.IsFinite() && W.IsFinite());
         }
 
         public void FromBytes(byte[] byteArray, int pos)
@@ -174,28 +172,13 @@ namespace SilverSim.Types
             return value1;
         }
 
-        private static double clamp(double val, double min, double max)
-        {
-            if(val < min)
-            {
-                return min;
-            }
-            else if(val > max)
-            {
-                return max;
-            }
-            else
-            {
-                return val;
-            }
-        }
         public static Vector4 Clamp(Vector4 value1, Vector4 min, Vector4 max)
         {
             return new Vector4(
-                clamp(value1.X, min.X, max.X),
-                clamp(value1.Y, min.Y, max.Y),
-                clamp(value1.Z, min.Z, max.Z),
-                clamp(value1.W, min.W, max.W));
+                value1.X.Clamp(min.X, max.X),
+                value1.Y.Clamp(min.Y, max.Y),
+                value1.Z.Clamp(min.Z, max.Z),
+                value1.W.Clamp(min.W, max.W));
         }
 
         public static double Distance(Vector4 value1, Vector4 value2)
@@ -303,19 +286,6 @@ namespace SilverSim.Types
             return vector;
         }
 
-        private static double smoothStep(double a, double b, double v)
-        {
-            return (b- a) * v + a;
-        }
-        public static Vector4 SmoothStep(Vector4 value1, Vector4 value2, double amount)
-        {
-            return new Vector4(
-                smoothStep(value1.X, value2.X, amount),
-                smoothStep(value1.Y, value2.Y, amount),
-                smoothStep(value1.Z, value2.Z, amount),
-                smoothStep(value1.W, value2.W, amount));
-        }
-
         public static Vector4 Subtract(Vector4 value1, Vector4 value2)
         {
             value1.W -= value2.W;
@@ -345,27 +315,33 @@ namespace SilverSim.Types
 
         public static Vector4 Parse(string val)
         {
-            char[] splitChar = { ',' };
-            string[] split = val.Replace("<", String.Empty).Replace(">", String.Empty).Split(splitChar);
-            return new Vector4(
-                float.Parse(split[0].Trim(), EnUsCulture),
-                float.Parse(split[1].Trim(), EnUsCulture),
-                float.Parse(split[2].Trim(), EnUsCulture),
-                float.Parse(split[3].Trim(), EnUsCulture));
+            Vector4 v;
+            if(!TryParse(val, out v))
+            {
+                throw new ArgumentException("Invalid Vector4 string given");
+            }
+            return v;
         }
 
         public static bool TryParse(string val, out Vector4 result)
         {
-            try
+            result = default(Vector4);
+            char[] splitChar = { ',' };
+            string[] split = val.Replace("<", String.Empty).Replace(">", String.Empty).Split(splitChar);
+            if(split.Length != 4)
             {
-                result = Parse(val);
-                return true;
-            }
-            catch (Exception)
-            {
-                result = new Vector4();
                 return false;
             }
+            double x, y, z, w;
+            if(!double.TryParse(split[0], NumberStyles.Float, EnUsCulture, out x) ||
+                !double.TryParse(split[1], NumberStyles.Float, EnUsCulture, out y) ||
+                !double.TryParse(split[2], NumberStyles.Float, EnUsCulture, out z) ||
+                !double.TryParse(split[3], NumberStyles.Float, EnUsCulture, out w))
+            {
+                return false;
+            }
+            result = new Vector4(x, y, z, w);
+            return true;
         }
 
         #endregion Static Methods

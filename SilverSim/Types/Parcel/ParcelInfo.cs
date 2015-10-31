@@ -3,6 +3,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -10,6 +11,8 @@ using System.Threading;
 namespace SilverSim.Types.Parcel
 {
     [Flags]
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum ObjectReturnType : uint
     {
         None = 0,
@@ -20,12 +23,16 @@ namespace SilverSim.Types.Parcel
         Sell = 1 << 5
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum ParcelAccessFlags : uint
     {
         NoAccess = 0,
         Access = 1
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum TeleportLandingType : byte
     {
         Blocked = 0,
@@ -34,6 +41,8 @@ namespace SilverSim.Types.Parcel
     }
 
     [Flags]
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum ParcelFlags : uint
     {
         None = 0,
@@ -70,6 +79,7 @@ namespace SilverSim.Types.Parcel
         DenyAgeUnverified = (uint)1 << 31
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum ParcelStatus : byte
     {
         None = 0xFF,
@@ -78,6 +88,7 @@ namespace SilverSim.Types.Parcel
         Abandoned = 2
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum ParcelCategory : byte
     {
         None = 0,
@@ -181,6 +192,7 @@ namespace SilverSim.Types.Parcel
                 m_ParcelInfo = parcelInfo;
             }
 
+            [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
             public byte[] Data
             {
                 get
@@ -220,6 +232,7 @@ namespace SilverSim.Types.Parcel
                 }
             }
 
+            [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
             public byte[] DataNoAABBUpdate
             {
                 set
@@ -254,6 +267,7 @@ namespace SilverSim.Types.Parcel
                 }
             }
 
+            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public bool this[int x, int y]
             {
                 get
@@ -298,6 +312,7 @@ namespace SilverSim.Types.Parcel
                 }
             }
 
+            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public bool this[int x, int y, bool runaabb]
             {
                 get

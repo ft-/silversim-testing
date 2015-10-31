@@ -2,7 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
@@ -37,7 +37,7 @@ namespace SilverSim.Viewer.Core
                     m.Add("is_display_name_default", false);
                     using (Stream o = res.GetOutputStream())
                     {
-                        LLSD_XML.Serialize(m, o);
+                        LlsdXml.Serialize(m, o);
                     }
                 }
             }

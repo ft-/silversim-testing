@@ -2,7 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System;
@@ -86,7 +86,7 @@ namespace SilverSim.Viewer.Core
 
             try
             {
-                o = LLSD_XML.Deserialize(httpreq.Body);
+                o = LlsdXml.Deserialize(httpreq.Body);
             }
             catch (Exception e)
             {

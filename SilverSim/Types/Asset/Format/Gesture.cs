@@ -203,131 +203,173 @@ namespace SilverSim.Types.Asset.Format
             string input = UTF8NoBOM.GetString(asset.Data);
             input = input.Replace('\t', ' ');
             List<string> lines = new List<string>(input.Split('\n'));
-            List<string>.Enumerator e = lines.GetEnumerator();
-            if(!e.MoveNext())
-            {
-                throw new NotAGestureFormatException();
-            }
-
-            if(int.Parse(e.Current) != 2)
-            {
-                throw new NotAGestureFormatException();
-            }
-
-            if (!e.MoveNext())
-            {
-                throw new NotAGestureFormatException();
-            }
-            TriggerKey = byte.Parse(e.Current);
-
-            if (!e.MoveNext())
-            {
-                throw new NotAGestureFormatException();
-            }
-            TriggerKeyMask = byte.Parse(e.Current);
-
-            if (!e.MoveNext())
-            {
-                throw new NotAGestureFormatException();
-            }
-            Trigger = e.Current;
-
-            if (!e.MoveNext())
-            {
-                throw new NotAGestureFormatException();
-            }
-            ReplaceWith = e.Current;
-
-            if (!e.MoveNext())
-            {
-                throw new NotAGestureFormatException();
-            }
-            int count = int.Parse(e.Current);
-
-            if(count < 0)
-            {
-                throw new NotAGestureFormatException();
-            }
-
-            for(int idx = 0; idx < count; ++idx)
+            using (List<string>.Enumerator e = lines.GetEnumerator())
             {
                 if (!e.MoveNext())
                 {
                     throw new NotAGestureFormatException();
                 }
-                StepType type = (StepType)int.Parse(e.Current);
+                int i;
 
-                switch(type)
+                if(!int.TryParse(e.Current, out i))
                 {
-                    case StepType.EndOfGesture:
-                        Sequence.Add(new StepEndOfGesture());
-                        return;
+                    throw new NotAGestureFormatException();
+                }
+                if (i != 2)
+                {
+                    throw new NotAGestureFormatException();
+                }
 
-                    case StepType.Animation:
-                        {
-                            StepAnimation step = new StepAnimation();
-                            if (e.MoveNext())
-                            {
-                                step.Name = e.Current;
-                            }
-                            if (e.MoveNext())
-                            {
-                                step.AssetID = UUID.Parse(e.Current);
-                            }
-                            if (e.MoveNext())
-                            {
-                                step.AnimationStart = int.Parse(e.Current) != 0;
-                            }
-                            Sequence.Add(step);
-                        }
-                        break;
+                if (!e.MoveNext())
+                {
+                    throw new NotAGestureFormatException();
+                }
 
-                    case StepType.Sound:
-                        {
-                            StepSound step = new StepSound();
-                            if (e.MoveNext())
-                            {
-                                step.Name = e.Current;
-                            }
-                            if (e.MoveNext())
-                            {
-                                step.AssetID = UUID.Parse(e.Current);
-                            }
-                            Sequence.Add(step);
-                        }
-                        break;
+                if(!byte.TryParse(e.Current, out TriggerKey))
+                {
+                    throw new NotAGestureFormatException();
+                }
 
-                    case StepType.Chat:
-                        {
-                            StepChat step = new StepChat();
-                            if (e.MoveNext())
-                            {
-                                step.Text = e.Current;
-                            }
-                            e.MoveNext();
-                            Sequence.Add(step);
-                        }
-                        break;
+                if (!e.MoveNext())
+                {
+                    throw new NotAGestureFormatException();
+                }
+                
+                if (!uint.TryParse(e.Current, out TriggerKeyMask))
+                {
+                    throw new NotAGestureFormatException();
+                }
 
-                    case StepType.Wait:
-                        {
-                            StepWait step = new StepWait();
-                            if (e.MoveNext())
-                            {
-                                step.WaitTime = float.Parse(e.Current, CultureInfo.InvariantCulture);
-                            }
-                            if (e.MoveNext())
-                            {
-                                int flags = int.Parse(e.Current);
-                                step.WaitForTime = (flags & 0x01) != 0;
-                                step.WaitForAnimation = (flags & 0x02) != 0;
-                            }
-                            Sequence.Add(step);
-                        }
-                        break;
+                if (!e.MoveNext())
+                {
+                    throw new NotAGestureFormatException();
+                }
+                Trigger = e.Current;
 
-                    default:
+                if (!e.MoveNext())
+                {
+                    throw new NotAGestureFormatException();
+                }
+                ReplaceWith = e.Current;
+
+                if (!e.MoveNext())
+                {
+                    throw new NotAGestureFormatException();
+                }
+                int count;
+                if(!int.TryParse(e.Current, out count))
+                {
+                    throw new NotAGestureFormatException();
+                }
+
+                if (count < 0)
+                {
+                    throw new NotAGestureFormatException();
+                }
+
+                for (int idx = 0; idx < count; ++idx)
+                {
+                    if (!e.MoveNext())
+                    {
                         throw new NotAGestureFormatException();
+                    }
+
+                    int intval;
+                    if (!int.TryParse(e.Current, out intval))
+                    {
+                        throw new NotAGestureFormatException();
+                    }
+                    StepType type = (StepType)intval;
+
+                    switch (type)
+                    {
+                        case StepType.EndOfGesture:
+                            Sequence.Add(new StepEndOfGesture());
+                            return;
+
+                        case StepType.Animation:
+                            {
+                                StepAnimation step = new StepAnimation();
+                                if (e.MoveNext())
+                                {
+                                    step.Name = e.Current;
+                                }
+                                if (e.MoveNext())
+                                {
+                                    if(!UUID.TryParse(e.Current, out step.AssetID))
+                                    {
+                                        throw new NotAGestureFormatException();
+                                    }
+                                }
+                                if (e.MoveNext())
+                                {
+                                    if (!int.TryParse(e.Current, out intval))
+                                    {
+                                        throw new NotAGestureFormatException();
+                                    }
+                                    step.AnimationStart = intval != 0;
+                                }
+                                Sequence.Add(step);
+                            }
+                            break;
+
+                        case StepType.Sound:
+                            {
+                                StepSound step = new StepSound();
+                                if (e.MoveNext())
+                                {
+                                    step.Name = e.Current;
+                                }
+                                if (e.MoveNext())
+                                {
+                                    if (!UUID.TryParse(e.Current, out step.AssetID))
+                                    {
+                                        throw new NotAGestureFormatException();
+                                    }
+                                }
+                                Sequence.Add(step);
+                            }
+                            break;
+
+                        case StepType.Chat:
+                            {
+                                StepChat step = new StepChat();
+                                if (e.MoveNext())
+                                {
+                                    step.Text = e.Current;
+                                }
+                                e.MoveNext();
+                                Sequence.Add(step);
+                            }
+                            break;
+
+                        case StepType.Wait:
+                            {
+                                StepWait step = new StepWait();
+                                if (e.MoveNext())
+                                {
+                                    if (!float.TryParse(e.Current, NumberStyles.Float, CultureInfo.InvariantCulture, out step.WaitTime))
+                                    {
+                                        throw new NotAGestureFormatException();
+                                    }
+                                }
+                                if (e.MoveNext())
+                                {
+                                    int flags;
+                                    if(!int.TryParse(e.Current, out flags))
+                                    {
+                                        throw new NotAGestureFormatException();
+                                    }
+                                    step.WaitForTime = (flags & 0x01) != 0;
+                                    step.WaitForAnimation = (flags & 0x02) != 0;
+                                }
+                                Sequence.Add(step);
+                            }
+                            break;
+
+                        default:
+                            throw new NotAGestureFormatException();
+                    }
                 }
             }
         }

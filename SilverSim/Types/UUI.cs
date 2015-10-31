@@ -2,10 +2,12 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types
 {
     /** <summary> Universal User Identifier </summary> */
+    [SuppressMessage("Gendarme.Rules.Maintainability", "VariableNamesShouldNotMatchFieldNamesRule")]
     public sealed class UUI : IEquatable<UUI>
     {
         public UUID ID = UUID.Zero;
@@ -57,6 +59,7 @@ namespace SilverSim.Types
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Correctness", "ReviewInconsistentIdentityRule")]
         public override int GetHashCode()
         {
             Uri h = HomeURI;

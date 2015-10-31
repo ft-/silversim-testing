@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using System.Diagnostics.CodeAnalysis;
 namespace SilverSim.Types.Grid
 {
     public class RegionInfo
@@ -27,12 +28,13 @@ namespace SilverSim.Types.Grid
         public string RegionSecret = string.Empty;
         public UUI Owner = UUI.Unknown;
         public RegionFlags Flags;
-        public string ProtocolVariant = ProtocolVariantId.Local;
+        public string ProtocolVariant = string.Empty; /* see ProtocolVariantId */
         public string GridURI = string.Empty; /* empty when addressing local grid */
+        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public static class ProtocolVariantId
         {
-            public static readonly string Local = string.Empty;
-            public static readonly string OpenSim = "OpenSim";
+            public const string Local = "";
+            public const string OpenSim = "OpenSim";
         }
         #endregion
 

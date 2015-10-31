@@ -10,7 +10,7 @@ using SilverSim.Types;
 using System.Net;
 using System.Xml;
 using System.IO;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Asset;
 using ThreadedClasses;
@@ -32,7 +32,7 @@ namespace SilverSim.Viewer.Core
 
             try
             {
-                iv = LLSD_XML.Deserialize(httpreq.Body);
+                iv = LlsdXml.Deserialize(httpreq.Body);
             }
             catch (Exception e)
             {
@@ -63,7 +63,7 @@ namespace SilverSim.Viewer.Core
                 res.ContentType = "application/llsd+xml";
                 using (Stream o = res.GetOutputStream())
                 {
-                    LLSD_XML.Serialize(new BinaryData(new byte[1] { 0 }), o);
+                    LlsdXml.Serialize(new BinaryData(new byte[1] { 0 }), o);
                 }
             }
         }

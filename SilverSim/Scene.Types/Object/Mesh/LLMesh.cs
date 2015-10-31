@@ -1,7 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Primitive;
@@ -28,7 +28,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
         internal static Mesh LLMeshToMesh(this Stream st, ObjectPart.PrimitiveShape.Decoded shape, bool usePhysicsMesh)
         {
             /* this is a format of multiple parts */
-            Map rootmap = (Map)LLSD_Binary.Deserialize(st);
+            Map rootmap = (Map)LlsdBinary.Deserialize(st);
             Map physicsParameter;
 
             if (rootmap.ContainsKey("physics_shape"))
@@ -82,7 +82,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             {
                 try
                 {
-                    meshArray = (AnArray)LLSD_Binary.Deserialize(gz);
+                    meshArray = (AnArray)LlsdBinary.Deserialize(gz);
                 }
                 catch
                 {

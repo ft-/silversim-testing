@@ -4,6 +4,7 @@
 using SilverSim.Types.Asset.Format;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using ThreadedClasses;
 
@@ -13,6 +14,7 @@ namespace SilverSim.Types.Agent
     {
         public class AvatarTextureData
         {
+            [SuppressMessage("Gendarme.Rules.Performance", "PreferLiteralOverInitOnlyFieldsRule")]
             public readonly static int TextureCount = 21;
             private UUID[] m_AvatarTextures = new UUID[TextureCount];
             private ReaderWriterLock m_RwLock = new ReaderWriterLock();
@@ -22,6 +24,7 @@ namespace SilverSim.Types.Agent
 
             }
 
+            [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
             public UUID[] All
             {
                 get
@@ -120,6 +123,7 @@ namespace SilverSim.Types.Agent
         public double AvatarHeight;
         public UInt32 Serial = 1;
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
         public byte[] BakeIndices
         {
             get
@@ -127,10 +131,13 @@ namespace SilverSim.Types.Agent
                 return new byte[] { 8, 9, 10, 11, 19, 20 };
             }
         }
-        public readonly static int MaxVisualParams = 260;
+
+        [SuppressMessage("Gendarme.Rules.Performance", "PreferLiteralOverInitOnlyFieldsRule")]
+        public static readonly int MaxVisualParams = 260;
 
         public readonly AvatarTextureData AvatarTextures = new AvatarTextureData();
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
         public byte[] VisualParams
         {
             get

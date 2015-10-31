@@ -30,6 +30,11 @@ namespace SilverSim.Types
             }
         }
 
+        public static bool IsFinite(this double value)
+        {
+            return !(Double.IsNaN(value) || Double.IsInfinity(value));
+        }
+
         public static int Clamp(this int val, int min, int max)
         {
             if (val < min)

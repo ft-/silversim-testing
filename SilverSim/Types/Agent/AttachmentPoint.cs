@@ -2,10 +2,12 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Agent
 {
     [Flags]
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum AttachmentPoint : byte
     {
         NotAttached = 0,

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 namespace SilverSim.Types
 {
     [Serializable]
-    public sealed class ABoolean : IComparable<ABoolean>, IEquatable<ABoolean>, IValue
+    public sealed class ABoolean : IEquatable<ABoolean>, IValue
     {
         private bool m_Value;
 

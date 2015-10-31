@@ -37,11 +37,16 @@ namespace SilverSim.Types.Asset.Format
                         {
                             break;
                         }
-                        if((parentNodeName == "SculptTexture" && data.Name == "UUID") ||
-                            (parentNodeName == "CollisionSound" && data.Name == "UUID") ||
-                            (parentNodeName == "AssetID" && data.Name == "UUID"))
+                        string nodeName = data.Name;
+                        if((parentNodeName == "SculptTexture" && nodeName == "UUID") ||
+                            (parentNodeName == "CollisionSound" && nodeName == "UUID") ||
+                            (parentNodeName == "AssetID" && nodeName == "UUID"))
                         {
-                            UUID id = UUID.Parse(data.ReadElementValueAsString());
+                            UUID id;
+                            if(!UUID.TryParse(data.ReadElementValueAsString(), out id))
+                            {
+                                throw new InvalidDataException("Invalid UUID in object asset");
+                            }
                             if(id != UUID.Zero)
                             {
                                 if(!reflist.Contains(id))
@@ -50,7 +55,7 @@ namespace SilverSim.Types.Asset.Format
                                 }
                             }
                         }
-                        else if(data.Name == "TextureEntry")
+                        else if(nodeName == "TextureEntry")
                         {
                             List<UUID> texlist = new TextureEntry(data.ReadContentAsBase64()).References;
                             foreach(UUID tex in texlist)
@@ -61,7 +66,7 @@ namespace SilverSim.Types.Asset.Format
                                 }
                             }
                         }
-                        else if(data.Name == "ParticleSystem")
+                        else if(nodeName == "ParticleSystem")
                         {
                             List<UUID> texlist = new ParticleSystem(data.ReadContentAsBase64(), 0).References;
                             foreach(UUID tex in texlist)
@@ -72,7 +77,7 @@ namespace SilverSim.Types.Asset.Format
                                 }
                             }
                         }
-                        else if(data.Name == "ExtraParams")
+                        else if(nodeName == "ExtraParams")
                         {
                             byte[] extraparams = data.ReadContentAsBase64();
 

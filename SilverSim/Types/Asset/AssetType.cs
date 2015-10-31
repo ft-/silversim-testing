@@ -1,8 +1,11 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using System.Diagnostics.CodeAnalysis;
+
 namespace SilverSim.Types.Asset
 {
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum AssetType : sbyte
     {
         Material = -2,

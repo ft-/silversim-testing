@@ -2,10 +2,12 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Inventory
 {
-    [Flags] 
+    [Flags]
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum InventoryPermissionsMask : uint
     {
         None = 0,

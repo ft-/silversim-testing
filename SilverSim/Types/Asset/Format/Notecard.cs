@@ -2,8 +2,10 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types.Inventory;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.IO;
 using System.Text;
@@ -26,7 +28,7 @@ namespace SilverSim.Types.Asset.Format
         {
             using(Stream assetdata = asset.InputStream)
             {
-                string line = readLine(assetdata);
+                string line = ReadLine(assetdata);
                 string[] versioninfo = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
                 if(versioninfo.Length < 2 || versioninfo[0] != "Linden" || versioninfo[1] != "text")
                 {
@@ -34,12 +36,13 @@ namespace SilverSim.Types.Asset.Format
                     Text = Encoding.UTF8.GetString(asset.Data);
                     return;
                 }
-                readNotecard(assetdata);
+                ReadNotecard(assetdata);
             }
         }
         #endregion
 
         #region References
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public List<UUID> References
         {
             get
@@ -60,7 +63,7 @@ namespace SilverSim.Types.Asset.Format
                     Map im;
                     using (Stream i = new MemoryStream(d))
                     {
-                        im = SilverSim.StructuredData.LLSD.LLSD_XML.Deserialize(i) as Map;
+                        im = LlsdXml.Deserialize(i) as Map;
                     }
                     if (null != im)
                     {
@@ -137,7 +140,7 @@ namespace SilverSim.Types.Asset.Format
 
         #region Notecard Parser
 
-        private string readLine(Stream stream)
+        string ReadLine(Stream stream)
         {
             int c;
             string data = string.Empty;
@@ -151,41 +154,62 @@ namespace SilverSim.Types.Asset.Format
             return data;
         }
 
-        private void readInventoryPermissions(Stream assetdata, ref NotecardInventoryItem item)
+        private void ReadInventoryPermissions(Stream assetdata, ref NotecardInventoryItem item)
         {
-            if(readLine(assetdata) != "{")
+            if(ReadLine(assetdata) != "{")
             {
                 throw new NotANotecardFormatException();
             }
             while(true)
             {
-                string line = readLine(assetdata);
+                string line = ReadLine(assetdata);
                 if(line == "}")
                 {
                     return;
                 }
 
                 string[] data = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
+                uint uval;
                 switch(data[0])
                 { 
                     case "base_mask":
-                        item.Permissions.Base = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                        if (!uint.TryParse(data[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uval))
+                        {
+                            throw new NotANotecardFormatException();
+                        }
+                        item.Permissions.Base = (InventoryPermissionsMask)uval;
                         break;
                 
                     case "owner_mask":
-                        item.Permissions.Current = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                        if (!uint.TryParse(data[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uval))
+                        {
+                            throw new NotANotecardFormatException();
+                        }
+                        item.Permissions.Current = (InventoryPermissionsMask)uval;
                         break;
 
                     case "group_mask":
-                        item.Permissions.Group = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                        if (!uint.TryParse(data[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uval))
+                        {
+                            throw new NotANotecardFormatException();
+                        }
+                        item.Permissions.Group = (InventoryPermissionsMask)uval;
                         break;
 
                     case "everyone_mask":
-                        item.Permissions.EveryOne = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                        if (!uint.TryParse(data[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uval))
+                        {
+                            throw new NotANotecardFormatException();
+                        }
+                        item.Permissions.EveryOne = (InventoryPermissionsMask)uval;
                         break;
     
                     case "next_owner_mask":
-                        item.Permissions.NextOwner = (InventoryPermissionsMask)uint.Parse(data[1], NumberStyles.HexNumber);
+                        if (!uint.TryParse(data[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uval))
+                        {
+                            throw new NotANotecardFormatException();
+                        }
+                        item.Permissions.NextOwner = (InventoryPermissionsMask)uval;
                         break;
 
                     case "creator_id":
@@ -210,21 +234,23 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        private void readInventorySaleInfo(Stream assetdata, ref NotecardInventoryItem item)
+        void ReadInventorySaleInfo(Stream assetdata, ref NotecardInventoryItem item)
         {
-            if(readLine(assetdata) != "{")
+            if(ReadLine(assetdata) != "{")
             {
                 throw new NotANotecardFormatException();
             }
             while(true)
             {
-                string line = readLine(assetdata);
+                string line = ReadLine(assetdata);
                 if(line == "}")
                 {
                     return;
                 }
 
                 string[] data = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
+                int ival;
+                uint uval;
                 switch(data[0])
                 {
                     case "sale_type":
@@ -232,11 +258,19 @@ namespace SilverSim.Types.Asset.Format
                         break;
                 
                     case "sale_price":
-                        item.SaleInfo.Price = int.Parse(data[1]);
+                        if (!int.TryParse(data[1], out ival))
+                        {
+                            throw new NotANotecardFormatException();
+                        }
+                        item.SaleInfo.Price = ival;
                         break;
                 
                     case "perm_mask":
-                        item.SaleInfo.PermMask = (InventoryPermissionsMask)uint.Parse(data[1]);
+                        if (!uint.TryParse(data[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uval))
+                        {
+                            throw new NotANotecardFormatException();
+                        }
+                        item.SaleInfo.PermMask = (InventoryPermissionsMask)uval;
                         break;
 
                     default:
@@ -245,16 +279,16 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        private NotecardInventoryItem readInventoryItem(Stream assetdata)
+        NotecardInventoryItem ReadInventoryItem(Stream assetdata)
         {
             NotecardInventoryItem item = new NotecardInventoryItem();
-            if(readLine(assetdata) != "{")
+            if(ReadLine(assetdata) != "{")
             {
                 throw new NotANotecardFormatException();
             }
             while(true)
             {
-                string line = readLine(assetdata);
+                string line = ReadLine(assetdata);
                 if(line == "}")
                 {
                     return item;
@@ -271,7 +305,7 @@ namespace SilverSim.Types.Asset.Format
                 }
                 else if(data[0] == "permissions")
                 {
-                    readInventoryPermissions(assetdata, ref item);  
+                    ReadInventoryPermissions(assetdata, ref item);  
                 }
                 else if(data[0] == "asset_id" && data.Length == 2)
                 {
@@ -287,11 +321,16 @@ namespace SilverSim.Types.Asset.Format
                 }
                 else if(data[0] == "flags" && data.Length == 2)
                 {
-                    item.Flags = uint.Parse(data[1], NumberStyles.HexNumber);
+                    uint uval;
+                    if (!uint.TryParse(data[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out uval))
+                    {
+                        throw new NotANotecardFormatException();
+                    }
+                    item.Flags = uval;
                 }
                 else if(data[0] == "sale_info")   
                 {
-                    readInventorySaleInfo(assetdata, ref item);
+                    ReadInventorySaleInfo(assetdata, ref item);
                 }
                 else if(data[0] == "name" && data.Length > 1)
                 {
@@ -303,7 +342,12 @@ namespace SilverSim.Types.Asset.Format
                 }
                 else if(data[0] == "creation_date" && data.Length == 2)
                 {
-                    item.CreationDate = Date.UnixTimeToDateTime(ulong.Parse(data[1]));
+                    ulong uval;
+                    if (!ulong.TryParse(data[1], out uval))
+                    {
+                        throw new NotANotecardFormatException();
+                    }
+                    item.CreationDate = Date.UnixTimeToDateTime(uval);
                 }
                 else
                 {
@@ -312,17 +356,17 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        private NotecardInventoryItem readInventoryItems(Stream assetdata)
+        NotecardInventoryItem ReadInventoryItems(Stream assetdata)
         {
             NotecardInventoryItem item = null;
             uint extcharindex = 0;
-            if(readLine(assetdata) != "{")
+            if(ReadLine(assetdata) != "{")
             {
                 throw new NotANotecardFormatException();
             }
             while(true)
             {
-                string line = readLine(assetdata);
+                string line = ReadLine(assetdata);
                 if(line == "}")
                 {
                     if(item == null)
@@ -335,11 +379,14 @@ namespace SilverSim.Types.Asset.Format
                 string[] data = line.Split(new char[] {'\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
                 if(data.Length == 4 && data[0] == "ext" && data[1] == "char" && data[2] == "index")
                 {
-                    extcharindex = uint.Parse(data[3]);
+                    if(!uint.TryParse(data[3], out extcharindex))
+                    {
+                        throw new NotANotecardFormatException();
+                    }
                 }
                 else if(data[0] == "inv_item")
                 {
-                    item = readInventoryItem(assetdata);
+                    item = ReadInventoryItem(assetdata);
                     item.ExtCharIndex = extcharindex;
                 }
                 else
@@ -349,16 +396,16 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        private void readInventory(Stream assetdata)
+        void ReadInventory(Stream assetdata)
         {
             Inventory = new NotecardInventory();
-            if(readLine(assetdata) != "{")
+            if(ReadLine(assetdata) != "{")
             {
                 throw new NotANotecardFormatException();
             }
             while(true)
             {
-                string line = readLine(assetdata);
+                string line = ReadLine(assetdata);
                 if(line == "}")
                 {
                     return;
@@ -367,10 +414,14 @@ namespace SilverSim.Types.Asset.Format
                 string[] data = line.Split(new char[] { ' ', '\t'}, StringSplitOptions.RemoveEmptyEntries);
                 if(data[0] == "count")
                 {
-                    uint count = uint.Parse(data[1]);
-                    for(uint i = 0; i < count; ++i)
+                    uint count;
+                    if (!uint.TryParse(data[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out count))
                     {
-                        NotecardInventoryItem item = readInventoryItems(assetdata);
+                        throw new NotANotecardFormatException();
+                    }
+                    for (uint i = 0; i < count; ++i)
+                    {
+                        NotecardInventoryItem item = ReadInventoryItems(assetdata);
                         Inventory.Add(item.ID, item);
                     }
                 }
@@ -381,15 +432,15 @@ namespace SilverSim.Types.Asset.Format
             }
         }
 
-        private void readNotecard(Stream assetdata)
+        void ReadNotecard(Stream assetdata)
         {
-            if(readLine(assetdata) != "{")
+            if(ReadLine(assetdata) != "{")
             {
                 throw new NotANotecardFormatException();
             }
             while(true)
             {
-                string line = readLine(assetdata);
+                string line = ReadLine(assetdata);
                 if(line == "}")
                 {
                     return;
@@ -398,11 +449,15 @@ namespace SilverSim.Types.Asset.Format
                 string[] data = line.Split(new char[] { '\t', ' '}, StringSplitOptions.RemoveEmptyEntries);
                 if(data[0] == "LLEmbeddedItems")
                 {
-                    readInventory(assetdata);
+                    ReadInventory(assetdata);
                 }
                 else if(data[0] == "Text" && data.Length == 3)
                 {
-                    int datalen = int.Parse(data[2]);
+                    int datalen;
+                    if(int.TryParse(data[2], out datalen))
+                    {
+                        throw new NotANotecardFormatException();
+                    }
                     byte[] buffer = new byte[datalen];
                     if(datalen != assetdata.Read(buffer, 0, datalen))
                     {
@@ -420,7 +475,7 @@ namespace SilverSim.Types.Asset.Format
         #endregion
 
         #region Operators
-        private static readonly string ItemFormatString =
+        private const string ItemFormatString =
                 "{{\n"+
                 "ext char index {0}\n" +
                 "\tinv_item\t0\n" +
@@ -454,7 +509,8 @@ namespace SilverSim.Types.Asset.Format
                 "\t}}\n" +
                 "}}\n";
 
-        private static string ItemToString(NotecardInventoryItem item)
+        [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
+        static string ItemToString(NotecardInventoryItem item)
         {
             return string.Format(ItemFormatString,
                 item.ExtCharIndex,

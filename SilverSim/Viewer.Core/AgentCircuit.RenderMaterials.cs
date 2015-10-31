@@ -3,7 +3,7 @@
 
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Object;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Primitive;
@@ -51,7 +51,7 @@ namespace SilverSim.Viewer.Core
             Map reqmap;
             try
             {
-                reqmap = LLSD_XML.Deserialize(httpreq.Body) as Map;
+                reqmap = LlsdXml.Deserialize(httpreq.Body) as Map;
             }
             catch (Exception e)
             {
@@ -76,7 +76,7 @@ namespace SilverSim.Viewer.Core
                     {
                         using (GZipStream gz = new GZipStream(ms, CompressionMode.Decompress))
                         {
-                            IValue inp = LLSD_XML.Deserialize(gz);
+                            IValue inp = LlsdXml.Deserialize(gz);
                             zippedDataArray = inp as AnArray;
                             zippedDataMap = inp as Map;
                         }

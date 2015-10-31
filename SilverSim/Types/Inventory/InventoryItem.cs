@@ -3,6 +3,7 @@
 
 using System;
 using SilverSim.Types.Asset;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Inventory
 {
@@ -43,6 +44,7 @@ namespace SilverSim.Types.Inventory
         #region SaleInfo
         public struct SaleInfoData
         {
+            [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
             public enum SaleType : byte
             {
                 NoSale = 0,

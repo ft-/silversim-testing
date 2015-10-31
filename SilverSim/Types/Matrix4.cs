@@ -3,12 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace SilverSim.Types
 {
     [StructLayout(LayoutKind.Sequential)]
+    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
+    [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
     public struct Matrix4 : IEquatable<Matrix4>
     {
         public double M11, M12, M13, M14;
@@ -971,6 +974,7 @@ namespace SilverSim.Types
         /// Get a formatted string representation of the vector
         /// </summary>
         /// <returns>A string representation of the vector</returns>
+        [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
         public override string ToString()
         {
             return string.Format(EnUsCulture,
@@ -992,6 +996,7 @@ namespace SilverSim.Types
             return !left.Equals(right);
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public double this[int row, int column]
         {
             get
@@ -1058,6 +1063,7 @@ namespace SilverSim.Types
                         throw new KeyNotFoundException("Matrix4 row and column values must be from 0-3");
                 }
             }
+
             set
             {
                 switch (row)

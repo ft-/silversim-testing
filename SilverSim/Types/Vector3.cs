@@ -2,13 +2,15 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Runtime.InteropServices;
 
 namespace SilverSim.Types
 {
     [StructLayout(LayoutKind.Sequential)]
-    public struct Vector3 : IComparable<Vector3>, IEquatable<Vector3>, IValue
+    [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
+    public struct Vector3 : IEquatable<Vector3>, IValue
     {
         public double X;
         public double Y;
@@ -187,26 +189,32 @@ namespace SilverSim.Types
         /// in arrow brackets and separated by commas</param>
         public static Vector3 Parse(string val)
         {
-            char[] splitChar = { ',' };
-            string[] split = val.Replace("<", System.String.Empty).Replace(">", System.String.Empty).Split(splitChar);
-            return new Vector3(
-                Single.Parse(split[0].Trim(), EnUsCulture),
-                Single.Parse(split[1].Trim(), EnUsCulture),
-                Single.Parse(split[2].Trim(), EnUsCulture));
+            Vector3 v;
+            if(!TryParse(val, out v))
+            {
+                throw new ArgumentException("Invalid Vector3 string specified");
+            }
+            return v;
         }
 
         public static bool TryParse(string val, out Vector3 result)
         {
-            try
+            result = default(Vector3);
+            char[] splitChar = { ',' };
+            string[] split = val.Replace("<", System.String.Empty).Replace(">", System.String.Empty).Split(splitChar);
+            if(split.Length != 3)
             {
-                result = Parse(val);
-                return true;
-            }
-            catch (Exception)
-            {
-                result = Vector3.Zero;
                 return false;
             }
+            double x, y, z;
+            if(!Double.TryParse(split[0], NumberStyles.Float, EnUsCulture, out x) ||
+                !Double.TryParse(split[1], NumberStyles.Float, EnUsCulture, out y) ||
+                !Double.TryParse(split[2], NumberStyles.Float, EnUsCulture, out z))
+            {
+                return false;
+            }
+            result = new Vector3(x, y, z);
+            return true;
         }
 
         /// <summary>
@@ -270,6 +278,7 @@ namespace SilverSim.Types
             return string.Format(EnUsCulture, "<{0},{1},{2}>", X, Y, Z);
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public string X_String
         {
             get
@@ -282,6 +291,7 @@ namespace SilverSim.Types
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public string Y_String
         {
             get
@@ -294,6 +304,7 @@ namespace SilverSim.Types
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public string Z_String
         {
             get
@@ -408,6 +419,7 @@ namespace SilverSim.Types
                 X * value2.Y - value2.X * Y);
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static explicit operator Vector3(string val)
         {
             return Vector3.Parse(val);

@@ -4,7 +4,7 @@
 using SilverSim.Http.Client;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Script.Events;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using SilverSim.Viewer.Messages.Chat;
@@ -199,7 +199,7 @@ namespace SilverSim.Scene.Types.Scene
             byte[] reqdata;
             using(MemoryStream ms = new MemoryStream())
             {
-                LLSD_XML.Serialize(reqmap, ms);
+                LlsdXml.Serialize(reqmap, ms);
                 reqdata = ms.GetBuffer();
             }
 
@@ -207,7 +207,7 @@ namespace SilverSim.Scene.Types.Scene
             IPAddress[] addresses = Dns.GetHostAddresses(destinationInfo.ServerIP);
             IPEndPoint ep = new IPEndPoint(addresses[0], (int)destinationInfo.ServerPort);
 
-            IValue iv = LLSD_XML.Deserialize(
+            IValue iv = LlsdXml.Deserialize(
                 HttpRequestHandler.DoStreamRequest(
                     "POST", 
                     destinationInfo.ServerURI + "circuit",

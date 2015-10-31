@@ -4,17 +4,36 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Xml;
 
-namespace SilverSim.Types.StructuredData.XMLRPC
+namespace SilverSim.Types.StructuredData.XmlRpc
 {
-    public static class XMLRPC
+    public static class XmlRpc
     {
         [Serializable]
         public class InvalidXmlRpcSerializationException : Exception 
         {
             public InvalidXmlRpcSerializationException()
+            {
+
+            }
+
+            public InvalidXmlRpcSerializationException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected InvalidXmlRpcSerializationException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public InvalidXmlRpcSerializationException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }
@@ -24,10 +43,34 @@ namespace SilverSim.Types.StructuredData.XMLRPC
         public class XmlRpcFaultException : Exception
         {
             public int FaultCode;
+
+            public XmlRpcFaultException()
+            {
+
+            }
+
             public XmlRpcFaultException(int faultCode, string faultString)
                 : base(faultString)
             {
                 FaultCode = faultCode;
+            }
+
+            public XmlRpcFaultException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected XmlRpcFaultException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+                FaultCode = info.GetInt32("FaultCode");
+            }
+
+            public XmlRpcFaultException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
             }
         }
 
@@ -42,12 +85,15 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                     throw new InvalidXmlRpcSerializationException();
                 }
 
+                bool isEmptyElement = reader.IsEmptyElement;
+                string nodeName = reader.Name;
+
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        if(reader.Name == "name")
+                        if (nodeName == "name")
                         {
-                            if (reader.IsEmptyElement)
+                            if (isEmptyElement)
                             {
                                 throw new InvalidXmlRpcSerializationException();
                             }
@@ -59,7 +105,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                             {
                                 throw new InvalidXmlRpcSerializationException();
                             }
-                            if (reader.IsEmptyElement)
+                            if (isEmptyElement)
                             {
                                 throw new InvalidXmlRpcSerializationException();
                             }
@@ -72,7 +118,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                         break;
 
                     case XmlNodeType.EndElement:
-                        if (reader.Name != "member")
+                        if (nodeName != "member")
                         {
                             throw new InvalidXmlRpcSerializationException();
                         }
@@ -202,14 +248,17 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                     throw new InvalidXmlRpcSerializationException();
                 }
 
+                bool isEmptyElement = reader.IsEmptyElement;
+                string nodeName = reader.Name;
+
                 switch(reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        switch(reader.Name)
+                        switch (nodeName)
                         {
                             case "i4":
                             case "int":
-                                if(reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     throw new InvalidXmlRpcSerializationException();
                                 }
@@ -217,7 +266,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                                 break;
 
                             case "boolean":
-                                if(reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     throw new InvalidXmlRpcSerializationException();
                                 }
@@ -229,7 +278,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                                 break;
 
                             case "double":
-                                if(reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     throw new InvalidXmlRpcSerializationException();
                                 }
@@ -241,7 +290,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                                 //break;
 
                             case "base64":
-                                if (reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     iv = new BinaryData();
                                 }
@@ -260,7 +309,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                                 break;
 
                             default:
-                                if(!reader.IsEmptyElement)
+                                if (!isEmptyElement)
                                 {
                                     reader.Skip();
                                 }
@@ -269,7 +318,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                         break;
 
                     case XmlNodeType.EndElement:
-                        if(reader.Name != "value")
+                        if(nodeName != "value")
                         {
                             throw new InvalidXmlRpcSerializationException();
                         }
@@ -619,6 +668,10 @@ namespace SilverSim.Types.StructuredData.XMLRPC
         #region Serialization
         static void Serialize(IValue iv, XmlTextWriter w)
         {
+            Map iv_m;
+            AnArray iv_a;
+            BinaryData iv_bin;
+
             if(iv is UUID)
             {
                 w.WriteStartElement("value");
@@ -640,12 +693,12 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                 w.WriteNamedValue("string", iv.ToString());
                 w.WriteEndElement();
             }
-            else if(iv is Map)
+            else if(null != (iv_m = iv as Map))
             {
                 w.WriteStartElement("value");
                 {
                     w.WriteStartElement("struct");
-                    foreach (KeyValuePair<string, IValue> kvp in (Map)iv)
+                    foreach (KeyValuePair<string, IValue> kvp in iv_m)
                     {
                         w.WriteStartElement("member");
                         w.WriteNamedValue("name", kvp.Key);
@@ -656,13 +709,13 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                 }
                 w.WriteEndElement();
             }
-            else if(iv is AnArray)
+            else if(null != (iv_a = iv as AnArray))
             {
                 w.WriteStartElement("value");
                 {
                     w.WriteStartElement("array");
                     w.WriteStartElement("data");
-                    foreach (IValue elem in (AnArray)iv)
+                    foreach (IValue elem in iv_a)
                     {
                         Serialize(elem, w);
                     }
@@ -680,19 +733,19 @@ namespace SilverSim.Types.StructuredData.XMLRPC
             else if(iv is Real)
             {
                 w.WriteStartElement("value");
-                w.WriteNamedValue("double", (Real)iv);
+                w.WriteNamedValue("double", iv.AsReal);
                 w.WriteEndElement();
             }
             else if(iv is ABoolean)
             {
                 w.WriteStartElement("value");
-                w.WriteNamedValue("boolean", ((ABoolean)iv).AsInt);
+                w.WriteNamedValue("boolean", iv.AsInt);
                 w.WriteEndElement();
             }
-            else if(iv is BinaryData)
+            else if(null != (iv_bin = iv as BinaryData))
             {
                 w.WriteStartElement("value");
-                w.WriteNamedValue("base64", (BinaryData)iv);
+                w.WriteNamedValue("base64", iv_bin);
                 w.WriteEndElement();
             }
             else if(iv is URI)
@@ -733,7 +786,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                     foreach (IValue iv in Params)
                     {
                         writer.WriteStartElement("param");
-                        XMLRPC.Serialize(iv, writer);
+                        XmlRpc.Serialize(iv, writer);
                         writer.WriteEndElement();
                     }
                     writer.WriteEndElement();
@@ -767,7 +820,7 @@ namespace SilverSim.Types.StructuredData.XMLRPC
                     writer.WriteStartElement("methodResponse");
                     writer.WriteStartElement("params");
                     writer.WriteStartElement("param");
-                    XMLRPC.Serialize(ReturnValue, writer);
+                    XmlRpc.Serialize(ReturnValue, writer);
                     writer.WriteEndElement();
                     writer.WriteEndElement();
                     writer.WriteEndElement();

@@ -1,15 +1,17 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace SilverSim.Types.Asset.Format.Mesh
 {
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public struct Vertex
     {
         public float X;
@@ -42,6 +44,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
         }
     }
 
+    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct Triangle
     {
         public int FaceIdx;
@@ -86,6 +89,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             UV3 = 0;
         }
     }
+
     public class LOD
     {
         public LOD()
@@ -145,7 +149,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             AnArray submeshes;
             using (MemoryStream ms = new MemoryStream(data, physOffset, physSize))
             {
-                submeshes = (AnArray)LLSD_Binary.Deserialize(ms);
+                submeshes = (AnArray)LlsdBinary.Deserialize(ms);
             }
             foreach(IValue iv in submeshes)
             {

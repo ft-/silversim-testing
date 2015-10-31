@@ -4,11 +4,13 @@
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 
 namespace SilverSim.Types.Asset.Format
 {
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum WearableType : byte
     {
         Shape = 0,
@@ -51,6 +53,7 @@ namespace SilverSim.Types.Asset.Format
             SaleInfo.PermMask = (InventoryPermissionsMask)0x7FFFFFFF;
         }
 
+        [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidComplexMethodsRule")]
         public Wearable(AssetData asset)
         {
             string[] lines = Encoding.UTF8.GetString(asset.Data).Split('\n');
@@ -72,33 +75,62 @@ namespace SilverSim.Types.Asset.Format
                 string[] para = line.Split(new char[] { ' ' , '\t'}, StringSplitOptions.RemoveEmptyEntries);
                 if(para.Length == 2 && para[0] == "type")
                 {
-                    Type = (WearableType)int.Parse(para[1]);
+                    int i;
+                    if(!int.TryParse(para[1], out i))
+                    {
+                        throw new NotAWearableFormatException();
+                    }
+                    Type = (WearableType)i;
                 }
                 else if(para.Length == 2 && para[0] == "parameters")
                 {
                     /* we got a parameter block */
-                    uint parametercount = uint.Parse(para[1]);
+                    uint parametercount;
+                    if(!uint.TryParse(para[1], out parametercount))
+                    {
+                        throw new NotAWearableFormatException();
+                    }
                     for(uint paranum = 0; paranum < parametercount; ++paranum)
                     {
                         line = lines[++idx].Trim();
                         para = line.Split(new char[] { ' ' , '\t'}, StringSplitOptions.RemoveEmptyEntries);
                         if(para.Length == 2)
                         {
-                            Params[uint.Parse(para[0])] = double.Parse(para[1]);
+                            uint index;
+                            double v;
+                            if(!uint.TryParse(para[0], out index))
+                            {
+                                throw new NotAWearableFormatException();
+                            }
+                            if(!double.TryParse(para[1], NumberStyles.Float, CultureInfo.InvariantCulture, out v))
+                            {
+                                throw new NotAWearableFormatException();
+                            }
+                            Params[index] = v;
                         }
                     }
                 }
                 else if(para.Length == 2 && para[0] == "textures")
                 {
                     /* we got a textures block */
-                    uint texturecount = uint.Parse(para[1]);
+                    uint texturecount;
+                    if(!uint.TryParse(para[1], out texturecount))
+                    {
+                        throw new NotAWearableFormatException();
+                    }
                     for(uint paranum = 0; paranum < texturecount; ++paranum)
                     {
                         line = lines[++idx].Trim();
                         para = line.Split(new char[] { ' ' , '\t'}, StringSplitOptions.RemoveEmptyEntries);
                         if(para.Length == 2)
                         {
-                            Textures[uint.Parse(para[0])] = para[1];
+                            uint index;
+                            if (!uint.TryParse(para[0], out index))
+                            {
+                                throw new NotAWearableFormatException();
+                            }
+
+                            Textures[index] = para[1];
                         }
                     }
                 }
@@ -120,23 +152,48 @@ namespace SilverSim.Types.Asset.Format
                         }
                         else if(para[0] == "base_mask")
                         {
-                            Permissions.Base = (InventoryPermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
+                            uint val;
+                            if (!uint.TryParse(para[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out val))
+                            {
+                                throw new NotAWearableFormatException();
+                            }
+                            Permissions.Base = (InventoryPermissionsMask)val;
                         }
                         else if(para[0] == "owner_mask")
                         {
-                            Permissions.Current = (InventoryPermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
+                            uint val;
+                            if (!uint.TryParse(para[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out val))
+                            {
+                                throw new NotAWearableFormatException();
+                            }
+                            Permissions.Current = (InventoryPermissionsMask)val;
                         }
                         else if(para[0] == "group_mask")
                         {
-                            Permissions.Group = (InventoryPermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
+                            uint val;
+                            if (!uint.TryParse(para[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out val))
+                            {
+                                throw new NotAWearableFormatException();
+                            }
+                            Permissions.Group = (InventoryPermissionsMask)val;
                         }
                         else if(para[0] == "everyone_mask")
                         {
-                            Permissions.EveryOne = (InventoryPermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
+                            uint val;
+                            if (!uint.TryParse(para[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out val))
+                            {
+                                throw new NotAWearableFormatException();
+                            }
+                            Permissions.EveryOne = (InventoryPermissionsMask)val;
                         }
                         else if(para[0] == "next_owner_mask")
                         {
-                            Permissions.NextOwner = (InventoryPermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
+                            uint val;
+                            if (!uint.TryParse(para[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out val))
+                            {
+                                throw new NotAWearableFormatException();
+                            }
+                            Permissions.NextOwner = (InventoryPermissionsMask)val;
                         }
                         else if(para[0] == "creator_id")
                         {
@@ -183,11 +240,21 @@ namespace SilverSim.Types.Asset.Format
                         }
                         else if(para[0] == "sale_price")
                         {
-                            SaleInfo.Price = int.Parse(para[1]);
+                            int val;
+                            if (!int.TryParse(para[1], out val))
+                            {
+                                throw new NotAWearableFormatException();
+                            }
+                            SaleInfo.Price = val;
                         }
                         else if (para[0] == "perm_mask")
                         {
-                            SaleInfo.PermMask = (InventoryPermissionsMask)uint.Parse(para[1], NumberStyles.HexNumber);
+                            uint val;
+                            if (!uint.TryParse(para[1], NumberStyles.HexNumber, CultureInfo.InvariantCulture, out val))
+                            {
+                                throw new NotAWearableFormatException();
+                            }
+                            SaleInfo.PermMask = (InventoryPermissionsMask)val;
                         }
 
                         if (++idx == lines.Length)
@@ -219,7 +286,7 @@ namespace SilverSim.Types.Asset.Format
         #endregion
 
         #region Operators
-        private static readonly string WearableFormat =
+        private const string WearableFormat =
                 "permissions 0\n" +
                 "{{\n" +
                 "\tbase_mask\t{0:x8}\n" +
@@ -239,6 +306,8 @@ namespace SilverSim.Types.Asset.Format
                 "}}\n" +
                 "type\t{11}\n";
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
+        [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
         public byte[] WearableData
         {
             get

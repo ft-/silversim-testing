@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace SilverSim.StructuredData.LLSD
+namespace SilverSim.Types.StructuredData.Llsd
 {
     public static class LLSD_Notation
     {

@@ -3,12 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
 namespace SilverSim.Types.Inventory
 {
     [Flags]
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum InventoryFlags : uint
     {
         None = 0,

@@ -2,10 +2,13 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Estate
 {
     [Flags]
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum RegionOptionFlags : uint
     {
         None = 0,

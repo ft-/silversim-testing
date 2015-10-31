@@ -1,8 +1,9 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 using ThreadedClasses;
 
@@ -33,6 +34,7 @@ namespace SilverSim.Types.Primitive
             public PrimitiveMediaPermission InteractPermissions = PrimitiveMediaPermission.All;
             public string[] WhiteList = new string[0];
 
+            [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
             public Entry(Map m)
             {
                 IsAlternativeImageEnabled = m["alt_image_enable"].AsBoolean;
@@ -60,6 +62,7 @@ namespace SilverSim.Types.Primitive
                 Width = m["width_pixels"].AsInt;
             }
 
+            [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
             public static explicit operator Map(Entry e)
             {
                 lock(e)
@@ -92,6 +95,7 @@ namespace SilverSim.Types.Primitive
                 }
             }
 
+            [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
             public static explicit operator Entry(Map m)
             {
                 Entry e = new Entry();
@@ -122,6 +126,7 @@ namespace SilverSim.Types.Primitive
                 return e;
             }
 
+            [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
             public void ToXml(XmlTextWriter writer)
             {
                 writer.WriteStartElement("map");
@@ -164,7 +169,7 @@ namespace SilverSim.Types.Primitive
             }
         }
 
-        static void fromXmlOSMedia(PrimitiveMedia media, XmlTextReader reader)
+        static void FromXmlOSMedia(PrimitiveMedia media, XmlTextReader reader)
         {
             for (; ; )
             {
@@ -196,7 +201,7 @@ namespace SilverSim.Types.Primitive
             }
         }
 
-        public static PrimitiveMedia fromXml(XmlTextReader reader)
+        public static PrimitiveMedia FromXml(XmlTextReader reader)
         {
             if (reader.IsEmptyElement)
             {
@@ -222,7 +227,7 @@ namespace SilverSim.Types.Primitive
                         switch(reader.Name)
                         {
                             case "OSMedia":
-                                fromXmlOSMedia(media, reader);
+                                FromXmlOSMedia(media, reader);
                                 break;
 
                             default:

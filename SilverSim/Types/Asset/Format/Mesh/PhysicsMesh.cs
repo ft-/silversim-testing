@@ -1,9 +1,10 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -11,6 +12,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
 {
     public class PhysicsMesh : LOD
     {
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public PhysicsMesh(AssetData asset)
         {
             if (asset.Type != AssetType.Mesh)
@@ -21,7 +23,7 @@ namespace SilverSim.Types.Asset.Format.Mesh
             int start;
             try
             {
-                meshmap = (Map)LLSD_Binary.Deserialize(asset.InputStream);
+                meshmap = (Map)LlsdBinary.Deserialize(asset.InputStream);
                 start = (int)asset.InputStream.Position;
             }
             catch

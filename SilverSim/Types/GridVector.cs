@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types
 {
@@ -30,8 +31,10 @@ namespace SilverSim.Types
             {
                 throw new ArgumentException("v is not a valid GridVector string");
             }
-            X = uint.Parse(x[0]);
-            Y = uint.Parse(x[1]);
+            if(!uint.TryParse(x[0], out X) || !uint.TryParse(x[1], out Y))
+            {
+                throw new ArgumentException("v is not a valid GridVector string");
+            }
         }
 
         public GridVector(string v, uint multiplier)
@@ -41,8 +44,12 @@ namespace SilverSim.Types
             {
                 throw new ArgumentException("v is not a valid GridVector string");
             }
-            X = uint.Parse(x[0]) * multiplier;
-            Y = uint.Parse(x[1]) * multiplier;
+            if (!uint.TryParse(x[0], out X) || !uint.TryParse(x[1], out Y))
+            {
+                throw new ArgumentException("v is not a valid GridVector string");
+            }
+            X *= multiplier;
+            Y *= multiplier;
         }
 
         public GridVector(ulong regionHandle)
@@ -69,6 +76,7 @@ namespace SilverSim.Types
         #endregion
 
         #region Properties
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
         public byte[] AsBytes
         {
             get

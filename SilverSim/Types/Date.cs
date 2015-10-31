@@ -64,6 +64,21 @@ namespace SilverSim.Types
             return m_Value.Equals(v.m_Value);
         }
 
+        public override bool Equals(object o)
+        {
+            Date v = o as Date;
+            if(null == v)
+            {
+                return false;
+            }
+            return Equals(v);
+        }
+
+        public override int GetHashCode()
+        {
+            return m_Value.GetHashCode();
+        }
+
         public override string ToString()
         {
             string format;

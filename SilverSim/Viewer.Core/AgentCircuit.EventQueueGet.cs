@@ -3,7 +3,7 @@
 
 using SilverSim.Viewer.Messages;
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using System;
 using System.IO;
@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Core
 
             try
             {
-                LLSD_XML.Deserialize(httpreq.Body);
+                LlsdXml.Deserialize(httpreq.Body);
             }
             catch (Exception e)
             {
@@ -126,7 +126,7 @@ namespace SilverSim.Viewer.Core
                 res.ContentType = "application/llsd+xml";
                 using (Stream o = res.GetOutputStream())
                 {
-                    LLSD_XML.Serialize(result, o);
+                    LlsdXml.Serialize(result, o);
                 }
             }
         }

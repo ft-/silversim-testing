@@ -6,7 +6,7 @@ using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.ServiceInterfaces.Database;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
@@ -140,7 +140,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
             using (MemoryStream ms = new MemoryStream(dbReader.GetBytes("DynAttrs")))
             {
-                foreach (KeyValuePair<string, IValue> kvp in (Map)LLSD_Binary.Deserialize(ms))
+                foreach (KeyValuePair<string, IValue> kvp in (Map)LlsdBinary.Deserialize(ms))
                 {
                     objpart.DynAttrs.Add(kvp.Key, kvp.Value);
                 }
@@ -741,7 +741,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                 using (MemoryStream ms = new MemoryStream())
                 { 
-                    LLSD_Binary.Serialize(objpart.DynAttrs, ms);
+                    LlsdBinary.Serialize(objpart.DynAttrs, ms);
                     cmd.Parameters.AddWithValue("?v_DynAttrs", ms.GetBuffer());
                 }
 

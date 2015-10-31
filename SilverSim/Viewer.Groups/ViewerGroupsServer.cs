@@ -15,7 +15,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Groups;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using SilverSim.Types.IM;
@@ -457,7 +457,7 @@ namespace SilverSim.Viewer.Groups
             {
                 try
                 {
-                    IValue iv = LLSD_XML.Deserialize(new MemoryStream(m.BinaryBucket));
+                    IValue iv = LlsdXml.Deserialize(new MemoryStream(m.BinaryBucket));
                     if(iv is Map)
                     {
                         Map binBuck = (Map)iv;
@@ -1590,7 +1590,7 @@ namespace SilverSim.Viewer.Groups
             UGI group;
             try
             {
-                iv = LLSD_XML.Deserialize(req.Body);
+                iv = LlsdXml.Deserialize(req.Body);
                 group = new UGI(((Map)iv)["group_id"].AsUUID);
             }
             catch(Exception e)
@@ -1687,7 +1687,7 @@ namespace SilverSim.Viewer.Groups
             res.Add("titles", groupTitlesArray);
 
             HttpResponse httpres = req.BeginResponse("application/llsd+xml");
-            LLSD_XML.Serialize(res, httpres.GetOutputStream());
+            LlsdXml.Serialize(res, httpres.GetOutputStream());
             httpres.Close();
         }
         #endregion

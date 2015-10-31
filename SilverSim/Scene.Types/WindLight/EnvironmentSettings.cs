@@ -1,7 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
@@ -106,7 +106,7 @@ namespace SilverSim.Scene.Types.WindLight
         public static EnvironmentSettings Deserialize(Stream input)
         {
             EnvironmentSettings env = new EnvironmentSettings();
-            AnArray a = LLSD_XML.Deserialize(input) as AnArray;
+            AnArray a = LlsdXml.Deserialize(input) as AnArray;
             if(null == a)
             {
                 throw new EnvironmentSettingsSerializationException();

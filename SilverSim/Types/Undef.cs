@@ -5,7 +5,7 @@ using System;
 
 namespace SilverSim.Types
 {
-    public sealed class Undef : IComparable<Undef>, IEquatable<Undef>, IValue
+    public sealed class Undef : IEquatable<Undef>, IValue
     {
         public Undef()
         {

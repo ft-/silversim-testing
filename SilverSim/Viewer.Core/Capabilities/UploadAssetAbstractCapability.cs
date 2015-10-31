@@ -2,7 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
@@ -82,7 +82,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 Map reqmap;
                 try
                 {
-                    reqmap = LLSD_XML.Deserialize(httpreq.Body) as Map;
+                    reqmap = LlsdXml.Deserialize(httpreq.Body) as Map;
                 }
                 catch
                 {
@@ -109,7 +109,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                     {
                         using (Stream outErrorStream = httperrorres.GetOutputStream())
                         {
-                            LLSD_XML.Serialize(llsderrorreply, outErrorStream);
+                            LlsdXml.Serialize(llsderrorreply, outErrorStream);
                         }
                     }
                     return;
@@ -123,7 +123,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                     {
                         using (Stream outErrorStream = httperrorres.GetOutputStream())
                         {
-                            LLSD_XML.Serialize(llsderrorreply, outErrorStream);
+                            LlsdXml.Serialize(llsderrorreply, outErrorStream);
                         }
                     }
                     return;
@@ -142,7 +142,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 {
                     using (Stream outStream = httpres.GetOutputStream())
                     {
-                        LLSD_XML.Serialize(llsdreply, outStream);
+                        LlsdXml.Serialize(llsdreply, outStream);
                     }
                 }
             }
@@ -195,7 +195,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                         httperrorres.ContentType = "application/llsd+xml";
                         using (Stream outErrorStream = httperrorres.GetOutputStream())
                         {
-                            LLSD_XML.Serialize(llsderrorreply, outErrorStream);
+                            LlsdXml.Serialize(llsderrorreply, outErrorStream);
                         }
                     }
                     return;
@@ -210,7 +210,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                         httperrorres.ContentType = "application/llsd+xml";
                         using (Stream outErrorStream = httperrorres.GetOutputStream())
                         {
-                            LLSD_XML.Serialize(llsderrorreply, outErrorStream);
+                            LlsdXml.Serialize(llsderrorreply, outErrorStream);
                         }
                     }
                     return;
@@ -229,7 +229,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                     httpres.ContentType = "application/llsd+xml";
                     using (Stream outStream = httpres.GetOutputStream())
                     {
-                        LLSD_XML.Serialize(llsdreply, outStream);
+                        LlsdXml.Serialize(llsdreply, outStream);
                     }
                 }
             }

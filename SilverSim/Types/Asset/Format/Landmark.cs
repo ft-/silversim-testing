@@ -42,11 +42,21 @@ namespace SilverSim.Types.Asset.Format
                 }
                 else if(para.Length == 4 && para[0] == "local_pos")
                 {
-                    LocalPos = new Vector3(float.Parse(para[1]), float.Parse(para[2]), float.Parse(para[3]));
+                    double x, y, z;
+                    if(!double.TryParse(para[1], out x) || double.TryParse(para[2], out y) || double.TryParse(para[3], out z))
+                    {
+                        throw new NotALandmarkFormatException();
+                    }
+                    LocalPos = new Vector3(x, y, z);
                 }
                 else if(para.Length == 2 && para[0] == "region_handle")
                 {
-                    Location = new GridVector(ulong.Parse(para[1]));
+                    ulong u;
+                    if(!ulong.TryParse(para[1], out u))
+                    {
+                        throw new NotALandmarkFormatException();
+                    }
+                    Location = new GridVector(u);
                 }
                 else if(para.Length == 2 && para[0] == "gatekeeper")
                 {

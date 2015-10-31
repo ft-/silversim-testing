@@ -6,11 +6,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 
-namespace SilverSim.StructuredData.JSON
+namespace SilverSim.Types.StructuredData.Json
 {
-    public static class JSON20RPC
+    public static class Json20Rpc
     {
         public static string SerializeRequest(string method, string jsonId, IValue param)
         {
@@ -19,35 +20,77 @@ namespace SilverSim.StructuredData.JSON
             request.Add("id", jsonId);
             request.Add("method", method);
             request.Add("params", param);
-            return JSON.Serialize(request);
+            return Json.Serialize(request);
         }
 
         [Serializable]
-        public class InvalidJSON20RPCResponseException : Exception
+        public class InvalidJson20RpcResponseException : Exception
         {
-            public InvalidJSON20RPCResponseException()
+            public InvalidJson20RpcResponseException()
+            {
+
+            }
+
+            public InvalidJson20RpcResponseException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected InvalidJson20RpcResponseException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public InvalidJson20RpcResponseException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }
         }
 
         [Serializable]
-        public class JSON20RPCException : Exception
+        public class Json20RpcException : Exception
         {
             public int FaultCode;
-            public JSON20RPCException(int faultCode, string message)
+
+            public Json20RpcException()
+            {
+
+            }
+
+            public Json20RpcException(int faultCode, string message)
                 : base(message)
             {
                 FaultCode = faultCode;
+            }
+
+            public Json20RpcException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected Json20RpcException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+                FaultCode = info.GetInt32("FaultCode");
+            }
+
+            public Json20RpcException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
             }
         }
 
         public static IValue DeserializeResponse(Stream stream)
         {
-            Map m = JSON.Deserialize(stream) as Map;
+            Map m = Json.Deserialize(stream) as Map;
             if(null == m)
             {
-                throw new InvalidJSON20RPCResponseException();
+                throw new InvalidJson20RpcResponseException();
             }
 
             if (m.ContainsKey("error"))
@@ -63,11 +106,11 @@ namespace SilverSim.StructuredData.JSON
                 {
                     faultString = error["message"].ToString();
                 }
-                throw new JSON20RPCException(faultCode, faultString);
+                throw new Json20RpcException(faultCode, faultString);
             }
             if (!m.ContainsKey("result"))
             {
-                throw new InvalidJSON20RPCResponseException();
+                throw new InvalidJson20RpcResponseException();
             }
             return m["result"];
         }

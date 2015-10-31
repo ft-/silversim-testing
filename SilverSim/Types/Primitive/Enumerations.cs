@@ -2,9 +2,11 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Primitive
 {
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum Bumpiness : byte
     {
         None = 0,
@@ -27,6 +29,8 @@ namespace SilverSim.Types.Primitive
         Weave = 17
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Design", "UseFlagsAttributeRule")]
     public enum Shininess : byte
     {
         None = 0,
@@ -35,6 +39,8 @@ namespace SilverSim.Types.Primitive
         High = 0xc0
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Design", "UseFlagsAttributeRule")]
     public enum MappingType : byte
     {
         Default = 0,
@@ -44,6 +50,8 @@ namespace SilverSim.Types.Primitive
     }
 
     [Flags]
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum TextureAttributes : uint
     {
         None = 0,
@@ -61,6 +69,8 @@ namespace SilverSim.Types.Primitive
         All = 0xFFFFFFFF
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum ClickActionType : byte
     {
         None = 0,
@@ -74,6 +84,8 @@ namespace SilverSim.Types.Primitive
         Zoom = 7
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum PrimitiveParamsType : int
     {
         Name = 27,
@@ -106,6 +118,7 @@ namespace SilverSim.Types.Primitive
         AlphaMode = 38
     }
 
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum PrimitivePhysicsShapeType : int
     {
         Prim = 0,
@@ -113,6 +126,7 @@ namespace SilverSim.Types.Primitive
         Convex = 2,
     }
 
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum PrimitiveShapeType : int
     {
         Box = 0,
@@ -126,6 +140,8 @@ namespace SilverSim.Types.Primitive
     }
 
     [Flags]
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum PrimitiveSculptType : byte
     {
         Sphere = 1,
@@ -140,6 +156,7 @@ namespace SilverSim.Types.Primitive
         Mirror = 128
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     public enum PrimitiveProfileShape : byte
     {
         Circle = 0,
@@ -152,6 +169,8 @@ namespace SilverSim.Types.Primitive
         Mask = 0x0F
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Design", "UseFlagsAttributeRule")]
     public enum PrimitiveProfileHollowShape : byte
     {
         Same = 0,
@@ -162,6 +181,8 @@ namespace SilverSim.Types.Primitive
         Mask = 0xF0
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Design", "UseFlagsAttributeRule")]
     public enum PrimitiveExtrusion : byte
     {
         Straight = 16,
@@ -170,6 +191,8 @@ namespace SilverSim.Types.Primitive
         Flexible = 128
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Design", "UseFlagsAttributeRule")]
     public enum PrimitiveHoleShape : byte
     {
         Default = 0x00,
@@ -179,6 +202,8 @@ namespace SilverSim.Types.Primitive
     }
 
     [Flags]
+    [SuppressMessage("Gendarme.Rules.Design", "FlagsShouldNotDefineAZeroValueRule")]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum PrimitiveMediaPermission : int
     {
         None = 0,

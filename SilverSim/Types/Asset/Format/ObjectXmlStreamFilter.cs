@@ -3,12 +3,14 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Text;
 
 namespace SilverSim.Types.Asset.Format
 {
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public class ObjectXmlStreamFilter : Stream
     {
         byte[] m_Buffer = new byte[10240];
@@ -185,7 +187,7 @@ namespace SilverSim.Types.Asset.Format
             throw new NotSupportedException();
         }
 
-        public new void Dispose()
+        protected override void Dispose(bool disposing)
         {
             m_BufInput.Dispose();
         }

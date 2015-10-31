@@ -5,16 +5,35 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Text;
 
-namespace SilverSim.StructuredData.LLSD
+namespace SilverSim.Types.StructuredData.Llsd
 {
-    public static class LLSD_Binary
+    public static class LlsdBinary
     {
         [Serializable]
-        public class InvalidLLSDBinarySerializationException : Exception 
+        public class InvalidLlsdBinarySerializationException : Exception 
         {
-            public InvalidLLSDBinarySerializationException()
+            public InvalidLlsdBinarySerializationException()
+            {
+
+            }
+
+            public InvalidLlsdBinarySerializationException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected InvalidLlsdBinarySerializationException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public InvalidLlsdBinarySerializationException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }
@@ -26,7 +45,7 @@ namespace SilverSim.StructuredData.LLSD
             byte[] data = new byte[4];
             if (4 != input.Read(data, 0, 4))
             {
-                throw new InvalidLLSDBinarySerializationException();
+                throw new InvalidLlsdBinarySerializationException();
             }
 
             if (!BitConverter.IsLittleEndian)
@@ -60,7 +79,7 @@ namespace SilverSim.StructuredData.LLSD
                     data = new byte[8];
                     if (8 != input.Read(data, 0, 8))
                     {
-                        throw new InvalidLLSDBinarySerializationException();
+                        throw new InvalidLlsdBinarySerializationException();
                     }
 
                     if(!BitConverter.IsLittleEndian)
@@ -74,7 +93,7 @@ namespace SilverSim.StructuredData.LLSD
                     data = new byte[16];
                     if(16 != input.Read(data, 0, 16))
                     {
-                        throw new InvalidLLSDBinarySerializationException();
+                        throw new InvalidLlsdBinarySerializationException();
                     }
 
                     return new UUID(data, 0);
@@ -86,7 +105,7 @@ namespace SilverSim.StructuredData.LLSD
 
                     if (datalen != input.Read(data, 0, datalen))
                     {
-                        throw new InvalidLLSDBinarySerializationException();
+                        throw new InvalidLlsdBinarySerializationException();
                     }
 
                     return new BinaryData(data);
@@ -98,7 +117,7 @@ namespace SilverSim.StructuredData.LLSD
 
                     if (datalen != input.Read(data, 0, datalen))
                     {
-                        throw new InvalidLLSDBinarySerializationException();
+                        throw new InvalidLlsdBinarySerializationException();
                     }
 
                     return new AString(Encoding.UTF8.GetString(data));
@@ -110,7 +129,7 @@ namespace SilverSim.StructuredData.LLSD
 
                     if (datalen != input.Read(data, 0, datalen))
                     {
-                        throw new InvalidLLSDBinarySerializationException();
+                        throw new InvalidLlsdBinarySerializationException();
                     }
 
                     return new URI(Encoding.UTF8.GetString(data));
@@ -119,7 +138,7 @@ namespace SilverSim.StructuredData.LLSD
                     data = new byte[8];
                     if(8 != input.Read(data, 0, 8))
                     {
-                        throw new InvalidLLSDBinarySerializationException();
+                        throw new InvalidLlsdBinarySerializationException();
                     }
 
                     return new Date(data, 0);
@@ -133,7 +152,7 @@ namespace SilverSim.StructuredData.LLSD
                     }
                     if(']' != input.ReadByte())
                     {
-                        throw new InvalidLLSDBinarySerializationException();
+                        throw new InvalidLlsdBinarySerializationException();
                     }
                     return newArray;
 
@@ -149,7 +168,7 @@ namespace SilverSim.StructuredData.LLSD
 
                         if (datalen != input.Read(data, 0, datalen))
                         {
-                            throw new InvalidLLSDBinarySerializationException();
+                            throw new InvalidLlsdBinarySerializationException();
                         }
 
                         key = Encoding.UTF8.GetString(data);
@@ -159,12 +178,12 @@ namespace SilverSim.StructuredData.LLSD
                     }
                     if('}' != input.ReadByte())
                     {
-                        throw new InvalidLLSDBinarySerializationException();
+                        throw new InvalidLlsdBinarySerializationException();
                     }
                     return newMap;
 
                 default:
-                    throw new InvalidLLSDBinarySerializationException();
+                    throw new InvalidLlsdBinarySerializationException();
             }
         }
         #endregion Main LLSD+Binary Deserialization
@@ -179,7 +198,7 @@ namespace SilverSim.StructuredData.LLSD
             }
             if(a != "<? LLSD/Binary ?>")
             {
-                throw new InvalidLLSDBinarySerializationException();
+                throw new InvalidLlsdBinarySerializationException();
             }
             return DeserializeInternal(input);
         }
@@ -187,18 +206,27 @@ namespace SilverSim.StructuredData.LLSD
         #region Main LLSD+Binary Serialization
         private static void SerializeInternal(IValue input, Stream output)
         {
-            if (input is SilverSim.Types.Map)
+            Map i_m;
+            AnArray i_a;
+            ABoolean i_bool;
+            Date i_d;
+            Integer i_int;
+            Real i_real;
+            AString i_string;
+            URI i_uri;
+            BinaryData i_bin;
+
+            if (null != (i_m = input as Map))
             {
-                Map i = (Map)input;
                 output.WriteByte((byte)'{');
-                byte[] cnt = BitConverter.GetBytes(i.Count);
+                byte[] cnt = BitConverter.GetBytes(i_m.Count);
                 if (!BitConverter.IsLittleEndian)
                 {
                     Array.Reverse(cnt);
                 }
                 output.Write(cnt, 0, cnt.Length);
 
-                foreach (KeyValuePair<string, IValue> kvp in (Map)input)
+                foreach (KeyValuePair<string, IValue> kvp in i_m)
                 {
                     output.WriteByte((byte)'s');
                     byte[] str = Encoding.UTF8.GetBytes(kvp.Key);
@@ -214,27 +242,26 @@ namespace SilverSim.StructuredData.LLSD
                 }
                 output.WriteByte((byte)'}');
             }
-            else if (input is AnArray)
+            else if (null != (i_a = input as AnArray))
             {
-                AnArray i = (AnArray) input;
                 output.WriteByte((byte)'[');
-                byte[] cnt = BitConverter.GetBytes(i.Count);
+                byte[] cnt = BitConverter.GetBytes(i_a.Count);
                 if(!BitConverter.IsLittleEndian)
                 {
                     Array.Reverse(cnt);
                 }
                 output.Write(cnt, 0, 4);
 
-                foreach(IValue v in i)
+                foreach(IValue v in i_a)
                 {
                     SerializeInternal(v, output);
                 }
 
                 output.WriteByte((byte)']');
             }
-            else if(input is ABoolean)
+            else if(null != (i_bool = input as ABoolean))
             {
-                if((ABoolean)input)
+                if (i_bool)
                 {
                     output.WriteByte((byte)'1');
                 }
@@ -243,18 +270,18 @@ namespace SilverSim.StructuredData.LLSD
                     output.WriteByte((byte)'0');
                 }
             }
-            else if(input is Date)
+            else if(null != (i_d = input as Date))
             {
                 output.WriteByte((byte)'d');
                 byte[] db = new byte[8];
-                ((Date)input).ToBytes(db, 0);
+                i_d.ToBytes(db, 0);
                 output.Write(db, 0, 8);
             }
-            else if(input is Integer)
+            else if(null != (i_int = input as Integer))
             {
                 output.WriteByte((byte)'i');
                 byte[] db = new byte[4];
-                ((Integer)input).ToBytes(db, 0);
+                i_int.ToBytes(db, 0);
                 output.Write(db, 0, 4);
             }
             else if(input is Quaternion)
@@ -291,20 +318,19 @@ namespace SilverSim.StructuredData.LLSD
 
                 output.WriteByte((byte)']');
             }
-            else if(input is Real)
+            else if(null != (i_real = input as Real))
             {
                 output.WriteByte((byte)'r');
                 byte[] db = new byte[8];
-                ((Real)input).ToBytes(db, 0);
+                i_real.ToBytes(db, 0);
                 if (!BitConverter.IsLittleEndian)
                     Array.Reverse(db);
                 output.Write(db, 0, 8);
             }
-            else if(input is AString)
+            else if(null != (i_string = input as AString))
             {
-                AString i = (AString)input;
                 output.WriteByte((byte)'s');
-                byte[] str = Encoding.UTF8.GetBytes(i.ToString());
+                byte[] str = Encoding.UTF8.GetBytes(i_string.ToString());
                 byte[] cnt = BitConverter.GetBytes(str.Length);
                 if (!BitConverter.IsLittleEndian)
                 {
@@ -317,11 +343,10 @@ namespace SilverSim.StructuredData.LLSD
             {
                 output.WriteByte((byte)'!');
             }
-            else if(input is URI)
+            else if(null != (i_uri = input as URI))
             {
-                URI i = (URI)input;
                 output.WriteByte((byte)'l');
-                byte[] str = Encoding.UTF8.GetBytes(i.ToString());
+                byte[] str = Encoding.UTF8.GetBytes(i_uri.ToString());
                 byte[] cnt = BitConverter.GetBytes(str.Length);
                 if (!BitConverter.IsLittleEndian)
                 {
@@ -365,9 +390,9 @@ namespace SilverSim.StructuredData.LLSD
 
                 output.WriteByte((byte)']');
             }
-            else if(input is BinaryData)
+            else if(null != (i_bin = input as BinaryData))
             {
-                byte[] data = ((BinaryData)input);
+                byte[] data = i_bin;
                 output.WriteByte((byte)'u');
                 byte[] cnt = BitConverter.GetBytes(data.Length);
                 if (!BitConverter.IsLittleEndian)

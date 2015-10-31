@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Asset
 {
@@ -21,6 +22,7 @@ namespace SilverSim.Types.Asset
         {
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotThrowInUnexpectedLocationRule")]
         public string FileExtension
         {
             get
@@ -51,6 +53,7 @@ namespace SilverSim.Types.Asset
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotThrowInUnexpectedLocationRule")]
         public string FileName
         {
             get
@@ -157,6 +160,7 @@ namespace SilverSim.Types.Asset
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotThrowInUnexpectedLocationRule")]
         public string ContentType
         {
             get

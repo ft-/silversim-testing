@@ -4,9 +4,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types
 {
+    [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
     public sealed class AnArray : List<IValue>, IValue
     {
         #region Constructors
@@ -137,6 +139,7 @@ namespace SilverSim.Types
         public ulong AsULong { get { return 0; } }
         #endregion 
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public Vector4 ElementsToVector4
         {
             get
@@ -145,6 +148,7 @@ namespace SilverSim.Types
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public Vector3 ElementsToVector3
         {
             get
@@ -204,6 +208,11 @@ namespace SilverSim.Types
             public void GoToMarkPosition()
             {
                 m_CurrentIndex = m_MarkIndex;
+            }
+
+            protected virtual void Dispose(bool v)
+            {
+
             }
         }
 

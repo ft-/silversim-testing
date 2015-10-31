@@ -6,8 +6,8 @@ using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.StructuredData.JSON;
-using SilverSim.StructuredData.LLSD;
+using SilverSim.Types.StructuredData.Json;
+using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Inventory;
@@ -1566,7 +1566,7 @@ namespace SilverSim.Scene.Types.Object
                     writer.WriteNamedValue("AttachedPos", ObjectGroup.AttachedPos);
 
                     writer.WriteStartElement("DynAttrs");
-                    LLSD_XML.Serialize(DynAttrs, writer);
+                    LlsdXml.Serialize(DynAttrs, writer);
                     writer.WriteEndElement();
 
                     writer.WriteNamedValue("TextureAnimation", TextureAnimationBytes);
@@ -1880,7 +1880,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "Media":
-                                part.m_Media = PrimitiveMedia.fromXml(reader);
+                                part.m_Media = PrimitiveMedia.FromXml(reader);
                                 break;
 
                             default:
@@ -2337,7 +2337,7 @@ namespace SilverSim.Scene.Types.Object
 
                             case "DynAttrs":
                                 {
-                                    Map damap = LLSD_XML.Deserialize(reader) as Map;
+                                    Map damap = LlsdXml.Deserialize(reader) as Map;
                                     if(null != damap)
                                     {
                                         foreach(string key in damap.Keys)
@@ -2368,7 +2368,7 @@ namespace SilverSim.Scene.Types.Object
                                     {
                                         if (!string.IsNullOrEmpty(json))
                                         {
-                                            IValue iv = JSON.Deserialize(new MemoryStream(UTF8NoBOM.GetBytes(json)));
+                                            IValue iv = Json.Deserialize(new MemoryStream(UTF8NoBOM.GetBytes(json)));
                                             if (iv is Map)
                                             {
                                                 Map m = (Map)iv;

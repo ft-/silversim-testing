@@ -5,10 +5,12 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Xml;
 
-namespace SilverSim.StructuredData.AssetXml
+namespace SilverSim.Types.StructuredData.AssetXml
 {
     public static class AssetXml
     {
@@ -20,9 +22,27 @@ namespace SilverSim.StructuredData.AssetXml
             public InvalidAssetSerializationException()
             {
             }
+
+            public InvalidAssetSerializationException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected InvalidAssetSerializationException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public InvalidAssetSerializationException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
         }
 
-        private static void parseAssetFullID(XmlTextReader reader)
+        private static void ParseAssetFullID(XmlTextReader reader)
         {
             while (true)
             {
@@ -57,7 +77,8 @@ namespace SilverSim.StructuredData.AssetXml
             }
         }
 
-        private static AssetData parseAssetDataInternal(XmlTextReader reader)
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        private static AssetData ParseAssetDataInternal(XmlTextReader reader)
         {
             AssetData asset = new AssetData();
             while (true)
@@ -67,13 +88,16 @@ namespace SilverSim.StructuredData.AssetXml
                     throw new InvalidAssetSerializationException();
                 }
 
+                bool isEmptyElement = reader.IsEmptyElement;
+                string nodeName = reader.Name;
+
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        switch (reader.Name)
+                        switch (nodeName)
                         {
                             case "Data":
-                                if(reader.IsEmptyElement)
+                                if(isEmptyElement)
                                 {
                                     asset.Data = new byte[0];
                                 }
@@ -84,7 +108,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "FullID":
-                                parseAssetFullID(reader);
+                                ParseAssetFullID(reader);
                                 break;
 
                             case "ID":
@@ -92,7 +116,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "Name":
-                                if (reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     asset.Name = string.Empty;
                                 }
@@ -111,21 +135,21 @@ namespace SilverSim.StructuredData.AssetXml
                                 break;
 
                             case "Local":
-                                if (!reader.IsEmptyElement)
+                                if (!isEmptyElement)
                                 {
                                     asset.Local = reader.ReadElementValueAsBoolean();
                                 }
                                 break;
 
                             case "Temporary":
-                                if (!reader.IsEmptyElement)
+                                if (!isEmptyElement)
                                 {
                                     asset.Temporary = reader.ReadElementValueAsBoolean();
                                 }
                                 break;
 
                             case "CreatorID":
-                                if (reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     asset.Creator = UUI.Unknown;
                                 }
@@ -173,7 +197,7 @@ namespace SilverSim.StructuredData.AssetXml
                         break;
 
                     case XmlNodeType.EndElement:
-                        if (reader.Name != "AssetBase")
+                        if (nodeName != "AssetBase")
                         {
                             throw new InvalidAssetSerializationException();
                         }
@@ -183,7 +207,7 @@ namespace SilverSim.StructuredData.AssetXml
             }
         }
 
-        public static AssetData parseAssetData(Stream input)
+        public static AssetData ParseAssetData(Stream input)
         {
             using (XmlTextReader reader = new XmlTextReader(input))
             {
@@ -202,7 +226,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 throw new InvalidAssetSerializationException();
                             }
 
-                            return parseAssetDataInternal(reader);
+                            return ParseAssetDataInternal(reader);
 
                         case XmlNodeType.EndElement:
                             throw new InvalidAssetSerializationException();
@@ -219,9 +243,27 @@ namespace SilverSim.StructuredData.AssetXml
             public InvalidAssetMetadataSerializationException()
             {
             }
+
+            public InvalidAssetMetadataSerializationException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected InvalidAssetMetadataSerializationException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public InvalidAssetMetadataSerializationException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
         }
 
-        private static AssetMetadata parseAssetMetadataInternal(XmlTextReader reader)
+        private static AssetMetadata ParseAssetMetadataInternal(XmlTextReader reader)
         {
             AssetMetadata asset = new AssetMetadata();
             while (true)
@@ -237,7 +279,7 @@ namespace SilverSim.StructuredData.AssetXml
                         switch (reader.Name)
                         {
                             case "FullID":
-                                parseAssetFullID(reader);
+                                ParseAssetFullID(reader);
                                 break;
 
                             case "ID":
@@ -308,7 +350,7 @@ namespace SilverSim.StructuredData.AssetXml
             }
         }
 
-        public static AssetMetadata parseAssetMetadata(Stream input)
+        public static AssetMetadata ParseAssetMetadata(Stream input)
         {
             using (XmlTextReader reader = new XmlTextReader(input))
             {
@@ -327,7 +369,7 @@ namespace SilverSim.StructuredData.AssetXml
                                 throw new InvalidAssetMetadataSerializationException();
                             }
 
-                            return parseAssetMetadataInternal(reader);
+                            return ParseAssetMetadataInternal(reader);
 
                         case XmlNodeType.EndElement:
                             throw new InvalidAssetMetadataSerializationException();

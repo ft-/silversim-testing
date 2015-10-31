@@ -3,10 +3,12 @@
 
 using System;
 using System.Collections;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types
 {
-    public sealed class BinaryData : IValue, IEnumerable, IEquatable<BinaryData>
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
+    public sealed class BinaryData : IValue, IEquatable<BinaryData>
     {
         private byte[] m_Data;
 
@@ -82,13 +84,6 @@ namespace SilverSim.Types
             return a.m_Data;
         }
         #endregion Operators
-
-        #region Enumerator
-        public IEnumerator GetEnumerator()
-        {
-            return m_Data.GetEnumerator();
-        }
-        #endregion Enumerator
 
         #region Helpers
         public ABoolean AsBoolean { get { return new ABoolean(m_Data.Length != 0); } }

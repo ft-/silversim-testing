@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using System.Diagnostics.CodeAnalysis;
 namespace SilverSim.Types
 {
     public class Color
@@ -159,6 +160,7 @@ namespace SilverSim.Types
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
         public virtual byte[] AsByte
         {
             get
@@ -253,6 +255,7 @@ namespace SilverSim.Types
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
         public override byte[] AsByte
         {
             get

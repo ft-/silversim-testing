@@ -2,12 +2,16 @@
 // GNU Affero General Public License v3
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
 namespace SilverSim.Types.Agent
 {
-    [Flags] public enum ControlFlags : uint
+    [Flags]
+    [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
+    public enum ControlFlags : uint
     {
         None = 0,
 

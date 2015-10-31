@@ -2,7 +2,7 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.Types.StructuredData.XMLRPC;
+using SilverSim.Types.StructuredData.XmlRpc;
 using System;
 using System.IO;
 using System.Net;
@@ -14,11 +14,11 @@ namespace SilverSim.Main.Common.HttpServer
     {
         private static readonly ILog m_Log = LogManager.GetLogger("XMLRPC SERVER");
 
-        public RwLockedDictionary<string, Func<XMLRPC.XmlRpcRequest, XMLRPC.XmlRpcResponse>> XmlRpcMethods = new RwLockedDictionary<string, Func<XMLRPC.XmlRpcRequest, XMLRPC.XmlRpcResponse>>();
+        public RwLockedDictionary<string, Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse>> XmlRpcMethods = new RwLockedDictionary<string, Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse>>();
 
         void RequestHandler(HttpRequest httpreq)
         {
-            XMLRPC.XmlRpcRequest req;
+            XmlRpc.XmlRpcRequest req;
             if(httpreq.Method != "POST")
             {
                 httpreq.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
@@ -26,7 +26,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
             try
             {
-                req = XMLRPC.DeserializeRequest(httpreq.Body);
+                req = XmlRpc.DeserializeRequest(httpreq.Body);
             }
             catch
 #if DEBUG
@@ -37,15 +37,15 @@ namespace SilverSim.Main.Common.HttpServer
                 return;
             }
 
-            Func<XMLRPC.XmlRpcRequest, XMLRPC.XmlRpcResponse> del;
-            XMLRPC.XmlRpcResponse res;
+            Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse> del;
+            XmlRpc.XmlRpcResponse res;
             if(XmlRpcMethods.TryGetValue(req.MethodName, out del))
             {
                 try
                 {
                     res = del(req);
                 }
-                catch(XMLRPC.XmlRpcFaultException e)
+                catch(XmlRpc.XmlRpcFaultException e)
                 {
                     FaultResponse(httpreq.BeginResponse(), e.FaultCode, e.Message);
                     return;
@@ -96,7 +96,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         private void FaultResponse(HttpResponse response, int statusCode, string statusMessage)
         {
-            XMLRPC.XmlRpcFaultResponse res = new XMLRPC.XmlRpcFaultResponse();
+            XmlRpc.XmlRpcFaultResponse res = new XmlRpc.XmlRpcFaultResponse();
             res.FaultCode = statusCode;
             res.FaultString = statusMessage;
 

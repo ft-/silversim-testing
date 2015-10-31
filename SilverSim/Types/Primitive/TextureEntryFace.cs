@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Types.Primitive
 {
+    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     public class TextureEntryFace : ICloneable, Asset.Format.IReferencesAccessor
     {
         private ColorAlpha m_TextureColor = new ColorAlpha(1, 1, 1, 1);
@@ -397,25 +399,7 @@ namespace SilverSim.Types.Primitive
             return ret;
         }
 
-        public override int GetHashCode()
-        {
-            return
-                TextureColor.GetHashCode() ^
-                RepeatU.GetHashCode() ^
-                RepeatV.GetHashCode() ^
-                OffsetU.GetHashCode() ^
-                OffsetV.GetHashCode() ^
-                Rotation.GetHashCode() ^
-                Glow.GetHashCode() ^
-                Bump.GetHashCode() ^
-                Shiny.GetHashCode() ^
-                FullBright.GetHashCode() ^
-                MediaFlags.GetHashCode() ^
-                TexMapType.GetHashCode() ^
-                TextureID.GetHashCode() ^
-                MaterialID.GetHashCode();
-        }
-
+        [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
         public override string ToString()
         {
             return String.Format("Color: {0} RepeatU: {1} RepeatV: {2} OffsetU: {3} OffsetV: {4} " +

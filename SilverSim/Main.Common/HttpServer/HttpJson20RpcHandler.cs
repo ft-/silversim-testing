@@ -2,7 +2,7 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.StructuredData.JSON;
+using SilverSim.Types.StructuredData.Json;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
@@ -52,7 +52,7 @@ namespace SilverSim.Main.Common.HttpServer
             
             try
             {
-                req = JSON.Deserialize(httpreq.Body);
+                req = Json.Deserialize(httpreq.Body);
             }
             catch
             {
@@ -87,7 +87,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 using (Stream o = httpres.GetOutputStream())
                 {
-                    JSON.Serialize(res, o);
+                    Json.Serialize(res, o);
                 }
             }
         }

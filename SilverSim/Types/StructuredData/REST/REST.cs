@@ -9,15 +9,18 @@ namespace SilverSim.Types.StructuredData.REST
 {
     public static class REST
     {
-        public static Dictionary<string, object> parseREST(Stream input)
+        public static Dictionary<string, object> ParseREST(Stream input)
         {
             Dictionary<string, object> result = new Dictionary<string, object>();
 
-            StreamReader sr = new StreamReader(input);
-            string body = sr.ReadToEnd().Trim();
+            string body;
+            using (StreamReader sr = new StreamReader(input))
+            {
+                 body = sr.ReadToEnd().Trim();
+            }
             string[] queryterms = body.Split('&');
 
-            if(queryterms.Length == 0)
+            if (queryterms.Length == 0)
             {
                 return result;
             }
@@ -33,11 +36,11 @@ namespace SilverSim.Types.StructuredData.REST
                     value = HttpUtility.UrlDecode(termparts[1]);
                 }
 
-                if(name.EndsWith("[]"))
+                if (name.EndsWith("[]"))
                 {
                     /* handle list based entries */
                     string baseName = name.Substring(0, name.Length - 2);
-                    if(!result.ContainsKey(baseName))
+                    if (!result.ContainsKey(baseName))
                     {
                         List<string> newList = new List<string>();
                         newList.Add(value);
@@ -51,7 +54,7 @@ namespace SilverSim.Types.StructuredData.REST
                     }
 
                 }
-                else if(!result.ContainsKey(name))
+                else if (!result.ContainsKey(name))
                 {
                     /* plain string handling */
                     result[name] = value;

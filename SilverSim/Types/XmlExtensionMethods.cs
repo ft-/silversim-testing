@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Xml;
 
@@ -194,15 +195,17 @@ namespace SilverSim.Types
                 return UUID.Zero;
             }
 
+            XmlNodeType nodeType;
             do
             {
                 if (!reader.Read())
                 {
                     throw new XmlException();
                 }
-            } while (reader.NodeType == XmlNodeType.Text || reader.NodeType == XmlNodeType.Attribute || reader.NodeType == XmlNodeType.Whitespace);
-            
-            if(reader.NodeType != XmlNodeType.Element)
+                nodeType = reader.NodeType;
+            } while (nodeType == XmlNodeType.Text || nodeType == XmlNodeType.Attribute || nodeType == XmlNodeType.Whitespace);
+
+            if (nodeType != XmlNodeType.Element)
             {
                 return new UUID(reader.ReadContentAsString()); /* they did three types of serialization for this and this is the third without inner element */
             }
@@ -214,9 +217,10 @@ namespace SilverSim.Types
                 {
                     throw new XmlException();
                 }
-            } while (reader.NodeType == XmlNodeType.Text || reader.NodeType == XmlNodeType.Attribute || reader.NodeType == XmlNodeType.Whitespace);
+                nodeType = reader.NodeType;
+            } while (nodeType == XmlNodeType.Text || nodeType == XmlNodeType.Attribute || nodeType == XmlNodeType.Whitespace);
 
-            if (reader.NodeType != XmlNodeType.EndElement)
+            if (nodeType != XmlNodeType.EndElement)
             {
                 throw new XmlException();
             }
@@ -243,7 +247,8 @@ namespace SilverSim.Types
             {
                 tagname = reader.Name;
             }
-            if((reader.NodeType == XmlNodeType.Element || reader.NodeType == XmlNodeType.Attribute) && !reader.IsEmptyElement)
+            XmlNodeType nodeType = reader.NodeType;
+            if((nodeType == XmlNodeType.Element || nodeType == XmlNodeType.Attribute) && !reader.IsEmptyElement)
             {
                 do
                 {
@@ -252,12 +257,13 @@ namespace SilverSim.Types
                     {
                         throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
                     }
-                    if(reader.NodeType == XmlNodeType.Element)
+                    nodeType = reader.NodeType;
+                    if(nodeType == XmlNodeType.Element)
                     {
                         ReadToEndElement(reader);
                         goto nextelem;
                     }
-                } while (reader.NodeType != XmlNodeType.EndElement);
+                } while (nodeType != XmlNodeType.EndElement);
                 if(tagname != reader.Name)
                 {
                     throw new XmlException("Closing tag does not match", null, reader.LineNumber, reader.LinePosition);
@@ -265,6 +271,7 @@ namespace SilverSim.Types
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static int ReadElementValueAsInt(this XmlTextReader reader)
         {
             if(reader.IsEmptyElement)
@@ -274,6 +281,7 @@ namespace SilverSim.Types
             return int.Parse(ReadElementValueAsString(reader));
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static uint ReadElementValueAsUInt(this XmlTextReader reader)
         {
             if (reader.IsEmptyElement)
@@ -283,6 +291,7 @@ namespace SilverSim.Types
             return uint.Parse(ReadElementValueAsString(reader));
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static long ReadElementValueAsLong(this XmlTextReader reader)
         {
             if(reader.IsEmptyElement)
@@ -292,6 +301,7 @@ namespace SilverSim.Types
             return long.Parse(ReadElementValueAsString(reader));
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static ulong ReadElementValueAsULong(this XmlTextReader reader)
         {
             if (reader.IsEmptyElement)
@@ -301,6 +311,7 @@ namespace SilverSim.Types
             return ulong.Parse(ReadElementValueAsString(reader));
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static double ReadElementValueAsFloat(this XmlTextReader reader)
         {
             if (reader.IsEmptyElement)
@@ -310,6 +321,7 @@ namespace SilverSim.Types
             return float.Parse(ReadElementValueAsString(reader), CultureInfo.InvariantCulture);
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public static double ReadElementValueAsDouble(this XmlTextReader reader)
         {
             if (reader.IsEmptyElement)
@@ -334,10 +346,12 @@ namespace SilverSim.Types
                     throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
                 }
 
+                string nodeName = reader.Name;
+
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        switch (reader.Name)
+                        switch (nodeName)
                         {
                             case "R":
                                 v.R_AsByte = (byte)reader.ReadElementValueAsUInt();
@@ -362,7 +376,7 @@ namespace SilverSim.Types
                         break;
 
                     case XmlNodeType.EndElement:
-                        if (reader.Name != tagname)
+                        if (nodeName != tagname)
                         {
                             throw new XmlException("Closing tag does not match", null, reader.LineNumber, reader.LinePosition);
                         }
@@ -387,10 +401,12 @@ namespace SilverSim.Types
                     throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
                 }
 
+                string nodeName = reader.Name;
+
                 switch(reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        switch(reader.Name)
+                        switch (nodeName)
                         {
                             case "X":
                                 v.X = reader.ReadElementValueAsDouble();
@@ -411,7 +427,7 @@ namespace SilverSim.Types
                         break;
 
                     case XmlNodeType.EndElement:
-                        if(reader.Name != tagname)
+                        if (nodeName != tagname)
                         {
                             throw new XmlException("Closing tag does not match", null, reader.LineNumber, reader.LinePosition);
                         }
@@ -436,10 +452,12 @@ namespace SilverSim.Types
                     throw new XmlException("Premature end of XML", null, reader.LineNumber, reader.LinePosition);
                 }
 
+                string nodeName = reader.Name;
+
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        switch (reader.Name)
+                        switch (nodeName)
                         {
                             case "X":
                                 v.X = reader.ReadElementValueAsDouble();
@@ -464,7 +482,7 @@ namespace SilverSim.Types
                         break;
 
                     case XmlNodeType.EndElement:
-                        if (reader.Name != tagname)
+                        if (nodeName != tagname)
                         {
                             throw new XmlException("Closing tag does not match", null, reader.LineNumber, reader.LinePosition);
                         }
