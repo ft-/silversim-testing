@@ -144,7 +144,12 @@ namespace SilverSim.Viewer.Core
                 try
                 {
                     m_InboundRunning = true;
-                    BeginUdpReceive();
+                    int i;
+                    /* follow recommendations for improving UDP receive performance */
+                    for (i = 0; i < 5; ++i)
+                    {
+                        BeginUdpReceive();
+                    }
                     m_Log.InfoFormat("Started at {0}:{1}", m_BindAddress.ToString(), m_BindPort);
                 }
                 catch
