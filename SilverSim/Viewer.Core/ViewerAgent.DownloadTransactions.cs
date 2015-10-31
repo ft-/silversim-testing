@@ -5,6 +5,7 @@ using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Transfer;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using ThreadedClasses;
@@ -30,6 +31,7 @@ namespace SilverSim.Viewer.Core
         internal RwLockedDoubleDictionary<string, ulong, DownloadTransferData> m_DownloadTransfers = new RwLockedDoubleDictionary<string, ulong, DownloadTransferData>();
 
         [PacketHandler(MessageType.RequestXfer)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRequestXfer(Message m)
         {
             RequestXfer req = (RequestXfer)m;
@@ -66,6 +68,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.ConfirmXferPacket)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleConfirmXferPacket(Message m)
         {
             ConfirmXferPacket req = (ConfirmXferPacket)m;

@@ -7,12 +7,14 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
         [PacketHandler(MessageType.ObjectAdd)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectAdd(Message m)
         {
             ObjectAdd p = (ObjectAdd)m;

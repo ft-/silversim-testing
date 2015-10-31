@@ -11,6 +11,7 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -22,6 +23,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.EstateOwnerMessage)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleEstateOwnerMessage(Message m)
         {
             EstateOwnerMessage req = (EstateOwnerMessage)m;

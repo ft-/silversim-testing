@@ -10,6 +10,7 @@ using SilverSim.Viewer.Messages.Sound;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using SilverSim.Scene.Types.Object;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -103,6 +104,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.SoundTrigger)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleSoundTrigger(Message m)
         {
             SoundTrigger req = (SoundTrigger)m;

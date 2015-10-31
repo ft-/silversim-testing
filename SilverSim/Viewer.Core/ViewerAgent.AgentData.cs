@@ -6,12 +6,14 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
         [PacketHandler(MessageType.AgentDataUpdateRequest)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAgentDataUpdateRequest(Message m)
         {
             Messages.Agent.AgentDataUpdateRequest adur = (Messages.Agent.AgentDataUpdateRequest)m;

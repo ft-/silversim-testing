@@ -6,12 +6,14 @@ using SilverSim.Viewer.Messages.Script;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types.Script;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
         [PacketHandler(MessageType.ScriptAnswerYes)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleScriptAnswerYes(Message m)
         {
             ScriptAnswerYes req = (ScriptAnswerYes)m;
@@ -45,6 +47,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.RevokePermissions)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleRevokePermissions(Message m)
         {
             RevokePermissions req = (RevokePermissions)m;

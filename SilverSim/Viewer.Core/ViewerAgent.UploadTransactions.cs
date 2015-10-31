@@ -10,6 +10,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -157,6 +158,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AssetUploadRequest)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAssetUploadRequest(Message m)
         {
             AssetUploadRequest req = (AssetUploadRequest)m;
@@ -192,6 +194,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AbortXfer)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAbortXfer(Message m)
         {
             AbortXfer req = (AbortXfer)m;
@@ -259,6 +262,7 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         [PacketHandler(MessageType.SendXferPacket)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleSendXferPacket(Message m)
         {
             SendXferPacket req = (SendXferPacket)m;

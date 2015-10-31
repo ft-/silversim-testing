@@ -11,12 +11,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public partial class SceneInterface
     {
         [PacketHandler(MessageType.RequestTaskInventory)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleRequestTaskInventory(Message m)
         {
             RequestTaskInventory req = (RequestTaskInventory)m;

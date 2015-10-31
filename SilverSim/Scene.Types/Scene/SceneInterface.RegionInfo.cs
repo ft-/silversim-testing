@@ -9,12 +9,14 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using SilverSim.Viewer.Messages;
 using SilverSim.Scene.Types.Agent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
         [PacketHandler(MessageType.RegionHandleRequest)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleRegionHandleRequest(Message m)
         {
             SilverSim.Viewer.Messages.Region.RegionHandleRequest req = (SilverSim.Viewer.Messages.Region.RegionHandleRequest)m;

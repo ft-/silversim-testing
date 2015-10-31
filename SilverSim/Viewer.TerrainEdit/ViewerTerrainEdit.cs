@@ -13,6 +13,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.TerrainEdit
 {
@@ -147,7 +148,8 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PacketHandler(MessageType.ModifyLand)]
-        public void HandleMessage(ViewerAgent agent, AgentCircuit circuit, Message m)
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        void HandleMessage(ViewerAgent agent, AgentCircuit circuit, Message m)
         {
             ModifyLand req = (ModifyLand)m;
             if (req.CircuitSessionID != req.SessionID ||
@@ -184,7 +186,8 @@ namespace SilverSim.Viewer.TerrainEdit
 
         #region Paint Effects
         [PaintEffect(StandardTerrainEffect.Raise)]
-        public void RaiseSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        void RaiseSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -253,7 +256,8 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PaintEffect(StandardTerrainEffect.Lower)]
-        public void LowerSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        void LowerSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -318,7 +322,8 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PaintEffect(StandardTerrainEffect.Flatten)]
-        public void FlattenSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        void FlattenSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -407,7 +412,8 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PaintEffect(StandardTerrainEffect.Smooth)]
-        public void SmoothSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        void SmoothSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -478,7 +484,8 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [PaintEffect(StandardTerrainEffect.Noise)]
-        public void NoiseSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        void NoiseSphere(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -552,7 +559,8 @@ namespace SilverSim.Viewer.TerrainEdit
 
         #region Flood Effects
         [FloodEffect(StandardTerrainEffect.Raise)]
-        public void RaiseArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        void RaiseArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
             for (int x = (int)data.West; x < (int)data.East; x++)
@@ -582,7 +590,8 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [FloodEffect(StandardTerrainEffect.Lower)]
-        public void LowerArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        void LowerArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
             for (int x = (int)data.West; x < (int)data.East; x++)
@@ -612,7 +621,8 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [FloodEffect(StandardTerrainEffect.Flatten)]
-        public void FlattenArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        void FlattenArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -664,7 +674,8 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [FloodEffect(StandardTerrainEffect.Smooth)]
-        public void SmoothArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        void SmoothArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 
@@ -712,7 +723,8 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [FloodEffect(StandardTerrainEffect.Noise)]
-        public void NoiseArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        void NoiseArea(ViewerAgent agent, SceneInterface scene, ModifyLand modify, ModifyLand.Data data)
         {
             List<LayerPatch> changed = new List<LayerPatch>();
 

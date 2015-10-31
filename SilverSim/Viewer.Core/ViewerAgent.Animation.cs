@@ -11,6 +11,7 @@ using SilverSim.Viewer.Messages.Avatar;
 using SilverSim.Viewer.Messages.Agent;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Viewer.Messages;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -64,6 +65,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentAnimation)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAgentAnimation(Message m)
         {
             AgentAnimation req = (AgentAnimation)m;

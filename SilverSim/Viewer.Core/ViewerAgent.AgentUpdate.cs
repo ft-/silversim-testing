@@ -11,6 +11,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -197,6 +198,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.SetAlwaysRun)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleSetAlwaysRun(Message m)
         {
             Messages.Agent.SetAlwaysRun sar = (Messages.Agent.SetAlwaysRun)m;
@@ -218,6 +220,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentUpdate)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAgentUpdateMessage(Message m)
         {
             /* only AgentUpdate is passed here */

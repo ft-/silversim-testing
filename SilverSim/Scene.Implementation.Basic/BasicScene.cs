@@ -37,6 +37,7 @@ using System.Threading;
 using ThreadedClasses;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Management.Scene;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -746,6 +747,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         #region Scene LL Message interface
         [PacketHandler(MessageType.RequestRegionInfo)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         public void HandleRequestRegionInfo(Message m)
         {
             SilverSim.Viewer.Messages.Region.RequestRegionInfo req = (SilverSim.Viewer.Messages.Region.RequestRegionInfo)m;

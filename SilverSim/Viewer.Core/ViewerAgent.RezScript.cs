@@ -34,12 +34,14 @@ using System.IO;
 using SilverSim.Scripting.Common;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Types.Asset;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
     public partial class ViewerAgent
     {
         [PacketHandler(MessageType.RezScript)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRezScript(Message m)
         {
             RezScript req = (RezScript)m;

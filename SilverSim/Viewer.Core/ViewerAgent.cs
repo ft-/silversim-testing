@@ -35,6 +35,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -1157,6 +1158,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.RegionHandshakeReply)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRegionHandshakeReply(Message m)
         {
             Messages.Region.RegionHandshakeReply rhr = (Messages.Region.RegionHandshakeReply)m;
@@ -1185,6 +1187,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.CompleteAgentMovement)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleCompleteAgentMovement(Message m)
         {
             Messages.Circuit.CompleteAgentMovement cam = (Messages.Circuit.CompleteAgentMovement)m;
@@ -1244,6 +1247,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.LogoutRequest)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleLogoutRequest(Message m)
         {
             Messages.Circuit.LogoutRequest lr = (Messages.Circuit.LogoutRequest)m;
@@ -1269,6 +1273,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.MuteListRequest)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleMuteListRequest(Message m)
         {
             Messages.MuteList.MuteListRequest req = (Messages.MuteList.MuteListRequest)m;

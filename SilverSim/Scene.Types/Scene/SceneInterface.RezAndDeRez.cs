@@ -10,6 +10,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -42,6 +43,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.DeRezObject)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         internal void HandleDeRezObject(Message m)
         {
             SilverSim.Viewer.Messages.Object.DeRezAck ackres;

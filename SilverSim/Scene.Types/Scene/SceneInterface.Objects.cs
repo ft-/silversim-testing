@@ -8,24 +8,28 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using System;
 using MultipleObjectUpdate = SilverSim.Viewer.Messages.Object.MultipleObjectUpdate;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
         [PacketHandler(MessageType.RequestPayPrice)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRequestPayPrice(Message m)
         {
             SilverSim.Viewer.Messages.Object.RequestPayPrice req = (SilverSim.Viewer.Messages.Object.RequestPayPrice)m;
         }
 
         [PacketHandler(MessageType.ObjectSpinStart)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectSpinStart(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectSpinStart req = (SilverSim.Viewer.Messages.Object.ObjectSpinStart)m;
         }
 
         [PacketHandler(MessageType.ObjectSpinUpdate)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectSpinUpdate(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectSpinUpdate req = (SilverSim.Viewer.Messages.Object.ObjectSpinUpdate)m;
@@ -37,6 +41,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectSpinStop)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectSpinStop(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectSpinStop req = (SilverSim.Viewer.Messages.Object.ObjectSpinStop)m;
@@ -48,6 +53,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectShape)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectShape(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectShape req = (SilverSim.Viewer.Messages.Object.ObjectShape)m;
@@ -59,6 +65,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectSaleInfo)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectSaleInfo(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectSaleInfo req = (SilverSim.Viewer.Messages.Object.ObjectSaleInfo)m;
@@ -70,6 +77,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.MultipleObjectUpdate)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleMultipleObjectUpdate(Message m)
         {
             SilverSim.Viewer.Messages.Object.MultipleObjectUpdate req = (SilverSim.Viewer.Messages.Object.MultipleObjectUpdate)m;
@@ -167,6 +175,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectRotation)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectRotation(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectRotation req = (SilverSim.Viewer.Messages.Object.ObjectRotation)m;
@@ -212,6 +221,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectPosition)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectPosition(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectPosition req = (SilverSim.Viewer.Messages.Object.ObjectPosition)m;
@@ -257,6 +267,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectScale)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectScale(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectScale req = (SilverSim.Viewer.Messages.Object.ObjectScale)m;
@@ -302,6 +313,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectPermissions)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectPermissions(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectPermissions req = (SilverSim.Viewer.Messages.Object.ObjectPermissions)m;
@@ -313,6 +325,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectOwner)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectOwner(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectOwner req = (SilverSim.Viewer.Messages.Object.ObjectOwner)m;
@@ -324,6 +337,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectName)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectName(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectName req = (SilverSim.Viewer.Messages.Object.ObjectName)m;
@@ -365,6 +379,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectLink)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectLink(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectLink req = (SilverSim.Viewer.Messages.Object.ObjectLink)m;
@@ -376,6 +391,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectDelink)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectDelink(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectDelink req = (SilverSim.Viewer.Messages.Object.ObjectDelink)m;
@@ -387,6 +403,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectGroup)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectGroup(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectGroup req = (SilverSim.Viewer.Messages.Object.ObjectGroup)m;
@@ -428,6 +445,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectIncludeInSearch)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectIncludeInSearch(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectIncludeInSearch req = (SilverSim.Viewer.Messages.Object.ObjectIncludeInSearch)m;
@@ -439,6 +457,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectFlagUpdate)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectFlagUpdate(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectFlagUpdate req = (SilverSim.Viewer.Messages.Object.ObjectFlagUpdate)m;
@@ -450,6 +469,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectMaterial)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectMaterial(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectMaterial req = (SilverSim.Viewer.Messages.Object.ObjectMaterial)m;
@@ -491,6 +511,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectExtraParams)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectExtraParams(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectExtraParams req = (SilverSim.Viewer.Messages.Object.ObjectExtraParams)m;
@@ -511,6 +532,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectExportSelected)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectExportSelected(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectExportSelected req = (SilverSim.Viewer.Messages.Object.ObjectExportSelected)m;
@@ -521,6 +543,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectSelect)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectSelect(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectSelect req = (SilverSim.Viewer.Messages.Object.ObjectSelect)m;
@@ -575,6 +598,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectDrop)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectDrop(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectDrop req = (SilverSim.Viewer.Messages.Object.ObjectDrop)m;
@@ -586,6 +610,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectAttach)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectAttach(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectAttach req = (SilverSim.Viewer.Messages.Object.ObjectAttach)m;
@@ -597,6 +622,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectDescription)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectDescription(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectDescription req = (SilverSim.Viewer.Messages.Object.ObjectDescription)m;
@@ -638,6 +664,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectDeselect)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectDeselect(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectDeselect req = (SilverSim.Viewer.Messages.Object.ObjectDeselect)m;
@@ -692,6 +719,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectClickAction)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectClickAction(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectClickAction req = (SilverSim.Viewer.Messages.Object.ObjectClickAction)m;
@@ -703,6 +731,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectCategory)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectCategory(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectCategory req = (SilverSim.Viewer.Messages.Object.ObjectCategory)m;
@@ -714,6 +743,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectBuy)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectBuy(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectBuy req = (SilverSim.Viewer.Messages.Object.ObjectBuy)m;
@@ -725,6 +755,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.BuyObjectInventory)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleBuyObjectInventory(Message m)
         {
             SilverSim.Viewer.Messages.Object.BuyObjectInventory req = (SilverSim.Viewer.Messages.Object.BuyObjectInventory)m;
@@ -736,6 +767,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectGrab)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectGrab(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectGrab req = (SilverSim.Viewer.Messages.Object.ObjectGrab)m;
@@ -747,6 +779,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectGrabUpdate)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectGrabUpdate(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectGrabUpdate req = (SilverSim.Viewer.Messages.Object.ObjectGrabUpdate)m;
@@ -758,6 +791,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.ObjectDeGrab)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectDeGrab(Message m)
         {
             SilverSim.Viewer.Messages.Object.ObjectDeGrab req = (SilverSim.Viewer.Messages.Object.ObjectDeGrab)m;
@@ -769,6 +803,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [PacketHandler(MessageType.RequestObjectPropertiesFamily)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRequestObjectPropertiesFamily(Message m)
         {
             SilverSim.Viewer.Messages.Object.RequestObjectPropertiesFamily req = (SilverSim.Viewer.Messages.Object.RequestObjectPropertiesFamily)m;

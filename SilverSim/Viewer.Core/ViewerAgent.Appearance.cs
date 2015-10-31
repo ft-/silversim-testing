@@ -29,6 +29,7 @@ using System;
 using System.Collections.Generic;
 using ThreadedClasses;
 using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -195,6 +196,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentSetAppearance)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleSetAgentAppearance(Message p)
         {
             Messages.Appearance.AgentSetAppearance m = (Messages.Appearance.AgentSetAppearance)p;
@@ -238,6 +240,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentWearablesRequest)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAgentWearablesRequest(Message p)
         {
             Messages.Appearance.AgentWearablesRequest m = (Messages.Appearance.AgentWearablesRequest)p;
@@ -266,6 +269,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentIsNowWearing)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAgentIsNowWearing(Message p)
         {
             Messages.Appearance.AgentIsNowWearing m = (Messages.Appearance.AgentIsNowWearing)p;
@@ -296,6 +300,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.AgentCachedTexture)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAgentCachedTexture(Message p)
         {
             Messages.Appearance.AgentCachedTexture m = (Messages.Appearance.AgentCachedTexture)p;

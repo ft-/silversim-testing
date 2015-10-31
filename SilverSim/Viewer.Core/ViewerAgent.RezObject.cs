@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -43,6 +44,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.RezObject)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRezObject(Message m)
         {
             Messages.Object.RezObject req = (Messages.Object.RezObject)m;
@@ -110,6 +112,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [PacketHandler(MessageType.RezObjectFromNotecard)]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRezObjectFromNotecard(Message m)
         {
             Messages.Object.RezObjectFromNotecard req = (Messages.Object.RezObjectFromNotecard)m;
