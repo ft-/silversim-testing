@@ -55,11 +55,6 @@ namespace SilverSim.Scene.Types.Scene
                 Patch = new PatchesAccessor(m_TerrainPatches, xPatches, yPatches);
             }
 
-            ~TerrainController()
-            {
-                m_Scene = null;
-            }
-
             #region Update of Terrain Data
             /*
             public IList<TerrainPatch> GetTerrainDistanceSorted(Vector3 v)

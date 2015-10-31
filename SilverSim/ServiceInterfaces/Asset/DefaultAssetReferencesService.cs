@@ -22,10 +22,6 @@ namespace SilverSim.ServiceInterfaces.Asset
             m_Service = service;
         }
 
-        ~DefaultAssetReferencesService()
-        {
-            m_Service = null;
-        }
         #endregion
 
         #region Accessor

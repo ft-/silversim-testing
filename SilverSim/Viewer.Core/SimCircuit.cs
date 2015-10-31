@@ -44,11 +44,6 @@ namespace SilverSim.Viewer.Core
             RemoteOffset = remoteOffset;
         }
 
-        ~SimCircuit()
-        {
-            Scene = null;
-        }
-
         protected override void CheckForNewDataToSend()
         {
         }
