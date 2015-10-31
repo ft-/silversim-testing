@@ -57,13 +57,11 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
-        public delegate void SendAnimationsDelegate(AvatarAnimation m);
-
         readonly List<AnimationInfo> m_ActiveAnimations = new List<AnimationInfo>();
         UUID m_AgentID;
-        SendAnimationsDelegate m_SendAnimations;
+        Action<AvatarAnimation> m_SendAnimations;
 
-        public AgentAnimationController(UUID agentID, SendAnimationsDelegate del)
+        public AgentAnimationController(UUID agentID, Action<AvatarAnimation> del)
         {
             m_AgentID = agentID;
             m_SendAnimations = del;
