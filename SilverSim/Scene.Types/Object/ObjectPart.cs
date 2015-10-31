@@ -2368,10 +2368,9 @@ namespace SilverSim.Scene.Types.Object
                                     {
                                         if (!string.IsNullOrEmpty(json))
                                         {
-                                            IValue iv = Json.Deserialize(new MemoryStream(UTF8NoBOM.GetBytes(json)));
-                                            if (iv is Map)
+                                            Map m = Json.Deserialize(new MemoryStream(UTF8NoBOM.GetBytes(json))) as Map;
+                                            if (null != m)
                                             {
-                                                Map m = (Map)iv;
                                                 if (m.ContainsKey("SavedAttachedPos") && m["SavedAttachedPos"] is AnArray && rootGroup != null)
                                                 {
                                                     AnArray a = (AnArray)(m["SavedAttachedPos"]);
