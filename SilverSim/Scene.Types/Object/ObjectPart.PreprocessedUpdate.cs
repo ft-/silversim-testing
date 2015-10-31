@@ -106,7 +106,7 @@ namespace SilverSim.Scene.Types.Object
             BlockLength = ProfileHollow + 2
         }
 
-        enum FullFixedBlock2Offset : int
+        public enum FullFixedBlock2Offset : int
         {
             LoopedSound = 0,
             SoundOwner = LoopedSound + 16,

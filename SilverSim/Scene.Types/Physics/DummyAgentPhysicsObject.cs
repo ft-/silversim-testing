@@ -13,11 +13,6 @@ namespace SilverSim.Scene.Types.Physics
 
         }
 
-        public void Dispose()
-        {
-
-        }
-
         public bool IsAgentCollisionActive 
         {
             get

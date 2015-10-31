@@ -216,11 +216,6 @@ namespace SilverSim.Scene.Types.Scene
                 m_WindData.PatchY = new LayerPatch();
             }
 
-            ~EnvironmentController()
-            {
-                m_Scene = null;
-            }
-
             #region Update of Wind Data
             private List<LayerData> CompileWindData()
             {
