@@ -99,8 +99,7 @@ namespace SilverSim.Scene.Types.Scene
         public abstract ISceneParcels Parcels { get; }
         public abstract List<ObjectUpdateInfo> UpdateInfos { get; }
         public event Action<SceneInterface> OnRemove;
-        public delegate void IPChangedDelegate(SceneInterface scene, IPAddress address);
-        public event IPChangedDelegate OnIPChanged;
+        public event Action<SceneInterface, IPAddress> OnIPChanged;
         public AssetServiceInterface TemporaryAssetService { get; protected set; }
         public AssetServiceInterface PersistentAssetService { get; protected set; }
         public AssetServiceInterface AssetService { get; private set; }
@@ -318,9 +317,10 @@ namespace SilverSim.Scene.Types.Scene
         public void TriggerIPChanged(IPAddress ip)
         {
             LastIPAddress = ip;
-            if (OnIPChanged != null)
+            var ev = OnIPChanged;
+            if (ev != null)
             {
-                foreach (IPChangedDelegate del in OnIPChanged.GetInvocationList())
+                foreach (Action<SceneInterface, IPAddress> del in ev.GetInvocationList())
                 {
                     try
                     {
