@@ -24,10 +24,8 @@ namespace SilverSim.Scene.Types.Script
         public abstract void ShoutError(string msg);
         public abstract bool HasEventsPending { get; }
         public IScriptWorkerThreadPool ThreadPool { get; set; }
-        public delegate void StateChangeEventDelegate(ScriptInstance si);
-        public delegate void ScriptResetEventDelegate(ScriptInstance si);
-        public event StateChangeEventDelegate OnStateChange;
-        public event ScriptResetEventDelegate OnScriptReset;
+        public event Action<ScriptInstance> OnStateChange;
+        public event Action<ScriptInstance> OnScriptReset;
 
         public abstract ObjectPartInventoryItem Item { get; }
 
@@ -64,7 +62,7 @@ namespace SilverSim.Scene.Types.Script
             var ev = OnStateChange; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                foreach (StateChangeEventDelegate del in ev.GetInvocationList())
+                foreach (Action<ScriptInstance> del in ev.GetInvocationList())
                 {
                     try
                     {
@@ -82,7 +80,7 @@ namespace SilverSim.Scene.Types.Script
             var ev = OnScriptReset; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                foreach (ScriptResetEventDelegate del in ev.GetInvocationList())
+                foreach (Action<ScriptInstance> del in ev.GetInvocationList())
                 {
                     try
                     {
