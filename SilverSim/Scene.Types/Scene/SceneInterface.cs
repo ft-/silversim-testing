@@ -203,52 +203,58 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         public UUI Owner { get; protected set; }
-        public virtual T GetService<T>()
+
+        protected virtual object GetService(Type service)
         {
-            if(typeof(T).IsAssignableFrom(typeof(AssetServiceInterface)))
+            if (service.IsAssignableFrom(typeof(AssetServiceInterface)))
             {
-                return (T)(object)AssetService;
+                return AssetService;
             }
-            else if(typeof(T).IsAssignableFrom(typeof(AvatarNameServiceInterface)))
+            else if (service.IsAssignableFrom(typeof(AvatarNameServiceInterface)))
             {
-                return (T)(object)AvatarNameService;
+                return AvatarNameService;
             }
-            else if(typeof(T).IsAssignableFrom(typeof(GroupsNameServiceInterface)))
+            else if (service.IsAssignableFrom(typeof(GroupsNameServiceInterface)))
             {
-                return (T)(object)GroupsNameService;
+                return GroupsNameService;
             }
-            else if (typeof(T).IsAssignableFrom(typeof(GridServiceInterface)))
+            else if (service.IsAssignableFrom(typeof(GridServiceInterface)))
             {
-                return (T)(object)GridService;
+                return GridService;
             }
-            else if(typeof(T).IsAssignableFrom(typeof(NotecardCache)))
+            else if (service.IsAssignableFrom(typeof(NotecardCache)))
             {
-                return (T)(object)m_NotecardCache;
+                return m_NotecardCache;
             }
-            else if(typeof(T).IsAssignableFrom(typeof(EconomyServiceInterface)))
+            else if (service.IsAssignableFrom(typeof(EconomyServiceInterface)))
             {
-                return (T)(object)EconomyService;
+                return EconomyService;
             }
-            else if(typeof(T).IsAssignableFrom(typeof(GroupsServiceInterface)))
+            else if (service.IsAssignableFrom(typeof(GroupsServiceInterface)))
             {
-                return (T)(object)GroupsService;
+                return GroupsService;
             }
-            else if (typeof(T).IsAssignableFrom(typeof(EstateServiceInterface)))
+            else if (service.IsAssignableFrom(typeof(EstateServiceInterface)))
             {
-                return (T)(object)EstateService;
+                return EstateService;
             }
-            else if (typeof(T).IsAssignableFrom(typeof(EnvironmentController)))
+            else if (service.IsAssignableFrom(typeof(EnvironmentController)))
             {
-                return (T)(object)Environment;
+                return Environment;
             }
-            else if (typeof(T).IsAssignableFrom(typeof(TerrainController)))
+            else if (service.IsAssignableFrom(typeof(TerrainController)))
             {
-                return (T)(object)Terrain;
+                return Terrain;
             }
             else
             {
-                throw new ArgumentException("Unknown target type " + typeof(T).FullName);
+                throw new ArgumentException("Unknown target type " + service.FullName);
             }
+        }
+
+        public T GetService<T>()
+        {
+            return (T)GetService(typeof(T));
         }
 
         private const uint PARCEL_BLOCK_SIZE = 4;

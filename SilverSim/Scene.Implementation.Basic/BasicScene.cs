@@ -373,15 +373,15 @@ namespace SilverSim.Scene.Implementation.Basic
         private SimulationDataStorageInterface m_SimulationDataStorage;
         private NeighborServiceInterface m_NeighborService;
 
-        public virtual new T GetService<T>()
+        protected virtual new object GetService(Type service)
         {
-            if(typeof(T).IsAssignableFrom(typeof(ChatServiceInterface)))
+            if (service.IsAssignableFrom(typeof(ChatServiceInterface)))
             {
-                return (T) (object)m_ChatService;
+                return m_ChatService;
             }
             else
             {
-                return base.GetService<T>();
+                return base.GetService(service);
             }
         }
 
