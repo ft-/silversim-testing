@@ -81,7 +81,7 @@ namespace SilverSim.Http.Client
                 }
             }
 
-            public virtual new int ReadTimeout 
+            public override int ReadTimeout 
             { 
                 get
                 {
@@ -93,12 +93,12 @@ namespace SilverSim.Http.Client
                 }
             }
 
-            public virtual new IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+            public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
             {
                 throw new NotSupportedException();
             }
 
-            public virtual new void Close()
+            public override void Close()
             {
                 if(m_Input != null)
                 {
@@ -123,7 +123,7 @@ namespace SilverSim.Http.Client
                 }
             }
 
-            protected virtual new void Dispose(bool disposing)
+            protected override void Dispose(bool disposing)
             {
                 if (m_Input != null)
                 {
@@ -149,7 +149,7 @@ namespace SilverSim.Http.Client
                 base.Dispose(disposing);
             }
 
-            public virtual new void EndWrite(IAsyncResult asyncResult)
+            public override void EndWrite(IAsyncResult asyncResult)
             {
                 throw new NotSupportedException();
             }
@@ -250,7 +250,7 @@ namespace SilverSim.Http.Client
             {
                 throw new NotSupportedException();
             }
-            public virtual new void WriteByte(byte value)
+            public override void WriteByte(byte value)
             {
                 throw new NotSupportedException();
             }

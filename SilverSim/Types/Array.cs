@@ -50,7 +50,7 @@ namespace SilverSim.Types
 
         #endregion Properties
 
-        public new string ToString()
+        public override string ToString()
         {
             string s = string.Empty;
             foreach(IValue iv in this)

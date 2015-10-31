@@ -59,11 +59,11 @@ namespace SilverSim.Main.Common.Console
         }
 
         #region Output logic
-        public new void LockOutput()
+        public override void LockOutput()
         {
         }
 
-        public new void UnlockOutput()
+        public override void UnlockOutput()
         {
         }
 

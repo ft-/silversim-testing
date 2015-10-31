@@ -248,7 +248,8 @@ namespace SilverSim.Scene.Types.Scene
             }
             else
             {
-                throw new ArgumentException("Unknown target type " + service.FullName);
+                m_Log.DebugFormat("Unknown target type {0}", service.FullName);
+                return null;
             }
         }
 

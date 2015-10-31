@@ -73,7 +73,7 @@ namespace SilverSim.Http
             }
         }
 
-        public new int WriteTimeout 
+        public override int WriteTimeout 
         { 
             get
             {
@@ -85,13 +85,13 @@ namespace SilverSim.Http
             }
         }
 
-        public new IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        public override IAsyncResult BeginRead(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             throw new NotSupportedException();
         }
 
         private static readonly byte[] LastChunkData = new byte[] { (byte)'0', (byte)'\r', (byte)'\n', (byte)'\r', (byte)'\n' };
-        public new void Close()
+        public override void Close()
         {
             if (m_Output != null)
             {
@@ -104,7 +104,7 @@ namespace SilverSim.Http
             }
         }
 
-        protected virtual new void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (m_Output != null)
             {

@@ -26,7 +26,7 @@ namespace SilverSim.Scene.Types.Script
             Messages = messages;
         }
 
-        public new string Message
+        public override string Message
         {
             get
             {

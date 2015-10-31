@@ -214,7 +214,7 @@ namespace SilverSim.Main.Common.Console
             }
         }
 
-        public new void LockOutput()
+        public override void LockOutput()
         {
             Monitor.Enter(m_CommandLineBuffer);
             try
@@ -240,7 +240,7 @@ namespace SilverSim.Main.Common.Console
             }
         }
 
-        public new void UnlockOutput()
+        public override void UnlockOutput()
         {
             if (m_CursorYPosition != -1)
             {

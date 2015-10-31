@@ -373,7 +373,7 @@ namespace SilverSim.Scene.Implementation.Basic
         private SimulationDataStorageInterface m_SimulationDataStorage;
         private NeighborServiceInterface m_NeighborService;
 
-        protected virtual new object GetService(Type service)
+        protected override object GetService(Type service)
         {
             if (service.IsAssignableFrom(typeof(ChatServiceInterface)))
             {
@@ -385,7 +385,7 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
-        protected virtual new void SendChatPass(ListenEvent le)
+        protected override void SendChatPass(ListenEvent le)
         {
             ChatServiceInterface chatService = m_ChatService;
             if (null != chatService)

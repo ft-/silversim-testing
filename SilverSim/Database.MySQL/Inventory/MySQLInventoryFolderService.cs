@@ -135,7 +135,7 @@ namespace SilverSim.Database.MySQL.Inventory
             return folders;
         }
 
-        public virtual new List<InventoryFolder> GetInventorySkeleton(UUID principalID)
+        public override List<InventoryFolder> GetInventorySkeleton(UUID principalID)
         {
             List<InventoryFolder> folders = new List<InventoryFolder>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))

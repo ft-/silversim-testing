@@ -10,7 +10,7 @@ namespace SilverSim.Scene.Chat
 {
     class RegionListenerInfo : ListenerInfo
     {
-        public virtual new bool IsIgnorePosition
+        public override bool IsIgnorePosition
         {
             get
             {

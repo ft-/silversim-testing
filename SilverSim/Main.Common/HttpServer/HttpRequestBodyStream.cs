@@ -73,7 +73,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        public new int ReadTimeout 
+        public override int ReadTimeout 
         { 
             get
             {
@@ -94,12 +94,12 @@ namespace SilverSim.Main.Common.HttpServer
                 m_Expect100Continue = false;
             }
         }
-        public new IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
+        public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback callback, object state)
         {
             throw new NotSupportedException();
         }
 
-        public new void Close()
+        public override void Close()
         {
             if(m_Input != null)
             {
@@ -121,7 +121,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
-        protected new void Dispose(bool disposing)
+        protected override void Dispose(bool disposing)
         {
             if (m_Input != null)
             {
@@ -144,7 +144,7 @@ namespace SilverSim.Main.Common.HttpServer
             base.Dispose(disposing);
         }
 
-        public new void EndWrite(IAsyncResult asyncResult)
+        public override void EndWrite(IAsyncResult asyncResult)
         {
             throw new NotSupportedException();
         }
@@ -225,7 +225,7 @@ namespace SilverSim.Main.Common.HttpServer
         {
             throw new NotSupportedException();
         }
-        public new void WriteByte(byte value)
+        public override void WriteByte(byte value)
         {
             throw new NotSupportedException();
         }
