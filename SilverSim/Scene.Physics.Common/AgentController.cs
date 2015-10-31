@@ -19,11 +19,6 @@ namespace SilverSim.Scene.Physics.Common
             m_StateData = new PhysicsStateData(agent, sceneID);
         }
 
-        public void Dispose()
-        {
-            m_Agent = null;
-        }
-
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
         {
             lock (this)

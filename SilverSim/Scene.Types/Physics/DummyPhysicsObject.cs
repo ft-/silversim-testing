@@ -13,11 +13,6 @@ namespace SilverSim.Scene.Types.Physics
 
         }
 
-        public void Dispose()
-        {
-
-        }
-
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
         {
         }

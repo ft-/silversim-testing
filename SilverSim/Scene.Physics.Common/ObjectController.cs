@@ -18,11 +18,6 @@ namespace SilverSim.Scene.Physics.Common
         bool m_VolumeDetect;
         PhysicsStateData m_StateData;
 
-        public void Dispose()
-        {
-            m_Group = null;
-        }
-
         public ObjectController(ObjectGroup part, UUID sceneID)
         {
             m_StateData = new PhysicsStateData(part, sceneID);
