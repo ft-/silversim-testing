@@ -3,6 +3,7 @@
 
 using SilverSim.Main.Common;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 using System.Threading;
 
@@ -13,6 +14,7 @@ namespace SilverSim.Main
         static ConfigurationLoader m_ConfigLoader;
         static ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         static void Main(string[] args)
         {
             Console.TreatControlCAsInput = true;
