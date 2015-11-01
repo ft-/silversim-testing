@@ -18,6 +18,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Map
 {
@@ -50,6 +51,7 @@ namespace SilverSim.Viewer.Map
             new Thread(HandlerThread).Start(MapDetailsRequestQueue);
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void HandlerThread(object o)
         {
             BlockingQueue<KeyValuePair<AgentCircuit, Message>> requestQueue = (BlockingQueue<KeyValuePair<AgentCircuit, Message>>)o;
@@ -108,6 +110,7 @@ namespace SilverSim.Viewer.Map
         }
 
         #region MapNameRequest and MapBlockRequest
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleMapBlockRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             List<MapBlockReply.DataEntry> results = new List<MapBlockReply.DataEntry>();
@@ -149,6 +152,7 @@ namespace SilverSim.Viewer.Map
             SendMapBlocks(agent, scene, req.Flags, results);
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleMapNameRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             MapNameRequest req = (MapNameRequest)m;
@@ -361,6 +365,7 @@ namespace SilverSim.Viewer.Map
         #endregion
 
         #region MapItemRequest
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void HandleMapItemRequest(ViewerAgent agent, SceneInterface scene, Message m)
         {
             MapItemRequest req = (MapItemRequest)m;

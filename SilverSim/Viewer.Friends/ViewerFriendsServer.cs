@@ -8,6 +8,7 @@ using SilverSim.Main.Common;
 using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Friends
 {
@@ -31,6 +32,7 @@ namespace SilverSim.Viewer.Friends
             new Thread(HandlerThread).Start();
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void HandlerThread()
         {
             Thread.CurrentThread.Name = "Friends Handler Thread";
