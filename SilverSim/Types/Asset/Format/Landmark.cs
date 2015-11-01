@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Globalization;
 using System.Text;
 
 namespace SilverSim.Types.Asset.Format
@@ -43,7 +44,9 @@ namespace SilverSim.Types.Asset.Format
                 else if(para.Length == 4 && para[0] == "local_pos")
                 {
                     double x, y, z;
-                    if(!double.TryParse(para[1], out x) || double.TryParse(para[2], out y) || double.TryParse(para[3], out z))
+                    if(!double.TryParse(para[1], NumberStyles.Float, CultureInfo.InvariantCulture, out x) ||
+                        !double.TryParse(para[2], NumberStyles.Float, CultureInfo.InvariantCulture, out y) ||
+                        !double.TryParse(para[3], NumberStyles.Float, CultureInfo.InvariantCulture, out z))
                     {
                         throw new NotALandmarkFormatException();
                     }
