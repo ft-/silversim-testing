@@ -11,6 +11,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using SilverSim.Scene.Types.Object;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Types.Primitive;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -29,7 +30,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        public void SendAttachedSound(ObjectPart objpart, UUID sound, double gain, double soundradius, byte flags)
+        public void SendAttachedSound(ObjectPart objpart, UUID sound, double gain, double soundradius, PrimitiveSoundFlags flags)
         {
             AttachedSound req = new AttachedSound();
             req.OwnerID = objpart.ObjectGroup.Owner.ID;

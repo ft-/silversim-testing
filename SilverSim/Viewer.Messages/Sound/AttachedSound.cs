@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using SilverSim.Types.Primitive;
 
 namespace SilverSim.Viewer.Messages.Sound
 {
@@ -14,7 +15,7 @@ namespace SilverSim.Viewer.Messages.Sound
         public UUID ObjectID;
         public UUID OwnerID;
         public double Gain;
-        public byte Flags;
+        public PrimitiveSoundFlags Flags;
 
         public AttachedSound()
         {
@@ -28,7 +29,7 @@ namespace SilverSim.Viewer.Messages.Sound
             p.WriteUUID(ObjectID);
             p.WriteUUID(OwnerID);
             p.WriteFloat((float)Gain);
-            p.WriteUInt8(Flags);
+            p.WriteUInt8((byte)Flags);
         }
     }
 }

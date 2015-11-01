@@ -11,6 +11,11 @@ namespace SilverSim.Types.Primitive
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public enum PrimitiveSoundFlags : byte
     {
-        Looped = 1
+        Looped = 1,
+        SyncMaster = 2,
+        SyncSlave = 4,
+        SyncPending = 8,
+        Queue = 16,
+        Stop = 32
     }
 }
