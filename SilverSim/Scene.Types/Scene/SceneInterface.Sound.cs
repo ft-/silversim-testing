@@ -72,6 +72,35 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        public void SendAttachedSoundGainChange(ObjectPart objpart, double gain, double soundradius)
+        {
+            AttachedSoundGainChange req = new AttachedSoundGainChange();
+            req.ObjectID = objpart.ID;
+            req.Gain = gain.Clamp(0, 1);
+
+            if (objpart.ObjectGroup.IsAttachedToPrivate)
+            {
+                IAgent agent;
+                if (Agents.TryGetValue(objpart.ObjectGroup.Owner.ID, out agent))
+                {
+                    if ((agent.GlobalPosition - objpart.GlobalPosition).Length <= soundradius)
+                    {
+                        agent.SendMessageAlways(req, ID);
+                    }
+                }
+            }
+            else
+            {
+                foreach (IAgent agent in Agents)
+                {
+                    if ((agent.GlobalPosition - objpart.GlobalPosition).Length <= soundradius)
+                    {
+                        agent.SendMessageAlways(req, ID);
+                    }
+                }
+            }
+        }
+
         public void SendTriggerSound(ObjectPart objpart, UUID sound, double gain, double soundradius)
         {
             SoundTrigger req = new SoundTrigger();
