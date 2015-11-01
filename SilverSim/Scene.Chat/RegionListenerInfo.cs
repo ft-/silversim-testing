@@ -8,7 +8,7 @@ using System;
 
 namespace SilverSim.Scene.Chat
 {
-    class RegionListenerInfo : ListenerInfo
+    public class RegionListenerInfo : ListenerInfo
     {
         public override bool IsIgnorePosition
         {
@@ -23,7 +23,7 @@ namespace SilverSim.Scene.Chat
             return Vector3.Zero;
         }
 
-        public RegionListenerInfo(
+        internal RegionListenerInfo(
             ChatHandler handler,
             int channel, 
             string name,

@@ -9,7 +9,7 @@ using System.Text.RegularExpressions;
 
 namespace SilverSim.Scene.Chat
 {
-    sealed class RegexListenerInfo : ChatServiceInterface.Listener
+    public sealed class RegexListenerInfo : ChatServiceInterface.Listener
     {
         int m_Channel;
         Regex m_Name;
@@ -32,7 +32,7 @@ namespace SilverSim.Scene.Chat
 
         private ChatHandler m_Handler;
 
-        public RegexListenerInfo(
+        internal RegexListenerInfo(
             ChatHandler handler,
             int channel, 
             string name,

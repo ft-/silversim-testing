@@ -8,7 +8,7 @@ using System;
 
 namespace SilverSim.Scene.Chat
 {
-    class ListenerInfo : ChatServiceInterface.Listener
+    public class ListenerInfo : ChatServiceInterface.Listener
     {
         private int m_Channel;
         private string m_Name;
@@ -23,7 +23,7 @@ namespace SilverSim.Scene.Chat
 
         private ChatHandler m_Handler;
 
-        public ListenerInfo(
+        internal ListenerInfo(
             ChatHandler handler,
             int channel, 
             string name,
