@@ -36,14 +36,15 @@ namespace SilverSim.Scene.RegionLoader.Basic
 
         public void Startup(ConfigurationLoader loader)
         {
+            IConfig config = loader.Config.Configs["Network"];
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
             m_RegionService = loader.GetService<GridServiceInterface>(m_RegionStorage);
-            if(loader.Config.Configs["Network"] != null)
+            if (config != null)
             {
-                m_ExternalHostName = loader.Config.Configs["Network"].GetString("ExternalHostName", "SYSTEMIP");
-                m_HttpPort = (uint)loader.Config.Configs["Network"].GetInt("HttpListenerPort", 9000);
+                m_ExternalHostName = config.GetString("ExternalHostName", "SYSTEMIP");
+                m_HttpPort = (uint)config.GetInt("HttpListenerPort", 9000);
 
-                if(loader.Config.Configs["Network"].Contains("ServerCertificate"))
+                if (config.Contains("ServerCertificate"))
                 {
                     m_Scheme = Uri.UriSchemeHttps;
                 }
