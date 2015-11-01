@@ -12,6 +12,7 @@ using SilverSim.Types.IM;
 using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.OfflineIM
 {
@@ -32,6 +33,7 @@ namespace SilverSim.Viewer.OfflineIM
             new Thread(HandlerThread).Start();
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void HandlerThread()
         {
             Thread.CurrentThread.Name = "OfflineIM Retrieve Handler Thread";

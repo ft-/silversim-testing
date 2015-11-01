@@ -20,17 +20,17 @@ namespace SilverSim.Viewer.Profile
 
         public override void VerifyAgent(UUID sessionID, string token)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public override void VerifyClient(UUID sessionID, string token)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public override List<UUID> NotifyStatus(List<KeyValuePair<UUI, string>> friends, UUI user, bool online)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public override UserInfo GetUserInfo(UUI user)
@@ -46,17 +46,17 @@ namespace SilverSim.Viewer.Profile
 
         public override Dictionary<string, string> GetServerURLs(UUI user)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public override string LocateUser(UUI user)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
-        public override Types.UUI GetUUI(UUI user, UUI targetUserID)
+        public override UUI GetUUI(UUI user, UUI targetUserID)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
     }
 }
