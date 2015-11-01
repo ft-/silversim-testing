@@ -76,7 +76,6 @@ namespace SilverSim.Scene.Types.Scene
 
             public void Dispose()
             {
-                m_Enum = null;
             }
 
             public ObjectGroup Current
