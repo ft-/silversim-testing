@@ -49,11 +49,25 @@ namespace SilverSim.Scene.Types.Scene
 
             req.Gain = gain;
 
-            foreach (IAgent agent in Agents)
+            if (objpart.ObjectGroup.IsAttachedToPrivate)
             {
-                if ((agent.GlobalPosition - objpart.GlobalPosition).Length <= soundradius)
+                IAgent agent;
+                if(Agents.TryGetValue(objpart.ObjectGroup.Owner.ID, out agent))
                 {
-                    agent.SendMessageAlways(req, ID);
+                    if ((agent.GlobalPosition - objpart.GlobalPosition).Length <= soundradius)
+                    {
+                        agent.SendMessageAlways(req, ID);
+                    }
+                }
+            }
+            else
+            {
+                foreach (IAgent agent in Agents)
+                {
+                    if ((agent.GlobalPosition - objpart.GlobalPosition).Length <= soundradius)
+                    {
+                        agent.SendMessageAlways(req, ID);
+                    }
                 }
             }
         }
@@ -86,11 +100,25 @@ namespace SilverSim.Scene.Types.Scene
             req.Gain = gain;
             req.GridPosition = RegionData.Location;
 
-            foreach (IAgent agent in Agents)
+            if (objpart.ObjectGroup.IsAttachedToPrivate)
             {
-                if ((agent.GlobalPosition - req.Position).Length <= soundradius)
+                IAgent agent;
+                if (Agents.TryGetValue(objpart.ObjectGroup.Owner.ID, out agent))
                 {
-                    agent.SendMessageAlways(req, ID);
+                    if ((agent.GlobalPosition - req.Position).Length <= soundradius)
+                    {
+                        agent.SendMessageAlways(req, ID);
+                    }
+                }
+            }
+            else
+            {
+                foreach (IAgent agent in Agents)
+                {
+                    if ((agent.GlobalPosition - req.Position).Length <= soundradius)
+                    {
+                        agent.SendMessageAlways(req, ID);
+                    }
                 }
             }
         }
@@ -123,11 +151,25 @@ namespace SilverSim.Scene.Types.Scene
             req.Position = objpart.GlobalPosition;
             req.Gain = gain;
 
-            foreach (IAgent agent in Agents)
+            if (objpart.ObjectGroup.IsAttachedToPrivate)
             {
-                if ((agent.GlobalPosition - req.Position).Length <= soundradius)
+                IAgent agent;
+                if (Agents.TryGetValue(objpart.ObjectGroup.Owner.ID, out agent))
                 {
-                    agent.SendMessageAlways(req, ID);
+                    if ((agent.GlobalPosition - req.Position).Length <= soundradius)
+                    {
+                        agent.SendMessageAlways(req, ID);
+                    }
+                }
+            }
+            else
+            {
+                foreach (IAgent agent in Agents)
+                {
+                    if ((agent.GlobalPosition - req.Position).Length <= soundradius)
+                    {
+                        agent.SendMessageAlways(req, ID);
+                    }
                 }
             }
         }
