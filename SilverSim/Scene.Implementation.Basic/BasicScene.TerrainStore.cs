@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -22,6 +23,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_TerrainStoreQueue.Enqueue(layerpath);
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void StoreTerrainProcess()
         {
             Thread.CurrentThread.Name = "Terrain:Store for " + ID.ToString();

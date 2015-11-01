@@ -97,11 +97,13 @@ namespace SilverSim.Scene.Implementation.Basic
                 });
             }
 
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             public IEnumerator<IObject> GetEnumerator()
             {
                 return m_Scene.m_Objects.Values.GetEnumerator();
             }
 
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
@@ -151,11 +153,13 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
             }
 
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             public IEnumerator<ObjectPart> GetEnumerator()
             {
                 return m_Scene.m_Primitives.Values.GetEnumerator();
             }
 
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
@@ -238,11 +242,13 @@ namespace SilverSim.Scene.Implementation.Basic
                 return m_Scene.m_Parcels.TryGetValue(localID, out pinfo);
             }
 
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             public IEnumerator<ParcelInfo> GetEnumerator()
             {
                 return m_Scene.m_Parcels.Values.GetEnumerator();
             }
 
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
@@ -279,11 +285,13 @@ namespace SilverSim.Scene.Implementation.Basic
                 return m_BasicScene.m_Agents.TryGetValue(id, out obj);
             }
 
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             public IEnumerator<IAgent> GetEnumerator()
             {
                 return m_BasicScene.m_Agents.Values.GetEnumerator();
             }
 
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
@@ -342,6 +350,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 return true;
             }
 
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             public IEnumerator<IAgent> GetEnumerator()
             {
                 ICollection<IAgent> agents = m_BasicScene.m_Agents.Values;
@@ -356,6 +365,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 return rootAgents.GetEnumerator();
             }
 
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
@@ -471,6 +481,7 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Internal Delegates
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private bool IMSend(GridInstantMessage im)
         {
             IAgent agent;
@@ -588,6 +599,8 @@ namespace SilverSim.Scene.Implementation.Basic
         internal int m_PrimitiveCount;
         internal int m_AgentCount;
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void Add(IObject obj)
         {
             ObjectGroup objgroup = obj as ObjectGroup;
