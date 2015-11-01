@@ -7,6 +7,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using ThreadedClasses;
 
@@ -81,6 +82,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             m_StorageThreads.Add(sti);
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         protected void StorageMainThread()
         {
             Thread.CurrentThread.Name = "Storage Main Thread";

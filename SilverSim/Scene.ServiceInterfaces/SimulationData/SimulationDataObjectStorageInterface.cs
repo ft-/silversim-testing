@@ -4,6 +4,7 @@
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
@@ -15,6 +16,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         }
         #endregion
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract ObjectGroup this[UUID regionID, UUID objectID]
         {
             get;
