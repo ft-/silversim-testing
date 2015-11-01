@@ -5,6 +5,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace SilverSim.ServiceInterfaces.UserAgents
@@ -43,6 +44,24 @@ namespace SilverSim.ServiceInterfaces.UserAgents
         public class RequestFailedException : Exception
         {
             public RequestFailedException()
+            {
+
+            }
+
+            public RequestFailedException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected RequestFailedException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public RequestFailedException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }

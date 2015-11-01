@@ -4,6 +4,7 @@
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
@@ -16,6 +17,8 @@ namespace SilverSim.ServiceInterfaces.Inventory
             m_Service = service;
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override InventoryFolderContent this[UUID principalID, UUID folderID]
         {
             get 

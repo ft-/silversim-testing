@@ -4,6 +4,7 @@
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
@@ -18,11 +19,14 @@ namespace SilverSim.ServiceInterfaces.Inventory
             get;
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract InventoryItem this[UUID principalID, UUID key]
         {
             get;
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public virtual List<InventoryItem> this[UUID principalID, List<UUID> itemids]
         {
             get
@@ -51,6 +55,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
         public abstract void Delete(UUID principalID, UUID id);
         public abstract void Move(UUID principalID, UUID id, UUID newFolder);
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public virtual List<UUID> Delete(UUID principalID, List<UUID> ids)
         {
             List<UUID> deleted = new List<UUID>();

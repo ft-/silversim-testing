@@ -3,6 +3,7 @@
 
 using SilverSim.Types.IM;
 using System;
+using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.IM
 {
@@ -10,6 +11,24 @@ namespace SilverSim.ServiceInterfaces.IM
     public class IMSendFailedException : Exception
     {
         public IMSendFailedException()
+        {
+
+        }
+
+        public IMSendFailedException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected IMSendFailedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public IMSendFailedException(string message, Exception innerException)
+            : base(message, innerException)
         {
 
         }

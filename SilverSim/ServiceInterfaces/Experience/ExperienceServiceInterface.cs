@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Types.Experience;
 using SilverSim.Types;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Experience
 {
@@ -26,6 +27,7 @@ namespace SilverSim.ServiceInterfaces.Experience
 
         public interface IExperiencePermissionsInterface
         {
+            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             ExperiencePermissionsInfo this[UUID experienceID, UUI agent] { get; set; }
         }
 
@@ -33,6 +35,7 @@ namespace SilverSim.ServiceInterfaces.Experience
 
         public interface IExperienceKeyInterface
         {
+            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             string this[UUID experienceID, string key] { get; set; }
         }
 

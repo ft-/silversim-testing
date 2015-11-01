@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace SilverSim.ServiceInterfaces.Estate
@@ -12,6 +13,24 @@ namespace SilverSim.ServiceInterfaces.Estate
     public class EstateUpdateFailedException : Exception
     {
         public EstateUpdateFailedException()
+        {
+
+        }
+
+        public EstateUpdateFailedException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected EstateUpdateFailedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public EstateUpdateFailedException(string message, Exception innerException)
+            : base(message, innerException)
         {
 
         }

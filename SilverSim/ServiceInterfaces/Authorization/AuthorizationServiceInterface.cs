@@ -6,11 +6,14 @@ using SilverSim.Types.Account;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Grid;
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.Authorization
 {
     public abstract class AuthorizationServiceInterface
     {
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         public struct AuthorizationData
         {
             public DestinationInfo DestinationInfo;
@@ -23,8 +26,25 @@ namespace SilverSim.ServiceInterfaces.Authorization
         [Serializable]
         public class NotAuthorizedException : Exception
         {
-            public NotAuthorizedException(string msg)
-                : base(msg)
+            public NotAuthorizedException()
+            {
+
+            }
+
+            public NotAuthorizedException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected NotAuthorizedException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public NotAuthorizedException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }

@@ -4,6 +4,7 @@
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.Asset
 {
@@ -11,6 +12,23 @@ namespace SilverSim.ServiceInterfaces.Asset
     public class HGAccessNotSupportedException : Exception
     {
         public HGAccessNotSupportedException()
+        {
+
+        }
+
+        public HGAccessNotSupportedException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected HGAccessNotSupportedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+
+        public HGAccessNotSupportedException(string message, Exception innerException)
+            : base(message, innerException)
         {
 
         }
@@ -26,6 +44,28 @@ namespace SilverSim.ServiceInterfaces.Asset
         {
             ID = key;
         }
+
+        public AssetNotFoundException()
+        {
+
+        }
+
+        public AssetNotFoundException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected AssetNotFoundException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+
+        public AssetNotFoundException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+
+        }
     }
 
     [Serializable]
@@ -38,6 +78,28 @@ namespace SilverSim.ServiceInterfaces.Asset
         {
             ID = key;
         }
+
+        public AssetNotDeletedException()
+        {
+
+        }
+
+        public AssetNotDeletedException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected AssetNotDeletedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+
+        public AssetNotDeletedException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+
+        }
     }
 
     [Serializable]
@@ -49,6 +111,28 @@ namespace SilverSim.ServiceInterfaces.Asset
             : base(string.Format("Asset {0} not stored", key))
         {
             ID = key;
+        }
+
+        public AssetStoreFailedException()
+        {
+
+        }
+
+        public AssetStoreFailedException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected AssetStoreFailedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+        }
+
+        public AssetStoreFailedException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+
         }
     }
 

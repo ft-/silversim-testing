@@ -6,6 +6,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
@@ -20,11 +21,13 @@ namespace SilverSim.ServiceInterfaces.Inventory
             get;
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract InventoryFolder this[UUID principalID, UUID key]
         {
             get;
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract InventoryFolder this[UUID principalID, AssetType type]
         {
             get;
@@ -60,6 +63,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
         public abstract void Purge(UUID folderID);
         public abstract void Purge(UUID principalID, UUID folderID);
         public abstract void IncrementVersion(UUID principalID, UUID folderID);
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public virtual List<UUID> Delete(UUID principalID, List<UUID> folderIDs)
         {
             List<UUID> deleted = new List<UUID>();

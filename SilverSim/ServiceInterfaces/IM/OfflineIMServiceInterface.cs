@@ -5,6 +5,7 @@ using SilverSim.Types;
 using SilverSim.Types.IM;
 using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.IM
 {
@@ -21,6 +22,18 @@ namespace SilverSim.ServiceInterfaces.IM
         {
 
         }
+
+        protected IMOfflineStoreFailedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public IMOfflineStoreFailedException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+
+        }
     }
 
     [Serializable]
@@ -33,6 +46,18 @@ namespace SilverSim.ServiceInterfaces.IM
 
         public IMOfflineRetrieveFailedException(string message)
             : base(message)
+        {
+
+        }
+
+        protected IMOfflineRetrieveFailedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public IMOfflineRetrieveFailedException(string message, Exception innerException)
+            : base(message, innerException)
         {
 
         }

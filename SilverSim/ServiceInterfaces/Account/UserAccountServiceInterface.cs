@@ -5,6 +5,8 @@ using SilverSim.Types;
 using SilverSim.Types.Account;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.Account
 {
@@ -12,6 +14,24 @@ namespace SilverSim.ServiceInterfaces.Account
     public class UserAccountNotFoundException : KeyNotFoundException
     {
         public UserAccountNotFoundException()
+        {
+
+        }
+
+        public UserAccountNotFoundException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected UserAccountNotFoundException(SerializationInfo info, StreamingContext context):
+            base(info, context)
+        {
+
+        }
+
+        public UserAccountNotFoundException(string message, Exception innerException)
+            : base(message, innerException)
         {
 
         }
@@ -26,16 +46,19 @@ namespace SilverSim.ServiceInterfaces.Account
         }
         #endregion
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract UserAccount this[UUID scopeID, UUID accountID]
         {
             get;
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract UserAccount this[UUID scopeID, string email]
         {
             get;
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract UserAccount this[UUID scopeID, string firstName, string lastName]
         {
             get;

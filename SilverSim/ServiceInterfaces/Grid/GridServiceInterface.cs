@@ -5,6 +5,8 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.Grid
 {
@@ -15,22 +17,48 @@ namespace SilverSim.ServiceInterfaces.Grid
         {
 
         }
+
         public GridRegionUpdateFailedException(string message)
             : base(message)
+        {
+
+        }
+
+        protected GridRegionUpdateFailedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public GridRegionUpdateFailedException(string message, Exception innerException)
+            : base(message, innerException)
         {
 
         }
     }
 
     [Serializable]
-    public class GridRegionNotFoundException : Exception
+    public class GridRegionNotFoundException : KeyNotFoundException
     {
         public GridRegionNotFoundException()
         {
 
         }
+
         public GridRegionNotFoundException(string message)
             : base(message)
+        {
+
+        }
+
+        protected GridRegionNotFoundException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public GridRegionNotFoundException(string message, Exception innerException)
+            : base(message, innerException)
         {
 
         }
@@ -40,6 +68,24 @@ namespace SilverSim.ServiceInterfaces.Grid
     public class GridServiceInaccessibleException : Exception
     {
         public GridServiceInaccessibleException()
+        {
+
+        }
+
+        public GridServiceInaccessibleException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected GridServiceInaccessibleException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public GridServiceInaccessibleException(string message, Exception innerException)
+            : base(message, innerException)
         {
 
         }
@@ -55,11 +101,13 @@ namespace SilverSim.ServiceInterfaces.Grid
         #endregion
 
         #region Accessors
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract RegionInfo this[UUID scopeID, UUID regionID]
         {
             get;
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public RegionInfo this[UUID scopeID, GridVector position]
         {
             get
@@ -68,11 +116,13 @@ namespace SilverSim.ServiceInterfaces.Grid
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract RegionInfo this[UUID scopeID, uint gridX, uint gridY]
         {
             get;
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract RegionInfo this[UUID scopeID, string regionName]
         {
             get;

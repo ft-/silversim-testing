@@ -5,6 +5,8 @@ using SilverSim.Types;
 using SilverSim.Types.Friends;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.Friends
 {
@@ -17,6 +19,24 @@ namespace SilverSim.ServiceInterfaces.Friends
             {
 
             }
+
+            public FriendUpdateFailedException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected FriendUpdateFailedException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public FriendUpdateFailedException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
         }
 
         public FriendsServiceInterface()
@@ -24,6 +44,7 @@ namespace SilverSim.ServiceInterfaces.Friends
 
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract FriendInfo this[UUI user, UUI friend]
         {
             get;

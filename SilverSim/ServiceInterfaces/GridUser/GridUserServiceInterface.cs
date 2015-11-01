@@ -5,6 +5,7 @@ using SilverSim.Types;
 using SilverSim.Types.GridUser;
 using System.Collections.Generic;
 using System;
+using System.Runtime.Serialization;
 
 namespace SilverSim.ServiceInterfaces.GridUser
 {
@@ -15,12 +16,48 @@ namespace SilverSim.ServiceInterfaces.GridUser
         {
 
         }
+
+        public GridUserNotFoundException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected GridUserNotFoundException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public GridUserNotFoundException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+
+        }
     }
 
     [Serializable]
     public class GridUserUpdateFailedException : Exception
     {
         public GridUserUpdateFailedException()
+        {
+
+        }
+
+        public GridUserUpdateFailedException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected GridUserUpdateFailedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public GridUserUpdateFailedException(string message, Exception innerException)
+            : base(message, innerException)
         {
 
         }

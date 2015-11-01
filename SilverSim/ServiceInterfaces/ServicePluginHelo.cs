@@ -3,6 +3,7 @@
 
 using SilverSim.Http.Client;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace SilverSim.ServiceInterfaces
@@ -14,6 +15,7 @@ namespace SilverSim.ServiceInterfaces
 
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         string HeloRequester(string uri)
         {
             if (!uri.EndsWith("="))

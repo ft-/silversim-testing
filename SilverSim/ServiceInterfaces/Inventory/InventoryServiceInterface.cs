@@ -6,17 +6,20 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Inventory
 {
     public abstract class InventoryServiceInterface
     {
         #region Accessors
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract InventoryFolderServiceInterface Folder
         {
             get;
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract InventoryItemServiceInterface Item
         {
             get;
@@ -24,6 +27,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
 
         public abstract List<InventoryItem> GetActiveGestures(UUID principalID);
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void VerifyInventoryFolder(UUID principalID, UUID parentFolderID, string name, AssetType type)
         {
             InventoryFolder folder;
@@ -43,6 +47,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public virtual void CheckInventory(UUID principalID)
         {
             InventoryFolder rootFolder;
