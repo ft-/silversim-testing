@@ -213,6 +213,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         #endregion
 
         #region Store asset method
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void Store(AssetData asset)
         {
             using (SHA1 sha = new SHA1CryptoServiceProvider())
@@ -278,7 +279,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
                                     }
                                 }
                             }
-                            catch (Exception)
+                            catch
                             {
                                 throw new AssetStoreFailedException(asset.ID);
                             }

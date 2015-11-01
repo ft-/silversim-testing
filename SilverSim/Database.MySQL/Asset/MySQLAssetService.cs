@@ -207,6 +207,7 @@ namespace SilverSim.Database.MySQL.Asset
         #endregion
 
         #region Store asset method
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void Store(AssetData asset)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))

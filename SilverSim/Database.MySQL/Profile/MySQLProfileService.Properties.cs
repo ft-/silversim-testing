@@ -65,6 +65,7 @@ namespace SilverSim.Database.MySQL.Profile
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
+            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public ProfileProperties this[UUI user, PropertiesUpdateFlags flags]
             {
                 set

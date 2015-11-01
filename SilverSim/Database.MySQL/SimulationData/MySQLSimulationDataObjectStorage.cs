@@ -151,6 +151,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         #endregion
 
         #region Load all object groups of a single region
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override List<ObjectGroup> this[UUID regionID]
         {
             get
@@ -331,6 +332,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void LoadInventory(MySqlConnection connection, ObjectPart objpart)
         {
             using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM primitems WHERE PrimID LIKE ?id", connection))

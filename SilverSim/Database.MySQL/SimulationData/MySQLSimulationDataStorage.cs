@@ -121,6 +121,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         int m_ProcessedPrims;
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         protected override void StorageWorkerThread(object p)
         {
             StorageThreadInfo s = (StorageThreadInfo)p;

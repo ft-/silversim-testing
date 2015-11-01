@@ -25,6 +25,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override LayerPatch this[UUID regionID, uint extendedPatchID]
         {
             get

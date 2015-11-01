@@ -10,6 +10,7 @@ using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
 using SilverSim.Types.IM;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Backend.Common.OfflineIM
 {
@@ -31,6 +32,7 @@ namespace SilverSim.Backend.Common.OfflineIM
             m_OfflineIMServiceName = offlineIMServiceName;
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool Send(GridInstantMessage im)
         {
             if(im.NoOfflineIMStore)

@@ -137,6 +137,7 @@ namespace SilverSim.Database.MySQL.Inventory
             IncrementVersion(principalID, toFolderID);
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void IncrementVersion(UUID principalID, UUID folderID)
         {
             try

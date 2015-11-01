@@ -105,6 +105,7 @@ namespace SilverSim.Database.MySQL.Presence
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override PresenceInfo this[UUID sessionID, UUID userID, PresenceServiceInterface.SetType reportType]
         { 
             /* setting null means logout, != null login message */

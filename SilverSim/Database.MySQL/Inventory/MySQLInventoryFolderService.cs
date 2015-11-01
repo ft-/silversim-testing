@@ -183,6 +183,7 @@ namespace SilverSim.Database.MySQL.Inventory
             return items;
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void Add(InventoryFolder folder)
         {
             Dictionary<string, object> newVals = new Dictionary<string, object>();
@@ -212,6 +213,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void Update(InventoryFolder folder)
         {
             Dictionary<string, object> newVals = new Dictionary<string, object>();
@@ -281,6 +283,7 @@ namespace SilverSim.Database.MySQL.Inventory
             Purge(folder.Owner.ID, folderID);
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void PurgeOrDelete(UUID principalID, UUID folderID, MySqlConnection connection, bool deleteFolder)
         {
             List<UUID> folders;
@@ -408,6 +411,7 @@ namespace SilverSim.Database.MySQL.Inventory
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void IncrementVersionNoExcept(UUID principalID, UUID folderID)
         {
             try
