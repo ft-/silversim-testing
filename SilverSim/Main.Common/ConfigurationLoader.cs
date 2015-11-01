@@ -35,16 +35,19 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Reflection;
+using System.Runtime.Serialization;
 using System.Threading;
 using System.Xml;
 using ThreadedClasses;
 
 namespace SilverSim.Main.Common
 {
+    [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public sealed class ConfigurationLoader
     {
         sealed class ResourceAssetPlugin : SceneInterface.ResourceAssetService, IPlugin
@@ -67,6 +70,24 @@ namespace SilverSim.Main.Common
             {
 
             }
+
+            public TestingErrorException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected TestingErrorException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public TestingErrorException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
         }
 
         [Serializable]
@@ -79,6 +100,18 @@ namespace SilverSim.Main.Common
 
             public ConfigurationErrorException(string msg)
                 : base(msg)
+            {
+
+            }
+
+            protected ConfigurationErrorException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public ConfigurationErrorException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }
@@ -343,8 +376,10 @@ namespace SilverSim.Main.Common
             {
                 get
                 {
-                    XmlReader r = new XmlTextReader(HttpRequestHandler.DoStreamGetRequest(m_Uri, null, 20000));
-                    return new XmlConfigSource(r);
+                    using (XmlReader r = new XmlTextReader(HttpRequestHandler.DoStreamGetRequest(m_Uri, null, 20000)))
+                    {
+                        return new XmlConfigSource(r);
+                    }
                 }
             }
         }
@@ -398,6 +433,9 @@ namespace SilverSim.Main.Common
                 }
             }
 
+            [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidCallingProblematicMethodsRule")]
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
+            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public IConfigSource ConfigSource
             {
                 get
@@ -535,6 +573,8 @@ namespace SilverSim.Main.Common
             throw new KeyNotFoundException();
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidCallingProblematicMethodsRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void LoadModules()
         {
             SilverSim.Types.Assembly.InterfaceVersion ownVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
@@ -608,6 +648,7 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Process [ParameterMap] section
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void ProcessParameterMap()
         {
             IConfig parameterMap = m_Config.Configs["ParameterMap"];
@@ -673,6 +714,7 @@ namespace SilverSim.Main.Common
         #endregion
 
         #region Process [ResourceMap] section
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void ProcessResourceMap()
         {
             IConfig resourceMap = m_Config.Configs["ResourceMap"];
@@ -747,6 +789,8 @@ namespace SilverSim.Main.Common
             Allowed
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public ConfigurationLoader(string[] args, ManualResetEvent shutdownEvent, LocalConsole localConsoleControl = LocalConsole.Allowed)
         {
             string defaultConfigName;
@@ -987,6 +1031,7 @@ namespace SilverSim.Main.Common
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         public void ShowMemoryCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
@@ -1000,6 +1045,7 @@ namespace SilverSim.Main.Common
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void ChangeRegionCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
@@ -1099,6 +1145,7 @@ namespace SilverSim.Main.Common
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         public void ShowThreadCountCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if(args[0] == "help")

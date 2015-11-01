@@ -9,7 +9,7 @@ namespace SilverSim.Main.Common.Log
 {
     public class LogController : AppenderSkeleton
     {
-        public static RwLockedList<BlockingQueue<LoggingEvent>> Queues = new RwLockedList<BlockingQueue<LoggingEvent>>();
+        public readonly static RwLockedList<BlockingQueue<LoggingEvent>> Queues = new RwLockedList<BlockingQueue<LoggingEvent>>();
 
         protected override void Append(LoggingEvent loggingEvent)
         {

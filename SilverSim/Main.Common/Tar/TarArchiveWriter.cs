@@ -5,11 +5,13 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Text;
 
 namespace SilverSim.Main.Common.Tar
 {
+    [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public class TarArchiveWriter
     {
         Stream m_Stream;
@@ -62,7 +64,8 @@ namespace SilverSim.Main.Common.Tar
 
         void WriteHeader(string filename, TarFileType fileType, int fileSize)
         {
-            byte[] bName = Encoding.ASCII.GetBytes(filename);
+            Encoding ascii = Encoding.ASCII;
+            byte[] bName = ascii.GetBytes(filename);
             if(bName.Length > 100)
             {
                 WriteHeader("././@LongLink", TarFileType.LongLink, bName.Length);
@@ -85,22 +88,22 @@ namespace SilverSim.Main.Common.Tar
             {
                 fileSizeOctal = "0" + fileSizeOctal;
             }
-            Buffer.BlockCopy(Encoding.ASCII.GetBytes(fileSizeOctal), 0, header, 124, 11);
+            Buffer.BlockCopy(ascii.GetBytes(fileSizeOctal), 0, header, 124, 11);
 
             string lastModTime = Convert.ToString((uint)Date.GetUnixTime(), 8);
             while(lastModTime.Length < 11)
             {
                 lastModTime = " " + lastModTime;
             }
-            Buffer.BlockCopy(Encoding.ASCII.GetBytes(lastModTime), 0, header, 136, 11);
+            Buffer.BlockCopy(ascii.GetBytes(lastModTime), 0, header, 136, 11);
 
             header[156] = (byte)fileType;
 
-            Buffer.BlockCopy(Encoding.ASCII.GetBytes("0000000"), 0, header, 329, 7);
-            Buffer.BlockCopy(Encoding.ASCII.GetBytes("0000000"), 0, header, 337, 7);
+            Buffer.BlockCopy(ascii.GetBytes("0000000"), 0, header, 329, 7);
+            Buffer.BlockCopy(ascii.GetBytes("0000000"), 0, header, 337, 7);
 
             /* TAR checksum calculation */
-            Buffer.BlockCopy(Encoding.ASCII.GetBytes("        "), 0, header, 148, 8);
+            Buffer.BlockCopy(ascii.GetBytes("        "), 0, header, 148, 8);
 
             int checksum = 0;
             foreach (byte b in header)
@@ -113,7 +116,7 @@ namespace SilverSim.Main.Common.Tar
             {
                 checkSumStr = "0" + checkSumStr;
             }
-            Array.Copy(Encoding.ASCII.GetBytes(checkSumStr), 0, header, 148, 6);
+            Array.Copy(ascii.GetBytes(checkSumStr), 0, header, 148, 6);
             header[154] = 0;
             WriteBytes(header);
         }

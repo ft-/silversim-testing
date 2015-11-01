@@ -11,6 +11,8 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -30,6 +32,24 @@ namespace SilverSim.Main.Common.HttpServer
 
             }
 
+            public JSON20RpcException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected JSON20RpcException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public JSON20RpcException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
+
             public JSON20RpcException(int statusCode, string message)
                 : base(message)
             {
@@ -37,6 +57,8 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void RequestHandler(HttpRequest httpreq)
         {
             IValue req;
@@ -92,6 +114,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         Map ProcessJsonRequest(Map req)
         {
             Func<string, IValue, IValue> del;

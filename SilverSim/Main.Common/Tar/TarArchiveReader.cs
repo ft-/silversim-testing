@@ -3,12 +3,15 @@
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace SilverSim.Main.Common.Tar
 {
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public class TarArchiveReader : Stream
     {
         /* TarArchiveReader has Stream support, so that we can directly apply XmlTextReader and so on */
@@ -16,6 +19,24 @@ namespace SilverSim.Main.Common.Tar
         public class EndOfTarException : Exception
         {
             public EndOfTarException()
+            {
+
+            }
+
+            public EndOfTarException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected EndOfTarException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public EndOfTarException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }

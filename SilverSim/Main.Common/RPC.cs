@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 
 namespace SilverSim.Main.Common.Rpc
 {
@@ -17,12 +18,18 @@ namespace SilverSim.Main.Common.Rpc
         public static IValue DoJson20RpcRequest(string url, string method, string jsonId, IValue param, int timeoutms)
         {
             string jsonReq = Json20Rpc.SerializeRequest(method, jsonId, param);
-            return Json20Rpc.DeserializeResponse(HttpRequestHandler.DoStreamRequest("POST", url, null, "application/json-rpc", jsonReq, false, timeoutms));
+            using (Stream res = HttpRequestHandler.DoStreamRequest("POST", url, null, "application/json-rpc", jsonReq, false, timeoutms))
+            {
+                return Json20Rpc.DeserializeResponse(res);
+            }
         }
 
         public static XmlRpc.XmlRpcResponse DoXmlRpcRequest(string url, XmlRpc.XmlRpcRequest req, int timeoutms)
         {
-            return XmlRpc.DeserializeResponse(HttpRequestHandler.DoStreamRequest("POST", url, null, "text/xml", UTF8NoBOM.GetString(req.Serialize()), false, timeoutms));
+            using (Stream res = HttpRequestHandler.DoStreamRequest("POST", url, null, "text/xml", UTF8NoBOM.GetString(req.Serialize()), false, timeoutms))
+            {
+                return XmlRpc.DeserializeResponse(res);
+            }
         }
 
         static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);

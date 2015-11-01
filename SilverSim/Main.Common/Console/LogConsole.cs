@@ -3,18 +3,21 @@
 
 using log4net.Core;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading;
 using ThreadedClasses;
 
 namespace SilverSim.Main.Common.Console
 {
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public class LogConsole : CmdIO.TTY, IPlugin, IPluginShutdown
     {
         private BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();
         private Thread m_LogThread;
         private bool m_Shutdown;
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public LogConsole(string consoleTitle)
         {
             try

@@ -8,6 +8,7 @@ using System.Net;
 using System.IO.Compression;
 using System.Text;
 using SilverSim.Http;
+using System.Runtime.Serialization;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -21,12 +22,48 @@ namespace SilverSim.Main.Common.HttpServer
             {
 
             }
+
+            public ConnectionCloseException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected ConnectionCloseException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public ConnectionCloseException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
         }
 
         [Serializable]
         public class DisconnectFromThreadException : Exception
         {
             public DisconnectFromThreadException()
+            {
+
+            }
+
+            public DisconnectFromThreadException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected DisconnectFromThreadException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public DisconnectFromThreadException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }

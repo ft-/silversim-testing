@@ -5,6 +5,7 @@ using log4net;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using ThreadedClasses;
 
@@ -17,6 +18,7 @@ namespace SilverSim.Main.Common.Caps
 
         public readonly RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUID, Action<HttpRequest>>> Caps = new RwLockedDictionaryAutoAdd<string, RwLockedDictionary<UUID, Action<HttpRequest>>>(delegate() { return new RwLockedDictionary<UUID, Action<HttpRequest>>();});
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void RequestHandler(HttpRequest httpreq)
         {
             Action<HttpRequest> del;
@@ -26,11 +28,7 @@ namespace SilverSim.Main.Common.Caps
             {
                 /* region seed */
                 UUID regionSeedUuid;
-                try
-                {
-                     regionSeedUuid = UUID.Parse(httpreq.RawUrl.Substring(6, 36));
-                }
-                catch
+                if(!UUID.TryParse(httpreq.RawUrl.Substring(6, 36), out regionSeedUuid))
                 {
                     httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                     return;
@@ -61,11 +59,7 @@ namespace SilverSim.Main.Common.Caps
             }
 
             UUID capsUUID;
-            try
-            {
-                capsUUID = UUID.Parse(parts[2]);
-            }
-            catch
+            if(!UUID.TryParse(parts[2], out capsUUID))
             {
                 httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;

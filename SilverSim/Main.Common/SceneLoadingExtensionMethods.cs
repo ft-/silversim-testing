@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Main.Common
 {
@@ -41,6 +42,8 @@ namespace SilverSim.Main.Common
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static void LoadSceneThread(object o)
         {
             SceneLoadingParams loadparams = (SceneLoadingParams)o;

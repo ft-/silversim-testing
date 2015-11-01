@@ -4,6 +4,7 @@
 using log4net;
 using SilverSim.Types.StructuredData.XmlRpc;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using ThreadedClasses;
@@ -16,6 +17,7 @@ namespace SilverSim.Main.Common.HttpServer
 
         public RwLockedDictionary<string, Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse>> XmlRpcMethods = new RwLockedDictionary<string, Func<XmlRpc.XmlRpcRequest, XmlRpc.XmlRpcResponse>>();
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void RequestHandler(HttpRequest httpreq)
         {
             XmlRpc.XmlRpcRequest req;

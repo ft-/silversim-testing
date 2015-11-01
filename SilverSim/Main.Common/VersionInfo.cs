@@ -2,12 +2,14 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 namespace SilverSim.Main.Common
 {
     public static class VersionInfo
     {
+        [SuppressMessage("Gendarme.Rules.Portability", "DoNotHardcodePathsRule", Justification = "Gendarme misinterprets the string")]
         public static string ProductName
         { 
             get
@@ -40,6 +42,7 @@ namespace SilverSim.Main.Common
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Portability", "DoNotHardcodePathsRule", Justification = "Gendarme misinterprets the string")]
         public static string RuntimeInformation
         {
             get

@@ -6,6 +6,7 @@ using Nini.Config;
 using SilverSim.Http;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
 using System.Net.Security;
@@ -80,6 +81,10 @@ namespace SilverSim.Main.Common.HttpServer
             RootUriContentTypeHandlers.Clear();
         }
 
+        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         private void AcceptConnectionCallback(IAsyncResult ar)
         {
             Socket socket;

@@ -4,6 +4,7 @@
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using ThreadedClasses;
 
 namespace SilverSim.Main.Common.CmdIO
@@ -49,6 +50,7 @@ namespace SilverSim.Main.Common.CmdIO
                 m_Dict = dict;
             }
 
+            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public void Command_Handler(List<string> args, TTY io, UUID limitedToScene)
             {
                 Action<List<string>, TTY, UUID> del;
@@ -96,6 +98,7 @@ namespace SilverSim.Main.Common.CmdIO
             ExecuteCommand(args, io, UUID.Zero);
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static void ExecuteCommand(List<string> args, TTY io, UUID limitedToScene)
         {
             Action<List<string>, TTY, UUID> del;

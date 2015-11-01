@@ -4,6 +4,7 @@
 using SilverSim.Http;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
 using System.Net;
@@ -16,6 +17,7 @@ namespace SilverSim.Main.Common.HttpServer
         KeepAlive
     }
 
+    [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public sealed class HttpRequest
     {
         #region Private Fields
@@ -123,6 +125,8 @@ namespace SilverSim.Main.Common.HttpServer
             return headerLine;
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         public HttpRequest(Stream httpStream, string callerIP, bool isBehindProxy)
         {
             m_HttpStream = httpStream;
@@ -262,7 +266,14 @@ namespace SilverSim.Main.Common.HttpServer
             if (ContainsHeader("Content-Length"))
             {
                 /* there is a body */
-                RawBody = new HttpRequestBodyStream(m_HttpStream, long.Parse(m_Headers["Content-Length"]), Expect100Continue);
+                long contentLength;
+                if(!long.TryParse(m_Headers["Content-Length"], out contentLength))
+                {
+                    ConnectionMode = HttpConnectionMode.Close;
+                    ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                    throw new InvalidDataException();
+                }
+                RawBody = new HttpRequestBodyStream(m_HttpStream, contentLength, Expect100Continue);
                 Body = RawBody;
 
                 if(ContainsHeader("Transfer-Encoding"))

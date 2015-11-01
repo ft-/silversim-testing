@@ -10,6 +10,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Main.Common.Transfer
 {
@@ -35,18 +36,14 @@ namespace SilverSim.Main.Common.Transfer
 
         protected void SendAlertMessage(string msg)
         {
-            try
-            {
-                IAgent agent = m_Scene.Agents[m_RezzingAgent.ID];
+            IAgent agent;
+            if(m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
+            { 
                 agent.SendAlertMessage(msg, m_Scene.ID);
             }
-            catch
-            {
-
-            }
-
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void AssetTransferComplete()
         {
             AssetData data;
@@ -92,6 +89,7 @@ namespace SilverSim.Main.Common.Transfer
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override void AssetTransferFailed(Exception e)
         {
             try
