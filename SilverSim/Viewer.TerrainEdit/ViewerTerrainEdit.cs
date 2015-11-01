@@ -36,6 +36,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
         
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         sealed class PaintEffect : Attribute
         {
             public StandardTerrainEffect Effect { get; private set; }
@@ -47,6 +48,7 @@ namespace SilverSim.Viewer.TerrainEdit
         }
 
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         sealed class FloodEffect : Attribute
         {
             public StandardTerrainEffect Effect { get; private set; }

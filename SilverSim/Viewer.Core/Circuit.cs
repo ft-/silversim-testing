@@ -7,6 +7,7 @@ using System.Net;
 using System.Threading;
 using ThreadedClasses;
 using SilverSim.Scene.Types.Scene;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -56,6 +57,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
+        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public sealed class IgnoreMethod : Attribute
         {
             public IgnoreMethod()

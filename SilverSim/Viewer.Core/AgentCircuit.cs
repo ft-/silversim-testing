@@ -22,6 +22,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -176,6 +177,7 @@ namespace SilverSim.Viewer.Core
         }
         #endregion
 
+        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         sealed class MessageHandlerExtenderKeyValuePairCircuitQueue
         {
             WeakReference m_Circuit;
