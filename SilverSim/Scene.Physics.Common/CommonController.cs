@@ -1,17 +1,15 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Physics.Common
 {
     public abstract class CommonPhysicsController
     {
+        [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
         public static double GravityAccelerationConstant = -9.8f;
 
         public CommonPhysicsController()

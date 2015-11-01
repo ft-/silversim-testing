@@ -7,9 +7,11 @@ using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Physics.Common
 {
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public abstract class ObjectController : CommonPhysicsController, IPhysicsObject
     {
         protected ObjectGroup m_Group;
@@ -52,8 +54,11 @@ namespace SilverSim.Scene.Physics.Common
 
         public abstract void UpdateCollisionInfo();
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public abstract Vector3 DeltaLinearVelocity { set; }
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public abstract Vector3 DeltaAngularVelocity { set; }
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public abstract Vector3 ControlTargetVelocity { set; }
         public abstract bool IsPhysicsActive { get; set; } /* disables updates of object */
         public bool IsPhantom
@@ -119,6 +124,7 @@ namespace SilverSim.Scene.Physics.Common
         }
 
         #region Vehicle Calculation
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         struct VehicleParams
         {
             public VehicleType VehicleType;
@@ -320,6 +326,7 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public VehicleFlags SetVehicleFlags
         {
             set
@@ -331,6 +338,7 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public VehicleFlags ClearVehicleFlags
         {
             set
@@ -566,6 +574,7 @@ namespace SilverSim.Scene.Physics.Common
         Vector3 m_AppliedForce = Vector3.Zero;
         Vector3 m_AppliedTorque = Vector3.Zero;
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 AppliedForce 
         { 
             set
@@ -577,6 +586,7 @@ namespace SilverSim.Scene.Physics.Common
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 AppliedTorque 
         { 
             set
@@ -589,6 +599,7 @@ namespace SilverSim.Scene.Physics.Common
         }
 
         Vector3 m_LinearImpulse = Vector3.Zero;
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 LinearImpulse 
         { 
             set
@@ -601,6 +612,7 @@ namespace SilverSim.Scene.Physics.Common
         }
 
         Vector3 m_AngularImpulse = Vector3.Zero;
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 AngularImpulse 
         {
             set
