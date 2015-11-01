@@ -9,13 +9,14 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.LoadStore.Terrain.Formats
 {
     [TerrainStorageType]
     public class LLRAW : ITerrainFileStorage, IPlugin
     {
-        public struct HeightmapLookupValue : IComparable<HeightmapLookupValue>
+        public struct HeightmapLookupValue : IComparable<HeightmapLookupValue>, IEquatable<HeightmapLookupValue>
         {
             public ushort Index;
             public float Value;
@@ -29,6 +30,47 @@ namespace SilverSim.LoadStore.Terrain.Formats
             public int CompareTo(HeightmapLookupValue val)
             {
                 return Value.CompareTo(val.Value);
+            }
+
+            public static bool operator ==(HeightmapLookupValue a, HeightmapLookupValue b)
+            {
+                return a.Equals(b);
+            }
+
+            public static bool operator !=(HeightmapLookupValue a, HeightmapLookupValue b)
+            {
+                return !a.Equals(b);
+            }
+
+            public static bool operator >(HeightmapLookupValue a, HeightmapLookupValue b)
+            {
+                return a.Value > b.Value;
+            }
+
+            public static bool operator <(HeightmapLookupValue a, HeightmapLookupValue b)
+            {
+                return a.Value < b.Value;
+            }
+
+            [SuppressMessage("Gendarme.Rules.Correctness", "AvoidFloatingPointEqualityRule")]
+            public override bool Equals(object obj)
+            {
+                if(obj is HeightmapLookupValue)
+                {
+                    return Value.Equals(((HeightmapLookupValue)obj).Value);
+                }
+                return false;
+            }
+
+            public override int GetHashCode()
+            {
+                return Value.GetHashCode();
+            }
+
+            [SuppressMessage("Gendarme.Rules.Correctness", "AvoidFloatingPointEqualityRule")]
+            public bool Equals(HeightmapLookupValue v)
+            {
+                return Value.Equals(v.Value);
             }
         }
 

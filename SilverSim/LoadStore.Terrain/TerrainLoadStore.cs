@@ -11,6 +11,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.LoadStore.Terrain
 {
@@ -52,10 +53,14 @@ namespace SilverSim.LoadStore.Terrain
             {
                 throw new ArgumentException("inp");
             }
-            x = uint.Parse(parts[0]);
-            y = uint.Parse(parts[1]);
+            if(!uint.TryParse(parts[0], out x) ||
+                !uint.TryParse(parts[1], out y))
+            {
+                throw new ArgumentException("inp");
+            }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void LoadTerrainCommand(List<string> args, TTY io, UUID limitedToScene)
         {
             UUID selectedScene = io.SelectedScene;
@@ -174,6 +179,7 @@ namespace SilverSim.LoadStore.Terrain
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void SaveTerrainCommand(List<string> args, TTY io, UUID limitedToScene)
         {
             UUID selectedScene = io.SelectedScene;

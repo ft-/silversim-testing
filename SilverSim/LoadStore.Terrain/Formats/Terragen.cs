@@ -38,15 +38,16 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
         public List<LayerPatch> LoadStream(System.IO.Stream input, int suggested_width, int suggested_height)
         {
+            Encoding ascii = Encoding.ASCII;
             List<LayerPatch> patches = new List<LayerPatch>();
 
             using (BinaryReader bs = new BinaryReader(input))
             {
-                if (Encoding.ASCII.GetString(bs.ReadBytes(16)) == "TERRAGENTERRAIN ")
+                if (ascii.GetString(bs.ReadBytes(16)) == "TERRAGENTERRAIN ")
                 {
                     for (; ; )
                     {
-                        switch (Encoding.ASCII.GetString(bs.ReadBytes(4)))
+                        switch (ascii.GetString(bs.ReadBytes(4)))
                         {
                             case "SIZE":
                                 suggested_width = bs.ReadInt16() + 1;
@@ -131,6 +132,7 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
         public void SaveStream(System.IO.Stream output, List<LayerPatch> terrain)
         {
+            Encoding ascii = Encoding.ASCII;
             short[] outdata = new short[terrain.Count * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
             uint linewidth = 0;
             double heightMax = terrain[0][0, 0];
@@ -186,27 +188,27 @@ namespace SilverSim.LoadStore.Terrain.Formats
 
             using (BinaryWriter bs = new BinaryWriter(output))
             {
-                bs.Write(Encoding.ASCII.GetBytes("TERRAGENTERRAIN "));
+                bs.Write(ascii.GetBytes("TERRAGENTERRAIN "));
 
-                bs.Write(Encoding.ASCII.GetBytes("SIZE"));
+                bs.Write(ascii.GetBytes("SIZE"));
                 bs.Write(Convert.ToInt16(mapWidth - 1));
                 bs.Write(Convert.ToInt16(0));  // padding
 
-                bs.Write(Encoding.ASCII.GetBytes("XPTS"));
+                bs.Write(ascii.GetBytes("XPTS"));
                 bs.Write(Convert.ToInt16(mapWidth));
                 bs.Write(Convert.ToInt16(0));  // padding
 
-                bs.Write(Encoding.ASCII.GetBytes("YPTS"));
+                bs.Write(ascii.GetBytes("YPTS"));
                 bs.Write(Convert.ToInt16(mapHeight));
                 bs.Write(Convert.ToInt16(0));  // padding
 
-                bs.Write(Encoding.ASCII.GetBytes("SCAL"));
+                bs.Write(ascii.GetBytes("SCAL"));
                 bs.Write(ToLittleEndian(1f)); // 1 terrain unit = 1 metre
                 bs.Write(ToLittleEndian(1f));
                 bs.Write(ToLittleEndian(1f));
 
                 // now write the elevation data
-                bs.Write(Encoding.ASCII.GetBytes("ALTW"));
+                bs.Write(ascii.GetBytes("ALTW"));
                 bs.Write(Convert.ToInt16(horizontalScale)); // range between max and min
                 bs.Write(Convert.ToInt16(baseHeight)); // base height or mid point
 
