@@ -15,9 +15,11 @@ using SilverSim.Types.StructuredData.Llsd;
 using System.IO;
 using SilverSim.Types.Primitive;
 using System.Xml;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
+    [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public class NewFileAgentInventoryVariablePrice : UploadAssetAbstractCapability
     {
         private InventoryServiceInterface m_InventoryService;

@@ -17,7 +17,7 @@ namespace SilverSim.Viewer.Core
     public partial class AgentCircuit
     {
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-        enum SimStatIndex : int
+        public enum SimStatIndex : int
         {
             TimeDilation,
             SimFPS,

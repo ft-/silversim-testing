@@ -8,9 +8,12 @@ using SilverSim.Types.Asset;
 using System;
 using System.IO;
 using System.Net;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
+    [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public abstract class UploadAssetAbstractCapability : ICapabilityInterface
     {
         public abstract string CapabilityName { get; }
@@ -38,6 +41,24 @@ namespace SilverSim.Viewer.Core.Capabilities
             {
 
             }
+
+            public UrlNotFoundException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected UrlNotFoundException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public UrlNotFoundException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
         }
 
         [Serializable]
@@ -47,13 +68,48 @@ namespace SilverSim.Viewer.Core.Capabilities
             {
 
             }
+
+            public InsufficientFundsException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected InsufficientFundsException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public InsufficientFundsException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
         }
 
         [Serializable]
         public class UploadErrorException : Exception
         {
+            public UploadErrorException()
+            {
+
+            }
+
             public UploadErrorException(string message)
                 : base(message)
+            {
+
+            }
+
+            protected UploadErrorException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public UploadErrorException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }

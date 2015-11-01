@@ -1,6 +1,7 @@
 ﻿using SilverSim.Viewer.Messages;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -148,6 +149,7 @@ namespace SilverSim.Viewer.Core
             return;
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void TransmitThread(object param)
         {
             int lastAckTick = Environment.TickCount;

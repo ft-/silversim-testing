@@ -27,3 +27,9 @@ using System.Reflection;
 [assembly: SuppressMessage("Gendarme.Rules.Design", "DeclareEventHandlersCorrectlyRule")]
 [assembly: SuppressMessage("Gendarme.Rules.Concurrency", "ReviewLockUsedOnlyForOperationsOnVariablesRule")]
 [assembly: SuppressMessage("Gendarme.Rules.Design", "PreferUriOverStringRule")]
+
+/* this assembly */
+[assembly: SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
+[assembly: SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
+[assembly: SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+[assembly: SuppressMessage("Gendarme.Rules.Naming", "AvoidRedundancyInMethodNameRule")]

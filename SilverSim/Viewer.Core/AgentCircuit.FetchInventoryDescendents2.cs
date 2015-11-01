@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Net;
 using System.Xml;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -75,6 +76,7 @@ namespace SilverSim.Viewer.Core
             writer.WriteEndElement();
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         void Cap_FetchInventoryDescendents2(HttpRequest httpreq)
         {
             IValue o;

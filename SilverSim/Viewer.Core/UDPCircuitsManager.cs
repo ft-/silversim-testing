@@ -16,6 +16,7 @@ using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -33,6 +34,9 @@ namespace SilverSim.Viewer.Core
     #endregion
 
     #region LLUDP Server
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
+    [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
+    [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     public partial class UDPCircuitsManager : IUDPCircuitsManager
     {
         private static readonly ILog m_Log = LogManager.GetLogger("UDP CIRCUITS MANAGER");

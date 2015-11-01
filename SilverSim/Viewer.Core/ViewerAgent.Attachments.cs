@@ -23,6 +23,7 @@ namespace SilverSim.Viewer.Core
     {
         readonly RwLockedDoubleDictionary<UUID /* ItemID */, UInt32 /* LocalID */, KeyValuePair<UUID /* SceneID */, UUID /* ObjectID */>> m_AttachmentsList = new RwLockedDoubleDictionary<UUID,UInt32,KeyValuePair<UUID, UUID>>();
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         struct DetachEntry
         {
             public UUID ItemID;

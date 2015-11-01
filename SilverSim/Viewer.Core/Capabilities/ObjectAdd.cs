@@ -14,9 +14,11 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
+    [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public class ObjectAdd : ICapabilityInterface
     {
         private SceneInterface m_Scene;

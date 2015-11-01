@@ -139,6 +139,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [Flags]
+        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
         enum EstateAccessCodes : uint
         {
             AccessOptions = 1,
@@ -272,6 +273,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         void EstateOwner_SetRegionInfo(EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 9)
@@ -374,6 +376,7 @@ namespace SilverSim.Viewer.Core
             return (s == "1" || s.ToLower() == "y" || s.ToLower() == "yes" || s.ToLower() == "t" || s.ToLower() == "true");
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         void EstateOwner_SetRegionTerrain(EstateOwnerMessage req)
         {
             if(req.ParamList.Count != 9)
@@ -413,6 +416,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         void EstateOwner_EstateChangeCovenantId(EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 1)
@@ -494,6 +498,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         void EstateOwner_TeleportHomeUser(EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 2)
@@ -546,6 +551,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         void EstateOwner_EstateChangeInfo(EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 3)
@@ -558,6 +564,7 @@ namespace SilverSim.Viewer.Core
             UInt32 param2 = UInt32.Parse(UTF8NoBOM.GetString(req.ParamList[2]));
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         void EstateOwner_Telehub(EstateOwnerMessage req)
         {
             UUID invoice = req.Invoice;

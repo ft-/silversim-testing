@@ -14,9 +14,11 @@ using System.Collections.Generic;
 using ThreadedClasses;
 using System.IO;
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
+    [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public class UpdateScriptTask : UploadAssetAbstractCapability
     {
         sealed class TransactionInfo

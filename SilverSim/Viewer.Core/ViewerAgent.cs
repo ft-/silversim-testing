@@ -39,6 +39,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public partial class ViewerAgent : IAgent
     {
         private static readonly ILog m_Log = LogManager.GetLogger("VIEWER AGENT");
@@ -1061,6 +1062,7 @@ namespace SilverSim.Viewer.Core
         }
 
         /* property here instead of a method. A lot more clear that we update something. */
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public PhysicsStateData PhysicsUpdate
         {
             set

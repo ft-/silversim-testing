@@ -10,6 +10,7 @@ using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Threading;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -43,6 +44,7 @@ namespace SilverSim.Viewer.Core
             SendMessage(res);
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread(object param)
         {
             Thread.CurrentThread.Name = string.Format("LLUDP:Inventory Fetch for CircuitCode {0} / IP {1}", CircuitCode, RemoteEndPoint.ToString());
@@ -135,6 +137,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_ChangeInventoryItemFlags(Message m)
         {
             Messages.Inventory.ChangeInventoryItemFlags req = (Messages.Inventory.ChangeInventoryItemFlags)m;
@@ -159,6 +162,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_TransferRequest(Message m)
         {
             UUID assetID;
@@ -306,6 +310,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_CopyInventoryItem(Message m)
         {
             Messages.Inventory.CopyInventoryItem req = (Messages.Inventory.CopyInventoryItem)m;
@@ -362,6 +367,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_CreateInventoryFolder(Message m)
         {
             Messages.Inventory.CreateInventoryFolder req = (Messages.Inventory.CreateInventoryFolder)m;
@@ -391,6 +397,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_FetchInventory(Message m)
         {
             Messages.Inventory.FetchInventory req = (Messages.Inventory.FetchInventory)m;
@@ -455,6 +462,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private void FetchInventoryThread_FetchInventoryDescendents(Message m)
         {
             Messages.Inventory.FetchInventoryDescendents req = (Messages.Inventory.FetchInventoryDescendents)m;

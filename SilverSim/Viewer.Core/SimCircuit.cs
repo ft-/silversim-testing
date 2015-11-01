@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Viewer.Messages.Agent;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -63,6 +64,7 @@ namespace SilverSim.Viewer.Core
             
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         protected override void OnCircuitSpecificPacketReceived(MessageType mType, UDPPacket p)
         {
             /* we know the message type now, so we have to decode it when possible */

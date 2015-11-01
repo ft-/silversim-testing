@@ -11,6 +11,7 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public abstract partial class Circuit : ICircuit
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL CIRCUIT");
