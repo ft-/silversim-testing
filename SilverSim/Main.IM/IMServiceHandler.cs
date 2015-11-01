@@ -7,18 +7,21 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.Management.IM;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types.IM;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using ThreadedClasses;
 
 namespace SilverSim.Main.IM
 {
     #region Service Implementation
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public class IMServiceHandler : IMServiceInterface, IPlugin
     {
         protected internal BlockingQueue<GridInstantMessage> m_Queue = new BlockingQueue<GridInstantMessage>();
         protected internal RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
         private uint m_MaxThreads;
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void IMSendThread(object s)
         {
             IMServiceHandler service = (IMServiceHandler)s;
