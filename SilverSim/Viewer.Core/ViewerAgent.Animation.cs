@@ -64,6 +64,11 @@ namespace SilverSim.Viewer.Core
             m_AnimationController.StopAnimation(animid, objectid);
         }
 
+        public List<UUID> GetPlayingAnimations()
+        {
+            return m_AnimationController.GetPlayingAnimations();
+        }
+
         [PacketHandler(MessageType.AgentAnimation)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleAgentAnimation(Message m)

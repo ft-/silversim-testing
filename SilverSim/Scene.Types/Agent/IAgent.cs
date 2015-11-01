@@ -227,6 +227,7 @@ namespace SilverSim.Scene.Types.Agent
         string GetAnimationOverride(string anim_state);
         void PlayAnimation(UUID anim, UUID objectid);
         void StopAnimation(UUID anim, UUID objectid);
+        List<UUID> GetPlayingAnimations();
 
         ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions);
         ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID);

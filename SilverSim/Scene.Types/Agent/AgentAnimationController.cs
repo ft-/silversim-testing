@@ -235,6 +235,19 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
+        public List<UUID> GetPlayingAnimations()
+        {
+            List<UUID> res = new List<UUID>();
+            lock(this)
+            {
+                foreach(AnimationInfo info in m_ActiveAnimations)
+                {
+                    res.Add(info.AnimID);
+                }
+            }
+            return res;
+        }
+
         public void SetDefaultAnimation(string anim_state)
         {
             if (m_AnimStates.Contains<string>(anim_state))
