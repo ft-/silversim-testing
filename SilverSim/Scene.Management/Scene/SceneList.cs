@@ -5,6 +5,7 @@ using log4net;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Management.Scene
@@ -44,6 +45,7 @@ namespace SilverSim.Scene.Management.Scene
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void Add(SceneInterface scene)
         {
             m_RegionNames.Add(scene.ID, scene.Name.ToLower());
@@ -92,6 +94,7 @@ namespace SilverSim.Scene.Management.Scene
             throw new InvalidOperationException();
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void Remove(SceneInterface scene)
         {
             scene.LoginControl.NotReady(SceneInterface.ReadyFlags.Remove);

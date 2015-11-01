@@ -3,6 +3,7 @@
 
 using SilverSim.Types.IM;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Management.IM
@@ -10,8 +11,11 @@ namespace SilverSim.Scene.Management.IM
     public static class IMRouter
     {
         #region Fields
+        [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
         public static RwLockedList<Func<GridInstantMessage, bool>> OfflineIM = new RwLockedList<Func<GridInstantMessage, bool>>();
+        [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
         public static RwLockedList<Func<GridInstantMessage, bool>> GridIM = new RwLockedList<Func<GridInstantMessage, bool>>();
+        [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
         public static RwLockedList<Func<GridInstantMessage, bool>> SceneIM = new RwLockedList<Func<GridInstantMessage, bool>>();
         #endregion
 
@@ -21,6 +25,7 @@ namespace SilverSim.Scene.Management.IM
             im.OnResult(im, SendSync(im));
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public static bool SendSync(GridInstantMessage im)
         {
             bool success = false;
