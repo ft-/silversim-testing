@@ -9,9 +9,12 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
+using System.Runtime.Serialization;
 
 namespace SilverSim.Scene.Types.WindLight
 {
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public class EnvironmentSettings
     {
         public readonly RwLockedList<KeyValuePair<double, string>> DayCycle = new RwLockedList<KeyValuePair<double, string>>();
@@ -98,6 +101,24 @@ namespace SilverSim.Scene.Types.WindLight
         public class EnvironmentSettingsSerializationException : Exception
         {
             public EnvironmentSettingsSerializationException()
+            {
+
+            }
+
+            public EnvironmentSettingsSerializationException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected EnvironmentSettingsSerializationException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public EnvironmentSettingsSerializationException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }

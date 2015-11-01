@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Runtime.Serialization;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.Script
@@ -11,6 +12,24 @@ namespace SilverSim.Scene.Types.Script
     {
         /* do not throw this exception after calling any XmlTextReader function */
         public ScriptStateLoaderNotImplementedException()
+        {
+
+        }
+
+        public ScriptStateLoaderNotImplementedException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected ScriptStateLoaderNotImplementedException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public ScriptStateLoaderNotImplementedException(string message, Exception innerException)
+            : base(message, innerException)
         {
 
         }

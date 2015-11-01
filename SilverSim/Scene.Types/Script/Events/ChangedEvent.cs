@@ -2,12 +2,15 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Script.Events
 {
+    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct ChangedEvent : IScriptEvent
     {
         [Flags]
+        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum ChangedFlags : int
         {
             Inventory = 0x001,

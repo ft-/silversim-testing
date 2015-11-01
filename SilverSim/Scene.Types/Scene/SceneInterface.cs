@@ -24,6 +24,7 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Threading;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -289,6 +290,7 @@ namespace SilverSim.Scene.Types.Scene
             InitializeParcelLayer();
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void InvokeOnRemove()
         {
             LoginControl.OnLoginsEnabled -= LoginsEnabledHandler;
@@ -314,6 +316,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public abstract IUDPCircuitsManager UDPServer { get; }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void TriggerIPChanged(IPAddress ip)
         {
             LastIPAddress = ip;
@@ -358,6 +361,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         protected void AddNewLocalID(IObject v)
         {
             do

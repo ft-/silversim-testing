@@ -6,6 +6,7 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using SilverSim.Types.Script;
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using ThreadedClasses;
 
@@ -27,8 +28,10 @@ namespace SilverSim.Scene.Types.Script
         public event Action<ScriptInstance> OnStateChange;
         public event Action<ScriptInstance> OnScriptReset;
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract ObjectPartInventoryItem Item { get; }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract ObjectPart Part { get; }
 
         public abstract double ExecutionTime { get; set; }
@@ -57,6 +60,7 @@ namespace SilverSim.Scene.Types.Script
 
         public abstract void RevokePermissions(UUID permissionsKey, ScriptPermissions permissions);
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         protected void TriggerOnStateChange()
         {
             var ev = OnStateChange; /* events are not exactly thread-safe, so copy the reference first */
@@ -75,6 +79,7 @@ namespace SilverSim.Scene.Types.Script
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         protected void TriggerOnScriptReset()
         {
             var ev = OnScriptReset; /* events are not exactly thread-safe, so copy the reference first */
@@ -114,6 +119,7 @@ namespace SilverSim.Scene.Types.Script
         }
 
         #region Threat Level System
+        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
         public enum ThreatLevelType : uint
         {
             None = 0,
@@ -138,13 +144,19 @@ namespace SilverSim.Scene.Types.Script
             }
 
             Permissions perms;
+            ObjectPart part = Part;
+            ObjectGroup objgroup = part.ObjectGroup;
+            ObjectPart rootPart = objgroup.RootPart;
+            UUI creator = rootPart.Creator;
+            UUI owner = objgroup.Owner;
+
             if (OSSLPermissions.TryGetValue(name, out perms))
             {
-                if (perms.Creators.Contains(Part.ObjectGroup.RootPart.Creator))
+                if (perms.Creators.Contains(creator))
                 {
                     return;
                 }
-                if (perms.Owners.Contains(Part.ObjectGroup.Owner))
+                if (perms.Owners.Contains(owner))
                 {
                     return;
                 }
@@ -152,7 +164,7 @@ namespace SilverSim.Scene.Types.Script
 
                 if (perms.IsAllowedForEstateOwner)
                 {
-                    if (Part.ObjectGroup.Scene.Owner == Part.ObjectGroup.Owner)
+                    if (objgroup.Scene.Owner == owner)
                     {
                         return;
                     }

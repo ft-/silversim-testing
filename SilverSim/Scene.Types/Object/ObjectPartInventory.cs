@@ -8,12 +8,14 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Script;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using System.Xml;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
 {
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public class ObjectPartInventory : RwLockedSortedDoubleDictionary<UUID, string, ObjectPartInventoryItem>
     {
         public enum ChangeAction
@@ -35,6 +37,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
         #region LSL style accessors
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public ObjectPartInventoryItem this[InventoryType type, uint index]
         {
             get

@@ -2,11 +2,16 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Script.Events
 {
+    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct ControlEvent : IScriptEvent
     {
+        [Flags]
+        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum ControlFlags : int
         {
             Forward = 0x00000001,

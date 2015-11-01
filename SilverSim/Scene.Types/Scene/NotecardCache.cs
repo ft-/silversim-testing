@@ -10,9 +10,11 @@ using SilverSim.ServiceInterfaces.Asset;
 using ThreadedClasses;
 using SilverSim.Types;
 using System.Timers;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
+    [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public class NotecardCache
     {
         private SceneInterface m_Scene;
@@ -47,6 +49,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotThrowInUnexpectedLocationRule")]
         public Notecard this[UUID assetid]
         {
             get

@@ -9,7 +9,9 @@ using SilverSim.Types.Groups;
 using SilverSim.Types.Parcel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace SilverSim.Scene.Types.Scene
@@ -29,6 +31,18 @@ namespace SilverSim.Scene.Types.Scene
             {
 
             }
+
+            protected ParcelAccessDeniedException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public ParcelAccessDeniedException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
         }
 
         bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel)
@@ -37,6 +51,7 @@ namespace SilverSim.Scene.Types.Scene
             return CheckParcelAccessRights(agent, parcel, out nop);
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel, out string reason)
         {
             reason = string.Empty;
@@ -82,6 +97,7 @@ namespace SilverSim.Scene.Types.Scene
             return true;
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         ParcelInfo FindNonBlockedParcel(IAgent agent, Vector3 destinationLocation)
         {
             ParcelInfo selectedParcel = null;
@@ -164,18 +180,19 @@ namespace SilverSim.Scene.Types.Scene
 
         EstateInfo CheckEstateRights(IAgent agent)
         {
+            UUI agentOwner = agent.Owner;
             uint estateID = EstateService.RegionMap[ID];
             EstateInfo estateInfo = EstateService[estateID];
             
             if((estateInfo.Flags & RegionOptionFlags.PublicAllowed) == 0)
             {
-                if (EstateService.EstateAccess[estateID, agent.Owner])
+                if (EstateService.EstateAccess[estateID, agentOwner])
                 {
                 }
                 else
                 {
                     List < UGI > estateGroups = EstateService.EstateGroup.All[estateID];
-                    List<GroupMembership> groups = GroupsService.Memberships[agent.Owner, agent.Owner];
+                    List<GroupMembership> groups = GroupsService.Memberships[agentOwner, agentOwner];
                     foreach(GroupMembership group in groups)
                     {
                         if(estateGroups.Contains(group.Group))
@@ -192,6 +209,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public void DetermineInitialAgentLocation(IAgent agent, TeleportFlags teleportFlags, Vector3 destinationLocation, Vector3 destinationLookAt)
         {
+            UUI agentOwner = agent.Owner;
             GridVector size = RegionData.Size;
             if (destinationLocation.X < 0 || destinationLocation.X >= size.X)
             {
@@ -205,9 +223,9 @@ namespace SilverSim.Scene.Types.Scene
             ParcelInfo p = Parcels[destinationLocation];
             EstateInfo estateInfo;
 
-            if (!p.Owner.EqualsGrid(agent.Owner) &&
-                !IsEstateManager(agent.Owner) &&
-                !IsPossibleGod(agent.Owner))
+            if (!p.Owner.EqualsGrid(agentOwner) &&
+                !IsEstateManager(agentOwner) &&
+                !IsPossibleGod(agentOwner))
             {
                 estateInfo = CheckEstateRights(agent);
                 if(RegionSettings.TelehubObject != UUID.Zero && (estateInfo.Flags & RegionOptionFlags.AllowDirectTeleport) == 0)

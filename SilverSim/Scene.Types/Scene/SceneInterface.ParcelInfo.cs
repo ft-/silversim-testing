@@ -174,6 +174,7 @@ namespace SilverSim.Scene.Types.Scene
 
         [PacketHandler(MessageType.ParcelInfoRequest)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleParcelInfoRequest(Message m)
         {
             ParcelInfoRequest req = (ParcelInfoRequest)m;
@@ -299,6 +300,7 @@ namespace SilverSim.Scene.Types.Scene
 
         [PacketHandler(MessageType.ParcelPropertiesRequest)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleParcelPropertiesRequest(Message m)
         {
             Dictionary<UUID, ParcelInfo> results = new Dictionary<UUID, ParcelInfo>();
@@ -371,6 +373,7 @@ namespace SilverSim.Scene.Types.Scene
 
         [PacketHandler(MessageType.ParcelPropertiesRequestByID)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleParcelPropertiesRequestByID(Message m)
         {
             ParcelPropertiesRequestByID req = (ParcelPropertiesRequestByID)m;

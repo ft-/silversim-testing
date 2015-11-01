@@ -7,6 +7,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using ThreadedClasses;
@@ -49,6 +50,7 @@ namespace SilverSim.Scene.Types.Object
 
         /* property here instead of a method. A lot more clear that we update something. */
         object m_PhysicsUpdateLock = new object();
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public PhysicsStateData PhysicsUpdate
         {
             set
@@ -74,6 +76,7 @@ namespace SilverSim.Scene.Types.Object
         bool m_IsVolumeDetect;
         double m_Buoyancy;
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         struct VehicleParams
         {
             public VehicleType VehicleType;
@@ -341,6 +344,7 @@ namespace SilverSim.Scene.Types.Object
                 TriggerOnUpdate(UpdateChangedFlags.Physics);
             }
         }
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public VehicleFlags SetVehicleFlags
         { 
             set
@@ -355,6 +359,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public VehicleFlags ClearVehicleFlags 
         {
             set

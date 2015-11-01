@@ -61,6 +61,26 @@ namespace SilverSim.Scene.Types
             o.m_Value = a.m_Value - b.m_Value;
             return o;
         }
+
+        public static bool operator==(Angle a, Angle b)
+        {
+            return a.Equals(b);
+        }
+
+        public static bool operator!=(Angle a, Angle b)
+        {
+            return !a.Equals(b);
+        }
+
+        public static bool operator>(Angle a, Angle b)
+        {
+            return a.m_Value > b.m_Value;
+        }
+
+        public static bool operator <(Angle a, Angle b)
+        {
+            return a.m_Value < b.m_Value;
+        }
         #endregion
 
         public int CompareTo(Angle a)
@@ -71,6 +91,20 @@ namespace SilverSim.Scene.Types
         public bool Equals(Angle a)
         {
             return m_Value.Equals(a.m_Value);
+        }
+
+        public override bool Equals(object a)
+        {
+            if (a is Angle)
+            {
+                return m_Value.Equals((Angle)a);
+            }
+            return false;
+        }
+
+        public override int GetHashCode()
+        {
+            return m_Value.GetHashCode();
         }
 
         public static readonly Angle Zero = new Angle(0f);

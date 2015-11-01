@@ -2,10 +2,13 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Physics.Vehicle
 {
     [Flags]
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
+    [SuppressMessage("Gendarme.Rules.Design", "FlagsShouldNotDefineAZeroValueRule")]
     public enum VehicleFlags : int
     {
         None = 0,

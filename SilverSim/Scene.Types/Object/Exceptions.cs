@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Runtime.Serialization;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -12,12 +13,48 @@ namespace SilverSim.Scene.Types.Object
         {
 
         }
+
+        public InvalidObjectXmlException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected InvalidObjectXmlException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public InvalidObjectXmlException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+
+        }
     }
 
     [Serializable]
-    public class ObjectDeserializationFailedDueKey : Exception
+    public class ObjectDeserializationFailedDueKeyException : Exception
     {
-        public ObjectDeserializationFailedDueKey()
+        public ObjectDeserializationFailedDueKeyException()
+        {
+
+        }
+
+        public ObjectDeserializationFailedDueKeyException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected ObjectDeserializationFailedDueKeyException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public ObjectDeserializationFailedDueKeyException(string message, Exception innerException)
+            : base(message, innerException)
         {
 
         }

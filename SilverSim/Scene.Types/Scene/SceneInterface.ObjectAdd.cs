@@ -35,9 +35,10 @@ namespace SilverSim.Scene.Types.Scene
             group.Name = "Primitive";
             IAgent agent;
             agent = Agents[p.AgentID];
-            group.Owner = agent.Owner;
-            group.LastOwner = agent.Owner;
-            part.Creator = agent.Owner;
+            UUI agentOwner = agent.Owner;
+            group.Owner = agentOwner;
+            group.LastOwner = agentOwner;
+            part.Creator = agentOwner;
             SilverSim.Scene.Types.Object.ObjectPart.PrimitiveShape pshape;
             pshape = part.Shape;
             pshape.PCode = p.PCode;

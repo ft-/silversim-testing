@@ -8,6 +8,7 @@ using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -324,6 +325,7 @@ namespace SilverSim.Scene.Types.Object
                 ProfileEnd = shape.ProfileEnd;
             }
 
+            [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
             public struct Decoded
             {
                 #region Overall Params
@@ -954,6 +956,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
         #region Primitive Methods
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public void GetPrimitiveParams(AnArray.Enumerator enumerator, ref AnArray paramList)
         {
             switch (ParamsHelper.GetPrimParamType(enumerator))
@@ -1192,6 +1195,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int ALL_SIDES = -1;
 
 
@@ -1222,6 +1226,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public void SetPrimitiveParams(AnArray.MarkEnumerator enumerator)
         {
             switch (ParamsHelper.GetPrimParamType(enumerator))
@@ -1496,6 +1501,8 @@ namespace SilverSim.Scene.Types.Object
         #region TextureEntryFace functions
         const int PRIM_ALPHA_MODE_BLEND = 1;
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public void GetTexPrimitiveParams(TextureEntryFace face, PrimitiveParamsType type, ref AnArray paramList)
         {
             switch (type)
@@ -1634,6 +1641,7 @@ namespace SilverSim.Scene.Types.Object
             throw new ArgumentException("texture does not name either a inventory item or a uuid");
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void SetTexPrimitiveParams(TextureEntryFace face, PrimitiveParamsType type, AnArray.MarkEnumerator enumerator)
         {
             switch (type)

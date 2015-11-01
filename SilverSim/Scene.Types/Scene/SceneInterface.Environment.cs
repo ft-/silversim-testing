@@ -13,6 +13,7 @@ using SilverSim.Viewer.Messages.Region;
 using SilverSim.Viewer.Messages;
 using System.Threading;
 using SilverSim.Scene.Types.WindLight;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -70,6 +71,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
+            [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
             public struct WindlightSkyData
             {
                 public WLVector4 Ambient;
@@ -99,6 +101,7 @@ namespace SilverSim.Scene.Types.Scene
                 public double SunMoonPosition;
             }
 
+            [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
             public struct WindlightWaterData
             {
                 public Vector3 BigWaveDirection;
@@ -115,6 +118,7 @@ namespace SilverSim.Scene.Types.Scene
                 public double FogDensityExponent;
             }
 
+            [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
             public struct SunData
             {
                 public UInt64 UsecSinceStart;
@@ -147,6 +151,7 @@ namespace SilverSim.Scene.Types.Scene
                     m_Controller = controller;
                 }
 
+                [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
                 public WindVector this[int y, int x]
                 {
                     get

@@ -5,9 +5,11 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
+    [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public class DefaultSceneObjectGroupInterface : ISceneObjectGroups
     {
         private SceneInterface m_Scene;
@@ -55,17 +57,19 @@ namespace SilverSim.Scene.Types.Scene
             return grp != null;
         }
 
+        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         public IEnumerator<ObjectGroup> GetEnumerator()
         {
             return new ObjectGroupEnumerator(m_Scene.Objects.GetEnumerator());
         }
 
+        [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
         }
 
-        public class ObjectGroupEnumerator : IEnumerator<ObjectGroup>
+        public sealed class ObjectGroupEnumerator : IEnumerator<ObjectGroup>
         {
             IEnumerator m_Enum;
 

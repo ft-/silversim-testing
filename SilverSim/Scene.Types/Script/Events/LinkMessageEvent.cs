@@ -2,9 +2,11 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Script.Events
 {
+    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct LinkMessageEvent : IScriptEvent
     {
         public int SenderNumber;

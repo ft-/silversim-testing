@@ -14,6 +14,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         [PacketHandler(MessageType.ScriptAnswerYes)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleScriptAnswerYes(Message m)
         {
             ScriptAnswerYes req = (ScriptAnswerYes)m;
@@ -48,6 +49,7 @@ namespace SilverSim.Scene.Types.Scene
 
         [PacketHandler(MessageType.RevokePermissions)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleRevokePermissions(Message m)
         {
             RevokePermissions req = (RevokePermissions)m;

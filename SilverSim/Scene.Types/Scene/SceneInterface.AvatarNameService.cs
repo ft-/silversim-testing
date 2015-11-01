@@ -8,6 +8,7 @@ using System.Text;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.Types;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -22,6 +23,8 @@ namespace SilverSim.Scene.Types.Scene
                 m_ServiceList = serviceList;
             }
 
+            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public override UUI this[string firstName, string lastName]
             {
                 get 
@@ -69,6 +72,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
+            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public override List<UUI> Search(string[] names)
             {
                 Dictionary<UUID, UUI> results = new Dictionary<UUID, UUI>();
@@ -92,6 +96,7 @@ namespace SilverSim.Scene.Types.Scene
                 return new List<UUI>(results.Values);
             }
 
+            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
             public override UUI this[UUID key]
             {
                 get

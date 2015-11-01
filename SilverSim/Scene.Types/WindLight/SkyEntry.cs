@@ -2,10 +2,12 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.WindLight
 {
+    [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct SkyEntry
     {
         public Vector4 Ambient;
@@ -34,6 +36,7 @@ namespace SilverSim.Scene.Types.WindLight
         public double SunAngle;
         public Vector4 SunlightColor;
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public SkyEntry(Map m)
         {
             AnArray a;

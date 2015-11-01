@@ -8,9 +8,11 @@ using SilverSim.Types;
 using SilverSim.Types.Script;
 using SilverSim.Viewer.Messages.Agent;
 using SilverSim.Viewer.Messages.Avatar;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Agent
 {
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public class AgentAnimationController
     {
         static readonly string[] m_AnimStates = new string[] {
@@ -43,6 +45,7 @@ namespace SilverSim.Scene.Types.Agent
 
         string m_CurrentDefaultAnimation = "standing";
         uint m_NextAnimSeqNumber;
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         struct AnimationInfo
         {
             public UUID AnimID;

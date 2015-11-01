@@ -14,11 +14,13 @@ using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Xml;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
 {
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public partial class ObjectGroup : RwLockedSortedDoubleDictionary<int, UUID, ObjectPart>, IObject
     {
         static IScriptCompilerRegistry m_CompilerRegistry;
@@ -60,10 +62,15 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int LINK_SET = -1;
+        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int LINK_ALL_OTHERS = -2;
+        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int LINK_ALL_CHILDREN = -3;
+        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int LINK_THIS = -4;
+        [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public const int LINK_ROOT = 1;
 
         private bool m_IsTempOnRez;
@@ -166,6 +173,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void TriggerOnUpdate(UpdateChangedFlags flags)
         {
             if (Count == 0)
@@ -1162,13 +1170,16 @@ namespace SilverSim.Scene.Types.Object
                     throw new InvalidObjectXmlException();
                 }
 
+                bool isEmptyElement = reader.IsEmptyElement;
+                string nodeName = reader.Name;
+
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        switch (reader.Name)
+                        switch (nodeName)
                         {
                             case "SceneObjectPart":
-                                if (reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
@@ -1186,7 +1197,7 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case XmlNodeType.EndElement:
-                        if (reader.Name != "Part")
+                        if (nodeName != "Part")
                         {
                             throw new InvalidObjectXmlException();
                         }
@@ -1195,6 +1206,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         static void FromXmlOtherParts(XmlTextReader reader, ObjectGroup group, UUI currentOwner)
         {
             ObjectPart part;
@@ -1211,13 +1223,16 @@ namespace SilverSim.Scene.Types.Object
                     throw new InvalidObjectXmlException();
                 }
 
+                bool isEmptyElement = reader.IsEmptyElement;
+                string nodeName = reader.Name;
+
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        switch (reader.Name)
+                        switch (nodeName)
                         {
                             case "Part":
-                                if (reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
@@ -1226,7 +1241,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "SceneObjectPart":
-                                if (reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
@@ -1238,7 +1253,7 @@ namespace SilverSim.Scene.Types.Object
                                 }
                                 catch
                                 {
-                                    throw new ObjectDeserializationFailedDueKey();
+                                    throw new ObjectDeserializationFailedDueKeyException();
                                 }
                                 break;
 
@@ -1249,7 +1264,7 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case XmlNodeType.EndElement:
-                        if (reader.Name != "OtherParts")
+                        if (nodeName != "OtherParts")
                         {
                             throw new InvalidObjectXmlException();
                         }
@@ -1279,17 +1294,20 @@ namespace SilverSim.Scene.Types.Object
                     throw new InvalidObjectXmlException();
                 }
 
+                string nodeName = reader.Name;
+                bool isEmptyElement = reader.IsEmptyElement;
+
                 switch(reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        switch (reader.Name)
+                        switch (nodeName)
                         {
                             case "SceneObjectPart":
                                 if(rootPart != null)
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                if (reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
@@ -1308,7 +1326,7 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case XmlNodeType.EndElement:
-                        if(reader.Name != "RootPart")
+                        if(nodeName != "RootPart")
                         {
                             throw new InvalidObjectXmlException();
                         }
@@ -1337,13 +1355,15 @@ namespace SilverSim.Scene.Types.Object
                     throw new InvalidObjectXmlException();
                 }
 
+                bool isEmptyElement = reader.IsEmptyElement;
+                string nodeName = reader.Name;
                 switch (reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        switch (reader.Name)
+                        switch (nodeName)
                         {
                             case "RootPart":
-                                if (reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
@@ -1359,7 +1379,7 @@ namespace SilverSim.Scene.Types.Object
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
-                                if (reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     throw new InvalidObjectXmlException();
                                 }
@@ -1372,7 +1392,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "OtherParts":
-                                if (reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     break;
                                 }
@@ -1384,7 +1404,7 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "GroupScriptStates":
-                                if(reader.IsEmptyElement)
+                                if (isEmptyElement)
                                 {
                                     break;
                                 }
@@ -1398,7 +1418,7 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case XmlNodeType.EndElement:
-                        if(reader.Name != "SceneObjectGroup")
+                        if (nodeName != "SceneObjectGroup")
                         {
                             throw new InvalidObjectXmlException();
                         }
@@ -1437,14 +1457,17 @@ namespace SilverSim.Scene.Types.Object
                     throw new InvalidObjectXmlException();
                 }
 
+                bool isEmptyElement = reader.IsEmptyElement;
+                string nodeName = reader.Name;
+
                 switch(reader.NodeType)
                 {
                     case XmlNodeType.Element:
-                        if (reader.IsEmptyElement)
+                        if (isEmptyElement)
                         {
                             break;
                         }
-                        switch(reader.Name)
+                        switch (nodeName)
                         {
                             case "SavedScriptState":
                                 itemID = UUID.Zero;
@@ -1455,7 +1478,10 @@ namespace SilverSim.Scene.Types.Object
                                         switch (reader.Name)
                                         {
                                             case "UUID":
-                                                itemID = UUID.Parse(reader.Value);
+                                                if(!UUID.TryParse(reader.Value, out itemID))
+                                                {
+                                                    throw new InvalidObjectXmlException();
+                                                }
                                                 break;
 
                                             default:
@@ -1475,7 +1501,7 @@ namespace SilverSim.Scene.Types.Object
                         break;
 
                     case XmlNodeType.EndElement:
-                        if(reader.Name != "GroupScriptStates")
+                        if (nodeName != "GroupScriptStates")
                         {
                             throw new InvalidObjectXmlException();
                         }
@@ -1487,6 +1513,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         static void FromXmlSavedScriptStateInner(XmlTextReader reader, ObjectGroup group, UUID itemID)
         {
             string tagname = reader.Name;

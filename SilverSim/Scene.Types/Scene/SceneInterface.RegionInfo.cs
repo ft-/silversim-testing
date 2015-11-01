@@ -17,6 +17,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         [PacketHandler(MessageType.RegionHandleRequest)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleRegionHandleRequest(Message m)
         {
             SilverSim.Viewer.Messages.Region.RegionHandleRequest req = (SilverSim.Viewer.Messages.Region.RegionHandleRequest)m;

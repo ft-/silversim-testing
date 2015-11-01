@@ -3,6 +3,7 @@
 
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Types;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Physics
 {
@@ -22,6 +23,7 @@ namespace SilverSim.Scene.Types.Physics
         }
 
         #region Injecting parameters properties
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 DeltaLinearVelocity 
         { 
             set 
@@ -29,6 +31,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 DeltaAngularVelocity 
         {
             set 
@@ -36,11 +39,16 @@ namespace SilverSim.Scene.Types.Physics
             } 
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 AppliedForce { set { } }
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 AppliedTorque { set { } }
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 LinearImpulse { set { } }
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 AngularImpulse { set { } }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 ControlTargetVelocity { set { } }
         #endregion
 
@@ -133,6 +141,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public VehicleFlags SetVehicleFlags
         {
             set
@@ -141,6 +150,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public VehicleFlags ClearVehicleFlags
         {
             set

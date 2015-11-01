@@ -88,11 +88,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if(!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -101,11 +97,7 @@ namespace SilverSim.Scene.Types.Scene
             foreach(MultipleObjectUpdate.ObjectDataEntry d in req.ObjectData)
             {
                 ObjectPart prim;
-                try
-                {
-                    prim = Primitives[d.ObjectLocalID];
-                }
-                catch
+                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
                 {
                     continue;
                 }
@@ -186,11 +178,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if (!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -198,11 +186,7 @@ namespace SilverSim.Scene.Types.Scene
             foreach (SilverSim.Viewer.Messages.Object.ObjectRotation.Data d in req.ObjectData)
             {
                 ObjectPart prim;
-                try
-                {
-                    prim = Primitives[d.ObjectLocalID];
-                }
-                catch
+                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
                 {
                     continue;
                 }
@@ -232,11 +216,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if (!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -244,11 +224,7 @@ namespace SilverSim.Scene.Types.Scene
             foreach (SilverSim.Viewer.Messages.Object.ObjectPosition.ObjectDataEntry d in req.ObjectData)
             {
                 ObjectPart prim;
-                try
-                {
-                    prim = Primitives[d.ObjectLocalID];
-                }
-                catch
+                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
                 {
                     continue;
                 }
@@ -278,11 +254,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if (!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -290,11 +262,7 @@ namespace SilverSim.Scene.Types.Scene
             foreach (SilverSim.Viewer.Messages.Object.ObjectScale.ObjectDataEntry d in req.ObjectData)
             {
                 ObjectPart prim;
-                try
-                {
-                    prim = Primitives[d.ObjectLocalID];
-                }
-                catch
+                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
                 {
                     continue;
                 }
@@ -348,11 +316,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if (!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -360,11 +324,7 @@ namespace SilverSim.Scene.Types.Scene
             foreach (SilverSim.Viewer.Messages.Object.ObjectName.Data d in req.ObjectData)
             {
                 ObjectPart prim;
-                try
-                {
-                    prim = Primitives[d.ObjectLocalID];
-                }
-                catch
+                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
                 {
                     continue;
                 }
@@ -414,11 +374,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if (!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -426,11 +382,7 @@ namespace SilverSim.Scene.Types.Scene
             foreach(UInt32 d in req.ObjectList)
             {
                 ObjectPart prim;
-                try
-                {
-                    prim = Primitives[d];
-                }
-                catch
+                if (!Primitives.TryGetValue(d, out prim))
                 {
                     continue;
                 }
@@ -480,11 +432,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if (!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -492,11 +440,7 @@ namespace SilverSim.Scene.Types.Scene
             foreach(SilverSim.Viewer.Messages.Object.ObjectMaterial.Data d in req.ObjectData)
             {
                 ObjectPart prim;
-                try
-                {
-                    prim = Primitives[d.ObjectLocalID];
-                }
-                catch
+                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
                 {
                     continue;
                 }
@@ -521,11 +465,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if (!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -553,11 +493,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if (!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -567,11 +503,7 @@ namespace SilverSim.Scene.Types.Scene
             ObjectProperties props = null;
             foreach(uint primLocalID in req.ObjectData)
             {
-                try
-                {
-                    part = Primitives[primLocalID];
-                }
-                catch
+                if (!Primitives.TryGetValue(primLocalID, out part))
                 {
                     continue;
                 }
@@ -633,11 +565,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if (!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -645,11 +573,7 @@ namespace SilverSim.Scene.Types.Scene
             foreach (SilverSim.Viewer.Messages.Object.ObjectDescription.Data d in req.ObjectData)
             {
                 ObjectPart prim;
-                try
-                {
-                    prim = Primitives[d.ObjectLocalID];
-                }
-                catch
+                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
                 {
                     continue;
                 }
@@ -674,11 +598,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if (!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -688,11 +608,7 @@ namespace SilverSim.Scene.Types.Scene
             ObjectProperties props = null;
             foreach (uint primLocalID in req.ObjectData)
             {
-                try
-                {
-                    part = Primitives[primLocalID];
-                }
-                catch
+                if(!Primitives.TryGetValue(primLocalID, out part))
                 {
                     continue;
                 }
@@ -813,24 +729,16 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
             ObjectPart part;
-            try
-            {
-                part = Primitives[req.ObjectID];
-            }
-            catch
+            if(!Primitives.TryGetValue(req.ObjectID, out part))
             {
                 return;
             }
             ObjectPropertiesFamily res = part.PropertiesFamily;
             res.RequestFlags = req.RequestFlags;
-            try
+            IAgent agent;
+            if (Agents.TryGetValue(req.AgentID, out agent))
             {
-                IAgent agent = Agents[req.AgentID];
                 agent.SendMessageAlways(res, ID);
-            }
-            catch
-            {
-
             }
         }
     }

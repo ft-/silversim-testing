@@ -8,6 +8,7 @@ using SilverSim.Types.Primitive;
 using System;
 using System.IO;
 using System.IO.Compression;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Object.Mesh
 {
@@ -25,6 +26,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal static Mesh LLMeshToMesh(this Stream st, ObjectPart.PrimitiveShape.Decoded shape, bool usePhysicsMesh)
         {
             /* this is a format of multiple parts */

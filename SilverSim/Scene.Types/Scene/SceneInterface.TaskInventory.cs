@@ -20,6 +20,7 @@ namespace SilverSim.Scene.Types.Scene
         [PacketHandler(MessageType.RequestTaskInventory)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         [SuppressMessage("Gendarme.Rules.Correctness", "ProvideCorrectArgumentsToFormattingMethodsRule")] /* gendarme does not catch all */
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleRequestTaskInventory(Message m)
         {
             RequestTaskInventory req = (RequestTaskInventory)m;

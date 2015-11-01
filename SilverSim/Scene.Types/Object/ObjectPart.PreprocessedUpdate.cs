@@ -3,6 +3,7 @@
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 
@@ -120,7 +121,7 @@ namespace SilverSim.Scene.Types.Object
             BlockLength = JointAxisOrAnchor + 12
         }
 
-        enum PropertiesFixedBlockOffset : int
+        public enum PropertiesFixedBlockOffset : int
         {
             ObjectID = 0,
             CreatorID = ObjectID + 16,
@@ -148,6 +149,8 @@ namespace SilverSim.Scene.Types.Object
         }
 
         [Flags]
+        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
+        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum UpdateDataFlags : uint
         {
             Full = 1,
@@ -170,6 +173,7 @@ namespace SilverSim.Scene.Types.Object
             UpdateData(flags, true);
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void UpdateData(UpdateDataFlags flags, bool incSerial)
         {
             lock (m_UpdateDataLock)

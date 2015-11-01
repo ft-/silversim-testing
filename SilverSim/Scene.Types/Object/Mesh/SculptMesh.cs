@@ -7,6 +7,7 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -31,8 +32,10 @@ namespace SilverSim.Scene.Types.Object.Mesh
         {
             using (Image im = J2kImage.FromStream(st))
             {
-                Bitmap bitmap = new Bitmap(im);
-                return bitmap.SculptMeshToMesh(shape);
+                using (Bitmap bitmap = new Bitmap(im))
+                {
+                    return bitmap.SculptMeshToMesh(shape);
+                }
             }
         }
 
@@ -54,6 +57,7 @@ namespace SilverSim.Scene.Types.Object.Mesh
             return v;
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         internal static Mesh SculptMeshToMesh(this Bitmap bitmap, ObjectPart.PrimitiveShape.Decoded shape)
         {
             bool mirror = shape.IsSculptMirrored;

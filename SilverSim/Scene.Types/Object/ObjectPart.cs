@@ -18,9 +18,11 @@ using System.IO;
 using System.Text;
 using System.Xml;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Object
 {
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public partial class ObjectPart : IObject
     {
         private static readonly ILog m_Log = LogManager.GetLogger("OBJECT PART");
@@ -164,6 +166,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public PhysicsStateData PhysicsUpdate
         {
             set
@@ -220,6 +223,7 @@ namespace SilverSim.Scene.Types.Object
             TriggerOnUpdate(UpdateChangedFlags.Inventory);
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void TriggerOnUpdate(UpdateChangedFlags flags)
         {
             /* we have to check the ObjectGroup during setup process before using it here */
@@ -253,6 +257,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void TriggerOnPositionChange()
         {
             /* we have to check the ObjectGroup during setup process before using it here */
@@ -1588,6 +1593,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region XML Deserialization
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         static void ShapeFromXml(ObjectPart part, ObjectGroup rootGroup, XmlTextReader reader)
         {
             PrimitiveShape shape = new PrimitiveShape();
@@ -1907,6 +1913,8 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public static ObjectPart FromXml(XmlTextReader reader, ObjectGroup rootGroup, UUI currentOwner)
         {
             ObjectPart part = new ObjectPart();
@@ -2368,21 +2376,24 @@ namespace SilverSim.Scene.Types.Object
                                     {
                                         if (!string.IsNullOrEmpty(json))
                                         {
-                                            Map m = Json.Deserialize(new MemoryStream(UTF8NoBOM.GetBytes(json))) as Map;
-                                            if (null != m)
+                                            using (MemoryStream ms = new MemoryStream(UTF8NoBOM.GetBytes(json)))
                                             {
-                                                if (m.ContainsKey("SavedAttachedPos") && m["SavedAttachedPos"] is AnArray && rootGroup != null)
+                                                Map m = Json.Deserialize(ms) as Map;
+                                                if (null != m)
                                                 {
-                                                    AnArray a = (AnArray)(m["SavedAttachedPos"]);
-                                                    if (a.Count == 3)
+                                                    if (m.ContainsKey("SavedAttachedPos") && m["SavedAttachedPos"] is AnArray && rootGroup != null)
                                                     {
-                                                        rootGroup.AttachedPos = new Vector3(a[0].AsReal, a[1].AsReal, a[2].AsReal);
+                                                        AnArray a = (AnArray)(m["SavedAttachedPos"]);
+                                                        if (a.Count == 3)
+                                                        {
+                                                            rootGroup.AttachedPos = new Vector3(a[0].AsReal, a[1].AsReal, a[2].AsReal);
+                                                        }
                                                     }
-                                                }
-                                                
-                                                if (m.ContainsKey("SavedAttachmentPoint") && rootGroup != null)
-                                                {
-                                                    rootGroup.AttachPoint = (AttachmentPoint)(m["SavedAttachmentPoint"].AsInt);
+
+                                                    if (m.ContainsKey("SavedAttachmentPoint") && rootGroup != null)
+                                                    {
+                                                        rootGroup.AttachPoint = (AttachmentPoint)(m["SavedAttachmentPoint"].AsInt);
+                                                    }
                                                 }
                                             }
                                         }

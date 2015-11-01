@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -31,10 +32,12 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         throw new AssetNotFoundException(key);
                     }
-                    Stream resource = GetType().Assembly.GetManifestResourceStream(resourcename);
-                    using(GZipStream gz = new GZipStream(resource, CompressionMode.Decompress))
+                    using (Stream resource = GetType().Assembly.GetManifestResourceStream(resourcename))
                     {
-                        return AssetXml.ParseAssetData(gz);
+                        using (GZipStream gz = new GZipStream(resource, CompressionMode.Decompress))
+                        {
+                            return AssetXml.ParseAssetData(gz);
+                        }
                     }
                 });
             }
@@ -84,6 +87,7 @@ namespace SilverSim.Scene.Types.Scene
                 m_ResourceAssets = resourceAssets;
             }
 
+            [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
             public override Stream this[UUID key]
             {
                 get

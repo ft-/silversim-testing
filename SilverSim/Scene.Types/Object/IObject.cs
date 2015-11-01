@@ -8,6 +8,7 @@ using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
@@ -166,6 +167,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
         /* property here instead of a method. A lot more clear that we update something. */
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         PhysicsStateData PhysicsUpdate
         {
             set;
@@ -186,20 +188,22 @@ namespace SilverSim.Scene.Types.Object
         #region List Access Helpers
         public static PrimitiveParamsType GetPrimParamType(IEnumerator<IValue> enumerator)
         {
-            if (enumerator.Current.LSL_Type != LSLValueType.Integer)
+            IValue current = enumerator.Current;
+            if (current.LSL_Type != LSLValueType.Integer)
             {
-                throw new ArgumentException("Expecting an integer parameter for parameter type: got " + enumerator.Current.LSL_Type.ToString());
+                throw new ArgumentException("Expecting an integer parameter for parameter type: got " + current.LSL_Type.ToString());
             }
-            return (PrimitiveParamsType)enumerator.Current.AsInt;
+            return (PrimitiveParamsType)current.AsInt;
         }
 
         public static ObjectDetailsType GetObjectDetailsType(IEnumerator<IValue> enumerator)
         {
-            if (enumerator.Current.LSL_Type != LSLValueType.Integer)
+            IValue current = enumerator.Current;
+            if (current.LSL_Type != LSLValueType.Integer)
             {
-                throw new ArgumentException("Expecting an integer parameter for object details type: got " + enumerator.Current.LSL_Type.ToString());
+                throw new ArgumentException("Expecting an integer parameter for object details type: got " + current.LSL_Type.ToString());
             }
-            return (ObjectDetailsType)enumerator.Current.AsInt;
+            return (ObjectDetailsType)current.AsInt;
         }
 
         public static int GetInteger(IEnumerator<IValue> enumerator, string paraName)
@@ -208,11 +212,12 @@ namespace SilverSim.Scene.Types.Object
             {
                 throw new ArgumentException("No parameter for " + paraName);
             }
-            if (enumerator.Current.LSL_Type != LSLValueType.Integer)
+            IValue current = enumerator.Current;
+            if (current.LSL_Type != LSLValueType.Integer)
             {
-                throw new ArgumentException("Expecting an integer parameter for " + paraName + ": got " + enumerator.Current.LSL_Type.ToString());
+                throw new ArgumentException("Expecting an integer parameter for " + paraName + ": got " + current.LSL_Type.ToString());
             }
-            return enumerator.Current.AsInt;
+            return current.AsInt;
         }
 
         public static bool GetBoolean(IEnumerator<IValue> enumerator, string paraName)
@@ -221,11 +226,12 @@ namespace SilverSim.Scene.Types.Object
             {
                 throw new ArgumentException("No parameter for " + paraName);
             }
-            if (enumerator.Current.LSL_Type != LSLValueType.Integer)
+            IValue current = enumerator.Current;
+            if (current.LSL_Type != LSLValueType.Integer)
             {
-                throw new ArgumentException("Expecting an integer parameter for " + paraName + ": got " + enumerator.Current.LSL_Type.ToString());
+                throw new ArgumentException("Expecting an integer parameter for " + paraName + ": got " + current.LSL_Type.ToString());
             }
-            return enumerator.Current.AsBoolean;
+            return current.AsBoolean;
         }
 
         public static string GetString(IEnumerator<IValue> enumerator, string paraName)
@@ -234,11 +240,13 @@ namespace SilverSim.Scene.Types.Object
             {
                 throw new ArgumentException("No parameter for " + paraName);
             }
-            if (enumerator.Current.LSL_Type != LSLValueType.String && enumerator.Current.LSL_Type != LSLValueType.Key)
+            IValue current = enumerator.Current;
+            LSLValueType lslType = current.LSL_Type;
+            if (lslType != LSLValueType.String && lslType != LSLValueType.Key)
             {
-                throw new ArgumentException("Expecting a string parameter for " + paraName + ": got " + enumerator.Current.LSL_Type.ToString());
+                throw new ArgumentException("Expecting a string parameter for " + paraName + ": got " + current.LSL_Type.ToString());
             }
-            return enumerator.Current.ToString();
+            return current.ToString();
         }
 
         public static UUID GetKey(IEnumerator<IValue> enumerator, string paraName)
@@ -247,11 +255,13 @@ namespace SilverSim.Scene.Types.Object
             {
                 throw new ArgumentException("No parameter for " + paraName);
             }
-            if (enumerator.Current.LSL_Type != LSLValueType.String && enumerator.Current.LSL_Type != LSLValueType.Key)
+            IValue current = enumerator.Current;
+            LSLValueType lslType = current.LSL_Type;
+            if (lslType != LSLValueType.String && lslType != LSLValueType.Key)
             {
-                throw new ArgumentException("Expecting a key parameter for " + paraName + ": got " + enumerator.Current.LSL_Type.ToString());
+                throw new ArgumentException("Expecting a key parameter for " + paraName + ": got " + current.LSL_Type.ToString());
             }
-            return enumerator.Current.AsUUID;
+            return current.AsUUID;
         }
 
         public static double GetDouble(IEnumerator<IValue> enumerator, string paraName)
@@ -260,11 +270,12 @@ namespace SilverSim.Scene.Types.Object
             {
                 throw new ArgumentException("No parameter for " + paraName);
             }
-            if (enumerator.Current.LSL_Type != LSLValueType.Float)
+            IValue current = enumerator.Current;
+            if (current.LSL_Type != LSLValueType.Float)
             {
-                throw new ArgumentException("Expecting a float parameter for " + paraName + ": got " + enumerator.Current.LSL_Type.ToString());
+                throw new ArgumentException("Expecting a float parameter for " + paraName + ": got " + current.LSL_Type.ToString());
             }
-            return enumerator.Current.AsReal;
+            return current.AsReal;
         }
 
         public static Quaternion GetRotation(IEnumerator<IValue> enumerator, string paraName)
@@ -273,11 +284,12 @@ namespace SilverSim.Scene.Types.Object
             {
                 throw new ArgumentException("No parameter for " + paraName);
             }
-            if (enumerator.Current.LSL_Type != LSLValueType.Rotation)
+            IValue current = enumerator.Current;
+            if (current.LSL_Type != LSLValueType.Rotation)
             {
-                throw new ArgumentException("Expecting a rotation parameter for " + paraName + ": got " + enumerator.Current.LSL_Type.ToString());
+                throw new ArgumentException("Expecting a rotation parameter for " + paraName + ": got " + current.LSL_Type.ToString());
             }
-            return enumerator.Current.AsQuaternion;
+            return current.AsQuaternion;
         }
 
         public static Vector3 GetVector(IEnumerator<IValue> enumerator, string paraName)
@@ -286,11 +298,12 @@ namespace SilverSim.Scene.Types.Object
             {
                 throw new ArgumentException("No parameter for " + paraName);
             }
-            if (enumerator.Current.LSL_Type != LSLValueType.Vector)
+            IValue current = enumerator.Current;
+            if (current.LSL_Type != LSLValueType.Vector)
             {
-                throw new ArgumentException("Expecting a vector parameter for " + paraName + ": got " + enumerator.Current.LSL_Type.ToString());
+                throw new ArgumentException("Expecting a vector parameter for " + paraName + ": got " + current.LSL_Type.ToString());
             }
-            return enumerator.Current.AsVector3;
+            return current.AsVector3;
         }
         #endregion
     }

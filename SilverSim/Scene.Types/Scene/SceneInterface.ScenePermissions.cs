@@ -10,6 +10,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Types.Parcel;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types.Inventory;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -17,12 +18,13 @@ namespace SilverSim.Scene.Types.Scene
     {
         GroupPowers GetGroupPowers(IAgent agent, UGI group)
         {
+            UUI agentOwner = agent.Owner;
             if(!IsGroupMember(agent, group))
             {
                 return GroupPowers.None;
             }
 
-            List<GroupRole> roles = GroupsService.Roles[agent.Owner, group, agent.Owner];
+            List<GroupRole> roles = GroupsService.Roles[agentOwner, group, agentOwner];
             GroupPowers powers = GroupPowers.None;
             foreach (GroupRole role in roles)
             {
@@ -37,8 +39,11 @@ namespace SilverSim.Scene.Types.Scene
             return (GetGroupPowers(agent, group) & power) != 0;
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         bool IsGroupMember(IAgent agent, UGI group)
         {
+            UUI agentOwner = agent.Owner;
+
             if (null == GroupsService || group.ID == UUID.Zero)
             {
                 return false;
@@ -46,7 +51,7 @@ namespace SilverSim.Scene.Types.Scene
             GroupMember member;
             try
             {
-                member = GroupsService.Members[agent.Owner, group, agent.Owner];
+                member = GroupsService.Members[agentOwner, group, agentOwner];
             }
             catch
             {
@@ -54,7 +59,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             /* care more for permissions by checking grid equality */
-            if (!member.Principal.EqualsGrid(agent.Owner))
+            if (!member.Principal.EqualsGrid(agentOwner))
             {
                 return false;
             }
@@ -71,6 +76,7 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool IsPossibleGod(UUI agent)
         {
             if (agent.EqualsGrid(Owner))
@@ -126,14 +132,11 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         #region Object Permissions
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanRez(IAgent agent, Vector3 location)
         {
             ParcelInfo pinfo;
-            try
-            {
-                pinfo = Parcels[location];
-            }
-            catch
+            if (!Parcels.TryGetValue(location, out pinfo))
             {
                 return false;
             }
@@ -158,14 +161,11 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanRunScript(IAgent agent, Vector3 location)
         {
             ParcelInfo pinfo;
-            try
-            {
-                pinfo = Parcels[location];
-            }
-            catch
+            if(!Parcels.TryGetValue(location, out pinfo))
             {
                 return false;
             }
@@ -190,18 +190,22 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanMove(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            if (IsPossibleGod(agent.Owner))
+            UUI agentOwner = agent.Owner;
+            UUI groupOwner = group.Owner;
+
+            if (IsPossibleGod(agentOwner))
             {
-                if(group.RootPart.IsLocked && group.Owner.EqualsGrid(agent.Owner))
+                if(group.RootPart.IsLocked && groupOwner.EqualsGrid(agentOwner))
                 {
                     return false;
                 }
                 return true;
             }
             /* deny modification of admin objects by non-admins */
-            else if (IsPossibleGod(group.Owner))
+            else if (IsPossibleGod(groupOwner))
             {
                 return false;
             }
@@ -213,7 +217,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             /* check object owner */
-            if (agent.Owner.EqualsGrid(group.Owner))
+            if (agentOwner.EqualsGrid(groupOwner))
             {
                 return true;
             }
@@ -225,7 +229,7 @@ namespace SilverSim.Scene.Types.Scene
 
 #warning Add Friends Rights to CanMove
 
-            if(group.RootPart.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Modify))
+            if(group.RootPart.CheckPermissions(agentOwner, agent.Group, InventoryPermissionsMask.Modify))
             {
                 return true;
             }
@@ -240,10 +244,9 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ParcelInfo pinfo;
-            try
+            if(Parcels.TryGetValue(location, out pinfo))
             {
-                pinfo = Parcels[location];
-                if (pinfo.Owner.EqualsGrid(agent.Owner))
+                if (pinfo.Owner.EqualsGrid(agentOwner))
                 {
                     return true;
                 }
@@ -253,21 +256,22 @@ namespace SilverSim.Scene.Types.Scene
                     return true;
                 }
             }
-            catch
-            {
-            }
 
             return false;
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanEdit(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            if (IsPossibleGod(agent.Owner))
+            UUI agentOwner = agent.Owner;
+            UUI groupOwner = group.Owner;
+
+            if (IsPossibleGod(agentOwner))
             {
                 return true;
             }
             /* deny modification of admin objects by non-admins */
-            else if (IsPossibleGod(group.Owner))
+            else if (IsPossibleGod(groupOwner))
             {
                 return false;
             }
@@ -287,35 +291,35 @@ namespace SilverSim.Scene.Types.Scene
 
 #warning Add Friends Rights to CanEdit
 
-            if (group.RootPart.CheckPermissions(agent.Owner, agent.Group, InventoryPermissionsMask.Modify))
+            if (group.RootPart.CheckPermissions(agentOwner, agent.Group, InventoryPermissionsMask.Modify))
             {
                 return true;
             }
 
             ParcelInfo pinfo;
-            try
+            if(Parcels.TryGetValue(location, out pinfo))
             {
-                pinfo = Parcels[location];
-                if (pinfo.Owner.EqualsGrid(agent.Owner))
+                if (pinfo.Owner.EqualsGrid(agentOwner))
                 {
                     return true;
                 }
-            }
-            catch
-            {
             }
 
             return false;
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanChangeGroup(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            if (IsPossibleGod(agent.Owner))
+            UUI agentOwner = agent.Owner;
+            UUI groupOwner = group.Owner;
+
+            if (IsPossibleGod(agentOwner))
             {
                 return true;
             }
             /* deny modification of admin objects by non-admins */
-            else if (IsPossibleGod(group.Owner))
+            else if (IsPossibleGod(groupOwner))
             {
                 return false;
             }
@@ -336,29 +340,28 @@ namespace SilverSim.Scene.Types.Scene
 #warning Add Friends Rights to CanChangeGroup
 
             ParcelInfo pinfo;
-            try
+            if(Parcels.TryGetValue(location, out pinfo))
             {
-                pinfo = Parcels[location];
-                if (pinfo.Owner.EqualsGrid(agent.Owner))
+                if (pinfo.Owner.EqualsGrid(agentOwner))
                 {
                     return true;
                 }
-            }
-            catch
-            {
             }
 
             return false;
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanDelete(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            if (IsPossibleGod(agent.Owner))
+            UUI agentOwner = agent.Owner;
+            UUI groupOwner = group.Owner;
+            if (IsPossibleGod(agentOwner))
             {
                 return true;
             }
             /* deny modification of admin objects by non-admins */
-            else if (IsPossibleGod(group.Owner))
+            else if (IsPossibleGod(groupOwner))
             {
                 return false;
             }
@@ -370,7 +373,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             /* check object owner */
-            if (agent.Owner.EqualsGrid(group.Owner))
+            if (agentOwner.EqualsGrid(groupOwner))
             {
                 return true;
             }
@@ -388,10 +391,9 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ParcelInfo pinfo;
-            try
+            if(Parcels.TryGetValue(location, out pinfo))
             {
-                pinfo = Parcels[location];
-                if (pinfo.Owner.EqualsGrid(agent.Owner))
+                if (pinfo.Owner.EqualsGrid(agentOwner))
                 {
                     return true;
                 }
@@ -401,21 +403,21 @@ namespace SilverSim.Scene.Types.Scene
                     return true;
                 }
             }
-            catch
-            {
-            }
 
             return false;
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanReturn(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            if (IsPossibleGod(agent.Owner))
+            UUI agentOwner = agent.Owner;
+            UUI groupOwner = group.Owner;
+            if (IsPossibleGod(agentOwner))
             {
                 return true;
             }
             /* deny modification of admin objects by non-admins */
-            else if (IsPossibleGod(group.Owner))
+            else if (IsPossibleGod(groupOwner))
             {
                 return false;
             }
@@ -427,7 +429,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             /* check object owner */
-            if (agent.Owner.EqualsGrid(group.Owner))
+            if (agentOwner.EqualsGrid(groupOwner))
             {
                 return true;
             }
@@ -452,10 +454,9 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ParcelInfo pinfo;
-            try
+            if(Parcels.TryGetValue(location, out pinfo))
             {
-                pinfo = Parcels[location];
-                if (pinfo.Owner.EqualsGrid(agent.Owner))
+                if (pinfo.Owner.EqualsGrid(agentOwner))
                 {
                     return true;
                 }
@@ -465,21 +466,21 @@ namespace SilverSim.Scene.Types.Scene
                     return true;
                 }
             }
-            catch
-            {
-            }
 
             return false;
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanTakeCopy(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            if (IsPossibleGod(agent.Owner))
+            UUI agentOwner = agent.Owner;
+            UUI groupOwner = group.Owner;
+            if (IsPossibleGod(agentOwner))
             {
                 return true;
             }
             /* deny modification of admin objects by non-admins */
-            else if (IsPossibleGod(group.Owner))
+            else if (IsPossibleGod(groupOwner))
             {
                 return false;
             }
@@ -491,7 +492,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             /* check object owner */
-            if (agent.Owner.EqualsGrid(group.Owner))
+            if (agentOwner.EqualsGrid(groupOwner))
             {
             }
             else if (group.IsAttached)
@@ -501,25 +502,21 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             InventoryPermissionsMask checkMask = InventoryPermissionsMask.Copy;
-            if(!agent.Owner.EqualsGrid(group.Owner))
+            if(!agentOwner.EqualsGrid(groupOwner))
             {
                 checkMask |= InventoryPermissionsMask.Transfer;
             }
 
             ParcelInfo pinfo;
-            try
+            if(Parcels.TryGetValue(location, out pinfo))
             {
-                pinfo = Parcels[location];
-                if (pinfo.Owner.EqualsGrid(agent.Owner) && ServerParamService.GetBoolean(ID, "parcel_owner_is_admin", false))
+                if (pinfo.Owner.EqualsGrid(agentOwner) && ServerParamService.GetBoolean(ID, "parcel_owner_is_admin", false))
                 {
                     return true;
                 }
             }
-            catch
-            {
-            }
 
-            if (group.RootPart.CheckPermissions(agent.Owner, group.Group, checkMask))
+            if (group.RootPart.CheckPermissions(agentOwner, group.Group, checkMask))
             {
                 return true;
             }
@@ -530,14 +527,17 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanTake(IAgent agent, ObjectGroup group, Vector3 location)
         {
-            if (IsPossibleGod(agent.Owner))
+            UUI agentOwner = agent.Owner;
+            UUI groupOwner = group.Owner;
+            if (IsPossibleGod(agentOwner))
             {
                 return true;
             }
             /* deny modification of admin objects by non-admins */
-            else if (IsPossibleGod(group.Owner))
+            else if (IsPossibleGod(groupOwner))
             {
                 return false;
             }
@@ -549,7 +549,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             /* check object owner */
-            if (agent.Owner.EqualsGrid(group.Owner))
+            if (agentOwner.EqualsGrid(groupOwner))
             {
             }
             else if (group.IsAttached)
@@ -559,21 +559,17 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ParcelInfo pinfo;
-            try
+            if(Parcels.TryGetValue(location, out pinfo))
             {
-                pinfo = Parcels[location];
-                if (pinfo.Owner.EqualsGrid(agent.Owner) && ServerParamService.GetBoolean(ID, "parcel_owner_is_admin", false))
+                if (pinfo.Owner.EqualsGrid(agentOwner) && ServerParamService.GetBoolean(ID, "parcel_owner_is_admin", false))
                 {
                     return true;
                 }
             }
-            catch
-            {
-            }
 
-            if (!agent.Owner.EqualsGrid(group.Owner))
+            if (!agentOwner.EqualsGrid(groupOwner))
             {
-                if (group.RootPart.CheckPermissions(agent.Owner, group.Group, InventoryPermissionsMask.Transfer))
+                if (group.RootPart.CheckPermissions(agentOwner, group.Group, InventoryPermissionsMask.Transfer))
                 {
                     return true;
                 }
@@ -582,9 +578,11 @@ namespace SilverSim.Scene.Types.Scene
         }
         #endregion
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanTerraform(IAgent agent, Vector3 location)
         {
-            if (IsPossibleGod(agent.Owner))
+            UUI agentOwner = agent.Owner;
+            if (IsPossibleGod(agentOwner))
             {
                 return true;
             }
@@ -603,7 +601,7 @@ namespace SilverSim.Scene.Types.Scene
                     return true;
                 }
 
-                if(pinfo.Owner.EqualsGrid(agent.Owner))
+                if(pinfo.Owner.EqualsGrid(agentOwner))
                 {
                     return true;
                 }

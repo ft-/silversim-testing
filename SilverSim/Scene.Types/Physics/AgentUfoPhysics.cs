@@ -5,12 +5,15 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Text;
 using System.Timers;
 
 namespace SilverSim.Scene.Types.Physics
 {
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
+    [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public class AgentUfoPhysics : IAgentPhysicsObject
     {
         Timer m_UfoTimer;
@@ -93,6 +96,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 DeltaLinearVelocity
         {
             set 
@@ -100,6 +104,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 DeltaAngularVelocity
         {
             set 
@@ -107,6 +112,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 AppliedForce
         {
             set 
@@ -114,6 +120,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 AppliedTorque
         {
             set 
@@ -121,6 +128,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 LinearImpulse
         {
             set 
@@ -128,6 +136,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 AngularImpulse
         {
             set 
@@ -135,6 +144,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vector3 ControlTargetVelocity
         {
             set 
@@ -226,6 +236,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vehicle.VehicleFlags SetVehicleFlags
         {
             set 
@@ -233,6 +244,7 @@ namespace SilverSim.Scene.Types.Physics
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public Vehicle.VehicleFlags ClearVehicleFlags
         {
             set 

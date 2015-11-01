@@ -16,6 +16,7 @@ namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
         public struct RezObjectParams
         {
             public Vector3 RayStart;
@@ -44,6 +45,7 @@ namespace SilverSim.Scene.Types.Scene
 
         [PacketHandler(MessageType.DeRezObject)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleDeRezObject(Message m)
         {
             SilverSim.Viewer.Messages.Object.DeRezAck ackres;
@@ -56,11 +58,7 @@ namespace SilverSim.Scene.Types.Scene
 
             IAgent agent;
             List<ObjectGroup> objectgroups = new List<ObjectGroup>();
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if(!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -85,10 +83,12 @@ namespace SilverSim.Scene.Types.Scene
                 
             }
 
-            switch(req.Destination)
+            bool isActiveGod = agent.IsActiveGod;
+
+            switch (req.Destination)
             {
                 case SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction.GodTakeCopy:
-                    if(!agent.IsActiveGod || !agent.IsInScene(this))
+                    if(!isActiveGod || !agent.IsInScene(this))
                     {
                         return;
                     }
@@ -97,7 +97,7 @@ namespace SilverSim.Scene.Types.Scene
                 case SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction.Delete:
                     foreach(ObjectGroup grp in objectgroups)
                     {
-                        if (!agent.IsActiveGod || !agent.IsInScene(this))
+                        if (!isActiveGod || !agent.IsInScene(this))
                         {
                             return;
                         }
@@ -116,7 +116,7 @@ namespace SilverSim.Scene.Types.Scene
                 case SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction.Return:
                     foreach(ObjectGroup grp in objectgroups)
                     {
-                        if (!agent.IsActiveGod || !agent.IsInScene(this))
+                        if (!isActiveGod || !agent.IsInScene(this))
                         {
                             return;
                         }
@@ -146,7 +146,7 @@ namespace SilverSim.Scene.Types.Scene
                 case SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction.Take:
                     foreach(ObjectGroup grp in objectgroups)
                     {
-                        if (!agent.IsActiveGod || !agent.IsInScene(this))
+                        if (!isActiveGod || !agent.IsInScene(this))
                         {
                             return;
                         }

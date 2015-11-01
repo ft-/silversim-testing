@@ -8,9 +8,11 @@ using System.Threading;
 using SilverSim.Viewer.Messages;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Object
 {
+    [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public class ObjectUpdateInfo
     {
 

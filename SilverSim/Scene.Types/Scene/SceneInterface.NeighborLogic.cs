@@ -12,6 +12,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
 using System.Net;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -28,6 +29,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public readonly Dictionary<UUID, NeighborEntry> Neighbors = new Dictionary<UUID, NeighborEntry>();
 
+        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public delegate bool TryGetSceneDelegate(UUID id, out SceneInterface scene);
         public TryGetSceneDelegate TryGetScene;
 
@@ -142,6 +144,7 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void VerifyNeighbor(RegionInfo rinfo)
         {
             if(rinfo.ServerURI == RegionData.ServerURI)
@@ -207,7 +210,8 @@ namespace SilverSim.Scene.Types.Scene
             IPAddress[] addresses = Dns.GetHostAddresses(destinationInfo.ServerIP);
             IPEndPoint ep = new IPEndPoint(addresses[0], (int)destinationInfo.ServerPort);
 
-            IValue iv = LlsdXml.Deserialize(
+            Map resmap;
+            using(Stream responseStream = 
                 HttpRequestHandler.DoStreamRequest(
                     "POST", 
                     destinationInfo.ServerURI + "circuit",
@@ -220,9 +224,11 @@ namespace SilverSim.Scene.Types.Scene
                     },
                     false,
                     10000,
-                    null));
+                    null))
+            {
+                resmap = (Map)LlsdXml.Deserialize(responseStream);
+            }
 
-            Map resmap = (Map)iv;
             circuitCode = resmap["circuit_code"].AsUInt;
             sessionID = resmap["session_id"].AsUUID;
             ICircuit simCircuit = UDPServer.UseSimCircuit(

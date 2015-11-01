@@ -13,6 +13,7 @@ using SilverSim.Viewer.Messages.Region;
 using SilverSim.Viewer.Messages;
 using System.Threading;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -187,6 +188,7 @@ namespace SilverSim.Scene.Types.Scene
             #endregion
 
             #region Properties
+            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public double this[uint x, uint y]
             {
                 get
@@ -215,6 +217,7 @@ namespace SilverSim.Scene.Types.Scene
                     catch(Exception e)
                     {
                         m_Log.Debug(string.Format("Terrain Change at {0},{1} failed", x, y), e);
+                        throw;
                     }
 #endif
                     finally
@@ -362,6 +365,7 @@ namespace SilverSim.Scene.Types.Scene
                     m_NumYPatches = yPatches;
                 }
 
+                [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
                 public LayerPatch this[uint x, uint y]
                 {
                     get

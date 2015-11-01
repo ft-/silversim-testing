@@ -205,6 +205,7 @@ namespace SilverSim.Scene.Types.Scene
 
         [PacketHandler(MessageType.SoundTrigger)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleSoundTrigger(Message m)
         {
             SoundTrigger req = (SoundTrigger)m;

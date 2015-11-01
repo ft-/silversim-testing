@@ -6,6 +6,7 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.Script
@@ -14,6 +15,30 @@ namespace SilverSim.Scene.Types.Script
     public class CompilerException : Exception
     {
         public Dictionary<int, string> Messages = new Dictionary<int,string>();
+
+
+        public CompilerException()
+        {
+
+        }
+
+        public CompilerException(string msg)
+            : base(msg)
+        {
+
+        }
+
+        protected CompilerException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public CompilerException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+
+        }
 
         public CompilerException(int linenumber, string message)
             :base(message)
