@@ -5,6 +5,7 @@ using SilverSim.Scene.Types.Script;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using ThreadedClasses;
 
@@ -12,6 +13,7 @@ namespace SilverSim.Scripting.Common
 {
     public static class CompilerRegistry
     {
+        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public class RegistryImpl : IScriptCompilerRegistry
         {
             private RwLockedDictionary<string, IScriptCompiler> m_ScriptCompilers = new RwLockedDictionary<string, IScriptCompiler>();

@@ -5,6 +5,7 @@ using SilverSim.Types;
 using SilverSim.Types.Profile;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.ServiceInterfaces.Profile
 {
@@ -37,6 +38,7 @@ namespace SilverSim.ServiceInterfaces.Profile
         }
 
         [Flags]
+        [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         public enum PropertiesUpdateFlags
         {
             Properties = 1,
