@@ -454,7 +454,7 @@ namespace SilverSim.Types.Asset.Format
                 else if(data[0] == "Text" && data.Length == 3)
                 {
                     int datalen;
-                    if(int.TryParse(data[2], out datalen))
+                    if(!int.TryParse(data[2], out datalen))
                     {
                         throw new NotANotecardFormatException();
                     }
