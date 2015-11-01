@@ -5,6 +5,7 @@ using System;
 using System.Collections;
 using System.IO;
 using System.Net.Sockets;
+using System.Runtime.Serialization;
 using System.Text;
 
 namespace SilverSim.Http
@@ -21,6 +22,24 @@ namespace SilverSim.Http
         public class TimeoutException : Exception
         {
             public TimeoutException()
+            {
+
+            }
+
+            public TimeoutException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected TimeoutException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public TimeoutException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Compression;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Web;
 
@@ -17,6 +18,24 @@ namespace SilverSim.Http.Client
         public class BadHttpResponseException : Exception
         {
             public BadHttpResponseException()
+            {
+
+            }
+
+            public BadHttpResponseException(string message)
+                : base(message)
+            {
+
+            }
+
+            protected BadHttpResponseException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public BadHttpResponseException(string message, Exception innerException)
+                : base(message, innerException)
             {
 
             }
@@ -196,7 +215,12 @@ namespace SilverSim.Http.Client
 
                     if (splits[1] != "100")
                     {
-                        throw new HttpException(int.Parse(splits[1]), splits[2]);
+                        int statusCode;
+                        if(!int.TryParse(splits[1], out statusCode))
+                        {
+                            statusCode = 500;
+                        }
+                        throw new HttpException(statusCode, splits[2]);
                     }
 
                     while (s.ReadHeaderLine().Length != 0)
@@ -243,7 +267,12 @@ namespace SilverSim.Http.Client
             if (splits[1] != "200")
             {
                 ReadHeaderLines(s, headers);
-                throw new HttpException(int.Parse(splits[1]), splits[2]);
+                int statusCode;
+                if(!int.TryParse(splits[1], out statusCode))
+                {
+                    statusCode = 500;
+                }
+                throw new HttpException(statusCode, splits[2]);
             }
 
             ReadHeaderLines(s, headers);
@@ -285,7 +314,12 @@ namespace SilverSim.Http.Client
 
             if (headers.TryGetValue("Content-Length", out value))
             {
-                Stream bs = new ResponseBodyStream(s, long.Parse(value), keepalive, uri.Scheme, uri.Host, uri.Port);
+                long contentLength;
+                if(!long.TryParse(value, out contentLength))
+                {
+                    throw new BadHttpResponseException();
+                }
+                Stream bs = new ResponseBodyStream(s, contentLength, keepalive, uri.Scheme, uri.Host, uri.Port);
                 if(headers.TryGetValue("Transfer-Encoding", out value))
                 {
                     if(value == "chunked")

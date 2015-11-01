@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.Globalization;
 using System.IO;
 
 namespace SilverSim.Http
@@ -176,7 +177,10 @@ namespace SilverSim.Http
                     }
                     else
                     {
-                        m_RemainingChunkLength = int.Parse(chunkFields[0], System.Globalization.NumberStyles.HexNumber);
+                        if(!int.TryParse(chunkFields[0], System.Globalization.NumberStyles.HexNumber, CultureInfo.InvariantCulture, out m_RemainingChunkLength))
+                        {
+                            throw new InvalidDataException();
+                        }
                         if (0 == m_RemainingChunkLength)
                         {
                             m_EndOfChunked = true;

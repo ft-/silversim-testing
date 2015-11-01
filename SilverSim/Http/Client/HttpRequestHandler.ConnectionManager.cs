@@ -4,6 +4,7 @@
 //#define SUPPORT_PIPELINING
 
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Net.Sockets;
 using System.Timers;
 using ThreadedClasses;
@@ -13,9 +14,9 @@ namespace SilverSim.Http.Client
     public static partial class HttpRequestHandler
     {
 #if SUPPORT_PIPELINING
-        public const bool SupportsPipelining = true;
+        public static readonly bool SupportsPipelining = true;
 #else
-        public const bool SupportsPipelining = false;
+        public static readonly bool SupportsPipelining /*= false */;
 #endif
 
         struct StreamInfo
@@ -39,6 +40,7 @@ namespace SilverSim.Http.Client
         static readonly RwLockedDictionaryAutoAdd<string, RwLockedList<StreamInfo>> m_StreamList = new RwLockedDictionaryAutoAdd<string, RwLockedList<StreamInfo>>(delegate() { return new RwLockedList<StreamInfo>(); });
         static Timer m_Timer;
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         static void CleanUpTimer(object sender, ElapsedEventArgs e)
         {
             try

@@ -14,6 +14,24 @@ namespace SilverSim.Http
         {
 
         }
+
+        public HttpHeaderFormatException(string message)
+            : base(message)
+        {
+
+        }
+
+        protected HttpHeaderFormatException(SerializationInfo info, StreamingContext context)
+            : base(info, context)
+        {
+
+        }
+
+        public HttpHeaderFormatException(string message, Exception innerException)
+            : base(message, innerException)
+        {
+
+        }
     }
 
     [Serializable]
