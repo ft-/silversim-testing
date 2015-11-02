@@ -23,3 +23,5 @@ using System.Reflection;
 [assembly: SuppressMessage("Gendarme.Rules.Exceptions", "UseObjectDisposedExceptionRule")]
 [assembly: SuppressMessage("Gendarme.Rules.Design", "PreferIntegerOrStringForIndexersRule")]
 [assembly: SuppressMessage("Gendarme.Rules.Design", "ProvideAlternativeNamesForOperatorOverloadsRule")]
+[assembly: SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+[assembly: SuppressMessage("Gendarme.Rules.Exceptions", "DoNotThrowInUnexpectedLocationRule")]
