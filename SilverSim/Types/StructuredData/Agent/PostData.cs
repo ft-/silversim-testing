@@ -196,76 +196,81 @@ namespace SilverSim.Types.StructuredData.Agent
 
             /*-----------------------------------------------------------------*/
             /* Appearance */
-            Map appearancePack = (Map)parms["packed_appearance"];
-            agentparams.Appearance.AvatarHeight = appearancePack["height"].AsReal;
-            //agentparams.Appearance.Serial = appearancePack["serial"].AsInt;
-
+            if (parms.ContainsKey("packed_appearance"))
             {
-                AnArray vParams = (AnArray)appearancePack["visualparams"];
-                byte[] visualParams = new byte[vParams.Count];
+                Map appearancePack = (Map)parms["packed_appearance"];
+                agentparams.Appearance.AvatarHeight = appearancePack["height"].AsReal;
+                //agentparams.Appearance.Serial = appearancePack["serial"].AsInt;
 
-                int i;
-                for (i = 0; i < vParams.Count; ++i)
                 {
-                    visualParams[i] = (byte)vParams[i].AsUInt;
-                }
-                agentparams.Appearance.VisualParams = visualParams;
-            }
+                    AnArray vParams = (AnArray)appearancePack["visualparams"];
+                    byte[] visualParams = new byte[vParams.Count];
 
-            {
-                AnArray texArray = (AnArray)appearancePack["textures"];
-                int i;
-                for (i = 0; i < AppearanceInfo.AvatarTextureData.TextureCount; ++i)
-                {
-                    agentparams.Appearance.AvatarTextures[i] = texArray[i].AsUUID;
-                }
-            }
-
-            {
-                int i;
-                uint n;
-                AnArray wearables = (AnArray)appearancePack["wearables"];
-                for (i = 0; i < (int)WearableType.NumWearables; ++i)
-                {
-                    AnArray ar;
-                    try
+                    int i;
+                    for (i = 0; i < vParams.Count; ++i)
                     {
-                        ar = (AnArray)wearables[i];
+                        visualParams[i] = (byte)vParams[i].AsUInt;
                     }
-                    catch
+                    agentparams.Appearance.VisualParams = visualParams;
+                }
+
+                {
+                    AnArray texArray = (AnArray)appearancePack["textures"];
+                    int i;
+                    for (i = 0; i < AppearanceInfo.AvatarTextureData.TextureCount; ++i)
                     {
-                        continue;
+                        agentparams.Appearance.AvatarTextures[i] = texArray[i].AsUUID;
                     }
-                    n = 0;
-                    foreach (IValue val in ar)
+                }
+
+                if (appearancePack.ContainsKey("wearables"))
+                {
+                    int i;
+                    uint n;
+                    AnArray wearables = (AnArray)appearancePack["wearables"];
+                    for (i = 0; i < (int)WearableType.NumWearables; ++i)
                     {
-                        AgentWearables.WearableInfo wi = new AgentWearables.WearableInfo();
-                        Map wp = (Map)val;
-                        wi.ItemID = wp["item"].AsUUID;
-                        if (wp.ContainsKey("asset"))
+                        AnArray ar;
+                        try
                         {
-                            wi.AssetID = wp["asset"].AsUUID;
+                            ar = (AnArray)wearables[i];
                         }
-                        else
+                        catch
                         {
-                            wi.AssetID = UUID.Zero;
+                            continue;
                         }
-                        WearableType type = (WearableType)i;
-                        agentparams.Appearance.Wearables[type, n++] = wi;
+                        n = 0;
+                        foreach (IValue val in ar)
+                        {
+                            AgentWearables.WearableInfo wi = new AgentWearables.WearableInfo();
+                            Map wp = (Map)val;
+                            wi.ItemID = wp["item"].AsUUID;
+                            if (wp.ContainsKey("asset"))
+                            {
+                                wi.AssetID = wp["asset"].AsUUID;
+                            }
+                            else
+                            {
+                                wi.AssetID = UUID.Zero;
+                            }
+                            WearableType type = (WearableType)i;
+                            agentparams.Appearance.Wearables[type, n++] = wi;
+                        }
                     }
                 }
-            }
 
-            {
-                foreach (IValue apv in (AnArray)appearancePack["attachments"])
+                if (appearancePack.ContainsKey("attachments"))
                 {
-                    Map ap = (Map)apv;
-                    uint apid;
-                    if (!uint.TryParse(ap["point"].ToString(), out apid))
+                    foreach (IValue apv in (AnArray)appearancePack["attachments"])
                     {
-                        throw new InvalidAgentPostSerializationException();
+                        Map ap = (Map)apv;
+                        uint apid;
+                        if (!uint.TryParse(ap["point"].ToString(), out apid))
+                        {
+                            throw new InvalidAgentPostSerializationException();
+                        }
+                        agentparams.Appearance.Attachments[(AttachmentPoint)apid][ap["item"].AsUUID] = UUID.Zero;
                     }
-                    agentparams.Appearance.Attachments[(AttachmentPoint)apid][ap["item"].AsUUID] = UUID.Zero;
                 }
             }
 
