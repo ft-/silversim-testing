@@ -33,7 +33,9 @@ namespace SilverSim.Types.Grid
         [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
         public static class ProtocolVariantId
         {
+            [SuppressMessage("Gendarme.Rules.Performance", "PreferLiteralOverInitOnlyFieldsRule")]
             public static readonly string Local = string.Empty;
+            [SuppressMessage("Gendarme.Rules.Performance", "PreferLiteralOverInitOnlyFieldsRule")]
             public static readonly string OpenSim = "OpenSim";
         }
         #endregion

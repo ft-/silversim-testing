@@ -9,6 +9,7 @@ using System.IO.Compression;
 using System.Text;
 using SilverSim.Http;
 using System.Runtime.Serialization;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -95,6 +96,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Correctness", "DisposableFieldsShouldBeDisposedRule")]
         public HttpResponse(Stream output, HttpRequest request, HttpStatusCode statusCode, string statusDescription)
         {
             Headers["Content-Type"] = "text/html";
