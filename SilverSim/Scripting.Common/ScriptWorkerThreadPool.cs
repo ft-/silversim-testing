@@ -6,6 +6,7 @@ using SilverSim.Scene.Types.Object;
 using System;
 using System.Threading;
 using ThreadedClasses;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scripting.Common
 {
@@ -82,6 +83,7 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void PostScript(ScriptInstance i)
         {
             /* Do not enqueue the already queued script */
@@ -131,6 +133,7 @@ namespace SilverSim.Scripting.Common
             });
         }
 
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void ThreadMain(object obj)
         {
             ScriptThreadContext tc = (ScriptThreadContext)obj;

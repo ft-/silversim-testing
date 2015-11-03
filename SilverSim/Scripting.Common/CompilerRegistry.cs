@@ -14,6 +14,7 @@ namespace SilverSim.Scripting.Common
     public static class CompilerRegistry
     {
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public class RegistryImpl : IScriptCompilerRegistry
         {
             private RwLockedDictionary<string, IScriptCompiler> m_ScriptCompilers = new RwLockedDictionary<string, IScriptCompiler>();
@@ -225,6 +226,7 @@ namespace SilverSim.Scripting.Common
 
         }
 
+        [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
         public static RegistryImpl ScriptCompilers = new RegistryImpl();
     }
 }
