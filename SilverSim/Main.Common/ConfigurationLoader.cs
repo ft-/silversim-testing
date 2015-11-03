@@ -1033,7 +1033,7 @@ namespace SilverSim.Main.Common
         }
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        public void ShowMemoryCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        public static void ShowMemoryCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
@@ -1047,7 +1047,7 @@ namespace SilverSim.Main.Common
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public void ChangeRegionCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        public static void ChangeRegionCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
@@ -1087,7 +1087,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        public void ShowRegionsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        public static void ShowRegionsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
@@ -1148,7 +1148,7 @@ namespace SilverSim.Main.Common
         }
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        public void ShowThreadCountCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        public static void ShowThreadCountCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if(args[0] == "help")
             {

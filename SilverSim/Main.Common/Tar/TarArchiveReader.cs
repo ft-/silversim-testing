@@ -82,6 +82,7 @@ namespace SilverSim.Main.Common.Tar
 
         public Header ReadHeader()
         {
+            Encoding ascii = Encoding.ASCII;
             bool haveLongLink = false;
             byte[] buf;
             Header hdr = new Header();
@@ -93,7 +94,7 @@ namespace SilverSim.Main.Common.Tar
                     throw new EndOfTarException();
                 }
                 hdr.FileType = (TarFileType)buf[156];
-                hdr.Length = Convert.ToInt32(Encoding.ASCII.GetString(buf, 124, 11), 8);
+                hdr.Length = Convert.ToInt32(ascii.GetString(buf, 124, 11), 8);
                 
                 if(buf[156] == (byte)TarFileType.LongLink)
                 {
@@ -103,7 +104,7 @@ namespace SilverSim.Main.Common.Tar
                     {
                         throw new IOException();
                     }
-                    hdr.FileName = Encoding.ASCII.GetString(fnameBytes);
+                    hdr.FileName = ascii.GetString(fnameBytes);
                 }
                 else if(!haveLongLink)
                 {
@@ -112,7 +113,7 @@ namespace SilverSim.Main.Common.Tar
                     {
 
                     }
-                    hdr.FileName = Encoding.ASCII.GetString(buf, 0, fnameLen);
+                    hdr.FileName = ascii.GetString(buf, 0, fnameLen);
                 }
 
             } while (buf[156] == (byte)TarFileType.LongLink);
