@@ -24,7 +24,7 @@ namespace SilverSim.Main.Common.Transfer
 
         public abstract void PostProcessObjectGroups(List<ObjectGroup> grp);
 
-        public RezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
+        protected RezObjectHandler(SceneInterface scene, Vector3 targetpos, UUID assetid, AssetServiceInterface source, UUI rezzingagent, SceneInterface.RezObjectParams rezparams, InventoryPermissionsMask itemOwnerPermissions = InventoryPermissionsMask.Every)
             : base(scene.AssetService, source, assetid, ReferenceSource.Destination)
         {
             m_Scene = scene;

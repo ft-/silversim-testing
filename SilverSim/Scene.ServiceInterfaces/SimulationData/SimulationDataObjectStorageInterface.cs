@@ -11,7 +11,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
     public abstract class SimulationDataObjectStorageInterface
     {
         #region Constructor
-        public SimulationDataObjectStorageInterface()
+        protected SimulationDataObjectStorageInterface()
         {
         }
         #endregion

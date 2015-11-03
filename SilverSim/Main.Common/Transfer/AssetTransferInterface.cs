@@ -23,7 +23,7 @@ namespace SilverSim.Main.Common.Transfer
 
         ReferenceSource m_RefSource;
 
-        public AssetTransferWorkItem(AssetServiceInterface dest, AssetServiceInterface source, UUID assetid, ReferenceSource refsource)
+        protected AssetTransferWorkItem(AssetServiceInterface dest, AssetServiceInterface source, UUID assetid, ReferenceSource refsource)
         {
             m_DestinationAssetService = dest;
             m_SourceAssetService = source;

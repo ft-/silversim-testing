@@ -15,7 +15,7 @@ namespace SilverSim.Scene.Physics.Common
         IAgent m_Agent;
         PhysicsStateData m_StateData;
 
-        public AgentController(IAgent agent, UUID sceneID)
+        protected AgentController(IAgent agent, UUID sceneID)
         {
             m_Agent = agent;
             m_StateData = new PhysicsStateData(agent, sceneID);

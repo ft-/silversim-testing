@@ -8,7 +8,7 @@ namespace SilverSim.Scene.ServiceInterfaces.Scene
 {
     public abstract class SceneFactoryInterface
     {
-        public SceneFactoryInterface()
+        protected SceneFactoryInterface()
         {
 
         }

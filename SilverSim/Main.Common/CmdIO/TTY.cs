@@ -9,7 +9,7 @@ namespace SilverSim.Main.Common.CmdIO
 {
     public abstract class TTY 
     {
-        public TTY()
+        protected TTY()
         {
 
         }

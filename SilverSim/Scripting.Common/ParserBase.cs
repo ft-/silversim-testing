@@ -4,6 +4,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.Serialization;
 
 namespace SilverSim.Scripting.Common
 {
@@ -16,6 +17,23 @@ namespace SilverSim.Scripting.Common
             {
 
             }
+
+            public StackEmptyException(string message)
+                : base(message)
+            {
+
+            }
+
+            public StackEmptyException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
+
+            protected StackEmptyException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            { 
+            }
         }
 
         [Serializable]
@@ -25,6 +43,23 @@ namespace SilverSim.Scripting.Common
             {
 
             }
+
+            public EndOfStringException(string message)
+                : base(message)
+            {
+
+            }
+
+            public EndOfStringException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
+
+            protected EndOfStringException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            { 
+            }
         }
 
         [Serializable]
@@ -33,6 +68,23 @@ namespace SilverSim.Scripting.Common
             public EndOfFileException()
             {
 
+            }
+
+            public EndOfFileException(string message)
+                : base(message)
+            {
+
+            }
+
+            public EndOfFileException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
+
+            protected EndOfFileException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            { 
             }
         }
 
@@ -44,6 +96,23 @@ namespace SilverSim.Scripting.Common
             {
 
             }
+
+            public PreprocessorLineErrorException(string message)
+                : base(message)
+            {
+
+            }
+
+            public PreprocessorLineErrorException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
+
+            protected PreprocessorLineErrorException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            { 
+            }
         }
 
         [Serializable]
@@ -54,6 +123,23 @@ namespace SilverSim.Scripting.Common
             {
 
             }
+
+            public ParenthesisMismatchErrorException(string message)
+                : base(message)
+            {
+
+            }
+
+            public ParenthesisMismatchErrorException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
+
+            protected ParenthesisMismatchErrorException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            { 
+            }
         }
 
         [Serializable]
@@ -62,6 +148,23 @@ namespace SilverSim.Scripting.Common
             public FileIoErrorException()
             {
 
+            }
+
+            public FileIoErrorException(string message)
+                : base(message)
+            {
+
+            }
+
+            public FileIoErrorException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
+
+            protected FileIoErrorException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            { 
             }
         }
 
@@ -73,6 +176,23 @@ namespace SilverSim.Scripting.Common
             {
 
             }
+
+            public CircularIncludeException()
+                : base()
+            {
+
+            }
+
+            public CircularIncludeException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
+
+            protected CircularIncludeException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            { 
+            }
         }
 
         private struct ParserInput
@@ -83,7 +203,7 @@ namespace SilverSim.Scripting.Common
         };
         private List<ParserInput> m_ParserInputs = new List<ParserInput>();
 
-        public ParserBase()
+        protected ParserBase()
         {
 
         }

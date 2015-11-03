@@ -31,6 +31,7 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
+using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -1099,8 +1100,9 @@ namespace SilverSim.Main.Common
                 {
                     if(limitedToScene == UUID.Zero || scene.ID == limitedToScene)
                     {
-                        Vector3 gridcoord = scene.RegionData.Location;
-                        output += string.Format("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", scene.Name, scene.ID, scene.RegionData.Location.ToString(), scene.RegionData.Size.ToString(), scene.Owner.FullName, gridcoord.X_String + "," + gridcoord.Y_String);
+                        RegionInfo rInfo = scene.RegionData;
+                        Vector3 gridcoord = rInfo.Location;
+                        output += string.Format("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", scene.Name, scene.ID, gridcoord.ToString(), rInfo.Size.ToString(), scene.Owner.FullName, gridcoord.X_String + "," + gridcoord.Y_String);
                     }
                 }
                 io.Write(output);

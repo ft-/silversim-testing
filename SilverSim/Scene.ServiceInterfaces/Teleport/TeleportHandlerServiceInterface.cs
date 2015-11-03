@@ -11,7 +11,7 @@ namespace SilverSim.ServiceInterfaces.Teleport
 {
     public abstract class TeleportHandlerServiceInterface : IAgentTeleportServiceInterface
     {
-        public TeleportHandlerServiceInterface()
+        protected TeleportHandlerServiceInterface()
         {
 
         }

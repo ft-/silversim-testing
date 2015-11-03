@@ -8,7 +8,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
     public abstract class SimulationDataEnvSettingsStorageInterface
     {
-        public SimulationDataEnvSettingsStorageInterface()
+        protected SimulationDataEnvSettingsStorageInterface()
         {
         }
 

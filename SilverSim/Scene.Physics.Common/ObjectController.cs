@@ -20,7 +20,7 @@ namespace SilverSim.Scene.Physics.Common
         bool m_VolumeDetect;
         PhysicsStateData m_StateData;
 
-        public ObjectController(ObjectGroup part, UUID sceneID)
+        protected ObjectController(ObjectGroup part, UUID sceneID)
         {
             m_StateData = new PhysicsStateData(part, sceneID);
             m_Group = part;

@@ -14,7 +14,7 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
         {
             public abstract void Remove();
 
-            public Listener()
+            protected Listener()
             {
 
             }

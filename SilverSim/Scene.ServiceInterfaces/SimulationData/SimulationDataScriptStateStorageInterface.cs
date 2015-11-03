@@ -16,7 +16,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
     public abstract class SimulationDataScriptStateStorageInterface
     {
-        public SimulationDataScriptStateStorageInterface()
+        protected SimulationDataScriptStateStorageInterface()
         {
 
         }

@@ -37,7 +37,7 @@ namespace SilverSim.Http
     [Serializable]
     public abstract class AbstractHttpStream : Stream
     {
-        public AbstractHttpStream()
+        protected AbstractHttpStream()
         {
         }
 

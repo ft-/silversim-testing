@@ -5,7 +5,7 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
 {
     public abstract class ChatServiceFactoryInterface
     {
-        public ChatServiceFactoryInterface()
+        protected ChatServiceFactoryInterface()
         {
 
         }
