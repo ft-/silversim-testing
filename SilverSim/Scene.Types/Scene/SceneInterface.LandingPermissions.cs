@@ -245,6 +245,9 @@ namespace SilverSim.Scene.Types.Scene
                         destinationLocation = p.LandingPosition;
                         destinationLookAt = p.LandingLookAt;
                         break;
+
+                    default:
+                        break;
                 }
             }
             else

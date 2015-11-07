@@ -227,6 +227,6 @@ namespace SilverSim.Scripting.Common
         }
 
         [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
-        public static RegistryImpl ScriptCompilers = new RegistryImpl();
+        public static readonly RegistryImpl ScriptCompilers = new RegistryImpl();
     }
 }

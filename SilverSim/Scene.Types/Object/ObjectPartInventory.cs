@@ -439,6 +439,9 @@ namespace SilverSim.Scene.Types.Object
                             item.Owner = UUI.Unknown;
                         }
                         return item;
+
+                    default:
+                        break;
                 }
             }
         }
@@ -484,6 +487,9 @@ namespace SilverSim.Scene.Types.Object
                             throw new InvalidObjectXmlException();
                         }
                         return;
+
+                    default:
+                        break;
                 }
             }
         }

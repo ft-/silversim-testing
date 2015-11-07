@@ -133,6 +133,9 @@ namespace SilverSim.Viewer.Core
                     case MessageType.UpdateInventoryItem:
                         FetchInventoryThread_UpdateInventoryItem(m);
                         break;
+
+                    default:
+                        break;
                 }
             }
         }

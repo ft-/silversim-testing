@@ -358,6 +358,9 @@ namespace SilverSim.Viewer.Core
                             scene.RegionSettings.Elevation1NE = lowValue;
                             scene.RegionSettings.Elevation2NE = highValue;
                             break;
+
+                        default:
+                            break;
                     }
                 }
 
@@ -548,6 +551,9 @@ namespace SilverSim.Viewer.Core
                         AddTerrainUploadTransaction(t, req.CircuitSceneID);
                     }
                     break;
+
+                default:
+                    break;
             }
         }
 
@@ -597,6 +603,6 @@ namespace SilverSim.Viewer.Core
             UUID prey = UUID.Parse(UTF8NoBOM.GetString(req.ParamList[0]));
         }
 
-        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
+        static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }

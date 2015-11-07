@@ -151,6 +151,9 @@ namespace SilverSim.Types.Asset.Format
                                             }
                                             pos += 28;
                                             break;
+
+                                        default:
+                                            break;
                                     }
                                 }
                             }

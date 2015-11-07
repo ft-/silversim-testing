@@ -286,6 +286,8 @@ namespace SilverSim.Scene.Types.Object
                                 ret = 1; // if it's a sculpt then max 1 face
                             }
                             break;
+                        default:
+                            break;
                     }
 
                     return ret;
@@ -499,6 +501,8 @@ namespace SilverSim.Scene.Types.Object
                             paramList.Add(PathRadiusOffset / 100f);
                             paramList.Add(PathSkew / 100f);
                             break;
+                        default:
+                            break;
                     }
                 }
             }
@@ -566,6 +570,9 @@ namespace SilverSim.Scene.Types.Object
 
                         case PrimitiveShapeType.Sculpt:
                             extrusion = PrimitiveExtrusion.Curve1;
+                            break;
+                            
+                        default:
                             break;
                     }
 

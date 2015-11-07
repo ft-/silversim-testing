@@ -242,6 +242,9 @@ namespace SilverSim.Types.Primitive
                             throw new XmlException();
                         }
                         return media;
+
+                    default:
+                        break;
                 }
             }
         }

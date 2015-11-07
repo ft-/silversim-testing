@@ -363,8 +363,14 @@ namespace SilverSim.Viewer.Groups
 
                                     case GridInstantMessageDialog.GroupNoticeInventoryAccepted:
                                         break;
+
+                                    default:
+                                        break;
                                 }
                             }
+                            break;
+
+                        default:
                             break;
                     }
                 }
@@ -932,6 +938,9 @@ namespace SilverSim.Viewer.Groups
                     }
                     SendAllAgentsGroupDataUpdate(scene, groupsService, new UGI(req.GroupID));
                     break;
+
+                default:
+                    break;
             }
         }
 
@@ -1152,6 +1161,9 @@ namespace SilverSim.Viewer.Groups
                                 m_Log.Info("GroupRoleUpdate.Update", e);
                             }
                         }
+                        break;
+
+                    default:
                         break;
                 }
             }

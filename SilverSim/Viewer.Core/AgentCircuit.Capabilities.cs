@@ -100,6 +100,9 @@ namespace SilverSim.Viewer.Core
                                 case 'u':
                                     uri += System.Uri.EscapeUriString((string)AgentID);
                                     break;
+
+                                default:
+                                    break;
                             }
                         }
                         else if (c == '$')

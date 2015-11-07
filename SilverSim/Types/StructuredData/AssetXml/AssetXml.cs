@@ -73,6 +73,9 @@ namespace SilverSim.Types.StructuredData.AssetXml
                         }
 
                         return;
+
+                    default:
+                        break;
                 }
             }
         }
@@ -203,6 +206,9 @@ namespace SilverSim.Types.StructuredData.AssetXml
                         }
 
                         return asset;
+
+                    default:
+                        break;
                 }
             }
         }
@@ -230,6 +236,9 @@ namespace SilverSim.Types.StructuredData.AssetXml
 
                         case XmlNodeType.EndElement:
                             throw new InvalidAssetSerializationException();
+
+                        default:
+                            break;
                     }
                 }
             }
@@ -346,6 +355,9 @@ namespace SilverSim.Types.StructuredData.AssetXml
                         }
 
                         return asset;
+
+                    default:
+                        break;
                 }
             }
         }
@@ -373,6 +385,9 @@ namespace SilverSim.Types.StructuredData.AssetXml
 
                         case XmlNodeType.EndElement:
                             throw new InvalidAssetMetadataSerializationException();
+
+                        default:
+                            break;
                     }
                 }
             }

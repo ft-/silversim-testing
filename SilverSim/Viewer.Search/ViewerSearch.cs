@@ -76,6 +76,9 @@ namespace SilverSim.Viewer.Search
                         case MessageType.AvatarPickerRequest:
                             ProcessAvatarPickerRequest(req.Key.Agent, req.Key, m);
                             break;
+
+                        default:
+                            break;
                     }
                 }
                 catch(Exception e)

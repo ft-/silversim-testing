@@ -75,6 +75,9 @@ namespace SilverSim.Viewer.Core
                         RezAttachment(req.ItemID, req.AttachmentPoint);
                     }
                     break;
+
+                default:
+                    break;
             }
         }
 

@@ -219,8 +219,14 @@ namespace SilverSim.Viewer.Profile
                                     case "avatarnotesrequest":
                                         HandleAvatarNotesRequest(req.Key.Agent, scene, gm);
                                         break;
+
+                                    default:
+                                        break;
                                 }
                             }
+                            break;
+
+                        default:
                             break;
                     }
                 }

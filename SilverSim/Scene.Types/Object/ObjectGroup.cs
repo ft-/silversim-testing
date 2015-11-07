@@ -1204,6 +1204,9 @@ namespace SilverSim.Scene.Types.Object
                             throw new InvalidObjectXmlException();
                         }
                         return otherPart;
+
+                    default:
+                        break;
                 }
             }
         }
@@ -1333,6 +1336,9 @@ namespace SilverSim.Scene.Types.Object
                             throw new InvalidObjectXmlException();
                         }
                         return rootPart;
+
+                    default:
+                        break;
                 }
             }
         }

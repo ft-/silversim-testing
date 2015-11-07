@@ -314,6 +314,9 @@ namespace SilverSim.Types.StructuredData.Llsd
                         {
                             throw new InvalidLlsdXmlSerializationException();
                         }
+
+                    default:
+                        break;
                 }
             }
         }

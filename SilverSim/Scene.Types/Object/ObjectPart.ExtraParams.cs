@@ -491,6 +491,9 @@ namespace SilverSim.Scene.Types.Object
                                     proj.ProjectionAmbience = LEBytes2Float(value, pos);
                                     pos += 4;
                                     break;
+
+                                default:
+                                    break;
                             }
                         }
                     }

@@ -69,6 +69,9 @@ namespace SilverSim.Viewer.Economy
                         case MessageType.EconomyDataRequest:
                             HandleEconomyDataRequest(req.Key, req.Value);
                             break;
+
+                        default:
+                            break;
                     }
                 }
                 catch(Exception e)

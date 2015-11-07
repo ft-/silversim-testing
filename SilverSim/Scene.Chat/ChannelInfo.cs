@@ -103,6 +103,9 @@ namespace SilverSim.Scene.Chat
                             listener.Send(ev);
                         }
                         break;
+
+                    default:
+                        break;
                 }
             });
         }
