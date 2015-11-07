@@ -204,7 +204,7 @@ namespace SilverSim.Types.Primitive
     [Flags]
     [SuppressMessage("Gendarme.Rules.Design", "FlagsShouldNotDefineAZeroValueRule")]
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-    public enum PrimitiveMediaPermission : int
+    public enum PrimitiveMediaPermission 
     {
         None = 0,
         Owner = 1,
