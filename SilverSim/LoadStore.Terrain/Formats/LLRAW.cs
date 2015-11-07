@@ -18,8 +18,8 @@ namespace SilverSim.LoadStore.Terrain.Formats
     {
         public struct HeightmapLookupValue : IComparable<HeightmapLookupValue>, IEquatable<HeightmapLookupValue>
         {
-            public ushort Index;
-            public float Value;
+            public readonly ushort Index;
+            public readonly float Value;
 
             public HeightmapLookupValue(ushort index, float value)
             {

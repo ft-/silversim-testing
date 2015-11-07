@@ -10,7 +10,7 @@ namespace SilverSim.ServiceInterfaces.Inventory
 {
     public class DefaultInventoryFolderContentService : InventoryFolderContentServiceInterface
     {
-        InventoryFolderServiceInterface m_Service;
+        readonly InventoryFolderServiceInterface m_Service;
 
         public DefaultInventoryFolderContentService(InventoryFolderServiceInterface service)
         {

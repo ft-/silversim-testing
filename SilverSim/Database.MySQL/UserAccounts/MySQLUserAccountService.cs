@@ -17,7 +17,7 @@ namespace SilverSim.Database.MySQL.UserAccounts
     #region Service Implementation
     public sealed class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL USERACCOUNT SERVICE");
 
         #region Constructor

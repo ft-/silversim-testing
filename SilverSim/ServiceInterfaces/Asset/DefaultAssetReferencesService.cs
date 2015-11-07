@@ -13,8 +13,8 @@ namespace SilverSim.ServiceInterfaces.Asset
     public sealed class DefaultAssetReferencesService : AssetReferencesServiceInterface
     {
         #region Fields
-        private AssetServiceInterface m_Service;
-        private readonly RwLockedDictionary<UUID, List<UUID>> m_ReferencesCache = new RwLockedDictionary<UUID, List<UUID>>();
+        readonly AssetServiceInterface m_Service;
+        readonly RwLockedDictionary<UUID, List<UUID>> m_ReferencesCache = new RwLockedDictionary<UUID, List<UUID>>();
         #endregion
 
         #region Constructor

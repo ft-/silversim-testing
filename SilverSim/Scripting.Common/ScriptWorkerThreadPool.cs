@@ -12,7 +12,7 @@ namespace SilverSim.Scripting.Common
 {
     public sealed class ScriptWorkerThreadPool : IScriptWorkerThreadPool
     {
-        private BlockingQueue<ScriptInstance> m_ScriptTriggerQueue = new BlockingQueue<ScriptInstance>();
+        readonly BlockingQueue<ScriptInstance> m_ScriptTriggerQueue = new BlockingQueue<ScriptInstance>();
         private int m_MinimumThreads = 2;
         private int m_MaximumThreads = 150;
         public class ScriptThreadContext
@@ -26,7 +26,7 @@ namespace SilverSim.Scripting.Common
 
             }
         }
-        private RwLockedList<ScriptThreadContext> m_Threads = new RwLockedList<ScriptThreadContext>();
+        readonly RwLockedList<ScriptThreadContext> m_Threads = new RwLockedList<ScriptThreadContext>();
 
         public int MinimumThreads
         {

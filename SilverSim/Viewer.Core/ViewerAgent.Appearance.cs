@@ -161,7 +161,8 @@ namespace SilverSim.Viewer.Core
                 foreach(KeyValuePair<WearableType, List<AgentWearables.WearableInfo>> kvp in aw)
                 {
                     List<AgentWearables.WearableInfo> lwi = kvp.Value;
-                    for (int c = 0; c < kvp.Value.Count;)
+                    int c = 0;
+                    while(c < kvp.Value.Count)
                     {
                         if (lwi[c].AssetID.Equals(UUID.Zero))
                         {

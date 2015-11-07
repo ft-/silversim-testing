@@ -150,8 +150,8 @@ namespace SilverSim.Viewer.Core
 
         void SendEstateList(UUID transactionID, UUID invoice, EstateAccessCodes code, List<UUI> data, uint estateID, UUID fromSceneID)
         {
-            int i;
-            for(i = 0; i < data.Count;)
+            int i = 0;
+            while(i < data.Count)
             {
                 int remaining = data.Count - i;
                 if(remaining > 50)
@@ -190,8 +190,8 @@ namespace SilverSim.Viewer.Core
         /* this is groups only, so no code check inside */
         void SendEstateList(UUID transactionID, UUID invoice, EstateAccessCodes code, List<UGI> data, uint estateID, UUID fromSceneID)
         {
-            int i;
-            for (i = 0; i < data.Count; )
+            int i = 0;
+            while(i < data.Count)
             {
                 int remaining = data.Count - i;
                 if (remaining > 50)

@@ -199,7 +199,7 @@ namespace SilverSim.Scripting.Common
             public TextReader Reader;
             public int LineNumberCounter;
         };
-        private List<ParserInput> m_ParserInputs = new List<ParserInput>();
+        readonly List<ParserInput> m_ParserInputs = new List<ParserInput>();
 
         protected ParserBase()
         {

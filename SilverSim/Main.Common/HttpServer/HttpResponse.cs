@@ -224,6 +224,10 @@ namespace SilverSim.Main.Common.HttpServer
 
         public void Dispose()
         {
+            if (null != ResponseBody)
+            {
+                ResponseBody.Dispose();
+            }
             Close();
             if (null != m_Output)
             {

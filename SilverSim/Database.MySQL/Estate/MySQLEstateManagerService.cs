@@ -49,7 +49,7 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
-        MySQLListAccess m_ListAccess;
+        readonly MySQLListAccess m_ListAccess;
 
         public MySQLEstateManagerService(string connectionString)
         {
