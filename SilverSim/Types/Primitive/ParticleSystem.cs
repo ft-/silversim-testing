@@ -363,7 +363,7 @@ namespace SilverSim.Types.Primitive
         void PackSystemBytes(ref BitPacker pack)
         {
             pack.PackBits(CRC, 32);
-            pack.PackBits((uint)PartFlags, 32);
+            pack.PackBits(PartFlags, 32);
             pack.PackBits((uint)Pattern, 8);
             pack.PackFixed(MaxAge, false, 8, 8);
             pack.PackFixed(StartAge, false, 8, 8);

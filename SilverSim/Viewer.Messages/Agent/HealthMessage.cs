@@ -8,7 +8,7 @@ namespace SilverSim.Viewer.Messages.Agent
     [Trusted]
     public class HealthMessage : Message
     {
-        public double Health = 0f;
+        public double Health;
 
         public HealthMessage()
         {

@@ -31,7 +31,7 @@ namespace SilverSim.Types
         public override bool Equals(object obj)
         {
             UUI u = obj as UUI;
-            return (null != u) ? this.ID == u.ID : false;
+            return (null != u) && this.ID == u.ID;
         }
 
         public bool Equals(UUI uui)
@@ -250,8 +250,8 @@ namespace SilverSim.Types
             }
         }
 
-        private static readonly char[] Semicolon = new char[1] { (char)';' };
-        private static readonly char[] Whitespace = new char[1] { (char)' ' };
+        private static readonly char[] Semicolon = new char[1] { ';' };
+        private static readonly char[] Whitespace = new char[1] { ' ' };
 
         public static UUI Unknown
         {

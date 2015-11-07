@@ -71,7 +71,7 @@ namespace SilverSim.Viewer.Groups
 
         BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>> IMGroupNoticeQueue = new BlockingQueue<KeyValuePair<SceneInterface, GridInstantMessage>>();
 
-        bool m_ShutdownGroups = false;
+        bool m_ShutdownGroups;
 
         public ViewerGroupsServer()
         {

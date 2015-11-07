@@ -3,7 +3,7 @@
 
 namespace SilverSim.Scene.Types.Physics.Vehicle
 {
-    public enum VehicleFloatParamId : int
+    public enum VehicleFloatParamId
     {
         AngularDeflectionEfficiency = 32,
         AngularDeflectionTimescale = 33,

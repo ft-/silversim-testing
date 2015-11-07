@@ -94,7 +94,7 @@ namespace SilverSim.Types
         public override bool Equals(object obj)
         {
             UGI u = obj as UGI;
-            return (u != null) ? this.Equals(u) : false;
+            return (u != null) && this.Equals(u);
         }
 
         public bool Equals(UGI ugi)
@@ -156,7 +156,7 @@ namespace SilverSim.Types
             }
         }
 
-        private static readonly char[] Semicolon = new char[1] { (char)';' };
+        private static readonly char[] Semicolon = new char[1] { ';' };
 
         public static UGI Unknown
         {

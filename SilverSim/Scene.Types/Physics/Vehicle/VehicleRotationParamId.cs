@@ -3,7 +3,7 @@
 
 namespace SilverSim.Scene.Types.Physics.Vehicle
 {
-    public enum VehicleRotationParamId : int
+    public enum VehicleRotationParamId
     {
         ReferenceFrame = 44
     }

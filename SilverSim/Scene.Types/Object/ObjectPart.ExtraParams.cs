@@ -436,10 +436,10 @@ namespace SilverSim.Scene.Types.Object
                                     }
                                     flexi.IsFlexible = true;
                                     flexi.Softness = ((value[pos] & 0x80) >> 6) | ((value[pos + 1] & 0x80) >> 7);
-                                    flexi.Tension = (float)(value[pos++] & 0x7F) / 10.0f;
-                                    flexi.Friction = (float)(value[pos++] & 0x7F) / 10.0f;
-                                    flexi.Gravity = (float)(value[pos++] / 10.0f) - 10.0f;
-                                    flexi.Wind = (float)value[pos++] / 10.0f;
+                                    flexi.Tension = (value[pos++] & 0x7F) / 10.0f;
+                                    flexi.Friction = (value[pos++] & 0x7F) / 10.0f;
+                                    flexi.Gravity = (value[pos++] / 10.0f) - 10.0f;
+                                    flexi.Wind = value[pos++] / 10.0f;
                                     flexi.Force.FromBytes(value, pos);
                                     pos += 12;
                                     break;

@@ -43,7 +43,7 @@ namespace SilverSim.Viewer.Core
             }
             basePermissions |= (uint)item.Permissions.EveryOne;
 
-            writer.WriteKeyValuePair("base_mask", (uint)basePermissions);
+            writer.WriteKeyValuePair("base_mask", basePermissions);
             writer.WriteKeyValuePair("creator_id", item.Creator.ID);
             writer.WriteKeyValuePair("everyone_mask", (uint)item.Permissions.EveryOne);
             writer.WriteKeyValuePair("group_id", item.Group.ID);

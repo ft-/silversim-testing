@@ -64,8 +64,8 @@ namespace SilverSim.Types.Primitive
             {
                 Flags = (TextureAnimMode)data[pos++];
                 Face = (sbyte)data[pos++];
-                SizeX = (byte)data[pos++];
-                SizeY = (byte)data[pos++];
+                SizeX = data[pos++];
+                SizeY = data[pos++];
                 Start = BytesToFloat(data, pos);
                 Length = BytesToFloat(data, pos + 4);
                 Rate = BytesToFloat(data, pos + 8);

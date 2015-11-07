@@ -13,7 +13,6 @@ namespace SilverSim.Types
     {
         #region Constructors
         public AnArray()
-            : base()
         {
 
         }

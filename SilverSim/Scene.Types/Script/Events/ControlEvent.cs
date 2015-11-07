@@ -12,7 +12,7 @@ namespace SilverSim.Scene.Types.Script.Events
     {
         [Flags]
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-        public enum ControlFlags : int
+        public enum ControlFlags
         {
             Forward = 0x00000001,
             Back = 0x00000002,

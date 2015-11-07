@@ -124,7 +124,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                if (value != null ? (value.Flags & TextureAnimationEntry.TextureAnimMode.ANIM_ON) == 0 : true)
+                if (value == null || (value.Flags & TextureAnimationEntry.TextureAnimMode.ANIM_ON) == 0)
                 {
                     m_TextureAnimationLock.AcquireWriterLock(-1);
                     try

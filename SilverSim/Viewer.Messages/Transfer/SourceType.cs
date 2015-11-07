@@ -3,7 +3,7 @@
 
 namespace SilverSim.Viewer.Messages.Transfer
 {
-    public enum SourceType : int
+    public enum SourceType
     {
         Unknown = 0,
         Asset = 2,

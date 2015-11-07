@@ -66,7 +66,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public enum FullFixedBlock1Offset : int
+        public enum FullFixedBlock1Offset
         {
             LocalID = 0,
             State = LocalID + 4,
@@ -107,7 +107,7 @@ namespace SilverSim.Scene.Types.Object
             BlockLength = ProfileHollow + 2
         }
 
-        public enum FullFixedBlock2Offset : int
+        public enum FullFixedBlock2Offset
         {
             LoopedSound = 0,
             SoundOwner = LoopedSound + 16,
@@ -121,7 +121,7 @@ namespace SilverSim.Scene.Types.Object
             BlockLength = JointAxisOrAnchor + 12
         }
 
-        public enum PropertiesFixedBlockOffset : int
+        public enum PropertiesFixedBlockOffset
         {
             ObjectID = 0,
             CreatorID = ObjectID + 16,

@@ -28,7 +28,6 @@ namespace SilverSim.Viewer.Core
         public GridVector RemoteLocation { get; protected set; }
         /* <summary>RemoteOffset = RemoteGlobalPosition - LocalGlobalPosition</summary> */
         public Vector3 RemoteOffset { get; protected set; }
-        SceneInterface m_Scene;
 
         public SimCircuit(
             UDPCircuitsManager server,
@@ -95,7 +94,7 @@ namespace SilverSim.Viewer.Core
                         /* radius */ p.ReadFloat();
                         /* simaccess */ p.ReadUInt8();
                         ev.Message = p.ReadStringLen16();
-                        SceneInterface scene = m_Scene;
+                        SceneInterface scene = Scene;
                         if (scene != null)
                         {
                             ev.OriginSceneID = scene.ID;
@@ -194,18 +193,7 @@ namespace SilverSim.Viewer.Core
             /* no sim stats */
         }
 
-        public SceneInterface Scene
-        {
-            get
-            {
-                return m_Scene;
-            }
-
-            set
-            {
-                m_Scene = value;
-            }
-        }
+        public SceneInterface Scene { get; set; }
 
         public class ChildAgentUpdater : IAgentChildUpdateServiceInterface
         {

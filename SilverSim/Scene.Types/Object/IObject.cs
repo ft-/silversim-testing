@@ -13,7 +13,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
 {
-    public enum ObjectDetailsType : int
+    public enum ObjectDetailsType
     {
         Name = 1,
         Desc = 2,

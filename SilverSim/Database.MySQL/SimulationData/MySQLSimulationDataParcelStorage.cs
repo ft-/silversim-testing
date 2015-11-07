@@ -70,7 +70,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             pi.Owner = new UUI((string)dbReader["Owner"]);
                             pi.SnapshotID = MySQLUtilities.GetUUID(dbReader, "SnapshotID");
                             pi.SalePrice = (int)dbReader["SalePrice"];
-                            pi.OtherCleanTime = (int)(int)dbReader["OtherCleanTime"];
+                            pi.OtherCleanTime = (int)dbReader["OtherCleanTime"];
                             pi.MediaAutoScale = (uint)dbReader["MediaAutoScale"] != 0;
                             pi.RentPrice = (int)dbReader["RentPrice"];
                             pi.AABBMin = MySQLUtilities.GetVector(dbReader, "AABBMin");

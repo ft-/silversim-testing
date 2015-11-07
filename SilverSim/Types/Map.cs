@@ -30,7 +30,6 @@ namespace SilverSim.Types
 
         #region Constructors
         public Map()
-            : base()
         {
         }
 

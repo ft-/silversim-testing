@@ -16,7 +16,6 @@ namespace SilverSim.Http
         byte[] m_Buffer;
         int m_BufferPos;
         int m_BufferFill;
-        int m_ReadTimeout = 5000;
 
         [Serializable]
         public class TimeoutException : Exception
@@ -47,6 +46,7 @@ namespace SilverSim.Http
 
         public HttpStream(Socket sock)
         {
+            ReadTimeout = 5000;
             m_Buffer = new byte[4096];
             m_Socket = sock;
         }
@@ -80,7 +80,7 @@ namespace SilverSim.Http
             if(m_BufferFill == m_BufferPos)
             {
                 m_BufferPos = 0;
-                m_BufferFill = ReadBytesInternal(m_Buffer, m_Buffer.Length, m_ReadTimeout);
+                m_BufferFill = ReadBytesInternal(m_Buffer, m_Buffer.Length, ReadTimeout);
             }
             if(m_BufferPos < m_BufferFill)
             {
@@ -100,7 +100,7 @@ namespace SilverSim.Http
                 if (m_BufferFill == m_BufferPos)
                 {
                     m_BufferPos = 0;
-                    m_BufferFill = ReadBytesInternal(m_Buffer, m_Buffer.Length, m_ReadTimeout);
+                    m_BufferFill = ReadBytesInternal(m_Buffer, m_Buffer.Length, ReadTimeout);
                     if (m_BufferFill == 0)
                     {
                         return s;
@@ -133,7 +133,7 @@ namespace SilverSim.Http
                 if(m_BufferFill == m_BufferPos)
                 {
                     m_BufferPos = 0;
-                    m_BufferFill = ReadBytesInternal(m_Buffer, m_Buffer.Length, m_ReadTimeout);
+                    m_BufferFill = ReadBytesInternal(m_Buffer, m_Buffer.Length, ReadTimeout);
                     if(m_BufferFill == 0)
                     {
                         return rescount;
@@ -162,17 +162,7 @@ namespace SilverSim.Http
         }
 
         #region Stream Functions
-        public override int ReadTimeout
-        {
-            get
-            {
-                return m_ReadTimeout;
-            }
-            set
-            {
-                m_ReadTimeout = value;
-            }
-        }
+        public override int ReadTimeout { get; set; }
 
         public override int WriteTimeout
         {

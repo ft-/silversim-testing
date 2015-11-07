@@ -256,7 +256,7 @@ namespace SilverSim.Types
 
         public override bool Equals(object obj)
         {
-            return (obj is Vector3) ? this == (Vector3)obj : false;
+            return (obj is Vector3) && this == (Vector3)obj;
         }
 
         public bool Equals(Vector3 other)

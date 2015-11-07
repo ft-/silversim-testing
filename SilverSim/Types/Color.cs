@@ -6,9 +6,9 @@ namespace SilverSim.Types
 {
     public class Color
     {
-        public double R = 0f;
-        public double G = 0f;
-        public double B = 0f;
+        public double R;
+        public double G;
+        public double B;
 
         #region Constructors
         public Color()

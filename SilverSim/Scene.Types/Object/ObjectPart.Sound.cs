@@ -138,7 +138,7 @@ namespace SilverSim.Scene.Types.Object
 
             #region Fields
             public UUID ImpactSound = UUID.Zero;
-            public double ImpactVolume = 0f;
+            public double ImpactVolume;
             #endregion
 
             public byte[] Serialization

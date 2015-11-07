@@ -9,7 +9,7 @@ namespace SilverSim.Types.Asset.Format
 {
     public class Gesture : IReferencesAccessor
     {
-        public enum StepType : int
+        public enum StepType
         {
             Animation = 0,
             Sound = 1,

@@ -6,7 +6,7 @@ using System.Diagnostics.CodeAnalysis;
 namespace SilverSim.Types.Primitive
 {
     [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
-    public enum PrimitiveMaterial : int
+    public enum PrimitiveMaterial
     {
         Stone = 0,
         Metal = 1,

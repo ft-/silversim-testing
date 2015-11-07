@@ -3,7 +3,7 @@
 
 namespace SilverSim.Scene.Types.Physics.Vehicle
 {
-    public enum VehicleVectorParamId : int
+    public enum VehicleVectorParamId
     {
         AngularFrictionTimescale = 17,
         AngularMotorDirection = 19,

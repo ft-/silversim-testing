@@ -9,7 +9,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
     [Flags]
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     [SuppressMessage("Gendarme.Rules.Design", "FlagsShouldNotDefineAZeroValueRule")]
-    public enum VehicleFlags : int
+    public enum VehicleFlags : uint
     {
         None = 0,
         NoDeflectionUp = 0x0001,

@@ -953,7 +953,7 @@ namespace SilverSim.Types
 
         public override bool Equals(object obj)
         {
-            return (obj is Matrix4) ? this == (Matrix4)obj : false;
+            return (obj is Matrix4) && this == (Matrix4)obj;
         }
 
         public bool Equals(Matrix4 other)

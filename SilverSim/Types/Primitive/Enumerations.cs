@@ -86,7 +86,7 @@ namespace SilverSim.Types.Primitive
 
     [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-    public enum PrimitiveParamsType : int
+    public enum PrimitiveParamsType
     {
         Name = 27,
         Desc = 28,
@@ -119,7 +119,7 @@ namespace SilverSim.Types.Primitive
     }
 
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-    public enum PrimitivePhysicsShapeType : int
+    public enum PrimitivePhysicsShapeType
     {
         Prim = 0,
         None = 1,
@@ -127,7 +127,7 @@ namespace SilverSim.Types.Primitive
     }
 
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-    public enum PrimitiveShapeType : int
+    public enum PrimitiveShapeType
     {
         Box = 0,
         Cylinder = 1,
@@ -213,7 +213,7 @@ namespace SilverSim.Types.Primitive
         All = 7
     }
 
-    public enum PrimitiveMediaControls : int
+    public enum PrimitiveMediaControls
     {
         Standard = 0,
         Mini = 1

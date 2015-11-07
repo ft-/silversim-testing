@@ -105,8 +105,8 @@ namespace SilverSim.Scene.Types.Object
 
             #region Fields
             public Vector3 Axis = Vector3.Zero;
-            public double Spinrate = 0;
-            public double Gain = 0;
+            public double Spinrate;
+            public double Gain;
             #endregion
         }
 

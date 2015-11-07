@@ -92,7 +92,6 @@ namespace SilverSim.Scripting.Common
         public class PreprocessorLineErrorException : Exception
         {
             public PreprocessorLineErrorException()
-                : base()
             {
 
             }
@@ -178,7 +177,6 @@ namespace SilverSim.Scripting.Common
             }
 
             public CircularIncludeException()
-                : base()
             {
 
             }

@@ -26,7 +26,6 @@ namespace SilverSim.Viewer.Core
         public EndPoint RemoteEndPoint = new IPEndPoint(0, 0);
 
         public UDPReceivePacket()
-            : base()
         {
 
         }

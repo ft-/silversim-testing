@@ -12,7 +12,7 @@ namespace SilverSim.Types.Asset
     {
         public byte[] Data = new byte[0];
 
-        public AssetData() : base()
+        public AssetData()
         {
 
         }

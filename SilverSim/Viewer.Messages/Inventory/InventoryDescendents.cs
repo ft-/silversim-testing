@@ -122,7 +122,7 @@ namespace SilverSim.Viewer.Messages.Inventory
                 checksum += d.Flags; // Flags
                 checksum += (uint)d.InvType; // InvType
                 checksum += (uint)d.Type; // Type 
-                checksum += (uint)d.CreationDate; // CreationDate
+                checksum += d.CreationDate; // CreationDate
                 checksum += (uint)d.SalePrice;    // SalePrice
                 checksum += (uint)((uint)d.SaleType * 0x07073096); // SaleType
 

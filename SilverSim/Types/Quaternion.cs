@@ -634,7 +634,7 @@ namespace SilverSim.Types
 
         public override bool Equals(object obj)
         {
-            return (obj is Quaternion) ? this == (Quaternion)obj : false;
+            return (obj is Quaternion) && this == (Quaternion)obj;
         }
 
         public bool Equals(Quaternion other)
