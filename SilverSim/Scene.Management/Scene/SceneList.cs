@@ -64,7 +64,8 @@ namespace SilverSim.Scene.Management.Scene
                 var ev = OnRegionAdd; /* events are not exactly thread-safe, so copy the reference first */
                 if (null != ev)
                 {
-                    foreach (Action<SceneInterface> del in ev.GetInvocationList())
+                    Action<SceneInterface>[] invocationList = (Action<SceneInterface>[])ev.GetInvocationList();
+                    foreach (Action<SceneInterface> del in invocationList)
                     {
                         try
                         {
@@ -104,7 +105,8 @@ namespace SilverSim.Scene.Management.Scene
                 var ev = OnRegionRemove; /* events are not exactly thread-safe, so copy the reference first */
                 if (null != ev)
                 {
-                    foreach (Action<SceneInterface> del in ev.GetInvocationList())
+                    Action<SceneInterface>[] invocationList = (Action<SceneInterface>[])ev.GetInvocationList();
+                    foreach (Action<SceneInterface> del in invocationList)
                     {
                         try
                         {

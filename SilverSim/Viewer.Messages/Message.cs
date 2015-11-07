@@ -173,7 +173,8 @@ namespace SilverSim.Viewer.Messages
             var ev = OnSendCompletion;
             if (null != ev)
             {
-                foreach (Action<bool> del in ev.GetInvocationList())
+                Action<bool>[] invocationList = (Action<bool>[])ev.GetInvocationList();
+                foreach (Action<bool> del in invocationList)
                 {
                     del(flag);
                 }

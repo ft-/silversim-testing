@@ -294,9 +294,11 @@ namespace SilverSim.Scene.Types.Scene
         public void InvokeOnRemove()
         {
             LoginControl.OnLoginsEnabled -= LoginsEnabledHandler;
-            if (null != OnRemove)
+            var ev = OnRemove;
+            if (null != ev)
             {
-                foreach (Action<SceneInterface> del in OnRemove.GetInvocationList())
+                Action<SceneInterface>[] invocationList = (Action<SceneInterface>[])ev.GetInvocationList();
+                foreach (Action<SceneInterface> del in invocationList)
                 {
                     try
                     {
@@ -323,7 +325,8 @@ namespace SilverSim.Scene.Types.Scene
             var ev = OnIPChanged;
             if (ev != null)
             {
-                foreach (Action<SceneInterface, IPAddress> del in ev.GetInvocationList())
+                Action<SceneInterface, IPAddress>[] invocationList = (Action<SceneInterface, IPAddress>[])ev.GetInvocationList();
+                foreach (Action<SceneInterface, IPAddress> del in invocationList)
                 {
                     try
                     {

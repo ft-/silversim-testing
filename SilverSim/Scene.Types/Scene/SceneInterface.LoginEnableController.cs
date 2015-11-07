@@ -77,7 +77,8 @@ namespace SilverSim.Scene.Types.Scene
                 var ev = OnLoginsEnabled;
                 if(ev != null)
                 {
-                    foreach (Action<bool> del in ev.GetInvocationList())
+                    Action<bool>[] invocationList = (Action<bool>[])ev.GetInvocationList();
+                    foreach (Action<bool> del in invocationList)
                     {
                         try
                         {

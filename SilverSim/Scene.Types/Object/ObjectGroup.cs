@@ -189,7 +189,8 @@ namespace SilverSim.Scene.Types.Object
             var ev = OnUpdate; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                foreach (Action<ObjectGroup, UpdateChangedFlags> del in ev.GetInvocationList())
+                Action<ObjectGroup, UpdateChangedFlags>[] invocationList = (Action<ObjectGroup, UpdateChangedFlags>[])ev.GetInvocationList();
+                foreach (Action<ObjectGroup, UpdateChangedFlags> del in invocationList)
                 {
                     try
                     {
@@ -695,7 +696,8 @@ namespace SilverSim.Scene.Types.Object
             var e = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
             if (e != null)
             {
-                foreach (Action<IObject> del in e.GetInvocationList())
+                Action<IObject>[] invocationList = (Action<IObject>[])e.GetInvocationList();
+                foreach (Action<IObject> del in invocationList)
                 {
                     del(this);
                 }
