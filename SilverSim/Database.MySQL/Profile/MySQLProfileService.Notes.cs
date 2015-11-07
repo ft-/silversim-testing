@@ -13,7 +13,7 @@ namespace SilverSim.Database.MySQL.Profile
     {
         public sealed class MySQLNotes : INotesInterface
         {
-            string m_ConnectionString;
+            readonly string m_ConnectionString;
 
             public MySQLNotes(string connectionString)
             {

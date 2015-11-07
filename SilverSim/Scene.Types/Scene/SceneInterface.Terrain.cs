@@ -26,10 +26,10 @@ namespace SilverSim.Scene.Types.Scene
             private const int BASE_REGION_SIZE = 256;
             private const double DEFAULT_TERRAIN_HEIGHT = 21;
 
-            private SceneInterface m_Scene;
-            private ReaderWriterLock m_TerrainRwLock = new ReaderWriterLock();
+            readonly SceneInterface m_Scene;
+            readonly ReaderWriterLock m_TerrainRwLock = new ReaderWriterLock();
 
-            private LayerPatch[,] m_TerrainPatches;
+            readonly LayerPatch[,] m_TerrainPatches;
 
             public readonly RwLockedList<ITerrainListener> TerrainListeners = new RwLockedList<ITerrainListener>();
 
@@ -355,9 +355,9 @@ namespace SilverSim.Scene.Types.Scene
 
             public class PatchesAccessor
             {
-                LayerPatch[,] m_TerrainPatches;
-                uint m_NumXPatches;
-                uint m_NumYPatches;
+                readonly LayerPatch[,] m_TerrainPatches;
+                readonly uint m_NumXPatches;
+                readonly uint m_NumYPatches;
                 public PatchesAccessor(LayerPatch[,] terrainPatches, uint xPatches, uint yPatches)
                 {
                     m_TerrainPatches = terrainPatches;

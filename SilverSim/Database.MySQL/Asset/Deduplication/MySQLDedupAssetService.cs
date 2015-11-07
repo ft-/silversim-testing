@@ -22,7 +22,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL DEDUP ASSET SERVICE");
 
-        private string m_ConnectionString;
+        readonly string m_ConnectionString;
         private MySQLDedupAssetMetadataService m_MetadataService;
         private DefaultAssetReferencesService m_ReferencesService;
         private MySQLDedupAssetDataService m_DataService;

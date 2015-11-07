@@ -16,7 +16,7 @@ namespace SilverSim.Database.MySQL.Groups
     #region Service Implementation
     public sealed class MySQLGroupsNameService : GroupsNameServiceInterface, IDBServiceInterface, IPlugin
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GROUP NAMES SERVICE");
 
         #region Constructor

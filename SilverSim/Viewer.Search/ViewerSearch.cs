@@ -33,7 +33,7 @@ namespace SilverSim.Viewer.Search
         [PacketHandler(MessageType.DirLandQuery)]
         [PacketHandler(MessageType.DirPopularQuery)]
         [PacketHandler(MessageType.DirFindQuery)]
-        BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
+        readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         bool m_ShutdownSearch;
 

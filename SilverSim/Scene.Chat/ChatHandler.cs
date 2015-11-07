@@ -12,8 +12,8 @@ namespace SilverSim.Scene.Chat
     #region Service Implementation
     public class ChatHandler : ChatServiceInterface
     {
-        private RwLockedDictionary<int, ChannelInfo> m_Channels = new RwLockedDictionary<int, ChannelInfo>();
-        private RwLockedList<Listener> m_ChatPass = new RwLockedList<Listener>();
+        readonly RwLockedDictionary<int, ChannelInfo> m_Channels = new RwLockedDictionary<int, ChannelInfo>();
+        readonly RwLockedList<Listener> m_ChatPass = new RwLockedList<Listener>();
 
         #region Constructor
         internal ChatHandler(double whisperDistance, double sayDistance, double shoutDistance)

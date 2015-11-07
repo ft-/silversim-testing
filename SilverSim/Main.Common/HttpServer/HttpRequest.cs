@@ -21,8 +21,8 @@ namespace SilverSim.Main.Common.HttpServer
     public sealed class HttpRequest
     {
         #region Private Fields
-        private Stream m_HttpStream;
-        private Dictionary<string, string> m_Headers = new Dictionary<string, string>();
+        readonly Stream m_HttpStream;
+        readonly Dictionary<string, string> m_Headers = new Dictionary<string, string>();
         #endregion
 
         #region Properties

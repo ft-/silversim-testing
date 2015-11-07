@@ -36,21 +36,21 @@ namespace SilverSim.Viewer.Core
         public UUID AgentID = UUID.Zero;
         public ViewerAgent Agent;
         private SceneInterface m_Scene;
-        private RwLockedDictionary<string, UUID> m_RegisteredCapabilities = new RwLockedDictionary<string, UUID>();
-        private CapsHttpRedirector m_CapsRedirector;
-        private object m_SceneSetLock = new object();
+        readonly RwLockedDictionary<string, UUID> m_RegisteredCapabilities = new RwLockedDictionary<string, UUID>();
+        readonly CapsHttpRedirector m_CapsRedirector;
+        readonly object m_SceneSetLock = new object();
         private ChatServiceInterface m_ChatService;
         private ChatServiceInterface.Listener m_ChatListener;
         private ChatServiceInterface.Listener m_DebugChannelListener;
 
         private Thread m_TextureDownloadThread;
         private bool m_TextureDownloadThreadRunning;
-        private BlockingQueue<Message> m_TextureDownloadQueue = new BlockingQueue<Message>();
+        readonly BlockingQueue<Message> m_TextureDownloadQueue = new BlockingQueue<Message>();
         internal List<ITriggerOnRootAgentActions> m_TriggerOnRootAgentActions = new List<ITriggerOnRootAgentActions>();
 
         private Thread m_InventoryThread;
         private bool m_InventoryThreadRunning;
-        private BlockingQueue<Message> m_InventoryRequestQueue = new BlockingQueue<Message>();
+        readonly BlockingQueue<Message> m_InventoryRequestQueue = new BlockingQueue<Message>();
         public string GatekeeperURI { get; protected set; }
 
         private Thread m_ObjectUpdateThread;
@@ -180,8 +180,8 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         sealed class MessageHandlerExtenderKeyValuePairCircuitQueue
         {
-            WeakReference m_Circuit;
-            Queue<KeyValuePair<AgentCircuit, Message>> m_Queue;
+            readonly WeakReference m_Circuit;
+            readonly Queue<KeyValuePair<AgentCircuit, Message>> m_Queue;
 
             public MessageHandlerExtenderKeyValuePairCircuitQueue(AgentCircuit circuit, Queue<KeyValuePair<AgentCircuit, Message>> q)
             {
@@ -201,9 +201,9 @@ namespace SilverSim.Viewer.Core
 
         sealed class MessageHandlerExtenderViewerAgent
         {
-            WeakReference m_Agent;
-            WeakReference m_Circuit;
-            Action<ViewerAgent, AgentCircuit, Message> m_Delegate;
+            readonly WeakReference m_Agent;
+            readonly WeakReference m_Circuit;
+            readonly Action<ViewerAgent, AgentCircuit, Message> m_Delegate;
 
             // for documentation
             //public delegate void HandlerDelegate(ViewerAgent agent, AgentCircuit circuit, Message m);
@@ -228,8 +228,8 @@ namespace SilverSim.Viewer.Core
 
         sealed class MessageHandlerExtenderIAgent
         {
-            WeakReference m_Agent;
-            Action<IAgent, Message> m_Delegate;
+            readonly WeakReference m_Agent;
+            readonly Action<IAgent, Message> m_Delegate;
 
             //for documentation
             //public delegate void HandlerDelegate(IAgent agent, Message m);

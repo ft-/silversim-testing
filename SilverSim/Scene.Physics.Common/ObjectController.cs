@@ -18,7 +18,7 @@ namespace SilverSim.Scene.Physics.Common
         bool m_Phantom;
         bool m_ContributesToCollisionSurfaceAsChild;
         bool m_VolumeDetect;
-        PhysicsStateData m_StateData;
+        readonly PhysicsStateData m_StateData;
 
         protected ObjectController(ObjectGroup part, UUID sceneID)
         {

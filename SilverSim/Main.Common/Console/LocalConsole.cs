@@ -17,16 +17,16 @@ namespace SilverSim.Main.Common.Console
     {
         private int m_CursorXPosition;
         private int m_CursorYPosition = -1;
-        private StringBuilder m_CommandLineBuffer = new StringBuilder();
+        readonly StringBuilder m_CommandLineBuffer = new StringBuilder();
         private bool m_EchoInput = true;
-        private RwLockedList<string> m_CmdHistory = new RwLockedList<string>();
+        readonly RwLockedList<string> m_CmdHistory = new RwLockedList<string>();
 
-        private BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();
-        private Thread m_LogThread;
-        private Thread m_InputThread;
-        object m_InputThreadLock = new object();
+        readonly BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();
+        readonly Thread m_LogThread;
+        readonly Thread m_InputThread;
+        readonly object m_InputThreadLock = new object();
         private bool m_Shutdown;
-        private string m_ConsoleTitle;
+        readonly string m_ConsoleTitle;
 
         public LocalConsole(string consoleTitle)
         {

@@ -17,8 +17,8 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class ObjectMediaNavigate : ICapabilityInterface
     {
-        UUI m_Agent;
-        SceneInterface m_Scene;
+        readonly UUI m_Agent;
+        readonly SceneInterface m_Scene;
 
         public ObjectMediaNavigate(UUI agent, SceneInterface scene)
         {

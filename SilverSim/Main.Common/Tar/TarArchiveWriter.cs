@@ -14,7 +14,7 @@ namespace SilverSim.Main.Common.Tar
     [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public class TarArchiveWriter
     {
-        Stream m_Stream;
+        readonly Stream m_Stream;
         int m_Position;
 
         public TarArchiveWriter(Stream s)
@@ -22,10 +22,10 @@ namespace SilverSim.Main.Common.Tar
             m_Stream = s;
         }
 
-        byte[] m_FileModeBytes = Encoding.ASCII.GetBytes("0000777");
-        byte[] m_OwnerIdBytes = Encoding.ASCII.GetBytes("0000764");
-        byte[] m_GroupIdBytes = Encoding.ASCII.GetBytes("0000764");
-        List<string> m_Directories = new List<string>();
+        static readonly byte[] m_FileModeBytes = Encoding.ASCII.GetBytes("0000777");
+        static readonly byte[] m_OwnerIdBytes = Encoding.ASCII.GetBytes("0000764");
+        static readonly byte[] m_GroupIdBytes = Encoding.ASCII.GetBytes("0000764");
+        readonly List<string> m_Directories = new List<string>();
 
         void WriteDirectory(string dirname)
         {

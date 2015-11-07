@@ -20,7 +20,7 @@ namespace SilverSim.Database.MySQL.SimulationData
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SCRIPT STATE SERVICE");
 
-        public string m_ConnectionString;
+        readonly string m_ConnectionString;
         public MySQLSimulationDataScriptStateStorage(string connectionString)
         {
             m_ConnectionString = connectionString;

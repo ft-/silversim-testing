@@ -10,18 +10,18 @@ namespace SilverSim.Scene.Chat
 {
     public class ListenerInfo : ChatServiceInterface.Listener
     {
-        private int m_Channel;
-        private string m_Name;
-        private UUID m_ID;
-        private string m_Message;
-        private Func<UUID> m_GetUUID;
-        private Func<Vector3> m_GetPos;
-        private Action<ListenEvent> m_Send;
+        readonly int m_Channel;
+        readonly string m_Name;
+        readonly UUID m_ID;
+        readonly string m_Message;
+        readonly Func<UUID> m_GetUUID;
+        readonly Func<Vector3> m_GetPos;
+        readonly Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
-        private bool m_IsAgent;
+        readonly bool m_IsAgent;
         public override bool IsAgent { get { return m_IsAgent; } }
 
-        private ChatHandler m_Handler;
+        readonly ChatHandler m_Handler;
 
         internal ListenerInfo(
             ChatHandler handler,

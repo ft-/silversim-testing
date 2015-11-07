@@ -18,9 +18,9 @@ namespace SilverSim.Scene.Types.Scene
     {
         private Int32[,] m_ParcelLayer; /* initialized in constructor */
         private bool[] m_ParcelLayerDirty; /* RegionWidth / PARCEL_BLOCK_SIZE * RegionHeight / PARCEL_BLOCK_SIZE / 1024 */
-        private ReaderWriterLock m_ParcelLayerRwLock = new ReaderWriterLock();
+        readonly ReaderWriterLock m_ParcelLayerRwLock = new ReaderWriterLock();
         protected readonly RwLockedDoubleDictionary<UUID, Int32, ParcelInfo> m_Parcels = new RwLockedDoubleDictionary<UUID, int, ParcelInfo>();
-        private object m_ParcelOverlayUpdateLock = new object();
+        readonly object m_ParcelOverlayUpdateLock = new object();
 
         private void InitializeParcelLayer()
         {

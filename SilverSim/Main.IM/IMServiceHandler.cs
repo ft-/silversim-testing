@@ -19,7 +19,7 @@ namespace SilverSim.Main.IM
     {
         protected internal BlockingQueue<GridInstantMessage> m_Queue = new BlockingQueue<GridInstantMessage>();
         protected internal RwLockedList<Thread> m_Threads = new RwLockedList<Thread>();
-        private uint m_MaxThreads;
+        readonly uint m_MaxThreads;
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void IMSendThread(object s)

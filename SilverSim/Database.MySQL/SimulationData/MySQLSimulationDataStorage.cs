@@ -22,12 +22,12 @@ namespace SilverSim.Database.MySQL.SimulationData
     public sealed class MySQLSimulationDataStorage : SimulationDataStorageInterface, IDBServiceInterface, IPlugin, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
-        private string m_ConnectionString;
-        private MySQLSimulationDataObjectStorage m_ObjectStorage;
-        private MySQLSimulationDataParcelStorage m_ParcelStorage;
-        private MySQLSimulationDataScriptStateStorage m_ScriptStateStorage;
-        private MySQLSimulationDataTerrainStorage m_TerrainStorage;
-        private MySQLSimulationDataEnvSettingsStorage m_EnvironmentStorage;
+        readonly string m_ConnectionString;
+        readonly MySQLSimulationDataObjectStorage m_ObjectStorage;
+        readonly MySQLSimulationDataParcelStorage m_ParcelStorage;
+        readonly MySQLSimulationDataScriptStateStorage m_ScriptStateStorage;
+        readonly MySQLSimulationDataTerrainStorage m_TerrainStorage;
+        readonly MySQLSimulationDataEnvSettingsStorage m_EnvironmentStorage;
 
         #region Constructor
         public MySQLSimulationDataStorage(string connectionString)

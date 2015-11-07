@@ -13,8 +13,8 @@ namespace SilverSim.Main.Common.Console
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public class LogConsole : CmdIO.TTY, IPlugin, IPluginShutdown
     {
-        private BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();
-        private Thread m_LogThread;
+        readonly BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();
+        readonly Thread m_LogThread;
         private bool m_Shutdown;
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]

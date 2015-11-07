@@ -15,7 +15,7 @@ namespace SilverSim.Scene.Management.Scene
         private static readonly ILog m_Log = LogManager.GetLogger("SCENE MANAGER");
         public event Action<SceneInterface> OnRegionAdd;
         public event Action<SceneInterface> OnRegionRemove;
-        private RwLockedBiDiMappingDictionary<UUID, string> m_RegionNames = new RwLockedBiDiMappingDictionary<UUID,string>();
+        readonly RwLockedBiDiMappingDictionary<UUID, string> m_RegionNames = new RwLockedBiDiMappingDictionary<UUID, string>();
 
         public SceneList()
         {

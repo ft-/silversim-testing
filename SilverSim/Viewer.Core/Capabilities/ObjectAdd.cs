@@ -21,8 +21,8 @@ namespace SilverSim.Viewer.Core.Capabilities
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public class ObjectAdd : ICapabilityInterface
     {
-        private SceneInterface m_Scene;
-        private UUI m_Creator;
+        readonly SceneInterface m_Scene;
+        readonly UUI m_Creator;
         public string CapabilityName
         {
             get

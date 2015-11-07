@@ -19,10 +19,10 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UpdateScriptAgent : UploadAssetAbstractCapability
     {
-        private ViewerAgent m_Agent;
-        private InventoryServiceInterface m_InventoryService;
-        private AssetServiceInterface m_AssetService;
-        private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
+        readonly ViewerAgent m_Agent;
+        readonly InventoryServiceInterface m_InventoryService;
+        readonly AssetServiceInterface m_AssetService;
+        readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
 
         public override string CapabilityName
         {

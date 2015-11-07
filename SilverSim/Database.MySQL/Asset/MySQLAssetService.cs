@@ -19,12 +19,12 @@ namespace SilverSim.Database.MySQL.Asset
     [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     public class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");
+        static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");
 
-        private string m_ConnectionString;
-        private MySQLAssetMetadataService m_MetadataService;
-        private DefaultAssetReferencesService m_ReferencesService;
-        private MySQLAssetDataService m_DataService;
+        readonly string m_ConnectionString;
+        readonly MySQLAssetMetadataService m_MetadataService;
+        readonly DefaultAssetReferencesService m_ReferencesService;
+        readonly MySQLAssetDataService m_DataService;
 
         #region Constructor
         public MySQLAssetService(string connectionString)

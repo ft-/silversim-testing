@@ -17,7 +17,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         public class ResourceAssetAccessor : RwLockedDictionary<UUID, AssetData>
         {
-            private List<string> m_Resources;
+            readonly List<string> m_Resources;
             internal ResourceAssetAccessor()
             {
                 m_Resources = new List<string>(GetType().Assembly.GetManifestResourceNames());
@@ -51,7 +51,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public class ResourceAssetMetadataService : AssetMetadataServiceInterface
         {
-            ResourceAssetAccessor m_ResourceAssets;
+            readonly ResourceAssetAccessor m_ResourceAssets;
 
             internal ResourceAssetMetadataService(ResourceAssetAccessor resourceAssets)
             {
@@ -80,7 +80,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public class ResourceAssetDataService : AssetDataServiceInterface
         {
-            ResourceAssetAccessor m_ResourceAssets;
+            readonly ResourceAssetAccessor m_ResourceAssets;
 
             internal ResourceAssetDataService(ResourceAssetAccessor resourceAssets)
             {
@@ -100,10 +100,10 @@ namespace SilverSim.Scene.Types.Scene
 
         public class ResourceAssetService : AssetServiceInterface
         {
-            ResourceAssetAccessor m_ResourceAssets;
-            ResourceAssetMetadataService m_MetadataService;
-            ResourceAssetDataService m_DataService;
-            SilverSim.ServiceInterfaces.Asset.DefaultAssetReferencesService m_ReferencesService;
+            readonly ResourceAssetAccessor m_ResourceAssets;
+            readonly ResourceAssetMetadataService m_MetadataService;
+            readonly ResourceAssetDataService m_DataService;
+            readonly SilverSim.ServiceInterfaces.Asset.DefaultAssetReferencesService m_ReferencesService;
 
             public ResourceAssetService()
             {

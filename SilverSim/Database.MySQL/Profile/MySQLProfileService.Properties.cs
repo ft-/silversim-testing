@@ -13,7 +13,7 @@ namespace SilverSim.Database.MySQL.Profile
     {
         public sealed class MySQLProperties : IPropertiesInterface
         {
-            string m_ConnectionString;
+            readonly string m_ConnectionString;
 
             public MySQLProperties(string connectionString)
             {

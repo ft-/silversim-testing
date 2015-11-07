@@ -12,7 +12,7 @@ namespace SilverSim.Http.Client
         {
             private Stream m_Output;
             private long m_RemainingLength;
-            private long m_ContentLength;
+            readonly long m_ContentLength;
             private static readonly byte[] FillBytes = new byte[10240];
 
             internal RequestBodyStream(Stream output, long contentLength)

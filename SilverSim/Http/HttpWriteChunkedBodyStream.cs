@@ -10,10 +10,10 @@ namespace SilverSim.Http
     public class HttpWriteChunkedBodyStream : Stream
     {
         private Stream m_Output;
-        private long m_WrittenLength;
-        private byte[] StreamBuffer = new byte[10240];
+        readonly long m_WrittenLength;
+        readonly byte[] StreamBuffer = new byte[10240];
         private int BufferFill;
-        private byte[] EOB = new byte[2] { (byte)'\r', (byte)'\n' };
+        readonly byte[] EOB = new byte[2] { (byte)'\r', (byte)'\n' };
 
         public HttpWriteChunkedBodyStream(Stream output)
         {

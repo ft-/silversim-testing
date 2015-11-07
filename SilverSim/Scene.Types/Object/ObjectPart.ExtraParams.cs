@@ -13,7 +13,7 @@ namespace SilverSim.Scene.Types.Object
     public partial class ObjectPart
     {
         private byte[] m_ExtraParamsBytes = new byte[0];
-        private ReaderWriterLock m_ExtraParamsLock = new ReaderWriterLock();
+        readonly ReaderWriterLock m_ExtraParamsLock = new ReaderWriterLock();
 
         private bool m_IsFacelightDisabled;
         private bool m_IsAttachmentLightsDisabled;

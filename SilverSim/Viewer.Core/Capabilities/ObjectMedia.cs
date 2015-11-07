@@ -14,8 +14,8 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class ObjectMedia : ICapabilityInterface
     {
-        UUI m_Agent;
-        SceneInterface m_Scene;
+        readonly UUI m_Agent;
+        readonly SceneInterface m_Scene;
 
         public ObjectMedia(UUI agent, SceneInterface scene)
         {

@@ -49,7 +49,7 @@ namespace SilverSim.Scene.Types.Object
 
 
         /* property here instead of a method. A lot more clear that we update something. */
-        object m_PhysicsUpdateLock = new object();
+        readonly object m_PhysicsUpdateLock = new object();
         [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
         public PhysicsStateData PhysicsUpdate
         {

@@ -18,7 +18,7 @@ namespace SilverSim.Viewer.Friends
         [PacketHandler(MessageType.DeclineFriendship)]
         [PacketHandler(MessageType.TerminateFriendship)]
         [PacketHandler(MessageType.GrantUserRights)]
-        BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
+        readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         bool m_ShutdownFriends;
 

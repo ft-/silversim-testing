@@ -123,13 +123,13 @@ namespace SilverSim.Main.Common
             m_ShutdownEvent.Dispose();
         }
 
-        private ILog m_Log;
-        private IConfigSource m_Config = new IniConfigSource();
-        private Queue<ICFG_Source> m_Sources = new Queue<ICFG_Source>();
-        private RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
-        private ManualResetEvent m_ShutdownEvent;
+        readonly ILog m_Log;
+        readonly IConfigSource m_Config = new IniConfigSource();
+        readonly Queue<ICFG_Source> m_Sources = new Queue<ICFG_Source>();
+        readonly RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
+        readonly ManualResetEvent m_ShutdownEvent;
         static readonly Dictionary<Type, string> m_FeaturesTable = new Dictionary<Type, string>();
-        private RwLockedDictionary<string, string> m_HeloResponseHeaders = new RwLockedDictionary<string, string>();
+        readonly RwLockedDictionary<string, string> m_HeloResponseHeaders = new RwLockedDictionary<string, string>();
 
         public void SetHeloResponseHeader(string key, string val)
         {
@@ -261,7 +261,7 @@ namespace SilverSim.Main.Common
 
         sealed class CFG_IniFileSource : ICFG_Source
         {
-            string m_FileName;
+            readonly string m_FileName;
             public CFG_IniFileSource(string fileName)
             {
                 m_FileName = fileName;
@@ -302,7 +302,7 @@ namespace SilverSim.Main.Common
 
         sealed class CFG_NiniXmlFileSource : ICFG_Source
         {
-            string m_Filename;
+            readonly string m_Filename;
             public CFG_NiniXmlFileSource(string fileName)
             {
                 m_Filename = fileName;
@@ -343,7 +343,7 @@ namespace SilverSim.Main.Common
 
         sealed class CFG_NiniXmlUriSource : ICFG_Source
         {
-            string m_Uri;
+            readonly string m_Uri;
             public CFG_NiniXmlUriSource(string uri)
             {
                 m_Uri = uri;
@@ -387,9 +387,9 @@ namespace SilverSim.Main.Common
 
         sealed class CFG_IniResourceSource : ICFG_Source
         {
-            string m_Name;
-            string m_Info;
-            string m_Assembly = string.Empty;
+            readonly string m_Name;
+            readonly string m_Info;
+            readonly string m_Assembly = string.Empty;
 
             public CFG_IniResourceSource(string name)
             {

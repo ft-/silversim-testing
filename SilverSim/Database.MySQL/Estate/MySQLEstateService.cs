@@ -18,14 +18,14 @@ namespace SilverSim.Database.MySQL.Estate
     [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
     public sealed class MySQLEstateService : EstateServiceInterface, IDBServiceInterface, IPlugin
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ESTATE SERVICE");
 
-        MySQLEstateOwnerService m_EstateOwnerService;
-        MySQLEstateManagerService m_EstateManagerService;
-        MySQLEstateAccessInterface m_EstateAccessService;
-        MySQLEstateGroupsService m_EstateGroupsService;
-        MySQLEstateRegionMapInterface m_EstateRegionMapService;
+        readonly MySQLEstateOwnerService m_EstateOwnerService;
+        readonly MySQLEstateManagerService m_EstateManagerService;
+        readonly MySQLEstateAccessInterface m_EstateAccessService;
+        readonly MySQLEstateGroupsService m_EstateGroupsService;
+        readonly MySQLEstateRegionMapInterface m_EstateRegionMapService;
 
         #region Constructor
         public MySQLEstateService(string connectionString)

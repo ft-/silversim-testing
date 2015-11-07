@@ -42,8 +42,8 @@ namespace SilverSim.Main.Common.CmdIO
 
         sealed class CommandType
         {
-            string m_Command;
-            RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_Dict;
+            readonly string m_Command;
+            readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> m_Dict;
             public CommandType(string command, RwLockedDictionary<string, Action<List<string>, TTY, UUID>> dict)
             {
                 m_Command = command;

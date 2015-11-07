@@ -22,10 +22,10 @@ namespace SilverSim.Viewer.Core.Capabilities
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public class NewFileAgentInventoryVariablePrice : UploadAssetAbstractCapability
     {
-        private InventoryServiceInterface m_InventoryService;
-        private AssetServiceInterface m_AssetService;
+        readonly InventoryServiceInterface m_InventoryService;
+        readonly AssetServiceInterface m_AssetService;
 
-        private readonly RwLockedDictionary<UUID, InventoryItem> m_Transactions = new RwLockedDictionary<UUID, InventoryItem>();
+        readonly RwLockedDictionary<UUID, InventoryItem> m_Transactions = new RwLockedDictionary<UUID, InventoryItem>();
 
         public override string CapabilityName
         {
@@ -115,7 +115,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
+        static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         void UploadObject(UUID transactionID, AssetData data)
         {

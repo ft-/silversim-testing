@@ -11,10 +11,10 @@ namespace SilverSim.Scene.Types.Object
     {
         private TextureEntry m_TextureEntry = new TextureEntry();
         private byte[] m_TextureEntryBytes = new byte[0];
-        private ReaderWriterLock m_TextureEntryLock = new ReaderWriterLock();
+        readonly ReaderWriterLock m_TextureEntryLock = new ReaderWriterLock();
 
         private byte[] m_TextureAnimationBytes = new byte[0];
-        private ReaderWriterLock m_TextureAnimationLock = new ReaderWriterLock();
+        readonly ReaderWriterLock m_TextureAnimationLock = new ReaderWriterLock();
 
         private string m_MediaURL = string.Empty;
 

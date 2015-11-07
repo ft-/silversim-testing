@@ -10,8 +10,8 @@ namespace SilverSim.Scene.Chat
 {
     sealed class ChannelInfo
     {
-        public RwLockedList<ChatServiceInterface.Listener> Listeners = new RwLockedList<ChatServiceInterface.Listener>();
-        private ChatHandler m_Handler;
+        public readonly RwLockedList<ChatServiceInterface.Listener> Listeners = new RwLockedList<ChatServiceInterface.Listener>();
+        readonly ChatHandler m_Handler;
 
         public ChannelInfo(ChatHandler handler)
         {

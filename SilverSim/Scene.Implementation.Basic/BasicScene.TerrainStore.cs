@@ -15,8 +15,8 @@ namespace SilverSim.Scene.Implementation.Basic
 {
     partial class BasicScene : ITerrainListener
     {
-        BlockingQueue<LayerPatch> m_TerrainStoreQueue = new BlockingQueue<LayerPatch>();
-        RwLockedDictionary<uint, uint> m_LastStoredTerrainSerial = new RwLockedDictionary<uint, uint>();
+        readonly BlockingQueue<LayerPatch> m_TerrainStoreQueue = new BlockingQueue<LayerPatch>();
+        readonly RwLockedDictionary<uint, uint> m_LastStoredTerrainSerial = new RwLockedDictionary<uint, uint>();
 
         public void TerrainUpdate(LayerPatch layerpath)
         {

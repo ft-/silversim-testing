@@ -13,7 +13,7 @@ namespace SilverSim.Database.MySQL.Estate
 {
     public sealed class MySQLEstateRegionMapInterface : IEstateRegionMapServiceInterface
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
 
         public MySQLEstateRegionMapInterface(string connectionString)
         {

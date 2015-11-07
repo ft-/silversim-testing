@@ -19,7 +19,7 @@ namespace SilverSim.Database.MySQL.Avatar
     #region Service Implementation
     public sealed class MySQLAvatarService : AvatarServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL AVATAR SERVICE");
 
         public MySQLAvatarService(string connectionString)

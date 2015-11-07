@@ -25,14 +25,14 @@ namespace SilverSim.Main.Common.HttpServer
         public RwLockedDictionary<string, Action<HttpRequest>> UriHandlers = new RwLockedDictionary<string, Action<HttpRequest>>();
         public RwLockedDictionary<string, Action<HttpRequest>> RootUriContentTypeHandlers = new RwLockedDictionary<string, Action<HttpRequest>>();
 
-        private TcpListener m_Listener;
+        readonly TcpListener m_Listener;
         public uint Port { get; private set; }
         public string ExternalHostName { get; private set; }
         public string Scheme { get; private set; }
 
-        private bool m_IsBehindProxy;
+        readonly bool m_IsBehindProxy;
 
-        X509Certificate m_ServerCertificate;
+        readonly X509Certificate m_ServerCertificate;
 
         public BaseHttpServer(IConfig httpConfig)
         {

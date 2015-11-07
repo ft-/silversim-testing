@@ -14,7 +14,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 {
     public class MySQLSimulationDataParcelStorage : SimulationDataParcelStorageInterface
     {
-        private string m_ConnectionString;
+        readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
 
         public MySQLSimulationDataParcelStorage(string connectionString)

@@ -12,7 +12,7 @@ namespace SilverSim.Database.MySQL.Profile
     {
         public sealed class MySQLUserPreferences : IUserPreferencesInterface
         {
-            string m_ConnectionString;
+            readonly string m_ConnectionString;
 
             public MySQLUserPreferences(string connectionString)
             {

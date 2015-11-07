@@ -12,11 +12,11 @@ namespace SilverSim.Http.Client
         {
             private AbstractHttpStream m_Input;
             private long m_RemainingLength;
-            private long m_ContentLength;
-            private bool m_KeepAlive;
-            string m_Scheme;
-            string m_Host;
-            int m_Port;
+            readonly long m_ContentLength;
+            readonly bool m_KeepAlive;
+            readonly string m_Scheme;
+            readonly string m_Host;
+            readonly int m_Port;
 
             internal ResponseBodyStream(AbstractHttpStream input, long contentLength, bool keepAlive, string scheme, string host, int port)
             {

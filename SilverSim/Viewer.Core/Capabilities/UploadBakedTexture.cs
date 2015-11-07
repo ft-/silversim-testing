@@ -17,9 +17,9 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UploadBakedTexture : UploadAssetAbstractCapability
     {
-        private static readonly ILog m_Log = LogManager.GetLogger("UPLOAD BAKED TEXTURE");
-        private AssetServiceInterface m_AssetService;
-        private readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
+        static readonly ILog m_Log = LogManager.GetLogger("UPLOAD BAKED TEXTURE");
+        readonly AssetServiceInterface m_AssetService;
+        readonly RwLockedDictionary<UUID, UUID> m_Transactions = new RwLockedDictionary<UUID, UUID>();
 
         public override string CapabilityName
         {

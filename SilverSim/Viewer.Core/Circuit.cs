@@ -20,26 +20,26 @@ namespace SilverSim.Viewer.Core
         private bool m_TxRunning;
         private Thread m_TxThread;
         private int __SequenceNumber;
-        private NonblockingQueue<UInt32> m_AckList = new NonblockingQueue<UInt32>();
-        private UDPCircuitsManager m_Server;
+        readonly NonblockingQueue<UInt32> m_AckList = new NonblockingQueue<UInt32>();
+        readonly UDPCircuitsManager m_Server;
         public EndPoint RemoteEndPoint;
-        private RwLockedDictionary<byte, int> m_PingSendTicks = new RwLockedDictionary<byte, int>();
+        readonly RwLockedDictionary<byte, int> m_PingSendTicks = new RwLockedDictionary<byte, int>();
         public int LastMeasuredLatencyTickCount { get; private set; }
         private uint m_LogoutReplySeqNo;
         private bool m_LogoutReplySent;
-        private object m_LogoutReplyLock = new object(); /* this is only for guarding access sequence to m_LogoutReply* variables */
+        readonly object m_LogoutReplyLock = new object(); /* this is only for guarding access sequence to m_LogoutReply* variables */
         private int m_LogoutReplySentAtTime;
         private int m_LastReceivedPacketAtTime;
 
-        protected Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
-        protected Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
-        protected Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
+        protected readonly Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
+        protected readonly Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
+        protected readonly Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
 
-        protected ThreadedClasses.BlockingQueue<UDPPacket> m_TxObjectPool = new BlockingQueue<UDPPacket>();
+        protected readonly ThreadedClasses.BlockingQueue<UDPPacket> m_TxObjectPool = new BlockingQueue<UDPPacket>();
         protected int m_PacketsReceived;
         protected int m_PacketsSent;
         protected int m_UnackedBytes;
-        protected object m_UnackedBytesLock = new object();
+        protected readonly object m_UnackedBytesLock = new object();
 
         internal UDPCircuitsManager Server
         {

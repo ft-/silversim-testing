@@ -19,7 +19,7 @@ namespace SilverSim.Database.MySQL.Presence
     #region Service Implementation
     public sealed class MySQLPresenceService : PresenceServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PRESENCE SERVICE");
 
         #region Constructor

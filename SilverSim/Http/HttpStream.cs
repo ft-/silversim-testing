@@ -12,8 +12,8 @@ namespace SilverSim.Http
 {
     public class HttpStream : AbstractHttpStream
     {
-        Socket m_Socket;
-        byte[] m_Buffer;
+        readonly Socket m_Socket;
+        readonly byte[] m_Buffer;
         int m_BufferPos;
         int m_BufferFill;
 

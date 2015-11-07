@@ -20,8 +20,8 @@ namespace SilverSim.Backend.Common.OfflineIM
 #if DEBUG
         private static readonly ILog m_Log = LogManager.GetLogger("OFFLINE IM");
 #endif
-        string m_AvatarNameServiceName;
-        string m_OfflineIMServiceName;
+        readonly string m_AvatarNameServiceName;
+        readonly string m_OfflineIMServiceName;
 
         AvatarNameServiceInterface m_AvatarNameService;
         OfflineIMServiceInterface m_OfflineIMService;

@@ -56,7 +56,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private ObjectUpdateInfo m_ObjectUpdateInfo;
+        readonly ObjectUpdateInfo m_ObjectUpdateInfo;
         private UUID m_ID = UUID.Zero;
         private string m_Name = string.Empty;
         private string m_Description = string.Empty;

@@ -24,18 +24,18 @@ namespace SilverSim.Scene.Implementation.Basic
     public sealed class SceneFactory : SceneFactoryInterface, IPlugin
     {
         ChatServiceFactoryInterface m_ChatFactory;
-        string m_ChatFactoryName;
-        string m_GroupsNameServiceName;
-        string m_GroupsServiceName;
-        string m_AssetServiceName;
-        string m_AssetCacheServiceName;
-        string m_GridServiceName;
-        string m_IMServiceName;
-        string m_EstateServiceName;
-        string m_SimulationDataStorageName;
-        string m_PhysicsName;
-        string m_NeighborServiceName;
-        List<string> m_AvatarNameServiceNames = new List<string>();
+        readonly string m_ChatFactoryName;
+        readonly string m_GroupsNameServiceName;
+        readonly string m_GroupsServiceName;
+        readonly string m_AssetServiceName;
+        readonly string m_AssetCacheServiceName;
+        readonly string m_GridServiceName;
+        readonly string m_IMServiceName;
+        readonly string m_EstateServiceName;
+        readonly string m_SimulationDataStorageName;
+        readonly string m_PhysicsName;
+        readonly string m_NeighborServiceName;
+        readonly List<string> m_AvatarNameServiceNames = new List<string>();
 
         GroupsNameServiceInterface m_GroupsNameService;
         AssetServiceInterface m_AssetService;
@@ -46,10 +46,10 @@ namespace SilverSim.Scene.Implementation.Basic
         IMServiceInterface m_IMService;
         EstateServiceInterface m_EstateService;
         SimulationDataStorageInterface m_SimulationDataStorage;
-        Dictionary<string, string> m_CapabilitiesConfig;
+        readonly Dictionary<string, string> m_CapabilitiesConfig;
         IPhysicsSceneFactory m_PhysicsFactory;
         NeighborServiceInterface m_NeighborService;
-        List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
+        readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
 
         public SceneFactory(IConfig ownConfig)
         {

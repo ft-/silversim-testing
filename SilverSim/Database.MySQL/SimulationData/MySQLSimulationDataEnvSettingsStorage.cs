@@ -15,7 +15,7 @@ namespace SilverSim.Database.MySQL.SimulationData
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL ENVIRONMENT SETTINGS SERVICE");
 
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
 
         public MySQLSimulationDataEnvSettingsStorage(string connectionString)
         {

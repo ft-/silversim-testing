@@ -138,10 +138,10 @@ namespace SilverSim.Viewer.Core
 
         public class RezAttachmentHandler : AssetTransferWorkItem
         {
-            SceneInterface m_Scene;
-            UUID m_ItemID;
-            UUI m_RezzingAgent;
-            AttachmentPoint m_AttachPoint;
+            readonly SceneInterface m_Scene;
+            readonly UUID m_ItemID;
+            readonly UUI m_RezzingAgent;
+            readonly AttachmentPoint m_AttachPoint;
 
             internal RezAttachmentHandler(SceneInterface scene, UUID itemid, UUID assetid, AssetServiceInterface source, UUI rezzingagent, AttachmentPoint attachPoint)
                 : base(scene.AssetService, source, assetid, ReferenceSource.Destination)

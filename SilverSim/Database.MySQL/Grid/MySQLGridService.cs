@@ -18,7 +18,7 @@ namespace SilverSim.Database.MySQL.Grid
     #region Service Implementation
     public sealed class MySQLGridService : GridServiceInterface, IDBServiceInterface, IPlugin
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRID SERVICE");
         private bool DeleteOnUnregister
         {

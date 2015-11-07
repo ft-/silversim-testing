@@ -61,8 +61,8 @@ namespace SilverSim.Scene.Types.Agent
         }
 
         readonly List<AnimationInfo> m_ActiveAnimations = new List<AnimationInfo>();
-        UUID m_AgentID;
-        Action<AvatarAnimation> m_SendAnimations;
+        readonly UUID m_AgentID;
+        readonly Action<AvatarAnimation> m_SendAnimations;
 
         public AgentAnimationController(UUID agentID, Action<AvatarAnimation> del)
         {

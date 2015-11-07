@@ -16,7 +16,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         public class DefaultAvatarNameService : AvatarNameServiceInterface
         {
-            RwLockedList<AvatarNameServiceInterface> m_ServiceList;
+            readonly RwLockedList<AvatarNameServiceInterface> m_ServiceList;
 
             internal DefaultAvatarNameService(RwLockedList<AvatarNameServiceInterface> serviceList)
             {

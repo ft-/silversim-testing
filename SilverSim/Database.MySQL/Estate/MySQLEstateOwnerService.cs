@@ -10,7 +10,7 @@ namespace SilverSim.Database.MySQL.Estate
 {
     public sealed class MySQLEstateOwnerService : IEstateOwnerServiceInterface
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
 
         public MySQLEstateOwnerService(string connectionString)
         {

@@ -10,7 +10,7 @@ namespace SilverSim.Scene.Types.Object
     public partial class ObjectPart
     {
         private byte[] m_ParticleSystem = new byte[0];
-        private ReaderWriterLock m_ParticleSystemLock = new ReaderWriterLock();
+        readonly ReaderWriterLock m_ParticleSystemLock = new ReaderWriterLock();
 
         public ParticleSystem ParticleSystem
         {

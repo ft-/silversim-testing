@@ -12,8 +12,8 @@ namespace SilverSim.Scene.Physics.Common
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
     public abstract class AgentController : CommonPhysicsController, IAgentPhysicsObject
     {
-        IAgent m_Agent;
-        PhysicsStateData m_StateData;
+        readonly IAgent m_Agent;
+        readonly PhysicsStateData m_StateData;
 
         protected AgentController(IAgent agent, UUID sceneID)
         {

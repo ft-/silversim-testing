@@ -13,7 +13,7 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
 {
     public class MySQLDedupAssetDataService : AssetDataServiceInterface
     {
-        private string m_ConnectionString;
+        readonly string m_ConnectionString;
         public MySQLDedupAssetDataService(string connectionString)
         {
             m_ConnectionString = connectionString;

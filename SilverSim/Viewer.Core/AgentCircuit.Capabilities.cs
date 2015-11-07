@@ -43,7 +43,7 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
-        Dictionary<string, string> m_ServiceURLCapabilities = new Dictionary<string, string>();
+        readonly Dictionary<string, string> m_ServiceURLCapabilities = new Dictionary<string, string>();
 
 
         bool GetCustomCapsUri(string capType, out string uri)
@@ -225,9 +225,9 @@ namespace SilverSim.Viewer.Core
         sealed class ExtenderCapabilityCaller
         {
             /* Weak reference kills the hard referencing */
-            WeakReference m_Agent;
-            WeakReference m_Circuit;
-            Action<ViewerAgent, AgentCircuit, HttpRequest> m_Delegate;
+            readonly WeakReference m_Agent;
+            readonly WeakReference m_Circuit;
+            readonly Action<ViewerAgent, AgentCircuit, HttpRequest> m_Delegate;
 
             public ExtenderCapabilityCaller(ViewerAgent agent, AgentCircuit circuit, Action<ViewerAgent, AgentCircuit, HttpRequest> del)
             {
@@ -247,7 +247,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        private List<UploadAssetAbstractCapability> m_UploadCapabilities = new List<UploadAssetAbstractCapability>();
+        readonly List<UploadAssetAbstractCapability> m_UploadCapabilities = new List<UploadAssetAbstractCapability>();
 
         public void SetupDefaultCapabilities(
             UUID regionSeedID, 

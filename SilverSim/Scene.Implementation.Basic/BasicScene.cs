@@ -57,7 +57,7 @@ namespace SilverSim.Scene.Implementation.Basic
         #region Interface wrappers
         public sealed class BasicSceneObjectsCollection : ISceneObjects
         {
-            private BasicScene m_Scene;
+            readonly BasicScene m_Scene;
 
             internal BasicSceneObjectsCollection(BasicScene scene)
             {
@@ -112,7 +112,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public sealed class BasicSceneObjectPartsCollection : ISceneObjectParts
         {
-            private BasicScene m_Scene;
+            readonly BasicScene m_Scene;
 
             internal BasicSceneObjectPartsCollection(BasicScene scene)
             {
@@ -168,7 +168,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public sealed class BasicSceneParcelsCollection : ISceneParcels
         {
-            private BasicScene m_Scene;
+            readonly BasicScene m_Scene;
 
             internal BasicSceneParcelsCollection(BasicScene scene)
             {
@@ -257,7 +257,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public sealed class BasicSceneAgentsCollection : ISceneAgents
         {
-            BasicScene m_BasicScene;
+            readonly BasicScene m_BasicScene;
 
             internal BasicSceneAgentsCollection(BasicScene scene)
             {
@@ -300,7 +300,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public sealed class BasicSceneRootAgentsCollection : ISceneAgents
         {
-            BasicScene m_BasicScene;
+            readonly BasicScene m_BasicScene;
 
             internal BasicSceneRootAgentsCollection(BasicScene scene)
             {
@@ -374,15 +374,15 @@ namespace SilverSim.Scene.Implementation.Basic
         #endregion
 
         #region Services
-        private ChatServiceInterface m_ChatService;
-        private BasicSceneObjectsCollection m_SceneObjects;
-        private BasicSceneParcelsCollection m_SceneParcels;
-        private BasicSceneObjectPartsCollection m_SceneObjectParts;
-        private DefaultSceneObjectGroupInterface m_SceneObjectGroups;
-        private BasicSceneAgentsCollection m_SceneAgents;
-        private BasicSceneRootAgentsCollection m_SceneRootAgents;
-        private SimulationDataStorageInterface m_SimulationDataStorage;
-        private NeighborServiceInterface m_NeighborService;
+        readonly ChatServiceInterface m_ChatService;
+        readonly BasicSceneObjectsCollection m_SceneObjects;
+        readonly BasicSceneParcelsCollection m_SceneParcels;
+        readonly BasicSceneObjectPartsCollection m_SceneObjectParts;
+        readonly DefaultSceneObjectGroupInterface m_SceneObjectGroups;
+        readonly BasicSceneAgentsCollection m_SceneAgents;
+        readonly BasicSceneRootAgentsCollection m_SceneRootAgents;
+        readonly SimulationDataStorageInterface m_SimulationDataStorage;
+        readonly NeighborServiceInterface m_NeighborService;
 
         protected override object GetService(Type service)
         {

@@ -17,7 +17,7 @@ namespace SilverSim.Scripting.Common
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public class RegistryImpl : IScriptCompilerRegistry
         {
-            private RwLockedDictionary<string, IScriptCompiler> m_ScriptCompilers = new RwLockedDictionary<string, IScriptCompiler>();
+            readonly RwLockedDictionary<string, IScriptCompiler> m_ScriptCompilers = new RwLockedDictionary<string, IScriptCompiler>();
             public string DefaultCompilerName { get; set; }
             public RegistryImpl()
             {

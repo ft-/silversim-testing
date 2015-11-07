@@ -59,8 +59,8 @@ namespace SilverSim.Viewer.TerrainEdit
             }
         }
 
-        Dictionary<StandardTerrainEffect, Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>> m_PaintEffects = new Dictionary<StandardTerrainEffect, Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>>();
-        Dictionary<StandardTerrainEffect, Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>> m_FloodEffects = new Dictionary<StandardTerrainEffect, Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>>();
+        readonly Dictionary<StandardTerrainEffect, Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>> m_PaintEffects = new Dictionary<StandardTerrainEffect, Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>>();
+        readonly Dictionary<StandardTerrainEffect, Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>> m_FloodEffects = new Dictionary<StandardTerrainEffect, Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>>();
 
         public ViewerTerrainEdit()
         {

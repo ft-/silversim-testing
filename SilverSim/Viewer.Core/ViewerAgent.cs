@@ -46,7 +46,7 @@ namespace SilverSim.Viewer.Core
         public event Action<IObject> OnPositionChange;
 
         #region Agent fields
-        private UUID m_AgentID;
+        readonly UUID m_AgentID;
         private UUID m_CurrentSceneID;
         #endregion
 
@@ -60,7 +60,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        ClientInfo m_ClientInfo;
+        readonly ClientInfo m_ClientInfo;
         public ClientInfo Client 
         { 
             get
@@ -69,7 +69,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        UserAccount m_UntrustedAccountInfo;
+        readonly UserAccount m_UntrustedAccountInfo;
         public UserAccount UntrustedAccountInfo
         { 
             get
@@ -961,14 +961,14 @@ namespace SilverSim.Viewer.Core
         private PresenceServiceInterface m_PresenceService;
         private GridUserServiceInterface m_GridUserService;
         private GridServiceInterface m_GridService;
-        private EconomyServiceInterface m_EconomyService;
-        private OfflineIMServiceInterface m_OfflineIMService;
+        readonly EconomyServiceInterface m_EconomyService;
+        readonly OfflineIMServiceInterface m_OfflineIMService;
 
         #endregion
 
-        UUID m_SecureSessionID;
-        string m_ServiceSessionID;
-        List<IAgentTeleportServiceInterface> m_TeleportServices;
+        readonly UUID m_SecureSessionID;
+        readonly string m_ServiceSessionID;
+        readonly List<IAgentTeleportServiceInterface> m_TeleportServices;
 
         public ViewerAgent(UUID agentID,
             string firstName,

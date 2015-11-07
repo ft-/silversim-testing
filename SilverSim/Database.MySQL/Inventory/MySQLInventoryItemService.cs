@@ -12,7 +12,7 @@ namespace SilverSim.Database.MySQL.Inventory
 {
     sealed class MySQLInventoryItemService : InventoryItemServiceInterface
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
 
         public MySQLInventoryItemService(string connectionString)
         {

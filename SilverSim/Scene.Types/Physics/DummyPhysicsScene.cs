@@ -12,8 +12,8 @@ namespace SilverSim.Scene.Types.Physics
 {
     public class DummyPhysicsScene : IPhysicsScene
     {
-        UUID m_SceneID;
-        RwLockedList<IObject> m_Agents = new RwLockedList<IObject>();
+        readonly UUID m_SceneID;
+        readonly RwLockedList<IObject> m_Agents = new RwLockedList<IObject>();
 
         public DummyPhysicsScene(UUID sceneID)
         {

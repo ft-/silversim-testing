@@ -7,7 +7,7 @@ namespace SilverSim.Types
 {
     public sealed class URI : IEquatable<URI>, IEquatable<string>, IValue
     {
-        private Uri m_Value;
+        readonly Uri m_Value;
 
         #region Properties
         public ValueType Type

@@ -16,11 +16,11 @@ namespace SilverSim.Main.Common.Transfer
 {
     public abstract class RezObjectHandler : AssetTransferWorkItem
     {
-        SceneInterface m_Scene;
-        Vector3 m_TargetPos;
-        UUI m_RezzingAgent;
-        InventoryPermissionsMask m_ItemOwnerPermissions;
-        SceneInterface.RezObjectParams m_RezParams;
+        readonly SceneInterface m_Scene;
+        readonly Vector3 m_TargetPos;
+        readonly UUI m_RezzingAgent;
+        readonly InventoryPermissionsMask m_ItemOwnerPermissions;
+        readonly SceneInterface.RezObjectParams m_RezParams;
 
         public abstract void PostProcessObjectGroups(List<ObjectGroup> grp);
 

@@ -14,7 +14,7 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        BlockingQueue<Message> m_EventQueue = new BlockingQueue<Message>();
+        readonly BlockingQueue<Message> m_EventQueue = new BlockingQueue<Message>();
         bool m_EventQueueEnabled = true;
         int m_EventQueueEventId = 1;
 

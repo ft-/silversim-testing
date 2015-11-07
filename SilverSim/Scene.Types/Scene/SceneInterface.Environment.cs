@@ -144,7 +144,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public class WindDataAccessor
             {
-                private EnvironmentController m_Controller;
+                readonly EnvironmentController m_Controller;
 
                 internal WindDataAccessor(EnvironmentController controller)
                 {
@@ -207,7 +207,7 @@ namespace SilverSim.Scene.Types.Scene
             WindlightWaterData m_WaterWindlight = new WindlightWaterData();
             SunData m_SunData = new SunData();
             WindData m_WindData = new WindData();
-            SceneInterface m_Scene;
+            readonly SceneInterface m_Scene;
             //bool m_SunFixed = false;
 
             public EnvironmentController(SceneInterface scene)

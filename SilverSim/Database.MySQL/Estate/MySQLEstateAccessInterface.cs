@@ -16,7 +16,7 @@ namespace SilverSim.Database.MySQL.Estate
     {
         public sealed class MySQLListAccess : IListAccess
         {
-            string m_ConnectionString;
+            readonly string m_ConnectionString;
             public MySQLListAccess(string connectionString)
             {
                 m_ConnectionString = connectionString;

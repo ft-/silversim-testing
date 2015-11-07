@@ -28,11 +28,11 @@ namespace SilverSim.Viewer.Map
 
         [PacketHandler(MessageType.MapBlockRequest)]
         [PacketHandler(MessageType.MapNameRequest)]
-        BlockingQueue<KeyValuePair<AgentCircuit, Message>> MapBlocksRequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
+        readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> MapBlocksRequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         [PacketHandler(MessageType.MapLayerRequest)]
         [PacketHandler(MessageType.MapItemRequest)]
-        BlockingQueue<KeyValuePair<AgentCircuit, Message>> MapDetailsRequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
+        readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> MapDetailsRequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
 
         List<IForeignGridConnectorPlugin> m_ForeignGridConnectorPlugins;
 

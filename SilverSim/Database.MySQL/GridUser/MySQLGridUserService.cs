@@ -17,7 +17,7 @@ namespace SilverSim.Database.MySQL.GridUser
     #region Service Implementation
     public sealed class MySQLGridUserService : GridUserServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL GRIDUSER SERVICE");
 
         #region Constructor

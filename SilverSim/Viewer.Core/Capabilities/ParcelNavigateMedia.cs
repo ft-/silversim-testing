@@ -21,8 +21,8 @@ namespace SilverSim.Viewer.Core.Capabilities
 {
     public class ParcelNavigateMedia : ICapabilityInterface
     {
-        UUI m_Agent;
-        SceneInterface m_Scene;
+        readonly UUI m_Agent;
+        readonly SceneInterface m_Scene;
 
         public ParcelNavigateMedia(UUI agent, SceneInterface scene)
         {

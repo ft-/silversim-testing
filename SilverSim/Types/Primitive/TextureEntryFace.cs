@@ -23,7 +23,7 @@ namespace SilverSim.Types.Primitive
         private UUID m_TextureID = DEFAULT_TEXTURE;
         private UUID m_MaterialID = UUID.Zero;
 
-        private TextureEntryFace m_DefaultTexture;
+        readonly TextureEntryFace m_DefaultTexture;
 
         // +----------+ S = Shiny
         // | SSFBBBBB | F = Fullbright

@@ -19,7 +19,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         byte[] m_MaterialsData;
         readonly Dictionary<UUID, Material> m_Materials = new Dictionary<UUID, Material>();
-        ReaderWriterLock m_MaterialsRwLock = new ReaderWriterLock();
+        readonly ReaderWriterLock m_MaterialsRwLock = new ReaderWriterLock();
 
         public byte[] MaterialsData
         {

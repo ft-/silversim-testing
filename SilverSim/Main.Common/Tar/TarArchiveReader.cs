@@ -50,7 +50,7 @@ namespace SilverSim.Main.Common.Tar
         }
 
         int m_Position;
-        Stream m_Stream;
+        readonly Stream m_Stream;
         int m_LengthOfData;
 
         public TarArchiveReader(Stream s)

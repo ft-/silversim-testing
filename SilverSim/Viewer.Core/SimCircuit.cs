@@ -197,8 +197,8 @@ namespace SilverSim.Viewer.Core
 
         public class ChildAgentUpdater : IAgentChildUpdateServiceInterface
         {
-            SimCircuit m_Circuit;
-            uint m_ViewerCircuitCode;
+            readonly SimCircuit m_Circuit;
+            readonly uint m_ViewerCircuitCode;
 
             public ChildAgentUpdater(SimCircuit circuit, uint viewercircuitcode)
             {

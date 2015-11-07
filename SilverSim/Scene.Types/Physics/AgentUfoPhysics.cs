@@ -16,10 +16,10 @@ namespace SilverSim.Scene.Types.Physics
     [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public class AgentUfoPhysics : IAgentPhysicsObject
     {
-        Timer m_UfoTimer;
-        IAgent m_Agent;
+        readonly Timer m_UfoTimer;
+        readonly IAgent m_Agent;
         Vector3 m_ControlTargetVelocity = Vector3.Zero;
-        PhysicsStateData m_StateData;
+        readonly PhysicsStateData m_StateData;
 
         public AgentUfoPhysics(IAgent agent, UUID sceneID)
         {

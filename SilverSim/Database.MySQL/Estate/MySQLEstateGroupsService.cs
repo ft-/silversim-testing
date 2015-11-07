@@ -14,12 +14,12 @@ namespace SilverSim.Database.MySQL.Estate
 {
     public sealed class MySQLEstateGroupsService : EstateGroupsServiceInterface
     {
-        string m_ConnectionString;
-        MySQLListAccess m_ListAccess;
+        readonly string m_ConnectionString;
+        readonly MySQLListAccess m_ListAccess;
 
         public sealed class MySQLListAccess : IListAccess
         {
-            string m_ConnectionString;
+            readonly string m_ConnectionString;
 
             public MySQLListAccess(string connectionString)
             {

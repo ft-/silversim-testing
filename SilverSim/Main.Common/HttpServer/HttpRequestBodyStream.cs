@@ -11,7 +11,7 @@ namespace SilverSim.Main.Common.HttpServer
     {
         private Stream m_Input;
         private long m_RemainingLength;
-        private long m_ContentLength;
+        readonly long m_ContentLength;
         private bool m_Expect100Continue;
         public HttpRequestBodyStream(Stream input, long contentLength, bool expect100Continue)
         {

@@ -13,7 +13,7 @@ namespace SilverSim.Database.MySQL.Asset
 {
     public class MySQLAssetDataService : AssetDataServiceInterface
     {
-        private string m_ConnectionString;
+        readonly string m_ConnectionString;
         public MySQLAssetDataService(string connectionString)
         {
             m_ConnectionString = connectionString;

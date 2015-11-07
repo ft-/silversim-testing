@@ -14,7 +14,7 @@ namespace SilverSim.Database.MySQL.Inventory
 {
     public class MySQLInventoryFolderService : InventoryFolderServiceInterface
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
 
         public MySQLInventoryFolderService(string connectionString)
         {

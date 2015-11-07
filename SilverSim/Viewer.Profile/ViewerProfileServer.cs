@@ -49,11 +49,11 @@ namespace SilverSim.Viewer.Profile
         [GenericMessageHandler("avatarpicksrequest")]
         [GenericMessageHandler("pickinforequest")]
         [GenericMessageHandler("avatarnotesrequest")]
-        BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
+        readonly BlockingQueue<KeyValuePair<AgentCircuit, Message>> RequestQueue = new BlockingQueue<KeyValuePair<AgentCircuit, Message>>();
         bool m_ShutdownProfile;
         List<IUserAgentServicePlugin> m_UserAgentServices;
         List<IProfileServicePlugin> m_ProfileServices;
-        System.Timers.Timer m_CleanupTimer = new System.Timers.Timer(10000);
+        readonly System.Timers.Timer m_CleanupTimer = new System.Timers.Timer(10000);
 
         sealed class ProfileServiceData
         {

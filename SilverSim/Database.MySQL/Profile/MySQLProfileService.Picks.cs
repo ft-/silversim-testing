@@ -14,7 +14,7 @@ namespace SilverSim.Database.MySQL.Profile
     {
         public sealed class MySQLPicks : IPicksInterface
         {
-            string m_ConnectionString;
+            readonly string m_ConnectionString;
 
             public MySQLPicks(string connectionString)
             {

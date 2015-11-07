@@ -10,7 +10,7 @@ namespace SilverSim.Types
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     public sealed class BinaryData : IValue, IEquatable<BinaryData>
     {
-        private byte[] m_Data;
+        readonly byte[] m_Data;
 
         public BinaryData()
         {

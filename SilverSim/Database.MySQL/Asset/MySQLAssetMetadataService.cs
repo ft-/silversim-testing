@@ -11,7 +11,7 @@ namespace SilverSim.Database.MySQL.Asset
 {
     public class MySQLAssetMetadataService : AssetMetadataServiceInterface
     {
-        private string m_ConnectionString;
+        readonly string m_ConnectionString;
         public MySQLAssetMetadataService(string connectionString)
         {
             m_ConnectionString = connectionString;

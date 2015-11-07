@@ -70,7 +70,7 @@ namespace SilverSim.Viewer.Core
 
         sealed class SimConsoleAsyncTTY : TTY
         {
-            AgentCircuit m_Circuit;
+            readonly AgentCircuit m_Circuit;
             public SimConsoleAsyncTTY(AgentCircuit c)
             {
                 m_Circuit = c;

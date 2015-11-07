@@ -161,11 +161,11 @@ namespace SilverSim.Types.Parcel
 
         public class ParcelDataLandBitmap
         {
-            byte[,] m_LandBitmap;
-            int m_BitmapWidth;
-            int m_BitmapHeight;
-            ReaderWriterLock m_LandBitmapRwLock;
-            ParcelInfo m_ParcelInfo;
+            readonly byte[,] m_LandBitmap;
+            readonly int m_BitmapWidth;
+            readonly int m_BitmapHeight;
+            readonly ReaderWriterLock m_LandBitmapRwLock;
+            readonly ParcelInfo m_ParcelInfo;
 
             public int BitmapWidth
             {

@@ -10,9 +10,9 @@ namespace SilverSim.Main.Common.HttpServer
     {
         private Stream m_Output;
         private long m_RemainingLength;
-        private bool m_HasLimitedLength;
-        private long m_ContentLength;
-        private static readonly byte[] FillBytes = new byte[10240];
+        readonly bool m_HasLimitedLength;
+        readonly long m_ContentLength;
+        static readonly byte[] FillBytes = new byte[10240];
 
         public HttpResponseBodyStream(Stream output, long contentLength)
         {

@@ -66,8 +66,8 @@ namespace SilverSim.Main.Service
         }
 
         ConfigurationLoader m_ConfigLoader;
-        ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
-        ManualResetEvent m_ShutdownCompleteEvent = new ManualResetEvent(false);
+        readonly ManualResetEvent m_ShutdownEvent = new ManualResetEvent(false);
+        readonly ManualResetEvent m_ShutdownCompleteEvent = new ManualResetEvent(false);
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void ServiceMain(object obj)

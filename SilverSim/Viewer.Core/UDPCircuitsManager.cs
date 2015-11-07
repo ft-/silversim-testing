@@ -39,18 +39,18 @@ namespace SilverSim.Viewer.Core
     public partial class UDPCircuitsManager : IUDPCircuitsManager
     {
         private static readonly ILog m_Log = LogManager.GetLogger("UDP CIRCUITS MANAGER");
-        IPAddress m_BindAddress;
-        int m_BindPort;
-        Socket m_UdpSocket;
-        NonblockingQueue<UDPReceivePacket> m_InboundBufferQueue = new NonblockingQueue<UDPReceivePacket>();
-        RwLockedDoubleDictionary<EndPoint, uint, Circuit> m_Circuits = new RwLockedDoubleDictionary<EndPoint, uint, Circuit>();
+        readonly IPAddress m_BindAddress;
+        readonly int m_BindPort;
+        readonly Socket m_UdpSocket;
+        readonly NonblockingQueue<UDPReceivePacket> m_InboundBufferQueue = new NonblockingQueue<UDPReceivePacket>();
+        readonly RwLockedDoubleDictionary<EndPoint, uint, Circuit> m_Circuits = new RwLockedDoubleDictionary<EndPoint, uint, Circuit>();
         bool m_InboundRunning;
-        IMServiceInterface m_IMService;
-        ChatServiceInterface m_ChatService;
-        BlockingQueue<IScriptEvent> m_ChatQueue = new BlockingQueue<IScriptEvent>();
-        RwLockedDictionary<UUID, ViewerAgent> m_Agents = new RwLockedDictionary<UUID, ViewerAgent>();
-        Thread m_ChatThread;
-        private object m_UseCircuitCodeProcessingLock = new object();
+        readonly IMServiceInterface m_IMService;
+        readonly ChatServiceInterface m_ChatService;
+        readonly BlockingQueue<IScriptEvent> m_ChatQueue = new BlockingQueue<IScriptEvent>();
+        readonly RwLockedDictionary<UUID, ViewerAgent> m_Agents = new RwLockedDictionary<UUID, ViewerAgent>();
+        readonly Thread m_ChatThread;
+        readonly object m_UseCircuitCodeProcessingLock = new object();
         
         public SceneInterface Scene { get; private set; }
         public bool LogAssetFailures;

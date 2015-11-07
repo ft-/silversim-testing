@@ -37,9 +37,9 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        private ViewerAgent m_Agent;
-        private SceneInterface m_Scene;
-        private readonly RwLockedDictionary<UUID, TransactionInfo> m_Transactions = new RwLockedDictionary<UUID, TransactionInfo>();
+        readonly ViewerAgent m_Agent;
+        readonly SceneInterface m_Scene;
+        readonly RwLockedDictionary<UUID, TransactionInfo> m_Transactions = new RwLockedDictionary<UUID, TransactionInfo>();
 
         public override string CapabilityName
         {

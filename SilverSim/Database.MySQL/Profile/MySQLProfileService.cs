@@ -18,12 +18,12 @@ namespace SilverSim.Database.MySQL.Profile
     {
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL PROFILE SERVICE");
 
-        string m_ConnectionString;
-        IClassifiedsInterface m_Classifieds;
-        IPicksInterface m_Picks;
-        INotesInterface m_Notes;
-        IUserPreferencesInterface m_UserPreferences;
-        IPropertiesInterface m_Properties;
+        readonly string m_ConnectionString;
+        readonly IClassifiedsInterface m_Classifieds;
+        readonly IPicksInterface m_Picks;
+        readonly INotesInterface m_Notes;
+        readonly IUserPreferencesInterface m_UserPreferences;
+        readonly IPropertiesInterface m_Properties;
 
         public MySQLProfileService(string connectionString)
         {

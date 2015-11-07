@@ -20,10 +20,10 @@ namespace SilverSim.Database.MySQL.Inventory
     #region Service Implementation
     public sealed class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL INVENTORY SERVICE");
-        MySQLInventoryItemService m_InventoryItemService;
-        MySQLInventoryFolderService m_InventoryFolderService;
+        readonly MySQLInventoryItemService m_InventoryItemService;
+        readonly MySQLInventoryFolderService m_InventoryFolderService;
 
         public MySQLInventoryService(string connectionString)
         {

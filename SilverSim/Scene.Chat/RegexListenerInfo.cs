@@ -11,16 +11,16 @@ namespace SilverSim.Scene.Chat
 {
     public sealed class RegexListenerInfo : ChatServiceInterface.Listener
     {
-        int m_Channel;
-        Regex m_Name;
-        string m_NamePlain = string.Empty;
-        UUID m_ID;
-        Regex m_Message;
-        string m_MessagePlain = string.Empty;
-        Int32 m_RegexBitfield;
-        Func<UUID> m_GetUUID;
-        Func<Vector3> m_GetPos;
-        Action<ListenEvent> m_Send;
+        readonly int m_Channel;
+        readonly Regex m_Name;
+        readonly string m_NamePlain = string.Empty;
+        readonly UUID m_ID;
+        readonly Regex m_Message;
+        readonly string m_MessagePlain = string.Empty;
+        readonly Int32 m_RegexBitfield;
+        readonly Func<UUID> m_GetUUID;
+        readonly Func<Vector3> m_GetPos;
+        readonly Action<ListenEvent> m_Send;
         public override bool IsActive { get; set; }
         public override bool IsAgent
         {
@@ -30,7 +30,7 @@ namespace SilverSim.Scene.Chat
             }
         }
 
-        private ChatHandler m_Handler;
+        readonly ChatHandler m_Handler;
 
         internal RegexListenerInfo(
             ChatHandler handler,

@@ -17,7 +17,7 @@ namespace SilverSim.Scene.Registration
     #region Service Implementation
     public class SceneRegistrar : IPlugin, IPluginShutdown
     {
-        private RwLockedList<SceneInterface> m_RegisteredScenes = new RwLockedList<SceneInterface>();
+        readonly RwLockedList<SceneInterface> m_RegisteredScenes = new RwLockedList<SceneInterface>();
         private BaseHttpServer m_HttpServer;
 
         public SceneRegistrar(IConfig ownSection)

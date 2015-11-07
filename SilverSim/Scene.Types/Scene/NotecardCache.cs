@@ -17,10 +17,10 @@ namespace SilverSim.Scene.Types.Scene
     [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public class NotecardCache
     {
-        private SceneInterface m_Scene;
-        private RwLockedDictionary<UUID, Notecard> m_Notecards = new RwLockedDictionary<UUID,Notecard>();
-        private RwLockedDictionary<UUID, int> m_LastAccessed = new RwLockedDictionary<UUID,int>();
-        private Timer m_Timer = new Timer(1);
+        readonly SceneInterface m_Scene;
+        readonly RwLockedDictionary<UUID, Notecard> m_Notecards = new RwLockedDictionary<UUID, Notecard>();
+        readonly RwLockedDictionary<UUID, int> m_LastAccessed = new RwLockedDictionary<UUID, int>();
+        readonly Timer m_Timer = new Timer(1);
 
         public NotecardCache(SceneInterface scene)
         {

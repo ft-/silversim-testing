@@ -139,7 +139,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        private object m_AppearanceUpdateLock = new object();
+        readonly object m_AppearanceUpdateLock = new object();
         public AppearanceInfo Appearance
         {
             get

@@ -72,7 +72,7 @@ namespace SilverSim.Main.Common.HttpServer
         #endregion
 
         public readonly Dictionary<string, string> Headers = new Dictionary<string,string>();
-        private Stream m_Output;
+        readonly Stream m_Output;
         public HttpStatusCode StatusCode;
         public string StatusDescription;
         public uint MajorVersion;
@@ -80,8 +80,8 @@ namespace SilverSim.Main.Common.HttpServer
         public bool IsCloseConnection { get; private set; }
         private bool m_IsHeaderSent;
         private Stream ResponseBody;
-        private bool IsChunkedAccepted;
-        private List<string> AcceptedEncodings;
+        readonly bool IsChunkedAccepted;
+        readonly List<string> AcceptedEncodings;
         private static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         public string ContentType

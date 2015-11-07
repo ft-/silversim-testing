@@ -10,7 +10,7 @@ namespace SilverSim.Types
     [SuppressMessage("Gendarme.Rules.Design", "EnsureSymmetryForOverloadedOperatorsRule")]
     public sealed class AString : IEquatable<AString>, IEquatable<string>, IValue
     {
-        private string m_Value;
+        readonly string m_Value;
 
         #region Properties
         public ValueType Type

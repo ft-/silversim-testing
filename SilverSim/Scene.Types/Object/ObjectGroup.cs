@@ -1032,7 +1032,7 @@ namespace SilverSim.Scene.Types.Object
         #region Agent Sitting
         public class AgentSittingInterface
         {
-            ObjectGroup m_Group;
+            readonly ObjectGroup m_Group;
 
             public AgentSittingInterface(ObjectGroup group)
             {

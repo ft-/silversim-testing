@@ -49,8 +49,8 @@ namespace SilverSim.Viewer.Messages.LayerData
         public float[,] Data = new float[16,16];
 
         internal uint PackedSerial;
-        private byte[] PackedDataBytes = new byte[651]; /* maximum length of a single 16 by 16 patch when packed perfectly bad */
-        internal BitPacker PackedData;
+        readonly byte[] PackedDataBytes = new byte[651]; /* maximum length of a single 16 by 16 patch when packed perfectly bad */
+        internal readonly BitPacker PackedData;
 
         public uint ExtendedPatchID
         {

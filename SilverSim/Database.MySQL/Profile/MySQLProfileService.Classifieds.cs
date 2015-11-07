@@ -14,7 +14,7 @@ namespace SilverSim.Database.MySQL.Profile
     {
         public sealed class MySQLClassifieds : IClassifiedsInterface
         {
-            string m_ConnectionString;
+            readonly string m_ConnectionString;
 
             public MySQLClassifieds(string connectionString)
             {

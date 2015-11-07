@@ -17,11 +17,11 @@ namespace SilverSim.Database.MySQL.ServerParam
     #region Service Implementation
     public sealed class MySQLServerParamService : ServerParamServiceInterface, IDBServiceInterface, IPlugin
     {
-        string m_ConnectionString;
+        readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SERVER PARAM SERVICE");
 
         #region Cache
-        private RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_Cache = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(delegate() { return new RwLockedDictionary<string, string>(); });
+        readonly RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>> m_Cache = new RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<string, string>>(delegate() { return new RwLockedDictionary<string, string>(); });
         #endregion
 
         #region Constructor

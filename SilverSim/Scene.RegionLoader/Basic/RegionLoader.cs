@@ -18,8 +18,8 @@ namespace SilverSim.Scene.RegionLoader.Basic
 {
     public class RegionLoaderService : IPlugin, IRegionLoaderInterface
     {
-        private string m_RegionStorage = string.Empty;
-        private string m_RegionCfg = string.Empty;
+        readonly string m_RegionStorage = string.Empty;
+        readonly string m_RegionCfg = string.Empty;
         private string m_ExternalHostName = string.Empty;
         private GridServiceInterface m_RegionService;
         private SceneFactoryInterface m_SceneFactory;

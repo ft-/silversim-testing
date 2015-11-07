@@ -114,7 +114,7 @@ namespace SilverSim.Scene.Types.Scene
         public EstateServiceInterface EstateService { get; protected set; }
         public ServerParamServiceInterface ServerParamService { get; protected set; }
         public EconomyInfo EconomyData { get; protected set; }
-        private NotecardCache m_NotecardCache;
+        readonly NotecardCache m_NotecardCache;
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }
         public string GatekeeperURI { get; protected set; }
 
@@ -141,7 +141,7 @@ namespace SilverSim.Scene.Types.Scene
 
         #region Physics
         IPhysicsScene m_PhysicsScene;
-        object m_PhysicsSceneChangeLock = new object();
+        readonly object m_PhysicsSceneChangeLock = new object();
 
         public IPhysicsScene PhysicsScene
         {
@@ -341,7 +341,7 @@ namespace SilverSim.Scene.Types.Scene
 
         private readonly RwLockedDictionary<UInt32, IObject> m_LocalIDs = new RwLockedDictionary<uint, IObject>();
         private UInt32 m_LastLocalID;
-        private object m_LastLocalIDLock = new object();
+        readonly object m_LastLocalIDLock = new object();
 
         private UInt32 NextLocalID
         {

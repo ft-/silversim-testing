@@ -11,8 +11,8 @@ namespace SilverSim.Main.Common.Transfer
 {
     public abstract class AssetTransferWorkItem
     {
-        AssetServiceInterface m_DestinationAssetService;
-        AssetServiceInterface m_SourceAssetService;
+        readonly AssetServiceInterface m_DestinationAssetService;
+        readonly AssetServiceInterface m_SourceAssetService;
         protected UUID m_AssetID { get; private set; }
 
         public enum ReferenceSource
@@ -21,7 +21,7 @@ namespace SilverSim.Main.Common.Transfer
             Destination
         }
 
-        ReferenceSource m_RefSource;
+        readonly ReferenceSource m_RefSource;
 
         protected AssetTransferWorkItem(AssetServiceInterface dest, AssetServiceInterface source, UUID assetid, ReferenceSource refsource)
         {

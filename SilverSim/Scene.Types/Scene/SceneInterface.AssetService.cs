@@ -14,7 +14,7 @@ namespace SilverSim.Scene.Types.Scene
     {
         public class DefaultAssetMetadataService : AssetMetadataServiceInterface
         {
-            SceneInterface m_Scene;
+            readonly SceneInterface m_Scene;
 
             internal DefaultAssetMetadataService(SceneInterface scene)
             {
@@ -49,7 +49,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public class DefaultAssetDataService : AssetDataServiceInterface
         {
-            SceneInterface m_Scene;
+            readonly SceneInterface m_Scene;
 
             internal DefaultAssetDataService(SceneInterface scene)
             {
@@ -95,7 +95,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public class DefaultAssetReferencesService : AssetReferencesServiceInterface
         {
-            SceneInterface m_Scene;
+            readonly SceneInterface m_Scene;
 
             internal DefaultAssetReferencesService(SceneInterface scene)
             {
@@ -128,10 +128,10 @@ namespace SilverSim.Scene.Types.Scene
 
         public class DefaultAssetService : AssetServiceInterface
         {
-            SceneInterface m_Scene;
-            DefaultAssetMetadataService m_MetadataService;
-            DefaultAssetDataService m_DataService;
-            DefaultAssetReferencesService m_ReferencesService;
+            readonly SceneInterface m_Scene;
+            readonly DefaultAssetMetadataService m_MetadataService;
+            readonly DefaultAssetDataService m_DataService;
+            readonly DefaultAssetReferencesService m_ReferencesService;
 
             internal DefaultAssetService(SceneInterface si)
             {
