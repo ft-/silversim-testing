@@ -158,14 +158,6 @@ namespace SilverSim.Scene.Types.Scene
                     {
                         selectedParcel = parcel;
                     }
-                    else if (parceldist > (b - destinationLocation).LengthSquared)
-                    {
-                        selectedParcel = parcel;
-                    }
-                    else if (parceldist > (b - destinationLocation).LengthSquared)
-                    {
-                        selectedParcel = parcel;
-                    }
                 }
 
                 selectedParcel = parcel;
