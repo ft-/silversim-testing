@@ -163,9 +163,8 @@ namespace SilverSim.Types
 
         public Vector3 Normalize()
         {
-            const double MAG_THRESHOLD = 0.0000001f;
             double factor = Length;
-            if (factor > MAG_THRESHOLD)
+            if (factor > Double.Epsilon)
             {
                 factor = 1f / factor;
                 X *= factor;
@@ -325,9 +324,9 @@ namespace SilverSim.Types
         #region Operators
         public static bool operator ==(Vector3 value1, Vector3 value2)
         {
-            return value1.X == value2.X
-                && value1.Y == value2.Y
-                && value1.Z == value2.Z;
+            return Math.Abs(value1.X - value2.X) < Double.Epsilon
+                && Math.Abs(value1.Y - value2.Y) < Double.Epsilon
+                && Math.Abs(value1.Z - value2.Z) < Double.Epsilon;
         }
 
         public static bool operator !=(Vector3 value1, Vector3 value2)

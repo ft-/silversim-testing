@@ -15,8 +15,6 @@ namespace SilverSim.Scene.Types.Object.Mesh
     {
         public static Mesh ToMesh(this ObjectPart part, AssetServiceInterface assetService)
         {
-            ObjectPart.PrimitiveShape.Decoded shape = part.Shape.DecodedParams;
-
             return part.Shape.DecodedParams.ToMesh(assetService);
         }
 

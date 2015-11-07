@@ -157,7 +157,7 @@ namespace SilverSim.Types
             axis = new Vector3();
             double scale = Math.Sqrt(X * X + Y * Y + Z * Z);
 
-            if (scale < Single.Epsilon || W > 1.0f || W < -1.0f)
+            if (scale < Double.Epsilon || W > 1.0f || W < -1.0f)
             {
                 angle = 0.0f;
                 axis.X = 0.0f;
@@ -258,7 +258,7 @@ namespace SilverSim.Types
 
             double trace = m.Trace();
 
-            if (trace > Single.Epsilon)
+            if (trace > Double.Epsilon)
             {
                 double s = Math.Sqrt(trace + 1f);
                 quat.W = s * 0.5f;
@@ -313,7 +313,7 @@ namespace SilverSim.Types
         {
             double norm = quaternion.LengthSquared;
 
-            if (norm == 0f)
+            if (Math.Abs(norm) < Double.Epsilon)
             {
                 quaternion.X = quaternion.Y = quaternion.Z = quaternion.W = 0f;
             }
@@ -639,10 +639,10 @@ namespace SilverSim.Types
 
         public bool Equals(Quaternion other)
         {
-            return W == other.W
-                && X == other.X
-                && Y == other.Y
-                && Z == other.Z;
+            return Math.Abs(W - other.W) < Double.Epsilon
+                && Math.Abs(X - other.X) < Double.Epsilon
+                && Math.Abs(Y - other.Y) < Double.Epsilon
+                && Math.Abs(Z - other.Z) < Double.Epsilon;
         }
 
         public override int GetHashCode()
@@ -867,7 +867,7 @@ namespace SilverSim.Types
         {
             double norm = Math.Sqrt(X * X + Y * Y + Z * Z + W * W);
 
-            if (norm != 0f)
+            if (Math.Abs(norm) >= Double.Epsilon)
             {
                 norm = 1f / norm;
 
@@ -901,7 +901,7 @@ namespace SilverSim.Types
         #endregion
 
         #region Helpers
-        public ABoolean AsBoolean { get { return new ABoolean(Length >= Single.Epsilon); } }
+        public ABoolean AsBoolean { get { return new ABoolean(Length >= Double.Epsilon); } }
         public Integer AsInteger { get { return new Integer((int)Length); } }
         public Quaternion AsQuaternion { get { return new Quaternion(X, Y, Z, W); } }
         public Real AsReal { get { return new Real(Length); } }

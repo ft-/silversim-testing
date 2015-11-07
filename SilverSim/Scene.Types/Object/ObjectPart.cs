@@ -1482,7 +1482,6 @@ namespace SilverSim.Scene.Types.Object
 
                         FlexibleParam fp = Flexible;
                         PointLightParam plp = PointLight;
-                        ProjectionParam pp = Projection;
 
                         writer.WriteNamedValue("FlexiSoftness", fp.Softness);
                         writer.WriteNamedValue("FlexiTension", fp.Tension);

@@ -154,12 +154,12 @@ namespace SilverSim.Types
         }
         public static bool operator ==(Real a, Real b)
         {
-            return a.m_Value == b.m_Value;
+            return Math.Abs(a.m_Value - b.m_Value) < Double.Epsilon;
         }
 
         public static bool operator !=(Real a, Real b)
         {
-            return a.m_Value != b.m_Value;
+            return Math.Abs(a.m_Value - b.m_Value) >= Double.Epsilon;
         }
 
         public static bool operator <(Real a, Real b)

@@ -355,10 +355,10 @@ namespace SilverSim.Types
 
         public bool Equals(Vector4 other)
         {
-            return W == other.W
-                && X == other.X
-                && Y == other.Y
-                && Z == other.Z;
+            return Math.Abs(W - other.W) < Double.Epsilon
+                && Math.Abs(X - other.X) < Double.Epsilon
+                && Math.Abs(Y - other.Y) < Double.Epsilon
+                && Math.Abs(Z - other.Z) < Double.Epsilon;
         }
 
         public override int GetHashCode()
@@ -377,10 +377,10 @@ namespace SilverSim.Types
 
         public static bool operator ==(Vector4 value1, Vector4 value2)
         {
-            return value1.W == value2.W
-                && value1.X == value2.X
-                && value1.Y == value2.Y
-                && value1.Z == value2.Z;
+            return Math.Abs(value1.W - value2.W) < Double.Epsilon
+                && Math.Abs(value1.X - value2.X) < Double.Epsilon
+                && Math.Abs(value1.Y - value2.Y) < Double.Epsilon
+                && Math.Abs(value1.Z - value2.Z) < Double.Epsilon;
         }
 
         public static bool operator !=(Vector4 value1, Vector4 value2)

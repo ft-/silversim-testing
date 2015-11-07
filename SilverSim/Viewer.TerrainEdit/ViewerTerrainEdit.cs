@@ -392,7 +392,7 @@ namespace SilverSim.Viewer.TerrainEdit
                         delta *= z;
                     }
 
-                    if (delta != 0) // add in non-zero amount
+                    if (Math.Abs(delta) >= Double.Epsilon) // add in non-zero amount
                     {
                         LayerPatch lp = scene.Terrain.AdjustTerrain((uint)x, (uint)y, delta);
                         if(lp != null && !changed.Contains(lp))

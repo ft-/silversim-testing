@@ -61,13 +61,13 @@ namespace SilverSim.Scene.Types.Object.Mesh
             while(physOffset > 0)
             {
                 int res;
-                if(physOffset > b.Length)
+                if (physOffset > physSize)
                 {
                     res = st.Read(b, 0, 1024);
                 }
                 else
                 {
-                    res = st.Read(b, 0, physOffset);
+                    res = st.Read(b, 0, physSize - physOffset);
                 }
                 if (res > 0)
                 {

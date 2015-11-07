@@ -128,7 +128,6 @@ namespace SilverSim.Viewer.Core.Capabilities
             if(parts.Length == 3)
             {
                 UUID uploadID;
-                IValue o;
                 if(httpreq.ContentType != "application/llsd+xml")
                 {
                     httpreq.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported Media Type");

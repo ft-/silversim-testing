@@ -84,7 +84,6 @@ namespace SilverSim.Types.StructuredData.Llsd
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private static IValue DeserializeInternal(XmlTextReader input)
         {
-            string element = input.Name;
             switch(input.Name)
             {
                 case "array":

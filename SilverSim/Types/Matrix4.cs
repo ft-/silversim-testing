@@ -884,8 +884,10 @@ namespace SilverSim.Types
 
         public static Matrix4 Inverse3x3(Matrix4 matrix)
         {
-            if (matrix.Determinant3x3 == 0f)
+            if (Math.Abs(matrix.Determinant3x3) < Double.Epsilon)
+            {
                 throw new ArgumentException("Singular matrix inverse not possible");
+            }
 
             return (Adjoint3x3(matrix) / matrix.Determinant3x3);
         }
@@ -896,7 +898,9 @@ namespace SilverSim.Types
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 0; j < 4; j++)
+                {
                     adjointMatrix[i, j] = (Math.Pow(-1, i + j) * (Minor(matrix, i, j).Determinant3x3));
+                }
             }
 
             adjointMatrix = Transpose(adjointMatrix);
@@ -905,8 +909,10 @@ namespace SilverSim.Types
 
         public static Matrix4 Inverse(Matrix4 matrix)
         {
-            if (matrix.Determinant == 0f)
+            if (Math.Abs(matrix.Determinant) < Double.Epsilon)
+            {
                 throw new ArgumentException("Singular matrix inverse not possible");
+            }
 
             return (Adjoint(matrix) / matrix.Determinant);
         }
@@ -917,7 +923,9 @@ namespace SilverSim.Types
             for (int i = 0; i < 4; i++)
             {
                 for (int j = 0; j < 4; j++)
+                {
                     adjointMatrix[i, j] = (Math.Pow(-1, i + j) * ((Minor(matrix, i, j)).Determinant));
+                }
             }
 
             adjointMatrix = Transpose(adjointMatrix);
@@ -932,12 +940,16 @@ namespace SilverSim.Types
             for (int i = 0; i < 4; i++)
             {
                 if (i == row)
+                {
                     continue;
+                }
                 n = 0;
                 for (int j = 0; j < 4; j++)
                 {
                     if (j == col)
+                    {
                         continue;
+                    }
                     minor[m, n] = matrix[i, j];
                     n++;
                 }
