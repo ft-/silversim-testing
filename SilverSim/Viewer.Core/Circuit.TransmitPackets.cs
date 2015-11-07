@@ -304,7 +304,8 @@ namespace SilverSim.Viewer.Core
                                 p.IsZeroEncoded = m.ZeroFlag || m.ForceZeroFlag;
                                 m.Serialize(p);
                                 p.Flush();
-                                if (p.IsReliable = m.IsReliable)
+                                p.IsReliable = m.IsReliable;
+                                if (p.IsReliable)
                                 {
                                     p.AckMessage = m;
                                 }

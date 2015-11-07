@@ -35,13 +35,13 @@ namespace SilverSim.Scene.Types.Object
                 case AssetType.CallingCard: InventoryType = InventoryType.CallingCard; break;
                 case AssetType.Clothing: InventoryType = InventoryType.Clothing; break;
                 case AssetType.Gesture: InventoryType = InventoryType.Gesture; break;
-                case AssetType.ImageJPEG: InventoryType = InventoryType.Snapshot; break;
+                case AssetType.ImageJPEG: 
                 case AssetType.ImageTGA: InventoryType = InventoryType.Snapshot; break;
                 case AssetType.Landmark: InventoryType = InventoryType.Landmark; break;
                 case AssetType.LSLBytecode: InventoryType = InventoryType.LSLBytecode; break;
                 case AssetType.LSLText: InventoryType = InventoryType.LSLText; break;
                 case AssetType.Notecard: InventoryType = InventoryType.Notecard; break;
-                case AssetType.Sound: InventoryType = InventoryType.Sound; break;
+                case AssetType.Sound: 
                 case AssetType.SoundWAV: InventoryType = InventoryType.Sound; break;
                 case AssetType.Texture: InventoryType = InventoryType.Texture; break;
                 case AssetType.TextureTGA: InventoryType = InventoryType.TextureTGA; break;

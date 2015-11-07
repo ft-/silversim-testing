@@ -959,7 +959,8 @@ namespace SilverSim.Main.Common
 
             BaseHttpServer httpServer;
 
-            PluginInstances.Add("HttpServer", httpServer = new BaseHttpServer(httpConfig));
+            httpServer = new BaseHttpServer(httpConfig);
+            PluginInstances.Add("HttpServer", httpServer);
             PluginInstances.Add("XmlRpcServer", new HttpXmlRpcHandler());
             PluginInstances.Add("JSON2.0RpcServer", new HttpJson20RpcHandler());
             PluginInstances.Add("CapsRedirector", new CapsHttpRedirector());

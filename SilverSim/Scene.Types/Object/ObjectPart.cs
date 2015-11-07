@@ -1136,12 +1136,9 @@ namespace SilverSim.Scene.Types.Object
                 {
                     if (null != ObjectGroup && ObjectGroup.RootPart != this)
                     {
-                        m_LocalPosition = value -= ObjectGroup.RootPart.GlobalPosition;
+                        value -= ObjectGroup.RootPart.GlobalPosition;
                     }
-                    else
-                    {
-                        m_LocalPosition = value;
-                    }
+                    m_LocalPosition = value;
                 }
                 lock (m_UpdateDataLock)
                 {
@@ -1230,12 +1227,9 @@ namespace SilverSim.Scene.Types.Object
                 {
                     if (ObjectGroup != null && this != ObjectGroup.RootPart)
                     {
-                        m_LocalRotation = value /= ObjectGroup.RootPart.GlobalRotation;
+                        value /= ObjectGroup.RootPart.GlobalRotation;
                     }
-                    else
-                    {
-                        m_LocalRotation = value;
-                    }
+                    m_LocalRotation = value;
                 }
                 lock (m_UpdateDataLock)
                 {

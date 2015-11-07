@@ -49,31 +49,22 @@ namespace SilverSim.Scene.Management.Scene
                     /* the first two cases are direct neighbors */
                     if(thisRegion.Location.X == otherExtentPos.X || otherRegion.Location.X == thisExtentPos.X)
                     {
-                        if(thisRegion.Location.Y >= otherRegion.Location.Y && thisRegion.Location.Y < otherExtentPos.Y)
-                        {
-                            neighbors.Add(otherRegion);
-                        }
-                        else if(otherRegion.Location.Y >= thisRegion.Location.Y && otherRegion.Location.Y < thisExtentPos.Y)
+                        if((thisRegion.Location.Y >= otherRegion.Location.Y && thisRegion.Location.Y < otherExtentPos.Y) ||
+                            (otherRegion.Location.Y >= thisRegion.Location.Y && otherRegion.Location.Y < thisExtentPos.Y))
                         {
                             neighbors.Add(otherRegion);
                         }
                     }
                     else if(thisRegion.Location.Y == otherExtentPos.Y || otherRegion.Location.Y == thisExtentPos.Y)
                     {
-                        if (thisRegion.Location.Y >= otherRegion.Location.Y && thisRegion.Location.Y < otherExtentPos.Y)
-                        {
-                            neighbors.Add(otherRegion);
-                        }
-                        else if (otherRegion.Location.Y >= thisRegion.Location.Y && otherRegion.Location.Y < thisExtentPos.Y)
+                        if (thisRegion.Location.Y >= otherRegion.Location.Y && thisRegion.Location.Y < otherExtentPos.Y ||
+                            (otherRegion.Location.Y >= thisRegion.Location.Y && otherRegion.Location.Y < thisExtentPos.Y))
                         {
                             neighbors.Add(otherRegion);
                         }
                     }
-                    else if (IsPointInBox(otherRegion.Location, thisRegion.Location, thisExtentPos, drawdistance))
-                    {
-                        neighbors.Add(otherRegion);
-                    }
-                    else if (IsPointInBox(otherExtentPos, thisRegion.Location, thisExtentPos, drawdistance))
+                    else if (IsPointInBox(otherRegion.Location, thisRegion.Location, thisExtentPos, drawdistance) ||
+                        IsPointInBox(otherExtentPos, thisRegion.Location, thisExtentPos, drawdistance))
                     {
                         neighbors.Add(otherRegion);
                     }
@@ -84,11 +75,8 @@ namespace SilverSim.Scene.Management.Scene
                         bb = otherExtentPos;
                         aa.Y = otherExtentPos.Y;
                         bb.Y = otherRegion.Location.Y;
-                        if(IsPointInBox(aa, thisRegion.Location, thisExtentPos, drawdistance))
-                        {
-                            neighbors.Add(otherRegion);
-                        }
-                        else if (IsPointInBox(bb, thisRegion.Location, thisExtentPos, drawdistance))
+                        if(IsPointInBox(aa, thisRegion.Location, thisExtentPos, drawdistance) ||
+                            IsPointInBox(bb, thisRegion.Location, thisExtentPos, drawdistance))
                         {
                             neighbors.Add(otherRegion);
                         }

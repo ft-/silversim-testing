@@ -167,7 +167,8 @@ namespace SilverSim.Viewer.Core
             if (!m_AssetTransactions.TryGetValue(req.TransactionID, out transaction))
             {
                 UInt64 XferID = NextXferID;
-                m_AssetTransactions.Add(req.TransactionID, XferID, transaction = new AssetUploadTransaction());
+                transaction = new AssetUploadTransaction();
+                m_AssetTransactions.Add(req.TransactionID, XferID, transaction);
                 transaction.XferID = XferID;
             }
 

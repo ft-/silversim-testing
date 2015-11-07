@@ -315,7 +315,10 @@ namespace SilverSim.Types
 
             if (Math.Abs(norm) < Double.Epsilon)
             {
-                quaternion.X = quaternion.Y = quaternion.Z = quaternion.W = 0f;
+                quaternion.X = 0f;
+                quaternion.Y = 0f;
+                quaternion.Z = 0f;
+                quaternion.W = 0f;
             }
             else
             {

@@ -166,7 +166,7 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
+                            m_Log.WarnFormat("(Content Handler): Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
                         }
                         req.Close();
                     }
@@ -187,7 +187,7 @@ namespace SilverSim.Main.Common.HttpServer
                         }
                         catch (Exception e)
                         {
-                            m_Log.WarnFormat("Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
+                            m_Log.WarnFormat("(Uri Handler): Unexpected exception at {0} {1}: {1}\n{2}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
                         }
                         req.Close();
                     }
@@ -212,17 +212,18 @@ namespace SilverSim.Main.Common.HttpServer
                                 }
                                 catch (Exception e)
                                 {
-                                    m_Log.WarnFormat("Unexpected exception at {0} {1}: {2}\n{3}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
+                                    m_Log.WarnFormat("(StartUriHandler): Unexpected exception at {0} {1}: {2}\n{3}", req.Method, req.RawUrl, e.GetType().Name, e.StackTrace);
                                 }
                                 req.Close();
                                 return;
                             }
                         }
 
-                        HttpResponse res = req.BeginResponse(HttpStatusCode.NotFound, "Not found");
-                        byte[] buffer = Encoding.UTF8.GetBytes(ErrorString);
-                        res.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
-                        res.Close();
+                        using (HttpResponse res = req.BeginResponse(HttpStatusCode.NotFound, "Not found"))
+                        {
+                            byte[] buffer = Encoding.UTF8.GetBytes(ErrorString);
+                            res.GetOutputStream(buffer.LongLength).Write(buffer, 0, buffer.Length);
+                        }
                     }
                     httpstream.ReadTimeout = 10000;
                 }

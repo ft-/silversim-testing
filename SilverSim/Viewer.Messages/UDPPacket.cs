@@ -476,7 +476,8 @@ namespace SilverSim.Viewer.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataLength = DataPos += 8;
+                DataPos += 8;
+                DataLength = DataPos;
             }
         }
         #endregion
@@ -501,7 +502,8 @@ namespace SilverSim.Viewer.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataLength = DataPos += 8;
+                DataPos += 8;
+                DataLength = DataPos;
             }
         }
 
@@ -550,7 +552,8 @@ namespace SilverSim.Viewer.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataLength = DataPos += 4;
+                DataPos += 4;
+                DataLength = DataPos;
             }
         }
 
@@ -599,7 +602,8 @@ namespace SilverSim.Viewer.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataLength = DataPos += 4;
+                DataPos += 4;
+                DataLength = DataPos;
             }
         }
         #endregion
@@ -648,7 +652,8 @@ namespace SilverSim.Viewer.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataLength = DataPos += 4;
+                DataPos += 4;
+                DataLength = DataPos;
             }
         }
         #endregion
@@ -697,7 +702,8 @@ namespace SilverSim.Viewer.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataLength = DataPos += 2;
+                DataPos += 2;
+                DataLength = DataPos;
             }
         }
         #endregion
@@ -746,7 +752,8 @@ namespace SilverSim.Viewer.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataLength = DataPos += 2;
+                DataPos += 2;
+                DataLength = DataPos;
             }
         }
         #endregion
@@ -776,7 +783,8 @@ namespace SilverSim.Viewer.Messages
             {
                 byte[] buf = new byte[]{val};
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataLength = DataPos += 1;
+                DataPos += 1;
+                DataLength = DataPos;
             }
         }
         #endregion
@@ -806,7 +814,8 @@ namespace SilverSim.Viewer.Messages
             {
                 byte[] buf = new byte[] { (byte)val };
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataLength = DataPos += 1;
+                DataPos += 1;
+                DataLength = DataPos;
             }
         }
         #endregion
@@ -855,7 +864,8 @@ namespace SilverSim.Viewer.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataLength = DataPos += 8;
+                DataPos += 8;
+                DataLength = DataPos;
             }
         }
         #endregion
@@ -904,7 +914,8 @@ namespace SilverSim.Viewer.Messages
                     Array.Reverse(buf);
                 }
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataLength = DataPos += 4;
+                DataPos += 4;
+                DataLength = DataPos;
             }
         }
         #endregion
@@ -1000,7 +1011,8 @@ namespace SilverSim.Viewer.Messages
             else
             {
                 val.ToBytes(Data, DataPos);
-                DataLength = DataPos += 16;
+                DataPos += 16;
+                DataLength = DataPos;
             }
         }
         #endregion
@@ -1038,7 +1050,8 @@ namespace SilverSim.Viewer.Messages
             else
             {
                 Buffer.BlockCopy(buf, 0, Data, DataPos, buf.Length);
-                DataLength = DataPos += buf.Length;
+                DataPos += buf.Length;
+                DataLength = DataPos;
             }
         }
         #endregion

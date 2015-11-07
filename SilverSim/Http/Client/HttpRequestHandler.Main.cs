@@ -320,12 +320,9 @@ namespace SilverSim.Http.Client
                     throw new BadHttpResponseException();
                 }
                 Stream bs = new ResponseBodyStream(s, contentLength, keepalive, uri.Scheme, uri.Host, uri.Port);
-                if(headers.TryGetValue("Transfer-Encoding", out value))
+                if(headers.TryGetValue("Transfer-Encoding", out value) && value == "chunked")
                 {
-                    if(value == "chunked")
-                    {
-                        bs = new HttpReadChunkedBodyStream(bs);
-                    }
+                    bs = new HttpReadChunkedBodyStream(bs);
                 }
                 if (compressedresult)
                 {
@@ -336,12 +333,9 @@ namespace SilverSim.Http.Client
             else
             {
                 Stream bs = s;
-                if (headers.TryGetValue("Transfer-Encoding", out value))
+                if (headers.TryGetValue("Transfer-Encoding", out value) && value == "chunked")
                 {
-                    if (value == "chunked")
-                    {
-                        bs = new HttpReadChunkedBodyStream(bs);
-                    }
+                    bs = new HttpReadChunkedBodyStream(bs);
                 }
                 if (compressedresult)
                 {
@@ -352,6 +346,6 @@ namespace SilverSim.Http.Client
         }
         #endregion
 
-        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
+        static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }

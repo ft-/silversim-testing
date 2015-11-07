@@ -103,16 +103,9 @@ namespace SilverSim.Scene.Types.Scene
             ParcelInfo selectedParcel = null;
             foreach(ParcelInfo parcel in Parcels)
             {
-                if(TeleportLandingType.Blocked == parcel.LandingType)
-                {
-                    continue;
-                }
-                else if(parcel.PassPrice != 0)
-                {
-                    /* skip parcels with pass price here */
-                    continue;
-                }
-                else if (!CheckParcelAccessRights(agent, parcel))
+                if(TeleportLandingType.Blocked == parcel.LandingType || 
+                    parcel.PassPrice != 0 /* skip parcels with pass price here */ ||
+                    !CheckParcelAccessRights(agent, parcel))
                 {
                     continue;
                 }
@@ -150,11 +143,8 @@ namespace SilverSim.Scene.Types.Scene
                     d.Y = a.Y;
                     b.Y = c.Y;
 
-                    if(parceldist > (a - destinationLocation).LengthSquared)
-                    {
-                        selectedParcel = parcel;
-                    }
-                    else if(parceldist > (b - destinationLocation).LengthSquared)
+                    if(parceldist > (a - destinationLocation).LengthSquared ||
+                        parceldist > (b - destinationLocation).LengthSquared)
                     {
                         selectedParcel = parcel;
                     }

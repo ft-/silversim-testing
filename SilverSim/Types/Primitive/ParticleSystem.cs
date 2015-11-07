@@ -231,12 +231,24 @@ namespace SilverSim.Types.Primitive
             BlendFuncSource = BlendFunc.SourceAlpha;
             BlendFuncDest = BlendFunc.OneMinusSourceAlpha;
 
-            MaxAge = StartAge = InnerAngle = OuterAngle = BurstRate = BurstRadius = BurstSpeedMin =
-                BurstSpeedMax = 0.0f;
-            AngularVelocity = PartAcceleration = Vector3.Zero;
-            Texture = Target = UUID.Zero;
-            PartStartColor = PartEndColor = ColorAlpha.Black;
-            PartStartScaleX = PartStartScaleY = PartEndScaleX = PartEndScaleY = 0.0f;
+            MaxAge = 0.0f;
+            StartAge = 0.0f;
+            InnerAngle = 0.0f;
+            OuterAngle = 0.0f;
+            BurstRate = 0.0f;
+            BurstRadius = 0.0f;
+            BurstSpeedMin = 0.0f;
+            BurstSpeedMax = 0.0f;
+            AngularVelocity = Vector3.Zero;
+            PartAcceleration = Vector3.Zero;
+            Texture = UUID.Zero;
+            Target = UUID.Zero;
+            PartStartColor = ColorAlpha.Black;
+            PartEndColor = ColorAlpha.Black;
+            PartStartScaleX = 0.0f;
+            PartStartScaleY = 0.0f;
+            PartEndScaleX = 0.0f;
+            PartEndScaleY = 0.0f;
 
             int size = data.Length - pos;
             BitPacker pack = new BitPacker(data, pos);

@@ -96,14 +96,7 @@ namespace SilverSim.Main.Common
         {
             get
             {
-                if (Environment.Is64BitProcess)
-                {
-                    return string.Format("{0} {1} {2} {3}", ProductName, Version, RuntimeInformation, MachineWidth);
-                }
-                else
-                {
-                    return string.Format("{0} {1} {2} {3}", ProductName, Version, RuntimeInformation, MachineWidth);
-                }
+                return string.Format("{0} {1} {2} {3}", ProductName, Version, RuntimeInformation, MachineWidth);
             }
         }
 

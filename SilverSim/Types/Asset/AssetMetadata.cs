@@ -168,7 +168,7 @@ namespace SilverSim.Types.Asset
                 switch(Type)
                 {
                     case AssetType.Texture: return "image/x-j2c";
-                    case AssetType.TextureTGA: return "image/tga";
+                    case AssetType.TextureTGA: 
                     case AssetType.ImageTGA: return "image/tga";
                     case AssetType.ImageJPEG: return "image/jpeg";
                     case AssetType.Sound: return "audio/ogg";

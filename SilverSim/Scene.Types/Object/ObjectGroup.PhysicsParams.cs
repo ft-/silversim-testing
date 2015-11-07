@@ -34,11 +34,7 @@ namespace SilverSim.Scene.Types.Object
                 {
                     IPhysicsObject obj;
                     SceneInterface scene = Scene;
-                    if (scene == null)
-                    {
-                        obj = DummyPhysicsObject.SharedInstance;
-                    }
-                    else if (!m_PhysicsActors.TryGetValue(scene.ID, out obj))
+                    if (scene == null || !m_PhysicsActors.TryGetValue(scene.ID, out obj))
                     {
                         obj = DummyPhysicsObject.SharedInstance;
                     }

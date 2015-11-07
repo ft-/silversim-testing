@@ -41,7 +41,9 @@ namespace SilverSim.ServiceInterfaces.Asset
                 AssetData data = m_Service[key];
                 try
                 {
-                    return new List<UUID>(m_ReferencesCache[key] = data.References);
+                    result = data.References;
+                    m_ReferencesCache[key] = result;
+                    return new List<UUID>(result);
                 }
                 catch
                 {

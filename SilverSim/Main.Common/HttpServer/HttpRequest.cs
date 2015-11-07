@@ -226,13 +226,7 @@ namespace SilverSim.Main.Common.HttpServer
                 }
 
                 string[] headerData = headerLine.Split(new char[]{':'}, 2);
-                if(headerData.Length != 2)
-                {
-                    ConnectionMode = HttpConnectionMode.Close;
-                    ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
-                    throw new InvalidDataException();
-                }
-                else if(headerData[0].Trim() != headerData[0])
+                if (headerData.Length != 2 || headerData[0].Trim() != headerData[0])
                 {
                     ConnectionMode = HttpConnectionMode.Close;
                     ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");

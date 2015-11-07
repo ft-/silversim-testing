@@ -1114,7 +1114,8 @@ namespace SilverSim.Viewer.Core
                     int seqid = ++m_NextParcelSequenceId;
                     if (seqid < 0)
                     {
-                        seqid = m_NextParcelSequenceId = 1;
+                        seqid = 1;
+                        m_NextParcelSequenceId = seqid;
                     }
                     return seqid;
                 }

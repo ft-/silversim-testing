@@ -1549,16 +1549,10 @@ namespace SilverSim.Scene.Types.Object
                     UUID assetid;
 
                     /* validate inventory item */
-                    if (!UUID.TryParse(attrs["Asset"], out assetid))
-                    {
-                        item = null;
-                    }
-                    else if (item.AssetType != SilverSim.Types.Asset.AssetType.LSLText ||
-                        item.InventoryType != SilverSim.Types.Inventory.InventoryType.LSLText)
-                    {
-                        item = null;
-                    }
-                    else if (assetid != item.AssetID)
+                    if (!UUID.TryParse(attrs["Asset"], out assetid) ||
+                        item.AssetType != SilverSim.Types.Asset.AssetType.LSLText ||
+                        item.InventoryType != SilverSim.Types.Inventory.InventoryType.LSLText ||
+                        assetid != item.AssetID)
                     {
                         item = null;
                     }

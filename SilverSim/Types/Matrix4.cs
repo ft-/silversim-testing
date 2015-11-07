@@ -378,7 +378,9 @@ namespace SilverSim.Types
             m.M33 = a * c;
             m.M34 = 0f;
 
-            m.M41 = m.M42 = m.M43 = 0f;
+            m.M41 = 0f;
+            m.M42 = 0f;
+            m.M43 = 0f;
             m.M44 = 1f;
 
             return m;
@@ -413,7 +415,9 @@ namespace SilverSim.Types
             matrix.M33 = 1f - (2f * (yy + xx));
             matrix.M34 = 0f;
 
-            matrix.M41 = matrix.M42 = matrix.M43 = 0f;
+            matrix.M41 = 0f;
+            matrix.M42 = 0f;
+            matrix.M43 = 0f;
             matrix.M44 = 1f;
 
             return matrix;

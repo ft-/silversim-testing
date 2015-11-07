@@ -64,20 +64,14 @@ namespace SilverSim.Scene.Types.Scene
                     ov |= ParcelOverlayType.OwnedByOther;
                 }
 
-                if(x == 0)
-                {
-                    ov |= ParcelOverlayType.BorderWest;
-                }
-                else if (m_ParcelLayer[x - 1, y] != parcelLocalID && m_Parcels.ContainsKey(m_ParcelLayer[x - 1, y]))
+                if(x == 0 ||
+                    m_ParcelLayer[x - 1, y] != parcelLocalID && m_Parcels.ContainsKey(m_ParcelLayer[x - 1, y]))
                 {
                     ov |= ParcelOverlayType.BorderWest;
                 }
 
-                if (y == 0)
-                {
-                    ov |= ParcelOverlayType.BorderSouth;
-                }
-                else if (m_ParcelLayer[x, y - 1] != parcelLocalID && m_Parcels.ContainsKey(m_ParcelLayer[x, y - 1]))
+                if (y == 0 ||
+                    m_ParcelLayer[x, y - 1] != parcelLocalID && m_Parcels.ContainsKey(m_ParcelLayer[x, y - 1]))
                 {
                     ov |= ParcelOverlayType.BorderSouth;
                 }
@@ -220,7 +214,8 @@ namespace SilverSim.Scene.Types.Scene
             prop.OtherCount = 0;
             prop.PublicCount = 0;
             prop.LocalID = pinfo.LocalID;
-            if(prop.IsGroupOwned = pinfo.GroupOwned)
+            prop.IsGroupOwned = pinfo.GroupOwned;
+            if (prop.IsGroupOwned)
             {
                 prop.OwnerID = pinfo.Group.ID;
             }

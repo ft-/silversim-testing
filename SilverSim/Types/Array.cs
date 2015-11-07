@@ -157,7 +157,7 @@ namespace SilverSim.Types
         }
 
         #region Stateful Enumerator
-        public class MarkEnumerator : IEnumerator<IValue>, IEnumerator
+        public class MarkEnumerator : IEnumerator<IValue>, IEnumerator, IDisposable
         {
             private int m_CurrentIndex;
             private int m_MarkIndex;
@@ -207,11 +207,6 @@ namespace SilverSim.Types
             public void GoToMarkPosition()
             {
                 m_CurrentIndex = m_MarkIndex;
-            }
-
-            protected virtual void Dispose(bool v)
-            {
-
             }
         }
 

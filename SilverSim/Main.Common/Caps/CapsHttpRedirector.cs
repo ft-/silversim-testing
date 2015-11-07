@@ -34,12 +34,7 @@ namespace SilverSim.Main.Common.Caps
                     return;
                 }
 
-                if(!Caps.ContainsKey("SEED"))
-                {
-                    httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
-                    return;
-                }
-                else if(!Caps["SEED"].TryGetValue(regionSeedUuid, out del))
+                if (!Caps.ContainsKey("SEED") || !Caps["SEED"].TryGetValue(regionSeedUuid, out del))
                 {
                     httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                     return;
@@ -66,12 +61,7 @@ namespace SilverSim.Main.Common.Caps
             }
 
             RwLockedDictionary<UUID, Action<HttpRequest>> dict;
-            if(!Caps.TryGetValue(parts[1], out dict))
-            {
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
-                return;
-            }
-            else if(!dict.TryGetValue(capsUUID, out del))
+            if (!Caps.TryGetValue(parts[1], out dict) || !dict.TryGetValue(capsUUID, out del))
             {
                 httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
                 return;
