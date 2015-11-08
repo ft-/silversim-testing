@@ -21,14 +21,7 @@ namespace SilverSim.Scene.Management.Scene
 
         uint LowerPos(uint a, uint drawdist)
         {
-            if(a < drawdist)
-            {
-                return 0;
-            }
-            else
-            {
-                return a - drawdist;
-            }
+            return (a < drawdist) ? 0 : a - drawdist;
         }
 
         bool IsPointInBox(GridVector pos, GridVector a, GridVector b, uint drawdist)

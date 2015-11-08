@@ -197,14 +197,7 @@ namespace SilverSim.Main.Common.HttpServer
             }
 
             /* Configure connection mode default according to version */
-            if(MinorVersion > 0)
-            {
-                ConnectionMode = HttpConnectionMode.KeepAlive;
-            }
-            else
-            {
-                ConnectionMode = HttpConnectionMode.Close;
-            }
+            ConnectionMode = MinorVersion > 0 ? HttpConnectionMode.KeepAlive : HttpConnectionMode.Close;
 
             Method = requestData[0];
             RawUrl = requestData[1];
@@ -352,14 +345,9 @@ namespace SilverSim.Main.Common.HttpServer
                 }
             }
 
-            if (m_Headers.ContainsKey("X-Forwarded-For") && isBehindProxy)
-            {
-                CallerIP = m_Headers["X-Forwarded-For"];
-            }
-            else
-            {
-                CallerIP = callerIP;
-            }
+            CallerIP = (m_Headers.ContainsKey("X-Forwarded-For") && isBehindProxy) ?
+                m_Headers["X-Forwarded-For"] : 
+                callerIP;
         }
 
         public HttpResponse BeginResponse()

@@ -80,15 +80,9 @@ namespace SilverSim.Database.MySQL.Estate
             }
             set
             {
-                string query;
-                if (value)
-                {
-                    query = "REPLACE INTO estate_groups (EstateID, GroupID) VALUES (?estateid, ?groupid)";
-                }
-                else
-                {
-                    query = "DELETE FROM estate_groups WHERE EstateID = ?estateid AND GroupID LIKE ?groupid";
-                }
+                string query = value ?
+                    "REPLACE INTO estate_groups (EstateID, GroupID) VALUES (?estateid, ?groupid)" : 
+                    "DELETE FROM estate_groups WHERE EstateID = ?estateid AND GroupID LIKE ?groupid";
 
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {

@@ -105,14 +105,9 @@ namespace SilverSim.Http.Client
                     byte[] b = new byte[10240];
                     while(m_RemainingLength > 0)
                     {
-                        if(m_RemainingLength > 10240)
-                        {
-                            Read(b, 0, 10240);
-                        }
-                        else
-                        {
-                            Read(b, 0, (int)m_RemainingLength);
-                        }
+                        Read(b, 0, m_RemainingLength > b.Length ?
+                            b.Length :
+                            (int)m_RemainingLength);
                     }
 
                     if(m_Input != null)
@@ -130,14 +125,9 @@ namespace SilverSim.Http.Client
                     byte[] b = new byte[10240];
                     while (m_RemainingLength > 0)
                     {
-                        if (m_RemainingLength > 10240)
-                        {
-                            Read(b, 0, 10240);
-                        }
-                        else
-                        {
-                            Read(b, 0, (int)m_RemainingLength);
-                        }
+                        Read(b, 0, m_RemainingLength > b.Length ?
+                            b.Length :
+                            (int)m_RemainingLength);
                     }
 
                     if (m_Input != null)
@@ -161,14 +151,9 @@ namespace SilverSim.Http.Client
                     byte[] b = new byte[10240];
                     while (m_RemainingLength > 0)
                     {
-                        if (m_RemainingLength > 10240)
-                        {
-                            Read(b, 0, 10240);
-                        }
-                        else
-                        {
-                            Read(b, 0, (int)m_RemainingLength);
-                        }
+                        Read(b, 0, m_RemainingLength > b.Length ?
+                            b.Length :
+                            (int)m_RemainingLength);
                     }
 
                     if (m_Input != null)
@@ -182,7 +167,8 @@ namespace SilverSim.Http.Client
             public override int Read(byte[] buffer, int offset, int count)
             {
                 int rescount = 0;
-                if(m_RemainingLength == 0 || m_Input == null)
+                int result;
+                if (m_RemainingLength == 0 || m_Input == null)
                 {
                     return 0;
                 }
@@ -193,15 +179,9 @@ namespace SilverSim.Http.Client
                     {
                         count = (int)m_RemainingLength;
                     }
-                    int result;
-                    if (count > 10240)
-                    {
-                        result = m_Input.Read(buffer, offset, 10240);
-                    }
-                    else
-                    {
-                        result = m_Input.Read(buffer, offset, count);
-                    }
+                    
+                    result = m_Input.Read(buffer, offset, count > 10240 ? 10240 : count);
+
                     if (result > 0)
                     {
                         m_RemainingLength -= result;

@@ -111,14 +111,7 @@ namespace SilverSim.Database.MySQL.Avatar
                                 cmd.Parameters.AddWithValue("?name", key);
                                 using (MySqlDataReader dbReader = cmd.ExecuteReader())
                                 {
-                                    if (dbReader.Read())
-                                    {
-                                        result.Add((string)dbReader["Value"]);
-                                    }
-                                    else
-                                    {
-                                        result.Add(string.Empty);
-                                    }
+                                    result.Add(dbReader.Read() ? (string)dbReader["Value"] : string.Empty);
                                 }
                             }
                         }

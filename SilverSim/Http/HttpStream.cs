@@ -82,14 +82,7 @@ namespace SilverSim.Http
                 m_BufferPos = 0;
                 m_BufferFill = ReadBytesInternal(m_Buffer, m_Buffer.Length, ReadTimeout);
             }
-            if(m_BufferPos < m_BufferFill)
-            {
-                return (int)m_Buffer[m_BufferPos++];
-            }
-            else
-            {
-                return -1;
-            }
+            return (m_BufferPos < m_BufferFill) ? (int)m_Buffer[m_BufferPos++] : -1;
         }
 
         public override string ReadHeaderLine()

@@ -34,14 +34,7 @@ namespace SilverSim.Scene.Physics.Common
 
             set
             {
-                if(value < 0)
-                {
-                    m_Buoyancy = 0;
-                }
-                else
-                {
-                    m_Buoyancy = value;
-                }
+                m_Buoyancy = (value < 0) ? 0 : value;
             }
         }
 

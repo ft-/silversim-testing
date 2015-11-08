@@ -80,15 +80,9 @@ namespace SilverSim.Database.MySQL.Estate
             }
             set
             {
-                string query;
-                if (value)
-                {
-                    query = "REPLACE INTO estate_users (EstateID, UserID) VALUES (?estateid, ?userid)";
-                }
-                else
-                {
+                string query = value ?
+                    query = "REPLACE INTO estate_users (EstateID, UserID) VALUES (?estateid, ?userid)" :
                     query = "DELETE FROM estate_users WHERE EstateID = ?estateid AND UserID LIKE ?userid";
-                }
 
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {

@@ -63,15 +63,11 @@ namespace SilverSim.Main.Common.Transfer
                         {
                             m_DestinationAssetService.Store(m_SourceAssetService[assetid]);
                         }
-                        List<UUID> ref_assetids;
-                        if (m_RefSource == ReferenceSource.Destination)
-                        {
-                            ref_assetids = m_DestinationAssetService.References[assetid];
-                        }
-                        else
-                        {
-                            ref_assetids = m_SourceAssetService.References[assetid];
-                        }
+
+                        List<UUID> ref_assetids = m_RefSource == ReferenceSource.Destination ?
+                            m_DestinationAssetService.References[assetid] :
+                            m_SourceAssetService.References[assetid];
+
                         foreach (UUID assetid_new in ref_assetids)
                         {
                             if (!new_assetids.Contains(assetid_new))

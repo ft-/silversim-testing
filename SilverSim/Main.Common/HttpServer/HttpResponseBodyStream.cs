@@ -104,14 +104,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 while(m_RemainingLength > 0)
                 {
-                    if(m_RemainingLength > FillBytes.Length)
-                    {
-                        Write(FillBytes, 0, FillBytes.Length);
-                    }
-                    else
-                    {
-                        Write(FillBytes, 0, (int)m_RemainingLength);
-                    }
+                    Write(FillBytes, 0, m_RemainingLength > FillBytes.Length ? FillBytes.Length : (int)m_RemainingLength);
                 }
                 m_Output.Flush();
                 m_Output = null;
@@ -124,14 +117,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 while (m_RemainingLength > 0)
                 {
-                    if (m_RemainingLength > 10240)
-                    {
-                        Write(FillBytes, 0, 10240);
-                    }
-                    else
-                    {
-                        Write(FillBytes, 0, (int)m_RemainingLength);
-                    }
+                    Write(FillBytes, 0, m_RemainingLength > FillBytes.Length ? FillBytes.Length : (int)m_RemainingLength);
                 }
                 m_Output.Flush();
                 m_Output = null;
@@ -145,14 +131,7 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 while (m_RemainingLength > 0)
                 {
-                    if (m_RemainingLength > FillBytes.Length)
-                    {
-                        Write(FillBytes, 0, FillBytes.Length);
-                    }
-                    else
-                    {
-                        Write(FillBytes, 0, (int)m_RemainingLength);
-                    }
+                    Write(FillBytes, 0, m_RemainingLength > FillBytes.Length ? FillBytes.Length : (int)m_RemainingLength);
                 }
                 m_Output.Flush();
             }

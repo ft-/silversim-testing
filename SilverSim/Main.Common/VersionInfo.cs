@@ -68,14 +68,7 @@ namespace SilverSim.Main.Common
                     if (type != null)
                     {
                         MethodInfo displayName = type.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static);
-                        if (displayName != null)
-                        {
-                            ru += "/" + displayName.Invoke(null, null);
-                        }
-                        else
-                        {
-                            ru += "/Mono";
-                        }
+                        ru += displayName != null ? "/" + displayName.Invoke(null, null) : "/Mono";
                     }
                     else
                     {
@@ -104,14 +97,9 @@ namespace SilverSim.Main.Common
         {
             get
             {
-                if(Environment.Is64BitProcess)
-                {
-                    return "64-bit";
-                }
-                else
-                {
-                    return "32-bit";
-                }
+                return Environment.Is64BitProcess ?
+                    "64-bit" :
+                    "32-bit";
             }
         }
     }
