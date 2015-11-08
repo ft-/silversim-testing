@@ -109,14 +109,9 @@ namespace SilverSim.Scene.Types.Scene
             {
                 m = new ParcelOverlay();
                 m.SequenceID = sequenceID;
-                if (c.Length - offset >= 1024)
-                {
-                    m.Data = new byte[1024];
-                }
-                else
-                {
-                    m.Data = new byte[c.Length - offset];
-                }
+                m.Data = (c.Length - offset >= 1024) ? 
+                    new byte[1024] : 
+                    new byte[c.Length - offset];
                 Buffer.BlockCopy(c, offset, m.Data, 0, m.Data.Length);
                 agent.SendMessageAlways(m, ID);
             }
@@ -139,14 +134,10 @@ namespace SilverSim.Scene.Types.Scene
                             foreach (IAgent a in Agents)
                             {
                                 ParcelOverlay m = new ParcelOverlay();
-                                if (totalLen - offset >= 1024)
-                                {
-                                    m.Data = new byte[1024];
-                                }
-                                else
-                                {
-                                    m.Data = new byte[totalLen - offset];
-                                }
+                                m.Data = (totalLen - offset >= 1024) ?
+                                    new byte[1024] :
+                                    new byte[totalLen - offset];
+
                                 m.SequenceID = sequenceID;
                                 UUI agentID = a.Owner;
                                 for (int pos = 0; pos < m.Data.Length; ++pos)
@@ -215,14 +206,9 @@ namespace SilverSim.Scene.Types.Scene
             prop.PublicCount = 0;
             prop.LocalID = pinfo.LocalID;
             prop.IsGroupOwned = pinfo.GroupOwned;
-            if (prop.IsGroupOwned)
-            {
-                prop.OwnerID = pinfo.Group.ID;
-            }
-            else
-            {
-                prop.OwnerID = pinfo.Owner.ID;
-            }
+            prop.OwnerID = (prop.IsGroupOwned) ? 
+                pinfo.Group.ID : 
+                pinfo.Owner.ID;
             prop.AuctionID = pinfo.AuctionID;
             prop.ClaimDate = pinfo.ClaimDate;
             prop.ClaimPrice = pinfo.ClaimPrice;
@@ -246,22 +232,12 @@ namespace SilverSim.Scene.Types.Scene
             prop.SalePrice = pinfo.SalePrice;
             prop.Name = pinfo.Name;
             prop.Description = pinfo.Description;
-            if (null != pinfo.MusicURI)
-            {
-                prop.MusicURL = pinfo.MusicURI;
-            }
-            else
-            {
-                prop.MusicURL = string.Empty;
-            }
-            if (null != pinfo.MediaURI)
-            {
-                prop.MediaURL = pinfo.MediaURI;
-            }
-            else
-            {
-                prop.MediaURL = string.Empty;
-            }
+            prop.MusicURL = (null != pinfo.MusicURI) ?
+                pinfo.MusicURI :
+                string.Empty;
+            prop.MediaURL = (null != pinfo.MediaURI) ?
+                pinfo.MediaURI :
+                string.Empty;
             prop.MediaID = pinfo.MediaID;
             prop.MediaAutoScale = pinfo.MediaAutoScale;
             prop.GroupID = pinfo.Group.ID;

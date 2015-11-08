@@ -18,14 +18,9 @@ namespace SilverSim.Types
 
         public static explicit operator string(UUI v)
         {
-            if (v.HomeURI != null)
-            {
-                return string.Format("{0}", v.ID.ToString());
-            }
-            else
-            {
-                return string.Format("{0};{1};{2} {3}", v.ID.ToString(), v.HomeURI.ToString(), v.FirstName, v.LastName);
-            }
+            return (v.HomeURI != null) ?
+                string.Format("{0};{1};{2} {3}", v.ID.ToString(), v.HomeURI.ToString(), v.FirstName, v.LastName) :
+                string.Format("{0}", v.ID.ToString());
         }
 
         public override bool Equals(object obj)
@@ -63,14 +58,9 @@ namespace SilverSim.Types
         public override int GetHashCode()
         {
             Uri h = HomeURI;
-            if (h != null)
-            {
-                return ID.GetHashCode() ^ h.GetHashCode();
-            }
-            else
-            {
-                return ID.GetHashCode();
-            }
+            return (h != null) ? 
+                ID.GetHashCode() ^ h.GetHashCode() : 
+                ID.GetHashCode();
         }
 
 
@@ -79,14 +69,9 @@ namespace SilverSim.Types
         {
             get
             {
-                if (HomeURI != null)
-                {
-                    return string.Format("{0};{1} {2}", HomeURI.ToString(), FirstName, LastName);
-                }
-                else
-                {
-                    return string.Empty;
-                }
+                return (HomeURI != null) ?
+                    string.Format("{0};{1} {2}", HomeURI.ToString(), FirstName, LastName) :
+                    string.Empty;
             }
             set
             {
@@ -120,14 +105,10 @@ namespace SilverSim.Types
                 else
                 {
                     string hostName;
-                    if(HomeURI.IsDefaultPort)
-                    {
-                        hostName = HomeURI.Host;
-                    }
-                    else
-                    {
-                        hostName = HomeURI.Host + ":" + HomeURI.Port.ToString();
-                    }
+                    hostName = HomeURI.IsDefaultPort ?
+                        HomeURI.Host :
+                        HomeURI.Host + ":" + HomeURI.Port.ToString();
+
                     return string.Format("{0}.{1} @{2}", FirstName.Replace(' ', '.'), LastName.Replace(' ', '.'), hostName);
                 }
             }
@@ -147,16 +128,9 @@ namespace SilverSim.Types
                         /* HG UUI */
                         HomeURI = new Uri("http://" + names[1]);
                         names = names[0].Split(new char[] { '.' }, 2, StringSplitOptions.None);
-                        if (names.Length < 2)
-                        {
-                            FirstName = names[0];
-                            LastName = string.Empty;
-                        }
-                        else
-                        {
-                            FirstName = names[0];
-                            LastName = names[1];
-                        }
+
+                        FirstName = names[0];
+                        LastName = names.Length < 2 ? string.Empty : names[1];
                     }
                     else
                     {
@@ -240,14 +214,9 @@ namespace SilverSim.Types
 
         public override string ToString()
         {
-            if (HomeURI != null)
-            {
-                return String.Format("{0};{1};{2} {3}", ID.ToString(), HomeURI, FirstName.Replace(' ', '.'), LastName.Replace(' ', '.'));
-            }
-            else
-            {
-                return ID.ToString();
-            }
+            return (HomeURI != null) ?
+                String.Format("{0};{1};{2} {3}", ID.ToString(), HomeURI, FirstName.Replace(' ', '.'), LastName.Replace(' ', '.')) :
+                ID.ToString();
         }
 
         private static readonly char[] Semicolon = new char[1] { ';' };

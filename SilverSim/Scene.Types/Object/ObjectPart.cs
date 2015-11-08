@@ -139,14 +139,9 @@ namespace SilverSim.Scene.Types.Object
 
         public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted)
         {
-            if (ObjectGroup.IsGroupOwned)
-            {
-                return m_Permissions.CheckGroupPermissions(Creator, ObjectGroup.Group, accessor, accessorgroup, wanted);
-            }
-            else
-            {
-                return m_Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
-            }
+            return (ObjectGroup.IsGroupOwned) ?
+                m_Permissions.CheckGroupPermissions(Creator, ObjectGroup.Group, accessor, accessorgroup, wanted) :
+                m_Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
         }
         #endregion
 
@@ -639,14 +634,9 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                if(ObjectGroup != null)
-                {
-                    return ObjectGroup.Acceleration;
-                }
-                else
-                {
-                    return Vector3.Zero;
-                }
+                return (ObjectGroup != null) ?
+                    ObjectGroup.Acceleration :
+                    Vector3.Zero;
             }
             set
             {
@@ -661,14 +651,9 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                if (ObjectGroup != null)
-                {
-                    return ObjectGroup.AngularAcceleration;
-                }
-                else
-                {
-                    return Vector3.Zero;
-                }
+                return (ObjectGroup != null) ?
+                    ObjectGroup.AngularAcceleration :
+                    Vector3.Zero;
             }
             set
             {
@@ -737,11 +722,17 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this) return m_SitTargetOffset;
+                lock (this)
+                {
+                    return m_SitTargetOffset;
+                }
             }
             set
             {
-                lock (this) m_SitTargetOffset = value;
+                lock (this)
+                {
+                    m_SitTargetOffset = value;
+                }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate( 0);
             }
@@ -751,11 +742,17 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this) return m_SitTargetOrientation;
+                lock (this) 
+                {
+                    return m_SitTargetOrientation; 
+                }
             }
             set
             {
-                lock (this) m_SitTargetOrientation = value;
+                lock (this)
+                {
+                    m_SitTargetOrientation = value;
+                }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -765,11 +762,17 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock(this) return m_SitText;
+                lock (this)
+                {
+                    return m_SitText;
+                }
             }
             set
             {
-                lock(this) m_SitText = value;
+                lock (this)
+                {
+                    m_SitText = value;
+                }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -798,11 +801,17 @@ namespace SilverSim.Scene.Types.Object
         {
             get
             {
-                lock (this) return m_TouchText;
+                lock (this)
+                {
+                    return m_TouchText;
+                }
             }
             set
             {
-                lock (this) m_TouchText = value;
+                lock (this)
+                {
+                    m_TouchText = value;
+                }
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -1209,14 +1218,9 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock (this)
                 {
-                    if (ObjectGroup != null && this != ObjectGroup.RootPart)
-                    {
-                        return m_LocalRotation * ObjectGroup.RootPart.GlobalRotation;
-                    }
-                    else
-                    {
-                        return m_LocalRotation;
-                    }
+                    return (ObjectGroup != null && this != ObjectGroup.RootPart) ?
+                        m_LocalRotation * ObjectGroup.RootPart.GlobalRotation :
+                        m_LocalRotation;
                 }
             }
             set
@@ -1347,14 +1351,10 @@ namespace SilverSim.Scene.Types.Object
                     pos += 4;
                 }
 
-                if (ObjectGroup != null)
-                {
-                    data[pos++] = (byte)ObjectGroup.AttachPoint;
-                }
-                else
-                {
-                    data[pos++] = 0;
-                }
+                data[pos++] = (ObjectGroup != null) ?
+                    (byte)ObjectGroup.AttachPoint :
+                    (byte)0;
+
                 data[pos++] = 0;
                 Position.ToBytes(data, pos);
                 pos += 12;
