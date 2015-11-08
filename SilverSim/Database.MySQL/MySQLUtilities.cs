@@ -567,14 +567,14 @@ namespace SilverSim.Database.MySQL
             {
                 return new UUID((Guid)v);
             }
-            else if(null != (s = v as string))
+            
+            s = v as string;
+            if(null != s)
             {
                 return new UUID(s);
             }
-            else
-            {
-                throw new InvalidCastException("GetUUID could not convert value for " + prefix);
-            }
+
+            throw new InvalidCastException("GetUUID could not convert value for " + prefix);
         }
 
         public static UUI GetUUI(this MySqlDataReader dbReader, string prefix)
@@ -585,14 +585,14 @@ namespace SilverSim.Database.MySQL
             {
                 return new UUI((Guid)v);
             }
-            else if (null != (s = v as string))
+
+            s = v as string;
+            if (null != s)
             {
                 return new UUI(s);
             }
-            else
-            {
-                throw new InvalidCastException("GetUUI could not convert value for " + prefix);
-            }
+
+            throw new InvalidCastException("GetUUI could not convert value for " + prefix);
         }
 
         public static UGI GetUGI(this MySqlDataReader dbReader, string prefix)
@@ -603,14 +603,14 @@ namespace SilverSim.Database.MySQL
             {
                 return new UGI((Guid)v);
             }
-            else if (null != (s = v as string))
+
+            s = v as string;
+            if (null != s)
             {
                 return new UGI(s);
             }
-            else
-            {
-                throw new InvalidCastException("GetUGI could not convert value for " + prefix);
-            }
+
+            throw new InvalidCastException("GetUGI could not convert value for " + prefix);
         }
 
         public static Date GetDate(this MySqlDataReader dbReader, string prefix)
