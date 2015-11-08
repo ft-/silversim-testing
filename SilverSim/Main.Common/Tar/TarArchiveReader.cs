@@ -108,7 +108,7 @@ namespace SilverSim.Main.Common.Tar
                 }
                 else if(!haveLongLink)
                 {
-                    int fnameLen = 0;
+                    int fnameLen;
                     for(fnameLen = 0; fnameLen < 100 && buf[fnameLen] != 0; ++fnameLen)
                     {
 

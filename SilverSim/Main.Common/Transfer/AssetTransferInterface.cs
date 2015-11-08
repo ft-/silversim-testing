@@ -72,6 +72,13 @@ namespace SilverSim.Main.Common.Transfer
                         {
                             ref_assetids = m_SourceAssetService.References[assetid];
                         }
+                        foreach (UUID assetid_new in ref_assetids)
+                        {
+                            if (!new_assetids.Contains(assetid_new))
+                            {
+                                new_assetids.Add(assetid_new);
+                            }
+                        }
                     }
                 }
             }

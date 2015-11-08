@@ -796,7 +796,7 @@ namespace SilverSim.Main.Common
         {
             string defaultConfigName;
             string defaultsIniName;
-            string mode = "Simulator";
+            string mode;
 
             m_ShutdownEvent = shutdownEvent;
             ArgvConfigSource configSource = new ArgvConfigSource(args);
