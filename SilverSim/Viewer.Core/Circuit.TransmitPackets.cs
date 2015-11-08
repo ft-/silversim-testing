@@ -173,11 +173,13 @@ namespace SilverSim.Viewer.Core
             MediumPriorityQueue = QueueList[(uint)Message.QueueOutType.Medium];
             LowPriorityQueue = QueueList[(uint)Message.QueueOutType.Low];
 
+            int qcount;
+            int timeout = 10;
+            Message m;
+            CancelTxThread cancelmsg;
+
             while (true)
             {
-                Message m;
-                int qcount;
-                int timeout = 10;
                 qcount = 0;
                 foreach (Queue<Message> q in QueueList)
                 {
@@ -189,7 +191,8 @@ namespace SilverSim.Viewer.Core
 
                 qcount = m_TxQueue.Count + 1;
                 m = null;
-                CancelTxThread cancelmsg = null;
+                cancelmsg = null;
+
                 while (qcount > 0)
                 {
                     try

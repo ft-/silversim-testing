@@ -144,7 +144,7 @@ namespace SilverSim.Types
         {
             get
             {
-                double det = 0f;
+                double det;
 
                 double diag1 = M11 * M22 * M33;
                 double diag2 = M12 * M32 * M31;

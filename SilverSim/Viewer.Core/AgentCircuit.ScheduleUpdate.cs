@@ -108,12 +108,6 @@ namespace SilverSim.Viewer.Core
                 }
                 Types.Primitive.PrimitiveFlags flags = (Types.Primitive.PrimitiveFlags)BitConverter.ToUInt32(b, 0);
 
-                b = BitConverter.GetBytes((UInt32)flags);
-                if (!BitConverter.IsLittleEndian)
-                {
-                    Array.Reverse(b);
-                }
-
                 if (kvp.Key.Part.Owner.EqualsGrid(Agent.Owner))
                 {
                     flags |= Types.Primitive.PrimitiveFlags.ObjectYouOwner;
@@ -155,6 +149,13 @@ namespace SilverSim.Viewer.Core
                     }
                 }
                 flags |= Types.Primitive.PrimitiveFlags.ObjectAnyOwner;
+
+                b = BitConverter.GetBytes((UInt32)flags);
+                if (!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(b);
+                }
+
                 Buffer.BlockCopy(b, 0, full_packet.Data, offset + (int)ObjectPart.FullFixedBlock1Offset.UpdateFlags, 4);
             }
 

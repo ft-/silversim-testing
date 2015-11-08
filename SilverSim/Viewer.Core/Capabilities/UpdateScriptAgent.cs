@@ -105,10 +105,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 try
                 {
-                    using (TextReader reader = new StreamReader(data.InputStream))
-                    {
-                        ScriptLoader.SyntaxCheck(item.Owner, data);
-                    }
+                    ScriptLoader.SyntaxCheck(item.Owner, data);
                     m.Add("compiled", true);
                 }
                 catch(CompilerException e)

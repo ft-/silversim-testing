@@ -256,8 +256,7 @@ namespace SilverSim.Viewer.Search
             }
 
             List<UUI> results = scene.AvatarNameService.Search(names);
-            int offset = 0;
-            for(offset = 0; offset < results.Count && offset < 100; ++offset)
+            for(int offset = 0; offset < results.Count && offset < 100; ++offset)
             {
                 AvatarPickerReply.DataEntry d = new AvatarPickerReply.DataEntry();
                 d.AvatarID = results[offset].ID;

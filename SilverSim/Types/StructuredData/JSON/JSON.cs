@@ -186,7 +186,7 @@ namespace SilverSim.Types.StructuredData.Json
                     {
                         do
                         {
-                            c = (char)io.Read();
+                            io.Read();
                             c = (char)io.Peek();
                         } while (char.IsWhiteSpace(c));
                     }
@@ -241,7 +241,7 @@ namespace SilverSim.Types.StructuredData.Json
                     {
                         do
                         {
-                            c = (char)io.Read();
+                            io.Read();
                             c = (char)io.Peek();
                         } while (char.IsWhiteSpace(c));
                     }

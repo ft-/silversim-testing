@@ -201,9 +201,8 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                     if (mesh_list.Count > 0)
                     {
-                        int idx = 0;
                         bool wroteOtherParts = false;
-                        for (idx = 0; idx < mesh_list.Count; ++idx)
+                        for (int idx = 0; idx < mesh_list.Count; ++idx)
                         {
                             UUID meshassetid;
                             if (0 == idx)

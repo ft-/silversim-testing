@@ -1468,7 +1468,6 @@ namespace SilverSim.Viewer.Core
                 ToUInt16Bytes(angvel.Y, -64f, 64f, data, pos);
                 pos += 2;
                 ToUInt16Bytes(angvel.Z, -64f, 64f, data, pos);
-                pos += 2;
 
                 return data;
             }

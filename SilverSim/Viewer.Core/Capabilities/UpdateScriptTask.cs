@@ -143,10 +143,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 try
                 {
-                    using (TextReader reader = new StreamReader(data.InputStream))
-                    {
-                        instance = ScriptLoader.Load(part, item, item.Owner, data);
-                    }
+                    instance = ScriptLoader.Load(part, item, item.Owner, data);
                     item.ScriptInstance = instance;
                     item.ScriptInstance.IsRunning = kvp.Value.IsScriptRunning;
                     m.Add("compiled", true);

@@ -389,7 +389,7 @@ namespace SilverSim.Viewer.Core
                 folder.InventoryType = req.FolderType;
                 folder.Name = req.FolderName;
                 folder.Owner = Agent.Owner;
-                folder.ParentFolderID = req.ParentFolderID;
+                folder.ParentFolderID = folder.ID;
                 folder.Version = 1;
                 Agent.InventoryService.Folder.Add(folder);
             }
@@ -945,7 +945,7 @@ namespace SilverSim.Viewer.Core
                 item.SaleInfo.Type = InventoryItem.SaleInfoData.SaleType.NoSale;
                 item.SaleInfo.Price = 0;
                 item.SaleInfo.PermMask = InventoryPermissionsMask.All;
-                item.ParentFolderID = req.FolderID;
+                item.ParentFolderID = folder.ID;
 
                 item.Permissions.Base = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;
                 item.Permissions.Current = InventoryPermissionsMask.All | InventoryPermissionsMask.Export;

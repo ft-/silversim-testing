@@ -173,7 +173,7 @@ namespace SilverSim.Viewer.Core
             {
                 using (GZipStream gz = new GZipStream(ms, CompressionMode.Compress))
                 {
-                    using (XmlTextWriter writer = new XmlTextWriter(ms, UTF8NoBOM))
+                    using (XmlTextWriter writer = new XmlTextWriter(gz, UTF8NoBOM))
                     {
                         writer.WriteStartElement("llsd");
                         writer.WriteStartElement("array");
