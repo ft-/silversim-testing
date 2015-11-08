@@ -671,7 +671,6 @@ namespace SilverSim.Scene.Types.Object
                     Float2LEBytes((float)proj.ProjectionFocus, updatebytes, i);
                     i += 4;
                     Float2LEBytes((float)proj.ProjectionAmbience, updatebytes, i);
-                    i += 4;
                 }
             }
             finally

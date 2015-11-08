@@ -191,16 +191,22 @@ namespace SilverSim.Scene.Types.Object
         public void Replace(string name, ObjectPartInventoryItem newItem)
         {
             ObjectPartInventoryItem oldItem;
+            ScriptInstance script;
             newItem.Name = name;
             lock(this)
             {
                 oldItem = this[name];
+                script = oldItem.RemoveScriptInstance;
                 Remove(name);
                 if(ContainsKey(newItem.ID))
                 {
                     newItem.ID = UUID.Random;
                 }
                 Add(newItem, false);
+            }
+            if (null != script)
+            {
+                script.Remove();
             }
             Interlocked.Increment(ref InventorySerial);
             var updateDelegate = OnChange;
@@ -215,8 +221,14 @@ namespace SilverSim.Scene.Types.Object
 
         public new bool Remove(UUID key1)
         {
-            if (base.Remove(key1))
+            ObjectPartInventoryItem item;
+            if (base.Remove(key1, out item))
             {
+                ScriptInstance script = item.RemoveScriptInstance;
+                if (null != script)
+                {
+                    script.Remove();
+                }
                 Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
@@ -236,6 +248,11 @@ namespace SilverSim.Scene.Types.Object
             ObjectPartInventoryItem item;
             if (base.Remove(key2, out item))
             {
+                ScriptInstance script = item.RemoveScriptInstance;
+                if (null != script)
+                {
+                    script.Remove();
+                }
                 Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
@@ -254,6 +271,11 @@ namespace SilverSim.Scene.Types.Object
         {
             if (base.Remove(key1, out item))
             {
+                ScriptInstance script = item.RemoveScriptInstance;
+                if (null != script)
+                {
+                    script.Remove();
+                }
                 Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
@@ -272,6 +294,11 @@ namespace SilverSim.Scene.Types.Object
         {
             if (base.Remove(key2, out item))
             {
+                ScriptInstance script = item.RemoveScriptInstance;
+                if (null != script)
+                {
+                    script.Remove();
+                }
                 Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
@@ -290,6 +317,7 @@ namespace SilverSim.Scene.Types.Object
         {
             if (base.Remove(key1, key2))
             {
+#warning check this for Script removal
                 Interlocked.Increment(ref InventorySerial);
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
