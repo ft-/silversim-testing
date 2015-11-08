@@ -69,18 +69,19 @@ namespace SilverSim.Types
         {
             AString a;
             string s;
-            if(null != (s = obj as string))
+            s = obj as string;
+            if(null != s)
             {
                 return m_Value == s;
             }
-            else if(null != (a = obj as AString))
+
+            a = obj as AString;
+            if(null != a)
             {
                 return m_Value == a.m_Value;
             }
-            else
-            {
-                return false;
-            }
+
+            return false;
         }
 
         public AString Substring(Int32 startIndex)

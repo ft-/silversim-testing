@@ -202,7 +202,8 @@ namespace SilverSim.Viewer.Core
                     }
                     timeout = 0;
                     --qcount;
-                    if (null != (cancelmsg = m as CancelTxThread))
+                    cancelmsg = m as CancelTxThread;
+                    if (null != cancelmsg)
                     {
                         break;
                     }

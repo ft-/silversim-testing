@@ -45,7 +45,10 @@ namespace SilverSim.Types
 
         public Vector4(byte[] byteArray, int pos)
         {
-            X = Y = Z = W = 0f;
+            X = 0f;
+            Y = 0f;
+            Z = 0f;
+            W = 0f;
             FromBytes(byteArray, pos);
         }
 

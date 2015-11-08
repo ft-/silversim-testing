@@ -385,19 +385,24 @@ namespace SilverSim.Types.Asset.Format
                 {
                     StepSound stepsound;
                     StepAnimation stepanim;
-                    if(null != (stepsound = step as StepSound))
+                    stepsound = step as StepSound;
+                    if(null != stepsound)
                     {
                         if (!refs.Contains(stepsound.AssetID))
                         {
                             refs.Add(stepsound.AssetID);
                         }
+                        continue;
                     }
-                    else if(null != (stepanim = step as StepAnimation))
+                    
+                    stepanim = step as StepAnimation;
+                    if(null != (stepanim))
                     {
                         if (!refs.Contains(stepanim.AssetID))
                         {
                             refs.Add(stepanim.AssetID);
                         }
+                        continue;
                     }
                 }
                 return refs;
