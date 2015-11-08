@@ -66,6 +66,8 @@ namespace SilverSim.Backend.Common.OfflineIM
                 return false;
             }
 
+            im.ToAgent = uui;
+
             try
             {
                 m_OfflineIMService.StoreOfflineIM(im);
