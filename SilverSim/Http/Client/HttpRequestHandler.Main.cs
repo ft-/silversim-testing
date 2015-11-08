@@ -136,8 +136,8 @@ namespace SilverSim.Http.Client
             byte[] outdata;
 
             string reqdata = uri.IsDefaultPort ?
-                reqdata = string.Format("{0} {1} HTTP/1.1\r\nHost: {2}\r\nAccept: */*\r\n", method, uri.PathAndQuery, uri.Host) :
-                reqdata = string.Format("{0} {1} HTTP/1.1\r\nHost: {2}:{3}\r\nAccept: */*\r\n", method, uri.PathAndQuery, uri.Host, uri.Port);
+                string.Format("{0} {1} HTTP/1.1\r\nHost: {2}\r\nAccept: */*\r\n", method, uri.PathAndQuery, uri.Host) :
+                string.Format("{0} {1} HTTP/1.1\r\nHost: {2}:{3}\r\nAccept: */*\r\n", method, uri.PathAndQuery, uri.Host, uri.Port);
 
             bool doPost = false;
             if (content_type.Length != 0)
