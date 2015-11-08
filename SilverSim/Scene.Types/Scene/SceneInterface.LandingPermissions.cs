@@ -77,6 +77,11 @@ namespace SilverSim.Scene.Types.Scene
                     try
                     {
                         GroupMembership res = GroupsService.Memberships[parcel.Owner, parcel.Group, agent.Owner];
+                        if(!res.Principal.EqualsGrid(agent.Owner) || !res.Group.Equals(parcel.Group))
+                        {
+                            reason = "Parcel group did not validate.";
+                            return false;
+                        }
                     }
                     catch
                     {
