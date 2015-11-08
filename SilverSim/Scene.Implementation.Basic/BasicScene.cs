@@ -772,8 +772,8 @@ namespace SilverSim.Scene.Implementation.Basic
             IAgent agent;
             if(m_Agents.TryGetValue(req.AgentID, out agent))
             {
-                ViewerAgent viewerAgent;
-                if (null != (viewerAgent = agent as ViewerAgent))
+                ViewerAgent viewerAgent = agent as ViewerAgent;
+                if (null != viewerAgent)
                 {
                     SendRegionInfo(viewerAgent);
                 }
@@ -784,8 +784,8 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             foreach(IAgent agent in Agents)
             {
-                ViewerAgent viewerAgent;
-                if(null != (viewerAgent = agent as ViewerAgent))
+                ViewerAgent viewerAgent = agent as ViewerAgent;
+                if(null != viewerAgent)
                 {
                     SendRegionInfo(viewerAgent);
                 }
