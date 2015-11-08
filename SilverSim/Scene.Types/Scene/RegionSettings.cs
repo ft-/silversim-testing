@@ -39,14 +39,9 @@ namespace SilverSim.Scene.Types.Scene
             }
             set
             {
-                if(value == UUID.Zero)
-                {
-                    m_TerrainTexture1 = DEFAULT_TERRAIN_TEXTURE_1;
-                }
-                else
-                {
-                    m_TerrainTexture1 = value;
-                }
+                m_TerrainTexture1 = (value == UUID.Zero) ?
+                    DEFAULT_TERRAIN_TEXTURE_1 :
+                    value;
             }
         }
 
@@ -59,14 +54,9 @@ namespace SilverSim.Scene.Types.Scene
             }
             set
             {
-                if (value == UUID.Zero)
-                {
-                    m_TerrainTexture2 = DEFAULT_TERRAIN_TEXTURE_2;
-                }
-                else
-                {
-                    m_TerrainTexture2 = value;
-                }
+                m_TerrainTexture2 = (value == UUID.Zero) ?
+                    DEFAULT_TERRAIN_TEXTURE_2 :
+                    value;
             }
         }
 
@@ -79,14 +69,9 @@ namespace SilverSim.Scene.Types.Scene
             }
             set
             {
-                if (value == UUID.Zero)
-                {
-                    m_TerrainTexture3 = DEFAULT_TERRAIN_TEXTURE_3;
-                }
-                else
-                {
-                    m_TerrainTexture3 = value;
-                }
+                m_TerrainTexture3 = (value == UUID.Zero) ?
+                    DEFAULT_TERRAIN_TEXTURE_3 :
+                    value;
             }
         }
 
@@ -99,14 +84,9 @@ namespace SilverSim.Scene.Types.Scene
             }
             set
             {
-                if (value == UUID.Zero)
-                {
-                    m_TerrainTexture4 = DEFAULT_TERRAIN_TEXTURE_4;
-                }
-                else
-                {
-                    m_TerrainTexture4 = value;
-                }
+                m_TerrainTexture4 = (value == UUID.Zero) ?
+                    DEFAULT_TERRAIN_TEXTURE_4 :
+                    value;
             }
         }
 

@@ -41,14 +41,9 @@ namespace SilverSim.Types
         {
             get
             {
-                if (HomeURI == null)
-                {
-                    return string.Format("{0}", GroupName);
-                }
-                else
-                {
-                    return string.Format("{0} @{1}", GroupName.Replace(' ', '.'), HomeURI.ToString());
-                }
+                return (HomeURI == null) ?
+                    string.Format("{0}", GroupName) :
+                    string.Format("{0} @{1}", GroupName.Replace(' ', '.'), HomeURI.ToString());
             }
             set
             {
@@ -110,14 +105,9 @@ namespace SilverSim.Types
         public override int GetHashCode()
         {
             Uri h = HomeURI;
-            if (h != null)
-            {
-                return ID.GetHashCode() ^ GroupName.GetHashCode() ^ h.GetHashCode();
-            }
-            else
-            {
-                return ID.GetHashCode() ^ GroupName.GetHashCode();
-            }
+            return (h != null) ?
+                ID.GetHashCode() ^ GroupName.GetHashCode() ^ h.GetHashCode() :
+                ID.GetHashCode() ^ GroupName.GetHashCode();
         }
 
 
@@ -146,14 +136,9 @@ namespace SilverSim.Types
 
         public override string ToString()
         {
-            if(HomeURI != null)
-            {
-                return String.Format("{0};{1};{2}", ID.ToString(), HomeURI, GroupName);
-            }
-            else
-            {
-                return ID.ToString();
-            }
+            return (HomeURI != null) ?
+                String.Format("{0};{1};{2}", ID.ToString(), HomeURI, GroupName) :
+                ID.ToString();
         }
 
         private static readonly char[] Semicolon = new char[1] { ';' };

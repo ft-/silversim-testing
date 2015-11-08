@@ -101,28 +101,19 @@ namespace SilverSim.Scene.Types.Object
             {
                 lock(this)
                 {
-                    if(null != m_PermsGranter)
-                    {
-                        return new PermsGranterInfo(m_PermsGranter);
-                    }
-                    else
-                    {
-                        return new PermsGranterInfo();
-                    }
+                    PermsGranterInfo permsGranter = m_PermsGranter;
+                    return (null != permsGranter) ?
+                        new PermsGranterInfo(permsGranter) :
+                        new PermsGranterInfo();
                 }
             }
             set
             {
                 lock(this)
                 {
-                    if(value == null)
-                    {
-                        m_PermsGranter = null;
-                    }
-                    else
-                    {
-                        m_PermsGranter = new PermsGranterInfo(value);
-                    }
+                    m_PermsGranter = (value == null) ?
+                        null :
+                        new PermsGranterInfo(value);
                 }
             }
         }

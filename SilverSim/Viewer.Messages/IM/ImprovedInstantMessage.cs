@@ -36,28 +36,18 @@ namespace SilverSim.Viewer.Messages.IM
 
         public ImprovedInstantMessage(GridInstantMessage gim)
         {
-            if (gim.IsFromGroup)
-            {
-                AgentID = gim.FromGroup.ID;
-            }
-            else
-            {
-                AgentID = gim.FromAgent.ID;
-            }
+            AgentID = gim.IsFromGroup ? 
+                gim.FromGroup.ID : 
+                gim.FromAgent.ID;
             SessionID = UUID.Zero;
             FromAgentName = gim.FromAgent.FullName;
             ToAgentID = gim.ToAgent.ID;
             Dialog = gim.Dialog;
             FromGroup = gim.IsFromGroup;
             Message = gim.Message;
-            if(gim.IMSessionID.Equals(UUID.Zero))
-            {
-                ID = gim.FromAgent.ID ^ gim.ToAgent.ID;
-            }
-            else
-            {
-                ID = gim.IMSessionID;
-            }
+            ID = (gim.IMSessionID.Equals(UUID.Zero)) ?
+                (gim.FromAgent.ID ^ gim.ToAgent.ID) :
+                gim.IMSessionID;
             IsOffline = gim.IsOffline;
             Position = gim.Position;
             if (gim.BinaryBucket != null)
@@ -66,14 +56,9 @@ namespace SilverSim.Viewer.Messages.IM
             }
             ParentEstateID = (uint)gim.ParentEstateID;
             RegionID = gim.RegionID;
-            if (null == gim.Timestamp)
-            {
-                Timestamp = new Date();
-            }
-            else
-            {
-                Timestamp = gim.Timestamp;
-            }
+            Timestamp = (null == gim.Timestamp) ?
+                new Date() :
+                gim.Timestamp;
         }
 
         public static explicit operator GridInstantMessage(ImprovedInstantMessage m)

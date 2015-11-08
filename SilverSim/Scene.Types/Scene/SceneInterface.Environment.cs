@@ -27,22 +27,18 @@ namespace SilverSim.Scene.Types.Scene
         {
             get
             {
-                if(m_EnvironmentSettings == null)
+                EnvironmentSettings envSettings = m_EnvironmentSettings;
+                if (envSettings == null)
                 {
                     return null;
                 }
-                return new EnvironmentSettings(m_EnvironmentSettings);
+                return new EnvironmentSettings(envSettings);
             }
             set
             {
-                if (null != value)
-                {
-                    m_EnvironmentSettings = new EnvironmentSettings(m_EnvironmentSettings);
-                }
-                else
-                {
-                    m_EnvironmentSettings = null;
-                }
+                m_EnvironmentSettings = (null != value) ?
+                    new EnvironmentSettings(m_EnvironmentSettings) :
+                    null;
             }
         }
 
@@ -279,14 +275,9 @@ namespace SilverSim.Scene.Types.Scene
             {
                 GenericMessage m;
 
-                if (m_WindlightValid)
-                {
-                    m = CompileWindlightSettings(m_SkyWindlight, m_WaterWindlight);
-                }
-                else
-                {
-                    m = CompileResetWindlightSettings();
-                }
+                m = (m_WindlightValid) ?
+                    CompileWindlightSettings(m_SkyWindlight, m_WaterWindlight) :
+                    CompileResetWindlightSettings();
 
                 SendToAllClients(m);
             }
@@ -294,14 +285,11 @@ namespace SilverSim.Scene.Types.Scene
             public void UpdateWindlightProfileToClient(IAgent agent)
             {
                 GenericMessage m;
-                if (m_WindlightValid)
-                {
-                    m = CompileWindlightSettings(m_SkyWindlight, m_WaterWindlight);
-                }
-                else
-                {
-                    m = CompileResetWindlightSettings();
-                }
+
+                m = (m_WindlightValid) ?
+                    CompileWindlightSettings(m_SkyWindlight, m_WaterWindlight) :
+                    CompileResetWindlightSettings();
+
                 agent.SendMessageAlways(m, m_Scene.ID);
             }
             #endregion
@@ -399,15 +387,9 @@ namespace SilverSim.Scene.Types.Scene
 
             private void AddToCompiledWL(bool v, ref byte[] mBlock, ref int pos)
             {
-                if (v)
-                {
-                    mBlock[pos] = 1;
-                }
-                else
-                {
-                    mBlock[pos] = 0;
-                }
-                ++pos;
+                mBlock[pos++] = v ?
+                    (byte)1 :
+                    (byte)0;
             }
 
             private void AddToCompiledWL(Vector3 v, ref byte[] mBlock, ref int pos)

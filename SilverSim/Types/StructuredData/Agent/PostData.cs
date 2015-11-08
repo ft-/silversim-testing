@@ -81,14 +81,7 @@ namespace SilverSim.Types.StructuredData.Agent
             /* Circuit Info */
             agentparams.Circuit.CircuitCode = parms["circuit_code"].AsUInt;
             agentparams.Circuit.CapsPath = parms["caps_path"].ToString();
-            if (parms.ContainsKey("child"))
-            {
-                agentparams.Circuit.IsChild = parms["child"].AsBoolean;
-            }
-            else
-            {
-                agentparams.Circuit.IsChild = false;
-            }
+            agentparams.Circuit.IsChild = parms.ContainsKey("child") && parms["child"].AsBoolean;
             if(parms.ContainsKey("children_seeds"))
             {
                 AnArray children_seeds = (AnArray)parms["children_seeds"];
@@ -245,14 +238,10 @@ namespace SilverSim.Types.StructuredData.Agent
                             AgentWearables.WearableInfo wi = new AgentWearables.WearableInfo();
                             Map wp = (Map)val;
                             wi.ItemID = wp["item"].AsUUID;
-                            if (wp.ContainsKey("asset"))
-                            {
-                                wi.AssetID = wp["asset"].AsUUID;
-                            }
-                            else
-                            {
-                                wi.AssetID = UUID.Zero;
-                            }
+                            wi.AssetID = (wp.ContainsKey("asset")) ?
+                                wp["asset"].AsUUID :
+                                UUID.Zero;
+
                             WearableType type = (WearableType)i;
                             agentparams.Appearance.Wearables[type, n++] = wi;
                         }
