@@ -93,8 +93,7 @@ namespace SilverSim.Scene.Management.Scene
             var ev = OnNeighborAddOrUpdate;
             if(ev != null)
             {
-                Action<RegionInfo>[] invocationList = (Action<RegionInfo>[])ev.GetInvocationList();
-                foreach (Action<RegionInfo> del in invocationList)
+                foreach (Action<RegionInfo> del in ev.GetInvocationList())
                 {
                     del(region);
                 }
@@ -107,8 +106,7 @@ namespace SilverSim.Scene.Management.Scene
             var ev = OnNeighborRemove;
             if(ev != null)
             {
-                Action<RegionInfo>[] invocationList = (Action<RegionInfo>[])ev.GetInvocationList();
-                foreach (Action<RegionInfo> del in invocationList)
+                foreach (Action<RegionInfo> del in ev.GetInvocationList())
                 {
                     del(region);
                 }

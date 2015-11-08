@@ -297,8 +297,7 @@ namespace SilverSim.Scene.Types.Scene
             var ev = OnRemove;
             if (null != ev)
             {
-                Action<SceneInterface>[] invocationList = (Action<SceneInterface>[])ev.GetInvocationList();
-                foreach (Action<SceneInterface> del in invocationList)
+                foreach (Action<SceneInterface> del in ev.GetInvocationList())
                 {
                     try
                     {
@@ -325,8 +324,7 @@ namespace SilverSim.Scene.Types.Scene
             var ev = OnIPChanged;
             if (ev != null)
             {
-                Action<SceneInterface, IPAddress>[] invocationList = (Action<SceneInterface, IPAddress>[])ev.GetInvocationList();
-                foreach (Action<SceneInterface, IPAddress> del in invocationList)
+                foreach (Action<SceneInterface, IPAddress> del in ev.GetInvocationList())
                 {
                     try
                     {

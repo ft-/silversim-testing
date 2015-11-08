@@ -163,8 +163,7 @@ namespace SilverSim.Viewer.Core
             var e = OnPositionChange; /* events are not exactly thread-safe, so copy the reference first */
             if (e != null)
             {
-                Action<IObject>[] invocationList = (Action<IObject>[])e.GetInvocationList();
-                foreach (Action<IObject> del in invocationList)
+                foreach (Action<IObject> del in e.GetInvocationList())
                 {
                     del(this);
                 }

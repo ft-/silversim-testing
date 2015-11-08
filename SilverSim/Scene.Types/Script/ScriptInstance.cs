@@ -66,8 +66,7 @@ namespace SilverSim.Scene.Types.Script
             var ev = OnStateChange; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                Action<ScriptInstance>[] invocationList = (Action<ScriptInstance>[])ev.GetInvocationList();
-                foreach (Action<ScriptInstance> del in invocationList)
+                foreach (Action<ScriptInstance> del in ev.GetInvocationList())
                 {
                     try
                     {
@@ -86,8 +85,7 @@ namespace SilverSim.Scene.Types.Script
             var ev = OnScriptReset; /* events are not exactly thread-safe, so copy the reference first */
             if (ev != null)
             {
-                Action<ScriptInstance>[] invocationList = (Action<ScriptInstance>[])ev.GetInvocationList();
-                foreach (Action<ScriptInstance> del in invocationList)
+                foreach (Action<ScriptInstance> del in ev.GetInvocationList())
                 {
                     try
                     {

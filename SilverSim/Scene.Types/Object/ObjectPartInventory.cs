@@ -161,8 +161,7 @@ namespace SilverSim.Scene.Types.Object
             var addDelegate = OnChange;
             if(addDelegate != null)
             {
-                Action<ChangeAction, UUID, UUID>[] invocationList = (Action<ChangeAction, UUID, UUID>[])addDelegate.GetInvocationList();
-                foreach (Action<ChangeAction, UUID, UUID> d in invocationList)
+                foreach (Action<ChangeAction, UUID, UUID> d in addDelegate.GetInvocationList())
                 {
                     d(ChangeAction.Add, PartID, item.ID);
                 }
@@ -182,8 +181,7 @@ namespace SilverSim.Scene.Types.Object
             var updateDelegate = OnChange;
             if(updateDelegate != null)
             {
-                Action<ChangeAction, UUID, UUID>[] invocationList = (Action<ChangeAction, UUID, UUID>[])updateDelegate.GetInvocationList();
-                foreach (Action<ChangeAction, UUID, UUID> d in invocationList)
+                foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
                 {
                     d(ChangeAction.Change, PartID, item.ID);
                 }
@@ -208,8 +206,7 @@ namespace SilverSim.Scene.Types.Object
             var updateDelegate = OnChange;
             if (updateDelegate != null)
             {
-                Action<ChangeAction, UUID, UUID>[] invocationList = (Action<ChangeAction, UUID, UUID>[])updateDelegate.GetInvocationList();
-                foreach (Action<ChangeAction, UUID, UUID> d in invocationList)
+                foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
                 {
                     d(ChangeAction.Add, PartID, newItem.ID);
                 }
@@ -224,8 +221,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    Action<ChangeAction, UUID, UUID>[] invocationList = (Action<ChangeAction, UUID, UUID>[])updateDelegate.GetInvocationList();
-                    foreach (Action<ChangeAction, UUID, UUID> d in invocationList)
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
                     {
                         d(ChangeAction.Remove, PartID, key1);
                     }
@@ -244,8 +240,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    Action<ChangeAction, UUID, UUID>[] invocationList = (Action<ChangeAction, UUID, UUID>[])updateDelegate.GetInvocationList();
-                    foreach (Action<ChangeAction, UUID, UUID> d in invocationList)
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
                     {
                         d(ChangeAction.Remove, PartID, item.ID);
                     }
@@ -263,8 +258,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    Action<ChangeAction, UUID, UUID>[] invocationList = (Action<ChangeAction, UUID, UUID>[])updateDelegate.GetInvocationList();
-                    foreach (Action<ChangeAction, UUID, UUID> d in invocationList)
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
                     {
                         d(ChangeAction.Remove, PartID, item.ID);
                     }
@@ -282,8 +276,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    Action<ChangeAction, UUID, UUID>[] invocationList = (Action<ChangeAction, UUID, UUID>[])updateDelegate.GetInvocationList();
-                    foreach (Action<ChangeAction, UUID, UUID> d in invocationList)
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
                     {
                         d(ChangeAction.Remove, PartID, item.ID);
                     }
@@ -301,8 +294,7 @@ namespace SilverSim.Scene.Types.Object
                 var updateDelegate = OnChange;
                 if (updateDelegate != null)
                 {
-                    Action<ChangeAction, UUID, UUID>[] invocationList = (Action<ChangeAction, UUID, UUID>[])updateDelegate.GetInvocationList();
-                    foreach (Action<ChangeAction, UUID, UUID> d in invocationList)
+                    foreach (Action<ChangeAction, UUID, UUID> d in updateDelegate.GetInvocationList())
                     {
                         d(ChangeAction.Remove, PartID, key1);
                     }
