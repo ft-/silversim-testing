@@ -274,7 +274,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                                 {
                                     throw new InvalidXmlRpcSerializationException();
                                 }
-                                iv = new Integer(reader.ReadElementValueAsInt());
+                                iv = new SilverSim.Types.Integer(reader.ReadElementValueAsInt());
                                 break;
 
                             case "boolean":
@@ -763,7 +763,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                 }
                 w.WriteEndElement();
             }
-            else if(iv is Integer)
+            else if (iv is SilverSim.Types.Integer)
             {
                 w.WriteStartElement("value");
                 w.WriteNamedValue("int", iv.AsInt);

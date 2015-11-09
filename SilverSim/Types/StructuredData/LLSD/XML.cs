@@ -329,10 +329,6 @@ namespace SilverSim.Types.StructuredData.Llsd
             AnArray i_a;
             ABoolean i_bool;
             Date i_d;
-            Integer i_int;
-            Real i_real;
-            AString i_string;
-            URI i_uri;
             BinaryData i_bin;
 
             if (null != (i_m = input as Map))
@@ -379,10 +375,10 @@ namespace SilverSim.Types.StructuredData.Llsd
                 output.WriteValue(i_d.ToString());
                 output.WriteEndElement();
             }
-            else if (null != (i_int = input as Integer))
+            else if (input is SilverSim.Types.Integer)
             {
                 output.WriteStartElement("integer");
-                output.WriteValue(i_int.AsInt);
+                output.WriteValue(input.AsInt);
                 output.WriteEndElement();
             }
             else if (input is Quaternion)
@@ -403,16 +399,10 @@ namespace SilverSim.Types.StructuredData.Llsd
                 output.WriteEndElement();
                 output.WriteEndElement();
             }
-            else if (null != (i_real = input as Real))
+            else if (input is Real)
             {
                 output.WriteStartElement("real");
-                output.WriteValue(i_real.AsReal);
-                output.WriteEndElement();
-            }
-            else if (null != (i_string = input as AString))
-            {
-                output.WriteStartElement("string");
-                output.WriteValue(i_string.ToString());
+                output.WriteValue(input.AsReal);
                 output.WriteEndElement();
             }
             else if (input is Undef)
@@ -420,10 +410,16 @@ namespace SilverSim.Types.StructuredData.Llsd
                 output.WriteStartElement("undef");
                 output.WriteEndElement();
             }
-            else if (null != (i_uri = input as URI))
+            else if (input is AString)
+            {
+                output.WriteStartElement("string");
+                output.WriteValue(input.ToString());
+                output.WriteEndElement();
+            }
+            else if (input is URI)
             {
                 output.WriteStartElement("uri");
-                output.WriteValue(i_uri.ToString());
+                output.WriteValue(input.ToString());
                 output.WriteEndElement();
             }
             else if (input is UUID)
@@ -459,7 +455,7 @@ namespace SilverSim.Types.StructuredData.Llsd
             }
             else
             {
-                throw new ArgumentException("Failed to serialize LLSD+Binary");
+                throw new ArgumentException("Failed to serialize LLSD+XML");
             }
         }
         #endregion Main LLSD+XML Serialization

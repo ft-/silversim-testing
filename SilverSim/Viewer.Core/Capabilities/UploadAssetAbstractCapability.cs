@@ -137,7 +137,8 @@ namespace SilverSim.Viewer.Core.Capabilities
                 Map reqmap;
                 try
                 {
-                    reqmap = LlsdXml.Deserialize(httpreq.Body) as Map;
+                    IValue iv = LlsdXml.Deserialize(httpreq.Body);
+                    reqmap = iv as Map;
                 }
                 catch
                 {
@@ -201,11 +202,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                     }
                 }
             }
-            else if(parts[3] != "Upload" || parts.Length < 4)
-            {
-                httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
-            }
-            else if(!UUID.TryParse(parts[4], out transactionID))
+            else if(parts.Length < 5 || parts[3] != "Upload" || !UUID.TryParse(parts[4], out transactionID))
             {
                 httpreq.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
             }

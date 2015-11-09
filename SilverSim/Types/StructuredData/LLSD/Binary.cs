@@ -210,7 +210,6 @@ namespace SilverSim.Types.StructuredData.Llsd
             AnArray i_a;
             ABoolean i_bool;
             Date i_d;
-            Integer i_int;
             Real i_real;
             AString i_string;
             URI i_uri;
@@ -277,11 +276,11 @@ namespace SilverSim.Types.StructuredData.Llsd
                 i_d.ToBytes(db, 0);
                 output.Write(db, 0, 8);
             }
-            else if(null != (i_int = input as Integer))
+            else if (input is SilverSim.Types.Integer)
             {
                 output.WriteByte((byte)'i');
                 byte[] db = new byte[4];
-                i_int.ToBytes(db, 0);
+                ((SilverSim.Types.Integer)input).ToBytes(db, 0);
                 output.Write(db, 0, 4);
             }
             else if(input is Quaternion)
