@@ -314,29 +314,29 @@ namespace SilverSim.Types.StructuredData.Json
 
         private static void SerializeData(TextWriter io, IValue val)
         {
-            Map map;
-            AnArray array;
-            ABoolean boolean;
-            Date date;
-            if(null != (map = val as Map))
+            Type t = val.GetType();
+
+            if(t == typeof(Map))
             {
-                SerializeStruct(io, map);
+                SerializeStruct(io, (Map)val);
             }
-            else if(val is URI)
+            else if(t == typeof(URI))
             {
                 io.Write("\"" + SerializeString(val.ToString()) + "\"");
             }
-            else if(val is UUID)
+            else if(t == typeof(UUID))
             {
                 io.Write("\"" + SerializeString(val.ToString()) + "\"");
             }
-            else if(null != (date = val as Date))
+            else if(t == typeof(Date))
             {
+                Date date = (Date)val;
                 DateTime dt = date;
                 io.Write("\"" + dt.ToUniversalTime().ToString() + "\"");
             }
-            else if(null != (boolean = val as ABoolean))
+            else if(t == typeof(ABoolean))
             {
+                ABoolean boolean = (ABoolean)val;
                 if (boolean)
                 {
                     io.Write("true");
@@ -346,25 +346,25 @@ namespace SilverSim.Types.StructuredData.Json
                     io.Write("false");
                 }
             }
-            else if(val is Real)
+            else if(t == typeof(Real))
             {
                 io.Write(val.ToString());
             }
-            else if(val is Integer)
+            else if(t == typeof(Integer))
             {
                 io.Write(val.ToString());
             }
-            else if(val is Undef)
+            else if(t == typeof(Undef))
             {
                 io.Write("null");
             }
-            else if(val is AString)
+            else if(t == typeof(AString))
             {
                 io.Write("\"" + SerializeString(val.ToString()) + "\"");
             }
-            else if(null != (array = val as AnArray))
+            else if(t == typeof(AnArray))
             {
-                SerializeArray(io, array);
+                SerializeArray(io, (AnArray)val);
             }
             else
             {

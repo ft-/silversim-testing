@@ -707,17 +707,15 @@ namespace SilverSim.Types.StructuredData.XmlRpc
         #region Serialization
         static void Serialize(IValue iv, XmlTextWriter w)
         {
-            Map iv_m;
-            AnArray iv_a;
-            BinaryData iv_bin;
+            Type t = iv.GetType();
 
-            if(iv is UUID)
+            if(t == typeof(UUID))
             {
                 w.WriteStartElement("value");
                 w.WriteNamedValue("string", iv.ToString());
                 w.WriteEndElement();
             }
-            else if(iv is Date)
+            else if(t == typeof(Date))
             {
                 /*
                 w.WriteStartElement("value");
@@ -726,14 +724,15 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                  * */
                 throw new InvalidXmlRpcSerializationException();
             }
-            else if(iv is AString)
+            else if(t == typeof(AString))
             {
                 w.WriteStartElement("value");
                 w.WriteNamedValue("string", iv.ToString());
                 w.WriteEndElement();
             }
-            else if(null != (iv_m = iv as Map))
+            else if(t == typeof(Map))
             {
+                Map iv_m = (Map)iv;
                 w.WriteStartElement("value");
                 {
                     w.WriteStartElement("struct");
@@ -748,8 +747,9 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                 }
                 w.WriteEndElement();
             }
-            else if(null != (iv_a = iv as AnArray))
+            else if(t == typeof(AnArray))
             {
+                AnArray iv_a = (AnArray)iv;
                 w.WriteStartElement("value");
                 {
                     w.WriteStartElement("array");
@@ -763,31 +763,32 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                 }
                 w.WriteEndElement();
             }
-            else if (iv is SilverSim.Types.Integer)
+            else if (t == typeof(Integer))
             {
                 w.WriteStartElement("value");
                 w.WriteNamedValue("int", iv.AsInt);
                 w.WriteEndElement();
             }
-            else if(iv is Real)
+            else if(t == typeof(Real))
             {
                 w.WriteStartElement("value");
                 w.WriteNamedValue("double", iv.AsReal);
                 w.WriteEndElement();
             }
-            else if(iv is ABoolean)
+            else if(t == typeof(ABoolean))
             {
                 w.WriteStartElement("value");
                 w.WriteNamedValue("boolean", iv.AsInt);
                 w.WriteEndElement();
             }
-            else if(null != (iv_bin = iv as BinaryData))
+            else if(t == typeof(BinaryData))
             {
+                BinaryData iv_bin = (BinaryData)iv;
                 w.WriteStartElement("value");
                 w.WriteNamedValue("base64", iv_bin);
                 w.WriteEndElement();
             }
-            else if(iv is URI)
+            else if(t == typeof(URI))
             {
                 w.WriteStartElement("value");
                 w.WriteNamedValue("string", iv.ToString());

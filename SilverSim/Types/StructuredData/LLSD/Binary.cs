@@ -206,17 +206,11 @@ namespace SilverSim.Types.StructuredData.Llsd
         #region Main LLSD+Binary Serialization
         private static void SerializeInternal(IValue input, Stream output)
         {
-            Map i_m;
-            AnArray i_a;
-            ABoolean i_bool;
-            Date i_d;
-            Real i_real;
-            AString i_string;
-            URI i_uri;
-            BinaryData i_bin;
+            Type t = input.GetType();
 
-            if (null != (i_m = input as Map))
+            if (t == typeof(Map))
             {
+                Map i_m = (Map)input;
                 output.WriteByte((byte)'{');
                 byte[] cnt = BitConverter.GetBytes(i_m.Count);
                 if (!BitConverter.IsLittleEndian)
@@ -241,8 +235,9 @@ namespace SilverSim.Types.StructuredData.Llsd
                 }
                 output.WriteByte((byte)'}');
             }
-            else if (null != (i_a = input as AnArray))
+            else if (t == typeof(AnArray))
             {
+                AnArray i_a = (AnArray)input;
                 output.WriteByte((byte)'[');
                 byte[] cnt = BitConverter.GetBytes(i_a.Count);
                 if(!BitConverter.IsLittleEndian)
@@ -258,8 +253,9 @@ namespace SilverSim.Types.StructuredData.Llsd
 
                 output.WriteByte((byte)']');
             }
-            else if(null != (i_bool = input as ABoolean))
+            else if(t == typeof(ABoolean))
             {
+                ABoolean i_bool = (ABoolean)input;
                 if (i_bool)
                 {
                     output.WriteByte((byte)'1');
@@ -269,21 +265,22 @@ namespace SilverSim.Types.StructuredData.Llsd
                     output.WriteByte((byte)'0');
                 }
             }
-            else if(null != (i_d = input as Date))
+            else if(t == typeof(Date))
             {
+                Date i_d = (Date)input;
                 output.WriteByte((byte)'d');
                 byte[] db = new byte[8];
                 i_d.ToBytes(db, 0);
                 output.Write(db, 0, 8);
             }
-            else if (input is SilverSim.Types.Integer)
+            else if (t == typeof(Integer))
             {
                 output.WriteByte((byte)'i');
                 byte[] db = new byte[4];
                 ((SilverSim.Types.Integer)input).ToBytes(db, 0);
                 output.Write(db, 0, 4);
             }
-            else if(input is Quaternion)
+            else if(t == typeof(Quaternion))
             {
                 Quaternion i = (Quaternion) input;
                 byte[] db = new byte[8];
@@ -294,40 +291,52 @@ namespace SilverSim.Types.StructuredData.Llsd
 
                 db = BitConverter.GetBytes(i.X);
                 if (!BitConverter.IsLittleEndian)
+                {
                     Array.Reverse(db);
+                }
                 output.Write(db, 0, 8);
 
                 output.WriteByte((byte)'r');
                 db = BitConverter.GetBytes(i.Y);
                 if (!BitConverter.IsLittleEndian)
+                {
                     Array.Reverse(db);
+                }
                 output.Write(db, 0, 8);
 
                 output.WriteByte((byte)'r');
                 db = BitConverter.GetBytes(i.Z);
                 if (!BitConverter.IsLittleEndian)
+                {
                     Array.Reverse(db);
+                }
                 output.Write(db, 0, 8);
 
                 output.WriteByte((byte)'r');
                 db = BitConverter.GetBytes(i.W);
                 if (!BitConverter.IsLittleEndian)
+                {
                     Array.Reverse(db);
+                }
                 output.Write(db, 0, 8);
 
                 output.WriteByte((byte)']');
             }
-            else if(null != (i_real = input as Real))
+            else if(t == typeof(Real))
             {
+                Real i_real = (Real)input;
                 output.WriteByte((byte)'r');
                 byte[] db = new byte[8];
                 i_real.ToBytes(db, 0);
                 if (!BitConverter.IsLittleEndian)
+                {
                     Array.Reverse(db);
+                }
                 output.Write(db, 0, 8);
             }
-            else if(null != (i_string = input as AString))
+            else if(t == typeof(AString))
             {
+                AString i_string = (AString)input;
                 output.WriteByte((byte)'s');
                 byte[] str = Encoding.UTF8.GetBytes(i_string.ToString());
                 byte[] cnt = BitConverter.GetBytes(str.Length);
@@ -338,12 +347,13 @@ namespace SilverSim.Types.StructuredData.Llsd
                 output.Write(cnt, 0, cnt.Length);
                 output.Write(str, 0, str.Length);
             }
-            else if(input is Undef)
+            else if(t == typeof(Undef))
             {
                 output.WriteByte((byte)'!');
             }
-            else if(null != (i_uri = input as URI))
+            else if(t == typeof(URI))
             {
+                URI i_uri = (URI)input;
                 output.WriteByte((byte)'l');
                 byte[] str = Encoding.UTF8.GetBytes(i_uri.ToString());
                 byte[] cnt = BitConverter.GetBytes(str.Length);
@@ -354,14 +364,14 @@ namespace SilverSim.Types.StructuredData.Llsd
                 output.Write(cnt, 0, cnt.Length);
                 output.Write(str, 0, str.Length);
             }
-            else if(input is UUID)
+            else if(t == typeof(UUID))
             {
                 output.WriteByte((byte)'u');
                 byte[] db = new byte[16];
                 ((UUID)input).ToBytes(db, 0);
                 output.Write(db, 0, 16);
             }
-            else if (input is Vector3)
+            else if (t == typeof(Vector3))
             {
                 Vector3 i = (Vector3)input;
                 byte[] db = new byte[6];
@@ -389,8 +399,9 @@ namespace SilverSim.Types.StructuredData.Llsd
 
                 output.WriteByte((byte)']');
             }
-            else if(null != (i_bin = input as BinaryData))
+            else if(t == typeof(BinaryData))
             {
+                BinaryData i_bin = (BinaryData)input;
                 byte[] data = i_bin;
                 output.WriteByte((byte)'u');
                 byte[] cnt = BitConverter.GetBytes(data.Length);

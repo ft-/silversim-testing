@@ -325,14 +325,12 @@ namespace SilverSim.Types.StructuredData.Llsd
 
         private static void SerializeInternal(IValue input, XmlTextWriter output)
         {
-            Map i_m;
-            AnArray i_a;
-            ABoolean i_bool;
-            Date i_d;
-            BinaryData i_bin;
+            Type t = input.GetType();
 
-            if (null != (i_m = input as Map))
+            if (t == typeof(Map))
             {
+                Map i_m = (Map)input;
+
                 output.WriteStartElement("map");
 
                 foreach (KeyValuePair<string, IValue> kvp in i_m)
@@ -345,8 +343,9 @@ namespace SilverSim.Types.StructuredData.Llsd
                 }
                 output.WriteEndElement();
             }
-            else if (null != (i_a = input as AnArray))
+            else if (t == typeof(AnArray))
             {
+                AnArray i_a = (AnArray)input;
                 output.WriteStartElement("array");
 
                 foreach (IValue v in i_a)
@@ -356,8 +355,9 @@ namespace SilverSim.Types.StructuredData.Llsd
 
                 output.WriteEndElement();
             }
-            else if (null != (i_bool = input as ABoolean))
+            else if (t == typeof(ABoolean))
             {
+                ABoolean i_bool = (ABoolean)input;
                 output.WriteStartElement("boolean");
                 if (i_bool)
                 {
@@ -369,19 +369,20 @@ namespace SilverSim.Types.StructuredData.Llsd
                 }
                 output.WriteEndElement();
             }
-            else if (null != (i_d = input as Date))
+            else if (t == typeof(Date))
             {
+                Date i_d = (Date)input;
                 output.WriteStartElement("date");
                 output.WriteValue(i_d.ToString());
                 output.WriteEndElement();
             }
-            else if (input is SilverSim.Types.Integer)
+            else if (t == typeof(Integer))
             {
                 output.WriteStartElement("integer");
                 output.WriteValue(input.AsInt);
                 output.WriteEndElement();
             }
-            else if (input is Quaternion)
+            else if (t == typeof(Quaternion))
             {
                 Quaternion i = (Quaternion)input;
                 output.WriteStartElement("array");
@@ -399,36 +400,36 @@ namespace SilverSim.Types.StructuredData.Llsd
                 output.WriteEndElement();
                 output.WriteEndElement();
             }
-            else if (input is Real)
+            else if (t == typeof(Real))
             {
                 output.WriteStartElement("real");
                 output.WriteValue(input.AsReal);
                 output.WriteEndElement();
             }
-            else if (input is Undef)
+            else if (t == typeof(Undef))
             {
                 output.WriteStartElement("undef");
                 output.WriteEndElement();
             }
-            else if (input is AString)
+            else if (t == typeof(AString))
             {
                 output.WriteStartElement("string");
                 output.WriteValue(input.ToString());
                 output.WriteEndElement();
             }
-            else if (input is URI)
+            else if (t == typeof(URI))
             {
                 output.WriteStartElement("uri");
                 output.WriteValue(input.ToString());
                 output.WriteEndElement();
             }
-            else if (input is UUID)
+            else if (t == typeof(UUID))
             {
                 output.WriteStartElement("uuid");
                 output.WriteValue(((UUID)input).ToString());
                 output.WriteEndElement();
             }
-            else if (input is Vector3)
+            else if (t == typeof(Vector3))
             {
                 Vector3 i = (Vector3)input;
                 output.WriteStartElement("array");
@@ -443,8 +444,9 @@ namespace SilverSim.Types.StructuredData.Llsd
                 output.WriteEndElement();
                 output.WriteEndElement();
             }
-            else if(null != (i_bin = input as BinaryData))
+            else if(t == typeof(BinaryData))
             {
+                BinaryData i_bin = (BinaryData)input;
                 byte[] data = i_bin;
                 output.WriteStartElement("binary");
                 if (data.Length != 0)
