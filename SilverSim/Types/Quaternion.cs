@@ -445,7 +445,7 @@ namespace SilverSim.Types
                         // If the magnitude of the vector was near zero, then assume the X axis is not
                         // orthogonal and use the Z axis instead.
                         // Set 180 z rotation.
-                        rotBetween = new Quaternion(0.0f, 0.0f, 1.0f, 0.0f);
+                        new Quaternion(0.0f, 0.0f, 1.0f, 0.0f);
                 }
                 // Check for parallel vectors.
                 // A dot product of 1 would mean the angle between vectors is 0 degrees.

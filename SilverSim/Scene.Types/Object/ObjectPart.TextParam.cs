@@ -55,7 +55,7 @@ namespace SilverSim.Scene.Types.Object
                     TextColor.A_AsByte = value[3];
                     Text = value.Length > 4 ?
                         UTF8NoBOM.GetString(value, 4, value.Length - 4) :
-                        Text = string.Empty;
+                        string.Empty;
                 }
             }
         }
