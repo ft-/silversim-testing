@@ -98,14 +98,11 @@ namespace SilverSim.Viewer.Core
 
             m_SimStatsData[(int)SimStatIndex.InPacketsPerSecond].StatValue = (double)packetsReceived * 1000f / dt;
             m_SimStatsData[(int)SimStatIndex.OutPacketsPerSecond].StatValue = (double)packetsSent * 1000f / dt;
-            if (agent != null)
-            {
-                m_SimStatsData[(int)SimStatIndex.PendingDownloads].StatValue = m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count + agent.m_DownloadTransfers.Count;
-            }
-            else
-            {
-                m_SimStatsData[(int)SimStatIndex.PendingDownloads].StatValue = m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count;
-            }
+
+            m_SimStatsData[(int)SimStatIndex.PendingDownloads].StatValue = agent != null ?
+                m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count + agent.m_DownloadTransfers.Count :
+                m_TextureDownloadQueue.Count + m_InventoryRequestQueue.Count;
+
             m_SimStatsData[(int)SimStatIndex.PendingUploads].StatValue = activeUploads;
             m_SimStatsData[(int)SimStatIndex.AgentUpdates].StatValue = (double)agentUpdatesReceived * 1000f / dt;
             m_SimStatsData[(int)SimStatIndex.UnAckedBytes].StatValue = m_UnackedBytes;

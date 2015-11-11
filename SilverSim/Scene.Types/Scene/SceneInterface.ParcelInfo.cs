@@ -232,12 +232,8 @@ namespace SilverSim.Scene.Types.Scene
             prop.SalePrice = pinfo.SalePrice;
             prop.Name = pinfo.Name;
             prop.Description = pinfo.Description;
-            prop.MusicURL = (null != pinfo.MusicURI) ?
-                pinfo.MusicURI :
-                string.Empty;
-            prop.MediaURL = (null != pinfo.MediaURI) ?
-                pinfo.MediaURI :
-                string.Empty;
+            prop.MusicURL = pinfo.MusicURI ?? string.Empty;
+            prop.MediaURL = pinfo.MediaURI ?? string.Empty;
             prop.MediaID = pinfo.MediaID;
             prop.MediaAutoScale = pinfo.MediaAutoScale;
             prop.GroupID = pinfo.Group.ID;

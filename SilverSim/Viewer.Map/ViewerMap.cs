@@ -55,14 +55,9 @@ namespace SilverSim.Viewer.Map
         public void HandlerThread(object o)
         {
             BlockingQueue<KeyValuePair<AgentCircuit, Message>> requestQueue = (BlockingQueue<KeyValuePair<AgentCircuit, Message>>)o;
-            if (requestQueue == MapDetailsRequestQueue)
-            {
-                Thread.CurrentThread.Name = "Map Details Handler Thread";
-            }
-            else
-            {
-                Thread.CurrentThread.Name = "Map Blocks Handler Thread";
-            }
+            Thread.CurrentThread.Name = (requestQueue == MapDetailsRequestQueue) ?
+                "Map Details Handler Thread" :
+                "Map Blocks Handler Thread";
 
             while (!m_ShutdownMap)
             {
@@ -191,14 +186,9 @@ namespace SilverSim.Viewer.Map
                 else
                 {
                     gatekeeperURI = "http://" + s[0] + ":" + s[1] + "/";
-                    if (s.Length > 2)
-                    {
-                        regionName = s[2];
-                    }
-                    else
-                    {
-                        regionName = string.Empty; /* Default Region */
-                    }
+                    regionName = (s.Length > 2) ?
+                        s[2] :
+                        string.Empty; /* Default Region */
                     isForeignGridTarget = true;
                 }
             }

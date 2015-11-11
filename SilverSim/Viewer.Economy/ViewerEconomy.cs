@@ -151,14 +151,9 @@ namespace SilverSim.Viewer.Economy
                 try
                 {
                     EconomyServiceInterface economyService = circuit.Scene.EconomyService;
-                    if (economyService != null)
-                    {
-                        mbrep.MoneyBalance = economyService.MoneyBalance[agent.Owner];
-                    }
-                    else
-                    {
-                        mbrep.MoneyBalance = 0;
-                    }
+                    mbrep.MoneyBalance= (economyService != null) ?
+                        economyService.MoneyBalance[agent.Owner] :
+                        0;
                     mbrep.TransactionSuccess = true;
                 }
                 catch

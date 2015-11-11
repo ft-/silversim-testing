@@ -337,14 +337,7 @@ namespace SilverSim.Types.StructuredData.Json
             else if(t == typeof(ABoolean))
             {
                 ABoolean boolean = (ABoolean)val;
-                if (boolean)
-                {
-                    io.Write("true");
-                }
-                else
-                {
-                    io.Write("false");
-                }
+                io.Write(boolean ? "true" : "false");
             }
             else if(t == typeof(Real))
             {

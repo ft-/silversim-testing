@@ -146,14 +146,9 @@ namespace SilverSim.Types.Asset
 
                 int lastOf = value.LastIndexOf('/');
                 string fname;
-                if (lastOf >= 0)
-                {
-                    fname = value.Substring(lastOf + 1);
-                }
-                else
-                {
-                    fname = value;
-                }
+                fname = (lastOf >= 0) ?
+                    value.Substring(lastOf + 1) :
+                    value;
                 fname = fname.Substring(0, fname.IndexOf('_'));
                 ID = fname;
                 Type = type;

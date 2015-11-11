@@ -128,14 +128,9 @@ namespace SilverSim.Viewer.Messages
         {
             get
             {
-                if(HasAckFlag)
-                {
-                    return Data[DataLength - 1];
-                }
-                else
-                {
-                    return 0;
-                }
+                return (HasAckFlag) ?
+                    Data[DataLength - 1] :
+                    0;
             }
         }
 

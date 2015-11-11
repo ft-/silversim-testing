@@ -36,14 +36,9 @@ namespace SilverSim.Scene.Types.Object
                 m_ParticleSystemLock.AcquireWriterLock(-1);
                 try
                 {
-                    if (value == null)
-                    {
-                        m_ParticleSystem = new byte[0];
-                    }
-                    else
-                    {
-                        m_ParticleSystem = value.GetBytes();
-                    }
+                    m_ParticleSystem = (value == null) ?
+                        new byte[0] :
+                        value.GetBytes();
                 }
                 finally
                 {

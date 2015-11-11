@@ -82,10 +82,9 @@ namespace SilverSim.Types
         public override string ToString()
         {
             string format;
-            if (m_Value.Millisecond > 0)
-                format = "yyyy-MM-ddTHH:mm:ss.ffZ";
-            else
-                format = "yyyy-MM-ddTHH:mm:ssZ";
+            format = (m_Value.Millisecond > 0) ?
+                "yyyy-MM-ddTHH:mm:ss.ffZ" :
+                "yyyy-MM-ddTHH:mm:ssZ";
             return m_Value.ToUniversalTime().ToString(format);
         }
 

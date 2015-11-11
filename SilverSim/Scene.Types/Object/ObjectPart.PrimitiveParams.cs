@@ -162,10 +162,8 @@ namespace SilverSim.Scene.Types.Object
                     bool hasProfileCut;
 
                     PrimitiveShapeType primType = Type;
-                    if (primType == PrimitiveShapeType.Box
-                        ||
-                        primType == PrimitiveShapeType.Cylinder
-                        ||
+                    if (primType == PrimitiveShapeType.Box ||
+                        primType == PrimitiveShapeType.Cylinder ||
                         primType == PrimitiveShapeType.Prism)
                     {
 
@@ -277,14 +275,9 @@ namespace SilverSim.Scene.Types.Object
                             break;
                         case PrimitiveShapeType.Sculpt:
                             // Special mesh handling
-                            if (SculptType == PrimitiveSculptType.Mesh)
-                            {
-                                ret = 32; // if it's a mesh then max 32 faces
-                            }
-                            else
-                            {
-                                ret = 1; // if it's a sculpt then max 1 face
-                            }
+                            ret = (SculptType == PrimitiveSculptType.Mesh) ?
+                                32 : // if it's a mesh then max 32 faces
+                                1; // if it's a sculpt then max 1 face
                             break;
                         default:
                             break;

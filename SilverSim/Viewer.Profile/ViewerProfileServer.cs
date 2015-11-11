@@ -858,14 +858,9 @@ namespace SilverSim.Viewer.Profile
 
             UserInfoReply reply = new UserInfoReply();
             reply.AgentID = req.AgentID;
-            if (prefs.Visible)
-            {
-                reply.DirectoryVisibility = "default";
-            }
-            else
-            {
-                reply.DirectoryVisibility = "hidden";
-            }
+            reply.DirectoryVisibility = (prefs.Visible) ?
+                "default" :
+                "hidden";
             reply.EMail = string.Empty;
             reply.IMViaEmail = prefs.IMviaEmail;
             agent.SendMessageAlways(reply, scene.ID);

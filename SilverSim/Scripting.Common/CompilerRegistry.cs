@@ -28,14 +28,9 @@ namespace SilverSim.Scripting.Common
             {
                 get
                 {
-                    if (String.IsNullOrEmpty(name))
-                    {
-                        return m_ScriptCompilers[DefaultCompilerName];
-                    }
-                    else
-                    {
-                        return m_ScriptCompilers[name];
-                    }
+                    return string.IsNullOrEmpty(name) ?
+                        m_ScriptCompilers[DefaultCompilerName] :
+                        m_ScriptCompilers[name];
                 }
                 set
                 {

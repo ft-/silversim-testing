@@ -56,14 +56,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if((m_AttributeFlags & TextureAttributes.Material) != 0)
-                {
-                    return m_Material;
-                }
-                else
-                {
-                    return m_DefaultTexture.Material;
-                }
+                return ((m_AttributeFlags & TextureAttributes.Material) != 0) ?
+                    m_Material :
+                    m_DefaultTexture.Material;
             }
             set
             {
@@ -76,14 +71,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if((m_AttributeFlags & TextureAttributes.Media) != 0)
-                {
-                    return m_MediaByte;
-                }
-                else
-                {
-                    return m_DefaultTexture.Media;
-                }
+                return ((m_AttributeFlags & TextureAttributes.Media) != 0) ?
+                    m_MediaByte :
+                    m_DefaultTexture.Media;
             }
             set
             {
@@ -96,14 +86,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if((m_AttributeFlags & TextureAttributes.RGBA) != 0)
-                {
-                    return m_TextureColor;
-                }
-                else
-                {
-                    return m_DefaultTexture.TextureColor;
-                }
+                return ((m_AttributeFlags & TextureAttributes.RGBA) != 0) ?
+                    m_TextureColor :
+                    m_DefaultTexture.TextureColor;
             }
             set
             {
@@ -116,14 +101,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if((m_AttributeFlags & TextureAttributes.RepeatU) != 0)
-                {
-                    return m_RepeatU;
-                }
-                else
-                {
-                    return m_DefaultTexture.RepeatU;
-                }
+                return ((m_AttributeFlags & TextureAttributes.RepeatU) != 0) ?
+                    m_RepeatU :
+                    m_DefaultTexture.RepeatU;
             }
             set
             {
@@ -136,14 +116,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if ((m_AttributeFlags & TextureAttributes.RepeatV) != 0)
-                {
-                    return m_RepeatV;
-                }
-                else
-                {
-                    return m_DefaultTexture.RepeatV;
-                }
+                return ((m_AttributeFlags & TextureAttributes.RepeatV) != 0) ?
+                    m_RepeatV :
+                     m_DefaultTexture.RepeatV;
             }
             set
             {
@@ -156,14 +131,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if ((m_AttributeFlags & TextureAttributes.OffsetU) != 0)
-                {
-                    return m_OffsetU;
-                }
-                else
-                {
-                    return m_DefaultTexture.OffsetU;
-                }
+                return ((m_AttributeFlags & TextureAttributes.OffsetU) != 0) ?
+                    m_OffsetU :
+                    m_DefaultTexture.OffsetU;
             }
             set
             {
@@ -176,14 +146,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if ((m_AttributeFlags & TextureAttributes.OffsetV) != 0)
-                {
-                    return m_OffsetV;
-                }
-                else
-                {
-                    return m_DefaultTexture.OffsetV;
-                }
+                return ((m_AttributeFlags & TextureAttributes.OffsetV) != 0) ?
+                    m_OffsetV :
+                    m_DefaultTexture.OffsetV;
             }
             set
             {
@@ -196,14 +161,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if((m_AttributeFlags & TextureAttributes.Rotation) != 0)
-                {
-                    return m_Rotation;
-                }
-                else
-                {
-                    return m_DefaultTexture.Rotation;
-                }
+                return ((m_AttributeFlags & TextureAttributes.Rotation) != 0) ?
+                    m_Rotation :
+                    m_DefaultTexture.Rotation;
             }
             set
             {
@@ -216,14 +176,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if((m_AttributeFlags & TextureAttributes.Glow) != 0)
-                {
-                    return m_Glow;
-                }
-                else
-                {
-                    return m_DefaultTexture.Glow;
-                }
+                return ((m_AttributeFlags & TextureAttributes.Glow) != 0) ?
+                    m_Glow :
+                    m_DefaultTexture.Glow;
             }
             set
             {
@@ -236,14 +191,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if((m_AttributeFlags & TextureAttributes.Material) != 0)
-                {
-                    return (Bumpiness)(Material & BUMP_MASK);
-                }
-                else
-                {
-                    return m_DefaultTexture.Bump;
-                }
+                return ((m_AttributeFlags & TextureAttributes.Material) != 0) ?
+                    (Bumpiness)(Material & BUMP_MASK) :
+                    m_DefaultTexture.Bump;
             }
             set
             {
@@ -257,14 +207,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if((m_AttributeFlags & TextureAttributes.Material) != 0)
-                {
-                    return (Shininess)(Material & SHINY_MASK);
-                }
-                else
-                {
-                    return m_DefaultTexture.Shiny;
-                }
+                return ((m_AttributeFlags & TextureAttributes.Material) != 0) ?
+                    (Shininess)(Material & SHINY_MASK) :
+                    m_DefaultTexture.Shiny;
             }
             set
             {
@@ -278,14 +223,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if((m_AttributeFlags & TextureAttributes.Material) != 0)
-                {
-                    return (Material & FULLBRIGHT_MASK) != 0;
-                }
-                else
-                {
-                    return m_DefaultTexture.FullBright;
-                }
+                return ((m_AttributeFlags & TextureAttributes.Material) != 0) ?
+                    (Material & FULLBRIGHT_MASK) != 0 :
+                    m_DefaultTexture.FullBright;
             }
             set
             {
@@ -301,14 +241,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if ((m_AttributeFlags & TextureAttributes.Media) != 0)
-                {
-                    return (Media & MEDIA_MASK) != 0;
-                }
-                else
-                {
-                    return m_DefaultTexture.MediaFlags;
-                }
+                return ((m_AttributeFlags & TextureAttributes.Media) != 0) ?
+                    (Media & MEDIA_MASK) != 0 :
+                    m_DefaultTexture.MediaFlags;
             }
             set
             {
@@ -324,14 +259,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if((m_AttributeFlags & TextureAttributes.Media) != 0)
-                {
-                    return (MappingType)(Media & TEX_MAP_MASK);
-                }
-                else
-                {
-                    return m_DefaultTexture.TexMapType;
-                }
+                return ((m_AttributeFlags & TextureAttributes.Media) != 0) ?
+                    (MappingType)(Media & TEX_MAP_MASK) :
+                    m_DefaultTexture.TexMapType;
             }
             set
             {
@@ -345,14 +275,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if((m_AttributeFlags & TextureAttributes.TextureID) != 0)
-                {
-                    return m_TextureID;
-                }
-                else
-                {
-                    return m_DefaultTexture.TextureID;
-                }
+                return ((m_AttributeFlags & TextureAttributes.TextureID) != 0) ?
+                    m_TextureID :
+                    m_DefaultTexture.TextureID;
             }
             set
             {
@@ -365,14 +290,9 @@ namespace SilverSim.Types.Primitive
         {
             get
             {
-                if((m_AttributeFlags & TextureAttributes.MaterialID) != 0)
-                {
-                    return m_MaterialID;
-                }
-                else
-                {
-                    return m_DefaultTexture.MaterialID;
-                }
+                return ((m_AttributeFlags & TextureAttributes.MaterialID) != 0) ?
+                    m_MaterialID :
+                    m_DefaultTexture.MaterialID;
             }
             set
             {

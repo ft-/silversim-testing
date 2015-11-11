@@ -440,17 +440,12 @@ namespace SilverSim.Types
                     orthoVector = orthoVector - a * (a.X / a.Dot(a));
                     // Check for near zero vector. A very small non-zero number here will create
                     // a rotation in an undesired direction.
-                    if (orthoVector.Length > 0.0001)
-                    {
-                        rotBetween = new Quaternion(orthoVector.X, orthoVector.Y, orthoVector.Z, 0.0f);
-                    }
-                    // If the magnitude of the vector was near zero, then assume the X axis is not
-                    // orthogonal and use the Z axis instead.
-                    else
-                    {
+                    rotBetween = (orthoVector.Length > 0.0001) ?
+                        new Quaternion(orthoVector.X, orthoVector.Y, orthoVector.Z, 0.0f) :
+                        // If the magnitude of the vector was near zero, then assume the X axis is not
+                        // orthogonal and use the Z axis instead.
                         // Set 180 z rotation.
                         rotBetween = new Quaternion(0.0f, 0.0f, 1.0f, 0.0f);
-                    }
                 }
                 // Check for parallel vectors.
                 // A dot product of 1 would mean the angle between vectors is 0 degrees.

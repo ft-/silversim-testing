@@ -212,6 +212,44 @@ namespace SilverSim.Types
             HomeURI = new Uri(parts[1]);
         }
 
+        public static bool TryParse(string uuiString, out UUI uui)
+        {
+            UUID id;
+            string firstName = string.Empty;
+            string lastName = string.Empty;
+            Uri homeURI;
+            uui = default(UUI);
+            string[] parts = uuiString.Split(Semicolon, 3);
+            if (parts.Length < 2)
+            {
+                if(!UUID.TryParse(parts[0], out id))
+                {
+                    return false;
+                }
+                uui = new UUI(id);
+                return true;
+            }
+            if (!UUID.TryParse(parts[0], out id))
+            {
+                return false;
+            }
+            if (parts.Length > 2)
+            {
+                string[] names = parts[2].Split(Whitespace, 2);
+                if (names.Length == 2)
+                {
+                    lastName = names[1];
+                }
+                firstName = names[0];
+            }
+            if (!Uri.TryCreate(parts[1], UriKind.Absolute, out homeURI))
+            {
+                return false;
+            }
+            uui = new UUI(id, firstName, lastName, homeURI);
+            return true;
+        }
+
         public override string ToString()
         {
             return (HomeURI != null) ?

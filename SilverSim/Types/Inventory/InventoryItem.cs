@@ -30,14 +30,9 @@ namespace SilverSim.Types.Inventory
 
         public bool CheckPermissions(UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted)
         {
-            if(IsGroupOwned)
-            {
-                return Permissions.CheckGroupPermissions(Creator, Group, accessor, accessorgroup, wanted);
-            }
-            else
-            {
-                return Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
-            }
+            return (IsGroupOwned) ?
+                Permissions.CheckGroupPermissions(Creator, Group, accessor, accessorgroup, wanted) :
+                Permissions.CheckAgentPermissions(Creator, Owner, accessor, wanted);
         }
         #endregion
 

@@ -100,14 +100,9 @@ namespace SilverSim.Types.StructuredData.AssetXml
                         switch (nodeName)
                         {
                             case "Data":
-                                if(isEmptyElement)
-                                {
-                                    asset.Data = new byte[0];
-                                }
-                                else
-                                {
-                                    asset.Data = reader.ReadContentAsBase64();
-                                }
+                                asset.Data = isEmptyElement ? 
+                                    new byte[0] :
+                                    reader.ReadContentAsBase64();
                                 break;
 
                             case "FullID":
@@ -119,14 +114,9 @@ namespace SilverSim.Types.StructuredData.AssetXml
                                 break;
 
                             case "Name":
-                                if (isEmptyElement)
-                                {
-                                    asset.Name = string.Empty;
-                                }
-                                else
-                                {
-                                    asset.Name = reader.ReadElementValueAsString();
-                                }
+                                asset.Name = (isEmptyElement) ?
+                                    string.Empty :
+                                    reader.ReadElementValueAsString();
                                 break;
 
                             case "Description":
@@ -159,14 +149,8 @@ namespace SilverSim.Types.StructuredData.AssetXml
                                 else
                                 {
                                     string creatorID = reader.ReadElementValueAsString();
-                                    try
-                                    {
-                                        asset.Creator = new UUI(creatorID);
-                                    }
-                                    catch
-                                    {
-                                        asset.Creator = UUI.Unknown;
-                                    }
+                                    UUI uui;
+                                    asset.Creator = UUI.TryParse(creatorID, out uui) ? uui : UUI.Unknown;
                                 }
                                 break;
 

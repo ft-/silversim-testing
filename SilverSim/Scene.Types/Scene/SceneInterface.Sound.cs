@@ -107,26 +107,12 @@ namespace SilverSim.Scene.Types.Scene
             req.OwnerID = objpart.ObjectGroup.Owner.ID;
             req.SoundID = sound;
             req.ObjectID = objpart.ID;
-            if (objpart.LinkNumber != 1)
-            {
-                req.ParentID = objpart.ObjectGroup.ID;
-            }
-            else
-            {
-                req.ParentID = UUID.Zero;
-            }
-
-            if (gain < 0)
-            {
-                gain = 0;
-            }
-            else if (gain > 1)
-            {
-                gain = 1;
-            }
+            req.ParentID = (objpart.LinkNumber != 1) ?
+                objpart.ObjectGroup.ID :
+                UUID.Zero;
 
             req.Position = objpart.GlobalPosition;
-            req.Gain = gain;
+            req.Gain = gain.Clamp(0, 1);
             req.GridPosition = RegionData.Location;
 
             if (objpart.ObjectGroup.IsAttachedToPrivate)
@@ -154,31 +140,17 @@ namespace SilverSim.Scene.Types.Scene
 
         public void SendTriggerSound(ObjectPart objpart, UUID sound, double gain, double soundradius, Vector3 top_north_east, Vector3 bottom_south_west)
         {
-            if(gain < 0)
-            {
-                gain = 0;
-            }
-            else if(gain > 1)
-            {
-                gain = 1;
-            }
-
             SoundTrigger req = new SoundTrigger();
             req.OwnerID = objpart.ObjectGroup.Owner.ID;
             req.SoundID = sound;
             req.ObjectID = objpart.ID;
             req.GridPosition = RegionData.Location;
 
-            if (objpart.LinkNumber != 1)
-            {
-                req.ParentID = objpart.ObjectGroup.ID;
-            }
-            else
-            {
-                req.ParentID = UUID.Zero;
-            }
+            req.ParentID = (objpart.LinkNumber != 1) ?
+                objpart.ObjectGroup.ID :
+                UUID.Zero;
             req.Position = objpart.GlobalPosition;
-            req.Gain = gain;
+            req.Gain = gain.Clamp(0, 1);
 
             if (objpart.ObjectGroup.IsAttachedToPrivate)
             {

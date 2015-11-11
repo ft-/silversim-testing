@@ -302,14 +302,9 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                                 //break;
 
                             case "base64":
-                                if (isEmptyElement)
-                                {
-                                    iv = new BinaryData();
-                                }
-                                else
-                                {
-                                    iv = new BinaryData(Convert.FromBase64String(reader.ReadElementValueAsString()));
-                                }
+                                iv = (isEmptyElement) ?
+                                    new BinaryData() :
+                                    new BinaryData(Convert.FromBase64String(reader.ReadElementValueAsString()));
                                 break;
 
                             case "struct":

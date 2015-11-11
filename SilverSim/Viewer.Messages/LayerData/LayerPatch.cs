@@ -23,14 +23,9 @@ namespace SilverSim.Viewer.Messages.LayerData
             {
                 lock(this)
                 {
-                    if (value == 0)
-                    {
-                        m_Serial = 1;
-                    }
-                    else
-                    {
-                        m_Serial = value;
-                    }
+                    m_Serial = (value == 0) ?
+                        1 :
+                        value;
                 }
             }
         }

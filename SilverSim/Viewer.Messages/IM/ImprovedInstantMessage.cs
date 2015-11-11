@@ -56,9 +56,7 @@ namespace SilverSim.Viewer.Messages.IM
             }
             ParentEstateID = (uint)gim.ParentEstateID;
             RegionID = gim.RegionID;
-            Timestamp = (null == gim.Timestamp) ?
-                new Date() :
-                gim.Timestamp;
+            Timestamp = gim.Timestamp ?? new Date();
         }
 
         public static explicit operator GridInstantMessage(ImprovedInstantMessage m)

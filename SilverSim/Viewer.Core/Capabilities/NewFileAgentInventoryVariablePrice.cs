@@ -278,14 +278,9 @@ namespace SilverSim.Viewer.Core.Capabilities
                                     face.RepeatU = scales;
                                     face.RepeatV = scalet;
 
-                                    if (textureids.Count > textureNum)
-                                    {
-                                        face.TextureID = textureids[textureNum];
-                                    }
-                                    else
-                                    {
-                                        face.TextureID = TextureEntry.WHITE_TEXTURE;
-                                    }
+                                    face.TextureID = (textureids.Count > textureNum) ?
+                                        textureids[textureNum] :
+                                        TextureEntry.WHITE_TEXTURE;
                                 }
                                 WritePart(writer, data.Name, primpositions[idx], primscales[idx], primrots[idx], meshassetid, texentry, idx + 1, data.CreateTime);
                             }

@@ -56,14 +56,7 @@ namespace SilverSim.Scripting.Common
             }
             set
             {
-                if(value < m_MinimumThreads)
-                {
-                    m_MaximumThreads = m_MinimumThreads;
-                }
-                else
-                {
-                    m_MaximumThreads = value;
-                }
+                m_MaximumThreads = value < m_MinimumThreads ? m_MinimumThreads : value;
             }
         }
 

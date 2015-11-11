@@ -256,14 +256,7 @@ namespace SilverSim.Types.StructuredData.Llsd
             else if(t == typeof(ABoolean))
             {
                 ABoolean i_bool = (ABoolean)input;
-                if (i_bool)
-                {
-                    output.WriteByte((byte)'1');
-                }
-                else
-                {
-                    output.WriteByte((byte)'0');
-                }
+                output.WriteByte(i_bool ? (byte)'1' : (byte)'0');
             }
             else if(t == typeof(Date))
             {

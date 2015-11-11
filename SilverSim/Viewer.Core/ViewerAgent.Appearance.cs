@@ -217,14 +217,9 @@ namespace SilverSim.Viewer.Core
             {
                 for (tidx = 0; tidx < Math.Min(te.FaceTextures.Length, NUM_AVATAR_TEXTURES); ++tidx)
                 {
-                    if (te.FaceTextures[tidx] != null)
-                    {
-                        Textures[tidx] = te.FaceTextures[tidx].TextureID;
-                    }
-                    else
-                    {
-                        Textures[tidx] = te.DefaultTexture.TextureID;
-                    }
+                    Textures[tidx] = (te.FaceTextures[tidx] != null) ?
+                        te.FaceTextures[tidx].TextureID :
+                        te.DefaultTexture.TextureID;
                 }
             }
 

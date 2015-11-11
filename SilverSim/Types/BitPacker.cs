@@ -224,14 +224,7 @@ namespace SilverSim.Types
             }
             set
             {
-                if (value)
-                {
-                    PackBitsToArray(BIT_ON, 1);
-                }
-                else
-                {
-                    PackBitsToArray(BIT_OFF, 1);
-                }
+                PackBitsToArray(value ? BIT_ON : BIT_OFF, 1);
             }
         }
 

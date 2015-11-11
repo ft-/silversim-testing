@@ -867,14 +867,9 @@ namespace SilverSim.Viewer.Core
                     }
                     item.IsGroupOwned = d.IsGroupOwned;
 
-                    if (d.CreationDate == 0)
-                    {
-                        item.CreationDate = new Date();
-                    }
-                    else
-                    {
-                        item.CreationDate = Date.UnixTimeToDateTime(d.CreationDate);
-                    }
+                    item.CreationDate = (d.CreationDate == 0) ?
+                        new Date() : 
+                        Date.UnixTimeToDateTime(d.CreationDate);
 
                     item.InventoryType = d.InvType;
 

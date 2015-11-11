@@ -262,14 +262,9 @@ namespace SilverSim.Viewer.Search
                 d.AvatarID = results[offset].ID;
                 string[] sp = results[offset].FullName.Split(new char[] {' '}, 2);
                 d.FirstName = sp[0];
-                if (sp.Length > 1)
-                {
-                    d.LastName = sp[1];
-                }
-                else
-                {
-                    d.LastName = string.Empty;
-                }
+                d.LastName = (sp.Length > 1) ?
+                    sp[1] :
+                    string.Empty;
                 res.Data.Add(d);
             }
             agent.SendMessageAlways(res, scene.ID);

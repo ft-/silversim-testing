@@ -33,14 +33,10 @@ namespace SilverSim.Viewer.Core
                 try
                 {
                     Messages.Image.RequestImage req;
-                    if (bakedReqs.Count != 0 || normalReqs.Count != 0)
-                    {
-                        req = (Messages.Image.RequestImage)m_TextureDownloadQueue.Dequeue(0);
-                    }
-                    else
-                    {
-                        req = (Messages.Image.RequestImage)m_TextureDownloadQueue.Dequeue(1000);
-                    }
+                    req = (bakedReqs.Count != 0 || normalReqs.Count != 0) ?
+                        (Messages.Image.RequestImage)m_TextureDownloadQueue.Dequeue(0) :
+                        (Messages.Image.RequestImage)m_TextureDownloadQueue.Dequeue(1000);
+
                     foreach(Messages.Image.RequestImage.RequestImageEntry imageRequest in req.RequestImageList)
                     {
                         if (!activeRequestImages.Contains(imageRequest.ImageID))
@@ -183,14 +179,9 @@ namespace SilverSim.Viewer.Core
                             Messages.Image.ImagePacket ip = new Messages.Image.ImagePacket();
                             ip.ID = imageRequest.ImageID;
                             ip.Packet = ++packetno;
-                            if(asset.Data.Length - offset > IMAGE_PACKET_SIZE)
-                            {
-                                ip.Data = new byte[IMAGE_PACKET_SIZE];
-                            }
-                            else
-                            {
-                                ip.Data = new byte[asset.Data.Length - offset];
-                            }
+                            ip.Data = (asset.Data.Length - offset > IMAGE_PACKET_SIZE) ?
+                                new byte[IMAGE_PACKET_SIZE] :
+                                new byte[asset.Data.Length - offset];
 
                             Buffer.BlockCopy(asset.Data, offset, ip.Data, 0, ip.Data.Length);
                             SendMessage(ip);

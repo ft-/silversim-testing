@@ -141,14 +141,10 @@ namespace SilverSim.Viewer.Core
                 try
                 {
                     start = int.Parse(v[0]);
-                    if (string.IsNullOrEmpty(v[1]))
-                    {
-                        end = asset.Data.Length - 1;
-                    }
-                    else
-                    {
-                        end = int.Parse(v[1]);
-                    }
+                    end = string.IsNullOrEmpty(v[1]) ?
+                        asset.Data.Length - 1 :
+                        int.Parse(v[1]);
+
                     /* The following check is regarding some weirdness of some viewers trying to retrieve data past the file size.
                      * Yet, RFC2616 requires a RequestedRangeNotSatisfiable here but those viewers would not accept it.
                      */

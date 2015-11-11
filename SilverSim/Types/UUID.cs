@@ -13,15 +13,9 @@ namespace SilverSim.Types
         #region Constructors
         public UUID(string s)
         {
-            if(string.IsNullOrEmpty(s))
-            {
-                m_Guid = new Guid();
-            }
-            else
-            {
-                m_Guid = new Guid(s);
-            }
+            m_Guid = string.IsNullOrEmpty(s) ? new Guid() : new Guid(s);
         }
+
         public UUID(Guid val)
         {
             m_Guid = val;
@@ -94,7 +88,10 @@ namespace SilverSim.Types
 
         public override bool Equals(object o)
         {
-            if (!(o is UUID)) return false;
+            if (!(o is UUID))
+            {
+                return false;
+            }
 
             return m_Guid == ((UUID)o).m_Guid;
         }

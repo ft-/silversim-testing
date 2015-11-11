@@ -100,15 +100,10 @@ namespace SilverSim.Viewer.Core
                 dataLength += block.Length;
             }
 
-            if (t.DataBlocks.Count > 1)
-            {
+            data = (t.DataBlocks.Count > 1) ?
                 /* multipart asset transfers have a CRC */
-                data = new byte[dataLength - 4];
-            }
-            else
-            {
-                data = new byte[dataLength];
-            }
+                new byte[dataLength - 4] :
+                new byte[dataLength];
 
             int dataOffset = 0;
             foreach (byte[] block in t.DataBlocks)

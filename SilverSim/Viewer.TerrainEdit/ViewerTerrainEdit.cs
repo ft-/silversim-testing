@@ -369,14 +369,9 @@ namespace SilverSim.Viewer.TerrainEdit
                     }
 
                     double z;
-                    if (modify.Seconds < 4.0)
-                    {
-                        z = SphericalFactor(x, y, data.West, data.South, strength) * modify.Seconds * 0.25f;
-                    }
-                    else
-                    {
-                        z = 1;
-                    }
+                    z = (modify.Seconds < 4.0) ?
+                        SphericalFactor(x, y, data.West, data.South, strength) * modify.Seconds * 0.25f :
+                        1;
 
                     double delta = modify.Height - scene.Terrain[(uint)x, (uint)y];
                     if (Math.Abs(delta) > 0.1)

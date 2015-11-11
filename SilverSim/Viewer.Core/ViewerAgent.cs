@@ -277,28 +277,18 @@ namespace SilverSim.Viewer.Core
             {
                 lock(this)
                 {
-                    if (m_SittingOnObject != null)
-                    {
-                        return m_GlobalPosition - m_SittingOnObject.Position;
-                    }
-                    else
-                    {
-                        return m_GlobalPosition;
-                    }
+                    return (m_SittingOnObject != null) ?
+                        m_GlobalPosition - m_SittingOnObject.Position :
+                        m_GlobalPosition;
                 }
             }
             set
             {
                 lock (this)
                 {
-                    if (m_SittingOnObject != null)
-                    {
-                        m_GlobalPosition = value + m_SittingOnObject.Position;
-                    }
-                    else
-                    {
-                        m_GlobalPosition = value;
-                    }
+                    m_GlobalPosition = (m_SittingOnObject != null) ?
+                        value + m_SittingOnObject.Position :
+                        value;
                 }
                 InvokeOnPositionUpdate();
             }
@@ -386,28 +376,18 @@ namespace SilverSim.Viewer.Core
             {
                 lock(this)
                 {
-                    if(m_SittingOnObject != null)
-                    {
-                        return m_GlobalPosition - m_SittingOnObject.Position;
-                    }
-                    else
-                    {
-                        return m_GlobalPosition;
-                    }
+                    return (m_SittingOnObject != null) ?
+                        m_GlobalPosition - m_SittingOnObject.Position :
+                        m_GlobalPosition;
                 }
             }
             set
             {
                 lock(this)
                 {
-                    if(m_SittingOnObject != null)
-                    {
-                        m_GlobalPosition = value + m_SittingOnObject.Position;
-                    }
-                    else
-                    {
-                        m_GlobalPosition = value;
-                    }
+                    m_GlobalPosition = (m_SittingOnObject != null) ?
+                        value + m_SittingOnObject.Position :
+                        value;
                 }
                 InvokeOnPositionUpdate();
             }
@@ -441,28 +421,18 @@ namespace SilverSim.Viewer.Core
             {
                 lock (this)
                 {
-                    if (m_SittingOnObject != null)
-                    {
-                        return m_GlobalRotation * m_SittingOnObject.Rotation;
-                    }
-                    else
-                    {
-                        return m_GlobalRotation;
-                    }
+                    return (m_SittingOnObject != null) ?
+                        m_GlobalRotation * m_SittingOnObject.Rotation :
+                        m_GlobalRotation;
                 }
             }
             set
             {
                 lock(this)
                 {
-                    if(m_SittingOnObject != null)
-                    {
-                        m_GlobalRotation = value / m_SittingOnObject.Rotation;
-                    }
-                    else
-                    {
-                        m_GlobalRotation = value;
-                    }
+                    m_GlobalRotation = (m_SittingOnObject != null) ?
+                        value / m_SittingOnObject.Rotation :
+                        value;
                 }
                 InvokeOnPositionUpdate();
             }
@@ -472,24 +442,20 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                if (m_SittingOnObject != null)
+                lock (this)
                 {
-                    return m_GlobalRotation / m_SittingOnObject.Rotation;
-                }
-                else
-                {
-                    return m_GlobalRotation;
+                    return (m_SittingOnObject != null) ?
+                        m_GlobalRotation / m_SittingOnObject.Rotation :
+                        m_GlobalRotation;
                 }
             }
             set
             {
-                if(m_SittingOnObject != null)
+                lock (this)
                 {
-                    m_GlobalRotation = value * m_SittingOnObject.Rotation;
-                }
-                else
-                {
-                    m_GlobalRotation = value;
+                    m_GlobalRotation = (m_SittingOnObject != null) ?
+                        value * m_SittingOnObject.Rotation :
+                        value;
                 }
                 InvokeOnPositionUpdate();
             }
@@ -499,11 +465,17 @@ namespace SilverSim.Viewer.Core
         {
             get
             {
-                return LocalRotation;
+                lock (this)
+                {
+                    return LocalRotation;
+                }
             }
             set
             {
-                LocalRotation = value;
+                lock (this)
+                {
+                    LocalRotation = value;
+                }
             }
         }
 
@@ -1092,14 +1064,9 @@ namespace SilverSim.Viewer.Core
         public RwLockedList<UUID> SelectedObjects(UUID scene)
         {
             AgentCircuit circuit;
-            if(Circuits.TryGetValue(scene, out circuit))
-            {
-                return circuit.SelectedObjects;
-            }
-            else
-            {
-                return new RwLockedList<UUID>();
-            }
+            return (Circuits.TryGetValue(scene, out circuit)) ?
+                circuit.SelectedObjects :
+                new RwLockedList<UUID>();
         }
 
         int m_NextParcelSequenceId;
