@@ -471,14 +471,9 @@ namespace SilverSim.Viewer.Core
             UUID invoice = req.Invoice;
             string message;
 
-            if(req.ParamList.Count < 5)
-            {
-                message = UTF8NoBOM.GetString(req.ParamList[1]);
-            }
-            else
-            {
-                message = UTF8NoBOM.GetString(req.ParamList[4]);
-            }
+            message = req.ParamList.Count < 5 ?
+                UTF8NoBOM.GetString(req.ParamList[1]) :
+                UTF8NoBOM.GetString(req.ParamList[4]);
         }
 
         void EstateOwner_SetRegionDebug(EstateOwnerMessage req)
