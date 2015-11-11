@@ -308,14 +308,9 @@ namespace SilverSim.Viewer.Core
                                 m.Serialize(p);
                                 p.Flush();
                                 p.IsReliable = m.IsReliable;
-                                if (p.IsReliable)
-                                {
-                                    p.AckMessage = m;
-                                }
-                                else
-                                {
-                                    p.AckMessage = null;
-                                }
+                                p.AckMessage = p.IsReliable ?
+                                    m : 
+                                    null;
                                 p.SequenceNumber = NextSequenceNumber;
                                 int savedDataLength = p.DataLength;
                                 if (!p.IsZeroEncoded)

@@ -83,14 +83,9 @@ namespace SilverSim.Types
                 HomeURI = new Uri(parts[0]);
                 string[] names = parts[1].Split(new char[] { ' ' }, 2, StringSplitOptions.None);
                 FirstName = names[0];
-                if (names.Length > 1)
-                {
-                    LastName = names[1];
-                }
-                else
-                {
-                    LastName = string.Empty;
-                }
+                LastName = (names.Length > 1) ?
+                    names[1] :
+                    string.Empty;
             }
         }
 

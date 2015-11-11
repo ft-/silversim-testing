@@ -162,17 +162,11 @@ namespace SilverSim.Scene.Types.Object
                     bool hasProfileCut;
 
                     PrimitiveShapeType primType = Type;
-                    if (primType == PrimitiveShapeType.Box ||
+                    hasCut = (primType == PrimitiveShapeType.Box ||
                         primType == PrimitiveShapeType.Cylinder ||
-                        primType == PrimitiveShapeType.Prism)
-                    {
-
-                        hasCut = (ProfileBegin > 0) || (ProfileEnd > 0);
-                    }
-                    else
-                    {
-                        hasCut = (PathBegin > 0) || (PathEnd > 0);
-                    }
+                        primType == PrimitiveShapeType.Prism) ?
+                        (ProfileBegin > 0 || ProfileEnd > 0) :
+                        (PathBegin > 0 || PathEnd > 0);
 
                     hasHollow = ProfileHollow > 0;
                     hasDimple = (ProfileBegin > 0) || (ProfileEnd > 0); // taken from llSetPrimitiveParms
@@ -399,14 +393,10 @@ namespace SilverSim.Scene.Types.Object
                     d.IsOpen = (ProfileBegin != 0 || ProfileEnd != 50000);
                     d.ProfileShape = (PrimitiveProfileShape)(ProfileCurve & (byte)PrimitiveProfileShape.Mask);
                     d.HoleShape = (PrimitiveProfileHollowShape)(ProfileCurve & (byte)PrimitiveProfileHollowShape.Mask);
-                    if ((Type != PrimitiveShapeType.Box || Type != PrimitiveShapeType.Tube) && d.HoleShape == PrimitiveProfileHollowShape.Square)
-                    {
-                        d.ProfileHollow = (ProfileHollow * HollowQuanta).Clamp(0f, 0.7f);
-                    }
-                    else
-                    {
-                        d.ProfileHollow = (ProfileHollow * HollowQuanta).Clamp(0f, 0.99f);
-                    }
+                    d.ProfileHollow = ((Type != PrimitiveShapeType.Box || Type != PrimitiveShapeType.Tube) && 
+                        d.HoleShape == PrimitiveProfileHollowShape.Square) ?
+                        (ProfileHollow * HollowQuanta).Clamp(0f, 0.7f) :
+                        (ProfileHollow * HollowQuanta).Clamp(0f, 0.99f);
                     d.IsHollow = ProfileHollow > 0;
                     #endregion
 

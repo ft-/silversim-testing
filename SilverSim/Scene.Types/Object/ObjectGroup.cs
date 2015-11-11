@@ -94,9 +94,7 @@ namespace SilverSim.Scene.Types.Object
         { 
             get
             {
-                return (null == m_AssetService) ?
-                    Scene.AssetService :
-                    m_AssetService;
+                return m_AssetService ?? Scene.AssetService;
             }
             set
             {
