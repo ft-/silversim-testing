@@ -64,8 +64,10 @@ namespace SilverSim.Scene.RegionLoader.Basic
                 IConfigSource cfg;
                 if (Uri.IsWellFormedUriString(m_RegionCfg, UriKind.Absolute))
                 {
-                    XmlReader r = XmlReader.Create(m_RegionCfg);
-                    cfg = new XmlConfigSource(r);
+                    using (XmlReader r = XmlReader.Create(m_RegionCfg))
+                    {
+                        cfg = new XmlConfigSource(r);
+                    }
                 }
                 else
                 {
