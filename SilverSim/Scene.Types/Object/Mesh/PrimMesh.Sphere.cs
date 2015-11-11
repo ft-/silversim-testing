@@ -33,52 +33,29 @@ namespace SilverSim.Scene.Types.Object.Mesh
             double radiusOffset;
 
             #region cut
-            if (shape.PathScale.X < 0f)
-            {
-                topSize.X = 1.0.Clamp(1f + shape.PathScale.X, 1f - cut);
-            }
-            else
-            {
-                topSize.X = 1.0.Clamp(1f - shape.PathScale.X, cut);
-            }
-            if (shape.PathScale.Y < 0f)
-            {
-                topSize.Y = 1.0.Clamp(1f + shape.PathScale.Y, 1f - cut);
-            }
-            else
-            {
-                topSize.Y = 1.0.Clamp(1f - shape.PathScale.Y, cut);
-            }
+            topSize.X = shape.PathScale.X < 0f ?
+                1.0.Clamp(1f + shape.PathScale.X, 1f - cut) :
+                1.0.Clamp(1f - shape.PathScale.X, cut);
+
+            topSize.Y = shape.PathScale.Y < 0f ?
+                1.0.Clamp(1f + shape.PathScale.Y, 1f - cut) :
+                1.0.Clamp(1f - shape.PathScale.Y, cut);
             #endregion
 
             #region taper
-            if (shape.Taper.X < 0f)
-            {
-                taper.X = 1.0.Clamp(1f + shape.Taper.X, 1f - cut);
-            }
-            else
-            {
-                taper.X = 1.0.Clamp(1f - shape.Taper.X, cut);
-            }
-            if (shape.Taper.Y < 0f)
-            {
-                taper.Y = 1.0.Clamp(1f + shape.Taper.Y, 1f - cut);
-            }
-            else
-            {
-                taper.Y = 1.0.Clamp(1f - shape.Taper.Y, cut);
-            }
+            taper.X = shape.Taper.X < 0f ?
+                1.0.Clamp(1f + shape.Taper.X, 1f - cut) :
+                1.0.Clamp(1f - shape.Taper.X, cut);
+
+            taper.Y = shape.Taper.Y < 0f ?
+                1.0.Clamp(1f + shape.Taper.Y, 1f - cut) :
+                1.0.Clamp(1f - shape.Taper.Y, cut);
             #endregion
 
             #region radius offset
-            if (shape.RadiusOffset < 0f)
-            {
-                radiusOffset = 1.0.Clamp(1f + shape.RadiusOffset, 1f - cut);
-            }
-            else
-            {
-                radiusOffset = 1.0.Clamp(1f - shape.RadiusOffset, cut);
-            }
+            radiusOffset = shape.RadiusOffset < 0f ?
+                1.0.Clamp(1f + shape.RadiusOffset, 1f - cut) :
+                1.0.Clamp(1f - shape.RadiusOffset, cut);
             #endregion
 
             /* generate extrusions */

@@ -19,41 +19,23 @@ namespace SilverSim.Scene.Types.Object.Mesh
             Vector3 shear = new Vector3();
 
             #region cut
-            if (shape.PathScale.X < 0f)
-            {
-                topSize.X = 1.0.Clamp(1f + shape.PathScale.X, 1f - cut);
-            }
-            else
-            {
-                topSize.X = 1.0.Clamp(1f - shape.PathScale.X, cut);
-            }
-            if (shape.PathScale.Y < 0f)
-            {
-                topSize.Y = 1.0.Clamp(1f + shape.PathScale.Y, 1f - cut);
-            }
-            else
-            {
-                topSize.Y = 1.0.Clamp(1f - shape.PathScale.Y, cut);
-            }
+            topSize.X = shape.PathScale.X < 0f ?
+                1.0.Clamp(1f + shape.PathScale.X, 1f - cut) :
+                1.0.Clamp(1f - shape.PathScale.X, cut);
+
+            topSize.Y = shape.PathScale.Y < 0f ?
+                1.0.Clamp(1f + shape.PathScale.Y, 1f - cut) :
+                1.0.Clamp(1f - shape.PathScale.Y, cut);
             #endregion
 
             #region top_shear
-            if (shape.TopShear.X < 0f)
-            {
-                shear.X = 1.0.Clamp(1f + shape.TopShear.X, 1f - cut);
-            }
-            else
-            {
-                shear.X = 1.0.Clamp(1f - shape.TopShear.X, cut);
-            }
-            if (shape.TopShear.Y < 0f)
-            {
-                shear.Y = 1.0.Clamp(1f + shape.TopShear.Y, 1f - cut);
-            }
-            else
-            {
-                shear.Y = 1.0.Clamp(1f - shape.TopShear.Y, 1f - cut);
-            }
+            shear.X = shape.TopShear.X < 0f ?
+                1.0.Clamp(1f + shape.TopShear.X, 1f - cut) :
+                1.0.Clamp(1f - shape.TopShear.X, cut);
+            
+            shear.Y = shape.TopShear.Y < 0f ?
+                1.0.Clamp(1f + shape.TopShear.Y, 1f - cut) :
+                1.0.Clamp(1f - shape.TopShear.Y, 1f - cut);
             #endregion
 
             /* generate extrusions */
@@ -342,14 +324,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     Vector3 innerDirectionalVec = outerDirectionalVec;
 
                     /* outer normalize on single component to 0.5, simplifies algorithm */
-                    if (Math.Abs(outerDirectionalVec.X) > Math.Abs(outerDirectionalVec.Y))
-                    {
-                        outerDirectionalVec *= 0.5 / (outerDirectionalVec.X);
-                    }
-                    else
-                    {
-                        outerDirectionalVec *= 0.5 / (outerDirectionalVec.Y);
-                    }
+                    outerDirectionalVec *= Math.Abs(outerDirectionalVec.X) > Math.Abs(outerDirectionalVec.Y) ?
+                        0.5 / outerDirectionalVec.X :
+                        0.5 / outerDirectionalVec.Y;
 
                     switch (shape.HoleShape)
                     {
@@ -365,14 +342,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
                         case PrimitiveProfileHollowShape.Same:
                         case PrimitiveProfileHollowShape.Square:
                             /* inner normalize on single component to 0.5 * hollow */
-                            if (Math.Abs(innerDirectionalVec.X) > Math.Abs(innerDirectionalVec.Y))
-                            {
-                                innerDirectionalVec *= (0.5 * shape.ProfileHollow / (innerDirectionalVec.X));
-                            }
-                            else
-                            {
-                                innerDirectionalVec *= (0.5 * shape.ProfileHollow / (innerDirectionalVec.Y));
-                            }
+                            innerDirectionalVec *= Math.Abs(innerDirectionalVec.X) > Math.Abs(innerDirectionalVec.Y) ?
+                                0.5 * shape.ProfileHollow / innerDirectionalVec.X :
+                                0.5 * shape.ProfileHollow / innerDirectionalVec.Y;
                             break;
 
                         default:
@@ -394,14 +366,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 {
                     Vector3 directionalVec = startPoint.Rotate2D_XY(startangle);
                     /* normalize on single component to 0.5, simplifies algorithm */
-                    if (Math.Abs(directionalVec.X) > Math.Abs(directionalVec.Y))
-                    {
-                        directionalVec *= 0.5 / (directionalVec.X);
-                    }
-                    else
-                    {
-                        directionalVec *= 0.5 / (directionalVec.Y);
-                    }
+                    directionalVec *= Math.Abs(directionalVec.X) > Math.Abs(directionalVec.Y) ?
+                        0.5 / directionalVec.X :
+                        0.5 / directionalVec.Y;
                     Path.Vertices.Add(directionalVec);
                 }
                 if (shape.IsOpen)
@@ -458,14 +425,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
 
                         case PrimitiveProfileHollowShape.Square:
                             /* inner normalize on single component to 0.5 * hollow */
-                            if (Math.Abs(innerDirectionalVec.X) > Math.Abs(innerDirectionalVec.Y))
-                            {
-                                innerDirectionalVec *= (0.5 * shape.ProfileHollow / (innerDirectionalVec.X));
-                            }
-                            else
-                            {
-                                innerDirectionalVec *= (0.5 * shape.ProfileHollow / (innerDirectionalVec.Y));
-                            }
+                            innerDirectionalVec *= Math.Abs(innerDirectionalVec.X) > Math.Abs(innerDirectionalVec.Y) ?
+                                0.5 * shape.ProfileHollow / innerDirectionalVec.X :
+                                0.5 * shape.ProfileHollow / innerDirectionalVec.Y;
                             break;
 
                         default:
@@ -545,14 +507,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
                         case PrimitiveProfileHollowShape.Square:
                             innerDirectionalVec = startPoint.Rotate2D_XY(startangle);
                             /* inner normalize on single component to 0.5 * hollow */
-                            if (Math.Abs(innerDirectionalVec.X) > Math.Abs(innerDirectionalVec.Y))
-                            {
-                                innerDirectionalVec *= (0.5 * shape.ProfileHollow / (innerDirectionalVec.X));
-                            }
-                            else
-                            {
-                                innerDirectionalVec *= (0.5 * shape.ProfileHollow / (innerDirectionalVec.Y));
-                            }
+                            innerDirectionalVec *= Math.Abs(innerDirectionalVec.X) > Math.Abs(innerDirectionalVec.Y) ?
+                                0.5 * shape.ProfileHollow / innerDirectionalVec.X :
+                                0.5 * shape.ProfileHollow / innerDirectionalVec.Y;
                             break;
 
                         default:

@@ -43,14 +43,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
         {
             Vector3 v = new Vector3();
             System.Drawing.Color c = bm.GetPixel(x, y);
-            if (mirror)
-            {
-                v.X = -(c.R / 255f - 0.5);
-            }
-            else
-            {
-                v.X = c.R / 255f - 0.5;
-            }
+            v.X = mirror ?
+                -(c.R / 255f - 0.5) :
+                c.R / 255f - 0.5;
             v.Y = c.G / 255f - 0.5;
             v.Z = c.B / 255f - 0.5;
 
@@ -73,14 +68,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
                 {
                     int ax, ay;
                     ay = y;
-                    if (reverse_horizontal)
-                    {
-                        ax = bitmap.Width - 1 - x;
-                    }
-                    else
-                    {
-                        ax = x;
-                    }
+                    ax = reverse_horizontal ?
+                        bitmap.Width - 1 - x :
+                        x;
 
                     if (y == 0)
                     {
@@ -91,14 +81,9 @@ namespace SilverSim.Scene.Types.Object.Mesh
                     }
                     else if (y == bitmap.Height)
                     {
-                        if (sculptType == PrimitiveSculptType.Torus)
-                        {
-                            ay = 0;
-                        }
-                        else
-                        {
-                            ay = bitmap.Height - 1;
-                        }
+                        ay = (sculptType == PrimitiveSculptType.Torus) ?
+                            0 :
+                            bitmap.Height - 1;
 
                         if (sculptType == PrimitiveSculptType.Sphere)
                         {
