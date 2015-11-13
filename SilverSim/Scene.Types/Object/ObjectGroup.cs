@@ -130,20 +130,6 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
-        public new void Add(int key1, UUID key2, ObjectPart value)
-        {
-            value.ObjectGroup = this;
-            try
-            {
-                base.Add(key1, key2, value);
-            }
-            catch
-            {
-                value.ObjectGroup = null;
-                throw;
-            }
-        }
-
         public UUID OriginalAssetID /* will be set to UUID.Zero when anything has been changed */
         {
             get
