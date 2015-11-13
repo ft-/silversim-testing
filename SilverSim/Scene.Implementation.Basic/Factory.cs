@@ -65,9 +65,12 @@ namespace SilverSim.Scene.Implementation.Basic
             m_PhysicsName = ownConfig.GetString("Physics", string.Empty);
             m_NeighborServiceName = ownConfig.GetString("NeighborService", "NeighborService");
             string avatarNameServices = ownConfig.GetString("AvatarNameServices", string.Empty);
-            foreach(string p in avatarNameServices.Split(','))
+            if (!string.IsNullOrEmpty(avatarNameServices))
             {
-                m_AvatarNameServiceNames.Add(p.Trim());
+                foreach (string p in avatarNameServices.Split(','))
+                {
+                    m_AvatarNameServiceNames.Add(p.Trim());
+                }
             }
 
             m_CapabilitiesConfig = new Dictionary<string, string>();
