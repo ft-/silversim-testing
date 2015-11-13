@@ -216,7 +216,7 @@ namespace SilverSim.Main.Common
 
         public T GetService<T>(string serviceName)
         {
-            IPlugin module = PluginInstances[serviceName];
+            IPlugin module;
             if(!PluginInstances.TryGetValue(serviceName, out module))
             {
                 throw new KeyNotFoundException(string.Format("Service {0} not found", serviceName));
