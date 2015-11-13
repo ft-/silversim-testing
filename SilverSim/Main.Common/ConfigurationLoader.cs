@@ -1015,7 +1015,7 @@ namespace SilverSim.Main.Common
                 m_Log.Info("Running post loading steps");
                 foreach (IPostLoadStep postLoadStep in postLoadSteps)
                 {
-                    postLoadStep.Startup(this);
+                    postLoadStep.PostLoad();
                 }
             }
         }

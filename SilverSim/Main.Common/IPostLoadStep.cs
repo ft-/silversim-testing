@@ -5,5 +5,6 @@ namespace SilverSim.Main.Common
 {
     public interface IPostLoadStep : IPlugin
     {
+        void PostLoad();
     }
 }
