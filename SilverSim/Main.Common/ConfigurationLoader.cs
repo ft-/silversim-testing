@@ -999,13 +999,23 @@ namespace SilverSim.Main.Common
                 httpServer.StartsWithUriHandlers.Add("/circuit", (Action<HttpRequest>)System.Delegate.CreateDelegate(typeof(Action<HttpRequest>), m));
 
                 m_Log.Info("Loading regions");
-                foreach (IRegionLoaderInterface regionLoader in GetServices<IRegionLoaderInterface>().Values)
+                foreach (IRegionLoaderInterface regionLoader in regionLoaders)
                 {
                     regionLoader.LoadRegions();
                 }
-                foreach (IRegionLoaderInterface regionLoader in GetServices<IRegionLoaderInterface>().Values)
+                foreach (IRegionLoaderInterface regionLoader in regionLoaders)
                 {
                     regionLoader.AllRegionsLoaded();
+                }
+            }
+
+            ICollection<IPostLoadStep> postLoadSteps = GetServices<IPostLoadStep>().Values;
+            if (postLoadSteps.Count != 0)
+            {
+                m_Log.Info("Running post loading steps");
+                foreach (IPostLoadStep postLoadStep in postLoadSteps)
+                {
+                    postLoadStep.Startup(this);
                 }
             }
         }
