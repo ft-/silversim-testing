@@ -118,6 +118,33 @@ namespace SilverSim.Main.Common
             }
         }
 
+        [Serializable]
+        public class ServiceNotFoundException : Exception
+        {
+            public ServiceNotFoundException()
+            {
+
+            }
+
+            public ServiceNotFoundException(string msg)
+                : base(msg)
+            {
+
+            }
+
+            protected ServiceNotFoundException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public ServiceNotFoundException(string message, Exception innerException)
+                : base(message, innerException)
+            {
+
+            }
+        }
+
         ~ConfigurationLoader()
         {
             m_ShutdownEvent.Dispose();
@@ -219,7 +246,7 @@ namespace SilverSim.Main.Common
             IPlugin module;
             if(!PluginInstances.TryGetValue(serviceName, out module))
             {
-                throw new KeyNotFoundException(string.Format("Service {0} not found", serviceName));
+                throw new ServiceNotFoundException(string.Format("Service {0} not found", serviceName));
             }
             if(!typeof(T).IsAssignableFrom(module.GetType()))
             {
