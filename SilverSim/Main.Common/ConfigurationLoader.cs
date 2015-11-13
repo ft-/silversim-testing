@@ -217,6 +217,10 @@ namespace SilverSim.Main.Common
         public T GetService<T>(string serviceName)
         {
             IPlugin module = PluginInstances[serviceName];
+            if(!PluginInstances.TryGetValue(serviceName, out module))
+            {
+                throw new KeyNotFoundException(string.Format("Service {0} not found", serviceName));
+            }
             if(!typeof(T).IsAssignableFrom(module.GetType()))
             {
                 throw new InvalidOperationException("Unexpected module configured for service " + serviceName);
