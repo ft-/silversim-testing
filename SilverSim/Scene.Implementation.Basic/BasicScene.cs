@@ -500,6 +500,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         private void RemoveScene(SceneInterface s)
         {
+            ScriptThreadPool.Shutdown();
             m_StopBasicSceneThreads = true;
             if (null != m_NeighborService)
             {
@@ -510,7 +511,11 @@ namespace SilverSim.Scene.Implementation.Basic
             SceneListeners.Remove(m_SimulationDataStorage);
             Terrain.TerrainListeners.Remove(this);
             IMRouter.SceneIM.Remove(IMSend);
-            m_UDPServer.Shutdown();
+            UDPCircuitsManager udpServer = m_UDPServer;
+            if (udpServer != null)
+            {
+                udpServer.Shutdown();
+            }
             m_UDPServer = null;
         }
         #endregion

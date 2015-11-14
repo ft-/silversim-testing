@@ -37,5 +37,6 @@ namespace SilverSim.Scene.Types.Script
     {
         void PostScript(ScriptInstance script);
         void AbortScript(ScriptInstance script);
+        void Shutdown();
     }
 }

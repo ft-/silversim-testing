@@ -15,6 +15,7 @@ namespace SilverSim.Scripting.Common
         readonly BlockingQueue<ScriptInstance> m_ScriptTriggerQueue = new BlockingQueue<ScriptInstance>();
         private int m_MinimumThreads = 2;
         private int m_MaximumThreads = 150;
+        bool m_ShutdownThreads = false;
         public class ScriptThreadContext
         {
             public ScriptInstance CurrentScriptInstance;
@@ -128,13 +129,18 @@ namespace SilverSim.Scripting.Common
             });
         }
 
+        public void Shutdown()
+        {
+            m_ShutdownThreads = true;
+        }
+
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void ThreadMain(object obj)
         {
             ScriptThreadContext tc = (ScriptThreadContext)obj;
             ScriptWorkerThreadPool pool = tc.ThreadPool;
             ScriptInstance ev;
-            while (true)
+            while (!m_ShutdownThreads)
             {
                 try
                 {
