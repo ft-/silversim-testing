@@ -298,6 +298,7 @@ namespace SilverSim.Database.MySQL.Grid
                     cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
                     cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                     cmd.Parameters.AddWithValue("?online", (uint)RegionFlags.RegionOnline);
+                    cmd.Parameters.AddWithValue("?unixtime", Date.GetUnixTime());
                     cmd.ExecuteNonQuery();
                 }
             }
