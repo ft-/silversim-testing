@@ -150,7 +150,7 @@ namespace SilverSim.Scripting.Common
                             return;
                         }
                     }
-                    return;
+                    continue;
                 }
 
                 try
