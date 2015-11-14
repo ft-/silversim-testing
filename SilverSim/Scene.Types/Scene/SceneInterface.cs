@@ -25,6 +25,7 @@ using System.Reflection;
 using System.Threading;
 using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -117,6 +118,7 @@ namespace SilverSim.Scene.Types.Scene
         readonly NotecardCache m_NotecardCache;
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }
         public string GatekeeperURI { get; protected set; }
+        public IScriptWorkerThreadPool ScriptThreadPool { get; protected set; }
 
         public bool IsSceneEnabled
         {

@@ -467,6 +467,7 @@ namespace SilverSim.Scene.Implementation.Basic
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures(string.Empty, string.Empty, string.Empty, true));
             Terrain.TerrainListeners.Add(this);
             SceneListeners.Add(m_SimulationDataStorage);
+            ScriptThreadPool = new ScriptWorkerThreadPool(50, 150);
             new Thread(StoreTerrainProcess).Start();
             if(null != physicsFactory)
             {
@@ -673,6 +674,7 @@ namespace SilverSim.Scene.Implementation.Basic
                         script = item.RemoveScriptInstance;
                         if (script != null)
                         {
+                            ScriptThreadPool.AbortScript(script);
                             script.Abort();
                             script.Remove();
                             ScriptLoader.Remove(item.AssetID, script);
