@@ -35,6 +35,7 @@ namespace SilverSim.Scene.Types.Script
 
     public interface IScriptWorkerThreadPool
     {
+        void PostScript(ScriptInstance script);
         void AbortScript(ScriptInstance script);
     }
 }

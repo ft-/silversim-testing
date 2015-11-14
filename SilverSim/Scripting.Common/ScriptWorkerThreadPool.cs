@@ -70,6 +70,7 @@ namespace SilverSim.Scripting.Common
                 ScriptThreadContext tc = new ScriptThreadContext();
                 tc.ScriptThread = new Thread(ThreadMain);
                 tc.ScriptThread.Name = "Script Worker";
+                tc.ScriptThread.IsBackground = true;
                 tc.ThreadPool = this;
                 tc.ScriptThread.Start(tc);
                 m_Threads.Add(tc);
@@ -96,6 +97,7 @@ namespace SilverSim.Scripting.Common
                         tc.ScriptThread = new Thread(ThreadMain);
                         tc.ThreadPool = this;
                         tc.ScriptThread.Name = "Script Worker";
+                        tc.ScriptThread.IsBackground = true;
                         tc.ScriptThread.Start(tc);
                         m_Threads.Add(tc);
                     }
@@ -130,7 +132,7 @@ namespace SilverSim.Scripting.Common
         private void ThreadMain(object obj)
         {
             ScriptThreadContext tc = (ScriptThreadContext)obj;
-            ScriptWorkerThreadPool pool = (ScriptWorkerThreadPool) obj;
+            ScriptWorkerThreadPool pool = tc.ThreadPool;
             ScriptInstance ev;
             while (true)
             {
