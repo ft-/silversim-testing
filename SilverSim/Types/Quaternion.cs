@@ -743,6 +743,11 @@ namespace SilverSim.Types
             return new Quaternion(quaternion.X * scaleFactor, quaternion.Y * scaleFactor, quaternion.Z * scaleFactor, quaternion.W * scaleFactor);
         }
 
+        public static Quaternion operator *(double scaleFactor, Quaternion quaternion)
+        {
+            return new Quaternion(quaternion.X * scaleFactor, quaternion.Y * scaleFactor, quaternion.Z * scaleFactor, quaternion.W * scaleFactor);
+        }
+
         public static Quaternion operator /(Quaternion quaternion1, Quaternion quaternion2)
         {
             double x = quaternion1.X;
