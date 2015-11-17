@@ -15,7 +15,7 @@ namespace SilverSim.Scripting.Common
         readonly BlockingQueue<ScriptInstance> m_ScriptTriggerQueue = new BlockingQueue<ScriptInstance>();
         private int m_MinimumThreads = 2;
         private int m_MaximumThreads = 150;
-        bool m_ShutdownThreads = false;
+        bool m_ShutdownThreads;
         public class ScriptThreadContext
         {
             public ScriptInstance CurrentScriptInstance;
