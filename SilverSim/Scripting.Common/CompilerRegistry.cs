@@ -285,7 +285,7 @@ namespace SilverSim.Scripting.Common
                 while (reader.Peek() == '/')
                 {
                     string shbang = reader.ReadLine();
-                    header += shbang;
+                    header += shbang + "\n";
                     if (shbang.StartsWith("//#!"))
                     {
                         shbangs.Add(linenumber, shbang);
@@ -306,7 +306,7 @@ namespace SilverSim.Scripting.Common
                 while (reader.Peek() == '/')
                 {
                     string shbang = reader.ReadLine();
-                    header += shbang;
+                    header += shbang + "\n";
                     if (shbang.StartsWith("//#!"))
                     {
                         shbangs.Add(linenumber, shbang);
@@ -326,7 +326,7 @@ namespace SilverSim.Scripting.Common
                 while (reader.Peek() == '/')
                 {
                     string shbang = reader.ReadLine();
-                    header += shbang;
+                    header += shbang + "\n";
                     if (shbang.StartsWith("//#!"))
                     {
                         shbangs.Add(linenumber, shbang);
