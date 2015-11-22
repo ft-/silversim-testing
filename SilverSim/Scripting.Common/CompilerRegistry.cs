@@ -172,7 +172,7 @@ namespace SilverSim.Scripting.Common
 
             public class StreamReaderAddHead : TextReader
             {
-                TextReader m_InnerReader;
+                readonly TextReader m_InnerReader;
                 string m_Header;
                 public StreamReaderAddHead(string header, TextReader reader)
                 {
