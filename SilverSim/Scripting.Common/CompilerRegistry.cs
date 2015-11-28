@@ -192,14 +192,9 @@ namespace SilverSim.Scripting.Common
                 }
                 public override int Peek()
                 {
-                    if(m_Header.Length != 0)
-                    {
-                        return (int)m_Header[0];
-                    }
-                    else
-                    {
-                        return m_InnerReader.Read();
-                    }
+                    return m_Header.Length != 0 ?
+                        (int)m_Header[0] :
+                        m_InnerReader.Read();
                 }
                 public override int Read()
                 {
