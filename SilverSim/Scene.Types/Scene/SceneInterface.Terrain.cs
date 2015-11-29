@@ -187,6 +187,35 @@ namespace SilverSim.Scene.Types.Scene
             }
             #endregion
 
+            public Vector3 Normal(int posX, int posY)
+            {
+                // Clamp to valid position
+                posX = posX.Clamp(0, (int)m_Scene.RegionData.Size.X);
+                posY = posY.Clamp(0, (int)m_Scene.RegionData.Size.Y);
+
+                /* Find neighboring points so we can calculate the resulting plane */
+                Vector3 p0 = new Vector3(posX, posY, this[(uint)posX, (uint)posY]);
+                Vector3 p1 = new Vector3(posX + 1, posY, 0);
+                Vector3 p2 = new Vector3(posX, posY + 1, 0);
+
+                p1.Z = this[(posX + 1) >= m_Scene.RegionData.Size.X ? 
+                            (uint)posX :
+                            (uint)posX + 1, 
+                            (uint)posY];
+
+                p2.Z = this[(uint)posX,
+                            (posY + 1.0) >= m_Scene.RegionData.Size.Y ?
+                            (uint)posY :
+                            (uint)posY + 1];
+
+                /* Calculate normalized vectors from p0 to p1 and p0 to p2 */
+                Vector3 v0 = p1 - p0;
+                Vector3 v1 = p2 - p0;
+
+                /* Calculate the cross product (the slope normal). */
+                return v0.Cross(v1).Normalize();
+            }
+
             #region Properties
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public double this[uint x, uint y]
@@ -295,14 +324,9 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    if (pos.X < 0 || pos.Y < 0)
-                    {
-                        throw new KeyNotFoundException();
-                    }
-
-                    uint x = (uint)pos.X;
-                    uint y = (uint)pos.Y;
-                    return this[x, y];
+                    int x = (int)pos.X.Clamp(0, m_Scene.RegionData.Size.X - 1);
+                    int y = (int)pos.Y.Clamp(0, m_Scene.RegionData.Size.Y - 1);
+                    return this[(uint)x, (uint)y];
                 }
                 set
                 {
