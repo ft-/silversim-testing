@@ -198,6 +198,8 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
+            public WindDataAccessor Wind { get; private set; }
+
             bool m_WindlightValid;
             WindlightSkyData m_SkyWindlight = new WindlightSkyData();
             WindlightWaterData m_WaterWindlight = new WindlightWaterData();
@@ -215,6 +217,7 @@ namespace SilverSim.Scene.Types.Scene
 
                 m_WindData.PatchX = new LayerPatch();
                 m_WindData.PatchY = new LayerPatch();
+                Wind = new WindDataAccessor(this);
             }
 
             #region Update of Wind Data
