@@ -125,12 +125,6 @@ namespace SilverSim.Scene.Types.Scene
                 public Vector3 SunAngVelocity;
             }
 
-            public struct WindVector
-            {
-                public double X;
-                public double Y;
-            }
-
             public struct WindData
             {
                 public LayerPatch PatchX;
@@ -148,11 +142,11 @@ namespace SilverSim.Scene.Types.Scene
                 }
 
                 [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-                public WindVector this[int y, int x]
+                public Vector3 this[int y, int x]
                 {
                     get
                     {
-                        WindVector wv = new WindVector();
+                        Vector3 wv = new Vector3();
                         if(x >= m_Controller.m_Scene.RegionData.Size.X || y >= m_Controller.m_Scene.RegionData.Size.Y)
                         {
                             return wv;
