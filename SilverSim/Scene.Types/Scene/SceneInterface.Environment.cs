@@ -142,11 +142,13 @@ namespace SilverSim.Scene.Types.Scene
                 }
 
                 [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-                public Vector3 this[int y, int x]
+                public Vector3 this[Vector3 p]
                 {
                     get
                     {
                         Vector3 wv = new Vector3();
+                        int x = (int)p.X;
+                        int y = (int)p.Y;
                         if(x >= m_Controller.m_Scene.RegionData.Size.X || y >= m_Controller.m_Scene.RegionData.Size.Y)
                         {
                             return wv;
@@ -169,6 +171,8 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     set
                     {
+                        int x = (int)p.X;
+                        int y = (int)p.Y;
                         if (x >= m_Controller.m_Scene.RegionData.Size.X || y >= m_Controller.m_Scene.RegionData.Size.Y)
                         {
                             return;
