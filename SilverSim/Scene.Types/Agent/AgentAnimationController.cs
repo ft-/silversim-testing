@@ -266,5 +266,13 @@ namespace SilverSim.Scene.Types.Agent
                 }
             }
         }
+
+        public string GetDefaultAnimation()
+        {
+            lock (this)
+            {
+                return m_CurrentDefaultAnimation;
+            }
+        }
     }
 }
