@@ -91,7 +91,7 @@ namespace SilverSim.Scene.Types.Agent
             m_DefaultAnimationOverride["prejumping"] = "7a4e87fe-de39-6fcb-6223-024b00893244";
             m_DefaultAnimationOverride["running"] = "05ddbff8-aaa9-92a1-2b74-8fe77a29b445";
             m_DefaultAnimationOverride["sitting"] = "1a5fe8ac-a804-8a5d-7cbd-56bd83184568";
-            m_DefaultAnimationOverride["sitting on ground"] = "	1c7600d6-661f-b87b-efe2-d7421eb93c86";
+            m_DefaultAnimationOverride["sitting on ground"] = "1c7600d6-661f-b87b-efe2-d7421eb93c86";
             m_DefaultAnimationOverride["standing"] = "2408fe9e-df1d-1d7d-f4ff-1384fa7b350f";
             m_DefaultAnimationOverride["standing up"] = "3da1d753-028a-5446-24f3-9c9b856d9422";
             m_DefaultAnimationOverride["striding"] = "1cb562b0-ba21-2202-efb3-30f82cdf9595";
