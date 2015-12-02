@@ -204,12 +204,33 @@ namespace SilverSim.Scene.Types.Scene
             SunData m_SunData = new SunData();
             WindData m_WindData = new WindData();
             readonly SceneInterface m_Scene;
-            //bool m_SunFixed = false;
+            bool m_SunFixed = false;
+            System.Timers.Timer m_Timer = new System.Timers.Timer(60000);
+
+            public Vector3 SunDirection
+            {
+                get
+                {
+                    lock(this)
+                    {
+                        return m_SunData.SunDirection;
+                    }
+                }
+                set
+                {
+                    lock(this)
+                    {
+                        m_SunData.SunDirection = value;
+                    }
+                }
+            }
 
             public EnvironmentController(SceneInterface scene)
             {
                 m_Scene = scene;
                 m_SunData.SunDirection = new Vector3();
+                m_SunData.SecPerDay = 4 * 60 * 60;
+                m_SunData.SecPerYear = 11 * m_SunData.SecPerDay;
 
                 m_WindData.ReaderWriterLock = new ReaderWriterLock();
 
@@ -217,6 +238,85 @@ namespace SilverSim.Scene.Types.Scene
                 m_WindData.PatchY = new LayerPatch();
                 Wind = new WindDataAccessor(this);
             }
+
+            public void Start()
+            {
+                lock(this)
+                {
+                    if(!m_Timer.Enabled)
+                    {
+                        m_Timer.Elapsed += EnvironmentTimer;
+                        m_Timer.Start();
+                    }
+                }
+            }
+
+            public void Stop()
+            {
+                lock(this)
+                {
+                    if(m_Timer.Enabled)
+                    {
+                        m_Timer.Stop();
+                        m_Timer.Elapsed -= EnvironmentTimer;
+                    }
+                }
+            }
+
+            private void EnvironmentTimer(object sender, System.Timers.ElapsedEventArgs e)
+            {
+                UpdateSunDirection();
+            }
+
+            #region Update of sun direction
+            /* source of algorithm is secondlifescripters mailing list */
+            double AverageSunTilt = -0.25 * Math.PI;
+            double SeasonalSunTilt = 0.03 * Math.PI;
+            double SunNormalizedOffset = 0.45;
+
+            public void UpdateSunDirection()
+            {
+                double DailyOmega;
+                double YearlyOmega;
+                lock (this)
+                {
+                    DailyOmega = 2 / m_SunData.SecPerDay;
+                    YearlyOmega = 2 / (m_SunData.SecPerYear);
+                }
+                ulong utctime = Date.GetUnixTime();
+                bool sunFixed = m_SunFixed;
+                if(sunFixed)
+                {
+                    utctime = 0;
+                }
+
+                double daily_phase = DailyOmega * utctime;
+                double sun_phase = daily_phase % (2 * Math.PI);
+                double yearly_phase = YearlyOmega * utctime;
+                double tilt = AverageSunTilt + SeasonalSunTilt * Math.Sin(yearly_phase);
+
+                Vector3 sunDirection = new Vector3(Math.Cos(-daily_phase), Math.Sin(-daily_phase), 0);
+                Quaternion tiltRot = new Quaternion(tilt, 1, 0, 0);
+
+                sunDirection *= tiltRot;
+                Vector3 sunVelocity = new Vector3(0, 0, DailyOmega);
+                if(sunFixed)
+                {
+                    sunVelocity = Vector3.Zero;
+                }
+                sunVelocity *= tiltRot;
+                sunDirection.Z += SunNormalizedOffset;
+                double radius = sunDirection.Length;
+                sunDirection = sunDirection.Normalize();
+                sunVelocity *= (1 / radius);
+                lock (this)
+                {
+                    m_SunData.SunDirection = sunDirection;
+                    m_SunData.SunAngVelocity = sunVelocity;
+                    m_SunData.UsecSinceStart = utctime * 1000000;
+                }
+            }
+            #endregion
 
             #region Update of Wind Data
             private List<LayerData> CompileWindData()
