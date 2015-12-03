@@ -289,11 +289,12 @@ namespace SilverSim.Viewer.Core
                             }
                             if (Environment.TickCount - Value.TransferredAtTime > 1000)
                             {
-                                if (Value.ResentCount++ < 5)
+                                if (Value.ResentCount < 5)
                                 {
                                     Value.TransferredAtTime = Environment.TickCount;
                                     m_Server.SendPacketTo(Value, RemoteEndPoint);
                                 }
+                                ++Value.ResentCount;
                             }
                         }
                     }

@@ -1621,12 +1621,10 @@ namespace SilverSim.Scene.Types.Object
             {
                 return uuid;
             }
-            else if(Inventory.TryGetValue(texture, out texitem))
+            else if(Inventory.TryGetValue(texture, out texitem) &&
+                texitem.AssetType == AssetType.Texture)
             {
-                if(texitem.AssetType == AssetType.Texture)
-                {
-                    return texitem.AssetID;
-                }
+                return texitem.AssetID;
             }
             throw new ArgumentException("texture does not name either a inventory item or a uuid");
         }

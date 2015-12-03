@@ -242,12 +242,10 @@ namespace SilverSim.Main.Common.HttpServer
             }
 
             Expect100Continue = false;
-            if (ContainsHeader("Expect"))
+            if (ContainsHeader("Expect") &&
+                m_Headers["Expect"] == "100-continue")
             {
-                if(m_Headers["Expect"] == "100-continue")
-                {
-                    Expect100Continue = true;
-                }
+                Expect100Continue = true;
             }
             
             if (ContainsHeader("Content-Length"))

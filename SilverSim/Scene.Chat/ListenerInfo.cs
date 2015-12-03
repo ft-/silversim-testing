@@ -77,12 +77,10 @@ namespace SilverSim.Scene.Chat
 
         public override void Send(ListenEvent ev)
         {
-            if(!String.IsNullOrEmpty(m_Name))
+            if(!String.IsNullOrEmpty(m_Name) &&
+                ev.Name != m_Name)
             {
-                if(ev.Name != m_Name)
-                {
-                    return;
-                }
+                return;
             }
             if(m_ID != null)
             {
@@ -95,12 +93,10 @@ namespace SilverSim.Scene.Chat
                     return;
                 }
             }
-            if(!String.IsNullOrEmpty(m_Message))
+            if(!String.IsNullOrEmpty(m_Message) &&
+                ev.Message != m_Message)
             {
-                if(ev.Message != m_Message)
-                {
-                    return;
-                }
+                return;
             }
 
             if (IsActive)

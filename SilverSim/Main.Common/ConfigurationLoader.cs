@@ -767,15 +767,13 @@ namespace SilverSim.Main.Common
                 {
                     continue;
                 }
-                if (config.Contains(parts[1]))
+                if (config.Contains(parts[1]) &&
+                    config.Get(parts[1]).Length != 0)
                 {
-                    if (config.Get(parts[1]).Length != 0)
-                    {
-                        string configname = resourceMap.GetString(key) + "." + config.Get(parts[1]) + ".ini";
-                        AddResourceConfig(configname,
-                            String.Format("Parameter {1} = {2} in section {0} is invalid", parts[0], parts[1], config.Get(parts[1])));
-                        config.Remove(parts[1]);
-                    }
+                    string configname = resourceMap.GetString(key) + "." + config.Get(parts[1]) + ".ini";
+                    AddResourceConfig(configname,
+                        String.Format("Parameter {1} = {2} in section {0} is invalid", parts[0], parts[1], config.Get(parts[1])));
+                    config.Remove(parts[1]);
                 }
             }
         }

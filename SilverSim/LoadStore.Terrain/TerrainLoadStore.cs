@@ -23,14 +23,12 @@ namespace SilverSim.LoadStore.Terrain
         {
             foreach (Type t in GetType().Assembly.GetTypes())
             {
-                if (t.GetCustomAttributes(typeof(TerrainStorageType), false).Length > 0)
+                if (t.GetCustomAttributes(typeof(TerrainStorageType), false).Length > 0 &&
+                    t.GetInterfaces().Contains(typeof(IPlugin)) &&
+                    t.GetInterfaces().Contains(typeof(ITerrainFileStorage)))
                 {
-                    if (t.GetInterfaces().Contains(typeof(IPlugin)) &&
-                        t.GetInterfaces().Contains(typeof(ITerrainFileStorage)))
-                    {
-                        object o = Activator.CreateInstance(t);
-                        loader.AddPlugin(((ITerrainFileStorage)o).Name, (IPlugin)o);
-                    }
+                    object o = Activator.CreateInstance(t);
+                    loader.AddPlugin(((ITerrainFileStorage)o).Name, (IPlugin)o);
                 }
             }
         }

@@ -162,12 +162,10 @@ namespace SilverSim.Scene.Types.Script
                 }
                 /* TODO: implement parcel rights */
 
-                if (perms.IsAllowedForEstateOwner)
+                if (perms.IsAllowedForEstateOwner &&
+                    objgroup.Scene.Owner == owner)
                 {
-                    if (objgroup.Scene.Owner == owner)
-                    {
-                        return;
-                    }
+                    return;
                 }
 
                 if (perms.IsAllowedForEstateManager)

@@ -46,10 +46,11 @@ namespace SilverSim.Scene.Types.Object
                 {
                     if(type == item.InventoryType)
                     {
-                        if(index-- == 0)
+                        if(index == 0)
                         {
                             return item;
                         }
+                        --index;
                     }
                 }
                 throw new KeyNotFoundException();
@@ -114,12 +115,10 @@ namespace SilverSim.Scene.Types.Object
                     if (item.InventoryType == InventoryType.LSLText || item.InventoryType == InventoryType.LSLBytecode)
                     {
                         ScriptInstance script = item.ScriptInstance;
-                        if(script != null)
+                        if(script != null &&
+                            script.IsRunning)
                         {
-                            if(script.IsRunning)
-                            {
-                                ++n;
-                            }
+                            ++n;
                         }
                     }
                 }

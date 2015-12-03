@@ -212,12 +212,10 @@ namespace SilverSim.Database.MySQL.Grid
                         cmd.Parameters.AddWithValue("?name", regionInfo.Name);
                         using(MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
-                            if (dbReader.Read())
+                            if (dbReader.Read() && 
+                                dbReader["uuid"].ToString() != regionInfo.ID.ToString())
                             {
-                                if (dbReader["uuid"].ToString() != regionInfo.ID.ToString())
-                                {
-                                    throw new GridRegionUpdateFailedException("Duplicate region name");
-                                }
+                                throw new GridRegionUpdateFailedException("Duplicate region name");
                             }
                         }
                     }
@@ -238,12 +236,10 @@ namespace SilverSim.Database.MySQL.Grid
                     cmd.Parameters.AddWithValue("?scopeid", regionInfo.ScopeID.ToString());
                     using(MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        if (dbReader.Read())
+                        if (dbReader.Read() && 
+                            (string)dbReader["uuid"] != regionInfo.ID.ToString())
                         {
-                            if ((string)dbReader["uuid"] != regionInfo.ID.ToString())
-                            {
-                                throw new GridRegionUpdateFailedException("Overlapping regions");
-                            }
+                            throw new GridRegionUpdateFailedException("Overlapping regions");
                         }
                     }
                 }

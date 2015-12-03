@@ -108,60 +108,58 @@ namespace SilverSim.Viewer.Core
                         }
                     }
                 }
-                else if(null != zippedDataMap)
+                else if(null != zippedDataMap &&
+                    zippedDataMap.ContainsKey("FullMaterialsPerFace"))
                 {
-                    if (zippedDataMap.ContainsKey("FullMaterialsPerFace"))
+                    AnArray faceData = zippedDataMap["FullMaterialsPerFace"] as AnArray;
+                    if (null != faceData)
                     {
-                        AnArray faceData = zippedDataMap["FullMaterialsPerFace"] as AnArray;
-                        if (null != faceData)
+                        foreach (IValue face_iv in faceData)
                         {
-                            foreach (IValue face_iv in faceData)
+                            Map faceDataMap = face_iv as Map;
+                            if(null == faceDataMap)
                             {
-                                Map faceDataMap = face_iv as Map;
-                                if(null == faceDataMap)
-                                {
-                                    continue;
-                                }
+                                continue;
+                            }
 
+                            try
+                            {
+                                uint primLocalID = faceDataMap["ID"].AsUInt;
+                                UUID matID = UUID.Random;
+                                Material mat;
                                 try
                                 {
-                                    uint primLocalID = faceDataMap["ID"].AsUInt;
-                                    UUID matID = UUID.Random;
-                                    Material mat;
-                                    try
-                                    {
-                                        matID = UUID.Random;
-                                        mat = new Material(matID, faceDataMap["Material"] as Map);
-                                    }
-                                    catch
-                                    {
-                                        matID = UUID.Zero;
-                                        mat = null;
-                                    }
-                                    if (mat != null)
-                                    {
-                                        Scene.StoreMaterial(mat);
-                                        continue;
-                                    }
-                                    ObjectPart p = Scene.Primitives[primLocalID];
-                                    if (faceDataMap.ContainsKey("Face"))
-                                    {
-                                        int face = faceDataMap["Face"].AsInt;
-                                        TextureEntryFace te = p.TextureEntry.FaceTextures[face];
-                                        te.MaterialID = matID;
-                                        p.TextureEntry.FaceTextures[face] = te;
-                                    }
-                                    else
-                                    {
-                                        TextureEntryFace te = p.TextureEntry.DefaultTexture;
-                                        te.MaterialID = matID;
-                                        p.TextureEntry.DefaultTexture = te;
-                                    }
+                                    matID = UUID.Random;
+                                    mat = new Material(matID, faceDataMap["Material"] as Map);
                                 }
                                 catch
                                 {
-
+                                    matID = UUID.Zero;
+                                    mat = null;
                                 }
+                                if (mat != null)
+                                {
+                                    Scene.StoreMaterial(mat);
+                                    continue;
+                                }
+                                ObjectPart p = Scene.Primitives[primLocalID];
+                                if (faceDataMap.ContainsKey("Face"))
+                                {
+                                    int face = faceDataMap["Face"].AsInt;
+                                    TextureEntryFace te = p.TextureEntry.FaceTextures[face];
+                                    te.MaterialID = matID;
+                                    p.TextureEntry.FaceTextures[face] = te;
+                                }
+                                else
+                                {
+                                    TextureEntryFace te = p.TextureEntry.DefaultTexture;
+                                    te.MaterialID = matID;
+                                    p.TextureEntry.DefaultTexture = te;
+                                }
+                            }
+                            catch
+                            {
+
                             }
                         }
                     }

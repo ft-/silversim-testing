@@ -167,12 +167,10 @@ namespace SilverSim.Types.StructuredData.Agent
                 }
             }
 
-            if (agentparams.Account.ServiceURLs.ContainsKey("GatekeeperURI"))
+            if (agentparams.Account.ServiceURLs.ContainsKey("GatekeeperURI") &&
+                (string.IsNullOrEmpty(agentparams.Account.ServiceURLs["GatekeeperURI"]) || agentparams.Account.ServiceURLs["GatekeeperURI"] == "/"))
             {
-                if (string.IsNullOrEmpty(agentparams.Account.ServiceURLs["GatekeeperURI"]) || agentparams.Account.ServiceURLs["GatekeeperURI"] == "/")
-                {
-                    agentparams.Account.ServiceURLs["GatekeeperURI"] = agentparams.Account.ServiceURLs["HomeURI"];
-                }
+                agentparams.Account.ServiceURLs["GatekeeperURI"] = agentparams.Account.ServiceURLs["HomeURI"];
             }
 
             if(agentparams.Account.ServiceURLs.ContainsKey("HomeURI"))

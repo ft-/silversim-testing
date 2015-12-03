@@ -147,13 +147,11 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                             selected_sti = sti;
                             break;
                         }
-                        if(sti.StorageRequestQueue.Count < lowest_count || lowest_count == 0)
+                        if((sti.StorageRequestQueue.Count < lowest_count || lowest_count == 0) &&
+                            m_StorageThreads.Count >= reqthreads)
                         {
-                            if (m_StorageThreads.Count >= reqthreads)
-                            {
-                                lowest_count = sti.StorageRequestQueue.Count;
-                                lowest_sti = sti;
-                            }
+                            lowest_count = sti.StorageRequestQueue.Count;
+                            lowest_sti = sti;
                         }
                     }
 

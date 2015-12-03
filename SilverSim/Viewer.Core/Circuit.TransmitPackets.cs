@@ -399,20 +399,19 @@ namespace SilverSim.Viewer.Core
                     SendSimStats(deltatime);
                 }
 
-                if (Environment.TickCount - lastPingTick >= 5000)
+                if (Environment.TickCount - lastPingTick >= 5000 &&
+                    !m_PingSendTicks.ContainsKey(pingID))
                 {
-                    if (!m_PingSendTicks.ContainsKey(pingID))
-                    {
-                        lastPingTick = Environment.TickCount;
-                        UDPPacket p = new UDPPacket();
-                        p.WriteMessageType(MessageType.StartPingCheck);
-                        p.WriteUInt8(pingID++);
-                        m_PingSendTicks[pingID] = Environment.TickCount;
-                        p.WriteUInt32(0);
-                        m_Server.SendPacketTo(p, RemoteEndPoint);
-                        Interlocked.Increment(ref m_PacketsSent);
-                    }
+                    lastPingTick = Environment.TickCount;
+                    UDPPacket p = new UDPPacket();
+                    p.WriteMessageType(MessageType.StartPingCheck);
+                    p.WriteUInt8(pingID++);
+                    m_PingSendTicks[pingID] = Environment.TickCount;
+                    p.WriteUInt32(0);
+                    m_Server.SendPacketTo(p, RemoteEndPoint);
+                    Interlocked.Increment(ref m_PacketsSent);
                 }
+
                 if (Environment.TickCount - lastAckTick >= 1000)
                 {
                     lastAckTick = Environment.TickCount;

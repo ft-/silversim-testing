@@ -65,71 +65,70 @@ namespace SilverSim.Types.Asset.Format
                     {
                         im = LlsdXml.Deserialize(i) as Map;
                     }
-                    if (null != im)
+                    if (null != im &&
+                        im.ContainsKey("serial") && 
+                        im.ContainsKey("height") &&
+                        im.ContainsKey("wearables") &&
+                        im.ContainsKey("textures") &&
+                        im.ContainsKey("visualparams") &&
+                        im.ContainsKey("attachments"))
                     {
-                        if (im.ContainsKey("serial") && im.ContainsKey("height") &&
-                            im.ContainsKey("wearables") &&
-                            im.ContainsKey("textures") &&
-                            im.ContainsKey("visualparams") &&
-                            im.ContainsKey("attachments"))
+                        try
                         {
-                            try
+                            if (im["wearables"] is AnArray)
                             {
-                                if (im["wearables"] is AnArray)
+                                foreach (IValue w in (AnArray)im["wearables"])
                                 {
-                                    foreach (IValue w in (AnArray)im["wearables"])
+                                    AnArray aw = w as AnArray;
+                                    if (aw != null)
                                     {
-                                        AnArray aw = w as AnArray;
-                                        if (aw != null)
+                                        foreach (IValue wi in aw)
                                         {
-                                            foreach (IValue wi in aw)
+                                            Map awm = wi as Map;
+                                            if (null != awm)
                                             {
-                                                Map awm = wi as Map;
-                                                if (null != awm)
+                                                try
                                                 {
-                                                    try
+                                                    UUID assetID = awm["asset"].AsUUID;
+                                                    if (!reflist.Contains(assetID))
                                                     {
-                                                        UUID assetID = awm["asset"].AsUUID;
-                                                        if (!reflist.Contains(assetID))
-                                                        {
-                                                            reflist.Add(assetID);
-                                                        }
-                                                    }
-                                                    catch
-                                                    {
+                                                        reflist.Add(assetID);
                                                     }
                                                 }
-                                            }
-                                        }
-                                    }
-                                }
-                                AnArray attarray = im["attachments"] as AnArray;
-                                if (attarray != null)
-                                {
-                                    foreach (IValue a in attarray)
-                                    {
-                                        Map am = a as Map;
-                                        if (null != am)
-                                        {
-                                            try
-                                            {
-                                                UUID assetID = am["asset"].AsUUID;
-                                                if (!reflist.Contains(assetID))
+                                                catch
                                                 {
-                                                    reflist.Add(assetID);
                                                 }
-                                            }
-                                            catch
-                                            {
                                             }
                                         }
                                     }
                                 }
                             }
-                            catch
+                            AnArray attarray = im["attachments"] as AnArray;
+                            if (attarray != null)
                             {
+                                foreach (IValue a in attarray)
+                                {
+                                    Map am = a as Map;
+                                    if (null != am)
+                                    {
+                                        try
+                                        {
+                                            UUID assetID = am["asset"].AsUUID;
+                                            if (!reflist.Contains(assetID))
+                                            {
+                                                reflist.Add(assetID);
+                                            }
+                                        }
+                                        catch
+                                        {
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        catch
+                        {
 
-                            }
                         }
                     }
                 }

@@ -297,12 +297,10 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ParcelInfo pinfo;
-            if(Parcels.TryGetValue(location, out pinfo))
+            if(Parcels.TryGetValue(location, out pinfo) &&
+                pinfo.Owner.EqualsGrid(agentOwner))
             {
-                if (pinfo.Owner.EqualsGrid(agentOwner))
-                {
-                    return true;
-                }
+                return true;
             }
 
             return false;
@@ -340,12 +338,10 @@ namespace SilverSim.Scene.Types.Scene
 #warning Add Friends Rights to CanChangeGroup
 
             ParcelInfo pinfo;
-            if(Parcels.TryGetValue(location, out pinfo))
+            if(Parcels.TryGetValue(location, out pinfo) &&
+                pinfo.Owner.EqualsGrid(agentOwner))
             {
-                if (pinfo.Owner.EqualsGrid(agentOwner))
-                {
-                    return true;
-                }
+                return true;
             }
 
             return false;
@@ -445,12 +441,10 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return true;
             }
-            else if(group.IsGroupOwned)
+            else if(group.IsGroupOwned &&
+                HasGroupPower(agent, group.Group, GroupPowers.ReturnGroupOwned))
             {
-                if(HasGroupPower(agent, group.Group, GroupPowers.ReturnGroupOwned))
-                {
-                    return true;
-                }
+                return true;
             }
 
             ParcelInfo pinfo;
@@ -508,12 +502,11 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ParcelInfo pinfo;
-            if(Parcels.TryGetValue(location, out pinfo))
+            if(Parcels.TryGetValue(location, out pinfo) &&
+                pinfo.Owner.EqualsGrid(agentOwner) && 
+                ServerParamService.GetBoolean(ID, "parcel_owner_is_admin", false))
             {
-                if (pinfo.Owner.EqualsGrid(agentOwner) && ServerParamService.GetBoolean(ID, "parcel_owner_is_admin", false))
-                {
-                    return true;
-                }
+                return true;
             }
 
             if (group.RootPart.CheckPermissions(agentOwner, group.Group, checkMask))
@@ -559,20 +552,17 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             ParcelInfo pinfo;
-            if(Parcels.TryGetValue(location, out pinfo))
+            if(Parcels.TryGetValue(location, out pinfo) &&
+                pinfo.Owner.EqualsGrid(agentOwner) && 
+                ServerParamService.GetBoolean(ID, "parcel_owner_is_admin", false))
             {
-                if (pinfo.Owner.EqualsGrid(agentOwner) && ServerParamService.GetBoolean(ID, "parcel_owner_is_admin", false))
-                {
-                    return true;
-                }
+                return true;
             }
 
-            if (!agentOwner.EqualsGrid(groupOwner))
+            if (!agentOwner.EqualsGrid(groupOwner) &&
+                group.RootPart.CheckPermissions(agentOwner, group.Group, InventoryPermissionsMask.Transfer))
             {
-                if (group.RootPart.CheckPermissions(agentOwner, group.Group, InventoryPermissionsMask.Transfer))
-                {
-                    return true;
-                }
+                return true;
             }
             return false;
         }

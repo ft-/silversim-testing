@@ -1162,55 +1162,54 @@ namespace SilverSim.Viewer.Core
         {
             Messages.Circuit.CompleteAgentMovement cam = (Messages.Circuit.CompleteAgentMovement)m;
             AgentCircuit circuit;
-            if ((this.TeleportFlags & TeleportFlags.ViaLogin) != 0 && (this.TeleportFlags & TeleportFlags.ViaHGLogin) == 0)
+            if ((this.TeleportFlags & TeleportFlags.ViaLogin) != 0 && 
+                (this.TeleportFlags & TeleportFlags.ViaHGLogin) == 0 &&
+                Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
             {
-                if (Circuits.TryGetValue(cam.ReceivedOnCircuitCode, out circuit))
+                /* switch agent region */
+                if (m_IsActiveGod && !circuit.Scene.IsPossibleGod(new UUI(ID, FirstName, LastName, HomeURI)))
                 {
-                    /* switch agent region */
-                    if (m_IsActiveGod && !circuit.Scene.IsPossibleGod(new UUI(ID, FirstName, LastName, HomeURI)))
-                    {
-                        /* revoke god powers when changing region and new region has a different owner */
-                        Messages.God.GrantGodlikePowers gm = new Messages.God.GrantGodlikePowers();
-                        gm.AgentID = ID;
-                        gm.SessionID = circuit.SessionID;
-                        gm.GodLevel = 0;
-                        gm.Token = UUID.Zero;
-                        SendMessageIfRootAgent(gm, SceneID);
-                        m_IsActiveGod = false;
-                    }
-                    SceneID = circuit.Scene.ID;
+                    /* revoke god powers when changing region and new region has a different owner */
+                    Messages.God.GrantGodlikePowers gm = new Messages.God.GrantGodlikePowers();
+                    gm.AgentID = ID;
+                    gm.SessionID = circuit.SessionID;
+                    gm.GodLevel = 0;
+                    gm.Token = UUID.Zero;
+                    SendMessageIfRootAgent(gm, SceneID);
+                    m_IsActiveGod = false;
+                }
+                SceneID = circuit.Scene.ID;
 
-                    Messages.Circuit.AgentMovementComplete amc = new Messages.Circuit.AgentMovementComplete();
-                    amc.AgentID = cam.AgentID;
-                    amc.ChannelVersion = VersionInfo.SimulatorVersion;
+                Messages.Circuit.AgentMovementComplete amc = new Messages.Circuit.AgentMovementComplete();
+                amc.AgentID = cam.AgentID;
+                amc.ChannelVersion = VersionInfo.SimulatorVersion;
 #warning TODO: extract from agent
-                    amc.LookAt = new Vector3(1, 1, 0);
-                    amc.Position = GlobalPosition;
-                    amc.SessionID = cam.SessionID;
-                    amc.GridPosition = circuit.Scene.GridPosition;
+                amc.LookAt = new Vector3(1, 1, 0);
+                amc.Position = GlobalPosition;
+                amc.SessionID = cam.SessionID;
+                amc.GridPosition = circuit.Scene.GridPosition;
 
-                    circuit.SendMessage(amc);
+                circuit.SendMessage(amc);
 
-                    Messages.Agent.CoarseLocationUpdate clu = new Messages.Agent.CoarseLocationUpdate();
-                    clu.You = 0;
-                    clu.Prey = -1;
-                    Messages.Agent.CoarseLocationUpdate.AgentDataEntry ad = new Messages.Agent.CoarseLocationUpdate.AgentDataEntry();
-                    ad.X = (byte)(uint)GlobalPosition.X;
-                    ad.Y = (byte)(uint)GlobalPosition.Y;
-                    ad.Z = (byte)(uint)GlobalPosition.Z;
-                    ad.AgentID = ID;
-                    clu.AgentData.Add(ad);
-                    circuit.SendMessage(clu);
+                Messages.Agent.CoarseLocationUpdate clu = new Messages.Agent.CoarseLocationUpdate();
+                clu.You = 0;
+                clu.Prey = -1;
+                Messages.Agent.CoarseLocationUpdate.AgentDataEntry ad = new Messages.Agent.CoarseLocationUpdate.AgentDataEntry();
+                ad.X = (byte)(uint)GlobalPosition.X;
+                ad.Y = (byte)(uint)GlobalPosition.Y;
+                ad.Z = (byte)(uint)GlobalPosition.Z;
+                ad.AgentID = ID;
+                clu.AgentData.Add(ad);
+                circuit.SendMessage(clu);
 
-                    SceneInterface scene = circuit.Scene;
-                    if (scene != null)
+                SceneInterface scene = circuit.Scene;
+                if (scene != null)
+                {
+                    scene.Environment.UpdateWindlightProfileToClient(this);
+
+                    foreach (ITriggerOnRootAgentActions action in circuit.m_TriggerOnRootAgentActions)
                     {
-                        scene.Environment.UpdateWindlightProfileToClient(this);
-
-                        foreach (ITriggerOnRootAgentActions action in circuit.m_TriggerOnRootAgentActions)
-                        {
-                            action.TriggerOnRootAgent(ID, scene);
-                        }
+                        action.TriggerOnRootAgent(ID, scene);
                     }
                 }
             }
@@ -1313,12 +1312,10 @@ namespace SilverSim.Viewer.Core
             im.Position = Vector3.Zero;
             im.Message = message;
             AgentCircuit circuit;
-            if (Circuits.TryGetValue(fromSceneID, out circuit))
+            if (Circuits.TryGetValue(fromSceneID, out circuit) &&
+                IsInScene(circuit.Scene))
             {
-                if (IsInScene(circuit.Scene))
-                {
-                    IMSend(im);
-                }
+                IMSend(im);
             }
         }
 

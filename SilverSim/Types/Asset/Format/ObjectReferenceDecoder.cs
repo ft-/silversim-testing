@@ -47,12 +47,10 @@ namespace SilverSim.Types.Asset.Format
                             {
                                 throw new InvalidDataException("Invalid UUID in object asset");
                             }
-                            if(id != UUID.Zero)
+                            if(id != UUID.Zero &&
+                                !reflist.Contains(id))
                             {
-                                if(!reflist.Contains(id))
-                                {
-                                    reflist.Add(id);
-                                }
+                                reflist.Add(id);
                             }
                         }
                         else if(nodeName == "TextureEntry")

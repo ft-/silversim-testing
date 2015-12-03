@@ -294,21 +294,17 @@ namespace SilverSim.Types.Asset.Format
                                 {
                                     step.Name = e.Current;
                                 }
-                                if (e.MoveNext())
+                                if (e.MoveNext() && 
+                                    !UUID.TryParse(e.Current, out step.AssetID))
                                 {
-                                    if(!UUID.TryParse(e.Current, out step.AssetID))
-                                    {
-                                        throw new NotAGestureFormatException();
-                                    }
+                                    throw new NotAGestureFormatException();
                                 }
-                                if (e.MoveNext())
+                                if (e.MoveNext() && 
+                                    !int.TryParse(e.Current, out intval))
                                 {
-                                    if (!int.TryParse(e.Current, out intval))
-                                    {
-                                        throw new NotAGestureFormatException();
-                                    }
-                                    step.AnimationStart = intval != 0;
+                                    throw new NotAGestureFormatException();
                                 }
+                                step.AnimationStart = intval != 0;
                                 Sequence.Add(step);
                             }
                             break;
@@ -320,12 +316,10 @@ namespace SilverSim.Types.Asset.Format
                                 {
                                     step.Name = e.Current;
                                 }
-                                if (e.MoveNext())
+                                if (e.MoveNext() &&
+                                    !UUID.TryParse(e.Current, out step.AssetID))
                                 {
-                                    if (!UUID.TryParse(e.Current, out step.AssetID))
-                                    {
-                                        throw new NotAGestureFormatException();
-                                    }
+                                    throw new NotAGestureFormatException();
                                 }
                                 Sequence.Add(step);
                             }
@@ -346,12 +340,10 @@ namespace SilverSim.Types.Asset.Format
                         case StepType.Wait:
                             {
                                 StepWait step = new StepWait();
-                                if (e.MoveNext())
+                                if (e.MoveNext() &&
+                                    !float.TryParse(e.Current, NumberStyles.Float, CultureInfo.InvariantCulture, out step.WaitTime))
                                 {
-                                    if (!float.TryParse(e.Current, NumberStyles.Float, CultureInfo.InvariantCulture, out step.WaitTime))
-                                    {
-                                        throw new NotAGestureFormatException();
-                                    }
+                                    throw new NotAGestureFormatException();
                                 }
                                 if (e.MoveNext())
                                 {
