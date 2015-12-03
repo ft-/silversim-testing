@@ -204,7 +204,7 @@ namespace SilverSim.Scene.Types.Scene
             SunData m_SunData = new SunData();
             WindData m_WindData = new WindData();
             readonly SceneInterface m_Scene;
-            bool m_SunFixed = false;
+            bool m_SunFixed;
             System.Timers.Timer m_Timer = new System.Timers.Timer(60000);
 
             public Vector3 SunDirection
