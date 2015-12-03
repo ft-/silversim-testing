@@ -295,7 +295,7 @@ namespace SilverSim.Scene.Types.Scene
                 double yearly_phase = YearlyOmega * utctime;
                 double tilt = AverageSunTilt + SeasonalSunTilt * Math.Sin(yearly_phase);
 
-                Vector3 sunDirection = new Vector3(Math.Cos(-daily_phase), Math.Sin(-daily_phase), 0);
+                Vector3 sunDirection = new Vector3(Math.Cos(-sun_phase), Math.Sin(-sun_phase), 0);
                 Quaternion tiltRot = new Quaternion(tilt, 1, 0, 0);
 
                 sunDirection *= tiltRot;
