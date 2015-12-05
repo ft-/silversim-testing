@@ -74,10 +74,15 @@ namespace SilverSim.ServiceInterfaces.GridUser
         {
             get;
         }
+
+        public abstract bool TryGetValue(UUID userID, out GridUserInfo userInfo);
+
         public abstract GridUserInfo this[UUI userID]
         {
             get;
         }
+
+        public abstract bool TryGetValue(UUI userID, out GridUserInfo userInfo);
 
         public abstract void LoggedInAdd(UUI userID); /* LoggedInAdd is only supported by DB services */
         public abstract void LoggedIn(UUI userID);

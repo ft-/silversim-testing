@@ -10,5 +10,6 @@ namespace SilverSim.ServiceInterfaces.Estate
     {
         List<UUID> this[uint estateID] { get; }
         uint this[UUID regionID] { get; set; }
+        bool TryGetValue(UUID regionID, out uint estateID);
     }
 }

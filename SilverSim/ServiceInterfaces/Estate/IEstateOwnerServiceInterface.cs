@@ -8,5 +8,6 @@ namespace SilverSim.ServiceInterfaces.Estate
     public interface IEstateOwnerServiceInterface
     {
         UUI this[uint estateID] { get; set; }
+        bool TryGetValue(uint estateID, out UUI uui);
     }
 }

@@ -23,20 +23,17 @@ namespace SilverSim.Scene.Types.Scene
                 m_ServiceList = serviceList;
             }
 
-            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-            public override UUI this[string firstName, string lastName]
+            public override bool TryGetValue(string firstName, string lastName, out UUI uui)
             {
-                get 
+                uui = null;
+                bool notFoundFirst = false;
+                foreach (AvatarNameServiceInterface service in m_ServiceList)
                 {
-                    UUI nd = null;
-                    bool notFoundFirst = false;
-                    foreach (AvatarNameServiceInterface service in m_ServiceList)
+                    try
                     {
-                        try
+                        if (service.TryGetValue(firstName, lastName, out uui))
                         {
-                            nd = service[firstName, lastName];
-                            if (!nd.IsAuthoritative)
+                            if (!uui.IsAuthoritative)
                             {
                                 notFoundFirst = true;
                             }
@@ -45,30 +42,49 @@ namespace SilverSim.Scene.Types.Scene
                                 break;
                             }
                         }
-                        catch
+                        else
                         {
                             notFoundFirst = true;
                         }
                     }
-                    if (null == nd)
+                    catch
+                    {
+                        notFoundFirst = true;
+                    }
+                }
+                if (null == uui)
+                {
+                    return false;
+                }
+                if (notFoundFirst && uui.IsAuthoritative)
+                {
+                    foreach (AvatarNameServiceInterface service in m_ServiceList)
+                    {
+                        try
+                        {
+                            service[uui.ID] = uui;
+                        }
+                        catch
+                        {
+                            /* ignore errors here */
+                        }
+                    }
+                }
+                return true;
+            }
+
+            [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+            public override UUI this[string firstName, string lastName]
+            {
+                get 
+                {
+                    UUI uui;
+                    if(!TryGetValue(firstName, lastName, out uui))
                     {
                         throw new KeyNotFoundException();
                     }
-                    if (notFoundFirst && nd.IsAuthoritative)
-                    {
-                        foreach (AvatarNameServiceInterface service in m_ServiceList)
-                        {
-                            try
-                            {
-                                service[nd.ID] = nd;
-                            }
-                            catch
-                            {
-                                /* ignore errors here */
-                            }
-                        }
-                    }
-                    return nd;
+                    return uui;
                 }
             }
 
@@ -96,19 +112,18 @@ namespace SilverSim.Scene.Types.Scene
                 return new List<UUI>(results.Values);
             }
 
-            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-            public override UUI this[UUID key]
+            public override bool TryGetValue(UUID key, out UUI uui)
             {
-                get
+                uui = null;
+                bool notFoundFirst = false;
+                foreach (AvatarNameServiceInterface service in m_ServiceList)
                 {
-                    UUI nd = null;
-                    bool notFoundFirst = false;
-                    foreach(AvatarNameServiceInterface service in m_ServiceList)
+                    try
                     {
-                        try
+                        if (service.TryGetValue(key, out uui))
                         {
-                            nd = service[key];
-                            if(!nd.IsAuthoritative)
+                            uui = service[key];
+                            if (!uui.IsAuthoritative)
                             {
                                 notFoundFirst = true;
                             }
@@ -117,30 +132,48 @@ namespace SilverSim.Scene.Types.Scene
                                 break;
                             }
                         }
-                        catch
+                        else
                         {
                             notFoundFirst = true;
                         }
                     }
-                    if(null == nd)
+                    catch
+                    {
+                        notFoundFirst = true;
+                    }
+                }
+                if (null == uui)
+                {
+                    return false;
+                }
+                if (notFoundFirst && uui.IsAuthoritative)
+                {
+                    foreach (AvatarNameServiceInterface service in m_ServiceList)
+                    {
+                        try
+                        {
+                            service[key] = uui;
+                        }
+                        catch
+                        {
+                            /* ignore errors here */
+                        }
+                    }
+                }
+                return true;
+            }
+
+            [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+            public override UUI this[UUID key]
+            {
+                get
+                {
+                    UUI uui = null;
+                    if(!TryGetValue(key, out uui))
                     {
                         throw new KeyNotFoundException();
                     }
-                    if(notFoundFirst && nd.IsAuthoritative)
-                    {
-                        foreach(AvatarNameServiceInterface service in m_ServiceList)
-                        {
-                            try
-                            {
-                                service[key] = nd;
-                            }
-                            catch
-                            {
-                                /* ignore errors here */
-                            }
-                        }
-                    }
-                    return nd;
+                    return uui;
                 }
                 set
                 {

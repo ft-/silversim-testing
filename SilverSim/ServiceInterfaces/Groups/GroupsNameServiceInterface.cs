@@ -22,6 +22,8 @@ namespace SilverSim.ServiceInterfaces.Groups
             get;
         }
 
+        public abstract bool TryGetValue(UUID groupID, out UGI ugi);
+
         public abstract List<UGI> GetGroupsByName(string groupName, int limit);
 
         public abstract void Store(UGI group);

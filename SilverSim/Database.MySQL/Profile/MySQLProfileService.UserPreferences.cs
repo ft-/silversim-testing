@@ -19,6 +19,37 @@ namespace SilverSim.Database.MySQL.Profile
                 m_ConnectionString = connectionString;
             }
 
+            public bool TryGetValue(UUI user, out ProfilePreferences prefs)
+            {
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM usersettings where useruuid LIKE ?uuid", conn))
+                    {
+                        cmd.Parameters.AddWithValue("?uuid", user.ID.ToString());
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                prefs = new ProfilePreferences();
+                                prefs.User = user;
+                                prefs.IMviaEmail = reader.GetBoolean("imviaemail");
+                                prefs.Visible = reader.GetBoolean("visible");
+                                return true;
+                            }
+                            else
+                            {
+                                prefs = new ProfilePreferences();
+                                prefs.User = user;
+                                prefs.IMviaEmail = false;
+                                prefs.Visible = false;
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
             public ProfilePreferences this[UUI user]
             {
                 get

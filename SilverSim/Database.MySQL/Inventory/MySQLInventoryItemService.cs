@@ -7,6 +7,7 @@ using SilverSim.Types;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System;
 
 namespace SilverSim.Database.MySQL.Inventory
 {
@@ -19,27 +20,107 @@ namespace SilverSim.Database.MySQL.Inventory
             m_ConnectionString = connectionString;
         }
 
+        public override bool ContainsKey(UUID key)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM inventoryitems WHERE ID LIKE ?itemid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?itemid", key.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public override bool TryGetValue(UUID key, out InventoryItem item)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE ID LIKE ?itemid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?itemid", key.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            item = dbReader.ToItem();
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            item = default(InventoryItem);
+            return false;
+        }
+
         public override InventoryItem this[UUID key]
         {
             get
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                InventoryItem item;
+                if(!TryGetValue(key, out item))
                 {
-                    connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE ID LIKE ?itemid", connection))
+                    throw new KeyNotFoundException();
+                }
+                return item;
+            }
+        }
+
+        public override bool ContainsKey(UUID principalID, UUID key)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
+                    cmd.Parameters.AddWithValue("?itemid", key.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("?itemid", key.ToString());
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        if (dbReader.Read())
                         {
-                            if (dbReader.Read())
-                            {
-                                return dbReader.ToItem();
-                            }
+                            return true;
                         }
                     }
                 }
-                throw new KeyNotFoundException();
             }
+
+            return false;
+        }
+
+        public override bool TryGetValue(UUID principalID, UUID key, out InventoryItem item)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
+                    cmd.Parameters.AddWithValue("?itemid", key.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            item = dbReader.ToItem();
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            item = default(InventoryItem);
+            return false;
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
@@ -47,23 +128,12 @@ namespace SilverSim.Database.MySQL.Inventory
         {
             get 
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                InventoryItem item;
+                if(!TryGetValue(principalID, key, out item))
                 {
-                    connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryitems WHERE OwnerID LIKE ?ownerid AND ID LIKE ?itemid", connection))
-                    {
-                        cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
-                        cmd.Parameters.AddWithValue("?itemid", key.ToString());
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                        {
-                            if (dbReader.Read())
-                            {
-                                return dbReader.ToItem();
-                            }
-                        }
-                    }
+                    throw new KeyNotFoundException();
                 }
-                throw new KeyNotFoundException();
+                return item;
             }
         }
 

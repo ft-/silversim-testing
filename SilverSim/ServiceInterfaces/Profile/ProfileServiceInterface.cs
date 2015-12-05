@@ -16,6 +16,8 @@ namespace SilverSim.ServiceInterfaces.Profile
             Dictionary<UUID, string> GetClassifieds(UUI user);
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             ProfileClassified this[UUI user, UUID id] { get; }
+            bool TryGetValue(UUI user, UUID id, out ProfileClassified classified);
+            bool ContainsKey(UUI user, UUID id);
             void Update(ProfileClassified classified);
             void Delete(UUID id);
         }
@@ -25,6 +27,8 @@ namespace SilverSim.ServiceInterfaces.Profile
             Dictionary<UUID, string> GetPicks(UUI user);
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             ProfilePick this[UUI user, UUID id] { get; }
+            bool TryGetValue(UUI user, UUID id, out ProfilePick pick);
+            bool ContainsKey(UUI user, UUID id);
             void Update(ProfilePick pick);
             void Delete(UUID id);
         }
@@ -33,11 +37,14 @@ namespace SilverSim.ServiceInterfaces.Profile
         {
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             string this[UUI user, UUI target] { get; set; }
+            bool TryGetValue(UUI user, UUI target, out string notes);
+            bool ContainsKey(UUI user, UUI target);
         }
 
         public interface IUserPreferencesInterface
         {
             ProfilePreferences this[UUI user] { get; set; }
+            bool TryGetValue(UUI user, out ProfilePreferences profilePrefs);
         }
 
         [Flags]

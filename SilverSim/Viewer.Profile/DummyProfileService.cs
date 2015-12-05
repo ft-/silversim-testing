@@ -41,6 +41,17 @@ namespace SilverSim.Viewer.Profile
                 throw new NotSupportedException();
             }
 
+            public bool TryGetValue(UUI user, UUID id, out ProfileClassified classified)
+            {
+                classified = default(ProfileClassified);
+                return false;
+            }
+
+            public bool ContainsKey(UUI user, UUID id)
+            {
+                return false;
+            }
+
             public void Delete(UUID id)
             {
                 throw new NotSupportedException();
@@ -63,6 +74,17 @@ namespace SilverSim.Viewer.Profile
             public ProfilePick this[UUI user, UUID id]
             {
                 get { throw new KeyNotFoundException(); }
+            }
+
+            public bool TryGetValue(UUI user, UUID id, out ProfilePick pick)
+            {
+                pick = default(ProfilePick);
+                return false;
+            }
+
+            public bool ContainsKey(UUI user, UUID id)
+            {
+                return false;
             }
 
             public void Update(ProfilePick pick)
@@ -95,6 +117,17 @@ namespace SilverSim.Viewer.Profile
                     throw new NotSupportedException();
                 }
             }
+
+            public bool TryGetValue(UUI user, UUI target, out string notes)
+            {
+                notes = string.Empty;
+                return false;
+            }
+
+            public bool ContainsKey(UUI user, UUI target)
+            {
+                return false;
+            }
         }
 
         public sealed class DummyUserPrefs : IUserPreferencesInterface
@@ -118,6 +151,17 @@ namespace SilverSim.Viewer.Profile
                 {
                     throw new NotSupportedException();
                 }
+            }
+
+            public bool TryGetValue(UUI user, out ProfilePreferences prefs)
+            {
+                prefs = default(ProfilePreferences);
+                return false;
+            }
+
+            public bool ContainsKey(UUI user)
+            {
+                return false;
             }
         }
 

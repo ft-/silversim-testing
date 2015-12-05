@@ -126,51 +126,62 @@ namespace SilverSim.Database.MySQL.Asset
         #endregion
 
         #region Accessors
+        public override bool TryGetValue(UUID key, out AssetData asset)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assets WHERE id LIKE ?id", conn))
+                {
+                    cmd.Parameters.AddWithValue("?id", key.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            asset = new AssetData();
+                            asset.ID = dbReader.GetUUID("id");
+                            asset.Data = dbReader.GetBytes("data");
+                            asset.Type = (AssetType)(int)dbReader["assetType"];
+                            asset.Name = (string)dbReader["name"];
+                            asset.CreateTime = dbReader.GetDate("create_time");
+                            asset.AccessTime = dbReader.GetDate("access_time");
+                            asset.Creator.ID = dbReader.GetUUID("CreatorID");
+                            asset.Flags = dbReader.GetAssetFlags("asset_flags");
+                            asset.Temporary = dbReader.GetBoolean("temporary");
+
+                            if (asset.CreateTime - DateTime.UtcNow > TimeSpan.FromHours(1))
+                            {
+                                /* update access_time */
+                                using (MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
+                                {
+                                    uconn.Open();
+                                    using (MySqlCommand ucmd = new MySqlCommand("UPDATE assets SET access_time = ?access WHERE id LIKE ?id", uconn))
+                                    {
+                                        ucmd.Parameters.AddWithValue("?access", Date.GetUnixTime());
+                                        ucmd.Parameters.AddWithValue("?id", key);
+                                        ucmd.ExecuteNonQuery();
+                                    }
+                                }
+                            }
+                            return true;
+                        }
+                    }
+                }
+            }
+            asset = null;
+            return false;
+        }
+
         public override AssetData this[UUID key]
         {
             get
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                AssetData asset;
+                if(!TryGetValue(key, out asset))
                 {
-                    conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assets WHERE id LIKE ?id", conn))
-                    {
-                        cmd.Parameters.AddWithValue("?id", key.ToString());
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                        {
-                            if (dbReader.Read())
-                            {
-                                AssetData asset = new AssetData();
-                                asset.ID = dbReader.GetUUID("id");
-                                asset.Data = dbReader.GetBytes("data");
-                                asset.Type = (AssetType)(int)dbReader["assetType"];
-                                asset.Name = (string)dbReader["name"];
-                                asset.CreateTime = dbReader.GetDate("create_time");
-                                asset.AccessTime = dbReader.GetDate("access_time");
-                                asset.Creator.ID = dbReader.GetUUID("CreatorID");
-                                asset.Flags = dbReader.GetAssetFlags("asset_flags");
-                                asset.Temporary = dbReader.GetBoolean("temporary");
-
-                                if (asset.CreateTime - DateTime.UtcNow > TimeSpan.FromHours(1))
-                                {
-                                    /* update access_time */
-                                    using (MySqlConnection uconn = new MySqlConnection(m_ConnectionString))
-                                    {
-                                        uconn.Open();
-                                        using (MySqlCommand ucmd = new MySqlCommand("UPDATE assets SET access_time = ?access WHERE id LIKE ?id", uconn))
-                                        {
-                                            ucmd.Parameters.AddWithValue("?access", Date.GetUnixTime());
-                                            ucmd.Parameters.AddWithValue("?id", key);
-                                            ucmd.ExecuteNonQuery();
-                                        }
-                                    }
-                                }
-                                return asset;
-                            }
-                        }
-                    }
+                    throw new AssetNotFoundException(key);
                 }
-                throw new AssetNotFoundException(key);
+                return asset;
             }
         }
 

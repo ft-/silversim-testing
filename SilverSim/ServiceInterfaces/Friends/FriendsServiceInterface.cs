@@ -55,6 +55,9 @@ namespace SilverSim.ServiceInterfaces.Friends
             get;
         }
 
+        public abstract bool TryGetValue(UUI user, UUI friend, out FriendInfo fInfo);
+        public abstract bool TryGetValue(UUI user, out List<FriendInfo> fInfoList);
+
         public abstract void Store(FriendInfo fi);
 
         public abstract void Delete(FriendInfo fi);

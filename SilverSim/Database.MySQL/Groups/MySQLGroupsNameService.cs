@@ -35,23 +35,35 @@ namespace SilverSim.Database.MySQL.Groups
         {
             get
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                UGI ugi;
+                if(!TryGetValue(groupID, out ugi))
                 {
-                    connection.Open();
+                    throw new KeyNotFoundException();
+                }
+                return ugi;
+            }
+        }
 
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupID LIKE '" + groupID.ToString() + "'", connection))
+        public override bool TryGetValue(UUID groupID, out UGI ugi)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM groupnames WHERE GroupID LIKE '" + groupID.ToString() + "'", connection))
+                {
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        if (dbReader.Read())
                         {
-                            if (dbReader.Read())
-                            {
-                                return new UGI(new UUID((string)dbReader["GroupID"]), (string)dbReader["GroupName"], new Uri((string)dbReader["HomeURI"]));
-                            }
+                            ugi = new UGI(new UUID((string)dbReader["GroupID"]), (string)dbReader["GroupName"], new Uri((string)dbReader["HomeURI"]));
+                            return true;
                         }
                     }
                 }
-                throw new KeyNotFoundException();
             }
+            ugi = default(UGI);
+            return false;
         }
 
         public override List<UGI> GetGroupsByName(string groupName, int limit)

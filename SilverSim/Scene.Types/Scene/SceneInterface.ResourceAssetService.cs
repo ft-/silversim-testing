@@ -10,6 +10,7 @@ using System.IO;
 using System.IO.Compression;
 using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using System;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -21,6 +22,12 @@ namespace SilverSim.Scene.Types.Scene
             internal ResourceAssetAccessor()
             {
                 m_Resources = new List<string>(GetType().Assembly.GetManifestResourceNames());
+            }
+
+            public bool ContainsAsset(UUID key)
+            {
+                string resourcename = "SilverSim.Scene.Types.Resources.Assets." + key.ToString() + ".gz";
+                return m_Resources.Contains(resourcename);
             }
 
             public AssetData GetAsset(UUID key)
@@ -76,6 +83,17 @@ namespace SilverSim.Scene.Types.Scene
                     return md;
                 }
             }
+
+            public override bool TryGetValue(UUID key, out AssetMetadata metadata)
+            {
+                if (!m_ResourceAssets.ContainsAsset(key))
+                {
+                    metadata = null;
+                    return false;
+                }
+                metadata = this[key];
+                return true;
+            }
         }
 
         public class ResourceAssetDataService : AssetDataServiceInterface
@@ -95,6 +113,17 @@ namespace SilverSim.Scene.Types.Scene
                     AssetData ad = m_ResourceAssets.GetAsset(key);
                     return new MemoryStream(ad.Data);
                 }
+            }
+
+            public override bool TryGetValue(UUID key, out Stream s)
+            {
+                if(!m_ResourceAssets.ContainsAsset(key))
+                {
+                    s = null;
+                    return false;
+                }
+                s = this[key];
+                return true;
             }
         }
 
@@ -143,6 +172,17 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     return m_ResourceAssets.GetAsset(key);
                 }
+            }
+
+            public override bool TryGetValue(UUID key, out AssetData assetData)
+            {
+                if(!m_ResourceAssets.ContainsAsset(key))
+                {
+                    assetData = null;
+                    return false;
+                }
+                assetData = this[key];
+                return true;
             }
 
             public override void Delete(UUID id)

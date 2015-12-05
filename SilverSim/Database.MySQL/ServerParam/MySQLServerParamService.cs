@@ -94,15 +94,59 @@ namespace SilverSim.Database.MySQL.ServerParam
         {
             get
             {
-                try
+                string value;
+                if(TryGetValue(regionID, parameter, out value))
                 {
-                    return this[regionID, parameter];
+                    return value;
                 }
-                catch(KeyNotFoundException)
-                { 
+                else
+                {
                     return defvalue;
                 }
             }
+        }
+
+        public override bool TryGetValue(UUID regionID, string parameter, out string value)
+        {
+            RwLockedDictionary<string, string> regParams;
+            if (m_Cache.TryGetValue(regionID, out regParams))
+            {
+                if (regParams.TryGetValue(parameter, out value))
+                {
+                    return true;
+                }
+            }
+
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
+                {
+                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.Parameters.AddWithValue("?parametername", parameter);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            m_Cache[regionID][parameter] = (string)dbReader["parametervalue"];
+                            value = (string)dbReader["parametervalue"];
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            if (UUID.Zero != regionID)
+            {
+                if(TryGetValue(UUID.Zero, parameter, out value))
+                {
+                    return true;
+                }
+            }
+
+            value = string.Empty;
+            return false;
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
@@ -110,48 +154,12 @@ namespace SilverSim.Database.MySQL.ServerParam
         {
             get
             {
-                RwLockedDictionary<string, string> regParams;
-                if(m_Cache.TryGetValue(regionID, out regParams))
+                string value;
+                if(!TryGetValue(regionID, parameter, out value))
                 {
-                    string val;
-                    if(regParams.TryGetValue(parameter, out val))
-                    {
-                        return val;
-                    }
+                    throw new KeyNotFoundException("Key " + regionID.ToString() + ":" + parameter);
                 }
-
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-                {
-                    connection.Open();
-
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM serverparams WHERE regionid LIKE ?regionid AND parametername LIKE ?parametername", connection))
-                    {
-                        cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
-                        cmd.Parameters.AddWithValue("?parametername", parameter);
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                        {
-                            if(dbReader.Read())
-                            {
-                                m_Cache[regionID][parameter] = (string)dbReader["parametervalue"];
-                                return (string)dbReader["parametervalue"];
-                            }
-                        }
-                    }
-                }
-
-                if(UUID.Zero != regionID)
-                {
-                    try
-                    {
-                        return this[UUID.Zero, parameter];
-                    }
-                    catch(KeyNotFoundException)
-                    {
-
-                    }
-                }
-
-                throw new KeyNotFoundException("Key " + regionID.ToString() + ":" + parameter);
+                return value;
             }
 
             set

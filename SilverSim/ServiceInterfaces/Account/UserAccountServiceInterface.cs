@@ -64,6 +64,14 @@ namespace SilverSim.ServiceInterfaces.Account
             get;
         }
 
+        public abstract bool ContainsKey(UUID scopeID, UUID accountID);
+        public abstract bool ContainsKey(UUID scopeID, string email);
+        public abstract bool ContainsKey(UUID scopeID, string firstName, string lastName);
+
+        public abstract bool TryGetValue(UUID scopeID, UUID accountID, out UserAccount account);
+        public abstract bool TryGetValue(UUID scopeID, string email, out UserAccount account);
+        public abstract bool TryGetValue(UUID scopeID, string firstName, string lastName, out UserAccount account);
+
         public abstract List<UserAccount> GetAccounts(UUID scopeID, string query);
 
         #region Optionally supported services

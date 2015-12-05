@@ -155,29 +155,41 @@ namespace SilverSim.Database.MySQL.Avatar
             }
         }
 
+        public override bool TryGetValue(UUID avatarID, string itemKey, out string value)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID LIKE ?principalid AND `Name` LIKE ?name", connection))
+                {
+                    cmd.Parameters.AddWithValue("?principalid", avatarID.ToString());
+                    cmd.Parameters.AddWithValue("?name", itemKey);
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            value = (string)dbReader["Value"];
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            value = string.Empty;
+            return false;
+        }
+
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override string this[UUID avatarID, string itemKey]
         {
             get
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                string s;
+                if (!TryGetValue(avatarID, itemKey, out s))
                 {
-                    connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT `Value` FROM avatars WHERE PrincipalID LIKE ?principalid AND `Name` LIKE ?name", connection))
-                    {
-                        cmd.Parameters.AddWithValue("?principalid", avatarID.ToString());
-                        cmd.Parameters.AddWithValue("?name", itemKey);
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                        {
-                            if (dbReader.Read())
-                            {
-                                return (string)dbReader["Value"];
-                            }
-                        }
-                    }
+                    throw new KeyNotFoundException(string.Format("{0},{1} not found", avatarID, itemKey));
                 }
-
-                throw new KeyNotFoundException(string.Format("{0},{1} not found", avatarID, itemKey));
+                return s;
             }
             set
             {

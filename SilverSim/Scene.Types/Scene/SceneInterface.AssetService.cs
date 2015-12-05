@@ -7,6 +7,7 @@ using SilverSim.Types.Asset;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -45,6 +46,25 @@ namespace SilverSim.Scene.Types.Scene
                     }
                 }
             }
+
+            public override bool TryGetValue(UUID key, out AssetMetadata metadata)
+            {
+                if(m_Scene.TemporaryAssetService.Metadata.TryGetValue(key, out metadata))
+                {
+                    return true;
+                }
+
+                if(m_Scene.PersistentAssetService.Metadata.TryGetValue(key, out metadata))
+                {
+                    return true;
+                }
+                
+                if(ResourceAssets.Metadata.TryGetValue(key, out metadata))
+                {
+                    return true;
+                }
+                return false;
+            }
         }
 
         public class DefaultAssetDataService : AssetDataServiceInterface
@@ -62,34 +82,35 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    try
+                    Stream s;
+                    if(!TryGetValue(key, out s))
                     {
-                        return m_Scene.TemporaryAssetService.Data[key];
+                        throw new AssetNotFoundException(key);
                     }
-                    catch
-                    {
-                        try
-                        {
-                            return m_Scene.PersistentAssetService.Data[key];
-                        }
-                        catch
-                        {
-                            AssetData ad = ResourceAssets[key];
-                            try
-                            {
-                                /* store these permanently */
-                                ad.Local = false;
-                                ad.Temporary = false;
-                                m_Scene.PersistentAssetService.Store(ad);
-                            }
-                            catch
-                            {
-
-                            }
-                            return new MemoryStream(ad.Data);
-                        }
-                    }
+                    return s;
                 }
+            }
+
+            public override bool TryGetValue(UUID key, out Stream s)
+            {
+                if(m_Scene.TemporaryAssetService.Data.TryGetValue(key, out s))
+                {
+                    return true;
+                }
+                if (m_Scene.PersistentAssetService.Data.TryGetValue(key, out s))
+                {
+                    return true;
+                }
+                AssetData ad;
+                if(ResourceAssets.TryGetValue(key, out ad))
+                {
+                    ad.Local = false;
+                    ad.Temporary = false;
+                    m_Scene.PersistentAssetService.Store(ad);
+                    s = new MemoryStream(ad.Data);
+                    return true;
+                }
+                return false;
             }
         }
 
@@ -170,34 +191,37 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    try
+                    AssetData ad;
+                    if(!TryGetValue(key, out ad))
                     {
-                        return m_Scene.TemporaryAssetService[key];
+                        throw new AssetNotFoundException(key);
                     }
-                    catch
-                    {
-                        try
-                        {
-                            return m_Scene.PersistentAssetService[key];
-                        }
-                        catch
-                        {
-                            AssetData ad = ResourceAssets[key];
-                            try
-                            {
-                                /* store these permanently */
-                                ad.Local = false;
-                                ad.Temporary = false;
-                                m_Scene.PersistentAssetService.Store(ad);
-                            }
-                            catch
-                            {
-
-                            }
-                            return ad;
-                        }
-                    }
+                    return ad;
                 }
+            }
+
+            public override bool TryGetValue(UUID key, out AssetData assetData)
+            {
+                if(m_Scene.TemporaryAssetService.TryGetValue(key, out assetData))
+                {
+                    return true;
+                }
+
+                if(m_Scene.PersistentAssetService.TryGetValue(key, out assetData))
+                {
+                    return true;
+                }
+
+                AssetData ad;
+                if(ResourceAssets.TryGetValue(key, out ad))
+                {
+                    ad.Local = false;
+                    ad.Temporary = false;
+                    m_Scene.PersistentAssetService.Store(ad);
+                    return true;
+                }
+
+                return false;
             }
 
             [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]

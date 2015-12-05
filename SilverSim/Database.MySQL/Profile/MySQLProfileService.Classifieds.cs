@@ -43,42 +43,73 @@ namespace SilverSim.Database.MySQL.Profile
             }
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+            public bool TryGetValue(UUI user, UUID id, out ProfileClassified classified)
+            {
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM classifieds WHERE classifieduuid LIKE ?uuid", conn))
+                    {
+                        cmd.Parameters.AddWithValue("?uuid", id.ToString());
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                classified = new ProfileClassified();
+                                classified.ClassifiedID = reader.GetUUID("classifieduuid");
+                                classified.Category = reader.GetInt32("category");
+                                classified.CreationDate = reader.GetDate("creationdate");
+                                classified.Creator.ID = reader.GetUUID("creatoruuid");
+                                classified.Description = reader.GetString("description");
+                                classified.ExpirationDate = reader.GetDate("expirationdate");
+                                classified.Flags = reader.GetByte("classifiedflags");
+                                classified.GlobalPos = reader.GetVector("posglobal");
+                                classified.Name = reader.GetString("name");
+                                classified.ParcelID = reader.GetUUID("parceluuid");
+                                classified.ParcelName = reader.GetString("parcelname");
+                                classified.ParentEstate = reader.GetInt32("parentestate");
+                                classified.Price = reader.GetInt32("priceforlisting");
+                                classified.SimName = reader.GetString("simname");
+                                classified.SnapshotID = reader.GetUUID("snapshotuuid");
+                                return true;
+                            }
+                        }
+                    }
+                }
+                classified = default(ProfileClassified);
+                return false;
+            }
+
+            public bool ContainsKey(UUI user, UUID id)
+            {
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT classifieduuid FROM classifieds WHERE classifieduuid LIKE ?uuid", conn))
+                    {
+                        cmd.Parameters.AddWithValue("?uuid", id.ToString());
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
+            }
+
             public ProfileClassified this[UUI user, UUID id]
             {
                 get 
                 {
-                    using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                    ProfileClassified classified;
+                    if (!TryGetValue(user, id, out classified))
                     {
-                        conn.Open();
-                        using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM classifieds WHERE classifieduuid LIKE ?uuid", conn))
-                        {
-                            cmd.Parameters.AddWithValue("?uuid", id.ToString());
-                            using (MySqlDataReader reader = cmd.ExecuteReader())
-                            {
-                                if (reader.Read())
-                                {
-                                    ProfileClassified classified = new ProfileClassified();
-                                    classified.ClassifiedID = reader.GetUUID("classifieduuid");
-                                    classified.Category = reader.GetInt32("category");
-                                    classified.CreationDate = reader.GetDate("creationdate");
-                                    classified.Creator.ID = reader.GetUUID("creatoruuid");
-                                    classified.Description = reader.GetString("description");
-                                    classified.ExpirationDate = reader.GetDate("expirationdate");
-                                    classified.Flags = reader.GetByte("classifiedflags");
-                                    classified.GlobalPos = reader.GetVector("posglobal");
-                                    classified.Name = reader.GetString("name");
-                                    classified.ParcelID = reader.GetUUID("parceluuid");
-                                    classified.ParcelName = reader.GetString("parcelname");
-                                    classified.ParentEstate = reader.GetInt32("parentestate");
-                                    classified.Price = reader.GetInt32("priceforlisting");
-                                    classified.SimName = reader.GetString("simname");
-                                    classified.SnapshotID = reader.GetUUID("snapshotuuid");
-                                    return classified;
-                                }
-                            }
-                        }
+                        throw new KeyNotFoundException();
                     }
-                    throw new KeyNotFoundException();
+                    return classified;
                 }
             }
 

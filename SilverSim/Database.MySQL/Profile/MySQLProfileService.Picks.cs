@@ -42,41 +42,74 @@ namespace SilverSim.Database.MySQL.Profile
                 }
             }
 
+            public bool ContainsKey(UUI user, UUID id)
+            {
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT pickuuid FROM userpicks WHERE pickuuid LIKE ?uuid", conn))
+                    {
+                        cmd.Parameters.AddWithValue("?uuid", id.ToString());
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                return false;
+            }
+
+            public bool TryGetValue(UUI user, UUID id, out ProfilePick pick)
+            {
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM userpicks WHERE pickuuid LIKE ?uuid", conn))
+                    {
+                        cmd.Parameters.AddWithValue("?uuid", id.ToString());
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                pick = new ProfilePick();
+                                pick.Creator.ID = reader.GetUUID("creatoruuid");
+                                pick.Description = reader.GetString("description");
+                                pick.Enabled = reader.GetBoolean("enabled");
+                                pick.Name = reader.GetString("name");
+                                pick.OriginalName = reader.GetString("originalname");
+                                pick.ParcelID = reader.GetUUID("parceluuid");
+                                pick.PickID = reader.GetUUID("pickuuid");
+                                pick.SimName = reader.GetString("simname");
+                                pick.SnapshotID = reader.GetUUID("snapshotuuid");
+                                pick.SortOrder = reader.GetInt32("sortorder");
+                                pick.TopPick = reader.GetBoolean("toppick");
+                                pick.GlobalPosition = reader.GetVector("posglobal");
+                                pick.ParcelName = reader.GetString("parcelname");
+                                return true;
+                            }
+                        }
+                    }
+                }
+
+                pick = default(ProfilePick);
+                return false;
+            }
+
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             public ProfilePick this[UUI user, UUID id]
             {
                 get 
-                { 
-                    using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    ProfilePick pick;
+                    if(!TryGetValue(user, id, out pick))
                     {
-                        conn.Open();
-                        using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM userpicks WHERE pickuuid LIKE ?uuid", conn))
-                        {
-                            cmd.Parameters.AddWithValue("?uuid", id.ToString());
-                            using(MySqlDataReader reader = cmd.ExecuteReader())
-                            {
-                                if(reader.Read())
-                                {
-                                    ProfilePick pick = new ProfilePick();
-                                    pick.Creator.ID = reader.GetUUID("creatoruuid");
-                                    pick.Description = reader.GetString("description");
-                                    pick.Enabled = reader.GetBoolean("enabled");
-                                    pick.Name = reader.GetString("name");
-                                    pick.OriginalName = reader.GetString("originalname");
-                                    pick.ParcelID = reader.GetUUID("parceluuid");
-                                    pick.PickID = reader.GetUUID("pickuuid");
-                                    pick.SimName = reader.GetString("simname");
-                                    pick.SnapshotID = reader.GetUUID("snapshotuuid");
-                                    pick.SortOrder = reader.GetInt32("sortorder");
-                                    pick.TopPick = reader.GetBoolean("toppick");
-                                    pick.GlobalPosition = reader.GetVector("posglobal");
-                                    pick.ParcelName = reader.GetString("parcelname");
-                                    return pick;
-                                }
-                            }
-                        }
+                        throw new KeyNotFoundException();
                     }
-                    throw new KeyNotFoundException();
+                    return pick;
                 }
             }
 

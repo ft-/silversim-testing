@@ -20,19 +20,24 @@ namespace SilverSim.ServiceInterfaces.Inventory
         {
             get;
         }
+        public abstract bool TryGetValue(UUID key, out InventoryFolder folder);
+        public abstract bool ContainsKey(UUID key);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract InventoryFolder this[UUID principalID, UUID key]
         {
             get;
         }
+        public abstract bool TryGetValue(UUID principalID, UUID key, out InventoryFolder folder);
+        public abstract bool ContainsKey(UUID principalID, UUID key);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract InventoryFolder this[UUID principalID, AssetType type]
         {
             get;
         }
-
+        public abstract bool TryGetValue(UUID principalID, AssetType type, out InventoryFolder folder);
+        public abstract bool ContainsKey(UUID principalID, AssetType type);
 
         public virtual InventoryFolderContentServiceInterface Content
         {

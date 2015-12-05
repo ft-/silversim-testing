@@ -32,66 +32,87 @@ namespace SilverSim.Database.MySQL.AvatarName
         #endregion
 
         #region Accessors
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-        public override UUI this[string firstName, string lastName]
+        public override bool TryGetValue(string firstName, string lastName, out UUI uui)
         {
-            get
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-                {
-                    connection.Open();
+                connection.Open();
 
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?firstName AND LastName LIKE ?lastName", connection))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE FirstName LIKE ?firstName AND LastName LIKE ?lastName", connection))
+                {
+                    cmd.Parameters.AddWithValue("?firstName", firstName);
+                    cmd.Parameters.AddWithValue("?lastName", lastName);
+                    using (MySqlDataReader dbreader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("?firstName", firstName);
-                        cmd.Parameters.AddWithValue("?lastName", lastName);
-                        using (MySqlDataReader dbreader = cmd.ExecuteReader())
+                        if (!dbreader.Read())
                         {
-                            if (!dbreader.Read())
-                            {
-                                throw new KeyNotFoundException();
-                            }
-                            UUI nd = new UUI();
-                            nd.ID = dbreader.GetUUID("AvatarID");
-                            nd.HomeURI = new Uri((string)dbreader["HomeURI"]);
-                            nd.FirstName = (string)dbreader["FirstName"];
-                            nd.LastName = (string)dbreader["LastName"];
-                            nd.IsAuthoritative = true;
-                            return nd;
+                            uui = default(UUI);
+                            return false;
                         }
+                        uui = new UUI();
+                        uui.ID = dbreader.GetUUID("AvatarID");
+                        uui.HomeURI = new Uri((string)dbreader["HomeURI"]);
+                        uui.FirstName = (string)dbreader["FirstName"];
+                        uui.LastName = (string)dbreader["LastName"];
+                        uui.IsAuthoritative = true;
+                        return true;
                     }
                 }
             }
         }
 
+        [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
+        public override UUI this[string firstName, string lastName]
+        {
+            get
+            {
+                UUI uui;
+                if(!TryGetValue(firstName, lastName, out uui))
+                {
+                    throw new KeyNotFoundException();
+                }
+                return uui;
+            }
+        }
+
+        public override bool TryGetValue(UUID key, out UUI uui)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE AvatarID LIKE ?avatarid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?avatarid", key.ToString());
+                    using (MySqlDataReader dbreader = cmd.ExecuteReader())
+                    {
+                        if (!dbreader.Read())
+                        {
+                            uui = default(UUI);
+                            return false;
+                        }
+                        uui = new UUI();
+                        uui.ID = dbreader.GetUUID("AvatarID");
+                        uui.HomeURI = new Uri((string)dbreader["HomeURI"]);
+                        uui.FirstName = (string)dbreader["FirstName"];
+                        uui.LastName = (string)dbreader["LastName"];
+                        uui.IsAuthoritative = true;
+                        return true;
+                    }
+                }
+            }
+        }
 
         public override UUI this[UUID key]
         {
             get
             {
-                using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                UUI uui;
+                if(!TryGetValue(key, out uui))
                 {
-                    connection.Open();
-
-                    using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM avatarnames WHERE AvatarID LIKE ?avatarid", connection))
-                    {
-                        cmd.Parameters.AddWithValue("?avatarid", key.ToString());
-                        using(MySqlDataReader dbreader = cmd.ExecuteReader())
-                        {
-                            if(!dbreader.Read())
-                            {
-                                throw new KeyNotFoundException();
-                            }
-                            UUI nd = new UUI();
-                            nd.ID = dbreader.GetUUID("AvatarID");
-                            nd.HomeURI = new Uri((string)dbreader["HomeURI"]);
-                            nd.FirstName = (string)dbreader["FirstName"];
-                            nd.LastName = (string)dbreader["LastName"];
-                            nd.IsAuthoritative = true;
-                            return nd;
-                        }
-                    }
+                    throw new KeyNotFoundException();
                 }
+                return uui;
             }
             set
             {

@@ -22,32 +22,43 @@ namespace SilverSim.Database.MySQL.Asset.Deduplication
         {
             get
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                AssetMetadata s;
+                if(!TryGetValue(key, out s))
                 {
-                    conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assetrefs WHERE id=?id", conn))
+                    throw new AssetNotFoundException(key);
+                }
+                return s;
+            }
+        }
+
+        public override bool TryGetValue(UUID key, out AssetMetadata metadata)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM assetrefs WHERE id=?id", conn))
+                {
+                    cmd.Parameters.AddWithValue("?id", key.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("?id", key.ToString());
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        if (dbReader.Read())
                         {
-                            if (dbReader.Read())
-                            {
-                                AssetMetadata asset = new AssetMetadata();
-                                asset.ID = dbReader.GetUUID("id");
-                                asset.Type = (AssetType)(int)dbReader["assetType"];
-                                asset.Name = (string)dbReader["name"];
-                                asset.Creator.ID = dbReader.GetUUID("CreatorID");
-                                asset.CreateTime = dbReader.GetDate("create_time");
-                                asset.AccessTime = dbReader.GetDate("access_time");
-                                asset.Flags = dbReader.GetAssetFlags("asset_flags");
-                                asset.Temporary = dbReader.GetBoolean("temporary");
-                                return asset;
-                            }
+                            metadata = new AssetMetadata();
+                            metadata.ID = dbReader.GetUUID("id");
+                            metadata.Type = (AssetType)(int)dbReader["assetType"];
+                            metadata.Name = (string)dbReader["name"];
+                            metadata.Creator.ID = dbReader.GetUUID("CreatorID");
+                            metadata.CreateTime = dbReader.GetDate("create_time");
+                            metadata.AccessTime = dbReader.GetDate("access_time");
+                            metadata.Flags = dbReader.GetAssetFlags("asset_flags");
+                            metadata.Temporary = dbReader.GetBoolean("temporary");
+                            return true;
                         }
                     }
                 }
-                throw new AssetNotFoundException(key);
             }
+            metadata = null;
+            return false;
         }
         #endregion
     }

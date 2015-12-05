@@ -19,11 +19,16 @@ namespace SilverSim.ServiceInterfaces.Inventory
             get;
         }
 
+        public abstract bool TryGetValue(UUID key, out InventoryItem item);
+        public abstract bool ContainsKey(UUID key);
+
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract InventoryItem this[UUID principalID, UUID key]
         {
             get;
         }
+        public abstract bool TryGetValue(UUID principalID, UUID key, out InventoryItem item);
+        public abstract bool ContainsKey(UUID principalID, UUID key);
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]

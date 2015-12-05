@@ -28,6 +28,8 @@ namespace SilverSim.ServiceInterfaces.ServerParam
             set;
         }
 
+        public abstract bool TryGetValue(UUID regionID, string parameter, out string value);
+
         public abstract List<string> this[UUID regionID]
         {
             get;

@@ -16,5 +16,7 @@ namespace SilverSim.ServiceInterfaces.Grid
         {
             get;
         }
+
+        public abstract bool TryGetValue(string name, out RegionInfo rInfo);
     }
 }

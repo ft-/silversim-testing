@@ -17,28 +17,39 @@ namespace SilverSim.Database.MySQL.Estate
             m_ConnectionString = connectionString;
         }
 
+        public bool TryGetValue(uint estateID, out UUI uui)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT OwnerID FROM estates WHERE ID = ?id", conn))
+                {
+                    cmd.Parameters.AddWithValue("?id", estateID);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            uui = new UUI();
+                            uui.ID = reader.GetUUID("OwnerID");
+                            return true;
+                        }
+                    }
+                }
+            }
+            uui = default(UUI);
+            return false;
+        }
+
         public UUI this[uint estateID]
         {
             get
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                UUI uui;
+                if(!TryGetValue(estateID, out uui))
                 {
-                    conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT OwnerID FROM estates WHERE ID = ?id", conn))
-                    {
-                        cmd.Parameters.AddWithValue("?id", estateID);
-                        using(MySqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if(reader.Read())
-                            {
-                                UUI uui = new UUI();
-                                uui.ID = reader.GetUUID("OwnerID");
-                                return uui;
-                            }
-                        }
-                    }
+                    throw new KeyNotFoundException();
                 }
-                throw new KeyNotFoundException();
+                return uui;
             }
             set
             {

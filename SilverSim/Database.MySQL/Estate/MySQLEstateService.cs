@@ -111,6 +111,48 @@ namespace SilverSim.Database.MySQL.Estate
                 "KEY ID_OwnerID (ID, OwnerID)) AUTO_INCREMENT=100 "
         };
 
+        public override bool TryGetValue(uint estateID, out EstateInfo estateInfo)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM estates WHERE ID LIKE ?id", conn))
+                {
+                    cmd.Parameters.AddWithValue("?id", estateID);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            estateInfo = reader.ToEstateInfo();
+                            return true;
+                        }
+                    }
+                }
+            }
+            estateInfo = default(EstateInfo);
+            return false;
+        }
+
+        public override bool ContainsKey(uint estateID)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT id FROM estates WHERE ID LIKE ?id", conn))
+                {
+                    cmd.Parameters.AddWithValue("?id", estateID);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
 
         public override EstateInfo this[uint estateID]
         {

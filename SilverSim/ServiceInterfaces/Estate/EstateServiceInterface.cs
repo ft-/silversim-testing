@@ -22,6 +22,9 @@ namespace SilverSim.ServiceInterfaces.Estate
             set;
         }
 
+        public abstract bool TryGetValue(uint estateID, out EstateInfo estateInfo);
+        public abstract bool ContainsKey(uint estateID);
+
         public abstract List<EstateInfo> All { get; }
 
         public abstract List<uint> AllIDs { get; }

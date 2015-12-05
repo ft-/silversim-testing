@@ -17,6 +17,25 @@ namespace SilverSim.ServiceInterfaces.Inventory
             m_Service = service;
         }
 
+        public override bool TryGetValue(UUID principalID, UUID folderID, out InventoryFolderContent inventoryFolderContent)
+        {
+            try
+            {
+                inventoryFolderContent = this[principalID, folderID];
+                return true;
+            }
+            catch
+            {
+                inventoryFolderContent = null;
+                return false;
+            }
+        }
+
+        public override bool ContainsKey(UUID principalID, UUID folderID)
+        {
+            return m_Service.ContainsKey(principalID, folderID);
+        }
+
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public override InventoryFolderContent this[UUID principalID, UUID folderID]

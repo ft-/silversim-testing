@@ -25,23 +25,36 @@ namespace SilverSim.Database.MySQL.Asset
         {
             get
             {
-                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                Stream s;
+                if(!TryGetValue(key, out s))
                 {
-                    conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT data FROM assets WHERE id=?id", conn))
+                    throw new AssetNotFoundException(key);
+                }
+                return s;
+            }
+        }
+
+        public override bool TryGetValue(UUID key, out Stream s)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT data FROM assets WHERE id=?id", conn))
+                {
+                    cmd.Parameters.AddWithValue("?id", key.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("?id", key.ToString());
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        if (dbReader.Read())
                         {
-                            if (dbReader.Read())
-                            {
-                                return new MemoryStream((byte[])dbReader["data"]);
-                            }
+                            s = new MemoryStream((byte[])dbReader["data"]);
+                            return true;
                         }
                     }
                 }
-                throw new AssetNotFoundException(key);
             }
+
+            s = null;
+            return false;
         }
         #endregion
     }

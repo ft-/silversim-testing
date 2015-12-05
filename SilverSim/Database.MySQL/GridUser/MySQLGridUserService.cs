@@ -11,6 +11,7 @@ using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.Types;
 using SilverSim.Types.GridUser;
 using System.Collections.Generic;
+using System;
 
 namespace SilverSim.Database.MySQL.GridUser
 {
@@ -61,6 +62,28 @@ namespace SilverSim.Database.MySQL.GridUser
         };
 
         #region GridUserServiceInterface
+        public override bool TryGetValue(UUID userID, out GridUserInfo userInfo)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM griduser WHERE ID LIKE ?id", conn))
+                {
+                    cmd.Parameters.AddWithValue("?id", userID.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            userInfo = dbReader.ToGridUser();
+                            return true;
+                        }
+                    }
+                }
+            }
+            userInfo = default(GridUserInfo);
+            return false;
+        }
+
         public override GridUserInfo this[UUID userID]
         {
             get 
@@ -82,6 +105,12 @@ namespace SilverSim.Database.MySQL.GridUser
                 }
                 throw new GridUserNotFoundException();
             }
+        }
+
+
+        public override bool TryGetValue(UUI userID, out GridUserInfo gridUserInfo)
+        {
+            return TryGetValue(userID.ID, out gridUserInfo);
         }
 
         public override GridUserInfo this[UUI userID]

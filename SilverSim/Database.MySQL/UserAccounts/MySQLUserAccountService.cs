@@ -11,6 +11,7 @@ using SilverSim.Types;
 using SilverSim.Types.Account;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System;
 
 namespace SilverSim.Database.MySQL.UserAccounts
 {
@@ -58,46 +59,145 @@ namespace SilverSim.Database.MySQL.UserAccounts
                 "PRIMARY KEY(ID), KEY Email (Email), UNIQUE KEY Name (FirstName, LastName), KEY FirstName (FirstName), KEY LastName (LastName))"
         };
 
+        public override bool ContainsKey(UUID scopeID, UUID accountID)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                if (scopeID != UUID.Zero)
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM useraccounts WHERE ScopeID LIKE ?scopeid AND ID LIKE ?id", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                        cmd.Parameters.AddWithValue("?id", accountID.ToString());
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM useraccounts WHERE ID LIKE ?id", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?id", accountID.ToString());
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public override bool TryGetValue(UUID scopeID, UUID accountID, out UserAccount account)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                if (scopeID != UUID.Zero)
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND ID LIKE ?id", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                        cmd.Parameters.AddWithValue("?id", accountID.ToString());
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                account = reader.ToUserAccount();
+                                return true;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ID LIKE ?id", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?id", accountID.ToString());
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                account = reader.ToUserAccount();
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            account = default(UserAccount);
+            return false;
+        }
+
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override UserAccount this[UUID scopeID, UUID accountID]
         {
             get
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                UserAccount account;
+                if (!TryGetValue(scopeID, accountID, out account))
                 {
-                    connection.Open();
-                    if (scopeID != UUID.Zero)
+                    throw new UserAccountNotFoundException();
+                }
+                return account;
+            }
+        }
+
+        public override bool ContainsKey(UUID scopeID, string email)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE ScopeID LIKE ?scopeid AND Email LIKE ?email", connection))
+                {
+                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                    cmd.Parameters.AddWithValue("?email", email);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
-                        using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND ID LIKE ?id", connection))
+                        if (reader.Read())
                         {
-                            cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                            cmd.Parameters.AddWithValue("?id", accountID.ToString());
-                            using (MySqlDataReader reader = cmd.ExecuteReader())
-                            {
-                                if (reader.Read())
-                                {
-                                    return reader.ToUserAccount();
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ID LIKE ?id", connection))
-                        {
-                            cmd.Parameters.AddWithValue("?id", accountID.ToString());
-                            using (MySqlDataReader reader = cmd.ExecuteReader())
-                            {
-                                if (reader.Read())
-                                {
-                                    return reader.ToUserAccount();
-                                }
-                            }
+                            return true;
                         }
                     }
                 }
-                throw new UserAccountNotFoundException();
             }
+
+            return false;
+        }
+
+        public override bool TryGetValue(UUID scopeID, string email, out UserAccount account)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND Email LIKE ?email", connection))
+                {
+                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                    cmd.Parameters.AddWithValue("?email", email);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            account = reader.ToUserAccount();
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            account = default(UserAccount);
+            return false;
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
@@ -105,24 +205,98 @@ namespace SilverSim.Database.MySQL.UserAccounts
         {
             get 
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                UserAccount account;
+                if(!TryGetValue(scopeID, email, out account))
                 {
-                    connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND Email LIKE ?email", connection))
+                    throw new UserAccountNotFoundException();
+                }
+                return account;
+            }
+        }
+
+        public override bool ContainsKey(UUID scopeID, string firstName, string lastName)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                if (scopeID != UUID.Zero)
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE ScopeID LIKE ?scopeid AND FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
                     {
                         cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                        cmd.Parameters.AddWithValue("?email", email);
+                        cmd.Parameters.AddWithValue("?firstname", firstName);
+                        cmd.Parameters.AddWithValue("?lastname", lastName);
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             if (reader.Read())
                             {
-                                return reader.ToUserAccount();
+                                return true;
                             }
                         }
                     }
                 }
-                throw new UserAccountNotFoundException();
+                else
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT ScopeID FROM useraccounts WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?firstname", firstName);
+                        cmd.Parameters.AddWithValue("?lastname", lastName);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
             }
+
+            return false;
+        }
+
+        public override bool TryGetValue(UUID scopeID, string firstName, string lastName, out UserAccount account)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                if (scopeID != UUID.Zero)
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                        cmd.Parameters.AddWithValue("?firstname", firstName);
+                        cmd.Parameters.AddWithValue("?lastname", lastName);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                account = reader.ToUserAccount();
+                                return true;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?firstname", firstName);
+                        cmd.Parameters.AddWithValue("?lastname", lastName);
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                account = reader.ToUserAccount();
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            account = default(UserAccount);
+            return false;
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
@@ -130,42 +304,12 @@ namespace SilverSim.Database.MySQL.UserAccounts
         {
             get 
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                UserAccount account;
+                if(!TryGetValue(scopeID, firstName, lastName, out account))
                 {
-                    connection.Open();
-                    if (scopeID != UUID.Zero)
-                    {
-                        using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE ScopeID LIKE ?scopeid AND FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
-                        {
-                            cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                            cmd.Parameters.AddWithValue("?firstname", firstName);
-                            cmd.Parameters.AddWithValue("?lastname", lastName);
-                            using (MySqlDataReader reader = cmd.ExecuteReader())
-                            {
-                                if (reader.Read())
-                                {
-                                    return reader.ToUserAccount();
-                                }
-                            }
-                        }
-                    }
-                    else
-                    {
-                        using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM useraccounts WHERE FirstName LIKE ?firstname AND LastName LIKE ?lastname", connection))
-                        {
-                            cmd.Parameters.AddWithValue("?firstname", firstName);
-                            cmd.Parameters.AddWithValue("?lastname", lastName);
-                            using (MySqlDataReader reader = cmd.ExecuteReader())
-                            {
-                                if (reader.Read())
-                                {
-                                    return reader.ToUserAccount();
-                                }
-                            }
-                        }
-                    }
+                    throw new UserAccountNotFoundException();
                 }
-                throw new UserAccountNotFoundException();
+                return account;
             }
         }
 

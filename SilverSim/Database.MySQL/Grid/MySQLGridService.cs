@@ -12,6 +12,7 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System;
 
 namespace SilverSim.Database.MySQL.Grid
 {
@@ -69,25 +70,37 @@ namespace SilverSim.Database.MySQL.Grid
         {
             get
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                RegionInfo rInfo;
+                if(!TryGetValue(scopeID, regionID, out rInfo))
                 {
-                    connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE uuid LIKE ?id AND ScopeID LIKE ?scopeid", connection))
+                    throw new KeyNotFoundException();
+                }
+                return rInfo;
+            }
+        }
+
+        public override bool TryGetValue(UUID scopeID, UUID regionID, out RegionInfo rInfo)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE uuid LIKE ?id AND ScopeID LIKE ?scopeid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", regionID.ToString());
+                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("?id", regionID.ToString());
-                        cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        if (dbReader.Read())
                         {
-                            if (dbReader.Read())
-                            {
-                                return ToRegionInfo(dbReader);
-                            }
+                            rInfo = ToRegionInfo(dbReader);
+                            return true;
                         }
                     }
                 }
-
-                throw new KeyNotFoundException();
             }
+
+            rInfo = default(RegionInfo);
+            return false;
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
@@ -95,26 +108,38 @@ namespace SilverSim.Database.MySQL.Grid
         {
             get
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                RegionInfo rInfo;
+                if(!TryGetValue(scopeID, gridX, gridY, out rInfo))
                 {
-                    connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE locX <= ?x AND locY <= ?y AND locX + sizeX > ?x AND locY + sizeY > ?y AND ScopeID LIKE ?scopeid", connection))
+                    throw new KeyNotFoundException();
+                }
+                return rInfo;
+            }
+        }
+
+        public override bool TryGetValue(UUID scopeID, uint gridX, uint gridY, out RegionInfo rInfo)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE locX <= ?x AND locY <= ?y AND locX + sizeX > ?x AND locY + sizeY > ?y AND ScopeID LIKE ?scopeid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?x", gridX);
+                    cmd.Parameters.AddWithValue("?y", gridY);
+                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("?x", gridX);
-                        cmd.Parameters.AddWithValue("?y", gridY);
-                        cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        if (dbReader.Read())
                         {
-                            if (dbReader.Read())
-                            {
-                                return ToRegionInfo(dbReader);
-                            }
+                            rInfo = ToRegionInfo(dbReader);
+                            return true;
                         }
                     }
                 }
-
-                throw new KeyNotFoundException();
             }
+
+            rInfo = default(RegionInfo);
+            return false;
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
@@ -122,49 +147,73 @@ namespace SilverSim.Database.MySQL.Grid
         {
             get
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                RegionInfo rInfo;
+                if(!TryGetValue(scopeID, regionName, out rInfo))
                 {
-                    connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE regionName LIKE ?name AND ScopeID LIKE ?scopeid", connection))
+                    throw new KeyNotFoundException();
+                }
+                return rInfo;
+            }
+        }
+
+        public override bool TryGetValue(UUID scopeID, string regionName, out RegionInfo rInfo)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE regionName LIKE ?name AND ScopeID LIKE ?scopeid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?name", regionName);
+                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("?name", regionName);
-                        cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        if (dbReader.Read())
                         {
-                            if (dbReader.Read())
-                            {
-                                return ToRegionInfo(dbReader);
-                            }
+                            rInfo = ToRegionInfo(dbReader);
+                            return true;
                         }
                     }
                 }
-
-                throw new KeyNotFoundException();
             }
+
+            rInfo = default(RegionInfo);
+            return false;
         }
 
         public override RegionInfo this[UUID regionID]
         {
             get
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                RegionInfo rInfo;
+                if(!TryGetValue(regionID, out rInfo))
                 {
-                    connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE uuid LIKE ?id", connection))
+                    throw new KeyNotFoundException();
+                }
+                return rInfo;
+            }
+        }
+
+        public override bool TryGetValue(UUID regionID, out RegionInfo rInfo)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE uuid LIKE ?id", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", regionID.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("?id", regionID.ToString());
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        if (dbReader.Read())
                         {
-                            if (dbReader.Read())
-                            {
-                                return ToRegionInfo(dbReader);
-                            }
+                            rInfo = ToRegionInfo(dbReader);
+                            return true;
                         }
                     }
                 }
-
-                throw new KeyNotFoundException();
             }
+
+            rInfo = default(RegionInfo);
+            return false;
         }
 
         #endregion

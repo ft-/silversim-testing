@@ -44,26 +44,39 @@ namespace SilverSim.Database.MySQL.Estate
             }
         }
 
+        public bool TryGetValue(UUID regionID, out uint estateID)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT EstateID FROM estate_regionmap WHERE RegionID = ?regionid", conn))
+                {
+                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            estateID = (uint)reader["EstateID"];
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            estateID = 0;
+            return false;
+        }
+
         public uint this[UUID regionID]
         {
             get
             {
-                using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                uint estateID;
+                if(!TryGetValue(regionID, out estateID))
                 {
-                    conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT EstateID FROM estate_regionmap WHERE RegionID = ?regionid", conn))
-                    {
-                        cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
-                        using(MySqlDataReader reader = cmd.ExecuteReader())
-                        {
-                            if(reader.Read())
-                            {
-                                return (uint)reader["EstateID"];
-                            }
-                        }
-                    }
+                    throw new KeyNotFoundException();
                 }
-                throw new KeyNotFoundException();
+                return estateID;
             }
             set
             {

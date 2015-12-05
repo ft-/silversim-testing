@@ -21,28 +21,107 @@ namespace SilverSim.Database.MySQL.Inventory
             m_ConnectionString = connectionString;
         }
 
+        public override bool TryGetValue(UUID key, out InventoryFolder folder)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE ID LIKE ?folderid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?folderid", key.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            folder = dbReader.ToFolder();
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            folder = default(InventoryFolder);
+            return false;
+        }
+
+        public override bool ContainsKey(UUID key)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM inventoryfolders WHERE ID LIKE ?folderid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?folderid", key.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
         public override InventoryFolder this[UUID key]
         {
             get
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                InventoryFolder folder;
+                if(!TryGetValue(key, out folder))
                 {
-                    connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE ID LIKE ?folderid", connection))
+                    throw new InventoryFolderNotFoundException(key);
+                }
+                return folder;
+            }
+        }
+
+        public override bool TryGetValue(UUID principalID, UUID key, out InventoryFolder folder)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
+                    cmd.Parameters.AddWithValue("?folderid", key.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        cmd.Parameters.AddWithValue("?folderid", key.ToString());
-                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        if (dbReader.Read())
                         {
-                            if (dbReader.Read())
-                            {
-                                return dbReader.ToFolder();
-                            }
+                            folder = dbReader.ToFolder();
+                            return true;
                         }
                     }
                 }
-
-                throw new InventoryFolderNotFoundException(key);
             }
+
+            folder = default(InventoryFolder);
+            return false;
+        }
+
+        public override bool ContainsKey(UUID principalID, UUID key)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
+                    cmd.Parameters.AddWithValue("?folderid", key.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        if (dbReader.Read())
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
@@ -50,25 +129,96 @@ namespace SilverSim.Database.MySQL.Inventory
         {
             get 
             {
-                using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+                InventoryFolder folder;
+                if(!TryGetValue(principalID, key, out folder))
                 {
-                    connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND ID LIKE ?folderid", connection))
+                    throw new InventoryFolderNotFoundException(key);
+                }
+                return folder;
+            }
+        }
+
+        public override bool ContainsKey(UUID principalID, AssetType type)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                if (type == AssetType.RootFolder)
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND ParentFolderID = ?parentfolderid", connection))
                     {
                         cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
-                        cmd.Parameters.AddWithValue("?folderid", key.ToString());
+                        cmd.Parameters.AddWithValue("?parentfolderid", UUID.Zero.ToString());
                         using (MySqlDataReader dbReader = cmd.ExecuteReader())
                         {
                             if (dbReader.Read())
                             {
-                                return dbReader.ToFolder();
+                                return true;
                             }
                         }
                     }
                 }
-
-                throw new InventoryFolderNotFoundException(key);
+                else
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND InventoryType = ?type", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
+                        cmd.Parameters.AddWithValue("?type", (int)type);
+                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        {
+                            if (dbReader.Read())
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
             }
+
+            return false;
+        }
+
+        public override bool TryGetValue(UUID principalID, AssetType type, out InventoryFolder folder)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                if (type == AssetType.RootFolder)
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND ParentFolderID = ?parentfolderid", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
+                        cmd.Parameters.AddWithValue("?parentfolderid", UUID.Zero.ToString());
+                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        {
+                            if (dbReader.Read())
+                            {
+                                folder = dbReader.ToFolder();
+                                return true;
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM inventoryfolders WHERE OwnerID LIKE ?ownerid AND InventoryType = ?type", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?ownerid", principalID.ToString());
+                        cmd.Parameters.AddWithValue("?type", (int)type);
+                        using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                        {
+                            if (dbReader.Read())
+                            {
+                                folder = dbReader.ToFolder();
+                                return true;
+                            }
+                        }
+                    }
+                }
+            }
+
+            folder = default(InventoryFolder);
+            return false;
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]

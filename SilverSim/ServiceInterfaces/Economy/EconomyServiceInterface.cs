@@ -69,6 +69,8 @@ namespace SilverSim.ServiceInterfaces.Economy
         public interface IMoneyBalanceAccessor
         {
             Int32 this[UUI agentID] { get; set; }
+
+            bool TryGetValue(UUI agentID, out Int32 balance);
         }
 
         public EconomyServiceInterface()

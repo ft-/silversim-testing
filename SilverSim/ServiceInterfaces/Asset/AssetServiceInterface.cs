@@ -20,6 +20,8 @@ namespace SilverSim.ServiceInterfaces.Asset
             get;
         }
 
+        public abstract bool TryGetValue(UUID key, out AssetData assetData);
+
         #endregion
 
         #region Metadata interface
