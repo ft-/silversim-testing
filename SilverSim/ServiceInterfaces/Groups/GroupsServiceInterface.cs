@@ -142,8 +142,8 @@ namespace SilverSim.ServiceInterfaces.Groups
                 get;
             }
 
-            bool TryGetValue(UUI requestingAgent, UGI group, UUID roleID, out GroupRolemember grolemem);
-            bool ContainsKey(UUI requestingAgent, UGI group, UUID roleID);
+            bool TryGetValue(UUI requestingAgent, UGI group, UUID roleID, UUI principal, out GroupRolemember grolemem);
+            bool ContainsKey(UUI requestingAgent, UGI group, UUID roleID, UUI principal);
 
             [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
             List<GroupRolemember> this[UUI requestingAgent, UGI group, UUID roleID]
