@@ -386,14 +386,9 @@ namespace SilverSim.Scene.Implementation.Basic
 
         protected override object GetService(Type service)
         {
-            if (service.IsAssignableFrom(typeof(ChatServiceInterface)))
-            {
-                return m_ChatService;
-            }
-            else
-            {
-                return base.GetService(service);
-            }
+            return (service.IsAssignableFrom(typeof(ChatServiceInterface))) ?
+                m_ChatService :
+                base.GetService(service);
         }
 
         protected override void SendChatPass(ListenEvent le)

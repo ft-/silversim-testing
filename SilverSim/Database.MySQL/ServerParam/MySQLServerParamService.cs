@@ -95,26 +95,19 @@ namespace SilverSim.Database.MySQL.ServerParam
             get
             {
                 string value;
-                if(TryGetValue(regionID, parameter, out value))
-                {
-                    return value;
-                }
-                else
-                {
-                    return defvalue;
-                }
+                return (TryGetValue(regionID, parameter, out value)) ?
+                    value :
+                    defvalue;
             }
         }
 
         public override bool TryGetValue(UUID regionID, string parameter, out string value)
         {
             RwLockedDictionary<string, string> regParams;
-            if (m_Cache.TryGetValue(regionID, out regParams))
+            if (m_Cache.TryGetValue(regionID, out regParams) &&
+                regParams.TryGetValue(parameter, out value))
             {
-                if (regParams.TryGetValue(parameter, out value))
-                {
-                    return true;
-                }
+                return true;
             }
 
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
@@ -137,12 +130,10 @@ namespace SilverSim.Database.MySQL.ServerParam
                 }
             }
 
-            if (UUID.Zero != regionID)
+            if (UUID.Zero != regionID &&
+                TryGetValue(UUID.Zero, parameter, out value))
             {
-                if(TryGetValue(UUID.Zero, parameter, out value))
-                {
-                    return true;
-                }
+                return true;
             }
 
             value = string.Empty;

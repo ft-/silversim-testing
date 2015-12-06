@@ -50,15 +50,14 @@ namespace SilverSim.Scene.Registration
             {
                 ri.Owner = new UUI();
             }
-            if ((m_HttpServer.Port == 80 && m_HttpServer.Scheme == Uri.UriSchemeHttp) ||
-                (m_HttpServer.Port == 443 && m_HttpServer.Scheme == Uri.UriSchemeHttps))
-            {
-                ri.ServerURI = m_HttpServer.Scheme + "://" + m_HttpServer.ExternalHostName + "/";
-            }
-            else 
-            {
-                ri.ServerURI = m_HttpServer.Scheme + "://" + m_HttpServer.ExternalHostName + ":" + m_HttpServer.Port.ToString() + "/";
-            }
+            ri.ServerURI =
+                ((m_HttpServer.Port == 80 && m_HttpServer.Scheme == Uri.UriSchemeHttp) ||
+                (m_HttpServer.Port == 443 && m_HttpServer.Scheme == Uri.UriSchemeHttps)) ?
+
+                m_HttpServer.Scheme + "://" + m_HttpServer.ExternalHostName + "/" :
+
+                m_HttpServer.Scheme + "://" + m_HttpServer.ExternalHostName + ":" + m_HttpServer.Port.ToString() + "/";
+
             ri.ServerHttpPort = m_HttpServer.Port;
             scene.GridService.RegisterRegion(ri);
         }
