@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.ServiceInterfaces.Estate;
 
 namespace SilverSim.Viewer.Core
 {
@@ -428,6 +429,19 @@ namespace SilverSim.Viewer.Core
             }
 
             UUID covenantID = UUID.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[0]));
+            EstateInfo estate;
+            uint estateID;
+            AgentCircuit circuit;
+            if (Circuits.TryGetValue(req.SessionID, out circuit))
+            {
+                EstateServiceInterface estateService = circuit.Scene.EstateService;
+                if(estateService.RegionMap.TryGetValue(circuit.Scene.ID, out estateID) &&
+                    estateService.TryGetValue(estateID, out estate))
+                {
+                    estate.CovenantID = covenantID;
+                    estateService[estate.ID] = estate;
+                }
+            }
         }
 
         void EstateOwner_EstateAccessDelta(EstateOwnerMessage req)

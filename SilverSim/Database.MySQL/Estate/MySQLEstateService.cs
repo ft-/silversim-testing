@@ -108,7 +108,8 @@ namespace SilverSim.Database.MySQL.Estate
                 "PRIMARY KEY(ID)," +
                 "UNIQUE KEY Name (Name)," +
                 "KEY Owner (OwnerID)," +
-                "KEY ID_OwnerID (ID, OwnerID)) AUTO_INCREMENT=100 "
+                "KEY ID_OwnerID (ID, OwnerID)) AUTO_INCREMENT=100 ",
+            "ALTER TABLE %tablename% ADD COLUMN (CovenantID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',"
         };
 
         public override bool TryGetValue(uint estateID, out EstateInfo estateInfo)
@@ -188,6 +189,7 @@ namespace SilverSim.Database.MySQL.Estate
                     dict["BillableFactor"] = value.BillableFactor;
                     dict["SunPosition"] = value.SunPosition;
                     dict["AbuseEmail"] = value.AbuseEmail;
+                    dict["CovenantID"] = value.CovenantID.ToString();
                     using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
