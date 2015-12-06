@@ -276,6 +276,17 @@ namespace SilverSim.Scene.Types.Scene
             double SeasonalSunTilt = 0.03 * Math.PI;
             double SunNormalizedOffset = 0.45;
 
+            public double TimeOfDay
+            {
+                get
+                {
+                    ulong utctime = Date.GetUnixTime();
+                    return m_SunData.IsSunFixed ?
+                        utctime :
+                        utctime % (4 * 3600);
+                }
+            }
+
             public void UpdateSunDirection()
             {
                 double DailyOmega;
