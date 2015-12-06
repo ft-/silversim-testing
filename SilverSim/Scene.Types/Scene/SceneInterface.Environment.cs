@@ -1,19 +1,17 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.WindLight;
+using SilverSim.Types;
+using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Generic;
 using SilverSim.Viewer.Messages.LayerData;
 using SilverSim.Viewer.Messages.Region;
-using SilverSim.Viewer.Messages;
-using System.Threading;
-using SilverSim.Scene.Types.WindLight;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -123,89 +121,20 @@ namespace SilverSim.Scene.Types.Scene
                 public Vector3 SunDirection;
                 public double SunPhase;
                 public Vector3 SunAngVelocity;
+                public bool IsSunFixed;
             }
 
-            public struct WindData
+            public IWindModel Wind
             {
-                public LayerPatch PatchX;
-                public LayerPatch PatchY;
-                public ReaderWriterLock ReaderWriterLock;
+                get; private set;
             }
-
-            public class WindDataAccessor
-            {
-                readonly EnvironmentController m_Controller;
-
-                internal WindDataAccessor(EnvironmentController controller)
-                {
-                    m_Controller = controller;
-                }
-
-                [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
-                public Vector3 this[Vector3 p]
-                {
-                    get
-                    {
-                        Vector3 wv = new Vector3();
-                        int x = (int)p.X;
-                        int y = (int)p.Y;
-                        if(x >= m_Controller.m_Scene.RegionData.Size.X || y >= m_Controller.m_Scene.RegionData.Size.Y)
-                        {
-                            return wv;
-                        }
-
-                        int px = x * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES / BASE_REGION_SIZE;
-                        int py = y * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES / BASE_REGION_SIZE;
-
-                        m_Controller.m_WindData.ReaderWriterLock.AcquireReaderLock(-1);
-                        try
-                        {
-                            wv.X = m_Controller.m_WindData.PatchX.Data[py, px];
-                            wv.Y = m_Controller.m_WindData.PatchY.Data[py, px];
-                        }
-                        finally
-                        {
-                            m_Controller.m_WindData.ReaderWriterLock.ReleaseReaderLock();
-                        }
-                        return wv;
-                    }
-                    set
-                    {
-                        int x = (int)p.X;
-                        int y = (int)p.Y;
-                        if (x >= m_Controller.m_Scene.RegionData.Size.X || y >= m_Controller.m_Scene.RegionData.Size.Y)
-                        {
-                            return;
-                        }
-
-                        int px = x * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES / BASE_REGION_SIZE;
-                        int py = y * LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES / BASE_REGION_SIZE;
-                        m_Controller.m_WindData.ReaderWriterLock.AcquireWriterLock(-1);
-                        try
-                        {
-                            m_Controller.m_WindData.PatchX.Data[py, px] = (float)value.X;
-                            m_Controller.m_WindData.PatchY.Data[py, px] = (float)value.Y;
-                            ++m_Controller.m_WindData.PatchX.Serial;
-                            ++m_Controller.m_WindData.PatchY.Serial;
-                        }
-                        finally
-                        {
-                            m_Controller.m_WindData.ReaderWriterLock.ReleaseWriterLock();
-                        }
-                    }
-                }
-            }
-
-            public WindDataAccessor Wind { get; private set; }
 
             bool m_WindlightValid;
             WindlightSkyData m_SkyWindlight = new WindlightSkyData();
             WindlightWaterData m_WaterWindlight = new WindlightWaterData();
             SunData m_SunData = new SunData();
-            WindData m_WindData = new WindData();
             readonly SceneInterface m_Scene;
-            bool m_SunFixed;
-            readonly System.Timers.Timer m_Timer = new System.Timers.Timer(60000);
+            readonly System.Timers.Timer m_Timer = new System.Timers.Timer(10000);
 
             public Vector3 SunDirection
             {
@@ -228,15 +157,10 @@ namespace SilverSim.Scene.Types.Scene
             public EnvironmentController(SceneInterface scene)
             {
                 m_Scene = scene;
+                Wind = new NoWindModel();
                 m_SunData.SunDirection = new Vector3();
                 m_SunData.SecPerDay = 4 * 60 * 60;
                 m_SunData.SecPerYear = 11 * m_SunData.SecPerDay;
-
-                m_WindData.ReaderWriterLock = new ReaderWriterLock();
-
-                m_WindData.PatchX = new LayerPatch();
-                m_WindData.PatchY = new LayerPatch();
-                Wind = new WindDataAccessor(this);
             }
 
             public void Start()
@@ -266,6 +190,10 @@ namespace SilverSim.Scene.Types.Scene
             private void EnvironmentTimer(object sender, System.Timers.ElapsedEventArgs e)
             {
                 UpdateSunDirection();
+                if(null != Wind)
+                {
+                    Wind.UpdateModel(m_SunData);
+                }
             }
 
             #region Update of sun direction
@@ -284,7 +212,7 @@ namespace SilverSim.Scene.Types.Scene
                     YearlyOmega = 2 / (m_SunData.SecPerYear);
                 }
                 ulong utctime = Date.GetUnixTime();
-                bool sunFixed = m_SunFixed;
+                bool sunFixed = m_SunData.IsSunFixed;
                 if(sunFixed)
                 {
                     utctime = 0;
@@ -319,42 +247,63 @@ namespace SilverSim.Scene.Types.Scene
             #endregion
 
             #region Update of Wind Data
-            private List<LayerData> CompileWindData()
+            private List<LayerData> CompileWindData(Vector3 basepos)
             {
-                m_WindData.ReaderWriterLock.AcquireReaderLock(-1);
-                try
+                List<LayerData> mlist = new List<LayerData>();
+                List<LayerPatch> patchesList = new List<LayerPatch>();
+                LayerPatch patchX = new LayerPatch();
+                LayerPatch patchY = new LayerPatch();
+
+                /* round to nearest low pos */
+                bool rX = basepos.X % 256 >= 128;
+                bool rY = basepos.Y % 256 >= 128;
+                basepos.X = Math.Floor(basepos.X / 256) * 256;
+                basepos.Y = Math.Floor(basepos.Y / 256) * 256;
+
+                for (int y = 0; y < 16; ++y)
                 {
-                    List<LayerData> mlist = new List<LayerData>();
-                    List<LayerPatch> patchesList = new List<LayerPatch>();
-
-                    patchesList.Add(new LayerPatch(m_WindData.PatchX));
-                    patchesList.Add(new LayerPatch(m_WindData.PatchY));
-
-                    LayerData.LayerDataType layerType = LayerData.LayerDataType.Wind;
-
-                    if (BASE_REGION_SIZE < m_Scene.RegionData.Size.X || BASE_REGION_SIZE < m_Scene.RegionData.Size.Y)
+                    for(int x = 0; x < 16; ++x)
                     {
-                        layerType = LayerData.LayerDataType.WindExtended;
+                        Vector3 actpos = basepos;
+                        actpos.X += x * 4;
+                        actpos.Y += y * 4;
+                        if(rX && x < 8)
+                        {
+                            actpos.X += 128;
+                        }
+                        if (rY && y < 8)
+                        {
+                            actpos.Y += 128;
+                        }
+                        Vector3 w = Wind[actpos];
+                        patchX[x, y] = (float)w.X;
+                        patchY[x, y] = (float)w.Y;
                     }
-                    int offset = 0;
-                    while (offset < patchesList.Count)
-                    {
-                        int remaining = Math.Min(patchesList.Count - offset, LayerCompressor.MESSAGES_PER_WIND_LAYER_PACKET);
-                        int actualused;
-                        mlist.Add(LayerCompressor.ToLayerMessage(patchesList, layerType, offset, remaining, out actualused));
-                        offset += actualused;
-                    }
-                    return mlist;
                 }
-                finally
+
+                patchesList.Add(patchX);
+                patchesList.Add(patchY);
+
+                LayerData.LayerDataType layerType = LayerData.LayerDataType.Wind;
+
+                if (BASE_REGION_SIZE < m_Scene.RegionData.Size.X || BASE_REGION_SIZE < m_Scene.RegionData.Size.Y)
                 {
-                    m_WindData.ReaderWriterLock.ReleaseReaderLock();
+                    layerType = LayerData.LayerDataType.WindExtended;
                 }
+                int offset = 0;
+                while (offset < patchesList.Count)
+                {
+                    int remaining = Math.Min(patchesList.Count - offset, LayerCompressor.MESSAGES_PER_WIND_LAYER_PACKET);
+                    int actualused;
+                    mlist.Add(LayerCompressor.ToLayerMessage(patchesList, layerType, offset, remaining, out actualused));
+                    offset += actualused;
+                }
+                return mlist;
             }
 
             public void UpdateWindDataToSingleClient(IAgent agent)
             {
-                List<LayerData> mlist = CompileWindData();
+                List<LayerData> mlist = CompileWindData(agent.GlobalPosition);
                 foreach (LayerData m in mlist)
                 {
                     agent.SendMessageAlways(m, m_Scene.ID);
@@ -363,10 +312,13 @@ namespace SilverSim.Scene.Types.Scene
 
             private void UpdateWindDataToClients()
             {
-                List<LayerData> mlist = CompileWindData();
-                foreach (LayerData m in mlist)
+                foreach (IAgent agent in m_Scene.Agents)
                 {
-                    SendToAllClients(m);
+                    List<LayerData> mlist = CompileWindData(agent.GlobalPosition);
+                    foreach (LayerData m in mlist)
+                    {
+                        agent.SendMessageAlways(m, m_Scene.ID);
+                    }
                 }
             }
             #endregion
