@@ -2,10 +2,15 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types.Asset.Format;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Runtime.Serialization;
+using System.Text;
 using System.Threading;
+using System.Xml;
 using ThreadedClasses;
 
 namespace SilverSim.Types.Agent
@@ -169,5 +174,176 @@ namespace SilverSim.Types.Agent
                 }
             }
         }
+
+        public AppearanceInfo()
+        {
+
+        }
+
+        public class InvalidAppearanceInfoSerializationException : Exception
+        {
+            public InvalidAppearanceInfoSerializationException()
+            {
+
+            }
+
+            public InvalidAppearanceInfoSerializationException(string msg)
+                : base(msg)
+            {
+
+            }
+
+            protected InvalidAppearanceInfoSerializationException(SerializationInfo info, StreamingContext context)
+                : base(info, context)
+            {
+
+            }
+
+            public InvalidAppearanceInfoSerializationException(string msg, Exception innerException)
+                : base(msg, innerException)
+            {
+
+            }
+        }
+
+        public static AppearanceInfo FromNotecard(Notecard nc)
+        {
+            using (MemoryStream ms = new MemoryStream(UTF8NoBOM.GetBytes(nc.Text)))
+            {
+                Map m = LlsdXml.Deserialize(ms) as Map;
+                if(m == null)
+                {
+                    throw new InvalidAppearanceInfoSerializationException();
+                }
+
+                AppearanceInfo appearanceInfo = new AppearanceInfo();
+                appearanceInfo.AvatarHeight = m["height"].AsReal;
+                AnArray wearables = m["wearables"] as AnArray;
+                AnArray textures = m["textures"] as AnArray;
+                AnArray attachments = m["attachments"] as AnArray;
+                BinaryData visualparams = m["visualparams"] as BinaryData;
+
+                appearanceInfo.VisualParams = visualparams;
+                foreach(IValue iv in attachments)
+                {
+                    Map im = iv as Map;
+                    if(im == null)
+                    {
+                        throw new InvalidAppearanceInfoSerializationException();
+                    }
+                    AttachmentPoint ap = (AttachmentPoint)im["point"].AsInt;
+
+                    appearanceInfo.Attachments[ap][im["item"].AsUUID] = im["asset"].AsUUID;
+                }
+                
+                for(int i = 0; i < wearables.Count; ++i)
+                {
+                    AnArray wearablesAt = wearables[i] as AnArray;
+                    if(null == wearablesAt)
+                    {
+                        throw new InvalidAppearanceInfoSerializationException();
+                    }
+                    foreach(IValue ivw in wearablesAt)
+                    {
+                        Map mw = ivw as Map;
+                        if(mw == null)
+                        {
+                            throw new InvalidAppearanceInfoSerializationException();
+                        }
+                        AgentWearables.WearableInfo wi = new AgentWearables.WearableInfo();
+                        wi.ItemID = mw["item"].AsUUID;
+                        wi.AssetID = mw["asset"].AsUUID;
+                        appearanceInfo.Wearables[(WearableType)i].Add(wi);
+                    }
+                }
+
+                for(int i = 0; i < textures.Count; ++i)
+                {
+                    appearanceInfo.AvatarTextures[i] = textures[i].AsUUID;
+                }
+                appearanceInfo.Serial = (uint)m["serial"].AsInt;
+                return appearanceInfo;
+            }
+        }
+
+        public static explicit operator Notecard(AppearanceInfo appearanceInfo)
+        {
+            using (MemoryStream ms = new MemoryStream())
+            {
+                using (XmlTextWriter writer = new XmlTextWriter(ms, UTF8NoBOM))
+                {
+                    writer.WriteStartElement("llsd");
+                    {
+                        writer.WriteStartElement("map");
+                        {
+                            writer.WriteKeyValuePair("serial", appearanceInfo.Serial);
+                            writer.WriteKeyValuePair("height", appearanceInfo.AvatarHeight);
+                            writer.WriteNamedValue("key", "wearables");
+                            writer.WriteStartElement("array");
+                            {
+                                for (int i = 0; i < (int)WearableType.NumWearables; ++i)
+                                {
+                                    writer.WriteStartElement("array");
+                                    {
+                                        List<AgentWearables.WearableInfo> wearables = appearanceInfo.Wearables[(WearableType)i];
+                                        foreach (AgentWearables.WearableInfo wearable in wearables)
+                                        {
+                                            writer.WriteStartElement("map");
+                                            {
+                                                writer.WriteKeyValuePair("item", wearable.ItemID);
+                                                writer.WriteKeyValuePair("asset", wearable.AssetID);
+                                            }
+                                            writer.WriteEndElement();
+                                        }
+                                    }
+                                    writer.WriteEndElement();
+                                }
+                            }
+                            writer.WriteEndElement();
+
+                            writer.WriteNamedValue("key", "textures");
+                            writer.WriteStartElement("array");
+                            {
+                                foreach (UUID tex in appearanceInfo.AvatarTextures.All)
+                                {
+                                    writer.WriteNamedValue("uuid", tex);
+                                }
+                            }
+                            writer.WriteEndElement();
+
+                            writer.WriteNamedValue("key", "visualparams");
+                            writer.WriteNamedValue("binary", Convert.ToBase64String(appearanceInfo.VisualParams));
+
+                            writer.WriteNamedValue("key", "attachments");
+                            writer.WriteStartElement("array");
+                            {
+                                foreach (KeyValuePair<AttachmentPoint, RwLockedDictionary<UUID, UUID>> kvpAp in appearanceInfo.Attachments)
+                                {
+                                    foreach (KeyValuePair<UUID, UUID> attachmentKvp in kvpAp.Value)
+                                    {
+                                        writer.WriteStartElement("map");
+                                        {
+                                            writer.WriteKeyValuePair("point", (int)kvpAp.Key);
+                                            writer.WriteKeyValuePair("item", attachmentKvp.Key);
+                                            writer.WriteKeyValuePair("asset", attachmentKvp.Value);
+                                        }
+                                        writer.WriteEndElement();
+                                    }
+                                }
+                            }
+                            writer.WriteEndElement();
+                        }
+                        writer.WriteEndElement();
+                    }
+                    writer.WriteEndElement();
+                }
+                
+                Notecard nc = new Notecard();
+                nc.Text = UTF8NoBOM.GetString(ms.GetBuffer());
+                return nc;
+            }
+        }
+
+        static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }
