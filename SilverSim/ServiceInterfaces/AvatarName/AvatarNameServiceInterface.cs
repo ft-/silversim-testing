@@ -27,12 +27,10 @@ namespace SilverSim.ServiceInterfaces.AvatarName
 
         public bool TryGetValue(UUI input, out UUI uui)
         {
-            if(!input.IsAuthoritative)
+            if(!input.IsAuthoritative &&
+                TryGetValue(input.ID, out uui))
             {
-                if(TryGetValue(input.ID, out uui))
-                {
-                    return true;
-                }
+                return true;
             }
             uui = input;
             return true;
