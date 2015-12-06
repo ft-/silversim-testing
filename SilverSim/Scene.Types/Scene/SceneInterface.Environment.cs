@@ -12,6 +12,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
+using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -56,7 +57,15 @@ namespace SilverSim.Scene.Types.Scene
                     X = q.X;
                     Y = q.Y;
                     Z = q.Z;
-                    W = q.Z;
+                    W = q.W;
+                }
+
+                public WLVector4(double x, double y, double z, double w)
+                {
+                    X = x;
+                    Y = y;
+                    Z = z;
+                    W = w;
                 }
 
                 public static implicit operator Quaternion(WLVector4 v)
@@ -93,6 +102,41 @@ namespace SilverSim.Scene.Types.Scene
                 public double SunGlowSize;
                 public WLVector4 SunMoonColor;
                 public double SunMoonPosition;
+
+                public static WindlightSkyData Defaults
+                {
+                    get
+                    {
+                        WindlightSkyData skyData = new WindlightSkyData();
+                        skyData.Horizon = new WLVector4(0.25, 0.25, 0.32, 0.32);
+                        skyData.HazeHorizon = 0.19;
+                        skyData.BlueDensity = new WLVector4(0.12, 0.22, 0.38, 0.38);
+                        skyData.HazeDensity = 0.7;
+                        skyData.DensityMultiplier = 0.18;
+                        skyData.DistanceMultiplier = 0.8;
+                        skyData.MaxAltitude = 1605;
+                        skyData.SunMoonPosition = 0.317;
+                        skyData.SunMoonColor = new WLVector4(0.24, 0.26, 0.30, 0.30);
+                        skyData.Ambient = new WLVector4(0.35, 0.35, 0.35, 0.35);
+                        skyData.EastAngle = 0;
+                        skyData.SunGlowFocus = 0.1;
+                        skyData.SunGlowSize = 1.75;
+                        skyData.SceneGamma = 1.0;
+                        skyData.StarBrightness = 0;
+                        skyData.CloudColor = new WLVector4(0.41, 0.41, 0.41, 0.41);
+                        skyData.CloudXYDensity = new Vector3(1.0, 0.53, 1.0);
+                        skyData.CloudCoverage = 0.27;
+                        skyData.CloudScale = 0.42;
+                        skyData.CloudDetailXYDensity = new Vector3(1.0, 0.52, 0.12);
+                        skyData.CloudScrollX = 0.2;
+                        skyData.CloudScrollY = 0.01;
+                        skyData.DrawClassicClouds = true;
+                        skyData.CloudScrollXLock = false;
+                        skyData.CloudScrollYLock = false;
+
+                        return skyData;
+                    }
+                }
             }
 
             [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
@@ -110,6 +154,28 @@ namespace SilverSim.Scene.Types.Scene
                 public double UnderwaterFogModifier;
                 public Color Color;
                 public double FogDensityExponent;
+
+                public static WindlightWaterData Defaults
+                {
+                    get
+                    {
+                        WindlightWaterData waterData = new WindlightWaterData();
+                        waterData.Color = new Color(4, 38, 64);
+                        waterData.FogDensityExponent = 4;
+                        waterData.UnderwaterFogModifier = 0.25;
+                        waterData.ReflectionWaveletScale = new Vector3(2.0, 2.0, 2.0);
+                        waterData.FresnelScale = 0.4;
+                        waterData.FresnelOffset = 0.5;
+                        waterData.RefractScaleAbove = 0.03;
+                        waterData.RefractScaleBelow = 0.2;
+                        waterData.BlurMultiplier = 0.04;
+                        waterData.BigWaveDirection = new Vector3(1.05, -0.42, 0);
+                        waterData.LittleWaveDirection = new Vector3(1.11, -1.16, 0);
+                        waterData.NormalMapTexture = new UUID("822ded49-9a6c-f61c-cb89-6df54f42cdf4");
+
+                        return waterData;
+                    }
+                }
             }
 
             [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
@@ -130,11 +196,19 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             bool m_WindlightValid;
+            struct WeatherConfig
+            {
+                public bool EnableLightShareControl;
+            }
+
+            WeatherConfig m_WeatherConfig = new WeatherConfig();
+            ReaderWriterLock m_LightShareLock = new ReaderWriterLock();
             WindlightSkyData m_SkyWindlight = new WindlightSkyData();
             WindlightWaterData m_WaterWindlight = new WindlightWaterData();
             SunData m_SunData = new SunData();
             readonly SceneInterface m_Scene;
             readonly System.Timers.Timer m_Timer = new System.Timers.Timer(10000);
+            readonly RwLockedDictionary<UUID, bool> m_OverrideLightSharePerAgent = new RwLockedDictionary<UUID, bool>();
 
             public Vector3 SunDirection
             {
@@ -323,6 +397,28 @@ namespace SilverSim.Scene.Types.Scene
             }
             #endregion
 
+            #region Client-specific update of Windlight Data
+            public void SendTargetedWindlightProfile(UUID agentID, WindlightSkyData skyData, WindlightWaterData waterData)
+            {
+                m_OverrideLightSharePerAgent[agentID] = true;
+                IAgent agent;
+                if(m_Scene.RootAgents.TryGetValue(agentID, out agent))
+                {
+                    agent.SendMessageIfRootAgent(CompileWindlightSettings(SkyData, waterData), m_Scene.ID);
+                }
+            }
+
+            public void ResetTargetedWindlightProfile(UUID agentID)
+            {
+                m_OverrideLightSharePerAgent[agentID] = false;
+                IAgent agent;
+                if (m_Scene.RootAgents.TryGetValue(agentID, out agent))
+                {
+                    UpdateWindlightProfileToClient(agent);
+                }
+            }
+            #endregion
+
             #region Update of Windlight Data
             private void UpdateWindlightProfileToClients()
             {
@@ -332,7 +428,15 @@ namespace SilverSim.Scene.Types.Scene
                     CompileWindlightSettings(m_SkyWindlight, m_WaterWindlight) :
                     CompileResetWindlightSettings();
 
-                SendToAllClients(m);
+                foreach (IAgent agent in m_Scene.Agents)
+                {
+                    bool overrideLs;
+                    if (m_OverrideLightSharePerAgent.TryGetValue(agent.Owner.ID, out overrideLs) && overrideLs)
+                    {
+                        continue;
+                    }
+                    agent.SendMessageIfRootAgent(m, m_Scene.ID);
+                }
             }
 
             public void UpdateWindlightProfileToClient(IAgent agent)
@@ -378,6 +482,147 @@ namespace SilverSim.Scene.Types.Scene
                 foreach (IAgent agent in m_Scene.Agents)
                 {
                     agent.SendMessageAlways(m, m_Scene.ID);
+                }
+            }
+
+            public enum BooleanWeatherParams
+            {
+                EnableLightShare,
+            }
+
+            public bool this[BooleanWeatherParams type]
+            {
+                get
+                {
+                    switch(type)
+                    {
+                        case BooleanWeatherParams.EnableLightShare:
+                            return m_WeatherConfig.EnableLightShareControl;
+
+                        default:
+                            return false;
+                    }
+                }
+                set
+                {
+                    switch(type)
+                    {
+                        case BooleanWeatherParams.EnableLightShare:
+                            m_LightShareLock.AcquireWriterLock(-1);
+                            try
+                            {
+                                m_WeatherConfig.EnableLightShareControl = value;
+                            }
+                            finally
+                            {
+                                m_LightShareLock.ReleaseWriterLock();
+                            }
+                            break;
+                    }
+                }
+            }
+
+            public void ResetLightShare()
+            {
+                bool windlightUpdated = false;
+                m_OverrideLightSharePerAgent.Clear();
+                m_LightShareLock.AcquireWriterLock(-1);
+                try
+                {
+                    if (!m_WeatherConfig.EnableLightShareControl)
+                    {
+                        m_WindlightValid = false;
+                        windlightUpdated = true;
+                    }
+                }
+                finally
+                {
+                    m_LightShareLock.ReleaseWriterLock();
+                }
+
+                if(windlightUpdated)
+                {
+                    SendToAllClients(CompileResetWindlightSettings());
+                }
+            }
+
+            public WindlightSkyData SkyData
+            {
+                get
+                {
+                    m_LightShareLock.AcquireReaderLock(-1);
+                    try
+                    {
+                        return m_WindlightValid ?
+                            m_SkyWindlight :
+                            WindlightSkyData.Defaults;
+                    }
+                    finally
+                    {
+                        m_LightShareLock.ReleaseReaderLock();
+                    }
+                }
+                set
+                {
+                    bool windlightUpdated = false;
+                    m_LightShareLock.AcquireWriterLock(-1);
+                    try
+                    {
+                        if (!m_WeatherConfig.EnableLightShareControl)
+                        {
+                            m_SkyWindlight = value;
+                            windlightUpdated = true;
+                            m_WindlightValid = true;
+                        }
+                    }
+                    finally
+                    { 
+                        m_LightShareLock.ReleaseWriterLock();
+                    }
+                    if(windlightUpdated)
+                    {
+                        UpdateWindlightProfileToClients();
+                    }
+                }
+            }
+
+            public WindlightWaterData WaterData
+            {
+                get
+                {
+                    m_LightShareLock.AcquireReaderLock(-1);
+                    try
+                    {
+                        return m_WindlightValid ?
+                            m_WaterWindlight :
+                            WindlightWaterData.Defaults;
+                    }
+                    finally
+                    {
+                        m_LightShareLock.ReleaseReaderLock();
+                    }
+                }
+                set
+                {
+                    bool windlightUpdated = false;
+                    m_LightShareLock.AcquireWriterLock(-1);
+                    try
+                    {
+                        if (!m_WeatherConfig.EnableLightShareControl)
+                        {
+                            m_WaterWindlight = value;
+                            windlightUpdated = true;
+                            m_WindlightValid = true;
+                        }
+                    }
+                    finally
+                    {
+                        m_LightShareLock.ReleaseWriterLock();
+                    }
+                    if (windlightUpdated)
+                    {
+                        UpdateWindlightProfileToClients();
+                    }
                 }
             }
 
