@@ -88,6 +88,7 @@ namespace SilverSim.Scene.Types.Object
         public AgentSittingInterface AgentSitting { get; private set; }
         public SceneInterface Scene { get; set; }
         public UUID FromItemID = UUID.Zero; /* used for attachments */
+        public UUID RezzingObjectID = UUID.Zero; /* used alongside llRezObject and llRezAtRoot */
 
         AssetServiceInterface m_AssetService;
         public AssetServiceInterface AssetService /* specific for attachments usage */
