@@ -26,6 +26,7 @@ namespace SilverSim.Types.Estate
         public string AbuseEmail = string.Empty;
         public bool UseGlobalTime = true;
         public UUID CovenantID = UUID.Zero;
+        public Date CovenantTimestamp = new Date();
 
         public EstateInfo()
         {

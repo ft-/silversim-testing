@@ -20,6 +20,7 @@ namespace SilverSim.Database.MySQL.Estate
             ei.SunPosition = (double)reader["SunPosition"];
             ei.AbuseEmail = (string)reader["AbuseEmail"];
             ei.CovenantID = reader.GetUUID("CovenantID");
+            ei.CovenantTimestamp = reader.GetDate("CovenantTimestamp");
 
             return ei;
         }
