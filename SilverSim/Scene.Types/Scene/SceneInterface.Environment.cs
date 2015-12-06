@@ -518,6 +518,9 @@ namespace SilverSim.Scene.Types.Scene
                                 m_LightShareLock.ReleaseWriterLock();
                             }
                             break;
+
+                        default:
+                            break;
                     }
                 }
             }
