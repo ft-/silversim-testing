@@ -1039,6 +1039,11 @@ namespace SilverSim.Scene.Types.Object
                     return m_Group.m_SittingAgents[p];
                 }
             }
+
+            public bool TryGetValue(ObjectPart p, out IAgent agent)
+            {
+                return m_Group.m_SittingAgents.TryGetValue(p, out agent);
+            }
         }
         #endregion
 
