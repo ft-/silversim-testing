@@ -5,7 +5,6 @@ using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Net;
 
