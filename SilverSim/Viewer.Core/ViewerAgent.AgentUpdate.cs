@@ -42,6 +42,19 @@ namespace SilverSim.Viewer.Core
         readonly Dictionary<ScriptInstance, ScriptControlData> m_ScriptControls = new Dictionary<ScriptInstance, ScriptControlData>();
         #endregion
 
+        public void TakeControls(ScriptInstance instance, int controls, int accept, int pass_on)
+        {
+            ScriptControlData data = new ScriptControlData();
+            data.Taken = accept != 0 ? (ControlFlags)controls : ControlFlags.None;
+            data.Ignored = pass_on != 0 ? (ControlFlags)controls : ControlFlags.None;
+            this[instance] = data;
+        }
+
+        public void ReleaseControls(ScriptInstance instance)
+        {
+            this[instance] = null;
+        }
+
         public ScriptControlData this[ScriptInstance instance]
         {
             get
@@ -60,7 +73,14 @@ namespace SilverSim.Viewer.Core
             {
                 lock(m_ScriptControls)
                 {
-                    m_ScriptControls[instance] = new ScriptControlData(value);
+                    if (null != value)
+                    {
+                        m_ScriptControls[instance] = new ScriptControlData(value);
+                    }
+                    else
+                    {
+                        m_ScriptControls.Remove(instance);
+                    }
                     m_TakenControls = ControlFlags.None;
                     m_IgnoredControls = ControlFlags.None;
                     foreach(ScriptControlData sc in m_ScriptControls.Values)

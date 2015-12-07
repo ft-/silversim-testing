@@ -25,6 +25,7 @@ using SilverSim.Types.IM;
 using SilverSim.Types.Script;
 using System.Collections.Generic;
 using ThreadedClasses;
+using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scene.Types.Agent
 {
@@ -233,5 +234,8 @@ namespace SilverSim.Scene.Types.Agent
         ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions);
         ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions, UUID experienceID);
         void RevokePermissions(UUID sourceID, UUID itemID, ScriptPermissions permissions);
+
+        void TakeControls(ScriptInstance instance, int controls, int accept, int pass_on);
+        void ReleaseControls(ScriptInstance instance);
     }
 }
