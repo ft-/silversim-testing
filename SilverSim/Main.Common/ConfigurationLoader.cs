@@ -281,6 +281,14 @@ namespace SilverSim.Main.Common
             }
         }
 
+        public BaseHttpServer HttpsServer
+        {
+            get
+            {
+                return GetService<BaseHttpServer>("HttpsServer");
+            }
+        }
+
         #region Configuration Loader Helpers
         private interface ICFG_Source
         {
@@ -979,10 +987,20 @@ namespace SilverSim.Main.Common
             }
 
             m_Log.Info("Initializing HTTP Server");
-            IConfig httpConfig = m_Config.Configs["Network"];
+            IConfig httpConfig = m_Config.Configs["HTTP"];
+            if (null == httpConfig)
+            {
+                httpConfig = m_Config.Configs["Network"];
+            }
             if(null == httpConfig)
             {
-                m_Log.Fatal("Missing configuration section [Network]");
+                m_Log.Fatal("Missing configuration section [Network] or preferred [HTTP]");
+                throw new ConfigurationErrorException();
+            }
+
+            if(httpConfig.Contains("ServerCertificate"))
+            {
+                m_Log.Fatal("Configuration section [Network] or preferred [HTTP] should not be configured for HTTPS");
                 throw new ConfigurationErrorException();
             }
 
@@ -990,11 +1008,24 @@ namespace SilverSim.Main.Common
 
             httpServer = new BaseHttpServer(httpConfig);
             PluginInstances.Add("HttpServer", httpServer);
+            httpServer.UriHandlers.Add("/helo", HeloResponseHandler);
+
+            IConfig httpsConfig = m_Config.Configs["HTTPS"];
+            if(null != httpsConfig)
+            {
+                if (httpsConfig.Contains("ServerCertificate"))
+                {
+                    m_Log.Fatal("Configuration section [HTTPS] should be configured for HTTPS");
+                    throw new ConfigurationErrorException();
+                }
+                BaseHttpServer httpsServer = new BaseHttpServer(httpsConfig);
+                httpsServer.UriHandlers.Add("/helo", HeloResponseHandler);
+                PluginInstances.Add("HttpsServer", httpsServer);
+            }
+
             PluginInstances.Add("XmlRpcServer", new HttpXmlRpcHandler());
             PluginInstances.Add("JSON2.0RpcServer", new HttpJson20RpcHandler());
             PluginInstances.Add("CapsRedirector", new CapsHttpRedirector());
-
-            httpServer.UriHandlers.Add("/helo", HeloResponseHandler);
 
             m_Log.Info("Initing extra modules");
             foreach (IPlugin instance in PluginInstances.Values)
