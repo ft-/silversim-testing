@@ -138,6 +138,7 @@ namespace SilverSim.Types.Parcel
         public URI MusicURI;
         public URI MediaURI;
         public UUID MediaID;
+        public string MediaType = string.Empty;
         public UUI Owner = new UUI();
         public UUID SnapshotID = UUID.Zero;
         public Int32 SalePrice;
