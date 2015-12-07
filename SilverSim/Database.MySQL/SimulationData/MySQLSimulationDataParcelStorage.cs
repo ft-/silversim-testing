@@ -75,9 +75,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             pi.MediaType = (string)dbReader["MediaType"];
                             pi.MediaWidth = (int)dbReader["MediaWidth"];
                             pi.MediaHeight = (int)dbReader["MediaHeight"];
-                            pi.MediaCommand = (int)dbReader["MediaCommand"];
-                            pi.MediaStartTime = (double)dbReader["MediaStartTime"];
-                            pi.MediaLoopTime = (double)dbReader["MediaLoopTime"];
+                            pi.MediaLoop = (int)dbReader["MediaLoop"] != 0;
                             pi.MediaDescription = (string)dbReader["MediaDescription"];
                             pi.RentPrice = (int)dbReader["RentPrice"];
                             pi.AABBMin = MySQLUtilities.GetVector(dbReader, "AABBMin");
@@ -153,9 +151,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["OtherCleanTime"] = parcel.OtherCleanTime;
             p["MediaAutoScale"] = parcel.MediaAutoScale ? 1 : 0;
             p["MediaDescription"] = parcel.MediaDescription;
-            p["MediaCommand"] = parcel.MediaCommand;
-            p["MediaStartTime"] = parcel.MediaStartTime;
-            p["MediaLoopTime"] = parcel.MediaLoopTime;
+            p["MediaLoop"] = parcel.MediaLoop ? 1 : 0;
             p["RentPrice"] = parcel.RentPrice;
             p["AABBMin"] = parcel.AABBMin;
             p["AABBMax"] = parcel.AABBMax;
@@ -237,9 +233,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "UNIQUE KEY LocalIDs (RegionID, LocalID))",
             "ALTER TABLE %tablename% ADD COLUMN (MediaDescription VARCHAR(255) NOT NULL DEFAULT '', " +
                             "MediaType VARCHAR(255) NOT NULL DEFAULT '', " +
-                            "MediaCommand INT(11) NOT NULL DEFAULT '0'," +
-                            "MediaStartTime DOUBLE NOT NULL DEFAULT '0'," +
-                            "MediaLoopTime DOUBLE NOT NULL DEFAULT '0'," +
+                            "MediaLoop INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
                             "MediaWidth INT(11) NOT NULL DEFAULT '0', " + 
                             "MediaHeight INT(11) NOT NULL DEFAULT '0'),",
         };
