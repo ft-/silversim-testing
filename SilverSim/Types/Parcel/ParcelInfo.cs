@@ -146,6 +146,9 @@ namespace SilverSim.Types.Parcel
         public bool MediaAutoScale;
         public int MediaWidth;
         public int MediaHeight;
+        public double MediaStartTime = -1;
+        public double MediaLoopTime = -1;
+        public int MediaCommand = 0;
         public string MediaDescription;
         public Int32 RentPrice;
         public Vector3 AABBMin;
