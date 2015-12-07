@@ -238,8 +238,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             "ALTER TABLE %tablename% ADD COLUMN (MediaDescription VARCHAR(255) NOT NULL DEFAULT '', " +
                             "MediaType VARCHAR(255) NOT NULL DEFAULT '', " +
                             "MediaCommand INT(11) NOT NULL DEFAULT '0'," +
-                            "MediaStartTime DOUBLE NOT NULL DEFAULT '-1'," +
-                            "MediaLoopTime DOUBLE NOT NULL DEFAULT '-1'," +
+                            "MediaStartTime DOUBLE NOT NULL DEFAULT '0'," +
+                            "MediaLoopTime DOUBLE NOT NULL DEFAULT '0'," +
                             "MediaWidth INT(11) NOT NULL DEFAULT '0', " + 
                             "MediaHeight INT(11) NOT NULL DEFAULT '0'),",
         };
