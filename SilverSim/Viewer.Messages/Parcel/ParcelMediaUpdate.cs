@@ -18,7 +18,7 @@ namespace SilverSim.Viewer.Messages.Parcel
         public string MediaDesc;
         public Int32 MediaWidth;
         public Int32 MediaHeight;
-        public byte MediaLoop;
+        public bool MediaLoop;
 
         public ParcelMediaUpdate()
         {
@@ -35,7 +35,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             p.WriteStringLen8(MediaDesc);
             p.WriteInt32(MediaWidth);
             p.WriteInt32(MediaHeight);
-            p.WriteUInt8(MediaLoop);
+            p.WriteBoolean(MediaLoop);
         }
     }
 }
