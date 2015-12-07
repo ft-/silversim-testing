@@ -144,6 +144,8 @@ namespace SilverSim.Types.Parcel
         public Int32 SalePrice;
         public Int32 OtherCleanTime;
         public bool MediaAutoScale;
+        public int MediaWidth;
+        public int MediaHeight;
         public Int32 RentPrice;
         public Vector3 AABBMin;
         public Vector3 AABBMax;

@@ -73,6 +73,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                             pi.OtherCleanTime = (int)dbReader["OtherCleanTime"];
                             pi.MediaAutoScale = (uint)dbReader["MediaAutoScale"] != 0;
                             pi.MediaType = (string)dbReader["MediaType"];
+                            pi.MediaWidth = (int)dbReader["MediaWidth"];
+                            pi.MediaHeight = (int)dbReader["MediaHeight"];
                             pi.RentPrice = (int)dbReader["RentPrice"];
                             pi.AABBMin = MySQLUtilities.GetVector(dbReader, "AABBMin");
                             pi.AABBMax = MySQLUtilities.GetVector(dbReader, "AABBMax");
@@ -139,6 +141,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["MusicURI"] = parcel.MusicURI;
             p["MediaURI"] = parcel.MediaURI;
             p["MediaType"] = parcel.MediaType;
+            p["MediaWidth"] = parcel.MediaWidth;
+            p["MediaHeight"] = parcel.MediaHeight;
             p["MediaID"] = parcel.MediaID.ToString();
             p["SnapshotID"] = parcel.SnapshotID.ToString();
             p["SalePrice"] = parcel.SalePrice;
@@ -223,7 +227,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "PRIMARY KEY(RegionID, ParcelID)," +
                 "KEY ParcelNames (RegionID, `Name`)," +
                 "UNIQUE KEY LocalIDs (RegionID, LocalID))",
-            "ALTER TABLE %tablename% ADD COLUMN (MediaType VARCHAR(255) NOT NULL DEFAULT '',",
+            "ALTER TABLE %tablename% ADD COLUMN (MediaType VARCHAR(255) NOT NULL DEFAULT '', MediaWidth INT(11) NOT NULL DEFAULT '0', MediaHeight INT(11) NOT NULL DEFAULT '0'),",
         };
         #endregion
     }
