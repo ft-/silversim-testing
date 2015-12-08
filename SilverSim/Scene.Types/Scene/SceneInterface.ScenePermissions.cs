@@ -16,10 +16,9 @@ namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
-        GroupPowers GetGroupPowers(IAgent agent, UGI group)
+        GroupPowers GetGroupPowers(UUI agentOwner, UGI group)
         {
-            UUI agentOwner = agent.Owner;
-            if(!IsGroupMember(agent, group))
+            if(!IsGroupMember(agentOwner, group))
             {
                 return GroupPowers.None;
             }
@@ -34,16 +33,14 @@ namespace SilverSim.Scene.Types.Scene
             return GroupPowers.None;
         }
 
-        bool HasGroupPower(IAgent agent, UGI group, GroupPowers power)
+        bool HasGroupPower(UUI agentOwner, UGI group, GroupPowers power)
         {
-            return (GetGroupPowers(agent, group) & power) != 0;
+            return (GetGroupPowers(agentOwner, group) & power) != 0;
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        bool IsGroupMember(IAgent agent, UGI group)
+        bool IsGroupMember(UUI agentOwner, UGI group)
         {
-            UUI agentOwner = agent.Owner;
-
             if (null == GroupsService || group.ID == UUID.Zero)
             {
                 return false;
@@ -151,7 +148,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             else if((pinfo.Flags & ParcelFlags.CreateGroupObjects) != 0 &&
                 pinfo.Group.ID != UUID.Zero &&
-                HasGroupPower(agent, pinfo.Group, GroupPowers.AllowRez))
+                HasGroupPower(agent.Owner, pinfo.Group, GroupPowers.AllowRez))
             {
                 return true;
             }
@@ -180,7 +177,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             else if ((pinfo.Flags & ParcelFlags.AllowGroupScripts) != 0 &&
                 pinfo.Group.ID != UUID.Zero &&
-                IsGroupMember(agent, pinfo.Group))
+                IsGroupMember(agent.Owner, pinfo.Group))
             {
                 return true;
             }
@@ -238,7 +235,7 @@ namespace SilverSim.Scene.Types.Scene
                 return true;
             }
 
-            if (HasGroupPower(agent, group.Group, GroupPowers.ObjectManipulate))
+            if (HasGroupPower(agent.Owner, group.Group, GroupPowers.ObjectManipulate))
             {
                 return true;
             }
@@ -251,7 +248,7 @@ namespace SilverSim.Scene.Types.Scene
                     return true;
                 }
 
-                if (HasGroupPower(agent, pinfo.Group, GroupPowers.ObjectManipulate))
+                if (HasGroupPower(agent.Owner, pinfo.Group, GroupPowers.ObjectManipulate))
                 {
                     return true;
                 }
@@ -348,9 +345,8 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public bool CanEditParcelDetails(IAgent agent, ObjectGroup group, ParcelInfo parcelInfo)
+        public bool CanEditParcelDetails(UUI agentOwner, ObjectGroup group, ParcelInfo parcelInfo)
         {
-            UUI agentOwner = agent.Owner;
             UUI groupOwner = group.Owner;
             if (IsPossibleGod(agentOwner))
             {
@@ -362,7 +358,7 @@ namespace SilverSim.Scene.Types.Scene
                 return true;
             }
 
-            if (HasGroupPower(agent, parcelInfo.Group, GroupPowers.LandEdit))
+            if (HasGroupPower(agentOwner, parcelInfo.Group, GroupPowers.LandEdit))
             {
                 return true;
             }
@@ -404,7 +400,7 @@ namespace SilverSim.Scene.Types.Scene
 
 #warning Add Friends Rights to CanDelete
 
-            if (HasGroupPower(agent, group.Group, GroupPowers.ObjectManipulate))
+            if (HasGroupPower(agent.Owner, group.Group, GroupPowers.ObjectManipulate))
             {
                 return true;
             }
@@ -417,7 +413,7 @@ namespace SilverSim.Scene.Types.Scene
                     return true;
                 }
 
-                if (HasGroupPower(agent, pinfo.Group, GroupPowers.ObjectManipulate))
+                if (HasGroupPower(agent.Owner, pinfo.Group, GroupPowers.ObjectManipulate))
                 {
                     return true;
                 }
@@ -460,12 +456,12 @@ namespace SilverSim.Scene.Types.Scene
 
 #warning Add Friends Rights to CanReturn?
 
-            if (HasGroupPower(agent, group.Group, GroupPowers.ReturnGroupSet))
+            if (HasGroupPower(agent.Owner, group.Group, GroupPowers.ReturnGroupSet))
             {
                 return true;
             }
             else if(group.IsGroupOwned &&
-                HasGroupPower(agent, group.Group, GroupPowers.ReturnGroupOwned))
+                HasGroupPower(agent.Owner, group.Group, GroupPowers.ReturnGroupOwned))
             {
                 return true;
             }
@@ -478,7 +474,7 @@ namespace SilverSim.Scene.Types.Scene
                     return true;
                 }
 
-                if (!pinfo.Group.Equals(group.Group) && HasGroupPower(agent, pinfo.Group, GroupPowers.ReturnNonGroup))
+                if (!pinfo.Group.Equals(group.Group) && HasGroupPower(agent.Owner, pinfo.Group, GroupPowers.ReturnNonGroup))
                 {
                     return true;
                 }
@@ -619,7 +615,7 @@ namespace SilverSim.Scene.Types.Scene
                     return true;
                 }
 
-                if(HasGroupPower(agent, pinfo.Group, GroupPowers.AllowEditLand))
+                if(HasGroupPower(agent.Owner, pinfo.Group, GroupPowers.AllowEditLand))
                 {
                     return true;
                 }
