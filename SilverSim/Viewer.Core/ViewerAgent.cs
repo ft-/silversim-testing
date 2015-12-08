@@ -1142,15 +1142,10 @@ namespace SilverSim.Viewer.Core
                 circuit.Scene.Environment.UpdateWindDataToSingleClient(this);
                 circuit.Scene.SendAgentObjectToAllAgents(this);
                 ParcelInfo pinfo;
-                try
+                if(circuit.Scene.Parcels.TryGetValue(GlobalPosition, out pinfo))
                 {
-                    pinfo = circuit.Scene.Parcels[GlobalPosition];
                     ParcelProperties props = circuit.Scene.ParcelInfo2ParcelProperties(Owner.ID, pinfo, NextParcelSequenceId, ParcelProperties.RequestResultType.Single);
                     circuit.SendMessage(props);
-                }
-                catch
-                {
-
                 }
                 circuit.ScheduleFirstUpdate();
                 SendAnimations();

@@ -110,7 +110,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             parcelData.Add("ClaimDate", ClaimDate.AsInt);
             parcelData.Add("ClaimPrice", ClaimPrice);
             parcelData.Add("Desc", Description);
-            parcelData.Add("ParcelFlags", (byte)ParcelFlags);
+            parcelData.Add("ParcelFlags", (uint)ParcelFlags);
             parcelData.Add("GroupID", GroupID);
             parcelData.Add("GroupPrims", GroupPrims);
             parcelData.Add("IsGroupOwned", IsGroupOwned);
