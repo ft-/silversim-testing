@@ -169,6 +169,7 @@ namespace SilverSim.Scene.Implementation.Basic
         public sealed class BasicSceneParcelsCollection : ISceneParcels
         {
             readonly BasicScene m_Scene;
+            readonly object m_SceneUpdateLock = new object();
 
             internal BasicSceneParcelsCollection(BasicScene scene)
             {
@@ -252,6 +253,42 @@ namespace SilverSim.Scene.Implementation.Basic
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
+            }
+
+            public void Add(ParcelInfo parcelInfo)
+            {
+                lock (m_SceneUpdateLock)
+                {
+                    m_Scene.AddParcel(parcelInfo);
+                    m_Scene.m_SimulationDataStorage.Parcels.Store(m_Scene.ID, parcelInfo);
+                }
+            }
+
+            public void Store(UUID parcelID)
+            {
+                lock(m_SceneUpdateLock)
+                {
+                    ParcelInfo pInfo;
+                    if (m_Scene.m_Parcels.TryGetValue(parcelID, out pInfo))
+                    {
+                        m_Scene.m_SimulationDataStorage.Parcels.Store(m_Scene.ID, pInfo);
+                    }
+                }
+            }
+
+            public bool Remove(UUID parcelID)
+            {
+                lock (m_SceneUpdateLock)
+                {
+                    bool res = m_Scene.m_Parcels.Remove(parcelID);
+                    res = res && m_Scene.m_SimulationDataStorage.Parcels.Remove(m_Scene.ID, parcelID);
+                    return res;
+                }
+            }
+
+            public void ResetParcels()
+            {
+
             }
         }
 

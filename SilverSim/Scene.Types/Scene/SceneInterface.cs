@@ -65,10 +65,15 @@ namespace SilverSim.Scene.Types.Scene
         ParcelInfo this[UUID id] { get; }
         ParcelInfo this[Vector3 position] { get; }
         ParcelInfo this[int localID] { get; }
-
+        
         bool TryGetValue(UUID id, out ParcelInfo pinfo);
         bool TryGetValue(Vector3 position, out ParcelInfo pinfo);
         bool TryGetValue(int localID, out ParcelInfo pinfo);
+
+        void Add(ParcelInfo parcelInfo);
+        void Store(UUID parcelID);
+        bool Remove(UUID parcelID);
+        void ResetParcels();
     }
 
     public abstract partial class SceneInterface

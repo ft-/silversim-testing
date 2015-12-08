@@ -94,6 +94,21 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
         }
 
+        public override bool Remove(UUID regionID, UUID parcelID)
+        {
+            List<UUID> parcels = new List<UUID>();
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID LIKE ?regionID AND ParcelID LIKE ?parcelID", connection))
+                {
+                    cmd.Parameters.AddWithValue("?regionID", regionID.ToString());
+                    cmd.Parameters.AddWithValue("?parcelID", parcelID.ToString());
+                    return cmd.ExecuteNonQuery() > 0;
+                }
+            }
+        }
+
         public override List<UUID> ParcelsInRegion(UUID key)
         {
             List<UUID> parcels = new List<UUID>();
