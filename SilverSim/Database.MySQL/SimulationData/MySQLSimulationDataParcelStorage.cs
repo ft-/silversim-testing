@@ -232,7 +232,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "KEY ParcelNames (RegionID, `Name`)," +
                 "UNIQUE KEY LocalIDs (RegionID, LocalID))",
             "ALTER TABLE %tablename% ADD COLUMN (MediaDescription VARCHAR(255) NOT NULL DEFAULT '', " +
-                            "MediaType VARCHAR(255) NOT NULL DEFAULT '', " +
+                            "MediaType VARCHAR(255) NOT NULL DEFAULT 'none/none', " +
                             "MediaLoop INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
                             "MediaWidth INT(11) NOT NULL DEFAULT '0', " + 
                             "MediaHeight INT(11) NOT NULL DEFAULT '0'),",
