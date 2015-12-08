@@ -356,7 +356,7 @@ namespace SilverSim.Viewer.Core
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
-            //AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, delegate(LLAgent agent) { return new Capabilities.ParcelNavigateMedia(agent.Owner, Scene); }, capConfig);
+            AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, delegate(ViewerAgent agent) { return new Capabilities.ParcelNavigateMedia(agent.Owner, Scene); }, capConfig);
             AddDefCapabilityFactory("ObjectMedia", regionSeedID, delegate(ViewerAgent agent) { return new Capabilities.ObjectMedia(agent.Owner, Scene); }, capConfig);
             AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, delegate(ViewerAgent agent) { return new Capabilities.ObjectMediaNavigate(agent.Owner, Scene); }, capConfig);
         }
