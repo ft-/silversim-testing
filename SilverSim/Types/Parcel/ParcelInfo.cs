@@ -157,6 +157,8 @@ namespace SilverSim.Types.Parcel
         public Int32 ActualArea;
         public Int32 BillableArea;
         public double Dwell;
+        public bool ObscureMedia;
+        public bool ObscureMusic;
 
         internal byte[,] m_LandBitmap;
         internal ReaderWriterLock m_LandBitmapRwLock = new ReaderWriterLock();

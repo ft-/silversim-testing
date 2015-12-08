@@ -169,9 +169,9 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            try
+            ParcelInfo pinfo;
+            if(Parcels.TryGetValue(req.ParcelID, out pinfo))
             {
-                ParcelInfo pinfo = Parcels[req.ParcelID];
                 ParcelInfoReply reply = new ParcelInfoReply();
                 reply.AgentID = req.AgentID;
                 reply.OwnerID = pinfo.Owner.ID;
@@ -186,10 +186,6 @@ namespace SilverSim.Scene.Types.Scene
                 reply.SalePrice = pinfo.SalePrice;
                 reply.AuctionID = pinfo.AuctionID;
                 Agents[req.AgentID].SendMessageAlways(reply, ID);
-            }
-            catch
-            {
-
             }
         }
 
@@ -250,17 +246,18 @@ namespace SilverSim.Scene.Types.Scene
             prop.RegionDenyIdentified = false;
             prop.RegionDenyTransacted = false;
             prop.RegionDenyAgeUnverified = false;
+#warning Other Parcel Details here
             prop.Privacy = false;
             prop.SeeAVs = true;
             prop.AnyAVSounds = true;
             prop.GroupAVSounds = true;
-            prop.MediaDesc = string.Empty;
-            prop.MediaHeight = 0;
-            prop.MediaWidth = 0;
-            prop.MediaLoop = false;
-            prop.MediaType = string.Empty;
-            prop.ObscureMedia = false;
-            prop.ObscureMusic = false;
+            prop.MediaDesc = pinfo.MediaDescription;
+            prop.MediaHeight = pinfo.MediaHeight;
+            prop.MediaWidth = pinfo.MediaWidth;
+            prop.MediaLoop = pinfo.MediaLoop;
+            prop.MediaType = pinfo.MediaType;
+            prop.ObscureMedia = pinfo.ObscureMedia;
+            prop.ObscureMusic = pinfo.ObscureMusic;
 
             return prop;
         }
@@ -321,11 +318,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             IAgent agent;
-            try
-            {
-                agent = Agents[req.AgentID];
-            }
-            catch
+            if(!Agents.TryGetValue(req.AgentID, out agent))
             {
                 return;
             }
@@ -349,16 +342,11 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
-            try
+            ParcelInfo pinfo;
+            if(Parcels.TryGetValue(req.LocalID, out pinfo))
             {
-                ParcelInfo pinfo = Parcels[req.LocalID];
-
                 ParcelProperties props = ParcelInfo2ParcelProperties(req.AgentID, pinfo, req.SequenceID, ParcelProperties.RequestResultType.Single);
                 Agents[req.AgentID].SendMessageAlways(props, ID);
-            }
-            catch
-            {
-
             }
         }
     }

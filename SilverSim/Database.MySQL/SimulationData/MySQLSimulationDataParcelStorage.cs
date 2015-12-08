@@ -67,7 +67,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                                 pi.MediaURI = new URI((string)dbReader["MediaURI"]);
                             }
                             pi.MediaID = MySQLUtilities.GetUUID(dbReader, "MediaID");
-                            pi.Owner = new UUI((string)dbReader["Owner"]);
+                            pi.Owner = dbReader.GetUUI("Owner");
                             pi.SnapshotID = MySQLUtilities.GetUUID(dbReader, "SnapshotID");
                             pi.SalePrice = (int)dbReader["SalePrice"];
                             pi.OtherCleanTime = (int)dbReader["OtherCleanTime"];
@@ -75,7 +75,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                             pi.MediaType = (string)dbReader["MediaType"];
                             pi.MediaWidth = (int)dbReader["MediaWidth"];
                             pi.MediaHeight = (int)dbReader["MediaHeight"];
-                            pi.MediaLoop = (int)dbReader["MediaLoop"] != 0;
+                            pi.MediaLoop = (uint)dbReader["MediaLoop"] != 0;
+                            pi.ObscureMedia = (uint)dbReader["ObscureMedia"] != 0;
+                            pi.ObscureMusic = (uint)dbReader["ObscureMusic"] != 0;
                             pi.MediaDescription = (string)dbReader["MediaDescription"];
                             pi.RentPrice = (int)dbReader["RentPrice"];
                             pi.AABBMin = MySQLUtilities.GetVector(dbReader, "AABBMin");
@@ -167,6 +169,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["MediaAutoScale"] = parcel.MediaAutoScale ? 1 : 0;
             p["MediaDescription"] = parcel.MediaDescription;
             p["MediaLoop"] = parcel.MediaLoop ? 1 : 0;
+            p["ObscureMedia"] = parcel.ObscureMedia ? 1 : 0;
+            p["ObscureMusic"] = parcel.ObscureMusic ? 1 : 0;
             p["RentPrice"] = parcel.RentPrice;
             p["AABBMin"] = parcel.AABBMin;
             p["AABBMax"] = parcel.AABBMax;
@@ -251,6 +255,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                             "MediaLoop INT(11) UNSIGNED NOT NULL DEFAULT '0'," +
                             "MediaWidth INT(11) NOT NULL DEFAULT '0', " + 
                             "MediaHeight INT(11) NOT NULL DEFAULT '0'),",
+            "ALTER TABLE %tablename% ADD COLUMN (ObscureMedia INT(1) UNSIGNED NOT NULL DEFAULT '0', " +
+                            "ObscureMusic INT(1) UNSIGNED NOT NULL DEFAULT '0'),"
         };
         #endregion
     }
