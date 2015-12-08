@@ -43,7 +43,7 @@ namespace SilverSim.Scene.Types.Object
 
     public interface IPrimitiveParamsInterface
     {
-        void GetPrimitiveParams(PrimitiveParamsType type, ref AnArray paramList);
+        void GetPrimitiveParams(PrimitiveParamsType type, AnArray paramList);
         void SetPrimitiveParams(PrimitiveParamsType type, AnArray.MarkEnumerator enumerator);
     }
 
@@ -175,9 +175,9 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Methods
-        void GetPrimitiveParams(AnArray.Enumerator enumerator, ref AnArray paramList);
+        void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList);
         void SetPrimitiveParams(AnArray.MarkEnumerator enumerator);
-        void GetObjectDetails(AnArray.Enumerator enumerator, ref AnArray paramList);
+        void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList);
         void PostEvent(IScriptEvent ev);
         #endregion
     }

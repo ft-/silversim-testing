@@ -947,7 +947,7 @@ namespace SilverSim.Scene.Types.Object
 
         #region Primitive Methods
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        public void GetPrimitiveParams(AnArray.Enumerator enumerator, ref AnArray paramList)
+        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList)
         {
             switch (ParamsHelper.GetPrimParamType(enumerator))
             {
@@ -1002,7 +1002,7 @@ namespace SilverSim.Scene.Types.Object
                         ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_ALPHAMODE"));
                         foreach (TextureEntryFace face in faces)
                         {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.AlphaMode, ref paramList);
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.AlphaMode, paramList);
                         }
                     }
                     finally
@@ -1018,7 +1018,7 @@ namespace SilverSim.Scene.Types.Object
                         ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_NORMAL"));
                         foreach (TextureEntryFace face in faces)
                         {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Normal, ref paramList);
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.Normal, paramList);
                         }
                     }
                     finally
@@ -1034,7 +1034,7 @@ namespace SilverSim.Scene.Types.Object
                         ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR"));
                         foreach (TextureEntryFace face in faces)
                         {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Specular, ref paramList);
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.Specular, paramList);
                         }
                     }
                     finally
@@ -1050,7 +1050,7 @@ namespace SilverSim.Scene.Types.Object
                         ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_TEXTURE"));
                         foreach (TextureEntryFace face in faces)
                         {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, ref paramList);
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, paramList);
                         }
                     }
                     finally
@@ -1074,7 +1074,7 @@ namespace SilverSim.Scene.Types.Object
                         ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_COLOR"));
                         foreach (TextureEntryFace face in faces)
                         {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Color, ref paramList);
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.Color, paramList);
                         }
                     }
                     finally
@@ -1090,7 +1090,7 @@ namespace SilverSim.Scene.Types.Object
                         ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_BUMP_SHINY"));
                         foreach (TextureEntryFace face in faces)
                         {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.BumpShiny, ref paramList);
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.BumpShiny, paramList);
                         }
                     }
                     finally
@@ -1117,7 +1117,7 @@ namespace SilverSim.Scene.Types.Object
                         ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_FULLBRIGHT"));
                         foreach (TextureEntryFace face in faces)
                         {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, ref paramList);
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, paramList);
                         }
                     }
                     finally
@@ -1146,7 +1146,7 @@ namespace SilverSim.Scene.Types.Object
                         ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_TEXGEN"));
                         foreach (TextureEntryFace face in faces)
                         {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, ref paramList);
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, paramList);
                         }
                     }
                     finally
@@ -1162,7 +1162,7 @@ namespace SilverSim.Scene.Types.Object
                         ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_GLOW"));
                         foreach (TextureEntryFace face in faces)
                         {
-                            GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, ref paramList);
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.Texture, paramList);
                         }
                     }
                     finally
@@ -1493,7 +1493,7 @@ namespace SilverSim.Scene.Types.Object
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        public void GetTexPrimitiveParams(TextureEntryFace face, PrimitiveParamsType type, ref AnArray paramList)
+        public void GetTexPrimitiveParams(TextureEntryFace face, PrimitiveParamsType type, AnArray paramList)
         {
             switch (type)
             {

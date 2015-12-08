@@ -1296,9 +1296,9 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Object Details Methods
-        public void GetObjectDetails(AnArray.Enumerator enumerator, ref AnArray paramList)
+        public void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList)
         {
-            ObjectGroup.GetObjectDetails(enumerator, ref paramList);
+            ObjectGroup.GetObjectDetails(enumerator, paramList);
         }
         #endregion
 

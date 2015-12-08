@@ -697,7 +697,7 @@ namespace SilverSim.Scene.Types.Object
         }
 
         #region Primitive Params Methods
-        public void GetPrimitiveParams(int linkThis, int linkTarget, AnArray.Enumerator enumerator, ref AnArray paramList)
+        public void GetPrimitiveParams(int linkThis, int linkTarget, AnArray.Enumerator enumerator, AnArray paramList)
         {
             if(0 == linkTarget)
             {
@@ -760,7 +760,7 @@ namespace SilverSim.Scene.Types.Object
                                 try
                                 {
                                     IObject obj = GetObjectLink(linkTarget);
-                                    obj.GetPrimitiveParams(enumerator, ref paramList);
+                                    obj.GetPrimitiveParams(enumerator, paramList);
                                 }
                                 catch(KeyNotFoundException)
                                 {
@@ -773,9 +773,9 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        public void GetPrimitiveParams(AnArray.Enumerator enumerator, ref AnArray paramList)
+        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList)
         {
-            GetPrimitiveParams(LINK_ROOT, LINK_ROOT, enumerator, ref paramList);
+            GetPrimitiveParams(LINK_ROOT, LINK_ROOT, enumerator, paramList);
         }
 
         public void SetPrimitiveParams(int linkThis, int linkTarget, AnArray.MarkEnumerator enumerator)
@@ -900,7 +900,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Object Details Methods
-        public void GetObjectDetails(AnArray.Enumerator enumerator, ref AnArray paramList)
+        public void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList)
         {
             while(enumerator.MoveNext())
             {

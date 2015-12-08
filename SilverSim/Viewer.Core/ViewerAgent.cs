@@ -508,7 +508,7 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region IObject Methods
-        public void GetPrimitiveParams(AnArray.Enumerator enumerator, ref AnArray paramList)
+        public void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList)
         {
             switch (ParamsHelper.GetPrimParamType(enumerator))
             {
@@ -665,7 +665,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        public void GetObjectDetails(AnArray.Enumerator enumerator, ref AnArray paramList)
+        public void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList)
         {
             while (enumerator.MoveNext())
             {
