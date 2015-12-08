@@ -16,6 +16,9 @@ using SilverSim.Types.StructuredData.Llsd;
 using ThreadedClasses;
 using SilverSim.Scene.Types.Scene;
 using System.IO;
+using SilverSim.Types.Parcel;
+using SilverSim.Viewer.Messages.Parcel;
+using SilverSim.Scene.Types.Agent;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -68,10 +71,42 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
-            UInt32 localID = reqmap["local-id"].AsUInt; /* this is parcel local id */
+            int localID = reqmap["local-id"].AsInt; /* this is parcel local id */
             string url = reqmap["url"].ToString();
 
-#warning Implement ParcelNavigateMedia
+            ParcelInfo parcelInfo;
+            if(m_Scene.Parcels.TryGetValue(localID, out parcelInfo))
+            {
+                if (!m_Scene.CanEditParcelDetails(m_Agent, parcelInfo))
+                {
+                    return;
+                }
+                parcelInfo.MediaURI = new URI(url);
+                ParcelMediaUpdate pmu = new ParcelMediaUpdate();
+                pmu.MediaAutoScale = parcelInfo.MediaAutoScale;
+                pmu.MediaDesc = parcelInfo.MediaDescription;
+                pmu.MediaHeight = parcelInfo.MediaHeight;
+                pmu.MediaID = parcelInfo.MediaID;
+                pmu.MediaLoop = parcelInfo.MediaLoop;
+                pmu.MediaType = parcelInfo.MediaType;
+                pmu.MediaURL = url;
+                pmu.MediaWidth = parcelInfo.MediaWidth;
+
+                parcelInfo.MediaAutoScale = pmu.MediaAutoScale;
+                parcelInfo.MediaDescription = pmu.MediaDesc;
+                parcelInfo.MediaHeight = pmu.MediaHeight;
+                parcelInfo.MediaID = pmu.MediaID;
+                parcelInfo.MediaType = pmu.MediaType;
+                parcelInfo.MediaLoop = pmu.MediaLoop;
+                parcelInfo.MediaURI = new URI(pmu.MediaURL);
+                parcelInfo.MediaWidth = pmu.MediaWidth;
+                m_Scene.Parcels.Store(parcelInfo.ID);
+
+                foreach (IAgent rootAgent in m_Scene.RootAgents)
+                {
+                    rootAgent.SendMessageIfRootAgent(pmu, m_Scene.ID);
+                }
+            }
 
             Map m = new Map();
             using (HttpResponse resp = httpreq.BeginResponse(HttpStatusCode.OK, "OK"))

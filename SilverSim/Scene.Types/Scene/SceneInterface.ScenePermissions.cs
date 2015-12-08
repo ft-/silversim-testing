@@ -345,9 +345,8 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public bool CanEditParcelDetails(UUI agentOwner, ObjectGroup group, ParcelInfo parcelInfo)
+        public bool CanEditParcelDetails(UUI agentOwner, ParcelInfo parcelInfo)
         {
-            UUI groupOwner = group.Owner;
             if (IsPossibleGod(agentOwner))
             {
                 return true;
