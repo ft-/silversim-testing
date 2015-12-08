@@ -348,7 +348,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public bool CanEditParcelDetails(IAgent agent, ObjectGroup group, Vector3 location)
+        public bool CanEditParcelDetails(IAgent agent, ObjectGroup group, ParcelInfo parcelInfo)
         {
             UUI agentOwner = agent.Owner;
             UUI groupOwner = group.Owner;
@@ -357,18 +357,14 @@ namespace SilverSim.Scene.Types.Scene
                 return true;
             }
 
-            ParcelInfo pinfo;
-            if (Parcels.TryGetValue(location, out pinfo))
+            if (parcelInfo.Owner.EqualsGrid(agentOwner))
             {
-                if (pinfo.Owner.EqualsGrid(agentOwner))
-                {
-                    return true;
-                }
+                return true;
+            }
 
-                if (HasGroupPower(agent, pinfo.Group, GroupPowers.LandEdit))
-                {
-                    return true;
-                }
+            if (HasGroupPower(agent, parcelInfo.Group, GroupPowers.LandEdit))
+            {
+                return true;
             }
 
             return false;
