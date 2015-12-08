@@ -348,6 +348,33 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        public bool CanEditParcelDetails(IAgent agent, ObjectGroup group, Vector3 location)
+        {
+            UUI agentOwner = agent.Owner;
+            UUI groupOwner = group.Owner;
+            if (IsPossibleGod(agentOwner))
+            {
+                return true;
+            }
+
+            ParcelInfo pinfo;
+            if (Parcels.TryGetValue(location, out pinfo))
+            {
+                if (pinfo.Owner.EqualsGrid(agentOwner))
+                {
+                    return true;
+                }
+
+                if (HasGroupPower(agent, pinfo.Group, GroupPowers.LandEdit))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public bool CanDelete(IAgent agent, ObjectGroup group, Vector3 location)
         {
             UUI agentOwner = agent.Owner;
