@@ -139,6 +139,7 @@ namespace SilverSim.Viewer.Core
         public Uri HomeURI { get; private set; }
         public UUID SessionID { get; private set; }
         public double DrawDistance { get; private set; }
+        public string AgentLanguage { get; internal set; }
 
         public TeleportFlags TeleportFlags;
         #endregion

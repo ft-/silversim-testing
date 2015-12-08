@@ -237,5 +237,7 @@ namespace SilverSim.Scene.Types.Agent
 
         void TakeControls(ScriptInstance instance, int controls, int accept, int pass_on);
         void ReleaseControls(ScriptInstance instance);
+
+        string AgentLanguage { get; }
     }
 }
