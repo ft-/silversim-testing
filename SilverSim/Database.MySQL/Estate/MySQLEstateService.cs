@@ -109,8 +109,8 @@ namespace SilverSim.Database.MySQL.Estate
                 "UNIQUE KEY Name (Name)," +
                 "KEY Owner (OwnerID)," +
                 "KEY ID_OwnerID (ID, OwnerID)) AUTO_INCREMENT=100 ",
-            "ALTER TABLE %tablename% ADD COLUMN (CovenantID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',",
-            "ALTER TABLE %tablename% ADD COLUMN (CovenantTimestamp BIGINT(20) UNSIGNED NOT NULL DEFAULT '0',"
+            "ALTER TABLE %tablename% ADD COLUMN (CovenantID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                                            "CovenantTimestamp BIGINT(20) UNSIGNED NOT NULL DEFAULT '0'),"
         };
 
         public override bool TryGetValue(uint estateID, out EstateInfo estateInfo)
