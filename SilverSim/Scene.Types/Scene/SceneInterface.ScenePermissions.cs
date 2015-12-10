@@ -587,9 +587,8 @@ namespace SilverSim.Scene.Types.Scene
         #endregion
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public bool CanTerraform(IAgent agent, Vector3 location)
+        public bool CanTerraform(UUI agentOwner, Vector3 location)
         {
-            UUI agentOwner = agent.Owner;
             if (IsPossibleGod(agentOwner))
             {
                 return true;
@@ -614,7 +613,7 @@ namespace SilverSim.Scene.Types.Scene
                     return true;
                 }
 
-                if(HasGroupPower(agent.Owner, pinfo.Group, GroupPowers.AllowEditLand))
+                if(HasGroupPower(agentOwner, pinfo.Group, GroupPowers.AllowEditLand))
                 {
                     return true;
                 }

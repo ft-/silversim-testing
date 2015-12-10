@@ -227,7 +227,7 @@ namespace SilverSim.Viewer.TerrainEdit
                 for (int y = yFrom; y <= yTo; y++)
                 {
                     Vector3 pos = new Vector3(x, y, 0);
-                    if (!scene.CanTerraform(agent, pos))
+                    if (!scene.CanTerraform(agent.Owner, pos))
                     {
                         continue;
                     }
@@ -293,7 +293,7 @@ namespace SilverSim.Viewer.TerrainEdit
                 for (int y = yFrom; y <= yTo; y++)
                 {
                     Vector3 pos = new Vector3(x, y, 0);
-                    if (!scene.CanTerraform(agent, pos))
+                    if (!scene.CanTerraform(agent.Owner, pos))
                     {
                         continue;
                     }
@@ -363,7 +363,7 @@ namespace SilverSim.Viewer.TerrainEdit
                 for (y = yFrom; y <= yTo; y++)
                 {
                     Vector3 pos = new Vector3(x, y, 0);
-                    if (!scene.CanTerraform(agent, pos))
+                    if (!scene.CanTerraform(agent.Owner, pos))
                     {
                         continue;
                     }
@@ -437,7 +437,7 @@ namespace SilverSim.Viewer.TerrainEdit
                     if (x >= 0 && y >= 0 && x < scene.RegionData.Size.X && y < scene.RegionData.Size.Y)
                     {
                         Vector3 pos = new Vector3(x, y, 0);
-                        if (!scene.CanTerraform(agent, pos))
+                        if (!scene.CanTerraform(agent.Owner, pos))
                         {
                             continue;
                         }
@@ -522,7 +522,7 @@ namespace SilverSim.Viewer.TerrainEdit
                     if (x >= 0 && y >= 0 && x < scene.RegionData.Size.X && y < scene.RegionData.Size.Y)
                     {
                         Vector3 pos = new Vector3(x, y, 0);
-                        if (!scene.CanTerraform(agent, pos))
+                        if (!scene.CanTerraform(agent.Owner, pos))
                         {
                             continue;
                         }
@@ -564,7 +564,7 @@ namespace SilverSim.Viewer.TerrainEdit
             {
                 for (int y = (int)data.South; y < (int)data.North; y++)
                 {
-                    if (scene.CanTerraform(agent, new Vector3(x, y, 0)))
+                    if (scene.CanTerraform(agent.Owner, new Vector3(x, y, 0)))
                     {
                         LayerPatch lp = scene.Terrain.AdjustTerrain((uint)x, (uint)y, modify.Size);
                         if (lp != null && !changed.Contains(lp))
@@ -595,7 +595,7 @@ namespace SilverSim.Viewer.TerrainEdit
             {
                 for (int y = (int)data.South; y < (int)data.North; y++)
                 {
-                    if (scene.CanTerraform(agent, new Vector3(x, y, 0)))
+                    if (scene.CanTerraform(agent.Owner, new Vector3(x, y, 0)))
                     {
                         LayerPatch lp = scene.Terrain.AdjustTerrain((uint)x, (uint)y, -modify.Size);
                         if (lp != null && !changed.Contains(lp))
@@ -631,7 +631,7 @@ namespace SilverSim.Viewer.TerrainEdit
             {
                 for (int y = (int)data.South; y < (int)data.North; y++)
                 {
-                    if (!scene.CanTerraform(agent, new Vector3(x, y, 0)))
+                    if (!scene.CanTerraform(agent.Owner, new Vector3(x, y, 0)))
                     {
                         continue;
                     }
@@ -648,7 +648,7 @@ namespace SilverSim.Viewer.TerrainEdit
             {
                 for (int y = (int)data.South; y < (int)data.North; y++)
                 {
-                    if (scene.CanTerraform(agent, new Vector3(x, y, 0)))
+                    if (scene.CanTerraform(agent.Owner, new Vector3(x, y, 0)))
                     {
                         LayerPatch lp = scene.Terrain.BlendTerrain((uint)x, (uint)y, avg, str);
                         if (lp != null && !changed.Contains(lp))
@@ -683,7 +683,7 @@ namespace SilverSim.Viewer.TerrainEdit
             {
                 for (int y = (int)data.South; y < (int)data.North; y++)
                 {
-                    if (!scene.CanTerraform(agent, new Vector3(x, y, 0)))
+                    if (!scene.CanTerraform(agent.Owner, new Vector3(x, y, 0)))
                     {
                         continue;
                     }
@@ -729,7 +729,7 @@ namespace SilverSim.Viewer.TerrainEdit
             {
                 for (int y = (int)data.South; y < (int)data.North; y++)
                 {
-                    if (!scene.CanTerraform(agent, new Vector3(x, y, 0)))
+                    if (!scene.CanTerraform(agent.Owner, new Vector3(x, y, 0)))
                     {
                         continue;
                     }
