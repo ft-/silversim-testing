@@ -216,6 +216,7 @@ namespace SilverSim.Scene.Types.Agent
         void SendRegionNotice(UUI fromAvatar, string message, UUID fromSceneID);
         void HandleMessage(ChildAgentUpdate m);
         void HandleMessage(ChildAgentPositionUpdate m);
+        bool UnSit();
 
         RwLockedList<UUID> SelectedObjects(UUID scene);
 

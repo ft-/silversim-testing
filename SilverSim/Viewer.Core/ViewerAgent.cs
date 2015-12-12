@@ -1132,6 +1132,12 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        public bool UnSit()
+        {
+#warning Implement ViewerAgent.UnSit()
+            return false;
+        }
+
         public ScriptPermissions RequestPermissions(ObjectPart part, UUID itemID, ScriptPermissions permissions)
         {
             return RequestPermissions(part, itemID, permissions, UUID.Zero);
