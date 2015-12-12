@@ -817,7 +817,10 @@ namespace SilverSim.Viewer.Core
         {
             lock(this)
             {
-                m_Health = (m_Health + v).Clamp(0, 100);
+                if (v >= 0)
+                {
+                    m_Health = (m_Health + v).Clamp(0, 100);
+                }
             }
         }
 
@@ -825,8 +828,11 @@ namespace SilverSim.Viewer.Core
         {
             lock (this)
             {
-                m_Health = (m_Health - v).Clamp(0, 100);
+                if (v <= 0)
+                {
+                    m_Health = (m_Health - v).Clamp(0, 100);
 #warning Implement death
+                }
             }
         }
 

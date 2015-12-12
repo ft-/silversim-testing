@@ -1623,6 +1623,21 @@ namespace SilverSim.Scene.Types.Object
         #region TextureEntryFace functions
         const int PRIM_ALPHA_MODE_BLEND = 1;
 
+        string GetTextureInventoryItem(UUID assetID)
+        {
+            if (assetID != UUID.Zero)
+            {
+                foreach (ObjectPartInventoryItem item in Inventory.Values)
+                {
+                    if (item.AssetType == AssetType.Texture && item.AssetID == assetID)
+                    {
+                        return item.Name;
+                    }
+                }
+            }
+            return assetID.ToString();
+        }
+
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         public void GetTexPrimitiveParams(TextureEntryFace face, PrimitiveParamsType type, AnArray paramList)
@@ -1630,7 +1645,7 @@ namespace SilverSim.Scene.Types.Object
             switch (type)
             {
                 case PrimitiveParamsType.Texture:
-                    paramList.Add(face.TextureID);
+                    paramList.Add(GetTextureInventoryItem(face.TextureID));
                     paramList.Add(new Vector3(face.RepeatU, face.RepeatV, 0));
                     paramList.Add(new Vector3(face.OffsetU, face.OffsetV, 0));
                     paramList.Add(face.Rotation);
@@ -1694,7 +1709,7 @@ namespace SilverSim.Scene.Types.Object
                     else try
                     {
                         Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                        paramList.Add(mat.NormMap);
+                        paramList.Add(GetTextureInventoryItem(mat.NormMap));
                         paramList.Add(new Vector3(mat.NormRepeatX, mat.NormRepeatY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
                         paramList.Add(new Vector3(mat.NormOffsetX, mat.NormOffsetY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
                         paramList.Add(mat.NormRotation);
@@ -1723,7 +1738,7 @@ namespace SilverSim.Scene.Types.Object
                     else try
                     {
                         Material mat = ObjectGroup.Scene.GetMaterial(face.MaterialID);
-                        paramList.Add(mat.SpecMap);
+                        paramList.Add(GetTextureInventoryItem(mat.SpecMap));
                         paramList.Add(new Vector3(mat.SpecRepeatX, mat.SpecRepeatY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
                         paramList.Add(new Vector3(mat.SpecOffsetX, mat.SpecOffsetY, 0) / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
                         paramList.Add(mat.SpecRotation / SilverSim.Types.Asset.Format.Material.MATERIALS_MULTIPLIER);
