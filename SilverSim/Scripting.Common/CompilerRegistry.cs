@@ -80,7 +80,7 @@ namespace SilverSim.Scripting.Common
                     throw new CompilerException(lineno, "Unknown engine specified");
                 }
 
-                object[] attrs = compiler.GetType().GetCustomAttributes(typeof(CompilerUsesRunAndCollectMode), false);
+                object[] attrs = compiler.GetType().GetCustomAttributes(typeof(CompilerUsesRunAndCollectModeAttribute), false);
                 if(attrs.Length != 0)
                 {
                     return compiler.Compile(AppDomain.CurrentDomain, user, shbangs, assetID, reader, linenumber);

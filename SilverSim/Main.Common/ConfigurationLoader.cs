@@ -584,11 +584,11 @@ namespace SilverSim.Main.Common
             return result;
         }
 
-        SilverSim.Types.Assembly.InterfaceVersion GetInterfaceVersion(Assembly assembly)
+        Types.Assembly.InterfaceVersionAttribute GetInterfaceVersion(Assembly assembly)
         {
             foreach(object o in assembly.GetCustomAttributes(false))
             {
-                SilverSim.Types.Assembly.InterfaceVersion attr = o as SilverSim.Types.Assembly.InterfaceVersion;
+                SilverSim.Types.Assembly.InterfaceVersionAttribute attr = o as SilverSim.Types.Assembly.InterfaceVersionAttribute;
                 if (null != attr)
                 {
                     return attr;
@@ -602,9 +602,9 @@ namespace SilverSim.Main.Common
         {
             foreach(Type t in assembly.GetTypes())
             {
-                foreach(object o in t.GetCustomAttributes(typeof(PluginName), false))
+                foreach(object o in t.GetCustomAttributes(typeof(PluginNameAttribute), false))
                 {
-                    if(((PluginName)o).Name == pluginName)
+                    if(((PluginNameAttribute)o).Name == pluginName)
                     {
                         return t;
                     }
@@ -617,7 +617,7 @@ namespace SilverSim.Main.Common
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         private void LoadModules()
         {
-            SilverSim.Types.Assembly.InterfaceVersion ownVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
+            Types.Assembly.InterfaceVersionAttribute ownVersion = GetInterfaceVersion(Assembly.GetExecutingAssembly());
             foreach (IConfig config in m_Config.Configs)
             {
                 if (config.Contains("IsTemplate"))
@@ -647,7 +647,7 @@ namespace SilverSim.Main.Common
                             throw new ConfigurationErrorException();
                         }
 
-                        SilverSim.Types.Assembly.InterfaceVersion loadedVersion = GetInterfaceVersion(assembly);
+                        Types.Assembly.InterfaceVersionAttribute loadedVersion = GetInterfaceVersion(assembly);
                         if(loadedVersion.Version != ownVersion.Version)
                         {
                             m_Log.FatalFormat("Failed to load module {0}: interface version mismatch: {2} != {1}", assemblyname, ownVersion, loadedVersion);

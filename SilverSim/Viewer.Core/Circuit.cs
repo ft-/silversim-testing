@@ -59,9 +59,9 @@ namespace SilverSim.Viewer.Core
 
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-        public sealed class IgnoreMethod : Attribute
+        public sealed class IgnoreMethodAttribute : Attribute
         {
-            public IgnoreMethod()
+            public IgnoreMethodAttribute()
             {
             }
         }

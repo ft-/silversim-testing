@@ -10,11 +10,11 @@ namespace SilverSim.Scene.Types.Script
     [Serializable]
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-    public sealed class ScriptApiName : Attribute
+    public sealed class ScriptApiNameAttribute : Attribute
     {
         public string Name { get; private set; }
 
-        public ScriptApiName(string name)
+        public ScriptApiNameAttribute(string name)
         {
             Name = name;
         }
@@ -23,11 +23,11 @@ namespace SilverSim.Scene.Types.Script
     [Serializable]
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface, Inherited = false)]
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-    public sealed class ScriptEngineUsage : Attribute
+    public sealed class ScriptEngineUsageAttribute : Attribute
     {
         public string Name { get; private set; }
 
-        public ScriptEngineUsage(string name)
+        public ScriptEngineUsageAttribute(string name)
         {
             Name = name;
         }

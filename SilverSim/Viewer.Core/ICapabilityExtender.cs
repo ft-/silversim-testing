@@ -10,11 +10,11 @@ namespace SilverSim.Viewer.Core
     [AttributeUsage(AttributeTargets.Method, Inherited = false)]
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
     /* used on methods compatible with FactoryDelegate */
-    public sealed class CapabilityHandler : Attribute
+    public sealed class CapabilityHandlerAttribute : Attribute
     {
         public string Name { get; private set; }
 
-        public CapabilityHandler(string name)
+        public CapabilityHandlerAttribute(string name)
         {
             Name = name;
         }

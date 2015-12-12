@@ -8,9 +8,9 @@ namespace SilverSim.Main.Common
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-    public sealed class PluginName : Attribute
+    public sealed class PluginNameAttribute : Attribute
     {
-        public PluginName(string name)
+        public PluginNameAttribute(string name)
         {
             Name = name;
         }

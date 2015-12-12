@@ -10,9 +10,9 @@ namespace SilverSim.Types.Assembly
     [AttributeUsage(AttributeTargets.Assembly, Inherited = false)]
     [ComVisible(true)]
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-    public sealed class InterfaceVersion : Attribute
+    public sealed class InterfaceVersionAttribute : Attribute
     {
-        public InterfaceVersion(string version)
+        public InterfaceVersionAttribute(string version)
         {
             Version = version;
         }

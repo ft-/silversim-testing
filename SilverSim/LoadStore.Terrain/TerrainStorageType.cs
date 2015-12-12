@@ -8,9 +8,9 @@ namespace SilverSim.LoadStore.Terrain
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-    sealed class TerrainStorageType : Attribute
+    sealed class TerrainStorageTypeAttribute : Attribute
     {
-        public TerrainStorageType()
+        public TerrainStorageTypeAttribute()
         {
 
         }

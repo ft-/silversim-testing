@@ -11,9 +11,9 @@ namespace SilverSim.Scripting.Common
     [Serializable]
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-    public sealed class CompilerUsesRunAndCollectMode : Attribute
+    public sealed class CompilerUsesRunAndCollectModeAttribute : Attribute
     {
-        public CompilerUsesRunAndCollectMode()
+        public CompilerUsesRunAndCollectModeAttribute()
         {
 
         }

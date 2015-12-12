@@ -368,8 +368,8 @@ namespace SilverSim.Viewer.Core
             {
                 foreach(FieldInfo fi in t.GetFields(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
                 {
-                    PacketHandler[] pas = (PacketHandler[])Attribute.GetCustomAttributes(fi, typeof(PacketHandler));
-                    foreach (PacketHandler pa in pas)
+                    PacketHandlerAttribute[] pas = (PacketHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(PacketHandlerAttribute));
+                    foreach (PacketHandlerAttribute pa in pas)
                     {
                         if (m_MessageRouting.ContainsKey(pa.Number))
                         {
@@ -392,8 +392,8 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    GenericMessageHandler[] gms = (GenericMessageHandler[])Attribute.GetCustomAttributes(fi, typeof(GenericMessageHandler));
-                    foreach (GenericMessageHandler gm in gms)
+                    GenericMessageHandlerAttribute[] gms = (GenericMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(GenericMessageHandlerAttribute));
+                    foreach (GenericMessageHandlerAttribute gm in gms)
                     {
                         if (m_GenericMessageRouting.ContainsKey(gm.Method))
                         {
@@ -412,8 +412,8 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    IMMessageHandler[] ims = (IMMessageHandler[])Attribute.GetCustomAttributes(fi, typeof(IMMessageHandler));
-                    foreach (IMMessageHandler im in ims)
+                    IMMessageHandlerAttribute[] ims = (IMMessageHandlerAttribute[])Attribute.GetCustomAttributes(fi, typeof(IMMessageHandlerAttribute));
+                    foreach (IMMessageHandlerAttribute im in ims)
                     {
                         if (m_IMMessageRouting.ContainsKey(im.Dialog))
                         {
@@ -435,15 +435,15 @@ namespace SilverSim.Viewer.Core
 
                 foreach (MethodInfo mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
                 {
-                    if (null != Attribute.GetCustomAttribute(mi, typeof(IgnoreMethod)))
+                    if (null != Attribute.GetCustomAttribute(mi, typeof(IgnoreMethodAttribute)))
                     {
                         continue;
                     }
-                    PacketHandler[] pas = (PacketHandler[])Attribute.GetCustomAttributes(mi, typeof(PacketHandler));
-                    GenericMessageHandler[] gms = (GenericMessageHandler[])Attribute.GetCustomAttributes(mi, typeof(GenericMessageHandler));
-                    IMMessageHandler[] ims = (IMMessageHandler[])Attribute.GetCustomAttributes(mi, typeof(IMMessageHandler));
+                    PacketHandlerAttribute[] pas = (PacketHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(PacketHandlerAttribute));
+                    GenericMessageHandlerAttribute[] gms = (GenericMessageHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(GenericMessageHandlerAttribute));
+                    IMMessageHandlerAttribute[] ims = (IMMessageHandlerAttribute[])Attribute.GetCustomAttributes(mi, typeof(IMMessageHandlerAttribute));
 
-                    foreach (PacketHandler pa in pas)
+                    foreach (PacketHandlerAttribute pa in pas)
                     {
                         if (m_MessageRouting.ContainsKey(pa.Number))
                         {
@@ -466,7 +466,7 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    foreach (GenericMessageHandler gm in gms)
+                    foreach (GenericMessageHandlerAttribute gm in gms)
                     {
                         if (m_GenericMessageRouting.ContainsKey(gm.Method))
                         {
@@ -485,7 +485,7 @@ namespace SilverSim.Viewer.Core
                         }
                     }
 
-                    foreach (IMMessageHandler im in ims)
+                    foreach (IMMessageHandlerAttribute im in ims)
                     {
                         if (m_IMMessageRouting.ContainsKey(im.Dialog))
                         {
@@ -559,7 +559,7 @@ namespace SilverSim.Viewer.Core
             {
                 foreach (MethodInfo mi in t.GetMethods(BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance))
                 {
-                    CapabilityHandler ca = (CapabilityHandler)Attribute.GetCustomAttribute(mi, typeof(CapabilityHandler));
+                    CapabilityHandlerAttribute ca = (CapabilityHandlerAttribute)Attribute.GetCustomAttribute(mi, typeof(CapabilityHandlerAttribute));
                     if (null == ca)
                     {
 

@@ -37,11 +37,11 @@ namespace SilverSim.Viewer.TerrainEdit
         
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-        sealed class PaintEffect : Attribute
+        sealed class PaintEffectAttribute : Attribute
         {
             public StandardTerrainEffect Effect { get; private set; }
 
-            public PaintEffect(StandardTerrainEffect effect)
+            public PaintEffectAttribute(StandardTerrainEffect effect)
             {
                 Effect = effect;
             }
@@ -49,11 +49,11 @@ namespace SilverSim.Viewer.TerrainEdit
 
         [AttributeUsage(AttributeTargets.Method, Inherited = false)]
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
-        sealed class FloodEffect : Attribute
+        sealed class FloodEffectAttribute : Attribute
         {
             public StandardTerrainEffect Effect { get; private set; }
 
-            public FloodEffect(StandardTerrainEffect effect)
+            public FloodEffectAttribute(StandardTerrainEffect effect)
             {
                 Effect = effect;
             }
@@ -66,7 +66,7 @@ namespace SilverSim.Viewer.TerrainEdit
         {
             foreach(MethodInfo mi in GetType().GetMethods(BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Public))
             {
-                PaintEffect pe = (PaintEffect)Attribute.GetCustomAttribute(mi, typeof(PaintEffect));
+                PaintEffectAttribute pe = (PaintEffectAttribute)Attribute.GetCustomAttribute(mi, typeof(PaintEffectAttribute));
                 if(pe == null)
                 {
                     continue;
@@ -104,7 +104,7 @@ namespace SilverSim.Viewer.TerrainEdit
                     m_PaintEffects.Add(pe.Effect, (Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>)
                         Delegate.CreateDelegate(typeof(Action<ViewerAgent, SceneInterface, ModifyLand, ModifyLand.Data>), this, mi));
                 }
-                FloodEffect fe = (FloodEffect)Attribute.GetCustomAttribute(mi, typeof(FloodEffect));
+                FloodEffectAttribute fe = (FloodEffectAttribute)Attribute.GetCustomAttribute(mi, typeof(FloodEffectAttribute));
                 if (fe == null)
                 {
                     continue;

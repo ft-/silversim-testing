@@ -30,7 +30,7 @@ namespace SilverSim.Viewer.Core
                         break;
 #endif
                     case 0: /* only Event Queue support */
-                        if (Attribute.GetCustomAttribute(m.GetType(), typeof(EventQueueGet)) != null)
+                        if (Attribute.GetCustomAttribute(m.GetType(), typeof(EventQueueGetAttribute)) != null)
                         {
                             SendViaEventQueueGet(m);
                         }
@@ -41,7 +41,7 @@ namespace SilverSim.Viewer.Core
                         break;
 
                     default:
-                        if (Attribute.GetCustomAttribute(m.GetType(), typeof(EventQueueGet)) != null)
+                        if (Attribute.GetCustomAttribute(m.GetType(), typeof(EventQueueGetAttribute)) != null)
                         {
                             SendViaEventQueueGet(m);
                         }

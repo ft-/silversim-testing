@@ -9,97 +9,97 @@ using System.Text;
 namespace SilverSim.Viewer.Messages
 {
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public sealed class Reliable : Attribute
+    public sealed class ReliableAttribute : Attribute
     {
-        public Reliable()
+        public ReliableAttribute()
         {
 
         }
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public sealed class Zerocoded : Attribute
+    public sealed class ZerocodedAttribute : Attribute
     {
-        public Zerocoded()
+        public ZerocodedAttribute()
         {
 
         }
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public sealed class Trusted : Attribute
+    public sealed class TrustedAttribute : Attribute
     {
-        public Trusted()
+        public TrustedAttribute()
         {
 
         }
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public sealed class NotTrusted : Attribute
+    public sealed class NotTrustedAttribute : Attribute
     {
-        public NotTrusted()
+        public NotTrustedAttribute()
         {
 
         }
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public sealed class UDPDeprecated : Attribute
+    public sealed class UDPDeprecatedAttribute : Attribute
     {
-        public UDPDeprecated()
+        public UDPDeprecatedAttribute()
         {
 
         }
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public sealed class UDPMessage : Attribute
+    public sealed class UDPMessageAttribute : Attribute
     {
         public MessageType Number { get; private set; }
 
-        public UDPMessage(MessageType number)
+        public UDPMessageAttribute(MessageType number)
         {
             Number = number;
         }
     }
 
     [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-    public sealed class EventQueueGet : Attribute
+    public sealed class EventQueueGetAttribute : Attribute
     {
         public string Name { get; private set; }
         
-        public EventQueueGet(string name)
+        public EventQueueGetAttribute(string name)
         {
             Name = name;
         }
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
-    public sealed class PacketHandler : Attribute
+    public sealed class PacketHandlerAttribute : Attribute
     {
         public MessageType Number { get; private set; }
-        public PacketHandler(MessageType number)
+        public PacketHandlerAttribute(MessageType number)
         {
             Number = number;
         }
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
-    public sealed class GenericMessageHandler : Attribute
+    public sealed class GenericMessageHandlerAttribute : Attribute
     {
         public string Method { get; private set; }
-        public GenericMessageHandler(string method)
+        public GenericMessageHandlerAttribute(string method)
         {
             Method = method;
         }
     }
 
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Field, Inherited = false, AllowMultiple = true)]
-    public sealed class IMMessageHandler : Attribute
+    public sealed class IMMessageHandlerAttribute : Attribute
     {
         public GridInstantMessageDialog Dialog { get; private set; }
-        public IMMessageHandler(GridInstantMessageDialog dialog)
+        public IMMessageHandlerAttribute(GridInstantMessageDialog dialog)
         {
             Dialog = dialog;
         }
@@ -195,7 +195,7 @@ namespace SilverSim.Viewer.Messages
         {
             get 
             {
-                return GetType().GetCustomAttributes(typeof(Reliable), false).Length != 0;
+                return GetType().GetCustomAttributes(typeof(ReliableAttribute), false).Length != 0;
             }
         }
 
@@ -203,7 +203,7 @@ namespace SilverSim.Viewer.Messages
         {
             get
             {
-                return GetType().GetCustomAttributes(typeof(Zerocoded), false).Length != 0;
+                return GetType().GetCustomAttributes(typeof(ZerocodedAttribute), false).Length != 0;
             }
         }
 
@@ -211,7 +211,7 @@ namespace SilverSim.Viewer.Messages
         {
             get
             {
-                UDPMessage a = (UDPMessage)Attribute.GetCustomAttribute(GetType(), typeof(UDPMessage));
+                UDPMessageAttribute a = (UDPMessageAttribute)Attribute.GetCustomAttribute(GetType(), typeof(UDPMessageAttribute));
                 if(a == null)
                 {
                     return 0;
@@ -234,7 +234,7 @@ namespace SilverSim.Viewer.Messages
         {
             get
             {
-                EventQueueGet a = (EventQueueGet)Attribute.GetCustomAttribute(GetType(), typeof(EventQueueGet));
+                EventQueueGetAttribute a = (EventQueueGetAttribute)Attribute.GetCustomAttribute(GetType(), typeof(EventQueueGetAttribute));
                 if (a == null)
                 {
                     throw new NotSupportedException();
