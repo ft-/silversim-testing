@@ -10,6 +10,10 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         Car = 2,
         Boat = 3,
         Airplane = 4,
-        Balloon = 5
+        Balloon = 5,
+
+        /* additional constants based on halcyon */
+        Sailboat = 10001,
+        Motorcycle = 10002
     }
 }
