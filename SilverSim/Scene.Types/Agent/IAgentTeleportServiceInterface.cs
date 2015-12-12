@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
@@ -22,5 +23,10 @@ namespace SilverSim.Scene.Types.Agent
         [Description("Remote call to other simulators")]
         void ReleaseAgent(UUID fromSceneID, IAgent agent, RegionInfo regionInfo);
         GridType GridType { get; }
+
+        /* following three functions return true if they accept a teleport request */
+        bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags);
+        bool TeleportTo(SceneInterface sceneInterface, IAgent agent, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags);
+        bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags);
     }
 }

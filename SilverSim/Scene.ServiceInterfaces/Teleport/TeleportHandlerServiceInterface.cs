@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
@@ -27,5 +28,22 @@ namespace SilverSim.ServiceInterfaces.Teleport
         [Description("Remote call to other simulators")]
         public abstract void ReleaseAgent(UUID fromSceneID, IAgent agent, RegionInfo regionInfo);
         public abstract GridType GridType { get; }
+
+        /* following three functions return true if they accept a teleport request */
+        public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        {
+            return false;
+        }
+
+        public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        {
+            return false;
+        }
+
+        public virtual bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        {
+            return false;
+        }
+
     }
 }
