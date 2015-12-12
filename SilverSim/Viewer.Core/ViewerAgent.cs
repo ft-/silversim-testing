@@ -48,6 +48,7 @@ namespace SilverSim.Viewer.Core
         #region Agent fields
         readonly UUID m_AgentID;
         private UUID m_CurrentSceneID;
+        double m_Health = 100f;
         #endregion
 
         readonly Dictionary<UUID, AgentChildInfo> m_ActiveChilds = new Dictionary<UUID, AgentChildInfo>();
@@ -792,6 +793,42 @@ namespace SilverSim.Viewer.Core
         public string DisplayName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }
+
+        public double Health
+        {
+            get
+            {
+                lock(this)
+                {
+                    return m_Health;
+                }
+            }
+            set
+            {
+                lock(this)
+                {
+                    m_Health = value.Clamp(0, 100);
+#warning Implement death
+                }
+            }
+        }
+
+        public void IncreaseHealth(double v)
+        {
+            lock(this)
+            {
+                m_Health = (m_Health + v).Clamp(0, 100);
+            }
+        }
+
+        public void DecreaseHealth(double v)
+        {
+            lock (this)
+            {
+                m_Health = (m_Health - v).Clamp(0, 100);
+#warning Implement death
+            }
+        }
 
         public Dictionary<string, string> ServiceURLs = new Dictionary<string, string>();
 

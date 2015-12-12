@@ -26,6 +26,7 @@ using SilverSim.Types.Script;
 using System.Collections.Generic;
 using ThreadedClasses;
 using SilverSim.Scene.Types.Script;
+using System.ComponentModel;
 
 namespace SilverSim.Scene.Types.Agent
 {
@@ -131,6 +132,16 @@ namespace SilverSim.Scene.Types.Agent
             get;
             set;
         }
+
+        [Description("Health in %")]
+        double Health
+        {
+            get;
+            set;
+        }
+
+        void IncreaseHealth(double v);
+        void DecreaseHealth(double v);
 
         AppearanceInfo.AvatarTextureData Textures
         {
