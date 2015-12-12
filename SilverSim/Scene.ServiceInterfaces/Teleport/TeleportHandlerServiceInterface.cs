@@ -54,5 +54,12 @@ namespace SilverSim.ServiceInterfaces.Teleport
         {
             return false;
         }
+
+        /* following function returns true if it accepts a teleport request or if it wants to distribute more specific error message except home location not available */
+        public virtual bool TeleportHome(SceneInterface sceneInterface, IAgent agent)
+        {
+            return false;
+        }
+
     }
 }

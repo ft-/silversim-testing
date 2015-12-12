@@ -258,5 +258,8 @@ namespace SilverSim.Scene.Types.Agent
         bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags);
         bool TeleportTo(SceneInterface sceneInterface, IAgent agent, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags);
         bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags);
+
+        /* following function returns true if it accepts a teleport request or if it wants to distribute more specific error message except home location not available */
+        bool TeleportHome(SceneInterface sceneInterface, IAgent agent);
     }
 }

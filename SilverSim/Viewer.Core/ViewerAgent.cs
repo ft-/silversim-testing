@@ -1046,6 +1046,19 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
+        /* following function returns true if it accepts a teleport request or if it wants to distribute more specific error message except home location not available */
+        public bool TeleportHome(SceneInterface sceneInterface, IAgent agent)
+        {
+            foreach(IAgentTeleportServiceInterface service in m_TeleportServices)
+            {
+                if(service.TeleportHome(sceneInterface, agent))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public ViewerAgent(UUID agentID,
             string firstName,
             string lastName,
