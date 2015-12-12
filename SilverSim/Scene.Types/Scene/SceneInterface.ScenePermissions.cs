@@ -33,7 +33,7 @@ namespace SilverSim.Scene.Types.Scene
             return GroupPowers.None;
         }
 
-        bool HasGroupPower(UUI agentOwner, UGI group, GroupPowers power)
+        public bool HasGroupPower(UUI agentOwner, UGI group, GroupPowers power)
         {
             return (GetGroupPowers(agentOwner, group) & power) != 0;
         }
