@@ -986,6 +986,42 @@ namespace SilverSim.Viewer.Core
         readonly string m_ServiceSessionID;
         readonly List<IAgentTeleportServiceInterface> m_TeleportServices;
 
+        public bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        {
+            foreach(IAgentTeleportServiceInterface service in m_TeleportServices)
+            {
+                if(service.TeleportTo(sceneInterface, agent, regionName, position, lookAt, TeleportFlags))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool TeleportTo(SceneInterface sceneInterface, IAgent agent, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        {
+            foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
+            {
+                if (service.TeleportTo(sceneInterface, agent, location, position, lookAt, TeleportFlags))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        {
+            foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
+            {
+                if (service.TeleportTo(sceneInterface, agent, gatekeeperURI, location, position, lookAt, TeleportFlags))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
+
         public ViewerAgent(UUID agentID,
             string firstName,
             string lastName,

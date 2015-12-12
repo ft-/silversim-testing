@@ -251,5 +251,10 @@ namespace SilverSim.Scene.Types.Agent
         void ReleaseControls(ScriptInstance instance);
 
         string AgentLanguage { get; }
+
+        /* following three functions return true if they accept a teleport request */
+        bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags);
+        bool TeleportTo(SceneInterface sceneInterface, IAgent agent, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags);
+        bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags);
     }
 }
