@@ -115,7 +115,16 @@ namespace SilverSim.Types.Primitive
         LinkTarget = 34,
         Specular = 36,
         Normal = 37,
-        AlphaMode = 38
+        AlphaMode = 38,
+
+        Alpha = 11001,
+
+        Projector = 11110,
+        ProjectorEnabled = 11101,
+        ProjectorTexture = 11102,
+        ProjectorFov = 11103,
+        ProjectorFocus = 11104,
+        ProjectorAmbience = 11105
     }
 
     [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]

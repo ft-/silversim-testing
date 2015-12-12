@@ -1180,6 +1180,68 @@ namespace SilverSim.Scene.Types.Object
                     }
                     break;
 
+                case PrimitiveParamsType.Alpha:
+                    m_TextureEntryLock.AcquireReaderLock(-1);
+                    try
+                    {
+                        ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_COLOR"));
+                        foreach (TextureEntryFace face in faces)
+                        {
+                            GetTexPrimitiveParams(face, PrimitiveParamsType.Alpha, paramList);
+                        }
+                    }
+                    finally
+                    {
+                        m_TextureEntryLock.ReleaseReaderLock();
+                    }
+                    break;
+
+                case PrimitiveParamsType.Projector:
+                    {
+                        ProjectionParam param = Projection;
+                        paramList.Add(param.IsProjecting ? 1 : 0);
+                        paramList.Add(param.ProjectionTextureID);
+                        paramList.Add(param.ProjectionFOV);
+                        paramList.Add(param.ProjectionFocus);
+                        paramList.Add(param.ProjectionAmbience);
+                    }
+                    break;
+
+                case PrimitiveParamsType.ProjectorEnabled:
+                    {
+                        ProjectionParam param = Projection;
+                        paramList.Add(param.IsProjecting ? 1 : 0);
+                    }
+                    break;
+
+                case PrimitiveParamsType.ProjectorTexture:
+                    {
+                        ProjectionParam param = Projection;
+                        paramList.Add(param.ProjectionTextureID);
+                    }
+                    break;
+
+                case PrimitiveParamsType.ProjectorFov:
+                    {
+                        ProjectionParam param = Projection;
+                        paramList.Add(param.ProjectionFOV);
+                    }
+                    break;
+
+                case PrimitiveParamsType.ProjectorFocus:
+                    {
+                        ProjectionParam param = Projection;
+                        paramList.Add(param.ProjectionFocus);
+                    }
+                    break;
+
+                case PrimitiveParamsType.ProjectorAmbience:
+                    {
+                        ProjectionParam param = Projection;
+                        paramList.Add(param.ProjectionAmbience);
+                    }
+                    break;
+
                 default:
                     throw new ArgumentException(String.Format("Invalid primitive parameter type {0}", enumerator.Current.AsUInt));
             }
@@ -1371,6 +1433,25 @@ namespace SilverSim.Scene.Types.Object
                     }
                     break;
 
+                case PrimitiveParamsType.Alpha:
+                    m_TextureEntryLock.AcquireWriterLock(-1);
+                    try
+                    {
+                        ICollection<TextureEntryFace> faces = GetFaces(ParamsHelper.GetInteger(enumerator, "PRIM_ALPHA"));
+                        enumerator.MarkPosition();
+                        foreach (TextureEntryFace face in faces)
+                        {
+                            enumerator.GoToMarkPosition();
+                            SetTexPrimitiveParams(face, PrimitiveParamsType.Alpha, enumerator);
+                        }
+                        m_TextureEntryBytes = m_TextureEntry.GetBytes();
+                    }
+                    finally
+                    {
+                        m_TextureEntryLock.ReleaseWriterLock();
+                    }
+                    break;
+
                 case PrimitiveParamsType.BumpShiny:
                     m_TextureEntryLock.AcquireWriterLock(-1);
                     try
@@ -1482,6 +1563,57 @@ namespace SilverSim.Scene.Types.Object
                     }
                     break;
 
+                case PrimitiveParamsType.Projector:
+                    {
+                        ProjectionParam param = new ProjectionParam();
+                        param.IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR");
+                        param.ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR");
+                        param.ProjectionFOV = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR");
+                        param.ProjectionFocus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR");
+                        param.ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR");
+                    }
+                    break;
+
+                case PrimitiveParamsType.ProjectorEnabled:
+                    {
+                        ProjectionParam param = Projection;
+                        param.IsProjecting = ParamsHelper.GetBoolean(enumerator, "PRIM_PROJECTOR_ENABLED");
+                        Projection = param;
+                    }
+                    break;
+
+                case PrimitiveParamsType.ProjectorTexture:
+                    {
+                        ProjectionParam param = Projection;
+                        param.ProjectionTextureID = GetTextureParam(enumerator, "PRIM_PROJECTOR_TEXTURE");
+                        Projection = param;
+                    }
+                    break;
+
+                case PrimitiveParamsType.ProjectorFov:
+                    {
+                        ProjectionParam param = Projection;
+                        param.ProjectionFOV = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR_FOV");
+                        Projection = param;
+                    }
+                    break;
+
+                case PrimitiveParamsType.ProjectorFocus:
+                    {
+                        ProjectionParam param = Projection;
+                        param.ProjectionFocus = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTOR_FOCUS");
+                        Projection = param;
+                    }
+                    break;
+
+                case PrimitiveParamsType.ProjectorAmbience:
+                    {
+                        ProjectionParam param = Projection;
+                        param.ProjectionAmbience = ParamsHelper.GetDouble(enumerator, "PRIM_PROJECTION_AMBIENCE");
+                        Projection = param;
+                    }
+                    break;
+
                 default:
                     throw new ArgumentException(String.Format("Invalid primitive parameter type {0}", enumerator.Current.AsInt));
             }
@@ -1506,6 +1638,10 @@ namespace SilverSim.Scene.Types.Object
 
                 case PrimitiveParamsType.Color:
                     paramList.Add(face.TextureColor.AsVector3);
+                    paramList.Add(face.TextureColor.A);
+                    break;
+
+                case PrimitiveParamsType.Alpha:
                     paramList.Add(face.TextureColor.A);
                     break;
 
@@ -1653,6 +1789,13 @@ namespace SilverSim.Scene.Types.Object
                         Vector3 color = ParamsHelper.GetVector(enumerator, "PRIM_COLOR");
                         double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_COLOR");
                         face.TextureColor = new ColorAlpha(color, alpha);
+                    }
+                    break;
+
+                case PrimitiveParamsType.Alpha:
+                    {
+                        double alpha = ParamsHelper.GetDouble(enumerator, "PRIM_ALPHA");
+                        face.TextureColor.A = alpha;
                     }
                     break;
 
