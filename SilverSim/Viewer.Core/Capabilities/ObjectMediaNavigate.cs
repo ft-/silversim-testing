@@ -128,7 +128,10 @@ namespace SilverSim.Viewer.Core.Capabilities
                     if(null != groupsService)
                     {
                         UGI groupID = part.ObjectGroup.Group;
-                        GroupMembership gm = groupsService.Memberships[m_Agent, groupID, m_Agent];
+                        if(!groupsService.Memberships.ContainsKey(m_Agent, groupID, m_Agent))
+                        {
+                            entry = null;
+                        }
                     }
                 }
             }

@@ -893,11 +893,7 @@ namespace SilverSim.Viewer.Groups
                 case GroupRoleChanges.ChangeType.Add:
                     if((GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.AssignMemberLimited) != 0)
                     {
-                        try
-                        {
-                            GroupRolemember grm = groupsService.Rolemembers[agent.Owner, new UGI(req.GroupID), req.RoleID, agent.Owner];
-                        }
-                        catch
+                        if(!groupsService.Rolemembers.ContainsKey(agent.Owner, new UGI(req.GroupID), req.RoleID, agent.Owner))
                         {
                             break;
                         }
@@ -1267,13 +1263,8 @@ namespace SilverSim.Viewer.Groups
                 return;
             }
 
-            try
+            if(!groupsService.Rolemembers.ContainsKey(agent.Owner, new UGI(req.GroupID), req.TitleRoleID, agent.Owner))
             {
-                GroupRolemember grm = groupsService.Rolemembers[agent.Owner, new UGI(req.GroupID), req.TitleRoleID, agent.Owner];
-            }
-            catch(Exception e)
-            {
-                m_Log.Info("GroupTitleUpdate", e);
                 return;
             }
 

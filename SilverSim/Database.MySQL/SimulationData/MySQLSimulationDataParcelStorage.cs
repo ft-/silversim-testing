@@ -98,7 +98,6 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         public override bool Remove(UUID regionID, UUID parcelID)
         {
-            List<UUID> parcels = new List<UUID>();
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
