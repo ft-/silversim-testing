@@ -180,7 +180,6 @@ namespace SilverSim.Viewer.Core
 
             while (true)
             {
-                qcount = 0;
                 foreach (Queue<Message> q in QueueList)
                 {
                     if (q.Count > 0)

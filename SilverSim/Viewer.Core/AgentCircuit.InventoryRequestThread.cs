@@ -383,7 +383,11 @@ namespace SilverSim.Viewer.Core
             {
 
                 InventoryFolder folder;
-                folder = Agent.InventoryService.Folder[AgentID, req.ParentFolderID];
+                if(!Agent.InventoryService.Folder.ContainsKey(AgentID, req.ParentFolderID))
+                {
+                    SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInvFolder"));
+                    return;
+                }
                 folder = new InventoryFolder();
                 folder.ID = req.FolderID;
                 folder.InventoryType = req.FolderType;
