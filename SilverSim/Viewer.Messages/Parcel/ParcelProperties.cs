@@ -107,10 +107,15 @@ namespace SilverSim.Viewer.Messages.Parcel
             parcelData.Add("AuthBuyerID", AuthBuyerID);
             parcelData.Add("Bitmap", new BinaryData(Bitmap));
             parcelData.Add("Category", (int)Category);
-            parcelData.Add("ClaimDate", ClaimDate.AsInt);
+            parcelData.Add("ClaimDate", ClaimDate.ToString());
             parcelData.Add("ClaimPrice", ClaimPrice);
             parcelData.Add("Desc", Description);
-            parcelData.Add("ParcelFlags", (int)(uint)ParcelFlags);
+            byte[] parcelFlags = BitConverter.GetBytes((uint)ParcelFlags);
+            if(!BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(parcelFlags);
+            }
+            parcelData.Add("ParcelFlags", new BinaryData(parcelFlags));
             parcelData.Add("GroupID", GroupID);
             parcelData.Add("GroupPrims", GroupPrims);
             parcelData.Add("IsGroupOwned", IsGroupOwned);
@@ -124,6 +129,8 @@ namespace SilverSim.Viewer.Messages.Parcel
             parcelData.Add("OtherCleanTime", OtherCleanTime);
             parcelData.Add("OtherCount", OtherCount);
             parcelData.Add("OtherPrims", OtherPrims);
+            parcelData.Add("OwnerID", OwnerID);
+            parcelData.Add("OwnerPrims", OwnerPrims);
             parcelData.Add("ParcelPrimBonus", ParcelPrimBonus);
             parcelData.Add("PassHours", PassHours);
             parcelData.Add("PassPrice", PassPrice);

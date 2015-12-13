@@ -66,7 +66,12 @@ namespace SilverSim.Viewer.Messages.Agent
                 groupData.Add("GroupID", e.GroupID);
                 groupData.Add("GroupInsigniaID", e.GroupInsigniaID);
                 groupData.Add("Contribution", e.Contribution);
-                groupData.Add("GroupPowers", ((UInt64)e.GroupPowers).ToString());
+                byte[] groupPowers = BitConverter.GetBytes((UInt64)e.GroupPowers);
+                if(!BitConverter.IsLittleEndian)
+                {
+                    Array.Reverse(groupPowers);
+                }
+                groupData.Add("GroupPowers", new BinaryData(groupPowers));
                 groupData.Add("GroupName", e.GroupName);
                 groupData.Add("AcceptNotices", e.AcceptNotices);
                 groupDataArray.Add(groupData);

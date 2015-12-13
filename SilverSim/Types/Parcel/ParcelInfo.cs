@@ -151,7 +151,7 @@ namespace SilverSim.Types.Parcel
         public Int32 RentPrice;
         public Vector3 AABBMin;
         public Vector3 AABBMax;
-        public double ParcelPrimBonus;
+        public double ParcelPrimBonus = 1;
         public Int32 PassPrice;
         public double PassHours;
         public Int32 ActualArea;
