@@ -30,17 +30,15 @@ namespace SilverSim.Viewer.Core
             EstateInfo estate;
             uint estateID;
             EstateServiceInterface estateService = Scene.EstateService;
-            if (estateService.RegionMap.TryGetValue(Scene.ID, out estateID))
+            if (estateService.RegionMap.TryGetValue(Scene.ID, out estateID) &&
+                estateService.TryGetValue(estateID, out estate))
             {
-                if (estateService.TryGetValue(estateID, out estate))
-                {
-                    reply.CovenantID = estate.CovenantID;
-                    reply.CovenantTimestamp = (uint)estate.CovenantTimestamp.DateTimeToUnixTime();
-                    reply.EstateName = estate.Name;
-                    reply.EstateOwnerID = estate.Owner.ID;
+                reply.CovenantID = estate.CovenantID;
+                reply.CovenantTimestamp = (uint)estate.CovenantTimestamp.DateTimeToUnixTime();
+                reply.EstateName = estate.Name;
+                reply.EstateOwnerID = estate.Owner.ID;
 
-                    SendMessage(reply);
-                }
+                SendMessage(reply);
             }
         }
     }
