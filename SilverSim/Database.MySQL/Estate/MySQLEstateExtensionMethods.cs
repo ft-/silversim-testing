@@ -21,6 +21,7 @@ namespace SilverSim.Database.MySQL.Estate
             ei.AbuseEmail = (string)reader["AbuseEmail"];
             ei.CovenantID = reader.GetUUID("CovenantID");
             ei.CovenantTimestamp = reader.GetDate("CovenantTimestamp");
+            ei.UseGlobalTime = (uint)reader["UseGlobalTime"] != 0;
 
             return ei;
         }
