@@ -270,7 +270,13 @@ namespace SilverSim.Viewer.Core
                     scene.EstateService.EstateGroup.All[estateID],
                     estateID, 
                     req.CircuitSceneID);
-                //sendEstateList(req.TransactionID, req.Invoice, EstateAccessCodes.EstateBans, scene.EstateService.EstateBans.All[estateID], estateID, req.CircuitSceneID);
+                SendEstateList(
+                    req.TransactionID, 
+                    req.Invoice, 
+                    EstateAccessCodes.EstateBans, 
+                    scene.EstateService.EstateBans.All[estateID], 
+                    estateID, 
+                    req.CircuitSceneID);
             }
         }
 

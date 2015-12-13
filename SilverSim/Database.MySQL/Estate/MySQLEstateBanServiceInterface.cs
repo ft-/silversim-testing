@@ -1,15 +1,18 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using MySql.Data.MySqlClient;
 using SilverSim.ServiceInterfaces.Estate;
-using SilverSim.Types;
+using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using SilverSim.Types;
 using System.Diagnostics.CodeAnalysis;
+using MySql.Data.MySqlClient;
 
 namespace SilverSim.Database.MySQL.Estate
 {
-    public sealed class MySQLEstateAccessInterface : EstateAccessServiceInterface
+    public class MySQLEstateBanServiceInterface : EstateBanServiceInterface
     {
         public sealed class MySQLListAccess : IListAccess
         {
@@ -22,13 +25,13 @@ namespace SilverSim.Database.MySQL.Estate
 
             public List<UUI> this[uint estateID]
             {
-                get 
+                get
                 {
                     List<UUI> estateusers = new List<UUI>();
                     using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        using (MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_users WHERE EstateID = ?estateid", conn))
+                        using (MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_bans WHERE EstateID = ?estateid", conn))
                         {
                             cmd.Parameters.AddWithValue("?estateid", estateID);
                             using (MySqlDataReader reader = cmd.ExecuteReader())
@@ -50,7 +53,7 @@ namespace SilverSim.Database.MySQL.Estate
         readonly MySQLListAccess m_ListAccess;
         readonly string m_ConnectionString;
 
-        public MySQLEstateAccessInterface(string connectionString)
+        public MySQLEstateBanServiceInterface(string connectionString)
         {
             m_ConnectionString = connectionString;
             m_ListAccess = new MySQLListAccess(connectionString);
@@ -64,7 +67,7 @@ namespace SilverSim.Database.MySQL.Estate
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_users WHERE EstateID = ?estateid AND UserID LIKE ?userid", conn))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_bans WHERE EstateID = ?estateid AND UserID LIKE ?userid", conn))
                     {
                         cmd.Parameters.AddWithValue("?estateid", estateID);
                         cmd.Parameters.AddWithValue("?userid", agent.ID.ToString());
@@ -78,8 +81,8 @@ namespace SilverSim.Database.MySQL.Estate
             set
             {
                 string query = value ?
-                    "REPLACE INTO estate_users (EstateID, UserID) VALUES (?estateid, ?userid)" :
-                    "DELETE FROM estate_users WHERE EstateID = ?estateid AND UserID LIKE ?userid";
+                    "REPLACE INTO estate_bans (EstateID, UserID) VALUES (?estateid, ?userid)" :
+                    "DELETE FROM estate_bans WHERE EstateID = ?estateid AND UserID LIKE ?userid";
 
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
@@ -99,7 +102,7 @@ namespace SilverSim.Database.MySQL.Estate
 
         public override IListAccess All
         {
-            get 
+            get
             {
                 return m_ListAccess;
             }

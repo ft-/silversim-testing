@@ -24,6 +24,7 @@ namespace SilverSim.Database.MySQL.Estate
         readonly MySQLEstateOwnerService m_EstateOwnerService;
         readonly MySQLEstateManagerService m_EstateManagerService;
         readonly MySQLEstateAccessInterface m_EstateAccessService;
+        readonly MySQLEstateBanServiceInterface m_EstateBanService;
         readonly MySQLEstateGroupsService m_EstateGroupsService;
         readonly MySQLEstateRegionMapInterface m_EstateRegionMapService;
 
@@ -34,6 +35,7 @@ namespace SilverSim.Database.MySQL.Estate
             m_EstateOwnerService = new MySQLEstateOwnerService(connectionString);
             m_EstateManagerService = new MySQLEstateManagerService(connectionString);
             m_EstateAccessService = new MySQLEstateAccessInterface(connectionString);
+            m_EstateBanService = new MySQLEstateBanServiceInterface(connectionString);
             m_EstateGroupsService = new MySQLEstateGroupsService(connectionString);
             m_EstateRegionMapService = new MySQLEstateRegionMapInterface(connectionString);
         }
@@ -56,6 +58,7 @@ namespace SilverSim.Database.MySQL.Estate
             MySQLUtilities.ProcessMigrations(m_ConnectionString, "estate_managers", Migrations_estatemanagers, m_Log);
             MySQLUtilities.ProcessMigrations(m_ConnectionString, "estate_groups", Migrations_estategroups, m_Log);
             MySQLUtilities.ProcessMigrations(m_ConnectionString, "estate_users", Migrations_estateusers, m_Log);
+            MySQLUtilities.ProcessMigrations(m_ConnectionString, "estate_bans", Migrations_estatebans, m_Log);
             MySQLUtilities.ProcessMigrations(m_ConnectionString, "estates", Migrations_estates, m_Log);
             MySQLUtilities.ProcessMigrations(m_ConnectionString, "estate_regionmap", Migrations_estateregionmap, m_Log);
         }
@@ -87,6 +90,15 @@ namespace SilverSim.Database.MySQL.Estate
         };
 
         private static readonly string[] Migrations_estateusers = new string[]{
+            "CREATE TABLE %tablename% (" +
+                "EstateID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "UserID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
+                "PRIMARY KEY(EstateID, UserID)," +
+                "KEY UserID (UserID)," +
+                "KEY EstateID (EstateID))"
+        };
+
+        private static readonly string[] Migrations_estatebans = new string[]{
             "CREATE TABLE %tablename% (" +
                 "EstateID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "UserID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
@@ -285,6 +297,14 @@ namespace SilverSim.Database.MySQL.Estate
             get 
             {
                 return m_EstateAccessService;
+            }
+        }
+
+        public override EstateBanServiceInterface EstateBans
+        {
+            get
+            {
+                return m_EstateBanService;
             }
         }
 
