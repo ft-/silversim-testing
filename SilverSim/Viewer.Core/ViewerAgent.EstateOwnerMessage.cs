@@ -49,11 +49,11 @@ namespace SilverSim.Viewer.Core
             switch(req.Method)
             {
                 case "getinfo":
-                    EstateOwner_GetInfo(req);
+                    EstateOwner_GetInfo(circuit, req);
                     break;
 
                 case "setregioninfo":
-                    EstateOwner_SetRegionInfo(req);
+                    EstateOwner_SetRegionInfo(circuit, req);
                     break;
 
 #if TEXTUREBASE
@@ -62,75 +62,75 @@ namespace SilverSim.Viewer.Core
 #endif
 
                 case "texturedetail":
-                    EstateOwner_TextureDetail(req);
+                    EstateOwner_TextureDetail(circuit, req);
                     break;
 
                 case "textureheights":
-                    EstateOwner_TextureHeights(req);
+                    EstateOwner_TextureHeights(circuit, req);
                     break;
 
                 case "texturecommit":
-                    EstateOwner_TextureCommit(req);
+                    EstateOwner_TextureCommit(circuit, req);
                     break;
 
                 case "setregionterrain":
-                    EstateOwner_SetRegionTerrain(req);
+                    EstateOwner_SetRegionTerrain(circuit, req);
                     break;
 
                 case "restart":
-                    EstateOwner_Restart(req);
+                    EstateOwner_Restart(circuit, req);
                     break;
 
                 case "estatechangecovenantid":
-                    EstateOwner_EstateChangeCovenantId(req);
+                    EstateOwner_EstateChangeCovenantId(circuit, req);
                     break;
 
                 case "estateaccessdelta":
-                    EstateOwner_EstateAccessDelta(req);
+                    EstateOwner_EstateAccessDelta(circuit, req);
                     break;
 
                 case "simulatormessage":
-                    EstateOwner_SimulatorMessage(req);
+                    EstateOwner_SimulatorMessage(circuit, req);
                     break;
 
                 case "instantmessage":
-                    EstateOwner_InstantMessage(req);
+                    EstateOwner_InstantMessage(circuit, req);
                     break;
 
                 case "setregiondebug":
-                    EstateOwner_SetRegionDebug(req);
+                    EstateOwner_SetRegionDebug(circuit, req);
                     break;
 
                 case "teleporthomeuser":
-                    EstateOwner_TeleportHomeUser(req);
+                    EstateOwner_TeleportHomeUser(circuit, req);
                     break;
 
                 case "teleporthomeallusers":
-                    EstateOwner_TeleportHomeAllUsers(req);
+                    EstateOwner_TeleportHomeAllUsers(circuit, req);
                     break;
 
                 case "colliders":
-                    EstateOwner_Colliders(req);
+                    EstateOwner_Colliders(circuit, req);
                     break;
 
                 case "scripts":
-                    EstateOwner_Scripts(req);
+                    EstateOwner_Scripts(circuit, req);
                     break;
 
                 case "terrain":
-                    EstateOwner_Terrain(req);
+                    EstateOwner_Terrain(circuit, req);
                     break;
 
                 case "estatechangeinfo":
-                    EstateOwner_EstateChangeInfo(req);
+                    EstateOwner_EstateChangeInfo(circuit, req);
                     break;
 
                 case "telehub":
-                    EstateOwner_Telehub(req);
+                    EstateOwner_Telehub(circuit, req);
                     break;
 
                 case "kickestate":
-                    EstateOwner_KickEstate(req);
+                    EstateOwner_KickEstate(circuit, req);
                     break;
 
                 default:
@@ -221,7 +221,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void EstateOwner_GetInfo(EstateOwnerMessage req)
+        void EstateOwner_GetInfo(AgentCircuit circuit, EstateOwnerMessage req)
         {
             EstateOwnerMessage msg = new EstateOwnerMessage();
             msg.AgentID = Owner.ID;
@@ -229,155 +229,180 @@ namespace SilverSim.Viewer.Core
             msg.Invoice = req.Invoice;
             msg.TransactionID = req.TransactionID;
             msg.Method = "estateupdateinfo";
-            AgentCircuit circuit;
-            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
-            {
-                SceneInterface scene = circuit.Scene;
+            SceneInterface scene = circuit.Scene;
 
-                uint estateID = scene.EstateService.RegionMap[scene.ID];
-                EstateInfo estateInfo = scene.EstateService[estateID];
-                msg.ParamList.Add(StringToBytes(estateInfo.Name));
-                msg.ParamList.Add(StringToBytes((string)estateInfo.Owner.ID));
-                msg.ParamList.Add(StringToBytes(estateID.ToString()));
-                msg.ParamList.Add(StringToBytes(((uint)estateInfo.Flags).ToString()));
-                msg.ParamList.Add(StringToBytes(estateInfo.SunPosition.ToString()));
-                msg.ParamList.Add(StringToBytes(estateInfo.ParentEstateID.ToString()));
-                msg.ParamList.Add(StringToBytes((string)UUID.Zero)); /* covenant */
-                msg.ParamList.Add(StringToBytes("0")); /* covenant changed */
-                msg.ParamList.Add(StringToBytes("1"));
-                msg.ParamList.Add(StringToBytes(estateInfo.AbuseEmail));
+            uint estateID = scene.EstateService.RegionMap[scene.ID];
+            EstateInfo estateInfo = scene.EstateService[estateID];
+            msg.ParamList.Add(StringToBytes(estateInfo.Name));
+            msg.ParamList.Add(StringToBytes((string)estateInfo.Owner.ID));
+            msg.ParamList.Add(StringToBytes(estateID.ToString()));
+            msg.ParamList.Add(StringToBytes(((uint)estateInfo.Flags).ToString()));
+            msg.ParamList.Add(StringToBytes(estateInfo.SunPosition.ToString()));
+            msg.ParamList.Add(StringToBytes(estateInfo.ParentEstateID.ToString()));
+            msg.ParamList.Add(StringToBytes((string)UUID.Zero)); /* covenant */
+            msg.ParamList.Add(StringToBytes("0")); /* covenant changed */
+            msg.ParamList.Add(StringToBytes("1"));
+            msg.ParamList.Add(StringToBytes(estateInfo.AbuseEmail));
 
-                SendMessageIfRootAgent(msg, req.CircuitSceneID);
+            SendMessageIfRootAgent(msg, req.CircuitSceneID);
 
-                SendEstateList(
-                    req.TransactionID,
-                    req.Invoice,
-                    EstateAccessCodes.EstateManagers,
-                    scene.EstateService.EstateManager.All[estateID], 
-                    estateID, 
-                    req.CircuitSceneID);
-                SendEstateList(
-                    req.TransactionID,
-                    req.Invoice, 
-                    EstateAccessCodes.AccessOptions, 
-                    scene.EstateService.EstateAccess.All[estateID], 
-                    estateID, 
-                    req.CircuitSceneID);
-                SendEstateList(
-                    req.TransactionID,
-                    req.Invoice,
-                    EstateAccessCodes.AllowedGroups,
-                    scene.EstateService.EstateGroup.All[estateID],
-                    estateID, 
-                    req.CircuitSceneID);
-                SendEstateList(
-                    req.TransactionID, 
-                    req.Invoice, 
-                    EstateAccessCodes.EstateBans, 
-                    scene.EstateService.EstateBans.All[estateID], 
-                    estateID, 
-                    req.CircuitSceneID);
-            }
+            SendEstateList(
+                req.TransactionID,
+                req.Invoice,
+                EstateAccessCodes.EstateManagers,
+                scene.EstateService.EstateManager.All[estateID], 
+                estateID, 
+                req.CircuitSceneID);
+            SendEstateList(
+                req.TransactionID,
+                req.Invoice, 
+                EstateAccessCodes.AccessOptions, 
+                scene.EstateService.EstateAccess.All[estateID], 
+                estateID, 
+                req.CircuitSceneID);
+            SendEstateList(
+                req.TransactionID,
+                req.Invoice,
+                EstateAccessCodes.AllowedGroups,
+                scene.EstateService.EstateGroup.All[estateID],
+                estateID, 
+                req.CircuitSceneID);
+            SendEstateList(
+                req.TransactionID, 
+                req.Invoice, 
+                EstateAccessCodes.EstateBans, 
+                scene.EstateService.EstateBans.All[estateID], 
+                estateID, 
+                req.CircuitSceneID);
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        void EstateOwner_SetRegionInfo(EstateOwnerMessage req)
+        void EstateOwner_SetRegionInfo(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 9)
             {
                 return;
             }
 
-            AgentCircuit circuit;
-            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
-            {
-                SceneInterface scene = circuit.Scene;
+            SceneInterface scene = circuit.Scene;
 
-                scene.RegionSettings.BlockTerraform = ParamStringToBool(req.ParamList[0]);
-                scene.RegionSettings.BlockFly = ParamStringToBool(req.ParamList[1]);
-                scene.RegionSettings.AllowDamage = ParamStringToBool(req.ParamList[2]);
-                scene.RegionSettings.AllowLandResell = ParamStringToBool(req.ParamList[3]);
-                scene.RegionSettings.AgentLimit = int.Parse(UTF8NoBOM.GetString(req.ParamList[4]));
-                scene.RegionSettings.ObjectBonus = float.Parse(UTF8NoBOM.GetString(req.ParamList[5]), CultureInfo.InvariantCulture);
+            scene.RegionSettings.BlockTerraform = ParamStringToBool(req.ParamList[0]);
+            scene.RegionSettings.BlockFly = ParamStringToBool(req.ParamList[1]);
+            scene.RegionSettings.AllowDamage = ParamStringToBool(req.ParamList[2]);
+            scene.RegionSettings.AllowLandResell = ParamStringToBool(req.ParamList[3]);
+            scene.RegionSettings.AgentLimit = int.Parse(UTF8NoBOM.GetString(req.ParamList[4]));
+            scene.RegionSettings.ObjectBonus = float.Parse(UTF8NoBOM.GetString(req.ParamList[5]), CultureInfo.InvariantCulture);
 #warning TODO: adjust for correct values
-                //scene.RegionSettings.Maturity = int.Parse(req.ParamList[6]);
-                scene.RegionSettings.RestrictPushing = ParamStringToBool(req.ParamList[7]);
-                scene.RegionSettings.AllowLandJoinDivide = ParamStringToBool(req.ParamList[8]);
+            //scene.RegionSettings.Maturity = int.Parse(req.ParamList[6]);
+            scene.RegionSettings.RestrictPushing = ParamStringToBool(req.ParamList[7]);
+            scene.RegionSettings.AllowLandJoinDivide = ParamStringToBool(req.ParamList[8]);
 
-                scene.TriggerRegionSettingsChanged();
-            }
+            scene.TriggerRegionSettingsChanged();
         }
 
-        void EstateOwner_TextureDetail(EstateOwnerMessage req)
+        void EstateOwner_TextureDetail(AgentCircuit circuit, EstateOwnerMessage req)
         {
-            foreach(byte[] b in req.ParamList)
+            bool settingsChanged = false;
+            
+            SceneInterface scene = circuit.Scene;
+            try
             {
-                string s = UTF8NoBOM.GetString(b);
-                string[] splitfield = s.Split(' ');
-                if(splitfield.Length != 2)
-                {
-                    continue;
-                }
-
-                Int16 corner = Int16.Parse(splitfield[0]);
-                UUID textureUUID = UUID.Parse(splitfield[1]);
-            }
-        }
-
-        void EstateOwner_TextureHeights(EstateOwnerMessage req)
-        {
-            AgentCircuit circuit;
-            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
-            {
-                SceneInterface scene = circuit.Scene;
-
                 foreach (byte[] b in req.ParamList)
                 {
                     string s = UTF8NoBOM.GetString(b);
                     string[] splitfield = s.Split(' ');
-                    if (splitfield.Length != 3)
+                    if (splitfield.Length != 2)
                     {
                         continue;
                     }
 
                     Int16 corner = Int16.Parse(splitfield[0]);
-                    float lowValue = float.Parse(splitfield[1], CultureInfo.InvariantCulture);
-                    float highValue = float.Parse(splitfield[2], CultureInfo.InvariantCulture);
-
+                    UUID textureUUID = UUID.Parse(splitfield[1]);
                     switch (corner)
                     {
                         case 0:
-                            scene.RegionSettings.Elevation1SW = lowValue;
-                            scene.RegionSettings.Elevation2SW = highValue;
+                            scene.RegionSettings.TerrainTexture1 = textureUUID;
+                            settingsChanged = true;
                             break;
 
                         case 1:
-                            scene.RegionSettings.Elevation1NW = lowValue;
-                            scene.RegionSettings.Elevation2NW = highValue;
+                            scene.RegionSettings.TerrainTexture2 = textureUUID;
+                            settingsChanged = true;
                             break;
 
                         case 2:
-                            scene.RegionSettings.Elevation1SE = lowValue;
-                            scene.RegionSettings.Elevation2SE = highValue;
+                            scene.RegionSettings.TerrainTexture3 = textureUUID;
+                            settingsChanged = true;
                             break;
 
                         case 3:
-                            scene.RegionSettings.Elevation1NE = lowValue;
-                            scene.RegionSettings.Elevation2NE = highValue;
+                            scene.RegionSettings.TerrainTexture4 = textureUUID;
+                            settingsChanged = true;
                             break;
 
                         default:
                             break;
                     }
                 }
-
-                scene.TriggerRegionSettingsChanged();
+            }
+            finally
+            {
+                if (settingsChanged)
+                {
+                    scene.TriggerRegionSettingsChanged();
+                }
             }
         }
 
-        void EstateOwner_TextureCommit(EstateOwnerMessage req)
+        void EstateOwner_TextureHeights(AgentCircuit circuit, EstateOwnerMessage req)
         {
+            SceneInterface scene = circuit.Scene;
 
+            foreach (byte[] b in req.ParamList)
+            {
+                string s = UTF8NoBOM.GetString(b);
+                string[] splitfield = s.Split(' ');
+                if (splitfield.Length != 3)
+                {
+                    continue;
+                }
+
+                Int16 corner = Int16.Parse(splitfield[0]);
+                float lowValue = float.Parse(splitfield[1], CultureInfo.InvariantCulture);
+                float highValue = float.Parse(splitfield[2], CultureInfo.InvariantCulture);
+
+                switch (corner)
+                {
+                    case 0:
+                        scene.RegionSettings.Elevation1SW = lowValue;
+                        scene.RegionSettings.Elevation2SW = highValue;
+                        break;
+
+                    case 1:
+                        scene.RegionSettings.Elevation1NW = lowValue;
+                        scene.RegionSettings.Elevation2NW = highValue;
+                        break;
+
+                    case 2:
+                        scene.RegionSettings.Elevation1SE = lowValue;
+                        scene.RegionSettings.Elevation2SE = highValue;
+                        break;
+
+                    case 3:
+                        scene.RegionSettings.Elevation1NE = lowValue;
+                        scene.RegionSettings.Elevation2NE = highValue;
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            scene.TriggerRegionSettingsChanged();
+        }
+
+        void EstateOwner_TextureCommit(AgentCircuit circuit, EstateOwnerMessage req)
+        {
         }
 
         static bool ParamStringToBool(byte[] b)
@@ -387,32 +412,30 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        void EstateOwner_SetRegionTerrain(EstateOwnerMessage req)
+        void EstateOwner_SetRegionTerrain(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count != 9)
             {
                 return;
             }
 
-            AgentCircuit circuit;
-            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
-            {
-                SceneInterface scene = circuit.Scene;
+            SceneInterface scene = circuit.Scene;
 
-                scene.RegionSettings.WaterHeight = float.Parse(UTF8NoBOM.GetString(req.ParamList[0]), CultureInfo.InvariantCulture);
-                scene.RegionSettings.TerrainRaiseLimit = float.Parse(UTF8NoBOM.GetString(req.ParamList[1]), CultureInfo.InvariantCulture);
-                scene.RegionSettings.TerrainLowerLimit = float.Parse(UTF8NoBOM.GetString(req.ParamList[2]), CultureInfo.InvariantCulture);
-                bool useEstateSun = ParamStringToBool(req.ParamList[3]);
-                bool useFixedSun = ParamStringToBool(req.ParamList[4]);
-                float sunHour = float.Parse(UTF8NoBOM.GetString(req.ParamList[5]), CultureInfo.InvariantCulture);
-                bool useGlobal = ParamStringToBool(req.ParamList[6]);
-                bool isEstateFixedSun = ParamStringToBool(req.ParamList[7]);
-                float estateSunHour = float.Parse(UTF8NoBOM.GetString(req.ParamList[8]), CultureInfo.InvariantCulture);
-                scene.TriggerRegionSettingsChanged();
-            }
+            scene.RegionSettings.WaterHeight = float.Parse(UTF8NoBOM.GetString(req.ParamList[0]), CultureInfo.InvariantCulture);
+            scene.RegionSettings.TerrainRaiseLimit = float.Parse(UTF8NoBOM.GetString(req.ParamList[1]), CultureInfo.InvariantCulture);
+            scene.RegionSettings.TerrainLowerLimit = float.Parse(UTF8NoBOM.GetString(req.ParamList[2]), CultureInfo.InvariantCulture);
+
+            bool useEstateSun = ParamStringToBool(req.ParamList[3]);
+            bool useFixedSun = ParamStringToBool(req.ParamList[4]);
+            float sunHour = float.Parse(UTF8NoBOM.GetString(req.ParamList[5]), CultureInfo.InvariantCulture);
+            bool useGlobal = ParamStringToBool(req.ParamList[6]);
+            bool isEstateFixedSun = ParamStringToBool(req.ParamList[7]);
+            float estateSunHour = float.Parse(UTF8NoBOM.GetString(req.ParamList[8]), CultureInfo.InvariantCulture);
+
+            scene.TriggerRegionSettingsChanged();
         }
 
-        void EstateOwner_Restart(EstateOwnerMessage req)
+        void EstateOwner_Restart(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 1)
             {
@@ -427,7 +450,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        void EstateOwner_EstateChangeCovenantId(EstateOwnerMessage req)
+        void EstateOwner_EstateChangeCovenantId(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 1)
             {
@@ -437,20 +460,16 @@ namespace SilverSim.Viewer.Core
             UUID covenantID = UUID.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[0]));
             EstateInfo estate;
             uint estateID;
-            AgentCircuit circuit;
-            if (Circuits.TryGetValue(req.SessionID, out circuit))
+            EstateServiceInterface estateService = circuit.Scene.EstateService;
+            if(estateService.RegionMap.TryGetValue(circuit.Scene.ID, out estateID) &&
+                estateService.TryGetValue(estateID, out estate))
             {
-                EstateServiceInterface estateService = circuit.Scene.EstateService;
-                if(estateService.RegionMap.TryGetValue(circuit.Scene.ID, out estateID) &&
-                    estateService.TryGetValue(estateID, out estate))
-                {
-                    estate.CovenantID = covenantID;
-                    estateService[estate.ID] = estate;
-                }
+                estate.CovenantID = covenantID;
+                estateService[estate.ID] = estate;
             }
         }
 
-        void EstateOwner_EstateAccessDelta(EstateOwnerMessage req)
+        void EstateOwner_EstateAccessDelta(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 3)
             {
@@ -462,7 +481,7 @@ namespace SilverSim.Viewer.Core
              */
         }
 
-        void EstateOwner_SimulatorMessage(EstateOwnerMessage req)
+        void EstateOwner_SimulatorMessage(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 5)
             {
@@ -471,18 +490,13 @@ namespace SilverSim.Viewer.Core
             UUID invoice = req.Invoice;
             string message = UTF8NoBOM.GetString(req.ParamList[4]);
 
-            AgentCircuit circuit;
-
-            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
+            foreach (IAgent agent in circuit.Scene.Agents)
             {
-                foreach (IAgent agent in circuit.Scene.Agents)
-                {
-                    agent.SendRegionNotice(Owner, message, req.CircuitSceneID);
-                }
+                agent.SendRegionNotice(Owner, message, req.CircuitSceneID);
             }
         }
 
-        void EstateOwner_InstantMessage(EstateOwnerMessage req)
+        void EstateOwner_InstantMessage(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if (req.ParamList.Count < 2)
             {
@@ -496,7 +510,7 @@ namespace SilverSim.Viewer.Core
                 UTF8NoBOM.GetString(req.ParamList[4]);
         }
 
-        void EstateOwner_SetRegionDebug(EstateOwnerMessage req)
+        void EstateOwner_SetRegionDebug(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 3)
             {
@@ -504,47 +518,67 @@ namespace SilverSim.Viewer.Core
             }
             UUID invoice = req.Invoice;
             UUID SenderID = Owner.ID;
-            AgentCircuit circuit;
-
-            if (Circuits.TryGetValue(req.CircuitSceneID, out circuit))
-            {
-                SceneInterface scene = circuit.Scene;
-                scene.RegionSettings.DisableScripts = !ParamStringToBool(req.ParamList[0]);
-                scene.RegionSettings.DisableCollisions = !ParamStringToBool(req.ParamList[1]);
-                scene.RegionSettings.DisablePhysics = !ParamStringToBool(req.ParamList[2]);
-                scene.TriggerRegionSettingsChanged();
-            }
+            SceneInterface scene = circuit.Scene;
+            scene.RegionSettings.DisableScripts = !ParamStringToBool(req.ParamList[0]);
+            scene.RegionSettings.DisableCollisions = !ParamStringToBool(req.ParamList[1]);
+            scene.RegionSettings.DisablePhysics = !ParamStringToBool(req.ParamList[2]);
+            scene.TriggerRegionSettingsChanged();
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        void EstateOwner_TeleportHomeUser(EstateOwnerMessage req)
+        void EstateOwner_TeleportHomeUser(AgentCircuit circuit, EstateOwnerMessage req)
         {
-            if(req.ParamList.Count < 2)
+            if (req.ParamList.Count < 2)
             {
                 return;
             }
             UUID invoice = req.Invoice;
             UUID senderID = Owner.ID;
             UUID prey = UUID.Parse(UTF8NoBOM.GetString(req.ParamList[1]));
+
+            SceneInterface scene = circuit.Scene;
+
+            IAgent targetagent;
+            if(scene.RootAgents.TryGetValue(prey, out targetagent))
+            {
+                if(!targetagent.TeleportHome(scene, targetagent))
+                {
+                    targetagent.KickUser("You were teleported home by the region owner. Because of failing TP, you have been logged out.");
+                }
+            }
         }
 
-        void EstateOwner_TeleportHomeAllUsers(EstateOwnerMessage req)
+        void EstateOwner_TeleportHomeAllUsers(AgentCircuit circuit, EstateOwnerMessage req)
         {
             UUID invoice = req.Invoice;
             UUID senderID = Owner.ID;
+
+            SceneInterface scene = circuit.Scene;
+
+            foreach(IAgent targetagent in scene.RootAgents)
+            {
+                if(targetagent == circuit.Agent)
+                {
+                    /* do not do self-kick */
+                }
+                else if (!targetagent.TeleportHome(scene, targetagent))
+                {
+                    targetagent.KickUser("You were teleported home by the region owner. Because of failing TP, you have been logged out.");
+                }
+            }
         }
 
-        void EstateOwner_Colliders(EstateOwnerMessage req)
+        void EstateOwner_Colliders(AgentCircuit circuit, EstateOwnerMessage req)
         {
 
         }
 
-        void EstateOwner_Scripts(EstateOwnerMessage req)
+        void EstateOwner_Scripts(AgentCircuit circuit, EstateOwnerMessage req)
         {
 
         }
 
-        void EstateOwner_Terrain(EstateOwnerMessage req)
+        void EstateOwner_Terrain(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 1)
             {
@@ -573,7 +607,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        void EstateOwner_EstateChangeInfo(EstateOwnerMessage req)
+        void EstateOwner_EstateChangeInfo(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 3)
             {
@@ -586,7 +620,7 @@ namespace SilverSim.Viewer.Core
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
-        void EstateOwner_Telehub(EstateOwnerMessage req)
+        void EstateOwner_Telehub(AgentCircuit circuit, EstateOwnerMessage req)
         {
             UUID invoice = req.Invoice;
             UUID senderID = Owner.ID;
@@ -606,7 +640,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        void EstateOwner_KickEstate(EstateOwnerMessage req)
+        void EstateOwner_KickEstate(AgentCircuit circuit, EstateOwnerMessage req)
         {
             if(req.ParamList.Count < 1)
             {
@@ -616,6 +650,13 @@ namespace SilverSim.Viewer.Core
             UUID invoice = req.Invoice;
             UUID senderID = Owner.ID;
             UUID prey = UUID.Parse(UTF8NoBOM.GetString(req.ParamList[0]));
+
+            IAgent targetagent;
+            SceneInterface scene = circuit.Scene;
+            if (scene.RootAgents.TryGetValue(prey, out targetagent))
+            {
+                targetagent.KickUser("You were kicked by the region owner.");
+            }
         }
 
         static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);

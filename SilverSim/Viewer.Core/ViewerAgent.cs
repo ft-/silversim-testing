@@ -986,6 +986,11 @@ namespace SilverSim.Viewer.Core
         readonly string m_ServiceSessionID;
         readonly List<IAgentTeleportServiceInterface> m_TeleportServices;
 
+        public void KickUser(string msg)
+        {
+
+        }
+
         public bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             foreach(IAgentTeleportServiceInterface service in m_TeleportServices)
