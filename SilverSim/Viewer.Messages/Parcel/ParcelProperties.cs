@@ -107,7 +107,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             parcelData.Add("AuthBuyerID", AuthBuyerID);
             parcelData.Add("Bitmap", new BinaryData(Bitmap));
             parcelData.Add("Category", (int)Category);
-            parcelData.Add("ClaimDate", ClaimDate.ToString());
+            parcelData.Add("ClaimDate", ClaimDate);
             parcelData.Add("ClaimPrice", ClaimPrice);
             parcelData.Add("Desc", Description);
             byte[] parcelFlags = BitConverter.GetBytes((uint)ParcelFlags);
