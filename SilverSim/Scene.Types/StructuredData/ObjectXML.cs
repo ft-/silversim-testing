@@ -138,7 +138,6 @@ namespace SilverSim.Scene.Types.StructuredData
             Serialize(writer, "AngularVelocity", part.AngularVelocity);
             Serialize(writer, "Acceleration", part.Acceleration);
             Serialize(writer, "Description", part.Description);
-            TextureEntry te = part.TextureEntry;
             ObjectPart.TextParam textparam = part.Text;
             Serialize(writer, "Color", textparam.TextColor);
             Serialize(writer, "Text", textparam.Text);
@@ -181,7 +180,6 @@ namespace SilverSim.Scene.Types.StructuredData
             //Serialize(writer, "HollowShape", (uint)shape.ProfileHollow);
             Serialize(writer, "SculptTexture", shape.SculptMap);
             Serialize(writer, "SculptType", (uint)shape.SculptType);
-            ObjectPart.ProjectionParam projparam = part.Projection;
             ObjectPart.FlexibleParam flexparam = part.Flexible;
             ObjectPart.PointLightParam lightparam = part.PointLight;
             Serialize(writer, "FlexiSoftness", flexparam.Softness);
