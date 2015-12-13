@@ -245,9 +245,9 @@ namespace SilverSim.Scene.Types.Scene
                         break;
                 }
             }
-            else
+            else if(!EstateService.ContainsKey(EstateService.RegionMap[ID]))
             {
-                estateInfo = EstateService[EstateService.RegionMap[ID]];
+                throw new ParcelAccessDeniedException("Estate data not available.");
             }
 
             if (destinationLocation.X < 0 || destinationLocation.X >= size.X)
