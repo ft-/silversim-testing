@@ -1045,6 +1045,20 @@ namespace SilverSim.Scene.Types.Object
             {
                 return m_Group.m_SittingAgents.TryGetValue(p, out agent);
             }
+
+            public bool TryGetValue(UUID agentid, out IAgent agent)
+            {
+                foreach(IAgent ag in m_Group.m_SittingAgents.Keys1)
+                {
+                    if(ag.ID == agentid)
+                    {
+                        agent = ag;
+                        return true;
+                    }
+                }
+                agent = null;
+                return false;
+            }
         }
         #endregion
 

@@ -31,6 +31,7 @@ using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
+using SilverSim.Types.Assembly;
 using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
@@ -584,15 +585,12 @@ namespace SilverSim.Main.Common
             return result;
         }
 
-        Types.Assembly.InterfaceVersionAttribute GetInterfaceVersion(Assembly assembly)
+        InterfaceVersionAttribute GetInterfaceVersion(Assembly assembly)
         {
-            foreach(object o in assembly.GetCustomAttributes(false))
+            InterfaceVersionAttribute attr = Attribute.GetCustomAttribute(assembly, typeof(InterfaceVersionAttribute)) as InterfaceVersionAttribute;
+            if(null != attr)
             {
-                SilverSim.Types.Assembly.InterfaceVersionAttribute attr = o as SilverSim.Types.Assembly.InterfaceVersionAttribute;
-                if (null != attr)
-                {
-                    return attr;
-                }
+                return attr;
             }
             m_Log.FatalFormat("Assembly {0} misses InterfaceVersion information", assembly.FullName);
             throw new ConfigurationErrorException();
