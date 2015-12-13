@@ -15,7 +15,7 @@ namespace SilverSim.Viewer.Messages.Parcel
     {
         public UUID AgentID;
         public Int32 SequenceID;
-        public UInt32 Flags;
+        public ParcelAccessList Flags;
         public Int32 LocalID;
 
         public struct Data
@@ -37,7 +37,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             p.WriteMessageType(Number);
             p.WriteUUID(AgentID);
             p.WriteInt32(SequenceID);
-            p.WriteUInt32(Flags);
+            p.WriteUInt32((uint)Flags);
             p.WriteInt32(LocalID);
 
             p.WriteUInt8((byte)AccessList.Count);

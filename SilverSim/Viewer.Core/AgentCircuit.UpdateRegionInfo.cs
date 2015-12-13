@@ -1,12 +1,10 @@
-﻿using SilverSim.ServiceInterfaces.Estate;
+﻿// SilverSim is distributed under the terms of the
+// GNU Affero General Public License v3
+
+using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Types.Estate;
-using SilverSim.Types.Grid;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Region;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Viewer.Core
 {
