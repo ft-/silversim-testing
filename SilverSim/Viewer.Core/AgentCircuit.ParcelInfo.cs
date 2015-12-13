@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Parcel;
@@ -13,6 +14,82 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
+        [PacketHandler(MessageType.ParcelPropertiesUpdate)]
+        public void HandleParcelPropertiesUpdate(Message m)
+        {
+            ParcelPropertiesUpdate req = (ParcelPropertiesUpdate)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ParcelInfo pInfo;
+            if (Scene.Parcels.TryGetValue(req.LocalID, out pInfo))
+            {
+                if (Scene.CanEditParcelDetails(Agent.Owner, pInfo))
+                {
+                    pInfo.Flags = req.ParcelFlags;
+                    pInfo.SalePrice = req.SalePrice;
+                    pInfo.Name = req.Name;
+                    pInfo.Description = req.Description;
+                    if (req.MusicURL.Length != 0)
+                    {
+                        pInfo.MusicURI = new URI(req.MusicURL);
+                    }
+                    else
+                    {
+                        pInfo.MusicURI = null;
+                    }
+                    if (req.MediaURL.Length != 0)
+                    {
+                        pInfo.MediaURI = new URI(req.MediaURL);
+                    }
+                    else
+                    {
+                        pInfo.MediaURI = null;
+                    }
+                    pInfo.MediaAutoScale = req.MediaAutoScale;
+                    UGI ugi;
+                    if (req.GroupID == UUID.Zero)
+                    {
+                        ugi = UGI.Unknown;
+                    }
+                    else if (Scene.GroupsNameService.TryGetValue(req.GroupID, out ugi))
+                    {
+                        pInfo.Group = ugi;
+                    }
+                    else
+                    {
+                        pInfo.Group = UGI.Unknown;
+                    }
+
+                    pInfo.PassPrice = req.PassPrice;
+                    pInfo.PassHours = req.PassHours;
+                    pInfo.Category = req.Category;
+                    UUI uui;
+                    if (req.AuthBuyerID == UUID.Zero)
+                    {
+                        pInfo.AuthBuyer = UUI.Unknown;
+                    }
+                    else if (Scene.AvatarNameService.TryGetValue(req.AuthBuyerID, out uui))
+                    {
+                        pInfo.AuthBuyer = uui;
+                    }
+                    else
+                    {
+                        pInfo.AuthBuyer = UUI.Unknown;
+                    }
+
+                    pInfo.SnapshotID = req.SnapshotID;
+                    pInfo.LandingPosition = req.UserLocation;
+                    pInfo.LandingLookAt = req.UserLookAt;
+                    pInfo.LandingType = req.LandingType;
+                    Scene.Parcels.Store(pInfo.ID);
+                }
+            }
+        }
+
         [PacketHandler(MessageType.ParcelDwellRequest)]
         public void HandleParcelDwellRequest(Message m)
         {
