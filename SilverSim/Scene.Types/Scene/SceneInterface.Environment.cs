@@ -202,7 +202,7 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             WeatherConfig m_WeatherConfig = new WeatherConfig();
-            ReaderWriterLock m_LightShareLock = new ReaderWriterLock();
+            readonly ReaderWriterLock m_LightShareLock = new ReaderWriterLock();
             WindlightSkyData m_SkyWindlight = new WindlightSkyData();
             WindlightWaterData m_WaterWindlight = new WindlightWaterData();
             SunData m_SunData = new SunData();
