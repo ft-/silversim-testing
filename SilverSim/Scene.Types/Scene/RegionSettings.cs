@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using SilverSim.Types;
+using SilverSim.Types.Estate;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -106,5 +107,59 @@ namespace SilverSim.Scene.Types.Scene
         public bool Sandbox;
 
         public UUID TelehubObject = UUID.Zero;
+
+        public RegionOptionFlags AsFlags
+        {
+            get
+            {
+                RegionOptionFlags flags = 0;
+                if (AllowDamage)
+                {
+                    flags |= RegionOptionFlags.AllowDamage;
+                }
+                if (BlockTerraform)
+                {
+                    flags |= RegionOptionFlags.BlockTerraform;
+                }
+                if (!AllowLandResell)
+                {
+                    flags |= RegionOptionFlags.BlockLandResell;
+                }
+                if (DisableCollisions)
+                {
+                    flags |= RegionOptionFlags.DisableAgentCollisions;
+                }
+                if (DisableScripts)
+                {
+                    flags |= RegionOptionFlags.DisableScripts;
+                }
+                if (DisablePhysics)
+                {
+                    flags |= RegionOptionFlags.DisablePhysics;
+                }
+                if(BlockFly)
+                {
+                    flags |= RegionOptionFlags.NoFly;
+                }
+                if(RestrictPushing)
+                {
+                    flags |= RegionOptionFlags.RestrictPushObject;
+                }
+                if(AllowLandJoinDivide)
+                {
+                    flags |= RegionOptionFlags.AllowParcelChanges;
+                }
+                if(BlockShowInSearch)
+                {
+                    flags |= RegionOptionFlags.BlockParcelSearch;
+                }
+                if(Sandbox)
+                {
+                    flags |= RegionOptionFlags.Sandbox;
+                }
+
+                return flags;
+            }
+        }
     }
 }

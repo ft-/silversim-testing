@@ -17,6 +17,7 @@ using System.Net.Sockets;
 using System.Threading;
 using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Types.Estate;
 
 namespace SilverSim.Viewer.Core
 {
@@ -264,7 +265,7 @@ namespace SilverSim.Viewer.Core
 
                                             SceneInterface scene = Scene;
                                             Messages.Region.RegionHandshake rh = new Messages.Region.RegionHandshake();
-                                            rh.RegionFlags = 0;
+                                            rh.RegionFlags = scene.RegionSettings.AsFlags;
                                             rh.SimAccess = scene.RegionData.Access;
                                             rh.SimName = scene.Name;
                                             rh.SimOwner = scene.Owner.ID;

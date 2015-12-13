@@ -290,7 +290,7 @@ namespace SilverSim.Viewer.Core
             scene.RegionSettings.BlockFly = ParamStringToBool(req.ParamList[1]);
             scene.RegionSettings.AllowDamage = ParamStringToBool(req.ParamList[2]);
             scene.RegionSettings.AllowLandResell = ParamStringToBool(req.ParamList[3]);
-            scene.RegionSettings.AgentLimit = int.Parse(UTF8NoBOM.GetString(req.ParamList[4]));
+            scene.RegionSettings.AgentLimit = (int)decimal.Parse(UTF8NoBOM.GetString(req.ParamList[4]), CultureInfo.InvariantCulture);
             scene.RegionSettings.ObjectBonus = float.Parse(UTF8NoBOM.GetString(req.ParamList[5]), CultureInfo.InvariantCulture);
 #warning TODO: adjust for correct values
             //scene.RegionSettings.Maturity = int.Parse(req.ParamList[6]);
@@ -762,6 +762,7 @@ namespace SilverSim.Viewer.Core
                 m.AgentID = circuit.AgentID;
                 m.SessionID = UUID.Zero;
                 m.Invoice = invoice;
+                m.Method = "estateupdateinfo";
                 m.TransactionID = UUID.Zero;
                 m.ParamList.Add(UTF8NoBOM.GetBytes(estate.Name));
                 m.ParamList.Add(UTF8NoBOM.GetBytes(estate.Owner.ID.ToString()));
