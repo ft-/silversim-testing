@@ -613,12 +613,10 @@ namespace SilverSim.Viewer.Core
             SceneInterface scene = circuit.Scene;
 
             IAgent targetagent;
-            if(scene.RootAgents.TryGetValue(prey, out targetagent))
+            if(scene.RootAgents.TryGetValue(prey, out targetagent) &&
+                !targetagent.TeleportHome(scene, targetagent))
             {
-                if(!targetagent.TeleportHome(scene, targetagent))
-                {
-                    targetagent.KickUser("You were teleported home by the region owner. Because of failing TP, you have been logged out.");
-                }
+                targetagent.KickUser("You were teleported home by the region owner. Because of failing TP, you have been logged out.");
             }
         }
 
