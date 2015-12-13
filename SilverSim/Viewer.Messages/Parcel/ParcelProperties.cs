@@ -111,7 +111,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             parcelData.Add("ClaimPrice", ClaimPrice);
             parcelData.Add("Desc", Description);
             byte[] parcelFlags = BitConverter.GetBytes((uint)ParcelFlags);
-            if(!BitConverter.IsLittleEndian)
+            if(BitConverter.IsLittleEndian)
             {
                 Array.Reverse(parcelFlags);
             }

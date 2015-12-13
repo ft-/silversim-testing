@@ -67,7 +67,7 @@ namespace SilverSim.Viewer.Messages.Agent
                 groupData.Add("GroupInsigniaID", e.GroupInsigniaID);
                 groupData.Add("Contribution", e.Contribution);
                 byte[] groupPowers = BitConverter.GetBytes((UInt64)e.GroupPowers);
-                if(!BitConverter.IsLittleEndian)
+                if(BitConverter.IsLittleEndian)
                 {
                     Array.Reverse(groupPowers);
                 }
