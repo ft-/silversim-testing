@@ -475,10 +475,84 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-            /*
-                        int estateAccessType = Convert.ToInt16(Utils.BytesToString(messagePacket.ParamList[1].Parameter));
-                        OnUpdateEstateAccessDeltaRequest(this, messagePacket.MethodData.Invoice, estateAccessType, new UUID(Utils.BytesToString(messagePacket.ParamList[2].Parameter)));
-             */
+
+            SceneInterface scene = circuit.Scene;
+            EstateAccessDeltaFlags flags = (EstateAccessDeltaFlags)int.Parse(UTF8NoBOM.GetString(req.ParamList[1]));
+            UUID prey = UUID.Parse(UTF8NoBOM.GetString(req.ParamList[2]));
+            UUI uui;
+            UGI ugi;
+            if(!scene.GroupsNameService.TryGetValue(prey, out ugi) &&
+                (flags & (EstateAccessDeltaFlags.AddGroup | EstateAccessDeltaFlags.RemoveGroup)) != 0)
+            {
+                circuit.Agent.SendAlertMessage("Changing estate access not possible since group not known", scene.ID);
+                return;
+            }
+            if (!scene.AvatarNameService.TryGetValue(prey, out uui) &&
+                (flags & (EstateAccessDeltaFlags.AddUser | EstateAccessDeltaFlags.AddManager | EstateAccessDeltaFlags.AddBan |
+                        EstateAccessDeltaFlags.RemoveUser | EstateAccessDeltaFlags.RemoveManager | EstateAccessDeltaFlags.RemoveBan)) != 0)
+            {
+                circuit.Agent.SendAlertMessage("Changing estate access not possible since agent not known", scene.ID);
+                return;
+            }
+
+            EstateInfo estate;
+            uint estateID;
+            List<uint> allEstateIds = new List<uint>();
+            EstateServiceInterface estateService = circuit.Scene.EstateService;
+            if (estateService.RegionMap.TryGetValue(circuit.Scene.ID, out estateID) &&
+                estateService.TryGetValue(estateID, out estate))
+            {
+                if((flags & EstateAccessDeltaFlags.AllEstates) != 0)
+                {
+                    allEstateIds = estateService.EstateOwner[estate.Owner];
+                }
+                else
+                {
+                    allEstateIds.Add(estateID);
+                }
+            }
+
+            if(allEstateIds.Count == 0)
+            {
+                circuit.Agent.SendAlertMessage("Changing estate access not possible since no estate found", scene.ID);
+                return;
+            }
+
+            foreach(uint selectedEstateId in allEstateIds)
+            {
+                if((flags & EstateAccessDeltaFlags.AddUser) != 0)
+                {
+                    estateService.EstateAccess[selectedEstateId, uui] = true;
+                }
+                if((flags & EstateAccessDeltaFlags.RemoveUser) != 0)
+                {
+                    estateService.EstateAccess[selectedEstateId, uui] = false;
+                }
+                if((flags & EstateAccessDeltaFlags.AddGroup) != 0)
+                {
+                    estateService.EstateGroup[selectedEstateId, ugi] = true;
+                }
+                if((flags & EstateAccessDeltaFlags.RemoveGroup) != 0)
+                {
+                    estateService.EstateGroup[selectedEstateId, ugi] = false;
+                }
+                if((flags & EstateAccessDeltaFlags.AddManager) != 0)
+                {
+                    estateService.EstateManager[selectedEstateId, uui] = true;
+                }
+                if((flags & EstateAccessDeltaFlags.RemoveManager) != 0)
+                {
+                    estateService.EstateManager[selectedEstateId, uui] = false;
+                }
+                if((flags & EstateAccessDeltaFlags.AddBan) != 0)
+                {
+                    estateService.EstateBans[selectedEstateId, uui] = true;
+                }
+                if((flags & EstateAccessDeltaFlags.RemoveBan) != 0)
+                {
+                    estateService.EstateBans[selectedEstateId, uui] = false;
+                }
+            }
         }
 
         void EstateOwner_SimulatorMessage(AgentCircuit circuit, EstateOwnerMessage req)
@@ -606,6 +680,19 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        [Flags]
+        public enum EstateChangeInfoFlags : uint
+        {
+            FixedSun = 0x00000010,
+            PublicAccess = 0x00008000,
+            AllowVoice = 0x10000000,
+            AllowDirectTeleport = 0x00100000,
+            DenyAnonymous = 0x00800000,
+            DenyIdentified = 0x01000000,
+            DenyTransacted = 0x02000000,
+            DenyMinors = 0x40000000
+        }
+
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         void EstateOwner_EstateChangeInfo(AgentCircuit circuit, EstateOwnerMessage req)
         {
@@ -615,8 +702,79 @@ namespace SilverSim.Viewer.Core
             }
             UUID invoice = req.Invoice;
             UUID senderID = req.AgentID;
-            UInt32 param1 = UInt32.Parse(UTF8NoBOM.GetString(req.ParamList[1]));
+            SceneInterface scene = circuit.Scene;
+            EstateChangeInfoFlags param1 = (EstateChangeInfoFlags)UInt32.Parse(UTF8NoBOM.GetString(req.ParamList[1]));
             UInt32 param2 = UInt32.Parse(UTF8NoBOM.GetString(req.ParamList[2]));
+
+            EstateInfo estate;
+            EstateServiceInterface estateService = scene.EstateService;
+            uint estateID;
+            if (estateService.RegionMap.TryGetValue(circuit.Scene.ID, out estateID) &&
+                estateService.TryGetValue(estateID, out estate))
+            {
+                if (param2 != 0)
+                {
+                    estate.UseGlobalTime = false;
+                    estate.SunPosition = (param2 - 0x1800) / 1024.0;
+                }
+                else
+                {
+                    estate.UseGlobalTime = true;
+                }
+
+                RegionOptionFlags flags = estate.Flags;
+
+                flags = ((param1 & EstateChangeInfoFlags.FixedSun) != 0) ?
+                    flags | RegionOptionFlags.SunFixed :
+                    flags & (~RegionOptionFlags.SunFixed);
+
+                flags = ((param1 & EstateChangeInfoFlags.PublicAccess) != 0) ?
+                    flags | RegionOptionFlags.PublicAllowed :
+                    flags & (~RegionOptionFlags.PublicAllowed);
+
+                flags = ((param1 & EstateChangeInfoFlags.AllowVoice) != 0) ?
+                    flags | RegionOptionFlags.AllowVoice :
+                    flags & (~RegionOptionFlags.AllowVoice);
+
+                flags = ((param1 & EstateChangeInfoFlags.AllowDirectTeleport) != 0) ?
+                    flags | RegionOptionFlags.AllowDirectTeleport :
+                    flags & (~RegionOptionFlags.AllowDirectTeleport);
+
+                flags = ((param1 & EstateChangeInfoFlags.DenyAnonymous) != 0) ?
+                    flags | RegionOptionFlags.DenyAnonymous :
+                    flags & (~RegionOptionFlags.DenyAnonymous);
+
+                flags = ((param1 & EstateChangeInfoFlags.DenyIdentified) != 0) ?
+                    flags | RegionOptionFlags.DenyIdentified :
+                    flags & (~RegionOptionFlags.DenyIdentified);
+
+                flags = ((param1 & EstateChangeInfoFlags.DenyTransacted) != 0) ?
+                    flags | RegionOptionFlags.DenyTransacted :
+                    flags & (~RegionOptionFlags.DenyTransacted);
+
+                flags = ((param1 & EstateChangeInfoFlags.DenyMinors) != 0) ?
+                    flags | RegionOptionFlags.DenyAgeUnverified :
+                    flags & (~RegionOptionFlags.DenyAgeUnverified);
+                estate.Flags = flags;
+                estateService[estateID] = estate;
+
+                EstateOwnerMessage m = new EstateOwnerMessage();
+                m.AgentID = circuit.AgentID;
+                m.SessionID = UUID.Zero;
+                m.Invoice = invoice;
+                m.TransactionID = UUID.Zero;
+                m.ParamList.Add(UTF8NoBOM.GetBytes(estate.Name));
+                m.ParamList.Add(UTF8NoBOM.GetBytes(estate.Owner.ID.ToString()));
+                m.ParamList.Add(UTF8NoBOM.GetBytes(estate.ID.ToString()));
+                m.ParamList.Add(UTF8NoBOM.GetBytes(((uint)estate.Flags).ToString()));
+                m.ParamList.Add(UTF8NoBOM.GetBytes(estate.SunPosition.ToString()));
+                m.ParamList.Add(UTF8NoBOM.GetBytes(estate.ParentEstateID.ToString()));
+                m.ParamList.Add(UTF8NoBOM.GetBytes(estate.CovenantID.ToString()));
+                m.ParamList.Add(UTF8NoBOM.GetBytes(estate.CovenantTimestamp.AsULong.ToString()));
+                m.ParamList.Add(UTF8NoBOM.GetBytes("1"));
+                m.ParamList.Add(UTF8NoBOM.GetBytes(estate.AbuseEmail));
+                circuit.SendMessage(m);
+            }
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]

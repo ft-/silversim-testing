@@ -40,6 +40,31 @@ namespace SilverSim.Database.MySQL.Estate
             return false;
         }
 
+        public List<uint> this[UUI owner]
+        {
+            get
+            {
+                List<uint> estates = new List<uint>();
+                using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+                {
+                    conn.Open();
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM estates WHERE OwnerID = ?id", conn))
+                    {
+                        cmd.Parameters.AddWithValue("?id", owner.ID.ToString());
+                        using (MySqlDataReader reader = cmd.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                estates.Add((uint)reader["ID"]);
+                            }
+                            return estates;
+                        }
+                    }
+                }
+
+            }
+        }
+
         public UUI this[uint estateID]
         {
             get
