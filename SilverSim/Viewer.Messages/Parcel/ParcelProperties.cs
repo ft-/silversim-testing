@@ -103,7 +103,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             parcelData.Add("AABBMax", AABBMax);
             parcelData.Add("AABBMin", AABBMin);
             parcelData.Add("Area", Area);
-            parcelData.Add("AuctionID", AuctionID);
+            parcelData.Add("AuctionID", (int)AuctionID);
             parcelData.Add("AuthBuyerID", AuthBuyerID);
             parcelData.Add("Bitmap", new BinaryData(Bitmap));
             parcelData.Add("Category", (int)Category);
