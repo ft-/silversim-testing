@@ -33,22 +33,11 @@ namespace SilverSim.Viewer.Core
                     pInfo.SalePrice = req.SalePrice;
                     pInfo.Name = req.Name;
                     pInfo.Description = req.Description;
-                    if (req.MusicURL.Length != 0)
-                    {
-                        pInfo.MusicURI = new URI(req.MusicURL);
-                    }
-                    else
-                    {
-                        pInfo.MusicURI = null;
-                    }
-                    if (req.MediaURL.Length != 0)
-                    {
-                        pInfo.MediaURI = new URI(req.MediaURL);
-                    }
-                    else
-                    {
-                        pInfo.MediaURI = null;
-                    }
+                    pInfo.MusicURI = (req.MusicURL.Length != 0) ?
+                         new URI(req.MusicURL) : null;
+
+                    pInfo.MediaURI = (req.MediaURL.Length != 0) ?
+                        new URI(req.MediaURL) : null;
                     pInfo.MediaAutoScale = req.MediaAutoScale;
                     UGI ugi;
                     if (req.GroupID == UUID.Zero)
