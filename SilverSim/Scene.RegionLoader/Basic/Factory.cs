@@ -6,7 +6,7 @@ using SilverSim.Main.Common;
 
 namespace SilverSim.Scene.RegionLoader.Basic
 {
-    [PluginName("RegionLoader")]
+    [PluginName("Basic")]
     public sealed class Factory : IPluginFactory
     {
         public Factory()
