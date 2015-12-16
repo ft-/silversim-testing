@@ -148,6 +148,28 @@ namespace SilverSim.Database.MySQL.Estate
             return false;
         }
 
+        public override bool TryGetValue(string estateName, out EstateInfo estateInfo)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM estates WHERE Name LIKE ?name", conn))
+                {
+                    cmd.Parameters.AddWithValue("?name", estateName);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            estateInfo = reader.ToEstateInfo();
+                            return true;
+                        }
+                    }
+                }
+            }
+            estateInfo = default(EstateInfo);
+            return false;
+        }
+
         public override bool ContainsKey(uint estateID)
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
@@ -156,6 +178,27 @@ namespace SilverSim.Database.MySQL.Estate
                 using (MySqlCommand cmd = new MySqlCommand("SELECT id FROM estates WHERE ID LIKE ?id", conn))
                 {
                     cmd.Parameters.AddWithValue("?id", estateID);
+                    using (MySqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        public override bool ContainsKey(string estateName)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT id FROM estates WHERE Name LIKE ?name", conn))
+                {
+                    cmd.Parameters.AddWithValue("?name", estateName);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())

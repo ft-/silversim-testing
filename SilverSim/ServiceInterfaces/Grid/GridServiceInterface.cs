@@ -152,6 +152,14 @@ namespace SilverSim.ServiceInterfaces.Grid
         public abstract void RegisterRegion(RegionInfo regionInfo);
         public abstract void UnregisterRegion(UUID scopeID, UUID regionID);
         public abstract void DeleteRegion(UUID scopeID, UUID regionID);
+        public virtual void AddRegionFlags(UUID regionID, RegionFlags setflags)
+        {
+            throw new NotSupportedException();
+        }
+        public virtual void RemoveRegionFlags(UUID regionID, RegionFlags removeflags)
+        {
+            throw new NotSupportedException();
+        }
         #endregion
 
         #region List accessors

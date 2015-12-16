@@ -1044,7 +1044,6 @@ namespace SilverSim.Main.Common
             ICollection<IRegionLoaderInterface> regionLoaders = GetServices<IRegionLoaderInterface>().Values;
             if (regionLoaders.Count != 0)
             {
-                CmdIO.CommandRegistry.ShowCommands.Add("regions", ShowRegionsCommand);
                 CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCommand);
                 CmdIO.CommandRegistry.ClearCommands.Add("region", Commands.ClearRegion.CmdHandler);
                 CmdIO.CommandRegistry.ClearCommands.Add("objects", Commands.ClearObjects.CmdHandler);
@@ -1153,28 +1152,6 @@ namespace SilverSim.Main.Common
             else
             {
                 io.Write("invalid parameters for change region");
-            }
-        }
-
-        public static void ShowRegionsCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
-        {
-            if (args[0] == "help")
-            {
-                io.Write("Show currently loaded regions");
-            }
-            else
-            {
-                string output = "Scene List:\n----------------------------------------------";
-                foreach (SceneInterface scene in SceneManager.Scenes.Values)
-                {
-                    if(limitedToScene == UUID.Zero || scene.ID == limitedToScene)
-                    {
-                        RegionInfo rInfo = scene.RegionData;
-                        Vector3 gridcoord = rInfo.Location;
-                        output += string.Format("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", scene.Name, scene.ID, gridcoord.ToString(), rInfo.Size.ToString(), scene.Owner.FullName, gridcoord.X_String + "," + gridcoord.Y_String);
-                    }
-                }
-                io.Write(output);
             }
         }
 

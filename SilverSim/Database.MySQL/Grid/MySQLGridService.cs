@@ -12,7 +12,6 @@ using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System;
 
 namespace SilverSim.Database.MySQL.Grid
 {
@@ -247,6 +246,34 @@ namespace SilverSim.Database.MySQL.Grid
         #endregion
 
         #region Region Registration
+        public override void AddRegionFlags(UUID regionID, RegionFlags setflags)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("UPDATE regions SET flags = flags | ?flags WHERE uuid LIKE ?regionid", conn))
+                {
+                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.Parameters.AddWithValue("?flags", (uint)setflags);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+        public override void RemoveRegionFlags(UUID regionID, RegionFlags removeflags)
+        {
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                using (MySqlCommand cmd = new MySqlCommand("UPDATE regions SET flags = flags & ~?flags WHERE uuid LIKE ?regionid", conn))
+                {
+                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.Parameters.AddWithValue("?flags", (uint)removeflags);
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
         public override void RegisterRegion(RegionInfo regionInfo)
         {
             using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
