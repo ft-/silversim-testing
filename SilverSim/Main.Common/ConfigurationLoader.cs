@@ -1146,7 +1146,7 @@ namespace SilverSim.Main.Common
                 }
                 catch
                 {
-                    io.WriteFormatted("region {0} does not exist", args[2]);
+                    io.WriteFormatted("region {0} does not exist or is not online", args[2]);
                 }
             }
             else
