@@ -1044,7 +1044,7 @@ namespace SilverSim.Main.Common
             ICollection<IRegionLoaderInterface> regionLoaders = GetServices<IRegionLoaderInterface>().Values;
             if (regionLoaders.Count != 0)
             {
-                CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCommand);
+                CmdIO.CommandRegistry.SelectCommands.Add("region", SelectRegionCommand);
                 CmdIO.CommandRegistry.ClearCommands.Add("region", Commands.ClearRegion.CmdHandler);
                 CmdIO.CommandRegistry.ClearCommands.Add("objects", Commands.ClearObjects.CmdHandler);
                 //CmdIO.CommandRegistry.ClearCommands.Add("parcels", Commands.ClearParcels.CmdHandler);
@@ -1115,21 +1115,21 @@ namespace SilverSim.Main.Common
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public static void ChangeRegionCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        public static void SelectRegionCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
-                io.Write("change region <region name>\nchange region to root");
+                io.Write("select region <region name>\nselect region to root");
             }
             else if(limitedToScene != UUID.Zero)
             {
-                io.Write("change region is not possible with limited console");
+                io.Write("select region is not possible with limited console");
             }
             else if(args.Count == 4)
             {
                 if(args[2] != "to" || args[3] != "root")
                 {
-                    io.Write("invalid parameters for change region");
+                    io.Write("invalid parameters for select region");
                 }
                 else
                 {
@@ -1151,7 +1151,7 @@ namespace SilverSim.Main.Common
             }
             else
             {
-                io.Write("invalid parameters for change region");
+                io.Write("invalid parameters for select region");
             }
         }
 
