@@ -64,6 +64,7 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.DisableCommands.Add("region", DisableRegionCmd);
             Common.CmdIO.CommandRegistry.StartCommands.Add("region", StartRegionCmd);
             Common.CmdIO.CommandRegistry.StopCommands.Add("region", StopRegionCmd);
+            Common.CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCmd);
         }
 
         public void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
