@@ -123,7 +123,8 @@ namespace SilverSim.Database.MySQL.Estate
                 "KEY ID_OwnerID (ID, OwnerID)) AUTO_INCREMENT=100 ",
             "ALTER TABLE %tablename% ADD COLUMN (CovenantID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                                             "CovenantTimestamp BIGINT(20) UNSIGNED NOT NULL DEFAULT '0'),",
-            "ALTER TABLE %tablename% ADD COLUMN (UseGlobalTime INT(11) NOT NULL DEFAULT '1'),"
+            "ALTER TABLE %tablename% ADD COLUMN (UseGlobalTime INT(11) NOT NULL DEFAULT '1'),",
+            "ALTER TABLE %tablename% CHANGE OwnerID Owner VARCHAR(255) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',"
         };
 
         public override bool TryGetValue(uint estateID, out EstateInfo estateInfo)
@@ -240,7 +241,7 @@ namespace SilverSim.Database.MySQL.Estate
                     Dictionary<string, object> dict = new Dictionary<string, object>();
                     dict["ID"] = value.ID;
                     dict["Name"] = value.Name;
-                    dict["OwnerID"] = value.Owner.ID.ToString();
+                    dict["Owner"] = value.Owner.ToString();
                     dict["Flags"] = (uint)value.Flags;
                     dict["PricePerMeter"] = value.PricePerMeter;
                     dict["BillableFactor"] = value.BillableFactor;

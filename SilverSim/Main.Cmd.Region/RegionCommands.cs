@@ -1,22 +1,21 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
+using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Scene.Management.Scene;
+using SilverSim.Scene.ServiceInterfaces.Scene;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Estate;
+using SilverSim.ServiceInterfaces.Grid;
+using SilverSim.Types;
+using SilverSim.Types.Estate;
+using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using Nini.Config;
-using SilverSim.Types;
-using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.Types.Grid;
-using SilverSim.Scene.Types.Scene;
-using SilverSim.Scene.ServiceInterfaces.Scene;
-using SilverSim.Scene.Management.Scene;
-using log4net;
-using SilverSim.ServiceInterfaces.Estate;
-using SilverSim.Types.Estate;
 using System.IO;
+using System.Linq;
 using System.Xml;
 
 namespace SilverSim.Main.Cmd.Region
@@ -91,7 +90,7 @@ namespace SilverSim.Main.Cmd.Region
             else if (args[2] == "online")
             {
                 List<RegionInfo> regionList = new List<RegionInfo>();
-                foreach(SceneInterface scene in Scene.Management.Scene.SceneManager.Scenes.Values)
+                foreach(SceneInterface scene in SceneManager.Scenes.Values)
                 {
                     regionList.Add(scene.RegionData);
                 }
@@ -155,7 +154,7 @@ namespace SilverSim.Main.Cmd.Region
                 int argi;
                 bool changeRegionData = false;
                 EstateInfo selectedEstate = null;
-                for(argi = 0; argi < args.Count; argi += 2)
+                for(argi = 3; argi < args.Count; argi += 2)
                 {
                     switch(args[argi].ToLower())
                     {
@@ -165,14 +164,14 @@ namespace SilverSim.Main.Cmd.Region
                             break;
 
                         case "port":
-                            if (!uint.TryParse(args[3], out rInfo.ServerPort))
+                            if (!uint.TryParse(args[argi + 1], out rInfo.ServerPort))
                             {
-                                io.WriteFormatted("Port {0} is not valid", args[3]);
+                                io.WriteFormatted("Port {0} is not valid", args[argi + 1]);
                                 return;
                             }
                             if (rInfo.ServerPort < 1 || rInfo.ServerPort > 65535)
                             {
-                                io.WriteFormatted("Port {0} is not valid", args[3]);
+                                io.WriteFormatted("Port {0} is not valid", args[argi + 1]);
                                 return;
                             }
                             changeRegionData = true;

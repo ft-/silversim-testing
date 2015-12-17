@@ -13,7 +13,7 @@ namespace SilverSim.Database.MySQL.Estate
             EstateInfo ei = new EstateInfo();
             ei.ID = (uint)reader["ID"];
             ei.Name = (string)reader["Name"];
-            ei.Owner.ID = reader.GetUUID("OwnerID");
+            ei.Owner = reader.GetUUI("Owner");
             ei.Flags = (RegionOptionFlags)(uint)reader["Flags"];
             ei.PricePerMeter = (int)reader["PricePerMeter"];
             ei.BillableFactor = (double)reader["BillableFactor"];
