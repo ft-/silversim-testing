@@ -16,6 +16,8 @@ using SilverSim.Scene.Management.Scene;
 using log4net;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Types.Estate;
+using System.IO;
+using System.Xml;
 
 namespace SilverSim.Main.Cmd.Region
 {
@@ -121,8 +123,261 @@ namespace SilverSim.Main.Cmd.Region
             io.Write(output);
         }
 
+        public void ChangeRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            RegionInfo rInfo;
+            if (limitedToScene != UUID.Zero)
+            {
+                io.WriteFormatted("create region not allowed from restricted console");
+            }
+            else if (args[0] == "help" || args.Count < 3)
+            {
+                io.Write("change region <regionname> parameters...\n\n" +
+                    "Parameters:\n" +
+                    "name <name>\n" +
+                    "port <port>\n" +
+                    "scopeid <uuid>\n" +
+                    "regiontype <regiontype>\n" +
+                    "owner <uui>\n" +
+                    "estate <name>\n" +
+                    "externalhostname <hostname>\n" +
+                    "access trial|pg|mature|adult\n" +
+                    "staticmaptile <uuid>\n");
+            }
+            else if (!m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+            {
+                io.WriteFormatted("Region with name {0} does not exist.", args[2]);
+            }
+            else
+            {
+                int argi;
+                bool changeRegionData = false;
+                EstateInfo selectedEstate = null;
+                for(argi = 0; argi < args.Count; argi += 2)
+                {
+                    switch(args[argi].ToLower())
+                    {
+                        case "name":
+                            rInfo.Name = args[argi + 1];
+                            changeRegionData = true;
+                            break;
+
+                        case "port":
+                            if (!uint.TryParse(args[3], out rInfo.ServerPort))
+                            {
+                                io.WriteFormatted("Port {0} is not valid", args[3]);
+                                return;
+                            }
+                            if (rInfo.ServerPort < 1 || rInfo.ServerPort > 65535)
+                            {
+                                io.WriteFormatted("Port {0} is not valid", args[3]);
+                                return;
+                            }
+                            changeRegionData = true;
+                            break;
+
+                        case "scopeid":
+                            if (!UUID.TryParse(args[argi + 1], out rInfo.ScopeID))
+                            {
+                                io.WriteFormatted("{0} is not a valid UUID.", args[argi + 1]);
+                                return;
+                            }
+                            changeRegionData = true;
+                            break;
+
+                        case "regiontype":
+                            break;
+
+                        case "owner":
+                            if (!UUI.TryParse(args[argi + 1], out rInfo.Owner))
+                            {
+                                io.WriteFormatted("{0} is not a valid UUI.", args[argi + 1]);
+                                return;
+                            }
+                            changeRegionData = true;
+                            break;
+
+                        case "estate":
+                            if (m_EstateService.TryGetValue(args[argi + 1], out selectedEstate))
+                            {
+                                io.WriteFormatted("{0} is not known as an estate", args[argi + 1]);
+                                return;
+                            }
+                            break;
+
+                        case "externalhostname":
+                            rInfo.ServerIP = args[argi + 1];
+                            changeRegionData = true;
+                            break;
+
+                        case "access":
+                            switch (args[argi + 1])
+                            {
+                                case "trial":
+                                    rInfo.Access = RegionAccess.Trial;
+                                    break;
+
+                                case "pg":
+                                    rInfo.Access = RegionAccess.PG;
+                                    break;
+
+                                case "mature":
+                                    rInfo.Access = RegionAccess.Mature;
+                                    break;
+
+                                case "adult":
+                                    rInfo.Access = RegionAccess.Adult;
+                                    break;
+
+                                default:
+                                    io.WriteFormatted("{0} is not a valid access", args[argi + 1]);
+                                    return;
+                            }
+                            changeRegionData = true;
+                            break;
+
+                        case "staticmaptile":
+                            if (!UUID.TryParse(args[argi + 1], out rInfo.RegionMapTexture))
+                            {
+                                io.WriteFormatted("{0} is not a valid UUID.", args[argi + 1]);
+                                return;
+                            }
+                            changeRegionData = true;
+                            break;
+
+                        default:
+                            io.WriteFormatted("Parameter {0} is not valid.", args[argi]);
+                            return;
+                    }
+                }
+
+                SceneInterface si;
+                if(SceneManager.Scenes.TryGetValue(rInfo.ID, out si))
+                {
+                    io.WriteFormatted("Please stop region first.");
+                    return;
+                }
+                if (changeRegionData)
+                {
+                    try
+                    {
+                        m_RegionStorage.RegisterRegion(rInfo);
+                    }
+                    catch (Exception e)
+                    {
+                        io.WriteFormatted("Could not change region parameters: {0}", e.Message);
+                    }
+                }
+                if(null != selectedEstate)
+                {
+                    m_EstateService.RegionMap[rInfo.ID] = selectedEstate.ID;
+                }
+            }
+        }
+
+        public void CreateRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (limitedToScene != UUID.Zero)
+            {
+                io.WriteFormatted("create region not allowed from restricted console");
+            }
+            else if(args.Count < 5)
+            {
+                io.WriteFormatted("create regions from ini <regions.ini file>");
+                return;
+            }
+            else if(args[2] == "from" && args[3] == "ini")
+            {
+                IConfigSource cfg;
+                try
+                {
+                    if (Uri.IsWellFormedUriString(args[4], UriKind.Absolute))
+                    {
+                        using (Stream s = Http.Client.HttpRequestHandler.DoStreamGetRequest(args[4], null, 20000))
+                        {
+                            using (XmlReader r = XmlReader.Create(s))
+                            {
+                                cfg = new XmlConfigSource(r);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        cfg = new IniConfigSource(args[4]);
+                    }
+                }
+                catch(Exception e)
+                {
+                    io.WriteFormatted("Could not open {0}: {1}", args[4], e.Message);
+                    return;
+                }
+
+                string msg = string.Empty;
+
+                foreach (IConfig regionEntry in cfg.Configs)
+                {
+                    RegionInfo r = new RegionInfo();
+                    r.Name = regionEntry.Name;
+                    r.ID = regionEntry.GetString("RegionUUID");
+                    r.Location = new GridVector(regionEntry.GetString("Location"), 256);
+                    r.ServerPort = (uint)regionEntry.GetInt("InternalPort");
+                    r.ServerURI = string.Format("{0}://{1}:{2}/", m_Scheme, m_ExternalHostName, m_HttpPort);
+                    r.Size.X = ((uint)regionEntry.GetInt("SizeX", 256) + 255) & (~(uint)255);
+                    r.Size.Y = ((uint)regionEntry.GetInt("SizeY", 256) + 255) & (~(uint)255);
+                    r.Flags = RegionFlags.RegionOnline;
+                    r.Owner = new UUI(regionEntry.GetString("Owner"));
+                    r.ScopeID = regionEntry.GetString("ScopeID", "00000000-0000-0000-0000-000000000000");
+                    r.ServerHttpPort = m_HttpPort;
+                    r.RegionMapTexture = regionEntry.GetString("MaptileStaticUUID", "00000000-0000-0000-0000-000000000000");
+                    switch (regionEntry.GetString("Access", "mature").ToLower())
+                    {
+                        case "trial":
+                            r.Access = RegionAccess.Trial;
+                            break;
+
+                        case "pg":
+                            r.Access = RegionAccess.PG;
+                            break;
+
+                        case "mature":
+                            r.Access = RegionAccess.Mature;
+                            break;
+
+                        case "adult":
+                            r.Access = RegionAccess.Adult;
+                            break;
+
+                        default:
+                            r.Access = RegionAccess.Mature;
+                            break;
+                    }
+
+                    r.ServerIP = regionEntry.GetString("ExternalHostName", m_ExternalHostName);
+                    RegionInfo rInfoCheck;
+                    if (m_RegionStorage.TryGetValue(UUID.Zero, r.Name, out rInfoCheck))
+                    {
+                        if (msg.Length != 0)
+                        {
+                            msg += "\n";
+                        }
+                        msg += string.Format("Region {0} is already used by region id {1}. Skipping.", rInfoCheck.Name, rInfoCheck.ID);
+                    }
+                    else
+                    {
+                        m_RegionStorage.RegisterRegion(r);
+                    }
+                }
+            }
+            else
+            {
+                io.Write("wrong command line for create regions");
+                return;
+            }
+        }
+
         public void CreateRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
+            RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
             {
                 io.WriteFormatted("create region not allowed from restricted console");
@@ -142,9 +397,13 @@ namespace SilverSim.Main.Cmd.Region
                     "staticmaptile <uuid>\n" +
                     "status online|offline");
             }
+            else if(m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+            {
+                io.WriteFormatted("Region with name {0} already exists.", args[2]);
+            }
             else
             {
-                RegionInfo rInfo = new RegionInfo();
+                rInfo = new RegionInfo();
                 EstateInfo selectedEstate = null;
                 rInfo.Name = args[2];
                 rInfo.ID = UUID.Random;
@@ -155,6 +414,11 @@ namespace SilverSim.Main.Cmd.Region
                 rInfo.Size = new GridVector(256, 256);
 
                 if (!uint.TryParse(args[3], out rInfo.ServerPort))
+                {
+                    io.WriteFormatted("Port {0} is not valid", args[3]);
+                    return;
+                }
+                if(rInfo.ServerPort < 1 || rInfo.ServerPort > 65535)
                 {
                     io.WriteFormatted("Port {0} is not valid", args[3]);
                     return;

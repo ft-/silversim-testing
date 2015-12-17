@@ -16,9 +16,7 @@ namespace SilverSim.Scene.RegionLoader.Basic
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownConfig)
         {
-            string regionCfgName = ownConfig.GetString("region_config_source", string.Empty);
-
-            return new RegionLoaderService(ownConfig.GetString("RegionStorage"), regionCfgName);
+            return new RegionLoaderService(ownConfig.GetString("RegionStorage"));
         }
     }
 }

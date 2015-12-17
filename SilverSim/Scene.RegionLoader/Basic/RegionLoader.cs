@@ -19,7 +19,6 @@ namespace SilverSim.Scene.RegionLoader.Basic
     public class RegionLoaderService : IPlugin, IRegionLoaderInterface
     {
         readonly string m_RegionStorage = string.Empty;
-        readonly string m_RegionCfg = string.Empty;
         private string m_ExternalHostName = string.Empty;
         private GridServiceInterface m_RegionService;
         private SceneFactoryInterface m_SceneFactory;
@@ -28,10 +27,9 @@ namespace SilverSim.Scene.RegionLoader.Basic
         private string m_Scheme = Uri.UriSchemeHttp;
 
         #region Constructor
-        internal RegionLoaderService(string regionStorage, string regionCfg)
+        internal RegionLoaderService(string regionStorage)
         {
             m_RegionStorage = regionStorage;
-            m_RegionCfg = regionCfg;
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -59,64 +57,6 @@ namespace SilverSim.Scene.RegionLoader.Basic
 
         public void LoadRegions()
         {
-            if (!string.IsNullOrEmpty(m_RegionCfg))
-            {
-                IConfigSource cfg;
-                if (Uri.IsWellFormedUriString(m_RegionCfg, UriKind.Absolute))
-                {
-                    using (XmlReader r = XmlReader.Create(m_RegionCfg))
-                    {
-                        cfg = new XmlConfigSource(r);
-                    }
-                }
-                else
-                {
-                    cfg = new IniConfigSource(m_RegionCfg);
-                }
-
-                foreach (IConfig regionEntry in cfg.Configs)
-                {
-                    RegionInfo r = new RegionInfo();
-                    r.Name = regionEntry.Name;
-                    r.ID = regionEntry.GetString("RegionUUID");
-                    r.Location = new GridVector(regionEntry.GetString("Location"), 256);
-                    r.ServerPort = (uint)regionEntry.GetInt("InternalPort");
-                    r.ServerURI = string.Format("{0}://{1}:{2}/", m_Scheme, m_ExternalHostName, m_HttpPort);
-                    r.Size.X = ((uint)regionEntry.GetInt("SizeX", 256) + 255) & (~(uint)255);
-                    r.Size.Y = ((uint)regionEntry.GetInt("SizeY", 256) + 255) & (~(uint)255);
-                    r.Flags = RegionFlags.RegionOnline;
-                    r.Owner = new UUI(regionEntry.GetString("Owner"));
-                    r.ScopeID = regionEntry.GetString("ScopeID", "00000000-0000-0000-0000-000000000000");
-                    r.ServerHttpPort = m_HttpPort;
-                    r.RegionMapTexture = regionEntry.GetString("MaptileStaticUUID", "00000000-0000-0000-0000-000000000000");
-                    switch (regionEntry.GetString("Access", "mature").ToLower())
-                    {
-                        case "trial":
-                            r.Access = RegionAccess.Trial;
-                            break;
-
-                        case "pg":
-                            r.Access = RegionAccess.PG;
-                            break;
-
-                        case "mature":
-                            r.Access = RegionAccess.Mature;
-                            break;
-
-                        case "adult":
-                            r.Access = RegionAccess.Adult;
-                            break;
-
-                        default:
-                            r.Access = RegionAccess.Mature;
-                            break;
-                    }
-
-                    r.ServerIP = regionEntry.GetString("ExternalHostName", m_ExternalHostName);
-                    m_RegionService.RegisterRegion(r);
-                }
-            }
-
             foreach(RegionInfo ri in m_RegionService.GetOnlineRegions())
             {
                 m_Log.InfoFormat("Starting Region {0}", ri.Name);
