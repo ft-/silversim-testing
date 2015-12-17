@@ -58,6 +58,7 @@ namespace SilverSim.Main.Cmd.Region
             m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
             Common.CmdIO.CommandRegistry.CreateCommands.Add("region", CreateRegionCmd);
+            Common.CmdIO.CommandRegistry.CreateCommands.Add("regions", CreateRegionsCmd);
             Common.CmdIO.CommandRegistry.ShowCommands.Add("regions", ShowRegionsCmd);
             Common.CmdIO.CommandRegistry.EnableCommands.Add("region", EnableRegionCmd);
             Common.CmdIO.CommandRegistry.DisableCommands.Add("region", DisableRegionCmd);
