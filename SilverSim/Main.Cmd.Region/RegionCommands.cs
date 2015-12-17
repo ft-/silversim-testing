@@ -97,7 +97,6 @@ namespace SilverSim.Main.Cmd.Region
             {
                 List<UUID> onlineRegions = new List<UUID>();
                 
-                List<RegionInfo> regionList = new List<RegionInfo>();
                 foreach (SceneInterface scene in SceneManager.Scenes.Values)
                 {
                     onlineRegions.Add(scene.ID);
