@@ -458,6 +458,7 @@ namespace SilverSim.Scene.Implementation.Basic
             Dictionary<string, string> capabilitiesConfig)
         : base(ri.Size.X, ri.Size.Y)
         {
+            ID = ri.ID;
             /* next line is there to break the circular dependencies */
             TryGetScene = SceneManager.Scenes.TryGetValue;
 

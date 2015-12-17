@@ -395,7 +395,15 @@ namespace SilverSim.Main.Cmd.Region
                 {
                     io.Write(string.Format("Starting region {0} ({1})", rInfo.Name, rInfo.ID.ToString()));
                     m_Log.InfoFormat("Starting Region {0} ({1})", rInfo.Name, rInfo.ID.ToString());
-                    si = m_SceneFactory.Instantiate(rInfo);
+                    try
+                    {
+                        si = m_SceneFactory.Instantiate(rInfo);
+                    }
+                    catch(Exception e)
+                    {
+                        io.WriteFormatted("Failed to start region: {0}", e.Message);
+                        return;
+                    }
                     SceneManager.Scenes.Add(si);
                     si.LoadSceneAsync();
                 }

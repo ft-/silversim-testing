@@ -96,9 +96,11 @@ namespace SilverSim.Viewer.Core
                 /* however, mono does not have an idea about what this is all about, so we catch that here */
             }
 
+            /* handle Bind before starting anything else */
+            m_UdpSocket.Bind(ep);
+
             m_ChatThread = new Thread(ChatSendHandler);
             m_ChatThread.Start();
-            m_UdpSocket.Bind(ep);
             m_Log.InfoFormat("Initialized UDP Circuits Manager at {0}:{1}", bindAddress.ToString(), port);
         }
 
@@ -121,7 +123,7 @@ namespace SilverSim.Viewer.Core
         #region Chat Thread
         public void ChatSendHandler()
         {
-            Thread.CurrentThread.Name = "Chat:Routing Thread";
+            Thread.CurrentThread.Name = "Chat:Routing Thread for " + Scene.ID.ToString();
             while(true)
             {
                 IScriptEvent ev = m_ChatQueue.Dequeue();
