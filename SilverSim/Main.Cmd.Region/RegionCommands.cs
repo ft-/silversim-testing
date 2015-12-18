@@ -70,7 +70,7 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.AlertCommands.Add("region", AlertRegionCmd);
             Common.CmdIO.CommandRegistry.AlertCommands.Add("regions", AlertRegionsCmd);
             Common.CmdIO.CommandRegistry.AlertCommands.Add("agent", AlertAgentCmd);
-            Common.CmdIO.CommandRegistry.KickCommands.Add("kick", KickAgentCmd);
+            Common.CmdIO.CommandRegistry.KickCommands.Add("agent", KickAgentCmd);
             Common.CmdIO.CommandRegistry.ShowCommands.Add("agents", ShowAgentsCmd);
             Common.CmdIO.CommandRegistry.EnableCommands.Add("logins", EnableDisableLoginsCmd);
             Common.CmdIO.CommandRegistry.DisableCommands.Add("logins", EnableDisableLoginsCmd);
