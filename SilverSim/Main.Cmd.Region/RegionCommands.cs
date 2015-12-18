@@ -74,6 +74,7 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.ShowCommands.Add("agents", ShowAgentsCmd);
             Common.CmdIO.CommandRegistry.EnableCommands.Add("logins", EnableDisableLoginsCmd);
             Common.CmdIO.CommandRegistry.DisableCommands.Add("logins", EnableDisableLoginsCmd);
+            Common.CmdIO.CommandRegistry.ShowCommands.Add("neighbors", ShowNeighborsCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)
@@ -87,6 +88,19 @@ namespace SilverSim.Main.Cmd.Region
                     }
                 }
             }
+        }
+
+        UUI ResolveName(UUI uui)
+        {
+            UUI resultUui;
+            foreach(AvatarNameServiceInterface service in m_AvatarNameServices)
+            {
+                if(service.TryGetValue(uui, out resultUui))
+                {
+                    return resultUui;
+                }
+            }
+            return uui;
         }
 
         bool TranslateToUUI(string arg, out UUI uui)
@@ -186,7 +200,7 @@ namespace SilverSim.Main.Cmd.Region
                 if (limitedToScene == UUID.Zero || rInfo.ID == limitedToScene)
                 {
                     Vector3 gridcoord = rInfo.Location;
-                    output += string.Format("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", rInfo.Name, rInfo.ID, gridcoord.ToString(), rInfo.Size.ToString(), rInfo.Owner.FullName, gridcoord.X_String + "," + gridcoord.Y_String);
+                    output += string.Format("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", rInfo.Name, rInfo.ID, gridcoord.ToString(), rInfo.Size.ToString(), ResolveName(rInfo.Owner).FullName, gridcoord.X_String + "," + gridcoord.Y_String);
                 }
             }
             io.Write(output);
@@ -931,6 +945,50 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.WriteFormatted("Agent {0} {1} not found.", args[2], args[3]);
             }
+        }
+
+        public void ShowNeighborsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help")
+            {
+                io.Write("show neighbors - Shows neighbors");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("show neighbors needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+                return;
+            }
+
+            string output = "Neighbor List:\n----------------------------------------------";
+            foreach (SceneInterface.NeighborEntry neighborInfo in scene.Neighbors.Values)
+            {
+                Vector3 gridcoord = neighborInfo.RemoteRegionData.Location;
+                output += string.Format("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", 
+                    neighborInfo.RemoteRegionData.Name, 
+                    neighborInfo.RemoteRegionData.ID, gridcoord.ToString(), 
+                    neighborInfo.RemoteRegionData.Size.ToString(),
+                    ResolveName(neighborInfo.RemoteRegionData.Owner).FullName, 
+                    gridcoord.X_String + "," + gridcoord.Y_String);
+            }
+            io.Write(output);
+
         }
 
         public void EnableDisableLoginsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)

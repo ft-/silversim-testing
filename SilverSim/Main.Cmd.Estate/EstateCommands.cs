@@ -57,6 +57,19 @@ namespace SilverSim.Main.Cmd.Estate
             }
         }
 
+        UUI ResolveName(UUI uui)
+        {
+            UUI resultUui;
+            foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
+            {
+                if (service.TryGetValue(uui, out resultUui))
+                {
+                    return resultUui;
+                }
+            }
+            return uui;
+        }
+
         bool TranslateToUUI(string arg, out UUI uui)
         {
             uui = UUI.Unknown;
@@ -118,7 +131,7 @@ namespace SilverSim.Main.Cmd.Estate
             string output = "Estate List:\n----------------------------------------------";
             foreach (EstateInfo estateInfo in estates)
             {
-                output += string.Format("\nEstate {0} [{1}]:\n  Owner={2}\n", estateInfo.Name, estateInfo.ID, estateInfo.Owner.FullName);
+                output += string.Format("\nEstate {0} [{1}]:\n  Owner={2}\n", estateInfo.Name, estateInfo.ID, ResolveName(estateInfo.Owner).FullName);
             }
             io.Write(output);
         }
