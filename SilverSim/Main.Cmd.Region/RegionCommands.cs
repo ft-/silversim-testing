@@ -859,6 +859,7 @@ namespace SilverSim.Main.Cmd.Region
                 return;
             }
 
+            bool agentFound = false;
             string msg = string.Join(" ", args.GetRange(4, args.Count - 4));
             foreach (IAgent agent in scene.RootAgents)
             {
@@ -866,7 +867,13 @@ namespace SilverSim.Main.Cmd.Region
                 if (agentid.FirstName == args[2] && agentid.LastName == args[3])
                 {
                     agent.SendAlertMessage(msg, scene.ID);
+                    agentFound = true;
                 }
+            }
+
+            if (!agentFound)
+            {
+                io.WriteFormatted("Agent {0} {1} not found.", args[2], args[3]);
             }
         }
 
@@ -909,13 +916,20 @@ namespace SilverSim.Main.Cmd.Region
                 msg = "You have been kicked.";
             }
 
+            bool agentFound = false;
             foreach (IAgent agent in scene.RootAgents)
             {
                 UUI agentid = agent.Owner;
                 if (agentid.FirstName == args[2] && agentid.LastName == args[3])
                 {
                     agent.KickUser(msg);
+                    agentFound = true;
                 }
+            }
+
+            if(!agentFound)
+            {
+                io.WriteFormatted("Agent {0} {1} not found.", args[2], args[3]);
             }
         }
 
