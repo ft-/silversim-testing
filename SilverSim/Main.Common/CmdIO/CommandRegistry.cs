@@ -31,6 +31,7 @@ namespace SilverSim.Main.Common.CmdIO
         public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> EnableCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
         public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> DisableCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
         public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> AlertCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
+        public static readonly RwLockedDictionary<string, Action<List<string>, TTY, UUID>> KickCommands = new RwLockedDictionary<string, Action<List<string>, TTY, UUID>>();
 
         static CommandRegistry()
         {
@@ -50,6 +51,7 @@ namespace SilverSim.Main.Common.CmdIO
             Commands.Add("enable", new CommandType("enable", EnableCommands).Command_Handler);
             Commands.Add("disable", new CommandType("disable", DisableCommands).Command_Handler);
             Commands.Add("alert", new CommandType("alert", AlertCommands).Command_Handler);
+            Commands.Add("kick", new CommandType("kick", KickCommands).Command_Handler);
         }
 
         sealed class CommandType

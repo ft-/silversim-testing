@@ -69,7 +69,8 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCmd);
             Common.CmdIO.CommandRegistry.AlertCommands.Add("region", AlertRegionCmd);
             Common.CmdIO.CommandRegistry.AlertCommands.Add("regions", AlertRegionsCmd);
-            Common.CmdIO.CommandRegistry.AlertCommands.Add("user", AlertUserCmd);
+            Common.CmdIO.CommandRegistry.AlertCommands.Add("agent", AlertAgentCmd);
+            Common.CmdIO.CommandRegistry.KickCommands.Add("kick", KickAgentCmd);
             Common.CmdIO.CommandRegistry.ShowCommands.Add("agents", ShowAgentsCmd);
             Common.CmdIO.CommandRegistry.EnableCommands.Add("logins", EnableDisableLoginsCmd);
             Common.CmdIO.CommandRegistry.DisableCommands.Add("logins", EnableDisableLoginsCmd);
@@ -829,12 +830,12 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void AlertUserCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        public void AlertAgentCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
-            if (args[0] == "help")
+            if (args[0] == "help" && args.Count < 5)
             {
-                io.Write("alert user <firstname> <lastname> <message>");
+                io.Write("alert agent <firstname> <lastname> <message>");
                 return;
             }
             else if (limitedToScene != UUID.Zero)
@@ -843,7 +844,7 @@ namespace SilverSim.Main.Cmd.Region
             }
             else if (io.SelectedScene == UUID.Zero)
             {
-                io.Write("alert-user needs a selected region before.");
+                io.Write("alert agent needs a selected region before.");
                 return;
             }
             else
@@ -858,16 +859,62 @@ namespace SilverSim.Main.Cmd.Region
                 return;
             }
 
-            if (args.Count >= 5)
+            string msg = string.Join(" ", args.GetRange(4, args.Count - 4));
+            foreach (IAgent agent in scene.RootAgents)
             {
-                string msg = string.Join(" ", args.GetRange(4, args.Count - 4));
-                foreach (IAgent agent in scene.RootAgents)
+                UUI agentid = agent.Owner;
+                if (agentid.FirstName == args[2] && agentid.LastName == args[3])
                 {
-                    UUI agentid = agent.Owner;
-                    if (agentid.FirstName == args[2] && agentid.LastName == args[3])
-                    {
-                        agent.SendAlertMessage(msg, scene.ID);
-                    }
+                    agent.SendAlertMessage(msg, scene.ID);
+                }
+            }
+        }
+
+        public void KickAgentCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help" || args.Count < 4)
+            {
+                io.Write("kick agent <firstname> <lastname> <message>");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("kick agent needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+                return;
+            }
+
+            string msg;
+            if (args.Count >= 4)
+            {
+                msg = string.Join(" ", args.GetRange(4, args.Count - 4));
+            }
+            else
+            {
+                msg = "You have been kicked.";
+            }
+
+            foreach (IAgent agent in scene.RootAgents)
+            {
+                UUI agentid = agent.Owner;
+                if (agentid.FirstName == args[2] && agentid.LastName == args[3])
+                {
+                    agent.KickUser(msg);
                 }
             }
         }
