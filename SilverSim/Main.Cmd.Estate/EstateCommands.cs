@@ -4,6 +4,9 @@
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Scene.Management.Scene;
+using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
@@ -38,6 +41,7 @@ namespace SilverSim.Main.Cmd.Estate
             Common.CmdIO.CommandRegistry.ChangeCommands.Add("estate", ChangeEstateCmd);
             Common.CmdIO.CommandRegistry.CreateCommands.Add("estate", CreateEstateCmd);
             Common.CmdIO.CommandRegistry.DeleteCommands.Add("estate", DeleteEstateCmd);
+            Common.CmdIO.CommandRegistry.AlertCommands.Add("estate", AlertEstateCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if(null != sceneConfig)
@@ -367,6 +371,38 @@ namespace SilverSim.Main.Cmd.Estate
             }
         }
 
+        public void AlertEstateCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            uint estateID;
+            if (limitedToScene != UUID.Zero)
+            {
+                io.Write("alert estate is not allowed from restricted console");
+                return;
+            }
+            else if (args[0] == "help" || args.Count < 4)
+            {
+                io.Write("alert estate <id> <message>");
+                return;
+            }
+            else if (!uint.TryParse(args[2], out estateID))
+            {
+                io.Write("Invalid estate id.");
+                return;
+            }
+
+            string msg = string.Join(" ", args.GetRange(3, args.Count - 3));
+            foreach (UUID regionID in m_EstateService.RegionMap[estateID])
+            {
+                SceneInterface scene;
+                if (SceneManager.Scenes.TryGetValue(regionID, out scene))
+                {
+                    foreach (IAgent agent in scene.RootAgents)
+                    {
+                        agent.SendAlertMessage(msg, scene.ID);
+                    }
+                }
+            }
+        }
     }
 
     #region Factory

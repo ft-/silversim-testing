@@ -67,8 +67,9 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.StartCommands.Add("region", StartRegionCmd);
             Common.CmdIO.CommandRegistry.StopCommands.Add("region", StopRegionCmd);
             Common.CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCmd);
-            Common.CmdIO.CommandRegistry.Commands.Add("alert", AlertCmd);
-            Common.CmdIO.CommandRegistry.Commands.Add("alert-user", AlertUserCmd);
+            Common.CmdIO.CommandRegistry.AlertCommands.Add("region", AlertRegionCmd);
+            Common.CmdIO.CommandRegistry.AlertCommands.Add("regions", AlertRegionsCmd);
+            Common.CmdIO.CommandRegistry.AlertCommands.Add("user", AlertUserCmd);
             Common.CmdIO.CommandRegistry.ShowCommands.Add("agents", ShowAgentsCmd);
             Common.CmdIO.CommandRegistry.EnableCommands.Add("logins", EnableDisableLoginsCmd);
             Common.CmdIO.CommandRegistry.DisableCommands.Add("logins", EnableDisableLoginsCmd);
@@ -766,12 +767,12 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void AlertCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        public void AlertRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help")
             {
-                io.Write("alert <message>");
+                io.Write("alert region <message>");
                 return;
             }
             else if (limitedToScene != UUID.Zero)
@@ -795,9 +796,32 @@ namespace SilverSim.Main.Cmd.Region
                 return;
             }
 
-            if (args.Count >= 2)
+            if (args.Count >= 3)
             {
-                string msg = string.Join(" ", args.GetRange(1, args.Count - 1));
+                string msg = string.Join(" ", args.GetRange(2, args.Count - 2));
+                foreach (IAgent agent in scene.RootAgents)
+                {
+                    agent.SendAlertMessage(msg, scene.ID);
+                }
+            }
+        }
+
+        public void AlertRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            if(limitedToScene != UUID.Zero)
+            {
+                io.Write("alert regions is not allowed from restricted console.");
+                return;
+            }
+            if (args[0] == "help")
+            {
+                io.Write("alert regions <message>");
+                return;
+            }
+
+            string msg = string.Join(" ", args.GetRange(2, args.Count - 2));
+            foreach (SceneInterface scene in SceneManager.Scenes.Values)
+            {
                 foreach (IAgent agent in scene.RootAgents)
                 {
                     agent.SendAlertMessage(msg, scene.ID);
@@ -810,7 +834,7 @@ namespace SilverSim.Main.Cmd.Region
             UUID selectedScene;
             if (args[0] == "help")
             {
-                io.Write("alert <firstname> <lastname> <message>");
+                io.Write("alert user <firstname> <lastname> <message>");
                 return;
             }
             else if (limitedToScene != UUID.Zero)
@@ -834,13 +858,13 @@ namespace SilverSim.Main.Cmd.Region
                 return;
             }
 
-            if (args.Count >= 4)
+            if (args.Count >= 5)
             {
-                string msg = string.Join(" ", args.GetRange(3, args.Count - 3));
+                string msg = string.Join(" ", args.GetRange(4, args.Count - 4));
                 foreach (IAgent agent in scene.RootAgents)
                 {
                     UUI agentid = agent.Owner;
-                    if (agentid.FirstName == args[1] && agentid.LastName == args[2])
+                    if (agentid.FirstName == args[2] && agentid.LastName == args[3])
                     {
                         agent.SendAlertMessage(msg, scene.ID);
                     }
