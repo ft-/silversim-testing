@@ -4,6 +4,7 @@
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
@@ -20,6 +21,7 @@ namespace SilverSim.Main.Cmd.Estate
         readonly string m_EstateServiceName;
         GridServiceInterface m_RegionStorage;
         EstateServiceInterface m_EstateService;
+        readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
         private static readonly ILog m_Log = LogManager.GetLogger("ESTATE COMMANDS");
 
         public EstateCommands(string regionStorageName, string estateServiceName)
@@ -36,6 +38,64 @@ namespace SilverSim.Main.Cmd.Estate
             Common.CmdIO.CommandRegistry.ChangeCommands.Add("estate", ChangeEstateCmd);
             Common.CmdIO.CommandRegistry.CreateCommands.Add("estate", CreateEstateCmd);
             Common.CmdIO.CommandRegistry.DeleteCommands.Add("estate", DeleteEstateCmd);
+
+            IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
+            if(null != sceneConfig)
+            {
+                string avatarNameServices = sceneConfig.GetString("AvatarNameServices", string.Empty);
+                if (!string.IsNullOrEmpty(avatarNameServices))
+                {
+                    foreach (string p in avatarNameServices.Split(','))
+                    {
+                        m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(p.Trim()));
+                    }
+                }
+            }
+        }
+
+        bool TranslateToUUI(string arg, out UUI uui)
+        {
+            uui = UUI.Unknown;
+            if (arg.Contains(","))
+            {
+                bool found = false;
+                string[] names = arg.Split(new char[] { ',' }, 2);
+                if(names.Length == 1)
+                {
+                    names = new string[] { names[0], string.Empty };
+                }
+                foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
+                {
+                    UUI founduui;
+                    if (service.TryGetValue(names[0], names[1], out founduui))
+                    {
+                        uui = founduui;
+                        found = true;
+                        break;
+                    }
+                }
+                return found;
+            }
+            else if (UUID.TryParse(arg, out uui.ID))
+            {
+                bool found = false;
+                foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
+                {
+                    UUI founduui;
+                    if (service.TryGetValue(uui.ID, out founduui))
+                    {
+                        uui = founduui;
+                        found = true;
+                        break;
+                    }
+                }
+                return found;
+            }
+            else if (!UUI.TryParse(arg, out uui))
+            {
+                return false;
+            }
+            return true;
         }
 
         public void ShowEstatesCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
@@ -73,10 +133,9 @@ namespace SilverSim.Main.Cmd.Estate
                     "Parameters:\n" +
                     "name <name>\n" +
                     "parentestateid <id>\n" +
-                    "owner <uui>\n" +
-                    "billablefactor <factor>\n" +
+                    "owner <uui>|<uuid>|<firstname>,<lastname>\n" +
                     "pricepermeter <value>\n" +
-                    "staticmaptile <uuid>\n" + 
+                    "billablefactor <factor>\n" +
                     "abuseemail <email>");
             }
             else if(!uint.TryParse(args[2], out estateID))
@@ -115,9 +174,9 @@ namespace SilverSim.Main.Cmd.Estate
                             break;
 
                         case "owner":
-                            if (!UUI.TryParse(args[argi + 1], out estateInfo.Owner))
+                            if(!TranslateToUUI(args[argi + 1], out estateInfo.Owner))
                             {
-                                io.WriteFormatted("{0} is not a valid UUI.", args[argi + 1]);
+                                io.WriteFormatted("{0} is not a valid owner.", args[argi + 1]);
                                 return;
                             }
                             changeEstateData = true;
@@ -173,11 +232,11 @@ namespace SilverSim.Main.Cmd.Estate
             {
                 io.Write("create estate <estatename> <estateid> parameters...\n\n" +
                     "Parameters:\n" +
-                    "name <name>\n" +
-                    "owner <uui>\n" +
+                    "owner <uui>|<uuid>|<firstname>,<lastname>\n" +
                     "parentestateid <parentestateid>\n" +
                     "pricepermeter <value>\n" +
-                    "staticmaptile <uuid>\n");
+                    "billablefactor <factor>\n" +
+                    "abuseemail <email>");
             }
             else if(!uint.TryParse(args[3], out estateID))
             {
@@ -216,9 +275,9 @@ namespace SilverSim.Main.Cmd.Estate
                             break;
 
                         case "owner":
-                            if (!UUI.TryParse(args[argi + 1], out estateInfo.Owner))
+                            if (!TranslateToUUI(args[argi + 1], out estateInfo.Owner))
                             {
-                                io.WriteFormatted("{0} is not a valid UUI.", args[argi + 1]);
+                                io.WriteFormatted("{0} is not a valid owner.", args[argi + 1]);
                                 return;
                             }
                             break;
@@ -321,6 +380,16 @@ namespace SilverSim.Main.Cmd.Estate
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
+            List<string> avatarNameServiceNames = new List<string>();
+            string avatarNameServices = ownSection.GetString("AvatarNameServices", string.Empty);
+            if (!string.IsNullOrEmpty(avatarNameServices))
+            {
+                foreach (string p in avatarNameServices.Split(','))
+                {
+                    avatarNameServiceNames.Add(p.Trim());
+                }
+            }
+
             return new EstateCommands(ownSection.GetString("RegionStorage", "RegionStorage"), ownSection.GetString("EstateService", "EstateService"));
         }
     }

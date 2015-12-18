@@ -7,6 +7,7 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
@@ -32,6 +33,7 @@ namespace SilverSim.Main.Cmd.Region
         private string m_ExternalHostName = string.Empty;
         private uint m_HttpPort;
         private string m_Scheme = Uri.UriSchemeHttp;
+        readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
 
         public RegionCommands(string regionStorageName, string estateServiceName)
         {
@@ -64,6 +66,64 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.StartCommands.Add("region", StartRegionCmd);
             Common.CmdIO.CommandRegistry.StopCommands.Add("region", StopRegionCmd);
             Common.CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCmd);
+
+            IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
+            if (null != sceneConfig)
+            {
+                string avatarNameServices = sceneConfig.GetString("AvatarNameServices", string.Empty);
+                if (!string.IsNullOrEmpty(avatarNameServices))
+                {
+                    foreach (string p in avatarNameServices.Split(','))
+                    {
+                        m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(p.Trim()));
+                    }
+                }
+            }
+        }
+
+        bool TranslateToUUI(string arg, out UUI uui)
+        {
+            uui = UUI.Unknown;
+            if (arg.Contains(","))
+            {
+                bool found = false;
+                string[] names = arg.Split(new char[] { ',' }, 2);
+                if (names.Length == 1)
+                {
+                    names = new string[] { names[0], string.Empty };
+                }
+                foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
+                {
+                    UUI founduui;
+                    if (service.TryGetValue(names[0], names[1], out founduui))
+                    {
+                        uui = founduui;
+                        found = true;
+                        break;
+                    }
+                }
+                return found;
+            }
+            else if (UUID.TryParse(arg, out uui.ID))
+            {
+                bool found = false;
+                foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
+                {
+                    UUI founduui;
+                    if (service.TryGetValue(uui.ID, out founduui))
+                    {
+                        uui = founduui;
+                        found = true;
+                        break;
+                    }
+                }
+                return found;
+            }
+            else if (!UUI.TryParse(arg, out uui))
+            {
+                return false;
+            }
+            return true;
         }
 
         public void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
@@ -139,7 +199,7 @@ namespace SilverSim.Main.Cmd.Region
                     "port <port>\n" +
                     "scopeid <uuid>\n" +
                     "regiontype <regiontype>\n" +
-                    "owner <uui>\n" +
+                    "owner <uui>|<uuid>|<firstname>,<lastname>\n" +
                     "estate <name>\n" +
                     "externalhostname <hostname>\n" +
                     "access trial|pg|mature|adult\n" +
@@ -190,9 +250,9 @@ namespace SilverSim.Main.Cmd.Region
                             break;
 
                         case "owner":
-                            if (!UUI.TryParse(args[argi + 1], out rInfo.Owner))
+                            if (!TranslateToUUI(args[argi + 1], out rInfo.Owner))
                             {
-                                io.WriteFormatted("{0} is not a valid UUI.", args[argi + 1]);
+                                io.WriteFormatted("{0} is not a valid owner.", args[argi + 1]);
                                 return;
                             }
                             changeRegionData = true;
@@ -391,7 +451,7 @@ namespace SilverSim.Main.Cmd.Region
                     "scopeid <uuid>\n" +
                     "size <x>,<y> - region size\n" +
                     "regiontype <regiontype>\n" +
-                    "owner <uui>\n" +
+                    "owner <uui>|<uuid>|<firstname>,<lastname>\n" +
                     "estate <name> - sets region owner to estate owner\n" +
                     "externalhostname <hostname>\n" +
                     "access trial|pg|mature|adult\n" +
@@ -492,9 +552,9 @@ namespace SilverSim.Main.Cmd.Region
                             break;
 
                         case "owner":
-                            if(!UUI.TryParse(args[argi + 1], out rInfo.Owner))
+                            if (!TranslateToUUI(args[argi + 1], out rInfo.Owner))
                             {
-                                io.WriteFormatted("{0} is not a valid UUI.", args[argi + 1]);
+                                io.WriteFormatted("{0} is not a valid owner.", args[argi + 1]);
                                 return;
                             }
                             break;
