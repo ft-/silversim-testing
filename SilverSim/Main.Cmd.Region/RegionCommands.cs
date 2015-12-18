@@ -813,7 +813,7 @@ namespace SilverSim.Main.Cmd.Region
                 io.Write("alert regions is not allowed from restricted console.");
                 return;
             }
-            if (args[0] == "help")
+            if (args[0] == "help" || args.Count < 3)
             {
                 io.Write("alert regions <message>");
                 return;
