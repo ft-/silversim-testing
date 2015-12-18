@@ -70,6 +70,8 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.Commands.Add("alert", AlertCmd);
             Common.CmdIO.CommandRegistry.Commands.Add("alert-user", AlertUserCmd);
             Common.CmdIO.CommandRegistry.ShowCommands.Add("agents", ShowAgentsCmd);
+            Common.CmdIO.CommandRegistry.EnableCommands.Add("logins", EnableDisableLoginsCmd);
+            Common.CmdIO.CommandRegistry.DisableCommands.Add("logins", EnableDisableLoginsCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)
@@ -843,6 +845,44 @@ namespace SilverSim.Main.Cmd.Region
                         agent.SendAlertMessage(msg, scene.ID);
                     }
                 }
+            }
+        }
+
+        public void EnableDisableLoginsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help")
+            {
+                io.Write("enable logins\ndisable logins");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.WriteFormatted("{0} logins needs a selected region before.", args[0]);
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+                return;
+            }
+            else if(args[0] == "enable")
+            {
+                scene.LoginControl.Ready(SceneInterface.ReadyFlags.LoginsEnable);
+            }
+            else if(args[0] == "disable")
+            {
+                scene.LoginControl.NotReady(SceneInterface.ReadyFlags.LoginsEnable);
             }
         }
 
