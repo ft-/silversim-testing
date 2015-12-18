@@ -531,7 +531,7 @@ namespace SilverSim.Scene.Implementation.Basic
             return agent.IMSend(im);
         }
 
-        private void RemoveScene(SceneInterface s)
+        void RemoveScene(SceneInterface s)
         {
             ScriptThreadPool.Shutdown();
             m_StopBasicSceneThreads = true;

@@ -117,6 +117,7 @@ namespace SilverSim.Viewer.Core
         {
             Stop();
             m_ChatQueue.Enqueue(new ShutdownEvent());
+            m_UdpSocket.Dispose();
             Scene = null;
         }
 
