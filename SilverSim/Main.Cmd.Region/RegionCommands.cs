@@ -69,6 +69,7 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCmd);
             Common.CmdIO.CommandRegistry.Commands.Add("alert", AlertCmd);
             Common.CmdIO.CommandRegistry.Commands.Add("alert-user", AlertUserCmd);
+            Common.CmdIO.CommandRegistry.ShowCommands.Add("agents", ShowAgentsCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)
@@ -138,11 +139,11 @@ namespace SilverSim.Main.Cmd.Region
                 io.Write("show regions ([enabled|disabled|online|offline])");
                 return;
             }
-            else if(args.Count < 3)
+            else if (args.Count < 3)
             {
                 regions = m_RegionStorage.GetAllRegions(UUID.Zero);
             }
-            else if(args[2] == "enabled")
+            else if (args[2] == "enabled")
             {
                 regions = m_RegionStorage.GetOnlineRegions();
             }
@@ -153,7 +154,7 @@ namespace SilverSim.Main.Cmd.Region
             else if (args[2] == "online")
             {
                 List<RegionInfo> regionList = new List<RegionInfo>();
-                foreach(SceneInterface scene in SceneManager.Scenes.Values)
+                foreach (SceneInterface scene in SceneManager.Scenes.Values)
                 {
                     regionList.Add(scene.RegionData);
                 }
@@ -162,7 +163,7 @@ namespace SilverSim.Main.Cmd.Region
             else if (args[2] == "offline")
             {
                 List<UUID> onlineRegions = new List<UUID>();
-                
+
                 foreach (SceneInterface scene in SceneManager.Scenes.Values)
                 {
                     onlineRegions.Add(scene.ID);
@@ -217,9 +218,9 @@ namespace SilverSim.Main.Cmd.Region
                 int argi;
                 bool changeRegionData = false;
                 EstateInfo selectedEstate = null;
-                for(argi = 3; argi < args.Count; argi += 2)
+                for (argi = 3; argi < args.Count; argi += 2)
                 {
-                    switch(args[argi].ToLower())
+                    switch (args[argi].ToLower())
                     {
                         case "name":
                             rInfo.Name = args[argi + 1];
@@ -316,7 +317,7 @@ namespace SilverSim.Main.Cmd.Region
                 }
 
                 SceneInterface si;
-                if(SceneManager.Scenes.TryGetValue(rInfo.ID, out si))
+                if (SceneManager.Scenes.TryGetValue(rInfo.ID, out si))
                 {
                     io.WriteFormatted("Please stop region first.");
                     return;
@@ -332,7 +333,7 @@ namespace SilverSim.Main.Cmd.Region
                         io.WriteFormatted("Could not change region parameters: {0}", e.Message);
                     }
                 }
-                if(null != selectedEstate)
+                if (null != selectedEstate)
                 {
                     m_EstateService.RegionMap[rInfo.ID] = selectedEstate.ID;
                 }
@@ -345,12 +346,12 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.WriteFormatted("create region not allowed from restricted console");
             }
-            else if(args.Count < 5)
+            else if (args.Count < 5)
             {
                 io.WriteFormatted("create regions from ini <regions.ini file>");
                 return;
             }
-            else if(args[2] == "from" && args[3] == "ini")
+            else if (args[2] == "from" && args[3] == "ini")
             {
                 IConfigSource cfg;
                 try
@@ -370,7 +371,7 @@ namespace SilverSim.Main.Cmd.Region
                         cfg = new IniConfigSource(args[4]);
                     }
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     io.WriteFormatted("Could not open {0}: {1}", args[4], e.Message);
                     return;
@@ -461,7 +462,7 @@ namespace SilverSim.Main.Cmd.Region
                     "staticmaptile <uuid>\n" +
                     "status online|offline");
             }
-            else if(m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+            else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
             {
                 io.WriteFormatted("Region with name {0} already exists.", args[2]);
             }
@@ -482,7 +483,7 @@ namespace SilverSim.Main.Cmd.Region
                     io.WriteFormatted("Port {0} is not valid", args[3]);
                     return;
                 }
-                if(rInfo.ServerPort < 1 || rInfo.ServerPort > 65535)
+                if (rInfo.ServerPort < 1 || rInfo.ServerPort > 65535)
                 {
                     io.WriteFormatted("Port {0} is not valid", args[3]);
                     return;
@@ -500,14 +501,14 @@ namespace SilverSim.Main.Cmd.Region
 
                 for (int argi = 5; argi + 1 < args.Count; argi += 2)
                 {
-                    switch(args[argi].ToLower())
+                    switch (args[argi].ToLower())
                     {
                         case "externalhostname":
                             rInfo.ServerIP = args[argi + 1];
                             break;
 
                         case "regionid":
-                            if(!UUID.TryParse(args[argi + 1], out rInfo.ID))
+                            if (!UUID.TryParse(args[argi + 1], out rInfo.ID))
                             {
                                 io.WriteFormatted("{0} is not a valid UUID.", args[argi + 1]);
                                 return;
@@ -546,7 +547,7 @@ namespace SilverSim.Main.Cmd.Region
                             break;
 
                         case "estate":
-                            if(m_EstateService.TryGetValue(args[argi + 1], out selectedEstate))
+                            if (m_EstateService.TryGetValue(args[argi + 1], out selectedEstate))
                             {
                                 io.WriteFormatted("{0} is not known as an estate", args[argi + 1]);
                                 return;
@@ -563,7 +564,7 @@ namespace SilverSim.Main.Cmd.Region
                             break;
 
                         case "status":
-                            switch(args[argi + 1].ToLower())
+                            switch (args[argi + 1].ToLower())
                             {
                                 case "online":
                                     rInfo.Flags = RegionFlags.RegionOnline;
@@ -580,7 +581,7 @@ namespace SilverSim.Main.Cmd.Region
                             break;
 
                         case "access":
-                            switch(args[argi + 1])
+                            switch (args[argi + 1])
                             {
                                 case "trial":
                                     rInfo.Access = RegionAccess.Trial;
@@ -662,11 +663,11 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.Write("enable region <regionname>");
             }
-            else if(args.Count < 3)
+            else if (args.Count < 3)
             {
                 io.Write("missing region name");
             }
-            else if(m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+            else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
             {
                 m_RegionStorage.AddRegionFlags(rInfo.ID, RegionFlags.RegionOnline);
             }
@@ -727,7 +728,7 @@ namespace SilverSim.Main.Cmd.Region
                     {
                         si = m_SceneFactory.Instantiate(rInfo);
                     }
-                    catch(Exception e)
+                    catch (Exception e)
                     {
                         io.WriteFormatted("Failed to start region: {0}", e.Message);
                         return;
@@ -766,16 +767,16 @@ namespace SilverSim.Main.Cmd.Region
         public void AlertCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
-            if(args[0] == "help")
+            if (args[0] == "help")
             {
                 io.Write("alert <message>");
                 return;
             }
-            else if(limitedToScene != UUID.Zero)
+            else if (limitedToScene != UUID.Zero)
             {
                 selectedScene = limitedToScene;
             }
-            else if(io.SelectedScene == UUID.Zero)
+            else if (io.SelectedScene == UUID.Zero)
             {
                 io.Write("alert needs a selected region before.");
                 return;
@@ -795,7 +796,7 @@ namespace SilverSim.Main.Cmd.Region
             if (args.Count >= 2)
             {
                 string msg = string.Join(" ", args.GetRange(1, args.Count - 1));
-                foreach(IAgent agent in scene.RootAgents)
+                foreach (IAgent agent in scene.RootAgents)
                 {
                     agent.SendAlertMessage(msg, scene.ID);
                 }
@@ -843,6 +844,55 @@ namespace SilverSim.Main.Cmd.Region
                     }
                 }
             }
+        }
+
+        public void ShowAgentsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help")
+            {
+                io.Write("show agents\nshow agents full");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("alert-user needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+                return;
+            }
+
+            IEnumerable<IAgent> agents;
+            string output;
+            if (args.Count == 3 && args[2] == "full")
+            {
+                agents = scene.Agents;
+                output = "All Agents: -----------------\n";
+            }
+            else
+            {
+                agents = scene.RootAgents;
+                output = "Root Agents: -----------------\n";
+            }
+
+            foreach(IAgent agent in agents)
+            {
+                output += string.Format("\n{0}\n    id={1}  Type={2}\n", agent.Owner.FullName, agent.Owner.ID.ToString(), agent.IsInScene(scene) ? "Root" : "Child");
+            }
+            io.Write(output);
         }
     }
     #endregion
