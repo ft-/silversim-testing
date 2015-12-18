@@ -6,6 +6,7 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Scene;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Estate;
@@ -66,6 +67,8 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.StartCommands.Add("region", StartRegionCmd);
             Common.CmdIO.CommandRegistry.StopCommands.Add("region", StopRegionCmd);
             Common.CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCmd);
+            Common.CmdIO.CommandRegistry.Commands.Add("alert", AlertCmd);
+            Common.CmdIO.CommandRegistry.Commands.Add("alert-user", AlertUserCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)
@@ -756,6 +759,88 @@ namespace SilverSim.Main.Cmd.Region
                 else
                 {
                     SceneManager.Scenes.Remove(si);
+                }
+            }
+        }
+
+        public void AlertCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if(args[0] == "help")
+            {
+                io.Write("alert <message>");
+                return;
+            }
+            else if(limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if(io.SelectedScene == UUID.Zero)
+            {
+                io.Write("alert needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+                return;
+            }
+
+            if (args.Count >= 2)
+            {
+                string msg = string.Join(" ", args.GetRange(1, args.Count - 1));
+                foreach(IAgent agent in scene.RootAgents)
+                {
+                    agent.SendAlertMessage(msg, scene.ID);
+                }
+            }
+        }
+
+        public void AlertUserCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene;
+            if (args[0] == "help")
+            {
+                io.Write("alert <firstname> <lastname> <message>");
+                return;
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                selectedScene = limitedToScene;
+            }
+            else if (io.SelectedScene == UUID.Zero)
+            {
+                io.Write("alert-user needs a selected region before.");
+                return;
+            }
+            else
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            SceneInterface scene;
+            if (!SceneManager.Scenes.TryGetValue(selectedScene, out scene))
+            {
+                io.Write("no scene selected");
+                return;
+            }
+
+            if (args.Count >= 4)
+            {
+                string msg = string.Join(" ", args.GetRange(3, args.Count - 3));
+                foreach (IAgent agent in scene.RootAgents)
+                {
+                    UUI agentid = agent.Owner;
+                    if (agentid.FirstName == args[1] && agentid.LastName == args[2])
+                    {
+                        agent.SendAlertMessage(msg, scene.ID);
+                    }
                 }
             }
         }
