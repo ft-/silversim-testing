@@ -96,7 +96,7 @@ namespace SilverSim.Viewer.Groups
                 if (adu.ActiveGroupID != UUID.Zero)
                 {
                     gr = groupsService.Roles[agent.Owner, gm.Group, gm.SelectedRoleID];
-                    adu.GroupName = string.Empty; // gm.Group.GroupName;
+                    adu.GroupName = gm.Group.GroupName;
                     adu.GroupTitle = gr.Title;
                     adu.GroupPowers = gr.Powers;
                 }

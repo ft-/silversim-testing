@@ -191,7 +191,7 @@ namespace SilverSim.Types.StructuredData.Agent
             {
                 Map appearancePack = (Map)parms["packed_appearance"];
                 agentparams.Appearance.AvatarHeight = appearancePack["height"].AsReal;
-                //agentparams.Appearance.Serial = appearancePack["serial"].AsInt;
+                agentparams.Appearance.Serial = (uint)appearancePack["serial"].AsInt;
 
                 {
                     AnArray vParams = (AnArray)appearancePack["visualparams"];

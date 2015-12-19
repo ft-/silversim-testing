@@ -367,14 +367,6 @@ namespace SilverSim.Main.Common.Console
                         continue;
                     }
 
-                    /*
-                    if (enteredChar == '?' && isCommand)
-                    {
-                        if (ContextHelp())
-                            continue;
-                    }
-                     */
-
                     m_CommandLineBuffer.Insert(m_CursorXPosition, enteredChar);
                     m_CursorXPosition++;
                 }
@@ -488,7 +480,6 @@ namespace SilverSim.Main.Common.Console
                             m_CursorYPosition = SetCursorTop(m_CursorYPosition);
 
                             System.Console.WriteLine();
-                            //Show();
 
                             lock (m_CommandLineBuffer)
                             {
