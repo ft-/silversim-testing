@@ -135,7 +135,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        #region LLAgent Properties
+        #region ViewerAgent Properties
         public UInt32 LocalID { get; set; }
         public Uri HomeURI { get; private set; }
         public UUID SessionID { get; private set; }
@@ -790,6 +790,15 @@ namespace SilverSim.Viewer.Core
         #endregion
 
         #region IAgent Properties
+        public bool IsNpc
+        {
+            get
+            {
+                return false;
+            }
+        }
+
+
         public string DisplayName { get; set; }
         public string FirstName { get; set; }
         public string LastName { get; set; }

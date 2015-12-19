@@ -227,6 +227,11 @@ namespace SilverSim.Scene.Types.Agent
             get;
         }
 
+        bool IsNpc
+        {
+            get;
+        }
+
         Vector3 LookAt
         {
             get;
