@@ -109,7 +109,7 @@ namespace SilverSim.WebIF.Admin
 
         void FindUser(SessionInfo sessionInfo, UUID challenge)
         {
-            string userRef = "WebIF.User." + sessionInfo.UserName + ".";
+            string userRef = "WebIF.Admin.User." + sessionInfo.UserName + ".";
             string passmd5;
             string rights;
 
@@ -130,7 +130,7 @@ namespace SilverSim.WebIF.Admin
 
         public void HandleUnsecureHttp(HttpRequest req)
         {
-            if(null == m_HttpsServer || m_ServerParams.GetBoolean(UUID.Zero, "WebIFAdmin_EnableHTTP", true))
+            if(null == m_HttpsServer || m_ServerParams.GetBoolean(UUID.Zero, "WebIF.Admin.EnableHTTP", true))
             {
                 HandleHttp(req);
             }
