@@ -379,9 +379,9 @@ namespace SilverSim.Main.Common.HttpServer
 
         public void ErrorResponse(HttpStatusCode statuscode, string statusDescription)
         {
-            using(BeginResponse(statuscode, statusDescription))
+            using(HttpResponse res = BeginResponse(statuscode, statusDescription))
             {
-
+                res.ContentType = "text/plain";
             }
         }
 
