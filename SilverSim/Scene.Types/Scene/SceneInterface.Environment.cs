@@ -160,7 +160,7 @@ namespace SilverSim.Scene.Types.Scene
                     get
                     {
                         WindlightWaterData waterData = new WindlightWaterData();
-                        waterData.Color = new Color(4, 38, 64);
+                        waterData.Color = new Color(4/255f, 38/255f, 64/255f);
                         waterData.FogDensityExponent = 4;
                         waterData.UnderwaterFogModifier = 0.25;
                         waterData.ReflectionWaveletScale = new Vector3(2.0, 2.0, 2.0);
@@ -721,9 +721,11 @@ namespace SilverSim.Scene.Types.Scene
 
             private void AddToCompiledWL(Color v, ref byte[] mBlock, ref int pos)
             {
-                AddToCompiledWL(v.R, ref mBlock, ref pos);
-                AddToCompiledWL(v.G, ref mBlock, ref pos);
-                AddToCompiledWL(v.B, ref mBlock, ref pos);
+                Vector3 c = v.AsVector3;
+                c *= 255;
+                AddToCompiledWL(c.X, ref mBlock, ref pos);
+                AddToCompiledWL(c.Y, ref mBlock, ref pos);
+                AddToCompiledWL(c.Z, ref mBlock, ref pos);
             }
 
             private void AddToCompiledWL(UUID v, ref byte[] mBlock, ref int pos)
