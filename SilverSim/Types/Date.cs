@@ -88,6 +88,14 @@ namespace SilverSim.Types
             return m_Value.ToUniversalTime().ToString(format);
         }
 
+        public string Iso8601
+        {
+            get
+            {
+                return m_Value.ToString("yyyyMMdd'T'HH':'mm':'ss", DateTimeFormatInfo.InvariantInfo);
+            }
+        }
+
         public string ToString(string format, IFormatProvider culture)
         {
             return m_Value.ToString(format, culture);

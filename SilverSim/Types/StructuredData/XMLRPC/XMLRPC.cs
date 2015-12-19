@@ -3,9 +3,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 
 namespace SilverSim.Types.StructuredData.XmlRpc
@@ -250,6 +252,20 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             }
         }
 
+        static readonly string[] Iso8601DateFormats = new string[]
+        {
+            "yyyyMMdd'T'HHmmss",
+            "yyyyMMdd'T'HHmmss'Z'",
+            "yyyyMMdd'T'HHmmsszzz",
+            "yyyyMMdd'T'HHmmsszz"
+        };
+
+        static Regex Iso8601DateRegex = new Regex(
+            @"(((?<year>\d{4})-(?<month>\d{2})-(?<day>\d{2}))|((?<year>\d{4})(?<month>\d{2})(?<day>\d{2})))" +
+            "T" +
+            @"(((?<hour>\d{2}):(?<minute>\d{2}):(?<second>\d{2}))|((?<hour>\d{2})(?<minute>\d{2})(?<second>\d{2})))" +
+            @"(?<tz>$|Z|([+-]\d{2}:?(\d{2})?))");
+
         static IValue DeserializeValue(XmlTextReader reader)
         {
             IValue iv = null;
@@ -298,8 +314,23 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                                 break;
 
                             case "dateTime.iso8601":
-                                throw new InvalidXmlRpcSerializationException();
-                                //break;
+                                if (isEmptyElement)
+                                {
+                                    throw new InvalidXmlRpcSerializationException();
+                                }
+                                else
+                                {
+                                    Match m = Iso8601DateRegex.Match(reader.ReadElementValueAsString());
+                                    string parseInput = m.Groups["year"].Value + m.Groups["month"].Value + m.Groups["day"].Value +
+                                            "T" + m.Groups["hour"].Value + m.Groups["minute"].Value + m.Groups["second"].Value + m.Groups["tz"].Value;
+                                    DateTime dt;
+                                    if(!DateTime.TryParseExact(parseInput, Iso8601DateFormats, CultureInfo.InvariantCulture, DateTimeStyles.AdjustToUniversal, out dt))
+                                    {
+                                        throw new InvalidXmlRpcSerializationException();
+                                    }
+                                    iv = new Date(dt);
+                                }
+                                break;
 
                             case "base64":
                                 iv = (isEmptyElement) ?
@@ -712,12 +743,9 @@ namespace SilverSim.Types.StructuredData.XmlRpc
             }
             else if(t == typeof(Date))
             {
-                /*
                 w.WriteStartElement("value");
-                w.WriteNamedValue("dateTime.iso8601", iv.);
+                w.WriteNamedValue("dateTime.iso8601", ((Date)iv).Iso8601);
                 w.WriteEndElement();
-                 * */
-                throw new InvalidXmlRpcSerializationException();
             }
             else if(t == typeof(AString))
             {
