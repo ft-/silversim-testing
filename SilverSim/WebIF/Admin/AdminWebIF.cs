@@ -73,7 +73,7 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        public readonly RwLockedDictionary<string, Action<HttpRequest, Map>> RestMethods = new RwLockedDictionary<string, Action<HttpRequest, Map>>();
+        public readonly RwLockedDictionary<string, Action<HttpRequest, Map>> JsonMethods = new RwLockedDictionary<string, Action<HttpRequest, Map>>();
 
         public void Startup(ConfigurationLoader loader)
         {
@@ -97,7 +97,7 @@ namespace SilverSim.WebIF.Admin
 
         public void Shutdown()
         {
-            RestMethods.Clear();
+            JsonMethods.Clear();
             m_HttpServer.StartsWithUriHandlers.Remove("/admin");
             if (null != m_HttpsServer)
             {
@@ -298,7 +298,7 @@ namespace SilverSim.WebIF.Admin
                                 {
                                 }
                             }
-                            else if (!RestMethods.TryGetValue(methodName, out del))
+                            else if (!JsonMethods.TryGetValue(methodName, out del))
                             {
                                 req.ErrorResponse(HttpStatusCode.BadRequest, "Request method \"" + methodName + "\" is not supported.");
                                 return;
