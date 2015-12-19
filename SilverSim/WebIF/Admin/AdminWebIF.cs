@@ -382,7 +382,17 @@ namespace SilverSim.WebIF.Admin
             }
             catch (FileNotFoundException)
             {
-                req.ErrorResponse(HttpStatusCode.NotFound, "Not Found");
+                using (HttpResponse res = req.BeginResponse(HttpStatusCode.NotFound, "Not Found"))
+                {
+                    res.ContentType = "text/html";
+                    using (Stream o = res.GetOutputStream())
+                    {
+                        using (StreamWriter w = new StreamWriter(o, UTF8NoBOM))
+                        {
+                            w.Write("<html><head><title>Not Found</title><body>Not Found</body></html>");
+                        }
+                    }
+                }
             }
         }
     }
@@ -399,7 +409,7 @@ namespace SilverSim.WebIF.Admin
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new AdminWebIF(ownSection.GetString("basepath", ""));
+            return new AdminWebIF(ownSection.GetString("BasePath", ""));
         }
     }
     #endregion
