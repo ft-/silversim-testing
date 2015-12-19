@@ -232,6 +232,11 @@ namespace SilverSim.Scene.Types.Agent
             get;
         }
 
+        bool IsInMouselook
+        {
+            get;
+        }
+
         Vector3 LookAt
         {
             get;

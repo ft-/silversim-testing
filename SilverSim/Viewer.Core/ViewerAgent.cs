@@ -798,6 +798,16 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        bool m_IsInMouselook;
+
+        public bool IsInMouselook
+        {
+            get
+            {
+                return m_IsInMouselook;
+            }
+        }
+
 
         public string DisplayName { get; set; }
         public string FirstName { get; set; }
