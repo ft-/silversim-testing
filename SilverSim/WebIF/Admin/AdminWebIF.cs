@@ -41,18 +41,6 @@ namespace SilverSim.WebIF.Admin
 
         readonly RwLockedDictionary<string, SessionInfo> m_Sessions = new RwLockedDictionary<string, SessionInfo>();
         readonly Timer m_Timer = new Timer(1);
-        class UserInfo
-        {
-            public string PassMD5 = string.Empty;
-            public readonly List<string> Rights = new List<string>();
-
-            public UserInfo()
-            {
-
-            }
-        }
-
-        readonly RwLockedDictionary<string, UserInfo> m_Users = new RwLockedDictionary<string, UserInfo>();
 
         public AdminWebIF(string basepath)
         {
@@ -121,15 +109,19 @@ namespace SilverSim.WebIF.Admin
 
         void FindUser(SessionInfo sessionInfo, UUID challenge)
         {
-            UserInfo userInfo;
-            if(m_Users.TryGetValue(sessionInfo.UserName, out userInfo))
+            string userRef = "WebIF.User." + sessionInfo.UserName + ".";
+            string passmd5;
+            string rights;
+
+            if (m_ServerParams.TryGetValue(UUID.Zero, userRef + "PassCode", out passmd5) &&
+                m_ServerParams.TryGetValue(UUID.Zero, userRef + "Rights", out rights))
             {
                 using (SHA1 md5 = SHA1.Create())
                 {
-                    byte[] str = UTF8NoBOM.GetBytes(challenge.ToString().ToLower() + "+" + userInfo.PassMD5.ToLower());
+                    byte[] str = UTF8NoBOM.GetBytes(challenge.ToString().ToLower() + "+" + passmd5.ToLower());
 
                     sessionInfo.ExpectedResponse = BitConverter.ToString(md5.ComputeHash(str)).Replace("-", "");
-                    sessionInfo.Rights = new List<string>(userInfo.Rights);
+                    sessionInfo.Rights = new List<string>(rights.Split(','));
                 }
             }
         }
