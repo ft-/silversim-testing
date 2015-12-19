@@ -920,15 +920,9 @@ namespace SilverSim.Main.Cmd.Region
                 return;
             }
 
-            string msg;
-            if (args.Count >= 4)
-            {
-                msg = string.Join(" ", args.GetRange(4, args.Count - 4));
-            }
-            else
-            {
-                msg = "You have been kicked.";
-            }
+            string msg = args.Count >= 4 ?
+                string.Join(" ", args.GetRange(4, args.Count - 4)) :
+                "You have been kicked.";
 
             bool agentFound = false;
             foreach (IAgent agent in scene.RootAgents)
