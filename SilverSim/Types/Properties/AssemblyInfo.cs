@@ -1,6 +1,7 @@
-﻿using System.Diagnostics.CodeAnalysis;
-// SilverSim is distributed under the terms of the
+﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
+
+using System.Diagnostics.CodeAnalysis;
 using System.Reflection;
 
 [assembly: AssemblyTitle("Common Types")]
