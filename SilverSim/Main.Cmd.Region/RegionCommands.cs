@@ -1037,7 +1037,7 @@ namespace SilverSim.Main.Cmd.Region
             }
             else if (io.SelectedScene == UUID.Zero)
             {
-                io.Write("alert-user needs a selected region before.");
+                io.Write("show agents needs a selected region before.");
                 return;
             }
             else
