@@ -345,7 +345,7 @@ namespace SilverSim.WebIF.Admin
                 using (FileStream file = new FileStream("../data/adminpages/" + filepath, FileMode.Open))
                 {
                     string contentType = "application/octet-stream";
-                    if (filepath.EndsWith(".html"))
+                    if (filepath.EndsWith(".html") || filepath.EndsWith(".htm"))
                     {
                         contentType = "text/html";
                     }
