@@ -213,6 +213,27 @@ namespace SilverSim.Database.MySQL.Estate
             return false;
         }
 
+        public override void Add(EstateInfo estateInfo)
+        {
+            Dictionary<string, object> dict = new Dictionary<string, object>();
+            dict["ID"] = estateInfo.ID;
+            dict["Name"] = estateInfo.Name;
+            dict["Owner"] = estateInfo.Owner.ToString();
+            dict["Flags"] = (uint)estateInfo.Flags;
+            dict["PricePerMeter"] = estateInfo.PricePerMeter;
+            dict["BillableFactor"] = estateInfo.BillableFactor;
+            dict["SunPosition"] = estateInfo.SunPosition;
+            dict["AbuseEmail"] = estateInfo.AbuseEmail;
+            dict["CovenantID"] = estateInfo.CovenantID.ToString();
+            dict["CovenantTimestamp"] = estateInfo.CovenantTimestamp.DateTimeToUnixTime();
+            dict["UseGlobalTime"] = estateInfo.UseGlobalTime ? 1 : 0;
+            using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
+            {
+                conn.Open();
+                conn.InsertInto("estates", dict);
+            }
+        }
+
         public override EstateInfo this[uint estateID]
         {
             get

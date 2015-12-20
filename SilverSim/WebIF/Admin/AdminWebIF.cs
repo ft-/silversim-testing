@@ -9,6 +9,7 @@ using SilverSim.Types;
 using SilverSim.Types.StructuredData.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography;
@@ -19,12 +20,15 @@ using ThreadedClasses;
 namespace SilverSim.WebIF.Admin
 {
     #region Service Implementation
+    [Description("Administration Web-Interface")]
     public class AdminWebIF : IPlugin, IPluginShutdown
     {
         ServerParamServiceInterface m_ServerParams;
         BaseHttpServer m_HttpServer;
         BaseHttpServer m_HttpsServer;
         readonly string m_BasePath;
+        const string JsonContentType = "application/json";
+
         class SessionInfo
         {
             public int LastSeenTickCount;
@@ -41,6 +45,60 @@ namespace SilverSim.WebIF.Admin
 
         readonly RwLockedDictionary<string, SessionInfo> m_Sessions = new RwLockedDictionary<string, SessionInfo>();
         readonly Timer m_Timer = new Timer(1);
+
+        #region Helpers
+        public static void SuccessResponse(HttpRequest req, Map m)
+        {
+            m.Add("success", true);
+            using (HttpResponse res = req.BeginResponse(JsonContentType))
+            {
+                using (Stream o = res.GetOutputStream())
+                {
+                    Json.Serialize(m, o);
+                }
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Method)]
+        public sealed class RequiredRightAttribute : Attribute
+        {
+            public string Right { get; private set; }
+
+            public RequiredRightAttribute(string right)
+            {
+                Right = right;
+            }
+        }
+
+        public enum ErrorResult
+        {
+            NotLoggedIn = 1,
+            NotFound = 2,
+            InsufficientRights = 3,
+            InvalidRequest = 4,
+            AlreadyExists = 5,
+            NotPossible = 6,
+            InUse = 7,
+            MissingSessionId = 8,
+            MissingMethod = 9,
+            InvalidSession = 10,
+            InvalidUserAndOrPassword = 11
+        };
+
+        public static void ErrorResponse(HttpRequest req, ErrorResult reason)
+        {
+            Map m = new Map();
+            m.Add("success", false);
+            m.Add("reason", (int)reason);
+            using (HttpResponse res = req.BeginResponse(JsonContentType))
+            {
+                using (Stream o = res.GetOutputStream())
+                {
+                    Json.Serialize(m, o);
+                }
+            }
+        }
+        #endregion
 
         public AdminWebIF(string basepath)
         {
@@ -144,7 +202,7 @@ namespace SilverSim.WebIF.Admin
         {
             if(!jsonreq.ContainsKey("sessionid") || !jsonreq.ContainsKey("user") || !jsonreq.ContainsKey("response"))
             {
-                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                ErrorResponse(req, ErrorResult.InvalidRequest);
                 return;
             }
 
@@ -154,12 +212,12 @@ namespace SilverSim.WebIF.Admin
             if(!m_Sessions.TryGetValue(sessionKey, out sessionInfo) || sessionInfo.ExpectedResponse.Length == 0)
             {
                 res.Add("success", false);
-                res.Add("message", "Session not valid");
+                res.Add("reason", (int)ErrorResult.InvalidSession);
             }
             else if(sessionInfo.IsAuthenticated)
             {
                 res.Add("success", false);
-                res.Add("message", "Session not valid");
+                res.Add("reason", (int)ErrorResult.InvalidSession);
             }
             else
             {
@@ -179,11 +237,11 @@ namespace SilverSim.WebIF.Admin
                 else
                 {
                     res.Add("success", false);
-                    res.Add("message", "User and/or password is not valid");
+                    res.Add("reason", (int)ErrorResult.InvalidUserAndOrPassword);
                     m_Sessions.Remove(sessionKey);
                 }
             }
-            using (HttpResponse httpres = req.BeginResponse("application/json"))
+            using (HttpResponse httpres = req.BeginResponse(JsonContentType))
             {
                 using (Stream o = httpres.GetOutputStream())
                 {
@@ -202,16 +260,16 @@ namespace SilverSim.WebIF.Admin
 
             if(!jsonreq.ContainsKey("user"))
             {
-                req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                ErrorResponse(req, ErrorResult.InvalidRequest);
                 return;
             }
 
             SessionInfo sessionInfo = new SessionInfo();
             m_Sessions.Add(req.CallerIP + "+" + sessionID.ToString(), sessionInfo);
-            sessionInfo.UserName = resdata["user"].ToString();
+            sessionInfo.UserName = jsonreq["user"].ToString();
 
 
-            using (HttpResponse res = req.BeginResponse("application/json"))
+            using (HttpResponse res = req.BeginResponse(JsonContentType))
             {
                 using (Stream o = res.GetOutputStream())
                 {
@@ -228,9 +286,9 @@ namespace SilverSim.WebIF.Admin
                 {
                     req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 }
-                else if(req.ContentType != "application/json")
+                else if(req.ContentType != JsonContentType)
                 {
-                    req.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported media type");
+                    req.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported media type " + req.ContentType);
                 }
                 else
                 {
@@ -247,13 +305,13 @@ namespace SilverSim.WebIF.Admin
                     }
                     if(jsondata == null)
                     {
-                        req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                        ErrorResponse(req, ErrorResult.InvalidRequest);
                         return;
                     }
                     Action<HttpRequest, Map> del;
                     if (!jsondata.ContainsKey("method"))
                     {
-                        req.ErrorResponse(HttpStatusCode.BadRequest, "'method' missing");
+                        ErrorResponse(req, ErrorResult.MissingMethod);
                         return;
                     }
 
@@ -273,6 +331,7 @@ namespace SilverSim.WebIF.Admin
                         default:
                             if(!jsondata.ContainsKey("sessionid"))
                             {
+                                ErrorResponse(req, ErrorResult.MissingSessionId);
                                 req.ErrorResponse(HttpStatusCode.BadRequest, "'sessionid' missing");
                                 return;
                             }
@@ -280,16 +339,7 @@ namespace SilverSim.WebIF.Admin
                             if (!m_Sessions.TryGetValue(sessionKey, out sessionInfo) ||
                                 !sessionInfo.IsAuthenticated)
                             {
-                                using (HttpResponse res = req.BeginResponse("text/plain"))
-                                {
-                                    using (Stream o = res.GetOutputStream())
-                                    {
-                                        Map m = new Map();
-                                        m.Add("success", false);
-                                        m.Add("reason", "Not logged in.");
-                                        Json.Serialize(m, o);
-                                    }
-                                }
+                                ErrorResponse(req, ErrorResult.NotLoggedIn);
                                 return;
                             }
                             else
@@ -316,6 +366,15 @@ namespace SilverSim.WebIF.Admin
                             }
                             else
                             {
+                                RequiredRightAttribute attr = Attribute.GetCustomAttribute(del.GetType(), typeof(RequiredRightAttribute)) as RequiredRightAttribute;
+                                if(attr != null)
+                                {
+                                    if(!sessionInfo.Rights.Contains(attr.Right))
+                                    {
+                                        ErrorResponse(req, ErrorResult.InsufficientRights);
+                                        return;
+                                    }
+                                }
                                 del(req, jsondata);
                             }
                             break;
