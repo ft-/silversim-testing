@@ -259,7 +259,6 @@ namespace SilverSim.WebIF.Admin
             m_Sessions.Add(req.CallerIP + "+" + sessionID.ToString(), sessionInfo);
             sessionInfo.UserName = jsonreq["user"].ToString();
 
-
             using (HttpResponse res = req.BeginResponse(JsonContentType))
             {
                 using (Stream o = res.GetOutputStream())
