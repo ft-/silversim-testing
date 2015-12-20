@@ -42,7 +42,7 @@ namespace SilverSim.Database.MySQL.ServerParam
                     {
                         while(dbReader.Read())
                         {
-                            UUID regionid = new UUID((string)dbReader["regionid"]);
+                            UUID regionid = dbReader.GetUUID("regionid");
                             m_Cache[regionid].Add((string)dbReader["parametername"], (string)dbReader["parametervalue"]);
                         }
                     }

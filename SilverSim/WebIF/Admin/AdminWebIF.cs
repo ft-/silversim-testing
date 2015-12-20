@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
@@ -21,8 +22,10 @@ namespace SilverSim.WebIF.Admin
 {
     #region Service Implementation
     [Description("Administration Web-Interface")]
-    public class AdminWebIF : IPlugin, IPluginShutdown
+    public class AdminWebIF : IPlugin, IPluginShutdown, IPostLoadStep
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("ADMIN WEB IF");
+
         ServerParamServiceInterface m_ServerParams;
         BaseHttpServer m_HttpServer;
         BaseHttpServer m_HttpsServer;
@@ -136,6 +139,8 @@ namespace SilverSim.WebIF.Admin
 
         public readonly RwLockedDictionary<string, Action<HttpRequest, Map>> JsonMethods = new RwLockedDictionary<string, Action<HttpRequest, Map>>();
 
+        const string AdminUserReference = "WebIF.Admin.User.admin.";
+
         public void Startup(ConfigurationLoader loader)
         {
             m_ServerParams = loader.GetServerParamStorage();
@@ -153,6 +158,25 @@ namespace SilverSim.WebIF.Admin
             if(null != m_HttpsServer)
             {
                 m_HttpsServer.StartsWithUriHandlers.Add("/admin", HandleHttp);
+            }
+
+        }
+
+        public void PostLoad()
+        {
+            string res;
+            if (!m_ServerParams.TryGetValue(UUID.Zero, AdminUserReference + "PassCode", out res))
+            {
+                res = UUID.Random.ToString();
+                m_Log.InfoFormat("<<admin>> created password: {0}", res);
+                using (SHA1 sha1 = SHA1.Create())
+                {
+                    byte[] str = UTF8NoBOM.GetBytes(res);
+
+                    res = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "");
+                }
+                m_ServerParams[UUID.Zero, AdminUserReference + "PassCode"] = res;
+                m_ServerParams[UUID.Zero, AdminUserReference + "Rights"] = "admin.all";
             }
         }
 
@@ -260,6 +284,7 @@ namespace SilverSim.WebIF.Admin
             SessionInfo sessionInfo = new SessionInfo();
             m_Sessions.Add(req.CallerIP + "+" + sessionID.ToString(), sessionInfo);
             sessionInfo.UserName = jsonreq["user"].ToString();
+            FindUser(sessionInfo, challenge);
 
             using (HttpResponse res = req.BeginResponse(JsonContentType))
             {
@@ -349,13 +374,16 @@ namespace SilverSim.WebIF.Admin
                             }
                             else
                             {
-                                RequiredRightAttribute attr = Attribute.GetCustomAttribute(del.GetType(), typeof(RequiredRightAttribute)) as RequiredRightAttribute;
-                                if(attr != null)
+                                if (!sessionInfo.Rights.Contains("admin.all"))
                                 {
-                                    if(!sessionInfo.Rights.Contains(attr.Right))
+                                    RequiredRightAttribute attr = Attribute.GetCustomAttribute(del.GetType(), typeof(RequiredRightAttribute)) as RequiredRightAttribute;
+                                    if (attr != null)
                                     {
-                                        ErrorResponse(req, ErrorResult.InsufficientRights);
-                                        return;
+                                        if (!sessionInfo.Rights.Contains(attr.Right))
+                                        {
+                                            ErrorResponse(req, ErrorResult.InsufficientRights);
+                                            return;
+                                        }
                                     }
                                 }
                                 del(req, jsondata);
