@@ -68,7 +68,9 @@ namespace SilverSim.Main.Common.HttpServer
             {
                 if (m_Headers.ContainsKey("Content-Type"))
                 {
-                    return m_Headers["Content-Type"];
+                    string contentType = m_Headers["Content-Type"];
+                    int semi = contentType.IndexOf(';');
+                    return semi >= 0 ? contentType.Substring(0, semi - 1).Trim() : contentType;
                 }
                 return string.Empty;
             }
