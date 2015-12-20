@@ -82,7 +82,8 @@ namespace SilverSim.WebIF.Admin
             MissingSessionId = 8,
             MissingMethod = 9,
             InvalidSession = 10,
-            InvalidUserAndOrPassword = 11
+            InvalidUserAndOrPassword = 11,
+            UnknownMethod = 12
         };
 
         public static void ErrorResponse(HttpRequest req, ErrorResult reason)
@@ -208,16 +209,13 @@ namespace SilverSim.WebIF.Admin
 
             string sessionKey = req.CallerIP + "+" + jsonreq["sessionid"].ToString();
             SessionInfo sessionInfo;
-            Map res = new Map();
             if(!m_Sessions.TryGetValue(sessionKey, out sessionInfo) || sessionInfo.ExpectedResponse.Length == 0)
             {
-                res.Add("success", false);
-                res.Add("reason", (int)ErrorResult.InvalidSession);
+                ErrorResponse(req, ErrorResult.InvalidSession);
             }
             else if(sessionInfo.IsAuthenticated)
             {
-                res.Add("success", false);
-                res.Add("reason", (int)ErrorResult.InvalidSession);
+                ErrorResponse(req, ErrorResult.InvalidSession);
             }
             else
             {
@@ -226,26 +224,19 @@ namespace SilverSim.WebIF.Admin
                     sessionInfo.LastSeenTickCount = Environment.TickCount;
                     sessionInfo.IsAuthenticated = true;
                     sessionInfo.ExpectedResponse = string.Empty;
-                    res.Add("success", true);
+                    Map res = new Map();
                     AnArray rights = new AnArray();
                     foreach(string right in sessionInfo.Rights)
                     {
                         rights.Add(right);
                     }
                     res.Add("rights", rights);
+                    SuccessResponse(req, res);
                 }
                 else
                 {
-                    res.Add("success", false);
-                    res.Add("reason", (int)ErrorResult.InvalidUserAndOrPassword);
                     m_Sessions.Remove(sessionKey);
-                }
-            }
-            using (HttpResponse httpres = req.BeginResponse(JsonContentType))
-            {
-                using (Stream o = httpres.GetOutputStream())
-                {
-                    Json.Serialize(res, o);
+                    ErrorResponse(req, ErrorResult.InvalidUserAndOrPassword);
                 }
             }
         }
@@ -332,7 +323,6 @@ namespace SilverSim.WebIF.Admin
                             if(!jsondata.ContainsKey("sessionid"))
                             {
                                 ErrorResponse(req, ErrorResult.MissingSessionId);
-                                req.ErrorResponse(HttpStatusCode.BadRequest, "'sessionid' missing");
                                 return;
                             }
                             sessionKey = req.CallerIP + "+" + jsondata["sessionid"].ToString();
@@ -349,19 +339,11 @@ namespace SilverSim.WebIF.Admin
                             if (methodName == "logout")
                             {
                                 m_Sessions.Remove(sessionKey);
-                                using (HttpResponse res = req.BeginResponse("text/plain"))
-                                {
-                                    using (Stream o = res.GetOutputStream())
-                                    {
-                                        Map m = new Map();
-                                        m.Add("success", true);
-                                        Json.Serialize(m, o);
-                                    }
-                                }
+                                SuccessResponse(req, new Map());
                             }
                             else if (!JsonMethods.TryGetValue(methodName, out del))
                             {
-                                req.ErrorResponse(HttpStatusCode.BadRequest, "Request method \"" + methodName + "\" is not supported.");
+                                ErrorResponse(req, ErrorResult.UnknownMethod);
                                 return;
                             }
                             else
