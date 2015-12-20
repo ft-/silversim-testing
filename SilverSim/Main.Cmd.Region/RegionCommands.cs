@@ -200,7 +200,11 @@ namespace SilverSim.Main.Cmd.Region
                 if (limitedToScene == UUID.Zero || rInfo.ID == limitedToScene)
                 {
                     Vector3 gridcoord = rInfo.Location;
-                    output += string.Format("\nRegion {0} [{1}]:\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", rInfo.Name, rInfo.ID, gridcoord.ToString(), rInfo.Size.ToString(), ResolveName(rInfo.Owner).FullName, gridcoord.X_String + "," + gridcoord.Y_String);
+                    output += string.Format("\nRegion {0} [{1}]: (Port {6})\n  Location={2} (grid coordinate {5})\n  Size={3}\n  Owner={4}\n", 
+                        rInfo.Name, rInfo.ID, 
+                        gridcoord.ToString(), 
+                        rInfo.Size.ToString(), 
+                        ResolveName(rInfo.Owner).FullName, gridcoord.X_String + "," + gridcoord.Y_String, rInfo.ServerPort);
                 }
             }
             io.Write(output);
