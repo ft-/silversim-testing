@@ -43,6 +43,7 @@ namespace SilverSim.WebIF.Admin
             public SessionInfo()
             {
                 LastSeenTickCount = Environment.TickCount;
+                IsAuthenticated = false;
             }
         }
 
@@ -173,7 +174,7 @@ namespace SilverSim.WebIF.Admin
                 {
                     byte[] str = UTF8NoBOM.GetBytes(res);
 
-                    res = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "");
+                    res = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "").ToLower();
                 }
                 m_ServerParams[UUID.Zero, AdminUserReference + "PassCode"] = res;
                 m_ServerParams[UUID.Zero, AdminUserReference + "Rights"] = "admin.all";
@@ -195,17 +196,17 @@ namespace SilverSim.WebIF.Admin
         void FindUser(SessionInfo sessionInfo, UUID challenge)
         {
             string userRef = "WebIF.Admin.User." + sessionInfo.UserName + ".";
-            string passmd5;
+            string pass_sha1;
             string rights;
 
-            if (m_ServerParams.TryGetValue(UUID.Zero, userRef + "PassCode", out passmd5) &&
+            if (m_ServerParams.TryGetValue(UUID.Zero, userRef + "PassCode", out pass_sha1) &&
                 m_ServerParams.TryGetValue(UUID.Zero, userRef + "Rights", out rights))
             {
                 using (SHA1 sha1 = SHA1.Create())
                 {
-                    byte[] str = UTF8NoBOM.GetBytes(challenge.ToString().ToLower() + "+" + passmd5.ToLower());
+                    byte[] str = UTF8NoBOM.GetBytes(challenge.ToString().ToLower() + "+" + pass_sha1.ToLower());
 
-                    sessionInfo.ExpectedResponse = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "");
+                    sessionInfo.ExpectedResponse = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "").ToLower();
                     sessionInfo.Rights = new List<string>(rights.ToLower().Split(','));
                 }
             }
@@ -245,7 +246,7 @@ namespace SilverSim.WebIF.Admin
             }
             else
             {
-                if(jsonreq["response"].ToString() == sessionInfo.ExpectedResponse)
+                if(jsonreq["response"].ToString().ToLower() == sessionInfo.ExpectedResponse)
                 {
                     sessionInfo.LastSeenTickCount = Environment.TickCount;
                     sessionInfo.IsAuthenticated = true;
@@ -377,13 +378,10 @@ namespace SilverSim.WebIF.Admin
                                 if (!sessionInfo.Rights.Contains("admin.all"))
                                 {
                                     RequiredRightAttribute attr = Attribute.GetCustomAttribute(del.GetType(), typeof(RequiredRightAttribute)) as RequiredRightAttribute;
-                                    if (attr != null)
+                                    if (attr != null && !sessionInfo.Rights.Contains(attr.Right))
                                     {
-                                        if (!sessionInfo.Rights.Contains(attr.Right))
-                                        {
-                                            ErrorResponse(req, ErrorResult.InsufficientRights);
-                                            return;
-                                        }
+                                        ErrorResponse(req, ErrorResult.InsufficientRights);
+                                        return;
                                     }
                                 }
                                 del(req, jsondata);
