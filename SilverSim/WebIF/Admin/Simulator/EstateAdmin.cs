@@ -185,7 +185,6 @@ namespace SilverSim.WebIF.Admin.Simulator
                 return;
             }
 
-            EstateInfo estateInfo = new EstateInfo();
             if(m_EstateService.RegionMap[estateID].Count != 0)
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InUse);
