@@ -209,13 +209,13 @@ namespace SilverSim.WebIF.Admin
 
             string sessionKey = req.CallerIP + "+" + jsonreq["sessionid"].ToString();
             SessionInfo sessionInfo;
-            if(!m_Sessions.TryGetValue(sessionKey, out sessionInfo) || sessionInfo.ExpectedResponse.Length == 0)
+            if(!m_Sessions.TryGetValue(sessionKey, out sessionInfo) || sessionInfo.IsAuthenticated)
             {
                 ErrorResponse(req, ErrorResult.InvalidSession);
             }
-            else if(sessionInfo.IsAuthenticated)
+            else if(sessionInfo.ExpectedResponse.Length == 0)
             {
-                ErrorResponse(req, ErrorResult.InvalidSession);
+                ErrorResponse(req, ErrorResult.InvalidUserAndOrPassword);
             }
             else
             {
