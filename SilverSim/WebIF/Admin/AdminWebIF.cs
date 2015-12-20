@@ -175,12 +175,12 @@ namespace SilverSim.WebIF.Admin
             if (m_ServerParams.TryGetValue(UUID.Zero, userRef + "PassCode", out passmd5) &&
                 m_ServerParams.TryGetValue(UUID.Zero, userRef + "Rights", out rights))
             {
-                using (SHA1 md5 = SHA1.Create())
+                using (SHA1 sha1 = SHA1.Create())
                 {
                     byte[] str = UTF8NoBOM.GetBytes(challenge.ToString().ToLower() + "+" + passmd5.ToLower());
 
-                    sessionInfo.ExpectedResponse = BitConverter.ToString(md5.ComputeHash(str)).Replace("-", "");
-                    sessionInfo.Rights = new List<string>(rights.Split(','));
+                    sessionInfo.ExpectedResponse = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "");
+                    sessionInfo.Rights = new List<string>(rights.ToLower().Split(','));
                 }
             }
         }
