@@ -277,14 +277,19 @@ namespace SilverSim.WebIF.Admin
                                 return;
                             }
                             sessionKey = req.CallerIP + "+" + jsondata["sessionid"].ToString();
-                            if (!m_Sessions.TryGetValue(sessionKey, out sessionInfo))
+                            if (!m_Sessions.TryGetValue(sessionKey, out sessionInfo) ||
+                                !sessionInfo.IsAuthenticated)
                             {
-                                req.ErrorResponse(HttpStatusCode.BadRequest, "Not logged in");
-                                return;
-                            }
-                            else if(!sessionInfo.IsAuthenticated)
-                            {
-                                req.ErrorResponse(HttpStatusCode.BadRequest, "Not logged in");
+                                using (HttpResponse res = req.BeginResponse("text/plain"))
+                                {
+                                    using (Stream o = res.GetOutputStream())
+                                    {
+                                        Map m = new Map();
+                                        m.Add("success", false);
+                                        m.Add("reason", "Not logged in.");
+                                        Json.Serialize(m, o);
+                                    }
+                                }
                                 return;
                             }
                             else
@@ -294,8 +299,14 @@ namespace SilverSim.WebIF.Admin
                             if (methodName == "logout")
                             {
                                 m_Sessions.Remove(sessionKey);
-                                using (req.BeginResponse("text/plain"))
+                                using (HttpResponse res = req.BeginResponse("text/plain"))
                                 {
+                                    using (Stream o = res.GetOutputStream())
+                                    {
+                                        Map m = new Map();
+                                        m.Add("success", true);
+                                        Json.Serialize(m, o);
+                                    }
                                 }
                             }
                             else if (!JsonMethods.TryGetValue(methodName, out del))
