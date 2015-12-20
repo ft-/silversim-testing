@@ -83,7 +83,9 @@ namespace SilverSim.WebIF.Admin
             MissingMethod = 9,
             InvalidSession = 10,
             InvalidUserAndOrPassword = 11,
-            UnknownMethod = 12
+            UnknownMethod = 12,
+            AlreadyStarted = 13,
+            FailedToStart = 14
         };
 
         public static void ErrorResponse(HttpRequest req, ErrorResult reason)

@@ -1,16 +1,28 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
+using System.Collections.Generic;
 
 namespace SilverSim.WebIF.Admin.Simulator
 {
     public static class ExtensionMethods
     {
+        public static AdminWebIF GetAdminWebIF(this ConfigurationLoader loader)
+        {
+            List<AdminWebIF> webIF = loader.GetServicesByValue<AdminWebIF>();
+            if (webIF.Count == 0)
+            {
+                throw new ConfigurationLoader.ConfigurationErrorException("No Admin WebIF service configured");
+            }
+            return webIF[0];
+        }
+
         public static Map ToJsonMap(this EstateInfo estate)
         {
             Map m = new Map();

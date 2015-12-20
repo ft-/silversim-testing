@@ -25,12 +25,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         public void Startup(ConfigurationLoader loader)
         {
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
-            List<AdminWebIF> webIF = loader.GetServicesByValue<AdminWebIF>();
-            if (webIF.Count == 0)
-            {
-                throw new ConfigurationLoader.ConfigurationErrorException("No Admin WebIF service configured");
-            }
-            AdminWebIF webif = webIF[0];
+            AdminWebIF webif = loader.GetAdminWebIF();
             webif.JsonMethods.Add("estates.list", HandleList);
             webif.JsonMethods.Add("estate.get", HandleGet);
             webif.JsonMethods.Add("estate.update", HandleUpdate);
