@@ -43,6 +43,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.enable", HandleEnable);
             webif.JsonMethods.Add("region.disable", HandleDisable);
             webif.JsonMethods.Add("region.notice", HandleNotice);
+            webif.JsonMethods.Add("regions.notice", HandleNotices);
         }
 
         [AdminWebIF.RequiredRight("regions.view")]
@@ -135,6 +136,26 @@ namespace SilverSim.WebIF.Admin.Simulator
                 foreach(IAgent agent in scene.RootAgents)
                 {
                     agent.SendRegionNotice(scene.Owner, jsondata["message"].ToString(), scene.ID);
+                }
+                AdminWebIF.SuccessResponse(req, new Map());
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.control")]
+        void HandleNotices(HttpRequest req, Map jsondata)
+        {
+            if (!jsondata.ContainsKey("message"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else
+            {
+                foreach (SceneInterface scene in SceneManager.Scenes.Values)
+                {
+                    foreach (IAgent agent in scene.RootAgents)
+                    {
+                        agent.SendRegionNotice(scene.Owner, jsondata["message"].ToString(), scene.ID);
+                    }
                 }
                 AdminWebIF.SuccessResponse(req, new Map());
             }
