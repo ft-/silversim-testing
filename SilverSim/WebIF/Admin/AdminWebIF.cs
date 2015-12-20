@@ -383,7 +383,9 @@ namespace SilverSim.WebIF.Admin
                         {
                             byte[] buf = new byte[10240];
                             int blocklen;
-                            while (0 != (blocklen = file.Read(buf, 0, 10240)))
+                            for (blocklen = file.Read(buf, 0, 10240); 
+                                0 != blocklen; 
+                                blocklen = file.Read(buf, 0, 10240))
                             {
                                 o.Write(buf, 0, blocklen);
                             }
