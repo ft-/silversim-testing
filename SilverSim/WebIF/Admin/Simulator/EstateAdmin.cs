@@ -30,7 +30,12 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 throw new ConfigurationLoader.ConfigurationErrorException("No Admin WebIF service configured");
             }
-            webIF[0].JsonMethods.Add("estates.list", HandleList);
+            AdminWebIF webif = webIF[0];
+            webif.JsonMethods.Add("estates.list", HandleList);
+            webif.JsonMethods.Add("estate.get", HandleGet);
+            webif.JsonMethods.Add("estate.update", HandleUpdate);
+            webif.JsonMethods.Add("estate.delete", HandleDelete);
+            webif.JsonMethods.Add("estate.create", HandleCreate);
         }
 
         [AdminWebIF.RequiredRight("estates.view")]
@@ -49,7 +54,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         }
 
         [AdminWebIF.RequiredRight("estates.view")]
-        void HandleGet(HttpRequest req, Map jsondata, List<string> rights)
+        void HandleGet(HttpRequest req, Map jsondata)
         {
             EstateInfo estateInfo;
             if (jsondata.ContainsKey("name") && m_EstateService.TryGetValue(jsondata["name"].ToString(), out estateInfo))
@@ -69,6 +74,75 @@ namespace SilverSim.WebIF.Admin.Simulator
             Map res = new Map();
             res.Add("estate", estateInfo.ToJsonMap());
             AdminWebIF.SuccessResponse(req, res);
+        }
+
+        [AdminWebIF.RequiredRight("estates.manage")]
+        void HandleUpdate(HttpRequest req, Map jsondata)
+        {
+            EstateInfo estateInfo;
+            if (jsondata.ContainsKey("id") && m_EstateService.TryGetValue(jsondata["id"].AsUInt, out estateInfo))
+            {
+                /* found estate via id */
+            }
+            else
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                return;
+            }
+
+            try
+            {
+                if (jsondata.ContainsKey("name"))
+                {
+                    estateInfo.Name = jsondata["name"].ToString();
+                }
+
+                if (jsondata.ContainsKey("flags"))
+                {
+                    estateInfo.Flags = (RegionOptionFlags)jsondata["flags"].AsUInt;
+                }
+
+                if (jsondata.ContainsKey("owner"))
+                {
+                    estateInfo.Owner = new UUI(jsondata["owner"].ToString());
+                }
+
+                if (jsondata.ContainsKey("pricepermeter"))
+                {
+                    estateInfo.PricePerMeter = jsondata["pricepermeter"].AsInt;
+                }
+
+                if (jsondata.ContainsKey("billablefactor"))
+                {
+                    estateInfo.BillableFactor = jsondata["billablefactor"].AsReal;
+                }
+
+                if (jsondata.ContainsKey("abuseemail"))
+                {
+                    estateInfo.AbuseEmail = jsondata["abuseemail"].ToString();
+                }
+
+                if (jsondata.ContainsKey("parentestateid"))
+                {
+                    estateInfo.ParentEstateID = jsondata["parentestateid"].AsUInt;
+                }
+
+            }
+            catch
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                return;
+            }
+
+            try
+            {
+                m_EstateService[estateInfo.ID] = estateInfo;
+            }
+            catch
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+            }
+
         }
 
         [AdminWebIF.RequiredRight("estates.manage")]
