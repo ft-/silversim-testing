@@ -80,6 +80,7 @@ namespace SilverSim.Scene.Types.Object
         private Date m_CreationDate = new Date();
         private PrimitiveFlags m_PrimitiveFlags;
         private Map m_DynAttrMap = new Map();
+        public bool IsScripted { get; private set; }
 
         public Map DynAttrs
         {
@@ -214,6 +215,7 @@ namespace SilverSim.Scene.Types.Object
                 int invSerial = Inventory.InventorySerial;
                 m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial] = (byte)(invSerial % 256);
                 m_PropUpdateFixedBlock[(int)PropertiesFixedBlockOffset.InventorySerial + 1] = (byte)(invSerial / 256);
+                IsScripted = Inventory.CountScripts != 0;
             }
             TriggerOnUpdate(UpdateChangedFlags.Inventory);
         }
