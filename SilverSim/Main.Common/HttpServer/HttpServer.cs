@@ -128,6 +128,10 @@ namespace SilverSim.Main.Common.HttpServer
                     {
                         return;
                     }
+                    catch(TimeoutException)
+                    {
+                        return;
+                    }
                     catch(IOException)
                     {
                         return;
