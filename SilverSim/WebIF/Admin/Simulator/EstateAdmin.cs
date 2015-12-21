@@ -214,21 +214,33 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else
             {
-                List<UUID> regionIds = m_EstateService.RegionMap[jsondata["id"].AsUInt];
+                uint estateID = jsondata["id"].AsUInt;
+                List<UUID> regionIds = m_EstateService.RegionMap[estateID];
 
                 if(regionIds.Count == 0)
                 {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                    if (m_EstateService.ContainsKey(estateID))
+                    {
+                        Map m = new Map();
+                        m.Add("noticed_regions", 0);
+                        AdminWebIF.SuccessResponse(req, m);
+                    }
+                    else
+                    {
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                    }
                 }
                 else
                 {
                     string message = jsondata["message"].ToString();
+                    int regions = 0;
 
                     foreach(UUID regionId in regionIds)
                     {
                         SceneInterface si;
                         if(SceneManager.Scenes.TryGetValue(regionId, out si))
                         {
+                            ++regions;
                             UUI regionOwner = si.RegionData.Owner;
                             foreach(IAgent agent in si.RootAgents)
                             {
@@ -236,7 +248,9 @@ namespace SilverSim.WebIF.Admin.Simulator
                             }
                         }
                     }
-                    AdminWebIF.SuccessResponse(req, new Map());
+                    Map m = new Map();
+                    m.Add("noticed_regions", regions);
+                    AdminWebIF.SuccessResponse(req, m);
                 }
             }
         }
