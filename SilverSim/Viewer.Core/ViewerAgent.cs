@@ -1010,11 +1010,11 @@ namespace SilverSim.Viewer.Core
 
         }
 
-        public bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        public bool TeleportTo(SceneInterface sceneInterface, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             foreach(IAgentTeleportServiceInterface service in m_TeleportServices)
             {
-                if(service.TeleportTo(sceneInterface, agent, regionName, position, lookAt, TeleportFlags))
+                if(service.TeleportTo(sceneInterface, this, regionName, position, lookAt, TeleportFlags))
                 {
                     return true;
                 }
@@ -1022,11 +1022,11 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
-        public bool TeleportTo(SceneInterface sceneInterface, IAgent agent, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        public bool TeleportTo(SceneInterface sceneInterface, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
             {
-                if (service.TeleportTo(sceneInterface, agent, location, position, lookAt, TeleportFlags))
+                if (service.TeleportTo(sceneInterface, this, location, position, lookAt, TeleportFlags))
                 {
                     return true;
                 }
@@ -1034,11 +1034,11 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
-        public bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        public bool TeleportTo(SceneInterface sceneInterface, string gatekeeperURI, GridVector location, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
             {
-                if (service.TeleportTo(sceneInterface, agent, gatekeeperURI, location, position, lookAt, TeleportFlags))
+                if (service.TeleportTo(sceneInterface, this, gatekeeperURI, location, position, lookAt, TeleportFlags))
                 {
                     return true;
                 }
@@ -1046,11 +1046,11 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
-        public bool TeleportTo(SceneInterface sceneInterface, IAgent agent, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        public bool TeleportTo(SceneInterface sceneInterface, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
             {
-                if (service.TeleportTo(sceneInterface, agent, regionID, position, lookAt, TeleportFlags))
+                if (service.TeleportTo(sceneInterface, this, regionID, position, lookAt, TeleportFlags))
                 {
                     return true;
                 }
@@ -1058,11 +1058,11 @@ namespace SilverSim.Viewer.Core
             return false;
         }
 
-        public bool TeleportTo(SceneInterface sceneInterface, IAgent agent, string gatekeeperURI, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
+        public bool TeleportTo(SceneInterface sceneInterface, string gatekeeperURI, UUID regionID, Vector3 position, Vector3 lookAt, TeleportFlags flags)
         {
             foreach (IAgentTeleportServiceInterface service in m_TeleportServices)
             {
-                if (service.TeleportTo(sceneInterface, agent, gatekeeperURI, regionID, position, lookAt, TeleportFlags))
+                if (service.TeleportTo(sceneInterface, this, gatekeeperURI, regionID, position, lookAt, TeleportFlags))
                 {
                     return true;
                 }
@@ -1071,11 +1071,11 @@ namespace SilverSim.Viewer.Core
         }
 
         /* following function returns true if it accepts a teleport request or if it wants to distribute more specific error message except home location not available */
-        public bool TeleportHome(SceneInterface sceneInterface, IAgent agent)
+        public bool TeleportHome(SceneInterface sceneInterface)
         {
             foreach(IAgentTeleportServiceInterface service in m_TeleportServices)
             {
-                if(service.TeleportHome(sceneInterface, agent))
+                if(service.TeleportHome(sceneInterface, this))
                 {
                     return true;
                 }

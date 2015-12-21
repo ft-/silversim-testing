@@ -614,7 +614,7 @@ namespace SilverSim.Viewer.Core
 
             IAgent targetagent;
             if(scene.RootAgents.TryGetValue(prey, out targetagent) &&
-                !targetagent.TeleportHome(scene, targetagent))
+                !targetagent.TeleportHome(scene))
             {
                 targetagent.KickUser("You were teleported home by the region owner. Because of failing TP, you have been logged out.");
             }
@@ -633,7 +633,7 @@ namespace SilverSim.Viewer.Core
                 {
                     /* do not do self-kick */
                 }
-                else if (!targetagent.TeleportHome(scene, targetagent))
+                else if (!targetagent.TeleportHome(scene))
                 {
                     targetagent.KickUser("You were teleported home by the region owner. Because of failing TP, you have been logged out.");
                 }

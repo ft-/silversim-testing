@@ -44,6 +44,8 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.disable", HandleDisable);
             webif.JsonMethods.Add("region.notice", HandleNotice);
             webif.JsonMethods.Add("regions.notice", HandleNotices);
+            webif.JsonMethods.Add("region.agents.view", HandleAgentsView);
+            webif.JsonMethods.Add("region.agents.kick", HandleAgentKick);
         }
 
         [AdminWebIF.RequiredRight("regions.view")]
@@ -61,6 +63,98 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             res.Add("regions", regionsRes);
             AdminWebIF.SuccessResponse(req, res);
+        }
+
+        [AdminWebIF.RequiredRight("regions.agents.teleporthome")]
+        void HandleAgentTeleportHome(HttpRequest req, Map jsondata)
+        {
+            SceneInterface si;
+            IAgent agent;
+            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("agentid"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotRunning);
+            }
+            else if (si.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
+            {
+                string msg = "You have been kicked.";
+                if (jsondata.ContainsKey("message"))
+                {
+                    msg = jsondata["message"].ToString();
+                }
+                agent.TeleportHome(si);
+                AdminWebIF.SuccessResponse(req, new Map());
+            }
+            else
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.agents.kick")]
+        void HandleAgentKick(HttpRequest req, Map jsondata)
+        {
+            SceneInterface si;
+            IAgent agent;
+            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("agentid"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotRunning);
+            }
+            else if(si.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
+            {
+                string msg = "You have been kicked.";
+                if(jsondata.ContainsKey("message"))
+                {
+                    msg = jsondata["message"].ToString();
+                }
+                agent.KickUser(msg);
+                AdminWebIF.SuccessResponse(req, new Map());
+            }
+            else
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.agents.view")]
+        void HandleAgentsView(HttpRequest req, Map jsondata)
+        {
+            SceneInterface si;
+            if (!jsondata.ContainsKey("id"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotRunning);
+            }
+            else
+            {
+                bool rootOnly = jsondata.ContainsKey("root_only");
+                bool userOnly = jsondata.ContainsKey("no_npc");
+                Map res = new Map();
+                AnArray agents = new AnArray();
+                foreach(IAgent agent in si.Agents)
+                {
+                    if(userOnly && agent.IsNpc)
+                    {
+                        continue;
+                    }
+                    if(rootOnly && !agent.IsInScene(si))
+                    {
+                        continue;
+                    }
+                    agents.Add(agent.ToJsonMap(si));
+                }
+                res.Add("agents", agents);
+            }
         }
 
         [AdminWebIF.RequiredRight("regions.control")]
