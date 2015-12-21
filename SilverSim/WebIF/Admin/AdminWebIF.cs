@@ -226,7 +226,7 @@ namespace SilverSim.WebIF.Admin
         #region Core Json API handler (login, challenge, logout + method lookup)
         public void HandleUnsecureHttp(HttpRequest req)
         {
-            if(null == m_HttpsServer || m_ServerParams.GetBoolean(UUID.Zero, "WebIF.Admin.EnableHTTP", true))
+            if(null == m_HttpsServer || m_ServerParams.GetBoolean(UUID.Zero, "WebIF.Admin.EnableHTTP", m_HttpsServer == null))
             {
                 HandleHttp(req);
             }
