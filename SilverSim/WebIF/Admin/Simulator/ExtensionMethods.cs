@@ -67,6 +67,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             m.Add("Type", agent.IsNpc ? "Npc" : "User");
             m.Add("IsRoot", agent.IsInScene(scene));
             m.Add("Position", agent.GlobalPosition.ToString());
+            m.Add("Health", agent.Health);
             return m;
         }
     }
