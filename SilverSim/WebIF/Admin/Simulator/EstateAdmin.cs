@@ -34,6 +34,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("estate.update", HandleUpdate);
             webif.JsonMethods.Add("estate.delete", HandleDelete);
             webif.JsonMethods.Add("estate.create", HandleCreate);
+            webif.JsonMethods.Add("estate.notice", HandleNotice);
         }
 
         [AdminWebIF.RequiredRight("estates.view")]
