@@ -112,6 +112,8 @@ namespace SilverSim.WebIF.Admin
         {
             m_BasePath = basepath;
             m_Timer.Elapsed += HandleTimer;
+            JsonMethods.Add("webif.admin.user.grantright", GrantRight);
+            JsonMethods.Add("webif.admin.user.revokeright", RevokeRight);
         }
 
         public ShutdownOrder ShutdownOrder
@@ -143,6 +145,7 @@ namespace SilverSim.WebIF.Admin
 
         const string AdminUserReference = "WebIF.Admin.User.admin.";
 
+        #region Initialization
         public void Startup(ConfigurationLoader loader)
         {
             m_ServerParams = loader.GetServerParamStorage();
@@ -193,7 +196,9 @@ namespace SilverSim.WebIF.Admin
             m_Timer.Elapsed -= HandleTimer;
             m_Timer.Dispose();
         }
+        #endregion
 
+        #region User Logic
         void FindUser(SessionInfo sessionInfo, UUID challenge)
         {
             string userRef = "WebIF.Admin.User." + sessionInfo.UserName + ".";
@@ -212,9 +217,11 @@ namespace SilverSim.WebIF.Admin
                 }
             }
         }
+        #endregion
 
         static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
+        #region Core Json API handler (login, challenge, logout + method lookup)
         public void HandleUnsecureHttp(HttpRequest req)
         {
             if(null == m_HttpsServer || m_ServerParams.GetBoolean(UUID.Zero, "WebIF.Admin.EnableHTTP", true))
@@ -417,7 +424,9 @@ namespace SilverSim.WebIF.Admin
                 ServeFile(req, m_BasePath + uri);
             }
         }
+        #endregion
 
+        #region HTTP File Serving
         void ServeFile(HttpRequest req, string filepath)
         {
             try
@@ -477,6 +486,103 @@ namespace SilverSim.WebIF.Admin
                 }
             }
         }
+        #endregion
+
+        #region Commands
+        public void AdminWebIFCmd(List<string> args, Main.Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            if(limitedToScene != UUID.Zero)
+            {
+                io.Write("webif command is not allowed on restricted console");
+                return;
+            }
+        }
+        #endregion
+
+        #region WebIF admin functions
+        [RequiredRight("webif.users.manage")]
+        public void GrantRight(HttpRequest req, Map jsondata)
+        {
+            if (!jsondata.ContainsKey("user") || !jsondata.ContainsKey("right"))
+            {
+                ErrorResponse(req, ErrorResult.InvalidRequest);
+            }
+            else
+            {
+                string userRef = "WebIF.Admin.User." + jsondata["user"].ToString() + ".";
+                string pass_sha1;
+                string rights;
+
+                if (m_ServerParams.TryGetValue(UUID.Zero, userRef + "PassCode", out pass_sha1) &&
+                    m_ServerParams.TryGetValue(UUID.Zero, userRef + "Rights", out rights))
+                {
+                    string[] rightlist = rights.ToLower().Split(',');
+                    List<string> rightlistnew = new List<string>();
+                    AnArray resdata = new AnArray();
+                    foreach(string r in rightlist)
+                    {
+                        rightlistnew.Add(r.Trim());
+                        resdata.Add(r.Trim());
+                    }
+                    if(!rightlistnew.Contains(jsondata["right"].ToString().ToLower()))
+                    {
+                        rightlistnew.Add(jsondata["right"].ToString().ToLower());
+                        resdata.Add(jsondata["right"].ToString().ToLower());
+                    }
+                    m_ServerParams[UUID.Zero, userRef + "Rights"] = string.Join(",", rightlistnew);
+                    Map m = new Map();
+                    m["user"] = jsondata["user"];
+                    m["rights"] = resdata;
+                    SuccessResponse(req, m);
+                }
+                else
+                {
+                    ErrorResponse(req, ErrorResult.NotFound);
+                }
+            }
+        }
+
+        [RequiredRight("webif.users.manage")]
+        public void RevokeRight(HttpRequest req, Map jsondata)
+        {
+            if (!jsondata.ContainsKey("user") || !jsondata.ContainsKey("right"))
+            {
+                ErrorResponse(req, ErrorResult.InvalidRequest);
+            }
+            else
+            {
+                string userRef = "WebIF.Admin.User." + jsondata["user"].ToString() + ".";
+                string pass_sha1;
+                string rights;
+
+                if (m_ServerParams.TryGetValue(UUID.Zero, userRef + "PassCode", out pass_sha1) &&
+                    m_ServerParams.TryGetValue(UUID.Zero, userRef + "Rights", out rights))
+                {
+                    string[] rightlist = rights.ToLower().Split(',');
+                    List<string> rightlistnew = new List<string>();
+                    AnArray resdata = new AnArray();
+                    foreach (string r in rightlist)
+                    {
+                        string trimmed = r.Trim();
+                        if (trimmed != jsondata["right"].ToString())
+                        {
+                            rightlistnew.Add(r.Trim());
+                            resdata.Add(r.Trim());
+                        }
+                    }
+                    m_ServerParams[UUID.Zero, userRef + "Rights"] = string.Join(",", rightlistnew);
+                    Map m = new Map();
+                    m["user"] = jsondata["user"];
+                    m["rights"] = resdata;
+                    SuccessResponse(req, m);
+                }
+                else
+                {
+                    ErrorResponse(req, ErrorResult.NotFound);
+                }
+            }
+        }
+        #endregion
     }
     #endregion
 
