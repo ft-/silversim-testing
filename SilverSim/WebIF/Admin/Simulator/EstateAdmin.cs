@@ -229,9 +229,10 @@ namespace SilverSim.WebIF.Admin.Simulator
                         SceneInterface si;
                         if(SceneManager.Scenes.TryGetValue(regionId, out si))
                         {
+                            UUI regionOwner = si.RegionData.Owner;
                             foreach(IAgent agent in si.RootAgents)
                             {
-                                agent.SendRegionNotice(si.RegionData.Owner, message, regionId);
+                                agent.SendRegionNotice(regionOwner, message, regionId);
                             }
                         }
                     }
