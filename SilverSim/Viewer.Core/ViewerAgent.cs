@@ -1007,7 +1007,7 @@ namespace SilverSim.Viewer.Core
 
         public void KickUser(string msg)
         {
-
+#warning Implement KickUser
         }
 
         public bool TeleportTo(SceneInterface sceneInterface, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)
