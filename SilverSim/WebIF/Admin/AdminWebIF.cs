@@ -4,6 +4,7 @@
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
@@ -114,6 +115,7 @@ namespace SilverSim.WebIF.Admin
             m_Timer.Elapsed += HandleTimer;
             JsonMethods.Add("webif.admin.user.grantright", GrantRight);
             JsonMethods.Add("webif.admin.user.revokeright", RevokeRight);
+            JsonMethods.Add("webif.admin.user.delete", DeleteUser);
         }
 
         public ShutdownOrder ShutdownOrder
@@ -164,7 +166,7 @@ namespace SilverSim.WebIF.Admin
             {
                 m_HttpsServer.StartsWithUriHandlers.Add("/admin", HandleHttp);
             }
-
+            CommandRegistry.Commands.Add("admin-webif", AdminWebIFCmd);
         }
 
         public void PostLoad()
@@ -489,19 +491,68 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region Commands
+        void DisplayAdminWebIFHelp(Main.Common.CmdIO.TTY io)
+        {
+            io.Write("admin-webif show users\n" +
+                "admin-webif delete user <user>\n" +
+                "admin-webif grant <user> <right>\n" +
+                "admin-webif revoke <user> <right>\n");
+        }
+
         public void AdminWebIFCmd(List<string> args, Main.Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if(limitedToScene != UUID.Zero)
             {
-                io.Write("webif command is not allowed on restricted console");
+                io.Write("admin-webif command is not allowed on restricted console");
                 return;
+            }
+            else if(args[0] == "help" || args.Count < 2)
+            {
+                DisplayAdminWebIFHelp(io);
+            }
+            else
+            {
+                switch(args[1])
+                {
+                    case "show":
+                        if(args.Count < 3)
+                        {
+                            DisplayAdminWebIFHelp(io);
+                        }
+                        else
+                        {
+                            switch(args[2])
+                            {
+                                case "users":
+                                    break;
+
+                                default:
+                                    DisplayAdminWebIFHelp(io);
+                                    break;
+                            }
+                        }
+                        break;
+
+                    case "delete":
+                        break;
+
+                    case "grant":
+                        break;
+
+                    case "revoke":
+                        break;
+
+                    default:
+                        io.Write("Unknown admin-webif operation " + args[1]);
+                        break;
+                }
             }
         }
         #endregion
 
         #region WebIF admin functions
-        [RequiredRight("webif.users.manage")]
-        public void GrantRight(HttpRequest req, Map jsondata)
+        [RequiredRight("webif.admin.users.manage")]
+        void GrantRight(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("user") || !jsondata.ContainsKey("right"))
             {
@@ -542,8 +593,8 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        [RequiredRight("webif.users.manage")]
-        public void RevokeRight(HttpRequest req, Map jsondata)
+        [RequiredRight("webif.admin.users.manage")]
+        void RevokeRight(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("user") || !jsondata.ContainsKey("right"))
             {
@@ -575,6 +626,29 @@ namespace SilverSim.WebIF.Admin
                     m["user"] = jsondata["user"];
                     m["rights"] = resdata;
                     SuccessResponse(req, m);
+                }
+                else
+                {
+                    ErrorResponse(req, ErrorResult.NotFound);
+                }
+            }
+        }
+
+        [RequiredRight("webif.admin.users.manage")]
+        void DeleteUser(HttpRequest req, Map jsondata)
+        {
+            if (!jsondata.ContainsKey("user"))
+            {
+                ErrorResponse(req, ErrorResult.InvalidRequest);
+            }
+            else
+            {
+                string userRef = "WebIF.Admin.User." + jsondata["user"].ToString().ToLower() + ".";
+
+                m_ServerParams.Remove(UUID.Zero, userRef + "Rights");
+                if (m_ServerParams.Remove(UUID.Zero, userRef + "PassCode"))
+                {
+                    SuccessResponse(req, new Map());
                 }
                 else
                 {
