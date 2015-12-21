@@ -4,6 +4,9 @@
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.Management.Scene;
+using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
@@ -198,6 +201,41 @@ namespace SilverSim.WebIF.Admin.Simulator
             catch
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+            }
+        }
+
+        [AdminWebIF.RequiredRight("estate.notice")]
+        void HandleNotice(HttpRequest req, Map jsondata)
+        {
+            if(!jsondata.ContainsKey("id") || !jsondata.ContainsKey("message"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else
+            {
+                List<UUID> regionIds = m_EstateService.RegionMap[jsondata["id"].AsUInt];
+
+                if(regionIds.Count == 0)
+                {
+                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                }
+                else
+                {
+                    string message = jsondata["message"].ToString();
+
+                    foreach(UUID regionId in regionIds)
+                    {
+                        SceneInterface si;
+                        if(SceneManager.Scenes.TryGetValue(regionId, out si))
+                        {
+                            foreach(IAgent agent in si.RootAgents)
+                            {
+                                agent.SendRegionNotice(si.RegionData.Owner, message, regionId);
+                            }
+                        }
+                    }
+                    AdminWebIF.SuccessResponse(req, new Map());
+                }
             }
         }
     }
