@@ -58,6 +58,8 @@ namespace SilverSim.Scene.Types.Script
             }
         }
 
+        public abstract bool IsLinkMessageReceiver { get; }
+
         public abstract void RevokePermissions(UUID permissionsKey, ScriptPermissions permissions);
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
