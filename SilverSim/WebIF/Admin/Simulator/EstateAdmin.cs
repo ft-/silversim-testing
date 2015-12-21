@@ -222,7 +222,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                     if (m_EstateService.ContainsKey(estateID))
                     {
                         Map m = new Map();
-                        m.Add("noticed_regions", 0);
+                        m.Add("noticed_regions", new AnArray());
                         AdminWebIF.SuccessResponse(req, m);
                     }
                     else
@@ -233,14 +233,14 @@ namespace SilverSim.WebIF.Admin.Simulator
                 else
                 {
                     string message = jsondata["message"].ToString();
-                    int regions = 0;
+                    AnArray regions = new AnArray();
 
                     foreach(UUID regionId in regionIds)
                     {
                         SceneInterface si;
                         if(SceneManager.Scenes.TryGetValue(regionId, out si))
                         {
-                            ++regions;
+                            regions.Add(regionId);
                             UUI regionOwner = si.RegionData.Owner;
                             foreach(IAgent agent in si.RootAgents)
                             {
