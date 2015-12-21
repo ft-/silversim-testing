@@ -292,7 +292,7 @@ namespace SilverSim.WebIF.Admin
 
             SessionInfo sessionInfo = new SessionInfo();
             m_Sessions.Add(req.CallerIP + "+" + sessionID.ToString(), sessionInfo);
-            sessionInfo.UserName = jsonreq["user"].ToString();
+            sessionInfo.UserName = jsonreq["user"].ToString().ToLower();
             FindUser(sessionInfo, challenge);
 
             using (HttpResponse res = req.BeginResponse(JsonContentType))
@@ -509,7 +509,7 @@ namespace SilverSim.WebIF.Admin
             }
             else
             {
-                string userRef = "WebIF.Admin.User." + jsondata["user"].ToString() + ".";
+                string userRef = "WebIF.Admin.User." + jsondata["user"].ToString().ToLower() + ".";
                 string pass_sha1;
                 string rights;
 
@@ -551,7 +551,7 @@ namespace SilverSim.WebIF.Admin
             }
             else
             {
-                string userRef = "WebIF.Admin.User." + jsondata["user"].ToString() + ".";
+                string userRef = "WebIF.Admin.User." + jsondata["user"].ToString().ToLower() + ".";
                 string pass_sha1;
                 string rights;
 
