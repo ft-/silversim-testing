@@ -213,7 +213,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.control")]
+        [AdminWebIF.RequiredRight("regions.notice")]
         void HandleNotice(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
@@ -235,7 +235,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
         }
 
-        [AdminWebIF.RequiredRight("regions.control")]
+        [AdminWebIF.RequiredRight("regions.notice")]
         void HandleNotices(HttpRequest req, Map jsondata)
         {
             if (!jsondata.ContainsKey("message"))
