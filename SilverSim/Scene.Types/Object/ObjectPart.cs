@@ -1300,7 +1300,131 @@ namespace SilverSim.Scene.Types.Object
         #region Object Details Methods
         public void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList)
         {
-            ObjectGroup.GetObjectDetails(enumerator, paramList);
+            while (enumerator.MoveNext())
+            {
+                switch (ParamsHelper.GetObjectDetailsType(enumerator))
+                {
+                    case ObjectDetailsType.Name:
+                        paramList.Add(Name);
+                        break;
+
+                    case ObjectDetailsType.Desc:
+                        paramList.Add(Description);
+                        break;
+
+                    case ObjectDetailsType.Pos:
+                        paramList.Add(Position);
+                        break;
+
+                    case ObjectDetailsType.Rot:
+                        paramList.Add(Rotation);
+                        break;
+
+                    case ObjectDetailsType.Velocity:
+                        paramList.Add(Velocity);
+                        break;
+
+                    case ObjectDetailsType.Owner:
+                        paramList.Add(Owner.ID);
+                        break;
+
+                    case ObjectDetailsType.Group:
+                        paramList.Add(Group.ID);
+                        break;
+
+                    case ObjectDetailsType.Creator:
+                        paramList.Add(Creator.ID);
+                        break;
+
+                    case ObjectDetailsType.RunningScriptCount:
+                        paramList.Add(Inventory.CountRunningScripts);
+                        break;
+
+                    case ObjectDetailsType.TotalScriptCount:
+                        paramList.Add(Inventory.CountScripts);
+                        break;
+
+                    case ObjectDetailsType.ScriptMemory:
+                        paramList.Add(0);
+                        break;
+
+                    case ObjectDetailsType.ScriptTime:
+                        paramList.Add(0f);
+                        break;
+
+                    case ObjectDetailsType.PrimEquivalence:
+                        paramList.Add(ObjectGroup.Count);
+                        break;
+
+                    case ObjectDetailsType.ServerCost:
+                        paramList.Add(0f);
+                        break;
+
+                    case ObjectDetailsType.StreamingCost:
+                        paramList.Add(0f);
+                        break;
+
+                    case ObjectDetailsType.PhysicsCost:
+                        paramList.Add(0f);
+                        break;
+
+                    case ObjectDetailsType.CharacterTime:
+                        paramList.Add(0);
+                        break;
+
+                    case ObjectDetailsType.Root:
+                        paramList.Add(ObjectGroup.ID);
+                        break;
+
+                    case ObjectDetailsType.AttachedPoint:
+                        paramList.Add((int)ObjectGroup.AttachPoint);
+                        break;
+
+                    case ObjectDetailsType.PathfindingType:
+                        paramList.Add(0);
+                        break;
+
+                    case ObjectDetailsType.Physics:
+                        paramList.Add(ObjectGroup.IsPhysics);
+                        break;
+
+                    case ObjectDetailsType.Phantom:
+                        paramList.Add(ObjectGroup.IsPhantom);
+                        break;
+
+                    case ObjectDetailsType.TempOnRez:
+                        paramList.Add(ObjectGroup.IsTempOnRez);
+                        break;
+
+                    case ObjectDetailsType.RenderWeight:
+                        paramList.Add(0);
+                        break;
+
+                    case ObjectDetailsType.HoverHeight:
+                        paramList.Add(0);
+                        break;
+
+                    case ObjectDetailsType.BodyShapeType:
+                        paramList.Add(-1f);
+                        break;
+
+                    case ObjectDetailsType.LastOwner:
+                        paramList.Add(ObjectGroup.LastOwner.ID);
+                        break;
+
+                    case ObjectDetailsType.ClickAction:
+                        paramList.Add((int)ClickAction);
+                        break;
+
+                    case ObjectDetailsType.Omega:
+                        paramList.Add(AngularVelocity);
+                        break;
+
+                    default:
+                        paramList.Add(-1);
+                        break;
+                }
+            }
         }
         #endregion
 
