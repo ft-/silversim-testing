@@ -298,7 +298,6 @@ namespace SilverSim.Types
 
         public float UnpackFixed(bool signed, int intBits, int fracBits)
         {
-            int minVal;
             int maxVal;
             int unsignedBits = intBits + fracBits;
             int totalBits = unsignedBits;
@@ -307,9 +306,6 @@ namespace SilverSim.Types
             if (signed)
             {
                 totalBits++;
-
-                minVal = 1 << intBits;
-                minVal *= -1;
             }
             maxVal = 1 << intBits;
 
