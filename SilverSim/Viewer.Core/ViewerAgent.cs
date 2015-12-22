@@ -807,7 +807,8 @@ namespace SilverSim.Viewer.Core
                         break;
 
                     default:
-                        throw new ArgumentException("Unknown Object Details Type");
+                        paramList.Add(-1);
+                        break;
                 }
             }
         }
