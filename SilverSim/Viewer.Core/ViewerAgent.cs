@@ -1351,6 +1351,7 @@ namespace SilverSim.Viewer.Core
                     m_IsActiveGod = false;
                 }
                 SceneID = circuit.Scene.ID;
+                circuit.Scene.TriggerAgentChangedScene(this);
 
                 Messages.Circuit.AgentMovementComplete amc = new Messages.Circuit.AgentMovementComplete();
                 amc.AgentID = cam.AgentID;

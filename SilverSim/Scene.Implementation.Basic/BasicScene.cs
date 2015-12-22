@@ -686,9 +686,21 @@ namespace SilverSim.Scene.Implementation.Basic
                     m_Objects.Add(obj.ID, obj);
                     if (obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
                     {
-                        m_Agents.Add(obj.ID, (IAgent)obj);
+                        IAgent agent = (IAgent)obj;
+                        m_Agents.Add(obj.ID, agent);
                         Interlocked.Increment(ref m_AgentCount);
                         PhysicsScene.Add(obj);
+                        foreach (IAgentListener aglistener in AgentListeners)
+                        {
+                            try
+                            {
+                                aglistener.AddedAgent(agent);
+                            }
+                            catch(Exception e)
+                            {
+                                m_Log.DebugFormat("Exception {0}\n{1}", e.Message, e.StackTrace);
+                            }
+                        }
                     }
                 }
                 catch
@@ -763,6 +775,17 @@ namespace SilverSim.Scene.Implementation.Basic
             else if(obj.GetType().GetInterfaces().Contains(typeof(IAgent)))
             {
                 IAgent agent = (IAgent)obj;
+                foreach (IAgentListener aglistener in AgentListeners)
+                {
+                    try
+                    {
+                        aglistener.RemovedAgent(agent);
+                    }
+                    catch (Exception e)
+                    {
+                        m_Log.DebugFormat("Exception {0}\n{1}", e.Message, e.StackTrace);
+                    }
+                }
                 List<ObjectGroup> grps = agent.Attachments.RemoveAll();
                 foreach(ObjectGroup grp in grps)
                 {

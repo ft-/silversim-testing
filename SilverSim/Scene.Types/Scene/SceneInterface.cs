@@ -115,6 +115,7 @@ namespace SilverSim.Scene.Types.Scene
         public AvatarNameServiceInterface AvatarNameService { get; private set; }
         public readonly RwLockedList<AvatarNameServiceInterface> AvatarNameServices = new RwLockedList<AvatarNameServiceInterface>();
         public readonly RwLockedList<ISceneListener> SceneListeners = new RwLockedList<ISceneListener>();
+        public readonly RwLockedList<IAgentListener> AgentListeners = new RwLockedList<IAgentListener>();
         public GridServiceInterface GridService { get; protected set; }
         public EconomyServiceInterface EconomyService { get; protected set; }
         public EstateServiceInterface EstateService { get; protected set; }
@@ -321,6 +322,21 @@ namespace SilverSim.Scene.Types.Scene
         public abstract void Add(IObject obj);
         public abstract bool Remove(IObject obj, Script.ScriptInstance instance = null);
         public abstract void ClearObjects();
+
+        public void TriggerAgentChangedScene(IAgent agent)
+        {
+            foreach(IAgentListener aglistener in AgentListeners)
+            {
+                try
+                {
+                    aglistener.AgentChangedScene(agent);
+                }
+                catch(Exception e)
+                {
+                    m_Log.DebugFormat("TriggerAgentChangedScene: {0}\n{1}", e.Message, e.StackTrace);
+                }
+            }
+        }
 
         public abstract IUDPCircuitsManager UDPServer { get; }
 
