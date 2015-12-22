@@ -86,12 +86,15 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else if (si.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
             {
-                string msg = "You have been kicked.";
+                string msg = "You have been kicked since you could not be teleported home.";
                 if (jsondata.ContainsKey("message"))
                 {
                     msg = jsondata["message"].ToString();
                 }
-                agent.TeleportHome(si);
+                if(!agent.TeleportHome(si))
+                {
+                    agent.KickUser(msg);
+                }
                 AdminWebIF.SuccessResponse(req, new Map());
             }
             else
