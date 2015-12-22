@@ -799,7 +799,7 @@ namespace SilverSim.Viewer.Core
                         break;
 
                     case ObjectDetailsType.ClickAction:
-                        paramList.Add((int)0);
+                        paramList.Add(0);
                         break;
 
                     case ObjectDetailsType.Omega:
