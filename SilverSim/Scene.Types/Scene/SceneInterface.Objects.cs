@@ -9,6 +9,7 @@ using SilverSim.Types;
 using System;
 using MultipleObjectUpdate = SilverSim.Viewer.Messages.Object.MultipleObjectUpdate;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Types.Inventory;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -18,21 +19,28 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRequestPayPrice(Message m)
         {
-            SilverSim.Viewer.Messages.Object.RequestPayPrice req = (SilverSim.Viewer.Messages.Object.RequestPayPrice)m;
+#if NOT_IMPLEMENTED_YET
+            RequestPayPrice req = (RequestPayPrice)m;
+#endif
         }
 
         [PacketHandler(MessageType.ObjectSpinStart)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectSpinStart(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectSpinStart req = (SilverSim.Viewer.Messages.Object.ObjectSpinStart)m;
+            ObjectSpinStart req = (ObjectSpinStart)m;
+            if (req.CircuitSessionID != req.SessionID ||
+                req.CircuitAgentID != req.AgentID)
+            {
+                return;
+            }
         }
 
         [PacketHandler(MessageType.ObjectSpinUpdate)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectSpinUpdate(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectSpinUpdate req = (SilverSim.Viewer.Messages.Object.ObjectSpinUpdate)m;
+            ObjectSpinUpdate req = (ObjectSpinUpdate)m;
             if(req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -44,7 +52,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectSpinStop(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectSpinStop req = (SilverSim.Viewer.Messages.Object.ObjectSpinStop)m;
+            ObjectSpinStop req = (ObjectSpinStop)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -56,7 +64,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectShape(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectShape req = (SilverSim.Viewer.Messages.Object.ObjectShape)m;
+            ObjectShape req = (ObjectShape)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -68,11 +76,34 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectSaleInfo(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectSaleInfo req = (SilverSim.Viewer.Messages.Object.ObjectSaleInfo)m;
+            ObjectSaleInfo req = (ObjectSaleInfo)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
                 return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            foreach (ObjectSaleInfo.Data d in req.ObjectData)
+            {
+                ObjectPart prim;
+                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
+                {
+                    continue;
+                }
+
+                if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                {
+                    continue;
+                }
+
+                prim.ObjectGroup.SalePrice = d.SalePrice;
+                prim.ObjectGroup.SaleType = (InventoryItem.SaleInfoData.SaleType)d.SaleType;
             }
         }
 
@@ -80,7 +111,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleMultipleObjectUpdate(Message m)
         {
-            SilverSim.Viewer.Messages.Object.MultipleObjectUpdate req = (SilverSim.Viewer.Messages.Object.MultipleObjectUpdate)m;
+            MultipleObjectUpdate req = (MultipleObjectUpdate)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -92,7 +123,6 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
-
 
             foreach(MultipleObjectUpdate.ObjectDataEntry d in req.ObjectData)
             {
@@ -161,8 +191,6 @@ namespace SilverSim.Scene.Types.Scene
                         prim.Size = pos;
                     }
                 }
-
-                prim.SendObjectUpdate();
             }
         }
 
@@ -170,7 +198,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectRotation(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectRotation req = (SilverSim.Viewer.Messages.Object.ObjectRotation)m;
+            ObjectRotation req = (ObjectRotation)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -183,7 +211,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach (SilverSim.Viewer.Messages.Object.ObjectRotation.Data d in req.ObjectData)
+            foreach (ObjectRotation.Data d in req.ObjectData)
             {
                 ObjectPart prim;
                 if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
@@ -200,7 +228,6 @@ namespace SilverSim.Scene.Types.Scene
                     continue;
                 }
                 prim.Rotation = d.Rotation;
-                prim.SendObjectUpdate();
             }
         }
 
@@ -208,7 +235,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectPosition(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectPosition req = (SilverSim.Viewer.Messages.Object.ObjectPosition)m;
+            ObjectPosition req = (ObjectPosition)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -221,7 +248,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach (SilverSim.Viewer.Messages.Object.ObjectPosition.ObjectDataEntry d in req.ObjectData)
+            foreach (ObjectPosition.ObjectDataEntry d in req.ObjectData)
             {
                 ObjectPart prim;
                 if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
@@ -238,7 +265,6 @@ namespace SilverSim.Scene.Types.Scene
                     continue;
                 }
                 prim.Position = d.Position;
-                prim.SendObjectUpdate();
             }
         }
 
@@ -246,7 +272,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectScale(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectScale req = (SilverSim.Viewer.Messages.Object.ObjectScale)m;
+            ObjectScale req = (ObjectScale)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -259,7 +285,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach (SilverSim.Viewer.Messages.Object.ObjectScale.ObjectDataEntry d in req.ObjectData)
+            foreach (ObjectScale.ObjectDataEntry d in req.ObjectData)
             {
                 ObjectPart prim;
                 if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
@@ -276,7 +302,6 @@ namespace SilverSim.Scene.Types.Scene
                     continue;
                 }
                 prim.Size = d.Size;
-                prim.SendObjectUpdate();
             }
         }
 
@@ -284,7 +309,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectPermissions(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectPermissions req = (SilverSim.Viewer.Messages.Object.ObjectPermissions)m;
+            ObjectPermissions req = (ObjectPermissions)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -296,7 +321,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectOwner(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectOwner req = (SilverSim.Viewer.Messages.Object.ObjectOwner)m;
+            ObjectOwner req = (ObjectOwner)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -308,7 +333,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectName(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectName req = (SilverSim.Viewer.Messages.Object.ObjectName)m;
+            ObjectName req = (ObjectName)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -321,7 +346,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach (SilverSim.Viewer.Messages.Object.ObjectName.Data d in req.ObjectData)
+            foreach (ObjectName.Data d in req.ObjectData)
             {
                 ObjectPart prim;
                 if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
@@ -334,7 +359,6 @@ namespace SilverSim.Scene.Types.Scene
                     continue;
                 }
                 prim.Name = d.Name;
-                prim.SendObjectUpdate();
             }
         }
 
@@ -342,7 +366,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectLink(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectLink req = (SilverSim.Viewer.Messages.Object.ObjectLink)m;
+            ObjectLink req = (ObjectLink)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -354,7 +378,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectDelink(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectDelink req = (SilverSim.Viewer.Messages.Object.ObjectDelink)m;
+            ObjectDelink req = (ObjectDelink)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -366,7 +390,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectGroup(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectGroup req = (SilverSim.Viewer.Messages.Object.ObjectGroup)m;
+            Viewer.Messages.Object.ObjectGroup req = (Viewer.Messages.Object.ObjectGroup)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -400,7 +424,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectIncludeInSearch(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectIncludeInSearch req = (SilverSim.Viewer.Messages.Object.ObjectIncludeInSearch)m;
+            ObjectIncludeInSearch req = (ObjectIncludeInSearch)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -412,7 +436,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectFlagUpdate(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectFlagUpdate req = (SilverSim.Viewer.Messages.Object.ObjectFlagUpdate)m;
+            ObjectFlagUpdate req = (ObjectFlagUpdate)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -424,7 +448,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectMaterial(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectMaterial req = (SilverSim.Viewer.Messages.Object.ObjectMaterial)m;
+            ObjectMaterial req = (ObjectMaterial)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -437,7 +461,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach(SilverSim.Viewer.Messages.Object.ObjectMaterial.Data d in req.ObjectData)
+            foreach(ObjectMaterial.Data d in req.ObjectData)
             {
                 ObjectPart prim;
                 if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
@@ -450,7 +474,6 @@ namespace SilverSim.Scene.Types.Scene
                     continue;
                 }
                 prim.Material = d.Material;
-                prim.SendObjectUpdate();
             }
         }
 
@@ -458,7 +481,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectExtraParams(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectExtraParams req = (SilverSim.Viewer.Messages.Object.ObjectExtraParams)m;
+            ObjectExtraParams req = (ObjectExtraParams)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -469,13 +492,27 @@ namespace SilverSim.Scene.Types.Scene
             {
                 return;
             }
+
+            foreach(ObjectExtraParams.Data data in req.ObjectData)
+            {
+                ObjectPart part;
+                if(!Primitives.TryGetValue(data.ObjectLocalID, out part))
+                {
+                    continue;
+                }
+                if(!CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
+                {
+                    continue;
+                }
+
+            }
         }
 
         [PacketHandler(MessageType.ObjectExportSelected)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectExportSelected(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectExportSelected req = (SilverSim.Viewer.Messages.Object.ObjectExportSelected)m;
+            ObjectExportSelected req = (ObjectExportSelected)m;
             if (req.CircuitAgentID != req.AgentID)
             {
                 return;
@@ -486,7 +523,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectSelect(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectSelect req = (SilverSim.Viewer.Messages.Object.ObjectSelect)m;
+            ObjectSelect req = (ObjectSelect)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -533,7 +570,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectDrop(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectDrop req = (SilverSim.Viewer.Messages.Object.ObjectDrop)m;
+            ObjectDrop req = (ObjectDrop)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -545,7 +582,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectAttach(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectAttach req = (SilverSim.Viewer.Messages.Object.ObjectAttach)m;
+            ObjectAttach req = (ObjectAttach)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -557,7 +594,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectDescription(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectDescription req = (SilverSim.Viewer.Messages.Object.ObjectDescription)m;
+            ObjectDescription req = (ObjectDescription)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -570,7 +607,7 @@ namespace SilverSim.Scene.Types.Scene
                 return;
             }
 
-            foreach (SilverSim.Viewer.Messages.Object.ObjectDescription.Data d in req.ObjectData)
+            foreach (ObjectDescription.Data d in req.ObjectData)
             {
                 ObjectPart prim;
                 if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
@@ -583,7 +620,6 @@ namespace SilverSim.Scene.Types.Scene
                     continue;
                 }
                 prim.Description = d.Description;
-                prim.SendObjectUpdate();
             }
         }
 
@@ -591,7 +627,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectDeselect(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectDeselect req = (SilverSim.Viewer.Messages.Object.ObjectDeselect)m;
+            ObjectDeselect req = (ObjectDeselect)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -638,11 +674,31 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectClickAction(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectClickAction req = (SilverSim.Viewer.Messages.Object.ObjectClickAction)m;
+            ObjectClickAction req = (ObjectClickAction)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
                 return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            foreach (ObjectClickAction.Data data in req.ObjectData)
+            {
+                ObjectPart part;
+                if (Primitives.TryGetValue(data.ObjectLocalID, out part))
+                {
+                    if (!CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
+                    {
+                        continue;
+                    }
+
+                    part.ClickAction = data.ClickAction;
+                }
             }
         }
 
@@ -650,11 +706,31 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectCategory(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectCategory req = (SilverSim.Viewer.Messages.Object.ObjectCategory)m;
+            ObjectCategory req = (ObjectCategory)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
                 return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            foreach (ObjectCategory.Data data in req.ObjectData)
+            {
+                ObjectPart part;
+                if (Primitives.TryGetValue(data.ObjectLocalID, out part))
+                {
+                    if (!CanEdit(agent, part.ObjectGroup, part.ObjectGroup.GlobalPosition))
+                    {
+                        continue;
+                    }
+
+                    part.ObjectGroup.Category = data.Category;
+                }
             }
         }
 
@@ -662,7 +738,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectBuy(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectBuy req = (SilverSim.Viewer.Messages.Object.ObjectBuy)m;
+            ObjectBuy req = (ObjectBuy)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -674,7 +750,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleBuyObjectInventory(Message m)
         {
-            SilverSim.Viewer.Messages.Object.BuyObjectInventory req = (SilverSim.Viewer.Messages.Object.BuyObjectInventory)m;
+            BuyObjectInventory req = (BuyObjectInventory)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -686,7 +762,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectGrab(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectGrab req = (SilverSim.Viewer.Messages.Object.ObjectGrab)m;
+            ObjectGrab req = (ObjectGrab)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -698,7 +774,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectGrabUpdate(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectGrabUpdate req = (SilverSim.Viewer.Messages.Object.ObjectGrabUpdate)m;
+            ObjectGrabUpdate req = (ObjectGrabUpdate)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -710,7 +786,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleObjectDeGrab(Message m)
         {
-            SilverSim.Viewer.Messages.Object.ObjectDeGrab req = (SilverSim.Viewer.Messages.Object.ObjectDeGrab)m;
+            ObjectDeGrab req = (ObjectDeGrab)m;
             if (req.CircuitSessionID != req.SessionID ||
                 req.CircuitAgentID != req.AgentID)
             {
@@ -722,7 +798,7 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRequestObjectPropertiesFamily(Message m)
         {
-            SilverSim.Viewer.Messages.Object.RequestObjectPropertiesFamily req = (SilverSim.Viewer.Messages.Object.RequestObjectPropertiesFamily)m;
+            RequestObjectPropertiesFamily req = (RequestObjectPropertiesFamily)m;
             if(req.AgentID != req.CircuitAgentID ||
                 req.SessionID != req.CircuitSessionID)
             {
