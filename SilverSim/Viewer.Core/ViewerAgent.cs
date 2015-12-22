@@ -774,7 +774,36 @@ namespace SilverSim.Viewer.Core
                         break;
 
                     case ObjectDetailsType.RenderWeight:
+                        paramList.Add(-1f);
+                        break;
+
+                    case ObjectDetailsType.HoverHeight:
                         paramList.Add(0);
+#warning Extract Hover Height correctly
+                        break;
+
+                    case ObjectDetailsType.BodyShapeType:
+                        byte[] vp = VisualParams;
+                        if (vp.Length > 31)
+                        {
+                            paramList.Add(vp[31] / 255f);
+                        }
+                        else
+                        {
+                            paramList.Add(-1f);
+                        }   
+                        break;
+
+                    case ObjectDetailsType.LastOwner:
+                        paramList.Add(Owner.ID);
+                        break;
+
+                    case ObjectDetailsType.ClickAction:
+                        paramList.Add((int)0);
+                        break;
+
+                    case ObjectDetailsType.Omega:
+                        paramList.Add(AngularVelocity);
                         break;
 
                     default:

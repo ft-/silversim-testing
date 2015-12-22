@@ -1016,6 +1016,26 @@ namespace SilverSim.Scene.Types.Object
                         paramList.Add(0);
                         break;
 
+                    case ObjectDetailsType.HoverHeight:
+                        paramList.Add(0);
+                        break;
+
+                    case ObjectDetailsType.BodyShapeType:
+                        paramList.Add(-1f);
+                        break;
+
+                    case ObjectDetailsType.LastOwner:
+                        paramList.Add(LastOwner.ID);
+                        break;
+
+                    case ObjectDetailsType.ClickAction:
+                        paramList.Add((int)RootPart.ClickAction);
+                        break;
+
+                    case ObjectDetailsType.Omega:
+                        paramList.Add(RootPart.AngularVelocity);
+                        break;
+
                     default:
                         throw new ArgumentException("Unknown Object Details Type");
                 }

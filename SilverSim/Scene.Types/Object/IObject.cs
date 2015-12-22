@@ -39,6 +39,11 @@ namespace SilverSim.Scene.Types.Object
         Phantom = 22,
         TempOnRez = 23,
         RenderWeight = 24,
+        HoverHeight = 25,
+        BodyShapeType = 26,
+        LastOwner = 27,
+        ClickAction = 28,
+        Omega = 29
     }
 
     public interface IPrimitiveParamsInterface
