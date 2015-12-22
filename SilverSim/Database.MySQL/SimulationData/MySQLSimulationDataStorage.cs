@@ -159,6 +159,15 @@ namespace SilverSim.Database.MySQL.SimulationData
                     cmd.ExecuteNonQuery();
                 }
             }
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM parcels WHERE RegionID LIKE ?regionid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.ExecuteNonQuery();
+                }
+            }
         }
 
 
