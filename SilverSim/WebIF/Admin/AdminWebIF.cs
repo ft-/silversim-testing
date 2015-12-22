@@ -91,7 +91,8 @@ namespace SilverSim.WebIF.Admin
             UnknownMethod = 12,
             AlreadyStarted = 13,
             FailedToStart = 14,
-            NotRunning = 15
+            NotRunning = 15,
+            IsRunning = 16
         };
 
         public static void ErrorResponse(HttpRequest req, ErrorResult reason)

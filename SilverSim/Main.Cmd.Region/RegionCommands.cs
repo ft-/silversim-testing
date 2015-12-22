@@ -6,6 +6,7 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Scene;
+using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.AvatarName;
@@ -27,19 +28,22 @@ namespace SilverSim.Main.Cmd.Region
     {
         readonly string m_RegionStorageName;
         readonly string m_EstateServiceName;
+        readonly string m_SimulationStorageName;
         GridServiceInterface m_RegionStorage;
         SceneFactoryInterface m_SceneFactory;
         EstateServiceInterface m_EstateService;
+        SimulationDataStorageInterface m_SimulationData;
         private static readonly ILog m_Log = LogManager.GetLogger("REGION COMMANDS");
         private string m_ExternalHostName = string.Empty;
         private uint m_HttpPort;
         private string m_Scheme = Uri.UriSchemeHttp;
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
 
-        public RegionCommands(string regionStorageName, string estateServiceName)
+        public RegionCommands(string regionStorageName, string estateServiceName, string simulationStorageName)
         {
             m_RegionStorageName = regionStorageName;
             m_EstateServiceName = estateServiceName;
+            m_SimulationStorageName = simulationStorageName;
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -59,8 +63,10 @@ namespace SilverSim.Main.Cmd.Region
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
             m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
+            m_SimulationData = loader.GetService<SimulationDataStorageInterface>(m_SimulationStorageName);
             Common.CmdIO.CommandRegistry.CreateCommands.Add("region", CreateRegionCmd);
             Common.CmdIO.CommandRegistry.CreateCommands.Add("regions", CreateRegionsCmd);
+            Common.CmdIO.CommandRegistry.DeleteCommands.Add("region", DeleteRegionCmd);
             Common.CmdIO.CommandRegistry.ShowCommands.Add("regions", ShowRegionsCmd);
             Common.CmdIO.CommandRegistry.EnableCommands.Add("region", EnableRegionCmd);
             Common.CmdIO.CommandRegistry.DisableCommands.Add("region", DisableRegionCmd);
@@ -665,12 +671,27 @@ namespace SilverSim.Main.Cmd.Region
             {
                 io.WriteFormatted("delete region not allowed from restricted console");
             }
-            else if (args[0] == "help")
+            else if (args[0] == "help" || args.Count < 3)
             {
                 io.Write("delete region <regionname>");
             }
             else
             {
+                RegionInfo rInfo;
+                if(!m_RegionStorage.TryGetValue(args[2], out rInfo))
+                {
+                    io.WriteFormatted("Region '{0}' not found", args[2]);
+                }
+                else if(SceneManager.Scenes.ContainsKey(rInfo.ID))
+                {
+                    io.WriteFormatted("Region '{0}' is running.", args[2]);
+                }
+                else
+                {
+                    m_RegionStorage.DeleteRegion(UUID.Zero, rInfo.ID);
+                    m_SimulationData.RemoveRegion(rInfo.ID);
+                    io.WriteFormatted("Region '{0}' deleted.", args[2]);
+                }
             }
         }
 
@@ -1089,7 +1110,9 @@ namespace SilverSim.Main.Cmd.Region
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new RegionCommands(ownSection.GetString("RegionStorage", "RegionStorage"), ownSection.GetString("EstateService", "EstateService"));
+            return new RegionCommands(ownSection.GetString("RegionStorage", "RegionStorage"),
+                ownSection.GetString("EstateService", "EstateService"),
+                ownSection.GetString("SimulationDataStorage", "SimulationDataStorage"));
         }
     }
     #endregion

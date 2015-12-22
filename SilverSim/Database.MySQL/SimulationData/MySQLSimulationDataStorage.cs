@@ -119,6 +119,49 @@ namespace SilverSim.Database.MySQL.SimulationData
             StopStorageThread();
         }
 
+        public override void RemoveRegion(UUID regionID)
+        {
+            List<UUID> objects = Objects.ObjectsInRegion(regionID);
+            List<UUID> prims = Objects.PrimitivesInRegion(regionID);
+            foreach(UUID prim in prims)
+            {
+                Objects.DeleteObjectPart(prim);
+            }
+            foreach(UUID objid in objects)
+            {
+                Objects.DeleteObjectGroup(objid);
+            }
+            
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM scriptstates WHERE RegionID LIKE ?regionid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM environmentsettings WHERE RegionID LIKE ?regionid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.ExecuteNonQuery();
+                }
+            }
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM terrains WHERE RegionID LIKE ?regionid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
+                    cmd.ExecuteNonQuery();
+                }
+            }
+        }
+
+
         int m_ProcessedPrims;
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]

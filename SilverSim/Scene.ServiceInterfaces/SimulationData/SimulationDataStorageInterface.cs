@@ -187,5 +187,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         {
             m_StorageMainRequestQueue.Enqueue(info);
         }
+
+        public abstract void RemoveRegion(UUID regionID);
     }
 }

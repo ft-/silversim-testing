@@ -7,6 +7,7 @@ using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Scene;
+using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Grid;
@@ -23,20 +24,25 @@ namespace SilverSim.WebIF.Admin.Simulator
         private static readonly ILog m_Log = LogManager.GetLogger("ADMIN WEB IF - REGION");
 
         string m_RegionStorageName;
+        string m_SimulationDataName;
         GridServiceInterface m_RegionStorage;
         SceneFactoryInterface m_SceneFactory;
+        SimulationDataStorageInterface m_SimulationData;
 
-        public RegionAdmin(string regionStorageName)
+        public RegionAdmin(string regionStorageName, string simulationDataName)
         {
             m_RegionStorageName = regionStorageName;
+            m_SimulationDataName = simulationDataName;
         }
 
         public void Startup(ConfigurationLoader loader)
         {
             m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
+            m_SimulationData = loader.GetService<SimulationDataStorageInterface>(m_SimulationDataName);
 
             AdminWebIF webif = loader.GetAdminWebIF();
+            webif.JsonMethods.Add("region.delete", HandleDelete);
             webif.JsonMethods.Add("regions.list", HandleList);
             webif.JsonMethods.Add("region.start", HandleStart);
             webif.JsonMethods.Add("region.stop", HandleStop);
@@ -154,6 +160,30 @@ namespace SilverSim.WebIF.Admin.Simulator
                     agents.Add(agent.ToJsonMap(si));
                 }
                 res.Add("agents", agents);
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.manage")]
+        void HandleDelete(HttpRequest req, Map jsondata)
+        {
+            RegionInfo region;
+            if (!jsondata.ContainsKey("id"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out region))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else if (SceneManager.Scenes.ContainsKey(region.ID))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.IsRunning);
+            }
+            else
+            {
+                m_RegionStorage.DeleteRegion(UUID.Zero, region.ID);
+                m_SimulationData.RemoveRegion(region.ID);
+                AdminWebIF.SuccessResponse(req, new Map());
             }
         }
 
@@ -320,7 +350,9 @@ namespace SilverSim.WebIF.Admin.Simulator
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new RegionAdmin(ownSection.GetString("RegionStorage", "RegionStorage"));
+            return new RegionAdmin(
+                ownSection.GetString("RegionStorage", "RegionStorage"),
+                ownSection.GetString("SimulationDataStorage", "SimulationDataStorage"));
         }
     }
     #endregion
