@@ -19,9 +19,28 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleRequestPayPrice(Message m)
         {
-#if NOT_IMPLEMENTED_YET
             RequestPayPrice req = (RequestPayPrice)m;
-#endif
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.CircuitAgentID, out agent))
+            {
+                return;
+            }
+
+            ObjectPart part;
+            if(Primitives.TryGetValue(req.ObjectID, out part))
+            {
+                PayPriceReply rep = new PayPriceReply();
+                rep.ObjectID = req.ObjectID;
+                Object.ObjectGroup grp = part.ObjectGroup;
+                rep.ButtonData.Add(grp.PayPrice0);
+                rep.ButtonData.Add(grp.PayPrice0);
+                rep.ButtonData.Add(grp.PayPrice0);
+                rep.ButtonData.Add(grp.PayPrice0);
+                rep.ButtonData.Add(grp.PayPrice0);
+
+                agent.SendMessageAlways(rep, ID);
+            }
         }
 
         [PacketHandler(MessageType.ObjectSpinStart)]
@@ -69,6 +88,48 @@ namespace SilverSim.Scene.Types.Scene
                 req.CircuitAgentID != req.AgentID)
             {
                 return;
+            }
+
+            IAgent agent;
+            if (!Agents.TryGetValue(req.AgentID, out agent))
+            {
+                return;
+            }
+
+            foreach (ObjectShape.Data d in req.ObjectData)
+            {
+                ObjectPart prim;
+                if (!Primitives.TryGetValue(d.ObjectLocalID, out prim))
+                {
+                    continue;
+                }
+
+                if (!CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
+                {
+                    continue;
+                }
+
+                ObjectPart.PrimitiveShape shape = prim.Shape;
+                shape.PathCurve = d.PathCurve;
+                shape.ProfileCurve = d.ProfileCurve;
+                shape.PathBegin = d.PathBegin;
+                shape.PathEnd = d.PathEnd;
+                shape.PathScaleX = d.PathScaleX;
+                shape.PathScaleY = d.PathScaleY;
+                shape.PathShearX = d.PathShearX;
+                shape.PathShearY = d.PathShearY;
+                shape.PathTwist = d.PathTwist;
+                shape.PathTwistBegin = d.PathTwistBegin;
+                shape.PathRadiusOffset = d.PathRadiusOffset;
+                shape.PathTaperX = d.PathTaperX;
+                shape.PathTaperY = d.PathTaperY;
+                shape.PathRevolutions = d.PathRevolutions;
+                shape.PathSkew = d.PathSkew;
+                shape.ProfileBegin = d.ProfileBegin;
+                shape.ProfileEnd = d.ProfileEnd;
+                shape.ProfileHollow = d.ProfileHollow;
+
+                prim.Shape = shape;
             }
         }
 
