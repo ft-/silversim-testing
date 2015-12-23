@@ -117,6 +117,7 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("webif.admin.user.grantright", GrantRight);
             JsonMethods.Add("webif.admin.user.revokeright", RevokeRight);
             JsonMethods.Add("webif.admin.user.delete", DeleteUser);
+            JsonMethods.Add("session.validate", HandleSessionValidateRequest);
         }
 
         public ShutdownOrder ShutdownOrder
@@ -237,7 +238,12 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        public void HandleLoginRequest(HttpRequest req, Map jsonreq)
+        void HandleSessionValidateRequest(HttpRequest req, Map jsonreq)
+        {
+            SuccessResponse(req, new Map());
+        }
+
+        void HandleLoginRequest(HttpRequest req, Map jsonreq)
         {
             if(!jsonreq.ContainsKey("sessionid") || !jsonreq.ContainsKey("user") || !jsonreq.ContainsKey("response"))
             {
@@ -269,7 +275,15 @@ namespace SilverSim.WebIF.Admin
                         rights.Add(right);
                     }
                     res.Add("rights", rights);
-                    SuccessResponse(req, res);
+                    res.Add("success", true);
+                    using (HttpResponse httpres = req.BeginResponse(JsonContentType))
+                    {
+                        httpres.Headers["Set-Cookie"] = "sessionid=" + jsonreq["sessionid"].ToString() +";path=/admin";
+                        using (Stream o = httpres.GetOutputStream())
+                        {
+                            Json.Serialize(res, o);
+                        }
+                    }
                 }
                 else
                 {
@@ -279,7 +293,7 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        public void HandleChallengeRequest(HttpRequest req, Map jsonreq)
+        void HandleChallengeRequest(HttpRequest req, Map jsonreq)
         {
             Map resdata = new Map();
             UUID sessionID = UUID.Random;
