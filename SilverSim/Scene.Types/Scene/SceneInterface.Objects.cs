@@ -34,10 +34,10 @@ namespace SilverSim.Scene.Types.Scene
                 rep.ObjectID = req.ObjectID;
                 Object.ObjectGroup grp = part.ObjectGroup;
                 rep.ButtonData.Add(grp.PayPrice0);
-                rep.ButtonData.Add(grp.PayPrice0);
-                rep.ButtonData.Add(grp.PayPrice0);
-                rep.ButtonData.Add(grp.PayPrice0);
-                rep.ButtonData.Add(grp.PayPrice0);
+                rep.ButtonData.Add(grp.PayPrice1);
+                rep.ButtonData.Add(grp.PayPrice2);
+                rep.ButtonData.Add(grp.PayPrice3);
+                rep.ButtonData.Add(grp.PayPrice4);
 
                 agent.SendMessageAlways(rep, ID);
             }
