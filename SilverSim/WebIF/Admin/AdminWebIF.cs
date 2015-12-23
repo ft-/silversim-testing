@@ -297,14 +297,7 @@ namespace SilverSim.WebIF.Admin
             m_Sessions.Add(req.CallerIP + "+" + sessionID.ToString(), sessionInfo);
             sessionInfo.UserName = jsonreq["user"].ToString().ToLower();
             FindUser(sessionInfo, challenge);
-
-            using (HttpResponse res = req.BeginResponse(JsonContentType))
-            {
-                using (Stream o = res.GetOutputStream())
-                {
-                    Json.Serialize(resdata, o);
-                }
-            }
+            SuccessResponse(req, resdata);
         }
 
         public void HandleHttp(HttpRequest req)
@@ -313,10 +306,16 @@ namespace SilverSim.WebIF.Admin
             {
                 if(req.Method != "POST")
                 {
+#if DEBUG
+                    m_Log.DebugFormat("Method {0} not allowed to /admin/json", req.Method);
+#endif
                     req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
                 }
                 else if(req.ContentType != JsonContentType)
                 {
+#if DEBUG
+                    m_Log.DebugFormat("Content-Type '{0}' not allowed to /admin/json", req.ContentType);
+#endif
                     req.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported media type " + req.ContentType);
                 }
                 else
@@ -346,6 +345,10 @@ namespace SilverSim.WebIF.Admin
 
                     string methodName = jsondata["method"].ToString();
                     string sessionKey;
+
+#if DEBUG
+                    m_Log.DebugFormat("/admin/json Method called {0}", methodName);
+#endif
 
                     switch(methodName)
                     {
@@ -525,6 +528,18 @@ namespace SilverSim.WebIF.Admin
                             switch(args[2])
                             {
                                 case "users":
+                                    string output = "User List: --------------------";
+                                    foreach(string name in m_ServerParams[UUID.Zero])
+                                    {
+                                        if(name.StartsWith("WebIF.Admin.User.") &&
+                                            name.EndsWith(".PassCode"))
+                                        {
+                                            string username = name.Substring(17, name.Length - 17 - 9);
+                                            output += "\n";
+                                            output += username;
+                                        }
+                                    }
+                                    io.Write(output);
                                     break;
 
                                 default:
