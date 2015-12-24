@@ -58,6 +58,7 @@ namespace SilverSim.Viewer.Core
 
         int m_AgentUpdatesReceived;
 
+        #region Scene Changing Property
         public SceneInterface Scene
         {
             get
@@ -69,6 +70,7 @@ namespace SilverSim.Viewer.Core
             {
                 lock (m_SceneSetLock) /* scene change serialization */
                 {
+                    SceneInterface oldScene = m_Scene;
                     if (null != m_Scene)
                     {
                         if(m_ChatListener != null)
@@ -93,6 +95,10 @@ namespace SilverSim.Viewer.Core
                         }
                     }
                     m_Scene = value;
+                    if(null != oldScene)
+                    {
+                        oldScene.TriggerAgentChangedScene(Agent);
+                    }
                     if (null != m_Scene)
                     {
                         UUID sceneCapID = UUID.Random;
@@ -125,10 +131,12 @@ namespace SilverSim.Viewer.Core
                                 m_DebugChannelListener = null;
                             }
                         }
+                        m_Scene.TriggerAgentChangedScene(Agent);
                     }
                 }
             }
         }
+        #endregion
 
         #region Chat Listener
         private Vector3 ChatGetAgentPosition()
@@ -177,6 +185,7 @@ namespace SilverSim.Viewer.Core
         }
         #endregion
 
+        #region Message Handler Definitions
         [SuppressMessage("Gendarme.Rules.Naming", "UseCorrectSuffixRule")]
         sealed class MessageHandlerExtenderKeyValuePairCircuitQueue
         {
@@ -250,6 +259,9 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        #endregion
+
+        #region Message Handler Initialization
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         Action<Message> DeriveActionDelegateFromFieldInfo(FieldInfo fi, Type t, object o, string info)
         {
@@ -606,6 +618,7 @@ namespace SilverSim.Viewer.Core
                 }
             }
         }
+        #endregion
 
         public AgentCircuit(
             ViewerAgent agent, 
