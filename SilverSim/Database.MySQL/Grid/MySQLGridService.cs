@@ -102,6 +102,23 @@ namespace SilverSim.Database.MySQL.Grid
             return false;
         }
 
+        public override bool ContainsKey(UUID scopeID, UUID regionID)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE uuid LIKE ?id AND ScopeID LIKE ?scopeid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", regionID.ToString());
+                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        return dbReader.Read();
+                    }
+                }
+            }
+        }
+
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public override RegionInfo this[UUID scopeID, uint gridX, uint gridY]
         {
@@ -139,6 +156,24 @@ namespace SilverSim.Database.MySQL.Grid
 
             rInfo = default(RegionInfo);
             return false;
+        }
+
+        public override bool ContainsKey(UUID scopeID, uint gridX, uint gridY)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE locX <= ?x AND locY <= ?y AND locX + sizeX > ?x AND locY + sizeY > ?y AND ScopeID LIKE ?scopeid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?x", gridX);
+                    cmd.Parameters.AddWithValue("?y", gridY);
+                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        return dbReader.Read();
+                    }
+                }
+            }
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
@@ -179,6 +214,23 @@ namespace SilverSim.Database.MySQL.Grid
             return false;
         }
 
+        public override bool ContainsKey(UUID scopeID, string regionName)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE regionName LIKE ?name AND ScopeID LIKE ?scopeid", connection))
+                {
+                    cmd.Parameters.AddWithValue("?name", regionName);
+                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        return dbReader.Read();
+                    }
+                }
+            }
+        }
+
         public override RegionInfo this[UUID regionID]
         {
             get
@@ -215,6 +267,21 @@ namespace SilverSim.Database.MySQL.Grid
             return false;
         }
 
+        public override bool ContainsKey(UUID regionID)
+        {
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            {
+                connection.Open();
+                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE uuid LIKE ?id", connection))
+                {
+                    cmd.Parameters.AddWithValue("?id", regionID.ToString());
+                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
+                    {
+                        return dbReader.Read();
+                    }
+                }
+            }
+        }
         #endregion
 
         #region dbData to RegionInfo
