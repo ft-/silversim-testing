@@ -381,6 +381,10 @@ namespace SilverSim.Main.Cmd.Region
                 io.WriteFormatted("create regions from ini <regions.ini file>");
                 return;
             }
+            else if(m_EstateService.All.Count == 0)
+            {
+                io.Write("please create an estate first");
+            }
             else if (args[2] == "from" && args[3] == "ini")
             {
                 IConfigSource cfg;
@@ -461,6 +465,19 @@ namespace SilverSim.Main.Cmd.Region
                     else
                     {
                         m_RegionStorage.RegisterRegion(r);
+                        List<EstateInfo> allEstates = m_EstateService.All;
+                        List<EstateInfo> ownerEstates = new List<EstateInfo>(from estate in allEstates where estate.Owner.EqualsGrid(r.Owner) select estate);
+                        if (ownerEstates.Count != 0)
+                        {
+                            m_EstateService.RegionMap[r.ID] = ownerEstates[0].ID;
+                            io.WriteFormatted("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, allEstates[0].Owner.FullName);
+                        }
+                        else if (allEstates.Count != 0)
+                        {
+                            r.Owner = allEstates[0].Owner;
+                            m_EstateService.RegionMap[r.ID] = allEstates[0].ID;
+                            io.WriteFormatted("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, allEstates[0].Owner.FullName);
+                        }
                     }
                 }
             }
@@ -492,6 +509,10 @@ namespace SilverSim.Main.Cmd.Region
                     "access trial|pg|mature|adult\n" +
                     "staticmaptile <uuid>\n" +
                     "status online|offline");
+            }
+            else if (m_EstateService.All.Count == 0)
+            {
+                io.Write("please create an estate first");
             }
             else if (m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
             {
