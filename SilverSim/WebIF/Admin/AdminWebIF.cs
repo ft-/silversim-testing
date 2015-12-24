@@ -512,9 +512,10 @@ namespace SilverSim.WebIF.Admin
         void DisplayAdminWebIFHelp(Main.Common.CmdIO.TTY io)
         {
             io.Write("admin-webif show users\n" +
+                "admin-webif show user <user>\n" +
                 "admin-webif delete user <user>\n" +
                 "admin-webif grant <user> <right>\n" +
-                "admin-webif revoke <user> <right>\n");
+                "admin-webif revoke <user> <right>");
         }
 
         public void AdminWebIFCmd(List<string> args, Main.Common.CmdIO.TTY io, UUID limitedToScene)
@@ -542,18 +543,45 @@ namespace SilverSim.WebIF.Admin
                             switch(args[2])
                             {
                                 case "users":
-                                    string output = "User List: --------------------";
-                                    foreach(string name in m_ServerParams[UUID.Zero])
                                     {
-                                        if(name.StartsWith("WebIF.Admin.User.") &&
-                                            name.EndsWith(".PassCode"))
+                                        string output = "User List: --------------------";
+                                        foreach (string name in m_ServerParams[UUID.Zero])
                                         {
-                                            string username = name.Substring(17, name.Length - 17 - 9);
-                                            output += "\n";
-                                            output += username;
+                                            if (name.StartsWith("WebIF.Admin.User.") &&
+                                                name.EndsWith(".PassCode"))
+                                            {
+                                                string username = name.Substring(17, name.Length - 17 - 9);
+                                                output += "\n";
+                                                output += username;
+                                            }
+                                        }
+                                        io.Write(output);
+                                    }
+                                    break;
+
+                                case "user":
+                                    if(args.Count < 4)
+                                    {
+                                        DisplayAdminWebIFHelp(io);
+                                    }
+                                    else
+                                    {
+                                        string userRef = "WebIF.Admin.User." + args[3];
+                                        string rights;
+                                        if(m_ServerParams.TryGetValue(UUID.Zero, userRef + ".Rights", out rights))
+                                        {
+                                            string output = "Rights: --------------------";
+                                            foreach(string right in rights.Split(','))
+                                            {
+                                                output += "\n" + right.Trim();
+                                            }
+                                            io.Write(output);
+                                        }
+                                        else
+                                        {
+                                            io.WriteFormatted("User '{0}' does not exist", args[3]);
                                         }
                                     }
-                                    io.Write(output);
                                     break;
 
                                 default:
@@ -564,6 +592,32 @@ namespace SilverSim.WebIF.Admin
                         break;
 
                     case "delete":
+                        if(args.Count < 3)
+                        {
+                            DisplayAdminWebIFHelp(io);
+                        }
+                        else
+                        {
+                            switch(args[2])
+                            {
+                                case "user":
+                                    if(args.Count < 4)
+                                    {
+                                        DisplayAdminWebIFHelp(io);
+                                    }
+                                    else
+                                    {
+                                        string userRef = "WebIF.Admin.User." + args[3];
+                                        m_ServerParams.Remove(UUID.Zero, userRef + ".PassCode");
+                                        m_ServerParams.Remove(UUID.Zero, userRef + ".Rights");
+                                    }
+                                    break;
+
+                                default:
+                                    DisplayAdminWebIFHelp(io);
+                                    break;
+                            }
+                        }
                         break;
 
                     case "grant":
