@@ -291,7 +291,7 @@ namespace SilverSim.Main.Cmd.Region
                             break;
 
                         case "estate":
-                            if (m_EstateService.TryGetValue(args[argi + 1], out selectedEstate))
+                            if (!m_EstateService.TryGetValue(args[argi + 1], out selectedEstate))
                             {
                                 io.WriteFormatted("{0} is not known as an estate", args[argi + 1]);
                                 return;
@@ -575,7 +575,7 @@ namespace SilverSim.Main.Cmd.Region
                             break;
 
                         case "estate":
-                            if (m_EstateService.TryGetValue(args[argi + 1], out selectedEstate))
+                            if (!m_EstateService.TryGetValue(args[argi + 1], out selectedEstate))
                             {
                                 io.WriteFormatted("{0} is not known as an estate", args[argi + 1]);
                                 return;
