@@ -230,7 +230,7 @@ namespace SilverSim.Main.Cmd.Region
                     "name <name>\n" +
                     "port <port>\n" +
                     "scopeid <uuid>\n" +
-                    "regiontype <regiontype>\n" +
+                    "productname <regiontype>\n" +
                     "owner <uui>|<uuid>|<firstname>,<lastname>\n" +
                     "estate <name>\n" +
                     "externalhostname <hostname>\n" +
@@ -278,7 +278,9 @@ namespace SilverSim.Main.Cmd.Region
                             changeRegionData = true;
                             break;
 
-                        case "regiontype":
+                        case "productname":
+                            rInfo.ProductName = args[argi + 1];
+                            changeRegionData = true;
                             break;
 
                         case "owner":
@@ -418,6 +420,7 @@ namespace SilverSim.Main.Cmd.Region
                     r.Size.X = ((uint)regionEntry.GetInt("SizeX", 256) + 255) & (~(uint)255);
                     r.Size.Y = ((uint)regionEntry.GetInt("SizeY", 256) + 255) & (~(uint)255);
                     r.Flags = RegionFlags.RegionOnline;
+                    r.ProductName = regionEntry.GetString("RegionType", "Mainland");
                     r.Owner = new UUI(regionEntry.GetString("Owner"));
                     r.ScopeID = regionEntry.GetString("ScopeID", "00000000-0000-0000-0000-000000000000");
                     r.ServerHttpPort = m_HttpPort;
@@ -482,7 +485,7 @@ namespace SilverSim.Main.Cmd.Region
                     "regionid <uuid> - if not specified, a random uuid will be generated\n" +
                     "scopeid <uuid>\n" +
                     "size <x>,<y> - region size\n" +
-                    "regiontype <regiontype>\n" +
+                    "productname <regiontype>\n" +
                     "owner <uui>|<uuid>|<firstname>,<lastname>\n" +
                     "estate <name> - sets region owner to estate owner\n" +
                     "externalhostname <hostname>\n" +
@@ -505,6 +508,7 @@ namespace SilverSim.Main.Cmd.Region
                 rInfo.ScopeID = UUID.Zero;
                 rInfo.ServerIP = m_ExternalHostName;
                 rInfo.Size = new GridVector(256, 256);
+                rInfo.ProductName = "Mainland";
 
                 if (!uint.TryParse(args[3], out rInfo.ServerPort))
                 {
@@ -571,7 +575,8 @@ namespace SilverSim.Main.Cmd.Region
                             }
                             break;
 
-                        case "regiontype":
+                        case "productname":
+                            rInfo.ProductName = args[argi + 1];
                             break;
 
                         case "estate":

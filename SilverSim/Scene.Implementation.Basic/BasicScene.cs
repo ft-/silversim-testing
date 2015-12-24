@@ -857,7 +857,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         protected void SendRegionInfo(ViewerAgent agent)
         {
-            SilverSim.Viewer.Messages.Region.RegionInfo res = new Viewer.Messages.Region.RegionInfo();
+            Viewer.Messages.Region.RegionInfo res = new Viewer.Messages.Region.RegionInfo();
             res.AgentID = agent.Owner.ID;
             res.SessionID = agent.SessionID;
 
@@ -878,7 +878,7 @@ namespace SilverSim.Scene.Implementation.Basic
             res.UseEstateSun = true;
             res.SunHour = 1;
             res.ProductSKU = VersionInfo.SimulatorVersion;
-            res.ProductName = VersionInfo.ProductName;
+            res.ProductName = RegionData.ProductName;
             res.RegionFlagsExtended.Add(0);
 
             agent.SendMessageAlways(res, ID);

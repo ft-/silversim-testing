@@ -297,7 +297,7 @@ namespace SilverSim.Viewer.Core
                                             rh.CPURatio = 1;
                                             rh.ColoName = string.Empty;
                                             rh.ProductSKU = VersionInfo.SimulatorVersion;
-                                            rh.ProductName = VersionInfo.ProductName;
+                                            rh.ProductName = scene.RegionData.ProductName;
 
                                             Messages.Region.RegionHandshake.RegionExtDataEntry entry = new Messages.Region.RegionHandshake.RegionExtDataEntry();
                                             entry.RegionFlagsExtended = 0;

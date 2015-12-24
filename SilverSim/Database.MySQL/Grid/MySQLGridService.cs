@@ -231,15 +231,16 @@ namespace SilverSim.Database.MySQL.Grid
             ri.Location.Y = (uint)dbReader["locY"];
             ri.RegionMapTexture = dbReader["regionMapTexture"].ToString();
             ri.ServerHttpPort = (uint)dbReader["serverHttpPort"];
-            ri.Owner = new UUI(dbReader["owner"].ToString());
+            ri.Owner = dbReader.GetUUI("owner");
             ri.Access = (RegionAccess)(uint)dbReader["access"];
             ri.ScopeID = dbReader["ScopeID"].ToString();
             ri.Size.X = (uint)dbReader["sizeX"];
             ri.Size.Y = (uint)dbReader["sizeY"];
             ri.Flags = (RegionFlags)(uint)dbReader["flags"];
             ri.AuthenticatingToken = dbReader["AuthenticatingToken"].ToString();
-            ri.AuthenticatingPrincipalID = dbReader["AuthenticatingPrincipalID"].ToString();
-            ri.ParcelMapTexture = dbReader["parcelMapTexture"].ToString();
+            ri.AuthenticatingPrincipal = dbReader.GetUUI("AuthenticatingPrincipalID");
+            ri.ParcelMapTexture = dbReader.GetUUID("parcelMapTexture");
+            ri.ProductName = (string)dbReader["ProductName"];
 
             return ri;
         }
@@ -336,9 +337,10 @@ namespace SilverSim.Database.MySQL.Grid
                 regionData["regionSecret"] = regionInfo.RegionSecret;
                 regionData["owner"] = regionInfo.Owner.ToString();
                 regionData["AuthenticatingToken"] = regionInfo.AuthenticatingToken;
-                regionData["AuthenticatingPrincipalID"] = regionInfo.AuthenticatingPrincipalID.ToString();
+                regionData["AuthenticatingPrincipalID"] = regionInfo.AuthenticatingPrincipal.ToString();
                 regionData["flags"] = (uint)regionInfo.Flags;
                 regionData["ScopeID"] = regionInfo.ScopeID.ToString();
+                regionData["ProductName"] = regionInfo.ProductName;
 
                 MySQLUtilities.ReplaceInsertInto(conn, "regions", regionData);
             }
@@ -658,7 +660,8 @@ namespace SilverSim.Database.MySQL.Grid
                 "PRIMARY KEY(uuid)," +
                 "KEY regionName (regionName)," +
                 "KEY ScopeID (ScopeID)," +
-                "KEY flags (flags))"
+                "KEY flags (flags))",
+            "ALTER TABLE %tablename% ADD COLUMN (ProductName VARCHAR(255) NOT NULL DEFAULT 'Mainland'),",
         };
     }
     #endregion

@@ -28,6 +28,7 @@ namespace SilverSim.Types.Grid
         public string RegionSecret = string.Empty;
         public UUI Owner = UUI.Unknown;
         public RegionFlags Flags;
+        public string ProductName = string.Empty; /* e.g. "Mainland" */
         public string ProtocolVariant = string.Empty; /* see ProtocolVariantId */
         public string GridURI = string.Empty; /* empty when addressing local grid */
         [SuppressMessage("Gendarme.Rules.BadPractice", "AvoidVisibleConstantFieldRule")]
@@ -41,7 +42,7 @@ namespace SilverSim.Types.Grid
         #endregion
 
         #region Authentication Info
-        public UUID AuthenticatingPrincipalID = UUID.Zero;
+        public UUI AuthenticatingPrincipal = UUI.Unknown;
         public string AuthenticatingToken = string.Empty;
         #endregion
 
