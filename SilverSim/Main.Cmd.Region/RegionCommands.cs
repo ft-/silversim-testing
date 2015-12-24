@@ -474,7 +474,6 @@ namespace SilverSim.Main.Cmd.Region
                         }
                         else if (allEstates.Count != 0)
                         {
-                            r.Owner = allEstates[0].Owner;
                             m_EstateService.RegionMap[r.ID] = allEstates[0].ID;
                             io.WriteFormatted("Assigning new region {0} to estate {1} owned by {2}", r.Name, allEstates[0].Name, allEstates[0].Owner.FullName);
                         }
@@ -683,7 +682,6 @@ namespace SilverSim.Main.Cmd.Region
                     }
                     else if (allEstates.Count != 0)
                     {
-                        rInfo.Owner = allEstates[0].Owner;
                         m_EstateService.RegionMap[rInfo.ID] = allEstates[0].ID;
                         io.WriteFormatted("Assigning new region {0} to estate {1} owned by {2}", rInfo.Name, allEstates[0].Name, allEstates[0].Owner.FullName);
                     }
