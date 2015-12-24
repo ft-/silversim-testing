@@ -23,8 +23,8 @@ namespace SilverSim.WebIF.Admin.Simulator
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ADMIN WEB IF - REGION");
 
-        string m_RegionStorageName;
-        string m_SimulationDataName;
+        readonly string m_RegionStorageName;
+        readonly string m_SimulationDataName;
         GridServiceInterface m_RegionStorage;
         SceneFactoryInterface m_SceneFactory;
         SimulationDataStorageInterface m_SimulationData;

@@ -17,7 +17,7 @@ namespace SilverSim.WebIF.Admin.Simulator
     #region Service implementation
     public class EstateAdmin : IPlugin
     {
-        string m_EstateServiceName;
+        readonly string m_EstateServiceName;
         EstateServiceInterface m_EstateService;
 
         public EstateAdmin(string estateServiceName)
