@@ -10,11 +10,15 @@ using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.AvatarName;
+using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
+using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace SilverSim.WebIF.Admin.Simulator
 {
@@ -25,23 +29,45 @@ namespace SilverSim.WebIF.Admin.Simulator
 
         readonly string m_RegionStorageName;
         readonly string m_SimulationDataName;
+        readonly string m_EstateServiceName;
         GridServiceInterface m_RegionStorage;
         SceneFactoryInterface m_SceneFactory;
+        EstateServiceInterface m_EstateService;
         SimulationDataStorageInterface m_SimulationData;
+        readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
+        uint m_HttpPort;
+        string m_ExternalHostName = string.Empty;
+        string m_Scheme = Uri.UriSchemeHttp;
 
-        public RegionAdmin(string regionStorageName, string simulationDataName)
+        public RegionAdmin(string regionStorageName, string simulationDataName, string estateServiceName)
         {
             m_RegionStorageName = regionStorageName;
             m_SimulationDataName = simulationDataName;
+            m_EstateServiceName = estateServiceName;
         }
 
         public void Startup(ConfigurationLoader loader)
         {
+            IConfig config = loader.Config.Configs["Network"];
+            if (config != null)
+            {
+                m_ExternalHostName = config.GetString("ExternalHostName", "SYSTEMIP");
+                m_HttpPort = (uint)config.GetInt("HttpListenerPort", 9000);
+
+                if (config.Contains("ServerCertificate"))
+                {
+                    m_Scheme = Uri.UriSchemeHttps;
+                }
+            }
+
             m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             m_SceneFactory = loader.GetService<SceneFactoryInterface>("DefaultSceneImplementation");
             m_SimulationData = loader.GetService<SimulationDataStorageInterface>(m_SimulationDataName);
+            m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
 
             AdminWebIF webif = loader.GetAdminWebIF();
+            webif.JsonMethods.Add("region.create", HandleCreate);
+            webif.JsonMethods.Add("region.change", HandleChange);
             webif.JsonMethods.Add("region.delete", HandleDelete);
             webif.JsonMethods.Add("regions.list", HandleList);
             webif.JsonMethods.Add("region.start", HandleStart);
@@ -52,6 +78,20 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("regions.notice", HandleNotices);
             webif.JsonMethods.Add("region.agents.view", HandleAgentsView);
             webif.JsonMethods.Add("region.agents.kick", HandleAgentKick);
+
+            IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
+            if (null != sceneConfig)
+            {
+                string avatarNameServices = sceneConfig.GetString("AvatarNameServices", string.Empty);
+                if (!string.IsNullOrEmpty(avatarNameServices))
+                {
+                    foreach (string p in avatarNameServices.Split(','))
+                    {
+                        m_AvatarNameServices.Add(loader.GetService<AvatarNameServiceInterface>(p.Trim()));
+                    }
+                }
+            }
+
         }
 
         [AdminWebIF.RequiredRight("regions.view")]
@@ -64,6 +104,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             foreach (RegionInfo region in regions)
             {
                 Map m = region.ToJsonMap();
+                region.Owner = ResolveName(region.Owner);
                 m.Add("IsOnline", SceneManager.Scenes.ContainsKey(region.ID));
                 regionsRes.Add(m);
             }
@@ -163,6 +204,371 @@ namespace SilverSim.WebIF.Admin.Simulator
                     agents.Add(agent.ToJsonMap(si));
                 }
                 res.Add("agents", agents);
+            }
+        }
+
+        UUI ResolveName(UUI uui)
+        {
+            UUI resultUui;
+            foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
+            {
+                if (service.TryGetValue(uui, out resultUui))
+                {
+                    return resultUui;
+                }
+            }
+            return uui;
+        }
+
+        bool TranslateToUUI(string arg, out UUI uui)
+        {
+            uui = UUI.Unknown;
+            if (arg.Contains(","))
+            {
+                bool found = false;
+                string[] names = arg.Split(new char[] { ',' }, 2);
+                if (names.Length == 1)
+                {
+                    names = new string[] { names[0], string.Empty };
+                }
+                foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
+                {
+                    UUI founduui;
+                    if (service.TryGetValue(names[0], names[1], out founduui))
+                    {
+                        uui = founduui;
+                        found = true;
+                        break;
+                    }
+                }
+                return found;
+            }
+            else if (UUID.TryParse(arg, out uui.ID))
+            {
+                bool found = false;
+                foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
+                {
+                    UUI founduui;
+                    if (service.TryGetValue(uui.ID, out founduui))
+                    {
+                        uui = founduui;
+                        found = true;
+                        break;
+                    }
+                }
+                return found;
+            }
+            else if (!UUI.TryParse(arg, out uui))
+            {
+                return false;
+            }
+            return true;
+        }
+
+        [AdminWebIF.RequiredRight("regions.manage")]
+        void HandleCreate(HttpRequest req, Map jsondata)
+        {
+            RegionInfo rInfo;
+            if (!jsondata.ContainsKey("name") || !jsondata.ContainsKey("port") || !jsondata.ContainsKey("location"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (m_EstateService.All.Count == 0)
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NoEstates);
+            }
+            else if (m_RegionStorage.TryGetValue(UUID.Zero, jsondata["name"].ToString(), out rInfo))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.AlreadyExists);
+            }
+            else
+            {
+                rInfo = new RegionInfo();
+                EstateInfo selectedEstate = null;
+                rInfo.Name = jsondata["name"].ToString();
+                rInfo.ID = UUID.Random;
+                rInfo.Access = RegionAccess.Mature;
+                rInfo.ServerHttpPort = m_HttpPort;
+                rInfo.ScopeID = UUID.Zero;
+                rInfo.ServerIP = m_ExternalHostName;
+                rInfo.Size = new GridVector(256, 256);
+                rInfo.ProductName = "Mainland";
+
+                if (!uint.TryParse(jsondata["port"].ToString(), out rInfo.ServerPort))
+                {
+                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    return;
+                }
+                if (rInfo.ServerPort < 1 || rInfo.ServerPort > 65535)
+                {
+                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    return;
+                }
+
+                try
+                {
+                    rInfo.Location = new GridVector(jsondata["location"].ToString(), 256);
+                }
+                catch
+                {
+                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    return;
+                }
+
+                if(jsondata.ContainsKey("externalhostname"))
+                {
+                    rInfo.ServerIP = jsondata["externalhostname"].ToString();
+                }
+                if(jsondata.ContainsKey("regionid") &&
+                    !UUID.TryParse(jsondata["regionid"].ToString(), out rInfo.ID))
+                {
+                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    return;
+                }
+                if (jsondata.ContainsKey("scopeid") &&
+                    !UUID.TryParse(jsondata["scopeid"].ToString(), out rInfo.ScopeID))
+                {
+                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    return;
+                }
+                if (jsondata.ContainsKey("staticmaptile") &&
+                    !UUID.TryParse(jsondata["staticmaptile"].ToString(), out rInfo.RegionMapTexture))
+                {
+                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    return;
+                }
+                if(jsondata.ContainsKey("size"))
+                {
+                    try
+                    {
+                        rInfo.Size = new GridVector(jsondata["size"].ToString(), 256);
+                    }
+                    catch (Exception e)
+                    {
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                    }
+                }
+                if(jsondata.ContainsKey("productname"))
+                {
+                    rInfo.ProductName = jsondata["productname"].ToString();
+                }
+                if(jsondata.ContainsKey("estate"))
+                {
+                    if (!m_EstateService.TryGetValue(jsondata["estate"].ToString(), out selectedEstate))
+                    {
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                    }
+                    rInfo.Owner = selectedEstate.Owner;
+                }
+
+                if(jsondata.ContainsKey("owner") &&
+                    !TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
+                {
+                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    return;
+                }
+                if(jsondata.ContainsKey("status"))
+                {
+                    switch (jsondata["status"].ToString().ToLower())
+                    {
+                        case "online":
+                            rInfo.Flags = RegionFlags.RegionOnline;
+                            break;
+
+                        case "offline":
+                            rInfo.Flags = RegionFlags.None;
+                            break;
+
+                        default:
+                            AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                            return;
+                    }
+                }
+                if(jsondata.ContainsKey("access"))
+                {
+                    switch (jsondata["access"].ToString().ToLower())
+                    {
+                        case "trial":
+                            rInfo.Access = RegionAccess.Trial;
+                            break;
+
+                        case "pg":
+                            rInfo.Access = RegionAccess.PG;
+                            break;
+
+                        case "mature":
+                            rInfo.Access = RegionAccess.Mature;
+                            break;
+
+                        case "adult":
+                            rInfo.Access = RegionAccess.Adult;
+                            break;
+
+                        default:
+                            AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                            return;
+                    }
+                }
+                rInfo.ServerURI = string.Format("{0}://{1}:{2}/", m_Scheme, m_ExternalHostName, m_HttpPort);
+                try
+                {
+                    m_RegionStorage.RegisterRegion(rInfo);
+                }
+                catch
+                {
+                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                    return;
+                }
+
+                if (selectedEstate != null)
+                {
+                    m_EstateService.RegionMap[rInfo.ID] = selectedEstate.ID;
+                }
+                else
+                {
+                    List<EstateInfo> allEstates = m_EstateService.All;
+                    List<EstateInfo> ownerEstates = new List<EstateInfo>(from estate in allEstates where estate.Owner.EqualsGrid(rInfo.Owner) select estate);
+                    if (ownerEstates.Count != 0)
+                    {
+                        m_EstateService.RegionMap[rInfo.ID] = ownerEstates[0].ID;
+                    }
+                    else if (allEstates.Count != 0)
+                    {
+                        m_EstateService.RegionMap[rInfo.ID] = allEstates[0].ID;
+                    }
+                }
+                AdminWebIF.SuccessResponse(req, new Map());
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.manage")]
+        void HandleChange(HttpRequest req, Map jsondata)
+        {
+            RegionInfo rInfo;
+            if(!jsondata.ContainsKey("id"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!m_RegionStorage.TryGetValue(UUID.Zero, jsondata["id"].AsUUID, out rInfo))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            {
+                bool changeRegionData = false;
+                EstateInfo selectedEstate = null;
+                if(jsondata.ContainsKey("name"))
+                {
+                    rInfo.Name = jsondata["name"].ToString();
+                    changeRegionData = true;
+                }
+                if(jsondata.ContainsKey("port"))
+                {
+                    rInfo.ServerPort = jsondata["port"].AsUInt;
+                    if(rInfo.ServerPort < 1 || rInfo.ServerPort > 65535)
+                    {
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                    }
+                    changeRegionData = true;
+                }
+                if(jsondata.ContainsKey("scopeid"))
+                {
+                    if (!UUID.TryParse(jsondata["scopeid"].ToString(), out rInfo.ScopeID))
+                    {
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                    }
+                    changeRegionData = true;
+                }
+                if(jsondata.ContainsKey("productname"))
+                {
+                    rInfo.ProductName = jsondata["productname"].ToString();
+                    changeRegionData = true;
+                }
+                if(jsondata.ContainsKey("owner"))
+                {
+                    if(!TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
+                    {
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                    }
+                    changeRegionData = true;
+                }
+                if(jsondata.ContainsKey("estate"))
+                {
+                    if(!m_EstateService.TryGetValue(jsondata["estate"].ToString(), out selectedEstate))
+                    {
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                    }
+                    changeRegionData = true;
+                }
+                if(jsondata.ContainsKey("externalhostname"))
+                {
+                    rInfo.ServerIP = jsondata["externalhostname"].ToString();
+                    changeRegionData = true;
+                }
+                if(jsondata.ContainsKey("access"))
+                {
+                    switch (jsondata["access"].ToString().ToLower())
+                    {
+                        case "trial":
+                            rInfo.Access = RegionAccess.Trial;
+                            break;
+
+                        case "pg":
+                            rInfo.Access = RegionAccess.PG;
+                            break;
+
+                        case "mature":
+                            rInfo.Access = RegionAccess.Mature;
+                            break;
+
+                        case "adult":
+                            rInfo.Access = RegionAccess.Adult;
+                            break;
+
+                        default:
+                            AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                            return;
+                    }
+                    changeRegionData = true;
+                }
+                if(jsondata.ContainsKey("staticmaptile"))
+                {
+                    if(!UUID.TryParse(jsondata["staticmaptile"].ToString(), out rInfo.RegionMapTexture))
+                    {
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                    }
+                    changeRegionData = true;
+                }
+
+                SceneInterface si;
+                if (SceneManager.Scenes.TryGetValue(rInfo.ID, out si))
+                {
+                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.IsRunning);
+                    return;
+                }
+                if (changeRegionData)
+                {
+                    try
+                    {
+                        m_RegionStorage.RegisterRegion(rInfo);
+                    }
+                    catch
+                    {
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                        return;
+                    }
+                }
+                if (null != selectedEstate)
+                {
+                    m_EstateService.RegionMap[rInfo.ID] = selectedEstate.ID;
+                }
             }
         }
 
@@ -355,7 +761,8 @@ namespace SilverSim.WebIF.Admin.Simulator
         {
             return new RegionAdmin(
                 ownSection.GetString("RegionStorage", "RegionStorage"),
-                ownSection.GetString("SimulationDataStorage", "SimulationDataStorage"));
+                ownSection.GetString("SimulationDataStorage", "SimulationDataStorage"),
+                ownSection.GetString("EstateService", "EstateService"));
         }
     }
     #endregion

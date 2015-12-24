@@ -92,7 +92,9 @@ namespace SilverSim.WebIF.Admin
             AlreadyStarted = 13,
             FailedToStart = 14,
             NotRunning = 15,
-            IsRunning = 16
+            IsRunning = 16,
+            InvalidParameter = 17,
+            NoEstates = 18
         };
 
         public static void ErrorResponse(HttpRequest req, ErrorResult reason)
