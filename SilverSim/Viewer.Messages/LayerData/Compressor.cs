@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
@@ -212,6 +213,8 @@ namespace SilverSim.Viewer.Messages.LayerData
             return wbits;
         }
 
+        static readonly ILog m_Log = LogManager.GetLogger("LAYER COMPRESSOR");
+
         private static void EncodePatch(BitPacker output, int[] patch, int postquant, int wbits)
         {
             /* maximum possible length of patch data 640 Bytes */
@@ -220,7 +223,7 @@ namespace SilverSim.Viewer.Messages.LayerData
 
             if (postquant > LAYER_PATCH_NUM_XY_ENTRIES * LAYER_PATCH_NUM_XY_ENTRIES || postquant < 0)
             {
-                //Logger.Log("Postquant is outside the range of allowed values in EncodePatch()", Helpers.LogLevel.Error);
+                m_Log.ErrorFormat("Postquant {0} is outside the range of allowed values in EncodePatch()", postquant);
                 return;
             }
 
