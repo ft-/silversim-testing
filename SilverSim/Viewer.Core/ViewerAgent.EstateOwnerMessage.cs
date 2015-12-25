@@ -562,7 +562,7 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-            UUID invoice = req.Invoice;
+
             string message = UTF8NoBOM.GetString(req.ParamList[4]);
 
             foreach (IAgent agent in circuit.Scene.Agents)
@@ -610,8 +610,6 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-            UUID invoice = req.Invoice;
-            UUID SenderID = Owner.ID;
             SceneInterface scene = circuit.Scene;
             scene.RegionSettings.DisableScripts = !ParamStringToBool(req.ParamList[0]);
             scene.RegionSettings.DisableCollisions = !ParamStringToBool(req.ParamList[1]);
@@ -626,8 +624,6 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-            UUID invoice = req.Invoice;
-            UUID senderID = Owner.ID;
             UUID prey = UUID.Parse(UTF8NoBOM.GetString(req.ParamList[1]));
 
             SceneInterface scene = circuit.Scene;
@@ -642,9 +638,6 @@ namespace SilverSim.Viewer.Core
 
         void EstateOwner_TeleportHomeAllUsers(AgentCircuit circuit, EstateOwnerMessage req)
         {
-            UUID invoice = req.Invoice;
-            UUID senderID = Owner.ID;
-
             SceneInterface scene = circuit.Scene;
 
             foreach(IAgent targetagent in scene.RootAgents)
@@ -718,8 +711,6 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-            UUID invoice = req.Invoice;
-            UUID senderID = req.AgentID;
             SceneInterface scene = circuit.Scene;
             EstateChangeInfoFlags param1 = (EstateChangeInfoFlags)UInt32.Parse(UTF8NoBOM.GetString(req.ParamList[1]));
             UInt32 param2 = UInt32.Parse(UTF8NoBOM.GetString(req.ParamList[2]));
@@ -779,7 +770,7 @@ namespace SilverSim.Viewer.Core
                 EstateOwnerMessage m = new EstateOwnerMessage();
                 m.AgentID = circuit.AgentID;
                 m.SessionID = UUID.Zero;
-                m.Invoice = invoice;
+                m.Invoice = req.Invoice;
                 m.Method = "estateupdateinfo";
                 m.TransactionID = UUID.Zero;
                 m.ParamList.Add(UTF8NoBOM.GetBytes(estate.Name));
@@ -799,8 +790,6 @@ namespace SilverSim.Viewer.Core
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         void EstateOwner_Telehub(AgentCircuit circuit, EstateOwnerMessage req)
         {
-            UUID invoice = req.Invoice;
-            UUID senderID = Owner.ID;
             UInt32 param = 0;
             if(req.ParamList.Count < 1)
             {
@@ -824,8 +813,6 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            UUID invoice = req.Invoice;
-            UUID senderID = Owner.ID;
             UUID prey = UUID.Parse(UTF8NoBOM.GetString(req.ParamList[0]));
 
             IAgent targetagent;
