@@ -75,19 +75,10 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     m_Log.FatalFormat("Method {0} does not match in parameter count", mi.Name);
                 }
-                else if (mi.GetParameters()[0].ParameterType != typeof(UUI))
-                {
-                    m_Log.FatalFormat("Method {0} does not match in parameters", mi.Name);
-                }
-                else if (mi.GetParameters()[1].ParameterType != typeof(SceneInterface))
-                {
-                    m_Log.FatalFormat("Method {0} does not match in parameters", mi.Name);
-                }
-                else if (mi.GetParameters()[2].ParameterType != typeof(ModifyLand))
-                {
-                    m_Log.FatalFormat("Method {0} does not match in parameters", mi.Name);
-                }
-                else if (mi.GetParameters()[3].ParameterType != typeof(ModifyLand.Data))
+                else if (mi.GetParameters()[0].ParameterType != typeof(UUI) ||
+                        mi.GetParameters()[1].ParameterType != typeof(SceneInterface) ||
+                        mi.GetParameters()[2].ParameterType != typeof(ModifyLand) ||
+                        mi.GetParameters()[3].ParameterType != typeof(ModifyLand.Data))
                 {
                     m_Log.FatalFormat("Method {0} does not match in parameters", mi.Name);
                 }
@@ -113,19 +104,10 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     m_Log.FatalFormat("Method {0} does not match in parameter count", mi.Name);
                 }
-                else if (mi.GetParameters()[0].ParameterType != typeof(UUI))
-                {
-                    m_Log.FatalFormat("Method {0} does not match in parameters", mi.Name);
-                }
-                else if (mi.GetParameters()[1].ParameterType != typeof(SceneInterface))
-                {
-                    m_Log.FatalFormat("Method {0} does not match in parameters", mi.Name);
-                }
-                else if (mi.GetParameters()[2].ParameterType != typeof(ModifyLand))
-                {
-                    m_Log.FatalFormat("Method {0} does not match in parameters", mi.Name);
-                }
-                else if (mi.GetParameters()[3].ParameterType != typeof(ModifyLand.Data))
+                else if (mi.GetParameters()[0].ParameterType != typeof(UUI) ||
+                        mi.GetParameters()[1].ParameterType != typeof(SceneInterface) ||
+                        mi.GetParameters()[2].ParameterType != typeof(ModifyLand) ||
+                        mi.GetParameters()[3].ParameterType != typeof(ModifyLand.Data))
                 {
                     m_Log.FatalFormat("Method {0} does not match in parameters", mi.Name);
                 }
