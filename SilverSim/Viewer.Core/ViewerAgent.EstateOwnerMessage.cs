@@ -14,6 +14,7 @@ using System.Text;
 using System.Diagnostics.CodeAnalysis;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Scene.Management.Scene;
+using SilverSim.Types.Grid;
 
 namespace SilverSim.Viewer.Core
 {
@@ -293,8 +294,7 @@ namespace SilverSim.Viewer.Core
             scene.RegionSettings.AllowLandResell = ParamStringToBool(req.ParamList[3]);
             scene.RegionSettings.AgentLimit = (int)decimal.Parse(UTF8NoBOM.GetString(req.ParamList[4]), CultureInfo.InvariantCulture);
             scene.RegionSettings.ObjectBonus = float.Parse(UTF8NoBOM.GetString(req.ParamList[5]), CultureInfo.InvariantCulture);
-#warning TODO: adjust for correct values
-            //scene.RegionSettings.Maturity = int.Parse(req.ParamList[6]);
+            scene.RegionData.Access = (RegionAccess)int.Parse(UTF8NoBOM.GetString(req.ParamList[6]));
             scene.RegionSettings.RestrictPushing = ParamStringToBool(req.ParamList[7]);
             scene.RegionSettings.AllowLandJoinDivide = ParamStringToBool(req.ParamList[8]);
 

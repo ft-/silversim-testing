@@ -26,7 +26,6 @@ namespace SilverSim.Scene.Types.Scene
         public bool BlockShowInSearch;
         public int AgentLimit = 40;
         public double ObjectBonus = 1.0;
-        public int Maturity;
         public bool DisableScripts;
         public bool DisableCollisions;
         public bool DisablePhysics;
