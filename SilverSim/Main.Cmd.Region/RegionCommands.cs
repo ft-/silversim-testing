@@ -440,15 +440,12 @@ namespace SilverSim.Main.Cmd.Region
                             break;
 
                         case "mature":
+                        default:
                             r.Access = RegionAccess.Mature;
                             break;
 
                         case "adult":
                             r.Access = RegionAccess.Adult;
-                            break;
-
-                        default:
-                            r.Access = RegionAccess.Mature;
                             break;
                     }
 
