@@ -743,6 +743,36 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
+        public override void ResetParcels()
+        {
+            List<UUID> parcelIDs = m_SimulationDataStorage.Parcels.ParcelsInRegion(ID);
+            foreach(UUID parcelID in parcelIDs)
+            {
+                m_SimulationDataStorage.Parcels.Remove(ID, parcelID);
+            }
+
+            ParcelInfo pi = new ParcelInfo((int)RegionData.Size.X / 4, (int)RegionData.Size.Y / 4);
+            pi.AABBMin = new Vector3(0, 0, 0);
+            pi.AABBMax = new Vector3(RegionData.Size.X - 1, RegionData.Size.Y - 1, 0);
+            pi.ActualArea = (int)(RegionData.Size.X * RegionData.Size.Y);
+            pi.Area = (int)(RegionData.Size.X * RegionData.Size.Y);
+            pi.AuctionID = 0;
+            pi.LocalID = 1;
+            pi.ID = UUID.Random;
+            pi.Name = "Your Parcel";
+            pi.Owner = RegionData.Owner;
+            pi.Flags = ParcelFlags.None; /* we keep all flags disabled initially */
+            pi.BillableArea = (int)(RegionData.Size.X * RegionData.Size.Y);
+            pi.LandBitmap.SetAllBits();
+            pi.LandingPosition = new Vector3(128, 128, 23);
+            pi.LandingLookAt = new Vector3(1, 0, 0);
+            pi.ClaimDate = new Date();
+            pi.Status = ParcelStatus.Leased;
+            m_SimulationDataStorage.Parcels.Store(ID, pi);
+            ClearParcels();
+            AddParcel(pi);
+        }
+
         public override void ClearObjects()
         {
             List<ObjectGroup> objects = new List<ObjectGroup>();

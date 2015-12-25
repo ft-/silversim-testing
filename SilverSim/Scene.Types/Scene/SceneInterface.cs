@@ -366,6 +366,8 @@ namespace SilverSim.Scene.Types.Scene
 
         public abstract void TriggerRegionSettingsChanged();
 
+        public abstract void ResetParcels();
+
         private readonly RwLockedDictionary<UInt32, IObject> m_LocalIDs = new RwLockedDictionary<uint, IObject>();
         private UInt32 m_LastLocalID;
         readonly object m_LastLocalIDLock = new object();

@@ -34,7 +34,7 @@ namespace SilverSim.Main.Common.Commands
                 io.Write("no region selected");
                 return;
             }
-            scene.ClearParcels();
+            scene.ResetParcels();
             io.Write("Region parcels cleared");
         }
     }

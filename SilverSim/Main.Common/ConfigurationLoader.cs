@@ -1047,7 +1047,7 @@ namespace SilverSim.Main.Common
                 CmdIO.CommandRegistry.SelectCommands.Add("region", SelectRegionCommand);
                 CmdIO.CommandRegistry.ClearCommands.Add("region", Commands.ClearRegion.CmdHandler);
                 CmdIO.CommandRegistry.ClearCommands.Add("objects", Commands.ClearObjects.CmdHandler);
-                //CmdIO.CommandRegistry.ClearCommands.Add("parcels", Commands.ClearParcels.CmdHandler);
+                CmdIO.CommandRegistry.ClearCommands.Add("parcels", Commands.ClearParcels.CmdHandler);
 
                 /* we have to bypass the circular issue we would get when trying to do it via using */
                 Assembly assembly = Assembly.Load("SilverSim.Viewer.Core");
