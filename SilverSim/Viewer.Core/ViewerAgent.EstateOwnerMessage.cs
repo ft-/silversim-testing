@@ -13,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Diagnostics.CodeAnalysis;
 using SilverSim.ServiceInterfaces.Estate;
+using SilverSim.Scene.Management.Scene;
 
 namespace SilverSim.Viewer.Core
 {
@@ -579,9 +580,28 @@ namespace SilverSim.Viewer.Core
             UUID invoice = req.Invoice;
             string message;
 
-            message = req.ParamList.Count < 5 ?
+            message = (req.ParamList.Count < 5) ?
                 UTF8NoBOM.GetString(req.ParamList[1]) :
                 UTF8NoBOM.GetString(req.ParamList[4]);
+
+            SceneInterface scene = circuit.Scene;
+            UUID thisRegionId = scene.ID;
+            EstateServiceInterface estateService = scene.EstateService;
+            uint estateId;
+            if(estateService.RegionMap.TryGetValue(thisRegionId, out estateId))
+            {
+                List<UUID> allRegions = estateService.RegionMap[estateId];
+                foreach(UUID regionId in allRegions)
+                {
+                    if(SceneManager.Scenes.TryGetValue(regionId, out scene))
+                    {
+                        foreach(IAgent agent in scene.RootAgents)
+                        {
+                            agent.SendAlertMessage(message, regionId);
+                        }
+                    }
+                }
+            }
         }
 
         void EstateOwner_SetRegionDebug(AgentCircuit circuit, EstateOwnerMessage req)
