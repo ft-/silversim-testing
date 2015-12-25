@@ -455,12 +455,9 @@ namespace SilverSim.Scene.Types.Scene
 
 #warning Add Friends Rights to CanReturn?
 
-            if (HasGroupPower(agent.Owner, group.Group, GroupPowers.ReturnGroupSet))
-            {
-                return true;
-            }
-            else if(group.IsGroupOwned &&
-                HasGroupPower(agent.Owner, group.Group, GroupPowers.ReturnGroupOwned))
+            if (HasGroupPower(agent.Owner, group.Group, GroupPowers.ReturnGroupSet) ||
+                (group.IsGroupOwned &&
+                HasGroupPower(agent.Owner, group.Group, GroupPowers.ReturnGroupOwned)))
             {
                 return true;
             }
