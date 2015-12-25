@@ -134,7 +134,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             set
             {
-                if(value)
+                if (value)
                 {
                     LoginControl.Ready(ReadyFlags.LoginsEnable);
                 }
@@ -162,7 +162,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             set
             {
-                if(value == null)
+                if (value == null)
                 {
                     throw new ArgumentNullException("value");
                 }
@@ -173,7 +173,7 @@ namespace SilverSim.Scene.Types.Scene
                         m_PhysicsScene.RemoveAll();
                     }
                     m_PhysicsScene = value;
-                    foreach(ObjectPart p in Primitives)
+                    foreach (ObjectPart p in Primitives)
                     {
                         m_PhysicsScene.Add(p);
                     }
@@ -270,7 +270,7 @@ namespace SilverSim.Scene.Types.Scene
 
         void LoginsEnabledHandler(bool state)
         {
-            if(state)
+            if (state)
             {
                 m_Log.WarnFormat("LOGINS ENABLED at {0} (ID {1})", Name, ID);
             }
@@ -279,6 +279,9 @@ namespace SilverSim.Scene.Types.Scene
                 m_Log.WarnFormat("LOGINS DISABLED at {0} (ID {1})", Name, ID);
             }
         }
+
+        public abstract void ReregisterRegion();
+        public GridServiceInterface RegionStorage { get; set; }
 
         public SceneInterface(UInt32 sizeX, UInt32 sizeY)
         {

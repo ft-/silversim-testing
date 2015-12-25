@@ -297,7 +297,7 @@ namespace SilverSim.Viewer.Core
             scene.RegionData.Access = (RegionAccess)int.Parse(UTF8NoBOM.GetString(req.ParamList[6]));
             scene.RegionSettings.RestrictPushing = ParamStringToBool(req.ParamList[7]);
             scene.RegionSettings.AllowLandJoinDivide = ParamStringToBool(req.ParamList[8]);
-
+            scene.ReregisterRegion();
             scene.TriggerRegionSettingsChanged();
         }
 

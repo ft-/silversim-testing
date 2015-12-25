@@ -30,6 +30,7 @@ namespace SilverSim.Scene.Implementation.Basic
         readonly string m_AssetServiceName;
         readonly string m_AssetCacheServiceName;
         readonly string m_GridServiceName;
+        readonly string m_RegionStorageName;
         readonly string m_IMServiceName;
         readonly string m_EstateServiceName;
         readonly string m_SimulationDataStorageName;
@@ -41,6 +42,7 @@ namespace SilverSim.Scene.Implementation.Basic
         AssetServiceInterface m_AssetService;
         AssetServiceInterface m_AssetCacheService;
         GridServiceInterface m_GridService;
+        GridServiceInterface m_RegionStorage;
         GroupsServiceInterface m_GroupsService;
         ServerParamServiceInterface m_ServerParamService;
         IMServiceInterface m_IMService;
@@ -53,6 +55,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public SceneFactory(IConfig ownConfig)
         {
+            m_RegionStorageName = ownConfig.GetString("RegionStorage", "RegionStorage");
             m_ChatFactoryName = ownConfig.GetString("ChatService", "Chat");
             m_GroupsNameServiceName = ownConfig.GetString("GroupsNameService", string.Empty);
             m_GroupsServiceName = ownConfig.GetString("GroupsService", string.Empty);
@@ -85,6 +88,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public void Startup(ConfigurationLoader loader)
         {
+            m_RegionStorage = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             m_ChatFactory = loader.GetService<ChatServiceFactoryInterface>(m_ChatFactoryName);
             if (m_GroupsNameServiceName.Length != 0)
             {
@@ -117,7 +121,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override SceneInterface Instantiate(RegionInfo ri)
         {
-            return new BasicScene(m_ChatFactory.Instantiate(), 
+            BasicScene scene = new BasicScene(m_ChatFactory.Instantiate(), 
                 m_IMService, 
                 m_GroupsNameService, 
                 m_GroupsService,
@@ -132,6 +136,8 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_PhysicsFactory,
                 m_NeighborService,
                 m_CapabilitiesConfig);
+            scene.RegionStorage = m_RegionStorage;
+            return scene;
         }
     }
 

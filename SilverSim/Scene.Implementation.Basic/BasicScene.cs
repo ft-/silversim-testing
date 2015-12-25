@@ -632,6 +632,16 @@ namespace SilverSim.Scene.Implementation.Basic
 
         #endregion
 
+        public override void ReregisterRegion()
+        {
+            GridService.RegisterRegion(RegionData);
+            GridServiceInterface regionStorage = RegionStorage;
+            if(null != regionStorage)
+            {
+                regionStorage.RegisterRegion(RegionData);
+            }
+        }
+
         #region Add and Remove
         internal int m_ObjectCount;
         internal int m_PrimitiveCount;
