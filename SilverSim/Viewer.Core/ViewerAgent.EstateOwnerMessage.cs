@@ -577,7 +577,7 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-            UUID invoice = req.Invoice;
+
             string message;
 
             message = (req.ParamList.Count < 5) ?
