@@ -172,6 +172,7 @@ namespace SilverSim.ServiceInterfaces.Grid
         #endregion
 
         #region List accessors
+        public abstract List<RegionInfo> GetHyperlinks(UUID scopeID);
         public abstract List<RegionInfo> GetDefaultRegions(UUID scopeID);
         public abstract List<RegionInfo> GetFallbackRegions(UUID scopeID);
         public abstract List<RegionInfo> GetDefaultHypergridRegions(UUID scopeID);

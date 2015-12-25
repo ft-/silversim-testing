@@ -462,20 +462,25 @@ namespace SilverSim.Database.MySQL.Grid
         #endregion
 
         #region List accessors
-        public override List<RegionInfo> GetDefaultRegions(UUID scopeID)
+        List<RegionInfo> GetRegionsByFlag(UUID scopeID, RegionFlags flags)
         {
             List<RegionInfo> result = new List<RegionInfo>();
 
-            using(MySqlConnection connection = new MySqlConnection(m_ConnectionString))
+            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using(MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
+                using (MySqlCommand cmd = new MySqlCommand(scopeID == UUID.Zero ?
+                    "SELECT * FROM regions WHERE flags & ?flag != 0" :
+                    "SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?flag", (uint)RegionFlags.DefaultRegion);
-                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                    cmd.Parameters.AddWithValue("?flag", (uint)flags);
+                    if (scopeID != UUID.Zero)
+                    {
+                        cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
+                    }
                     using (MySqlDataReader dbReader = cmd.ExecuteReader())
                     {
-                        while(dbReader.Read())
+                        while (dbReader.Read())
                         {
                             result.Add(ToRegionInfo(dbReader));
                         }
@@ -484,101 +489,36 @@ namespace SilverSim.Database.MySQL.Grid
             }
 
             return result;
+        }
+
+        public override List<RegionInfo> GetHyperlinks(UUID scopeID)
+        {
+            return GetRegionsByFlag(scopeID, RegionFlags.Hyperlink);
+        }
+
+        public override List<RegionInfo> GetDefaultRegions(UUID scopeID)
+        {
+            return GetRegionsByFlag(scopeID, RegionFlags.DefaultRegion);
         }
 
         public override List<RegionInfo> GetOnlineRegions(UUID scopeID)
         {
-            List<RegionInfo> result = new List<RegionInfo>();
-
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
-                {
-                    cmd.Parameters.AddWithValue("?flag", (uint)RegionFlags.RegionOnline);
-                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                    {
-                        while (dbReader.Read())
-                        {
-                            result.Add(ToRegionInfo(dbReader));
-                        }
-                    }
-                }
-            }
-
-            return result;
+            return GetRegionsByFlag(scopeID, RegionFlags.RegionOnline);
         }
 
         public override List<RegionInfo> GetOnlineRegions()
         {
-            List<RegionInfo> result = new List<RegionInfo>();
-
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0", connection))
-                {
-                    cmd.Parameters.AddWithValue("?flag", (uint)RegionFlags.RegionOnline);
-                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                    {
-                        while (dbReader.Read())
-                        {
-                            result.Add(ToRegionInfo(dbReader));
-                        }
-                    }
-                }
-            }
-
-            return result;
+            return GetRegionsByFlag(UUID.Zero, RegionFlags.RegionOnline);
         }
 
         public override List<RegionInfo> GetFallbackRegions(UUID scopeID)
         {
-            List<RegionInfo> result = new List<RegionInfo>();
-
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
-                {
-                    cmd.Parameters.AddWithValue("?flags", (uint)RegionFlags.FallbackRegion);
-                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                    {
-                        while (dbReader.Read())
-                        {
-                            result.Add(ToRegionInfo(dbReader));
-                        }
-                    }
-                }
-            }
-
-            return result;
+            return GetRegionsByFlag(scopeID, RegionFlags.FallbackRegion);
         }
 
         public override List<RegionInfo> GetDefaultHypergridRegions(UUID scopeID)
         {
-            List<RegionInfo> result = new List<RegionInfo>();
-
-            using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
-            {
-                connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM regions WHERE flags & ?flag != 0 AND ScopeID LIKE ?scopeid", connection))
-                {
-                    cmd.Parameters.AddWithValue("?flags", (uint)RegionFlags.DefaultHGRegion);
-                    cmd.Parameters.AddWithValue("?scopeid", scopeID.ToString());
-                    using (MySqlDataReader dbReader = cmd.ExecuteReader())
-                    {
-                        while (dbReader.Read())
-                        {
-                            result.Add(ToRegionInfo(dbReader));
-                        }
-                    }
-                }
-            }
-
-            return result;
+            return GetRegionsByFlag(scopeID, RegionFlags.DefaultHGRegion);
         }
 
         public override List<RegionInfo> GetRegionsByRange(UUID scopeID, GridVector min, GridVector max)
