@@ -49,7 +49,7 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
 
             public abstract bool IsAgent { get; }
 
-            public abstract void Serialize(List<string> res, int handle);
+            public abstract void Serialize(List<object> res, int handle);
 
             public abstract bool IsMatching(string name, UUID id, string message, Int32 regexBitfield);
         }

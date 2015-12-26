@@ -86,15 +86,15 @@ namespace SilverSim.Scene.Chat
             m_Send = send;
         }
 
-        public override void Serialize(List<string> res, int handle)
+        public override void Serialize(List<object> res, int handle)
         {
-            res.Add(IsActive.ToString());
-            res.Add(handle.ToString());
-            res.Add(Channel.ToString());
+            res.Add(IsActive);
+            res.Add(handle);
+            res.Add(Channel);
             res.Add(m_NamePlain);
-            res.Add(m_ID.ToString());
-            res.Add(m_MessagePlain.ToString());
-            res.Add(m_RegexBitfield.ToString());
+            res.Add(m_ID);
+            res.Add(m_MessagePlain);
+            res.Add(m_RegexBitfield);
         }
 
         public override void Remove()

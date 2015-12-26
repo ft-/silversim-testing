@@ -55,15 +55,15 @@ namespace SilverSim.Scene.Chat
                 0 == regexBitfield;
         }
 
-        public override void Serialize(List<string> res, int handle)
+        public override void Serialize(List<object> res, int handle)
         {
-            res.Add(IsActive.ToString());
-            res.Add(handle.ToString());
-            res.Add(Channel.ToString());
+            res.Add(IsActive);
+            res.Add(handle);
+            res.Add(Channel);
             res.Add(m_Name);
-            res.Add(m_ID.ToString());
-            res.Add(m_Message.ToString());
-            res.Add("0");
+            res.Add(m_ID);
+            res.Add(m_Message);
+            res.Add(0);
         }
 
         public override void Remove()
