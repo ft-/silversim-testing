@@ -16,6 +16,7 @@ namespace SilverSim.Scene.Types.Script.Events
     {
         public UUID Key;
         public UUI Group;
+        public UUI Owner;
         public string Name;
         public Vector3 Position;
         public Quaternion Rotation;
