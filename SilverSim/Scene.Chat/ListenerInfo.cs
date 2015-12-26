@@ -5,6 +5,7 @@ using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 
 namespace SilverSim.Scene.Chat
 {
@@ -44,6 +45,25 @@ namespace SilverSim.Scene.Chat
             m_GetUUID = getuuid;
             m_GetPos = getpos;
             m_Send = send;
+        }
+
+        public override bool IsMatching(string name, UUID id, string message, Int32 regexBitfield)
+        {
+            return m_Name == name &&
+                m_ID == id &&
+                m_Message == message &&
+                0 == regexBitfield;
+        }
+
+        public override void Serialize(List<string> res, int handle)
+        {
+            res.Add(IsActive.ToString());
+            res.Add(handle.ToString());
+            res.Add(Channel.ToString());
+            res.Add(m_Name);
+            res.Add(m_ID.ToString());
+            res.Add(m_Message.ToString());
+            res.Add("0");
         }
 
         public override void Remove()

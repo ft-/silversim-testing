@@ -5,6 +5,7 @@ using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace SilverSim.Scene.Chat
@@ -32,6 +33,14 @@ namespace SilverSim.Scene.Chat
 
         readonly ChatHandler m_Handler;
 
+        public override bool IsMatching(string name, UUID id, string message, Int32 regexBitfield)
+        {
+            return m_NamePlain == name &&
+                m_ID == id &&
+                m_MessagePlain == message &&
+                m_RegexBitfield == regexBitfield;
+        }
+
         internal RegexListenerInfo(
             ChatHandler handler,
             int channel, 
@@ -52,6 +61,7 @@ namespace SilverSim.Scene.Chat
                 if((m_RegexBitfield & 1) != 0)
                 {
                     m_Name = new Regex(name);
+                    m_NamePlain = name;
                 }
                 else
                 {
@@ -64,6 +74,7 @@ namespace SilverSim.Scene.Chat
                 if ((m_RegexBitfield & 2) != 0)
                 {
                     m_Message = new Regex(message);
+                    m_MessagePlain = name;
                 }
                 else
                 {
@@ -73,6 +84,17 @@ namespace SilverSim.Scene.Chat
             m_GetUUID = getuuid;
             m_GetPos = getpos;
             m_Send = send;
+        }
+
+        public override void Serialize(List<string> res, int handle)
+        {
+            res.Add(IsActive.ToString());
+            res.Add(handle.ToString());
+            res.Add(Channel.ToString());
+            res.Add(m_NamePlain);
+            res.Add(m_ID.ToString());
+            res.Add(m_MessagePlain.ToString());
+            res.Add(m_RegexBitfield.ToString());
         }
 
         public override void Remove()

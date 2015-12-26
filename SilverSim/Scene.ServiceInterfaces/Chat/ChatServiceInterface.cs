@@ -4,6 +4,7 @@
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.ServiceInterfaces.Chat
@@ -47,6 +48,10 @@ namespace SilverSim.Scene.ServiceInterfaces.Chat
             public abstract bool IsActive { get; set; }
 
             public abstract bool IsAgent { get; }
+
+            public abstract void Serialize(List<string> res, int handle);
+
+            public abstract bool IsMatching(string name, UUID id, string message, Int32 regexBitfield);
         }
 
         #region Constructor
