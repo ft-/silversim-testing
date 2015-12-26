@@ -14,7 +14,10 @@ namespace SilverSim.Scene.Types.Script.Events
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
     public struct DetectInfo 
     {
-        public IObject Object;
+        public UUID Key;
+        public string Name;
+        public Vector3 Position;
+        public Quaternion Rotation;
         public Vector3 GrabOffset;
         public int LinkNumber;
         public Vector3 TouchBinormal;
