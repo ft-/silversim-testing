@@ -537,6 +537,36 @@ namespace SilverSim.Types
             }
         }
 
+        public static string ReadElementValueAsString(this XmlTextReader reader, string tagname)
+        {
+            for (;;)
+            {
+                if (!reader.Read())
+                {
+                    throw new XmlException("Premature end of XML");
+                }
+
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        throw new XmlException("Unexpected child node");
+
+                    case XmlNodeType.Text:
+                        return reader.ReadContentAsString();
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != tagname)
+                        {
+                            throw new XmlException("closing tag does not match");
+                        }
+                        return string.Empty;
+
+                    default:
+                        break;
+                }
+            }
+        }
+
         public static bool ReadElementValueAsBoolean(this XmlTextReader reader)
         {
             string tagname = reader.Name;
