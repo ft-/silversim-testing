@@ -15,6 +15,7 @@ namespace SilverSim.Scene.Types.Script.Events
     public struct DetectInfo 
     {
         public UUID Key;
+        public UUI Group;
         public string Name;
         public Vector3 Position;
         public Quaternion Rotation;
