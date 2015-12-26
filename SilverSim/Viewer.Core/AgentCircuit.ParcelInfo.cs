@@ -55,16 +55,8 @@ namespace SilverSim.Viewer.Core
                 pInfo.PassPrice = req.PassPrice;
                 pInfo.PassHours = req.PassHours;
                 pInfo.Category = req.Category;
-                UUI uui;
-                if (req.AuthBuyerID == UUID.Zero)
-                {
-                    pInfo.AuthBuyer = UUI.Unknown;
-                }
-                else if (Scene.AvatarNameService.TryGetValue(req.AuthBuyerID, out uui))
-                {
-                    pInfo.AuthBuyer = uui;
-                }
-                else
+                if (req.AuthBuyerID == UUID.Zero ||
+                    !Scene.AvatarNameService.TryGetValue(req.AuthBuyerID, out pInfo.AuthBuyer))
                 {
                     pInfo.AuthBuyer = UUI.Unknown;
                 }
