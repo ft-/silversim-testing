@@ -15,7 +15,7 @@ namespace SilverSim.Scene.Types.Script.Events
     public struct DetectInfo 
     {
         public UUID Key;
-        public UUI Group;
+        public UGI Group;
         public UUI Owner;
         public string Name;
         public Vector3 Position;
