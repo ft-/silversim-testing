@@ -57,7 +57,7 @@ namespace SilverSim.Types.Asset.Format
 
                 if(Text.StartsWith("<llsd>"))
                 {
-                    byte[] d = Text.ToUTF8String();
+                    byte[] d = Text.ToUTF8Bytes();
                     /* could be an agent appearance notecard, so let us try that */
                     Map im;
                     using (Stream i = new MemoryStream(d))
@@ -554,9 +554,9 @@ namespace SilverSim.Types.Asset.Format
 
                 notecard += "}\n";
             }
-            byte[] TextData = v.Text.ToUTF8String();
+            byte[] TextData = v.Text.ToUTF8Bytes();
             notecard += String.Format("Text length {0}\n", TextData.Length);
-            byte[] NotecardHeader = notecard.ToUTF8String();
+            byte[] NotecardHeader = notecard.ToUTF8Bytes();
 
             AssetData asset = new AssetData();
             asset.Data = new byte[TextData.Length + NotecardHeader.Length + 2];

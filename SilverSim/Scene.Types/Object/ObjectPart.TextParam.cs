@@ -26,7 +26,7 @@ namespace SilverSim.Scene.Types.Object
             {
                 get
                 {
-                    byte[] textBytes = Text.ToUTF8String();
+                    byte[] textBytes = Text.ToUTF8Bytes();
                     byte[] serialization = new byte[4 + textBytes.Length];
                     Buffer.BlockCopy(textBytes, 0, serialization, 4, textBytes.Length);
                     serialization[0] = TextColor.R_AsByte;
@@ -46,7 +46,7 @@ namespace SilverSim.Scene.Types.Object
                     TextColor.B_AsByte = value[2];
                     TextColor.A_AsByte = value[3];
                     Text = value.Length > 4 ?
-                        value.FromUTF8String(4, value.Length - 4) :
+                        value.FromUTF8Bytes(4, value.Length - 4) :
                         string.Empty;
                 }
             }

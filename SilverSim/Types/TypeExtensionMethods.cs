@@ -85,22 +85,22 @@ namespace SilverSim.Types
 
         static readonly UTF8Encoding m_UTF8NoBOM = new UTF8Encoding(false);
 
-        public static byte[] ToUTF8String(this string s)
+        public static byte[] ToUTF8Bytes(this string s)
         {
             return m_UTF8NoBOM.GetBytes(s);
         }
 
-        public static int ToUTF8StringCount(this string s)
+        public static int ToUTF8ByteCount(this string s)
         {
             return m_UTF8NoBOM.GetByteCount(s);
         }
 
-        public static string FromUTF8String(this byte[] data)
+        public static string FromUTF8Bytes(this byte[] data)
         {
             return m_UTF8NoBOM.GetString(data);
         }
 
-        public static string FromUTF8String(this byte[] data, int index, int count)
+        public static string FromUTF8Bytes(this byte[] data, int index, int count)
         {
             return m_UTF8NoBOM.GetString(data, index, count);
         }

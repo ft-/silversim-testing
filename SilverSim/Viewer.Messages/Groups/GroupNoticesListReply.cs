@@ -29,7 +29,7 @@ namespace SilverSim.Viewer.Messages.Groups
             {
                 get
                 {
-                    return 25 + FromName.Length + Subject.ToUTF8StringCount();
+                    return 25 + FromName.Length + Subject.ToUTF8ByteCount();
                 }
             }
         }

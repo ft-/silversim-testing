@@ -182,7 +182,7 @@ namespace SilverSim.WebIF.Admin
                 m_Log.InfoFormat("<<admin>> created password: {0}", res);
                 using (SHA1 sha1 = SHA1.Create())
                 {
-                    byte[] str = res.ToUTF8String();
+                    byte[] str = res.ToUTF8Bytes();
 
                     res = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "").ToLower();
                 }
@@ -216,7 +216,7 @@ namespace SilverSim.WebIF.Admin
             {
                 using (SHA1 sha1 = SHA1.Create())
                 {
-                    byte[] str = (challenge.ToString().ToLower() + "+" + pass_sha1.ToLower()).ToUTF8String();
+                    byte[] str = (challenge.ToString().ToLower() + "+" + pass_sha1.ToLower()).ToUTF8Bytes();
 
                     sessionInfo.ExpectedResponse = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "").ToLower();
                     sessionInfo.Rights = new List<string>(rights.ToLower().Split(','));

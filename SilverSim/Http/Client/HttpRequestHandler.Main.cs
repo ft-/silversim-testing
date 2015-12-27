@@ -92,7 +92,7 @@ namespace SilverSim.Http.Client
 
             if (post.Length != 0)
             {
-                buffer = post.ToUTF8String();
+                buffer = post.ToUTF8Bytes();
 
                 if (compressed || content_type == "application/x-gzip")
                 {

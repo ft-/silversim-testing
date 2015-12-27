@@ -25,7 +25,7 @@ namespace SilverSim.Viewer.Messages.Groups
             {
                 get
                 {
-                    return 20 + Title.ToUTF8StringCount();
+                    return 20 + Title.ToUTF8ByteCount();
                 }
             }
         }

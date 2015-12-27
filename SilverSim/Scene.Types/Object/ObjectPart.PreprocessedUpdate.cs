@@ -205,10 +205,10 @@ namespace SilverSim.Scene.Types.Object
                     byte[] textureEntry = TextureEntryBytes;
                     byte[] textureAnimEntry = TextureAnimationBytes;
                     TextParam text = Text;
-                    byte[] textBytes = text.Text.ToUTF8String();
+                    byte[] textBytes = text.Text.ToUTF8Bytes();
                     byte[] psBlock = ParticleSystemBytes;
                     byte[] extraParams = ExtraParamsBytes;
-                    byte[] mediaUrlBytes = MediaURL.ToUTF8String();
+                    byte[] mediaUrlBytes = MediaURL.ToUTF8Bytes();
 
                     byte[] data;
                     switch (m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode])
@@ -312,7 +312,7 @@ namespace SilverSim.Scene.Types.Object
                         m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.State] = ObjectGroup.RootPart.Shape.State;
                     }
 
-                    byte[] nameBytes = name.ToUTF8String();
+                    byte[] nameBytes = name.ToUTF8Bytes();
 
                     int blockSize = m_FullUpdateFixedBlock1.Length + m_FullUpdateFixedBlock2.Length;
                     blockSize += textureEntry.Length + 2;
@@ -403,10 +403,10 @@ namespace SilverSim.Scene.Types.Object
                 #region ObjectProperties
                 if ((flags & UpdateDataFlags.Properties) != 0)
                 {
-                    byte[] nameBytes = Name.ToUTF8String();
-                    byte[] descriptionBytes = Description.ToUTF8String();
-                    byte[] touchNameBytes = TouchText.ToUTF8String();
-                    byte[] sitNameBytes = SitText.ToUTF8String();
+                    byte[] nameBytes = Name.ToUTF8Bytes();
+                    byte[] descriptionBytes = Description.ToUTF8Bytes();
+                    byte[] touchNameBytes = TouchText.ToUTF8Bytes();
+                    byte[] sitNameBytes = SitText.ToUTF8Bytes();
                     
                     int propDataLength = m_PropUpdateFixedBlock.Length + 9 + 
                         nameBytes.Length + 

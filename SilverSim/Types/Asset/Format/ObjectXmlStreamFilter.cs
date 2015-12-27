@@ -114,7 +114,7 @@ namespace SilverSim.Types.Asset.Format
                             break;
                         }
                     }
-                    string test = m_Buffer.FromUTF8String(0, tagend + 1);
+                    string test = m_Buffer.FromUTF8Bytes(0, tagend + 1);
                     if(test.StartsWith("<SceneObjectPart"))
                     {
                         if(test.Contains("xmlns:xmlns:"))
@@ -141,7 +141,7 @@ namespace SilverSim.Types.Asset.Format
                             }
                             byte[] newbuf = new byte[m_BufFill - tagend - 1];
                             Buffer.BlockCopy(m_Buffer, tagend + 1, newbuf, 0, m_BufFill - tagend - 1);
-                            byte[] newstr = test.ToUTF8String();
+                            byte[] newstr = test.ToUTF8Bytes();
                             Buffer.BlockCopy(newstr, 0, m_Buffer, 0, newstr.Length);
                             Buffer.BlockCopy(newbuf, 0, m_Buffer, newstr.Length, newbuf.Length);
                             m_BufFill = newstr.Length + newbuf.Length;
@@ -156,7 +156,7 @@ namespace SilverSim.Types.Asset.Format
                         test = "<?xml version=\"1.0\"?>";
                         byte[] newbuf = new byte[m_BufFill - tagend - 1];
                         Buffer.BlockCopy(m_Buffer, tagend + 1, newbuf, 0, m_BufFill - tagend - 1);
-                        byte[] newstr = test.ToUTF8String();
+                        byte[] newstr = test.ToUTF8Bytes();
                         Buffer.BlockCopy(newstr, 0, m_Buffer, 0, newstr.Length);
                         Buffer.BlockCopy(newbuf, 0, m_Buffer, newstr.Length, newbuf.Length);
                         m_BufFill = newstr.Length + newbuf.Length;

@@ -2493,7 +2493,7 @@ namespace SilverSim.Scene.Types.Object
                                     {
                                         if (!string.IsNullOrEmpty(json))
                                         {
-                                            using (MemoryStream ms = new MemoryStream(json.ToUTF8String()))
+                                            using (MemoryStream ms = new MemoryStream(json.ToUTF8Bytes()))
                                             {
                                                 Map m = Json.Deserialize(ms) as Map;
                                                 if (null != m)

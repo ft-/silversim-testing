@@ -22,7 +22,7 @@ namespace SilverSim.Viewer.Core
     {
         byte[] StringToBytes(string s)
         {
-            return (s + "\0").ToUTF8String();
+            return (s + "\0").ToUTF8Bytes();
         }
 
         [PacketHandler(MessageType.EstateOwnerMessage)]
@@ -292,9 +292,9 @@ namespace SilverSim.Viewer.Core
             scene.RegionSettings.BlockFly = ParamStringToBool(req.ParamList[1]);
             scene.RegionSettings.AllowDamage = ParamStringToBool(req.ParamList[2]);
             scene.RegionSettings.AllowLandResell = ParamStringToBool(req.ParamList[3]);
-            scene.RegionSettings.AgentLimit = (int)decimal.Parse(req.ParamList[4].FromUTF8String(), CultureInfo.InvariantCulture);
-            scene.RegionSettings.ObjectBonus = float.Parse(req.ParamList[5].FromUTF8String(), CultureInfo.InvariantCulture);
-            scene.RegionData.Access = (RegionAccess)int.Parse(req.ParamList[6].FromUTF8String());
+            scene.RegionSettings.AgentLimit = (int)decimal.Parse(req.ParamList[4].FromUTF8Bytes(), CultureInfo.InvariantCulture);
+            scene.RegionSettings.ObjectBonus = float.Parse(req.ParamList[5].FromUTF8Bytes(), CultureInfo.InvariantCulture);
+            scene.RegionData.Access = (RegionAccess)int.Parse(req.ParamList[6].FromUTF8Bytes());
             scene.RegionSettings.RestrictPushing = ParamStringToBool(req.ParamList[7]);
             scene.RegionSettings.AllowLandJoinDivide = ParamStringToBool(req.ParamList[8]);
             scene.ReregisterRegion();
@@ -310,7 +310,7 @@ namespace SilverSim.Viewer.Core
             {
                 foreach (byte[] b in req.ParamList)
                 {
-                    string s = b.FromUTF8String();
+                    string s = b.FromUTF8Bytes();
                     string[] splitfield = s.Split(' ');
                     if (splitfield.Length != 2)
                     {
@@ -361,7 +361,7 @@ namespace SilverSim.Viewer.Core
 
             foreach (byte[] b in req.ParamList)
             {
-                string s = b.FromUTF8String();
+                string s = b.FromUTF8Bytes();
                 string[] splitfield = s.Split(' ');
                 if (splitfield.Length != 3)
                 {
@@ -408,7 +408,7 @@ namespace SilverSim.Viewer.Core
 
         static bool ParamStringToBool(byte[] b)
         {
-            string s = b.FromUTF8String();
+            string s = b.FromUTF8Bytes();
             return (s == "1" || s.ToLower() == "y" || s.ToLower() == "yes" || s.ToLower() == "t" || s.ToLower() == "true");
         }
 
@@ -422,16 +422,16 @@ namespace SilverSim.Viewer.Core
 
             SceneInterface scene = circuit.Scene;
 
-            scene.RegionSettings.WaterHeight = float.Parse(req.ParamList[0].FromUTF8String(), CultureInfo.InvariantCulture);
-            scene.RegionSettings.TerrainRaiseLimit = float.Parse(req.ParamList[1].FromUTF8String(), CultureInfo.InvariantCulture);
-            scene.RegionSettings.TerrainLowerLimit = float.Parse(req.ParamList[2].FromUTF8String(), CultureInfo.InvariantCulture);
+            scene.RegionSettings.WaterHeight = float.Parse(req.ParamList[0].FromUTF8Bytes(), CultureInfo.InvariantCulture);
+            scene.RegionSettings.TerrainRaiseLimit = float.Parse(req.ParamList[1].FromUTF8Bytes(), CultureInfo.InvariantCulture);
+            scene.RegionSettings.TerrainLowerLimit = float.Parse(req.ParamList[2].FromUTF8Bytes(), CultureInfo.InvariantCulture);
 
             bool useEstateSun = ParamStringToBool(req.ParamList[3]);
             bool useFixedSun = ParamStringToBool(req.ParamList[4]);
-            float sunHour = float.Parse(req.ParamList[5].FromUTF8String(), CultureInfo.InvariantCulture);
+            float sunHour = float.Parse(req.ParamList[5].FromUTF8Bytes(), CultureInfo.InvariantCulture);
             bool useGlobal = ParamStringToBool(req.ParamList[6]);
             bool isEstateFixedSun = ParamStringToBool(req.ParamList[7]);
-            float estateSunHour = float.Parse(req.ParamList[8].FromUTF8String(), CultureInfo.InvariantCulture);
+            float estateSunHour = float.Parse(req.ParamList[8].FromUTF8Bytes(), CultureInfo.InvariantCulture);
 
             scene.TriggerRegionSettingsChanged();
         }
@@ -444,7 +444,7 @@ namespace SilverSim.Viewer.Core
             }
 
             float timeToRestart;
-            if(!float.TryParse(req.ParamList[0].FromUTF8String(), NumberStyles.Any, CultureInfo.InvariantCulture, out timeToRestart))
+            if(!float.TryParse(req.ParamList[0].FromUTF8Bytes(), NumberStyles.Any, CultureInfo.InvariantCulture, out timeToRestart))
             {
                 timeToRestart = 120;
             }
@@ -478,8 +478,8 @@ namespace SilverSim.Viewer.Core
             }
 
             SceneInterface scene = circuit.Scene;
-            EstateAccessDeltaFlags flags = (EstateAccessDeltaFlags)int.Parse(req.ParamList[1].FromUTF8String());
-            UUID prey = UUID.Parse(req.ParamList[2].FromUTF8String());
+            EstateAccessDeltaFlags flags = (EstateAccessDeltaFlags)int.Parse(req.ParamList[1].FromUTF8Bytes());
+            UUID prey = UUID.Parse(req.ParamList[2].FromUTF8Bytes());
             UUI uui;
             UGI ugi;
             if(!scene.GroupsNameService.TryGetValue(prey, out ugi) &&
@@ -563,7 +563,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            string message = req.ParamList[4].FromUTF8String();
+            string message = req.ParamList[4].FromUTF8Bytes();
 
             foreach (IAgent agent in circuit.Scene.Agents)
             {
@@ -582,7 +582,7 @@ namespace SilverSim.Viewer.Core
 
             message = (req.ParamList.Count < 5 ?
                 req.ParamList[1] :
-                req.ParamList[4]).FromUTF8String();
+                req.ParamList[4]).FromUTF8Bytes();
 
             SceneInterface scene = circuit.Scene;
             UUID thisRegionId = scene.ID;
@@ -624,7 +624,7 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-            UUID prey = UUID.Parse(req.ParamList[1].FromUTF8String());
+            UUID prey = UUID.Parse(req.ParamList[1].FromUTF8Bytes());
 
             SceneInterface scene = circuit.Scene;
 
@@ -669,7 +669,7 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-            switch (req.ParamList[0].FromUTF8String())
+            switch (req.ParamList[0].FromUTF8Bytes())
             {
                 case "bake":
                     break;
@@ -681,7 +681,7 @@ namespace SilverSim.Viewer.Core
                     if(req.ParamList.Count > 1)
                     {
                         TerrainUploadTransaction t = new TerrainUploadTransaction();
-                        t.Filename = req.ParamList[1].FromUTF8String();
+                        t.Filename = req.ParamList[1].FromUTF8Bytes();
                         AddTerrainUploadTransaction(t, req.CircuitSceneID);
                     }
                     break;
@@ -712,8 +712,8 @@ namespace SilverSim.Viewer.Core
                 return;
             }
             SceneInterface scene = circuit.Scene;
-            EstateChangeInfoFlags param1 = (EstateChangeInfoFlags)UInt32.Parse(req.ParamList[1].FromUTF8String());
-            UInt32 param2 = UInt32.Parse(req.ParamList[2].FromUTF8String());
+            EstateChangeInfoFlags param1 = (EstateChangeInfoFlags)UInt32.Parse(req.ParamList[1].FromUTF8Bytes());
+            UInt32 param2 = UInt32.Parse(req.ParamList[2].FromUTF8Bytes());
 
             EstateInfo estate;
             EstateServiceInterface estateService = scene.EstateService;
@@ -773,16 +773,16 @@ namespace SilverSim.Viewer.Core
                 m.Invoice = req.Invoice;
                 m.Method = "estateupdateinfo";
                 m.TransactionID = UUID.Zero;
-                m.ParamList.Add(estate.Name.ToUTF8String());
-                m.ParamList.Add(estate.Owner.ID.ToString().ToUTF8String());
-                m.ParamList.Add(estate.ID.ToString().ToUTF8String());
-                m.ParamList.Add(((uint)estate.Flags).ToString().ToUTF8String());
-                m.ParamList.Add(estate.SunPosition.ToString().ToUTF8String());
-                m.ParamList.Add(estate.ParentEstateID.ToString().ToUTF8String());
-                m.ParamList.Add(estate.CovenantID.ToString().ToUTF8String());
-                m.ParamList.Add(estate.CovenantTimestamp.AsULong.ToString().ToUTF8String());
-                m.ParamList.Add("1".ToUTF8String());
-                m.ParamList.Add(estate.AbuseEmail.ToUTF8String());
+                m.ParamList.Add(estate.Name.ToUTF8Bytes());
+                m.ParamList.Add(estate.Owner.ID.ToString().ToUTF8Bytes());
+                m.ParamList.Add(estate.ID.ToString().ToUTF8Bytes());
+                m.ParamList.Add(((uint)estate.Flags).ToString().ToUTF8Bytes());
+                m.ParamList.Add(estate.SunPosition.ToString().ToUTF8Bytes());
+                m.ParamList.Add(estate.ParentEstateID.ToString().ToUTF8Bytes());
+                m.ParamList.Add(estate.CovenantID.ToString().ToUTF8Bytes());
+                m.ParamList.Add(estate.CovenantTimestamp.AsULong.ToString().ToUTF8Bytes());
+                m.ParamList.Add("1".ToUTF8Bytes());
+                m.ParamList.Add(estate.AbuseEmail.ToUTF8Bytes());
                 circuit.SendMessage(m);
             }
         }
@@ -795,14 +795,14 @@ namespace SilverSim.Viewer.Core
             {
                 return;
             }
-            string cmd = req.ParamList[0].FromUTF8String();
+            string cmd = req.ParamList[0].FromUTF8Bytes();
             if(cmd != "info ui")
             {
                 if (req.ParamList.Count < 2)
                 {
                     return;
                 }
-                param = UInt32.Parse(req.ParamList[1].FromUTF8String());
+                param = UInt32.Parse(req.ParamList[1].FromUTF8Bytes());
             }
         }
 
@@ -813,7 +813,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            UUID prey = UUID.Parse(req.ParamList[0].FromUTF8String());
+            UUID prey = UUID.Parse(req.ParamList[0].FromUTF8Bytes());
 
             IAgent targetagent;
             SceneInterface scene = circuit.Scene;

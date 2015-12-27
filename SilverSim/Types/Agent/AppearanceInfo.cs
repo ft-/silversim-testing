@@ -207,7 +207,7 @@ namespace SilverSim.Types.Agent
 
         public static AppearanceInfo FromNotecard(Notecard nc)
         {
-            using (MemoryStream ms = new MemoryStream(nc.Text.ToUTF8String()))
+            using (MemoryStream ms = new MemoryStream(nc.Text.ToUTF8Bytes()))
             {
                 Map m = LlsdXml.Deserialize(ms) as Map;
                 if(m == null)
@@ -338,7 +338,7 @@ namespace SilverSim.Types.Agent
                 }
                 
                 Notecard nc = new Notecard();
-                nc.Text = ms.GetBuffer().FromUTF8String();
+                nc.Text = ms.GetBuffer().FromUTF8Bytes();
                 return nc;
             }
         }

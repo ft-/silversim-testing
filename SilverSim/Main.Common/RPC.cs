@@ -22,7 +22,7 @@ namespace SilverSim.Main.Common.Rpc
 
         public static XmlRpc.XmlRpcResponse DoXmlRpcRequest(string url, XmlRpc.XmlRpcRequest req, int timeoutms)
         {
-            using (Stream res = HttpRequestHandler.DoStreamRequest("POST", url, null, "text/xml", req.Serialize().FromUTF8String(), false, timeoutms))
+            using (Stream res = HttpRequestHandler.DoStreamRequest("POST", url, null, "text/xml", req.Serialize().FromUTF8Bytes(), false, timeoutms))
             {
                 return XmlRpc.DeserializeResponse(res);
             }
