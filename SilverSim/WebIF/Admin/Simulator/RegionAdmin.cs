@@ -110,7 +110,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 Map m = region.ToJsonMap();
                 region.Owner = ResolveName(region.Owner);
                 m.Add("IsOnline", isOnline);
-                m.Add("IsLoginsEnabled", isOnline ? scene.LoginControl.IsLoginEnabled : false);
+                m.Add("IsLoginsEnabled", isOnline && scene.LoginControl.IsLoginEnabled);
                 regionsRes.Add(m);
             }
             res.Add("regions", regionsRes);
