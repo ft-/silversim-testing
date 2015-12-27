@@ -72,6 +72,8 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("regions.list", HandleList);
             webif.JsonMethods.Add("region.start", HandleStart);
             webif.JsonMethods.Add("region.stop", HandleStop);
+            webif.JsonMethods.Add("region.login.enable", HandleLoginEnable);
+            webif.JsonMethods.Add("region.login.disable", HandleLoginDisable);
             webif.JsonMethods.Add("region.enable", HandleEnable);
             webif.JsonMethods.Add("region.disable", HandleDisable);
             webif.JsonMethods.Add("region.notice", HandleNotice);
@@ -103,9 +105,12 @@ namespace SilverSim.WebIF.Admin.Simulator
             AnArray regionsRes = new AnArray();
             foreach (RegionInfo region in regions)
             {
+                SceneInterface scene;
+                bool isOnline = SceneManager.Scenes.TryGetValue(region.ID, out scene);
                 Map m = region.ToJsonMap();
                 region.Owner = ResolveName(region.Owner);
-                m.Add("IsOnline", SceneManager.Scenes.ContainsKey(region.ID));
+                m.Add("IsOnline", isOnline);
+                m.Add("IsLoginsEnabled", isOnline ? scene.LoginControl.IsLoginEnabled : false);
                 regionsRes.Add(m);
             }
             res.Add("regions", regionsRes);
@@ -592,6 +597,44 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 m_RegionStorage.DeleteRegion(UUID.Zero, region.ID);
                 m_SimulationData.RemoveRegion(region.ID);
+                AdminWebIF.SuccessResponse(req, new Map());
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.logincontrol")]
+        void HandleLoginEnable(HttpRequest req, Map jsondata)
+        {
+            SceneInterface scene;
+            if (!jsondata.ContainsKey("id"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            {
+                scene.LoginControl.Ready(SceneInterface.ReadyFlags.LoginsEnable);
+                AdminWebIF.SuccessResponse(req, new Map());
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.logincontrol")]
+        void HandleLoginDisable(HttpRequest req, Map jsondata)
+        {
+            SceneInterface scene;
+            if (!jsondata.ContainsKey("id"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            {
+                scene.LoginControl.NotReady(SceneInterface.ReadyFlags.LoginsEnable);
                 AdminWebIF.SuccessResponse(req, new Map());
             }
         }
