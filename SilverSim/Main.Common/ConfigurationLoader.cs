@@ -873,6 +873,8 @@ namespace SilverSim.Main.Common
             CmdIO.CommandRegistry.ShowCommands.Add("memory", ShowMemoryCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("threadcount", ShowThreadCountCommand);
             CmdIO.CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
+            CmdIO.CommandRegistry.GetCommands.Add("serverparam", GetServerParamCommand);
+            CmdIO.CommandRegistry.SetCommands.Add("serverparam", SetServerParamCommand);
 
             while(m_Sources.Count != 0)
             {
@@ -1084,7 +1086,7 @@ namespace SilverSim.Main.Common
             m_ShutdownEvent.Set();
         }
 
-        public void ShutdownCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        void ShutdownCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -1101,7 +1103,7 @@ namespace SilverSim.Main.Common
         }
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        public static void ShowMemoryCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        static void ShowMemoryCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
@@ -1115,7 +1117,89 @@ namespace SilverSim.Main.Common
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public static void SelectRegionCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        void GetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (args[0] == "help")
+            {
+                io.Write("get serverparam <regionid> <param>\nget serverparam <param>");
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                io.Write("get serverparam is not possible with limited console");
+            }
+            else if (args.Count == 3)
+            {
+                try
+                {
+                    io.Write("=" + GetServerParamStorage()[UUID.Zero, args[2]]);
+                }
+                catch (Exception e)
+                {
+                    io.Write("Server parameter not available");
+                }
+            }
+            else if (args.Count == 4)
+            {
+                UUID regionId;
+                if (!UUID.TryParse(args[2], out regionId))
+                {
+                    io.Write("regionid is not a UUID");
+                    return;
+                }
+                try
+                {
+                    io.Write("=" + GetServerParamStorage()[regionId, args[3]]);
+                }
+                catch (Exception e)
+                {
+                    io.Write("Server parameter not available");
+                }
+            }
+        }
+
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        void SetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (args[0] == "help")
+            {
+                io.Write("set serverparam <regionid> <param> <value>\nset serverparam <param> <value>");
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                io.Write("set serverparam is not possible with limited console");
+            }
+            else if(args.Count == 4)
+            {
+                try
+                {
+                    GetServerParamStorage()[UUID.Zero, args[2]] = args[3];
+                }
+                catch(Exception e)
+                {
+                    io.Write(e.Message);
+                }
+            }
+            else if(args.Count == 5)
+            {
+                UUID regionId;
+                if(!UUID.TryParse(args[2], out regionId))
+                {
+                    io.Write("regionid is not a UUID");
+                    return;
+                }
+                try
+                { 
+                    GetServerParamStorage()[regionId, args[3]] = args[4];
+                }
+                catch (Exception e)
+                {
+                    io.Write(e.Message);
+                }
+            }
+        }
+
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        static void SelectRegionCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if (args[0] == "help")
             {
@@ -1155,7 +1239,7 @@ namespace SilverSim.Main.Common
             }
         }
 
-        public void ShowModulesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        void ShowModulesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if(args[0] == "help")
             {
@@ -1194,7 +1278,7 @@ namespace SilverSim.Main.Common
         }
 
         [SuppressMessage("Gendarme.Rules.Correctness", "EnsureLocalDisposalRule")]
-        public static void ShowThreadCountCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        static void ShowThreadCountCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if(args[0] == "help")
             {
