@@ -1119,7 +1119,7 @@ namespace SilverSim.Main.Common
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void GetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
-            if (args[0] == "help")
+            if (args[0] == "help" || args.Count < 3 || args.Count > 4)
             {
                 io.Write("get serverparam <regionid> <param>\nget serverparam <param>");
             }
@@ -1160,7 +1160,7 @@ namespace SilverSim.Main.Common
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void SetServerParamCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
-            if (args[0] == "help")
+            if (args[0] == "help" || args.Count < 4 || args.Count > 5)
             {
                 io.Write("set serverparam <regionid> <param> <value>\nset serverparam <param> <value>");
             }
