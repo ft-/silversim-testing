@@ -343,7 +343,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                     {
                         rInfo.Size = new GridVector(jsondata["size"].ToString(), 256);
                     }
-                    catch (Exception e)
+                    catch
                     {
                         AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
                         return;

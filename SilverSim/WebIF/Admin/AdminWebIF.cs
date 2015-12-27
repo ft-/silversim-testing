@@ -133,6 +133,8 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("webif.admin.user.revokeright", RevokeRight);
             JsonMethods.Add("webif.admin.user.delete", DeleteUser);
             JsonMethods.Add("session.validate", HandleSessionValidateRequest);
+            JsonMethods.Add("serverparam.get", GetServerParam);
+            JsonMethods.Add("serverparam.set", SetServerParam);
         }
 
         public ShutdownOrder ShutdownOrder
@@ -705,6 +707,82 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region WebIF admin functions
+        [RequiredRight("serverparams.manage")]
+        void SetServerParam(HttpRequest req, Map jsondata)
+        {
+            if(!jsondata.ContainsKey("parameter") || !jsondata.ContainsKey("value"))
+            {
+                ErrorResponse(req, ErrorResult.InvalidRequest);
+            }
+            else
+            {
+                UUID regionid = UUID.Zero;
+                if(jsondata.ContainsKey("regionid") && !UUID.TryParse(jsondata["regionid"].ToString(), out regionid))
+                {
+                    ErrorResponse(req, ErrorResult.InvalidParameter);
+                    return;
+                }
+
+                string parameter = jsondata["parameter"].ToString();
+                string value = jsondata["value"].ToString();
+                if(parameter.StartsWith("WebIF.Admin.User."))
+                {
+                    ErrorResponse(req, ErrorResult.InvalidParameter);
+                    return;
+                }
+
+                try
+                {
+                    m_ServerParams[regionid, parameter] = value;
+                }
+                catch
+                {
+                    ErrorResponse(req, ErrorResult.NotPossible);
+                    return;
+                }
+                SuccessResponse(req, new Map());
+            }
+        }
+
+        [RequiredRight("serverparams.manage")]
+        void GetServerParam(HttpRequest req, Map jsondata)
+        {
+            if (!jsondata.ContainsKey("parameter"))
+            {
+                ErrorResponse(req, ErrorResult.InvalidRequest);
+            }
+            else
+            {
+                UUID regionid = UUID.Zero;
+                if (jsondata.ContainsKey("regionid") && !UUID.TryParse(jsondata["regionid"].ToString(), out regionid))
+                {
+                    ErrorResponse(req, ErrorResult.InvalidParameter);
+                    return;
+                }
+
+                string parameter = jsondata["parameter"].ToString();
+                string value;
+                if (parameter.StartsWith("WebIF.Admin.User."))
+                {
+                    ErrorResponse(req, ErrorResult.InvalidParameter);
+                    return;
+                }
+
+                try
+                {
+                    value = m_ServerParams[regionid, parameter];
+                }
+                catch
+                {
+                    ErrorResponse(req, ErrorResult.NotFound);
+                    return;
+                }
+                Map res = new Map();
+                res.Add("value", value);
+                SuccessResponse(req, res);
+            }
+        }
+
         [RequiredRight("webif.admin.users.manage")]
         void GrantRight(HttpRequest req, Map jsondata)
         {
