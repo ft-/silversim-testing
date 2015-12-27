@@ -11,5 +11,6 @@ namespace SilverSim.Scene.Types.Script.Events
     {
         public UUID TransactionID;
         public bool Success;
+        public string ReplyData;
     }
 }
