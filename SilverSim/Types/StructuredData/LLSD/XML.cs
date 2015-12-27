@@ -1,13 +1,11 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Xml;
 
 namespace SilverSim.Types.StructuredData.Llsd
@@ -464,7 +462,7 @@ namespace SilverSim.Types.StructuredData.Llsd
 
         public static void Serialize(IValue value, Stream output)
         {
-            using (XmlTextWriter text = new XmlTextWriter(output, UTF8NoBOM))
+            using (XmlTextWriter text = output.UTF8XmlTextWriter())
             {
                 Serialize(value, text);
             }
@@ -476,7 +474,5 @@ namespace SilverSim.Types.StructuredData.Llsd
             SerializeInternal(value, text);
             text.WriteEndElement();
         }
-
-        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
     }
 }

@@ -3,18 +3,15 @@
 
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
-using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Net;
-using System.Text;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -228,14 +225,12 @@ namespace SilverSim.Viewer.Core.Capabilities
 
             using (HttpResponse res = httpreq.BeginResponse("application/xml"))
             {
-                using (StreamWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+                using (StreamWriter w = res.GetOutputStream().UTF8StreamWriter())
                 {
                     w.Write(string.Format("<llsd><map><key>local_id</key><binary encoding=\"base64\">{0}</binary></map></llsd>", Convert.ToBase64String(resultbytes)));
                     w.Flush();
                 }
             }
         }
-
-        static Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }

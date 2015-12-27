@@ -2,9 +2,6 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Economy;
-using SilverSim.Viewer.Messages.IM;
 using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.ServiceInterfaces.Chat;
@@ -12,17 +9,16 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
-using SilverSim.Types.Economy;
 using SilverSim.Types.IM;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.IM;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
-using System.Net;
 using System.Reflection;
-using System.Text;
 using System.Threading;
 using ThreadedClasses;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -30,7 +26,6 @@ namespace SilverSim.Viewer.Core
     {
         internal readonly RwLockedList<UUID> SelectedObjects = new RwLockedList<UUID>();
         private static readonly ILog m_Log = LogManager.GetLogger("LL AGENT CIRCUIT");
-        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
         private static readonly UDPPacketDecoder m_PacketDecoder = new UDPPacketDecoder();
         public UUID SessionID = UUID.Zero;
         public UUID AgentID = UUID.Zero;

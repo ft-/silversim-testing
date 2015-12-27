@@ -1,12 +1,12 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Viewer.Core.Capabilities;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
-using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
+using SilverSim.Types.StructuredData.Llsd;
+using SilverSim.Viewer.Core.Capabilities;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -173,7 +173,7 @@ namespace SilverSim.Viewer.Core
                 res.ContentType = "application/llsd+xml";
                 using (Stream tw = res.GetOutputStream())
                 {
-                    using (XmlTextWriter text = new XmlTextWriter(tw, UTF8NoBOM))
+                    using (XmlTextWriter text = tw.UTF8XmlTextWriter())
                     {
                         text.WriteStartElement("llsd");
                         text.WriteStartElement("map");

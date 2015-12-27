@@ -16,7 +16,6 @@ namespace SilverSim.Types.Asset.Format
     {
         public NotecardInventory Inventory;
         public string Text = string.Empty;
-        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
 
         #region Constructors
         public Notecard()
@@ -58,7 +57,7 @@ namespace SilverSim.Types.Asset.Format
 
                 if(Text.StartsWith("<llsd>"))
                 {
-                    byte[] d = UTF8NoBOM.GetBytes(Text);
+                    byte[] d = Text.ToUTF8String();
                     /* could be an agent appearance notecard, so let us try that */
                     Map im;
                     using (Stream i = new MemoryStream(d))
@@ -555,9 +554,9 @@ namespace SilverSim.Types.Asset.Format
 
                 notecard += "}\n";
             }
-            byte[] TextData = UTF8NoBOM.GetBytes(v.Text);
+            byte[] TextData = v.Text.ToUTF8String();
             notecard += String.Format("Text length {0}\n", TextData.Length);
-            byte[] NotecardHeader = UTF8NoBOM.GetBytes(notecard);
+            byte[] NotecardHeader = notecard.ToUTF8String();
 
             AssetData asset = new AssetData();
             asset.Data = new byte[TextData.Length + NotecardHeader.Length + 2];

@@ -1,10 +1,10 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Viewer.Messages;
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
+using SilverSim.Types.StructuredData.Llsd;
+using SilverSim.Viewer.Messages;
 using System;
 using System.IO;
 using System.Net;
@@ -66,7 +66,7 @@ namespace SilverSim.Viewer.Core
                 using (HttpResponse res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:"))
                 {
                     res.MinorVersion = 0;
-                    using (TextWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+                    using (TextWriter w = res.GetOutputStream().UTF8StreamWriter())
                     {
                         w.Write("Upstream error: ");
                         w.Flush();
@@ -94,7 +94,7 @@ namespace SilverSim.Viewer.Core
                     using (HttpResponse res = httpreq.BeginResponse(HttpStatusCode.BadGateway, "Upstream error:"))
                     {
                         res.MinorVersion = 0;
-                        using (TextWriter w = new StreamWriter(res.GetOutputStream(), UTF8NoBOM))
+                        using (TextWriter w = res.GetOutputStream().UTF8StreamWriter())
                         {
                             w.Write("Upstream error: ");
                             w.Flush();

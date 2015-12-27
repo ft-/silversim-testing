@@ -43,7 +43,7 @@ namespace SilverSim.Types
         public static void WriteKeyValuePair(this XmlTextWriter writer, string key, double value)
         {
             writer.WriteNamedValue("key", key);
-            writer.WriteNamedValue("real", ((float)value).ToString(EnUsCulture));
+            writer.WriteNamedValue("real", ((float)value).ToString(CultureInfo.InvariantCulture));
         }
 
         public static void WriteKeyValuePair(this XmlTextWriter writer, string key, UUID value)
@@ -83,14 +83,14 @@ namespace SilverSim.Types
         public static void WriteNamedValue(this XmlTextWriter writer, string name, float value)
         {
             writer.WriteStartElement(name);
-            writer.WriteValue(value.ToString(EnUsCulture));
+            writer.WriteValue(value.ToString(CultureInfo.InvariantCulture));
             writer.WriteEndElement();
         }
 
         public static void WriteNamedValue(this XmlTextWriter writer, string name, double value)
         {
             writer.WriteStartElement(name);
-            writer.WriteValue(value.ToString(EnUsCulture));
+            writer.WriteValue(value.ToString(CultureInfo.InvariantCulture));
             writer.WriteEndElement();
         }
 
@@ -622,6 +622,5 @@ namespace SilverSim.Types
             }
         }
 
-        private readonly static CultureInfo EnUsCulture = new CultureInfo("en-us");
     }
 }

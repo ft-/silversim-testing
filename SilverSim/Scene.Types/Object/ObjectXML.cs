@@ -7,15 +7,12 @@ using SilverSim.Types.Asset.Format;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 using System.Xml;
 
 namespace SilverSim.Scene.Types.Object
 {
     public static class ObjectXML
     {
-        private static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
-
         public static AssetData Asset(this ObjectGroup grp, XmlSerializationOptions options = XmlSerializationOptions.None)
         {
             return grp.Asset(UUI.Unknown, Vector3.Zero, options, false);
@@ -30,7 +27,7 @@ namespace SilverSim.Scene.Types.Object
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                using (XmlTextWriter writer = new XmlTextWriter(ms, UTF8NoBOM))
+                using (XmlTextWriter writer = ms.UTF8XmlTextWriter())
                 {
                     grp.ToXml(writer, nextOwner, offsetpos, options, writeOffsetPos);
                     writer.Flush();
@@ -58,7 +55,7 @@ namespace SilverSim.Scene.Types.Object
 
             using (MemoryStream ms = new MemoryStream())
             {
-                using (XmlTextWriter writer = new XmlTextWriter(ms, UTF8NoBOM))
+                using (XmlTextWriter writer = ms.UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("CoalescedObject");
                     foreach (ObjectGroup grp in objlist)

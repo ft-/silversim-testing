@@ -1,14 +1,10 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Types.StructuredData.Json;
-using SilverSim.Types;
 using SilverSim.Http.Client;
+using SilverSim.Types;
+using SilverSim.Types.StructuredData.Json;
 using SilverSim.Types.StructuredData.XmlRpc;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.IO;
 
 namespace SilverSim.Main.Common.Rpc
@@ -26,12 +22,10 @@ namespace SilverSim.Main.Common.Rpc
 
         public static XmlRpc.XmlRpcResponse DoXmlRpcRequest(string url, XmlRpc.XmlRpcRequest req, int timeoutms)
         {
-            using (Stream res = HttpRequestHandler.DoStreamRequest("POST", url, null, "text/xml", UTF8NoBOM.GetString(req.Serialize()), false, timeoutms))
+            using (Stream res = HttpRequestHandler.DoStreamRequest("POST", url, null, "text/xml", req.Serialize().FromUTF8String(), false, timeoutms))
             {
                 return XmlRpc.DeserializeResponse(res);
             }
         }
-
-        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }

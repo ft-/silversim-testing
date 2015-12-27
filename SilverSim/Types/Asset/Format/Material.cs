@@ -5,7 +5,6 @@ using SilverSim.Types.StructuredData.Llsd;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 using System.Xml;
 
 namespace SilverSim.Types.Asset.Format
@@ -198,7 +197,7 @@ namespace SilverSim.Types.Asset.Format
             using (MemoryStream ms = new MemoryStream())
             {
 
-                using (XmlTextWriter w = new XmlTextWriter(ms, UTF8NoBOM))
+                using (XmlTextWriter w = ms.UTF8XmlTextWriter())
                 {
                     w.WriteStartElement("llsd");
                     v.WriteMap(w);
@@ -213,7 +212,5 @@ namespace SilverSim.Types.Asset.Format
             return asset;
         }
         #endregion
-
-        private static Encoding UTF8NoBOM = new System.Text.UTF8Encoding(false);
     }
 }

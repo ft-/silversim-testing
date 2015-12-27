@@ -1,15 +1,15 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Http;
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.IO.Compression;
-using System.Text;
-using SilverSim.Http;
-using System.Runtime.Serialization;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.IO.Compression;
+using System.Net;
+using System.Runtime.Serialization;
 
 namespace SilverSim.Main.Common.HttpServer
 {
@@ -82,7 +82,6 @@ namespace SilverSim.Main.Common.HttpServer
         private Stream ResponseBody;
         readonly bool IsChunkedAccepted;
         readonly List<string> AcceptedEncodings;
-        private static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         public string ContentType
         {
@@ -122,7 +121,7 @@ namespace SilverSim.Main.Common.HttpServer
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                using (TextWriter w = new StreamWriter(ms, UTF8NoBOM))
+                using (TextWriter w = ms.UTF8StreamWriter())
                 {
                     w.Write(string.Format("HTTP/{0}.{1} {2} {3}\r\n", MajorVersion, MinorVersion, (uint)StatusCode, StatusDescription.Replace("\n", string.Empty).Replace("\r", string.Empty)));
                     foreach (KeyValuePair<string, string> kvp in Headers)

@@ -6,19 +6,18 @@ using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.Types.StructuredData.Json;
-using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
+using SilverSim.Types.StructuredData.Json;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
-using System.Text;
 using System.Xml;
 using ThreadedClasses;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -2494,7 +2493,7 @@ namespace SilverSim.Scene.Types.Object
                                     {
                                         if (!string.IsNullOrEmpty(json))
                                         {
-                                            using (MemoryStream ms = new MemoryStream(UTF8NoBOM.GetBytes(json)))
+                                            using (MemoryStream ms = new MemoryStream(json.ToUTF8String()))
                                             {
                                                 Map m = Json.Deserialize(ms) as Map;
                                                 if (null != m)
@@ -2570,7 +2569,5 @@ namespace SilverSim.Scene.Types.Object
             }
         }
         #endregion
-
-        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }

@@ -1,11 +1,9 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
+using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.Scene.Types.Object
 {
@@ -207,10 +205,10 @@ namespace SilverSim.Scene.Types.Object
                     byte[] textureEntry = TextureEntryBytes;
                     byte[] textureAnimEntry = TextureAnimationBytes;
                     TextParam text = Text;
-                    byte[] textBytes = UTF8NoBOM.GetBytes(text.Text);
+                    byte[] textBytes = text.Text.ToUTF8String();
                     byte[] psBlock = ParticleSystemBytes;
                     byte[] extraParams = ExtraParamsBytes;
-                    byte[] mediaUrlBytes = UTF8NoBOM.GetBytes(MediaURL);
+                    byte[] mediaUrlBytes = MediaURL.ToUTF8String();
 
                     byte[] data;
                     switch (m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.PCode])
@@ -314,7 +312,7 @@ namespace SilverSim.Scene.Types.Object
                         m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.State] = ObjectGroup.RootPart.Shape.State;
                     }
 
-                    byte[] nameBytes = UTF8NoBOM.GetBytes(name);
+                    byte[] nameBytes = name.ToUTF8String();
 
                     int blockSize = m_FullUpdateFixedBlock1.Length + m_FullUpdateFixedBlock2.Length;
                     blockSize += textureEntry.Length + 2;
@@ -405,10 +403,10 @@ namespace SilverSim.Scene.Types.Object
                 #region ObjectProperties
                 if ((flags & UpdateDataFlags.Properties) != 0)
                 {
-                    byte[] nameBytes = UTF8NoBOM.GetBytes(Name);
-                    byte[] descriptionBytes = UTF8NoBOM.GetBytes(Description);
-                    byte[] touchNameBytes = UTF8NoBOM.GetBytes(TouchText);
-                    byte[] sitNameBytes = UTF8NoBOM.GetBytes(SitText);
+                    byte[] nameBytes = Name.ToUTF8String();
+                    byte[] descriptionBytes = Description.ToUTF8String();
+                    byte[] touchNameBytes = TouchText.ToUTF8String();
+                    byte[] sitNameBytes = SitText.ToUTF8String();
                     
                     int propDataLength = m_PropUpdateFixedBlock.Length + 9 + 
                         nameBytes.Length + 

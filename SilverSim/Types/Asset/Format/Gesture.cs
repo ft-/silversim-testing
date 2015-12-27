@@ -200,7 +200,7 @@ namespace SilverSim.Types.Asset.Format
 
         public Gesture(AssetData asset)
         {
-            string input = UTF8NoBOM.GetString(asset.Data);
+            string input = asset.Data.FromUTF8String();
             input = input.Replace('\t', ' ');
             List<string> lines = new List<string>(input.Split('\n'));
             using (List<string>.Enumerator e = lines.GetEnumerator())
@@ -433,13 +433,12 @@ namespace SilverSim.Types.Asset.Format
                 sb.Append(s.Serialize());
             }
 
-            asset.Data = UTF8NoBOM.GetBytes(sb.ToString());
+            asset.Data = sb.ToString().ToUTF8String();
             asset.Type = AssetType.Gesture;
             asset.Name = "Gesture";
             return asset;
         }
 
-        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
         #endregion
     }
 }

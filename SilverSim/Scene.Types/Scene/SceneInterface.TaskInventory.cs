@@ -1,17 +1,14 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.TaskInventory;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
-using System;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.TaskInventory;
 using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -62,7 +59,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 using(MemoryStream ms = new MemoryStream())
                 {
-                    using(TextWriter w = new StreamWriter(ms, UTF8NoBOM))
+                    using(TextWriter w = ms.UTF8StreamWriter())
                     {
                         w.Write(InvFile_Header);
                         w.Write(string.Format(InvFile_NameValueLine, "obj_id", part.ID));

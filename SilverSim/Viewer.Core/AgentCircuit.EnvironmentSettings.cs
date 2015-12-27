@@ -4,11 +4,7 @@
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.WindLight;
 using SilverSim.Types;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
 using System.Xml;
 
 namespace SilverSim.Viewer.Core
@@ -45,7 +41,7 @@ namespace SilverSim.Viewer.Core
                 }
                 else
                 {
-                    using (XmlTextWriter writer = new XmlTextWriter(httpres.GetOutputStream(), UTF8NoBOM))
+                    using (XmlTextWriter writer = httpres.GetOutputStream().UTF8XmlTextWriter())
                     {
                         writer.WriteStartElement("llsd");
                         {
@@ -72,7 +68,7 @@ namespace SilverSim.Viewer.Core
         {
             using (HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml"))
             {
-                using (XmlTextWriter writer = new XmlTextWriter(httpres.GetOutputStream(), UTF8NoBOM))
+                using (XmlTextWriter writer = httpres.GetOutputStream().UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("llsd");
                     {

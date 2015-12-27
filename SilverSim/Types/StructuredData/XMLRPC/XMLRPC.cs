@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 
@@ -841,7 +840,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
 
             public void Serialize(Stream o)
             {
-                using (XmlTextWriter writer = new XmlTextWriter(o, UTF8NoBOM))
+                using (XmlTextWriter writer = o.UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("methodCall");
                     writer.WriteNamedValue("methodName", MethodName);
@@ -878,7 +877,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
 
             public void Serialize(Stream o)
             {
-                using(XmlTextWriter writer = new XmlTextWriter(o, UTF8NoBOM))
+                using(XmlTextWriter writer = o.UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("methodResponse");
                     writer.WriteStartElement("params");
@@ -912,7 +911,7 @@ namespace SilverSim.Types.StructuredData.XmlRpc
 
             public void Serialize(Stream o)
             {
-                using(XmlTextWriter writer = new XmlTextWriter(o, UTF8NoBOM))
+                using(XmlTextWriter writer = o.UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("methodResponse");
                     {
@@ -954,7 +953,5 @@ namespace SilverSim.Types.StructuredData.XmlRpc
                 }
             }
         }
-
-        static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }

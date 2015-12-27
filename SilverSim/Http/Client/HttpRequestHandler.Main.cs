@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -91,7 +92,7 @@ namespace SilverSim.Http.Client
 
             if (post.Length != 0)
             {
-                buffer = UTF8NoBOM.GetBytes(post);
+                buffer = post.ToUTF8String();
 
                 if (compressed || content_type == "application/x-gzip")
                 {
@@ -341,7 +342,5 @@ namespace SilverSim.Http.Client
             }
         }
         #endregion
-
-        static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }

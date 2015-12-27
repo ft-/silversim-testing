@@ -77,7 +77,7 @@ namespace SilverSim.Viewer.Core
 
             using (HttpResponse res = httpreq.BeginResponse())
             {
-                using (XmlTextWriter text = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM))
+                using (XmlTextWriter text = res.GetOutputStream().UTF8XmlTextWriter())
                 {
                     text.WriteStartElement("llsd");
                     text.WriteStartElement("map");

@@ -180,8 +180,6 @@ namespace SilverSim.Viewer.Messages
             }
         }
 
-        protected static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
-
         #region Overloaded methods
         public virtual string TypeDescription
         {

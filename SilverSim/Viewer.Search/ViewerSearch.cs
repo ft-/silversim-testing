@@ -334,7 +334,7 @@ namespace SilverSim.Viewer.Search
             List<UUI> results = scene.AvatarNameService.Search(nameparts);
             using (HttpResponse res = req.BeginResponse("application/llsd+xml"))
             {
-                using (XmlTextWriter writer = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM))
+                using (XmlTextWriter writer = res.GetOutputStream().UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("llsd");
                     writer.WriteStartElement("map");
@@ -370,8 +370,6 @@ namespace SilverSim.Viewer.Search
                 }
             }
         }
-
-        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         public ShutdownOrder ShutdownOrder
         {

@@ -1,21 +1,19 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
-using SilverSim.Types;
-using ThreadedClasses;
-using SilverSim.Types.StructuredData.Llsd;
-using System.IO;
 using SilverSim.Types.Primitive;
-using System.Xml;
+using SilverSim.Types.StructuredData.Llsd;
+using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
+using System.Xml;
+using ThreadedClasses;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -115,8 +113,6 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
-
         void UploadObject(UUID transactionID, AssetData data)
         {
             Map m = (Map)LlsdXml.Deserialize(data.InputStream);
@@ -131,7 +127,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
             using (MemoryStream objectms = new MemoryStream())
             {
-                using(XmlTextWriter writer = new XmlTextWriter(objectms, UTF8NoBOM))
+                using(XmlTextWriter writer = objectms.UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("SceneObjectGroup");
                     /* we serialize the assets straight away, no allocating SOG in between here. Allocating a SOG would just take senselessly a lot of time and memory. */

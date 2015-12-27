@@ -2,6 +2,9 @@
 // GNU Affero General Public License v3
 
 using System;
+using System.IO;
+using System.Text;
+using System.Xml;
 
 namespace SilverSim.Types
 {
@@ -78,6 +81,43 @@ namespace SilverSim.Types
         {
             double yaw = Math.Atan2(lookat.Y, lookat.X);
             return Quaternion.CreateFromEulers(0, 0, yaw);
+        }
+
+        static readonly UTF8Encoding m_UTF8NoBOM = new UTF8Encoding(false);
+
+        public static byte[] ToUTF8String(this string s)
+        {
+            return m_UTF8NoBOM.GetBytes(s);
+        }
+
+        public static int ToUTF8StringCount(this string s)
+        {
+            return m_UTF8NoBOM.GetByteCount(s);
+        }
+
+        public static string FromUTF8String(this byte[] data)
+        {
+            return m_UTF8NoBOM.GetString(data);
+        }
+
+        public static string FromUTF8String(this byte[] data, int index, int count)
+        {
+            return m_UTF8NoBOM.GetString(data, index, count);
+        }
+
+        public static XmlTextWriter UTF8XmlTextWriter(this Stream s)
+        {
+            return new XmlTextWriter(s, m_UTF8NoBOM);
+        }
+
+        public static StreamReader UTF8StreamReader(this Stream s)
+        {
+            return new StreamReader(s, m_UTF8NoBOM);
+        }
+
+        public static StreamWriter UTF8StreamWriter(this Stream s)
+        {
+            return new StreamWriter(s, m_UTF8NoBOM);
         }
     }
 }

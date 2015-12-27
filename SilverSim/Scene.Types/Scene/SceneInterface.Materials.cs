@@ -9,7 +9,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
-using System.Text;
 using System.Threading;
 using System.Xml;
 
@@ -204,7 +203,6 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
-        static UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
         void UpdateMaterials()
         {
             byte[] buf;
@@ -212,7 +210,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 using (GZipStream gz = new GZipStream(ms, CompressionMode.Compress))
                 {
-                    using (XmlTextWriter writer = new XmlTextWriter(gz, UTF8NoBOM))
+                    using (XmlTextWriter writer = gz.UTF8XmlTextWriter())
                     {
                         writer.WriteStartElement("llsd");
                         writer.WriteStartElement("array");
@@ -233,7 +231,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             using(MemoryStream ms = new MemoryStream())
             {
-                using(XmlTextWriter writer = new XmlTextWriter(ms, UTF8NoBOM))
+                using(XmlTextWriter writer = ms.UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("llsd");
                     writer.WriteNamedValue("key", "Zipped");

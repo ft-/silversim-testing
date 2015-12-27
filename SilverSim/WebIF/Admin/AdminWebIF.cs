@@ -182,7 +182,7 @@ namespace SilverSim.WebIF.Admin
                 m_Log.InfoFormat("<<admin>> created password: {0}", res);
                 using (SHA1 sha1 = SHA1.Create())
                 {
-                    byte[] str = UTF8NoBOM.GetBytes(res);
+                    byte[] str = res.ToUTF8String();
 
                     res = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "").ToLower();
                 }
@@ -216,7 +216,7 @@ namespace SilverSim.WebIF.Admin
             {
                 using (SHA1 sha1 = SHA1.Create())
                 {
-                    byte[] str = UTF8NoBOM.GetBytes(challenge.ToString().ToLower() + "+" + pass_sha1.ToLower());
+                    byte[] str = (challenge.ToString().ToLower() + "+" + pass_sha1.ToLower()).ToUTF8String();
 
                     sessionInfo.ExpectedResponse = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "").ToLower();
                     sessionInfo.Rights = new List<string>(rights.ToLower().Split(','));
@@ -224,8 +224,6 @@ namespace SilverSim.WebIF.Admin
             }
         }
         #endregion
-
-        static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
         #region Core Json API handler (login, challenge, logout + method lookup)
         public void HandleUnsecureHttp(HttpRequest req)
@@ -500,7 +498,7 @@ namespace SilverSim.WebIF.Admin
                     res.ContentType = "text/html";
                     using (Stream o = res.GetOutputStream())
                     {
-                        using (StreamWriter w = new StreamWriter(o, UTF8NoBOM))
+                        using (StreamWriter w = o.UTF8StreamWriter())
                         {
                             w.Write("<html><head><title>Not Found</title><body>Not Found</body></html>");
                         }

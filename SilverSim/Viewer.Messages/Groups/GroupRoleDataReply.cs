@@ -31,7 +31,7 @@ namespace SilverSim.Viewer.Messages.Groups
             {
                 get
                 {
-                    return 34 + UTF8NoBOM.GetByteCount(Title) + UTF8NoBOM.GetByteCount(Description) + UTF8NoBOM.GetByteCount(Name);
+                    return 34 + Title.ToUTF8StringCount() + Description.ToUTF8StringCount() + Name.ToUTF8StringCount();
                 }
             }
         }

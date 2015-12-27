@@ -8,7 +8,6 @@ using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Runtime.Serialization;
-using System.Text;
 using System.Threading;
 using System.Xml;
 using ThreadedClasses;
@@ -208,7 +207,7 @@ namespace SilverSim.Types.Agent
 
         public static AppearanceInfo FromNotecard(Notecard nc)
         {
-            using (MemoryStream ms = new MemoryStream(UTF8NoBOM.GetBytes(nc.Text)))
+            using (MemoryStream ms = new MemoryStream(nc.Text.ToUTF8String()))
             {
                 Map m = LlsdXml.Deserialize(ms) as Map;
                 if(m == null)
@@ -270,7 +269,7 @@ namespace SilverSim.Types.Agent
         {
             using (MemoryStream ms = new MemoryStream())
             {
-                using (XmlTextWriter writer = new XmlTextWriter(ms, UTF8NoBOM))
+                using (XmlTextWriter writer = ms.UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("llsd");
                     {
@@ -339,11 +338,9 @@ namespace SilverSim.Types.Agent
                 }
                 
                 Notecard nc = new Notecard();
-                nc.Text = UTF8NoBOM.GetString(ms.GetBuffer());
+                nc.Text = ms.GetBuffer().FromUTF8String();
                 return nc;
             }
         }
-
-        static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
     }
 }

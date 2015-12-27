@@ -2,14 +2,14 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Inventory;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Xml;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -106,7 +106,7 @@ namespace SilverSim.Viewer.Core
 
             using (HttpResponse res = httpreq.BeginResponse())
             {
-                using (XmlTextWriter text = new XmlTextWriter(res.GetOutputStream(), UTF8NoBOM))
+                using (XmlTextWriter text = res.GetOutputStream().UTF8XmlTextWriter())
                 {
                     List<UUID> badfolders = new List<UUID>();
                     text.WriteStartElement("llsd");

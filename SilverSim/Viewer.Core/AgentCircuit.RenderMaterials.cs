@@ -3,10 +3,10 @@
 
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Object;
-using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Primitive;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -171,7 +171,7 @@ namespace SilverSim.Viewer.Core
             {
                 using (GZipStream gz = new GZipStream(ms, CompressionMode.Compress))
                 {
-                    using (XmlTextWriter writer = new XmlTextWriter(gz, UTF8NoBOM))
+                    using (XmlTextWriter writer = gz.UTF8XmlTextWriter())
                     {
                         writer.WriteStartElement("llsd");
                         writer.WriteStartElement("array");
@@ -193,7 +193,7 @@ namespace SilverSim.Viewer.Core
 
             using (HttpResponse httpres = httpreq.BeginResponse("application/llsd+xml"))
             {
-                using (XmlTextWriter writer = new XmlTextWriter(httpres.GetOutputStream(), UTF8NoBOM))
+                using (XmlTextWriter writer = httpres.GetOutputStream().UTF8XmlTextWriter())
                 {
                     writer.WriteStartElement("llsd");
                     writer.WriteNamedValue("key", "Zipped");
