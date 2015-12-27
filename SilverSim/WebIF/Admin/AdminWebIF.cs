@@ -50,6 +50,19 @@ namespace SilverSim.WebIF.Admin
 
         readonly RwLockedDictionary<string, SessionInfo> m_Sessions = new RwLockedDictionary<string, SessionInfo>();
         readonly Timer m_Timer = new Timer(1);
+        bool EnableSetPasswordCommand
+        {
+            get
+            {
+                return m_ServerParams.GetBoolean(UUID.Zero, "WebIF.Admin.EnableSetPasswordCommand",
+#if DEBUG
+                    true
+#else
+                    false
+#endif
+                    );
+            }
+        }
 
         #region Helpers
         public static void SuccessResponse(HttpRequest req, Map m)
@@ -205,6 +218,28 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region User Logic
+        bool SetUserPassword(string user, string pass)
+        {
+            string userRef = "WebIF.Admin.User." + user + ".PassCode";
+            string oldPass;
+            if (m_ServerParams.TryGetValue(UUID.Zero, userRef, out oldPass))
+            {
+                string res;
+                using (SHA1 sha1 = SHA1.Create())
+                {
+                    byte[] str = pass.ToUTF8Bytes();
+
+                    res = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "").ToLower();
+                }
+
+                if (res != oldPass)
+                {
+                    m_ServerParams[UUID.Zero, AdminUserReference + "PassCode"] = res;
+                }
+                return true;
+            }
+            return false;
+        }
         void FindUser(SessionInfo sessionInfo, UUID challenge)
         {
             string userRef = "WebIF.Admin.User." + sessionInfo.UserName + ".";
@@ -509,10 +544,16 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region Commands
-        void DisplayAdminWebIFHelp(Main.Common.CmdIO.TTY io)
+        void DisplayAdminWebIFHelp(TTY io)
         {
+            string chgpwcmd = string.Empty;
+            if(EnableSetPasswordCommand)
+            {
+                chgpwcmd = "admin-webif change password <user> <pass>\n";
+            }
             io.Write("admin-webif show users\n" +
                 "admin-webif show user <user>\n" +
+                chgpwcmd +
                 "admin-webif delete user <user>\n" +
                 "admin-webif grant <user> <right>\n" +
                 "admin-webif revoke <user> <right>");
@@ -581,6 +622,35 @@ namespace SilverSim.WebIF.Admin
                                         {
                                             io.WriteFormatted("User '{0}' does not exist", args[3]);
                                         }
+                                    }
+                                    break;
+
+                                default:
+                                    DisplayAdminWebIFHelp(io);
+                                    break;
+                            }
+                        }
+                        break;
+
+                    case "change":
+                        if(args.Count < 3)
+                        {
+                            DisplayAdminWebIFHelp(io);
+                        }
+                        else
+                        {
+                            switch(args[2])
+                            {
+                                case "password":
+                                    if(args.Count < 5 || !EnableSetPasswordCommand)
+                                    {
+                                        DisplayAdminWebIFHelp(io);
+                                    }
+                                    else
+                                    {
+                                        io.Write(SetUserPassword(args[3], args[4]) ?
+                                            "Password changed." :
+                                            "User does not exist.");
                                     }
                                     break;
 
@@ -755,8 +825,9 @@ namespace SilverSim.WebIF.Admin
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new AdminWebIF(ownSection.GetString("BasePath", ""));
+            return new AdminWebIF(
+                ownSection.GetString("BasePath", ""));
         }
     }
-    #endregion
+#endregion
 }
