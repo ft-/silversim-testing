@@ -107,7 +107,6 @@ namespace SilverSim.Viewer.Messages.LayerData
 
         public static void LoadLLRawStream(this Stream input, int suggested_width, int suggested_height, Action<LayerPatch> del)
         {
-            List<LayerPatch> patches = new List<LayerPatch>();
             float[,] vals = new float[LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES, suggested_width / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES];
             uint maxY = (uint)suggested_height / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES - 1;
 
