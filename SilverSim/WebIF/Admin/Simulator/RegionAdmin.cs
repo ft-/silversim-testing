@@ -79,7 +79,8 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.notice", HandleNotice);
             webif.JsonMethods.Add("regions.notice", HandleNotices);
             webif.JsonMethods.Add("region.agents.view", HandleAgentsView);
-            webif.JsonMethods.Add("region.agents.kick", HandleAgentKick);
+            webif.JsonMethods.Add("region.agent.kick", HandleAgentKick);
+            webif.JsonMethods.Add("region.agent.teleporthome", HandleAgentTeleportHome);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)

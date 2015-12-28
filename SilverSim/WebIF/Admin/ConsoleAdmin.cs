@@ -12,8 +12,9 @@ using System.Text;
 
 namespace SilverSim.WebIF.Admin
 {
-    public class ConsoleAdmin : IPlugin
+    public class ConsoleAdmin : IPlugin, IPluginShutdown
     {
+        AdminWebIF m_WebIF;
         public ConsoleAdmin()
         {
 
@@ -22,8 +23,8 @@ namespace SilverSim.WebIF.Admin
         public void Startup(ConfigurationLoader loader)
         {
 
-            AdminWebIF webif = loader.GetAdminWebIF();
-            webif.JsonMethods.Add("console.command", ConsoleCommand);
+            m_WebIF = loader.GetAdminWebIF();
+            m_WebIF.JsonMethods.Add("console.command", ConsoleCommand);
         }
 
         public class ConsoleAdminTty : TTY
@@ -43,6 +44,14 @@ namespace SilverSim.WebIF.Admin
 
         static readonly UTF8Encoding UTF8NoBOM = new UTF8Encoding(false);
 
+        public ShutdownOrder ShutdownOrder
+        {
+            get
+            {
+                return ShutdownOrder.Any;
+            }
+        }
+
         [AdminWebIF.RequiredRight("console.access")]
         public void ConsoleCommand(HttpRequest req, Map jsondata)
         {
@@ -59,11 +68,22 @@ namespace SilverSim.WebIF.Admin
                 {
                     using (StreamWriter w = new StreamWriter(o, UTF8NoBOM))
                     {
-                        ConsoleAdminTty tty = new ConsoleAdminTty(w);
-                        CommandRegistry.ExecuteCommand(tty.GetCmdLine(cmd), tty);
+                        AdminWebIF webif = m_WebIF;
+                        if (webif != null)
+                        {
+                            ConsoleAdminTty tty = new ConsoleAdminTty(w);
+                            tty.SelectedScene = webif.GetSelectedRegion(req, jsondata);
+                            CommandRegistry.ExecuteCommand(tty.GetCmdLine(cmd), tty);
+                            webif.SetSelectedRegion(req, jsondata, tty.SelectedScene);
+                        }
                     }
                 }
             }
+        }
+
+        public void Shutdown()
+        {
+            m_WebIF = null;
         }
     }
 

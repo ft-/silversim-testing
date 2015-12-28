@@ -40,6 +40,7 @@ namespace SilverSim.WebIF.Admin
             public string UserName = string.Empty;
             public string ExpectedResponse = string.Empty;
             public List<string> Rights = new List<string>();
+            public UUID SelectedSceneID = UUID.Zero;
 
             public SessionInfo()
             {
@@ -327,6 +328,27 @@ namespace SilverSim.WebIF.Admin
                     m_Sessions.Remove(sessionKey);
                     ErrorResponse(req, ErrorResult.InvalidUserAndOrPassword);
                 }
+            }
+        }
+
+        public UUID GetSelectedRegion(HttpRequest req, Map jsonreq)
+        {
+            string sessionKey = req.CallerIP + "+" + jsonreq["sessionid"].ToString();
+            SessionInfo info;
+            if(m_Sessions.TryGetValue(sessionKey,out info))
+            {
+                return info.SelectedSceneID;
+            }
+            return UUID.Zero;
+        }
+        
+        public void SetSelectedRegion(HttpRequest req, Map jsonreq, UUID sceneID)
+        {
+            string sessionKey = req.CallerIP + "+" + jsonreq["sessionid"].ToString();
+            SessionInfo info;
+            if (m_Sessions.TryGetValue(sessionKey, out info))
+            {
+                info.SelectedSceneID = sceneID;
             }
         }
 
