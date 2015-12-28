@@ -561,7 +561,7 @@ namespace SilverSim.WebIF.Admin
                 "admin-webif revoke <user> <right>");
         }
 
-        public void AdminWebIFCmd(List<string> args, Main.Common.CmdIO.TTY io, UUID limitedToScene)
+        public void AdminWebIFCmd(List<string> args, TTY io, UUID limitedToScene)
         {
             if(limitedToScene != UUID.Zero)
             {
@@ -693,9 +693,58 @@ namespace SilverSim.WebIF.Admin
                         break;
 
                     case "grant":
+                        if(args.Count < 4)
+                        {
+                            DisplayAdminWebIFHelp(io);
+                        }
+                        else
+                        {
+                            string s;
+                            string paraname = "WebIF.Admin.User." + args[2] + "Rights";
+                            if(!m_ServerParams.TryGetValue(UUID.Zero, paraname, out s))
+                            {
+                                io.Write("User not found.");
+                            }
+                            else
+                            {
+                                List<string> rights = new List<string>();
+                                foreach(string i in s.Split(','))
+                                {
+                                    rights.Add(i.Trim());
+                                }
+                                if (!rights.Contains(args[3]))
+                                {
+                                    rights.Add(args[3]);
+                                }
+                                m_ServerParams[UUID.Zero, paraname] = string.Join(",", rights);
+                            }
+                        }
                         break;
 
                     case "revoke":
+                        if (args.Count < 4)
+                        {
+                            DisplayAdminWebIFHelp(io);
+                        }
+                        else
+                        {
+                            string s;
+                            string paraname = "WebIF.Admin.User." + args[2] + "Rights";
+                            if (!m_ServerParams.TryGetValue(UUID.Zero, paraname, out s))
+                            {
+                                io.Write("User not found.");
+                            }
+                            else
+                            {
+                                List<string> rights = new List<string>();
+                                foreach (string i in s.Split(','))
+                                {
+                                    rights.Add(i.Trim());
+                                }
+                                rights.Remove(args[3]);
+                                m_ServerParams[UUID.Zero, paraname] = string.Join(",", rights);
+                            }
+                        }
                         break;
 
                     default:
