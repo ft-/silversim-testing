@@ -1,18 +1,18 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Viewer.Messages.LayerData;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.Terrain;
+using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
-using System.Linq;
-using System.Text;
 
 namespace SilverSim.LoadStore.Terrain.Formats
 {
     [TerrainStorageType]
+    [Description("RAW32 Terrain Format")]
     public class RAW32 : ITerrainFileStorage, IPlugin
     {
         public RAW32()

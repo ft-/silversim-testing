@@ -8,10 +8,12 @@ using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.ComponentModel;
 
 namespace SilverSim.LoadStore.Terrain.Formats
 {
     [TerrainStorageType]
+    [Description("Terrain Generic Storage Loader")]
     public class File : ITerrainFileStorage, IPlugin
     {
         public File()

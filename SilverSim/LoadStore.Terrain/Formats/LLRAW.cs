@@ -6,12 +6,14 @@ using SilverSim.Scene.ServiceInterfaces.Terrain;
 using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 
 namespace SilverSim.LoadStore.Terrain.Formats
 {
     [TerrainStorageType]
+    [Description("LLRAW Terrain Format")]
     public class LLRAW : ITerrainFileStorage, IPlugin
     {
         public struct HeightmapLookupValue : IComparable<HeightmapLookupValue>, IEquatable<HeightmapLookupValue>

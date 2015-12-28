@@ -9,10 +9,12 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
+using System.ComponentModel;
 
 namespace SilverSim.LoadStore.Terrain.Formats
 {
     [TerrainStorageType]
+    [Description("JPEG Terrain Storage Format Writer")]
     public class JPEG : ITerrainFileStorage, IPlugin
     {
         static readonly Color[] m_GradientMap;

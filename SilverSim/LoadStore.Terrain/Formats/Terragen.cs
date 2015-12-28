@@ -9,10 +9,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.ComponentModel;
 
 namespace SilverSim.LoadStore.Terrain.Formats
 {
     [TerrainStorageType]
+    [Description("Terragen Terrain Format")]
     public class Terragen : ITerrainFileStorage, IPlugin
     {
         public Terragen()
