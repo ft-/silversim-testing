@@ -2,20 +2,21 @@
 // GNU Affero General Public License v3
 
 using Nini.Config;
+using SilverSim.Main.Common;
+using SilverSim.ServiceInterfaces.IM;
+using SilverSim.Types.IM;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.IM;
-using SilverSim.Main.Common;
-using SilverSim.Scene.Types.Agent;
-using SilverSim.ServiceInterfaces.IM;
-using SilverSim.Types.IM;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using ThreadedClasses;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.OfflineIM
 {
+    [Description("Viewer Offline IM Handler")]
     public class ViewerOfflineIMServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
         [PacketHandler(MessageType.RetrieveInstantMessages)]

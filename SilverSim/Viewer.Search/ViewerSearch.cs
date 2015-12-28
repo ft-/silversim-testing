@@ -20,9 +20,11 @@ using System.Threading;
 using System.Xml;
 using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
 
 namespace SilverSim.Viewer.Search
 {
+    [Description("Viewer Search Handler")]
     public class ViewerSearch : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL SEARCH");

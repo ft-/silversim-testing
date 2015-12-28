@@ -13,11 +13,13 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Inventory
 {
     #region Service Implementation
+    [Description("MySQL Inventory Backend")]
     public sealed class MySQLInventoryService : InventoryServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         readonly string m_ConnectionString;

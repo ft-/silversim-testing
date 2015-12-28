@@ -12,9 +12,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
 
 namespace SilverSim.LoadStore.Terrain
 {
+    [Description("Terrain Load/Store Support")]
     public class TerrainLoadStore : IPlugin
     {
         private readonly Dictionary<string, ITerrainFileStorage> m_TerrainFileStorages = new Dictionary<string, ITerrainFileStorage>();

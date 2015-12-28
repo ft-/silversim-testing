@@ -9,12 +9,14 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using ThreadedClasses;
 
 namespace SilverSim.Database.MySQL.ServerParam
 {
     #region Service Implementation
+    [Description("MySQL ServerParam Backend")]
     public sealed class MySQLServerParamService : ServerParamServiceInterface, IDBServiceInterface, IPlugin
     {
         readonly string m_ConnectionString;

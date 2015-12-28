@@ -12,11 +12,13 @@ using SilverSim.Types;
 using SilverSim.Types.Presence;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Presence
 {
     #region Service Implementation
+    [Description("MySQL Presence Backend")]
     public sealed class MySQLPresenceService : PresenceServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         readonly string m_ConnectionString;

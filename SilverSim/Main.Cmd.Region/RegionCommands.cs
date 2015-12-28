@@ -17,6 +17,7 @@ using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -24,6 +25,7 @@ using System.Xml;
 namespace SilverSim.Main.Cmd.Region
 {
     #region Service Implementation
+    [Description("Region Console Commands")]
     public class RegionCommands : IPlugin
     {
         readonly string m_RegionStorageName;

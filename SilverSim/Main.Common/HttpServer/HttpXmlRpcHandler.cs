@@ -4,6 +4,7 @@
 using log4net;
 using SilverSim.Types.StructuredData.XmlRpc;
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
@@ -11,6 +12,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Main.Common.HttpServer
 {
+    [Description("HTTP XMLRPC Handler")]
     public class HttpXmlRpcHandler : IPlugin, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("XMLRPC SERVER");

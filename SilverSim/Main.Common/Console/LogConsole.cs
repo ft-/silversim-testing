@@ -3,14 +3,15 @@
 
 using log4net.Core;
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System.Text;
 using System.Threading;
 using ThreadedClasses;
 
 namespace SilverSim.Main.Common.Console
 {
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
+    [Description("Log Console")]
     public class LogConsole : CmdIO.TTY, IPlugin, IPluginShutdown
     {
         readonly BlockingQueue<LoggingEvent> m_LogQueue = new BlockingQueue<LoggingEvent>();

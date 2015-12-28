@@ -6,6 +6,7 @@ using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
 using System.Threading;
@@ -13,6 +14,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Main.Common.Console
 {
+    [Description("Local Console")]
     public class LocalConsole : CmdIO.TTY, IPlugin, IPluginShutdown
     {
         private int m_CursorXPosition;

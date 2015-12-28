@@ -10,12 +10,13 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using System;
 
 namespace SilverSim.Database.MySQL.UserAccounts
 {
     #region Service Implementation
+    [Description("MySQL UserAccount Backend")]
     public sealed class MySQLUserAccountService : UserAccountServiceInterface, IDBServiceInterface, IPlugin
     {
         readonly string m_ConnectionString;

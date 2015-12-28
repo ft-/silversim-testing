@@ -11,11 +11,12 @@ using SilverSim.ServiceInterfaces.GridUser;
 using SilverSim.Types;
 using SilverSim.Types.GridUser;
 using System.Collections.Generic;
-using System;
+using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.GridUser
 {
     #region Service Implementation
+    [Description("MySQL GridUser Backend")]
     public sealed class MySQLGridUserService : GridUserServiceInterface, IDBServiceInterface, IPlugin, IUserAccountDeleteServiceInterface
     {
         readonly string m_ConnectionString;

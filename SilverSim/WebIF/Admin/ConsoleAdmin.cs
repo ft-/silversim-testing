@@ -1,17 +1,19 @@
-﻿using Nini.Config;
+﻿// SilverSim is distributed under the terms of the
+// GNU Affero General Public License v3
+
+using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
-using System;
-using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
 
 namespace SilverSim.WebIF.Admin
 {
+    [Description("WebIF Console Admin Support")]
     public class ConsoleAdmin : IPlugin, IPluginShutdown
     {
         AdminWebIF m_WebIF;

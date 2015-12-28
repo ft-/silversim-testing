@@ -10,11 +10,13 @@ using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.AvatarName
 {
     #region Service Implementation
+    [Description("MySQL AvatarName Backend")]
     public sealed class MySQLAvatarNameService : AvatarNameServiceInterface, IDBServiceInterface, IPlugin
     {
         readonly string m_ConnectionString;

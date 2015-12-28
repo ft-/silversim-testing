@@ -11,10 +11,12 @@ using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.WebIF.Admin.Simulator
 {
     #region Service implementation
+    [Description("WebIF Estate Admin Support")]
     public class EstateAdmin : IPlugin
     {
         readonly string m_EstateServiceName;

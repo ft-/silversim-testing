@@ -10,11 +10,13 @@ using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types;
 using SilverSim.Types.IM;
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Backend.Common.OfflineIM
 {
     #region Service implementation
+    [Description("Offline IM Handler")]
     public sealed class OfflineIM : IPlugin, IPluginShutdown
     {
 #if DEBUG

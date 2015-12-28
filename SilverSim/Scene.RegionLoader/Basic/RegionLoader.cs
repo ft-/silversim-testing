@@ -12,10 +12,12 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System;
+using System.ComponentModel;
 using System.Xml;
 
 namespace SilverSim.Scene.RegionLoader.Basic
 {
+    [Description("Region Loader")]
     public class RegionLoaderService : IPlugin, IRegionLoaderInterface
     {
         readonly string m_RegionStorage = string.Empty;

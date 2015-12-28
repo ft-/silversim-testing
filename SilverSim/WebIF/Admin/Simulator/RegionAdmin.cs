@@ -18,11 +18,13 @@ using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 
 namespace SilverSim.WebIF.Admin.Simulator
 {
     #region Service implementation
+    [Description("WebIF Region Admin Support")]
     public class RegionAdmin : IPlugin
     {
         private static readonly ILog m_Log = LogManager.GetLogger("ADMIN WEB IF - REGION");

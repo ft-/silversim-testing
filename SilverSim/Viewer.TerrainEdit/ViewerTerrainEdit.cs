@@ -10,9 +10,11 @@ using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Land;
 using System;
+using System.ComponentModel;
 
 namespace SilverSim.Viewer.TerrainEdit
 {
+    [Description("Viewer Terraforming Handler")]
     public class ViewerTerrainEdit : IPlugin, IPacketHandlerExtender
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL TERRAIN EDIT");

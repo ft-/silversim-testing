@@ -5,9 +5,11 @@ using Nini.Config;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
 using SilverSim.Main.Common;
+using System.ComponentModel;
 
 namespace SilverSim.Viewer.Teleport
 {
+    [Description("Viewer Teleport Handler")]
     public class ViewerTeleport : IPlugin, IPacketHandlerExtender
     {
         public ViewerTeleport()

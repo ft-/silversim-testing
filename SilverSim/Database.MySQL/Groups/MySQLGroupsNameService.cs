@@ -10,10 +10,12 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.Database.MySQL.Groups
 {
     #region Service Implementation
+    [Description("MySQL GroupsName Backend")]
     public sealed class MySQLGroupsNameService : GroupsNameServiceInterface, IDBServiceInterface, IPlugin
     {
         readonly string m_ConnectionString;

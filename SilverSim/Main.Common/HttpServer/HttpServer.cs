@@ -6,6 +6,7 @@ using Nini.Config;
 using SilverSim.Http;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Net;
@@ -17,6 +18,7 @@ using ThreadedClasses;
 
 namespace SilverSim.Main.Common.HttpServer
 {
+    [Description("HTTP Server")]
     public class BaseHttpServer : IPlugin, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("HTTP SERVER");

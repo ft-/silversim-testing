@@ -14,10 +14,12 @@ using SilverSim.Types;
 using SilverSim.Types.Estate;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Globalization;
 
 namespace SilverSim.Main.Cmd.Estate
 {
+    [Description("Estate Console Commands")]
     public class EstateCommands : IPlugin
     {
         readonly string m_RegionStorageName;

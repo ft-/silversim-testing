@@ -11,12 +11,14 @@ using SilverSim.Types;
 using SilverSim.Types.Asset;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Asset
 {
     #region Service Implementation
     [SuppressMessage("Gendarme.Rules.Maintainability", "AvoidLackOfCohesionOfMethodsRule")]
+    [Description("MySQL Asset Backend")]
     public class MySQLAssetService : AssetServiceInterface, IDBServiceInterface, IPlugin
     {
         static readonly ILog m_Log = LogManager.GetLogger("MYSQL ASSET SERVICE");

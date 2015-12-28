@@ -5,11 +5,13 @@ using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Types;
 using System;
+using System.ComponentModel;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Chat
 {
     #region Service Implementation
+    [Description("Region Chat Handler")]
     public class ChatHandler : ChatServiceInterface
     {
         readonly RwLockedDictionary<int, ChannelInfo> m_Channels = new RwLockedDictionary<int, ChannelInfo>();

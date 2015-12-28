@@ -24,9 +24,11 @@ using System.Threading;
 using System.Timers;
 using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
 
 namespace SilverSim.Viewer.Profile
 {
+    [Description("Viewer Profile Handler")]
     public class ViewerProfileServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL PROFILE");

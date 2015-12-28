@@ -13,9 +13,11 @@ using System.Text;
 using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.Serialization;
+using System.ComponentModel;
 
 namespace SilverSim.Main.Common.HttpServer
 {
+    [Description("HTTP JSON2.0RPC Handler")]
     public class HttpJson20RpcHandler : IPlugin, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("JSON2.0RPC SERVER");

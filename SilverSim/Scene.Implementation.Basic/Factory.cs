@@ -18,9 +18,11 @@ using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
+    [Description("Basic Scene Factory")]
     public sealed class SceneFactory : SceneFactoryInterface, IPlugin
     {
         ChatServiceFactoryInterface m_ChatFactory;

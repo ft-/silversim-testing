@@ -11,11 +11,13 @@ using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Grid
 {
     #region Service Implementation
+    [Description("MySQL Grid Backend")]
     public sealed class MySQLGridService : GridServiceInterface, IDBServiceInterface, IPlugin
     {
         readonly string m_ConnectionString;
