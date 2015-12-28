@@ -5,12 +5,14 @@ using log4net;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using System;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using ThreadedClasses;
 
 namespace SilverSim.Main.Common.Caps
 {
+    [Description("HTTP Capability Handler")]
     public class CapsHttpRedirector : IPlugin, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("CAPS HTTP REDIRECTOR");

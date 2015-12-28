@@ -19,9 +19,11 @@ using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
 
 namespace SilverSim.Viewer.Map
 {
+    [Description("Viewer Map Handler")]
     public class ViewerMap : IPlugin, IPluginShutdown, IPacketHandlerExtender
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL MAP");

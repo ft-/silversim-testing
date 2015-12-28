@@ -4,10 +4,12 @@
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using Nini.Config;
+using System.ComponentModel;
 
 namespace SilverSim.Scene.Chat
 {
     #region Chat Factory Service
+    [Description("Region Chat Handler")]
     public sealed class ChatHandlerFactory : ChatServiceFactoryInterface, IPlugin
     {
         readonly double m_WhisperDistance;
