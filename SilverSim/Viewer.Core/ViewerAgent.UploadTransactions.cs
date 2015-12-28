@@ -50,7 +50,7 @@ namespace SilverSim.Viewer.Core
 
         public class TerrainUploadTransaction : UploadTransaction
         {
-            SceneInterface m_Scene;
+            readonly SceneInterface m_Scene;
 
             internal TerrainUploadTransaction(SceneInterface scene)
             {
