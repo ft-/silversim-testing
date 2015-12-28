@@ -28,7 +28,7 @@ namespace SilverSim.WebIF.Admin
 
         public class ConsoleAdminTty : TTY
         {
-            StreamWriter m_StreamWriter;
+            readonly StreamWriter m_StreamWriter;
 
             public ConsoleAdminTty(StreamWriter w)
             {
