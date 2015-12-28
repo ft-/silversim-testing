@@ -15,6 +15,7 @@ using System.Diagnostics.CodeAnalysis;
 using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Types.Grid;
+using SilverSim.Viewer.Messages.LayerData;
 
 namespace SilverSim.Viewer.Core
 {
@@ -680,7 +681,7 @@ namespace SilverSim.Viewer.Core
                 case "upload filename":
                     if(req.ParamList.Count > 1)
                     {
-                        TerrainUploadTransaction t = new TerrainUploadTransaction();
+                        TerrainUploadTransaction t = new TerrainUploadTransaction(circuit.Scene);
                         t.Filename = req.ParamList[1].FromUTF8Bytes();
                         AddTerrainUploadTransaction(t, req.CircuitSceneID);
                     }

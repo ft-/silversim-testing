@@ -11,6 +11,10 @@ using System.Linq;
 using System.Text;
 using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Viewer.Messages.LayerData;
+using System.IO;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Management.Scene;
 
 namespace SilverSim.Viewer.Core
 {
@@ -46,14 +50,22 @@ namespace SilverSim.Viewer.Core
 
         public class TerrainUploadTransaction : UploadTransaction
         {
-            internal TerrainUploadTransaction()
-            {
+            SceneInterface m_Scene;
 
+            internal TerrainUploadTransaction(SceneInterface scene)
+            {
+                m_Scene = scene;
             }
 
             public virtual void OnCompletion(byte[] data)
             {
-
+                using (MemoryStream input = new MemoryStream(ViewerAgent.BuildUploadedData(this)))
+                {
+                    input.LoadLLRawStream(
+                        (int)m_Scene.RegionData.Size.X,
+                        (int)m_Scene.RegionData.Size.Y,
+                        m_Scene.Terrain.Patch.Update);
+                }
             }
 
             public virtual void OnAbort()
@@ -72,12 +84,10 @@ namespace SilverSim.Viewer.Core
 
             internal AssetUploadTransaction()
             {
-
             }
 
             public virtual void OnCompletion()
             {
-
             }
 
             public virtual void OnAbort()
@@ -90,7 +100,7 @@ namespace SilverSim.Viewer.Core
         internal RwLockedDoubleDictionary<UUID, UInt64, TerrainUploadTransaction> m_TerrainTransactions = new RwLockedDoubleDictionary<UUID, ulong, TerrainUploadTransaction>();
 
         #region Data Builder
-        byte[] BuildUploadedData(UploadTransaction t)
+        internal static byte[] BuildUploadedData(UploadTransaction t)
         {
             int dataLength = 0;
             byte[] data;
