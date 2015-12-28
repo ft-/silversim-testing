@@ -9,9 +9,11 @@ using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
 
 namespace SilverSim.Viewer.Friends
 {
+    [Description("Viewer Friends Handler")]
     public class ViewerFriendsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
         [PacketHandler(MessageType.AcceptFriendship)]

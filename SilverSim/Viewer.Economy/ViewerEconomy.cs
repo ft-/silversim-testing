@@ -16,9 +16,11 @@ using System.Collections.Generic;
 using System.Threading;
 using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using System.ComponentModel;
 
 namespace SilverSim.Viewer.Economy
 {
+    [Description("Viewer Economy Handler")]
     public class ViewerEconomy : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL ECONOMY");

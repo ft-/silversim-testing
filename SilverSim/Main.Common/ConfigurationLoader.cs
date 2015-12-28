@@ -52,6 +52,7 @@ namespace SilverSim.Main.Common
     [SuppressMessage("Gendarme.Rules.Design", "TypesWithDisposableFieldsShouldBeDisposableRule")]
     public sealed class ConfigurationLoader
     {
+        [Description("Resource Asset Backend")]
         sealed class ResourceAssetPlugin : SceneInterface.ResourceAssetService, IPlugin
         {
             public ResourceAssetPlugin()

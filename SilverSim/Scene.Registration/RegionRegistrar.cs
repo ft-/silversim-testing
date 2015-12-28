@@ -11,10 +11,12 @@ using ThreadedClasses;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types.Grid;
 using System;
+using System.ComponentModel;
 
 namespace SilverSim.Scene.Registration
 {
     #region Service Implementation
+    [Description("Grid Registration Handler")]
     public class SceneRegistrar : IPlugin, IPluginShutdown
     {
         readonly RwLockedList<SceneInterface> m_RegisteredScenes = new RwLockedList<SceneInterface>();

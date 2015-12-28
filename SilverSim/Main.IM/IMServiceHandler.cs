@@ -7,6 +7,7 @@ using SilverSim.Main.Common;
 using SilverSim.Scene.Management.IM;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.Types.IM;
+using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
 using ThreadedClasses;
@@ -15,6 +16,7 @@ namespace SilverSim.Main.IM
 {
     #region Service Implementation
     [SuppressMessage("Gendarme.Rules.Concurrency", "DoNotLockOnThisOrTypesRule")]
+    [Description("IM Service")]
     public class IMServiceHandler : IMServiceInterface, IPlugin
     {
         protected internal BlockingQueue<GridInstantMessage> m_Queue = new BlockingQueue<GridInstantMessage>();

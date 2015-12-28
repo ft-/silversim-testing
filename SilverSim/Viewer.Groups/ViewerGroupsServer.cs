@@ -3,11 +3,6 @@
 
 using log4net;
 using Nini.Config;
-using SilverSim.Viewer.Core;
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Agent;
-using SilverSim.Viewer.Messages.Groups;
-using SilverSim.Viewer.Messages.IM;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.IM;
@@ -15,22 +10,28 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Groups;
-using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using SilverSim.Types.IM;
 using SilverSim.Types.Inventory;
+using SilverSim.Types.StructuredData.Llsd;
+using SilverSim.Viewer.Core;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Agent;
+using SilverSim.Viewer.Messages.Groups;
+using SilverSim.Viewer.Messages.IM;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
 using System.Threading;
 using ThreadedClasses;
 
 namespace SilverSim.Viewer.Groups
 {
+    [Description("Viewer Groups Handler")]
     public class ViewerGroupsServer : IPlugin, IPacketHandlerExtender, ICapabilityExtender, IPluginShutdown, ITriggerOnRootAgentActions
     {
         private static readonly ILog m_Log = LogManager.GetLogger("LL GROUPS");
