@@ -31,6 +31,7 @@ namespace SilverSim.WebIF.Admin
         BaseHttpServer m_HttpsServer;
         readonly string m_BasePath;
         const string JsonContentType = "application/json";
+        RwLockedList<string> m_KnownSecurityIssues;
 
         class SessionInfo
         {
@@ -125,6 +126,7 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("session.validate", HandleSessionValidateRequest);
             JsonMethods.Add("serverparam.get", GetServerParam);
             JsonMethods.Add("serverparam.set", SetServerParam);
+            JsonMethods.Add("securityissues.get", SecurityIssuesView);
         }
 
         public ShutdownOrder ShutdownOrder
@@ -159,6 +161,7 @@ namespace SilverSim.WebIF.Admin
         #region Initialization
         public void Startup(ConfigurationLoader loader)
         {
+            m_KnownSecurityIssues = loader.KnownSecurityIssues;
             m_ServerParams = loader.GetServerParamStorage();
             m_HttpServer = loader.HttpServer;
             m_HttpServer.StartsWithUriHandlers.Add("/admin", HandleUnsecureHttp);
@@ -792,6 +795,19 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region WebIF admin functions
+        [RequiredRight("securityissues.view")]
+        void SecurityIssuesView(HttpRequest req, Map jsondata)
+        {
+            AnArray res = new AnArray();
+            foreach(string s in m_KnownSecurityIssues)
+            {
+                res.Add(s);
+            }
+            Map mres = new Map();
+            mres["securityissues"] = res;
+            SuccessResponse(req, mres);
+        }
+
         [RequiredRight("serverparams.manage")]
         void SetServerParam(HttpRequest req, Map jsondata)
         {
