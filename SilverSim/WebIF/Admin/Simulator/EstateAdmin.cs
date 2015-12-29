@@ -8,8 +8,10 @@ using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Estate;
+using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
+using SilverSim.Types.Grid;
 using System.Collections.Generic;
 using System.ComponentModel;
 
@@ -20,16 +22,20 @@ namespace SilverSim.WebIF.Admin.Simulator
     public class EstateAdmin : IPlugin
     {
         readonly string m_EstateServiceName;
+        readonly string m_RegionStorageName;
         EstateServiceInterface m_EstateService;
+        GridServiceInterface m_RegionStorageService;
 
-        public EstateAdmin(string estateServiceName)
+        public EstateAdmin(string estateServiceName, string regionStorageName)
         {
             m_EstateServiceName = estateServiceName;
+            m_RegionStorageName = regionStorageName;
         }
 
         public void Startup(ConfigurationLoader loader)
         {
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
+            m_RegionStorageService = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             AdminWebIF webif = loader.GetAdminWebIF();
             webif.JsonMethods.Add("estates.list", HandleList);
             webif.JsonMethods.Add("estate.get", HandleGet);
@@ -77,6 +83,22 @@ namespace SilverSim.WebIF.Admin.Simulator
 
             Map res = new Map();
             res.Add("estate", estateInfo.ToJsonMap());
+            List<UUID> regionMap = m_EstateService.RegionMap[estateInfo.ID];
+            AnArray regionsdata = new AnArray();
+            foreach(UUID regionid in regionMap)
+            {
+                RegionInfo rInfo;
+                Map regiondata = new Map();
+
+                regiondata.Add("ID", regionid);
+                if (m_RegionStorageService.TryGetValue(regionid, out rInfo))
+                {
+                    regiondata.Add("Name", rInfo.Name);
+                }
+                regionsdata.Add(regiondata);
+            }
+            res.Add("regions", regionsdata);
+
             AdminWebIF.SuccessResponse(req, res);
         }
 
@@ -286,7 +308,9 @@ namespace SilverSim.WebIF.Admin.Simulator
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new EstateAdmin(ownSection.GetString("EstateService", "EstateService"));
+            return new EstateAdmin(
+                ownSection.GetString("EstateService", "EstateService"),
+                ownSection.GetString("RegionStorage", "RegionStorage"));
         }
     }
     #endregion
