@@ -125,10 +125,6 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("session.validate", HandleSessionValidateRequest);
             JsonMethods.Add("serverparam.get", GetServerParam);
             JsonMethods.Add("serverparam.set", SetServerParam);
-            if(enablesetpasscommand)
-            {
-                m_Log.Error("Disable setting EnableSetPasswordCommand for AdminWebIF");
-            }
         }
 
         public ShutdownOrder ShutdownOrder
@@ -985,6 +981,8 @@ namespace SilverSim.WebIF.Admin
     [PluginName("AdminWebIF")]
     public class AdminWebIFFactory : IPluginFactory
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("ADMIN WEB IF");
+
         public AdminWebIFFactory()
         {
 
@@ -992,16 +990,22 @@ namespace SilverSim.WebIF.Admin
 
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
-            return new AdminWebIF(
-                ownSection.GetString("BasePath", ""),
-                ownSection.GetBoolean("EnableSetPasswordCommand",
+            bool enableSetPasswordCommand = ownSection.GetBoolean("EnableSetPasswordCommand",
 #if DEBUG
                     true
 #else
                     false
 #endif
-                    )
-                );
+                    );
+
+            if (enableSetPasswordCommand)
+            {
+                loader.KnownSecurityIssues.Add("Set EnableSetPasswordCommand=false in section [" + ownSection.Name + "]");
+                m_Log.ErrorFormat("[SECURITY] Set EnableSetPasswordCommand=false in section [{0}]", ownSection.Name);
+            }
+            return new AdminWebIF(
+                ownSection.GetString("BasePath", ""),
+                enableSetPasswordCommand);
         }
     }
 #endregion
