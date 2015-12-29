@@ -1041,6 +1041,10 @@ namespace SilverSim.Main.Common
                 httpsServer.UriHandlers.Add("/helo", HeloResponseHandler);
                 PluginInstances.Add("HttpsServer", httpsServer);
             }
+            else
+            {
+                KnownConfigurationIssues.Add("Configure HTTPS support in [HTTPS] section");
+            }
 
             PluginInstances.Add("XmlRpcServer", new HttpXmlRpcHandler());
             PluginInstances.Add("JSON2.0RpcServer", new HttpJson20RpcHandler());
