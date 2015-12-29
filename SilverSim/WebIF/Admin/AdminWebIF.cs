@@ -4,9 +4,28 @@
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpServer;
+using SilverSim.Scene.ServiceInterfaces.RegionLoader;
+using SilverSim.Scene.ServiceInterfaces.SimulationData;
+using SilverSim.Scene.ServiceInterfaces.Terrain;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Scene.Types.Script;
+using SilverSim.ServiceInterfaces.Account;
+using SilverSim.ServiceInterfaces.Asset;
+using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.AvatarName;
+using SilverSim.ServiceInterfaces.Database;
+using SilverSim.ServiceInterfaces.Estate;
+using SilverSim.ServiceInterfaces.Friends;
+using SilverSim.ServiceInterfaces.Grid;
+using SilverSim.ServiceInterfaces.GridUser;
+using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.ServiceInterfaces.Neighbor;
+using SilverSim.ServiceInterfaces.Presence;
+using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Json;
@@ -14,6 +33,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Timers;
@@ -33,7 +53,45 @@ namespace SilverSim.WebIF.Admin
         readonly string m_BasePath;
         const string JsonContentType = "application/json";
         RwLockedList<string> m_KnownConfigurationIssues;
+        ConfigurationLoader m_Loader;
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
+
+        static readonly Dictionary<Type, string> m_FeaturesTable = new Dictionary<Type, string>();
+        static AdminWebIF()
+        {
+            m_FeaturesTable[typeof(IPluginFactory)] = "Plugin Factory";
+            m_FeaturesTable[typeof(IPluginSubFactory)] = "Plugin Sub Factory";
+
+            m_FeaturesTable[typeof(AssetServiceInterface)] = "Asset Service";
+            m_FeaturesTable[typeof(InventoryServiceInterface)] = "Inventory Service";
+            m_FeaturesTable[typeof(AvatarNameServiceInterface)] = "Avatar Name Lookup Service";
+            m_FeaturesTable[typeof(PresenceServiceInterface)] = "Presence Service";
+            m_FeaturesTable[typeof(GridServiceInterface)] = "Grid Service";
+            m_FeaturesTable[typeof(GridUserServiceInterface)] = "GridUser Service";
+            m_FeaturesTable[typeof(AvatarServiceInterface)] = "Avatar Service";
+            m_FeaturesTable[typeof(UserAccountServiceInterface)] = "UserAccount Service";
+            m_FeaturesTable[typeof(IInventoryServicePlugin)] = "Inventory Service HELO Instantiator";
+            m_FeaturesTable[typeof(IAssetServicePlugin)] = "Asset Service HELO Instantiator";
+            m_FeaturesTable[typeof(SimulationDataStorageInterface)] = "Simulation Data Storage";
+            m_FeaturesTable[typeof(EstateServiceInterface)] = "Estate Service";
+            m_FeaturesTable[typeof(GroupsServiceInterface)] = "Groups Service";
+            m_FeaturesTable[typeof(ProfileServiceInterface)] = "Profile Service";
+            m_FeaturesTable[typeof(NeighborServiceInterface)] = "Neighbor Signaling Service";
+            m_FeaturesTable[typeof(FriendsServiceInterface)] = "Friends Service";
+
+            m_FeaturesTable[typeof(IPluginShutdown)] = "Shutdown Handler";
+            m_FeaturesTable[typeof(IDBServiceInterface)] = "DataBase Service";
+            m_FeaturesTable[typeof(BaseHttpServer)] = "HTTP Server";
+            m_FeaturesTable[typeof(IScriptCompiler)] = "Script Compiler";
+            m_FeaturesTable[typeof(IScriptApi)] = "Script Api";
+            m_FeaturesTable[typeof(ITerrainFileStorage)] = "Terrain File Format";
+            m_FeaturesTable[typeof(IRegionLoaderInterface)] = "Region Loader";
+            m_FeaturesTable[typeof(TTY)] = "Console";
+            m_FeaturesTable[typeof(SceneInterface)] = "Scene Implementation";
+            m_FeaturesTable[typeof(HttpXmlRpcHandler)] = "XML RPC Server";
+            m_FeaturesTable[typeof(CapsHttpRedirector)] = "Capability Redirector";
+            m_FeaturesTable[typeof(HttpJson20RpcHandler)] = "JSON2.0RPC Server";
+        }
 
         class SessionInfo
         {
@@ -129,6 +187,8 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("serverparam.get", GetServerParam);
             JsonMethods.Add("serverparam.set", SetServerParam);
             JsonMethods.Add("issues.get", IssuesView);
+            JsonMethods.Add("modules.list", ModulesList);
+            JsonMethods.Add("module.get", ModuleGet);
         }
 
         public ShutdownOrder ShutdownOrder
@@ -221,6 +281,7 @@ namespace SilverSim.WebIF.Admin
         #region Initialization
         public void Startup(ConfigurationLoader loader)
         {
+            m_Loader = loader;
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)
             {
@@ -274,6 +335,7 @@ namespace SilverSim.WebIF.Admin
 
         public void Shutdown()
         {
+            m_Loader = null;
             JsonMethods.Clear();
             m_HttpServer.StartsWithUriHandlers.Remove("/admin");
             if (null != m_HttpsServer)
@@ -884,6 +946,69 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region WebIF admin functions
+        [RequiredRight("modules.view")]
+        void ModulesList(HttpRequest req, Map jsondata)
+        {
+            AnArray res = new AnArray();
+            Dictionary<string, IPlugin> plugins = m_Loader.AllServices;
+            foreach(KeyValuePair<string, IPlugin> kvp in plugins)
+            {
+                Map pluginData = new Map();
+                pluginData.Add("Name", kvp.Key);
+                DescriptionAttribute descAttr = Attribute.GetCustomAttribute(kvp.Value.GetType(), typeof(DescriptionAttribute)) as DescriptionAttribute;
+                pluginData.Add("Description", descAttr != null ? descAttr.Description : string.Empty);
+                res.Add(pluginData);
+            }
+            Map m = new Map();
+            m.Add("modules", res);
+            SuccessResponse(req, m);
+        }
+
+        [RequiredRight("modules.view")]
+        void ModuleGet(HttpRequest req, Map jsondata)
+        {
+            if(!jsondata.ContainsKey("name"))
+            {
+                ErrorResponse(req, ErrorResult.InvalidRequest);
+                return;
+            }
+
+            Dictionary<string, IPlugin> plugins = m_Loader.AllServices;
+            IPlugin plugin;
+            if(plugins.TryGetValue(jsondata["name"].ToString(), out plugin))
+            {
+                Map res = new Map();
+                res.Add("Name", jsondata["name"].ToString());
+                Type pluginType = plugin.GetType();
+                DescriptionAttribute descAttr = Attribute.GetCustomAttribute(pluginType, typeof(DescriptionAttribute)) as DescriptionAttribute;
+                res.Add("Description", descAttr != null ? descAttr.Description : string.Empty);
+
+                AnArray featuresList = new AnArray();
+
+                foreach (KeyValuePair<Type, string> kvp in m_FeaturesTable)
+                {
+                    if (kvp.Key.IsInterface)
+                    {
+                        if (pluginType.GetInterfaces().Contains(kvp.Key))
+                        {
+                            featuresList.Add(kvp.Value);
+                        }
+                    }
+                    else if (kvp.Key.IsAssignableFrom(pluginType))
+                    {
+                        featuresList.Add(kvp.Value);
+                    }
+                }
+
+                res.Add("Features", featuresList);
+                SuccessResponse(req, res);
+            }
+            else
+            {
+                ErrorResponse(req, ErrorResult.NotFound);
+            }
+        }
+
         [RequiredRight("issues.view")]
         void IssuesView(HttpRequest req, Map jsondata)
         {

@@ -260,6 +260,14 @@ namespace SilverSim.Main.Common
             return GetService<ServerParamServiceInterface>("ServerParamStorage");
         }
 
+        public Dictionary<string, IPlugin> AllServices
+        {
+            get
+            {
+                return new Dictionary<string, IPlugin>(PluginInstances);
+            }
+        }
+
         public T GetService<T>(string serviceName)
         {
             IPlugin module;
