@@ -155,7 +155,20 @@ namespace SilverSim.WebIF.Admin.Simulator
             EstateInfo estateInfo = new EstateInfo();
             try
             {
-                estateInfo.ID = jsondata["id"].AsUInt;
+                if (jsondata.ContainsKey("id"))
+                {
+                    estateInfo.ID = jsondata["id"].AsUInt;
+                }
+                else
+                {
+                    List<uint> estateids = m_EstateService.AllIDs;
+                    uint id = 100;
+                    while(estateids.Contains(id))
+                    {
+                        ++id;
+                    }
+                    estateInfo.ID = id;
+                }
                 estateInfo.Name = jsondata["name"].ToString();
                 estateInfo.Flags = (RegionOptionFlags)jsondata["flags"].AsUInt;
                 estateInfo.Owner = new UUI(jsondata["owner"].ToString());
