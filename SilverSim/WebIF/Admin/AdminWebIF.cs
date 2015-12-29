@@ -31,7 +31,7 @@ namespace SilverSim.WebIF.Admin
         BaseHttpServer m_HttpsServer;
         readonly string m_BasePath;
         const string JsonContentType = "application/json";
-        RwLockedList<string> m_KnownSecurityIssues;
+        RwLockedList<string> m_KnownConfigurationIssues;
 
         class SessionInfo
         {
@@ -126,7 +126,7 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("session.validate", HandleSessionValidateRequest);
             JsonMethods.Add("serverparam.get", GetServerParam);
             JsonMethods.Add("serverparam.set", SetServerParam);
-            JsonMethods.Add("securityissues.get", SecurityIssuesView);
+            JsonMethods.Add("issues.get", IssuesView);
         }
 
         public ShutdownOrder ShutdownOrder
@@ -161,7 +161,7 @@ namespace SilverSim.WebIF.Admin
         #region Initialization
         public void Startup(ConfigurationLoader loader)
         {
-            m_KnownSecurityIssues = loader.KnownSecurityIssues;
+            m_KnownConfigurationIssues = loader.KnownConfigurationIssues;
             m_ServerParams = loader.GetServerParamStorage();
             m_HttpServer = loader.HttpServer;
             m_HttpServer.StartsWithUriHandlers.Add("/admin", HandleUnsecureHttp);
@@ -321,9 +321,9 @@ namespace SilverSim.WebIF.Admin
                     res.Add("rights", rights);
                     res.Add("success", true);
                     if (sessionInfo.Rights.Contains("admin.all") ||
-                        sessionInfo.Rights.Contains("securityissues.view"))
+                        sessionInfo.Rights.Contains("issues.view"))
                     {
-                        res.Add("numsecurityissues", m_KnownSecurityIssues.Count);
+                        res.Add("numissues", m_KnownConfigurationIssues.Count);
                     }
                     using (HttpResponse httpres = req.BeginResponse(JsonContentType))
                     {
@@ -800,16 +800,16 @@ namespace SilverSim.WebIF.Admin
         #endregion
 
         #region WebIF admin functions
-        [RequiredRight("securityissues.view")]
-        void SecurityIssuesView(HttpRequest req, Map jsondata)
+        [RequiredRight("issues.view")]
+        void IssuesView(HttpRequest req, Map jsondata)
         {
             AnArray res = new AnArray();
-            foreach(string s in m_KnownSecurityIssues)
+            foreach(string s in m_KnownConfigurationIssues)
             {
                 res.Add(s);
             }
             Map mres = new Map();
-            mres["securityissues"] = res;
+            mres["issues"] = res;
             SuccessResponse(req, mres);
         }
 
@@ -1021,7 +1021,7 @@ namespace SilverSim.WebIF.Admin
 
             if (enableSetPasswordCommand)
             {
-                loader.KnownSecurityIssues.Add("Set EnableSetPasswordCommand=false in section [" + ownSection.Name + "]");
+                loader.KnownConfigurationIssues.Add("Set EnableSetPasswordCommand=false in section [" + ownSection.Name + "]");
                 m_Log.ErrorFormat("[SECURITY] Set EnableSetPasswordCommand=false in section [{0}]", ownSection.Name);
             }
             return new AdminWebIF(

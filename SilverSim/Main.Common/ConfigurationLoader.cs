@@ -159,21 +159,21 @@ namespace SilverSim.Main.Common
         readonly ManualResetEvent m_ShutdownEvent;
         static readonly Dictionary<Type, string> m_FeaturesTable = new Dictionary<Type, string>();
         readonly RwLockedDictionary<string, string> m_HeloResponseHeaders = new RwLockedDictionary<string, string>();
-        public readonly RwLockedList<string> KnownSecurityIssues = new RwLockedList<string>();
+        public readonly RwLockedList<string> KnownConfigurationIssues = new RwLockedList<string>();
 
-        public void ShowSecurityIssuesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
+        public void ShowIssuesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
             if(UUID.Zero != limitedToScene)
             {
-                io.Write("show security issues not allowed on limited console");
+                io.Write("show issues not allowed on limited console");
             }
-            else if(args[0] == "help" || args.Count < 3 || args[2] != "issues")
+            else if(args[0] == "help")
             {
-                io.Write("show security issues");
+                io.Write("show issues");
             }
             else
             {
-                io.Write("Known Security Issues:\n" + string.Join("\n", KnownSecurityIssues));
+                io.Write("Known Configuration Issues:\n" + string.Join("\n", KnownConfigurationIssues));
             }
         }
 
@@ -893,7 +893,7 @@ namespace SilverSim.Main.Common
             CmdIO.CommandRegistry.ShowCommands.Add("modules", ShowModulesCommand);
             CmdIO.CommandRegistry.GetCommands.Add("serverparam", GetServerParamCommand);
             CmdIO.CommandRegistry.SetCommands.Add("serverparam", SetServerParamCommand);
-            CmdIO.CommandRegistry.ShowCommands.Add("security", ShowSecurityIssuesCommand);
+            CmdIO.CommandRegistry.ShowCommands.Add("issues", ShowIssuesCommand);
 
             while(m_Sources.Count != 0)
             {
