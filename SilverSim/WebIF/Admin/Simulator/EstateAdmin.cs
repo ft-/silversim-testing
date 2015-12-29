@@ -203,7 +203,14 @@ namespace SilverSim.WebIF.Admin.Simulator
                     estateInfo.ID = id;
                 }
                 estateInfo.Name = jsondata["name"].ToString();
-                estateInfo.Flags = (RegionOptionFlags)jsondata["flags"].AsUInt;
+                if (jsondata.ContainsKey("flags"))
+                {
+                    estateInfo.Flags = (RegionOptionFlags)jsondata["flags"].AsUInt;
+                }
+                else
+                {
+                    estateInfo.Flags = RegionOptionFlags.PublicAllowed | RegionOptionFlags.AllowVoice | RegionOptionFlags.AllowSetHome | RegionOptionFlags.AllowLandmark | RegionOptionFlags.AllowDirectTeleport | RegionOptionFlags.AllowParcelChanges;
+                }
                 estateInfo.PricePerMeter = jsondata["pricepermeter"].AsInt;
                 estateInfo.BillableFactor = jsondata["billablefactor"].AsReal;
                 estateInfo.AbuseEmail = jsondata["abuseemail"].ToString();
@@ -222,7 +229,9 @@ namespace SilverSim.WebIF.Admin.Simulator
             catch
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                return;
             }
+            AdminWebIF.SuccessResponse(req, new Map());
         }
 
         [AdminWebIF.RequiredRight("estates.manage")]
@@ -252,7 +261,9 @@ namespace SilverSim.WebIF.Admin.Simulator
             catch
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                return;
             }
+            AdminWebIF.SuccessResponse(req, new Map());
         }
 
         [AdminWebIF.RequiredRight("estate.notice")]

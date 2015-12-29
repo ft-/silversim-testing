@@ -459,143 +459,154 @@ namespace SilverSim.WebIF.Admin
 
         public void HandleHttp(HttpRequest req)
         {
-            if(req.RawUrl.StartsWith("/admin/json"))
+            try
             {
-                if(req.Method != "POST")
+                if (req.RawUrl.StartsWith("/admin/json"))
                 {
+                    if (req.Method != "POST")
+                    {
 #if DEBUG
-                    m_Log.DebugFormat("Method {0} not allowed to /admin/json", req.Method);
+                        m_Log.DebugFormat("Method {0} not allowed to /admin/json", req.Method);
 #endif
-                    req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                        req.ErrorResponse(HttpStatusCode.MethodNotAllowed, "Method not allowed");
+                    }
+                    else if (req.ContentType != JsonContentType)
+                    {
+#if DEBUG
+                        m_Log.DebugFormat("Content-Type '{0}' not allowed to /admin/json", req.ContentType);
+#endif
+                        req.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported media type " + req.ContentType);
+                    }
+                    else
+                    {
+                        SessionInfo sessionInfo;
+                        Map jsondata;
+                        try
+                        {
+                            jsondata = Json.Deserialize(req.Body) as Map;
+                        }
+                        catch (Json.InvalidJsonSerializationException)
+                        {
+                            req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                            return;
+                        }
+                        if (jsondata == null)
+                        {
+                            ErrorResponse(req, ErrorResult.InvalidRequest);
+                            return;
+                        }
+                        Action<HttpRequest, Map> del;
+                        if (!jsondata.ContainsKey("method"))
+                        {
+                            ErrorResponse(req, ErrorResult.MissingMethod);
+                            return;
+                        }
+
+                        string methodName = jsondata["method"].ToString();
+                        string sessionKey;
+
+#if DEBUG
+                        m_Log.DebugFormat("/admin/json Method called {0}", methodName);
+#endif
+
+                        switch (methodName)
+                        {
+                            case "login":
+                                HandleLoginRequest(req, jsondata);
+                                break;
+
+                            case "challenge":
+                                HandleChallengeRequest(req, jsondata);
+                                break;
+
+                            default:
+                                if (!jsondata.ContainsKey("sessionid"))
+                                {
+                                    ErrorResponse(req, ErrorResult.MissingSessionId);
+                                    return;
+                                }
+                                sessionKey = req.CallerIP + "+" + jsondata["sessionid"].ToString();
+                                if (!m_Sessions.TryGetValue(sessionKey, out sessionInfo) ||
+                                    !sessionInfo.IsAuthenticated)
+                                {
+                                    ErrorResponse(req, ErrorResult.NotLoggedIn);
+                                    return;
+                                }
+                                else
+                                {
+                                    sessionInfo.LastSeenTickCount = Environment.TickCount;
+                                }
+                                if (methodName == "logout")
+                                {
+                                    m_Sessions.Remove(sessionKey);
+                                    SuccessResponse(req, new Map());
+                                }
+                                else if (!JsonMethods.TryGetValue(methodName, out del))
+                                {
+                                    ErrorResponse(req, ErrorResult.UnknownMethod);
+                                    return;
+                                }
+                                else
+                                {
+                                    if (!sessionInfo.Rights.Contains("admin.all"))
+                                    {
+                                        bool isRightRequired = false;
+                                        bool hasRightRequired = false;
+                                        RequiredRightAttribute[] attrs = Attribute.GetCustomAttributes(del.GetType(), typeof(RequiredRightAttribute[])) as RequiredRightAttribute[];
+                                        foreach (RequiredRightAttribute attr in attrs)
+                                        {
+                                            isRightRequired = true;
+                                            if (sessionInfo.Rights.Contains(attr.Right))
+                                            {
+                                                hasRightRequired = true;
+                                                break;
+                                            }
+                                        }
+                                        if (isRightRequired && !hasRightRequired)
+                                        {
+                                            ErrorResponse(req, ErrorResult.InsufficientRights);
+                                            return;
+                                        }
+                                    }
+                                    del(req, jsondata);
+                                }
+                                break;
+                        }
+                    }
                 }
-                else if(req.ContentType != JsonContentType)
+                else if (req.RawUrl.StartsWith("/admin/js/") || req.RawUrl.StartsWith("/admin/css/"))
                 {
-#if DEBUG
-                    m_Log.DebugFormat("Content-Type '{0}' not allowed to /admin/json", req.ContentType);
-#endif
-                    req.ErrorResponse(HttpStatusCode.UnsupportedMediaType, "Unsupported media type " + req.ContentType);
+                    string uri = Uri.UnescapeDataString(req.RawUrl).Substring(6);
+                    if (uri.Contains("..") || uri.Contains("/./") || uri.Contains("\\"))
+                    {
+                        req.ErrorResponse(HttpStatusCode.NotFound, "File Not Found");
+                        return;
+                    }
+                    ServeFile(req, uri);
                 }
                 else
                 {
-                    SessionInfo sessionInfo;
-                    Map jsondata;
-                    try
+                    string uri = Uri.UnescapeDataString(req.RawUrl).Substring(6);
+                    if (uri.Contains("..") || uri.Contains("/./") || uri.Contains("\\"))
                     {
-                        jsondata = Json.Deserialize(req.Body) as Map;
-                    }
-                    catch(Json.InvalidJsonSerializationException)
-                    {
-                        req.ErrorResponse(HttpStatusCode.BadRequest, "Bad Request");
+                        req.ErrorResponse(HttpStatusCode.NotFound, "File Not Found");
                         return;
                     }
-                    if(jsondata == null)
+                    if (0 == uri.Length || uri.EndsWith("/"))
                     {
-                        ErrorResponse(req, ErrorResult.InvalidRequest);
-                        return;
-                    }
-                    Action<HttpRequest, Map> del;
-                    if (!jsondata.ContainsKey("method"))
-                    {
-                        ErrorResponse(req, ErrorResult.MissingMethod);
-                        return;
+                        uri = "index.html";
                     }
 
-                    string methodName = jsondata["method"].ToString();
-                    string sessionKey;
-
-#if DEBUG
-                    m_Log.DebugFormat("/admin/json Method called {0}", methodName);
-#endif
-
-                    switch(methodName)
-                    {
-                        case "login":
-                            HandleLoginRequest(req, jsondata);
-                            break;
-
-                        case "challenge":
-                            HandleChallengeRequest(req, jsondata);
-                            break;
-
-                        default:
-                            if(!jsondata.ContainsKey("sessionid"))
-                            {
-                                ErrorResponse(req, ErrorResult.MissingSessionId);
-                                return;
-                            }
-                            sessionKey = req.CallerIP + "+" + jsondata["sessionid"].ToString();
-                            if (!m_Sessions.TryGetValue(sessionKey, out sessionInfo) ||
-                                !sessionInfo.IsAuthenticated)
-                            {
-                                ErrorResponse(req, ErrorResult.NotLoggedIn);
-                                return;
-                            }
-                            else
-                            {
-                                sessionInfo.LastSeenTickCount = Environment.TickCount;
-                            }
-                            if (methodName == "logout")
-                            {
-                                m_Sessions.Remove(sessionKey);
-                                SuccessResponse(req, new Map());
-                            }
-                            else if (!JsonMethods.TryGetValue(methodName, out del))
-                            {
-                                ErrorResponse(req, ErrorResult.UnknownMethod);
-                                return;
-                            }
-                            else
-                            {
-                                if (!sessionInfo.Rights.Contains("admin.all"))
-                                {
-                                    bool isRightRequired = false;
-                                    bool hasRightRequired = false;
-                                    RequiredRightAttribute[] attrs = Attribute.GetCustomAttributes(del.GetType(), typeof(RequiredRightAttribute[])) as RequiredRightAttribute[];
-                                    foreach (RequiredRightAttribute attr in attrs)
-                                    {
-                                        isRightRequired = true;
-                                        if (sessionInfo.Rights.Contains(attr.Right))
-                                        {
-                                            hasRightRequired = true;
-                                            break;
-                                        }
-                                    }
-                                    if (isRightRequired && !hasRightRequired)
-                                    {
-                                        ErrorResponse(req, ErrorResult.InsufficientRights);
-                                        return;
-                                    }
-                                }
-                                del(req, jsondata);
-                            }
-                            break;
-                    }
+                    ServeFile(req, m_BasePath + uri);
                 }
             }
-            else if(req.RawUrl.StartsWith("/admin/js/") || req.RawUrl.StartsWith("/admin/css/"))
+            catch(HttpResponse.ConnectionCloseException)
             {
-                string uri = Uri.UnescapeDataString(req.RawUrl).Substring(6);
-                if (uri.Contains("..") || uri.Contains("/./") || uri.Contains("\\"))
-                {
-                    req.ErrorResponse(HttpStatusCode.NotFound, "File Not Found");
-                    return;
-                }
-                ServeFile(req, uri);
+                throw;
             }
-            else
+            catch(Exception e)
             {
-                string uri = Uri.UnescapeDataString(req.RawUrl).Substring(6);
-                if (uri.Contains("..") || uri.Contains("/./") || uri.Contains("\\"))
-                {
-                    req.ErrorResponse(HttpStatusCode.NotFound, "File Not Found");
-                    return;
-                }
-                if (0 == uri.Length || uri.EndsWith("/"))
-                {
-                    uri = "index.html";
-                }
-
-                ServeFile(req, m_BasePath + uri);
+                m_Log.ErrorFormat("Exception encountered! {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
             }
         }
         #endregion
