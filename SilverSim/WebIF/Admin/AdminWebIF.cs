@@ -15,7 +15,6 @@ using System.ComponentModel;
 using System.IO;
 using System.Net;
 using System.Security.Cryptography;
-using System.Text;
 using System.Timers;
 using ThreadedClasses;
 
@@ -50,6 +49,7 @@ namespace SilverSim.WebIF.Admin
         }
 
         readonly RwLockedDictionary<string, SessionInfo> m_Sessions = new RwLockedDictionary<string, SessionInfo>();
+        readonly public RwLockedDictionaryAutoAdd<string, RwLockedList<string>> AutoGrantRights = new RwLockedDictionaryAutoAdd<string, RwLockedList<string>>(delegate () { return new RwLockedList<string>(); });
         readonly Timer m_Timer = new Timer(1);
         bool EnableSetPasswordCommand
         {
@@ -78,7 +78,7 @@ namespace SilverSim.WebIF.Admin
             }
         }
 
-        [AttributeUsage(AttributeTargets.Method)]
+        [AttributeUsage(AttributeTargets.Method, Inherited = false)]
         public sealed class RequiredRightAttribute : Attribute
         {
             public string Right { get; private set; }
@@ -258,6 +258,20 @@ namespace SilverSim.WebIF.Admin
 
                     sessionInfo.ExpectedResponse = BitConverter.ToString(sha1.ComputeHash(str)).Replace("-", "").ToLower();
                     sessionInfo.Rights = new List<string>(rights.ToLower().Split(','));
+                    foreach (string r in sessionInfo.Rights.ToArray())
+                    {
+                        RwLockedList<string> autoGrantRightsOnRight;
+                        if (AutoGrantRights.TryGetValue(r, out autoGrantRightsOnRight))
+                        {
+                            foreach (string g in autoGrantRightsOnRight)
+                            {
+                                if (!sessionInfo.Rights.Contains(g))
+                                {
+                                    sessionInfo.Rights.Add(g);
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -464,8 +478,19 @@ namespace SilverSim.WebIF.Admin
                             {
                                 if (!sessionInfo.Rights.Contains("admin.all"))
                                 {
-                                    RequiredRightAttribute attr = Attribute.GetCustomAttribute(del.GetType(), typeof(RequiredRightAttribute)) as RequiredRightAttribute;
-                                    if (attr != null && !sessionInfo.Rights.Contains(attr.Right))
+                                    bool isRightRequired = false;
+                                    bool hasRightRequired = false;
+                                    RequiredRightAttribute[] attrs = Attribute.GetCustomAttributes(del.GetType(), typeof(RequiredRightAttribute[])) as RequiredRightAttribute[];
+                                    foreach (RequiredRightAttribute attr in attrs)
+                                    {
+                                        isRightRequired = true;
+                                        if (sessionInfo.Rights.Contains(attr.Right))
+                                        {
+                                            hasRightRequired = true;
+                                            break;
+                                        }
+                                    }
+                                    if (isRightRequired && !hasRightRequired)
                                     {
                                         ErrorResponse(req, ErrorResult.InsufficientRights);
                                         return;
