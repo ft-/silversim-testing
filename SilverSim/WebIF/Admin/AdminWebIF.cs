@@ -51,19 +51,7 @@ namespace SilverSim.WebIF.Admin
         readonly RwLockedDictionary<string, SessionInfo> m_Sessions = new RwLockedDictionary<string, SessionInfo>();
         readonly public RwLockedDictionaryAutoAdd<string, RwLockedList<string>> AutoGrantRights = new RwLockedDictionaryAutoAdd<string, RwLockedList<string>>(delegate () { return new RwLockedList<string>(); });
         readonly Timer m_Timer = new Timer(1);
-        bool EnableSetPasswordCommand
-        {
-            get
-            {
-                return m_ServerParams.GetBoolean(UUID.Zero, "WebIF.Admin.EnableSetPasswordCommand",
-#if DEBUG
-                    true
-#else
-                    false
-#endif
-                    );
-            }
-        }
+        bool m_EnableSetPasswordCommand;
 
         #region Helpers
         public static void SuccessResponse(HttpRequest req, Map m)
@@ -126,8 +114,9 @@ namespace SilverSim.WebIF.Admin
         }
         #endregion
 
-        public AdminWebIF(string basepath)
+        public AdminWebIF(string basepath, bool enablesetpasscommand)
         {
+            m_EnableSetPasswordCommand = enablesetpasscommand;
             m_BasePath = basepath;
             m_Timer.Elapsed += HandleTimer;
             JsonMethods.Add("webif.admin.user.grantright", GrantRight);
@@ -136,6 +125,10 @@ namespace SilverSim.WebIF.Admin
             JsonMethods.Add("session.validate", HandleSessionValidateRequest);
             JsonMethods.Add("serverparam.get", GetServerParam);
             JsonMethods.Add("serverparam.set", SetServerParam);
+            if(enablesetpasscommand)
+            {
+                m_Log.Error("Disable setting EnableSetPasswordCommand for AdminWebIF");
+            }
         }
 
         public ShutdownOrder ShutdownOrder
@@ -596,7 +589,7 @@ namespace SilverSim.WebIF.Admin
         void DisplayAdminWebIFHelp(TTY io)
         {
             string chgpwcmd = string.Empty;
-            if(EnableSetPasswordCommand)
+            if(m_EnableSetPasswordCommand)
             {
                 chgpwcmd = "admin-webif change password <user> <pass>\n";
             }
@@ -691,7 +684,7 @@ namespace SilverSim.WebIF.Admin
                             switch(args[2])
                             {
                                 case "password":
-                                    if(args.Count < 5 || !EnableSetPasswordCommand)
+                                    if(args.Count < 5 || !m_EnableSetPasswordCommand)
                                     {
                                         DisplayAdminWebIFHelp(io);
                                     }
@@ -1000,7 +993,15 @@ namespace SilverSim.WebIF.Admin
         public IPlugin Initialize(ConfigurationLoader loader, IConfig ownSection)
         {
             return new AdminWebIF(
-                ownSection.GetString("BasePath", ""));
+                ownSection.GetString("BasePath", ""),
+                ownSection.GetBoolean("EnableSetPasswordCommand",
+#if DEBUG
+                    true
+#else
+                    false
+#endif
+                    )
+                );
         }
     }
 #endregion
