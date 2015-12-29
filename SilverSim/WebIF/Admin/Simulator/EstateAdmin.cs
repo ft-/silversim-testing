@@ -25,6 +25,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         readonly string m_RegionStorageName;
         EstateServiceInterface m_EstateService;
         GridServiceInterface m_RegionStorageService;
+        AdminWebIF m_WebIF;
 
         public EstateAdmin(string estateServiceName, string regionStorageName)
         {
@@ -37,6 +38,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
             m_RegionStorageService = loader.GetService<GridServiceInterface>(m_RegionStorageName);
             AdminWebIF webif = loader.GetAdminWebIF();
+            m_WebIF = webif;
             webif.JsonMethods.Add("estates.list", HandleList);
             webif.JsonMethods.Add("estate.get", HandleGet);
             webif.JsonMethods.Add("estate.update", HandleUpdate);
@@ -116,6 +118,15 @@ namespace SilverSim.WebIF.Admin.Simulator
                 return;
             }
 
+            if (jsondata.ContainsKey("owner"))
+            {
+                if (!m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out estateInfo.Owner))
+                {
+                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    return;
+                }
+            }
+
             try
             {
                 if (jsondata.ContainsKey("name"))
@@ -126,11 +137,6 @@ namespace SilverSim.WebIF.Admin.Simulator
                 if (jsondata.ContainsKey("flags"))
                 {
                     estateInfo.Flags = (RegionOptionFlags)jsondata["flags"].AsUInt;
-                }
-
-                if (jsondata.ContainsKey("owner"))
-                {
-                    estateInfo.Owner = new UUI(jsondata["owner"].ToString());
                 }
 
                 if (jsondata.ContainsKey("pricepermeter"))
@@ -175,6 +181,11 @@ namespace SilverSim.WebIF.Admin.Simulator
         void HandleCreate(HttpRequest req, Map jsondata)
         {
             EstateInfo estateInfo = new EstateInfo();
+            if (!m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out estateInfo.Owner))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                return;
+            }
             try
             {
                 if (jsondata.ContainsKey("id"))
@@ -193,7 +204,6 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
                 estateInfo.Name = jsondata["name"].ToString();
                 estateInfo.Flags = (RegionOptionFlags)jsondata["flags"].AsUInt;
-                estateInfo.Owner = new UUI(jsondata["owner"].ToString());
                 estateInfo.PricePerMeter = jsondata["pricepermeter"].AsInt;
                 estateInfo.BillableFactor = jsondata["billablefactor"].AsReal;
                 estateInfo.AbuseEmail = jsondata["abuseemail"].ToString();

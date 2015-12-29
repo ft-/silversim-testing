@@ -40,6 +40,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         uint m_HttpPort;
         string m_ExternalHostName = string.Empty;
         string m_Scheme = Uri.UriSchemeHttp;
+        AdminWebIF m_WebIF;
 
         public RegionAdmin(string regionStorageName, string simulationDataName, string estateServiceName)
         {
@@ -68,6 +69,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             m_EstateService = loader.GetService<EstateServiceInterface>(m_EstateServiceName);
 
             AdminWebIF webif = loader.GetAdminWebIF();
+            m_WebIF = webif;
             webif.JsonMethods.Add("region.create", HandleCreate);
             webif.JsonMethods.Add("region.change", HandleChange);
             webif.JsonMethods.Add("region.delete", HandleDelete);
@@ -121,7 +123,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 SceneInterface scene;
                 bool isOnline = SceneManager.Scenes.TryGetValue(region.ID, out scene);
                 Map m = region.ToJsonMap();
-                region.Owner = ResolveName(region.Owner);
+                region.Owner = m_WebIF.ResolveName(region.Owner);
                 m.Add("IsOnline", isOnline);
                 m.Add("IsLoginsEnabled", isOnline && scene.LoginControl.IsLoginEnabled);
                 regionsRes.Add(m);
@@ -225,64 +227,6 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
         }
 
-        UUI ResolveName(UUI uui)
-        {
-            UUI resultUui;
-            foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
-            {
-                if (service.TryGetValue(uui, out resultUui))
-                {
-                    return resultUui;
-                }
-            }
-            return uui;
-        }
-
-        bool TranslateToUUI(string arg, out UUI uui)
-        {
-            uui = UUI.Unknown;
-            if (arg.Contains(","))
-            {
-                bool found = false;
-                string[] names = arg.Split(new char[] { ',' }, 2);
-                if (names.Length == 1)
-                {
-                    names = new string[] { names[0], string.Empty };
-                }
-                foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
-                {
-                    UUI founduui;
-                    if (service.TryGetValue(names[0], names[1], out founduui))
-                    {
-                        uui = founduui;
-                        found = true;
-                        break;
-                    }
-                }
-                return found;
-            }
-            else if (UUID.TryParse(arg, out uui.ID))
-            {
-                bool found = false;
-                foreach (AvatarNameServiceInterface service in m_AvatarNameServices)
-                {
-                    UUI founduui;
-                    if (service.TryGetValue(uui.ID, out founduui))
-                    {
-                        uui = founduui;
-                        found = true;
-                        break;
-                    }
-                }
-                return found;
-            }
-            else if (!UUI.TryParse(arg, out uui))
-            {
-                return false;
-            }
-            return true;
-        }
-
         [AdminWebIF.RequiredRight("regions.manage")]
         void HandleCreate(HttpRequest req, Map jsondata)
         {
@@ -382,7 +326,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
 
                 if(jsondata.ContainsKey("owner") &&
-                    !TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
+                    !m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
                 {
                     AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
                     return;
@@ -508,7 +452,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
                 if(jsondata.ContainsKey("owner"))
                 {
-                    if(!TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
+                    if(!m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
                     {
                         AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
                         return;
