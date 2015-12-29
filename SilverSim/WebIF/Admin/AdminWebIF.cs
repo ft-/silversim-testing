@@ -320,6 +320,7 @@ namespace SilverSim.WebIF.Admin
                     }
                     res.Add("rights", rights);
                     res.Add("success", true);
+                    res.Add("numsecurityissues", m_KnownSecurityIssues.Count);
                     using (HttpResponse httpres = req.BeginResponse(JsonContentType))
                     {
                         httpres.Headers["Set-Cookie"] = "sessionid=" + jsonreq["sessionid"].ToString() +";path=/admin";
