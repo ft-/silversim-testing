@@ -173,8 +173,9 @@ namespace SilverSim.WebIF.Admin.Simulator
             catch
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                return;
             }
-
+            AdminWebIF.SuccessResponse(req, new Map());
         }
 
         [AdminWebIF.RequiredRight("estates.manage")]
