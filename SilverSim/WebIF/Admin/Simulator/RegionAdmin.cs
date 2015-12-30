@@ -613,6 +613,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 try
                 {
                     m_SimulationData.RemoveRegion(region.ID);
+                    m_EstateService.RegionMap.Remove(region.ID);
                     m_RegionStorage.DeleteRegion(UUID.Zero, region.ID);
                 }
                 catch (Exception e)

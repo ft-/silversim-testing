@@ -711,8 +711,9 @@ namespace SilverSim.Main.Cmd.Region
                 }
                 else
                 {
-                    m_RegionStorage.DeleteRegion(UUID.Zero, rInfo.ID);
                     m_SimulationData.RemoveRegion(rInfo.ID);
+                    m_EstateService.RegionMap.Remove(rInfo.ID);
+                    m_RegionStorage.DeleteRegion(UUID.Zero, rInfo.ID);
                     io.WriteFormatted("Region '{0}' deleted.", args[2]);
                 }
             }
