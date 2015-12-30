@@ -72,6 +72,7 @@ namespace SilverSim.WebIF.Admin.Simulator
         {
             Map m = new Map();
             m.Add("ID", agent.Owner.ID);
+            m.Add("FullName", agent.Owner.FullName);
             m.Add("FirstName", agent.Owner.FirstName);
             m.Add("LastName", agent.Owner.LastName);
             m.Add("HomeURI", agent.Owner.HomeURI != null ? agent.Owner.HomeURI.ToString() : string.Empty);
