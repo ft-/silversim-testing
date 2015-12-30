@@ -132,6 +132,14 @@ namespace SilverSim.Types
             return String.Format("{0},{1}", X, Y);
         }
 
+        public string GridLocation
+        {
+            get
+            {
+                return string.Format("{0},{1}", GridX, GridY);
+            }
+        }
+
         public ushort GridX
         {
             get

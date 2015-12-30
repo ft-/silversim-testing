@@ -79,6 +79,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.get", HandleGet);
             webif.JsonMethods.Add("region.get.estates", HandleGetEstates);
             webif.JsonMethods.Add("region.change.estate", HandleChangeEstate);
+            webif.JsonMethods.Add("region.change.access", HandleChangeAccess);
             webif.JsonMethods.Add("region.login.enable", HandleLoginEnable);
             webif.JsonMethods.Add("region.login.disable", HandleLoginDisable);
             webif.JsonMethods.Add("region.enable", HandleEnable);
@@ -190,6 +191,68 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             res.Add("regions", regionsRes);
             AdminWebIF.SuccessResponse(req, res);
+        }
+
+        [AdminWebIF.RequiredRight("regions.manage")]
+        void HandleChangeAccess(HttpRequest req, Map jsondata)
+        {
+            if (!jsondata.ContainsKey("id") ||
+                !jsondata.ContainsKey("access"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                return;
+            }
+
+            RegionInfo rInfo;
+            EstateInfo eInfo;
+            RegionAccess access;
+            switch(jsondata["access"].ToString().ToLower())
+            {
+                case "trial":
+                    access = RegionAccess.Trial;
+                    break;
+
+                case "pg":
+                    access = RegionAccess.PG;
+                    break;
+
+                case "mature":
+                    access = RegionAccess.Mature;
+                    break;
+
+                case "adult":
+                    access = RegionAccess.Adult;
+                    break;
+
+                default:
+                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                    return;
+            }
+
+            if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                return;
+            }
+
+            rInfo.Access = access;
+            try
+            {
+                m_RegionStorage.RegisterRegion(rInfo);
+            }
+            catch
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                return;
+            }
+
+            SceneInterface scene;
+            if(SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
+            {
+                scene.RegionData.Access = access;
+            }
+
+            AdminWebIF.SuccessResponse(req, new Map());
         }
 
         [AdminWebIF.RequiredRight("regions.manage")]

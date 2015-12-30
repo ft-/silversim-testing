@@ -31,8 +31,8 @@ namespace SilverSim.WebIF.Admin.Simulator
         {
             Map m = new Map();
             m.Add("ID", region.ID);
-            m.Add("Location", region.Location.ToString());
-            m.Add("Size", region.Size.ToString());
+            m.Add("Location", region.Location.GridLocation);
+            m.Add("Size", region.Size.GridLocation);
             m.Add("Name", region.Name);
             m.Add("ServerIP", region.ServerIP);
             m.Add("ServerHttpPort", (int)region.ServerHttpPort);
