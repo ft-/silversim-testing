@@ -76,6 +76,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("regions.list", HandleList);
             webif.JsonMethods.Add("region.start", HandleStart);
             webif.JsonMethods.Add("region.stop", HandleStop);
+            webif.JsonMethods.Add("region.get", HandleGet);
             webif.JsonMethods.Add("region.login.enable", HandleLoginEnable);
             webif.JsonMethods.Add("region.login.disable", HandleLoginDisable);
             webif.JsonMethods.Add("region.enable", HandleEnable);
@@ -112,6 +113,38 @@ namespace SilverSim.WebIF.Admin.Simulator
         }
 
         [AdminWebIF.RequiredRight("regions.view")]
+        void HandleGet(HttpRequest req, Map jsondata)
+        {
+            if(!jsondata.ContainsKey("id"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                return;
+            }
+            RegionInfo rInfo;
+            if(m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo))
+            {
+                rInfo.Owner = m_WebIF.ResolveName(rInfo.Owner);
+                Map m = rInfo.ToJsonMap();
+                GetRegionDetails(rInfo.ID, m);
+                Map res = new Map();
+                res.Add("region", m);
+                AdminWebIF.SuccessResponse(req, res);
+            }
+            else
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+        }
+
+        void GetRegionDetails(UUID regionid, Map m)
+        {
+            SceneInterface scene;
+            bool isOnline = SceneManager.Scenes.TryGetValue(regionid, out scene);
+            m.Add("IsOnline", isOnline);
+            m.Add("IsLoginsEnabled", isOnline && scene.LoginControl.IsLoginEnabled);
+        }
+
+        [AdminWebIF.RequiredRight("regions.view")]
         void HandleList(HttpRequest req, Map jsondata)
         {
             List<RegionInfo> regions = m_RegionStorage.GetAllRegions(UUID.Zero);
@@ -120,12 +153,9 @@ namespace SilverSim.WebIF.Admin.Simulator
             AnArray regionsRes = new AnArray();
             foreach (RegionInfo region in regions)
             {
-                SceneInterface scene;
-                bool isOnline = SceneManager.Scenes.TryGetValue(region.ID, out scene);
                 Map m = region.ToJsonMap();
                 region.Owner = m_WebIF.ResolveName(region.Owner);
-                m.Add("IsOnline", isOnline);
-                m.Add("IsLoginsEnabled", isOnline && scene.LoginControl.IsLoginEnabled);
+                GetRegionDetails(region.ID, m);
                 regionsRes.Add(m);
             }
             res.Add("regions", regionsRes);

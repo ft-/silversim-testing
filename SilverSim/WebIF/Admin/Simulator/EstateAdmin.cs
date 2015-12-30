@@ -59,6 +59,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             AnArray estateRes = new AnArray();
             foreach (EstateInfo estate in estates)
             {
+                estate.Owner = m_WebIF.ResolveName(estate.Owner);
                 estateRes.Add(estate.ToJsonMap());
             }
             res.Add("estates", estateRes);
@@ -84,6 +85,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
 
             Map res = new Map();
+            estateInfo.Owner = m_WebIF.ResolveName(estateInfo.Owner);
             res.Add("estate", estateInfo.ToJsonMap());
             List<UUID> regionMap = m_EstateService.RegionMap[estateInfo.ID];
             AnArray regionsdata = new AnArray();
