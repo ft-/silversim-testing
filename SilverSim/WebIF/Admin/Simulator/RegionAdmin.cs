@@ -78,8 +78,10 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.stop", HandleStop);
             webif.JsonMethods.Add("region.get", HandleGet);
             webif.JsonMethods.Add("region.get.estates", HandleGetEstates);
+            webif.JsonMethods.Add("region.change.location", HandleChangeLocation);
             webif.JsonMethods.Add("region.change.estate", HandleChangeEstate);
             webif.JsonMethods.Add("region.change.access", HandleChangeAccess);
+            webif.JsonMethods.Add("region.change.owner", HandleChangeOwner);
             webif.JsonMethods.Add("region.login.enable", HandleLoginEnable);
             webif.JsonMethods.Add("region.login.disable", HandleLoginDisable);
             webif.JsonMethods.Add("region.enable", HandleEnable);
@@ -204,7 +206,6 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
 
             RegionInfo rInfo;
-            EstateInfo eInfo;
             RegionAccess access;
             switch(jsondata["access"].ToString().ToLower())
             {
@@ -250,6 +251,102 @@ namespace SilverSim.WebIF.Admin.Simulator
             if(SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
             {
                 scene.RegionData.Access = access;
+            }
+
+            AdminWebIF.SuccessResponse(req, new Map());
+        }
+
+        [AdminWebIF.RequiredRight("regions.manage")]
+        void HandleChangeOwner(HttpRequest req, Map jsondata)
+        {
+            if (!jsondata.ContainsKey("id") ||
+                !jsondata.ContainsKey("owner"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                return;
+            }
+
+            RegionInfo rInfo;
+
+            if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                return;
+            }
+
+            if (!m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                return;
+            }
+
+            try
+            {
+                m_RegionStorage.RegisterRegion(rInfo);
+            }
+            catch
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                return;
+            }
+
+            SceneInterface scene;
+            if (SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
+            {
+                scene.RegionData.Owner = rInfo.Owner;
+            }
+
+            AdminWebIF.SuccessResponse(req, new Map());
+        }
+
+        [AdminWebIF.RequiredRight("regions.manage")]
+        void HandleChangeLocation(HttpRequest req, Map jsondata)
+        {
+            if (!jsondata.ContainsKey("id") ||
+                !jsondata.ContainsKey("location"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                return;
+            }
+
+            RegionInfo rInfo;
+
+            if (!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                return;
+            }
+
+            try
+            {
+                rInfo.Location = new GridVector(jsondata["location"].ToString(), 256);
+            }
+            catch
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                return;
+            }
+
+            if(SceneManager.Scenes.ContainsKey(rInfo.ID))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.IsRunning);
+                return;
+            }
+
+            try
+            {
+                m_RegionStorage.RegisterRegion(rInfo);
+            }
+            catch
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                return;
+            }
+
+            SceneInterface scene;
+            if (SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
+            {
+                scene.RegionData.Owner = rInfo.Owner;
             }
 
             AdminWebIF.SuccessResponse(req, new Map());
