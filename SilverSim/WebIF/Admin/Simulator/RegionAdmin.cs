@@ -77,6 +77,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.start", HandleStart);
             webif.JsonMethods.Add("region.stop", HandleStop);
             webif.JsonMethods.Add("region.get", HandleGet);
+            webif.JsonMethods.Add("region.get.estates", HandleGetEstates);
             webif.JsonMethods.Add("region.login.enable", HandleLoginEnable);
             webif.JsonMethods.Add("region.login.disable", HandleLoginDisable);
             webif.JsonMethods.Add("region.enable", HandleEnable);
@@ -110,6 +111,24 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
             }
 
+        }
+
+        [AdminWebIF.RequiredRight("regions.manage")]
+        void HandleGetEstates(HttpRequest req, Map jsondata)
+        {
+            List<EstateInfo> estates = m_EstateService.All;
+
+            Map res = new Map();
+            AnArray estateRes = new AnArray();
+            foreach (EstateInfo estate in estates)
+            {
+                Map m = new Map();
+                m.Add("ID", estate.ID);
+                m.Add("Name", estate.Name);
+                estateRes.Add(m);
+            }
+            res.Add("estates", estateRes);
+            AdminWebIF.SuccessResponse(req, res);
         }
 
         [AdminWebIF.RequiredRight("regions.view")]
@@ -354,8 +373,17 @@ namespace SilverSim.WebIF.Admin.Simulator
                     }
                     rInfo.Owner = selectedEstate.Owner;
                 }
+                else if (jsondata.ContainsKey("estateid"))
+                {
+                    if (!m_EstateService.TryGetValue(jsondata["estateid"].AsUInt, out selectedEstate))
+                    {
+                        AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                        return;
+                    }
+                    rInfo.Owner = selectedEstate.Owner;
+                }
 
-                if(jsondata.ContainsKey("owner") &&
+                if (jsondata.ContainsKey("owner") &&
                     !m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out rInfo.Owner))
                 {
                     AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
@@ -365,11 +393,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     switch (jsondata["status"].ToString().ToLower())
                     {
-                        case "online":
+                        case "enabled":
                             rInfo.Flags = RegionFlags.RegionOnline;
                             break;
 
-                        case "offline":
+                        case "disabled":
                             rInfo.Flags = RegionFlags.None;
                             break;
 
@@ -582,8 +610,15 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else
             {
-                m_RegionStorage.DeleteRegion(UUID.Zero, region.ID);
-                m_SimulationData.RemoveRegion(region.ID);
+                try
+                {
+                    m_SimulationData.RemoveRegion(region.ID);
+                    m_RegionStorage.DeleteRegion(UUID.Zero, region.ID);
+                }
+                catch (Exception e)
+                {
+                    m_Log.ErrorFormat("Exception encountered when deleting region: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
+                }
                 AdminWebIF.SuccessResponse(req, new Map());
             }
         }
