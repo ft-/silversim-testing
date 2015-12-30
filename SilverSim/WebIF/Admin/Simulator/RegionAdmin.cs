@@ -475,6 +475,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                     agents.Add(agent.ToJsonMap(si));
                 }
                 res.Add("agents", agents);
+                AdminWebIF.SuccessResponse(req, res);
             }
         }
 
