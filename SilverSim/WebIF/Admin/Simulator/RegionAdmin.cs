@@ -89,6 +89,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.notice", HandleNotice);
             webif.JsonMethods.Add("regions.notice", HandleNotices);
             webif.JsonMethods.Add("region.agents.list", HandleAgentsView);
+            webif.JsonMethods.Add("region.agent.get", HandleAgentGet);
             webif.JsonMethods.Add("region.agent.kick", HandleAgentKick);
             webif.JsonMethods.Add("region.agent.teleporthome", HandleAgentTeleportHome);
 
@@ -441,6 +442,31 @@ namespace SilverSim.WebIF.Admin.Simulator
             else
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.agents.view")]
+        void HandleAgentGet(HttpRequest req, Map jsondata)
+        {
+            SceneInterface si;
+            IAgent agent;
+            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("agentid"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotRunning);
+            }
+            else if (!si.Agents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            {
+                Map res = new Map();
+                res.Add("agent", agent.ToJsonMap(si));
+                AdminWebIF.SuccessResponse(req, res);
             }
         }
 
