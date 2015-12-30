@@ -39,7 +39,29 @@ namespace SilverSim.WebIF.Admin.Simulator
             m.Add("ServerURI", region.ServerURI);
             m.Add("ServerPort", (int)region.ServerPort);
             m.Add("RegionMapTexture", region.ParcelMapTexture.ToString());
-            m.Add("Access", (int)region.Access);
+            switch(region.Access)
+            {
+                case RegionAccess.Trial:
+                    m.Add("Access", "trial");
+                    break;
+
+                case RegionAccess.PG:
+                    m.Add("Access", "pg");
+                    break;
+
+                case RegionAccess.Mature:
+                    m.Add("Access", "mature");
+                    break;
+
+                case RegionAccess.Adult:
+                    m.Add("Access", "adult");
+                    break;
+
+                default:
+                    m.Add("Access", "unknown");
+                    break;
+            }
+            
             m.Add("Owner", region.Owner.ToString());
             m.Add("Flags", ((uint)region.Flags).ToString());
             return m;

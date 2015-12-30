@@ -147,6 +147,16 @@ namespace SilverSim.WebIF.Admin.Simulator
                 GetRegionDetails(rInfo.ID, m);
                 Map res = new Map();
                 res.Add("region", m);
+                uint estateID;
+                EstateInfo estateInfo;
+                if(m_EstateService.RegionMap.TryGetValue(rInfo.ID, out estateID) &&
+                    m_EstateService.TryGetValue(estateID, out estateInfo))
+                {
+                    Map estateData = new Map();
+                    estateData.Add("ID", estateInfo.ID);
+                    estateData.Add("Name", estateInfo.Name);
+                    res.Add("estate", estateData);
+                }
                 AdminWebIF.SuccessResponse(req, res);
             }
             else
