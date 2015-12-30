@@ -78,6 +78,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.stop", HandleStop);
             webif.JsonMethods.Add("region.get", HandleGet);
             webif.JsonMethods.Add("region.get.estates", HandleGetEstates);
+            webif.JsonMethods.Add("region.change.estate", HandleChangeEstate);
             webif.JsonMethods.Add("region.login.enable", HandleLoginEnable);
             webif.JsonMethods.Add("region.login.disable", HandleLoginDisable);
             webif.JsonMethods.Add("region.enable", HandleEnable);
@@ -189,6 +190,37 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             res.Add("regions", regionsRes);
             AdminWebIF.SuccessResponse(req, res);
+        }
+
+        [AdminWebIF.RequiredRight("regions.manage")]
+        void HandleChangeEstate(HttpRequest req, Map jsondata)
+        {
+            if(!jsondata.ContainsKey("id") ||
+                !jsondata.ContainsKey("estateid"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+                return;
+            }
+
+            RegionInfo rInfo;
+            EstateInfo eInfo;
+            if(!m_RegionStorage.TryGetValue(jsondata["id"].AsUUID, out rInfo) ||
+                !m_EstateService.TryGetValue(jsondata["estateid"].AsUInt, out eInfo))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+                return;
+            }
+
+            try
+            {
+                m_EstateService.RegionMap[rInfo.ID] = eInfo.ID;
+            }
+            catch
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
+                return;
+            }
+            AdminWebIF.SuccessResponse(req, new Map());
         }
 
         [AdminWebIF.RequiredRight("regions.agents.teleporthome")]
