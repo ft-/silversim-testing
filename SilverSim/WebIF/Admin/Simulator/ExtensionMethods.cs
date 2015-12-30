@@ -39,6 +39,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             m.Add("ServerURI", region.ServerURI);
             m.Add("ServerPort", (int)region.ServerPort);
             m.Add("RegionMapTexture", region.ParcelMapTexture.ToString());
+            m.Add("ProductName", region.ProductName);
             switch(region.Access)
             {
                 case RegionAccess.Trial:
