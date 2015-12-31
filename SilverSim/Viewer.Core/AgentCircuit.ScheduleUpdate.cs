@@ -177,10 +177,7 @@ namespace SilverSim.Viewer.Core
             while (m_ObjectUpdateThreadRunning)
             {
 
-                if ((physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0) && m_AckThrottlingCount[(int)Message.QueueOutType.Object] < 100)
-                {
-                }
-                else
+                if (!((physicalOutQueue.Count != 0 || nonPhysicalOutQueue.Count != 0) && m_AckThrottlingCount[(int)Message.QueueOutType.Object] < 100))
                 {
                     try
                     {
@@ -383,21 +380,17 @@ namespace SilverSim.Viewer.Core
                         break;
                     }
                     SendFullUpdateMsg(full_packet, full_packet_data);
-                    full_packet_data = null;
                 }
 
                 if (terse_packet != null)
                 {
                     terse_packet.Data[17] = terse_packet_count;
                     SendObjectUpdateMsg(terse_packet);
-                    terse_packet = null;
-                    terse_packet_count = 0;
                 }
 
                 if(ko != null)
                 {
                     SendMessage(ko);
-                    ko = null;
                 }
             }
         }

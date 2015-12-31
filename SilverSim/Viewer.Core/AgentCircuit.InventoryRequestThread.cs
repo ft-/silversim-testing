@@ -1008,10 +1008,6 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
             }
-            else
-            {
-
-            }
         }
         #endregion
     }

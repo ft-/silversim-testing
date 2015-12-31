@@ -246,13 +246,10 @@ namespace SilverSim.Viewer.Core
                                 if (null != acircuit)
                                 {
                                     /* there it is check for SessionID and AgentID */
-                                    if (!acircuit.SessionID.Equals(sessionID))
+                                    if (!acircuit.SessionID.Equals(sessionID) ||
+                                        !acircuit.AgentID.Equals(agentID))
                                     {
-                                        /* no match on SessionID */
-                                    }
-                                    else if (!acircuit.AgentID.Equals(agentID))
-                                    {
-                                        /* no match on AgentID */
+                                        /* no match on SessionID or AgentID */
                                     }
                                     else
                                     {
