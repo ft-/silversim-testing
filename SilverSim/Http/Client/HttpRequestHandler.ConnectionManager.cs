@@ -7,6 +7,8 @@ using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Security;
 using System.Net.Sockets;
+using System.Security.Authentication;
+using System.Security.Cryptography.X509Certificates;
 using System.Timers;
 using ThreadedClasses;
 
@@ -76,6 +78,18 @@ namespace SilverSim.Http.Client
         #region Stream pipeling handling
         static AbstractHttpStream OpenStream(string scheme, string host, int port)
         {
+            return OpenStream(scheme, host, port,
+                null,
+                SslProtocols.Default,
+                false);
+        }
+
+        static AbstractHttpStream OpenStream(
+            string scheme, string host, int port,
+            X509CertificateCollection clientCertificates, 
+            SslProtocols enabledSslProtocols, 
+            bool checkCertificateRevocation)
+        {
 #if SUPPORT_PIPELINING
             string key = scheme + "://" + host + ":" + port.ToString();
             RwLockedList<StreamInfo> streaminfo;
@@ -109,7 +123,11 @@ namespace SilverSim.Http.Client
             else if (scheme == Uri.UriSchemeHttps)
             {
                 SslStream sslstream = new SslStream(new TcpClient(host, port).GetStream());
-                sslstream.AuthenticateAsClient(host);
+                sslstream.AuthenticateAsClient(host, clientCertificates, enabledSslProtocols, checkCertificateRevocation);
+                if(!sslstream.IsEncrypted)
+                {
+                    throw new AuthenticationException("Encryption not available");
+                }
                 return new HttpsStream(sslstream);
             }
             else
