@@ -51,6 +51,11 @@ namespace SilverSim.Http
             m_Socket = sock;
         }
 
+        protected override void Dispose(bool flag)
+        {
+            m_Socket.Dispose();
+        }
+
         public int ReadBytesInternal(byte[] buffer, int maxbytes, int timeoutms)
         {
             ArrayList readList = new ArrayList();
