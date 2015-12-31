@@ -125,6 +125,15 @@ namespace SilverSim.Scene.Types.Scene
         public Dictionary<string, string> CapabilitiesConfig { get; protected set; }
         public string GatekeeperURI { get; protected set; }
         public IScriptWorkerThreadPool ScriptThreadPool { get; protected set; }
+        public Date m_StartTime = new Date();
+
+        public Date RegionStartTime
+        {
+            get
+            {
+                return new Date(m_StartTime);
+            }
+        }
 
         public bool IsSceneEnabled
         {
