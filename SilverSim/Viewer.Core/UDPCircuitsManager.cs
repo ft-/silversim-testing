@@ -322,7 +322,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-
+                    /* no action required */
                 }
 
                 /* back to pool with that packet. Packet holds nothing of interest. */
@@ -432,7 +432,7 @@ namespace SilverSim.Viewer.Core
             }
             catch
             {
-
+                /* no action required */
             }
         }
 

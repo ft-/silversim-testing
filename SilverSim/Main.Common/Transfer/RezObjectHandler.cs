@@ -99,7 +99,7 @@ namespace SilverSim.Main.Common.Transfer
             }
             catch
             {
-
+                /* no action required */
             }
         }
     }

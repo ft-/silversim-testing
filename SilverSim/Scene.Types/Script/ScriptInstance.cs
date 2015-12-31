@@ -76,6 +76,7 @@ namespace SilverSim.Scene.Types.Script
                     }
                     catch
                     {
+                        /* no action required */
                     }
                 }
             }
@@ -95,6 +96,7 @@ namespace SilverSim.Scene.Types.Script
                     }
                     catch
                     {
+                        /* no action required */
                     }
                 }
             }

@@ -617,7 +617,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             catch
             {
-
+                /* no action required */
             }
             return false;
         }

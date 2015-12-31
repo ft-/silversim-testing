@@ -404,7 +404,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 catch
                 {
-
+                    /* no action required */
                 }
             } while (true);
         }

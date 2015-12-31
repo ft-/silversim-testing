@@ -376,7 +376,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             }
                             catch
                             {
-
+                                /* no action required */
                             }
                         }
                         grantinfo.PermsMask = (Types.Script.ScriptPermissions)(uint)dbReader["PermsMask"];

@@ -175,7 +175,7 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
                     }
                     catch
                     {
-                        
+                        /* no action required */
                     }
                 }
             }
