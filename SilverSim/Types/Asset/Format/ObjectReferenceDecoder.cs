@@ -106,14 +106,8 @@ namespace SilverSim.Types.Asset.Format
                                     switch (type)
                                     {
                                         case FlexiEP:
-                                            if (len < 16)
-                                            {
-                                                break;
-                                            }
-                                            pos += 16;
-                                            break;
-
                                         case LightEP:
+                                            /* in this decoder, both types are equal */
                                             if (len < 16)
                                             {
                                                 break;
