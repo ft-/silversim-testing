@@ -387,20 +387,35 @@ namespace SilverSim.WebIF.Admin.Simulator
             AdminWebIF.SuccessResponse(req, new Map());
         }
 
-        [AdminWebIF.RequiredRight("regions.agents.teleporthome")]
-        void HandleAgentTeleportHome(HttpRequest req, Map jsondata)
+        bool TryGetRootAgent(HttpRequest req, Map jsondata, out SceneInterface scene, out IAgent agent)
         {
-            SceneInterface si;
-            IAgent agent;
+            agent = null;
+            scene = null;
             if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("agentid"))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotRunning);
             }
-            else if (si.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
+            else if (scene.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
+            {
+                return true;
+            }
+            else
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            return false;
+        }
+
+        [AdminWebIF.RequiredRight("regions.agents.teleporthome")]
+        void HandleAgentTeleportHome(HttpRequest req, Map jsondata)
+        {
+            IAgent agent;
+            SceneInterface si;
+            if(TryGetRootAgent(req, jsondata, out si, out agent))
             {
                 string msg = "You have been kicked since you could not be teleported home.";
                 if (jsondata.ContainsKey("message"))
@@ -413,26 +428,14 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
                 AdminWebIF.SuccessResponse(req, new Map());
             }
-            else
-            {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
-            }
         }
 
         [AdminWebIF.RequiredRight("regions.agents.kick")]
         void HandleAgentKick(HttpRequest req, Map jsondata)
         {
-            SceneInterface si;
             IAgent agent;
-            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("agentid"))
-            {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
-            }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out si))
-            {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotRunning);
-            }
-            else if(si.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
+            SceneInterface si;
+            if (TryGetRootAgent(req, jsondata, out si, out agent))
             {
                 string msg = "You have been kicked.";
                 if(jsondata.ContainsKey("message"))
@@ -441,10 +444,6 @@ namespace SilverSim.WebIF.Admin.Simulator
                 }
                 agent.KickUser(msg);
                 AdminWebIF.SuccessResponse(req, new Map());
-            }
-            else
-            {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }
         }
 
