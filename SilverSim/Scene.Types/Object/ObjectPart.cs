@@ -1301,6 +1301,11 @@ namespace SilverSim.Scene.Types.Object
         {
             while (enumerator.MoveNext())
             {
+                /* LSL ignores non-integer parameters, see http://wiki.secondlife.com/wiki/LlGetObjectDetails. */
+                if (enumerator.Current.LSL_Type != LSLValueType.Integer)
+                {
+                    continue;
+                }
                 switch (ParamsHelper.GetObjectDetailsType(enumerator))
                 {
                     case ObjectDetailsType.Name:
