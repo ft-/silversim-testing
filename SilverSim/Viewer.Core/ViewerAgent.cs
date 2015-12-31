@@ -698,15 +698,12 @@ namespace SilverSim.Viewer.Core
                         break;
 
                     case ObjectDetailsType.Owner:
+                    case ObjectDetailsType.Creator:
                         paramList.Add(ID);
                         break;
 
                     case ObjectDetailsType.Group:
                         paramList.Add(Group.ID);
-                        break;
-
-                    case ObjectDetailsType.Creator:
-                        paramList.Add(ID);
                         break;
 
                     case ObjectDetailsType.RunningScriptCount:
