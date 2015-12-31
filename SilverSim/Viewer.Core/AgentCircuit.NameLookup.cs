@@ -37,6 +37,7 @@ namespace SilverSim.Viewer.Core
                     }
                     catch
                     {
+                        /* no action possible */
                     }
                 }
             }

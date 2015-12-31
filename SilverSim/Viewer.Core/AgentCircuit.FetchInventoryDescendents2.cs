@@ -163,7 +163,7 @@ namespace SilverSim.Viewer.Core
                         }
                         catch
                         {
-
+                            /* no action required */
                         }
                     }
 
@@ -202,10 +202,6 @@ namespace SilverSim.Viewer.Core
                                     {
                                         linkeditemids.Add(item.AssetID);
                                     }
-                                    else if (item.AssetType == Types.Asset.AssetType.LinkFolder)
-                                    {
-
-                                    }
                                 }
 
                                 try
@@ -214,7 +210,7 @@ namespace SilverSim.Viewer.Core
                                 }
                                 catch
                                 {
-
+                                    /* no action required */
                                 }
                                 if (!wroteheader)
                                 {

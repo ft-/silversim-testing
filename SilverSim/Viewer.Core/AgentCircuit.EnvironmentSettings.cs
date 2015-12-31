@@ -4,6 +4,7 @@
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.WindLight;
 using SilverSim.Types;
+using System;
 using System.Net;
 using System.Xml;
 
@@ -113,8 +114,12 @@ namespace SilverSim.Viewer.Core
                     /* Viewer triggers that by updating RegionInfo through UDP message */
                     return;
                 }
-                catch
+                catch(Exception e)
                 {
+                    m_Log.ErrorFormat("Exception when storing Environment settings: {0}: {1}\n{2}",
+                        e.GetType().FullName,
+                        e.Message,
+                        e.StackTrace);
                 }
             }
             EnvironmentPostResponse(httpreq, UUID.Zero, false, "Insufficient estate permissions, settings has not been saved.");

@@ -74,9 +74,12 @@ namespace SilverSim.Viewer.Core
                         /* try to store the asset on our sim's asset service */
                         Scene.AssetService.Store(asset);
                     }
-                    catch
+                    catch(Exception e)
                     {
-
+                        m_Log.WarnFormat("Storing of asset failed: {0}: {1}\n{2}",
+                            e.GetType().FullName,
+                            e.Message,
+                            e.StackTrace);
                     }
                 }
                 catch

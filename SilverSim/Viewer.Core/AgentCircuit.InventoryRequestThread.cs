@@ -160,7 +160,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-
+                    /* no useful action possible */
                 }
             }
         }
@@ -718,7 +718,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-
+                    /* no action possible */
                 }
             }
         }
@@ -739,7 +739,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-
+                    /* no action possible */
                 }
             }
         }
@@ -893,7 +893,7 @@ namespace SilverSim.Viewer.Core
                     }
                     catch
                     {
-
+                        /* no action possible, missing update will signal no action */
                     }
                 }
 

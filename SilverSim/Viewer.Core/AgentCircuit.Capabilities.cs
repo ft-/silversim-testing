@@ -280,7 +280,7 @@ namespace SilverSim.Viewer.Core
             }
             catch
             {
-
+                /* no action needed here */
             }
 
             AddDefCapability("UpdateAgentLanguage", regionSeedID, Cap_UpdateAgentLanguage, capConfig);
