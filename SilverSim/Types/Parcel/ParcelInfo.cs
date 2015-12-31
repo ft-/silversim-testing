@@ -279,43 +279,11 @@ namespace SilverSim.Types.Parcel
             {
                 get
                 {
-                    if (x < m_BitmapWidth && y < m_BitmapHeight)
-                    {
-                        return 0 != (m_LandBitmap[y, x / m_BitmapWidth] & (1 << (x % 8)));
-                    }
-                    else
-                    {
-                        throw new KeyNotFoundException();
-                    }
+                    return this[x, y, true];
                 }
                 set
                 {
-                    if (x < m_BitmapWidth && y < m_BitmapHeight)
-                    {
-                        m_LandBitmapRwLock.AcquireWriterLock(-1);
-                        try
-                        {
-                            byte b = m_LandBitmap[y, x / m_BitmapWidth];
-                            if (value)
-                            {
-                                b |= (byte)(1 << (x % 8));
-                            }
-                            else
-                            {
-                                b &= (byte)(~(1 << (x % 8)));
-                            }
-                            m_LandBitmap[y, x / m_BitmapWidth] = b;
-                            DetermineAABB();
-                        }
-                        finally
-                        {
-                            m_LandBitmapRwLock.ReleaseWriterLock();
-                        }
-                    }
-                    else
-                    {
-                        throw new KeyNotFoundException();
-                    }
+                    this[x, y, true] = value;
                 }
             }
 
