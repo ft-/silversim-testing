@@ -98,6 +98,22 @@ namespace SilverSim.Scene.Types.Agent
             }
         }
 
+        public List<ObjectGroup> All
+        {
+            get
+            {
+                m_AttachmentsRwLock.AcquireWriterLock(-1);
+                try
+                {
+                    return new List<ObjectGroup>(m_AllAttachments.Values);
+                }
+                finally
+                {
+                    m_AttachmentsRwLock.ReleaseWriterLock();
+                }
+            }
+        }
+
         public List<ObjectGroup> RemoveAll()
         {
             m_AttachmentsRwLock.AcquireWriterLock(-1);

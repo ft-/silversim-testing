@@ -710,18 +710,29 @@ namespace SilverSim.Viewer.Core
                         break;
 
                     case ObjectDetailsType.RunningScriptCount:
-                        paramList.Add(0);
+                        {
+                            int runningScriptCount = 0;
+                            foreach (ObjectGroup grp in Attachments.All)
+                            {
+                                foreach (ObjectPart part in grp.Values)
+                                {
+                                    runningScriptCount += part.Inventory.CountRunningScripts;
+                                }
+                            }
+                            paramList.Add(runningScriptCount);
+                        }
                         break;
 
                     case ObjectDetailsType.TotalScriptCount:
                         {
                             int n = 0;
-#if COUNT_AVATAR_SCRIPTS
-                            foreach (ObjectPart obj in this.Values)
+                            foreach (ObjectGroup grp in Attachments.All)
                             {
-                                n += obj.Inventory.CountScripts();
+                                foreach (ObjectPart part in grp.Values)
+                                {
+                                    n += part.Inventory.CountScripts;
+                                }
                             }
-#endif
                             paramList.Add(n);
                         }
                         break;
@@ -771,9 +782,6 @@ namespace SilverSim.Viewer.Core
                         break;
 
                     case ObjectDetailsType.Phantom:
-                        paramList.Add(false);
-                        break;
-
                     case ObjectDetailsType.TempOnRez:
                         paramList.Add(false);
                         break;
@@ -804,7 +812,7 @@ namespace SilverSim.Viewer.Core
                         break;
 
                     case ObjectDetailsType.ClickAction:
-                        paramList.Add(0);
+                        paramList.Add((int)ClickActionType.None);
                         break;
 
                     case ObjectDetailsType.Omega:
