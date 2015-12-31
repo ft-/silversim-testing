@@ -135,6 +135,14 @@ namespace SilverSim.Scene.Types.Scene
             }
         }
 
+        public virtual uint FrameNumber
+        {
+            get
+            {
+                return 0;
+            }
+        }
+
         public bool IsSceneEnabled
         {
             get
