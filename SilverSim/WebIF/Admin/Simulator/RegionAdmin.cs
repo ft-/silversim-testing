@@ -983,11 +983,8 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
             }
-            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
-            {
-                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
-            }
-            else if (!scene.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene) ||
+                !scene.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
             }

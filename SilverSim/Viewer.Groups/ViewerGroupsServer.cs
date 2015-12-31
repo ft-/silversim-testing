@@ -197,11 +197,8 @@ namespace SilverSim.Viewer.Groups
                 {
                     if(gim.Dialog == GridInstantMessageDialog.GroupNotice)
                     {
-                        if(!gmem.IsAcceptNotices)
-                        {
-                            continue;
-                        }
-                        else if(0 == (GetGroupPowers(gmem.Principal, groupsService, gim.FromGroup) & GroupPowers.ReceiveNotices))
+                        if(!gmem.IsAcceptNotices ||
+                            0 == (GetGroupPowers(gmem.Principal, groupsService, gim.FromGroup) & GroupPowers.ReceiveNotices))
                         {
                             continue;
                         }
@@ -320,7 +317,7 @@ namespace SilverSim.Viewer.Groups
                             break;
 
                         case MessageType.SetGroupAcceptNotices:
-                            HandleSetGroupContribution(req.Key.Agent, scene, m);
+                            HandleSetGroupAcceptNotices(req.Key.Agent, scene, m);
                             break;
 
                         case MessageType.GroupRoleDataRequest:
@@ -520,14 +517,15 @@ namespace SilverSim.Viewer.Groups
             }
             GroupsServiceInterface groupsService = scene.GroupsService;
 
-            if(groupsService == null)
+            if(groupsService == null ||
+                (GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.ReceiveNotices) == 0)
             {
                 GroupNoticesListReply reply = new GroupNoticesListReply();
                 reply.AgentID = req.AgentID;
                 reply.GroupID = req.GroupID;
                 agent.SendMessageAlways(reply, scene.ID);
             }
-            else if((GetGroupPowers(agent.Owner, groupsService, new UGI(req.GroupID)) & GroupPowers.ReceiveNotices) != 0)
+            else
             {
                 List<GroupNotice> notices;
                 try
@@ -573,13 +571,6 @@ namespace SilverSim.Viewer.Groups
                 {
                     agent.SendMessageAlways(reply, scene.ID);
                 }
-            }
-            else
-            {
-                GroupNoticesListReply reply = new GroupNoticesListReply();
-                reply.AgentID = req.AgentID;
-                reply.GroupID = req.GroupID;
-                agent.SendMessageAlways(reply, scene.ID);
             }
         }
         #endregion
