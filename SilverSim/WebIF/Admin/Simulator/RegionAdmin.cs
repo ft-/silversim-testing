@@ -99,8 +99,8 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.AutoGrantRights["regions.agents.kick"].Add("regions.agents.view");
             webif.AutoGrantRights["regions.agents.teleporthome"].Add("regions.view");
             webif.AutoGrantRights["regions.agents.teleporthome"].Add("regions.agents.view");
-            webif.AutoGrantRights["regions.agent.notice"].Add("regions.view");
-            webif.AutoGrantRights["regions.agent.notice"].Add("regions.agents.view");
+            webif.AutoGrantRights["regions.agents.notice"].Add("regions.view");
+            webif.AutoGrantRights["regions.agents.notice"].Add("regions.agents.view");
             webif.AutoGrantRights["regions.agents.view"].Add("regions.view");
             webif.AutoGrantRights["regions.control"].Add("regions.view");
             webif.AutoGrantRights["regions.logincontrol"].Add("regions.view");
@@ -972,7 +972,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
         }
 
-        [AdminWebIF.RequiredRight("region.agent.notice")]
+        [AdminWebIF.RequiredRight("region.agents.notice")]
         void HandleAgentNotice(HttpRequest req, Map jsondata)
         {
             SceneInterface scene;
