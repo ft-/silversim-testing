@@ -166,7 +166,7 @@ namespace SilverSim.Database.MySQL.ServerParam
                         param["regionid"] = regionID.ToString();
                         param["parametername"] = parameter;
                         param["parametervalue"] = value;
-                        connection.ReplaceInsertInto("serverparams", param);
+                        connection.ReplaceInto("serverparams", param);
                         m_Cache[regionID][parameter] = value;
                     });
                 }

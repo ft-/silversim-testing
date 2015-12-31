@@ -222,98 +222,10 @@ namespace SilverSim.Database.MySQL
         }
         #endregion
 
-        #region REPLACE INSERT INTO helper
-        public static void ReplaceInsertInto(this MySqlConnection connection, string tablename, Dictionary<string, object> vals)
+        #region Common REPLACE INTO/INSERT INTO helper
+        public static void AnyInto(this MySqlConnection connection, string cmd, string tablename, Dictionary<string, object> vals)
         {
-            string q1 = "REPLACE INTO " + tablename + " (";
-            string q2 = ") VALUES (";
-            bool first = true;
-            foreach(KeyValuePair<string, object> kvp in vals)
-            {
-                if (kvp.Value != null)
-                {
-                    if (!first)
-                    {
-                        q1 += ",";
-                        q2 += ",";
-                    }
-                    first = false;
-                }
-
-                if (kvp.Value is Vector3)
-                {
-                    q1 += "`" + kvp.Key.ToString() + "X`,";
-                    q2 += "?v_" + kvp.Key.ToString() + "X,";
-                    q1 += "`" + kvp.Key.ToString() + "Y`,";
-                    q2 += "?v_" + kvp.Key.ToString() + "Y,";
-                    q1 += "`" + kvp.Key.ToString() + "Z`";
-                    q2 += "?v_" + kvp.Key.ToString() + "Z";
-                }
-                else if(kvp.Value is GridVector)
-                {
-                    q1 += "`" + kvp.Key.ToString() + "X`,";
-                    q2 += "?v_" + kvp.Key.ToString() + "X,";
-                    q1 += "`" + kvp.Key.ToString() + "Y`";
-                    q2 += "?v_" + kvp.Key.ToString() + "Y";
-                }
-                else if (kvp.Value is Quaternion)
-                {
-                    q1 += "`" + kvp.Key.ToString() + "X`,";
-                    q2 += "?v_" + kvp.Key.ToString() + "X,";
-                    q1 += "`" + kvp.Key.ToString() + "Y`,";
-                    q2 += "?v_" + kvp.Key.ToString() + "Y,";
-                    q1 += "`" + kvp.Key.ToString() + "Z`,";
-                    q2 += "?v_" + kvp.Key.ToString() + "Z,";
-                    q1 += "`" + kvp.Key.ToString() + "W`";
-                    q2 += "?v_" + kvp.Key.ToString() + "W";
-                }
-                else if(kvp.Value is Color)
-                {
-                    q1 += "`" + kvp.Key.ToString() + "Red`,";
-                    q2 += "?v_" + kvp.Key.ToString() + "Red,";
-                    q1 += "`" + kvp.Key.ToString() + "Green`,";
-                    q2 += "?v_" + kvp.Key.ToString() + "Green,";
-                    q1 += "`" + kvp.Key.ToString() + "Blue`";
-                    q2 += "?v_" + kvp.Key.ToString() + "Blue";
-                }
-                else if (kvp.Value is ColorAlpha)
-                {
-                    q1 += "`" + kvp.Key.ToString() + "Red`,";
-                    q2 += "?v_" + kvp.Key.ToString() + "Red,";
-                    q1 += "`" + kvp.Key.ToString() + "Green`,";
-                    q2 += "?v_" + kvp.Key.ToString() + "Green,";
-                    q1 += "`" + kvp.Key.ToString() + "Blue`,";
-                    q2 += "?v_" + kvp.Key.ToString() + "Blue,";
-                    q1 += "`" + kvp.Key.ToString() + "Alpha`";
-                    q2 += "?v_" + kvp.Key.ToString() + "Alpha";
-                }
-                else if(kvp.Value == null)
-                {
-                    /* skip */
-                }
-                else
-                {
-                    q1 += "`" + kvp.Key.ToString() + "`";
-                    q2 += "?v_" + kvp.Key.ToString();
-                }
-            }
-
-            string query = q1 + q2 + ")";
-            using(MySqlCommand command = new MySqlCommand(query, connection))
-            {
-                AddParameters(command.Parameters, vals);
-                if(command.ExecuteNonQuery() < 1)
-                {
-                    throw new MySQLInsertException();
-                }
-            }
-        }
-        #endregion
-
-        #region INSERT INTO helper
-        public static void InsertInto(this MySqlConnection connection, string tablename, Dictionary<string, object> vals)
-        {
-            string q1 = "INSERT INTO " + tablename + " (";
+            string q1 = cmd + " INTO " + tablename + " (";
             string q2 = ") VALUES (";
             bool first = true;
             foreach (KeyValuePair<string, object> kvp in vals)
@@ -395,6 +307,20 @@ namespace SilverSim.Database.MySQL
                     throw new MySQLInsertException();
                 }
             }
+        }
+        #endregion
+
+        #region REPLACE INSERT INTO helper
+        public static void ReplaceInto(this MySqlConnection connection, string tablename, Dictionary<string, object> vals)
+        {
+            connection.AnyInto("REPLACE", tablename, vals);
+        }
+        #endregion
+
+        #region INSERT INTO helper
+        public static void InsertInto(this MySqlConnection connection, string tablename, Dictionary<string, object> vals)
+        {
+            connection.AnyInto("INSERT", tablename, vals);
         }
         #endregion
 

@@ -134,7 +134,7 @@ namespace SilverSim.Database.MySQL.Profile
                 using(MySqlConnection conn = new MySqlConnection())
                 {
                     conn.Open();
-                    conn.ReplaceInsertInto("classifieds", replaceVals);
+                    conn.ReplaceInto("classifieds", replaceVals);
                 }
             }
 

@@ -106,7 +106,7 @@ namespace SilverSim.Database.MySQL.Estate
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    conn.ReplaceInsertInto("estate_regionmap", vals);
+                    conn.ReplaceInto("estate_regionmap", vals);
                 }
             }
         }

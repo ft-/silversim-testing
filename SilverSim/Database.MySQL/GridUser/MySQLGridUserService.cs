@@ -141,7 +141,7 @@ namespace SilverSim.Database.MySQL.GridUser
                 param["ID"] = userID.ID.ToString();
                 param["LastLogin"] = Date.GetUnixTime();
                 param["IsOnline"] = 1;
-                conn.ReplaceInsertInto("griduser", param);
+                conn.ReplaceInto("griduser", param);
             }
 
         }

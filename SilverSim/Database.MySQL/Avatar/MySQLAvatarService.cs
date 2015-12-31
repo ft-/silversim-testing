@@ -84,7 +84,7 @@ namespace SilverSim.Database.MySQL.Avatar
                             {
                                 vals["Name"] = kvp.Key;
                                 vals["Value"] = kvp.Value;
-                                connection.ReplaceInsertInto("avatars", vals);
+                                connection.ReplaceInto("avatars", vals);
                             }
                         });
                     }
@@ -149,7 +149,7 @@ namespace SilverSim.Database.MySQL.Avatar
                         {
                             vals["Name"] = itemKeys[i];
                             vals["Value"] = value[i];
-                            connection.ReplaceInsertInto("avatars", vals);
+                            connection.ReplaceInto("avatars", vals);
                         }
                     });
                 }
@@ -201,7 +201,7 @@ namespace SilverSim.Database.MySQL.Avatar
                     vals["PrincipalID"] = avatarID.ToString();
                     vals["Name"] = itemKey;
                     vals["Value"] = value;
-                    connection.ReplaceInsertInto("avatars", vals);
+                    connection.ReplaceInto("avatars", vals);
                 }
             }
         }

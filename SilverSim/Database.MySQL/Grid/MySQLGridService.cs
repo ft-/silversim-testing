@@ -411,7 +411,7 @@ namespace SilverSim.Database.MySQL.Grid
                 regionData["ScopeID"] = regionInfo.ScopeID.ToString();
                 regionData["ProductName"] = regionInfo.ProductName;
 
-                MySQLUtilities.ReplaceInsertInto(conn, "regions", regionData);
+                MySQLUtilities.ReplaceInto(conn, "regions", regionData);
             }
         }
 

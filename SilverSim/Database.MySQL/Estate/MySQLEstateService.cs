@@ -276,7 +276,7 @@ namespace SilverSim.Database.MySQL.Estate
                     using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        conn.ReplaceInsertInto("estates", dict);
+                        conn.ReplaceInto("estates", dict);
                     }
                 }
                 else

@@ -91,7 +91,7 @@ namespace SilverSim.Database.MySQL.Profile
                     using(MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                     {
                         conn.Open();
-                        conn.ReplaceInsertInto("usersettings", replaceVals);
+                        conn.ReplaceInto("usersettings", replaceVals);
                     }
                 }
             }

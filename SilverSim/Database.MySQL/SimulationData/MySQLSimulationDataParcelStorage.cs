@@ -181,7 +181,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                MySQLUtilities.ReplaceInsertInto(connection, "parcels", p);
+                MySQLUtilities.ReplaceInto(connection, "parcels", p);
             }
         }
 

@@ -75,7 +75,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                         p["PrimID"] = primID;
                         p["ItemID"] = itemID;
                         p["ScriptState"] = value;
-                        MySQLUtilities.ReplaceInsertInto(connection, "scriptstates", p);
+                        MySQLUtilities.ReplaceInto(connection, "scriptstates", p);
                     }
                 }
             }

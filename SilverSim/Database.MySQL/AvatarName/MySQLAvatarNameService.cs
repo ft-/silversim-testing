@@ -146,7 +146,7 @@ namespace SilverSim.Database.MySQL.AvatarName
                     {
                         connection.Open();
 
-                        connection.ReplaceInsertInto("avatarnames", data);
+                        connection.ReplaceInto("avatarnames", data);
                     }
                 }
             }

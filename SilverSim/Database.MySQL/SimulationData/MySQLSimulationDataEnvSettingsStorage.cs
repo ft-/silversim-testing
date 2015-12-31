@@ -69,7 +69,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             value.Serialize(ms, regionID);
                             param["EnvironmentSettings"] = ms.GetBuffer();
                         }
-                        conn.ReplaceInsertInto("environmentsettings", param);
+                        conn.ReplaceInto("environmentsettings", param);
                     }
                 }
             }
