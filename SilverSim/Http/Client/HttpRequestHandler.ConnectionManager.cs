@@ -5,6 +5,7 @@
 
 using System;
 using System.Diagnostics.CodeAnalysis;
+using System.Net.Security;
 using System.Net.Sockets;
 using System.Timers;
 using ThreadedClasses;
@@ -107,10 +108,9 @@ namespace SilverSim.Http.Client
             }
             else if (scheme == Uri.UriSchemeHttps)
             {
-/*                SslStream sslstream = new SslStream(new TcpClient(host, port).GetStream());
+                SslStream sslstream = new SslStream(new TcpClient(host, port).GetStream());
                 sslstream.AuthenticateAsClient(host);
-                return sslstream;*/
-                throw new NotImplementedException();
+                return new HttpsStream(sslstream);
             }
             else
             {
