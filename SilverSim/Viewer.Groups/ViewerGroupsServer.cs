@@ -195,13 +195,11 @@ namespace SilverSim.Viewer.Groups
 
                 foreach(GroupMember gmem in gmems)
                 {
-                    if(gim.Dialog == GridInstantMessageDialog.GroupNotice)
+                    if(gim.Dialog == GridInstantMessageDialog.GroupNotice &&
+                        (!gmem.IsAcceptNotices ||
+                            0 == (GetGroupPowers(gmem.Principal, groupsService, gim.FromGroup) & GroupPowers.ReceiveNotices)))
                     {
-                        if(!gmem.IsAcceptNotices ||
-                            0 == (GetGroupPowers(gmem.Principal, groupsService, gim.FromGroup) & GroupPowers.ReceiveNotices))
-                        {
-                            continue;
-                        }
+                        continue;
                     }
 
                     GridInstantMessage ngim = gim.Clone();
