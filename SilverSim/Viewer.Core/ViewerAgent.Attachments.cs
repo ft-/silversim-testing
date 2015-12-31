@@ -168,7 +168,11 @@ namespace SilverSim.Viewer.Core
             {
                 AssetData data;
                 List<ObjectGroup> objgroups;
-                if(!m_Scene.AssetService.TryGetValue(m_AssetID, out data))
+                try
+                {
+                    data = m_Scene.AssetService[m_AssetID];
+                }
+                catch
                 {
                     SendAlertMessage("ALERT: CantFindObject");
                     return;
