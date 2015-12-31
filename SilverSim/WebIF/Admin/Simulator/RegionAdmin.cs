@@ -86,6 +86,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.login.disable", HandleLoginDisable);
             webif.JsonMethods.Add("region.enable", HandleEnable);
             webif.JsonMethods.Add("region.disable", HandleDisable);
+            webif.JsonMethods.Add("region.agent.notice", HandleAgentNotice);
             webif.JsonMethods.Add("region.notice", HandleNotice);
             webif.JsonMethods.Add("regions.notice", HandleNotices);
             webif.JsonMethods.Add("region.agents.list", HandleAgentsView);
@@ -98,6 +99,8 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.AutoGrantRights["regions.agents.kick"].Add("regions.agents.view");
             webif.AutoGrantRights["regions.agents.teleporthome"].Add("regions.view");
             webif.AutoGrantRights["regions.agents.teleporthome"].Add("regions.agents.view");
+            webif.AutoGrantRights["regions.agent.notice"].Add("regions.view");
+            webif.AutoGrantRights["regions.agent.notice"].Add("regions.agents.view");
             webif.AutoGrantRights["regions.agents.view"].Add("regions.view");
             webif.AutoGrantRights["regions.control"].Add("regions.view");
             webif.AutoGrantRights["regions.logincontrol"].Add("regions.view");
@@ -965,6 +968,32 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     agent.SendRegionNotice(scene.Owner, jsondata["message"].ToString(), scene.ID);
                 }
+                AdminWebIF.SuccessResponse(req, new Map());
+            }
+        }
+
+        [AdminWebIF.RequiredRight("region.agent.notice")]
+        void HandleAgentNotice(HttpRequest req, Map jsondata)
+        {
+            SceneInterface scene;
+            IAgent agent;
+            if (!jsondata.ContainsKey("id") ||
+                !jsondata.ContainsKey("agentid") ||
+                !jsondata.ContainsKey("message"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else if (!scene.RootAgents.TryGetValue(jsondata["agentid"].AsUUID, out agent))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            { 
+                agent.SendRegionNotice(scene.Owner, jsondata["message"].ToString(), scene.ID);
                 AdminWebIF.SuccessResponse(req, new Map());
             }
         }
