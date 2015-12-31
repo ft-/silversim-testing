@@ -322,20 +322,18 @@ namespace SilverSim.Types
             matrix.M11 = xx + (cos * (1f - xx));
             matrix.M12 = (xy - (cos * xy)) + (sin * z);
             matrix.M13 = (xz - (cos * xz)) - (sin * y);
-            //matrix.M14 = 0f;
 
             matrix.M21 = (xy - (cos * xy)) - (sin * z);
             matrix.M22 = yy + (cos * (1f - yy));
             matrix.M23 = (yz - (cos * yz)) + (sin * x);
-            //matrix.M24 = 0f;
 
             matrix.M31 = (xz - (cos * xz)) + (sin * y);
             matrix.M32 = (yz - (cos * yz)) - (sin * x);
             matrix.M33 = zz + (cos * (1f - zz));
-            //matrix.M34 = 0f;
 
-            //matrix.M41 = matrix.M42 = matrix.M43 = 0f;
             matrix.M44 = 1f;
+
+            /* any other fields of matrix are automatically set to 0f */
 
             return matrix;
         }
