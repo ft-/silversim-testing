@@ -120,13 +120,11 @@ namespace SilverSim.WebIF.Admin.Simulator
                 return;
             }
 
-            if (jsondata.ContainsKey("owner"))
+            if (jsondata.ContainsKey("owner") &&
+                !m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out estateInfo.Owner))
             {
-                if (!m_WebIF.TranslateToUUI(jsondata["owner"].ToString(), out estateInfo.Owner))
-                {
-                    AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
-                    return;
-                }
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidParameter);
+                return;
             }
 
             try
@@ -206,14 +204,10 @@ namespace SilverSim.WebIF.Admin.Simulator
                     estateInfo.ID = id;
                 }
                 estateInfo.Name = jsondata["name"].ToString();
-                if (jsondata.ContainsKey("flags"))
-                {
-                    estateInfo.Flags = (RegionOptionFlags)jsondata["flags"].AsUInt;
-                }
-                else
-                {
-                    estateInfo.Flags = RegionOptionFlags.PublicAllowed | RegionOptionFlags.AllowVoice | RegionOptionFlags.AllowSetHome | RegionOptionFlags.AllowLandmark | RegionOptionFlags.AllowDirectTeleport | RegionOptionFlags.AllowParcelChanges;
-                }
+                estateInfo.Flags = jsondata.ContainsKey("flags") ?
+                    (RegionOptionFlags)jsondata["flags"].AsUInt :
+                    RegionOptionFlags.PublicAllowed | RegionOptionFlags.AllowVoice | RegionOptionFlags.AllowSetHome | RegionOptionFlags.AllowLandmark | RegionOptionFlags.AllowDirectTeleport | RegionOptionFlags.AllowParcelChanges;
+
                 estateInfo.PricePerMeter = jsondata["pricepermeter"].AsInt;
                 estateInfo.BillableFactor = jsondata["billablefactor"].AsReal;
                 estateInfo.AbuseEmail = jsondata["abuseemail"].ToString();
