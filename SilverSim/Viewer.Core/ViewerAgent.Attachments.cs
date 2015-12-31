@@ -157,27 +157,18 @@ namespace SilverSim.Viewer.Core
 
             void SendAlertMessage(string msg)
             {
-                try
+                IAgent agent;
+                if(m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
                 {
-                    IAgent agent = m_Scene.Agents[m_RezzingAgent.ID];
                     agent.SendAlertMessage(msg, m_Scene.ID);
                 }
-                catch
-                {
-
-                }
-
             }
 
             public override void AssetTransferComplete()
             {
                 AssetData data;
                 List<ObjectGroup> objgroups;
-                try
-                {
-                    data = m_Scene.AssetService[m_AssetID];
-                }
-                catch
+                if(!m_Scene.AssetService.TryGetValue(m_AssetID, out data))
                 {
                     SendAlertMessage("ALERT: CantFindObject");
                     return;
@@ -252,14 +243,10 @@ namespace SilverSim.Viewer.Core
 
             public override void AssetTransferFailed(Exception e)
             {
-                try
+                IAgent agent;
+                if(m_Scene.Agents.TryGetValue(m_RezzingAgent.ID, out agent))
                 {
-                    IAgent agent = m_Scene.Agents[m_RezzingAgent.ID];
                     agent.SendAlertMessage("ALERT: CantFindObject", m_Scene.ID);
-                }
-                catch
-                {
-
                 }
             }
         }
