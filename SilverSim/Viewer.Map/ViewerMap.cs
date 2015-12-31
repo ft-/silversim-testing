@@ -373,11 +373,8 @@ namespace SilverSim.Viewer.Map
             reply.ItemType = req.ItemType;
 
             SceneInterface accessScene = null;
-            if(req.Location.RegionHandle == 0)
-            {
-                accessScene = scene;
-            }
-            else if(req.Location.Equals(scene.RegionData.Location))
+            if(req.Location.RegionHandle == 0 ||
+                req.Location.Equals(scene.RegionData.Location))
             {
                 accessScene = scene;
             }

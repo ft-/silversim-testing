@@ -280,11 +280,7 @@ namespace SilverSim.Viewer.Profile
                     uui = scene.AvatarNameService[agentID];
                     agentUUI = uui;
 
-                    if (m_LastKnownProfileServices.TryGetValue(uui.HomeURI.ToString(), out serviceData))
-                    {
-
-                    }
-                    else
+                    if (!m_LastKnownProfileServices.TryGetValue(uui.HomeURI.ToString(), out serviceData))
                     {
                         foreach (IUserAgentServicePlugin userAgentPlugin in m_UserAgentServices)
                         {
