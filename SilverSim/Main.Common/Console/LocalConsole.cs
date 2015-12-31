@@ -97,7 +97,7 @@ namespace SilverSim.Main.Common.Console
                     }
                     catch
                     {
-
+                        /* no action required */
                     }
                 }
             }
@@ -122,7 +122,7 @@ namespace SilverSim.Main.Common.Console
             }
             catch
             {
-
+                /* no action required */
             }
 
             return top;
@@ -148,7 +148,7 @@ namespace SilverSim.Main.Common.Console
                     }
                     catch
                     {
-
+                        /* no action required */
                     }
                 }
             }
@@ -173,7 +173,7 @@ namespace SilverSim.Main.Common.Console
             }
             catch
             {
-
+                /* no action required */
             }
 
             return left;
@@ -244,6 +244,7 @@ namespace SilverSim.Main.Common.Console
             }
             catch (Exception)
             {
+                /* no action required */
             }
         }
 
@@ -281,6 +282,7 @@ namespace SilverSim.Main.Common.Console
             }
             catch (ObjectDisposedException)
             {
+                /* no action required */
             }
         }
 
@@ -552,7 +554,7 @@ namespace SilverSim.Main.Common.Console
                 }
                 catch
                 {
-
+                    /* no action required */
                 }
                 string cmd = ReadLine(CmdPrompt, true);
 
@@ -566,7 +568,7 @@ namespace SilverSim.Main.Common.Console
                 }
                 catch
                 {
-
+                    /* no action required */
                 }
 
                 if (m_CmdHistory.Count >= 100)
