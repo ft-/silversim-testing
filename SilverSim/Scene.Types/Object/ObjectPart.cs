@@ -89,7 +89,7 @@ namespace SilverSim.Scene.Types.Object
             }
         }
 
-        private SilverSim.Types.Inventory.InventoryPermissionsData m_Permissions = new SilverSim.Types.Inventory.InventoryPermissionsData();
+        private InventoryPermissionsData m_Permissions = new InventoryPermissionsData();
 
         public int ScriptAccessPin;
 
@@ -113,11 +113,11 @@ namespace SilverSim.Scene.Types.Object
         #region Constructor
         public ObjectPart()
         {
-            m_Permissions.Base = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
-            m_Permissions.Current = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
-            m_Permissions.Group = SilverSim.Types.Inventory.InventoryPermissionsMask.None;
-            m_Permissions.EveryOne = SilverSim.Types.Inventory.InventoryPermissionsMask.None;
-            m_Permissions.NextOwner = SilverSim.Types.Inventory.InventoryPermissionsMask.All;
+            m_Permissions.Base = InventoryPermissionsMask.All;
+            m_Permissions.Current = InventoryPermissionsMask.All;
+            m_Permissions.Group = InventoryPermissionsMask.None;
+            m_Permissions.EveryOne = InventoryPermissionsMask.None;
+            m_Permissions.NextOwner = InventoryPermissionsMask.All;
             m_FullUpdateFixedBlock1[(int)FullFixedBlock1Offset.ObjectDataLength] = (byte)60;
 
             ObjectGroup = null;
