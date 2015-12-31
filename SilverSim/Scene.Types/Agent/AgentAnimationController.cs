@@ -125,7 +125,8 @@ namespace SilverSim.Scene.Types.Agent
             {
                 lock (this)
                 {
-                    for (i = 0; i < m_ActiveAnimations.Count; )
+                    i = 0;
+                    while (i < m_ActiveAnimations.Count)
                     {
                         if (m_ActiveAnimations[i].SourceID == sourceID)
                         {

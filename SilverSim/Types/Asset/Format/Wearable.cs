@@ -69,7 +69,8 @@ namespace SilverSim.Types.Asset.Format
             Name = lines[1].Trim();
             Description = lines[2].Trim();
 
-            for(int idx = 3; idx < lines.Length; ++idx)
+            int idx = 2;
+            while(++idx < lines.Length)
             {
                 string line = lines[idx].Trim();
                 string[] para = line.Split(new char[] { ' ' , '\t'}, StringSplitOptions.RemoveEmptyEntries);
