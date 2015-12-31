@@ -112,7 +112,7 @@ namespace SilverSim.WebIF.Admin
         readonly RwLockedDictionary<string, SessionInfo> m_Sessions = new RwLockedDictionary<string, SessionInfo>();
         readonly public RwLockedDictionaryAutoAdd<string, RwLockedList<string>> AutoGrantRights = new RwLockedDictionaryAutoAdd<string, RwLockedList<string>>(delegate () { return new RwLockedList<string>(); });
         readonly Timer m_Timer = new Timer(1);
-        bool m_EnableSetPasswordCommand;
+        readonly bool m_EnableSetPasswordCommand;
 
         #region Helpers
         public static void SuccessResponse(HttpRequest req, Map m)
