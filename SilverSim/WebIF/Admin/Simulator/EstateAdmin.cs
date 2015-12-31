@@ -70,13 +70,12 @@ namespace SilverSim.WebIF.Admin.Simulator
         void HandleGet(HttpRequest req, Map jsondata)
         {
             EstateInfo estateInfo;
-            if (jsondata.ContainsKey("name") && m_EstateService.TryGetValue(jsondata["name"].ToString(), out estateInfo))
+            if ((jsondata.ContainsKey("name") && 
+                    m_EstateService.TryGetValue(jsondata["name"].ToString(), out estateInfo)) ||
+                (jsondata.ContainsKey("id") && 
+                    m_EstateService.TryGetValue(jsondata["id"].AsUInt, out estateInfo)))
             {
-                /* found estate via name */
-            }
-            else if (jsondata.ContainsKey("id") && m_EstateService.TryGetValue(jsondata["id"].AsUInt, out estateInfo))
-            {
-                /* found estate via id */
+                /* found estate via name or via id */
             }
             else
             {

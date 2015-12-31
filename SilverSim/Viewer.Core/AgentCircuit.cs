@@ -583,15 +583,9 @@ namespace SilverSim.Viewer.Core
                     {
                         m_Log.FatalFormat("Method {0} parameter count does not match", mi.Name);
                     }
-                    else if (mi.GetParameters()[0].ParameterType != typeof(ViewerAgent))
-                    {
-                        m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
-                    }
-                    else if (mi.GetParameters()[1].ParameterType != typeof(AgentCircuit))
-                    {
-                        m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
-                    }
-                    else if (mi.GetParameters()[2].ParameterType != typeof(HttpRequest))
+                    else if (mi.GetParameters()[0].ParameterType != typeof(ViewerAgent) ||
+                        mi.GetParameters()[1].ParameterType != typeof(AgentCircuit) ||  
+                        mi.GetParameters()[2].ParameterType != typeof(HttpRequest))
                     {
                         m_Log.FatalFormat("Method {0} parameter types do not match", mi.Name);
                     }
@@ -729,11 +723,8 @@ namespace SilverSim.Viewer.Core
             { 
                 case MessageType.ScriptDialogReply:
                     /* script dialog uses a different internal format, so we decode it specifically */
-                    if(!p.ReadUUID().Equals(AgentID))
-                    {
-
-                    }
-                    else if (!p.ReadUUID().Equals(SessionID))
+                    if(!p.ReadUUID().Equals(AgentID) ||
+                        !p.ReadUUID().Equals(SessionID))
                     {
 
                     }
@@ -753,11 +744,8 @@ namespace SilverSim.Viewer.Core
 
                 case MessageType.ChatFromViewer:
                     /* chat uses a different internal format, so we decode it specifically */
-                    if(!p.ReadUUID().Equals(AgentID))
-                    {
-
-                    }
-                    else if (!p.ReadUUID().Equals(SessionID))
+                    if(!p.ReadUUID().Equals(AgentID) ||
+                        !p.ReadUUID().Equals(SessionID))
                     {
 
                     }
@@ -864,7 +852,7 @@ namespace SilverSim.Viewer.Core
                         }
                         else if (m.Number == MessageType.GenericMessage)
                         {
-                            SilverSim.Viewer.Messages.Generic.GenericMessage genMsg = (SilverSim.Viewer.Messages.Generic.GenericMessage)m;
+                            Messages.Generic.GenericMessage genMsg = (Messages.Generic.GenericMessage)m;
                             if (m_GenericMessageRouting.TryGetValue(genMsg.Method, out mdel))
                             {
                                 mdel(m);
