@@ -4,28 +4,9 @@
 using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
-using SilverSim.Main.Common.Caps;
 using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpServer;
-using SilverSim.Scene.ServiceInterfaces.RegionLoader;
-using SilverSim.Scene.ServiceInterfaces.SimulationData;
-using SilverSim.Scene.ServiceInterfaces.Terrain;
-using SilverSim.Scene.Types.Scene;
-using SilverSim.Scene.Types.Script;
-using SilverSim.ServiceInterfaces.Account;
-using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Avatar;
 using SilverSim.ServiceInterfaces.AvatarName;
-using SilverSim.ServiceInterfaces.Database;
-using SilverSim.ServiceInterfaces.Estate;
-using SilverSim.ServiceInterfaces.Friends;
-using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
-using SilverSim.ServiceInterfaces.Groups;
-using SilverSim.ServiceInterfaces.Inventory;
-using SilverSim.ServiceInterfaces.Neighbor;
-using SilverSim.ServiceInterfaces.Presence;
-using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Json;
@@ -55,43 +36,6 @@ namespace SilverSim.WebIF.Admin
         RwLockedList<string> m_KnownConfigurationIssues;
         ConfigurationLoader m_Loader;
         readonly List<AvatarNameServiceInterface> m_AvatarNameServices = new List<AvatarNameServiceInterface>();
-
-        static readonly Dictionary<Type, string> m_FeaturesTable = new Dictionary<Type, string>();
-        static AdminWebIF()
-        {
-            m_FeaturesTable[typeof(IPluginFactory)] = "Plugin Factory";
-            m_FeaturesTable[typeof(IPluginSubFactory)] = "Plugin Sub Factory";
-
-            m_FeaturesTable[typeof(AssetServiceInterface)] = "Asset Service";
-            m_FeaturesTable[typeof(InventoryServiceInterface)] = "Inventory Service";
-            m_FeaturesTable[typeof(AvatarNameServiceInterface)] = "Avatar Name Lookup Service";
-            m_FeaturesTable[typeof(PresenceServiceInterface)] = "Presence Service";
-            m_FeaturesTable[typeof(GridServiceInterface)] = "Grid Service";
-            m_FeaturesTable[typeof(GridUserServiceInterface)] = "GridUser Service";
-            m_FeaturesTable[typeof(AvatarServiceInterface)] = "Avatar Service";
-            m_FeaturesTable[typeof(UserAccountServiceInterface)] = "UserAccount Service";
-            m_FeaturesTable[typeof(IInventoryServicePlugin)] = "Inventory Service HELO Instantiator";
-            m_FeaturesTable[typeof(IAssetServicePlugin)] = "Asset Service HELO Instantiator";
-            m_FeaturesTable[typeof(SimulationDataStorageInterface)] = "Simulation Data Storage";
-            m_FeaturesTable[typeof(EstateServiceInterface)] = "Estate Service";
-            m_FeaturesTable[typeof(GroupsServiceInterface)] = "Groups Service";
-            m_FeaturesTable[typeof(ProfileServiceInterface)] = "Profile Service";
-            m_FeaturesTable[typeof(NeighborServiceInterface)] = "Neighbor Signaling Service";
-            m_FeaturesTable[typeof(FriendsServiceInterface)] = "Friends Service";
-
-            m_FeaturesTable[typeof(IPluginShutdown)] = "Shutdown Handler";
-            m_FeaturesTable[typeof(IDBServiceInterface)] = "DataBase Service";
-            m_FeaturesTable[typeof(BaseHttpServer)] = "HTTP Server";
-            m_FeaturesTable[typeof(IScriptCompiler)] = "Script Compiler";
-            m_FeaturesTable[typeof(IScriptApi)] = "Script Api";
-            m_FeaturesTable[typeof(ITerrainFileStorage)] = "Terrain File Format";
-            m_FeaturesTable[typeof(IRegionLoaderInterface)] = "Region Loader";
-            m_FeaturesTable[typeof(TTY)] = "Console";
-            m_FeaturesTable[typeof(SceneInterface)] = "Scene Implementation";
-            m_FeaturesTable[typeof(HttpXmlRpcHandler)] = "XML RPC Server";
-            m_FeaturesTable[typeof(CapsHttpRedirector)] = "Capability Redirector";
-            m_FeaturesTable[typeof(HttpJson20RpcHandler)] = "JSON2.0RPC Server";
-        }
 
         class SessionInfo
         {
@@ -985,7 +929,7 @@ namespace SilverSim.WebIF.Admin
 
                 AnArray featuresList = new AnArray();
 
-                foreach (KeyValuePair<Type, string> kvp in m_FeaturesTable)
+                foreach (KeyValuePair<Type, string> kvp in ConfigurationLoader.FeaturesTable)
                 {
                     if (kvp.Key.IsInterface)
                     {

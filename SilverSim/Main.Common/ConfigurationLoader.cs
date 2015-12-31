@@ -157,7 +157,7 @@ namespace SilverSim.Main.Common
         readonly Queue<ICFG_Source> m_Sources = new Queue<ICFG_Source>();
         readonly RwLockedDictionary<string, IPlugin> PluginInstances = new RwLockedDictionary<string, IPlugin>();
         readonly ManualResetEvent m_ShutdownEvent;
-        static readonly Dictionary<Type, string> m_FeaturesTable = new Dictionary<Type, string>();
+        static public readonly Dictionary<Type, string> FeaturesTable = new Dictionary<Type, string>();
         readonly RwLockedDictionary<string, string> m_HeloResponseHeaders = new RwLockedDictionary<string, string>();
         public readonly RwLockedList<string> KnownConfigurationIssues = new RwLockedList<string>();
 
@@ -208,38 +208,38 @@ namespace SilverSim.Main.Common
         {
             /* prevent circular dependencies by assigning relevant parts here */
             ObjectGroup.CompilerRegistry = CompilerRegistry.ScriptCompilers;
-            m_FeaturesTable[typeof(IPluginFactory)] = "Plugin Factory";
-            m_FeaturesTable[typeof(IPluginSubFactory)] = "Plugin Sub Factory";
+            FeaturesTable[typeof(IPluginFactory)] = "Plugin Factory";
+            FeaturesTable[typeof(IPluginSubFactory)] = "Plugin Sub Factory";
 
-            m_FeaturesTable[typeof(AssetServiceInterface)] = "Asset Service";
-            m_FeaturesTable[typeof(InventoryServiceInterface)] = "Inventory Service";
-            m_FeaturesTable[typeof(AvatarNameServiceInterface)] = "Avatar Name Lookup Service";
-            m_FeaturesTable[typeof(PresenceServiceInterface)] = "Presence Service";
-            m_FeaturesTable[typeof(GridServiceInterface)] = "Grid Service";
-            m_FeaturesTable[typeof(GridUserServiceInterface)] = "GridUser Service";
-            m_FeaturesTable[typeof(AvatarServiceInterface)] = "Avatar Service";
-            m_FeaturesTable[typeof(UserAccountServiceInterface)] = "UserAccount Service";
-            m_FeaturesTable[typeof(IInventoryServicePlugin)] = "Inventory Service HELO Instantiator";
-            m_FeaturesTable[typeof(IAssetServicePlugin)] = "Asset Service HELO Instantiator";
-            m_FeaturesTable[typeof(SimulationDataStorageInterface)] = "Simulation Data Storage";
-            m_FeaturesTable[typeof(EstateServiceInterface)] = "Estate Service";
-            m_FeaturesTable[typeof(GroupsServiceInterface)] = "Groups Service";
-            m_FeaturesTable[typeof(ProfileServiceInterface)] = "Profile Service";
-            m_FeaturesTable[typeof(NeighborServiceInterface)] = "Neighbor Signaling Service";
-            m_FeaturesTable[typeof(FriendsServiceInterface)] = "Friends Service";
+            FeaturesTable[typeof(AssetServiceInterface)] = "Asset Service";
+            FeaturesTable[typeof(InventoryServiceInterface)] = "Inventory Service";
+            FeaturesTable[typeof(AvatarNameServiceInterface)] = "Avatar Name Lookup Service";
+            FeaturesTable[typeof(PresenceServiceInterface)] = "Presence Service";
+            FeaturesTable[typeof(GridServiceInterface)] = "Grid Service";
+            FeaturesTable[typeof(GridUserServiceInterface)] = "GridUser Service";
+            FeaturesTable[typeof(AvatarServiceInterface)] = "Avatar Service";
+            FeaturesTable[typeof(UserAccountServiceInterface)] = "UserAccount Service";
+            FeaturesTable[typeof(IInventoryServicePlugin)] = "Inventory Service HELO Instantiator";
+            FeaturesTable[typeof(IAssetServicePlugin)] = "Asset Service HELO Instantiator";
+            FeaturesTable[typeof(SimulationDataStorageInterface)] = "Simulation Data Storage";
+            FeaturesTable[typeof(EstateServiceInterface)] = "Estate Service";
+            FeaturesTable[typeof(GroupsServiceInterface)] = "Groups Service";
+            FeaturesTable[typeof(ProfileServiceInterface)] = "Profile Service";
+            FeaturesTable[typeof(NeighborServiceInterface)] = "Neighbor Signaling Service";
+            FeaturesTable[typeof(FriendsServiceInterface)] = "Friends Service";
 
-            m_FeaturesTable[typeof(IPluginShutdown)] = "Shutdown Handler";
-            m_FeaturesTable[typeof(IDBServiceInterface)] = "DataBase Service";
-            m_FeaturesTable[typeof(BaseHttpServer)] = "HTTP Server";
-            m_FeaturesTable[typeof(IScriptCompiler)] = "Script Compiler";
-            m_FeaturesTable[typeof(IScriptApi)] = "Script Api";
-            m_FeaturesTable[typeof(ITerrainFileStorage)] = "Terrain File Format";
-            m_FeaturesTable[typeof(IRegionLoaderInterface)] = "Region Loader";
-            m_FeaturesTable[typeof(CmdIO.TTY)] = "Console";
-            m_FeaturesTable[typeof(SceneInterface)] = "Scene Implementation";
-            m_FeaturesTable[typeof(HttpXmlRpcHandler)] = "XML RPC Server";
-            m_FeaturesTable[typeof(CapsHttpRedirector)] = "Capability Redirector";
-            m_FeaturesTable[typeof(HttpJson20RpcHandler)] = "JSON2.0RPC Server";
+            FeaturesTable[typeof(IPluginShutdown)] = "Shutdown Handler";
+            FeaturesTable[typeof(IDBServiceInterface)] = "DataBase Service";
+            FeaturesTable[typeof(BaseHttpServer)] = "HTTP Server";
+            FeaturesTable[typeof(IScriptCompiler)] = "Script Compiler";
+            FeaturesTable[typeof(IScriptApi)] = "Script Api";
+            FeaturesTable[typeof(ITerrainFileStorage)] = "Terrain File Format";
+            FeaturesTable[typeof(IRegionLoaderInterface)] = "Region Loader";
+            FeaturesTable[typeof(CmdIO.TTY)] = "Console";
+            FeaturesTable[typeof(SceneInterface)] = "Scene Implementation";
+            FeaturesTable[typeof(HttpXmlRpcHandler)] = "XML RPC Server";
+            FeaturesTable[typeof(CapsHttpRedirector)] = "Capability Redirector";
+            FeaturesTable[typeof(HttpJson20RpcHandler)] = "JSON2.0RPC Server";
         }
 
         public IConfigSource Config
@@ -1288,7 +1288,7 @@ namespace SilverSim.Main.Common
                     {
                         features += "\n   Description: " + desc.Description;
                     }
-                    foreach(KeyValuePair<Type, string> kvp in m_FeaturesTable)
+                    foreach(KeyValuePair<Type, string> kvp in FeaturesTable)
                     {
                         if(kvp.Key.IsInterface)
                         {
