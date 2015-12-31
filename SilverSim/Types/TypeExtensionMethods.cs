@@ -121,7 +121,7 @@ namespace SilverSim.Types
             return new StreamWriter(s, m_UTF8NoBOM);
         }
 
-        private static byte[] FromHexStringToByteArray(this string hex)
+        public static byte[] FromHexStringToByteArray(this string hex)
         {
             return Enumerable.Range(0, hex.Length)
                              .Where(x => x % 2 == 0)
@@ -129,7 +129,7 @@ namespace SilverSim.Types
                              .ToArray();
         }
 
-        private static string ToHexString(this byte[] data)
+        public static string ToHexString(this byte[] data)
         {
             return BitConverter.ToString(data).Replace("-", string.Empty);
         }
