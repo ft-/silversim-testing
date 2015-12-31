@@ -110,7 +110,7 @@ namespace SilverSim.Http
                     if (m_Buffer[i] == (byte)'\r')
                     {
                         s += Encoding.ASCII.GetString(m_Buffer, m_BufferPos, i - m_BufferPos);
-                        m_BufferPos = ++i;
+                        m_BufferPos = i + 1;
                         if (ReadByte() != '\n')
                         {
                             throw new HttpHeaderFormatException();
