@@ -394,7 +394,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch
                             {
-
+                                m_Log.WarnFormat("Tried duplicate registration of message number {0}", pa.Number.ToString());
                             }
                         }
                     }
@@ -414,7 +414,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch
                             {
-
+                                m_Log.WarnFormat("Tried duplicate registration of generic message {0}", gm.Method);
                             }
                         }
                     }
@@ -434,7 +434,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch
                             {
-
+                                m_Log.WarnFormat("Tried duplicate registration of InstantMessage dialog {0}", im.Dialog.ToString());
                             }
                         }
                     }
@@ -468,7 +468,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch
                             {
-
+                                m_Log.WarnFormat("Tried duplicate registration of message {0}", pa.Number.ToString());
                             }
                         }
                     }
@@ -487,7 +487,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch
                             {
-
+                                m_Log.WarnFormat("Tried duplicate registration of generic message {0}", gm.Method.ToString());
                             }
                         }
                     }
@@ -506,7 +506,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch
                             {
-
+                                m_Log.WarnFormat("Tried duplicate registration of InstantMessage dialog {0}", im.Dialog.ToString());
                             }
                         }
                     }

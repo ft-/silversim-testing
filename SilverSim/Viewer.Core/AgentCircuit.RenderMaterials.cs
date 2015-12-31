@@ -104,7 +104,7 @@ namespace SilverSim.Viewer.Core
                         }
                         catch
                         {
-
+                            /* adding faled due to duplicate */
                         }
                     }
                 }
@@ -159,7 +159,7 @@ namespace SilverSim.Viewer.Core
                             }
                             catch
                             {
-
+                                /* no action possible */
                             }
                         }
                     }

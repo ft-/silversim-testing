@@ -208,7 +208,7 @@ namespace SilverSim.Viewer.Core
                     }
                     catch
                     {
-
+                        /* ensure that no exception kills this thread unexpectedly */
                     }
                 }
 
@@ -233,7 +233,7 @@ namespace SilverSim.Viewer.Core
                     }
                     catch
                     {
-
+                        /* ensure that no exception kills this thread unexpectedly */
                     }
                 }
 
