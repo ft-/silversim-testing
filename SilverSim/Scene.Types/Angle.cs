@@ -7,17 +7,15 @@ namespace SilverSim.Scene.Types
 {
     public struct Angle : IEquatable<Angle>, IComparable<Angle>
     {
-        private double m_Value;
-
         #region Constructor
         public Angle(Angle v)
         {
-            m_Value = v.m_Value;
+            Radians = v.Radians;
         }
 
         private Angle(double v)
         {
-            m_Value = v;
+            Radians = v;
         }
         #endregion
 
@@ -26,39 +24,29 @@ namespace SilverSim.Scene.Types
         {
             get
             {
-                return m_Value * 180f / Math.PI;
+                return Radians * 180f / Math.PI;
             }
             set
             {
-                m_Value = value * Math.PI / 180f;
+                Radians = value * Math.PI / 180f;
             }
         }
 
-        public double Radians
-        {
-            get
-            {
-                return m_Value;
-            }
-            set
-            {
-                m_Value = value;
-            }
-        }
+        public double Radians;
         #endregion
 
         #region Operators
         public static Angle operator+(Angle a, Angle b)
         {
             Angle o;
-            o.m_Value = a.m_Value + b.m_Value;
+            o.Radians = a.Radians + b.Radians;
             return o;
         }
 
         public static Angle operator -(Angle a, Angle b)
         {
             Angle o;
-            o.m_Value = a.m_Value - b.m_Value;
+            o.Radians = a.Radians - b.Radians;
             return o;
         }
 
@@ -74,37 +62,37 @@ namespace SilverSim.Scene.Types
 
         public static bool operator>(Angle a, Angle b)
         {
-            return a.m_Value > b.m_Value;
+            return a.Radians > b.Radians;
         }
 
         public static bool operator <(Angle a, Angle b)
         {
-            return a.m_Value < b.m_Value;
+            return a.Radians < b.Radians;
         }
         #endregion
 
         public int CompareTo(Angle a)
         {
-            return m_Value.CompareTo(a.m_Value);
+            return Radians.CompareTo(a.Radians);
         }
 
         public bool Equals(Angle a)
         {
-            return m_Value.Equals(a.m_Value);
+            return Radians.Equals(a.Radians);
         }
 
         public override bool Equals(object a)
         {
             if (a is Angle)
             {
-                return m_Value.Equals((Angle)a);
+                return Radians.Equals((Angle)a);
             }
             return false;
         }
 
         public override int GetHashCode()
         {
-            return m_Value.GetHashCode();
+            return Radians.GetHashCode();
         }
 
         public static readonly Angle Zero = new Angle(0f);
