@@ -58,11 +58,11 @@ namespace SilverSim.Types.Inventory
                 {
                     switch(Type)
                     {
+                        default:
                         case SaleType.NoSale: return "not";
                         case SaleType.Original: return "orig";
                         case SaleType.Copy: return "copy";
                         case SaleType.Content: return "cntn";
-                        default: return "not";
                     }
                 }
                 set

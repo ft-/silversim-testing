@@ -33,11 +33,8 @@ namespace SilverSim.Viewer.Messages
                         if(mi == null)
                         {
                         }
-                        else if((mi.Attributes & MethodAttributes.Static) == 0)
-                        {
-                            m_Log.WarnFormat("Type {0} does not contain a static Decode method with correct return type", t.FullName);
-                        }
-                        else if(mi.ReturnType != typeof(Message) && !mi.ReturnType.IsSubclassOf(typeof(Message)))
+                        else if((mi.Attributes & MethodAttributes.Static) == 0 ||
+                            (mi.ReturnType != typeof(Message) && !mi.ReturnType.IsSubclassOf(typeof(Message))))
                         {
                             m_Log.WarnFormat("Type {0} does not contain a static Decode method with correct return type", t.FullName);
                         }

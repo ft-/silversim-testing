@@ -79,10 +79,7 @@ namespace SilverSim.Types.Asset.Format
                         {
                             byte[] extraparams = data.ReadContentAsBase64();
 
-                            if (extraparams.Length < 1)
-                            {
-                            }
-                            else
+                            if (extraparams.Length >= 1)
                             {
                                 const ushort FlexiEP = 0x10;
                                 const ushort LightEP = 0x20;

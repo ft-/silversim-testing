@@ -246,7 +246,6 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     Vector3 pos = new Vector3();
                     pos.FromBytes(d.Data, datapos);
-                    datapos += 12;
                     if(CanEdit(agent, prim.ObjectGroup, prim.ObjectGroup.GlobalPosition))
                     {
                         prim.Size = pos;
