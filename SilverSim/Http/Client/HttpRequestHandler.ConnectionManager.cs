@@ -64,7 +64,7 @@ namespace SilverSim.Http.Client
             }
             catch
             {
-
+                /* just ensure that the caller does not get exceptioned */
             }
         }
 

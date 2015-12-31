@@ -228,11 +228,11 @@ namespace SilverSim.Http.Client
                 }
                 catch(HttpStream.TimeoutException)
                 {
-
+                    /* keep caller from being exceptioned */
                 }
                 catch (IOException)
                 {
-
+                    /* keep caller from being exceptioned */
                 }
 
                 /* append request POST data */

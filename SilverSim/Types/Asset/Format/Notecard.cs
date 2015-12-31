@@ -96,6 +96,7 @@ namespace SilverSim.Types.Asset.Format
                                                 }
                                                 catch
                                                 {
+                                                    /* no action required */
                                                 }
                                             }
                                         }
@@ -120,6 +121,7 @@ namespace SilverSim.Types.Asset.Format
                                         }
                                         catch
                                         {
+                                            /* no action required */
                                         }
                                     }
                                 }
@@ -127,7 +129,7 @@ namespace SilverSim.Types.Asset.Format
                         }
                         catch
                         {
-
+                            /* no action required */
                         }
                     }
                 }

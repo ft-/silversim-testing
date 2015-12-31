@@ -36,20 +36,15 @@ namespace SilverSim.ServiceInterfaces.AvatarName
             return true;
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public UUI this[UUI input]
         {
             get
             {
-                try
+                UUI resultuui;
+                if (!input.IsAuthoritative &&
+                    TryGetValue(input.ID, out resultuui))
                 {
-                    if (!input.IsAuthoritative)
-                    {
-                        return this[input.ID];
-                    }
-                }
-                catch
-                {
+                    return resultuui;
                 }
                 return input;
             }
