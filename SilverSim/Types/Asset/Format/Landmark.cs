@@ -80,22 +80,17 @@ namespace SilverSim.Types.Asset.Format
         {
             AssetData asset = new AssetData();
             string landmarkdata;
-            
-            if(v.GatekeeperURI != null)
-            {
-                landmarkdata = String.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\ngatekeeper {5}\n",
+
+            landmarkdata = (v.GatekeeperURI != null) ?
+                String.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\ngatekeeper {5}\n",
                     v.RegionID,
                     v.LocalPos.X, v.LocalPos.Y, v.LocalPos.Z,
                     v.Location.RegionHandle,
-                    v.GatekeeperURI);
-            }
-            else
-            {
-                landmarkdata = String.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\n",
+                    v.GatekeeperURI) :
+                String.Format("Landmark version 2\nregion_id {0}\nlocal_pos {1} {2} {3}\nregion_handle {4}\n",
                     v.RegionID,
                     v.LocalPos.X, v.LocalPos.Y, v.LocalPos.Z,
                     v.Location.RegionHandle);
-            }
 
             asset.Data = Encoding.ASCII.GetBytes(landmarkdata);
             asset.Type = AssetType.Landmark;
