@@ -80,21 +80,21 @@ namespace SilverSim.Scene.Types.Scene
             }
             catch
             {
-                
+                /* no action required */
             }
 
             bool isActiveGod = agent.IsActiveGod;
 
             switch (req.Destination)
             {
-                case SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction.GodTakeCopy:
+                case Viewer.Messages.Object.DeRezObject.DeRezAction.GodTakeCopy:
                     if(!isActiveGod || !agent.IsInScene(this))
                     {
                         return;
                     }
                     break;
 
-                case SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction.Delete:
+                case Viewer.Messages.Object.DeRezObject.DeRezAction.Delete:
                     foreach(ObjectGroup grp in objectgroups)
                     {
                         if (!isActiveGod || !agent.IsInScene(this))
@@ -113,7 +113,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     break;
 
-                case SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction.Return:
+                case Viewer.Messages.Object.DeRezObject.DeRezAction.Return:
                     foreach(ObjectGroup grp in objectgroups)
                     {
                         if (!isActiveGod || !agent.IsInScene(this))
@@ -136,14 +136,14 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     break;
 
-                case SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction.SaveToExistingUserInventoryItem:
-                    ackres = new SilverSim.Viewer.Messages.Object.DeRezAck();
+                case Viewer.Messages.Object.DeRezObject.DeRezAction.SaveToExistingUserInventoryItem:
+                    ackres = new Viewer.Messages.Object.DeRezAck();
                     ackres.TransactionID = req.TransactionID;
                     ackres.Success = false;
                     agent.SendMessageAlways(ackres, ID);
                     return;
 
-                case SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction.Take:
+                case Viewer.Messages.Object.DeRezObject.DeRezAction.Take:
                     foreach(ObjectGroup grp in objectgroups)
                     {
                         if (!isActiveGod || !agent.IsInScene(this))
@@ -166,7 +166,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     break;
 
-                case SilverSim.Viewer.Messages.Object.DeRezObject.DeRezAction.TakeCopy:
+                case Viewer.Messages.Object.DeRezObject.DeRezAction.TakeCopy:
                     foreach(ObjectGroup grp in objectgroups)
                     {
                         if(CanTakeCopy(agent, grp, grp.Position))

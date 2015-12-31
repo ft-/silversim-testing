@@ -235,7 +235,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 catch
                 {
-
+                    /* no action required */
                 }
                 try
                 {
@@ -244,9 +244,9 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 catch
                 {
-
+                    /* no action required */
                 }
-                if(!success)
+                if (!success)
                 {
                     throw new AssetNotFoundException(id);
                 }

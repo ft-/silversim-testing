@@ -106,7 +106,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     catch
                     {
-
+                        /* no action required */
                     }
                 }
                 return new List<UUI>(results.Values);
