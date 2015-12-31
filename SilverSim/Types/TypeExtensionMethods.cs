@@ -3,6 +3,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Xml;
 
@@ -118,6 +119,19 @@ namespace SilverSim.Types
         public static StreamWriter UTF8StreamWriter(this Stream s)
         {
             return new StreamWriter(s, m_UTF8NoBOM);
+        }
+
+        private static byte[] FromHexStringToByteArray(this string hex)
+        {
+            return Enumerable.Range(0, hex.Length)
+                             .Where(x => x % 2 == 0)
+                             .Select(x => Convert.ToByte(hex.Substring(x, 2), 16))
+                             .ToArray();
+        }
+
+        private static string ToHexString(this byte[] data)
+        {
+            return BitConverter.ToString(data).Replace("-", string.Empty);
         }
     }
 }
