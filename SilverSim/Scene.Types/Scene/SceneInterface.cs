@@ -302,6 +302,7 @@ namespace SilverSim.Scene.Types.Scene
 
         public SceneInterface(UInt32 sizeX, UInt32 sizeY)
         {
+            EnableLandingOwnerOverride = false;
             SizeX = sizeX;
             SizeY = sizeY;
             AssetService = new DefaultAssetService(this);

@@ -173,10 +173,7 @@ namespace SilverSim.Scene.Types.Scene
             
             if((estateInfo.Flags & RegionOptionFlags.PublicAllowed) == 0)
             {
-                if (EstateService.EstateAccess[estateID, agentOwner])
-                {
-                }
-                else
+                if (!EstateService.EstateAccess[estateID, agentOwner])
                 {
                     List < UGI > estateGroups = EstateService.EstateGroup.All[estateID];
                     List<GroupMembership> groups = GroupsService.Memberships[agentOwner, agentOwner];
@@ -194,6 +191,8 @@ namespace SilverSim.Scene.Types.Scene
             return estateInfo;
         }
 
+        public bool EnableLandingOwnerOverride { get; set; }
+
         public void DetermineInitialAgentLocation(IAgent agent, TeleportFlags teleportFlags, Vector3 destinationLocation, Vector3 destinationLookAt)
         {
             UUI agentOwner = agent.Owner;
@@ -210,9 +209,10 @@ namespace SilverSim.Scene.Types.Scene
             ParcelInfo p = Parcels[destinationLocation];
             EstateInfo estateInfo;
 
-            if (!p.Owner.EqualsGrid(agentOwner) &&
+            if ((!p.Owner.EqualsGrid(agentOwner) &&
                 !IsEstateManager(agentOwner) &&
-                !IsPossibleGod(agentOwner))
+                !IsPossibleGod(agentOwner)) ||
+                !EnableLandingOwnerOverride)
             {
                 estateInfo = CheckEstateRights(agent);
                 if(RegionSettings.TelehubObject != UUID.Zero && (estateInfo.Flags & RegionOptionFlags.AllowDirectTeleport) == 0)
