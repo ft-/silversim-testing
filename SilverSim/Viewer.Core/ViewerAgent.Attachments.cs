@@ -272,14 +272,21 @@ namespace SilverSim.Viewer.Core
                 SendAlertMessage("ALERT: InvalidObjectParams", SceneID);
                 return;
             }
-            AssetData data;
+            bool accessFailed = false;
             try
             {
-                data = AssetService[item.AssetID];
+                accessFailed = !AssetService.Exists(item.AssetID);
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 m_Log.WarnFormat("Attaching item {0} / asset {1} not possible due {2}: {3}", item.ID, item.AssetID, e.GetType().FullName, e.ToString());
+                SendAlertMessage("ALERT: CantFindInvItem", SceneID);
+                return;
+            }
+
+            if (accessFailed)
+            { 
+                m_Log.WarnFormat("Attaching item {0} / asset {1} not possible since it is missing", item.ID, item.AssetID);
                 SendAlertMessage("ALERT: CantFindInvItem", SceneID);
                 return;
             }
