@@ -31,17 +31,17 @@ namespace SilverSim.Scene.Types.Scene
         public void AddParcel(ParcelInfo p)
         {
             m_Parcels.Add(p.ID, p.LocalID, p);
+            TriggerParcelUpdate(p);
         }
+
+        public abstract bool RemoveParcel(ParcelInfo p, UUID mergeTo);
 
         public void ClearParcels()
         {
             m_Parcels.Clear();
         }
 
-        public void TriggerParcelUpdate(ParcelInfo pInfo)
-        {
-
-        }
+        public abstract void TriggerParcelUpdate(ParcelInfo pInfo);
 
         private ParcelOverlayType GetParcelLayerByte(int x, int y, UUI agentID)
         {

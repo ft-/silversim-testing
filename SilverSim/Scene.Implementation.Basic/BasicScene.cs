@@ -743,6 +743,25 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
+        readonly object m_ParcelUpdateLock = new object();
+
+        public override bool RemoveParcel(ParcelInfo p, UUID mergeTo)
+        {
+            bool removed = false;
+            ParcelInfo mergeParcel;
+            lock (m_ParcelUpdateLock)
+            {
+
+                if (m_Parcels.TryGetValue(mergeTo, out mergeParcel))
+                {
+                    removed = m_Parcels.Remove(p.ID);
+                    m_SimulationDataStorage.RemoveRegion(p.ID);
+                    mergeParcel.LandBitmap.Merge(p.LandBitmap);
+                }
+            }
+            return removed;
+        }
+
         public override void ResetParcels()
         {
             List<UUID> parcelIDs = m_SimulationDataStorage.Parcels.ParcelsInRegion(ID);
@@ -768,9 +787,23 @@ namespace SilverSim.Scene.Implementation.Basic
             pi.LandingLookAt = new Vector3(1, 0, 0);
             pi.ClaimDate = new Date();
             pi.Status = ParcelStatus.Leased;
-            m_SimulationDataStorage.Parcels.Store(ID, pi);
-            ClearParcels();
-            AddParcel(pi);
+            lock(m_ParcelUpdateLock)
+            {
+                m_SimulationDataStorage.Parcels.Store(ID, pi);
+                ClearParcels();
+                AddParcel(pi);
+            }
+        }
+
+        public override void TriggerParcelUpdate(ParcelInfo pInfo)
+        {
+            lock (m_ParcelUpdateLock)
+            {
+                if (m_Parcels.ContainsKey(pInfo.ID))
+                {
+                    m_SimulationDataStorage.Parcels.Store(ID, pInfo);
+                }
+            }
         }
 
         public override void ClearObjects()

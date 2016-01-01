@@ -200,6 +200,35 @@ namespace SilverSim.Types.Parcel
             }
 
             [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
+            /** <summary>Do not use this to merge with an active parcel data</summary> */
+            public void Merge(ParcelDataLandBitmap bitmap)
+            {
+                try
+                {
+                    m_LandBitmapRwLock.AcquireWriterLock(-1);
+                    if (bitmap.m_LandBitmap.Length == m_LandBitmap.Length)
+                    {
+                        for (int y = 0; y < m_BitmapHeight; ++y)
+                        {
+                            for (int x = 0; x < m_BitmapWidth; ++x)
+                            {
+                                m_LandBitmap[y, x] |= bitmap.m_LandBitmap[y, x];
+                            }
+                        }
+                        DetermineAABB();
+                    }
+                    else
+                    {
+                        throw new ArgumentException("Parcel Bitmap size does not match");
+                    }
+                }
+                finally
+                {
+                    m_LandBitmapRwLock.ReleaseWriterLock();
+                }
+            }
+
+            [SuppressMessage("Gendarme.Rules.Performance", "AvoidReturningArraysOnPropertiesRule")]
             public byte[] Data
             {
                 get
