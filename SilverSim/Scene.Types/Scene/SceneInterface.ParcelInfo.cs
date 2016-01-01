@@ -38,6 +38,11 @@ namespace SilverSim.Scene.Types.Scene
             m_Parcels.Clear();
         }
 
+        public void TriggerParcelUpdate(ParcelInfo pInfo)
+        {
+
+        }
+
         private ParcelOverlayType GetParcelLayerByte(int x, int y, UUI agentID)
         {
             ParcelInfo pi;

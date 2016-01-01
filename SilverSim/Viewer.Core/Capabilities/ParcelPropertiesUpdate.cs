@@ -89,6 +89,8 @@ namespace SilverSim.Viewer.Core.Capabilities
                 pInfo.LandingLookAt = reqmap["user_look_at"].AsVector3;
                 pInfo.LandingType = (TeleportLandingType)reqmap["landing_type"].AsInt;
 
+                m_Scene.TriggerParcelUpdate(pInfo);
+
                 using (HttpResponse res = httpreq.BeginResponse("text/plain"))
                 {
                     /* no action required here */
