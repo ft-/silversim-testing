@@ -60,11 +60,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 SceneInterface remoteScene;
                 TryGetSceneDelegate m_TryGetScene = TryGetScene;
-                if(null == ServerParamService)
-                {
-
-                }
-                else
+                if(null != ServerParamService)
                 {
                     bool chatPass;
                     chatPass = ServerParamService.GetBoolean(kvp.Key, "ChatPassOutEnable", chatPassDefault);
@@ -97,11 +93,7 @@ namespace SilverSim.Scene.Types.Scene
                         kvp.Value.RemoteCircuit.SendMessage(cp);
                     }
                 }
-                else if (null == m_TryGetScene)
-                {
-
-                }
-                else if (m_TryGetScene(kvp.Key, out remoteScene))
+                else if (null != m_TryGetScene && m_TryGetScene(kvp.Key, out remoteScene))
                 {
                     Vector3 newPosition = le.GlobalPosition + kvp.Value.RemoteOffset;;
                     if (newPosition.X >= -le.Distance &&

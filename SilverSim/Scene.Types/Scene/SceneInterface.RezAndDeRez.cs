@@ -48,8 +48,8 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         internal void HandleDeRezObject(Message m)
         {
-            SilverSim.Viewer.Messages.Object.DeRezAck ackres;
-            SilverSim.Viewer.Messages.Object.DeRezObject req = (SilverSim.Viewer.Messages.Object.DeRezObject)m;
+            Viewer.Messages.Object.DeRezAck ackres;
+            Viewer.Messages.Object.DeRezObject req = (Viewer.Messages.Object.DeRezObject)m;
             if(req.AgentID != m.CircuitAgentID ||
                 req.SessionID != m.CircuitSessionID)
             {
@@ -101,11 +101,7 @@ namespace SilverSim.Scene.Types.Scene
                         {
                             return;
                         }
-                        else if(CanDelete(agent, grp, grp.Position))
-                        {
-
-                        }
-                        else
+                        else if(!CanDelete(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage("ALERT: ", ID);
                             return;
@@ -120,14 +116,10 @@ namespace SilverSim.Scene.Types.Scene
                         {
                             return;
                         }
-                        else if(CanReturn(agent, grp, grp.Position))
-                        {
-
-                        }
-                        else
+                        else if(!CanReturn(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage(string.Format("No permission to return object '{0}' to owners", grp.Name), ID);
-                            ackres = new SilverSim.Viewer.Messages.Object.DeRezAck();
+                            ackres = new Viewer.Messages.Object.DeRezAck();
                             ackres.TransactionID = req.TransactionID;
                             ackres.Success = false;
                             agent.SendMessageAlways(ackres, ID);
@@ -150,14 +142,10 @@ namespace SilverSim.Scene.Types.Scene
                         {
                             return;
                         }
-                        else if(CanTake(agent, grp, grp.Position))
-                        {
-
-                        }
-                        else
+                        else if(!CanTake(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage(string.Format("No permission to take object '{0}'", grp.Name), ID);
-                            ackres = new SilverSim.Viewer.Messages.Object.DeRezAck();
+                            ackres = new Viewer.Messages.Object.DeRezAck();
                             ackres.TransactionID = req.TransactionID;
                             ackres.Success = false;
                             agent.SendMessageAlways(ackres, ID);
@@ -169,14 +157,10 @@ namespace SilverSim.Scene.Types.Scene
                 case Viewer.Messages.Object.DeRezObject.DeRezAction.TakeCopy:
                     foreach(ObjectGroup grp in objectgroups)
                     {
-                        if(CanTakeCopy(agent, grp, grp.Position))
-                        {
-
-                        }
-                        else
+                        if(!CanTakeCopy(agent, grp, grp.Position))
                         {
                             agent.SendAlertMessage(string.Format("No permission to copy object '{0}'", grp.Name), ID);
-                            ackres = new SilverSim.Viewer.Messages.Object.DeRezAck();
+                            ackres = new Viewer.Messages.Object.DeRezAck();
                             ackres.TransactionID = req.TransactionID;
                             ackres.Success = false;
                             agent.SendMessageAlways(ackres, ID);
@@ -187,7 +171,7 @@ namespace SilverSim.Scene.Types.Scene
 
                 default:
                     agent.SendAlertMessage("Invalid derez request by viewer", ID);
-                    ackres = new SilverSim.Viewer.Messages.Object.DeRezAck();
+                    ackres = new Viewer.Messages.Object.DeRezAck();
                     ackres.TransactionID = req.TransactionID;
                     ackres.Success = false;
                     agent.SendMessageAlways(ackres, ID);
@@ -199,7 +183,7 @@ namespace SilverSim.Scene.Types.Scene
                 grp.Scene.Remove(grp);
             }
 
-            ackres = new SilverSim.Viewer.Messages.Object.DeRezAck();
+            ackres = new Viewer.Messages.Object.DeRezAck();
             ackres.TransactionID = req.TransactionID;
             ackres.Success = true;
             agent.SendMessageAlways(ackres, ID);
