@@ -584,6 +584,36 @@ namespace SilverSim.Viewer.Core
                 case PrimitiveParamsType.Omega:
                     throw new ArgumentException("PRIM_OMEGA not allowed for agents");
 
+                case PrimitiveParamsType.Specular:
+                    throw new ArgumentException("PRIM_SPECULAR not allowed for agents");
+
+                case PrimitiveParamsType.Normal:
+                    throw new ArgumentException("PRIM_NORMAL not allowed for agents");
+
+                case PrimitiveParamsType.AlphaMode:
+                    throw new ArgumentException("PRIM_ALPHA_MODE not allowed for agents");
+
+                case PrimitiveParamsType.Alpha:
+                    throw new ArgumentException("PRIM_ALPHA not allowed for agents");
+
+                case PrimitiveParamsType.Projector:
+                    throw new ArgumentException("PRIM_PROJECTOR not allowed for agents");
+
+                case PrimitiveParamsType.ProjectorEnabled:
+                    throw new ArgumentException("PRIM_PROJECTOR_ENABLED not allowed for agents");
+
+                case PrimitiveParamsType.ProjectorTexture:
+                    throw new ArgumentException("PRIM_PROJECTOR_TEXTURE not allowed for agents");
+
+                case PrimitiveParamsType.ProjectorFov:
+                    throw new ArgumentException("PRIM_PROJECTOR_FOV not allowed for agents");
+
+                case PrimitiveParamsType.ProjectorFocus:
+                    throw new ArgumentException("PRIM_PROJECTOR_FOCUS not allowed for agents");
+
+                case PrimitiveParamsType.ProjectorAmbience:
+                    throw new ArgumentException("PRIM_PROJECTOR_AMBIENCE not allowed for agents");
+
                 default:
                     throw new ArgumentException(String.Format("Invalid primitive parameter type {0}", enumerator.Current.AsUInt));
             }
@@ -661,6 +691,36 @@ namespace SilverSim.Viewer.Core
 
                 case PrimitiveParamsType.Omega:
                     throw new ArgumentException("PRIM_OMEGA not allowed for agents");
+
+                case PrimitiveParamsType.Specular:
+                    throw new ArgumentException("PRIM_SPECULAR not allowed for agents");
+
+                case PrimitiveParamsType.Normal:
+                    throw new ArgumentException("PRIM_NORMAL not allowed for agents");
+
+                case PrimitiveParamsType.AlphaMode:
+                    throw new ArgumentException("PRIM_ALPHA_MODE not allowed for agents");
+
+                case PrimitiveParamsType.Alpha:
+                    throw new ArgumentException("PRIM_ALPHA not allowed for agents");
+
+                case PrimitiveParamsType.Projector:
+                    throw new ArgumentException("PRIM_PROJECTOR not allowed for agents");
+
+                case PrimitiveParamsType.ProjectorEnabled:
+                    throw new ArgumentException("PRIM_PROJECTOR_ENABLED not allowed for agents");
+
+                case PrimitiveParamsType.ProjectorTexture:
+                    throw new ArgumentException("PRIM_PROJECTOR_TEXTURE not allowed for agents");
+
+                case PrimitiveParamsType.ProjectorFov:
+                    throw new ArgumentException("PRIM_PROJECTOR_FOV not allowed for agents");
+
+                case PrimitiveParamsType.ProjectorFocus:
+                    throw new ArgumentException("PRIM_PROJECTOR_FOCUS not allowed for agents");
+
+                case PrimitiveParamsType.ProjectorAmbience:
+                    throw new ArgumentException("PRIM_PROJECTOR_AMBIENCE not allowed for agents");
 
                 default:
                     throw new ArgumentException(String.Format("Invalid primitive parameter type {0}", enumerator.Current.AsInt));
