@@ -256,6 +256,7 @@ namespace SilverSim.Viewer.Core
             }
             set
             {
+                throw new NotSupportedException();
             }
         }
 
@@ -267,7 +268,7 @@ namespace SilverSim.Viewer.Core
             }
             set
             {
-
+                throw new NotSupportedException();
             }
         }
 
