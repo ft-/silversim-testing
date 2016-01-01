@@ -566,22 +566,8 @@ namespace SilverSim.Scene.Types.Object
                     double hollow = ParamsHelper.GetDouble(enumerator, "PRIM_TYPE");
                     Vector3 twist = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
 
-                    if (cut.X < 0f)
-                    {
-                        cut.X = 0f;
-                    }
-                    if (cut.X > 1f)
-                    {
-                        cut.X = 1f;
-                    }
-                    if (cut.Y < 0f)
-                    {
-                        cut.Y = 0f;
-                    }
-                    if (cut.Y > 1f)
-                    {
-                        cut.Y = 1f;
-                    }
+                    cut.X = cut.X.Clamp(0, 1);
+                    cut.Y = cut.Y.Clamp(0, 1);
                     if (cut.Y - cut.X < 0.05f)
                     {
                         cut.Y = cut.Y - 0.05f;
@@ -594,48 +580,19 @@ namespace SilverSim.Scene.Types.Object
                     shape.ProfileBegin = (ushort)(50000 * cut.X);
                     shape.ProfileEnd = (ushort)(50000 * (1 - cut.Y));
 
-                    if (hollow < 0f)
-                    {
-                        hollow = 0f;
-                    }
                     // If the prim is a Cylinder, Prism, Sphere, Torus or Ring (or not a
                     // Box or Tube) and the hole shape is a square, hollow is limited to
                     // a max of 70%. The viewer performs its own check on this value but
                     // we need to do it here also so llGetPrimitiveParams can have access
                     // to the correct value.
-                    if (profileShape != PrimitiveProfileShape.Square &&
-                        holeShape == PrimitiveHoleShape.Square)
-                    {
-                        if (hollow > 0.70f)
-                        {
-                            hollow = 0.70f;
-                        }
-                    }
+                    hollow = (profileShape != PrimitiveProfileShape.Square &&
+                        holeShape == PrimitiveHoleShape.Square) ?
+                        hollow.Clamp(0f, 0.70f) :
                     // Otherwise, hollow is limited to 95%.
-                    else
-                    {
-                        if (hollow > 0.95f)
-                        {
-                            hollow = 0.95f;
-                        }
-                    }
+                        hollow.Clamp(0f, 0.95f);
                     shape.ProfileHollow = (ushort)(50000 * hollow);
-                    if (twist.X < -1.0f)
-                    {
-                        twist.X = -1.0f;
-                    }
-                    if (twist.X > 1.0f)
-                    {
-                        twist.X = 1.0f;
-                    }
-                    if (twist.Y < -1.0f)
-                    {
-                        twist.Y = -1.0f;
-                    }
-                    if (twist.Y > 1.0f)
-                    {
-                        twist.Y = 1.0f;
-                    }
+                    twist.X = twist.X.Clamp(-1f, 1f);
+                    twist.Y = twist.Y.Clamp(-1f, 1f);
 
                     double tempFloat = (100.0d * twist.X);
                     shape.PathTwistBegin = (sbyte)tempFloat;
@@ -655,42 +612,14 @@ namespace SilverSim.Scene.Types.Object
                             topSize = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
                             topShear = ParamsHelper.GetVector(enumerator, "PRIM_TYPE");
 
-                            if (topSize.X < 0f)
-                            {
-                                topSize.X = 0f;
-                            }
-                            if (topSize.X > 2f)
-                            {
-                                topSize.X = 2f;
-                            }
-                            if (topSize.Y < 0f)
-                            {
-                                topSize.Y = 0f;
-                            }
-                            if (topSize.Y > 2f)
-                            {
-                                topSize.Y = 2f;
-                            }
+                            topSize.X = topSize.X.Clamp(0f, 2f);
+                            topSize.Y = topSize.Y.Clamp(0f, 2f);
                             tempFloat = (float)(100.0d * (2.0d - topSize.X));
                             shape.PathScaleX = (byte)tempFloat;
                             tempFloat = (float)(100.0d * (2.0d - topSize.Y));
                             shape.PathScaleY = (byte)tempFloat;
-                            if (topShear.X < -0.5f)
-                            {
-                                topShear.X = -0.5f;
-                            }
-                            if (topShear.X > 0.5f)
-                            {
-                                topShear.X = 0.5f;
-                            }
-                            if (topShear.Y < -0.5f)
-                            {
-                                topShear.Y = -0.5f;
-                            }
-                            if (topShear.Y > 0.5f)
-                            {
-                                topShear.Y = 0.5f;
-                            }
+                            topShear.X = topShear.X.Clamp(-0.5f, 0.5f);
+                            topShear.Y = topShear.Y.Clamp(-0.5f, 0.5f);
                             tempFloat = (float)(100.0d * topShear.X);
                             shape.PathShearX = (byte)tempFloat;
                             tempFloat = (float)(100.0d * topShear.Y);
@@ -707,22 +636,8 @@ namespace SilverSim.Scene.Types.Object
                             shape.PathScaleX = 100;
                             shape.PathScaleY = 100;
 
-                            if (dimple.X < 0f)
-                            {
-                                dimple.X = 0f;
-                            }
-                            if (dimple.X > 1f)
-                            {
-                                dimple.X = 1f;
-                            }
-                            if (dimple.Y < 0f)
-                            {
-                                dimple.Y = 0f;
-                            }
-                            if (dimple.Y > 1f)
-                            {
-                                dimple.Y = 1f;
-                            }
+                            dimple.X = dimple.X.Clamp(0f, 1f);
+                            dimple.Y = dimple.Y.Clamp(0f, 1f);
                             if (dimple.Y - cut.X < 0.05f)
                             {
                                 dimple.X = cut.Y - 0.05f;
@@ -746,62 +661,20 @@ namespace SilverSim.Scene.Types.Object
                             shape.PathBegin = shape.ProfileBegin;
                             shape.PathEnd = shape.ProfileEnd;
 
-                            if (holeSize.X < 0.05f)
-                            {
-                                holeSize.X = 0.05f;
-                            }
-                            if (holeSize.X > 1f)
-                            {
-                                holeSize.X = 1f;
-                            }
-                            if (holeSize.Y < 0.05f)
-                            {
-                                holeSize.Y = 0.05f;
-                            }
-                            if (holeSize.Y > 0.5f)
-                            {
-                                holeSize.Y = 0.5f;
-                            }
+                            holeSize.X = holeSize.X.Clamp(0.05f, 1f);
+                            holeSize.Y = holeSize.Y.Clamp(0.05f, 0.5f);
                             tempFloat = (float)(100.0d * (2.0d - holeSize.X));
                             shape.PathScaleX = (byte)tempFloat;
                             tempFloat = (float)(100.0d * (2.0d - holeSize.Y));
                             shape.PathScaleY = (byte)tempFloat;
-                            if (topShear.X < -0.5f)
-                            {
-                                topShear.X = -0.5f;
-                            }
-                            if (topShear.X > 0.5f)
-                            {
-                                topShear.X = 0.5f;
-                            }
-                            if (topShear.Y < -0.5f)
-                            {
-                                topShear.Y = -0.5f;
-                            }
-                            if (topShear.Y > 0.5f)
-                            {
-                                topShear.Y = 0.5f;
-                            }
+                            topShear.X = topShear.X.Clamp(-0.5f, 0.5f);
+                            topShear.Y = topShear.Y.Clamp(-0.5f, 0.5f);
                             tempFloat = (float)(100.0d * topShear.X);
                             shape.PathShearX = (byte)tempFloat;
                             tempFloat = (float)(100.0d * topShear.Y);
                             shape.PathShearY = (byte)tempFloat;
-                            if (advancedCut.X < 0f)
-                            {
-                                advancedCut.X = 0f;
-                            }
-                            if (advancedCut.X > 1f)
-                            {
-                                advancedCut.X = 1f;
-                            }
-                            if (advancedCut.Y < 0f)
-                            {
-                                advancedCut.Y = 0f;
-                            }
-                            if (advancedCut.Y > 1f)
-                            {
-                                advancedCut.Y = 1f;
-                            }
+                            advancedCut.X = advancedCut.X.Clamp(0f, 1f);
+                            advancedCut.Y = advancedCut.Y.Clamp(0f, 1f);
                             if (advancedCut.Y - advancedCut.X < 0.05f)
                             {
                                 advancedCut.X = advancedCut.Y - 0.05f;
@@ -813,55 +686,20 @@ namespace SilverSim.Scene.Types.Object
                             }
                             shape.ProfileBegin = (ushort)(50000 * advancedCut.X);
                             shape.ProfileEnd = (ushort)(50000 * (1 - advancedCut.Y));
-                            if (taper.X < -1f)
-                            {
-                                taper.X = -1f;
-                            }
-                            if (taper.X > 1f)
-                            {
-                                taper.X = 1f;
-                            }
-                            if (taper.Y < -1f)
-                            {
-                                taper.Y = -1f;
-                            }
-                            if (taper.Y > 1f)
-                            {
-                                taper.Y = 1f;
-                            }
+                            taper.X = taper.X.Clamp(-1f, 1f);
+                            taper.Y = taper.Y.Clamp(-1f, 1f);
                             tempFloat = (float)(100.0d * taper.X);
                             shape.PathTaperX = (sbyte)tempFloat;
                             tempFloat = (float)(100.0d * taper.Y);
                             shape.PathTaperY = (sbyte)tempFloat;
-                            if (revolutions < 1f)
-                            {
-                                revolutions = 1f;
-                            }
-                            if (revolutions > 4f)
-                            {
-                                revolutions = 4f;
-                            }
+                            revolutions = revolutions.Clamp(1f, 4f);
                             tempFloat = 66.66667f * (revolutions - 1.0f);
                             shape.PathRevolutions = (byte)tempFloat;
                             // limits on radiusoffset depend on revolutions and hole size (how?) seems like the maximum range is 0 to 1
-                            if (radiusOffset < 0f)
-                            {
-                                radiusOffset = 0f;
-                            }
-                            if (radiusOffset > 1f)
-                            {
-                                radiusOffset = 1f;
-                            }
+                            radiusOffset = radiusOffset.Clamp(0f, 1f);
                             tempFloat = 100.0f * radiusOffset;
                             shape.PathRadiusOffset = (sbyte)tempFloat;
-                            if (skew < -0.95f)
-                            {
-                                skew = -0.95f;
-                            }
-                            if (skew > 0.95f)
-                            {
-                                skew = 0.95f;
-                            }
+                            skew = skew.Clamp(-0.95f, 0.95f);
                             tempFloat = 100.0f * skew;
                             shape.PathSkew = (sbyte)tempFloat;
                             break;
@@ -1845,22 +1683,8 @@ namespace SilverSim.Scene.Types.Object
                         }
                         mat.DiffuseAlphaMode = ParamsHelper.GetInteger(enumerator, "PRIM_ALPHA_MODE");
                         mat.AlphaMaskCutoff = ParamsHelper.GetInteger(enumerator, "PRIM_ALPHA_MODE");
-                        if(mat.DiffuseAlphaMode < 0)
-                        {
-                            mat.DiffuseAlphaMode = 0;
-                        }
-                        else if(mat.DiffuseAlphaMode > 3)
-                        {
-                            mat.DiffuseAlphaMode = 3;
-                        }
-                        if(mat.AlphaMaskCutoff < 0)
-                        {
-                            mat.AlphaMaskCutoff = 0;
-                        }
-                        else if(mat.AlphaMaskCutoff > 3)
-                        {
-                            mat.AlphaMaskCutoff = 3;
-                        }
+                        mat.DiffuseAlphaMode = mat.DiffuseAlphaMode.Clamp(0, 3);
+                        mat.AlphaMaskCutoff = mat.AlphaMaskCutoff.Clamp(0, 3);
                         mat.MaterialID = UUID.Random;
                         ObjectGroup.Scene.StoreMaterial(mat);
                         face.MaterialID = mat.MaterialID;
@@ -1917,22 +1741,8 @@ namespace SilverSim.Scene.Types.Object
                         ColorAlpha color = new ColorAlpha(ParamsHelper.GetVector(enumerator, "PRIM_SPECULAR"), 1);
                         int glossiness = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");
                         int environment = ParamsHelper.GetInteger(enumerator, "PRIM_SPECULAR");
-                        if(environment < 0)
-                        {
-                            environment = 0;
-                        }
-                        else if(environment > 255)
-                        {
-                            environment = 255;
-                        }
-                        if(glossiness < 0)
-                        {
-                            glossiness = 0;
-                        }
-                        else if(glossiness > 255)
-                        {
-                            glossiness = 255;
-                        }
+                        environment = environment.Clamp(0, 255);
+                        glossiness = glossiness.Clamp(0, 255);
                         Material mat;
                         try
                         {
