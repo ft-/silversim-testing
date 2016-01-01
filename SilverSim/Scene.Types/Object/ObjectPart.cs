@@ -2177,9 +2177,6 @@ namespace SilverSim.Scene.Types.Object
                                 break;
 
                             case "RotationalVelocity":
-                                part.AngularVelocity = reader.ReadElementChildsAsVector3();
-                                break;
-
                             case "AngularVelocity":
                                 part.AngularVelocity = reader.ReadElementChildsAsVector3();
                                 break;

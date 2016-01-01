@@ -170,22 +170,20 @@ namespace SilverSim.Scene.Types.Scene
             UUI agentOwner = agent.Owner;
             uint estateID = EstateService.RegionMap[ID];
             EstateInfo estateInfo = EstateService[estateID];
-            
-            if((estateInfo.Flags & RegionOptionFlags.PublicAllowed) == 0)
+
+            if ((estateInfo.Flags & RegionOptionFlags.PublicAllowed) == 0 &&
+                !EstateService.EstateAccess[estateID, agentOwner])
             {
-                if (!EstateService.EstateAccess[estateID, agentOwner])
+                List<UGI> estateGroups = EstateService.EstateGroup.All[estateID];
+                List<GroupMembership> groups = GroupsService.Memberships[agentOwner, agentOwner];
+                foreach (GroupMembership group in groups)
                 {
-                    List < UGI > estateGroups = EstateService.EstateGroup.All[estateID];
-                    List<GroupMembership> groups = GroupsService.Memberships[agentOwner, agentOwner];
-                    foreach(GroupMembership group in groups)
+                    if (estateGroups.Contains(group.Group))
                     {
-                        if(estateGroups.Contains(group.Group))
-                        {
-                            return estateInfo;
-                        }
+                        return estateInfo;
                     }
-                    throw new ParcelAccessDeniedException("You are not allowed to enter the estate.");
                 }
+                throw new ParcelAccessDeniedException("You are not allowed to enter the estate.");
             }
 
             return estateInfo;
