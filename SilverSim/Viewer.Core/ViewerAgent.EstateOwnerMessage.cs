@@ -1,5 +1,6 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
+
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Generic;
 using SilverSim.Scene.Types.Agent;

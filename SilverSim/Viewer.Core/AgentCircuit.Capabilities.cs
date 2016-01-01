@@ -298,6 +298,10 @@ namespace SilverSim.Viewer.Core
             AddDefCapability("GetDisplayNames", regionSeedID, Cap_GetDisplayNames, capConfig);
             AddDefCapability("MeshUploadFlag", regionSeedID, Cap_MeshUploadFlag, capConfig);
             string localHostName = string.Format("{0}://{1}:{2}", m_CapsRedirector.Scheme, m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port);
+            AddDefCapabilityFactory("DispatchRegionInfo", regionSeedID, delegate(ViewerAgent agent)
+            {
+                return new DispatchRegionInfo(agent, Scene);
+            }, capConfig);
             AddDefCapabilityFactory("AgentPreferences", regionSeedID, delegate(ViewerAgent agent)
             {
                 return new AgentPreferences(agent);
