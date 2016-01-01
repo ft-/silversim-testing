@@ -272,6 +272,19 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        private double m_HoverHeight;
+        public double HoverHeight
+        {
+            get
+            {
+                return m_HoverHeight;
+            }
+            set
+            {
+                m_HoverHeight = value.Clamp(-2f, 2f);
+            }
+        }
+
         private Vector3 m_GlobalPosition = Vector3.Zero;
 
         public Vector3 Position
@@ -849,8 +862,7 @@ namespace SilverSim.Viewer.Core
                         break;
 
                     case ObjectDetailsType.HoverHeight:
-                        paramList.Add(0);
-#warning Extract Hover Height correctly
+                        paramList.Add(HoverHeight);
                         break;
 
                     case ObjectDetailsType.BodyShapeType:

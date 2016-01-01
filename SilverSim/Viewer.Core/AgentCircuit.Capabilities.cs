@@ -298,67 +298,71 @@ namespace SilverSim.Viewer.Core
             AddDefCapability("GetDisplayNames", regionSeedID, Cap_GetDisplayNames, capConfig);
             AddDefCapability("MeshUploadFlag", regionSeedID, Cap_MeshUploadFlag, capConfig);
             string localHostName = string.Format("{0}://{1}:{2}", m_CapsRedirector.Scheme, m_CapsRedirector.ExternalHostName, m_CapsRedirector.Port);
+            AddDefCapabilityFactory("AgentPreferences", regionSeedID, delegate(ViewerAgent agent)
+            {
+                return new AgentPreferences(agent);
+            }, capConfig);
             AddDefCapabilityFactory("ObjectAdd", regionSeedID, delegate(ViewerAgent agent)
             {
-                return new Capabilities.ObjectAdd(Scene, agent.Owner);
+                return new ObjectAdd(Scene, agent.Owner);
             }, capConfig);
             AddDefCapabilityFactory("UploadBakedTexture", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new Capabilities.UploadBakedTexture(agent.Owner, Server.Scene.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new UploadBakedTexture(agent.Owner, Server.Scene.AssetService, localHostName);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("NewFileAgentInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new Capabilities.NewFileAgentInventory(agent.Owner, agent.InventoryService, agent.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new NewFileAgentInventory(agent.Owner, agent.InventoryService, agent.AssetService, localHostName);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("NewFileAgentInventoryVariablePrice", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new Capabilities.NewFileAgentInventoryVariablePrice(agent.Owner, agent.InventoryService, agent.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new NewFileAgentInventoryVariablePrice(agent.Owner, agent.InventoryService, agent.AssetService, localHostName);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateGestureAgentInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new Capabilities.UpdateGestureAgentInventory(agent, agent.InventoryService, agent.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new UpdateGestureAgentInventory(agent, agent.InventoryService, agent.AssetService, localHostName);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateNotecardAgentInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new Capabilities.UpdateNotecardAgentInventory(agent, agent.InventoryService, agent.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new UpdateNotecardAgentInventory(agent, agent.InventoryService, agent.AssetService, localHostName);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateScriptAgent", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new Capabilities.UpdateScriptAgent(agent, agent.InventoryService, agent.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new UpdateScriptAgent(agent, agent.InventoryService, agent.AssetService, localHostName);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateScriptTask", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new Capabilities.UpdateScriptTask(agent, Scene, localHostName);
+                UploadAssetAbstractCapability capability = new UpdateScriptTask(agent, Scene, localHostName);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateGestureTaskInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new Capabilities.UpdateGestureTaskInventory(agent, Scene, localHostName);
+                UploadAssetAbstractCapability capability = new UpdateGestureTaskInventory(agent, Scene, localHostName);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("UpdateNotecardTaskInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new Capabilities.UpdateNotecardTaskInventory(agent, Scene, localHostName);
+                UploadAssetAbstractCapability capability = new UpdateNotecardTaskInventory(agent, Scene, localHostName);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
-            AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, delegate(ViewerAgent agent) { return new Capabilities.ParcelNavigateMedia(agent.Owner, Scene); }, capConfig);
-            AddDefCapabilityFactory("ObjectMedia", regionSeedID, delegate(ViewerAgent agent) { return new Capabilities.ObjectMedia(agent.Owner, Scene); }, capConfig);
-            AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, delegate(ViewerAgent agent) { return new Capabilities.ObjectMediaNavigate(agent.Owner, Scene); }, capConfig);
+            AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, delegate(ViewerAgent agent) { return new ParcelNavigateMedia(agent.Owner, Scene); }, capConfig);
+            AddDefCapabilityFactory("ObjectMedia", regionSeedID, delegate(ViewerAgent agent) { return new ObjectMedia(agent.Owner, Scene); }, capConfig);
+            AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, delegate(ViewerAgent agent) { return new ObjectMediaNavigate(agent.Owner, Scene); }, capConfig);
         }
         #endregion
     }
