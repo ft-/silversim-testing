@@ -302,6 +302,10 @@ namespace SilverSim.Viewer.Core
             {
                 return new DispatchRegionInfo(agent, Scene);
             }, capConfig);
+            AddDefCapabilityFactory("ParcelPropertiesUpdate", regionSeedID, delegate (ViewerAgent agent)
+            {
+                return new ParcelPropertiesUpdate(agent, Scene);
+            }, capConfig);
             AddDefCapabilityFactory("AgentPreferences", regionSeedID, delegate(ViewerAgent agent)
             {
                 return new AgentPreferences(agent);

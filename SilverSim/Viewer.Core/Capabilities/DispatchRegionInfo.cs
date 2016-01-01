@@ -57,6 +57,12 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
+            if (!m_Scene.IsEstateManager(m_Agent.Owner))
+            {
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
+            }
+
             m_Scene.RegionSettings.BlockTerraform = reqmap["block_terraform"].AsBoolean;
             m_Scene.RegionSettings.BlockFly = reqmap["block_fly"].AsBoolean;
             //bool blockFlyOver = reqmap["block_fly_over"].AsBoolean;
