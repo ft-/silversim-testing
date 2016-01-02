@@ -133,5 +133,16 @@ namespace SilverSim.Types
         {
             return BitConverter.ToString(data).Replace("-", string.Empty);
         }
+
+        public static string TrimToMaxLength(this string s, int length)
+        {
+            return length < s.Length ? 
+                (
+                    length < 0 ? 
+                    string.Empty : 
+                    s.Substring(0, length)
+                ) : 
+                s;
+        }
     }
 }

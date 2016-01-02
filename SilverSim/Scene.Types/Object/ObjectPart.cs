@@ -984,7 +984,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set 
             { 
-                m_Name = value;
+                m_Name = value.TrimToMaxLength(63);
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
@@ -998,7 +998,7 @@ namespace SilverSim.Scene.Types.Object
             }
             set
             {
-                m_Description = value;
+                m_Description = value.TrimToMaxLength(127);
                 IsChanged = m_IsChangedEnabled;
                 TriggerOnUpdate(0);
             }
