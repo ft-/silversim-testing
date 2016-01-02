@@ -41,6 +41,11 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             get;
         }
 
+        public abstract SimulationDataRegionSettingsStorageInterface RegionSettings
+        {
+            get;
+        }
+
         public abstract SimulationDataEnvSettingsStorageInterface EnvironmentSettings
         {
             get;

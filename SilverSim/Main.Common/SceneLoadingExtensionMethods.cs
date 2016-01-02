@@ -65,6 +65,56 @@ namespace SilverSim.Main.Common
 
                 lock (loadparams.Scene.m_LoaderThreadLock)
                 {
+                    RegionSettings settings;
+                    bool storeSettings = false;
+                    if(!loadparams.SimulationDataStorage.RegionSettings.TryGetValue(loadparams.Scene.ID, out settings))
+                    {
+                        settings = new RegionSettings();
+                        m_Log.InfoFormat("Initializing with region settings defaults for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID);
+                        storeSettings = true;
+                    }
+                    else
+                    {
+                        m_Log.InfoFormat("Loaded region settings for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID);
+                    }
+                    loadparams.Scene.RegionSettings.BlockTerraform = settings.BlockTerraform;
+                    loadparams.Scene.RegionSettings.BlockFly = settings.BlockFly;
+                    loadparams.Scene.RegionSettings.AllowDamage = settings.AllowDamage;
+                    loadparams.Scene.RegionSettings.RestrictPushing = settings.RestrictPushing;
+                    loadparams.Scene.RegionSettings.AllowLandResell = settings.AllowLandResell;
+                    loadparams.Scene.RegionSettings.AllowLandJoinDivide = settings.AllowLandJoinDivide;
+                    loadparams.Scene.RegionSettings.BlockShowInSearch = settings.BlockShowInSearch;
+                    loadparams.Scene.RegionSettings.AgentLimit = settings.AgentLimit;
+                    loadparams.Scene.RegionSettings.ObjectBonus = settings.ObjectBonus;
+                    loadparams.Scene.RegionSettings.DisableScripts = settings.DisableScripts;
+                    loadparams.Scene.RegionSettings.DisableCollisions = settings.DisableCollisions;
+                    loadparams.Scene.RegionSettings.BlockFlyOver = settings.BlockFlyOver;
+                    loadparams.Scene.RegionSettings.Sandbox = settings.Sandbox;
+                    loadparams.Scene.RegionSettings.TerrainTexture1 = settings.TerrainTexture1;
+                    loadparams.Scene.RegionSettings.TerrainTexture2 = settings.TerrainTexture2;
+                    loadparams.Scene.RegionSettings.TerrainTexture3 = settings.TerrainTexture3;
+                    loadparams.Scene.RegionSettings.TerrainTexture4 = settings.TerrainTexture4;
+                    loadparams.Scene.RegionSettings.TelehubObject = settings.TelehubObject;
+                    loadparams.Scene.RegionSettings.Elevation1NW = settings.Elevation1NW;
+                    loadparams.Scene.RegionSettings.Elevation2NW = settings.Elevation2NW;
+                    loadparams.Scene.RegionSettings.Elevation1NE = settings.Elevation1NE;
+                    loadparams.Scene.RegionSettings.Elevation2NE = settings.Elevation2NE;
+                    loadparams.Scene.RegionSettings.Elevation1SE = settings.Elevation1SE;
+                    loadparams.Scene.RegionSettings.Elevation2SE = settings.Elevation2SE;
+                    loadparams.Scene.RegionSettings.Elevation1SW = settings.Elevation1SW;
+                    loadparams.Scene.RegionSettings.Elevation2SW = settings.Elevation2SW;
+                    loadparams.Scene.RegionSettings.WaterHeight = settings.WaterHeight;
+                    loadparams.Scene.RegionSettings.TerrainRaiseLimit = settings.TerrainRaiseLimit;
+                    loadparams.Scene.RegionSettings.TerrainLowerLimit = settings.TerrainLowerLimit;
+
+                    if(storeSettings)
+                    {
+                        loadparams.SimulationDataStorage.RegionSettings[loadparams.Scene.ID] = settings;
+                    }
+                }
+
+                lock (loadparams.Scene.m_LoaderThreadLock)
+                {
                     parcels = loadparams.SimulationDataStorage.Parcels.ParcelsInRegion(loadparams.Scene.ID);
                 }
                 if (parcels.Count == 1)
