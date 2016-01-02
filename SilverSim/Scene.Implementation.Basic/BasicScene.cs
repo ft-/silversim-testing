@@ -957,7 +957,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override void TriggerRegionSettingsChanged()
         {
-#warning Implement storing region settings
+            m_SimulationDataStorage.RegionSettings[ID] = RegionSettings;
             foreach(IAgent agent in Agents)
             {
                 ViewerAgent viewerAgent = agent as ViewerAgent;
