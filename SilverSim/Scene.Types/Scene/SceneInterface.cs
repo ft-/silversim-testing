@@ -92,6 +92,7 @@ namespace SilverSim.Scene.Types.Scene
         public UUID RegionSecret { get; private set; }
         public uint RegionPort { get; protected set; }
         public uint ServerHttpPort { get; protected set; }
+        public uint ServerUdpPort { get; protected set; }
         public UUID RegionMapTexture { get; protected set; }
         public UUID ParcelMapTexture { get; protected set; }
         public string ServerURI { get; set; } /* updated by region registrar */

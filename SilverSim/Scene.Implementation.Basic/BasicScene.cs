@@ -463,6 +463,7 @@ namespace SilverSim.Scene.Implementation.Basic
             TryGetScene = SceneManager.Scenes.TryGetValue;
 
             m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
+            ServerUdpPort = ri.ServerPort;
             GroupsNameService = groupsNameService;
             GroupsService = groupsService;
             EstateService = estateService;
