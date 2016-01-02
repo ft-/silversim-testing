@@ -91,10 +91,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 m_Scene.TriggerParcelUpdate(pInfo);
 
-                using (HttpResponse res = httpreq.BeginResponse("text/plain"))
-                {
-                    /* no action required here */
-                }
+                httpreq.EmptyResponse();
             }
         }
     }
