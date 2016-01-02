@@ -365,6 +365,11 @@ namespace SilverSim.Main.Common.HttpServer
             return Response = new HttpResponse(m_HttpStream, this, HttpStatusCode.OK, "OK");
         }
 
+        public void EmptyResponse(string contentType = "text/plain")
+        {
+            BeginResponse(contentType).Dispose();
+        }
+
         public HttpResponse BeginResponse(string contentType)
         {
             HttpResponse res = BeginResponse();

@@ -4,6 +4,7 @@
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using SilverSim.Types.Estate;
 using SilverSim.Types.StructuredData.Llsd;
 using System.Net;
 
@@ -62,12 +63,73 @@ namespace SilverSim.Viewer.Core.Capabilities
             bool allowVoiceChat = reqmap["allow_voice_chat"].AsBoolean;
             UUID invoiceID = reqmap["invoice"].AsUUID;
 
-#warning Implement linkage
-
-            using (HttpResponse res = httpreq.BeginResponse("text/plain"))
+            uint estateID;
+            EstateInfo estate;
+            if(!m_Scene.IsEstateManager(m_Agent.Owner))
             {
-                /* no further action required */
+                httpreq.ErrorResponse(HttpStatusCode.Forbidden, "Forbidden");
+                return;
             }
+
+            if(m_Scene.EstateService.RegionMap.TryGetValue(m_Scene.ID, out estateID) &&
+                m_Scene.EstateService.TryGetValue(estateID, out estate))
+            {
+                estate.Name = estateName;
+                estate.SunPosition = sun_hour;
+                if (isSunFixed)
+                {
+                    estate.Flags |= RegionOptionFlags.SunFixed;
+                }
+                else
+                {
+                    estate.Flags &= ~RegionOptionFlags.SunFixed;
+                }
+
+                if(isExternallyVisible)
+                {
+                    estate.Flags |= RegionOptionFlags.ExternallyVisible;
+                }
+                else
+                {
+                    estate.Flags &= ~RegionOptionFlags.ExternallyVisible;
+                }
+                if(allowDirectTeleport)
+                {
+                    estate.Flags |= RegionOptionFlags.AllowDirectTeleport;
+                }
+                else
+                {
+                    estate.Flags &= ~RegionOptionFlags.AllowDirectTeleport;
+                }
+                if(denyAnonymous)
+                {
+                    estate.Flags |= RegionOptionFlags.DenyAnonymous;
+                }
+                else
+                {
+                    estate.Flags &= ~RegionOptionFlags.DenyAnonymous;
+                }
+                if(denyAgeUnverified)
+                {
+                    estate.Flags |= RegionOptionFlags.DenyAgeUnverified;
+                }
+                else
+                {
+                    estate.Flags &= ~RegionOptionFlags.DenyAgeUnverified;
+                }
+                if(allowVoiceChat)
+                {
+                    estate.Flags |= RegionOptionFlags.AllowVoice;
+                }
+                else
+                {
+                    estate.Flags &= ~RegionOptionFlags.AllowVoice;
+                }
+                m_Scene.EstateService[estate.ID] = estate;
+                m_Scene.TriggerEstateUpdate();
+            }
+
+            httpreq.EmptyResponse();
         }
     }
 }
