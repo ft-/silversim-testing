@@ -9,11 +9,9 @@ using SilverSim.Scene.ServiceInterfaces.RegionLoader;
 using SilverSim.Scene.ServiceInterfaces.Scene;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.Types;
 using SilverSim.Types.Grid;
 using System;
 using System.ComponentModel;
-using System.Xml;
 
 namespace SilverSim.Scene.RegionLoader.Basic
 {

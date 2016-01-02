@@ -463,7 +463,6 @@ namespace SilverSim.Scene.Implementation.Basic
             TryGetScene = SceneManager.Scenes.TryGetValue;
 
             m_UDPServer = new UDPCircuitsManager(new IPAddress(0), (int)ri.ServerPort, imService, chatService, this);
-            ServerUdpPort = ri.ServerPort;
             GroupsNameService = groupsNameService;
             GroupsService = groupsService;
             EstateService = estateService;
@@ -484,23 +483,25 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 AvatarNameServices.Add(avNameService);
             }
+
+            GatekeeperURI = ri.GridURI;
             Access = ri.Access;
             ID = ri.ID;
-            GridURI = ri.GridURI;
             Name = ri.Name;
             Owner = ri.Owner;
             GridPosition = ri.Location;
             ScopeID = ri.ScopeID;
             Terrain = new TerrainController(this);
             Environment = new EnvironmentController(this);
-            m_ChatService = chatService;
-            IMRouter.SceneIM.Add(IMSend);
-            OnRemove += RemoveScene;
-            ExternalHostName = ri.ServerIP;
             ProductName = ri.ProductName;
             RegionPort = ri.ServerPort;
             ServerURI = ri.ServerURI;
             ServerHttpPort = ri.ServerHttpPort;
+
+            m_ChatService = chatService;
+            IMRouter.SceneIM.Add(IMSend);
+            OnRemove += RemoveScene;
+            ExternalHostName = ri.ServerIP;
             m_UDPServer.Start();
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures(string.Empty, string.Empty, string.Empty, true));
             Terrain.TerrainListeners.Add(this);

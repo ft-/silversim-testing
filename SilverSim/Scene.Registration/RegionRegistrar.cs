@@ -12,6 +12,7 @@ using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types.Grid;
 using System;
 using System.ComponentModel;
+using System.Collections.Generic;
 
 namespace SilverSim.Scene.Registration
 {
@@ -62,6 +63,11 @@ namespace SilverSim.Scene.Registration
 
             ri.ServerHttpPort = m_HttpServer.Port;
             scene.ServerURI = ri.ServerURI;
+            Dictionary<string, string> gridFeatures = scene.GridService.GetGridExtraFeatures();
+            if (gridFeatures.ContainsKey("GridURL"))
+            {
+                ri.GridURI = gridFeatures["GridURL"];
+            }
             scene.GridService.RegisterRegion(ri);
         }
 
