@@ -139,12 +139,12 @@ namespace SilverSim.Scene.Types.Scene
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         void VerifyNeighbor(RegionInfo rinfo)
         {
-            if(rinfo.ServerURI == RegionData.ServerURI)
+            if(rinfo.ServerURI == ServerURI)
             {
                 if(!Neighbors.ContainsKey(rinfo.ID))
                 {
                     NeighborEntry lne = new NeighborEntry();
-                    lne.RemoteOffset = rinfo.Location - RegionData.Location;
+                    lne.RemoteOffset = rinfo.Location - GridPosition;
                     lne.RemoteRegionData = rinfo;
                     Neighbors[rinfo.ID] = lne;
                     CheckAgentsForNeighbors();
@@ -174,7 +174,7 @@ namespace SilverSim.Scene.Types.Scene
                 UUID randomID = UUID.Random;
                 uint circuitID;
                 NeighborEntry lne = new NeighborEntry();
-                lne.RemoteOffset = rinfo.Location - RegionData.Location;
+                lne.RemoteOffset = rinfo.Location - GridPosition;
                 lne.RemoteRegionData = rinfo;
                 Neighbors[rinfo.ID] = lne;
                 EnableSimCircuit(rinfo, out randomID, out circuitID);
@@ -190,7 +190,7 @@ namespace SilverSim.Scene.Types.Scene
             Map reqmap = new Map();
             reqmap["to_region_id"] = destinationInfo.ID;
             reqmap["from_region_id"] = ID;
-            reqmap["scope_id"] = RegionData.ScopeID;
+            reqmap["scope_id"] = ScopeID;
             byte[] reqdata;
             using(MemoryStream ms = new MemoryStream())
             {
@@ -230,7 +230,7 @@ namespace SilverSim.Scene.Types.Scene
                 destinationInfo.ID, 
                 circuitCode, 
                 destinationInfo.Location, 
-                destinationInfo.Location - RegionData.Location);
+                destinationInfo.Location - GridPosition);
             Neighbors[destinationInfo.ID].RemoteCircuit = simCircuit;
             CheckAgentsForNeighbors();
         }

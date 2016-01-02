@@ -185,7 +185,7 @@ namespace SilverSim.Scene.Types.Scene
                 reply.ActualArea = pinfo.ActualArea;
                 reply.BillableArea = pinfo.BillableArea;
                 reply.Flags = pinfo.Flags;
-                reply.SimName = RegionData.Name;
+                reply.SimName = Name;
                 reply.SnapshotID = UUID.Zero;
                 reply.Dwell = pinfo.Dwell;
                 reply.SalePrice = pinfo.SalePrice;
@@ -292,13 +292,13 @@ namespace SilverSim.Scene.Types.Scene
             {
                 start_y = 0;
             }
-            if(end_x >= RegionData.Size.X)
+            if(end_x >= SizeX)
             {
-                end_x = (int)RegionData.Size.X - 1;
+                end_x = (int)SizeX - 1;
             }
-            if (end_y >= RegionData.Size.Y)
+            if (end_y >= SizeY)
             {
-                end_y = (int)RegionData.Size.Y - 1;
+                end_y = (int)SizeY - 1;
             }
             
             for(int x = start_x; x <= end_x; ++x)

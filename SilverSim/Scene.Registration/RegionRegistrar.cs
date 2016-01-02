@@ -46,7 +46,7 @@ namespace SilverSim.Scene.Registration
         {
             m_RegisteredScenes.Add(scene);
             scene.OnIPChanged += IPChanged;
-            RegionInfo ri = scene.RegionData;
+            RegionInfo ri = scene.GetRegionInfo();
             ri.ServerHttpPort = m_HttpServer.Port;
             if(ri.Owner == null)
             {
@@ -61,12 +61,13 @@ namespace SilverSim.Scene.Registration
                 m_HttpServer.Scheme + "://" + m_HttpServer.ExternalHostName + ":" + m_HttpServer.Port.ToString() + "/";
 
             ri.ServerHttpPort = m_HttpServer.Port;
+            scene.ServerURI = ri.ServerURI;
             scene.GridService.RegisterRegion(ri);
         }
 
         public void IPChanged(SceneInterface scene, IPAddress address)
         {
-            scene.GridService.RegisterRegion(scene.RegionData);
+            scene.GridService.RegisterRegion(scene.GetRegionInfo());
         }
 
         public void RegionRemoved(SceneInterface scene)

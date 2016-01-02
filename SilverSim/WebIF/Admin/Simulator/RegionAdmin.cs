@@ -254,7 +254,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             SceneInterface scene;
             if(SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
             {
-                scene.RegionData.Access = access;
+                scene.Access = access;
                 scene.TriggerRegionDataChanged();
             }
 
@@ -298,7 +298,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             SceneInterface scene;
             if (SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
             {
-                scene.RegionData.Owner = rInfo.Owner;
+                scene.Owner = rInfo.Owner;
             }
 
             AdminWebIF.SuccessResponse(req, new Map());
@@ -351,7 +351,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             SceneInterface scene;
             if (SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
             {
-                scene.RegionData.Owner = rInfo.Owner;
+                scene.Owner = rInfo.Owner;
             }
 
             AdminWebIF.SuccessResponse(req, new Map());

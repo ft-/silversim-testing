@@ -75,7 +75,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_Scene.RegionSettings.AllowLandResell = reqmap["allow_land_resell"].AsBoolean;
             m_Scene.RegionSettings.AgentLimit = (int)decimal.Parse(reqmap["agent_limit"].ToString());
             m_Scene.RegionSettings.ObjectBonus = reqmap["prim_bonus"].AsReal;
-            m_Scene.RegionData.Access = (RegionAccess)reqmap["sim_access"].AsUInt;
+            m_Scene.Access = (RegionAccess)reqmap["sim_access"].AsUInt;
             m_Scene.RegionSettings.RestrictPushing = reqmap["restrict_pushobject"].AsBoolean;
             m_Scene.RegionSettings.AllowLandResell = reqmap["allow_parcel_changes"].AsBoolean;
             m_Scene.RegionSettings.BlockShowInSearch = reqmap["block_parcel_search"].AsBoolean;

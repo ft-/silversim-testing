@@ -124,7 +124,7 @@ namespace SilverSim.Viewer.Map
             List<RegionInfo> ris;
             try
             {
-                ris = scene.GridService.GetRegionsByRange(scene.RegionData.ScopeID, req.Min, req.Max);
+                ris = scene.GridService.GetRegionsByRange(scene.ScopeID, req.Min, req.Max);
             }
             catch
             {
@@ -285,7 +285,7 @@ namespace SilverSim.Viewer.Map
                     List<RegionInfo> ris;
                     try
                     {
-                        ris = service.SearchRegionsByName(scene.RegionData.ScopeID, regionName);
+                        ris = service.SearchRegionsByName(scene.ScopeID, regionName);
                     }
                     catch
                     {
@@ -374,7 +374,7 @@ namespace SilverSim.Viewer.Map
 
             SceneInterface accessScene = null;
             if(req.Location.RegionHandle == 0 ||
-                req.Location.Equals(scene.RegionData.Location))
+                req.Location.Equals(scene.GridPosition))
             {
                 accessScene = scene;
             }

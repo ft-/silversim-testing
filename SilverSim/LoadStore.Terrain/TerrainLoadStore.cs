@@ -106,8 +106,8 @@ namespace SilverSim.LoadStore.Terrain
             {
                 uint x = 0;
                 uint y = 0;
-                uint w = scene.RegionData.Size.X;
-                uint h = scene.RegionData.Size.Y;
+                uint w = scene.SizeX;
+                uint h = scene.SizeY;
 
                 if (args.Count >= 5)
                 {
@@ -225,8 +225,8 @@ namespace SilverSim.LoadStore.Terrain
             {
                 uint x = 0;
                 uint y = 0;
-                uint w = scene.RegionData.Size.X;
-                uint h = scene.RegionData.Size.Y;
+                uint w = scene.SizeX;
+                uint h = scene.SizeY;
 
                 if (args.Count >= 5)
                 {

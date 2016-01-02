@@ -140,14 +140,14 @@ namespace SilverSim.Scene.Types.Scene
                 yFrom = 0;
             }
 
-            if (xTo >= scene.RegionData.Size.X)
+            if (xTo >= scene.SizeX)
             {
-                xTo = (int)scene.RegionData.Size.X - 1;
+                xTo = (int)scene.SizeX - 1;
             }
 
-            if (yTo >= scene.RegionData.Size.Y)
+            if (yTo >= scene.SizeY)
             {
-                yTo = (int)scene.RegionData.Size.Y - 1;
+                yTo = (int)scene.SizeY - 1;
             }
 
 #if DEBUG
@@ -209,14 +209,14 @@ namespace SilverSim.Scene.Types.Scene
                 yFrom = 0;
             }
 
-            if (xTo >= scene.RegionData.Size.X)
+            if (xTo >= scene.SizeX)
             {
-                xTo = (int)scene.RegionData.Size.X - 1;
+                xTo = (int)scene.SizeX - 1;
             }
 
-            if (yTo >= scene.RegionData.Size.Y)
+            if (yTo >= scene.SizeY)
             {
-                yTo = (int)scene.RegionData.Size.Y - 1;
+                yTo = (int)scene.SizeY - 1;
             }
 
             for (int x = xFrom; x <= xTo; x++)
@@ -278,14 +278,14 @@ namespace SilverSim.Scene.Types.Scene
                 yFrom = 0;
             }
 
-            if (xTo >= scene.RegionData.Size.X)
+            if (xTo >= scene.SizeX)
             {
-                xTo = (int)scene.RegionData.Size.X - 1;
+                xTo = (int)scene.SizeX - 1;
             }
 
-            if (yTo > scene.RegionData.Size.Y)
+            if (yTo > scene.SizeY)
             {
-                yTo = (int)scene.RegionData.Size.Y - 1;
+                yTo = (int)scene.SizeY - 1;
             }
 
             for (x = xFrom; x <= xTo; x++)
@@ -363,7 +363,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     int x = zx + dx;
                     int y = zy + dy;
-                    if (x >= 0 && y >= 0 && x < scene.RegionData.Size.X && y < scene.RegionData.Size.Y)
+                    if (x >= 0 && y >= 0 && x < scene.SizeX && y < scene.SizeY)
                     {
                         Vector3 pos = new Vector3(x, y, 0);
                         if (!scene.CanTerraform(agentOwner, pos))
@@ -447,7 +447,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     int x = zx + dx;
                     int y = zy + dy;
-                    if (x >= 0 && y >= 0 && x < scene.RegionData.Size.X && y < scene.RegionData.Size.Y)
+                    if (x >= 0 && y >= 0 && x < scene.SizeX && y < scene.SizeY)
                     {
                         Vector3 pos = new Vector3(x, y, 0);
                         if (!scene.CanTerraform(agentOwner, pos))
@@ -657,8 +657,8 @@ namespace SilverSim.Scene.Types.Scene
                         continue;
                     }
 
-                    double noise = PerlinNoise2D((double)x / scene.RegionData.Size.X,
-                                                            (double)y / scene.RegionData.Size.Y, 8, 1);
+                    double noise = PerlinNoise2D((double)x / scene.SizeX,
+                                                            (double)y / scene.SizeY, 8, 1);
 
                     LayerPatch lp = scene.Terrain.AdjustTerrain((uint)x, (uint)y, noise * modify.Size);
                     if (lp != null && !changed.Contains(lp))
@@ -693,8 +693,8 @@ namespace SilverSim.Scene.Types.Scene
 
         static double GetBilinearInterpolate(double x, double y, SceneInterface scene)
         {
-            int w = (int)scene.RegionData.Size.X;
-            int h = (int)scene.RegionData.Size.Y;
+            int w = (int)scene.SizeX;
+            int h = (int)scene.SizeY;
 
             if (x > w - 2)
             {
@@ -704,31 +704,9 @@ namespace SilverSim.Scene.Types.Scene
             {
                 y = h - 2;
             }
-            if (x < 0.0)
-            {
-                x = 1.0f;
-            }
-            if (y < 0.0)
-            {
-                y = 1.0f;
-            }
 
-            if (x > scene.RegionData.Size.X - 2)
-            {
-                x = scene.RegionData.Size.X - 2;
-            }
-            if (x < 0)
-            {
-                x = 0;
-            }
-            if (y > scene.RegionData.Size.Y - 2)
-            {
-                y = scene.RegionData.Size.Y - 2;
-            }
-            if (y < 0)
-            {
-                y = 0;
-            }
+            x = x.Clamp(1f, scene.SizeX - 2);
+            y = y.Clamp(1f, scene.SizeY - 2);
 
             const int stepSize = 1;
             double h00 = scene.Terrain[(uint)x, (uint)y];

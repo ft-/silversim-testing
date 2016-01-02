@@ -88,13 +88,17 @@ namespace SilverSim.Scene.Types.Scene
         #endregion
 
         public UUID ID { get; protected set; }
+        public UUID ScopeID { get; protected set; }
         public UUID RegionSecret { get; private set; }
         public uint RegionPort { get; protected set; }
         public uint ServerHttpPort { get; protected set; }
-        public string ServerURI { get; protected set; }
+        public UUID RegionMapTexture { get; protected set; }
+        public UUID ParcelMapTexture { get; protected set; }
+        public string ServerURI { get; set; } /* updated by region registrar */
+        public string GridURI { get; protected set; }
         public uint SizeX { get; private set; }
         public uint SizeY { get; private set; }
-        public string Name { get; protected set; }
+        public string Name { get; set; }
         public IPAddress LastIPAddress { get; protected set; }
         public string ExternalHostName { get; protected set; }
         public GridVector GridPosition { get; protected set; }
@@ -126,6 +130,8 @@ namespace SilverSim.Scene.Types.Scene
         public string GatekeeperURI { get; protected set; }
         public IScriptWorkerThreadPool ScriptThreadPool { get; protected set; }
         public Date m_StartTime = new Date();
+
+        public string ProductName { get; set; }
 
         public Date RegionStartTime
         {
@@ -202,32 +208,39 @@ namespace SilverSim.Scene.Types.Scene
         /* do not put any other than ICapabilityInterface into this list */
         public readonly RwLockedDictionary<string, object> SceneCapabilities = new RwLockedDictionary<string, object>();
 
-        public RegionInfo RegionData
+        public RegionInfo GetRegionInfo()
         {
-            get
-            {
-                RegionInfo reg = new RegionInfo();
-                reg.Access = 0;
-                reg.Flags = RegionFlags.RegionOnline;
-                reg.ID = ID;
-                reg.Location = GridPosition;
-                reg.Name = Name;
-                reg.Owner = Owner;
-                reg.ServerURI = ServerURI;
-                reg.ServerHttpPort = ServerHttpPort;
-                reg.ParcelMapTexture = UUID.Zero;
-                reg.RegionMapTexture = UUID.Zero;
-                reg.RegionSecret = (string)RegionSecret;
-                reg.ScopeID = UUID.Zero;
-                reg.ServerIP = ExternalHostName;
-                reg.ServerPort = RegionPort;
-                reg.Size.X = SizeX;
-                reg.Size.Y = SizeY;
-                return reg;
-            }
+            RegionInfo reg = new RegionInfo();
+            reg.Access = Access;
+            reg.Flags = RegionFlags.RegionOnline;
+            reg.ID = ID;
+            reg.Location = GridPosition;
+            reg.Name = Name;
+            reg.Owner = Owner;
+            reg.ServerURI = ServerURI;
+            reg.ServerHttpPort = ServerHttpPort;
+            reg.ParcelMapTexture = ParcelMapTexture;
+            reg.RegionMapTexture = RegionMapTexture;
+            reg.RegionSecret = (string)RegionSecret;
+            reg.ScopeID = UUID.Zero;
+            reg.ServerIP = ExternalHostName;
+            reg.ServerPort = RegionPort;
+            reg.Size.X = SizeX;
+            reg.Size.Y = SizeY;
+            return reg;
         }
 
-        public UUI Owner { get; protected set; }
+        public RegionAccess Access
+        {
+            get;
+            set;
+        }
+
+        public UUI Owner
+        {
+            get;
+            set;
+        }
 
         protected virtual object GetService(Type service)
         {
@@ -305,9 +318,9 @@ namespace SilverSim.Scene.Types.Scene
             EnableLandingOwnerOverride = false;
             SizeX = sizeX;
             SizeY = sizeY;
+            Owner = UUI.Unknown;
             AssetService = new DefaultAssetService(this);
             AvatarNameService = new DefaultAvatarNameService(AvatarNameServices);
-            Owner = new UUI();
             CapabilitiesConfig = new Dictionary<string, string>();
             RegionSecret = UUID.Random;
             LastIPAddress = new IPAddress(0);

@@ -61,7 +61,7 @@ namespace SilverSim.Viewer.Core
             }
 #endif
 
-            Scene.RegionData.Name = req.SimName;
+            Scene.Name = req.SimName;
             Scene.ReregisterRegion();
 #warning GodUpdateRegionInfo.RegionFlags & RegionOptionFlags.FixedSun not yet supported
 

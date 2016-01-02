@@ -974,7 +974,7 @@ namespace SilverSim.Viewer.Core
                     }
                     lm.LocalPos = pos;
                     lm.RegionID = curSceneID;
-                    lm.Location = curScene.RegionData.Location;
+                    lm.Location = curScene.GridPosition;
 
                     AssetData asset = lm;
                     asset.Name = item.Name;

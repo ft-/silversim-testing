@@ -73,7 +73,7 @@ namespace SilverSim.Scene.Types.Scene
                             PrimitiveFlags.ObjectYouOwner | PrimitiveFlags.ObjectMove | PrimitiveFlags.InventoryEmpty | PrimitiveFlags.ObjectTransfer |
                             PrimitiveFlags.ObjectOwnerModify;
             m.ObjectData.Add(d);
-            m.GridPosition = RegionData.Location;
+            m.GridPosition = GridPosition;
             return m;
         }
 

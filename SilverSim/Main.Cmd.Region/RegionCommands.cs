@@ -182,7 +182,7 @@ namespace SilverSim.Main.Cmd.Region
                 List<RegionInfo> regionList = new List<RegionInfo>();
                 foreach (SceneInterface scene in SceneManager.Scenes.Values)
                 {
-                    regionList.Add(scene.RegionData);
+                    regionList.Add(scene.GetRegionInfo());
                 }
                 regions = regionList;
             }

@@ -109,7 +109,7 @@ namespace SilverSim.Scene.Types.Scene
 
             req.Position = objpart.GlobalPosition;
             req.Gain = gain.Clamp(0, 1);
-            req.GridPosition = RegionData.Location;
+            req.GridPosition = GridPosition;
 
             if (objpart.ObjectGroup.IsAttachedToPrivate)
             {
@@ -138,7 +138,7 @@ namespace SilverSim.Scene.Types.Scene
             req.OwnerID = objpart.ObjectGroup.Owner.ID;
             req.SoundID = sound;
             req.ObjectID = objpart.ID;
-            req.GridPosition = RegionData.Location;
+            req.GridPosition = GridPosition;
 
             req.ParentID = (objpart.LinkNumber != 1) ?
                 objpart.ObjectGroup.ID :
@@ -198,7 +198,7 @@ namespace SilverSim.Scene.Types.Scene
 
             Vector3 pos = ownAgent.Position;
             req.Position = pos;
-            req.GridPosition = RegionData.Location;
+            req.GridPosition = GridPosition;
 
             if(req.Gain < 0)
             {

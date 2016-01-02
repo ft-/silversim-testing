@@ -194,14 +194,13 @@ namespace SilverSim.Scene.Types.Scene
         public void DetermineInitialAgentLocation(IAgent agent, TeleportFlags teleportFlags, Vector3 destinationLocation, Vector3 destinationLookAt)
         {
             UUI agentOwner = agent.Owner;
-            GridVector size = RegionData.Size;
-            if (destinationLocation.X < 0 || destinationLocation.X >= size.X)
+            if (destinationLocation.X < 0 || destinationLocation.X >= SizeX)
             {
-                destinationLocation.X = size.X / 2f;
+                destinationLocation.X = SizeX / 2f;
             }
-            if (destinationLocation.Y < 0 || destinationLocation.Y >= size.X)
+            if (destinationLocation.Y < 0 || destinationLocation.Y >= SizeY)
             {
-                destinationLocation.Y = size.Y / 2f;
+                destinationLocation.Y = SizeY / 2f;
             }
 
             ParcelInfo p = Parcels[destinationLocation];
@@ -248,13 +247,13 @@ namespace SilverSim.Scene.Types.Scene
                 throw new ParcelAccessDeniedException("Estate data not available.");
             }
 
-            if (destinationLocation.X < 0 || destinationLocation.X >= size.X)
+            if (destinationLocation.X < 0 || destinationLocation.X >= SizeX)
             {
-                destinationLocation.X = size.X / 2f;
+                destinationLocation.X = SizeX / 2f;
             }
-            if (destinationLocation.Y < 0 || destinationLocation.Y >= size.X)
+            if (destinationLocation.Y < 0 || destinationLocation.Y >= SizeY)
             {
-                destinationLocation.Y = size.Y / 2f;
+                destinationLocation.Y = SizeY / 2f;
             }
 
             agent.Rotation = destinationLookAt.AgentLookAtToQuaternion();

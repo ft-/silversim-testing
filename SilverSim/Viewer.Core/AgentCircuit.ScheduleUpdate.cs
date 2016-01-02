@@ -84,7 +84,7 @@ namespace SilverSim.Viewer.Core
             UInt64 regionHandle;
             try
             {
-                regionHandle = Scene.RegionData.Location.RegionHandle;
+                regionHandle = Scene.GridPosition.RegionHandle;
             }
             catch
             {
@@ -171,7 +171,7 @@ namespace SilverSim.Viewer.Core
             Queue<ObjectUpdateInfo> nonPhysicalOutQueue = new Queue<ObjectUpdateInfo>();
             queues[0] = physicalOutQueue;
             queues[1] = nonPhysicalOutQueue;
-            regionHandle = Scene.RegionData.Location.RegionHandle;
+            regionHandle = Scene.GridPosition.RegionHandle;
             ObjectUpdateInfo objinfo;
 
             while (m_ObjectUpdateThreadRunning)

@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
+using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
@@ -19,7 +20,7 @@ namespace SilverSim.Viewer.Messages.Region
         public string SimName = string.Empty;
         public UInt32 EstateID;
         public UInt32 ParentEstateID;
-        public RegionFlags RegionFlags;
+        public RegionOptionFlags RegionFlags;
         public RegionAccess SimAccess;
         public UInt32 MaxAgents;
         public double BillableFactor;

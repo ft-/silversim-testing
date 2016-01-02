@@ -371,7 +371,7 @@ namespace SilverSim.Scene.Types.Scene
 
                 LayerData.LayerDataType layerType = LayerData.LayerDataType.Wind;
 
-                if (BASE_REGION_SIZE < m_Scene.RegionData.Size.X || BASE_REGION_SIZE < m_Scene.RegionData.Size.Y)
+                if (BASE_REGION_SIZE < m_Scene.SizeX || BASE_REGION_SIZE < m_Scene.SizeY)
                 {
                     layerType = LayerData.LayerDataType.WindExtended;
                 }

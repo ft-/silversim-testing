@@ -266,7 +266,7 @@ namespace SilverSim.Viewer.Core
                                             SceneInterface scene = Scene;
                                             Messages.Region.RegionHandshake rh = new Messages.Region.RegionHandshake();
                                             rh.RegionFlags = scene.RegionSettings.AsFlags;
-                                            rh.SimAccess = scene.RegionData.Access;
+                                            rh.SimAccess = scene.Access;
                                             rh.SimName = scene.Name;
                                             rh.SimOwner = scene.Owner.ID;
                                             rh.IsEstateManager = scene.IsEstateManager(new UUI(acircuit.Agent.ID, acircuit.Agent.FirstName, acircuit.Agent.LastName, acircuit.Agent.HomeURI));
@@ -294,7 +294,7 @@ namespace SilverSim.Viewer.Core
                                             rh.CPURatio = 1;
                                             rh.ColoName = string.Empty;
                                             rh.ProductSKU = VersionInfo.SimulatorVersion;
-                                            rh.ProductName = scene.RegionData.ProductName;
+                                            rh.ProductName = scene.ProductName;
 
                                             Messages.Region.RegionHandshake.RegionExtDataEntry entry = new Messages.Region.RegionHandshake.RegionExtDataEntry();
                                             entry.RegionFlagsExtended = 0;

@@ -115,8 +115,8 @@ namespace SilverSim.Viewer.Core
             }
 
             SimStats stats = new SimStats();
-            stats.RegionX = Scene.RegionData.Location.X;
-            stats.RegionY = Scene.RegionData.Location.Y;
+            stats.RegionX = Scene.GridPosition.X;
+            stats.RegionY = Scene.GridPosition.Y;
             stats.RegionFlags = 0;
             stats.ObjectCapacity = 15000;
             stats.PID = 0;

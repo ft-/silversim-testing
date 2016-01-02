@@ -34,7 +34,7 @@ namespace SilverSim.Viewer.Core
                         m.AtAxis = CameraAtAxis;
                         m.Center = CameraPosition;
                         m.LeftAxis = CameraLeftAxis;
-                        m.RegionLocation = scene.RegionData.Location;
+                        m.RegionLocation = scene.GridPosition;
                         m.SessionID = SessionID;
                         m.Size = Size;
                         m.UpAxis = CameraUpAxis;
@@ -60,7 +60,7 @@ namespace SilverSim.Viewer.Core
                     {
                         ChildAgentUpdate m = new ChildAgentUpdate();
                         m.RegionID = scene.ID;
-                        m.RegionLocation = scene.RegionData.Location;
+                        m.RegionLocation = scene.GridPosition;
                         m.AgentID = m_AgentID;
                         m.SessionID = SessionID;
                         m.AgentPosition = GlobalPosition;

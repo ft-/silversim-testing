@@ -190,7 +190,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 {
                     int x = (int)pos.X;
                     int y = (int)pos.Y;
-                    if(pos.X < 0 || pos.Y < 0 || x < 0 || y < 0 || x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
+                    if(pos.X < 0 || pos.Y < 0 || x < 0 || y < 0 || x >= m_Scene.SizeX || y >= m_Scene.SizeY)
                     {
                         throw new KeyNotFoundException();
                     }
@@ -223,7 +223,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 pinfo = null;
                 int x = (int)pos.X;
                 int y = (int)pos.Y;
-                if (pos.X < 0 || pos.Y < 0 || x < 0 || y < 0 || x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
+                if (pos.X < 0 || pos.Y < 0 || x < 0 || y < 0 || x >= m_Scene.SizeX || y >= m_Scene.SizeY)
                 {
                     return false;
                 }
@@ -483,16 +483,19 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 AvatarNameServices.Add(avNameService);
             }
+            Access = ri.Access;
             ID = ri.ID;
+            GridURI = ri.GridURI;
             Name = ri.Name;
-            Owner = ri.Owner;
             GridPosition = ri.Location;
+            ScopeID = ri.ScopeID;
             Terrain = new TerrainController(this);
             Environment = new EnvironmentController(this);
             m_ChatService = chatService;
             IMRouter.SceneIM.Add(IMSend);
             OnRemove += RemoveScene;
             ExternalHostName = ri.ServerIP;
+            ProductName = ri.ProductName;
             RegionPort = ri.ServerPort;
             ServerURI = ri.ServerURI;
             ServerHttpPort = ri.ServerHttpPort;
@@ -537,7 +540,7 @@ namespace SilverSim.Scene.Implementation.Basic
             m_StopBasicSceneThreads = true;
             if (null != m_NeighborService)
             {
-                RegionInfo rInfo = s.RegionData;
+                RegionInfo rInfo = s.GetRegionInfo();
                 rInfo.Flags &= (~RegionFlags.RegionOnline);
                 m_NeighborService.NotifyNeighborStatus(rInfo);
             }
@@ -635,11 +638,12 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override void ReregisterRegion()
         {
-            GridService.RegisterRegion(RegionData);
+            RegionInfo ri = GetRegionInfo();
+            GridService.RegisterRegion(ri);
             GridServiceInterface regionStorage = RegionStorage;
             if(null != regionStorage)
             {
-                regionStorage.RegisterRegion(RegionData);
+                regionStorage.RegisterRegion(ri);
             }
             foreach (IAgent agent in Agents)
             {
@@ -779,18 +783,18 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_SimulationDataStorage.Parcels.Remove(ID, parcelID);
             }
 
-            ParcelInfo pi = new ParcelInfo((int)RegionData.Size.X / 4, (int)RegionData.Size.Y / 4);
+            ParcelInfo pi = new ParcelInfo((int)SizeX / 4, (int)SizeY / 4);
             pi.AABBMin = new Vector3(0, 0, 0);
-            pi.AABBMax = new Vector3(RegionData.Size.X - 1, RegionData.Size.Y - 1, 0);
-            pi.ActualArea = (int)(RegionData.Size.X * RegionData.Size.Y);
-            pi.Area = (int)(RegionData.Size.X * RegionData.Size.Y);
+            pi.AABBMax = new Vector3(SizeX - 1, SizeY - 1, 0);
+            pi.ActualArea = (int)(SizeX * SizeY);
+            pi.Area = (int)(SizeX * SizeY);
             pi.AuctionID = 0;
             pi.LocalID = 1;
             pi.ID = UUID.Random;
             pi.Name = "Your Parcel";
-            pi.Owner = RegionData.Owner;
+            pi.Owner = Owner;
             pi.Flags = ParcelFlags.None; /* we keep all flags disabled initially */
-            pi.BillableArea = (int)(RegionData.Size.X * RegionData.Size.Y);
+            pi.BillableArea = (int)(SizeX * SizeY);
             pi.LandBitmap.SetAllBits();
             pi.LandingPosition = new Vector3(128, 128, 23);
             pi.LandingLookAt = new Vector3(1, 0, 0);
@@ -894,7 +898,7 @@ namespace SilverSim.Scene.Implementation.Basic
         {
             if (null != m_NeighborService)
             {
-                RegionInfo rInfo = RegionData;
+                RegionInfo rInfo = GetRegionInfo();
                 rInfo.Flags |= RegionFlags.RegionOnline;
                 m_NeighborService.NotifyNeighborStatus(rInfo);
             }
@@ -998,9 +1002,9 @@ namespace SilverSim.Scene.Implementation.Basic
                 res.BillableFactor = 1;
                 res.PricePerMeter = 1;
             }
-            res.SimName = RegionData.Name;
-            res.RegionFlags = RegionData.Flags;
-            res.SimAccess = RegionData.Access;
+            res.SimName = Name;
+            res.RegionFlags = RegionSettings.AsFlags;
+            res.SimAccess = Access;
             res.MaxAgents = (uint)RegionSettings.AgentLimit;
             res.ObjectBonusFactor = RegionSettings.ObjectBonus;
             res.WaterHeight = RegionSettings.WaterHeight;
@@ -1012,7 +1016,7 @@ namespace SilverSim.Scene.Implementation.Basic
             res.UseEstateSun = true;
             res.SunHour = Environment.TimeOfDay;
             res.ProductSKU = VersionInfo.SimulatorVersion;
-            res.ProductName = RegionData.ProductName;
+            res.ProductName = ProductName;
             res.RegionFlagsExtended.Add(0);
 
             agent.SendMessageAlways(res, ID);

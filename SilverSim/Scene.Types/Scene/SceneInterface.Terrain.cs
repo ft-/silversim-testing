@@ -38,8 +38,8 @@ namespace SilverSim.Scene.Types.Scene
                 uint x;
                 uint y;
 
-                uint xPatches = scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                uint yPatches = scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                uint xPatches = scene.SizeX / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                uint yPatches = scene.SizeY / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
 
                 m_Scene = scene;
                 m_TerrainPatches = new LayerPatch[yPatches, xPatches];
@@ -115,9 +115,9 @@ namespace SilverSim.Scene.Types.Scene
                     List<LayerPatch> dirtyPatches = new List<LayerPatch>();
                     RwLockedDictionary<uint, uint> agentSceneSerials = agent.TransmittedTerrainSerials[m_Scene.ID];
                     
-                    for (y = 0; y < m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
+                    for (y = 0; y < m_Scene.SizeY / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++y)
                     {
-                        for (x = 0; x < m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
+                        for (x = 0; x < m_Scene.SizeX / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES; ++x)
                         {
                             LayerPatch patch = m_TerrainPatches[y, x];
                             uint serial;
@@ -137,7 +137,7 @@ namespace SilverSim.Scene.Types.Scene
                     }
                     LayerData.LayerDataType layerType = LayerData.LayerDataType.Land;
 
-                    if (BASE_REGION_SIZE < m_Scene.RegionData.Size.X || BASE_REGION_SIZE < m_Scene.RegionData.Size.Y)
+                    if (BASE_REGION_SIZE < m_Scene.SizeX || BASE_REGION_SIZE < m_Scene.SizeY)
                     {
                         layerType = LayerData.LayerDataType.LandExtended;
                     }
@@ -190,21 +190,21 @@ namespace SilverSim.Scene.Types.Scene
             public Vector3 Normal(int posX, int posY)
             {
                 // Clamp to valid position
-                posX = posX.Clamp(0, (int)m_Scene.RegionData.Size.X);
-                posY = posY.Clamp(0, (int)m_Scene.RegionData.Size.Y);
+                posX = posX.Clamp(0, (int)m_Scene.SizeX);
+                posY = posY.Clamp(0, (int)m_Scene.SizeY);
 
                 /* Find neighboring points so we can calculate the resulting plane */
                 Vector3 p0 = new Vector3(posX, posY, this[(uint)posX, (uint)posY]);
                 Vector3 p1 = new Vector3(posX + 1, posY, 0);
                 Vector3 p2 = new Vector3(posX, posY + 1, 0);
 
-                p1.Z = this[(posX + 1) >= m_Scene.RegionData.Size.X ? 
+                p1.Z = this[(posX + 1) >= m_Scene.SizeX ? 
                             (uint)posX :
                             (uint)posX + 1, 
                             (uint)posY];
 
                 p2.Z = this[(uint)posX,
-                            (posY + 1.0) >= m_Scene.RegionData.Size.Y ?
+                            (posY + 1.0) >= m_Scene.SizeY ?
                             (uint)posY :
                             (uint)posY + 1];
 
@@ -222,7 +222,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    if (x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
+                    if (x >= m_Scene.SizeX || y >= m_Scene.SizeY)
                     {
                         throw new KeyNotFoundException();
                     }
@@ -231,7 +231,7 @@ namespace SilverSim.Scene.Types.Scene
                 set
                 {
                     LayerPatch lp = null;
-                    if (x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
+                    if (x >= m_Scene.SizeX || y >= m_Scene.SizeY)
                     {
                         throw new KeyNotFoundException();
                     }
@@ -266,7 +266,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public LayerPatch AdjustTerrain(uint x, uint y, double change)
             {
-                if (x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
+                if (x >= m_Scene.SizeX || y >= m_Scene.SizeY)
                 {
                     throw new KeyNotFoundException();
                 }
@@ -293,7 +293,7 @@ namespace SilverSim.Scene.Types.Scene
 
             public LayerPatch BlendTerrain(uint x, uint y, double newval, double mix /* 0. orig only , 1. new only */)
             {
-                if (x >= m_Scene.RegionData.Size.X || y >= m_Scene.RegionData.Size.Y)
+                if (x >= m_Scene.SizeX || y >= m_Scene.SizeY)
                 {
                     throw new KeyNotFoundException();
                 }
@@ -324,8 +324,8 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    int x = (int)pos.X.Clamp(0, m_Scene.RegionData.Size.X - 1);
-                    int y = (int)pos.Y.Clamp(0, m_Scene.RegionData.Size.Y - 1);
+                    int x = (int)pos.X.Clamp(0, m_Scene.SizeX - 1);
+                    int y = (int)pos.Y.Clamp(0, m_Scene.SizeY - 1);
                     return this[(uint)x, (uint)y];
                 }
                 set
@@ -349,8 +349,8 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    int xPatches = (int)m_Scene.RegionData.Size.X / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
-                    int yPatches = (int)m_Scene.RegionData.Size.Y / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                    int xPatches = (int)m_Scene.SizeX / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
+                    int yPatches = (int)m_Scene.SizeY / LayerCompressor.LAYER_PATCH_NUM_XY_ENTRIES;
 
                     List<LayerPatch> patches = new List<LayerPatch>();
                     for (int y = 0; y < yPatches; ++y)

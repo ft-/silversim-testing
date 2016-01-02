@@ -11,6 +11,7 @@ using SilverSim.Types.Parcel;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Types.Inventory;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Types.Estate;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -64,13 +65,24 @@ namespace SilverSim.Scene.Types.Scene
             return true;
         }
 
-        public bool IsEstateManager(UUI agent)
+        public bool IsRegionOwner(UUI agent)
         {
-            if(agent.EqualsGrid(Owner))
+            if (agent.EqualsGrid(Owner))
             {
                 return true;
             }
             return false;
+        }
+
+        public bool IsEstateManager(UUI agent)
+        {
+            uint estateID;
+            UUI estateOwner;
+
+            return (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
+                EstateService.EstateOwner.TryGetValue(estateID, out estateOwner) &&
+                (agent.EqualsGrid(estateOwner) ||
+                    EstateService.EstateManager[estateID, agent]));
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
@@ -115,12 +127,14 @@ namespace SilverSim.Scene.Types.Scene
 
         public bool IsSimConsoleAllowed(UUI agent)
         {
-            if(IsPossibleGod(agent))
+            if (ServerParamService.GetBoolean(ID, "region_owner_is_simconsole_user", false) && 
+                agent.EqualsGrid(Owner))
             {
                 return true;
             }
 
-            if (ServerParamService.GetBoolean(ID, "estate_manager_is_simconsole_user", false) && IsEstateManager(agent))
+            if (ServerParamService.GetBoolean(ID, "estate_manager_is_simconsole_user", false) && 
+                IsEstateManager(agent))
             {
                 return true;
             }

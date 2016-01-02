@@ -62,8 +62,8 @@ namespace SilverSim.Viewer.Core
                 using (MemoryStream input = new MemoryStream(ViewerAgent.BuildUploadedData(this)))
                 {
                     input.LoadLLRawStream(
-                        (int)m_Scene.RegionData.Size.X,
-                        (int)m_Scene.RegionData.Size.Y,
+                        (int)m_Scene.SizeX,
+                        (int)m_Scene.SizeY,
                         m_Scene.Terrain.Patch.Update);
                 }
             }

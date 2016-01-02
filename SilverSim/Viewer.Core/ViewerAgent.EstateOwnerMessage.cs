@@ -296,7 +296,7 @@ namespace SilverSim.Viewer.Core
             scene.RegionSettings.AllowLandResell = ParamStringToBool(req.ParamList[3]);
             scene.RegionSettings.AgentLimit = (int)decimal.Parse(req.ParamList[4].FromUTF8Bytes(), CultureInfo.InvariantCulture);
             scene.RegionSettings.ObjectBonus = float.Parse(req.ParamList[5].FromUTF8Bytes(), CultureInfo.InvariantCulture);
-            scene.RegionData.Access = (RegionAccess)int.Parse(req.ParamList[6].FromUTF8Bytes());
+            scene.Access = (RegionAccess)int.Parse(req.ParamList[6].FromUTF8Bytes());
             scene.RegionSettings.RestrictPushing = ParamStringToBool(req.ParamList[7]);
             scene.RegionSettings.AllowLandJoinDivide = ParamStringToBool(req.ParamList[8]);
             scene.ReregisterRegion();

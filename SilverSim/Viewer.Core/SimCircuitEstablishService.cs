@@ -99,7 +99,7 @@ namespace SilverSim.Viewer.Core
 
             UUID sessionID = UUID.Random;
             uint circuitCode = NewCircuitCode;
-            Vector3 remoteOffset = regionInfo.Location - scene.RegionData.Location;
+            Vector3 remoteOffset = regionInfo.Location - scene.GridPosition;
             UDPCircuitsManager udpServer = (UDPCircuitsManager)scene.UDPServer;
             SimCircuit circuit = new SimCircuit(udpServer, circuitCode, fromRegionID, sessionID, regionInfo.Location, remoteOffset);
             udpServer.AddCircuit(circuit);

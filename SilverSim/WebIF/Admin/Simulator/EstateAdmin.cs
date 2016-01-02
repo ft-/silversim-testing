@@ -308,7 +308,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                         if(SceneManager.Scenes.TryGetValue(regionId, out si))
                         {
                             regions.Add(regionId);
-                            UUI regionOwner = si.RegionData.Owner;
+                            UUI regionOwner = si.Owner;
                             foreach(IAgent agent in si.RootAgents)
                             {
                                 agent.SendRegionNotice(regionOwner, message, regionId);
