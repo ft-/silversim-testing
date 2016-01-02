@@ -488,6 +488,7 @@ namespace SilverSim.Scene.Implementation.Basic
             ID = ri.ID;
             GridURI = ri.GridURI;
             Name = ri.Name;
+            Owner = ri.Owner;
             GridPosition = ri.Location;
             ScopeID = ri.ScopeID;
             Terrain = new TerrainController(this);
