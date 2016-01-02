@@ -924,6 +924,30 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
+        public override void TriggerEstateUpdate()
+        {
+            foreach (IAgent agent in Agents)
+            {
+                ViewerAgent viewerAgent = agent as ViewerAgent;
+                if (null != viewerAgent)
+                {
+                    SendRegionInfo(viewerAgent);
+                }
+            }
+        }
+
+        public override void TriggerRegionDataChanged()
+        {
+            foreach (IAgent agent in Agents)
+            {
+                ViewerAgent viewerAgent = agent as ViewerAgent;
+                if (null != viewerAgent)
+                {
+                    SendRegionInfo(viewerAgent);
+                }
+            }
+        }
+
         public override void TriggerRegionSettingsChanged()
         {
 #warning Implement storing region settings

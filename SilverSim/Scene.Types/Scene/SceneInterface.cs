@@ -383,6 +383,8 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         public abstract void TriggerRegionSettingsChanged();
+        public abstract void TriggerEstateUpdate();
+        public abstract void TriggerRegionDataChanged();
 
         public abstract void ResetParcels();
 

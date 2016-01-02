@@ -255,6 +255,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             if(SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
             {
                 scene.RegionData.Access = access;
+                scene.TriggerRegionDataChanged();
             }
 
             AdminWebIF.SuccessResponse(req, new Map());
@@ -383,6 +384,11 @@ namespace SilverSim.WebIF.Admin.Simulator
             {
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
                 return;
+            }
+            SceneInterface scene;
+            if(SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
+            {
+                scene.TriggerEstateUpdate();
             }
             AdminWebIF.SuccessResponse(req, new Map());
         }

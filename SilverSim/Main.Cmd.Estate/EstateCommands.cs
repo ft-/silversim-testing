@@ -235,6 +235,17 @@ namespace SilverSim.Main.Cmd.Estate
                     {
                         io.WriteFormatted("Could not change estate parameters: {0}", e.Message);
                     }
+
+                    /* trigger estate data update */
+                    List<UUID> regionids = m_EstateService.RegionMap[estateInfo.ID];
+                    foreach (UUID regionid in regionids)
+                    {
+                        SceneInterface scene;
+                        if (SceneManager.Scenes.TryGetValue(regionid, out scene))
+                        {
+                            scene.TriggerEstateUpdate();
+                        }
+                    }
                 }
             }
         }

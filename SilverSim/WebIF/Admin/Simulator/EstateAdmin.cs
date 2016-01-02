@@ -174,6 +174,16 @@ namespace SilverSim.WebIF.Admin.Simulator
                 AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotPossible);
                 return;
             }
+
+            List<UUID> regionids = m_EstateService.RegionMap[estateInfo.ID];
+            foreach(UUID regionid in regionids)
+            {
+                SceneInterface scene;
+                if(SceneManager.Scenes.TryGetValue(regionid, out scene))
+                {
+                    scene.TriggerEstateUpdate();
+                }
+            }
             AdminWebIF.SuccessResponse(req, new Map());
         }
 
