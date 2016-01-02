@@ -283,7 +283,7 @@ namespace SilverSim.Scene.Types.Scene
                     ulong utctime = Date.GetUnixTime();
                     return m_SunData.IsSunFixed ?
                         utctime :
-                        utctime % (4 * 3600);
+                        utctime % (m_SunData.SecPerDay);
                 }
             }
 
