@@ -38,6 +38,7 @@ using ThreadedClasses;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Management.Scene;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Types.Estate;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -640,6 +641,14 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 regionStorage.RegisterRegion(RegionData);
             }
+            foreach (IAgent agent in Agents)
+            {
+                ViewerAgent viewerAgent = agent as ViewerAgent;
+                if (null != viewerAgent)
+                {
+                    SendRegionInfo(viewerAgent);
+                }
+            }
         }
 
         #region Add and Remove
@@ -917,6 +926,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override void TriggerRegionSettingsChanged()
         {
+#warning Implement storing region settings
             foreach(IAgent agent in Agents)
             {
                 ViewerAgent viewerAgent = agent as ViewerAgent;
@@ -933,22 +943,50 @@ namespace SilverSim.Scene.Implementation.Basic
             res.AgentID = agent.Owner.ID;
             res.SessionID = agent.SessionID;
 
+            uint estateID;
+            EstateInfo estateInfo;
+            try /* we need a fail protection here */
+            {
+                if (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
+                   EstateService.TryGetValue(estateID, out estateInfo))
+                {
+                    res.EstateID = estateID;
+                    res.ParentEstateID = estateInfo.ParentEstateID;
+                    res.BillableFactor = estateInfo.BillableFactor;
+                    res.PricePerMeter = estateInfo.PricePerMeter;
+                }
+                else
+                {
+                    res.EstateID = 1;
+                    res.ParentEstateID = 1;
+                    res.BillableFactor = 1;
+                    res.PricePerMeter = 1;
+                }
+            }
+            catch(Exception e)
+            {
+                m_Log.WarnFormat("Exception when accessing EstateService: {0}: {1}\n{2}",
+                    e.GetType().FullName,
+                    e.Message,
+                    e.StackTrace);
+                res.EstateID = 1;
+                res.ParentEstateID = 1;
+                res.BillableFactor = 1;
+                res.PricePerMeter = 1;
+            }
             res.SimName = RegionData.Name;
-            res.EstateID = 1; /* TODO: */
-            res.ParentEstateID = 1; /* TODO: */
             res.RegionFlags = RegionData.Flags;
             res.SimAccess = RegionData.Access;
-            res.MaxAgents = 40;
-            res.BillableFactor = 1;
-            res.ObjectBonusFactor = 1;
-            res.WaterHeight = 21;
-            res.TerrainRaiseLimit = 100;
-            res.TerrainLowerLimit = 0;
-            res.PricePerMeter = 1;
+            res.MaxAgents = (uint)RegionSettings.AgentLimit;
+            res.ObjectBonusFactor = RegionSettings.ObjectBonus;
+            res.WaterHeight = RegionSettings.WaterHeight;
+            res.TerrainRaiseLimit = RegionSettings.TerrainRaiseLimit;
+            res.TerrainLowerLimit = RegionSettings.TerrainLowerLimit;
             res.RedirectGridX = 0;
             res.RedirectGridY = 0;
+#warning Change this to connect to Estate sun setting
             res.UseEstateSun = true;
-            res.SunHour = 1;
+            res.SunHour = Environment.TimeOfDay;
             res.ProductSKU = VersionInfo.SimulatorVersion;
             res.ProductName = RegionData.ProductName;
             res.RegionFlagsExtended.Add(0);
