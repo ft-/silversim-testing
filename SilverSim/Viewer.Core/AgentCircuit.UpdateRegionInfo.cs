@@ -61,7 +61,8 @@ namespace SilverSim.Viewer.Core
             }
 #endif
 
-#warning GodUpdateRegionInfo.SimName not yet supported
+            Scene.RegionData.Name = req.SimName;
+            Scene.ReregisterRegion();
 #warning GodUpdateRegionInfo.RegionFlags & RegionOptionFlags.FixedSun not yet supported
 
             Scene.RegionSettings.AllowDamage = (regionFlags & (uint)RegionOptionFlags.AllowDamage) != 0;

@@ -29,6 +29,7 @@ namespace SilverSim.Scene.Types.Scene
         public bool DisableScripts;
         public bool DisableCollisions;
         public bool DisablePhysics;
+        public bool BlockFlyOver;
 
         private UUID m_TerrainTexture1 = DEFAULT_TERRAIN_TEXTURE_1;
         public UUID TerrainTexture1

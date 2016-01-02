@@ -63,9 +63,14 @@ namespace SilverSim.Viewer.Core.Capabilities
                 return;
             }
 
+            if (!m_Agent.IsInScene(m_Scene))
+            {
+                return;
+            }
+
             m_Scene.RegionSettings.BlockTerraform = reqmap["block_terraform"].AsBoolean;
             m_Scene.RegionSettings.BlockFly = reqmap["block_fly"].AsBoolean;
-            //bool blockFlyOver = reqmap["block_fly_over"].AsBoolean;
+            m_Scene.RegionSettings.BlockFlyOver = reqmap["block_fly_over"].AsBoolean;
             m_Scene.RegionSettings.AllowDamage = reqmap["allow_damage"].AsBoolean;
             m_Scene.RegionSettings.AllowLandResell = reqmap["allow_land_resell"].AsBoolean;
             m_Scene.RegionSettings.AgentLimit = (int)decimal.Parse(reqmap["agent_limit"].ToString());
@@ -74,6 +79,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_Scene.RegionSettings.RestrictPushing = reqmap["restrict_pushobject"].AsBoolean;
             m_Scene.RegionSettings.AllowLandResell = reqmap["allow_parcel_changes"].AsBoolean;
             m_Scene.RegionSettings.BlockShowInSearch = reqmap["block_parcel_search"].AsBoolean;
+
             m_Scene.TriggerRegionSettingsChanged();
             m_Scene.ReregisterRegion();
 
