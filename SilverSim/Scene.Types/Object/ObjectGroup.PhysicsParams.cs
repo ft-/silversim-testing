@@ -103,6 +103,9 @@ namespace SilverSim.Scene.Types.Object
             public double VerticalAttractionEfficiency;
             public double VerticalAttractionTimescale;
             public VehicleFlags Flags;
+
+            public Vector3 LinearWindEfficiency;
+            public Vector3 AngularWindEfficiency;
         }
         VehicleParams m_Vehicle = new VehicleParams();
 
@@ -436,6 +439,12 @@ namespace SilverSim.Scene.Types.Object
                     case VehicleVectorParamId.LinearMotorTimescale:
                         return m_Vehicle.LinearMotorTimescale;
 
+                    case VehicleVectorParamId.AngularWindEfficiency:
+                        return m_Vehicle.AngularWindEfficiency;
+
+                    case VehicleVectorParamId.LinearWindEfficiency:
+                        return m_Vehicle.LinearWindEfficiency;
+
                     default:
                         throw new KeyNotFoundException();
                 }
@@ -464,6 +473,30 @@ namespace SilverSim.Scene.Types.Object
 
                         case VehicleVectorParamId.LinearMotorOffset:
                             m_Vehicle.LinearMotorOffset = value;
+                            break;
+
+                        case VehicleVectorParamId.AngularMotorDecayTimescale:
+                            m_Vehicle.AngularMotorDecayTimescale = value;
+                            break;
+
+                        case VehicleVectorParamId.AngularMotorTimescale:
+                            m_Vehicle.AngularMotorTimescale = value;
+                            break;
+
+                        case VehicleVectorParamId.LinearMotorDecayTimescale:
+                            m_Vehicle.LinearMotorDecayTimescale = value;
+                            break;
+
+                        case VehicleVectorParamId.LinearMotorTimescale:
+                            m_Vehicle.LinearMotorTimescale = value;
+                            break;
+
+                        case VehicleVectorParamId.AngularWindEfficiency:
+                            m_Vehicle.AngularWindEfficiency = value;
+                            break;
+
+                        case VehicleVectorParamId.LinearWindEfficiency:
+                            m_Vehicle.LinearWindEfficiency = value;
                             break;
 
                         default:

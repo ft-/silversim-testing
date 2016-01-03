@@ -18,5 +18,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         AngularMotorDecayTimescale = 35,
         AngularMotorTimescale = 34,
 
+        LinearWindEfficiency = 12001,
+        AngularWindEfficiency = 12002,
     }
 }
