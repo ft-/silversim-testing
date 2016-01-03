@@ -1166,10 +1166,10 @@ namespace SilverSim.Main.Cmd.Region
             }
             else
             {
-                string output = "Parcel List:\n--------------------------------------------------------------------------------\n";
+                string output = "Parcel List:\n--------------------------------------------------------------------------------";
                 foreach(ParcelInfo parcel in scene.Parcels)
                 {
-                    output += string.Format("Parcel {0} ({1}):\n  Owner={2}\n", 
+                    output += string.Format("\nParcel {0} ({1}):\n  Owner={2}\n", 
                         parcel.Name, 
                         parcel.ID,
                         ResolveName(parcel.Owner).FullName);
