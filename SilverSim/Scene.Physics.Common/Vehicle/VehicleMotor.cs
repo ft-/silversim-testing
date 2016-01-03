@@ -82,6 +82,14 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             linearForce += (m_Params[VehicleVectorParamId.LinearMotorDirection] - velocity).ElementMultiply(m_Params.OneByLinearMotorTimescale * dt);
             angularTorque += (m_Params[VehicleVectorParamId.AngularMotorDirection] - angularVelocity + mouselookAngularInput).ElementMultiply(m_Params.OneByAngularMotorTimescale * dt);
 
+            if((m_Params.Flags & VehicleFlags.TorqueWorldZ) != 0)
+            {
+                /* translate Z to world (needed for motorcycles based on halcyon design) */
+                double angZ = angularTorque.Z;
+                angularTorque.Z = 0;
+                Quaternion q = Quaternion.CreateFromEulers(0, 0, angZ);
+                angularTorque += (q * angularOrientaton).GetEulerAngles();
+            }
             #endregion
 
             #region Motor Limiting
