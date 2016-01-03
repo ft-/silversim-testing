@@ -162,6 +162,7 @@ namespace SilverSim.Types.Parcel
         public bool SeeAvatars = true;
         public bool AnyAvatarSounds = true;
         public bool GroupAvatarSounds = true;
+        public bool IsPrivate;
 
         internal byte[,] m_LandBitmap;
         internal ReaderWriterLock m_LandBitmapRwLock = new ReaderWriterLock();

@@ -253,9 +253,9 @@ namespace SilverSim.Scene.Types.Scene
             prop.RegionDenyAgeUnverified = false;
 #warning Other Parcel Details here
             prop.Privacy = false;
-            prop.SeeAVs = true;
-            prop.AnyAVSounds = true;
-            prop.GroupAVSounds = true;
+            prop.SeeAVs = pinfo.SeeAvatars;
+            prop.AnyAVSounds = pinfo.AnyAvatarSounds;
+            prop.GroupAVSounds = pinfo.GroupAvatarSounds;
             prop.MediaDesc = pinfo.MediaDescription;
             prop.MediaHeight = pinfo.MediaHeight;
             prop.MediaWidth = pinfo.MediaWidth;

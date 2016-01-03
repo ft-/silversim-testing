@@ -92,6 +92,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                             pi.SeeAvatars = (uint)dbReader["SeeAvatars"] != 0;
                             pi.AnyAvatarSounds = (uint)dbReader["AnyAvatarSounds"] != 0;
                             pi.GroupAvatarSounds = (uint)dbReader["GroupAvatarSounds"] != 0;
+                            pi.IsPrivate = (uint)dbReader["IsPrivate"] != 0;
                             return pi;
                         }
                     }
@@ -184,6 +185,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["SeeAvatars"] = parcel.SeeAvatars ? 1 : 0;
             p["AnyAvatarSounds"] = parcel.AnyAvatarSounds ? 1 : 0;
             p["GroupAvatarSounds"] = parcel.GroupAvatarSounds ? 1 : 0;
+            p["IsPrivate"] = parcel.IsPrivate ? 1 : 0;
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
@@ -264,7 +266,8 @@ namespace SilverSim.Database.MySQL.SimulationData
                             "ObscureMusic INT(1) UNSIGNED NOT NULL DEFAULT '0'),",
             "ALTER TABLE %tablename% ADD COLUMN (SeeAvatars INT(1) UNSIGNED NOT NULL DEFAULT '1', " +
                             "GroupAvatarSounds INT(11) NOT NULL DEFAULT '1', " +
-                            "AnyAvatarSounds INT(1) UNSIGNED NOT NULL DEFAULT '1'),"
+                            "AnyAvatarSounds INT(1) UNSIGNED NOT NULL DEFAULT '1'),",
+            "ALTER TABLE %tablename% ADD COLUMN (IsPrivate INT(1) UNSIGNED NOT NULL DEFAULT '0'),",
         };
         #endregion
     }
