@@ -17,7 +17,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         LinearDeflectionEfficiency = 28,
         LinearDeflectionTimescale = 29,
         VerticalAttractionEfficiency = 36,
-        VerticalAttractionTimescale = 37
+        VerticalAttractionTimescale = 37,
 
         MouselookAzimuth = 11001,
         MouselookAltitude = 11002,

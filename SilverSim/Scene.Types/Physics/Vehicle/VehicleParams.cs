@@ -537,11 +537,11 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         case VehicleFloatParamId.AngularDeflectionTimescale:
                             return m_AngularDeflectionTimescale;
 
-                        case VehicleFloatParamId.AngularMotorDecayTimescale:
-                            return m_AngularMotorDecayTimescale.Length;
+                        case VehicleFloatParamId.LinearDeflectionTimescale:
+                            return m_LinearDeflectionTimescale;
 
-                        case VehicleFloatParamId.AngularMotorTimescale:
-                            return m_AngularMotorTimescale.Length;
+                        case VehicleFloatParamId.LinearDeflectionEfficiency:
+                            return m_LinearDeflectionEfficiency;
 
                         case VehicleFloatParamId.BankingEfficiency:
                             return m_BankingEfficiency;
@@ -564,11 +564,29 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                         case VehicleFloatParamId.HoverTimescale:
                             return m_HoverTimescale;
 
-                        case VehicleFloatParamId.LinearMotorDecayTimescale:
-                            return m_LinearMotorDecayTimescale.Length;
+                        case VehicleFloatParamId.VerticalAttractionEfficiency:
+                            return m_VerticalAttractionEfficiency;
 
-                        case VehicleFloatParamId.LinearMotorTimescale:
-                            return m_LinearMotorTimescale.Length;
+                        case VehicleFloatParamId.VerticalAttractionTimescale:
+                            return m_VerticalAttractionTimescale;
+
+                        case VehicleFloatParamId.MouselookAzimuth:
+                            return m_MouselookAzimuth;
+
+                        case VehicleFloatParamId.MouselookAltitude:
+                            return m_MouselookAltitude;
+
+                        case VehicleFloatParamId.BankingAzimuth:
+                            return m_BankingAzimuth;
+
+                        case VehicleFloatParamId.DisableMotorsAbove:
+                            return m_DisableMotorsAbove;
+
+                        case VehicleFloatParamId.DisableMotorsAfter:
+                            return m_DisableMotorsAfter;
+
+                        case VehicleFloatParamId.InvertedBankingModifier:
+                            return m_InvertedBankingModifier;
 
                         default:
                             throw new KeyNotFoundException();
@@ -589,12 +607,12 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                             m_AngularDeflectionTimescale = value;
                             break;
 
-                        case VehicleFloatParamId.AngularMotorDecayTimescale:
-                            m_AngularMotorDecayTimescale = new Vector3(value, value, value);
+                        case VehicleFloatParamId.LinearDeflectionEfficiency:
+                            m_LinearDeflectionEfficiency = value;
                             break;
 
-                        case VehicleFloatParamId.AngularMotorTimescale:
-                            m_AngularMotorTimescale = new Vector3(value, value, value);
+                        case VehicleFloatParamId.LinearDeflectionTimescale:
+                            m_LinearDeflectionTimescale = value;
                             break;
 
                         case VehicleFloatParamId.BankingEfficiency:
@@ -625,12 +643,36 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
                             m_HoverTimescale = value;
                             break;
 
-                        case VehicleFloatParamId.LinearMotorDecayTimescale:
-                            m_LinearMotorDecayTimescale = new Vector3(value, value, value);
+                        case VehicleFloatParamId.VerticalAttractionEfficiency:
+                            m_VerticalAttractionEfficiency = value;
                             break;
 
-                        case VehicleFloatParamId.LinearMotorTimescale:
-                            m_LinearMotorTimescale = new Vector3(value, value, value);
+                        case VehicleFloatParamId.VerticalAttractionTimescale:
+                            m_VerticalAttractionTimescale = value;
+                            break;
+
+                        case VehicleFloatParamId.MouselookAzimuth:
+                            m_MouselookAzimuth = value;
+                            break;
+
+                        case VehicleFloatParamId.MouselookAltitude:
+                            m_MouselookAltitude = value;
+                            break;
+
+                        case VehicleFloatParamId.BankingAzimuth:
+                            m_BankingAzimuth = value;
+                            break;
+
+                        case VehicleFloatParamId.DisableMotorsAbove:
+                            m_DisableMotorsAbove = value;
+                            break;
+
+                        case VehicleFloatParamId.DisableMotorsAfter:
+                            m_DisableMotorsAfter = value;
+                            break;
+
+                        case VehicleFloatParamId.InvertedBankingModifier:
+                            m_InvertedBankingModifier = value;
                             break;
 
                         default:
