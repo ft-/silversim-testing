@@ -80,5 +80,13 @@ namespace SilverSim.Scene.Types.Physics
                 return 0;
             }
         }
+
+        public uint PhysicsFrameNumber
+        {
+            get
+            {
+                return 0;
+            }
+        }
     }
 }

@@ -14,10 +14,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         HoverHeight = 24,
         HoverEfficiency = 25,
         HoverTimescale = 26,
-        LinearDeflectionEfficiency = 28,
-        LinearDeflectionTimescale = 29,
-        VerticalAttractionEfficiency = 36,
-        VerticalAttractionTimescale = 37,
 
         LinearMotorDecayTimescale = 31,
         LinearMotorTimescale = 30,
@@ -25,5 +21,11 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         AngularMotorDecayTimescale = 35,
         AngularMotorTimescale = 34,
 
+        MouselookAzimuth = 11001,
+        MouselookAltitude = 11002,
+        BankingAzimuth = 11003,
+        DisableMotorsAbove = 11004,
+        DisableMotorsAfter = 11005,
+        InvertedBankingModifier = 11006,
     }
 }

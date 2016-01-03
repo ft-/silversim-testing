@@ -23,6 +23,12 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         MouselookBank = 0x0100,
         CameraDecoupled = 0x0200,
 
-
+        /* halcyon based extensions */
+        ReactToCurrents = 0x10000,
+        ReactToWind = 0x20000,
+        LimitMotorDown = 0x40000,
+        TorqueWorldZ = 0x80000,
+        MousePointSteer = 0x100000,
+        MousePointBank = 0x200000,
     }
 }

@@ -34,15 +34,7 @@ namespace SilverSim.Scene.Types.Physics
 
         double Buoyancy { get; set; }
 
-        VehicleType VehicleType { get; set; }
-        VehicleFlags VehicleFlags { get; set; }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        VehicleFlags SetVehicleFlags { set; }
-        [SuppressMessage("Gendarme.Rules.Design", "AvoidPropertiesWithoutGetAccessorRule")]
-        VehicleFlags ClearVehicleFlags { set; }
-        Quaternion this[VehicleRotationParamId id] { get; set; }
-        Vector3 this[VehicleVectorParamId id] { get; set; }
-        double this[VehicleFloatParamId id] { get; set; }
+        /* Vehicle model is now accessed through shared memory class VehicleParams */
 
         void TransferState(IPhysicsObject target, Vector3 positionOffset);
         void ReceiveState(PhysicsStateData data, Vector3 positionOffset);

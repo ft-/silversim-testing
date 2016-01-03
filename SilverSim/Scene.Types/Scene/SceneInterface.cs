@@ -144,7 +144,8 @@ namespace SilverSim.Scene.Types.Scene
         {
             get
             {
-                return 0;
+                IPhysicsScene physicsScene = m_PhysicsScene;
+                return physicsScene != null ? physicsScene.PhysicsFrameNumber : 0;
             }
         }
 

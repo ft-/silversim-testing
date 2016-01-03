@@ -22,5 +22,7 @@ namespace SilverSim.Scene.Types.Physics
         double PhysicsDilationTime { get; } /* in seconds */
 
         double PhysicsExecutionTime { get; } /* in seconds */
+
+        uint PhysicsFrameNumber { get; }
     }
 }
