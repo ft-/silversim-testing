@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Scene.Physics.Common.Vehicle;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
@@ -13,6 +14,7 @@ namespace SilverSim.Scene.Physics.Common
     public abstract class ObjectController : CommonPhysicsController, IPhysicsObject
     {
         protected ObjectGroup m_Group;
+        protected VehicleMotor m_Vehicle;
         bool m_Phantom;
         bool m_ContributesToCollisionSurfaceAsChild;
         bool m_VolumeDetect;
@@ -23,6 +25,7 @@ namespace SilverSim.Scene.Physics.Common
             m_StateData = new PhysicsStateData(part, sceneID);
             m_Group = part;
             m_Phantom = true;
+            m_Vehicle = m_Group.VehicleParams.GetMotor();
         }
 
         public void TransferState(IPhysicsObject target, Vector3 positionOffset)
@@ -192,6 +195,10 @@ namespace SilverSim.Scene.Physics.Common
                 linearForce += BuoyancyMotor(m_Group, dt);
                 linearForce += GravityMotor(m_Group, dt);
                 linearForce += HoverMotor(m_Group, dt);
+
+                m_Vehicle.Process(dt, m_StateData);
+                linearForce += m_Vehicle.LinearForce;
+                angularTorque += m_Vehicle.AngularTorque;
 
                 lock(this)
                 {
