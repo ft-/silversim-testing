@@ -1077,11 +1077,6 @@ namespace SilverSim.Main.Common
             ICollection<IRegionLoaderInterface> regionLoaders = GetServices<IRegionLoaderInterface>().Values;
             if (regionLoaders.Count != 0)
             {
-                CmdIO.CommandRegistry.SelectCommands.Add("region", SelectRegionCommand);
-                CmdIO.CommandRegistry.ClearCommands.Add("region", Commands.ClearRegion.CmdHandler);
-                CmdIO.CommandRegistry.ClearCommands.Add("objects", Commands.ClearObjects.CmdHandler);
-                CmdIO.CommandRegistry.ClearCommands.Add("parcels", Commands.ClearParcels.CmdHandler);
-
                 /* we have to bypass the circular issue we would get when trying to do it via using */
                 Assembly assembly = Assembly.Load("SilverSim.Viewer.Core");
                 Type t = assembly.GetType("SilverSim.Viewer.Core.SimCircuitEstablishService");
@@ -1226,47 +1221,6 @@ namespace SilverSim.Main.Common
                 {
                     io.Write(e.Message);
                 }
-            }
-        }
-
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        static void SelectRegionCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
-        {
-            if (args[0] == "help")
-            {
-                io.Write("select region <region name>\nselect region to root");
-            }
-            else if(limitedToScene != UUID.Zero)
-            {
-                io.Write("select region is not possible with limited console");
-            }
-            else if(args.Count == 4)
-            {
-                if(args[2] != "to" || args[3] != "root")
-                {
-                    io.Write("invalid parameters for select region");
-                }
-                else
-                {
-                    io.SelectedScene = UUID.Zero;
-                }
-            }
-            else if(args.Count == 3)
-            {
-                try
-                {
-                    SceneInterface scene = SceneManager.Scenes[args[2]];
-                    io.SelectedScene = scene.ID;
-                    io.WriteFormatted("region {0} selected", args[2]);
-                }
-                catch
-                {
-                    io.WriteFormatted("region {0} does not exist or is not online", args[2]);
-                }
-            }
-            else
-            {
-                io.Write("invalid parameters for select region");
             }
         }
 

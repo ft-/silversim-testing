@@ -18,6 +18,7 @@ using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.Linq;
 using System.Xml;
@@ -83,6 +84,10 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.EnableCommands.Add("logins", EnableDisableLoginsCmd);
             Common.CmdIO.CommandRegistry.DisableCommands.Add("logins", EnableDisableLoginsCmd);
             Common.CmdIO.CommandRegistry.ShowCommands.Add("neighbors", ShowNeighborsCmd);
+            Common.CmdIO.CommandRegistry.ClearCommands.Add("objects", ClearObjectsCmd);
+            Common.CmdIO.CommandRegistry.ClearCommands.Add("parcels", ClearParcelsCmd);
+            Common.CmdIO.CommandRegistry.ClearCommands.Add("region", ClearRegionCmd);
+            Common.CmdIO.CommandRegistry.SelectCommands.Add("region", SelectRegionCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)
@@ -156,7 +161,7 @@ namespace SilverSim.Main.Cmd.Region
             return true;
         }
 
-        public void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void ShowRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             IEnumerable<RegionInfo> regions;
 
@@ -221,7 +226,7 @@ namespace SilverSim.Main.Cmd.Region
             io.Write(output);
         }
 
-        public void ChangeRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void ChangeRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
@@ -375,7 +380,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void CreateRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void CreateRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -489,7 +494,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void CreateRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void CreateRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
@@ -691,7 +696,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void DeleteRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void DeleteRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if (limitedToScene != UUID.Zero)
             {
@@ -722,7 +727,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void EnableRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void EnableRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
@@ -747,7 +752,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void DisableRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void DisableRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
@@ -772,7 +777,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void StartRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void StartRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
@@ -809,7 +814,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void StopRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void StopRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             RegionInfo rInfo;
             if (limitedToScene != UUID.Zero)
@@ -834,7 +839,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void AlertRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void AlertRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help")
@@ -873,7 +878,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void AlertRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void AlertRegionsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             if(limitedToScene != UUID.Zero)
             {
@@ -896,7 +901,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void AlertAgentCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void AlertAgentCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help" && args.Count < 5)
@@ -943,7 +948,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void KickAgentCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void KickAgentCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help" || args.Count < 4)
@@ -993,7 +998,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void ShowNeighborsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void ShowNeighborsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help")
@@ -1037,7 +1042,7 @@ namespace SilverSim.Main.Cmd.Region
 
         }
 
-        public void EnableDisableLoginsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void EnableDisableLoginsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help")
@@ -1075,7 +1080,7 @@ namespace SilverSim.Main.Cmd.Region
             }
         }
 
-        public void ShowAgentsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        void ShowAgentsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
             UUID selectedScene;
             if (args[0] == "help")
@@ -1122,6 +1127,123 @@ namespace SilverSim.Main.Cmd.Region
                 output += string.Format("\n{0}\n    id={1}  Type={2}\n", agent.Owner.FullName, agent.Owner.ID.ToString(), agent.IsInScene(scene) ? "Root" : "Child");
             }
             io.Write(output);
+        }
+
+        void ClearObjectsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            SceneInterface scene;
+            if (args[0] == "help")
+            {
+                io.Write("clear all region objects");
+                return;
+            }
+            else if (UUID.Zero != limitedToScene)
+            {
+                scene = SceneManager.Scenes[limitedToScene];
+            }
+            else if (UUID.Zero != io.SelectedScene)
+            {
+                scene = SceneManager.Scenes[io.SelectedScene];
+            }
+            else
+            {
+                io.Write("no region selected");
+                return;
+            }
+            scene.ClearObjects();
+            io.Write("All objects deleted.");
+        }
+
+        void ClearParcelsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            SceneInterface scene;
+            if (args[0] == "help")
+            {
+                io.Write("clears region parcels entirely");
+                return;
+            }
+            else if (UUID.Zero != limitedToScene)
+            {
+                scene = SceneManager.Scenes[limitedToScene];
+            }
+            else if (UUID.Zero != io.SelectedScene)
+            {
+                scene = SceneManager.Scenes[io.SelectedScene];
+            }
+            else
+            {
+                io.Write("no region selected");
+                return;
+            }
+            scene.ResetParcels();
+            io.Write("Region parcels cleared");
+        }
+
+        void ClearRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            SceneInterface scene;
+            if (args[0] == "help")
+            {
+                io.Write("clears region entirely");
+                return;
+            }
+            else if (UUID.Zero != limitedToScene)
+            {
+                scene = SceneManager.Scenes[limitedToScene];
+            }
+            else if (UUID.Zero != io.SelectedScene)
+            {
+                scene = SceneManager.Scenes[io.SelectedScene];
+            }
+            else
+            {
+                io.Write("no region selected");
+                return;
+            }
+            scene.ClearObjects();
+            scene.ResetParcels();
+            io.Write("Region cleared.");
+        }
+
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        void SelectRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            if (args[0] == "help")
+            {
+                io.Write("select region <region name>\nselect region to root");
+            }
+            else if (limitedToScene != UUID.Zero)
+            {
+                io.Write("select region is not possible with limited console");
+            }
+            else if (args.Count == 4)
+            {
+                if (args[2] != "to" || args[3] != "root")
+                {
+                    io.Write("invalid parameters for select region");
+                }
+                else
+                {
+                    io.SelectedScene = UUID.Zero;
+                }
+            }
+            else if (args.Count == 3)
+            {
+                try
+                {
+                    SceneInterface scene = SceneManager.Scenes[args[2]];
+                    io.SelectedScene = scene.ID;
+                    io.WriteFormatted("region {0} selected", args[2]);
+                }
+                catch
+                {
+                    io.WriteFormatted("region {0} does not exist or is not online", args[2]);
+                }
+            }
+            else
+            {
+                io.Write("invalid parameters for select region");
+            }
         }
     }
     #endregion
