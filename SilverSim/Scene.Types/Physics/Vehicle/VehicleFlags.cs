@@ -21,6 +21,8 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         LimitMotorUp = 0x0040,
         MouselookSteer = 0x0080,
         MouselookBank = 0x0100,
-        CameraDecoupled = 0x0200
+        CameraDecoupled = 0x0200,
+
+
     }
 }

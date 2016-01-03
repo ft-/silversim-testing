@@ -7,8 +7,6 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
     {
         AngularDeflectionEfficiency = 32,
         AngularDeflectionTimescale = 33,
-        AngularMotorDecayTimescale = 35,
-        AngularMotorTimescale = 34,
         BankingEfficiency = 38,
         BankingMix = 39,
         BankingTimescale = 40,
@@ -18,9 +16,14 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         HoverTimescale = 26,
         LinearDeflectionEfficiency = 28,
         LinearDeflectionTimescale = 29,
+        VerticalAttractionEfficiency = 36,
+        VerticalAttractionTimescale = 37,
+
         LinearMotorDecayTimescale = 31,
         LinearMotorTimescale = 30,
-        VerticalAttractionEfficiency = 36,
-        VerticalAttractionTimescale = 37
+
+        AngularMotorDecayTimescale = 35,
+        AngularMotorTimescale = 34,
+
     }
 }

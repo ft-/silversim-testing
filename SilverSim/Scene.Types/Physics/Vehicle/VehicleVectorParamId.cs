@@ -9,6 +9,14 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         AngularMotorDirection = 19,
         LinearFrictionTimescale = 16,
         LinearMotorDirection = 18,
-        LinearMotorOffset = 20
+        LinearMotorOffset = 20,
+
+        /* enable use of these as vector parameters */
+        LinearMotorDecayTimescale = 31,
+        LinearMotorTimescale = 30,
+
+        AngularMotorDecayTimescale = 35,
+        AngularMotorTimescale = 34,
+
     }
 }
