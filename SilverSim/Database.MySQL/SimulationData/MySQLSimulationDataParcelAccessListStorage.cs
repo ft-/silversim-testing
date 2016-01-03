@@ -30,21 +30,41 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             get
             {
+                List<ParcelAccessEntry> result = new List<ParcelAccessEntry>();
+
                 using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT Accessor FROM ?table WHERE RegionID LIKE ?regionid AND Accessor LIKE ?accessor AND (ExpiresAt = 0 OR ExpiresAt > ?unixtime)", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM ?table WHERE ExpiresAt <= ?unixtime AND ExpiresAt <> 0", connection))
                     {
                         cmd.Parameters.AddWithValue("?table", m_TableName);
-                        cmd.Parameters.AddWithValue("?regionid", parcelID.ToString());
-                        cmd.Parameters.AddWithValue("?accessor", accessor.ToString());
                         cmd.Parameters.AddWithValue("?unixtime", Date.GetUnixTime());
+                        cmd.ExecuteNonQuery();
+                    }
+
+                    /* we use a specific implementation to reduce the result set here */
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM ?table WHERE ParcelID LIKE ?parcelid AND Accessor LIKE \"" +accessor.ID.ToString() + "\"%", connection))
+                    {
+                        cmd.Parameters.AddWithValue("?table", m_TableName);
+                        cmd.Parameters.AddWithValue("?parcelid", parcelID.ToString());
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            return reader.Read();
+                            ParcelAccessEntry entry = new ParcelAccessEntry();
+                            entry.ParcelID = reader.GetUUID("ParcelID");
+                            entry.Accessor = reader.GetUUI("Accessor");
+                            ulong val = (ulong)reader["ExpiresAt"];
+                            if (val != 0)
+                            {
+                                entry.ExpiresAt = Date.UnixTimeToDateTime(val);
+                            }
+                            result.Add(entry);
                         }
                     }
                 }
+
+                /* the prefiltered set reduces the amount of checks we have to do here */
+                IEnumerable<ParcelAccessEntry> en = from entry in result where entry.Accessor.EqualsGrid(accessor) select entry;
+                return en.GetEnumerator().MoveNext();
             }
         }
 
