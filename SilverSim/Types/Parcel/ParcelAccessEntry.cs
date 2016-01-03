@@ -7,7 +7,7 @@ namespace SilverSim.Types.Parcel
     {
         public UUID ParcelID;
         public UUI Accessor;
-        public Date ExpiresAt = null;
+        public Date ExpiresAt;
 
         public ParcelAccessEntry()
         {
