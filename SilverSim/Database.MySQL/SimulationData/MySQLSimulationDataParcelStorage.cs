@@ -89,6 +89,9 @@ namespace SilverSim.Database.MySQL.SimulationData
                             pi.BillableArea = (int)(ulong)dbReader["BillAbleArea"];
                             pi.LandBitmap.DataNoAABBUpdate = (byte[])dbReader["Bitmap"];
                             pi.Status = (ParcelStatus)(int)dbReader["Status"];
+                            pi.SeeAvatars = (uint)dbReader["SeeAvatars"] != 0;
+                            pi.AnyAvatarSounds = (uint)dbReader["AnyAvatarSounds"] != 0;
+                            pi.GroupAvatarSounds = (uint)dbReader["GroupAvatarSounds"] != 0;
                             return pi;
                         }
                     }
@@ -178,6 +181,9 @@ namespace SilverSim.Database.MySQL.SimulationData
             p["PassHours"] = parcel.PassHours;
             p["ActualArea"] = parcel.ActualArea;
             p["BillableArea"] = parcel.BillableArea;
+            p["SeeAvatars"] = parcel.SeeAvatars ? 1 : 0;
+            p["AnyAvatarSounds"] = parcel.AnyAvatarSounds ? 1 : 0;
+            p["GroupAvatarSounds"] = parcel.GroupAvatarSounds ? 1 : 0;
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
@@ -255,7 +261,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                             "MediaWidth INT(11) NOT NULL DEFAULT '0', " + 
                             "MediaHeight INT(11) NOT NULL DEFAULT '0'),",
             "ALTER TABLE %tablename% ADD COLUMN (ObscureMedia INT(1) UNSIGNED NOT NULL DEFAULT '0', " +
-                            "ObscureMusic INT(1) UNSIGNED NOT NULL DEFAULT '0'),"
+                            "ObscureMusic INT(1) UNSIGNED NOT NULL DEFAULT '0'),",
+            "ALTER TABLE %tablename% ADD COLUMN (SeeAvatars INT(1) UNSIGNED NOT NULL DEFAULT '1', " +
+                            "GroupAvatarSounds INT(11) NOT NULL DEFAULT '1', " +
+                            "AnyAvatarSounds INT(1) UNSIGNED NOT NULL DEFAULT '1'),"
         };
         #endregion
     }

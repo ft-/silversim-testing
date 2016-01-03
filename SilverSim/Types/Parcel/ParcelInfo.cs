@@ -159,6 +159,9 @@ namespace SilverSim.Types.Parcel
         public double Dwell;
         public bool ObscureMedia;
         public bool ObscureMusic;
+        public bool SeeAvatars = true;
+        public bool AnyAvatarSounds = true;
+        public bool GroupAvatarSounds = true;
 
         internal byte[,] m_LandBitmap;
         internal ReaderWriterLock m_LandBitmapRwLock = new ReaderWriterLock();
