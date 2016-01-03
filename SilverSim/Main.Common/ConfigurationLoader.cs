@@ -32,7 +32,6 @@ using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.ServerParam;
 using SilverSim.Types;
 using SilverSim.Types.Assembly;
-using SilverSim.Types.Grid;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

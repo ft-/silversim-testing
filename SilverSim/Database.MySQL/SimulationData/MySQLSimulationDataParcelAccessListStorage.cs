@@ -1,16 +1,14 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using log4net;
+using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using MySql.Data.MySqlClient;
-using log4net;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {

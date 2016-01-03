@@ -3,7 +3,6 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using System.Linq;
 using ThreadedClasses;

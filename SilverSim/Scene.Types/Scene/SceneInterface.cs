@@ -2,10 +2,10 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.Viewer.Messages;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
+using SilverSim.Scene.Types.Script;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.Economy;
@@ -19,13 +19,11 @@ using SilverSim.Types.Grid;
 using SilverSim.Types.Parcel;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
-using System.Reflection;
 using System.Threading;
 using ThreadedClasses;
-using System.Diagnostics.CodeAnalysis;
-using SilverSim.Scene.Types.Script;
 
 namespace SilverSim.Scene.Types.Scene
 {

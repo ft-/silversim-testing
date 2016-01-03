@@ -3,11 +3,7 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Types;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
 using System.Timers;
 
 namespace SilverSim.Scene.Types.Physics

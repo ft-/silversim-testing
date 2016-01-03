@@ -1,14 +1,11 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.ServiceInterfaces.Estate;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
-using System.Diagnostics.CodeAnalysis;
 using MySql.Data.MySqlClient;
+using SilverSim.ServiceInterfaces.Estate;
+using SilverSim.Types;
+using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Database.MySQL.Estate
 {

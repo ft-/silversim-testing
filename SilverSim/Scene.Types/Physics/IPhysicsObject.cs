@@ -2,8 +2,6 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Types;
-using SilverSim.Scene.Types.Physics.Vehicle;
-using System;
 using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.Types.Physics
