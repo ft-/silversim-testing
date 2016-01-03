@@ -99,28 +99,31 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             angularTorque += vertAttractorTorque;
             #endregion
 
-            #region Linear Wind Affector
-            Vector3 windvelocity = scene.Environment.Wind[pos];
-            linearForce += (windvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
-            #endregion
-
-            #region Angular Wind Affector
-            windvelocity = new Vector3(-windvelocity.Y, windvelocity.X, 0);
-
-            if (angularVelocity.X * windvelocity.X >= 0 &&
-                angularVelocity.X.PosIfNotNeg() * (angularVelocity.X - windvelocity.X) > 0)
+            if ((flags & VehicleFlags.ReactToWind) != 0)
             {
-                windvelocity.X = 0;
-            }
+                #region Linear Wind Affector
+                Vector3 windvelocity = scene.Environment.Wind[pos];
+                linearForce += (windvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
+                #endregion
 
-            if (angularVelocity.Y * windvelocity.Y >= 0 &&
-                angularVelocity.Y.PosIfNotNeg() * (angularVelocity.Y - windvelocity.Y) > 0)
-            {
-                windvelocity.Y = 0;
-            }
+                #region Angular Wind Affector
+                windvelocity = new Vector3(-windvelocity.Y, windvelocity.X, 0);
 
-            AngularTorque += windvelocity.ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt;
-            #endregion
+                if (angularVelocity.X * windvelocity.X >= 0 &&
+                    angularVelocity.X.PosIfNotNeg() * (angularVelocity.X - windvelocity.X) > 0)
+                {
+                    windvelocity.X = 0;
+                }
+
+                if (angularVelocity.Y * windvelocity.Y >= 0 &&
+                    angularVelocity.Y.PosIfNotNeg() * (angularVelocity.Y - windvelocity.Y) > 0)
+                {
+                    windvelocity.Y = 0;
+                }
+
+                AngularTorque += windvelocity.ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt;
+                #endregion
+            }
 
             #region Banking Motor
             angularTorque.Z -= (AngularTorque.X * ((double)1).Lerp(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * m_Params.OneByBankingTimescale * dt;

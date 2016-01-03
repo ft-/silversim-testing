@@ -170,7 +170,7 @@ namespace SilverSim.Scene.Types.Physics.Vehicle
         double m_DisableMotorsAfter;
         double m_InvertedBankingModifier;
 
-        object m_VehicleParamLock = new object();
+        readonly object m_VehicleParamLock = new object();
 
         public VehicleParams()
         {
