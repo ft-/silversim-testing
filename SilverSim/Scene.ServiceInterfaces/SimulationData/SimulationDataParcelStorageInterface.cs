@@ -16,6 +16,16 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         }
         #endregion
 
+        public abstract SimulationDataParcelAccessListStorageInterface WhiteList
+        {
+            get;
+        }
+
+        public abstract SimulationDataParcelAccessListStorageInterface BlackList
+        {
+            get;
+        }
+
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
         public abstract ParcelInfo this[UUID regionID, UUID parcelID]
         {

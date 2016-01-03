@@ -16,10 +16,14 @@ namespace SilverSim.Database.MySQL.SimulationData
     {
         readonly string m_ConnectionString;
         private static readonly ILog m_Log = LogManager.GetLogger("MYSQL SIMULATION STORAGE");
+        readonly MySQLSimulationDataParcelAccessListStorage m_WhiteListStorage;
+        readonly MySQLSimulationDataParcelAccessListStorage m_BlackListStorage;
 
         public MySQLSimulationDataParcelStorage(string connectionString)
         {
             m_ConnectionString = connectionString;
+            m_WhiteListStorage = new MySQLSimulationDataParcelAccessListStorage(connectionString, "parcelaccesswhitelist");
+            m_BlackListStorage = new MySQLSimulationDataParcelAccessListStorage(connectionString, "parcelaccessblacklist");
         }
 
         [SuppressMessage("Gendarme.Rules.Design", "AvoidMultidimensionalIndexerRule")]
@@ -205,6 +209,8 @@ namespace SilverSim.Database.MySQL.SimulationData
         public void ProcessMigrations()
         {
             MySQLUtilities.ProcessMigrations(m_ConnectionString, "parcels", Migrations, m_Log);
+            m_BlackListStorage.ProcessMigrations();
+            m_WhiteListStorage.ProcessMigrations();
         }
 
         private static readonly string[] Migrations = new string[]{
@@ -269,6 +275,22 @@ namespace SilverSim.Database.MySQL.SimulationData
                             "AnyAvatarSounds INT(1) UNSIGNED NOT NULL DEFAULT '1'),",
             "ALTER TABLE %tablename% ADD COLUMN (IsPrivate INT(1) UNSIGNED NOT NULL DEFAULT '0'),",
         };
+
+        public override SimulationDataParcelAccessListStorageInterface WhiteList
+        {
+            get
+            {
+                return m_WhiteListStorage;
+            }
+        }
+
+        public override SimulationDataParcelAccessListStorageInterface BlackList
+        {
+            get
+            {
+                return m_BlackListStorage;
+            }
+        }
         #endregion
     }
 }

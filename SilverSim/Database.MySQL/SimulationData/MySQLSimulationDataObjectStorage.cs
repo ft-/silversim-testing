@@ -6,17 +6,16 @@ using MySql.Data.MySqlClient;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Object;
 using SilverSim.ServiceInterfaces.Database;
-using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using SilverSim.Types.Agent;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
+using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.IO;
 using System.Diagnostics.CodeAnalysis;
+using System.IO;
 
 namespace SilverSim.Database.MySQL.SimulationData
 {
