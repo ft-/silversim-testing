@@ -174,7 +174,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             "CREATE TABLE %tablename% (" +
                 "ParcelID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "Accessor VARCHAR(255) NOT NULL," +
-                "ExpiresAt BIGINT(20) NOT NULL)"
+                "ExpiresAt BIGINT(20) NOT NULL)",
+            "ALTER TABLE %tablename% ADD KEY Accessor (Accessor), ADD KEY ExpiresAt (ExpiresAt),"
         };
     }
 }
