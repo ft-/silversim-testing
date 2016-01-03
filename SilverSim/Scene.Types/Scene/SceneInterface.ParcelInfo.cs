@@ -252,7 +252,7 @@ namespace SilverSim.Scene.Types.Scene
             prop.RegionDenyTransacted = false;
             prop.RegionDenyAgeUnverified = false;
 #warning Other Parcel Details here
-            prop.Privacy = false;
+            prop.Privacy = pinfo.IsPrivate;
             prop.SeeAVs = pinfo.SeeAvatars;
             prop.AnyAVSounds = pinfo.AnyAvatarSounds;
             prop.GroupAVSounds = pinfo.GroupAvatarSounds;
