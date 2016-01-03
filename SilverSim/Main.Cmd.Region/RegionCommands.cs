@@ -15,6 +15,7 @@ using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
+using SilverSim.Types.Parcel;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -88,6 +89,7 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.ClearCommands.Add("parcels", ClearParcelsCmd);
             Common.CmdIO.CommandRegistry.ClearCommands.Add("region", ClearRegionCmd);
             Common.CmdIO.CommandRegistry.SelectCommands.Add("region", SelectRegionCmd);
+            Common.CmdIO.CommandRegistry.ShowCommands.Add("parcels", ShowParcelsCmd);
 
             IConfig sceneConfig = loader.Config.Configs["DefaultSceneImplementation"];
             if (null != sceneConfig)
@@ -1152,6 +1154,28 @@ namespace SilverSim.Main.Cmd.Region
             }
             scene.ClearObjects();
             io.Write("All objects deleted.");
+        }
+
+        void ShowParcelsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID sceneID = UUID.Zero != limitedToScene ? limitedToScene : io.SelectedScene;
+            SceneInterface scene;
+            if(!SceneManager.Scenes.TryGetValue(sceneID, out scene))
+            {
+                io.Write("No region selected.");
+            }
+            else
+            {
+                string output = "Parcel List:\n--------------------------------------------------------------------------------\n";
+                foreach(ParcelInfo parcel in scene.Parcels)
+                {
+                    output += string.Format("Parcel {0} ({1}):\n  Owner={2}\n", 
+                        parcel.Name, 
+                        parcel.ID,
+                        ResolveName(parcel.Owner).FullName);
+                }
+                io.Write(output);
+            }
         }
 
         void ClearParcelsCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
