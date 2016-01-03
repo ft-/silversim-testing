@@ -59,14 +59,9 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 Quaternion localCam = currentState.CameraRotation / m_Params[VehicleRotationParamId.ReferenceFrame];
                 mouselookAngularInput = (localCam / angularOrientaton).GetEulerAngles();
                 mouselookAngularInput.Y = 0;
-                if(IsMouselookBankActive(flags, currentState))
-                {
-                    mouselookAngularInput.X = mouselookAngularInput.Z * m_Params[VehicleFloatParamId.MouselookAltitude];
-                }
-                else
-                {
-                    mouselookAngularInput.X = 0;
-                }
+                mouselookAngularInput.X = (IsMouselookBankActive(flags, currentState)) ?
+                    mouselookAngularInput.Z * m_Params[VehicleFloatParamId.MouselookAltitude] :
+                    0;
 
                 if(IsMouselookSteerActive(flags, currentState))
                 {
