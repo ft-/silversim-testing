@@ -119,7 +119,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 windvelocity.Y = 0;
             }
 
-            AngularTorque += scene.Environment.Wind[pos].ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt;
+            AngularTorque += windvelocity.ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt;
             #endregion
 
             #region Banking Motor
