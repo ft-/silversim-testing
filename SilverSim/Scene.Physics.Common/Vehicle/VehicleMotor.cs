@@ -211,8 +211,15 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             #region Linear Deflection
             /* Linear deflection deflects the affecting force along the reference x-axis */
             Vector3 naturalVelocity = velocity;
+            Vector3 linearDeflect;
             naturalVelocity = (naturalVelocity.X < 0 ? -Vector3.UnitX : Vector3.UnitX) * naturalVelocity.Length;
-            linearForce += (naturalVelocity - velocity) * m_Params[VehicleFloatParamId.LinearDeflectionEfficiency] * m_Params.OneByLinearDeflectionTimescale * dt;
+            linearDeflect = (naturalVelocity - velocity) * m_Params[VehicleFloatParamId.LinearDeflectionEfficiency] * m_Params.OneByLinearDeflectionTimescale * dt;
+
+            if((flags & VehicleFlags.NoDeflectionUp) != 0 && linearDeflect.Z >= 0)
+            {
+                linearDeflect.Z = 0;
+            }
+            linearForce += linearDeflect;
             #endregion  
 
             #region Motor Decay
