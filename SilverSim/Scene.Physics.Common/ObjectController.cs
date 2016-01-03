@@ -196,7 +196,7 @@ namespace SilverSim.Scene.Physics.Common
                 linearForce += GravityMotor(m_Group, dt);
                 linearForce += HoverMotor(m_Group, dt);
 
-                m_Vehicle.Process(dt, m_StateData);
+                m_Vehicle.Process(dt, m_StateData, m_Group.Scene);
                 linearForce += m_Vehicle.LinearForce;
                 angularTorque += m_Vehicle.AngularTorque;
 

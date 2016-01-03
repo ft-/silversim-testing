@@ -10,7 +10,7 @@ namespace SilverSim.Scene.Physics.Common
     public abstract class CommonPhysicsController
     {
         [SuppressMessage("Gendarme.Rules.Concurrency", "NonConstantStaticFieldsShouldNotBeVisibleRule")]
-        public static double GravityAccelerationConstant = -9.8f;
+        public static double GravityAccelerationConstant = 9.8f;
 
         protected CommonPhysicsController()
         {
@@ -41,7 +41,7 @@ namespace SilverSim.Scene.Physics.Common
 
         protected Vector3 BuoyancyMotor(IObject obj, double dt)
         {
-            return new Vector3(0, 0, -m_Buoyancy * obj.PhysicsActor.Mass * GravityAccelerationConstant);
+            return new Vector3(0, 0, -(m_Buoyancy - 1) * obj.PhysicsActor.Mass * GravityAccelerationConstant);
         }
         #endregion
 

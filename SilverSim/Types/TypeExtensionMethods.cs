@@ -16,6 +16,11 @@ namespace SilverSim.Types
             return a + ((b - a) * u);
         }
 
+        public static Vector3 ClampElements(this Vector3 val, double min, double max)
+        {
+            return new Vector3(val.X.Clamp(min, max), val.Y.Clamp(min, max), val.Z.Clamp(min, max));
+        }
+
         public static double Clamp(this double val, double min, double max)
         {
             if(val < min)

@@ -20,6 +20,7 @@ namespace SilverSim.Scene.Types.Physics
         public Vector3 AngularVelocity = Vector3.Zero;
         public Vector3 Acceleration = Vector3.Zero;
         public Vector3 AngularAcceleration = Vector3.Zero;
+        public double Mass;
 
         public PhysicsStateData(IObject obj, UUID sceneID)
         {
@@ -30,6 +31,7 @@ namespace SilverSim.Scene.Types.Physics
             AngularVelocity = obj.AngularVelocity;
             Acceleration = obj.Acceleration;
             AngularAcceleration = obj.AngularAcceleration;
+            Mass = obj.PhysicsActor.Mass;
         }
     }
 }

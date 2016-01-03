@@ -321,6 +321,16 @@ namespace SilverSim.Types
             return lhs + (rhs - lhs) * c;
         }
 
+        public Vector3 ElementDivide(Vector3 b)
+        {
+            return new Vector3(X / b.X, Y / b.Y, Z / b.Z);
+        }
+
+        public Vector3 ElementMultiply(Vector3 b)
+        {
+            return new Vector3(X * b.X, Y * b.Y, Z * b.Z);
+        }
+
         #region Operators
         public static bool operator ==(Vector3 value1, Vector3 value2)
         {
