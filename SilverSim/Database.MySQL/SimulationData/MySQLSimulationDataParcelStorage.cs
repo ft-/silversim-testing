@@ -265,7 +265,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             "ALTER TABLE %tablename% ADD COLUMN (ObscureMedia INT(1) UNSIGNED NOT NULL DEFAULT '0', " +
                             "ObscureMusic INT(1) UNSIGNED NOT NULL DEFAULT '0'),",
             "ALTER TABLE %tablename% ADD COLUMN (SeeAvatars INT(1) UNSIGNED NOT NULL DEFAULT '1', " +
-                            "GroupAvatarSounds INT(11) NOT NULL DEFAULT '1', " +
+                            "GroupAvatarSounds INT(1) UNSIGNED NOT NULL DEFAULT '1', " +
                             "AnyAvatarSounds INT(1) UNSIGNED NOT NULL DEFAULT '1'),",
             "ALTER TABLE %tablename% ADD COLUMN (IsPrivate INT(1) UNSIGNED NOT NULL DEFAULT '0'),",
         };
