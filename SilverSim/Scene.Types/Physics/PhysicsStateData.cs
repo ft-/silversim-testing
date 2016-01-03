@@ -22,6 +22,11 @@ namespace SilverSim.Scene.Types.Physics
         public Vector3 AngularAcceleration = Vector3.Zero;
         public double Mass;
 
+        /* inputs for mouselook steer */
+        public Quaternion CameraRotation;
+        public bool IsCameraDataValid;
+        public bool IsAgentInMouselook;
+
         public PhysicsStateData(IObject obj, UUID sceneID)
         {
             SceneID = sceneID;

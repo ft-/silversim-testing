@@ -5,16 +5,30 @@ using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
+using System;
 
 namespace SilverSim.Scene.Physics.Common.Vehicle
 {
     public class VehicleMotor
     {
         readonly VehicleParams m_Params;
+        double HeightExceededTime;
 
         internal VehicleMotor(VehicleParams param)
         {
             m_Params = param;
+        }
+
+        bool IsMouselookSteerActive(VehicleFlags flags, PhysicsStateData currentState)
+        {
+            return ((flags & VehicleFlags.MouselookSteer) != 0 && currentState.IsAgentInMouselook) ||
+                (flags & VehicleFlags.MousePointSteer) != 0;
+        }
+
+        bool IsMouselookBankActive(VehicleFlags flags, PhysicsStateData currentState)
+        {
+            return ((flags & VehicleFlags.MouselookBank) != 0 && currentState.IsAgentInMouselook) ||
+                (flags & VehicleFlags.MousePointBank) != 0;
         }
 
         public void Process(double dt, PhysicsStateData currentState, SceneInterface scene)
@@ -24,6 +38,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
                 /* disable vehicle */
                 LinearForce = Vector3.Zero;
                 AngularTorque = Vector3.Zero;
+                HeightExceededTime = 0f;
                 return;
             }
 
@@ -38,9 +53,35 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             Quaternion angularOrientaton = currentState.Rotation / referenceFrame;
             #endregion
 
+            Vector3 mouselookAngularInput = Vector3.Zero;
+            if ((flags & (VehicleFlags.MouselookBank | VehicleFlags.MouselookSteer | VehicleFlags.MousePointBank | VehicleFlags.MousePointSteer)) != 0)
+            {
+                Quaternion localCam = currentState.CameraRotation / m_Params[VehicleRotationParamId.ReferenceFrame];
+                mouselookAngularInput = (localCam / angularOrientaton).GetEulerAngles();
+                mouselookAngularInput.Y = 0;
+                if(IsMouselookBankActive(flags, currentState))
+                {
+                    mouselookAngularInput.X = mouselookAngularInput.Z * m_Params[VehicleFloatParamId.MouselookAltitude];
+                }
+                else
+                {
+                    mouselookAngularInput.X = 0;
+                }
+
+                if(IsMouselookSteerActive(flags, currentState))
+                {
+                    mouselookAngularInput.Z *= m_Params[VehicleFloatParamId.MouselookAzimuth];
+                }
+                else
+                {
+                    mouselookAngularInput.Z = 0;
+                }
+            }
+
             #region Motor Inputs
             linearForce += (m_Params[VehicleVectorParamId.LinearMotorDirection] - velocity).ElementMultiply(m_Params.OneByLinearMotorTimescale * dt);
-            angularTorque += (m_Params[VehicleVectorParamId.AngularMotorDirection] - angularVelocity).ElementMultiply(m_Params.OneByAngularMotorTimescale * dt);
+            angularTorque += (m_Params[VehicleVectorParamId.AngularMotorDirection] - angularVelocity + mouselookAngularInput).ElementMultiply(m_Params.OneByAngularMotorTimescale * dt);
+
             #endregion
 
             #region Motor Limiting
@@ -54,13 +95,9 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             }
             #endregion
 
-            #region Friction
-            linearForce -= (currentState.Velocity).ElementMultiply(m_Params.OneByLinearFrictionTimescale * dt);
-            angularTorque -= (currentState.AngularVelocity).ElementMultiply(m_Params.OneByAngularFrictionTimescale * dt);
-            #endregion
 
-            #region Hover Height
-            double hoverForce = 0;
+            #region Hover Height Influence Calculation
+            double hoverForce;
             Vector3 pos = currentState.Position;
             double hoverHeight = scene.Terrain[pos];
             double waterHeight = scene.RegionSettings.WaterHeight;
@@ -81,7 +118,33 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             {
                 hoverForce = 0;
             }
+            #endregion
+
+            #region Disable Motor Logic (neat idea based on halcyon simulator)
+            double disableMotorsAfter = m_Params[VehicleFloatParamId.DisableMotorsAfter];
+            if(disableMotorsAfter > double.Epsilon &&
+                m_Params[VehicleFloatParamId.DisableMotorsAbove] < pos.Z - hoverHeight)
+            {
+                HeightExceededTime += dt;
+                if(disableMotorsAfter <= HeightExceededTime)
+                {
+                    angularTorque = Vector3.Zero;
+                    linearForce = Vector3.Zero;
+                }
+            }
+            else
+            {
+                HeightExceededTime = 0;
+            }
+            #endregion
+
+            #region Add Hover Height Force
             linearForce.Z += hoverForce;
+            #endregion
+
+            #region Friction
+            linearForce -= (currentState.Velocity).ElementMultiply(m_Params.OneByLinearFrictionTimescale * dt);
+            angularTorque -= (currentState.AngularVelocity).ElementMultiply(m_Params.OneByAngularFrictionTimescale * dt);
             #endregion
 
             #region Vertical Attractor
@@ -126,7 +189,12 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             }
 
             #region Banking Motor
-            angularTorque.Z -= (AngularTorque.X * ((double)1).Lerp(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * m_Params.OneByBankingTimescale * dt;
+            double invertedBankModifier = 1f;
+            if((Vector3.UnitZ * angularOrientaton).Z < 0)
+            {
+                invertedBankModifier = m_Params[VehicleFloatParamId.InvertedBankingModifier];
+            }
+            angularTorque.Z -= (AngularTorque.X * ((double)1).Lerp(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * invertedBankModifier * m_Params.OneByBankingTimescale * dt;
             #endregion
 
             #region Buoyancy
