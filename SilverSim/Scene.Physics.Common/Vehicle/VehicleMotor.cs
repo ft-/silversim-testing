@@ -100,7 +100,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             #endregion
 
             #region Linear Wind Affector
-            linearForce += scene.Environment.Wind[pos].ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]);
+            linearForce += (scene.Environment.Wind[pos] - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]);
             #endregion
 
             #region Angular Wind Affector
