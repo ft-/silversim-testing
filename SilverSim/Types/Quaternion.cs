@@ -107,6 +107,12 @@ namespace SilverSim.Types
             }
         }
 
+        public Vector3 GetEulerAngles()
+        {
+            Vector3 v = new Vector3();
+            GetEulerAngles(out v.X, out v.Y, out v.Z);
+            return v;
+        }
 
         /// <summary>
         /// Convert this quaternion to euler angles

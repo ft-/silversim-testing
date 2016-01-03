@@ -11,6 +11,11 @@ namespace SilverSim.Types
 {
     public static class TypeExtensionMethods
     {
+        public static int PosIfNotNeg(this double a)
+        {
+            return a < 0 ? -1 : 1;
+        }
+
         public static double Lerp(this double a, double b, double u)
         {
             return a + ((b - a) * u);

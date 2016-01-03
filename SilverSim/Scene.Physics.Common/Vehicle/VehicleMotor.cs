@@ -34,7 +34,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             #region Transform Reference Frame
             Quaternion referenceFrame = m_Params[VehicleRotationParamId.ReferenceFrame];
             Vector3 velocity = currentState.Velocity / referenceFrame;
-            Vector3 angularVelocity = currentState.AngularVelocity / referenceFrame;
+            Vector3 angularVelocity = (Quaternion.CreateFromEulers(currentState.AngularVelocity) / referenceFrame).GetEulerAngles();
             Quaternion angularOrientaton = currentState.Rotation / referenceFrame;
             #endregion
 
@@ -88,7 +88,7 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             /* vertical attractor is a angular motor 
             VEHICLE_FLAG_LIMIT_ROLL_ONLY affects this one to be only affected on roll axis
             */
-            Vector3 angularPos = angularOrientaton.AsVector3;
+            Vector3 angularPos = angularOrientaton.GetEulerAngles();
             Vector3 vertAttractorTorque;
             vertAttractorTorque = angularPos * m_Params[VehicleFloatParamId.VerticalAttractionEfficiency] * m_Params[VehicleFloatParamId.VerticalAttractionTimescale] * dt;
             if((flags & VehicleFlags.LimitRollOnly) !=0)
@@ -100,40 +100,53 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             #endregion
 
             #region Linear Wind Affector
-            linearForce += (scene.Environment.Wind[pos] - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]);
+            Vector3 windvelocity = scene.Environment.Wind[pos];
+            linearForce += (windvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
             #endregion
 
             #region Angular Wind Affector
-            #if HAVE_ANGULAR_AFFECTOR
-            AngularTorque += scene.Environment.Wind[pos].ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]);
-            #endif
+            windvelocity = new Vector3(-windvelocity.Y, windvelocity.X, 0);
+
+            if (angularVelocity.X * windvelocity.X >= 0 &&
+                angularVelocity.X.PosIfNotNeg() * (angularVelocity.X - windvelocity.X) > 0)
+            {
+                windvelocity.X = 0;
+            }
+
+            if (angularVelocity.Y * windvelocity.Y >= 0 &&
+                angularVelocity.Y.PosIfNotNeg() * (angularVelocity.Y - windvelocity.Y) > 0)
+            {
+                windvelocity.Y = 0;
+            }
+
+            AngularTorque += scene.Environment.Wind[pos].ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt;
             #endregion
 
-#region Banking Motor
+            #region Banking Motor
             angularTorque.Z -= (AngularTorque.X * ((double)1).Lerp(velocity.X, m_Params[VehicleFloatParamId.BankingMix])) * m_Params[VehicleFloatParamId.BankingEfficiency] * m_Params.OneByBankingTimescale * dt;
-#endregion
+            #endregion
 
-#region Buoyancy
+            #region Buoyancy
             /* we simply act against the physics effect of the BuoyancyMotor */
             linearForce.Z -= m_Params[VehicleFloatParamId.Buoyancy] * currentState.Mass * CommonPhysicsController.GravityAccelerationConstant;
-#endregion
+            #endregion
 
-#region Angular Deflection
+            #region Angular Deflection
             /* Angular deflection reorients the vehicle to the velocity vector */
             Vector3 deflect = Quaternion.RotBetween(Vector3.UnitX, velocity).AsVector3;
             angularTorque -= (deflect * m_Params[VehicleFloatParamId.AngularDeflectionEfficiency] * m_Params.OneByAngularDeflectionTimescale * dt);
-#endregion
+            #endregion
 
-#region Linear Deflection
+            #region Linear Deflection
             /* Linear deflection deflects the affecting force along the reference x-axis */
             Vector3 naturalVelocity = velocity;
             naturalVelocity = (naturalVelocity.X < 0 ? -Vector3.UnitX : Vector3.UnitX) * naturalVelocity.Length;
             linearForce += (naturalVelocity - velocity) * m_Params[VehicleFloatParamId.LinearDeflectionEfficiency] * m_Params.OneByLinearDeflectionTimescale * dt;
-#endregion
+            #endregion  
 
-#region Motor Decay
+            #region Motor Decay
             m_Params.DecayDirections(dt);
-#endregion
+            #endregion
 
             LinearForce = linearForce;
             AngularTorque = angularTorque * referenceFrame;
