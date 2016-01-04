@@ -1127,7 +1127,21 @@ namespace SilverSim.Viewer.Core
 
         public void KickUser(string msg)
         {
-#warning Implement KickUser
+            Messages.User.KickUser req = new Messages.User.KickUser();
+            req.AgentID = Owner.ID;
+            req.SessionID = SessionID;
+            req.Message = msg;
+            SendMessageIfRootAgent(req, m_CurrentSceneID);
+        }
+
+        public void KickUser(string msg, Action<bool> callbackDelegate)
+        {
+            Messages.User.KickUser req = new Messages.User.KickUser();
+            req.OnSendCompletion += callbackDelegate;
+            req.AgentID = Owner.ID;
+            req.SessionID = SessionID;
+            req.Message = msg;
+            SendMessageIfRootAgent(req, m_CurrentSceneID);
         }
 
         public bool TeleportTo(SceneInterface sceneInterface, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)

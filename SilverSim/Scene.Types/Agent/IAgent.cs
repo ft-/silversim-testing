@@ -27,6 +27,7 @@ using System.Collections.Generic;
 using ThreadedClasses;
 using SilverSim.Scene.Types.Script;
 using System.ComponentModel;
+using System;
 
 namespace SilverSim.Scene.Types.Agent
 {
@@ -273,5 +274,6 @@ namespace SilverSim.Scene.Types.Agent
         bool TeleportHome(SceneInterface sceneInterface);
 
         void KickUser(string msg);
+        void KickUser(string msg, Action<bool> callbackDelegate);
     }
 }
