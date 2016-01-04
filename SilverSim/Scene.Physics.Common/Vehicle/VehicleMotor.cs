@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
@@ -165,30 +166,80 @@ namespace SilverSim.Scene.Physics.Common.Vehicle
             angularTorque += vertAttractorTorque;
             #endregion
 
-            if ((flags & VehicleFlags.ReactToWind) != 0)
+            if ((flags & (VehicleFlags.ReactToWind | VehicleFlags.ReactToCurrents)) != 0)
             {
-                #region Linear Wind Affector
-                Vector3 windvelocity = scene.Environment.Wind[pos];
-                linearForce += (windvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
-                #endregion
+                double windCurrentMix;
+                double halfBoundBoxSizeZ = currentState.BoundBox.Size.Z / 2;
 
-                #region Angular Wind Affector
-                windvelocity = new Vector3(-windvelocity.Y, windvelocity.X, 0);
-
-                if (angularVelocity.X * windvelocity.X >= 0 &&
-                    angularVelocity.X.PosIfNotNeg() * (angularVelocity.X - windvelocity.X) > 0)
+                if (pos.Z - halfBoundBoxSizeZ > waterHeight || currentState.BoundBox.Size.Z < double.Epsilon)
                 {
-                    windvelocity.X = 0;
+                    windCurrentMix = 1;
+                }
+                else if (pos.Z + halfBoundBoxSizeZ < waterHeight)
+                {
+                    windCurrentMix = 0;
+                }
+                else
+                {
+                    windCurrentMix = (pos.Z - halfBoundBoxSizeZ - waterHeight) /
+                        currentState.BoundBox.Size.Z;
                 }
 
-                if (angularVelocity.Y * windvelocity.Y >= 0 &&
-                    angularVelocity.Y.PosIfNotNeg() * (angularVelocity.Y - windvelocity.Y) > 0)
+                if ((flags & VehicleFlags.ReactToWind) != 0 && pos.Z + halfBoundBoxSizeZ > waterHeight)
                 {
-                    windvelocity.Y = 0;
+                    Vector3 windvelocity = scene.Environment.Wind[pos + new Vector3(0, 0, halfBoundBoxSizeZ / 2)];
+
+                    #region Linear Wind Affector
+                    linearForce += (windvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
+                    #endregion
+
+                    #region Angular Wind Affector
+                    windvelocity = new Vector3(-windvelocity.Y, windvelocity.X, 0);
+
+                    if (angularVelocity.X * windvelocity.X >= 0 &&
+                        angularVelocity.X.PosIfNotNeg() * (angularVelocity.X - windvelocity.X) > 0)
+                    {
+                        windvelocity.X = 0;
+                    }
+
+                    if (angularVelocity.Y * windvelocity.Y >= 0 &&
+                        angularVelocity.Y.PosIfNotNeg() * (angularVelocity.Y - windvelocity.Y) > 0)
+                    {
+                        windvelocity.Y = 0;
+                    }
+
+                    AngularTorque += windvelocity.ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt * windCurrentMix;
+                    #endregion
                 }
 
-                AngularTorque += windvelocity.ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt;
-                #endregion
+                if ((flags & VehicleFlags.ReactToCurrents) != 0 && pos.Z - halfBoundBoxSizeZ / 2 < waterHeight)
+                {
+                    /* yes, wind model also provides current model */
+                    Vector3 currentvelocity = scene.Environment.Wind[pos - new Vector3(0, 0, halfBoundBoxSizeZ / 2)];
+
+                    #region Linear Current Affector
+                    linearForce += (currentvelocity - velocity).ElementMultiply(m_Params[VehicleVectorParamId.LinearWindEfficiency]) * dt;
+                    #endregion
+
+                    #region Angular Current Affector
+                    /* works opposite to wind as we are simulating its attacking force below center */
+                    currentvelocity = new Vector3(currentvelocity.Y, -currentvelocity.X, 0);
+
+                    if (angularVelocity.X * currentvelocity.X >= 0 &&
+                        angularVelocity.X.PosIfNotNeg() * (angularVelocity.X - currentvelocity.X) > 0)
+                    {
+                        currentvelocity.X = 0;
+                    }
+
+                    if (angularVelocity.Y * currentvelocity.Y >= 0 &&
+                        angularVelocity.Y.PosIfNotNeg() * (angularVelocity.Y - currentvelocity.Y) > 0)
+                    {
+                        currentvelocity.Y = 0;
+                    }
+
+                    AngularTorque += currentvelocity.ElementMultiply(m_Params[VehicleVectorParamId.AngularWindEfficiency]) * dt * (1 - windCurrentMix);
+                    #endregion
+                }
             }
 
             #region Banking Motor

@@ -955,6 +955,14 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
+        public void GetBoundingBox(out BoundingBox box)
+        {
+            box = new BoundingBox();
+            box.CenterOffset = Vector3.Zero;
+            box.Size = Vector3.Zero;
+#warning Implement update
+        }
+
         public byte[] TerseData
         {
             get

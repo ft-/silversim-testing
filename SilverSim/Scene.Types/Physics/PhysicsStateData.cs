@@ -20,6 +20,8 @@ namespace SilverSim.Scene.Types.Physics
         public Vector3 AngularVelocity = Vector3.Zero;
         public Vector3 Acceleration = Vector3.Zero;
         public Vector3 AngularAcceleration = Vector3.Zero;
+
+        public BoundingBox BoundBox = new BoundingBox();
         public double Mass;
 
         /* inputs for mouselook steer */
@@ -37,6 +39,7 @@ namespace SilverSim.Scene.Types.Physics
             Acceleration = obj.Acceleration;
             AngularAcceleration = obj.AngularAcceleration;
             Mass = obj.PhysicsActor.Mass;
+            obj.GetBoundingBox(out BoundBox);
         }
     }
 }

@@ -171,6 +171,14 @@ namespace SilverSim.Scene.Types.Object
         }
         #endregion
 
+
+        public void GetBoundingBox(out BoundingBox box)
+        {
+            box = new BoundingBox();
+            box.CenterOffset = Vector3.Zero;
+            box.Size = Size * Rotation;
+        }
+
         public void SendKillObject()
         {
             m_ObjectUpdateInfo.KillObject();

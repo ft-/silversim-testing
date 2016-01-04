@@ -52,6 +52,12 @@ namespace SilverSim.Scene.Types.Object
         void SetPrimitiveParams(PrimitiveParamsType type, AnArray.MarkEnumerator enumerator);
     }
 
+    public struct BoundingBox
+    {
+        public Vector3 CenterOffset;
+        public Vector3 Size;
+    }
+
     public interface IObject
     {
         event Action<IObject> OnPositionChange;
@@ -180,6 +186,7 @@ namespace SilverSim.Scene.Types.Object
         #endregion
 
         #region Methods
+        void GetBoundingBox(out BoundingBox box);
         void GetPrimitiveParams(AnArray.Enumerator enumerator, AnArray paramList);
         void SetPrimitiveParams(AnArray.MarkEnumerator enumerator);
         void GetObjectDetails(AnArray.Enumerator enumerator, AnArray paramList);

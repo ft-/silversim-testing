@@ -145,6 +145,13 @@ namespace SilverSim.Viewer.Core
         public TeleportFlags TeleportFlags;
         #endregion
 
+        public void GetBoundingBox(out BoundingBox box)
+        {
+            box = new BoundingBox();
+            box.CenterOffset = Vector3.Zero;
+            box.Size = Size * Rotation;
+        }
+
         /* Circuits: UUID is SceneID */
         public readonly RwLockedDoubleDictionary<UInt32, UUID, AgentCircuit> Circuits = new RwLockedDoubleDictionary<UInt32, UUID, AgentCircuit>();
         public readonly RwLockedDictionary<GridVector, string> KnownChildAgentURIs = new RwLockedDictionary<GridVector, string>();
