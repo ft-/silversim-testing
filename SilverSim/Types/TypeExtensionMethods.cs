@@ -16,6 +16,11 @@ namespace SilverSim.Types
             return a < 0 ? -1 : 1;
         }
 
+        public static double Mix(this double a, double b, double m)
+        {
+            return a * (1 - m) + b * m;
+        }
+
         public static double Lerp(this double a, double b, double u)
         {
             return a + ((b - a) * u);
