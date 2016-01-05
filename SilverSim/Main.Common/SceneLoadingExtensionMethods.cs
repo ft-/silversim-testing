@@ -160,6 +160,7 @@ namespace SilverSim.Main.Common
                     pi.Flags = ParcelFlags.None; /* we keep all flags disabled initially */
                     pi.BillableArea = (int)(loadparams.Scene.SizeX * loadparams.Scene.SizeY);
                     pi.LandBitmap.SetAllBits();
+                    pi.LandingType = TeleportLandingType.Anywhere;
                     pi.LandingPosition = new Vector3(128, 128, 23);
                     pi.LandingLookAt = new Vector3(1, 0, 0);
                     pi.ClaimDate = new Date();
