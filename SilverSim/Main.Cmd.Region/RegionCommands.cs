@@ -1024,12 +1024,16 @@ namespace SilverSim.Main.Cmd.Region
 
             string msg = args.Count >= 4 ?
                 string.Join(" ", args.GetRange(4, args.Count - 4)) :
-                "You have been kicked.";
+                string.Empty;
 
             bool agentFound = false;
             foreach (IAgent agent in scene.RootAgents)
             {
                 UUI agentid = agent.Owner;
+                if(args.Count < 4)
+                {
+                    msg = this.GetLanguageString(agent.CurrentCulture, "YouHaveBeenKicked", "You have been kicked.");
+                }
                 if (agentid.FullName.ToLower() == (args[2] + " " + args[3]).ToLower())
                 {
                     agent.KickUser(msg);

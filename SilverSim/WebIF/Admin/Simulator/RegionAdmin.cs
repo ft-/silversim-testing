@@ -423,7 +423,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             SceneInterface si;
             if(TryGetRootAgent(req, jsondata, out si, out agent))
             {
-                string msg = "You have been kicked since you could not be teleported home.";
+                string msg = this.GetLanguageString(agent.CurrentCulture, "YouHaveBeenKickedSinceYouCouldNotBeTeleportedHome", "You have been kicked since you could not be teleported home.");
                 if (jsondata.ContainsKey("message"))
                 {
                     msg = jsondata["message"].ToString();
@@ -443,7 +443,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             SceneInterface si;
             if (TryGetRootAgent(req, jsondata, out si, out agent))
             {
-                string msg = "You have been kicked.";
+                string msg = this.GetLanguageString(agent.CurrentCulture, "YouHaveBeenKicked", "You have been kicked.");
                 if(jsondata.ContainsKey("message"))
                 {
                     msg = jsondata["message"].ToString();
