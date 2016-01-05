@@ -658,6 +658,18 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
+        #region Parcel Access/Ban Lists
+        protected override bool IsOnParcelAccessList(IAgent agent, ParcelInfo parcel)
+        {
+            return m_SimulationDataStorage.Parcels.WhiteList[parcel.ID, agent.Owner];
+        }
+
+        protected override bool IsOnParcelBanList(IAgent agent, ParcelInfo parcel)
+        {
+            return m_SimulationDataStorage.Parcels.BlackList[parcel.ID, agent.Owner];
+        }
+        #endregion
+
         #region Add and Remove
         internal int m_ObjectCount;
         internal int m_PrimitiveCount;

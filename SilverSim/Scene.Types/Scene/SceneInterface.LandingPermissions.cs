@@ -51,18 +51,36 @@ namespace SilverSim.Scene.Types.Scene
             return CheckParcelAccessRights(agent, parcel, out nop);
         }
 
+        protected abstract bool IsOnParcelAccessList(IAgent agent, ParcelInfo parcel);
+        protected abstract bool IsOnParcelBanList(IAgent agent, ParcelInfo parcel);
+
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel, out string reason)
         {
             reason = string.Empty;
-            if ((parcel.Flags & ParcelFlags.UseAccessList) != 0)
+            /* owner must be able to enter parcel */
+            if(agent.Owner.EqualsGrid(parcel.Owner))
             {
-                /* check white list before */
+                return true;
             }
 
             if ((parcel.Flags & ParcelFlags.UseBanList) != 0)
             {
                 /* check black list before */
+                if (IsOnParcelBanList(agent, parcel))
+                {
+                    reason = "You are banned from the parcel.";
+                    return false;
+                }
+            }
+
+            if ((parcel.Flags & ParcelFlags.UseAccessList) != 0)
+            {
+                /* check white list before */
+                if (IsOnParcelAccessList(agent, parcel))
+                {
+                    return true;
+                }
             }
 
             if ((parcel.Flags & ParcelFlags.UseAccessGroup) != 0)
@@ -115,7 +133,7 @@ namespace SilverSim.Scene.Types.Scene
                     continue;
                 }
 
-                if(null != selectedParcel)
+                if (null != selectedParcel)
                 {
                     Vector3 a, b, c, d;
                     a = selectedParcel.AABBMin;
@@ -126,7 +144,7 @@ namespace SilverSim.Scene.Types.Scene
                     b.Y = c.Y;
                     double parceldist = (a - destinationLocation).LengthSquared;
                     double f = (b - destinationLocation).LengthSquared;
-                    if(f < parceldist)
+                    if (f < parceldist)
                     {
                         parceldist = f;
                     }
@@ -148,14 +166,16 @@ namespace SilverSim.Scene.Types.Scene
                     d.Y = a.Y;
                     b.Y = c.Y;
 
-                    if(parceldist > (a - destinationLocation).LengthSquared ||
+                    if (parceldist > (a - destinationLocation).LengthSquared ||
                         parceldist > (b - destinationLocation).LengthSquared)
                     {
                         selectedParcel = parcel;
                     }
                 }
-
-                selectedParcel = parcel;
+                else
+                {
+                    selectedParcel = parcel;
+                }
             }
 
             if(null == selectedParcel)
