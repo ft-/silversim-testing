@@ -61,23 +61,17 @@ namespace SilverSim.Scene.Types.Scene
                 return true;
             }
 
-            if ((parcel.Flags & ParcelFlags.UseBanList) != 0)
+            if ((parcel.Flags & ParcelFlags.UseBanList) != 0 &&
+                Parcels.BlackList[parcel.ID, agent.Owner])
             {
-                /* check black list before */
-                if (Parcels.BlackList[parcel.ID, agent.Owner])
-                {
-                    reason = "You are banned from the parcel.";
-                    return false;
-                }
+                reason = "You are banned from the parcel.";
+                return false;
             }
 
-            if ((parcel.Flags & ParcelFlags.UseAccessList) != 0)
+            if ((parcel.Flags & ParcelFlags.UseAccessList) != 0 &&
+                Parcels.WhiteList[parcel.ID, agent.Owner])
             {
-                /* check white list before */
-                if (Parcels.WhiteList[parcel.ID, agent.Owner])
-                {
-                    return true;
-                }
+                return true;
             }
 
             if ((parcel.Flags & ParcelFlags.UseAccessGroup) != 0)
