@@ -126,36 +126,37 @@ namespace SilverSim.Scene.Management.Scene
 
             if (agentCount > 0)
             {
-                Semaphore waitSema = new Semaphore(0, agentCount);
-                foreach (IAgent agent in agentsToLogout)
+                using (Semaphore waitSema = new Semaphore(0, agentCount))
                 {
-                    agent.KickUser("Simulator shutting down", delegate (bool v) 
+                    foreach (IAgent agent in agentsToLogout)
+                    {
+                        agent.KickUser("Simulator shutting down", delegate (bool v)
+                        {
+                            try
+                            {
+                                waitSema.Release(1);
+                            }
+                            catch (ObjectDisposedException)
+                            {
+                                /* ignore this specific error, we might have disposed it before getting to this call */
+                            }
+                        });
+                    }
+                    int count = 0;
+                    while (count < agentCount)
                     {
                         try
                         {
-                            waitSema.Release(1);
+                            waitSema.WaitOne(11000);
                         }
-                        catch(ObjectDisposedException)
+                        catch
                         {
-                            /* ignore this specific error, we might have disposed it before getting to this call */
+                            m_Log.InfoFormat("Remaining agents are forced to be disconnected. Count: {0}", agentCount - count);
+                            break;
                         }
-                    });
-                }
-                int count = 0;
-                while (count < agentCount)
-                {
-                    try
-                    {
-                        waitSema.WaitOne(11000);
+                        ++count;
                     }
-                    catch
-                    {
-                        m_Log.InfoFormat("Remaining agents are forced to be disconnected. Count: {0}", agentCount - count);
-                        break;
-                    }
-                    ++count;
                 }
-                waitSema.Dispose();
             }
             /* if there are still agents left, we kill their connections here. */
 
