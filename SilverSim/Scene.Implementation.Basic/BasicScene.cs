@@ -176,6 +176,22 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_Scene = scene;
             }
 
+            public IParcelAccessList WhiteList
+            {
+                get
+                {
+                    return m_Scene.m_SimulationDataStorage.Parcels.WhiteList;
+                }
+            }
+
+            public IParcelAccessList BlackList
+            {
+                get
+                {
+                    return m_Scene.m_SimulationDataStorage.Parcels.BlackList;
+                }
+            }
+
             public ParcelInfo this[UUID id]
             {
                 get
@@ -657,18 +673,6 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
             }
         }
-
-        #region Parcel Access/Ban Lists
-        protected override bool IsOnParcelAccessList(IAgent agent, ParcelInfo parcel)
-        {
-            return m_SimulationDataStorage.Parcels.WhiteList[parcel.ID, agent.Owner];
-        }
-
-        protected override bool IsOnParcelBanList(IAgent agent, ParcelInfo parcel)
-        {
-            return m_SimulationDataStorage.Parcels.BlackList[parcel.ID, agent.Owner];
-        }
-        #endregion
 
         #region Add and Remove
         internal int m_ObjectCount;

@@ -1,14 +1,14 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {
-    public abstract class SimulationDataParcelAccessListStorageInterface
+    public abstract class SimulationDataParcelAccessListStorageInterface : IParcelAccessList
     {
         public SimulationDataParcelAccessListStorageInterface()
         {

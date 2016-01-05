@@ -51,9 +51,6 @@ namespace SilverSim.Scene.Types.Scene
             return CheckParcelAccessRights(agent, parcel, out nop);
         }
 
-        protected abstract bool IsOnParcelAccessList(IAgent agent, ParcelInfo parcel);
-        protected abstract bool IsOnParcelBanList(IAgent agent, ParcelInfo parcel);
-
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel, out string reason)
         {
@@ -67,7 +64,7 @@ namespace SilverSim.Scene.Types.Scene
             if ((parcel.Flags & ParcelFlags.UseBanList) != 0)
             {
                 /* check black list before */
-                if (IsOnParcelBanList(agent, parcel))
+                if (Parcels.BlackList[parcel.ID, agent.Owner])
                 {
                     reason = "You are banned from the parcel.";
                     return false;
@@ -77,7 +74,7 @@ namespace SilverSim.Scene.Types.Scene
             if ((parcel.Flags & ParcelFlags.UseAccessList) != 0)
             {
                 /* check white list before */
-                if (IsOnParcelAccessList(agent, parcel))
+                if (Parcels.WhiteList[parcel.ID, agent.Owner])
                 {
                     return true;
                 }
@@ -241,7 +238,7 @@ namespace SilverSim.Scene.Types.Scene
                     p = FindNonBlockedParcel(agent, destinationLocation);
                 }
 
-                /* do not block parcel owner, estate manager or estate owner */
+                /* do not block parcel owner, estate manager or estate owner when landing override is enabled */
 
                 switch (p.LandingType)
                 {

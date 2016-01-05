@@ -58,6 +58,15 @@ namespace SilverSim.Scene.Types.Scene
         int Count { get; }
     }
 
+    public interface IParcelAccessList
+    {
+        bool this[UUID parcelID, UUI accessor] { get; }
+        List<ParcelAccessEntry> this[UUID parcelID] { get; }
+        void Store(ParcelAccessEntry entry);
+        bool RemoveAll(UUID parcelID);
+        bool Remove(UUID parcelID, UUI accessor);
+    }
+
     public interface ISceneParcels : IEnumerable<ParcelInfo>
     {
         ParcelInfo this[UUID id] { get; }
@@ -72,6 +81,9 @@ namespace SilverSim.Scene.Types.Scene
         void Store(UUID parcelID);
         bool Remove(UUID parcelID);
         void ResetParcels();
+
+        IParcelAccessList WhiteList { get; }
+        IParcelAccessList BlackList { get; }
     }
 
     public abstract partial class SceneInterface
