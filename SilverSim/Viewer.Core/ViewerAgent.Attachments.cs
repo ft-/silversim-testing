@@ -332,7 +332,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    SendAlertMessage("Could not store attachment data", SceneID);
+                    SendAlertMessage(this.GetLanguageString(CurrentCulture, "CouldNotStoreAttachmentData", "Could not store attachment data"), SceneID);
                     return;
                 }
                 try
@@ -340,7 +340,7 @@ namespace SilverSim.Viewer.Core
                     InventoryItem item = InventoryService.Item[ID, entry.ItemID];
                     if (item.AssetType != AssetType.Object)
                     {
-                        SendAlertMessage("Could not store attachment data", SceneID);
+                        SendAlertMessage(this.GetLanguageString(CurrentCulture, "CouldNotStoreAttachmentData", "Could not store attachment data"), SceneID);
                         return;
                     }
                     else
@@ -351,7 +351,7 @@ namespace SilverSim.Viewer.Core
                 }
                 catch
                 {
-                    SendAlertMessage("Could not store attachment data within item", SceneID);
+                    SendAlertMessage(this.GetLanguageString(CurrentCulture, "CouldNotStoreAttachmentDataWithinItem", "Could not store attachment data within item"), SceneID);
                     return;
                 }
             }

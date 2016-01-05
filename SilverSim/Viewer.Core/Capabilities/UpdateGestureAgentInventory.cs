@@ -72,7 +72,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 if(!item.CheckPermissions(m_Agent.Owner, m_Agent.Group, InventoryPermissionsMask.Modify))
                 {
-                    throw new UploadErrorException("Not allowed to modify gesture");
+                    throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "NotAllowedToModifyGesture", "Not allowed to modify gesture"));
                 }
                 item.AssetID = data.ID;
                 data.Creator = item.Creator;
@@ -84,7 +84,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch
                 {
-                    throw new UploadErrorException("Failed to store asset");
+                    throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreAsset", "Failed to store asset"));
                 }
 
                 try
@@ -93,7 +93,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch
                 {
-                    throw new UploadErrorException("Failed to store inventory item");
+                    throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreInventoryItem", "Failed to store inventory item"));
                 }
                 return m;
             }

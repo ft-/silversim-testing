@@ -364,7 +364,7 @@ namespace SilverSim.Viewer.Core
                 catch
                 {
                     Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                    res.Message = "Failed to copy item";
+                    res.Message = this.GetLanguageString(Agent.CurrentCulture, "FailedToCopyItem", "Failed to copy item");
                     SendMessage(res);
                 }
             }

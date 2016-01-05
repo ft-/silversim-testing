@@ -235,7 +235,7 @@ namespace SilverSim.Viewer.Core
             catch
             {
                 Messages.Alert.AlertMessage res = new Messages.Alert.AlertMessage();
-                res.Message = "Could not compile script";
+                res.Message = this.GetLanguageString(circuit.Agent.CurrentCulture, "CouldNotCompileScript", "Could not compile script");
                 circuit.SendMessage(res);
                 return;
             }

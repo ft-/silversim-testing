@@ -66,7 +66,7 @@ namespace SilverSim.Scene.Types.Scene
             if ((parcel.Flags & ParcelFlags.UseBanList) != 0 &&
                 Parcels.BlackList[parcel.ID, agent.Owner])
             {
-                reason = "You are banned from the parcel.";
+                reason = this.GetLanguageString(agent.CurrentCulture, "YouAreBannedFromTheParcel", "You are banned from the parcel.");
                 return false;
             }
 
@@ -80,7 +80,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 if(null == GroupsService)
                 {
-                    reason = "Parcel is group restricted";
+                    reason = this.GetLanguageString(agent.CurrentCulture, "ParcelIsGroupRestricted", "Parcel is group restricted");
                     return false;
                 }
                 else
@@ -90,16 +90,16 @@ namespace SilverSim.Scene.Types.Scene
                         GroupMembership res = GroupsService.Memberships[parcel.Owner, parcel.Group, agent.Owner];
                         if(!res.Principal.EqualsGrid(agent.Owner) || !res.Group.Equals(parcel.Group))
                         {
-                            reason = "Parcel group did not validate.";
+                            reason = this.GetLanguageString(agent.CurrentCulture, "ParcelGroupDidNotValidate", "Parcel group did not validate.");
                             return false;
                         }
                     }
                     catch
                     {
-                        reason = "You are not a member of the parcel group.";
+                        reason = this.GetLanguageString(agent.CurrentCulture, "YouAreNotAMemberOfTheParcelGroup", "You are not a member of the parcel group.");
                         if((parcel.Flags & ParcelFlags.UseAccessList) != 0)
                         {
-                            reason = "You are neither a member of the parcel group or on the access list.";
+                            reason = this.GetLanguageString(agent.CurrentCulture, "YouAreNeitherAMemberOfTheParcelGroupOrOnTheAccessList", "You are neither a member of the parcel group or on the access list.");
                         }
                         return false;
                     }
@@ -107,7 +107,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             if((parcel.Flags & ParcelFlags.UseAccessList) != 0)
             {
-                reason = "You are not on the access list.";
+                reason = this.GetLanguageString(agent.CurrentCulture, "YouAreNotOnTheParcelAccessList", "You are not on the parcel access list.");
                 return false;
             }
             return true;
@@ -173,7 +173,7 @@ namespace SilverSim.Scene.Types.Scene
 
             if(null == selectedParcel)
             {
-                throw new ParcelAccessDeniedException("No parcels for teleporting to found.");
+                throw new ParcelAccessDeniedException(this.GetLanguageString(agent.CurrentCulture, "NoParcelsForTeleportingToFound", "No parcels for teleporting to found."));
             }
             return selectedParcel;
         }
@@ -196,7 +196,7 @@ namespace SilverSim.Scene.Types.Scene
                         return estateInfo;
                     }
                 }
-                throw new ParcelAccessDeniedException("You are not allowed to enter the estate.");
+                throw new ParcelAccessDeniedException(this.GetLanguageString(agent.CurrentCulture, "YouAreNotAllowedToEnterTheEstate", "You are not allowed to enter the estate."));
             }
 
             return estateInfo;
@@ -257,7 +257,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             else if(!EstateService.ContainsKey(EstateService.RegionMap[ID]))
             {
-                throw new ParcelAccessDeniedException("Estate data not available.");
+                throw new ParcelAccessDeniedException(this.GetLanguageString(agent.CurrentCulture, "EstateDataNotAvailable", "Estate data not available."));
             }
 
             if (destinationLocation.X < 0 || destinationLocation.X >= SizeX)
