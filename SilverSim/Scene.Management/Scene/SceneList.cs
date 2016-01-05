@@ -8,6 +8,8 @@ using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.Resources;
 using System.Threading;
 using ThreadedClasses;
 
@@ -97,8 +99,16 @@ namespace SilverSim.Scene.Management.Scene
             throw new InvalidOperationException();
         }
 
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         public void Remove(SceneInterface scene)
+        {
+            Remove(scene, delegate (CultureInfo culture) 
+            {
+                return this.GetLanguageString(culture, "RegionIsShuttingDown", "Region is shutting down");
+            });
+        }
+
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        public void Remove(SceneInterface scene, Func<CultureInfo, string> GetLocalizedOutput)
         {
             scene.LoginControl.NotReady(SceneInterface.ReadyFlags.Remove);
             m_Log.InfoFormat("Removing region {0} at {1},{2}", scene.Name, scene.GridPosition.X / 256, scene.GridPosition.Y / 256);
@@ -130,7 +140,7 @@ namespace SilverSim.Scene.Management.Scene
                 {
                     foreach (IAgent agent in agentsToLogout)
                     {
-                        agent.KickUser("Simulator shutting down", delegate (bool v)
+                        agent.KickUser(GetLocalizedOutput(agent.CurrentCulture), delegate (bool v)
                         {
                             try
                             {
