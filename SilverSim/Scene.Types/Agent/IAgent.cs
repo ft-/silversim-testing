@@ -28,6 +28,7 @@ using ThreadedClasses;
 using SilverSim.Scene.Types.Script;
 using System.ComponentModel;
 using System;
+using System.Globalization;
 
 namespace SilverSim.Scene.Types.Agent
 {
@@ -41,6 +42,7 @@ namespace SilverSim.Scene.Types.Agent
         ClientInfo Client { get; }
         SessionInfo Session { get; }
         UserAccount UntrustedAccountInfo { get; }
+        CultureInfo CurrentCulture { get; }
 
         List<GridType> SupportedGridTypes { get; }
 

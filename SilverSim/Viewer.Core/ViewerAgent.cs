@@ -36,6 +36,7 @@ using System.Collections.Generic;
 using System.Net;
 using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
 
 namespace SilverSim.Viewer.Core
 {
@@ -140,9 +141,65 @@ namespace SilverSim.Viewer.Core
         public Uri HomeURI { get; private set; }
         public UUID SessionID { get; private set; }
         public double DrawDistance { get; private set; }
-        public string AgentLanguage { get; internal set; }
+        #endregion
+
+        #region AgentLanguage
+        string m_AgentLanguage = string.Empty;
+        CultureInfo m_AgentCultureInfo = null;
+        object m_AgentLanguageLock = new object();
+        public string AgentLanguage
+        {
+            get
+            {
+                lock (m_AgentLanguageLock)
+                {
+                    return m_AgentLanguage;
+                }
+            }
+
+            internal set
+            {
+                lock (m_AgentLanguageLock)
+                {
+                    m_AgentLanguage = value;
+                    try
+                    {
+                        m_AgentCultureInfo = new CultureInfo(value);
+#if DEBUG
+                        m_Log.DebugFormat("Agent {0} selected CultureInfo {1}", Owner.FullName, value);
+#endif
+                    }
+                    catch
+                    {
+                        m_AgentCultureInfo = EnUsCulture;
+#if DEBUG
+                        m_Log.DebugFormat("Agent {0} set to fallback CultureInfo en-US", Owner.FullName);
+#endif
+                    }
+                }
+            }
+        }
 
         public TeleportFlags TeleportFlags;
+
+        static readonly CultureInfo EnUsCulture = new CultureInfo("en-US");
+        public CultureInfo CurrentCulture
+        {
+            get
+            {
+                lock (m_AgentLanguageLock)
+                {
+                    if (null == m_AgentCultureInfo)
+                    {
+                        return EnUsCulture;
+                    }
+                    else
+                    {
+                        return m_AgentCultureInfo;
+                    }
+                }
+            }
+        }
         #endregion
 
         public void GetBoundingBox(out BoundingBox box)
