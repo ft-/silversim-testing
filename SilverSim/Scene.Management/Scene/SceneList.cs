@@ -129,14 +129,24 @@ namespace SilverSim.Scene.Management.Scene
                 Semaphore waitSema = new Semaphore(0, agentCount);
                 foreach (IAgent agent in agentsToLogout)
                 {
-                    agent.KickUser("Simulator shutting down", delegate (bool v) { waitSema.Release(1); });
+                    agent.KickUser("Simulator shutting down", delegate (bool v) 
+                    {
+                        try
+                        {
+                            waitSema.Release(1);
+                        }
+                        catch(ObjectDisposedException)
+                        {
+                            /* ignore this specific error, we might have disposed it before getting to this call */
+                        }
+                    });
                 }
                 int count = 0;
                 while (count < agentCount)
                 {
                     try
                     {
-                        waitSema.WaitOne(10000);
+                        waitSema.WaitOne(11000);
                     }
                     catch
                     {
@@ -145,6 +155,7 @@ namespace SilverSim.Scene.Management.Scene
                     }
                     ++count;
                 }
+                waitSema.Dispose();
             }
             /* if there are still agents left, we kill their connections here. */
 
