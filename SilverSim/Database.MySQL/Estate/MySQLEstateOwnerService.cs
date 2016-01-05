@@ -22,15 +22,14 @@ namespace SilverSim.Database.MySQL.Estate
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
-                using (MySqlCommand cmd = new MySqlCommand("SELECT OwnerID FROM estates WHERE ID = ?id", conn))
+                using (MySqlCommand cmd = new MySqlCommand("SELECT Owner FROM estates WHERE ID = ?id", conn))
                 {
                     cmd.Parameters.AddWithValue("?id", estateID);
                     using (MySqlDataReader reader = cmd.ExecuteReader())
                     {
                         if (reader.Read())
                         {
-                            uui = new UUI();
-                            uui.ID = reader.GetUUID("OwnerID");
+                            uui = reader.GetUUI("Owner");
                             return true;
                         }
                     }
@@ -48,14 +47,18 @@ namespace SilverSim.Database.MySQL.Estate
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT ID FROM estates WHERE OwnerID = ?id", conn))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT ID, Owner FROM estates WHERE Owner LIKE \"" + owner.ID.ToString() + "%\"", conn))
                     {
                         cmd.Parameters.AddWithValue("?id", owner.ID.ToString());
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
                             while (reader.Read())
                             {
-                                estates.Add((uint)reader["ID"]);
+                                UUI uui = reader.GetUUI("Owner");
+                                if (uui.EqualsGrid(owner))
+                                {
+                                    estates.Add((uint)reader["ID"]);
+                                }
                             }
                             return estates;
                         }
@@ -81,10 +84,10 @@ namespace SilverSim.Database.MySQL.Estate
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("UPDATE estates SET OwnerID = ?ownerid WHERE ID = ?id", conn))
+                    using (MySqlCommand cmd = new MySqlCommand("UPDATE estates SET Owner = ?ownerid WHERE ID = ?id", conn))
                     {
                         cmd.Parameters.AddWithValue("?id", estateID);
-                        cmd.Parameters.AddWithValue("?ownerid", value.ID.ToString());
+                        cmd.Parameters.AddWithValue("?ownerid", value.ToString());
                         if(cmd.ExecuteNonQuery() < 1)
                         {
                             throw new EstateUpdateFailedException();
