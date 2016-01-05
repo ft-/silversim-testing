@@ -55,8 +55,10 @@ namespace SilverSim.Scene.Types.Scene
         bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel, out string reason)
         {
             reason = string.Empty;
-            /* owner must be able to enter parcel */
-            if(agent.Owner.EqualsGrid(parcel.Owner))
+            /* EO,EM,RO,PO must be able to enter parcel */
+            if(agent.Owner.EqualsGrid(parcel.Owner) ||
+                agent.Owner.EqualsGrid(Owner) ||
+                IsEstateManager(agent.Owner))
             {
                 return true;
             }
