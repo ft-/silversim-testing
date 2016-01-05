@@ -753,7 +753,9 @@ namespace SilverSim.Scene.Implementation.Basic
                     FirstTrigger = false;
                     foreach (IAgent agent in scene.RootAgents)
                     {
-                        agent.SendRegionNotice(scene.Owner, string.Format("Simulator is restarting in {0} seconds", timeLeft), scene.ID);
+                        agent.SendRegionNotice(scene.Owner, 
+                            string.Format(this.GetLanguageString(agent.CurrentCulture, "RegionIsRestartingInXSeconds", "Region is restarting in {0} seconds"), timeLeft),
+                            scene.ID);
                     }
                     m_Log.InfoFormat("Region {0} restarting in {1} seconds", scene.Name, timeLeft);
                 }
@@ -767,7 +769,11 @@ namespace SilverSim.Scene.Implementation.Basic
                     if (m_RegionStorage.TryGetValue(scopeID, sceneID, out rInfo))
                     {
                         m_Log.InfoFormat("Restarting Region {0} ({1})", rInfo.Name, rInfo.ID.ToString());
-                        SceneManager.Scenes.Remove(scene);
+                        SceneManager.Scenes.Remove(scene,
+                            delegate(System.Globalization.CultureInfo culture)
+                            {
+                                return this.GetLanguageString(culture, "RegionIsNowRestarting", "Region is now restarting.");
+                            });
                         scene = null;
                         /* we are still alive despite having just stopped the region */
                         m_Log.InfoFormat("Starting Region {0} ({1})", rInfo.Name, rInfo.ID.ToString());
