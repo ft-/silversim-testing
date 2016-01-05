@@ -137,8 +137,9 @@ namespace SilverSim.Scene.Implementation.Basic
                 m_EstateService,
                 m_PhysicsFactory,
                 m_NeighborService,
-                m_CapabilitiesConfig);
-            scene.RegionStorage = m_RegionStorage;
+                m_CapabilitiesConfig,
+                m_RegionStorage,
+                this);
             return scene;
         }
     }

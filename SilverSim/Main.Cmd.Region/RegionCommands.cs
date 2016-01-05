@@ -78,6 +78,7 @@ namespace SilverSim.Main.Cmd.Region
             Common.CmdIO.CommandRegistry.StopCommands.Add("region", StopRegionCmd);
             Common.CmdIO.CommandRegistry.ChangeCommands.Add("region", ChangeRegionCmd);
             Common.CmdIO.CommandRegistry.AlertCommands.Add("region", AlertRegionCmd);
+            Common.CmdIO.CommandRegistry.RestartCommands.Add("region", RestartRegionCmd);
             Common.CmdIO.CommandRegistry.AlertCommands.Add("regions", AlertRegionsCmd);
             Common.CmdIO.CommandRegistry.AlertCommands.Add("agent", AlertAgentCmd);
             Common.CmdIO.CommandRegistry.KickCommands.Add("agent", KickAgentCmd);
@@ -725,6 +726,48 @@ namespace SilverSim.Main.Cmd.Region
                     m_EstateService.RegionMap.Remove(rInfo.ID);
                     m_RegionStorage.DeleteRegion(UUID.Zero, rInfo.ID);
                     io.WriteFormatted("Region '{0}' deleted.", args[2]);
+                }
+            }
+        }
+
+        void RestartRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
+        {
+            UUID selectedScene = limitedToScene;
+            RegionInfo rInfo;
+            if(selectedScene == UUID.Zero)
+            {
+                selectedScene = io.SelectedScene;
+            }
+
+            if (args[0] == "help" || args.Count < 4)
+            {
+                io.Write("restart region <regionname> seconds\nrestart region <regionname> abort");
+            }
+            else if (!m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
+            {
+                io.Write("No region selected");
+            }
+            else
+            {
+                SceneInterface scene;
+                int timeToRestart;
+                if(!SceneManager.Scenes.TryGetValue(rInfo.ID, out scene))
+                {
+                    io.Write("region not started");
+                }
+                else if(args[3].ToLower() == "abort")
+                {
+                    scene.AbortRegionRestart();
+                    io.Write("Region restart abort requested");
+                }
+                else if(int.TryParse(args[3], out timeToRestart))
+                {
+                    scene.RequestRegionRestart(timeToRestart);
+                    io.Write("Region restart requested");
+                }
+                else
+                {
+                    io.Write("Invalid seconds specified: " + args[3]);
                 }
             }
         }

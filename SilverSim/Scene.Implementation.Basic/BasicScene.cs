@@ -39,6 +39,7 @@ using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scene.Management.Scene;
 using System.Diagnostics.CodeAnalysis;
 using SilverSim.Types.Estate;
+using System.Timers;
 
 namespace SilverSim.Scene.Implementation.Basic
 {
@@ -471,9 +472,12 @@ namespace SilverSim.Scene.Implementation.Basic
             EstateServiceInterface estateService,
             IPhysicsSceneFactory physicsFactory,
             NeighborServiceInterface neighborService,
-            Dictionary<string, string> capabilitiesConfig)
+            Dictionary<string, string> capabilitiesConfig,
+            GridServiceInterface regionStorage,
+            SceneFactory myFactory)
         : base(ri.Size.X, ri.Size.Y)
         {
+            m_RestartObject = new RestartObject(this, myFactory, regionStorage);
             ID = ri.ID;
             /* next line is there to break the circular dependencies */
             TryGetScene = SceneManager.Scenes.TryGetValue;
@@ -556,6 +560,7 @@ namespace SilverSim.Scene.Implementation.Basic
         void RemoveScene(SceneInterface s)
         {
             ScriptThreadPool.Shutdown();
+            m_RestartObject = null;
             m_StopBasicSceneThreads = true;
             if (null != m_NeighborService)
             {
@@ -673,6 +678,145 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
             }
         }
+
+        #region Restart Timer
+        RestartObject m_RestartObject;
+
+        class RestartObject
+        {
+            WeakReference m_WeakScene;
+            SceneFactory m_SceneFactory;
+            GridServiceInterface m_RegionStorage;
+            public System.Timers.Timer RestartTimer = new System.Timers.Timer(1000);
+            int m_SecondsToRestart;
+            public bool FirstTrigger;
+            object m_ActionLock = new object();
+            public int SecondsToRestart
+            {
+                get
+                {
+                    lock (m_ActionLock)
+                    {
+                        return m_SecondsToRestart;
+                    }
+                }
+                set
+                {
+                    lock (m_ActionLock)
+                    {
+                        if (value >= 0)
+                        {
+                            m_SecondsToRestart = value;
+                        }
+                    }
+                }
+            }
+
+            ~RestartObject()
+            {
+                RestartTimer.Elapsed -= RestartTimerHandler;
+                RestartTimer.Dispose();
+            }
+
+            public RestartObject(SceneInterface scene, SceneFactory sceneFactory, GridServiceInterface regionStorage)
+            {
+                m_WeakScene = new WeakReference(scene);
+                m_SceneFactory = sceneFactory;
+                m_RegionStorage = regionStorage;
+                RestartTimer.Elapsed += RestartTimerHandler;
+            }
+
+            public void RestartTimerHandler(object o, ElapsedEventArgs evargs)
+            {
+                int timeLeft;
+                lock (m_ActionLock)
+                {
+                    timeLeft = m_SecondsToRestart--;
+                }
+                if (timeLeft < 0)
+                {
+                    /* may happen during stopping */
+                    return;
+                }
+
+                SceneInterface scene = (SceneInterface)m_WeakScene.Target;
+                if (!m_WeakScene.IsAlive)
+                {
+#if DEBUG
+                    m_Log.Debug("Weak reference lost");
+#endif
+                    return;
+                }
+
+                if (timeLeft % 15 == 0 || FirstTrigger)
+                {
+                    FirstTrigger = false;
+                    foreach (IAgent agent in scene.RootAgents)
+                    {
+                        agent.SendRegionNotice(scene.Owner, string.Format("Simulator is restarting in {0} seconds", timeLeft), scene.ID);
+                    }
+                    m_Log.InfoFormat("Region {0} restarting in {1} seconds", scene.Name, timeLeft);
+                }
+
+                if (timeLeft == 0)
+                {
+                    UUID sceneID = scene.ID;
+                    UUID scopeID = scene.ScopeID;
+                    RegionInfo rInfo;
+                    m_WeakScene.Target = null;
+                    if (m_RegionStorage.TryGetValue(scopeID, sceneID, out rInfo))
+                    {
+                        m_Log.InfoFormat("Restarting Region {0} ({1})", rInfo.Name, rInfo.ID.ToString());
+                        SceneManager.Scenes.Remove(scene);
+                        scene = null;
+                        /* we are still alive despite having just stopped the region */
+                        m_Log.InfoFormat("Starting Region {0} ({1})", rInfo.Name, rInfo.ID.ToString());
+                        try
+                        {
+                            scene = m_SceneFactory.Instantiate(rInfo);
+                        }
+                        catch (Exception e)
+                        {
+                            m_Log.InfoFormat("Failed to start region: {0}", e.Message);
+                            return;
+                        }
+                        SceneManager.Scenes.Add(scene);
+                        scene.LoadSceneAsync();
+                    }
+                    RestartTimer.Stop();
+                }
+            }
+        }
+
+        public override void AbortRegionRestart()
+        {
+            m_RestartObject.SecondsToRestart = -1;
+            try
+            {
+                m_RestartObject.RestartTimer.Stop();
+            }
+            catch (NullReferenceException)
+            {
+                /* we use NullReferenceException here */
+            }
+            catch(ObjectDisposedException)
+            {
+                /* ensure that a disposed Timer does not kill something unnecessarily */
+            }
+        }
+
+        public override void RequestRegionRestart(int seconds)
+        {
+            AbortRegionRestart();
+            if (seconds < 15)
+            {
+                return;
+            }
+            m_RestartObject.FirstTrigger = true;
+            m_RestartObject.SecondsToRestart = seconds;
+            m_RestartObject.RestartTimer.Start();
+        }
+        #endregion
 
         #region Add and Remove
         internal int m_ObjectCount;

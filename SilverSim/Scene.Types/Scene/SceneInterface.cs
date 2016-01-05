@@ -366,6 +366,8 @@ namespace SilverSim.Scene.Types.Scene
         public abstract void Add(IObject obj);
         public abstract bool Remove(IObject obj, Script.ScriptInstance instance = null);
         public abstract void ClearObjects();
+        public abstract void AbortRegionRestart();
+        public abstract void RequestRegionRestart(int seconds);
 
         public void TriggerAgentChangedScene(IAgent agent)
         {

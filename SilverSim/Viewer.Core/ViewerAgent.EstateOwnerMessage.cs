@@ -450,6 +450,7 @@ namespace SilverSim.Viewer.Core
             {
                 timeToRestart = 120;
             }
+            circuit.Scene.RequestRegionRestart((int)timeToRestart);
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
