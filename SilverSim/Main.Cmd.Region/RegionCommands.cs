@@ -937,7 +937,7 @@ namespace SilverSim.Main.Cmd.Region
             foreach (IAgent agent in scene.RootAgents)
             {
                 UUI agentid = agent.Owner;
-                if (agentid.FirstName == args[2] && agentid.LastName == args[3])
+                if (agentid.FullName.ToLower() == (args[2] + " " + args[3]).ToLower())
                 {
                     agent.SendAlertMessage(msg, scene.ID);
                     agentFound = true;
