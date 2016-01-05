@@ -84,6 +84,8 @@ namespace SilverSim.WebIF.Admin.Simulator
             webif.JsonMethods.Add("region.change.owner", HandleChangeOwner);
             webif.JsonMethods.Add("region.login.enable", HandleLoginEnable);
             webif.JsonMethods.Add("region.login.disable", HandleLoginDisable);
+            webif.JsonMethods.Add("region.restart", HandleRestart);
+            webif.JsonMethods.Add("region.restart.abort", HandleRestartAbort);
             webif.JsonMethods.Add("region.enable", HandleEnable);
             webif.JsonMethods.Add("region.disable", HandleDisable);
             webif.JsonMethods.Add("region.agent.notice", HandleAgentNotice);
@@ -895,6 +897,46 @@ namespace SilverSim.WebIF.Admin.Simulator
             else
             {
                 scene.LoginControl.NotReady(SceneInterface.ReadyFlags.LoginsEnable);
+                AdminWebIF.SuccessResponse(req, new Map());
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.control")]
+        void HandleRestart(HttpRequest req, Map jsondata)
+        {
+            SceneInterface scene;
+            if (!jsondata.ContainsKey("id") || !jsondata.ContainsKey("seconds"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            {
+                scene.RequestRegionRestart(int.Parse(jsondata["seconds"].ToString()));
+                AdminWebIF.SuccessResponse(req, new Map());
+            }
+        }
+
+        [AdminWebIF.RequiredRight("regions.control")]
+        void HandleRestartAbort(HttpRequest req, Map jsondata)
+        {
+            SceneInterface scene;
+            if (!jsondata.ContainsKey("id"))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.InvalidRequest);
+            }
+
+            else if (!SceneManager.Scenes.TryGetValue(jsondata["id"].AsUUID, out scene))
+            {
+                AdminWebIF.ErrorResponse(req, AdminWebIF.ErrorResult.NotFound);
+            }
+            else
+            {
+                scene.AbortRegionRestart();
                 AdminWebIF.SuccessResponse(req, new Map());
             }
         }
