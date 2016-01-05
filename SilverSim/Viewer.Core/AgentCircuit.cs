@@ -679,7 +679,7 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        ~AgentCircuit()
+        protected void CloseCircuit()
         {
             foreach (KeyValuePair<string, UUID> kvp in m_RegisteredCapabilities)
             {
@@ -687,6 +687,10 @@ namespace SilverSim.Viewer.Core
             }
             if (null != Agent && null != Scene)
             {
+#if DEBUG
+                m_Log.DebugFormat("Removing agent {0} from scene {1}", Agent.Owner.FullName, Scene.Name);
+#endif
+                Scene.Remove(Agent);
                 Agent.Circuits.Remove(CircuitCode, Scene.ID);
             }
             m_UploadCapabilities.Clear();
@@ -949,6 +953,7 @@ namespace SilverSim.Viewer.Core
                 m_TxObjectQueue.Enqueue(null);
             }
             m_EventQueueEnabled = false;
+            CloseCircuit();
         }
         #endregion
     }

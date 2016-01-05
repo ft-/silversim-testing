@@ -730,7 +730,10 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
                 catch
                 {
-                    m_Agents.Remove(obj.ID);
+                    if(m_Agents.Remove(obj.ID))
+                    {
+                        Interlocked.Decrement(ref m_AgentCount);
+                    }
                     m_Objects.Remove(obj.ID);
                     RemoveLocalID(obj);
                 }
@@ -881,6 +884,10 @@ namespace SilverSim.Scene.Implementation.Basic
                 }
                 PhysicsScene.Remove(agent);
                 m_Objects.Remove(agent.ID);
+                if(m_Agents.Remove(agent.ID))
+                {
+                    Interlocked.Decrement(ref m_AgentCount);
+                }
                 SendKillObjectToAgents(agent.LocalID);
                 RemoveLocalID(agent);
                 Interlocked.Decrement(ref m_AgentCount);
