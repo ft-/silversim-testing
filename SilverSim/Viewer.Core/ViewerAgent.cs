@@ -1125,23 +1125,37 @@ namespace SilverSim.Viewer.Core
         readonly string m_ServiceSessionID;
         readonly List<IAgentTeleportServiceInterface> m_TeleportServices;
 
+        void CloseAllCircuits(bool result)
+        {
+            foreach(AgentChildInfo info in ActiveChilds.Values)
+            {
+                info.ChildAgentUpdateService.Disconnect();
+            }
+            foreach(Circuit circ in Circuits.Values)
+            {
+                circ.Stop();
+            }
+        }
+
         public void KickUser(string msg)
         {
             Messages.User.KickUser req = new Messages.User.KickUser();
             req.AgentID = Owner.ID;
             req.SessionID = SessionID;
             req.Message = msg;
-            SendMessageIfRootAgent(req, m_CurrentSceneID);
+            req.OnSendCompletion += CloseAllCircuits;
+            SendMessageAlways(req, m_CurrentSceneID);
         }
 
         public void KickUser(string msg, Action<bool> callbackDelegate)
         {
             Messages.User.KickUser req = new Messages.User.KickUser();
             req.OnSendCompletion += callbackDelegate;
+            req.OnSendCompletion += CloseAllCircuits;
             req.AgentID = Owner.ID;
             req.SessionID = SessionID;
             req.Message = msg;
-            SendMessageIfRootAgent(req, m_CurrentSceneID);
+            SendMessageAlways(req, m_CurrentSceneID);
         }
 
         public bool TeleportTo(SceneInterface sceneInterface, string regionName, Vector3 position, Vector3 lookAt, TeleportFlags flags)

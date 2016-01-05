@@ -20,6 +20,14 @@ namespace SilverSim.Viewer.Messages.User
 
         }
 
+        public override bool IsReliable
+        {
+            get
+            {
+                return true;
+            }
+        }
+
         public override MessageType Number
         {
             get
