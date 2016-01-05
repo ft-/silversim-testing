@@ -362,6 +362,11 @@ namespace SilverSim.Viewer.Core
                                         m_LogoutReplySent = true;
                                     }
                                 }
+                                if(m.Number == MessageType.KickUser)
+                                {
+                                    m_KickUserSentAtTime = Environment.TickCount;
+                                    m_KickUserSent = true;
+                                }
                             }
                             catch (Exception e)
                             {
@@ -384,7 +389,8 @@ namespace SilverSim.Viewer.Core
                     return;
                 }
 
-                if (Environment.TickCount - m_LogoutReplySentAtTime >= 10000 && m_LogoutReplySent)
+                if ((Environment.TickCount - m_LogoutReplySentAtTime >= 10000 && m_LogoutReplySent) ||
+                    (Environment.TickCount - m_KickUserSentAtTime >= 10000 && m_KickUserSent))
                 {
                     LogMsgLogoutReply();
                     TerminateCircuit();

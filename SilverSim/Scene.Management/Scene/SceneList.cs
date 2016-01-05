@@ -124,24 +124,27 @@ namespace SilverSim.Scene.Management.Scene
             List<IAgent> agentsToLogout = new List<IAgent>(scene.RootAgents);
             int agentCount = agentsToLogout.Count;
 
-            Semaphore waitSema = new Semaphore(0, agentsToLogout.Count);
-            foreach(IAgent agent in scene.RootAgents)
+            if (agentCount > 0)
             {
-                agent.KickUser("Simulator shutting down", delegate(bool v) { waitSema.Release(1); });
-            }
-            int count = 0;
-            while(count < agentCount)
-            {
-                try
+                Semaphore waitSema = new Semaphore(0, agentCount);
+                foreach (IAgent agent in agentsToLogout)
                 {
-                    waitSema.WaitOne(10000);
+                    agent.KickUser("Simulator shutting down", delegate (bool v) { waitSema.Release(1); });
                 }
-                catch
+                int count = 0;
+                while (count < agentCount)
                 {
-                    m_Log.InfoFormat("Remaining agents are forced to be disconnected. Count: {0}", agentCount - count);
-                    break;
+                    try
+                    {
+                        waitSema.WaitOne(10000);
+                    }
+                    catch
+                    {
+                        m_Log.InfoFormat("Remaining agents are forced to be disconnected. Count: {0}", agentCount - count);
+                        break;
+                    }
+                    ++count;
                 }
-                ++count;
             }
             /* if there are still agents left, we kill their connections here. */
 

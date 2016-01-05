@@ -31,6 +31,9 @@ namespace SilverSim.Viewer.Core
         private int m_LogoutReplySentAtTime;
         private int m_LastReceivedPacketAtTime;
 
+        private int m_KickUserSentAtTime;
+        private bool m_KickUserSent;
+
         protected readonly Dictionary<MessageType, Action<Message>> m_MessageRouting = new Dictionary<MessageType, Action<Message>>();
         protected readonly Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
         protected readonly Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
