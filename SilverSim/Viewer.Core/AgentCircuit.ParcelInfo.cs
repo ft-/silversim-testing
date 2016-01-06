@@ -150,15 +150,15 @@ namespace SilverSim.Viewer.Core
             }
 
             ParcelInfo pInfo;
-            if (Scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
-                (pInfo.Owner.EqualsGrid(Agent.Owner) ||
-                Scene.HasGroupPower(Agent.Owner, pInfo.Group, Types.Groups.GroupPowers.LandManageAllowed)))
+            if (Scene.Parcels.TryGetValue(req.LocalID, out pInfo))
             {
-                if ((req.Flags & ParcelAccessList.Access) != 0)
+                if ((req.Flags & ParcelAccessList.Access) != 0 && (pInfo.Owner.EqualsGrid(Agent.Owner) ||
+                Scene.HasGroupPower(Agent.Owner, pInfo.Group, Types.Groups.GroupPowers.LandManageAllowed)))
                 {
                     SendParcelAccessList(req.LocalID, ParcelAccessList.Access, Scene.Parcels.WhiteList[Scene.ID, pInfo.ID]);
                 }
-                if ((req.Flags & ParcelAccessList.Ban) != 0)
+                if ((req.Flags & ParcelAccessList.Ban) != 0 && (pInfo.Owner.EqualsGrid(Agent.Owner) ||
+                Scene.HasGroupPower(Agent.Owner, pInfo.Group, Types.Groups.GroupPowers.LandManageBanned)))
                 {
                     SendParcelAccessList(req.LocalID, ParcelAccessList.Ban, Scene.Parcels.BlackList[Scene.ID, pInfo.ID]);
                 }
