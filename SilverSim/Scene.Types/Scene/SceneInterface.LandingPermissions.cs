@@ -247,8 +247,6 @@ namespace SilverSim.Scene.Types.Scene
             return estateInfo;
         }
 
-        public bool EnableLandingOwnerOverride { get; set; }
-
         public void DetermineInitialAgentLocation(IAgent agent, TeleportFlags teleportFlags, Vector3 destinationLocation, Vector3 destinationLookAt)
         {
             UUI agentOwner = agent.Owner;
@@ -267,7 +265,7 @@ namespace SilverSim.Scene.Types.Scene
             if ((!p.Owner.EqualsGrid(agentOwner) &&
                 !IsEstateManager(agentOwner) &&
                 !IsPossibleGod(agentOwner)) ||
-                !EnableLandingOwnerOverride)
+                !ServerParamService.GetBoolean(ID, "EnableLandingOverride", false))
             {
                 estateInfo = CheckEstateRights(agent);
                 if(RegionSettings.TelehubObject != UUID.Zero && (estateInfo.Flags & RegionOptionFlags.AllowDirectTeleport) == 0)
