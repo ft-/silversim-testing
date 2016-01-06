@@ -91,7 +91,7 @@ namespace SilverSim.Viewer.Core
 
         const int P_AL_ACCESS = 1;
         const int P_AL_BAN = 2;
-        const int P_MAX_ENTRIES = 1000 / 24;
+        const int P_MAX_ENTRIES = 48;
 
         void SendParcelAccessList(int localID, ParcelAccessList listType, List<ParcelAccessEntry> list)
         {
