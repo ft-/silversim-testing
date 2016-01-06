@@ -6,11 +6,7 @@ using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Parcel;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using ThreadedClasses;
 
 namespace SilverSim.Viewer.Core
 {
