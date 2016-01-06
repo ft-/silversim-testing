@@ -13,6 +13,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
+using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Scene
 {
@@ -50,6 +51,27 @@ namespace SilverSim.Scene.Types.Scene
             string nop;
             return CheckParcelAccessRights(agent, parcel, out nop);
         }
+
+        RwLockedList<Vector3> m_Spawnpoints = new RwLockedList<Vector3>();
+
+        public List<Vector3> SpawnPoints
+        {
+            get
+            {
+                return new List<Vector3>(m_Spawnpoints);
+            }
+            set
+            {
+                m_Spawnpoints.Clear();
+                foreach(Vector3 v in value)
+                {
+                    m_Spawnpoints.Add(v);
+                }
+                TriggerSpawnpointUpdate();
+            }
+        }
+
+        protected abstract void TriggerSpawnpointUpdate();
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
         bool CheckParcelAccessRights(IAgent agent, ParcelInfo parcel, out string reason)

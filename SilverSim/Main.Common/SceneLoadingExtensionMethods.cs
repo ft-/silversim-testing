@@ -113,6 +113,12 @@ namespace SilverSim.Main.Common
                     }
                 }
 
+                lock(loadparams.Scene.m_LoaderThreadLock)
+                {
+                    List<Vector3> spawns = loadparams.SimulationDataStorage.Spawnpoints[loadparams.Scene.ID];
+                    loadparams.Scene.SpawnPoints = spawns;
+                }
+
                 lock (loadparams.Scene.m_LoaderThreadLock)
                 {
                     parcels = loadparams.SimulationDataStorage.Parcels.ParcelsInRegion(loadparams.Scene.ID);

@@ -1,11 +1,9 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using log4net;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
@@ -20,6 +18,11 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
         {
         }
         #endregion
+
+        public abstract SimulationDataSpawnPointStorageInterface Spawnpoints
+        {
+            get;
+        }
 
         public abstract SimulationDataObjectStorageInterface Objects
         {

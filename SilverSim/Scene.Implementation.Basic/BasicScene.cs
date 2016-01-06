@@ -1132,6 +1132,11 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
+        protected override void TriggerSpawnpointUpdate()
+        {
+            m_SimulationDataStorage.Spawnpoints[ID] = SpawnPoints;
+        }
+
         public override void TriggerEstateUpdate()
         {
             foreach (IAgent agent in Agents)
