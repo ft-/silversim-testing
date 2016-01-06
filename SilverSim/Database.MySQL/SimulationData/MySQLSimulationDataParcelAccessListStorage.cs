@@ -143,7 +143,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE ?regionid AND ParcelID LIKE ?regionid AND Accessor LIKE \"" + accessor.ID.ToString() + "%\"", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE ?regionid AND ParcelID LIKE ?parcelid AND Accessor LIKE \"" + accessor.ID.ToString() + "%\"", connection))
                 {
                     cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
                     cmd.Parameters.AddWithValue("?parcelid", parcelID.ToString());
@@ -172,6 +172,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "ExpiresAt BIGINT(20) NOT NULL)",
             "ALTER TABLE %tablename% ADD KEY Accessor (Accessor), ADD KEY ExpiresAt (ExpiresAt),",
             "ALTER TABLE %tablename% ADD COLUMN (RegionID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'), ADD KEY RegionID (RegionID),",
+            "ALTER TABLE %tablename% ADD PRIMARY KEY (RegionID, ParcelID, Accessor),",
         };
     }
 }
