@@ -190,9 +190,7 @@ namespace SilverSim.Viewer.Core
             {
                 lock (m_AgentLanguageLock)
                 {
-                    return (null == m_AgentCultureInfo) ?
-                        EnUsCulture :
-                        m_AgentCultureInfo;
+                    return m_AgentCultureInfo ?? EnUsCulture;
                 }
             }
         }
