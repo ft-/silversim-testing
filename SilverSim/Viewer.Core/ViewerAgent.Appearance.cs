@@ -148,7 +148,11 @@ namespace SilverSim.Viewer.Core
                 ai.Wearables = Wearables;
                 ai.VisualParams = VisualParams;
                 ai.AvatarHeight = AvatarHeight;
-                //ai.Attachments = Attachments;
+                ai.Attachments.Clear();
+                foreach (ObjectGroup grp in Attachments.All)
+                {
+                    ai.Attachments[grp.AttachPoint][grp.FromItemID] = grp.OriginalAssetID;
+                }
                 ai.Serial = Serial;
                 ai.AvatarTextures.All = Textures.All;
                 return ai;
