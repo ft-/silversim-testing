@@ -77,6 +77,28 @@ namespace SilverSim.Types
             }
         }
 
+        public static Matrix4 CreateTransformationMatrix(Quaternion quat, Vector3 scale, Vector3 translation)
+        {
+            Matrix4 m = quat.GetMatrix();
+            m.M11 *= scale.X;
+            m.M12 *= scale.X;
+            m.M13 *= scale.X;
+
+            m.M21 *= scale.Y;
+            m.M22 *= scale.Y;
+            m.M23 *= scale.Y;
+
+            m.M31 *= scale.Z;
+            m.M32 *= scale.Z;
+            m.M33 *= scale.Z;
+
+            m.M41 += translation.X;
+            m.M42 += translation.Y;
+            m.M43 += translation.Z;
+
+            return m;
+        }
+
         #endregion Properties
 
         #region Constructors
