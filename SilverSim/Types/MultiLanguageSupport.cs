@@ -79,7 +79,12 @@ namespace SilverSim.Types
             }
             try
             {
-                return res.GetString(name);
+                string str = res.GetString(name);
+                if(string.IsNullOrEmpty(str))
+                {
+                    str = defvalue;
+                }
+                return str;
             }
             catch(InvalidOperationException)
             {
