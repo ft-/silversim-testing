@@ -215,10 +215,6 @@ namespace SilverSim.WebIF.Admin.Simulator
             RegionAccess access;
             switch(jsondata["access"].ToString().ToLower())
             {
-                case "trial":
-                    access = RegionAccess.Trial;
-                    break;
-
                 case "pg":
                     access = RegionAccess.PG;
                     break;
@@ -649,10 +645,6 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     switch (jsondata["access"].ToString().ToLower())
                     {
-                        case "trial":
-                            rInfo.Access = RegionAccess.Trial;
-                            break;
-
                         case "pg":
                             rInfo.Access = RegionAccess.PG;
                             break;
@@ -774,10 +766,6 @@ namespace SilverSim.WebIF.Admin.Simulator
                 {
                     switch (jsondata["access"].ToString().ToLower())
                     {
-                        case "trial":
-                            rInfo.Access = RegionAccess.Trial;
-                            break;
-
                         case "pg":
                             rInfo.Access = RegionAccess.PG;
                             break;

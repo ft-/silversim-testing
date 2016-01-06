@@ -42,10 +42,6 @@ namespace SilverSim.WebIF.Admin.Simulator
             m.Add("ProductName", region.ProductName);
             switch(region.Access)
             {
-                case RegionAccess.Trial:
-                    m.Add("Access", "trial");
-                    break;
-
                 case RegionAccess.PG:
                     m.Add("Access", "pg");
                     break;

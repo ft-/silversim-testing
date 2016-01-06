@@ -247,7 +247,7 @@ namespace SilverSim.Main.Cmd.Region
                     "owner <uui>|<uuid>|<firstname>,<lastname>\n" +
                     "estate <name>\n" +
                     "externalhostname <hostname>\n" +
-                    "access trial|pg|mature|adult\n" +
+                    "access pg|mature|adult\n" +
                     "staticmaptile <uuid>\n");
             }
             else if (!m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
@@ -321,10 +321,6 @@ namespace SilverSim.Main.Cmd.Region
                         case "access":
                             switch (args[argi + 1])
                             {
-                                case "trial":
-                                    rInfo.Access = RegionAccess.Trial;
-                                    break;
-
                                 case "pg":
                                     rInfo.Access = RegionAccess.PG;
                                     break;
@@ -444,10 +440,6 @@ namespace SilverSim.Main.Cmd.Region
                     r.RegionMapTexture = regionEntry.GetString("MaptileStaticUUID", "00000000-0000-0000-0000-000000000000");
                     switch (regionEntry.GetString("Access", "mature").ToLower())
                     {
-                        case "trial":
-                            r.Access = RegionAccess.Trial;
-                            break;
-
                         case "pg":
                             r.Access = RegionAccess.PG;
                             break;
@@ -515,7 +507,7 @@ namespace SilverSim.Main.Cmd.Region
                     "owner <uui>|<uuid>|<firstname>,<lastname>\n" +
                     "estate <name> - sets region owner to estate owner\n" +
                     "externalhostname <hostname>\n" +
-                    "access trial|pg|mature|adult\n" +
+                    "access pg|mature|adult\n" +
                     "staticmaptile <uuid>\n" +
                     "status online|offline");
             }
@@ -646,10 +638,6 @@ namespace SilverSim.Main.Cmd.Region
                         case "access":
                             switch (args[argi + 1])
                             {
-                                case "trial":
-                                    rInfo.Access = RegionAccess.Trial;
-                                    break;
-
                                 case "pg":
                                     rInfo.Access = RegionAccess.PG;
                                     break;

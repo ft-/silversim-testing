@@ -9,7 +9,6 @@ namespace SilverSim.Types.Grid
     public enum RegionAccess : byte
     {
         Unknown = 0,
-        Trial = 7,
         PG = 13,
         Mature = 21,
         Adult = 42,
