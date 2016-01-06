@@ -116,10 +116,7 @@ namespace SilverSim.Database.MySQL.SimulationData
                 Dictionary<string, object> data = new Dictionary<string, object>();
                 data["ParcelID"] = entry.ParcelID.ToString();
                 data["Accessor"] = entry.Accessor;
-                if(entry.ExpiresAt != null)
-                {
-                    data["ExpiresAt"] = entry.ExpiresAt.AsULong;
-                }
+                data["ExpiresAt"] = entry.ExpiresAt != null ? entry.ExpiresAt.AsULong : (ulong)0;
                 connection.ReplaceInto(m_TableName, data);
             }
         }
