@@ -113,12 +113,16 @@ namespace SilverSim.Types
 
         public static string FromUTF8Bytes(this byte[] data)
         {
-            return m_UTF8NoBOM.GetString(data);
+            string s = m_UTF8NoBOM.GetString(data);
+            int pos = s.IndexOf('\0');
+            return (pos >= 0) ? s.Substring(0, pos) : s;
         }
 
         public static string FromUTF8Bytes(this byte[] data, int index, int count)
         {
-            return m_UTF8NoBOM.GetString(data, index, count);
+            string s = m_UTF8NoBOM.GetString(data, index, count);
+            int pos = s.IndexOf('\0');
+            return (pos >= 0) ? s.Substring(0, pos) : s;
         }
 
         public static XmlTextWriter UTF8XmlTextWriter(this Stream s)

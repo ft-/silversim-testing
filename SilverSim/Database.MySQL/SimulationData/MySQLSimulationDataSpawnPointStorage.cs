@@ -64,7 +64,7 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                         foreach (Vector3 v in value)
                         {
-                            data.Add("Distance", v);
+                            data["Distance"] = v;
                             conn.InsertInto("spawnpoints", data);
                         }
                     });
