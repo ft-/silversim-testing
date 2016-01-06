@@ -1,24 +1,22 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Generic;
+using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
+using SilverSim.Types.Grid;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Generic;
+using SilverSim.Viewer.Messages.Telehub;
 using System;
 using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Text;
 using System.Diagnostics.CodeAnalysis;
-using SilverSim.ServiceInterfaces.Estate;
-using SilverSim.Scene.Management.Scene;
-using SilverSim.Types.Grid;
-using SilverSim.Viewer.Messages.LayerData;
-using SilverSim.Scene.Types.Object;
-using SilverSim.Viewer.Messages.Telehub;
+using System.Globalization;
+using System.Text;
 
 namespace SilverSim.Viewer.Core
 {
@@ -696,19 +694,6 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        [Flags]
-        public enum EstateChangeInfoFlags : uint
-        {
-            FixedSun = 0x00000010,
-            PublicAccess = 0x00008000,
-            AllowVoice = 0x10000000,
-            AllowDirectTeleport = 0x00100000,
-            DenyAnonymous = 0x00800000,
-            DenyIdentified = 0x01000000,
-            DenyTransacted = 0x02000000,
-            DenyMinors = 0x40000000
-        }
-
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         void EstateOwner_EstateChangeInfo(AgentCircuit circuit, EstateOwnerMessage req)
         {
@@ -717,7 +702,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
             SceneInterface scene = circuit.Scene;
-            EstateChangeInfoFlags param1 = (EstateChangeInfoFlags)UInt32.Parse(req.ParamList[1].FromUTF8Bytes());
+            RegionOptionFlags param1 = (RegionOptionFlags)UInt32.Parse(req.ParamList[1].FromUTF8Bytes());
             UInt32 param2 = UInt32.Parse(req.ParamList[2].FromUTF8Bytes());
 
             EstateInfo estate;
@@ -736,40 +721,7 @@ namespace SilverSim.Viewer.Core
                     estate.UseGlobalTime = true;
                 }
 
-                RegionOptionFlags flags = estate.Flags;
-
-                flags = ((param1 & EstateChangeInfoFlags.FixedSun) != 0) ?
-                    flags | RegionOptionFlags.SunFixed :
-                    flags & (~RegionOptionFlags.SunFixed);
-
-                flags = ((param1 & EstateChangeInfoFlags.PublicAccess) != 0) ?
-                    flags | RegionOptionFlags.PublicAllowed :
-                    flags & (~RegionOptionFlags.PublicAllowed);
-
-                flags = ((param1 & EstateChangeInfoFlags.AllowVoice) != 0) ?
-                    flags | RegionOptionFlags.AllowVoice :
-                    flags & (~RegionOptionFlags.AllowVoice);
-
-                flags = ((param1 & EstateChangeInfoFlags.AllowDirectTeleport) != 0) ?
-                    flags | RegionOptionFlags.AllowDirectTeleport :
-                    flags & (~RegionOptionFlags.AllowDirectTeleport);
-
-                flags = ((param1 & EstateChangeInfoFlags.DenyAnonymous) != 0) ?
-                    flags | RegionOptionFlags.DenyAnonymous :
-                    flags & (~RegionOptionFlags.DenyAnonymous);
-
-                flags = ((param1 & EstateChangeInfoFlags.DenyIdentified) != 0) ?
-                    flags | RegionOptionFlags.DenyIdentified :
-                    flags & (~RegionOptionFlags.DenyIdentified);
-
-                flags = ((param1 & EstateChangeInfoFlags.DenyTransacted) != 0) ?
-                    flags | RegionOptionFlags.DenyTransacted :
-                    flags & (~RegionOptionFlags.DenyTransacted);
-
-                flags = ((param1 & EstateChangeInfoFlags.DenyMinors) != 0) ?
-                    flags | RegionOptionFlags.DenyAgeUnverified :
-                    flags & (~RegionOptionFlags.DenyAgeUnverified);
-                estate.Flags = flags;
+                estate.Flags = param1;
                 estateService[estateID] = estate;
 
                 EstateOwnerMessage m = new EstateOwnerMessage();
