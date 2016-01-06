@@ -684,13 +684,13 @@ namespace SilverSim.Scene.Implementation.Basic
 
         class RestartObject
         {
-            WeakReference m_WeakScene;
-            SceneFactory m_SceneFactory;
-            GridServiceInterface m_RegionStorage;
-            public System.Timers.Timer RestartTimer = new System.Timers.Timer(1000);
+            readonly WeakReference m_WeakScene;
+            readonly SceneFactory m_SceneFactory;
+            readonly GridServiceInterface m_RegionStorage;
+            public readonly System.Timers.Timer RestartTimer = new System.Timers.Timer(1000);
             int m_SecondsToRestart;
             public bool FirstTrigger;
-            object m_ActionLock = new object();
+            readonly object m_ActionLock = new object();
             public bool Abort()
             {
                 lock(m_ActionLock)

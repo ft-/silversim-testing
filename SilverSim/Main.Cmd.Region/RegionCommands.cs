@@ -732,12 +732,7 @@ namespace SilverSim.Main.Cmd.Region
 
         void RestartRegionCmd(List<string> args, Common.CmdIO.TTY io, UUID limitedToScene)
         {
-            UUID selectedScene = limitedToScene;
             RegionInfo rInfo;
-            if(selectedScene == UUID.Zero)
-            {
-                selectedScene = io.SelectedScene;
-            }
 
             if (args[0] == "help" || args.Count < 4)
             {
@@ -746,6 +741,10 @@ namespace SilverSim.Main.Cmd.Region
             else if (!m_RegionStorage.TryGetValue(UUID.Zero, args[2], out rInfo))
             {
                 io.Write("No region selected");
+            }
+            else if(limitedToScene != UUID.Zero && rInfo.ID != limitedToScene)
+            {
+                io.Write("Not possible to restart another region than the current one");
             }
             else
             {

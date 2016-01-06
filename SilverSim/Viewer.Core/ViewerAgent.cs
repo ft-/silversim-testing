@@ -113,6 +113,7 @@ namespace SilverSim.Viewer.Core
             }
             set
             {
+                /* nothing to do for now */
             }
         }
 
@@ -145,8 +146,8 @@ namespace SilverSim.Viewer.Core
 
         #region AgentLanguage
         string m_AgentLanguage = string.Empty;
-        CultureInfo m_AgentCultureInfo = null;
-        object m_AgentLanguageLock = new object();
+        CultureInfo m_AgentCultureInfo;
+        readonly object m_AgentLanguageLock = new object();
         public string AgentLanguage
         {
             get
@@ -189,14 +190,9 @@ namespace SilverSim.Viewer.Core
             {
                 lock (m_AgentLanguageLock)
                 {
-                    if (null == m_AgentCultureInfo)
-                    {
-                        return EnUsCulture;
-                    }
-                    else
-                    {
-                        return m_AgentCultureInfo;
-                    }
+                    return (null == m_AgentCultureInfo) ?
+                        EnUsCulture :
+                        m_AgentCultureInfo;
                 }
             }
         }
