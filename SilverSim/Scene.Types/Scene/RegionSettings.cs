@@ -125,6 +125,10 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     flags |= RegionOptionFlags.BlockLandResell;
                 }
+                if(BlockFlyOver)
+                {
+                    flags |= RegionOptionFlags.BlockFlyOver;
+                }
                 if (DisableCollisions)
                 {
                     flags |= RegionOptionFlags.DisableAgentCollisions;
@@ -139,7 +143,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 if(BlockFly)
                 {
-                    flags |= RegionOptionFlags.NoFly;
+                    flags |= RegionOptionFlags.BlockFly;
                 }
                 if(RestrictPushing)
                 {

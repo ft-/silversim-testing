@@ -822,7 +822,7 @@ namespace SilverSim.Viewer.Core
             SceneInterface scene = circuit.Scene;
             if (scene.RootAgents.TryGetValue(prey, out targetagent))
             {
-                targetagent.KickUser("You were kicked by the region owner.");
+                targetagent.KickUser(this.GetLanguageString(targetagent.CurrentCulture, "YouHaveBeenKicked", "You have been kicked."));
             }
         }
     }
