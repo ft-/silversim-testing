@@ -51,7 +51,7 @@ namespace SilverSim.Scene.Types.Scene
             return CheckParcelAccessRights(agent, parcel, out nop);
         }
 
-        RwLockedList<Vector3> m_Spawnpoints = new RwLockedList<Vector3>();
+        readonly RwLockedList<Vector3> m_Spawnpoints = new RwLockedList<Vector3>();
 
         public List<Vector3> SpawnPoints
         {
@@ -89,7 +89,7 @@ namespace SilverSim.Scene.Types.Scene
             }
             catch(IndexOutOfRangeException)
             {
-
+                /* intentionally left empty */
             }
             TriggerSpawnpointUpdate();
         }
@@ -274,16 +274,16 @@ namespace SilverSim.Scene.Types.Scene
                     IObject obj;
                     if (Objects.TryGetValue(RegionSettings.TelehubObject, out obj))
                     {
-                        List<Vector3> spawns = SpawnPoints;
-                        List<Vector3> newSpawns = new List<Vector3>();
+                        List<Vector3> relativeSpawns = SpawnPoints;
+                        List<Vector3> absoluteSpawns = new List<Vector3>();
                         switch(ServerParamService.GetString(ID, "SpawnpointRouting", "closest"))
                         {
                             case "random":
                                 {
                                     Random rand = new Random();
-                                    while(spawns.Count > 0)
+                                    while(relativeSpawns.Count > 0)
                                     {
-                                        newSpawns.Add(spawns[rand.Next(spawns.Count - 1).Clamp(0, spawns.Count - 1)] + obj.GlobalPosition);
+                                        absoluteSpawns.Add(relativeSpawns[rand.Next(relativeSpawns.Count - 1).Clamp(0, relativeSpawns.Count - 1)] + obj.GlobalPosition);
                                     }
                                 }
                                 break;
@@ -296,16 +296,16 @@ namespace SilverSim.Scene.Types.Scene
                                         agentLocations.Add(retAgent.GlobalPosition);
                                     }
 
-                                    while(spawns.Count > 0)
+                                    while(relativeSpawns.Count > 0)
                                     {
                                         int emptiestindex = -1;
                                         double emptiestdistindicator = 0;
                                         Vector3 emptiest = Vector3.Zero;
 
-                                        for(int i = 0; i < spawns.Count; ++i)
+                                        for(int i = 0; i < relativeSpawns.Count; ++i)
                                         {
                                             double distindicator = 0;
-                                            Vector3 absSpawnV = spawns[i] + obj.GlobalPosition;
+                                            Vector3 absSpawnV = relativeSpawns[i] + obj.GlobalPosition;
                                             foreach(Vector3 agLocation in agentLocations)
                                             {
                                                 distindicator += (agLocation - absSpawnV).LengthSquared;
@@ -317,8 +317,8 @@ namespace SilverSim.Scene.Types.Scene
                                                 emptiestindex = i;
                                             }
                                         }
-                                        spawns.RemoveAt(emptiestindex);
-                                        newSpawns.Add(emptiest);
+                                        relativeSpawns.RemoveAt(emptiestindex);
+                                        absoluteSpawns.Add(emptiest);
                                     }
                                 }
                                 break;
@@ -326,14 +326,14 @@ namespace SilverSim.Scene.Types.Scene
                             default:
                             case "closest":
                                 {
-                                    while(spawns.Count > 0)
+                                    while(relativeSpawns.Count > 0)
                                     {
                                         int closestindex = -1;
                                         double distance = 0;
                                         Vector3 closest = Vector3.Zero;
-                                        for (int i = 0; i < spawns.Count; ++i)
+                                        for (int i = 0; i < relativeSpawns.Count; ++i)
                                         {
-                                            Vector3 v = spawns[i] + obj.GlobalPosition;
+                                            Vector3 v = relativeSpawns[i] + obj.GlobalPosition;
                                             double newDist = (v - destinationLocation).LengthSquared;
                                             if (closestindex < 0 || distance > newDist)
                                             {
@@ -342,33 +342,30 @@ namespace SilverSim.Scene.Types.Scene
                                                 closest = v;
                                             }
                                         }
-                                        spawns.RemoveAt(closestindex);
-                                        newSpawns.Add(closest);
+                                        relativeSpawns.RemoveAt(closestindex);
+                                        absoluteSpawns.Add(closest);
                                     }
                                 }
                                 break;
 
                             case "sequence":
-                                foreach(Vector3 v in spawns)
+                                foreach(Vector3 v in relativeSpawns)
                                 {
-                                    newSpawns.Add(v + obj.GlobalPosition);
+                                    absoluteSpawns.Add(v + obj.GlobalPosition);
                                 }
                                 break;
                         }
-                        spawns = newSpawns;
 
-                        foreach (Vector3 spawn in SpawnPoints)
+                        foreach (Vector3 spawn in absoluteSpawns)
                         {
                             ParcelInfo spawnParcel;
-                            if (Parcels.TryGetValue(spawn, out spawnParcel))
-                            {
-                                if (spawnParcel.PassPrice != 0 /* skip parcels with pass price here */ ||
-                                    CheckParcelAccessRights(agent, spawnParcel))
-                                {
+                            if (Parcels.TryGetValue(spawn, out spawnParcel) &&
+                               (spawnParcel.PassPrice != 0 /* skip parcels with pass price here */ ||
+                                    CheckParcelAccessRights(agent, spawnParcel)))
+                            { 
                                     /* found a viable spawn here */
                                     p = spawnParcel;
                                     destinationLocation = spawn;
-                                }
                             }
                         }
                     }

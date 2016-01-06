@@ -74,7 +74,6 @@ namespace SilverSim.Database.MySQL.SimulationData
 
         public override bool Remove(UUID regionID)
         {
-            List<Vector3> res = new List<Vector3>();
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();
