@@ -264,6 +264,7 @@ namespace SilverSim.Scene.Types.Scene
 
             if ((!p.Owner.EqualsGrid(agentOwner) &&
                 !IsEstateManager(agentOwner) &&
+                !Owner.EqualsGrid(agentOwner) &&
                 !IsPossibleGod(agentOwner)) ||
                 !ServerParamService.GetBoolean(ID, "EnableLandingOverride", false))
             {
