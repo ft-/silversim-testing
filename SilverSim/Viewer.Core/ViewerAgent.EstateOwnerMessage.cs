@@ -702,8 +702,8 @@ namespace SilverSim.Viewer.Core
                 return;
             }
             SceneInterface scene = circuit.Scene;
-            RegionOptionFlags param1 = (RegionOptionFlags)UInt32.Parse(req.ParamList[1].FromUTF8Bytes());
-            UInt32 param2 = UInt32.Parse(req.ParamList[2].FromUTF8Bytes());
+            RegionOptionFlags param1 = (RegionOptionFlags)uint.Parse(req.ParamList[1].FromUTF8Bytes());
+            uint param2 = uint.Parse(req.ParamList[2].FromUTF8Bytes());
 
             EstateInfo estate;
             EstateServiceInterface estateService = scene.EstateService;
