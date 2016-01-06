@@ -633,6 +633,36 @@ namespace SilverSim.Types
         }
         #endregion
 
+        public Matrix4 GetMatrix(Quaternion quaternion)
+        {
+            Matrix4 matrix = new Matrix4();
+
+            double xx = X * X;
+            double yy = Y * Y;
+            double zz = Z * Z;
+            double xy = X * Y;
+            double zw = Z * W;
+            double zx = Z * X;
+            double yw = Y * W;
+            double yz = Y * Z;
+            double xw = X * W;
+
+            matrix.M11 = 1f - (2f * (yy + zz));
+            matrix.M12 = 2f * (xy + zw);
+            matrix.M13 = 2f * (zx - yw);
+
+            matrix.M21 = 2f * (xy - zw);
+            matrix.M22 = 1f - (2f * (zz + xx));
+            matrix.M23 = 2f * (yz + xw);
+
+            matrix.M31 = 2f * (zx + yw);
+            matrix.M32 = 2f * (yz - xw);
+            matrix.M33 = 1f - (2f * (yy + xx));
+
+            matrix.M44 = 1f;
+
+            return matrix;
+        }
 
         #region Overrides
 
