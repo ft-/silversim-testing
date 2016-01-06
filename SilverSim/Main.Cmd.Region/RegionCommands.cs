@@ -757,13 +757,13 @@ namespace SilverSim.Main.Cmd.Region
                 }
                 else if(args[3].ToLower() == "abort")
                 {
-                    scene.AbortRegionRestart();
                     io.Write("Region restart abort requested");
+                    scene.AbortRegionRestart();
                 }
                 else if(int.TryParse(args[3], out timeToRestart))
                 {
-                    scene.RequestRegionRestart(timeToRestart);
                     io.Write("Region restart requested");
+                    scene.RequestRegionRestart(timeToRestart);
                 }
                 else
                 {

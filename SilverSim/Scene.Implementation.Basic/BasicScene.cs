@@ -691,6 +691,16 @@ namespace SilverSim.Scene.Implementation.Basic
             int m_SecondsToRestart;
             public bool FirstTrigger;
             object m_ActionLock = new object();
+            public bool Abort()
+            {
+                lock(m_ActionLock)
+                {
+                    bool aborted = m_SecondsToRestart > 0;
+                    m_SecondsToRestart = -1;
+                    return aborted;
+                }
+            }
+
             public int SecondsToRestart
             {
                 get
@@ -796,7 +806,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override void AbortRegionRestart()
         {
-            m_RestartObject.SecondsToRestart = -1;
+            bool aborted = m_RestartObject.Abort();
             try
             {
                 m_RestartObject.RestartTimer.Stop();
@@ -804,10 +814,23 @@ namespace SilverSim.Scene.Implementation.Basic
             catch (NullReferenceException)
             {
                 /* we use NullReferenceException here */
+                return;
             }
             catch(ObjectDisposedException)
             {
                 /* ensure that a disposed Timer does not kill something unnecessarily */
+                return;
+            }
+
+            if(aborted)
+            {
+                foreach (IAgent agent in RootAgents)
+                {
+                    agent.SendRegionNotice(Owner,
+                        this.GetLanguageString(agent.CurrentCulture, "RegionRestartIsAborted", "Region restart is aborted."),
+                        ID);
+                }
+                m_Log.InfoFormat("Region restart of {0} is aborted.", Name);
             }
         }
 

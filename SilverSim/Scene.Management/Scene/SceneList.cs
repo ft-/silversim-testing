@@ -9,6 +9,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Reflection;
 using System.Resources;
 using System.Threading;
 using ThreadedClasses;
@@ -24,6 +25,42 @@ namespace SilverSim.Scene.Management.Scene
 
         public SceneList()
         {
+            /* we have to bypass the circular issue we would get when trying to do it via using */
+            Assembly assembly = Assembly.Load("SilverSim.Main.Common");
+            Type t = assembly.GetType("SilverSim.Main.Common.ConfigurationLoader");
+            FieldInfo f = t.GetField("SimulatorShutdownDelegate", BindingFlags.NonPublic | BindingFlags.Static);
+            Action<int> act = HandleSimulatorShutdownInNotice;
+            f.SetValue(null, act);
+            f = t.GetField("SimulatorShutdownAbortDelegate", BindingFlags.NonPublic | BindingFlags.Static);
+            Action act2 = HandleSimulatorShutdownAbortNotice;
+            f.SetValue(null, act2);
+        }
+
+        void HandleSimulatorShutdownInNotice(int timeLeft)
+        {
+            foreach (SceneInterface scene in SceneManager.Scenes.Values)
+            {
+                foreach (IAgent agent in scene.RootAgents)
+                {
+                    agent.SendRegionNotice(
+                        agent.Owner,
+                        string.Format(this.GetLanguageString(agent.CurrentCulture, "SimulatorIsShuttingDownInXSeconds", "Simulator is shutting down in {0} seconds."),
+                        timeLeft), scene.ID);
+                }
+            }
+        }
+
+        void HandleSimulatorShutdownAbortNotice()
+        {
+            foreach (SceneInterface scene in SceneManager.Scenes.Values)
+            {
+                foreach (IAgent agent in scene.RootAgents)
+                {
+                    agent.SendRegionNotice(
+                        agent.Owner,
+                        this.GetLanguageString(agent.CurrentCulture, "SimulatorIsShutdownAborted", "Simulator shutdown is aborted."), scene.ID);
+                }
+            }
         }
 
         public void RemoveAll()

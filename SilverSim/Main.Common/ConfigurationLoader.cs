@@ -11,6 +11,7 @@ using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.ServiceInterfaces.Terrain;
+using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
@@ -43,6 +44,7 @@ using System.Net;
 using System.Reflection;
 using System.Runtime.Serialization;
 using System.Threading;
+using System.Timers;
 using System.Xml;
 using ThreadedClasses;
 
@@ -159,6 +161,92 @@ namespace SilverSim.Main.Common
         static public readonly Dictionary<Type, string> FeaturesTable = new Dictionary<Type, string>();
         readonly RwLockedDictionary<string, string> m_HeloResponseHeaders = new RwLockedDictionary<string, string>();
         public readonly RwLockedList<string> KnownConfigurationIssues = new RwLockedList<string>();
+        readonly System.Timers.Timer m_ShutdownTimer = new System.Timers.Timer(1000);
+        int m_ShutdownInSeconds = -1;
+        bool m_FirstShutdownNotice;
+        readonly object m_ShutdownTimerLock = new object();
+
+        int ShutdownInSeconds
+        {
+            get
+            {
+                return m_ShutdownInSeconds;
+            }
+            set
+            {
+                lock(m_ShutdownTimerLock)
+                {
+                    if (value > 0)
+                    {
+                        m_ShutdownInSeconds = value;
+                    }
+                }
+            }
+        }
+
+        static internal Action<int> SimulatorShutdownDelegate; /* used for Scene.Management registration */
+        static internal Action SimulatorShutdownAbortDelegate; /* used for Scene.Management registration */
+
+        void ShutdownTimerEventHandler(object o, ElapsedEventArgs evargs)
+        {
+            int timeLeft;
+            lock(m_ShutdownTimerLock)
+            {
+                timeLeft = m_ShutdownInSeconds--;
+            }
+
+            if(timeLeft < 0)
+            {
+                /* probably a shutdown abort */
+                return;
+            }
+
+            if(timeLeft % 15 == 0 || m_FirstShutdownNotice)
+            {
+                m_FirstShutdownNotice = false;
+                Action<int> del = SimulatorShutdownDelegate;
+                if (del != null)
+                {
+                    del(timeLeft);
+                }
+
+                m_Log.InfoFormat("Simulator shutdown in {0} seconds", timeLeft);
+            }
+            if (timeLeft == 0)
+            {
+                m_ShutdownTimer.Stop();
+                TriggerShutdown();
+            }
+        }
+
+        public void RequestSimulatorShutdown(int timeUntilShutdown)
+        {
+            AbortSimulatorShutdown();
+            if(timeUntilShutdown < 1)
+            {
+                return;
+            }
+            ShutdownInSeconds = timeUntilShutdown;
+            m_FirstShutdownNotice = true;
+            m_ShutdownTimer.Start();
+        }
+
+        public void AbortSimulatorShutdown()
+        {
+            bool sendAbortNotice = false;
+            lock(m_ShutdownTimerLock)
+            {
+                sendAbortNotice = (m_ShutdownInSeconds > 0);
+                m_ShutdownInSeconds = -1;
+                m_ShutdownTimer.Stop();
+            }
+
+            if(null != SimulatorShutdownAbortDelegate && sendAbortNotice)
+            {
+                m_Log.Info("Simulator shutdown is aborted.");
+                SimulatorShutdownAbortDelegate();
+            }
+        }
 
         public void ShowIssuesCommand(List<string> args, CmdIO.TTY io, UUID limitedToScene)
         {
@@ -858,6 +946,7 @@ namespace SilverSim.Main.Common
             string defaultsIniName;
             string mode;
 
+            m_ShutdownTimer.Elapsed += ShutdownTimerEventHandler;
             m_ShutdownEvent = shutdownEvent;
             ArgvConfigSource configSource = new ArgvConfigSource(args);
             configSource.AddSwitch("Startup", "mode", "m");
@@ -1117,13 +1206,29 @@ namespace SilverSim.Main.Common
             {
                 io.WriteFormatted("shutdown not allowed from restricted console");
             }
-            else if(args[0] == "help")
+            else if(args[0] == "help" || args.Count < 2 || (args[1] == "in" && args.Count < 3))
             {
-                io.Write("shutdown simulator");
+                io.Write("shutdown now\nshutdown in <seconds>\nshutdown abort");
+            }
+            else if(args[1] == "now")
+            {
+                m_ShutdownEvent.Set();
+            }
+            else if (args[1] == "abort")
+            {
+                AbortSimulatorShutdown();
             }
             else
             {
-                m_ShutdownEvent.Set();
+                int secondsToShutdown;
+                if(int.TryParse(args[2], out secondsToShutdown))
+                {
+                    RequestSimulatorShutdown(secondsToShutdown);
+                }
+                else
+                {
+                    io.WriteFormatted("{0} is not a valid number.", secondsToShutdown);
+                }
             }
         }
 
