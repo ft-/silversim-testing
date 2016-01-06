@@ -263,7 +263,7 @@ namespace SilverSim.Viewer.Core
             }
 
             if ((pInfo.Owner.EqualsGrid(Agent.Owner) ||
-                Scene.HasGroupPower(Agent.Owner, pInfo.Group, Types.Groups.GroupPowers.LandManageAllowed)) &&
+                Scene.HasGroupPower(Agent.Owner, pInfo.Group, Types.Groups.GroupPowers.LandManageBanned)) &&
                 req.Flags == ParcelAccessList.Ban)
             { 
                 lock (m_ParcelBanListLock)
