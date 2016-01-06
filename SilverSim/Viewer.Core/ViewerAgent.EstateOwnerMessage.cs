@@ -17,6 +17,8 @@ using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Types.Grid;
 using SilverSim.Viewer.Messages.LayerData;
+using SilverSim.Scene.Types.Object;
+using SilverSim.Viewer.Messages.Telehub;
 
 namespace SilverSim.Viewer.Core
 {
@@ -790,7 +792,6 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
         void EstateOwner_Telehub(AgentCircuit circuit, EstateOwnerMessage req)
         {
             UInt32 param = 0;
@@ -799,14 +800,60 @@ namespace SilverSim.Viewer.Core
                 return;
             }
             string cmd = req.ParamList[0].FromUTF8Bytes();
-            if(cmd != "info ui")
+            if(cmd != "info ui" && cmd != "delete")
             {
-                if (req.ParamList.Count < 2)
+                if (req.ParamList.Count < 2 ||
+                    !UInt32.TryParse(req.ParamList[1].FromUTF8Bytes(), out param))
                 {
                     return;
                 }
-                param = UInt32.Parse(req.ParamList[1].FromUTF8Bytes());
             }
+
+            ObjectPart part;
+            SceneInterface scene = circuit.Scene;
+            switch (cmd)
+            {
+                case "connect":
+                    if(scene.Primitives.TryGetValue(param, out part))
+                    {
+                        scene.SpawnPoints = new List<Vector3>();
+                        scene.RegionSettings.TelehubObject = part.ObjectGroup.ID;
+                        scene.TriggerRegionSettingsChanged();
+                    }
+                    break;
+
+                case "delete":
+                    scene.SpawnPoints = new List<Vector3>();
+                    scene.RegionSettings.TelehubObject = UUID.Zero;
+                    scene.TriggerRegionSettingsChanged();
+                    break;
+
+                case "spawnpoint add":
+                    if (scene.Primitives.TryGetValue(param, out part))
+                    {
+                        scene.AddSpawnPoint(part.GlobalPosition);
+                    }
+                    break;
+
+                case "spawnpoint remove":
+                    scene.RemoveSpawnPoint(param);
+                    break;
+
+                default:
+                    break;
+            }
+
+            TelehubInfo res = new TelehubInfo();
+            res.ObjectID = scene.RegionSettings.TelehubObject;
+            if (scene.Primitives.TryGetValue(res.ObjectID, out part))
+            {
+                res.ObjectName = part.Name;
+                res.TelehubPos = part.GlobalPosition;
+                res.TelehubRot = part.GlobalRotation;
+            }
+
+            res.SpawnPoints.AddRange(scene.SpawnPoints);
+            SendMessageAlways(res, scene.ID);
         }
 
         void EstateOwner_KickEstate(AgentCircuit circuit, EstateOwnerMessage req)

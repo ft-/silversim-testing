@@ -2,6 +2,7 @@
 // GNU Affero General Public License v3
 
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
@@ -10,9 +11,7 @@ using SilverSim.Types.Parcel;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
 using System.Runtime.Serialization;
-using System.Text;
 using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Scene
@@ -69,6 +68,30 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 TriggerSpawnpointUpdate();
             }
+        }
+
+        public void AddSpawnPoint(Vector3 absPos)
+        {
+            IObject obj;
+            if(Objects.TryGetValue(RegionSettings.TelehubObject, out obj))
+            {
+                Vector3 spawnPos = absPos - obj.GlobalPosition;
+                m_Spawnpoints.Add(spawnPos);
+                TriggerSpawnpointUpdate();
+            }
+        }
+
+        public void RemoveSpawnPoint(uint index)
+        {
+            try
+            {
+                m_Spawnpoints.RemoveAt((int)index);
+            }
+            catch(IndexOutOfRangeException)
+            {
+
+            }
+            TriggerSpawnpointUpdate();
         }
 
         protected abstract void TriggerSpawnpointUpdate();
