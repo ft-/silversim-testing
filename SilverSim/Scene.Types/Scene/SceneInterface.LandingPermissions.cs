@@ -333,7 +333,7 @@ namespace SilverSim.Scene.Types.Scene
                                         Vector3 closest = Vector3.Zero;
                                         for (int i = 0; i < spawns.Count; ++i)
                                         {
-                                            Vector3 v = spawns[i];
+                                            Vector3 v = spawns[i] + obj.GlobalPosition;
                                             double newDist = (v - destinationLocation).LengthSquared;
                                             if (closestindex < 0 || distance > newDist)
                                             {
@@ -343,7 +343,7 @@ namespace SilverSim.Scene.Types.Scene
                                             }
                                         }
                                         spawns.RemoveAt(closestindex);
-                                        newSpawns.Add(closest + obj.GlobalPosition);
+                                        newSpawns.Add(closest);
                                     }
                                 }
                                 break;
