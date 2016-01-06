@@ -946,6 +946,10 @@ namespace SilverSim.Main.Common
             string defaultsIniName;
             string mode;
 
+#if DEBUG
+            KnownConfigurationIssues.Add("Please use a release build for productive usage");
+#endif
+
             m_ShutdownTimer.Elapsed += ShutdownTimerEventHandler;
             m_ShutdownEvent = shutdownEvent;
             ArgvConfigSource configSource = new ArgvConfigSource(args);
@@ -1218,7 +1222,7 @@ namespace SilverSim.Main.Common
             {
                 AbortSimulatorShutdown();
             }
-            else
+            else if(args[1] == "in")
             {
                 int secondsToShutdown;
                 if(int.TryParse(args[2], out secondsToShutdown))
@@ -1229,6 +1233,10 @@ namespace SilverSim.Main.Common
                 {
                     io.WriteFormatted("{0} is not a valid number.", secondsToShutdown);
                 }
+            }
+            else
+            {
+                io.WriteFormatted("Unknown token {0} for shutdown", args[1]);
             }
         }
 
