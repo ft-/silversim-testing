@@ -403,7 +403,8 @@ namespace SilverSim.Scene.Types.Scene
                     }
                 }
             }
-            else if(!EstateService.ContainsKey(EstateService.RegionMap[ID]))
+
+            if (!EstateService.ContainsKey(EstateService.RegionMap[ID]))
             {
                 throw new ParcelAccessDeniedException(this.GetLanguageString(agent.CurrentCulture, "EstateDataNotAvailable", "Estate data not available."));
             }
