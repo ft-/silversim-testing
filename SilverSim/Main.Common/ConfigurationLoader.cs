@@ -946,10 +946,6 @@ namespace SilverSim.Main.Common
             string defaultsIniName;
             string mode;
 
-#if DEBUG
-            KnownConfigurationIssues.Add("Please use a release build for productive usage");
-#endif
-
             m_ShutdownTimer.Elapsed += ShutdownTimerEventHandler;
             m_ShutdownEvent = shutdownEvent;
             ArgvConfigSource configSource = new ArgvConfigSource(args);
@@ -1078,6 +1074,12 @@ namespace SilverSim.Main.Common
                     m_Log.InfoFormat("Mono Version String: " + displayName.Invoke(null, null));
                 }
             }
+
+#if DEBUG
+            string pleaseUseReleaseMsg = "Please use a release build for productive usage";
+            KnownConfigurationIssues.Add(pleaseUseReleaseMsg);
+            m_Log.Error(pleaseUseReleaseMsg);
+#endif
 
             m_Log.Info("Loading specified modules");
             LoadModules();
