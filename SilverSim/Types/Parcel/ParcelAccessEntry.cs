@@ -5,6 +5,7 @@ namespace SilverSim.Types.Parcel
 {
     public class ParcelAccessEntry
     {
+        public UUID RegionID;
         public UUID ParcelID;
         public UUI Accessor;
         public Date ExpiresAt;

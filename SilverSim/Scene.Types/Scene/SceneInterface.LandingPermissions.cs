@@ -109,14 +109,14 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             if ((parcel.Flags & ParcelFlags.UseBanList) != 0 &&
-                Parcels.BlackList[parcel.ID, agent.Owner])
+                Parcels.BlackList[ID, parcel.ID, agent.Owner])
             {
                 reason = this.GetLanguageString(agent.CurrentCulture, "YouAreBannedFromTheParcel", "You are banned from the parcel.");
                 return false;
             }
 
             if ((parcel.Flags & ParcelFlags.UseAccessList) != 0 &&
-                Parcels.WhiteList[parcel.ID, agent.Owner])
+                Parcels.WhiteList[ID, parcel.ID, agent.Owner])
             {
                 return true;
             }

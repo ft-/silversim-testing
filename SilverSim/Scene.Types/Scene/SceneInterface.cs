@@ -60,11 +60,11 @@ namespace SilverSim.Scene.Types.Scene
 
     public interface IParcelAccessList
     {
-        bool this[UUID parcelID, UUI accessor] { get; }
-        List<ParcelAccessEntry> this[UUID parcelID] { get; }
+        bool this[UUID regionID, UUID parcelID, UUI accessor] { get; }
+        List<ParcelAccessEntry> this[UUID regionID, UUID parcelID] { get; }
         void Store(ParcelAccessEntry entry);
         bool RemoveAll(UUID parcelID);
-        bool Remove(UUID parcelID, UUI accessor);
+        bool Remove(UUID regionID, UUID parcelID, UUI accessor);
     }
 
     public interface ISceneParcels : IEnumerable<ParcelInfo>

@@ -15,10 +15,10 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 
         }
 
-        public abstract bool this[UUID parcelID, UUI accessor] { get; }
-        public abstract List<ParcelAccessEntry> this[UUID parcelID] { get; }
+        public abstract bool this[UUID regionID, UUID parcelID, UUI accessor] { get; }
+        public abstract List<ParcelAccessEntry> this[UUID regionID, UUID parcelID] { get; }
         public abstract void Store(ParcelAccessEntry entry);
         public abstract bool RemoveAll(UUID parcelID);
-        public abstract bool Remove(UUID parcelID, UUI accessor);
+        public abstract bool Remove(UUID regionId, UUID parcelID, UUI accessor);
     }
 }

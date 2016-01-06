@@ -156,11 +156,11 @@ namespace SilverSim.Viewer.Core
             {
                 if ((req.Flags & ParcelAccessList.Access) != 0)
                 {
-                    SendParcelAccessList(req.LocalID, ParcelAccessList.Access, Scene.Parcels.WhiteList[pInfo.ID]);
+                    SendParcelAccessList(req.LocalID, ParcelAccessList.Access, Scene.Parcels.WhiteList[Scene.ID, pInfo.ID]);
                 }
                 if ((req.Flags & ParcelAccessList.Ban) != 0)
                 {
-                    SendParcelAccessList(req.LocalID, ParcelAccessList.Ban, Scene.Parcels.BlackList[pInfo.ID]);
+                    SendParcelAccessList(req.LocalID, ParcelAccessList.Ban, Scene.Parcels.BlackList[Scene.ID, pInfo.ID]);
                 }
             }
         }
@@ -175,11 +175,11 @@ namespace SilverSim.Viewer.Core
 
         void ParcelAccessListUpdateManage(UUID parcelID, Dictionary<UUID, ParcelAccessListUpdate.Data> entries, IParcelAccessList accessList)
         {
-            foreach (ParcelAccessEntry listed in accessList[parcelID])
+            foreach (ParcelAccessEntry listed in accessList[Scene.ID, parcelID])
             {
                 if (!entries.ContainsKey(listed.Accessor.ID))
                 {
-                    Scene.Parcels.WhiteList.Remove(parcelID, listed.Accessor);
+                    accessList.Remove(Scene.ID, parcelID, listed.Accessor);
                 }
             }
             foreach (ParcelAccessListUpdate.Data upd in entries.Values)
@@ -188,6 +188,7 @@ namespace SilverSim.Viewer.Core
                 if (Scene.AvatarNameService.TryGetValue(upd.ID, out uui))
                 {
                     ParcelAccessEntry pae = new ParcelAccessEntry();
+                    pae.RegionID = Scene.ID;
                     pae.Accessor = uui;
                     pae.ParcelID = parcelID;
                     accessList.Store(pae);
@@ -222,7 +223,11 @@ namespace SilverSim.Viewer.Core
                             }
 
                             m_ParcelAccessListSegments[req.SequenceID] = req;
-                            if (m_ParcelAccessListSegments.Count == req.Sections)
+                            if(req.Sections == 0)
+                            {
+                                ParcelAccessListUpdateManage(pInfo.ID, new Dictionary<UUID, ParcelAccessListUpdate.Data>(), Scene.Parcels.WhiteList);
+                            }
+                            else if (m_ParcelAccessListSegments.Count == req.Sections)
                             {
                                 Dictionary<int, ParcelAccessListUpdate> list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelAccessListSegments);
                                 m_ParcelAccessListSegments.Clear();
@@ -265,7 +270,11 @@ namespace SilverSim.Viewer.Core
                             }
 
                             m_ParcelBanListSegments[req.SequenceID] = req;
-                            if (m_ParcelBanListSegments.Count == req.Sections)
+                            if (req.Sections == 0)
+                            {
+                                ParcelAccessListUpdateManage(pInfo.ID, new Dictionary<UUID, ParcelAccessListUpdate.Data>(), Scene.Parcels.BlackList);
+                            }
+                            else if (m_ParcelBanListSegments.Count == req.Sections)
                             {
                                 Dictionary<int, ParcelAccessListUpdate> list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelBanListSegments);
                                 m_ParcelBanListSegments.Clear();
