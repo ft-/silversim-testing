@@ -800,13 +800,11 @@ namespace SilverSim.Viewer.Core
                 return;
             }
             string cmd = req.ParamList[0].FromUTF8Bytes();
-            if(cmd != "info ui" && cmd != "delete")
+            if ((cmd != "info ui" && cmd != "delete") &&
+                (req.ParamList.Count < 2 ||
+                    !UInt32.TryParse(req.ParamList[1].FromUTF8Bytes(), out param)))
             {
-                if (req.ParamList.Count < 2 ||
-                    !UInt32.TryParse(req.ParamList[1].FromUTF8Bytes(), out param))
-                {
-                    return;
-                }
+                return;
             }
 
             ObjectPart part;
