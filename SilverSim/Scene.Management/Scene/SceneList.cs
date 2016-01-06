@@ -58,7 +58,7 @@ namespace SilverSim.Scene.Management.Scene
                 {
                     agent.SendRegionNotice(
                         agent.Owner,
-                        this.GetLanguageString(agent.CurrentCulture, "SimulatorIsShutdownAborted", "Simulator shutdown is aborted."), scene.ID);
+                        this.GetLanguageString(agent.CurrentCulture, "SimulatorShutdownIsAborted", "Simulator shutdown is aborted."), scene.ID);
                 }
             }
         }
