@@ -67,10 +67,9 @@ namespace SilverSim.Types.Parcel
         UrlRawHtml = 1 << 20,
         RestrictPushObject = 1 << 21,
         DenyAnonymous = 1 << 22,
-        LindenHome = 1 << 23,
         AllowGroupScripts = 1 << 25,
         CreateGroupObjects = 1 << 26,
-        AllowAPrimitiveEntry = 1 << 27,
+        AllowAllPrimitiveEntry = 1 << 27,
         AllowGroupObjectEntry = 1 << 28,
         AllowVoiceChat = 1 << 29,
         UseEstateVoiceChan = 1 << 30,
@@ -120,7 +119,7 @@ namespace SilverSim.Types.Parcel
         public string Description = string.Empty;
         public ParcelFlags Flags = ParcelFlags.AllowFly |
                             ParcelFlags.AllowLandmark |
-                            ParcelFlags.AllowAPrimitiveEntry |
+                            ParcelFlags.AllowAllPrimitiveEntry |
                             ParcelFlags.AllowDeedToGroup |
                             ParcelFlags.AllowTerraform |
                             ParcelFlags.CreateObjects |

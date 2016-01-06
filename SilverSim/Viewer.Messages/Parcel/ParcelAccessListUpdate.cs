@@ -15,7 +15,7 @@ namespace SilverSim.Viewer.Messages.Parcel
     {
         public UUID AgentID;
         public UUID SessionID;
-        public UInt32 Flags;
+        public ParcelAccessList Flags;
         public Int32 LocalID;
         public UUID TransactionID;
         public Int32 SequenceID;
@@ -40,7 +40,7 @@ namespace SilverSim.Viewer.Messages.Parcel
             ParcelAccessListUpdate m = new ParcelAccessListUpdate();
             m.AgentID = p.ReadUUID();
             m.SessionID = p.ReadUUID();
-            m.Flags = p.ReadUInt32();
+            m.Flags = (ParcelAccessList)p.ReadUInt32();
             m.LocalID = p.ReadInt32();
             m.TransactionID = p.ReadUUID();
             m.SequenceID = p.ReadInt32();

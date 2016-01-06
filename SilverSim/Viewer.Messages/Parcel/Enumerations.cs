@@ -9,6 +9,8 @@ namespace SilverSim.Viewer.Messages.Parcel
     public enum ParcelAccessList : uint
     {
         Access = 1,
-        Ban = 2
+        Ban = 2,
+        AllowExperience = 8,
+        BlockExperience = 16
     }
 }

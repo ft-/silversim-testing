@@ -33,17 +33,15 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM ?table WHERE ExpiresAt <= ?unixtime AND ExpiresAt <> 0", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE ExpiresAt <= ?unixtime AND ExpiresAt <> 0", connection))
                     {
-                        cmd.Parameters.AddWithValue("?table", m_TableName);
                         cmd.Parameters.AddWithValue("?unixtime", Date.GetUnixTime());
                         cmd.ExecuteNonQuery();
                     }
 
                     /* we use a specific implementation to reduce the result set here */
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM ?table WHERE ParcelID LIKE ?parcelid AND Accessor LIKE \"" +accessor.ID.ToString() + "\"%", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE ParcelID LIKE ?parcelid AND Accessor LIKE \"" + accessor.ID.ToString() + "\"%", connection))
                     {
-                        cmd.Parameters.AddWithValue("?table", m_TableName);
                         cmd.Parameters.AddWithValue("?parcelid", parcelID.ToString());
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
@@ -74,28 +72,29 @@ namespace SilverSim.Database.MySQL.SimulationData
                 using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
                 {
                     connection.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM ?table WHERE ExpiresAt <= ?unixtime AND ExpiresAt <> 0", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE ExpiresAt <= ?unixtime AND ExpiresAt > 0", connection))
                     {
-                        cmd.Parameters.AddWithValue("?table", m_TableName);
                         cmd.Parameters.AddWithValue("?unixtime", Date.GetUnixTime());
                         cmd.ExecuteNonQuery();
                     }
 
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM ?table WHERE ParcelID LIKE ?parcelid", connection))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM " + m_TableName + " WHERE ParcelID LIKE ?parcelid", connection))
                     {
-                        cmd.Parameters.AddWithValue("?table", m_TableName);
                         cmd.Parameters.AddWithValue("?parcelid", parcelID.ToString());
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            ParcelAccessEntry entry = new ParcelAccessEntry();
-                            entry.ParcelID = reader.GetUUID("ParcelID");
-                            entry.Accessor = reader.GetUUI("Accessor");
-                            ulong val = (ulong)reader["ExpiresAt"];
-                            if (val != 0)
+                            while (reader.Read())
                             {
-                                entry.ExpiresAt = Date.UnixTimeToDateTime(val);
+                                ParcelAccessEntry entry = new ParcelAccessEntry();
+                                entry.ParcelID = reader.GetUUID("ParcelID");
+                                entry.Accessor = reader.GetUUI("Accessor");
+                                ulong val = (ulong)reader["ExpiresAt"];
+                                if (val != 0)
+                                {
+                                    entry.ExpiresAt = Date.UnixTimeToDateTime(val);
+                                }
+                                result.Add(entry);
                             }
-                            result.Add(entry);
                         }
                     }
                 }
@@ -108,15 +107,14 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM ?table WHERE ExpiresAt <= ?unixtime AND ExpiresAt <> 0", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE ExpiresAt <= ?unixtime AND ExpiresAt > 0", connection))
                 {
-                    cmd.Parameters.AddWithValue("?table", m_TableName);
                     cmd.Parameters.AddWithValue("?unixtime", Date.GetUnixTime());
                     cmd.ExecuteNonQuery();
                 }
 
                 Dictionary<string, object> data = new Dictionary<string, object>();
-                data["ParcelID"] = entry.ParcelID;
+                data["ParcelID"] = entry.ParcelID.ToString();
                 data["Accessor"] = entry.Accessor;
                 if(entry.ExpiresAt != null)
                 {
@@ -131,9 +129,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM ?table WHERE RegionID LIKE ?regionid", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE ?regionid", connection))
                 {
-                    cmd.Parameters.AddWithValue("?table", m_TableName);
                     cmd.Parameters.AddWithValue("?regionid", parcelID.ToString());
                     return cmd.ExecuteNonQuery() > 0;
                 }
@@ -145,9 +142,8 @@ namespace SilverSim.Database.MySQL.SimulationData
             using (MySqlConnection connection = new MySqlConnection(m_ConnectionString))
             {
                 connection.Open();
-                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM ?table WHERE RegionID LIKE ?regionid AND Accessor LIKE ?accessor", connection))
+                using (MySqlCommand cmd = new MySqlCommand("DELETE FROM " + m_TableName + " WHERE RegionID LIKE ?regionid AND Accessor LIKE ?accessor", connection))
                 {
-                    cmd.Parameters.AddWithValue("?table", m_TableName);
                     cmd.Parameters.AddWithValue("?regionid", parcelID.ToString());
                     cmd.Parameters.AddWithValue("?accessor", accessor.ToString());
                     return cmd.ExecuteNonQuery() > 0;

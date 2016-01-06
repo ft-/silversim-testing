@@ -1,6 +1,7 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Messages;
@@ -9,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using ThreadedClasses;
 
 namespace SilverSim.Viewer.Core
 {
@@ -91,6 +93,52 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        const int P_AL_ACCESS = 1;
+        const int P_AL_BAN = 2;
+        const int P_MAX_ENTRIES = 1000 / 24;
+
+        void SendParcelAccessList(int localID, ParcelAccessList listType, List<ParcelAccessEntry> list)
+        {
+            ParcelAccessListReply rep = new ParcelAccessListReply();
+            int segments = (list.Count + P_MAX_ENTRIES - 1) / P_MAX_ENTRIES;
+            int sequenceno = 1;
+            if(list.Count == 0)
+            {
+                rep.AgentID = AgentID;
+                rep.LocalID = localID;
+                rep.Flags = listType;
+                rep.SequenceID = sequenceno++;
+                rep.AccessList.Add(new ParcelAccessListReply.Data());
+                SendMessage(rep);
+                return;
+            }
+            else
+            {
+                rep.AgentID = AgentID;
+                rep.LocalID = localID;
+                rep.Flags = listType;
+                rep.SequenceID = sequenceno++;
+                
+                foreach (ParcelAccessEntry pae in list)
+                {
+                    if(rep.AccessList.Count == P_MAX_ENTRIES)
+                    {
+                        SendMessage(rep);
+                        rep.AgentID = AgentID;
+                        rep.LocalID = localID;
+                        rep.Flags = listType;
+                        rep.SequenceID = sequenceno++;
+                    }
+                    ParcelAccessListReply.Data pad = new ParcelAccessListReply.Data();
+                    pad.Flags = listType;
+                    pad.ID = pae.Accessor.ID;
+                    rep.AccessList.Add(pad);
+                }
+
+                SendMessage(rep);
+            }
+        }
+
         [PacketHandler(MessageType.ParcelAccessListRequest)]
         public void HandleParcelAccessListRequest(Message m)
         {
@@ -102,16 +150,158 @@ namespace SilverSim.Viewer.Core
             }
 
             ParcelInfo pInfo;
-            if (Scene.Parcels.TryGetValue(req.LocalID, out pInfo))
+            if (Scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                (pInfo.Owner.EqualsGrid(Agent.Owner) ||
+                Scene.HasGroupPower(Agent.Owner, pInfo.Group, Types.Groups.GroupPowers.LandManageAllowed)))
             {
-                ParcelAccessListReply reply = new ParcelAccessListReply();
-                reply.AgentID = req.AgentID;
-                reply.SequenceID = req.SequenceID;
-                reply.Flags = req.Flags;
-                reply.LocalID = req.LocalID;
+                if ((req.Flags & ParcelAccessList.Access) != 0)
+                {
+                    SendParcelAccessList(req.LocalID, ParcelAccessList.Access, Scene.Parcels.WhiteList[pInfo.ID]);
+                }
+                if ((req.Flags & ParcelAccessList.Ban) != 0)
+                {
+                    SendParcelAccessList(req.LocalID, ParcelAccessList.Ban, Scene.Parcels.BlackList[pInfo.ID]);
+                }
+            }
+        }
 
+        readonly object m_ParcelAccessListLock = new object();
+        UUID m_ParcelAccessListTransaction = UUID.Zero;
+        readonly Dictionary<int, ParcelAccessListUpdate> m_ParcelAccessListSegments = new Dictionary<int, ParcelAccessListUpdate>();
+
+        readonly object m_ParcelBanListLock = new object();
+        UUID m_ParcelBanListTransaction = UUID.Zero;
+        readonly Dictionary<int, ParcelAccessListUpdate> m_ParcelBanListSegments = new Dictionary<int, ParcelAccessListUpdate>();
+
+        void ParcelAccessListUpdateManage(UUID parcelID, Dictionary<UUID, ParcelAccessListUpdate.Data> entries, IParcelAccessList accessList)
+        {
+            foreach (ParcelAccessEntry listed in accessList[parcelID])
+            {
+                if (!entries.ContainsKey(listed.Accessor.ID))
+                {
+                    Scene.Parcels.WhiteList.Remove(parcelID, listed.Accessor);
+                }
+            }
+            foreach (ParcelAccessListUpdate.Data upd in entries.Values)
+            {
+                UUI uui;
+                if (Scene.AvatarNameService.TryGetValue(upd.ID, out uui))
+                {
+                    ParcelAccessEntry pae = new ParcelAccessEntry();
+                    pae.Accessor = uui;
+                    pae.ParcelID = parcelID;
+                    accessList.Store(pae);
+                }
+            }
+        }
+
+        [PacketHandler(MessageType.ParcelAccessListUpdate)]
+        public void HandleParcelAccessListUpdateRequest(Message m)
+        {
+            ParcelAccessListUpdate req = (ParcelAccessListUpdate)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ParcelInfo pInfo;
+            if (Scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                (pInfo.Owner.EqualsGrid(Agent.Owner) ||
+                Scene.HasGroupPower(Agent.Owner, pInfo.Group, Types.Groups.GroupPowers.LandManageAllowed)))
+            {
+                switch(req.Flags)
+                {
+                    case ParcelAccessList.Access:
+                        lock(m_ParcelAccessListLock)
+                        {
+                            if (m_ParcelAccessListTransaction != req.TransactionID)
+                            {
+                                m_ParcelAccessListSegments.Clear();
+                                m_ParcelAccessListTransaction = req.TransactionID;
+                            }
+
+                            m_ParcelAccessListSegments[req.SequenceID] = req;
+                            if (m_ParcelAccessListSegments.Count == req.Sections)
+                            {
+                                Dictionary<int, ParcelAccessListUpdate> list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelAccessListSegments);
+                                m_ParcelAccessListSegments.Clear();
+                                m_ParcelAccessListTransaction = UUID.Zero;
+                                bool isComplete = true;
+                                for (int i = 1; i < req.Sections; ++i)
+                                {
+                                    if (!list.ContainsKey(i))
+                                    {
+                                        isComplete = false;
+                                        break;
+                                    }
+                                }
+                                if (!isComplete)
+                                {
+                                    return;
+                                }
+
+                                Dictionary<UUID, ParcelAccessListUpdate.Data> entries = new Dictionary<UUID, ParcelAccessListUpdate.Data>();
+                                foreach (ParcelAccessListUpdate upd in list.Values)
+                                {
+                                    foreach (ParcelAccessListUpdate.Data d in upd.AccessList)
+                                    {
+                                        entries[d.ID] = d;
+                                    }
+                                }
+
+                                ParcelAccessListUpdateManage(pInfo.ID, entries, Scene.Parcels.WhiteList);
+                            }
+                        }
+                        break;
+
+                    case ParcelAccessList.Ban:
+                        lock(m_ParcelBanListLock)
+                        {
+                            if (m_ParcelBanListTransaction != req.TransactionID)
+                            {
+                                m_ParcelBanListSegments.Clear();
+                                m_ParcelBanListTransaction = req.TransactionID;
+                            }
+
+                            m_ParcelBanListSegments[req.SequenceID] = req;
+                            if (m_ParcelBanListSegments.Count == req.Sections)
+                            {
+                                Dictionary<int, ParcelAccessListUpdate> list = new Dictionary<int, ParcelAccessListUpdate>(m_ParcelBanListSegments);
+                                m_ParcelBanListSegments.Clear();
+                                m_ParcelBanListTransaction = UUID.Zero;
+                                bool isComplete = true;
+                                for (int i = 1; i < req.Sections; ++i)
+                                {
+                                    if (!list.ContainsKey(i))
+                                    {
+                                        isComplete = false;
+                                        break;
+                                    }
+                                }
+                                if (!isComplete)
+                                {
+                                    return;
+                                }
+
+                                Dictionary<UUID, ParcelAccessListUpdate.Data> entries = new Dictionary<UUID, ParcelAccessListUpdate.Data>();
+                                foreach (ParcelAccessListUpdate upd in list.Values)
+                                {
+                                    foreach (ParcelAccessListUpdate.Data d in upd.AccessList)
+                                    {
+                                        entries[d.ID] = d;
+                                    }
+                                }
+
+                                ParcelAccessListUpdateManage(pInfo.ID, entries, Scene.Parcels.WhiteList);
+                            }
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
 #warning add parcel access list
-                SendMessage(reply);
             }
         }
     }
