@@ -268,6 +268,8 @@ namespace SilverSim.Scene.Types.Scene
                 !IsPossibleGod(agentOwner)) ||
                 !ServerParamService.GetBoolean(ID, "EnableLandingOverride", false))
             {
+                bool foundTelehub = false;
+
                 estateInfo = CheckEstateRights(agent);
                 if(RegionSettings.TelehubObject != UUID.Zero && (estateInfo.Flags & RegionOptionFlags.AllowDirectTeleport) == 0)
                 {
@@ -366,35 +368,39 @@ namespace SilverSim.Scene.Types.Scene
                                     /* found a viable spawn here */
                                     p = spawnParcel;
                                     destinationLocation = spawn;
+                                foundTelehub = true;
                             }
                         }
                     }
                 }
 
-                if(!CheckParcelAccessRights(agent, p))
+                if(!CheckParcelAccessRights(agent, p) && !foundTelehub)
                 {
                     p = FindNonBlockedParcel(agent, destinationLocation);
                 }
 
                 /* do not block parcel owner, estate manager or estate owner when landing override is enabled */
 
-                switch (p.LandingType)
+                if (!foundTelehub)
                 {
-                    case TeleportLandingType.Blocked:
-                        /* let's find another parcel */
-                        p = FindNonBlockedParcel(agent, destinationLocation);
-                        break;
+                    switch (p.LandingType)
+                    {
+                        case TeleportLandingType.Blocked:
+                            /* let's find another parcel */
+                            p = FindNonBlockedParcel(agent, destinationLocation);
+                            break;
 
-                    case TeleportLandingType.Anywhere:
-                        break;
+                        case TeleportLandingType.Anywhere:
+                            break;
 
-                    case TeleportLandingType.LandingPoint:
-                        destinationLocation = p.LandingPosition;
-                        destinationLookAt = p.LandingLookAt;
-                        break;
+                        case TeleportLandingType.LandingPoint:
+                            destinationLocation = p.LandingPosition;
+                            destinationLookAt = p.LandingLookAt;
+                            break;
 
-                    default:
-                        break;
+                        default:
+                            break;
+                    }
                 }
             }
             else if(!EstateService.ContainsKey(EstateService.RegionMap[ID]))
