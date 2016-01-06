@@ -7,6 +7,8 @@ using System;
 namespace SilverSim.Viewer.Messages.User
 {
     [UDPMessage(MessageType.KickUser)]
+    [Reliable]
+    [Trusted]
     public class KickUser : Message
     {
         public UInt32 IpAddr;
@@ -18,22 +20,6 @@ namespace SilverSim.Viewer.Messages.User
         public KickUser()
         {
 
-        }
-
-        public override bool IsReliable
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override MessageType Number
-        {
-            get
-            {
-                return MessageType.KickUser;
-            }
         }
 
         public override void Serialize(UDPPacket p)
