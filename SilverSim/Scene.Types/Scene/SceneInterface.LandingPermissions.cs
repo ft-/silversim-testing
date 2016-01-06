@@ -272,6 +272,107 @@ namespace SilverSim.Scene.Types.Scene
                 estateInfo = CheckEstateRights(agent);
                 if(RegionSettings.TelehubObject != UUID.Zero && (estateInfo.Flags & RegionOptionFlags.AllowDirectTeleport) == 0)
                 {
+                    IObject obj;
+                    if (Objects.TryGetValue(RegionSettings.TelehubObject, out obj))
+                    {
+                        List<Vector3> spawns = SpawnPoints;
+                        List<Vector3> newSpawns = new List<Vector3>();
+                        switch(ServerParamService.GetString(ID, "SpawnpointRouting", "closest"))
+                        {
+                            case "random":
+                                {
+                                    Random rand = new Random();
+                                    while(spawns.Count > 0)
+                                    {
+                                        newSpawns.Add(spawns[rand.Next(spawns.Count - 1).Clamp(0, spawns.Count - 1)] + obj.GlobalPosition);
+                                    }
+                                }
+                                break;
+
+                            case "emptiest":
+                                {
+                                    List<Vector3> agentLocations = new List<Vector3>();
+                                    foreach(IAgent retAgent in RootAgents)
+                                    {
+                                        agentLocations.Add(retAgent.GlobalPosition);
+                                    }
+
+                                    while(spawns.Count > 0)
+                                    {
+                                        int emptiestindex = -1;
+                                        double emptiestdistindicator = 0;
+                                        Vector3 emptiest = Vector3.Zero;
+
+                                        for(int i = 0; i < spawns.Count; ++i)
+                                        {
+                                            double distindicator = 0;
+                                            Vector3 absSpawnV = spawns[i] + obj.GlobalPosition;
+                                            foreach(Vector3 agLocation in agentLocations)
+                                            {
+                                                distindicator += (agLocation - absSpawnV).LengthSquared;
+                                            }
+                                            if(emptiestindex < 0 || distindicator < emptiestdistindicator)
+                                            {
+                                                emptiestdistindicator = distindicator;
+                                                emptiest = absSpawnV;
+                                                emptiestindex = i;
+                                            }
+                                        }
+                                        spawns.RemoveAt(emptiestindex);
+                                        newSpawns.Add(emptiest);
+                                    }
+                                }
+                                break;
+
+                            default:
+                            case "closest":
+                                {
+                                    while(spawns.Count > 0)
+                                    {
+                                        int closestindex = -1;
+                                        double distance = 0;
+                                        Vector3 closest = Vector3.Zero;
+                                        for (int i = 0; i < spawns.Count; ++i)
+                                        {
+                                            Vector3 v = spawns[i];
+                                            double newDist = (v - destinationLocation).LengthSquared;
+                                            if (closestindex < 0 || distance > newDist)
+                                            {
+                                                distance = newDist;
+                                                closestindex = i;
+                                                closest = v;
+                                            }
+                                        }
+                                        spawns.RemoveAt(closestindex);
+                                        newSpawns.Add(closest + obj.GlobalPosition);
+                                    }
+                                }
+                                break;
+
+                            case "sequence":
+                                foreach(Vector3 v in spawns)
+                                {
+                                    newSpawns.Add(v + obj.GlobalPosition);
+                                }
+                                break;
+                        }
+                        spawns = newSpawns;
+
+                        foreach (Vector3 spawn in SpawnPoints)
+                        {
+                            ParcelInfo spawnParcel;
+                            if (Parcels.TryGetValue(spawn, out spawnParcel))
+                            {
+                                if (spawnParcel.PassPrice != 0 /* skip parcels with pass price here */ ||
+                                    CheckParcelAccessRights(agent, spawnParcel))
+                                {
+                                    /* found a viable spawn here */
+                                    p = spawnParcel;
+                                    destinationLocation = spawn;
+                                }
+                            }
+                        }
+                    }
                 }
 
                 if(!CheckParcelAccessRights(agent, p))
