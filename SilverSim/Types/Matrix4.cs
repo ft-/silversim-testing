@@ -63,6 +63,20 @@ namespace SilverSim.Types
             }
         }
 
+        public Vector3 Translate
+        {
+            get
+            {
+                return new Vector3(M41, M42, M43);
+            }
+            set
+            {
+                M41 = value.X;
+                M42 = value.Y;
+                M43 = value.Z;
+            }
+        }
+
         #endregion Properties
 
         #region Constructors
