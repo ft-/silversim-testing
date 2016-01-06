@@ -221,7 +221,7 @@ namespace SilverSim.Main.Common
 
         public void RequestSimulatorShutdown(int timeUntilShutdown)
         {
-            AbortSimulatorShutdown();
+            AbortSimulatorShutdown(true);
             if(timeUntilShutdown < 1)
             {
                 return;
@@ -231,7 +231,7 @@ namespace SilverSim.Main.Common
             m_ShutdownTimer.Start();
         }
 
-        public void AbortSimulatorShutdown()
+        public void AbortSimulatorShutdown(bool quietAbort = false)
         {
             bool sendAbortNotice = false;
             lock(m_ShutdownTimerLock)
@@ -241,7 +241,7 @@ namespace SilverSim.Main.Common
                 m_ShutdownTimer.Stop();
             }
 
-            if(null != SimulatorShutdownAbortDelegate && sendAbortNotice)
+            if(null != SimulatorShutdownAbortDelegate && sendAbortNotice && !quietAbort)
             {
                 m_Log.Info("Simulator shutdown is aborted.");
                 SimulatorShutdownAbortDelegate();

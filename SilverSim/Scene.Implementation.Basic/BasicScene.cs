@@ -806,6 +806,11 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override void AbortRegionRestart()
         {
+            AbortRegionRestart(false);
+        }
+
+        void AbortRegionRestart(bool quietAbort)
+        {
             bool aborted = m_RestartObject.Abort();
             try
             {
@@ -816,13 +821,13 @@ namespace SilverSim.Scene.Implementation.Basic
                 /* we use NullReferenceException here */
                 return;
             }
-            catch(ObjectDisposedException)
+            catch (ObjectDisposedException)
             {
                 /* ensure that a disposed Timer does not kill something unnecessarily */
                 return;
             }
 
-            if(aborted)
+            if (aborted && !quietAbort)
             {
                 foreach (IAgent agent in RootAgents)
                 {
@@ -836,7 +841,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override void RequestRegionRestart(int seconds)
         {
-            AbortRegionRestart();
+            AbortRegionRestart(seconds >= 15);
             if (seconds < 15)
             {
                 return;
