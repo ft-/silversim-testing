@@ -916,7 +916,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             }
             else
             {
-                scene.RequestRegionRestart(int.Parse(jsondata["seconds"].ToString()));
+                scene.RequestRegionRestart(jsondata["seconds"].AsInt);
                 AdminWebIF.SuccessResponse(req, new Map());
             }
         }
