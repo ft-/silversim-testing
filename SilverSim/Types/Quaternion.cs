@@ -633,7 +633,7 @@ namespace SilverSim.Types
         }
         #endregion
 
-        public Matrix4 GetMatrix(Quaternion quaternion)
+        public Matrix4 GetMatrix()
         {
             Matrix4 matrix = new Matrix4();
 
