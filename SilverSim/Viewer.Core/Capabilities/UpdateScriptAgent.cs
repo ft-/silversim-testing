@@ -14,11 +14,14 @@ using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using SilverSim.Types;
 using ThreadedClasses;
+using log4net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
     public class UpdateScriptAgent : UploadAssetAbstractCapability
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("UPDATE SCRIPT AGENT");
+
         readonly ViewerAgent m_Agent;
         readonly InventoryServiceInterface m_InventoryService;
         readonly AssetServiceInterface m_AssetService;
@@ -120,6 +123,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch(Exception e)
                 {
+                    m_Log.ErrorFormat("Unexpected exception: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                     AnArray errors = new AnArray();
                     errors.Add("0: Unexpected compiler error " + e.GetType().Name);
                     m.Add("errors", errors);

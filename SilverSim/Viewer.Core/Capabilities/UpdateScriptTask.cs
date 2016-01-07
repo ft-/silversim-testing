@@ -15,12 +15,15 @@ using ThreadedClasses;
 using System.IO;
 using System;
 using System.Diagnostics.CodeAnalysis;
+using log4net;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
     [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
     public class UpdateScriptTask : UploadAssetAbstractCapability
     {
+        private static readonly ILog m_Log = LogManager.GetLogger("UPDATE SCRIPT TASK");
+
         sealed class TransactionInfo
         {
             public UUID TaskID;
@@ -156,6 +159,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch (Exception e)
                 {
+                    m_Log.ErrorFormat("Unexpected exception: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                     AnArray errors = new AnArray();
                     errors.Add("0: Unexpected compiler error " + e.GetType().Name);
                     m.Add("errors", errors);
