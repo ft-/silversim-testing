@@ -37,9 +37,7 @@ namespace SilverSim.Database.MySQL.Estate
                             {
                                 while(reader.Read())
                                 {
-                                    UUI uui = new UUI();
-                                    uui.ID = reader.GetUUID("UserID");
-                                    estatemanagers.Add(uui);
+                                    estatemanagers.Add(reader.GetUUI("UserID"));
                                 }
                             }
                         }
@@ -65,13 +63,20 @@ namespace SilverSim.Database.MySQL.Estate
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
                     conn.Open();
-                    using (MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_managers WHERE EstateID = ?estateid AND UserID LIKE ?userid", conn))
+                    using (MySqlCommand cmd = new MySqlCommand("SELECT UserID FROM estate_managers WHERE EstateID = ?estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"", conn))
                     {
                         cmd.Parameters.AddWithValue("?estateid", estateID);
-                        cmd.Parameters.AddWithValue("?userid", agent.ID.ToString());
                         using (MySqlDataReader reader = cmd.ExecuteReader())
                         {
-                            return reader.Read();
+                            while(reader.Read())
+                            {
+                                UUI uui = reader.GetUUI("UserID");
+                                if(uui.EqualsGrid(agent))
+                                {
+                                    return true;
+                                }
+                            }
+                            return false;
                         }
                     }
                 }
@@ -80,7 +85,7 @@ namespace SilverSim.Database.MySQL.Estate
             {
                 string query = value ? 
                     "REPLACE INTO estate_managers (EstateID, UserID) VALUES (?estateid, ?userid)" :
-                    "DELETE FROM estate_managers WHERE EstateID = ?estateid AND UserID LIKE ?userid";
+                    "DELETE FROM estate_managers WHERE EstateID = ?estateid AND UserID LIKE \"" + agent.ID.ToString() + "%\"";
 
                 using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
                 {
@@ -88,8 +93,11 @@ namespace SilverSim.Database.MySQL.Estate
                     using (MySqlCommand cmd = new MySqlCommand(query, conn))
                     {
                         cmd.Parameters.AddWithValue("?estateid", estateID);
-                        cmd.Parameters.AddWithValue("?userid", agent.ID.ToString());
-                        if (cmd.ExecuteNonQuery() < 1)
+                        if (value)
+                        {
+                            cmd.Parameters.AddWithValue("?userid", agent.ID);
+                        }
+                        if (cmd.ExecuteNonQuery() < 1 && value)
                         {
                             throw new EstateUpdateFailedException();
                         }

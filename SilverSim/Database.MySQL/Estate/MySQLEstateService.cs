@@ -79,7 +79,8 @@ namespace SilverSim.Database.MySQL.Estate
                 "UserID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "PRIMARY KEY(EstateID, UserID)," +
                 "KEY UserID (UserID)," +
-                "KEY EstateID (EstateID))"
+                "KEY EstateID (EstateID))",
+            "ALTER TABLE %tablename% CHANGE UserID UserID VARCHAR(255) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',",
         };
 
         private static readonly string[] Migrations_estategroups = new string[]{
@@ -97,7 +98,8 @@ namespace SilverSim.Database.MySQL.Estate
                 "UserID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "PRIMARY KEY(EstateID, UserID)," +
                 "KEY UserID (UserID)," +
-                "KEY EstateID (EstateID))"
+                "KEY EstateID (EstateID))",
+            "ALTER TABLE %tablename% CHANGE EstateID EstateID INT(10) UNSIGNED NOT NULL, CHANGE UserID UserID VARCHAR(255) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',",
         };
 
         private static readonly string[] Migrations_estatebans = new string[]{
@@ -106,7 +108,8 @@ namespace SilverSim.Database.MySQL.Estate
                 "UserID CHAR(36) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000'," +
                 "PRIMARY KEY(EstateID, UserID)," +
                 "KEY UserID (UserID)," +
-                "KEY EstateID (EstateID))"
+                "KEY EstateID (EstateID))",
+            "ALTER TABLE %tablename% CHANGE EstateID EstateID INT(10) UNSIGNED NOT NULL, CHANGE UserID UserID VARCHAR(255) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',",
         };
 
         private static readonly string[] Migrations_estates = new string[]{
@@ -127,7 +130,6 @@ namespace SilverSim.Database.MySQL.Estate
                                             "CovenantTimestamp BIGINT(20) UNSIGNED NOT NULL DEFAULT '0'),",
             "ALTER TABLE %tablename% ADD COLUMN (UseGlobalTime INT(11) NOT NULL DEFAULT '1'),",
             "ALTER TABLE %tablename% CHANGE OwnerID Owner VARCHAR(255) NOT NULL DEFAULT '00000000-0000-0000-0000-000000000000',",
-            "ALTER TABLE %tablename% ADD COLUMN (IsPublicAllowed INT(11) NOT NULL DEFAULT '1'),",
         };
 
         public override bool TryGetValue(uint estateID, out EstateInfo estateInfo)
@@ -230,7 +232,6 @@ namespace SilverSim.Database.MySQL.Estate
             dict["CovenantID"] = estateInfo.CovenantID.ToString();
             dict["CovenantTimestamp"] = estateInfo.CovenantTimestamp.DateTimeToUnixTime();
             dict["UseGlobalTime"] = estateInfo.UseGlobalTime ? 1 : 0;
-            dict["IsPublicAllowed"] = estateInfo.IsPublicAllowed ? 1 : 0;
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
                 conn.Open();

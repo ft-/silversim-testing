@@ -159,17 +159,14 @@ namespace SilverSim.Viewer.Core
             }
         }
 
-        [Flags]
-        [SuppressMessage("Gendarme.Rules.Design", "EnumsShouldUseInt32Rule")]
-        enum EstateAccessCodes : uint
-        {
-            AccessOptions = 1,
-            AllowedGroups = 2,
-            EstateBans = 4,
-            EstateManagers = 8
-        }
+        static readonly EstateAccessFlags[] m_OrderedAccessFlags = new EstateAccessFlags[4] {
+            EstateAccessFlags.AllowedAgents,
+            EstateAccessFlags.AllowedGroups,
+            EstateAccessFlags.BannedAgents,
+            EstateAccessFlags.Managers
+        };
 
-        void SendEstateList(UUID transactionID, UUID invoice, EstateAccessCodes code, List<UUI> data, uint estateID, UUID fromSceneID)
+        void SendEstateList(UUID transactionID, UUID invoice, EstateAccessFlags code, List<UUI> data, uint estateID, UUID fromSceneID)
         {
             int i = 0;
             while(i < data.Count)
@@ -189,17 +186,17 @@ namespace SilverSim.Viewer.Core
 
                 msg.ParamList.Add(StringToBytes(estateID.ToString()));
                 msg.ParamList.Add(StringToBytes(((uint)code).ToString()));
-                msg.ParamList.Add(StringToBytes("0"));
-                msg.ParamList.Add(StringToBytes("0"));
-                if (code == EstateAccessCodes.EstateBans)
+                foreach(EstateAccessFlags flag in m_OrderedAccessFlags)
                 {
-                    msg.ParamList.Add(StringToBytes(remaining.ToString()));
+                    if(code == flag)
+                    {
+                        msg.ParamList.Add(StringToBytes(remaining.ToString()));
+                    }
+                    else
+                    {
+                        msg.ParamList.Add(StringToBytes("0"));
+                    }
                 }
-                else
-                {
-                    msg.ParamList.Add(StringToBytes("0"));
-                }
-                msg.ParamList.Add(StringToBytes("0"));
                 while(remaining-- != 0)
                 {
                     msg.ParamList.Add(data[i++].ID.GetBytes());
@@ -209,7 +206,7 @@ namespace SilverSim.Viewer.Core
         }
 
         /* this is groups only, so no code check inside */
-        void SendEstateList(UUID transactionID, UUID invoice, EstateAccessCodes code, List<UGI> data, uint estateID, UUID fromSceneID)
+        void SendEstateList(UUID transactionID, UUID invoice, List<UGI> data, uint estateID, UUID fromSceneID)
         {
             int i = 0;
             while(i < data.Count)
@@ -228,9 +225,9 @@ namespace SilverSim.Viewer.Core
                 msg.Method = "setaccess";
 
                 msg.ParamList.Add(StringToBytes(estateID.ToString()));
-                msg.ParamList.Add(StringToBytes(((uint)code).ToString()));
+                msg.ParamList.Add(StringToBytes(((uint)EstateAccessFlags.AllowedGroups).ToString()));
                 msg.ParamList.Add(StringToBytes("0"));
-                msg.ParamList.Add(StringToBytes("0"));
+                msg.ParamList.Add(StringToBytes(remaining.ToString()));
                 msg.ParamList.Add(StringToBytes("0"));
                 msg.ParamList.Add(StringToBytes("0"));
                 while (remaining-- != 0)
@@ -255,28 +252,27 @@ namespace SilverSim.Viewer.Core
             SendEstateList(
                 req.TransactionID,
                 req.Invoice,
-                EstateAccessCodes.EstateManagers,
+                EstateAccessFlags.Managers,
                 scene.EstateService.EstateManager.All[estateID], 
                 estateID, 
                 req.CircuitSceneID);
             SendEstateList(
                 req.TransactionID,
-                req.Invoice, 
-                EstateAccessCodes.AccessOptions, 
+                req.Invoice,
+                EstateAccessFlags.AllowedAgents, 
                 scene.EstateService.EstateAccess.All[estateID], 
                 estateID, 
                 req.CircuitSceneID);
             SendEstateList(
                 req.TransactionID,
                 req.Invoice,
-                EstateAccessCodes.AllowedGroups,
                 scene.EstateService.EstateGroup.All[estateID],
                 estateID, 
                 req.CircuitSceneID);
             SendEstateList(
                 req.TransactionID, 
-                req.Invoice, 
-                EstateAccessCodes.EstateBans, 
+                req.Invoice,
+                EstateAccessFlags.BannedAgents, 
                 scene.EstateService.EstateBans.All[estateID], 
                 estateID, 
                 req.CircuitSceneID);

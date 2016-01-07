@@ -215,8 +215,7 @@ namespace SilverSim.WebIF.Admin.Simulator
                 estateInfo.Name = jsondata["name"].ToString();
                 estateInfo.Flags = jsondata.ContainsKey("flags") ?
                     (RegionOptionFlags)jsondata["flags"].AsUInt :
-                    RegionOptionFlags.AllowVoice | RegionOptionFlags.AllowSetHome | RegionOptionFlags.AllowLandmark | RegionOptionFlags.AllowDirectTeleport | RegionOptionFlags.AllowParcelChanges;
-                estateInfo.IsPublicAllowed = jsondata.ContainsKey("ispublicallowed") ? jsondata["ispublicallowed"].AsBoolean : true;
+                    RegionOptionFlags.AllowVoice | RegionOptionFlags.AllowSetHome | RegionOptionFlags.AllowLandmark | RegionOptionFlags.AllowDirectTeleport | RegionOptionFlags.AllowParcelChanges | RegionOptionFlags.ExternallyVisible;
 
                 estateInfo.PricePerMeter = jsondata["pricepermeter"].AsInt;
                 estateInfo.BillableFactor = jsondata["billablefactor"].AsReal;

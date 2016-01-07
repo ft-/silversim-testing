@@ -238,7 +238,8 @@ namespace SilverSim.Scene.Types.Scene
                 /* EM, EO and RO should never be blocked by estate access rights */
                 return estateInfo;
             }
-            if (!estateInfo.IsPublicAllowed &&
+
+            if ((estateInfo.Flags & RegionOptionFlags.ExternallyVisible) == 0 &&
                 !EstateService.EstateAccess[estateID, agentOwner])
             {
                 List<UGI> estateGroups = EstateService.EstateGroup.All[estateID];
