@@ -614,7 +614,6 @@ namespace SilverSim.Threading
     {
         private CreateValueDelegate m_AutoAddDelegate;
         public RwLockedDictionaryAutoAdd(CreateValueDelegate autoAddDelegate)
-            : base()
         {
             m_AutoAddDelegate = autoAddDelegate;
         }

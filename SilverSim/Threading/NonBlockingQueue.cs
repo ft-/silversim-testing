@@ -19,7 +19,6 @@ namespace SilverSim.Threading
         }
 
         public NonblockingQueue()
-            : base()
         {
         }
 

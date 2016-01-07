@@ -27,7 +27,6 @@ namespace SilverSim.Threading
         }
 
         public BlockingQueue()
-            : base()
         {
         }
 
