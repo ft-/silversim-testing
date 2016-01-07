@@ -913,6 +913,88 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        private UUID CreateLandmarkForInventory(InventoryItem item)
+        {
+            Vector3 pos = Agent.GlobalPosition;
+            UUID curSceneID = Agent.SceneID;
+            SceneInterface curScene;
+            try
+            {
+                curScene = Agent.Circuits[curSceneID].Scene;
+            }
+            catch
+            {
+                SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateLandmark"));
+                return UUID.Zero;
+            }
+
+            Landmark lm = new Landmark();
+            if (!string.IsNullOrEmpty(GatekeeperURI))
+            {
+                lm.GatekeeperURI = new URI(GatekeeperURI);
+            }
+            lm.LocalPos = pos;
+            lm.RegionID = curSceneID;
+            lm.Location = curScene.GridPosition;
+
+            AssetData asset = lm;
+            asset.Name = item.Name;
+            asset.Creator = Agent.Owner;
+            asset.ID = UUID.Random;
+            try
+            {
+                Agent.AssetService.Store(asset);
+            }
+            catch (Exception e)
+            {
+                SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateLandmark"));
+                m_Log.Error("Failed to create asset for landmark", e);
+                return UUID.Zero;
+            }
+            return asset.ID;
+        }
+
+        private const string DefaultScript = "default\n{\n  state_entry()\n  {\n    llSay(PUBLIC_CHANNEL, \"Hello, World!\");\n  }\n}\n";
+        private UUID CreateDefaultScriptForInventory(InventoryItem item)
+        {
+            AssetData asset = new AssetData();
+            asset.Data = DefaultScript.ToUTF8Bytes();
+            asset.Name = item.Name;
+            asset.Creator = Agent.Owner;
+            asset.ID = UUID.Random;
+            try
+            {
+                Agent.AssetService.Store(asset);
+            }
+            catch (Exception e)
+            {
+                SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInv"));
+                m_Log.Error("Failed to create asset for notecard", e);
+                return UUID.Zero;
+            }
+            return asset.ID;
+        }
+
+        private UUID CreateDefaultNotecardForInventory(InventoryItem item)
+        {
+            Notecard nc = new Notecard();
+            AssetData asset = nc;
+            asset.Name = item.Name;
+            asset.Creator = Agent.Owner;
+            asset.ID = UUID.Random;
+            try
+            {
+                Agent.AssetService.Store(asset);
+            }
+            catch (Exception e)
+            {
+                SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInv"));
+                m_Log.Error("Failed to create asset for notecard", e);
+                return UUID.Zero;
+            }
+            return asset.ID;
+        }
+
         private void FetchInventoryThread_CreateInventoryItem(Messages.Inventory.CreateInventoryItem req)
         {
             if (req.SessionID != SessionID || req.AgentID != AgentID)
@@ -929,7 +1011,13 @@ namespace SilverSim.Viewer.Core
                     folder = Agent.InventoryService.Folder[AgentID, req.FolderID];
                 }
                 catch
+#if DEBUG
+                (Exception e)
+#endif
                 {
+#if DEBUG
+                    m_Log.DebugFormat("Failed to create inventory: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
+#endif
                     SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateInventory"));
                     return;
                 }
@@ -952,61 +1040,42 @@ namespace SilverSim.Viewer.Core
                 item.Permissions.EveryOne = InventoryPermissionsMask.None;
                 item.Permissions.NextOwner = req.NextOwnerMask;
 
-                if(item.InventoryType == InventoryType.Landmark)
+                switch(item.InventoryType)
                 {
-                    Vector3 pos = Agent.GlobalPosition;
-                    UUID curSceneID = Agent.SceneID;
-                    SceneInterface curScene;
-                    try
-                    {
-                        curScene = Agent.Circuits[curSceneID].Scene;
-                    }
-                    catch
-                    {
-                        SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateLandmark"));
-                        return;
-                    }
+                    case InventoryType.Landmark:
+                        item.AssetID = CreateLandmarkForInventory(item);
+                        break;
 
-                    Landmark lm = new Landmark();
-                    if (!string.IsNullOrEmpty(GatekeeperURI))
-                    {
-                        lm.GatekeeperURI = new URI(GatekeeperURI);
-                    }
-                    lm.LocalPos = pos;
-                    lm.RegionID = curSceneID;
-                    lm.Location = curScene.GridPosition;
+                    case InventoryType.LSLText:
+                        item.AssetID = CreateDefaultScriptForInventory(item);
+                        break;
 
-                    AssetData asset = lm;
-                    asset.Name = item.Name;
-                    asset.Creator = Agent.Owner;
-                    asset.ID = UUID.Random;
-                    try
-                    {
-                        Agent.AssetService.Store(asset);
-                    }
-                    catch(Exception e)
-                    {
-                        SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateLandmark"));
-                        m_Log.Error("Failed to create asset for landmark", e);
-                        return;
-                    }
-                    try
-                    {
-                        Agent.InventoryService.Item.Add(item);
-                    }
-                    catch(Exception e)
-                    {
-                        SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateLandmark"));
-                        m_Log.Error("Failed to create inventory item for landmark", e);
-                        return;
-                    }
-                    SendMessage(new Messages.Inventory.UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, req.CallbackID));
+                    case InventoryType.Notecard:
+                        item.AssetID = CreateDefaultNotecardForInventory(item);
+                        break;
+
+                    default:
+                        item.AssetID = UUID.Zero;
+                        break;
                 }
-                else
+                if (UUID.Zero == item.AssetID)
                 {
                     SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateInventory"));
+                    m_Log.ErrorFormat("Failed to create asset for type {0}", item.InventoryType.ToString());
                     return;
                 }
+
+                try
+                {
+                    Agent.InventoryService.Item.Add(item);
+                }
+                catch(Exception e)
+                {
+                    SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateLandmark"));
+                    m_Log.Error("Failed to create inventory item for landmark", e);
+                    return;
+                }
+                SendMessage(new Messages.Inventory.UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, req.CallbackID));
             }
         }
         #endregion
