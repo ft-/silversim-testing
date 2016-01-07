@@ -2563,13 +2563,13 @@ namespace SilverSim.Scene.Types.Object
 
                         if(part.Inventory.CountScripts == 0)
                         {
-                            part.Flags &= ~(PrimitiveFlags.Touch | PrimitiveFlags.Money);
+                            part.Flags &= ~(PrimitiveFlags.Touch | PrimitiveFlags.TakesMoney);
                         }
                         
                         part.Flags &= ~(
                             PrimitiveFlags.InventoryEmpty | PrimitiveFlags.Physics | PrimitiveFlags.Temporary | PrimitiveFlags.TemporaryOnRez |
-                            PrimitiveFlags.AllowInventoryDrop | PrimitiveFlags.ZlibCompressed | PrimitiveFlags.Scripted |
-                            PrimitiveFlags.ObjectGroupOwned | PrimitiveFlags.ObjectYouOfficer | PrimitiveFlags.ObjectYouOwner | PrimitiveFlags.ObjectOwnerModify);
+                            PrimitiveFlags.AllowInventoryDrop | PrimitiveFlags.Scripted |
+                            PrimitiveFlags.ObjectGroupOwned | PrimitiveFlags.ObjectYouOwner | PrimitiveFlags.ObjectOwnerModify);
                         part.Inventory.InventorySerial = InventorySerial;
                         return part;
 

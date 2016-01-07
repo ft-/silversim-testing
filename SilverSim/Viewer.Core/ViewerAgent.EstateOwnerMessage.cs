@@ -708,9 +708,9 @@ namespace SilverSim.Viewer.Core
                 return;
             }
             SceneInterface scene = circuit.Scene;
-            scene.RegionSettings.DisableScripts = !ParamStringToBool(req.ParamList[0]);
-            scene.RegionSettings.DisableCollisions = !ParamStringToBool(req.ParamList[1]);
-            scene.RegionSettings.DisablePhysics = !ParamStringToBool(req.ParamList[2]);
+            scene.RegionSettings.DisableScripts = ParamStringToBool(req.ParamList[0]);
+            scene.RegionSettings.DisableCollisions = ParamStringToBool(req.ParamList[1]);
+            scene.RegionSettings.DisablePhysics = ParamStringToBool(req.ParamList[2]);
             scene.TriggerRegionSettingsChanged();
         }
 

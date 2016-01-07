@@ -119,7 +119,7 @@ namespace SilverSim.Viewer.Core
                     }
                     if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Modify) != 0)
                     {
-                        flags |= Types.Primitive.PrimitiveFlags.ObjectModify;
+                        flags |= Types.Primitive.PrimitiveFlags.ObjectModify | Types.Primitive.PrimitiveFlags.ObjectOwnerModify;
                     }
                     if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Copy) != 0)
                     {
@@ -128,7 +128,7 @@ namespace SilverSim.Viewer.Core
                 }
                 else
                 {
-                    flags |= Types.Primitive.PrimitiveFlags.ObjectYouOwner;
+                    flags &= ~Types.Primitive.PrimitiveFlags.ObjectYouOwner;
                     if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Move) != 0)
                     {
                         flags |= Types.Primitive.PrimitiveFlags.ObjectMove;
@@ -144,6 +144,26 @@ namespace SilverSim.Viewer.Core
                     if ((kvp.Key.Part.EveryoneMask & InventoryPermissionsMask.Copy) != 0)
                     {
                         flags |= Types.Primitive.PrimitiveFlags.ObjectCopy;
+                    }
+
+                    if(Agent.Group.Equals(kvp.Key.Part.Group))
+                    {
+                        if ((kvp.Key.Part.GroupMask & InventoryPermissionsMask.Move) != 0)
+                        {
+                            flags |= Types.Primitive.PrimitiveFlags.ObjectMove;
+                        }
+                        if ((kvp.Key.Part.GroupMask & InventoryPermissionsMask.Transfer) != 0)
+                        {
+                            flags |= Types.Primitive.PrimitiveFlags.ObjectTransfer;
+                        }
+                        if ((kvp.Key.Part.GroupMask & InventoryPermissionsMask.Modify) != 0)
+                        {
+                            flags |= Types.Primitive.PrimitiveFlags.ObjectModify;
+                        }
+                        if ((kvp.Key.Part.GroupMask & InventoryPermissionsMask.Copy) != 0)
+                        {
+                            flags |= Types.Primitive.PrimitiveFlags.ObjectCopy;
+                        }
                     }
                 }
                 flags |= Types.Primitive.PrimitiveFlags.ObjectAnyOwner;
