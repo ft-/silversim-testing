@@ -284,7 +284,7 @@ namespace SilverSim.Viewer.Core
             SendEstateUpdateInfo(req.Invoice, req.TransactionID, estateInfo, req.CircuitSceneID);
         }
 
-        internal void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID)
+        internal void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID, bool sendToAgentOnly = true)
         {
             EstateOwnerMessage msg = new EstateOwnerMessage();
             msg.AgentID = Owner.ID;
@@ -303,12 +303,12 @@ namespace SilverSim.Viewer.Core
             }
             else
             {
-                msg.ParamList.Add(StringToBytes(estate.SunPosition.ToString()));
+                msg.ParamList.Add(StringToBytes(((int)(estate.SunPosition * 1024)).ToString()));
             }
             msg.ParamList.Add(StringToBytes(estate.ParentEstateID.ToString()));
             msg.ParamList.Add(estate.CovenantID.ToString().ToUTF8Bytes());
             msg.ParamList.Add(estate.CovenantTimestamp.AsULong.ToString().ToUTF8Bytes());
-            msg.ParamList.Add(StringToBytes("1"));
+            msg.ParamList.Add(StringToBytes(sendToAgentOnly?"1":"0"));
             msg.ParamList.Add(StringToBytes(estate.AbuseEmail));
 
             SendMessageIfRootAgent(msg, fromSceneID);

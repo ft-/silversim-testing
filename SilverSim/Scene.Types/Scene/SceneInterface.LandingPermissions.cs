@@ -229,7 +229,7 @@ namespace SilverSim.Scene.Types.Scene
             uint estateID = EstateService.RegionMap[ID];
             EstateInfo estateInfo = EstateService[estateID];
 
-            if ((estateInfo.Flags & RegionOptionFlags.PublicAllowed) == 0 &&
+            if (!estateInfo.IsPublicAllowed &&
                 !EstateService.EstateAccess[estateID, agentOwner])
             {
                 List<UGI> estateGroups = EstateService.EstateGroup.All[estateID];

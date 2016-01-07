@@ -17,9 +17,8 @@ namespace SilverSim.Types.Estate
         public RegionOptionFlags Flags = RegionOptionFlags.AllowDirectTeleport | 
             RegionOptionFlags.AllowLandmark |
             RegionOptionFlags.AllowSetHome | 
-            RegionOptionFlags.AllowVoice |
-            RegionOptionFlags.AllowDirectTeleport |
-            RegionOptionFlags.PublicAllowed;
+            RegionOptionFlags.AllowVoice;
+        public bool IsPublicAllowed = true;
         public UUI Owner = UUI.Unknown;
         public int PricePerMeter;
         public double BillableFactor = 1;

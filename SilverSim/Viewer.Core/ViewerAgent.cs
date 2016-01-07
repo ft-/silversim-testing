@@ -11,6 +11,7 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Economy;
+using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Friends;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.GridUser;
@@ -1484,9 +1485,11 @@ namespace SilverSim.Viewer.Core
                 circuit.Scene.Environment.UpdateWindDataToSingleClient(this);
                 circuit.Scene.SendAgentObjectToAllAgents(this);
                 ParcelInfo pinfo;
+                SceneInterface scene = circuit.Scene;
+                EstateServiceInterface estateService = scene.EstateService;
                 if(circuit.Scene.Parcels.TryGetValue(GlobalPosition, out pinfo))
                 {
-                    ParcelProperties props = circuit.Scene.ParcelInfo2ParcelProperties(Owner.ID, pinfo, NextParcelSequenceId, ParcelProperties.RequestResultType.Single);
+                    ParcelProperties props = scene.ParcelInfo2ParcelProperties(Owner.ID, pinfo, NextParcelSequenceId, ParcelProperties.RequestResultType.Single);
                     circuit.SendMessage(props);
                 }
                 circuit.ScheduleFirstUpdate();

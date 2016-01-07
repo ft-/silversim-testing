@@ -22,6 +22,7 @@ namespace SilverSim.Database.MySQL.Estate
             ei.CovenantID = reader.GetUUID("CovenantID");
             ei.CovenantTimestamp = reader.GetDate("CovenantTimestamp");
             ei.UseGlobalTime = (int)reader["UseGlobalTime"] != 0;
+            ei.IsPublicAllowed = (int)reader["IsPublicAllowed"] != 0;
 
             return ei;
         }

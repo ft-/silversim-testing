@@ -24,6 +24,7 @@ namespace SilverSim.WebIF.Admin.Simulator
             m.Add("SunPosition", estate.SunPosition);
             m.Add("AbuseEmail", estate.AbuseEmail);
             m.Add("UseGlobalTime", estate.UseGlobalTime);
+            m.Add("IsPublicAllowed", estate.IsPublicAllowed);
             return m;
         }
 
