@@ -8,6 +8,7 @@ namespace SilverSim.Threading
 {
     public class NonblockingQueue<T> : Queue<T>
     {
+        readonly object m_Lock = new object();
         public NonblockingQueue(IEnumerable<T> col)
             : base(col)
         {
@@ -24,7 +25,7 @@ namespace SilverSim.Threading
 
         ~NonblockingQueue()
         {
-            lock (this)
+            lock (m_Lock)
             {
                 base.Clear();
             }
@@ -32,7 +33,7 @@ namespace SilverSim.Threading
 
         public new T Dequeue()
         {
-            lock (this)
+            lock (m_Lock)
             {
                 return base.Dequeue();
             }
@@ -54,7 +55,7 @@ namespace SilverSim.Threading
 
         public new T Peek()
         {
-            lock(this)
+            lock(m_Lock)
             {
                 return base.Peek();
             }
@@ -62,7 +63,7 @@ namespace SilverSim.Threading
 
         public new void Enqueue(T obj)
         {
-            lock (this)
+            lock (m_Lock)
             {
                 base.Enqueue(obj);
             }
@@ -72,7 +73,10 @@ namespace SilverSim.Threading
         {
             get
             {
-                lock (this) return base.Count;
+                lock (m_Lock)
+                {
+                    return base.Count;
+                }
             }
         }
     }

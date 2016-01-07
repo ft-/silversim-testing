@@ -9,12 +9,7 @@ namespace SilverSim.Threading
 {
     public class BlockingQueue<T> : Queue<T>
     {
-        public class TimeoutException : Exception
-        {
-            public TimeoutException()
-            {
-            }
-        }
+        readonly object m_Lock = new object();
 
         public BlockingQueue(IEnumerable<T> col)
             : base(col)
@@ -32,10 +27,10 @@ namespace SilverSim.Threading
 
         ~BlockingQueue()
         {
-            lock(this)
+            lock(m_Lock)
             {
                 base.Clear();
-                Monitor.PulseAll(this);
+                Monitor.PulseAll(m_Lock);
             }
         }
 
@@ -51,11 +46,11 @@ namespace SilverSim.Threading
 
         public T Dequeue(int timeout)
         {
-            lock(this)
+            lock(m_Lock)
             {
                 while(base.Count == 0)
                 {
-                    if(!Monitor.Wait(this, timeout))
+                    if(!Monitor.Wait(m_Lock, timeout))
                     {
                         throw new TimeoutException();
                     }
@@ -66,10 +61,10 @@ namespace SilverSim.Threading
 
         public new void Enqueue(T obj)
         {
-            lock (this)
+            lock (m_Lock)
             {
                 base.Enqueue(obj);
-                Monitor.Pulse(this);
+                Monitor.Pulse(m_Lock);
             }
         }
 
@@ -77,13 +72,16 @@ namespace SilverSim.Threading
         {
             get
             {
-                lock (this) return base.Count;
+                lock (m_Lock)
+                {
+                    return base.Count;
+                }
             }
         }
 
         public new bool Contains(T obj)
         {
-            lock(this)
+            lock(m_Lock)
             {
                 return base.Contains(obj);
             }

@@ -513,7 +513,7 @@ namespace SilverSim.Main.Common.Console
                 {
                     LogWrite(m_LogQueue.Dequeue(1000));
                 }
-                catch(BlockingQueue<LoggingEvent>.TimeoutException)
+                catch(TimeoutException)
                 {
                     continue;
                 }
