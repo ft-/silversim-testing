@@ -954,7 +954,7 @@ namespace SilverSim.Viewer.Core
             return asset.ID;
         }
 
-        private const string DefaultScript = "default\n{\n  state_entry()\n  {\n    llSay(PUBLIC_CHANNEL, \"Hello, World!\");\n  }\n}\n";
+        private const string DefaultScript = "default\n{\n    state_entry()\n    {\n        llSay(PUBLIC_CHANNEL, \"Hello, World!\");\n    }\n}\n";
         private UUID CreateDefaultScriptForInventory(InventoryItem item)
         {
             AssetData asset = new AssetData();
