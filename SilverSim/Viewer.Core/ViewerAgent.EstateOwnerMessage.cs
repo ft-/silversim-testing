@@ -281,26 +281,37 @@ namespace SilverSim.Viewer.Core
                 estateID, 
                 req.CircuitSceneID);
 
+            SendEstateUpdateInfo(req.Invoice, req.TransactionID, estateInfo, req.CircuitSceneID);
+        }
+
+        internal void SendEstateUpdateInfo(UUID invoice, UUID transactionID, EstateInfo estate, UUID fromSceneID)
+        {
             EstateOwnerMessage msg = new EstateOwnerMessage();
             msg.AgentID = Owner.ID;
             msg.SessionID = SessionID;
-            msg.Invoice = req.Invoice;
-            msg.TransactionID = req.TransactionID;
+            msg.Invoice = invoice;
+            msg.TransactionID = transactionID;
             msg.Method = "estateupdateinfo";
 
-            msg.ParamList.Add(StringToBytes(estateInfo.Name));
-            msg.ParamList.Add(StringToBytes((string)estateInfo.Owner.ID));
-            msg.ParamList.Add(StringToBytes(estateID.ToString()));
-            msg.ParamList.Add(StringToBytes(((uint)estateInfo.Flags).ToString()));
-            msg.ParamList.Add(StringToBytes(estateInfo.SunPosition.ToString()));
-            msg.ParamList.Add(StringToBytes(estateInfo.ParentEstateID.ToString()));
-            msg.ParamList.Add(StringToBytes((string)UUID.Zero)); /* covenant */
-            msg.ParamList.Add(StringToBytes("0")); /* covenant changed */
+            msg.ParamList.Add(StringToBytes(estate.Name));
+            msg.ParamList.Add(StringToBytes((string)estate.Owner.ID));
+            msg.ParamList.Add(StringToBytes(estate.ID.ToString()));
+            msg.ParamList.Add(StringToBytes(((uint)estate.Flags).ToString()));
+            if (estate.UseGlobalTime)
+            {
+                msg.ParamList.Add(StringToBytes("0"));
+            }
+            else
+            {
+                msg.ParamList.Add(StringToBytes(estate.SunPosition.ToString()));
+            }
+            msg.ParamList.Add(StringToBytes(estate.ParentEstateID.ToString()));
+            msg.ParamList.Add(estate.CovenantID.ToString().ToUTF8Bytes());
+            msg.ParamList.Add(estate.CovenantTimestamp.AsULong.ToString().ToUTF8Bytes());
             msg.ParamList.Add(StringToBytes("1"));
-            msg.ParamList.Add(StringToBytes(estateInfo.AbuseEmail));
+            msg.ParamList.Add(StringToBytes(estate.AbuseEmail));
 
-            SendMessageIfRootAgent(msg, req.CircuitSceneID);
-
+            SendMessageIfRootAgent(msg, fromSceneID);
         }
 
         [SuppressMessage("Gendarme.Rules.BadPractice", "PreferTryParseRule")]
@@ -735,6 +746,11 @@ namespace SilverSim.Viewer.Core
             SceneInterface scene = circuit.Scene;
             RegionOptionFlags param1 = (RegionOptionFlags)uint.Parse(req.ParamList[1].FromUTF8Bytes());
             uint param2 = uint.Parse(req.ParamList[2].FromUTF8Bytes());
+            string estateName = req.ParamList[0].FromUTF8Bytes();
+#if DEBUG
+            m_Log.DebugFormat("Changing Estate Info: Name={0}, Flags={1}, SunPos={2}",
+                estateName, param1.ToString(), param2);
+#endif
 
             EstateInfo estate;
             EstateServiceInterface estateService = scene.EstateService;
@@ -745,33 +761,21 @@ namespace SilverSim.Viewer.Core
                 if (param2 != 0)
                 {
                     estate.UseGlobalTime = false;
-                    estate.SunPosition = (param2 - 0x1800) / 1024.0;
+                    estate.SunPosition = param2 / 1024.0;
                 }
                 else
                 {
                     estate.UseGlobalTime = true;
                 }
 
+                if (estateName.Length != 0)
+                {
+                    estate.Name = estateName;
+                }
                 estate.Flags = param1;
                 estateService[estateID] = estate;
 
-                EstateOwnerMessage m = new EstateOwnerMessage();
-                m.AgentID = circuit.AgentID;
-                m.SessionID = UUID.Zero;
-                m.Invoice = req.Invoice;
-                m.Method = "estateupdateinfo";
-                m.TransactionID = UUID.Zero;
-                m.ParamList.Add(estate.Name.ToUTF8Bytes());
-                m.ParamList.Add(estate.Owner.ID.ToString().ToUTF8Bytes());
-                m.ParamList.Add(estate.ID.ToString().ToUTF8Bytes());
-                m.ParamList.Add(((uint)estate.Flags).ToString().ToUTF8Bytes());
-                m.ParamList.Add(estate.SunPosition.ToString().ToUTF8Bytes());
-                m.ParamList.Add(estate.ParentEstateID.ToString().ToUTF8Bytes());
-                m.ParamList.Add(estate.CovenantID.ToString().ToUTF8Bytes());
-                m.ParamList.Add(estate.CovenantTimestamp.AsULong.ToString().ToUTF8Bytes());
-                m.ParamList.Add("1".ToUTF8Bytes());
-                m.ParamList.Add(estate.AbuseEmail.ToUTF8Bytes());
-                circuit.SendMessage(m);
+                SendEstateUpdateInfo(req.Invoice, req.TransactionID, estate, scene.ID);
                 foreach (UUID regionID in estateService.RegionMap[estateID])
                 {
                     SceneInterface estateScene;

@@ -6,7 +6,6 @@ using SilverSim.Scene.Types.Scene;
 using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.StructuredData.Llsd;
-using SilverSim.Viewer.Messages.Generic;
 using System.IO;
 using System.Net;
 
@@ -78,6 +77,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             {
                 estate.Name = estateName;
                 estate.SunPosition = sun_hour;
+                estate.UseGlobalTime = (sun_hour < double.Epsilon);
                 if (isSunFixed)
                 {
                     estate.Flags |= RegionOptionFlags.SunFixed;
@@ -128,25 +128,9 @@ namespace SilverSim.Viewer.Core.Capabilities
                     estate.Flags &= ~RegionOptionFlags.AllowVoice;
                 }
                 m_Scene.EstateService[estate.ID] = estate;
-                m_Scene.TriggerEstateUpdate();
 
-                EstateOwnerMessage m = new EstateOwnerMessage();
-                m.AgentID = m_Agent.ID;
-                m.SessionID = UUID.Zero;
-                m.Invoice = invoiceID;
-                m.Method = "estateupdateinfo";
-                m.TransactionID = UUID.Zero;
-                m.ParamList.Add(estate.Name.ToUTF8Bytes());
-                m.ParamList.Add(estate.Owner.ID.ToString().ToUTF8Bytes());
-                m.ParamList.Add(estate.ID.ToString().ToUTF8Bytes());
-                m.ParamList.Add(((uint)estate.Flags).ToString().ToUTF8Bytes());
-                m.ParamList.Add(estate.SunPosition.ToString().ToUTF8Bytes());
-                m.ParamList.Add(estate.ParentEstateID.ToString().ToUTF8Bytes());
-                m.ParamList.Add(estate.CovenantID.ToString().ToUTF8Bytes());
-                m.ParamList.Add(estate.CovenantTimestamp.AsULong.ToString().ToUTF8Bytes());
-                m.ParamList.Add("1".ToUTF8Bytes());
-                m.ParamList.Add(estate.AbuseEmail.ToUTF8Bytes());
-                m_Agent.SendMessageAlways(m, m_Scene.ID);
+                m_Agent.SendEstateUpdateInfo(invoiceID, UUID.Zero, estate, m_Scene.ID);
+                m_Scene.TriggerEstateUpdate();
             }
 
             using (HttpResponse httpres = httpreq.BeginResponse())
