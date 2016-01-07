@@ -110,6 +110,10 @@ namespace SilverSim.Viewer.Core
                 {
                     flags |= Types.Primitive.PrimitiveFlags.ObjectGroupOwned;
                 }
+                if(0 != (kvp.Key.Part.ObjectGroup.VehicleFlags & SilverSim.Scene.Types.Physics.Vehicle.VehicleFlags.CameraDecoupled))
+                {
+                    flags |= Types.Primitive.PrimitiveFlags.CameraDecoupled;
+                }
                 if (kvp.Key.Part.Owner.EqualsGrid(Agent.Owner) && !kvp.Key.Part.ObjectGroup.IsGroupOwned)
                 {
                     flags |= Types.Primitive.PrimitiveFlags.ObjectYouOwner;
