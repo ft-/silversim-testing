@@ -371,6 +371,9 @@ namespace SilverSim.Viewer.Core
             AddDefCapabilityFactory("ParcelNavigateMedia", regionSeedID, delegate(ViewerAgent agent) { return new ParcelNavigateMedia(agent.Owner, Server.Scene); }, capConfig);
             AddDefCapabilityFactory("ObjectMedia", regionSeedID, delegate(ViewerAgent agent) { return new ObjectMedia(agent.Owner, Server.Scene); }, capConfig);
             AddDefCapabilityFactory("ObjectMediaNavigate", regionSeedID, delegate(ViewerAgent agent) { return new ObjectMediaNavigate(agent.Owner, Server.Scene); }, capConfig);
+#if DEBUG
+            m_Log.DebugFormat("Registered {0} capabilities", m_RegisteredCapabilities.Count);
+#endif
         }
         #endregion
     }
