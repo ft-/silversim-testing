@@ -1196,6 +1196,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
             uint estateID;
             EstateInfo estateInfo;
+            RegionOptionFlags estateFlags = RegionOptionFlags.None;
             try /* we need a fail protection here */
             {
                 if (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
@@ -1205,6 +1206,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     res.ParentEstateID = estateInfo.ParentEstateID;
                     res.BillableFactor = estateInfo.BillableFactor;
                     res.PricePerMeter = estateInfo.PricePerMeter;
+                    estateFlags = estateInfo.Flags;
                 }
                 else
                 {
@@ -1226,7 +1228,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 res.PricePerMeter = 1;
             }
             res.SimName = Name;
-            res.RegionFlags = RegionSettings.AsFlags;
+            res.RegionFlags = RegionSettings.AsFlags | estateFlags;
             res.SimAccess = Access;
             res.MaxAgents = (uint)RegionSettings.AgentLimit;
             res.ObjectBonusFactor = RegionSettings.ObjectBonus;
@@ -1240,7 +1242,7 @@ namespace SilverSim.Scene.Implementation.Basic
             res.SunHour = Environment.TimeOfDay;
             res.ProductSKU = VersionInfo.SimulatorVersion;
             res.ProductName = ProductName;
-            res.RegionFlagsExtended.Add(0);
+            res.RegionFlagsExtended.Add((ulong)(RegionSettings.AsFlags | estateFlags));
 
             agent.SendMessageAlways(res, ID);
         }
