@@ -560,40 +560,96 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
+            bool userUpdate = false;
+            bool groupUpdate = false;
+            bool banUpdate = false;
+            bool emUpdate = false;
+
             foreach(uint selectedEstateId in allEstateIds)
             {
                 if((flags & EstateAccessDeltaFlags.AddUser) != 0)
                 {
                     estateService.EstateAccess[selectedEstateId, uui] = true;
+                    userUpdate = true;
                 }
                 if((flags & EstateAccessDeltaFlags.RemoveUser) != 0)
                 {
                     estateService.EstateAccess[selectedEstateId, uui] = false;
+                    userUpdate = true;
                 }
                 if((flags & EstateAccessDeltaFlags.AddGroup) != 0)
                 {
                     estateService.EstateGroup[selectedEstateId, ugi] = true;
+                    groupUpdate = true;
                 }
                 if((flags & EstateAccessDeltaFlags.RemoveGroup) != 0)
                 {
                     estateService.EstateGroup[selectedEstateId, ugi] = false;
+                    groupUpdate = true;
                 }
-                if((flags & EstateAccessDeltaFlags.AddManager) != 0)
+                if ((flags & EstateAccessDeltaFlags.AddManager) != 0)
                 {
                     estateService.EstateManager[selectedEstateId, uui] = true;
+                    emUpdate = true;
                 }
                 if((flags & EstateAccessDeltaFlags.RemoveManager) != 0)
                 {
                     estateService.EstateManager[selectedEstateId, uui] = false;
+                    emUpdate = true;
                 }
                 if((flags & EstateAccessDeltaFlags.AddBan) != 0)
                 {
                     estateService.EstateBans[selectedEstateId, uui] = true;
+                    banUpdate = true;
                 }
                 if((flags & EstateAccessDeltaFlags.RemoveBan) != 0)
                 {
                     estateService.EstateBans[selectedEstateId, uui] = false;
+                    banUpdate = true;
                 }
+            }
+
+            if (emUpdate)
+            {
+                SendEstateList(
+                    req.TransactionID,
+                    req.Invoice,
+                    EstateAccessFlags.Managers,
+                    scene.EstateService.EstateManager.All[estateID],
+                    estateID,
+                    req.CircuitSceneID);
+            }
+
+            if (userUpdate)
+            {
+                SendEstateList(
+                    req.TransactionID,
+                    req.Invoice,
+                    EstateAccessFlags.AllowedAgents,
+                    scene.EstateService.EstateAccess.All[estateID],
+                    estateID,
+                    req.CircuitSceneID);
+            }
+
+            if (groupUpdate)
+            {
+                SendEstateList(
+                    req.TransactionID,
+                    req.Invoice,
+                    scene.EstateService.EstateGroup.All[estateID],
+                    estateID,
+                    req.CircuitSceneID);
+            }
+
+            if (banUpdate)
+            {
+                SendEstateList(
+                    req.TransactionID,
+                    req.Invoice,
+                    EstateAccessFlags.BannedAgents,
+                    scene.EstateService.EstateBans.All[estateID],
+                    estateID,
+                    req.CircuitSceneID);
             }
         }
 
