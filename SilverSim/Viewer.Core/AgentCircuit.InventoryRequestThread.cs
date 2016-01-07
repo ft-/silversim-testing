@@ -1063,6 +1063,10 @@ namespace SilverSim.Viewer.Core
                         item.AssetID = CreateDefaultGestureForInventory(item);
                         break;
 
+                    case InventoryType.Animation:
+                        item.AssetID = new UUID("ddc2400f-ecdb-b00e-aee7-442ff99d5fb7"); /* this is the handshake animation */
+                        break;
+
                     default:
                         item.AssetID = UUID.Zero;
                         break;
@@ -1080,8 +1084,10 @@ namespace SilverSim.Viewer.Core
                 }
                 catch(Exception e)
                 {
-                    SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateLandmark"));
-                    m_Log.Error("Failed to create inventory item for landmark", e);
+                    SendMessage(new Messages.Alert.AlertMessage(item.InventoryType == InventoryType.Landmark ?
+                        "ALERT: CantCreateLandmark" :
+                        "ALERT: CantCreateInventory"));
+                    m_Log.Error("Failed to create inventory item for inventory", e);
                     return;
                 }
                 SendMessage(new Messages.Inventory.UpdateCreateInventoryItem(AgentID, true, req.TransactionID, item, req.CallbackID));
