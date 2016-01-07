@@ -580,7 +580,7 @@ namespace SilverSim.Threading
 
     public class RwLockedSortedDictionaryAutoAdd<TKey, TValue> : RwLockedSortedDictionary<TKey, TValue>
     {
-        private CreateValueDelegate m_AutoAddDelegate;
+        readonly CreateValueDelegate m_AutoAddDelegate;
         public RwLockedSortedDictionaryAutoAdd(CreateValueDelegate autoAddDelegate)
         {
             m_AutoAddDelegate = autoAddDelegate;
