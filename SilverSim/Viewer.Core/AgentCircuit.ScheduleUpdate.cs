@@ -1,22 +1,20 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Scene.Types.Agent;
+using SilverSim.Scene.Types.Object;
+using SilverSim.Threading;
+using SilverSim.Types.Inventory;
+using SilverSim.Viewer.Messages;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Scene.Types.Object;
-using ThreadedClasses;
 using System.Threading;
-using SilverSim.Scene.Types.Agent;
-using SilverSim.Viewer.Messages;
-using SilverSim.Types.Inventory;
 
 namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
-        readonly ThreadedClasses.BlockingQueue<ObjectUpdateInfo> m_TxObjectQueue = new BlockingQueue<ObjectUpdateInfo>();
+        readonly BlockingQueue<ObjectUpdateInfo> m_TxObjectQueue = new BlockingQueue<ObjectUpdateInfo>();
         private bool m_TriggerFirstUpdate;
 
         public void ScheduleUpdate(ObjectUpdateInfo info)

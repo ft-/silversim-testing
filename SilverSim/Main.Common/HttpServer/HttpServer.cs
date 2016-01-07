@@ -4,6 +4,7 @@
 using log4net;
 using Nini.Config;
 using SilverSim.Http;
+using SilverSim.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -14,7 +15,6 @@ using System.Net.Security;
 using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using System.Text;
-using ThreadedClasses;
 
 namespace SilverSim.Main.Common.HttpServer
 {

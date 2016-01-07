@@ -3,9 +3,9 @@
 
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Threading;
 using SilverSim.Types;
 using System;
-using ThreadedClasses;
 
 namespace SilverSim.Scene.Chat
 {

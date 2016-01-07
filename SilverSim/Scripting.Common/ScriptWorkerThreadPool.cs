@@ -1,12 +1,12 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Scene.Types.Script;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Script;
+using SilverSim.Threading;
 using System;
-using System.Threading;
-using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace SilverSim.Scripting.Common
 {

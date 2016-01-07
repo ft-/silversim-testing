@@ -4,6 +4,7 @@
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.IM;
+using SilverSim.Threading;
 using SilverSim.Types.IM;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
@@ -12,7 +13,6 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using ThreadedClasses;
 
 namespace SilverSim.Viewer.OfflineIM
 {

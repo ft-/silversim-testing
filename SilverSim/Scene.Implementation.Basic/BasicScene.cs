@@ -2,11 +2,9 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.Viewer.Core;
-using SilverSim.Viewer.Core.Capabilities;
-using SilverSim.Viewer.Messages;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.IM;
+using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.Types.Agent;
@@ -14,6 +12,7 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
+using SilverSim.Scene.Types.Script.Events;
 using SilverSim.Scripting.Common;
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.AvatarName;
@@ -23,22 +22,23 @@ using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.IM;
 using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Types.Estate;
 using SilverSim.Types.Grid;
 using SilverSim.Types.IM;
 using SilverSim.Types.Parcel;
+using SilverSim.Viewer.Core;
+using SilverSim.Viewer.Core.Capabilities;
+using SilverSim.Viewer.Messages;
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using ThreadedClasses;
-using SilverSim.Scene.Types.Script.Events;
-using SilverSim.Scene.Management.Scene;
-using System.Diagnostics.CodeAnalysis;
-using SilverSim.Types.Estate;
 using System.Timers;
 
 namespace SilverSim.Scene.Implementation.Basic

@@ -3,6 +3,7 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.WindLight;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Generic;
@@ -12,7 +13,6 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Scene
 {

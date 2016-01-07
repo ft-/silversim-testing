@@ -1,16 +1,16 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Parcel;
 using SilverSim.Scene.Types.Agent;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Parcel;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Parcel;
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Scene
 {

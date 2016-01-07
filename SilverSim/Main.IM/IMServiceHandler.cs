@@ -1,16 +1,15 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using log4net;
 using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Management.IM;
 using SilverSim.ServiceInterfaces.IM;
+using SilverSim.Threading;
 using SilverSim.Types.IM;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using ThreadedClasses;
 
 namespace SilverSim.Main.IM
 {

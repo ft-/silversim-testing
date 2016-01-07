@@ -4,12 +4,12 @@
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Primitive;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
 {

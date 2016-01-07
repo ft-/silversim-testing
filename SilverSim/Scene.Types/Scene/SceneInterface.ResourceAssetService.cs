@@ -2,15 +2,14 @@
 // GNU Affero General Public License v3
 
 using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.Types.StructuredData.AssetXml;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
+using SilverSim.Types.StructuredData.AssetXml;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
 using System.IO.Compression;
-using ThreadedClasses;
-using System.Diagnostics.CodeAnalysis;
-using System;
 
 namespace SilverSim.Scene.Types.Scene
 {

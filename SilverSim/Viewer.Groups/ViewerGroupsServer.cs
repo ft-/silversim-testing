@@ -10,6 +10,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Economy;
 using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using SilverSim.Types.IM;
@@ -27,7 +28,6 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Threading;
-using ThreadedClasses;
 
 namespace SilverSim.Viewer.Groups
 {

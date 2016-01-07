@@ -1,15 +1,13 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Inventory;
-using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
-using ThreadedClasses;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {

@@ -3,11 +3,11 @@
 
 using SilverSim.ServiceInterfaces.Asset;
 using SilverSim.ServiceInterfaces.Inventory;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System.Collections.Generic;
-using ThreadedClasses;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {

@@ -1,35 +1,18 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using log4net;
-using SilverSim.Viewer.Messages;
-using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
-using SilverSim.Scene.Types.Scene;
-using SilverSim.Scene.Types.Script.Events;
-using SilverSim.ServiceInterfaces.Asset;
-using SilverSim.ServiceInterfaces.Economy;
-using SilverSim.ServiceInterfaces.Friends;
-using SilverSim.ServiceInterfaces.Grid;
-using SilverSim.ServiceInterfaces.GridUser;
-using SilverSim.ServiceInterfaces.Groups;
-using SilverSim.ServiceInterfaces.Inventory;
-using SilverSim.ServiceInterfaces.Presence;
-using SilverSim.ServiceInterfaces.Profile;
-using SilverSim.ServiceInterfaces.UserAgents;
 using SilverSim.Types;
-using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Agent;
-using SilverSim.Types.Grid;
-using SilverSim.Types.IM;
+using SilverSim.Types.Asset.Format;
 using SilverSim.Types.Inventory;
 using SilverSim.Types.Primitive;
+using SilverSim.Viewer.Messages;
 using System;
 using System.Collections.Generic;
-using ThreadedClasses;
-using System.Threading;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace SilverSim.Viewer.Core
 {

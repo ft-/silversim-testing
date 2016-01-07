@@ -2,10 +2,6 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Agent;
-using SilverSim.Viewer.Messages.Parcel;
-using SilverSim.Viewer.Messages.Script;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Neighbor;
@@ -24,6 +20,7 @@ using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Account;
 using SilverSim.Types.Grid;
@@ -31,12 +28,15 @@ using SilverSim.Types.IM;
 using SilverSim.Types.Parcel;
 using SilverSim.Types.Primitive;
 using SilverSim.Types.Script;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Agent;
+using SilverSim.Viewer.Messages.Parcel;
+using SilverSim.Viewer.Messages.Script;
 using System;
 using System.Collections.Generic;
-using System.Net;
-using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
+using System.Net;
 
 namespace SilverSim.Viewer.Core
 {

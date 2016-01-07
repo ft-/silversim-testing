@@ -11,7 +11,6 @@ using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.ServiceInterfaces.RegionLoader;
 using SilverSim.Scene.ServiceInterfaces.SimulationData;
 using SilverSim.Scene.ServiceInterfaces.Terrain;
-using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
@@ -31,6 +30,7 @@ using SilverSim.ServiceInterfaces.Neighbor;
 using SilverSim.ServiceInterfaces.Presence;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Assembly;
 using System;
@@ -46,7 +46,6 @@ using System.Runtime.Serialization;
 using System.Threading;
 using System.Timers;
 using System.Xml;
-using ThreadedClasses;
 
 namespace SilverSim.Main.Common
 {

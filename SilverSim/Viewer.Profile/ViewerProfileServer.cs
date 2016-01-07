@@ -3,28 +3,28 @@
 
 using log4net;
 using Nini.Config;
-using SilverSim.Viewer.Core;
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Generic;
-using SilverSim.Viewer.Messages.Profile;
-using SilverSim.Viewer.Messages.Search;
 using SilverSim.Main.Common;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Profile;
 using SilverSim.ServiceInterfaces.UserAgents;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
 using SilverSim.Types.Profile;
+using SilverSim.Viewer.Core;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Generic;
+using SilverSim.Viewer.Messages.Profile;
+using SilverSim.Viewer.Messages.Search;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Text;
 using System.Threading;
 using System.Timers;
-using ThreadedClasses;
-using System.Diagnostics.CodeAnalysis;
-using System.ComponentModel;
 
 namespace SilverSim.Viewer.Profile
 {

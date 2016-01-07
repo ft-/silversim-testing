@@ -7,11 +7,11 @@ using Nini.Config;
 using SilverSim.Main.Common;
 using SilverSim.ServiceInterfaces.Database;
 using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.Threading;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics.CodeAnalysis;
-using ThreadedClasses;
 
 namespace SilverSim.Database.MySQL.ServerParam
 {

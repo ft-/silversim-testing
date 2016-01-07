@@ -4,15 +4,14 @@
 using log4net;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Threading;
 using SilverSim.Types;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Globalization;
 using System.Reflection;
-using System.Resources;
 using System.Threading;
-using ThreadedClasses;
 
 namespace SilverSim.Scene.Management.Scene
 {

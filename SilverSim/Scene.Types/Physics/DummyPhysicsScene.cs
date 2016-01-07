@@ -3,9 +3,9 @@
 
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Object;
+using SilverSim.Threading;
 using SilverSim.Types;
 using System.Linq;
-using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Physics
 {

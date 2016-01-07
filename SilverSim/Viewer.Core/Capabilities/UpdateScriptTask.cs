@@ -6,13 +6,13 @@ using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script;
 using SilverSim.Scripting.Common;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using ThreadedClasses;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {

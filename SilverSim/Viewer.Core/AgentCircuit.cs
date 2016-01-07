@@ -8,6 +8,7 @@ using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.IM;
 using SilverSim.Viewer.Messages;
@@ -18,7 +19,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using System.Reflection;
 using System.Threading;
-using ThreadedClasses;
 
 namespace SilverSim.Viewer.Core
 {

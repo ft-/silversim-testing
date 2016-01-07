@@ -1,10 +1,10 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
-using SilverSim.Types;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Script.Events;
-using ThreadedClasses;
+using SilverSim.Threading;
+using SilverSim.Types;
 
 namespace SilverSim.Scene.Chat
 {

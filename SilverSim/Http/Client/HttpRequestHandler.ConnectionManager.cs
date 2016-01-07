@@ -3,6 +3,7 @@
 
 //#define SUPPORT_PIPELINING
 
+using SilverSim.Threading;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Net.Security;
@@ -10,7 +11,6 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 using System.Timers;
-using ThreadedClasses;
 
 namespace SilverSim.Http.Client
 {

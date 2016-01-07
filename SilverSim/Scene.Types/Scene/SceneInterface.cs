@@ -13,6 +13,7 @@ using SilverSim.ServiceInterfaces.Estate;
 using SilverSim.ServiceInterfaces.Grid;
 using SilverSim.ServiceInterfaces.Groups;
 using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Economy;
 using SilverSim.Types.Grid;
@@ -23,7 +24,6 @@ using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Scene
 {

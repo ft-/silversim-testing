@@ -1,19 +1,14 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Scene.Types.Agent;
+using SilverSim.Threading;
+using SilverSim.Types;
+using SilverSim.Viewer.Messages.LayerData;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using SilverSim.Types;
-using SilverSim.Scene.Types.Agent;
-using SilverSim.Viewer.Messages.Generic;
-using SilverSim.Viewer.Messages.LayerData;
-using SilverSim.Viewer.Messages.Region;
-using SilverSim.Viewer.Messages;
-using System.Threading;
-using ThreadedClasses;
 using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace SilverSim.Scene.Types.Scene
 {

@@ -3,12 +3,12 @@
 
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Script.Events;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Script;
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Script
 {

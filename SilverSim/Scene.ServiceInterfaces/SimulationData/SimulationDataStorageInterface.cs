@@ -3,11 +3,11 @@
 
 using SilverSim.Scene.Types.Object;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Threading;
 using SilverSim.Types;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.Threading;
-using ThreadedClasses;
 
 namespace SilverSim.Scene.ServiceInterfaces.SimulationData
 {

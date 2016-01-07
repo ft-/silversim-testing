@@ -2,22 +2,21 @@
 // GNU Affero General Public License v3
 
 using log4net;
-using SilverSim.Viewer.Messages;
 using SilverSim.Main.Common;
 using SilverSim.Scene.ServiceInterfaces.Chat;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.Scene.Types.Script.Events;
 using SilverSim.ServiceInterfaces.IM;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.IM;
+using SilverSim.Viewer.Messages;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
-using ThreadedClasses;
-using System.Diagnostics.CodeAnalysis;
-using SilverSim.Types.Estate;
 
 namespace SilverSim.Viewer.Core
 {

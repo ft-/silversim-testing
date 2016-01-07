@@ -8,6 +8,7 @@ using SilverSim.Main.Common.CmdIO;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.ServiceInterfaces.AvatarName;
 using SilverSim.ServiceInterfaces.ServerParam;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Json;
 using System;
@@ -18,7 +19,6 @@ using System.Linq;
 using System.Net;
 using System.Security.Cryptography;
 using System.Timers;
-using ThreadedClasses;
 
 namespace SilverSim.WebIF.Admin
 {

@@ -3,24 +3,23 @@
 
 using log4net;
 using Nini.Config;
-using SilverSim.Viewer.Core;
-using SilverSim.Viewer.Messages;
-using SilverSim.Viewer.Messages.Search;
 using SilverSim.Main.Common;
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Types.Scene;
 using SilverSim.ServiceInterfaces.Groups;
+using SilverSim.Threading;
 using SilverSim.Types;
 using SilverSim.Types.Groups;
+using SilverSim.Viewer.Core;
+using SilverSim.Viewer.Messages;
+using SilverSim.Viewer.Messages.Search;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
-using System.Text;
 using System.Threading;
 using System.Xml;
-using ThreadedClasses;
-using System.Diagnostics.CodeAnalysis;
-using System.ComponentModel;
 
 namespace SilverSim.Viewer.Search
 {

@@ -1,13 +1,16 @@
-﻿using log4net;
-using SilverSim.Viewer.Messages;
+﻿// SilverSim is distributed under the terms of the
+// GNU Affero General Public License v3
+
+using log4net;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.Threading;
 using SilverSim.Types.IM;
+using SilverSim.Viewer.Messages;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading;
-using ThreadedClasses;
-using SilverSim.Scene.Types.Scene;
-using System.Diagnostics.CodeAnalysis;
 
 namespace SilverSim.Viewer.Core
 {
@@ -38,7 +41,7 @@ namespace SilverSim.Viewer.Core
         protected readonly Dictionary<string, Action<Message>> m_GenericMessageRouting = new Dictionary<string, Action<Message>>();
         protected readonly Dictionary<GridInstantMessageDialog, Action<Message>> m_IMMessageRouting = new Dictionary<GridInstantMessageDialog, Action<Message>>();
 
-        protected readonly ThreadedClasses.BlockingQueue<UDPPacket> m_TxObjectPool = new BlockingQueue<UDPPacket>();
+        protected readonly BlockingQueue<UDPPacket> m_TxObjectPool = new BlockingQueue<UDPPacket>();
         protected int m_PacketsReceived;
         protected int m_PacketsSent;
         protected int m_UnackedBytes;

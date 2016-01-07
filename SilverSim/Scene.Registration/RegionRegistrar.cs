@@ -1,18 +1,18 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using Nini.Config;
 using SilverSim.Main.Common;
+using SilverSim.Main.Common.HttpServer;
 using SilverSim.Scene.Management.Scene;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Threading;
 using SilverSim.Types;
-using Nini.Config;
-using System.Net;
-using ThreadedClasses;
-using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types.Grid;
 using System;
-using System.ComponentModel;
 using System.Collections.Generic;
+using System.ComponentModel;
+using System.Net;
 
 namespace SilverSim.Scene.Registration
 {

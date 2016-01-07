@@ -3,20 +3,19 @@
 
 using log4net;
 using Nini.Config;
+using SilverSim.Main.Common;
+using SilverSim.Scene.Types.Scene;
+using SilverSim.ServiceInterfaces.Economy;
+using SilverSim.Threading;
+using SilverSim.Types.Economy;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Economy;
-using SilverSim.Main.Common;
-using SilverSim.Scene.Management.Scene;
-using SilverSim.Scene.Types.Scene;
-using SilverSim.ServiceInterfaces.Economy;
-using SilverSim.Types.Economy;
 using System;
 using System.Collections.Generic;
-using System.Threading;
-using ThreadedClasses;
-using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace SilverSim.Viewer.Economy
 {

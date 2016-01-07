@@ -2,14 +2,14 @@
 // GNU Affero General Public License v3
 
 using Nini.Config;
+using SilverSim.Main.Common;
+using SilverSim.Threading;
 using SilverSim.Viewer.Core;
 using SilverSim.Viewer.Messages;
-using SilverSim.Main.Common;
 using System.Collections.Generic;
-using System.Threading;
-using ThreadedClasses;
-using System.Diagnostics.CodeAnalysis;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
+using System.Threading;
 
 namespace SilverSim.Viewer.Friends
 {

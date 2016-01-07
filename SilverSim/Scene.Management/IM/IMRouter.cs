@@ -1,10 +1,10 @@
 ﻿// SilverSim is distributed under the terms of the
 // GNU Affero General Public License v3
 
+using SilverSim.Threading;
 using SilverSim.Types.IM;
 using System;
 using System.Diagnostics.CodeAnalysis;
-using ThreadedClasses;
 
 namespace SilverSim.Scene.Management.IM
 {

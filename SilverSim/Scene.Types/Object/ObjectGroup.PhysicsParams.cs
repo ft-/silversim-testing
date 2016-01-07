@@ -4,13 +4,9 @@
 using SilverSim.Scene.Types.Physics;
 using SilverSim.Scene.Types.Physics.Vehicle;
 using SilverSim.Scene.Types.Scene;
+using SilverSim.Threading;
 using SilverSim.Types;
-using System;
-using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
-using System.Linq;
-using System.Text;
-using ThreadedClasses;
 
 namespace SilverSim.Scene.Types.Object
 {
