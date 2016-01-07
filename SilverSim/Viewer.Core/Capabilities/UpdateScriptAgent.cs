@@ -78,7 +78,7 @@ namespace SilverSim.Viewer.Core.Capabilities
 
                 if (!item.CheckPermissions(m_Agent.Owner, m_Agent.Group, InventoryPermissionsMask.Modify))
                 {
-                    throw new UploadErrorException("Not allowed to modify script");
+                    throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "NotAllowedToModifyScript", "Not allowed to modify script"));
                 }
 
                 item.AssetID = data.ID;
@@ -91,7 +91,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch
                 {
-                    throw new UploadErrorException("Failed to store asset");
+                    throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreAsset", "Failed to store asset"));
                 }
 
                 try
@@ -100,7 +100,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch
                 {
-                    throw new UploadErrorException("Failed to store inventory item");
+                    throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreInventoryItem", "Failed to store inventory item"));
                 }
 
                 try
@@ -113,12 +113,19 @@ namespace SilverSim.Viewer.Core.Capabilities
                     AnArray errors = new AnArray();
                     foreach(KeyValuePair<int, string> line in e.Messages)
                     {
-                        errors.Add(string.Format("{0}:{1}", kvp.Key, kvp.Value));
+                        errors.Add(string.Format("{0}:{1}", line.Key, line.Value));
                     }
                     m.Add("errors", errors);
                     m.Add("compiled", false);
                 }
-                   
+                catch(Exception e)
+                {
+                    AnArray errors = new AnArray();
+                    errors.Add("0: Unexpected compiler error " + e.GetType().Name);
+                    m.Add("errors", errors);
+                    m.Add("compiled", false);
+                }
+
                 return m;
             }
             else

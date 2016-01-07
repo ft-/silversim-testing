@@ -21,7 +21,7 @@ namespace SilverSim.Scripting.Common
             public string DefaultCompilerName { get; set; }
             public RegistryImpl()
             {
-
+                DefaultCompilerName = "lsl";
             }
 
             public IScriptCompiler this[string name]

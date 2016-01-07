@@ -31,7 +31,7 @@ namespace SilverSim.Types.Inventory
 
         public bool CheckAgentPermissions(UUI creator, UUI owner, UUI accessor, InventoryPermissionsMask wanted)
         {
-            if(accessor == creator)
+            if(accessor.EqualsGrid(creator))
             {
                 return true;
             }
@@ -39,7 +39,7 @@ namespace SilverSim.Types.Inventory
             {
                 return false;
             }
-            else if (accessor == owner)
+            else if (accessor.EqualsGrid(owner))
             {
                 return (wanted & Base & Current) == wanted;
             }
@@ -51,7 +51,7 @@ namespace SilverSim.Types.Inventory
 
         public bool CheckGroupPermissions(UUI creator, UGI ownergroup, UUI accessor, UGI accessorgroup, InventoryPermissionsMask wanted)
         {
-            if(accessor == creator)
+            if(accessor.EqualsGrid(creator))
             {
                 return true;
             }
@@ -59,7 +59,7 @@ namespace SilverSim.Types.Inventory
             {
                 return false;
             }
-            else if(accessorgroup == ownergroup)
+            else if(accessorgroup.Equals(ownergroup))
             {
                 return (wanted & Base & Group) == wanted;
             }
