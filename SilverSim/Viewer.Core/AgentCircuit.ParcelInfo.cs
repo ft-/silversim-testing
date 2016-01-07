@@ -13,6 +13,25 @@ namespace SilverSim.Viewer.Core
 {
     public partial class AgentCircuit
     {
+        [PacketHandler(MessageType.ParcelSetOtherCleanTime)]
+        public void HandleParcelSetOtherCleanTime(Message m)
+        {
+            ParcelSetOtherCleanTime req = (ParcelSetOtherCleanTime)m;
+            if (req.AgentID != req.CircuitAgentID ||
+                req.SessionID != req.CircuitSessionID)
+            {
+                return;
+            }
+
+            ParcelInfo pInfo;
+            if (Scene.Parcels.TryGetValue(req.LocalID, out pInfo) &&
+                Scene.CanEditParcelDetails(Agent.Owner, pInfo))
+            {
+                pInfo.OtherCleanTime = req.OtherCleanTime;
+                Scene.TriggerParcelUpdate(pInfo);
+            }
+        }
+
         [PacketHandler(MessageType.ParcelPropertiesUpdate)]
         public void HandleParcelPropertiesUpdate(Message m)
         {
@@ -64,7 +83,7 @@ namespace SilverSim.Viewer.Core
                 pInfo.LandingPosition = req.UserLocation;
                 pInfo.LandingLookAt = req.UserLookAt;
                 pInfo.LandingType = req.LandingType;
-                Scene.Parcels.Store(pInfo.ID);
+                Scene.TriggerParcelUpdate(pInfo);
             }
         }
 
