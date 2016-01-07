@@ -390,15 +390,13 @@ namespace SilverSim.Scene.Types.Scene
                             p = FindNonBlockedParcel(agent, destinationLocation);
                             break;
 
-                        case TeleportLandingType.Anywhere:
-                            break;
-
                         case TeleportLandingType.LandingPoint:
                             destinationLocation = p.LandingPosition;
                             destinationLookAt = p.LandingLookAt;
                             break;
 
                         default:
+                        case TeleportLandingType.Anywhere:
                             break;
                     }
                 }
