@@ -209,6 +209,9 @@ namespace SilverSim.Scripting.Common
         protected int cur_linenumber;
         protected string cur_filename;
 
+        protected int begin_linenumber;
+        protected string begin_filename;
+
         public int CurrentLineNumber; /* set to start of line */
 
         public void Push(TextReader stream, string filename, int lineNumber = 1)
@@ -242,10 +245,22 @@ namespace SilverSim.Scripting.Common
             }
         }
 
+        protected void MarkBeginOfLine()
+        {
+            begin_linenumber = cur_linenumber;
+            begin_filename = cur_filename;
+        }
+
         public void GetFileInfo(out string filename, out int linenumber)
         {
             linenumber = cur_linenumber;
             filename = cur_filename;
+        }
+
+        public void GetBeginFileInfo(out string filename, out int linenumber)
+        {
+            linenumber = begin_linenumber;
+            filename = begin_filename;
         }
 
         public struct FileInfo
