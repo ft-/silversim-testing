@@ -465,12 +465,10 @@ namespace SilverSim.Threading
             m_RwLock.AcquireWriterLock(-1);
             try
             {
-                if (m_Dictionary.ContainsKey(key))
+                if (m_Dictionary.ContainsKey(key) &&
+                    !del(m_Dictionary[key]))
                 {
-                    if (!del(m_Dictionary[key]))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
                 return m_Dictionary.Remove(key);
             }
@@ -577,12 +575,10 @@ namespace SilverSim.Threading
             try
             {
                 TValue checkval;
-                if(m_Dictionary.TryGetValue(key, out checkval))
+                if(m_Dictionary.TryGetValue(key, out checkval) && 
+				    !del(checkval))
                 {
-                    if(!del(checkval))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
                 m_Dictionary[key] = value;
                 return true;
@@ -612,7 +608,7 @@ namespace SilverSim.Threading
 
     public class RwLockedDictionaryAutoAdd<TKey, TValue> : RwLockedDictionary<TKey, TValue>
     {
-        private CreateValueDelegate m_AutoAddDelegate;
+        readonly CreateValueDelegate m_AutoAddDelegate;
         public RwLockedDictionaryAutoAdd(CreateValueDelegate autoAddDelegate)
         {
             m_AutoAddDelegate = autoAddDelegate;

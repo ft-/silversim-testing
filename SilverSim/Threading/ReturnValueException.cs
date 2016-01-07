@@ -9,7 +9,7 @@ namespace SilverSim.Threading
     public class ReturnValueException<TValue> : Exception
     {
         [NonSerialized]
-        private TValue m_Value;
+        readonly TValue m_Value;
 
         public TValue Value
         {

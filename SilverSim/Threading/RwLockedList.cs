@@ -10,8 +10,8 @@ namespace SilverSim.Threading
 {
     public class RwLockedList<T> : IList<T>
     {
-        private List<T> m_List;
-        private ReaderWriterLock m_RwLock = new ReaderWriterLock();
+        readonly List<T> m_List;
+        readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
 
         public RwLockedList()
         {

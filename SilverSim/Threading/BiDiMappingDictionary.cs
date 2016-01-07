@@ -37,9 +37,9 @@ namespace SilverSim.Threading
             }
         }
 
-        Dictionary<TKey1, TKey2> m_Dictionary_K1;
-        Dictionary<TKey2, TKey1> m_Dictionary_K2;
-        ReaderWriterLock m_RwLock = new ReaderWriterLock();
+        readonly Dictionary<TKey1, TKey2> m_Dictionary_K1;
+        readonly Dictionary<TKey2, TKey1> m_Dictionary_K2;
+        readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
 
         public RwLockedBiDiMappingDictionary()
         {
@@ -65,12 +65,10 @@ namespace SilverSim.Threading
                         throw new ArgumentException("key1 exists in the dictionary but not key2");
                     }
                 }
-                else if (m_Dictionary_K2.ContainsKey(key2))
+                else if (m_Dictionary_K2.ContainsKey(key2) &&
+                    !m_Dictionary_K1.ContainsKey(key1))
                 {
-                    if (!m_Dictionary_K1.ContainsKey(key1))
-                    {
-                        throw new ArgumentException("key2 exists in the dictionary but not key1");
-                    }
+                    throw new ArgumentException("key2 exists in the dictionary but not key1");
                 }
 
                 m_Dictionary_K1[key1] = key2;

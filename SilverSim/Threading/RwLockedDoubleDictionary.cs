@@ -37,9 +37,9 @@ namespace SilverSim.Threading
             }
         }
 
-        Dictionary<TKey1, KeyValuePair<TKey2, TValue>> m_Dictionary_K1;
-        Dictionary<TKey2, KeyValuePair<TKey1, TValue>> m_Dictionary_K2;
-        ReaderWriterLock m_RwLock = new ReaderWriterLock();
+        readonly Dictionary<TKey1, KeyValuePair<TKey2, TValue>> m_Dictionary_K1;
+        readonly Dictionary<TKey2, KeyValuePair<TKey1, TValue>> m_Dictionary_K2;
+        readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
 
         public RwLockedDoubleDictionary()
         {

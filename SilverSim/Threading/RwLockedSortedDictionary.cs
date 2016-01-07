@@ -10,7 +10,7 @@ namespace SilverSim.Threading
 {
     public class RwLockedSortedDictionary<TKey, TValue> : IDictionary<TKey, TValue>
     {
-        protected ReaderWriterLock m_RwLock = new ReaderWriterLock();
+        protected readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
         protected SortedDictionary<TKey, TValue> m_Dictionary;
 
         public class KeyAlreadyExistsException : Exception
@@ -437,12 +437,10 @@ namespace SilverSim.Threading
             m_RwLock.AcquireWriterLock(-1);
             try
             {
-                if (m_Dictionary.ContainsKey(key))
+                if (m_Dictionary.ContainsKey(key) &&
+                    !del(m_Dictionary[key]))
                 {
-                    if (!del(m_Dictionary[key]))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
                 return m_Dictionary.Remove(key);
             }
@@ -549,12 +547,10 @@ namespace SilverSim.Threading
             try
             {
                 TValue checkval;
-                if (m_Dictionary.TryGetValue(key, out checkval))
+                if (m_Dictionary.TryGetValue(key, out checkval) &&
+                    !del(checkval))
                 {
-                    if (!del(checkval))
-                    {
-                        return false;
-                    }
+                    return false;
                 }
                 m_Dictionary[key] = value;
                 return true;

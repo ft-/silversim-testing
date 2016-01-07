@@ -17,9 +17,9 @@ namespace SilverSim.Threading
 
             }
         }
-        SortedDictionary<TKey1, KeyValuePair<TKey2, TValue>> m_Dictionary_K1;
-        SortedDictionary<TKey2, KeyValuePair<TKey1, TValue>> m_Dictionary_K2;
-        ReaderWriterLock m_RwLock = new ReaderWriterLock();
+        readonly SortedDictionary<TKey1, KeyValuePair<TKey2, TValue>> m_Dictionary_K1;
+        readonly SortedDictionary<TKey2, KeyValuePair<TKey1, TValue>> m_Dictionary_K2;
+        readonly ReaderWriterLock m_RwLock = new ReaderWriterLock();
 
         public RwLockedSortedDoubleDictionary()
         {
@@ -41,12 +41,14 @@ namespace SilverSim.Threading
                 if (m_Dictionary_K1.ContainsKey(key1))
                 {
                     if (!m_Dictionary_K2.ContainsKey(key2))
+                    {
                         throw new ArgumentException("key1 exists in the dictionary but not key2");
+                    }
                 }
-                else if (m_Dictionary_K2.ContainsKey(key2))
+                else if (m_Dictionary_K2.ContainsKey(key2) &&
+                    !m_Dictionary_K1.ContainsKey(key1))
                 {
-                    if (!m_Dictionary_K1.ContainsKey(key1))
-                        throw new ArgumentException("key2 exists in the dictionary but not key1");
+                    throw new ArgumentException("key2 exists in the dictionary but not key1");
                 }
 
                 m_Dictionary_K1[key1] = new KeyValuePair<TKey2, TValue>(key2, value);
