@@ -8,6 +8,7 @@ using SilverSim.Types.Grid;
 using SilverSim.Types.StructuredData.Llsd;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -83,9 +84,13 @@ namespace SilverSim.Viewer.Core.Capabilities
             m_Scene.TriggerRegionSettingsChanged();
             m_Scene.ReregisterRegion();
 
-            using (HttpResponse res = httpreq.BeginResponse("text/plain"))
+            using (HttpResponse httpres = httpreq.BeginResponse())
             {
-                /* no further action required */
+                httpres.ContentType = "application/llsd+xml";
+                using (Stream outStream = httpres.GetOutputStream())
+                {
+                    LlsdXml.Serialize(new Map(), outStream);
+                }
             }
         }
     }

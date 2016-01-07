@@ -7,6 +7,7 @@ using SilverSim.Types;
 using SilverSim.Types.Estate;
 using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Viewer.Messages.Generic;
+using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
@@ -148,7 +149,14 @@ namespace SilverSim.Viewer.Core.Capabilities
                 m_Agent.SendMessageAlways(m, m_Scene.ID);
             }
 
-            httpreq.EmptyResponse();
+            using (HttpResponse httpres = httpreq.BeginResponse())
+            {
+                httpres.ContentType = "application/llsd+xml";
+                using (Stream outStream = httpres.GetOutputStream())
+                {
+                    LlsdXml.Serialize(new Map(), outStream);
+                }
+            }
         }
     }
 }

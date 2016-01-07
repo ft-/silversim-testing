@@ -4,6 +4,7 @@
 using SilverSim.Main.Common.HttpServer;
 using SilverSim.Types;
 using SilverSim.Types.StructuredData.Llsd;
+using System.IO;
 using System.Net;
 
 namespace SilverSim.Viewer.Core.Capabilities
@@ -64,9 +65,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
             }
 
-            using (HttpResponse res = httpreq.BeginResponse("text/plain"))
+            using (HttpResponse httpres = httpreq.BeginResponse())
             {
-                /* seems the response has no real use here */
+                httpres.ContentType = "application/llsd+xml";
+                using (Stream outStream = httpres.GetOutputStream())
+                {
+                    LlsdXml.Serialize(new Map(), outStream);
+                }
             }
         }
     }

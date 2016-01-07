@@ -9,6 +9,7 @@ using System.Net;
 using SilverSim.Types.StructuredData.Llsd;
 using SilverSim.Types;
 using log4net;
+using System.IO;
 
 namespace SilverSim.Viewer.Core.Capabilities
 {
@@ -81,9 +82,9 @@ namespace SilverSim.Viewer.Core.Capabilities
             pInfo.SalePrice = reqmap["sale_price"].AsInt;
             pInfo.Description = reqmap["description"].ToString();
             string music_uri = reqmap["music_url"].ToString();
-            pInfo.MusicURI = music_uri != string.Empty ? new URI(music_uri) : null;
+            pInfo.MusicURI = music_uri != string.Empty && Uri.IsWellFormedUriString(music_uri, UriKind.Absolute) ? new URI(music_uri) : null;
             string media_uri = reqmap["media_url"].ToString();
-            pInfo.MediaURI = media_uri != string.Empty ? new URI(media_uri) : null;
+            pInfo.MediaURI = media_uri != string.Empty && Uri.IsWellFormedUriString(media_uri, UriKind.Absolute) ? new URI(media_uri) : null;
             pInfo.MediaDescription = reqmap["media_desc"].ToString();
             pInfo.MediaType = reqmap["media_type"].ToString();
             pInfo.MediaWidth = reqmap["media_width"].AsInt;
@@ -105,7 +106,14 @@ namespace SilverSim.Viewer.Core.Capabilities
 
             m_Scene.TriggerParcelUpdate(pInfo);
 
-            httpreq.EmptyResponse();
+            using (HttpResponse httpres = httpreq.BeginResponse())
+            {
+                httpres.ContentType = "application/llsd+xml";
+                using (Stream outStream = httpres.GetOutputStream())
+                {
+                    LlsdXml.Serialize(new Map(), outStream);
+                }
+            }
         }
     }
 }
