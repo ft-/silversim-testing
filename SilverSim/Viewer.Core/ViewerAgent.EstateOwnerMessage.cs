@@ -46,7 +46,8 @@ namespace SilverSim.Viewer.Core
 
             if(!circuit.Scene.IsEstateManager(Owner) && circuit.Scene.Owner != Owner)
             {
-                /* only EO and EM allowed behind */
+                /* only RO, EO and EM allowed behind */
+                /* some messages later will be limited further */
                 return;
             }
 
@@ -86,10 +87,20 @@ namespace SilverSim.Viewer.Core
                     break;
 
                 case "estatechangecovenantid":
+                    if(!circuit.Scene.IsEstateManager(Owner))
+                    {
+                        /* only EO and EM */
+                        return;
+                    }
                     EstateOwner_EstateChangeCovenantId(circuit, req);
                     break;
 
                 case "estateaccessdelta":
+                    if (!circuit.Scene.IsEstateManager(Owner))
+                    {
+                        /* only EO and EM */
+                        return;
+                    }
                     EstateOwner_EstateAccessDelta(circuit, req);
                     break;
 
@@ -126,6 +137,11 @@ namespace SilverSim.Viewer.Core
                     break;
 
                 case "estatechangeinfo":
+                    if (!circuit.Scene.IsEstateManager(Owner))
+                    {
+                        /* only EO and EM */
+                        return;
+                    }
                     EstateOwner_EstateChangeInfo(circuit, req);
                     break;
 
