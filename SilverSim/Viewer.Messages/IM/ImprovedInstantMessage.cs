@@ -25,8 +25,8 @@ namespace SilverSim.Viewer.Messages.IM
         public GridInstantMessageDialog Dialog;
         public UUID ID;
         public Date Timestamp;
-        public string FromAgentName;
-        public string Message;
+        public string FromAgentName = string.Empty;
+        public string Message = string.Empty;
         public byte[] BinaryBucket = new byte[0];
 
         public ImprovedInstantMessage()
