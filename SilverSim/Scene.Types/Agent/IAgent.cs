@@ -29,6 +29,7 @@ using SilverSim.Scene.Types.Script;
 using System.ComponentModel;
 using System;
 using System.Globalization;
+using SilverSim.Types.Parcel;
 
 namespace SilverSim.Scene.Types.Agent
 {
@@ -53,6 +54,7 @@ namespace SilverSim.Scene.Types.Agent
         RwLockedDictionaryAutoAdd<UUID, RwLockedDictionary<uint, uint>> TransmittedTerrainSerials { get; }
 
         void EnableSimulator(UUID originSceneID, uint circuitCode, string capsURI, DestinationInfo destinationInfo);
+        void SendUpdatedParcelInfo(ParcelInfo pinfo, UUID fromSceneID);
 
         IAgentTeleportServiceInterface ActiveTeleportService
         {

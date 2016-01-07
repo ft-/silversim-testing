@@ -1017,6 +1017,20 @@ namespace SilverSim.Scene.Implementation.Basic
                     m_SimulationDataStorage.Parcels.Store(ID, pInfo);
                 }
             }
+
+            foreach (IAgent agent in RootAgents)
+            {
+                int x = (int)agent.Position.X;
+                int y = (int)agent.Position.Y;
+                if (agent.Position.X < 0 || agent.Position.Y < 0 || x < 0 || y < 0 || x >= SizeX || y >= SizeY)
+                {
+                    continue;
+                }
+                if (pInfo.LandBitmap[x / 4, y / 4])
+                {
+                    agent.SendUpdatedParcelInfo(pInfo, ID);
+                }
+            }
         }
 
         public override void ClearObjects()

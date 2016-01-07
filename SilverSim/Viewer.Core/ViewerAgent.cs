@@ -1497,6 +1497,16 @@ namespace SilverSim.Viewer.Core
             }
         }
 
+        public void SendUpdatedParcelInfo(ParcelInfo pinfo, UUID fromSceneID)
+        {
+            AgentCircuit circuit;
+            if (Circuits.TryGetValue(fromSceneID, out circuit))
+            {
+                ParcelProperties props = circuit.Scene.ParcelInfo2ParcelProperties(Owner.ID, pinfo, NextParcelSequenceId, ParcelProperties.RequestResultType.Single);
+                circuit.SendMessage(props);
+            }
+        }
+
         [PacketHandler(MessageType.CompleteAgentMovement)]
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidUncalledPrivateCodeRule")]
         void HandleCompleteAgentMovement(Message m)
