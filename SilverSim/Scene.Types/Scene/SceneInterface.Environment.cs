@@ -481,7 +481,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 SimulatorViewerTimeMessage m = new SimulatorViewerTimeMessage();
                 m.SunPhase = m_SunData.SunPhase;
-                m.UsecSinceStart = m_SunData.UsecSinceStart;
+                m.UsecSinceStart = Date.GetUnixTime() * 1000000;
                 m.SunDirection = m_SunData.SunDirection;
                 m.SunAngVelocity = m_SunData.SunAngVelocity;
                 m.SecPerYear = m_SunData.SecPerYear;
