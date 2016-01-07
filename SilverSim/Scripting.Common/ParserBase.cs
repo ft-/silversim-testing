@@ -200,10 +200,11 @@ namespace SilverSim.Scripting.Common
             public int LineNumberCounter;
         };
         readonly List<ParserInput> m_ParserInputs = new List<ParserInput>();
+        public ParserInput AtEoF { get; private set; }
 
         protected ParserBase()
         {
-
+            AtEoF = null;
         }
 
         public abstract void Read(List<string> arguments);
@@ -294,8 +295,9 @@ namespace SilverSim.Scripting.Common
                 c = pi.Reader.Read();
                 if(c == -1)
                 {
+                    AtEoF = m_ParserInputs[m_ParserInputs.Count - 1];
                     Pop();
-                    if(0 == m_ParserInputs.Count)
+                    if (0 == m_ParserInputs.Count)
                     {
                         throw new EndOfFileException();
                     }
