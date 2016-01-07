@@ -537,6 +537,7 @@ namespace SilverSim.Scene.Implementation.Basic
                 PhysicsScene = new DummyPhysicsScene(ID);
                 LoginControl.Ready(ReadyFlags.PhysicsTerrain);
             }
+            Environment.Start();
         }
         #endregion
 
@@ -559,6 +560,7 @@ namespace SilverSim.Scene.Implementation.Basic
 
         void RemoveScene(SceneInterface s)
         {
+            Environment.Stop();
             ScriptThreadPool.Shutdown();
             m_RestartObject = null;
             m_StopBasicSceneThreads = true;

@@ -243,6 +243,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     if(!m_Timer.Enabled)
                     {
+                        EnvironmentTimer(this, null);
                         m_Timer.Elapsed += EnvironmentTimer;
                         m_Timer.Start();
                     }
@@ -264,7 +265,8 @@ namespace SilverSim.Scene.Types.Scene
             private void EnvironmentTimer(object sender, System.Timers.ElapsedEventArgs e)
             {
                 UpdateSunDirection();
-                if(null != Wind)
+                SendSimulatorTimeMessageToAllClients();
+                if (null != Wind)
                 {
                     Wind.UpdateModel(m_SunData);
                 }
@@ -475,7 +477,7 @@ namespace SilverSim.Scene.Types.Scene
                 SendToAllClients(m);
             }
 
-            private void SendSimulatorTimeMessageToClient(IAgent agent)
+            public void SendSimulatorTimeMessageToClient(IAgent agent)
             {
                 SimulatorViewerTimeMessage m = new SimulatorViewerTimeMessage();
                 m.SunPhase = m_SunData.SunPhase;

@@ -1557,6 +1557,7 @@ namespace SilverSim.Viewer.Core
                 if (scene != null)
                 {
                     scene.Environment.UpdateWindlightProfileToClient(this);
+                    scene.Environment.SendSimulatorTimeMessageToClient(this);
 
                     foreach (ITriggerOnRootAgentActions action in circuit.m_TriggerOnRootAgentActions)
                     {
