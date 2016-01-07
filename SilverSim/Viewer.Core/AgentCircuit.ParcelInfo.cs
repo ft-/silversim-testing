@@ -116,7 +116,6 @@ namespace SilverSim.Viewer.Core
         void SendParcelAccessList(int localID, ParcelAccessList listType, List<ParcelAccessEntry> list)
         {
             ParcelAccessListReply rep = new ParcelAccessListReply();
-            int segments = (list.Count + P_MAX_ENTRIES - 1) / P_MAX_ENTRIES;
             int sequenceno = 1;
             if(list.Count == 0)
             {
