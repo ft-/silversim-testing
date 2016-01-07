@@ -254,6 +254,11 @@ namespace SilverSim.Scene.Types.Scene
                 throw new ParcelAccessDeniedException(this.GetLanguageString(agent.CurrentCulture, "YouAreNotAllowedToEnterTheEstate", "You are not allowed to enter the estate."));
             }
 
+            if(EstateService.EstateBans[estateID, agentOwner])
+            {
+                throw new ParcelAccessDeniedException(this.GetLanguageString(agent.CurrentCulture, "YouAreBannedFromThisEstate", "You are banned from this estate."));
+            }
+
             return estateInfo;
         }
 
