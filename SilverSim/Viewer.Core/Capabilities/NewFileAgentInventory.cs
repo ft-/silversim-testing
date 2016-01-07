@@ -6,6 +6,7 @@ using SilverSim.ServiceInterfaces.Inventory;
 using SilverSim.Types;
 using SilverSim.Types.Asset;
 using SilverSim.Types.Inventory;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using ThreadedClasses;
@@ -17,6 +18,7 @@ namespace SilverSim.Viewer.Core.Capabilities
     {
         readonly InventoryServiceInterface m_InventoryService;
         readonly AssetServiceInterface m_AssetService;
+        readonly ViewerAgent m_Agent;
 
         readonly RwLockedDictionary<UUID, InventoryItem> m_Transactions = new RwLockedDictionary<UUID, InventoryItem>();
 
@@ -36,11 +38,12 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
         }
 
-        public NewFileAgentInventory(UUI creator, InventoryServiceInterface inventoryService, AssetServiceInterface assetService, string serverURI)
-            : base(creator, serverURI)
+        public NewFileAgentInventory(ViewerAgent agent, string serverURI)
+            : base(agent.Owner, serverURI)
         {
-            m_InventoryService = inventoryService;
-            m_AssetService = assetService;
+            m_Agent = agent;
+            m_InventoryService = agent.InventoryService;
+            m_AssetService = agent.AssetService;
         }
 
         public override UUID GetUploaderID(Map reqmap)
@@ -82,7 +85,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 }
                 catch
                 {
-                    throw new UploadErrorException("Failed to store asset");
+                    throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreAsset", "Failed to store asset"));
                 }
 
                 try
@@ -90,8 +93,11 @@ namespace SilverSim.Viewer.Core.Capabilities
                     m_InventoryService.Item.Add(kvp.Value);
                 }
                 catch
+#if DEBUG
+                (Exception e)
+#endif
                 {
-                    throw new UploadErrorException("Failed to store new inventory item");
+                    throw new UploadErrorException(this.GetLanguageString(m_Agent.CurrentCulture, "FailedToStoreNewInventoryItem", "Failed to store new inventory item"));
                 }
                 return m;
             }

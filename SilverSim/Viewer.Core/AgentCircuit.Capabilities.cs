@@ -322,13 +322,13 @@ namespace SilverSim.Viewer.Core
             }, capConfig);
             AddDefCapabilityFactory("NewFileAgentInventory", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new NewFileAgentInventory(agent.Owner, agent.InventoryService, agent.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new NewFileAgentInventory(agent, localHostName);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
             AddDefCapabilityFactory("NewFileAgentInventoryVariablePrice", regionSeedID, delegate(ViewerAgent agent) 
             {
-                UploadAssetAbstractCapability capability = new NewFileAgentInventoryVariablePrice(agent.Owner, agent.InventoryService, agent.AssetService, localHostName);
+                UploadAssetAbstractCapability capability = new NewFileAgentInventoryVariablePrice(agent, localHostName);
                 m_UploadCapabilities.Add(capability);
                 return capability;
             }, capConfig);
