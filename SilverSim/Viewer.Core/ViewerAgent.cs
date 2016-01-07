@@ -831,6 +831,7 @@ namespace SilverSim.Viewer.Core
 
                     case ObjectDetailsType.Owner:
                     case ObjectDetailsType.Creator:
+                    case ObjectDetailsType.Root:
                         paramList.Add(ID);
                         break;
 
@@ -892,10 +893,6 @@ namespace SilverSim.Viewer.Core
 
                     case ObjectDetailsType.CharacterTime:
                         paramList.Add(0);
-                        break;
-
-                    case ObjectDetailsType.Root:
-                        paramList.Add(ID);
                         break;
 
                     case ObjectDetailsType.AttachedPoint:
