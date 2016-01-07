@@ -248,6 +248,13 @@ namespace SilverSim.Viewer.Core
                 }
             }
 
+            if(null == asset)
+            {
+                /* safe guard here */
+                SendAssetNotFound(req);
+                return;
+            }
+
             if (Server.LogTransferPacket)
             {
                 m_Log.DebugFormat("Starting to download asset {0} (TransferPacket)", assetID);

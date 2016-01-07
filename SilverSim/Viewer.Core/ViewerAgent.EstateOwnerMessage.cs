@@ -477,7 +477,7 @@ namespace SilverSim.Viewer.Core
                 return;
             }
 
-            UUID covenantID = UUID.Parse(UTF8Encoding.UTF8.GetString(req.ParamList[0]));
+            UUID covenantID = UUID.Parse(req.ParamList[0].FromUTF8Bytes());
             EstateInfo estate;
             uint estateID;
             EstateServiceInterface estateService = circuit.Scene.EstateService;
@@ -486,6 +486,14 @@ namespace SilverSim.Viewer.Core
             {
                 estate.CovenantID = covenantID;
                 estateService[estate.ID] = estate;
+                foreach(UUID regionID in estateService.RegionMap[estateID])
+                {
+                    SceneInterface estateScene;
+                    if(SceneManager.Scenes.TryGetValue(regionID, out estateScene))
+                    {
+                        estateScene.TriggerEstateUpdate();
+                    }
+                }
             }
         }
 
@@ -757,6 +765,14 @@ namespace SilverSim.Viewer.Core
                 m.ParamList.Add("1".ToUTF8Bytes());
                 m.ParamList.Add(estate.AbuseEmail.ToUTF8Bytes());
                 circuit.SendMessage(m);
+                foreach (UUID regionID in estateService.RegionMap[estateID])
+                {
+                    SceneInterface estateScene;
+                    if (SceneManager.Scenes.TryGetValue(regionID, out estateScene))
+                    {
+                        estateScene.TriggerEstateUpdate();
+                    }
+                }
             }
         }
 
