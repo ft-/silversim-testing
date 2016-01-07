@@ -635,7 +635,7 @@ namespace SilverSim.Viewer.Core
             if(scene.RootAgents.TryGetValue(prey, out targetagent) &&
                 !targetagent.TeleportHome(scene))
             {
-                targetagent.KickUser("You were teleported home by the region owner. Because of failing TP, you have been logged out.");
+                targetagent.KickUser(this.GetLanguageString(circuit.Agent.CurrentCulture, "YouHaveBeenKickedSinceYouCouldNotBeTeleportedHome", "You have been kicked since you could not be teleported home."));
             }
         }
 
@@ -651,7 +651,7 @@ namespace SilverSim.Viewer.Core
                 }
                 else if (!targetagent.TeleportHome(scene))
                 {
-                    targetagent.KickUser("You were teleported home by the region owner. Because of failing TP, you have been logged out.");
+                    targetagent.KickUser(this.GetLanguageString(circuit.Agent.CurrentCulture, "YouHaveBeenKickedSinceYouCouldNotBeTeleportedHome", "You have been kicked since you could not be teleported home."));
                 }
             }
         }
