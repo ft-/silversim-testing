@@ -960,6 +960,26 @@ namespace SilverSim.Viewer.Core
             return new UUID("366ac8e9-b391-11dc-8314-0800200c9a66");
         }
 
+        private UUID CreateDefaultGestureForInventory(InventoryItem item)
+        {
+            Gesture gesture = new Gesture();
+            AssetData asset = gesture;
+            asset.Name = "New Gesture";
+            asset.Creator.ID = new UUID("11111111-1111-0000-0000-000100bba000");
+            asset.ID = new UUID("cf83499a- 6547 - 4b07 - 8669 - ff1d567071d3");
+            try
+            {
+                Agent.AssetService.Store(asset);
+            }
+            catch (Exception e)
+            {
+                SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInv"));
+                m_Log.Error("Failed to create asset for gesture", e);
+                return UUID.Zero;
+            }
+            return asset.ID;
+        }
+
         private UUID CreateDefaultNotecardForInventory(InventoryItem item)
         {
             Notecard nc = new Notecard();
@@ -1037,6 +1057,10 @@ namespace SilverSim.Viewer.Core
 
                     case InventoryType.Notecard:
                         item.AssetID = CreateDefaultNotecardForInventory(item);
+                        break;
+
+                    case InventoryType.Gesture:
+                        item.AssetID = CreateDefaultGestureForInventory(item);
                         break;
 
                     default:
