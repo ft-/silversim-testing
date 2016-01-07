@@ -483,9 +483,9 @@ namespace SilverSim.Viewer.Core
             SceneInterface scene = circuit.Scene;
             EstateAccessDeltaFlags flags = (EstateAccessDeltaFlags)int.Parse(req.ParamList[1].FromUTF8Bytes());
             UUID prey = UUID.Parse(req.ParamList[2].FromUTF8Bytes());
-            UUI uui;
-            UGI ugi;
-            if(!scene.GroupsNameService.TryGetValue(prey, out ugi) &&
+            UUI uui = UUI.Unknown;
+            UGI ugi = UGI.Unknown;
+            if((null == scene.GroupsNameService || !scene.GroupsNameService.TryGetValue(prey, out ugi)) &&
                 (flags & (EstateAccessDeltaFlags.AddGroup | EstateAccessDeltaFlags.RemoveGroup)) != 0)
             {
                 circuit.Agent.SendAlertMessage("Changing estate access not possible since group not known", scene.ID);
