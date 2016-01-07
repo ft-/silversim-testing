@@ -6,6 +6,7 @@ using SilverSim.Types;
 using SilverSim.Types.Parcel;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Parcel;
+using System;
 using System.Collections.Generic;
 
 namespace SilverSim.Viewer.Core
@@ -30,10 +31,10 @@ namespace SilverSim.Viewer.Core
                 pInfo.SalePrice = req.SalePrice;
                 pInfo.Name = req.Name;
                 pInfo.Description = req.Description;
-                pInfo.MusicURI = (req.MusicURL.Length != 0) ?
+                pInfo.MusicURI = (req.MusicURL.Length != 0) && Uri.IsWellFormedUriString(req.MusicURL, UriKind.Absolute) ?
                         new URI(req.MusicURL) : null;
 
-                pInfo.MediaURI = (req.MediaURL.Length != 0) ?
+                pInfo.MediaURI = (req.MediaURL.Length != 0) && Uri.IsWellFormedUriString(req.MediaURL, UriKind.Absolute) ?
                     new URI(req.MediaURL) : null;
                 pInfo.MediaAutoScale = req.MediaAutoScale;
                 UGI ugi;
