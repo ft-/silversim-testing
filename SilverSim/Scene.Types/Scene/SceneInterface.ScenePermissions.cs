@@ -71,6 +71,7 @@ namespace SilverSim.Scene.Types.Scene
             return false;
         }
 
+        /** <summary>This function also returns true if EO is passed</summary> */
         public bool IsEstateManager(UUI agent)
         {
             uint estateID;
@@ -80,6 +81,16 @@ namespace SilverSim.Scene.Types.Scene
                 EstateService.EstateOwner.TryGetValue(estateID, out estateOwner) &&
                 (agent.EqualsGrid(estateOwner) ||
                     EstateService.EstateManager[estateID, agent]));
+        }
+
+        public bool IsEstateOwner(UUI agent)
+        {
+            uint estateID;
+            UUI estateOwner;
+
+            return (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
+                EstateService.EstateOwner.TryGetValue(estateID, out estateOwner) &&
+                agent.EqualsGrid(estateOwner));
         }
 
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
