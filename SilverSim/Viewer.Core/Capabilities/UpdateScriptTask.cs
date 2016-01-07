@@ -152,7 +152,13 @@ namespace SilverSim.Viewer.Core.Capabilities
                     AnArray errors = new AnArray();
                     foreach (KeyValuePair<int, string> line in e.Messages)
                     {
-                        errors.Add(string.Format("{0}:{1}", line.Key, line.Value));
+                        int lineNumber = line.Key - 1;
+                        /* Viewer editors count lines from 0 */
+                        if (lineNumber < 0)
+                        {
+                            lineNumber = 0;
+                        }
+                        errors.Add(string.Format("{0}:{1}", lineNumber, line.Value));
                     }
                     m.Add("errors", errors);
                     m.Add("compiled", false);

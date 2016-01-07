@@ -954,25 +954,10 @@ namespace SilverSim.Viewer.Core
             return asset.ID;
         }
 
-        private const string DefaultScript = "default\n{\n    state_entry()\n    {\n        llSay(PUBLIC_CHANNEL, \"Hello, World!\");\n    }\n}\n";
         private UUID CreateDefaultScriptForInventory(InventoryItem item)
         {
-            AssetData asset = new AssetData();
-            asset.Data = DefaultScript.ToUTF8Bytes();
-            asset.Name = item.Name;
-            asset.Creator = Agent.Owner;
-            asset.ID = UUID.Random;
-            try
-            {
-                Agent.AssetService.Store(asset);
-            }
-            catch (Exception e)
-            {
-                SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInv"));
-                m_Log.Error("Failed to create asset for script", e);
-                return UUID.Zero;
-            }
-            return asset.ID;
+            /* this is the KAN-Ed llSay script */
+            return new UUID("366ac8e9-b391-11dc-8314-0800200c9a66");
         }
 
         private UUID CreateDefaultNotecardForInventory(InventoryItem item)
@@ -981,7 +966,7 @@ namespace SilverSim.Viewer.Core
             AssetData asset = nc;
             asset.Name = item.Name;
             asset.Creator = Agent.Owner;
-            asset.ID = UUID.Random;
+            asset.ID = new UUID("2f9ccdf4-5968-40c2-9ab6-b1259140d1c4");
             try
             {
                 Agent.AssetService.Store(asset);

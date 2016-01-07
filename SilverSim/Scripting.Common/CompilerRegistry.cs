@@ -264,7 +264,7 @@ namespace SilverSim.Scripting.Common
                 }
                 using (StreamReaderAddHead headReader = new StreamReaderAddHead(header, reader))
                 {
-                    SyntaxCheck(user, shbangs, assetID, headReader, linenumber);
+                    Compile(user, shbangs, assetID, headReader, linenumber);
                 }
             }
 
