@@ -31,7 +31,7 @@ namespace SilverSim.Types.Primitive
         AllowInventoryDrop = 1 << 16,
         ObjectTransfer = 1 << 17,
         ObjectGroupOwned = 1 << 18,
-        CameraDecoupled = 1 << 20,
+        CameraDecoupled = 1 << 20, /* this is coupled to VehicleFlags.CameraDecoupled */
         AnimSource = 1 << 21,
         CameraSource = 1 << 22,
         ObjectOwnerModify = 1 << 28,

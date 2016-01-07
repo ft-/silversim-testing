@@ -106,7 +106,11 @@ namespace SilverSim.Viewer.Core
                 }
                 Types.Primitive.PrimitiveFlags flags = (Types.Primitive.PrimitiveFlags)BitConverter.ToUInt32(b, 0);
 
-                if (kvp.Key.Part.Owner.EqualsGrid(Agent.Owner))
+                if(kvp.Key.Part.ObjectGroup.IsGroupOwned)
+                {
+                    flags |= Types.Primitive.PrimitiveFlags.ObjectGroupOwned;
+                }
+                if (kvp.Key.Part.Owner.EqualsGrid(Agent.Owner) && !kvp.Key.Part.ObjectGroup.IsGroupOwned)
                 {
                     flags |= Types.Primitive.PrimitiveFlags.ObjectYouOwner;
                     if ((kvp.Key.Part.OwnerMask & InventoryPermissionsMask.Move) != 0)
