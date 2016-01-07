@@ -964,8 +964,8 @@ namespace SilverSim.Viewer.Core
         {
             Notecard nc = new Notecard();
             AssetData asset = nc;
-            asset.Name = item.Name;
-            asset.Creator = Agent.Owner;
+            asset.Name = "New Note";
+            asset.Creator.ID = new UUID("11111111-1111-0000-0000-000100bba000");
             asset.ID = new UUID("2f9ccdf4-5968-40c2-9ab6-b1259140d1c4");
             try
             {
