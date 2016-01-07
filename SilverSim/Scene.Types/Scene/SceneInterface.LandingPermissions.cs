@@ -216,9 +216,13 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
+            /* only block teleport destination when not EM, EO or RO */
             if(null == selectedParcel)
             {
-                throw new ParcelAccessDeniedException(this.GetLanguageString(agent.CurrentCulture, "NoParcelsForTeleportingToFound", "No parcels for teleporting to found."));
+                if ((!IsEstateManager(agent.Owner) && !agent.Owner.EqualsGrid(Owner)) || !Parcels.TryGetValue(destinationLocation, out selectedParcel))
+                {
+                    throw new ParcelAccessDeniedException(this.GetLanguageString(agent.CurrentCulture, "NoParcelsForTeleportingToFound", "No parcels for teleporting to found."));
+                }
             }
             return selectedParcel;
         }
@@ -229,6 +233,11 @@ namespace SilverSim.Scene.Types.Scene
             uint estateID = EstateService.RegionMap[ID];
             EstateInfo estateInfo = EstateService[estateID];
 
+            if(Owner.EqualsGrid(agentOwner) || IsEstateManager(agentOwner))
+            {
+                /* EM, EO and RO should never be blocked by estate access rights */
+                return estateInfo;
+            }
             if (!estateInfo.IsPublicAllowed &&
                 !EstateService.EstateAccess[estateID, agentOwner])
             {
