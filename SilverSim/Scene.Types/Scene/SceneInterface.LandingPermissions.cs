@@ -286,6 +286,8 @@ namespace SilverSim.Scene.Types.Scene
                 bool foundTelehub = false;
 
                 estateInfo = CheckEstateRights(agent);
+
+                #region Telehub logic
                 if(RegionSettings.TelehubObject != UUID.Zero && (estateInfo.Flags & RegionOptionFlags.AllowDirectTeleport) == 0)
                 {
                     IObject obj;
@@ -388,6 +390,7 @@ namespace SilverSim.Scene.Types.Scene
                         }
                     }
                 }
+                #endregion
 
                 if(!CheckParcelAccessRights(agent, p) && !foundTelehub)
                 {
