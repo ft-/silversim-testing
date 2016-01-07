@@ -14,9 +14,9 @@ namespace SilverSim.Types.Estate
             RegionOptionFlags.AllowVoice |
             RegionOptionFlags.ExternallyVisible;
         public UUI Owner = UUI.Unknown;
-        public int PricePerMeter;
+        public int PricePerMeter = 1;
         public double BillableFactor = 1;
-        public double SunPosition = 0;
+        public double SunPosition;
         public string AbuseEmail = string.Empty;
         public bool UseGlobalTime = true;
         public UUID CovenantID = UUID.Zero;

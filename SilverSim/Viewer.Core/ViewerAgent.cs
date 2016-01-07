@@ -1479,15 +1479,14 @@ namespace SilverSim.Viewer.Core
             AgentCircuit circuit;
             if (Circuits.TryGetValue(rhr.ReceivedOnCircuitCode, out circuit))
             {
-                /* Add our agent to scene */
-                circuit.Scene.SendAllParcelOverlaysTo(this);
-                circuit.Scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
-                circuit.Scene.Environment.UpdateWindDataToSingleClient(this);
-                circuit.Scene.SendAgentObjectToAllAgents(this);
-                ParcelInfo pinfo;
                 SceneInterface scene = circuit.Scene;
-                EstateServiceInterface estateService = scene.EstateService;
-                if(circuit.Scene.Parcels.TryGetValue(GlobalPosition, out pinfo))
+                /* Add our agent to scene */
+                scene.SendAllParcelOverlaysTo(this);
+                scene.Terrain.UpdateTerrainDataToSingleClient(this, true);
+                scene.Environment.UpdateWindDataToSingleClient(this);
+                scene.SendAgentObjectToAllAgents(this);
+                ParcelInfo pinfo;
+                if(scene.Parcels.TryGetValue(GlobalPosition, out pinfo))
                 {
                     ParcelProperties props = scene.ParcelInfo2ParcelProperties(Owner.ID, pinfo, NextParcelSequenceId, ParcelProperties.RequestResultType.Single);
                     circuit.SendMessage(props);

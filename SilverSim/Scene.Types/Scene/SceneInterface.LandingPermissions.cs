@@ -217,12 +217,12 @@ namespace SilverSim.Scene.Types.Scene
             }
 
             /* only block teleport destination when not EM, EO or RO */
-            if(null == selectedParcel)
+            if(null == selectedParcel &&
+                (
+                    (!IsEstateManager(agent.Owner) && !agent.Owner.EqualsGrid(Owner)) || !Parcels.TryGetValue(destinationLocation, out selectedParcel)
+                ))
             {
-                if ((!IsEstateManager(agent.Owner) && !agent.Owner.EqualsGrid(Owner)) || !Parcels.TryGetValue(destinationLocation, out selectedParcel))
-                {
-                    throw new ParcelAccessDeniedException(this.GetLanguageString(agent.CurrentCulture, "NoParcelsForTeleportingToFound", "No parcels for teleporting to found."));
-                }
+                throw new ParcelAccessDeniedException(this.GetLanguageString(agent.CurrentCulture, "NoParcelsForTeleportingToFound", "No parcels for teleporting to found."));
             }
             return selectedParcel;
         }
