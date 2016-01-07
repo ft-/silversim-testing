@@ -79,6 +79,72 @@ namespace SilverSim.Types.StructuredData.Llsd
             }
         }
 
+        private static IValue DeserializeBinary(XmlTextReader reader)
+        {
+            string attrname = string.Empty;
+            string encoding = "base64";
+            while (reader.ReadAttributeValue())
+            {
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Attribute:
+                        attrname = reader.Value;
+                        break;
+
+                    case XmlNodeType.Text:
+                        switch (attrname)
+                        {
+                            case "encoding":
+                                encoding = reader.Value;
+                                break;
+
+                            default:
+                                break;
+                        }
+                        break;
+
+                    default:
+                        break;
+                }
+            }
+
+            if(encoding != "base64")
+            {
+                throw new InvalidLlsdXmlSerializationException("Unsupported binary encoding " + encoding);
+            }
+
+            while (true)
+            {
+                if (!reader.Read())
+                {
+                    throw new InvalidLlsdXmlSerializationException();
+                }
+                switch (reader.NodeType)
+                {
+                    case XmlNodeType.Element:
+                        reader.ReadToEndElement();
+                        break;
+
+                    case XmlNodeType.Text:
+                        return new BinaryData(Convert.FromBase64String(reader.ReadContentAsString()));
+
+                    case XmlNodeType.EndElement:
+                        if (reader.Name != "binary")
+                        {
+                            throw new InvalidLlsdXmlSerializationException();
+                        }
+                        else
+                        {
+                            return new BinaryData();
+                        }
+
+                    default:
+                        break;
+                }
+            }
+
+        }
+
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
         private static IValue DeserializeInternal(XmlTextReader input)
         {
@@ -117,6 +183,13 @@ namespace SilverSim.Types.StructuredData.Llsd
                                 break;
                         }
                     }
+
+                case "binary":
+                    if(input.IsEmptyElement)
+                    {
+                        return new BinaryData();
+                    }
+                    return DeserializeBinary(input);
 
                 case "boolean":
                     if(input.IsEmptyElement)
