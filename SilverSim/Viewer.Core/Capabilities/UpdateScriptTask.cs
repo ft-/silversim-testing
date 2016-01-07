@@ -164,7 +164,7 @@ namespace SilverSim.Viewer.Core.Capabilities
                 {
                     m_Log.ErrorFormat("Unexpected exception: {0}: {1}\n{2}", e.GetType().FullName, e.Message, e.StackTrace);
                     AnArray errors = new AnArray();
-                    errors.Add("0: Unexpected compiler error " + e.GetType().Name);
+                    errors.Add("0:Unexpected compiler error " + e.GetType().Name);
                     m.Add("errors", errors);
                     m.Add("compiled", false);
                 }
