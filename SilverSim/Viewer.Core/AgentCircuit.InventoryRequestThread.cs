@@ -969,7 +969,7 @@ namespace SilverSim.Viewer.Core
             catch (Exception e)
             {
                 SendMessage(new Messages.Alert.AlertMessage("ALERT: CantCreateRequestedInv"));
-                m_Log.Error("Failed to create asset for notecard", e);
+                m_Log.Error("Failed to create asset for script", e);
                 return UUID.Zero;
             }
             return asset.ID;
