@@ -1198,6 +1198,18 @@ namespace SilverSim.Scene.Implementation.Basic
             }
             this.LoadSceneAsync(m_SimulationDataStorage);
         }
+
+        /** <summary>for testing purposes only</summary> */
+        public override void LoadSceneSync()
+        {
+            if (null != m_NeighborService)
+            {
+                RegionInfo rInfo = GetRegionInfo();
+                rInfo.Flags |= RegionFlags.RegionOnline;
+                m_NeighborService.NotifyNeighborStatus(rInfo);
+            }
+            this.LoadSceneSync(m_SimulationDataStorage);
+        }
         #endregion
 
         #region Scene LL Message interface

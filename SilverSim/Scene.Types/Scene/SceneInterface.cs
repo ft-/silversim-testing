@@ -183,6 +183,7 @@ namespace SilverSim.Scene.Types.Scene
         }
 
         public abstract void LoadSceneAsync();
+        public abstract void LoadSceneSync();
 
         #region Physics
         IPhysicsScene m_PhysicsScene;
