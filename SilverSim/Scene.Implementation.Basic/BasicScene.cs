@@ -526,6 +526,23 @@ namespace SilverSim.Scene.Implementation.Basic
             SceneCapabilities.Add("SimulatorFeatures", new SimulatorFeatures(string.Empty, string.Empty, string.Empty, true));
             Terrain.TerrainListeners.Add(this);
             SceneListeners.Add(m_SimulationDataStorage);
+            uint estateID;
+            EstateInfo estate;
+
+            /* load estate flags cache */
+            if (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
+                EstateService.TryGetValue(estateID, out estate))
+            {
+                m_EstateData = estate;
+            }
+            else
+            {
+                m_EstateData.ID = 1;
+                m_EstateData.ParentEstateID = 1;
+                m_EstateData.BillableFactor = 1;
+                m_EstateData.PricePerMeter = 1;
+            }
+
             ScriptThreadPool = new ScriptWorkerThreadPool(50, 150);
             new Thread(StoreTerrainProcess).Start();
             if(null != physicsFactory)
@@ -995,7 +1012,7 @@ namespace SilverSim.Scene.Implementation.Basic
             pi.ID = UUID.Random;
             pi.Name = "Your Parcel";
             pi.Owner = Owner;
-            pi.Flags = ParcelFlags.None; /* we keep all flags disabled initially */
+            pi.Flags = FilterParcelFlags(ParcelFlags.None); /* we keep all flags disabled initially */
             pi.BillableArea = (int)(SizeX * SizeY);
             pi.LandBitmap.SetAllBits();
             pi.LandingPosition = new Vector3(128, 128, 23);
@@ -1016,6 +1033,7 @@ namespace SilverSim.Scene.Implementation.Basic
             {
                 if (m_Parcels.ContainsKey(pInfo.ID))
                 {
+                    pInfo.Flags = FilterParcelFlags(pInfo.Flags);
                     m_SimulationDataStorage.Parcels.Store(ID, pInfo);
                 }
             }
@@ -1155,6 +1173,30 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override void TriggerEstateUpdate()
         {
+            uint estateID;
+            EstateInfo estateInfo;
+            lock(m_EstateDataUpdateLock)
+            {
+                try /* we need a fail protection here */
+                {
+                    if (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
+                       EstateService.TryGetValue(estateID, out estateInfo))
+                    {
+                        lock(m_EstateDataUpdateLock)
+                        {
+                            m_EstateData = estateInfo;
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    m_Log.WarnFormat("Exception when accessing EstateService: {0}: {1}\n{2}",
+                        e.GetType().FullName,
+                        e.Message,
+                        e.StackTrace);
+                }
+            }
+
             foreach (IAgent agent in Agents)
             {
                 ViewerAgent viewerAgent = agent as ViewerAgent;
@@ -1194,23 +1236,10 @@ namespace SilverSim.Scene.Implementation.Basic
 
         public override RegionOptionFlags GetRegionFlags()
         {
-            EstateInfo estateInfo;
-            uint estateID;
-            RegionOptionFlags regionFlags = RegionOptionFlags.None;
-            try /* we need a fail protection here */
+            RegionOptionFlags regionFlags;
+            lock(m_EstateDataUpdateLock)
             {
-                if (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
-                   EstateService.TryGetValue(estateID, out estateInfo))
-                {
-                    regionFlags = estateInfo.Flags;
-                }
-            }
-            catch (Exception e)
-            {
-                m_Log.WarnFormat("Exception when accessing EstateService: {0}: {1}\n{2}",
-                    e.GetType().FullName,
-                    e.Message,
-                    e.StackTrace);
+                regionFlags = m_EstateData.Flags;
             }
             regionFlags &= ~RegionOptionFlags.SunFixed;
             regionFlags |= RegionSettings.AsFlags;
@@ -1227,42 +1256,20 @@ namespace SilverSim.Scene.Implementation.Basic
             res.AgentID = agent.Owner.ID;
             res.SessionID = agent.SessionID;
 
-            uint estateID;
             EstateInfo estateInfo;
-            RegionOptionFlags estateFlags = RegionOptionFlags.None;
-            try /* we need a fail protection here */
+            lock(m_EstateDataUpdateLock)
             {
-                if (EstateService.RegionMap.TryGetValue(ID, out estateID) &&
-                   EstateService.TryGetValue(estateID, out estateInfo))
-                {
-                    res.EstateID = estateID;
-                    res.ParentEstateID = estateInfo.ParentEstateID;
-                    res.BillableFactor = estateInfo.BillableFactor;
-                    res.PricePerMeter = estateInfo.PricePerMeter;
-                    estateFlags = estateInfo.Flags;
-                }
-                else
-                {
-                    res.EstateID = 1;
-                    res.ParentEstateID = 1;
-                    res.BillableFactor = 1;
-                    res.PricePerMeter = 1;
-                }
+                estateInfo = m_EstateData;
             }
-            catch(Exception e)
-            {
-                m_Log.WarnFormat("Exception when accessing EstateService: {0}: {1}\n{2}",
-                    e.GetType().FullName,
-                    e.Message,
-                    e.StackTrace);
-                res.EstateID = 1;
-                res.ParentEstateID = 1;
-                res.BillableFactor = 1;
-                res.PricePerMeter = 1;
-            }
-            estateFlags &= ~RegionOptionFlags.SunFixed;
+
+            res.EstateID = estateInfo.ID;
+            res.ParentEstateID = estateInfo.ParentEstateID;
+            res.BillableFactor = estateInfo.BillableFactor;
+            res.PricePerMeter = estateInfo.PricePerMeter;
+
+            estateInfo.Flags &= ~RegionOptionFlags.SunFixed;
             res.SimName = Name;
-            res.RegionFlags = RegionSettings.AsFlags | estateFlags;
+            res.RegionFlags = RegionSettings.AsFlags | estateInfo.Flags;
             if(RegionSettings.IsSunFixed)
             {
                 res.RegionFlags |= RegionOptionFlags.SunFixed;
@@ -1283,7 +1290,7 @@ namespace SilverSim.Scene.Implementation.Basic
             res.UseEstateSun = RegionSettings.UseEstateSun;
             res.ProductSKU = VersionInfo.SimulatorVersion;
             res.ProductName = ProductName;
-            res.RegionFlagsExtended.Add((ulong)(RegionSettings.AsFlags | estateFlags));
+            res.RegionFlagsExtended.Add((ulong)(RegionSettings.AsFlags | estateInfo.Flags));
 
             agent.SendMessageAlways(res, ID);
         }
