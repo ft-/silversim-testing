@@ -9,6 +9,7 @@ namespace SilverSim.Scene.Types.Scene
 {
     public abstract partial class SceneInterface
     {
+        public TerrainController Terrain;
         public EnvironmentController Environment;
 
         public void UpdateEnvironmentSettings()
