@@ -5,6 +5,7 @@ using SilverSim.Scene.Types.Agent;
 using SilverSim.Scene.Types.WindLight;
 using SilverSim.Threading;
 using SilverSim.Types;
+using SilverSim.Types.Estate;
 using SilverSim.Viewer.Messages;
 using SilverSim.Viewer.Messages.Generic;
 using SilverSim.Viewer.Messages.LayerData;
@@ -19,6 +20,26 @@ namespace SilverSim.Scene.Types.Scene
     public abstract partial class SceneInterface
     {
         public EnvironmentController Environment;
+
+        public void UpdateEnvironmentSettings()
+        {
+            if(RegionSettings.UseEstateSun)
+            {
+                uint estateID;
+                EstateInfo estate;
+                if(EstateService.RegionMap.TryGetValue(ID, out estateID) &&
+                    EstateService.TryGetValue(estateID, out estate))
+                {
+                    Environment.FixedSunPosition = estate.SunPosition;
+                    Environment.IsSunFixed = (estate.Flags & RegionOptionFlags.SunFixed) != 0;
+                }
+            }
+            else
+            {
+                Environment.FixedSunPosition = RegionSettings.SunPosition;
+                Environment.IsSunFixed = RegionSettings.IsSunFixed;
+            }
+        }
 
         EnvironmentSettings m_EnvironmentSettings;
 
@@ -365,8 +386,9 @@ namespace SilverSim.Scene.Types.Scene
                     m_CountedTicks = 0;
                 }
 
-                if(newTickCount - m_LastSunUpdateTickCount >= m_SunUpdateEveryMsecs)
+                if(newTickCount - m_LastSunUpdateTickCount >= m_SunUpdateEveryMsecs || m_ImmediateSunUpdate)
                 {
+                    m_ImmediateSunUpdate = false;
                     m_LastSunUpdateTickCount = newTickCount;
                     UpdateSunDirection();
                     if(m_SunUpdatesUntilSendSimTime-- == 0)
@@ -444,12 +466,27 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     lock(this)
                     {
+#if DEBUG
+                        m_Log.DebugFormat("FixedSunPosition set to {0}h Position", value);
+#endif
                         m_SunData.FixedSunPhase = (value * Math.PI / 12) % (2 * Math.PI);
                     }
                 }
             }
 
-            public bool IsSunFixed { get; set; }
+            bool m_ImmediateSunUpdate;
+            public bool IsSunFixed
+            {
+                get
+                {
+                    return m_SunData.IsSunFixed;
+                }
+                set
+                {
+                    m_SunData.IsSunFixed = value;
+                    m_ImmediateSunUpdate = true;
+                }
+            }
 
             public void UpdateSunDirection()
             {

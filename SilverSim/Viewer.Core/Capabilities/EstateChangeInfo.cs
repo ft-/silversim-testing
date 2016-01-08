@@ -55,7 +55,7 @@ namespace SilverSim.Viewer.Core.Capabilities
             }
 
             string estateName = reqmap["estate_name"].ToString();
-            double sun_hour = reqmap["sun_hour"].AsReal;
+            double sun_hour = reqmap["sun_hour"].AsReal - 6;
             bool isSunFixed = reqmap["is_sun_fixed"].AsBoolean;
             bool isExternallyVisible = reqmap["is_externally_visible"].AsBoolean;
             bool allowDirectTeleport = reqmap["allow_direct_teleport"].AsBoolean;

@@ -277,6 +277,7 @@ namespace SilverSim.Main.Common
                     }
                 }
 
+                loadparams.Scene.UpdateEnvironmentSettings();
                 loadparams.Scene.LoginControl.Ready(SceneInterface.ReadyFlags.SceneObjects);
             }
             finally

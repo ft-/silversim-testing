@@ -1163,6 +1163,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     SendRegionInfo(viewerAgent);
                 }
             }
+            UpdateEnvironmentSettings();
         }
 
         public override void TriggerRegionDataChanged()
@@ -1188,6 +1189,7 @@ namespace SilverSim.Scene.Implementation.Basic
                     SendRegionInfo(viewerAgent);
                 }
             }
+            UpdateEnvironmentSettings();
         }
 
         protected void SendRegionInfo(ViewerAgent agent)
@@ -1229,8 +1231,13 @@ namespace SilverSim.Scene.Implementation.Basic
                 res.BillableFactor = 1;
                 res.PricePerMeter = 1;
             }
+            estateFlags &= ~RegionOptionFlags.SunFixed;
             res.SimName = Name;
             res.RegionFlags = RegionSettings.AsFlags | estateFlags;
+            if(RegionSettings.IsSunFixed)
+            {
+                res.RegionFlags |= RegionOptionFlags.SunFixed;
+            }
             res.SimAccess = Access;
             res.MaxAgents = (uint)RegionSettings.AgentLimit;
             res.ObjectBonusFactor = RegionSettings.ObjectBonus;
@@ -1239,9 +1246,8 @@ namespace SilverSim.Scene.Implementation.Basic
             res.TerrainLowerLimit = RegionSettings.TerrainLowerLimit;
             res.RedirectGridX = 0;
             res.RedirectGridY = 0;
-#warning Change this to connect to Estate sun setting
             res.UseEstateSun = RegionSettings.UseEstateSun;
-            res.SunHour = RegionSettings.SunPosition;
+            res.SunHour = RegionSettings.SunPosition + 6;
             res.ProductSKU = VersionInfo.SimulatorVersion;
             res.ProductName = ProductName;
             res.RegionFlagsExtended.Add((ulong)(RegionSettings.AsFlags | estateFlags));
