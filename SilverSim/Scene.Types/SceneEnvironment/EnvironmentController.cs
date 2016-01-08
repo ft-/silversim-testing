@@ -141,7 +141,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
         {
             get
             {
-                lock (this)
+                lock (m_EnvironmentLock)
                 {
                     return m_EnvironmentFps;
                 }

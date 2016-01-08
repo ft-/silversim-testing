@@ -180,7 +180,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             double radius = sunDirection.Length;
             sunDirection = sunDirection.Normalize();
             sunVelocity *= (1 / radius);
-            lock (this)
+            lock (m_EnvironmentLock)
             {
                 m_SunData.SunPhase = sun_phase;
                 m_SunData.SunDirection = sunDirection;
