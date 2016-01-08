@@ -157,17 +157,18 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                 }
             }
 
-            lock(m_LightShareLock)
+            Quaternion tiltRot = new Quaternion(tilt, 1, 0, 0);
+
+            lock (m_LightShareLock)
             {
                 if (m_WindlightValid)
                 {
                     sun_phase = m_SkyWindlight.SunMoonPosition;
+                    tiltRot = Quaternion.CreateFromEulers(0, 0, m_SkyWindlight.EastAngle);
                 }
             }
 
             Vector3 sunDirection = new Vector3(Math.Cos(-sun_phase), Math.Sin(-sun_phase), 0);
-            Quaternion tiltRot = new Quaternion(tilt, 1, 0, 0);
-
             sunDirection *= tiltRot;
             Vector3 sunVelocity = new Vector3(0, 0, DailyOmega);
             if (sunFixed || m_WindlightValid)

@@ -1054,6 +1054,24 @@ namespace SilverSim.Scene.Implementation.Basic
             }
         }
 
+        readonly object m_LightShareStoreLock = new object();
+        public override void TriggerLightShareSettingsChanged()
+        {
+            lock(m_LightShareStoreLock)
+            {
+                if (Environment.IsWindLightValid)
+                {
+                    EnvironmentController.WindlightSkyData skyData = Environment.SkyData;
+                    EnvironmentController.WindlightWaterData waterData = Environment.WaterData;
+                    m_SimulationDataStorage.LightShare.Store(ID, skyData, waterData);
+                }
+                else
+                {
+                    m_SimulationDataStorage.LightShare.Remove(ID);
+                }
+            }
+        }
+
         public override void ClearObjects()
         {
             List<ObjectGroup> objects = new List<ObjectGroup>();

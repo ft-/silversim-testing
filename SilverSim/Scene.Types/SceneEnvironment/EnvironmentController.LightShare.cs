@@ -231,6 +231,22 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
         }
 
+        public bool IsWindLightValid
+        {
+            get
+            {
+                m_LightShareLock.AcquireReaderLock(-1);
+                try
+                {
+                    return m_WindlightValid;
+                }
+                finally
+                {
+                    m_LightShareLock.ReleaseReaderLock();
+                }
+            }
+        }
+
         public WindlightSkyData SkyData
         {
             get
