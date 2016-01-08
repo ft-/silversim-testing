@@ -183,10 +183,10 @@ namespace SilverSim.Database.MySQL.SimulationData
 
                                     objgroupID = MySQLUtilities.GetUUID(dbReader, "id");
                                     ObjectGroup objgroup = new ObjectGroup();
-                                    objgroup.IsVolumeDetect = MySQLUtilities.GetBoolean(dbReader, "IsVolumeDetect");
-                                    objgroup.IsPhantom = MySQLUtilities.GetBoolean(dbReader, "IsPhantom");
-                                    objgroup.IsPhysics = MySQLUtilities.GetBoolean(dbReader, "IsPhysics");
-                                    objgroup.IsTempOnRez = MySQLUtilities.GetBoolean(dbReader, "IsTempOnRez");
+                                    objgroup.IsVolumeDetect = MySQLUtilities.GetBool(dbReader, "IsVolumeDetect");
+                                    objgroup.IsPhantom = MySQLUtilities.GetBool(dbReader, "IsPhantom");
+                                    objgroup.IsPhysics = MySQLUtilities.GetBool(dbReader, "IsPhysics");
+                                    objgroup.IsTempOnRez = MySQLUtilities.GetBool(dbReader, "IsTempOnRez");
                                     objgroup.Owner = dbReader.GetUUI("Owner");
                                     objgroup.LastOwner = new UUI((string)dbReader["LastOwner"]);
                                     objgroup.Group = dbReader.GetUGI("Group");
@@ -410,10 +410,10 @@ namespace SilverSim.Database.MySQL.SimulationData
                             }
 
                             objgroup = new ObjectGroup();
-                            objgroup.IsVolumeDetect = MySQLUtilities.GetBoolean(dbReader, "IsVolumeDetect");
-                            objgroup.IsPhantom = MySQLUtilities.GetBoolean(dbReader, "IsPhantom");
-                            objgroup.IsPhysics = MySQLUtilities.GetBoolean(dbReader, "IsPhysics");
-                            objgroup.IsTempOnRez = MySQLUtilities.GetBoolean(dbReader, "IsTempOnRez");
+                            objgroup.IsVolumeDetect = MySQLUtilities.GetBool(dbReader, "IsVolumeDetect");
+                            objgroup.IsPhantom = MySQLUtilities.GetBool(dbReader, "IsPhantom");
+                            objgroup.IsPhysics = MySQLUtilities.GetBool(dbReader, "IsPhysics");
+                            objgroup.IsTempOnRez = MySQLUtilities.GetBool(dbReader, "IsTempOnRez");
                             objgroup.Owner = dbReader.GetUUI("Owner");
                             objgroup.LastOwner = new UUI((string)dbReader["LastOwner"]);
                             objgroup.Group = dbReader.GetUGI("Group");

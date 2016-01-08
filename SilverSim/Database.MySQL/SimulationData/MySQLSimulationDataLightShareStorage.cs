@@ -52,14 +52,14 @@ namespace SilverSim.Database.MySQL.SimulationData
                         skyData.CloudDetailXYDensity.Y = reader.GetDouble("CloudDetailXYDensityY");
                         skyData.CloudScale = reader.GetDouble("CloudScale");
                         skyData.CloudScrollX = reader.GetDouble("CloudScrollX");
-                        skyData.CloudScrollXLock = MySQLUtilities.GetBoolean(reader, "CloudScrollXLock");
+                        skyData.CloudScrollXLock = MySQLUtilities.GetBool(reader, "CloudScrollXLock");
                         skyData.CloudScrollY = reader.GetDouble("CloudScrollY");
-                        skyData.CloudScrollYLock = MySQLUtilities.GetBoolean(reader, "CloudScrollYLock");
+                        skyData.CloudScrollYLock = MySQLUtilities.GetBool(reader, "CloudScrollYLock");
                         skyData.CloudXYDensity.X = reader.GetDouble("CloudXYDensityX");
                         skyData.CloudXYDensity.Y = reader.GetDouble("CloudXYDensityY");
                         skyData.DensityMultiplier = reader.GetDouble("DensityMultiplier");
                         skyData.DistanceMultiplier = reader.GetDouble("DistanceMultiplier");
-                        skyData.DrawClassicClouds = MySQLUtilities.GetBoolean(reader, "DrawClassicClouds");
+                        skyData.DrawClassicClouds = MySQLUtilities.GetBool(reader, "DrawClassicClouds");
                         skyData.EastAngle = reader.GetDouble("EastAngle");
                         skyData.HazeDensity = reader.GetDouble("HazeDensity");
                         skyData.HazeHorizon = reader.GetDouble("HazeHorizon");
@@ -109,14 +109,14 @@ namespace SilverSim.Database.MySQL.SimulationData
                 data["CloudDetailXYDensityY"] = skyData.CloudDetailXYDensity.Y;
                 data["CloudScale"] = skyData.CloudScale;
                 data["CloudScrollX"] = skyData.CloudScrollX;
-                data["CloudScrollXLock"] = skyData.CloudScrollXLock ? 1 : 0;
+                data["CloudScrollXLock"] = skyData.CloudScrollXLock;
                 data["CloudScrollY"] = skyData.CloudScrollY;
-                data["CloudScrollYLock"] = skyData.CloudScrollYLock ? 1 : 0;
+                data["CloudScrollYLock"] = skyData.CloudScrollYLock;
                 data["CloudXYDensityX"] = skyData.CloudXYDensity.X;
                 data["CloudXYDensityY"] = skyData.CloudXYDensity.Y;
                 data["DensityMultiplier"] = skyData.DensityMultiplier;
                 data["DistanceMultiplier"] = skyData.DistanceMultiplier;
-                data["DrawClassicClouds"] = skyData.DrawClassicClouds ? 1 : 0;
+                data["DrawClassicClouds"] = skyData.DrawClassicClouds;
                 data["EastAngle"] = skyData.EastAngle;
                 data["HazeDensity"] = skyData.HazeDensity;
                 data["HazeHorizon"] = skyData.HazeHorizon;
@@ -192,7 +192,11 @@ namespace SilverSim.Database.MySQL.SimulationData
                 "UnderwaterFogModifier DOUBLE NOT NULL, " +
                 "WaterColorRed DOUBLE NOT NULL, WaterColorGreen DOUBLE NOT NULL, WaterColorBlue DOUBLE NOT NULL," +
                 "FogDensityExponent DOUBLE NOT NULL," +
-                "PRIMARY KEY(RegionID))"
+                "PRIMARY KEY(RegionID))",
+            "ALTER TABLE %tablename% ADD COLUMN (BlueDensityRed DOUBLE NOT NULL, " +
+                            "BlueDensityGreen DOUBLE NOT NULL," +
+                            "BlueDensityBlue DOUBLE NOT NULL," +
+                            "BlueDensityValue DOUBLE NOT NULL),",
         };
     }
 }

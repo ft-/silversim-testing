@@ -51,6 +51,7 @@ namespace SilverSim.Database.MySQL
         }
         #endregion
 
+        #region Exceptions
         [Serializable]
         public class MySQLInsertException : Exception
         {
@@ -131,6 +132,7 @@ namespace SilverSim.Database.MySQL
 
             }
         }
+        #endregion
 
         #region Transaction Helper
         [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
@@ -213,7 +215,7 @@ namespace SilverSim.Database.MySQL
                 }
                 else if (t == typeof(bool))
                 {
-                    mysqlparam.AddWithValue("?v_" + kvp.Key, (bool)kvp.Value ? 1 : 0);
+                    mysqlparam.AddWithValue("?v_" + key, (bool)value ? 1 : 0);
                 }
                 else if (t == typeof(UUID) || t == typeof(UUI) || t == typeof(UGI))
                 {
@@ -300,6 +302,17 @@ namespace SilverSim.Database.MySQL
                     q2 += "?v_" + key + "Green,";
                     q1 += "`" + key + "Blue`";
                     q2 += "?v_" + key + "Blue";
+                }
+                else if(t == typeof(EnvironmentController.WLVector4))
+                {
+                    q1 += "`" + key + "Red`,";
+                    q2 += "?v_" + key + "Red,";
+                    q1 += "`" + key + "Green`,";
+                    q2 += "?v_" + key + "Green,";
+                    q1 += "`" + key + "Blue`,";
+                    q2 += "?v_" + key + "Blue,";
+                    q1 += "`" + key + "Value`";
+                    q2 += "?v_" + key + "Value";
                 }
                 else if (t == typeof(ColorAlpha))
                 {
@@ -394,6 +407,13 @@ namespace SilverSim.Database.MySQL
                     q1 += "`" + key + "Green` = ?v_" + key + "Green,";
                     q1 += "`" + key + "Blue` = ?v_" + key + "Blue";
                 }
+                else if (t == typeof(EnvironmentController.WLVector4))
+                {
+                    q1 += "`" + key + "Red` = ?v_" + key + "Red,";
+                    q1 += "`" + key + "Green` = ?v_" + key + "Green,";
+                    q1 += "`" + key + "Blue` = ?v_" + key + "Blue,";
+                    q1 += "`" + key + "Value` = ?v_" + key + "Value";
+                }
                 else if (t == typeof(ColorAlpha))
                 {
                     q1 += "`" + key + "Red` = ?v_" + key + "Red,";
@@ -472,6 +492,13 @@ namespace SilverSim.Database.MySQL
                     q1 += "`" + key + "Blue` = ?v_" + key + "Blue,";
                     q1 += "`" + key + "Alpha` = ?v_" + key + "Alpha";
                 }
+                else if (t == typeof(EnvironmentController.WLVector4))
+                {
+                    q1 += "`" + key + "Red` = ?v_" + key + "Red,";
+                    q1 += "`" + key + "Green` = ?v_" + key + "Green,";
+                    q1 += "`" + key + "Blue` = ?v_" + key + "Blue,";
+                    q1 += "`" + key + "Value` = ?v_" + key + "Value";
+                }
                 else if (kvp.Value == null)
                 {
                     /* skip */
@@ -511,10 +538,10 @@ namespace SilverSim.Database.MySQL
         public static EnvironmentController.WLVector4 GetWLVector4(this MySqlDataReader dbReader, string prefix)
         {
             return new EnvironmentController.WLVector4(
-                (double)dbReader[prefix + "R"],
-                (double)dbReader[prefix + "G"],
-                (double)dbReader[prefix + "B"],
-                (double)dbReader[prefix + "Y"]);
+                (double)dbReader[prefix + "Red"],
+                (double)dbReader[prefix + "Green"],
+                (double)dbReader[prefix + "Blue"],
+                (double)dbReader[prefix + "Value"]);
         }
 
 
@@ -633,7 +660,7 @@ namespace SilverSim.Database.MySQL
                 (double)dbReader[prefix + "Alpha"]);
         }
 
-        public static bool GetBoolean(this MySqlDataReader dbReader, string prefix)
+        public static bool GetBool(this MySqlDataReader dbReader, string prefix)
         {
             object o = dbReader[prefix];
             Type t = o != null ? o.GetType() : null;
