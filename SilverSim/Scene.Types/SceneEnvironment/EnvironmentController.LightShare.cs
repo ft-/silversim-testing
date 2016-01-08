@@ -352,8 +352,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             AddToCompiledWL(waterWindlight.RefractScaleAbove, ref mBlock, ref pos);
             AddToCompiledWL(waterWindlight.RefractScaleBelow, ref mBlock, ref pos);
             AddToCompiledWL(waterWindlight.BlurMultiplier, ref mBlock, ref pos);
-            AddToCompiledWL(waterWindlight.BigWaveDirection, ref mBlock, ref pos);
-            AddToCompiledWL(waterWindlight.LittleWaveDirection, ref mBlock, ref pos);
+            AddToCompiledWLNoZ(waterWindlight.BigWaveDirection, ref mBlock, ref pos);
+            AddToCompiledWLNoZ(waterWindlight.LittleWaveDirection, ref mBlock, ref pos);
             AddToCompiledWL(waterWindlight.NormalMapTexture, ref mBlock, ref pos);
 
             AddToCompiledWL(skyWindlight.Horizon, ref mBlock, ref pos);
@@ -377,7 +377,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             AddToCompiledWL(skyWindlight.CloudDetailXYDensity, ref mBlock, ref pos);
             AddToCompiledWL(skyWindlight.CloudScrollX, ref mBlock, ref pos);
             AddToCompiledWL(skyWindlight.CloudScrollY, ref mBlock, ref pos);
-            AddToCompiledWL(skyWindlight.MaxAltitude, ref mBlock, ref pos);
+            AddToCompiledWL((ushort)skyWindlight.MaxAltitude, ref mBlock, ref pos);
             AddToCompiledWL(skyWindlight.CloudScrollXLock, ref mBlock, ref pos);
             AddToCompiledWL(skyWindlight.CloudScrollYLock, ref mBlock, ref pos);
             AddToCompiledWL(skyWindlight.DrawClassicClouds, ref mBlock, ref pos);
@@ -397,6 +397,12 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             AddToCompiledWL(v.X, ref mBlock, ref pos);
             AddToCompiledWL(v.Y, ref mBlock, ref pos);
             AddToCompiledWL(v.Z, ref mBlock, ref pos);
+        }
+
+        private void AddToCompiledWLNoZ(Vector3 v, ref byte[] mBlock, ref int pos)
+        {
+            AddToCompiledWL(v.X, ref mBlock, ref pos);
+            AddToCompiledWL(v.Y, ref mBlock, ref pos);
         }
 
         private void AddToCompiledWL(WLVector4 v, ref byte[] mBlock, ref int pos)
@@ -433,7 +439,7 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             pos += b.Length;
         }
 
-        private void AddToCompiledWL(int v, ref byte[] mBlock, ref int pos)
+        private void AddToCompiledWL(ushort v, ref byte[] mBlock, ref int pos)
         {
             byte[] b = BitConverter.GetBytes(v);
             if (!BitConverter.IsLittleEndian)
