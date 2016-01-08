@@ -389,10 +389,15 @@ namespace SilverSim.Scene.Types.Scene
 
                 if(newTickCount - m_LastSunUpdateTickCount >= m_SunUpdateEveryMsecs || m_ImmediateSunUpdate)
                 {
-                    m_ImmediateSunUpdate = false;
+                    bool immedSendSimTime;
+                    lock (m_EnvironmentLock)
+                    {
+                        immedSendSimTime = m_ImmediateSunUpdate;
+                        m_ImmediateSunUpdate = false;
+                    }
                     m_LastSunUpdateTickCount = newTickCount;
                     UpdateSunDirection();
-                    if(m_SunUpdatesUntilSendSimTime-- == 0)
+                    if(m_SunUpdatesUntilSendSimTime-- == 0 || immedSendSimTime)
                     {
                         m_SunUpdatesUntilSendSimTime = m_SendSimTimeAfterNSunUpdates;
                         SendSimulatorTimeMessageToAllClients();
@@ -484,8 +489,14 @@ namespace SilverSim.Scene.Types.Scene
                 }
                 set
                 {
+#if DEBUG
+                    m_Log.DebugFormat("IsSunFixed set to {0}", value);
+#endif
                     m_SunData.IsSunFixed = value;
-                    m_ImmediateSunUpdate = true;
+                    lock(m_EnvironmentLock)
+                    {
+                        m_ImmediateSunUpdate = true;
+                    }
                 }
             }
 
@@ -493,7 +504,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 double DailyOmega;
                 double YearlyOmega;
-                lock (this)
+                lock (m_EnvironmentLock)
                 {
                     DailyOmega = 2f / m_SunData.SecPerDay;
                     YearlyOmega = 2f / (m_SunData.SecPerYear);
@@ -514,7 +525,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     lock(m_EnvironmentLock)
                     {
-                        m_SunData.SunPhase = m_SunData.FixedSunPhase % (2 * Math.PI);
+                        sun_phase = m_SunData.FixedSunPhase % (2 * Math.PI);
                     }
                 }
                 Vector3 sunDirection = new Vector3(Math.Cos(-sun_phase), Math.Sin(-sun_phase), 0);
