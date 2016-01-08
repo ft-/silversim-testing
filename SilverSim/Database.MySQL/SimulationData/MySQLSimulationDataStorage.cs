@@ -32,6 +32,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         readonly MySQLSimulationDataEnvSettingsStorage m_EnvironmentStorage;
         readonly MySQLSimulationDataRegionSettingsStorage m_RegionSettingsStorage;
         readonly MySQLSimulationDataSpawnPointStorage m_SpawnPointStorage;
+        readonly MySQLSimulationDataLightShareStorage m_LightShareStorage;
 
         #region Constructor
         public MySQLSimulationDataStorage(string connectionString)
@@ -44,6 +45,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_EnvironmentStorage = new MySQLSimulationDataEnvSettingsStorage(connectionString);
             m_RegionSettingsStorage = new MySQLSimulationDataRegionSettingsStorage(connectionString);
             m_SpawnPointStorage = new MySQLSimulationDataSpawnPointStorage(connectionString);
+            m_LightShareStorage = new MySQLSimulationDataLightShareStorage(connectionString);
         }
 
         public void Startup(ConfigurationLoader loader)
@@ -53,6 +55,14 @@ namespace SilverSim.Database.MySQL.SimulationData
         #endregion
 
         #region Properties
+        public override SimulationDataLightShareStorageInterface LightShare
+        {
+            get
+            {
+                return m_LightShareStorage;
+            }
+        }
+
         public override SimulationDataSpawnPointStorageInterface Spawnpoints
         {
             get
@@ -127,6 +137,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             m_EnvironmentStorage.ProcessMigrations();
             m_RegionSettingsStorage.ProcessMigrations();
             m_SpawnPointStorage.ProcessMigrations();
+            m_LightShareStorage.ProcessMigrations();
         }
         #endregion
 
@@ -194,6 +205,7 @@ namespace SilverSim.Database.MySQL.SimulationData
             }
 
             Spawnpoints.Remove(regionID);
+            LightShare.Remove(regionID);
         }
 
 

@@ -24,6 +24,11 @@ namespace SilverSim.Scene.ServiceInterfaces.SimulationData
             get;
         }
 
+        public abstract SimulationDataLightShareStorageInterface LightShare
+        {
+            get;
+        }
+
         public abstract SimulationDataObjectStorageInterface Objects
         {
             get;

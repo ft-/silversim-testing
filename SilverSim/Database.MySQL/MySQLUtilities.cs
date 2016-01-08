@@ -13,6 +13,7 @@ using System.IO;
 using SilverSim.Types.Asset;
 using System.Runtime.Serialization;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Scene.Types.SceneEnvironment;
 
 namespace SilverSim.Database.MySQL
 {
@@ -194,9 +195,21 @@ namespace SilverSim.Database.MySQL
                     mysqlparam.AddWithValue("?v_" + kvp.Key + "Blue", ((ColorAlpha)kvp.Value).B);
                     mysqlparam.AddWithValue("?v_" + kvp.Key + "Alpha", ((ColorAlpha)kvp.Value).A);
                 }
+                else if (kvp.Value is EnvironmentController.WLVector4)
+                {
+                    EnvironmentController.WLVector4 vec = (EnvironmentController.WLVector4)kvp.Value;
+                    mysqlparam.AddWithValue("?v_" + kvp.Key + "Red", vec.X);
+                    mysqlparam.AddWithValue("?v_" + kvp.Key + "Green", vec.Y);
+                    mysqlparam.AddWithValue("?v_" + kvp.Key + "Blue", vec.Z);
+                    mysqlparam.AddWithValue("?v_" + kvp.Key + "Value", vec.W);
+                }
                 else if (kvp.Value is bool)
                 {
                     mysqlparam.AddWithValue("?v_" + kvp.Key, (bool)kvp.Value ? 1 : 0);
+                }
+                else if (kvp.Value is UUID || kvp.Value is UUI || kvp.Value is UGI)
+                {
+                    mysqlparam.AddWithValue("?v_" + kvp.Key, kvp.Value.ToString());
                 }
                 else if (kvp.Value is AnArray)
                 {
@@ -475,6 +488,16 @@ namespace SilverSim.Database.MySQL
         #endregion
 
         #region Data parsers
+        public static EnvironmentController.WLVector4 GetWLVector4(this MySqlDataReader dbReader, string prefix)
+        {
+            return new EnvironmentController.WLVector4(
+                (double)dbReader[prefix + "R"],
+                (double)dbReader[prefix + "G"],
+                (double)dbReader[prefix + "B"],
+                (double)dbReader[prefix + "Y"]);
+        }
+
+
         public static AssetFlags GetAssetFlags(this MySqlDataReader dbreader, string prefix)
         {
             uint assetFlags;
