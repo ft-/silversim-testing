@@ -12,19 +12,24 @@ namespace SilverSim.Scene.Types.SceneEnvironment
     public partial class EnvironmentController
     {
         [SuppressMessage("Gendarme.Rules.Performance", "AvoidLargeStructureRule")]
-        public struct SunData
+        public class SunData
         {
-            public UInt64 UsecSinceStart;
-            public UInt32 SecPerDay;
-            public UInt32 SecPerYear;
-            public Vector3 SunDirection;
-            public double SunPhase;
-            public double FixedSunPhase;
-            public Vector3 SunAngVelocity;
-            public bool IsSunFixed;
+            public UInt64 UsecSinceStart { get; internal set; }
+            public UInt32 SecPerDay { get; internal set; }
+            public UInt32 SecPerYear { get; internal set; }
+            public Vector3 SunDirection { get; internal set; }
+            public double SunPhase { get; internal set; }
+            public double FixedSunPhase { get; internal set; }
+            public Vector3 SunAngVelocity { get; internal set; }
+            public bool IsSunFixed { get; internal set; }
+
+            public SunData()
+            {
+
+            }
         }
 
-        SunData m_SunData = new SunData();
+        readonly SunData m_SunData = new SunData();
 
         public Vector3 SunDirection
         {
