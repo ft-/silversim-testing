@@ -116,6 +116,10 @@ namespace SilverSim.Scene.Types.Scene
             get
             {
                 RegionOptionFlags flags = 0;
+                if(IsSunFixed)
+                {
+                    flags |= RegionOptionFlags.SunFixed;
+                }
                 if (AllowDamage)
                 {
                     flags |= RegionOptionFlags.AllowDamage;

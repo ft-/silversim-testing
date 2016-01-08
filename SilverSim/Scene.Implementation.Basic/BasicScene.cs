@@ -1240,8 +1240,8 @@ namespace SilverSim.Scene.Implementation.Basic
             res.RedirectGridX = 0;
             res.RedirectGridY = 0;
 #warning Change this to connect to Estate sun setting
-            res.UseEstateSun = true;
-            res.SunHour = Environment.TimeOfDay;
+            res.UseEstateSun = RegionSettings.UseEstateSun;
+            res.SunHour = RegionSettings.SunPosition;
             res.ProductSKU = VersionInfo.SimulatorVersion;
             res.ProductName = ProductName;
             res.RegionFlagsExtended.Add((ulong)(RegionSettings.AsFlags | estateFlags));

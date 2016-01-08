@@ -385,7 +385,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            #region Update of sun direction
+#region Update of sun direction
             /* source of algorithm is secondlifescripters mailing list */
             double AverageSunTilt = -0.25 * Math.PI;
             double SeasonalSunTilt = 0.03 * Math.PI;
@@ -426,7 +426,7 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     lock(this)
                     {
-                        return m_SunData.SunPhase * 12 / Math.PI;
+                        return (m_SunData.SunPhase * 12 / Math.PI) % 24;
                     }
                 }
             }
@@ -435,7 +435,7 @@ namespace SilverSim.Scene.Types.Scene
             {
                 get
                 {
-                    lock(this)
+                    lock (this)
                     {
                         return m_SunData.FixedSunPhase * 12 / Math.PI;
                     }
@@ -444,28 +444,12 @@ namespace SilverSim.Scene.Types.Scene
                 {
                     lock(this)
                     {
-                        m_SunData.FixedSunPhase = value * Math.PI / 12;
+                        m_SunData.FixedSunPhase = (value * Math.PI / 12) % (2 * Math.PI);
                     }
                 }
             }
 
-            public bool IsSunFixed
-            {
-                get
-                {
-                    lock(this)
-                    {
-                        return m_SunData.IsSunFixed;
-                    }
-                }
-                set
-                {
-                    lock(this)
-                    {
-                        m_SunData.IsSunFixed = value;
-                    }
-                }
-            }
+            public bool IsSunFixed { get; set; }
 
             public void UpdateSunDirection()
             {
@@ -473,8 +457,8 @@ namespace SilverSim.Scene.Types.Scene
                 double YearlyOmega;
                 lock (this)
                 {
-                    DailyOmega = 2 / m_SunData.SecPerDay;
-                    YearlyOmega = 2 / (m_SunData.SecPerYear);
+                    DailyOmega = 2f / m_SunData.SecPerDay;
+                    YearlyOmega = 2f / (m_SunData.SecPerYear);
                 }
                 ulong utctime = Date.GetUnixTime();
                 bool sunFixed = m_SunData.IsSunFixed;
@@ -488,7 +472,13 @@ namespace SilverSim.Scene.Types.Scene
                 double yearly_phase = YearlyOmega * utctime;
                 double tilt = AverageSunTilt + SeasonalSunTilt * Math.Sin(yearly_phase);
 
-                m_SunData.SunPhase = sun_phase;
+                if(sunFixed)
+                {
+                    lock(this)
+                    {
+                        m_SunData.SunPhase = m_SunData.FixedSunPhase % (2 * Math.PI);
+                    }
+                }
                 Vector3 sunDirection = new Vector3(Math.Cos(-sun_phase), Math.Sin(-sun_phase), 0);
                 Quaternion tiltRot = new Quaternion(tilt, 1, 0, 0);
 
@@ -505,14 +495,15 @@ namespace SilverSim.Scene.Types.Scene
                 sunVelocity *= (1 / radius);
                 lock (this)
                 {
+                    m_SunData.SunPhase = sun_phase;
                     m_SunData.SunDirection = sunDirection;
                     m_SunData.SunAngVelocity = sunVelocity;
                     m_SunData.UsecSinceStart = utctime * 1000000;
                 }
             }
-            #endregion
+#endregion
 
-            #region Update of Wind Data
+#region Update of Wind Data
             private List<LayerData> CompileWindData(Vector3 basepos)
             {
                 List<LayerData> mlist = new List<LayerData>();
@@ -587,9 +578,9 @@ namespace SilverSim.Scene.Types.Scene
                     }
                 }
             }
-            #endregion
+#endregion
 
-            #region Client-specific update of Windlight Data
+#region Client-specific update of Windlight Data
             public void SendTargetedWindlightProfile(UUID agentID, WindlightSkyData skyData, WindlightWaterData waterData)
             {
                 m_OverrideLightSharePerAgent[agentID] = true;
@@ -609,9 +600,9 @@ namespace SilverSim.Scene.Types.Scene
                     UpdateWindlightProfileToClient(agent);
                 }
             }
-            #endregion
+#endregion
 
-            #region Update of Windlight Data
+#region Update of Windlight Data
             private void UpdateWindlightProfileToClients()
             {
                 GenericMessage m;
@@ -641,9 +632,9 @@ namespace SilverSim.Scene.Types.Scene
 
                 agent.SendMessageAlways(m, m_Scene.ID);
             }
-            #endregion
+#endregion
 
-            #region Viewer time message update
+#region Viewer time message update
             private void SendSimulatorTimeMessageToAllClients()
             {
                 SimulatorViewerTimeMessage m = new SimulatorViewerTimeMessage();
@@ -667,7 +658,7 @@ namespace SilverSim.Scene.Types.Scene
                 m.SecPerDay = m_SunData.SecPerDay;
                 agent.SendMessageAlways(m, m_Scene.ID);
             }
-            #endregion
+#endregion
 
             private void SendToAllClients(Message m)
             {
@@ -821,7 +812,7 @@ namespace SilverSim.Scene.Types.Scene
                 }
             }
 
-            #region Windlight message compiler
+#region Windlight message compiler
             private GenericMessage CompileResetWindlightSettings()
             {
                 GenericMessage m = new GenericMessage();
@@ -936,7 +927,7 @@ namespace SilverSim.Scene.Types.Scene
                 Buffer.BlockCopy(b, 0, mBlock, pos, b.Length);
                 pos += b.Length;
             }
-            #endregion
+#endregion
         }
     }
 }
