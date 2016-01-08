@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Diagnostics.CodeAnalysis;
+using SilverSim.Scene.Types.SceneEnvironment;
 
 namespace SilverSim.Main.Common
 {
@@ -117,6 +118,18 @@ namespace SilverSim.Main.Common
                 {
                     List<Vector3> spawns = loadparams.SimulationDataStorage.Spawnpoints[loadparams.Scene.ID];
                     loadparams.Scene.SpawnPoints = spawns;
+                }
+
+                lock(loadparams.Scene.m_LoaderThreadLock)
+                {
+                    EnvironmentController.WindlightSkyData skyData;
+                    EnvironmentController.WindlightWaterData waterData;
+                    if(loadparams.SimulationDataStorage.LightShare.TryGetValue(loadparams.Scene.ID, out skyData, out waterData))
+                    {
+                        loadparams.Scene.Environment.SkyData = skyData;
+                        loadparams.Scene.Environment.WaterData = waterData;
+                        m_Log.InfoFormat("Loaded LightShare settings for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID);
+                    }
                 }
 
                 lock (loadparams.Scene.m_LoaderThreadLock)
