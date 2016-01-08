@@ -151,6 +151,16 @@ namespace SilverSim.Scene.Types.WindLight
                 }
                 writer.WriteEndElement();
 
+                writer.WriteNamedValue("key", "cloud_scale");
+                writer.WriteStartElement("array");
+                {
+                    writer.WriteNamedValue("real", CloudScale.X);
+                    writer.WriteNamedValue("real", CloudScale.Y);
+                    writer.WriteNamedValue("real", CloudScale.Z);
+                    writer.WriteNamedValue("real", CloudScale.W);
+                }
+                writer.WriteEndElement();
+
                 writer.WriteNamedValue("key", "cloud_scroll_rate");
                 writer.WriteStartElement("array");
                 {

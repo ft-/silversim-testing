@@ -82,8 +82,10 @@ namespace SilverSim.Main.Common
                         loadparams.Scene.EnvironmentSettings = loadparams.SimulationDataStorage.EnvironmentSettings[loadparams.Scene.ID];
                         m_Log.InfoFormat("Loaded environment settings for {0} ({1})", loadparams.Scene.Name, loadparams.Scene.ID);
                     }
-                    catch
+                    catch(Exception e)
                     {
+                        m_Log.ErrorFormat("Failed to load environment settings for {0} ({1}): {2}: {3}\n{4}",
+                            loadparams.Scene.Name, loadparams.Scene.ID, e.GetType().FullName, e.Message, e.StackTrace);
                         loadparams.Scene.EnvironmentSettings = null;
                     }
                 }

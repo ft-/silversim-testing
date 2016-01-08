@@ -204,6 +204,14 @@ namespace SilverSim.Scene.Types.SceneEnvironment
 
             agent.SendMessageAlways(m, m_Scene.ID);
         }
+
+        public void UpdateWindlightProfileToClientNoReset(IAgent agent)
+        {
+            if (m_WindlightValid)
+            {
+                agent.SendMessageAlways(CompileWindlightSettings(m_SkyWindlight, m_WaterWindlight), m_Scene.ID);
+            }
+        }
         #endregion
 
         public void ResetLightShare()
