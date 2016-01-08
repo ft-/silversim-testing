@@ -14,8 +14,8 @@ namespace SilverSim.Scene.Types.SceneEnvironment
     public partial class EnvironmentController
     {
         readonly ReaderWriterLock m_LightShareLock = new ReaderWriterLock();
-        WindlightSkyData m_SkyWindlight = new WindlightSkyData();
-        WindlightWaterData m_WaterWindlight = new WindlightWaterData();
+        WindlightSkyData m_SkyWindlight = WindlightSkyData.Defaults;
+        WindlightWaterData m_WaterWindlight = WindlightWaterData.Defaults;
         readonly RwLockedDictionary<UUID, bool> m_OverrideLightSharePerAgent = new RwLockedDictionary<UUID, bool>();
         bool m_WindlightValid;
 
