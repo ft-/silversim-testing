@@ -143,10 +143,6 @@ namespace SilverSim.Scene.Types.SceneEnvironment
             }
             ulong utctime = Date.GetUnixTime();
             bool sunFixed = m_SunData.IsSunFixed;
-            if (sunFixed)
-            {
-                utctime = 0;
-            }
 
             double daily_phase = DailyOmega * utctime;
             double sun_phase = daily_phase % (2 * Math.PI);
@@ -160,12 +156,21 @@ namespace SilverSim.Scene.Types.SceneEnvironment
                     sun_phase = m_SunData.FixedSunPhase % (2 * Math.PI);
                 }
             }
+
+            lock(m_LightShareLock)
+            {
+                if (m_WindlightValid)
+                {
+                    sun_phase = m_SkyWindlight.SunMoonPosition;
+                }
+            }
+
             Vector3 sunDirection = new Vector3(Math.Cos(-sun_phase), Math.Sin(-sun_phase), 0);
             Quaternion tiltRot = new Quaternion(tilt, 1, 0, 0);
 
             sunDirection *= tiltRot;
             Vector3 sunVelocity = new Vector3(0, 0, DailyOmega);
-            if (sunFixed)
+            if (sunFixed || m_WindlightValid)
             {
                 sunVelocity = Vector3.Zero;
             }
