@@ -30,6 +30,7 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
+                conn.Open();
                 using (MySqlCommand cmd = new MySqlCommand("SELECT * FROM lightshare WHERE RegionID LIKE ?regionid", conn))
                 {
                     cmd.Parameters.AddWithValue("?regionid", regionID.ToString());
@@ -96,6 +97,8 @@ namespace SilverSim.Database.MySQL.SimulationData
         {
             using (MySqlConnection conn = new MySqlConnection(m_ConnectionString))
             {
+                conn.Open();
+
                 Dictionary<string, object> data = new Dictionary<string, object>();
                 data["RegionID"] = regionID;
                 data["Ambient"] = skyData.Ambient;
