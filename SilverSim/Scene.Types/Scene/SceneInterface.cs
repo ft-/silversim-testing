@@ -93,7 +93,7 @@ namespace SilverSim.Scene.Types.Scene
         private static readonly ILog m_Log = LogManager.GetLogger("SCENE");
 
         public readonly RegionSettings RegionSettings = new RegionSettings();
-        protected EstateInfo m_EstateData;
+        protected EstateInfo m_EstateData = new EstateInfo();
         protected readonly object m_EstateDataUpdateLock = new object();
 
         #region Scene Loading fields (do not use for anything else)
