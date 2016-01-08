@@ -459,7 +459,7 @@ namespace SilverSim.Viewer.Core
             scene.RegionSettings.TerrainLowerLimit = float.Parse(req.ParamList[2].FromUTF8Bytes(), CultureInfo.InvariantCulture);
 
             scene.RegionSettings.IsSunFixed = ParamStringToBool(req.ParamList[4]);
-            scene.RegionSettings.SunPosition = double.Parse(req.ParamList[5].FromUTF8Bytes(), CultureInfo.InvariantCulture) - 6;
+            scene.RegionSettings.SunPosition = (double.Parse(req.ParamList[5].FromUTF8Bytes(), CultureInfo.InvariantCulture) - 6).Clamp(0, 24);
             scene.RegionSettings.UseEstateSun = ParamStringToBool(req.ParamList[3]);
             /* 6 is bool estate use global time */
             /* 7 is bool for IsEstateFixedSun */
@@ -813,7 +813,7 @@ namespace SilverSim.Viewer.Core
                 if (param2 != 0)
                 {
                     estate.UseGlobalTime = false;
-                    estate.SunPosition = param2 / 1024.0 - 6;
+                    estate.SunPosition = (param2 / 1024.0 - 6).Clamp(0, 24);
                 }
                 else
                 {
