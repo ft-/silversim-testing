@@ -46,6 +46,7 @@ namespace SilverSim.Main.Common
         /** <summary>only for testing code</summary> */
         public static void LoadSceneSync(this SceneInterface scene, SimulationDataStorageInterface simulationDataStorage)
         {
+            m_Log.Error("Do not use LoadSceneSync in production software");
             lock (scene.m_LoaderThreadLock)
             {
                 if (scene.m_LoaderThread == null && !scene.IsSceneEnabled)
@@ -55,17 +56,22 @@ namespace SilverSim.Main.Common
                     loadparams.SimulationDataStorage = simulationDataStorage;
                     scene.m_LoaderThread = new Thread(LoadSceneThread);
                     /* we put a thread in there for ensuring correct sequence but we do not start it */
-                    LoadSceneThread(loadparams);
+                    LoadSceneMain(loadparams);
                 }
             }
         }
 
-        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
-        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
-        public static void LoadSceneThread(object o)
+        static void LoadSceneThread(object o)
         {
             SceneLoadingParams loadparams = (SceneLoadingParams)o;
             Thread.CurrentThread.Name = "Scene Loading Thread for " + loadparams.Scene.Name + " (" + loadparams.Scene.ID.ToString() + ")";
+            LoadSceneMain(loadparams);
+        }
+
+        [SuppressMessage("Gendarme.Rules.Performance", "AvoidRepetitiveCallsToPropertiesRule")]
+        [SuppressMessage("Gendarme.Rules.Exceptions", "DoNotSwallowErrorsCatchingNonSpecificExceptionsRule")]
+        static void LoadSceneMain(SceneLoadingParams loadparams)
+        {
             List<UUID> parcels;
             try
             {
