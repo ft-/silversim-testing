@@ -166,7 +166,7 @@ namespace SilverSim.Database.MySQL
             {
                 object value = kvp.Value;
                 string key = kvp.Key;
-                Type t = value.GetType();
+                Type t = value != null ? value.GetType() : null;
                 if(t == typeof(Vector3))
                 {
                     Vector3 v = (Vector3)value;
@@ -262,7 +262,7 @@ namespace SilverSim.Database.MySQL
                     first = false;
                 }
 
-                Type t = value.GetType();
+                Type t = value != null ? value.GetType() : null;
                 string key = kvp.Key;
 
                 if (t == typeof(Vector3))
@@ -358,7 +358,7 @@ namespace SilverSim.Database.MySQL
             foreach (KeyValuePair<string, object> kvp in vals)
             {
                 object value = kvp.Value;
-                Type t = value.GetType();
+                Type t = value != null ? value.GetType() : null;
                 string key = kvp.Key;
 
                 if (kvp.Value != null)
@@ -429,7 +429,7 @@ namespace SilverSim.Database.MySQL
             foreach (KeyValuePair<string, object> kvp in vals)
             {
                 object value = kvp.Value;
-                Type t = value.GetType();
+                Type t = value != null ? value.GetType() : null;
                 string key = kvp.Key;
 
                 if (value != null)
@@ -531,7 +531,7 @@ namespace SilverSim.Database.MySQL
         public static UUID GetUUID(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
-            Type t = v.GetType();
+            Type t = v != null ? v.GetType() : null;
             if(t == typeof(Guid))
             {
                 return new UUID((Guid)v);
@@ -548,7 +548,7 @@ namespace SilverSim.Database.MySQL
         public static UUI GetUUI(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
-            Type t = v.GetType();
+            Type t = v != null ? v.GetType() : null;
             if (t == typeof(Guid))
             {
                 return new UUI((Guid)v);
@@ -565,7 +565,7 @@ namespace SilverSim.Database.MySQL
         public static UGI GetUGI(this MySqlDataReader dbReader, string prefix)
         {
             object v = dbReader[prefix];
-            Type t = v.GetType();
+            Type t = v != null ? v.GetType() : null;
             if (t == typeof(Guid))
             {
                 return new UGI((Guid)v);
@@ -636,7 +636,7 @@ namespace SilverSim.Database.MySQL
         public static bool GetBoolean(this MySqlDataReader dbReader, string prefix)
         {
             object o = dbReader[prefix];
-            Type t = o.GetType();
+            Type t = o != null ? o.GetType() : null;
             if(t == typeof(uint))
             {
                 return (uint)o != 0;
@@ -662,7 +662,7 @@ namespace SilverSim.Database.MySQL
         public static byte[] GetBytes(this MySqlDataReader dbReader, string prefix)
         {
             object o = dbReader[prefix];
-            Type t = o.GetType();
+            Type t = o != null ? o.GetType() : null;
             if(t == typeof(DBNull))
             {
                 return new byte[0];
