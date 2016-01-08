@@ -478,6 +478,43 @@ namespace SilverSim.Scene.Implementation.Basic
             SceneFactory myFactory)
         : base(ri.Size.X, ri.Size.Y)
         {
+            if(persistentAssetService == null)
+            {
+                throw new ArgumentNullException("persistentAssetService");
+            }
+            if (gridService == null)
+            {
+                throw new ArgumentNullException("gridService");
+            }
+            if (serverParamService == null)
+            {
+                throw new ArgumentNullException("serverParamService");
+            }
+            if (ri == null)
+            {
+                throw new ArgumentNullException("ri");
+            }
+            if (avatarNameServices == null)
+            {
+                throw new ArgumentNullException("avatarNameServices");
+            }
+            if (simulationDataStorage == null)
+            {
+                throw new ArgumentNullException("simulationDataStorage");
+            }
+            if (estateService == null)
+            {
+                throw new ArgumentNullException("estateService");
+            }
+            if (capabilitiesConfig == null)
+            {
+                throw new ArgumentNullException("capabilitiesConfig");
+            }
+            if (regionStorage == null)
+            {
+                throw new ArgumentNullException("regionStorage");
+            }
+
             m_RestartObject = new RestartObject(this, myFactory, regionStorage);
             ID = ri.ID;
             /* next line is there to break the circular dependencies */
